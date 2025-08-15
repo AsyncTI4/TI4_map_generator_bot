@@ -117,12 +117,12 @@ class Ban extends GameStateSubcommand {
         for (String unit : unitIDs) {
             String faction = unit.split("_")[0];
             String type = unit.split("_")[1];
-            if (type.equalsIgnoreCase("mech")) {
+            if ("mech".equalsIgnoreCase(type)) {
                 game.setStoredValue("bannedMechs", game.getStoredValue("bannedMechs") + "finSep" + faction);
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(), "Successfully banned " + faction + " " + type + ".");
             }
-            if (type.equalsIgnoreCase("flagship")) {
+            if ("flagship".equalsIgnoreCase(type)) {
                 game.setStoredValue("bannedFSs", game.getStoredValue("bannedFSs") + "finSep" + faction);
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(), "Successfully banned " + faction + " " + type + ".");

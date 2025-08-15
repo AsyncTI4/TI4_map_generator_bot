@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 @Documented
 @Retention(RUNTIME)
-@Target({ElementType.METHOD})
+@Target(ElementType.METHOD)
 public @interface ManyModalHandlers {
     ModalHandler[] value();
 }

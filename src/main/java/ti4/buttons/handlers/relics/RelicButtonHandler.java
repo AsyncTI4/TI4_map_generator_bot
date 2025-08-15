@@ -111,12 +111,12 @@ class RelicButtonHandler {
         player.removeExhaustedRelic(relic);
         game.removeRevealedObjective(poID);
         String msg = player.getRepresentation() + " is using _Neuraloop_, purge "
-                + (relic.equals("neuraloop") ? "itself" : Mapper.getRelic(relic).getName())
+                + ("neuraloop".equals(relic) ? "itself" : Mapper.getRelic(relic).getName())
                 + ", to replace the recently revealed objective with a random " + type + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (type.equalsIgnoreCase("stage1")) {
+        if ("stage1".equalsIgnoreCase(type)) {
             RevealPublicObjectiveService.revealS1(game, event, true);
-        } else if (type.equalsIgnoreCase("stage2")) {
+        } else if ("stage2".equalsIgnoreCase(type)) {
             RevealPublicObjectiveService.revealS2(game, event, true);
         } else {
             RevealPublicObjectiveService.revealSO(game, event.getMessageChannel());

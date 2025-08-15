@@ -60,7 +60,7 @@ public class TacticalActionService {
         for (String uhKey : displacedKeys) {
             // Already cleared
             if (!displaced.containsKey(uhKey)) continue;
-            if (uhKey.equals("unk")) {
+            if ("unk".equals(uhKey)) {
                 unkEncountered = true;
                 continue;
             }

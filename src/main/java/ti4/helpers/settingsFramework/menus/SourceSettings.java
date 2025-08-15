@@ -17,7 +17,7 @@ import ti4.service.emoji.SourceEmojis;
 
 // This is a sub-menu
 @Getter
-@JsonIgnoreProperties({"messageId"})
+@JsonIgnoreProperties("messageId")
 public class SourceSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
@@ -189,7 +189,7 @@ public class SourceSettings extends SettingsMenu {
                         .setEphemeral(true)
                         .queue();
             case "Ignis" -> {
-                boolean ignis = getIgnis().isVal();
+                boolean ignis = this.ignis.isVal();
 
                 // Decks with both
                 String relic = ignis ? "relics_baldrick" : "relics_pok";
@@ -215,8 +215,8 @@ public class SourceSettings extends SettingsMenu {
                         .queue();
             }
             case "UnchartSpace", "Absol" -> {
-                boolean abs = getAbsol().isVal();
-                boolean ds = getUnchartedSpace().isVal();
+                boolean abs = absol.isVal();
+                boolean ds = unchartedSpace.isVal();
                 boolean both = abs && ds;
 
                 // Decks with both

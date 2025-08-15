@@ -49,7 +49,7 @@ public class TechDraftItem extends DraftItem {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
             for (var tech : faction.getFactionTech()) {
-                allItems.add(DraftItem.generate(DraftItem.Category.TECH, tech));
+                allItems.add(generate(DraftItem.Category.TECH, tech));
             }
         }
         return allItems;
@@ -69,7 +69,7 @@ public class TechDraftItem extends DraftItem {
                 if (Arrays.asList(results).contains(tech)) {
                     continue;
                 }
-                allItems.add(DraftItem.generate(DraftItem.Category.TECH, tech));
+                allItems.add(generate(DraftItem.Category.TECH, tech));
             }
         }
         return allItems;

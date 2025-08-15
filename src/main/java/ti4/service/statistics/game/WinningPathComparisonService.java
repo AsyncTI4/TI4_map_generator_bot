@@ -38,10 +38,10 @@ public class WinningPathComparisonService {
             if (winningPathCount == 1) {
                 sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳")
                         .append("\n");
-            } else if (winningPathPercent <= .005) {
+            } else if (winningPathPercent <= 0.005) {
                 sb.append("🎉__**Few have traveled your path! We celebrate your boldness!**__🎉")
                         .append("\n");
-            } else if (winningPathPercent <= .01) {
+            } else if (winningPathPercent <= 0.01) {
                 sb.append("🎉__**Who needs a conventional win? Not you!**__🎉").append("\n");
             }
         }

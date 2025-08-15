@@ -83,7 +83,7 @@ public class ExploreService {
                 player.getFaction() + "planetsExplored",
                 game.getStoredValue(player.getFaction() + "planetsExplored") + planetName + "*");
 
-        if (planetName.equalsIgnoreCase("garbozia")) {
+        if ("garbozia".equalsIgnoreCase(planetName)) {
             if (player.hasAbility("distant_suns")) {
                 String reportMessage =
                         """
@@ -281,7 +281,7 @@ public class ExploreService {
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
             return;
         }
-        ExploreService.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
+        resolveExplore(event, cardID, tile, planetName, messageText, player, game);
         if (player.hasTech("pfa")) { // Pre-Fab Arcologies
             PlanetService.refreshPlanet(player, planetName);
             MessageHelper.sendMessageToChannel(
@@ -1047,7 +1047,7 @@ public class ExploreService {
             cardID = cardID == null ? game.drawExplore(Constants.FRONTIER) : cardID;
             String messageText = player.getRepresentation() + (force ? " force" : "") + " explored the "
                     + ExploreEmojis.Frontier + "frontier token in tile " + tile.getPosition() + ":";
-            ExploreService.resolveExplore(event, cardID, tile, null, messageText, player, game);
+            resolveExplore(event, cardID, tile, null, messageText, player, game);
 
             if (player.hasTech("dslaner")) {
                 player.setAtsCount(player.getAtsCount() + 1);
@@ -1168,7 +1168,7 @@ public class ExploreService {
                     entry.getValue().stream().map(ExploreModel::getId).toList();
 
             if (showFullText) {
-                sb.append(index++)
+                sb.append(index)
                         .append("\\. ")
                         .append(emoji)
                         .append(" _")
@@ -1176,6 +1176,7 @@ public class ExploreService {
                         .append("_ (`")
                         .append(String.join("`, `", ids))
                         .append("`)");
+                index++;
                 if (showPercents && ids.size() > 1) {
                     sb.append(" - ").append(formatPercent.format(deckDrawChance * ids.size()));
                 }
@@ -1188,13 +1189,13 @@ public class ExploreService {
                         .append("_ (`")
                         .append(String.join("`, `", ids))
                         .append("`)");
-                if (!entry.getValue()
-                        .getFirst()
-                        .getAttachmentId()
-                        .orElse("nothin")
-                        .equalsIgnoreCase("nothin")) {
-                    if (!entry.getValue().getFirst().getAlias().equalsIgnoreCase("gw")
-                            && !entry.getValue().getFirst().getType().equalsIgnoreCase("frontier")) {
+                if (!"nothin"
+                        .equalsIgnoreCase(
+                                entry.getValue().getFirst().getAttachmentId().orElse("nothin"))) {
+                    if (!"gw".equalsIgnoreCase(entry.getValue().getFirst().getAlias())
+                            && !"frontier"
+                                    .equalsIgnoreCase(
+                                            entry.getValue().getFirst().getType())) {
                         sb.append(" [ATTACHMENT]");
                     }
                 }

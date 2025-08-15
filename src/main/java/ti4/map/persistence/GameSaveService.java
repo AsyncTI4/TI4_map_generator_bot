@@ -1035,7 +1035,7 @@ class GameSaveService {
     }
 
     private static void savePeekedPublicObjectives(
-            Writer writer, final String constant, Map<String, List<String>> peekedPOs) {
+            Writer writer, String constant, Map<String, List<String>> peekedPOs) {
         try {
             writer.write(constant + " ");
 

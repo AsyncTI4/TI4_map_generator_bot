@@ -31,9 +31,9 @@ public class ModalContext extends ListenerContext {
         if (!isValid()) return; // super failed
 
         // Proceed with additional context
-        this.modalID = this.componentID; // ID after checking faction
-        this.messageID = event.getId();
-        this.values = new HashMap<>();
+        modalID = componentID; // ID after checking faction
+        messageID = event.getId();
+        values = new HashMap<>();
         for (ModalMapping mapping : event.getValues()) {
             values.put(mapping.getId(), mapping.getAsString());
         }

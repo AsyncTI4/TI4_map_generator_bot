@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
@@ -774,11 +775,11 @@ public class ConvertTTPGtoAsync {
     }
 
     public static String readFileAsString(String filepath) throws Exception {
-        return new String(Files.readAllBytes(Paths.get(filepath)));
+        return new String(Files.readAllBytes(Paths.get(filepath)), StandardCharsets.UTF_8);
     }
 
     public static String readFileAsString(File file) throws Exception {
-        return new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
+        return new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())), StandardCharsets.UTF_8);
     }
 
     public static JsonNode parse(String source) throws JsonProcessingException {

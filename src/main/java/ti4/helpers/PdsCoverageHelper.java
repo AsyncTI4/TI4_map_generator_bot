@@ -64,13 +64,13 @@ public class PdsCoverageHelper {
 
                         UnitModel model = player.getUnitFromUnitKey(unitKey);
                         if (model == null
-                                || (model.getId().equalsIgnoreCase("xxcha_mech")
+                                || ("xxcha_mech".equalsIgnoreCase(model.getId())
                                         && ButtonHelper.isLawInPlay(game, "articles_war"))) {
                             continue;
                         }
 
                         int tempMod = 0;
-                        if (model.getId().equalsIgnoreCase("bentor_flagship")) {
+                        if ("bentor_flagship".equalsIgnoreCase(model.getId())) {
                             tempMod += player.getNumberOfBluePrints();
                         }
 

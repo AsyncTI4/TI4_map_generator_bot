@@ -99,7 +99,7 @@ public class TileGenerator {
         this.displayType = displayType;
         this.context = context;
         this.focusTile = focusTile;
-        this.isFoWPrivate = isFowModeActive();
+        isFoWPrivate = isFowModeActive();
         this.fowPlayer = fowPlayer != null
                 ? fowPlayer
                 : (event != null
@@ -293,7 +293,7 @@ public class TileGenerator {
                 // ADD HEX BORDERS FOR CONTROL
                 // display type = unlocked forces border style = solid
                 Player controllingPlayer = game.getPlayerThatControlsTile(tile);
-                if ((!game.getHexBorderStyle().equals("off") || displayType == DisplayType.unlocked)
+                if ((!"off".equals(game.getHexBorderStyle()) || displayType == DisplayType.unlocked)
                         && controllingPlayer != null
                         && !isSpiral) {
                     int sideNum = 0;
@@ -304,7 +304,7 @@ public class TileGenerator {
                         }
                         sideNum++;
                     }
-                    if (isFoWPrivate && this.fowPlayer == null) openSides.clear();
+                    if (isFoWPrivate && fowPlayer == null) openSides.clear();
                     String hexBorderStyle = displayType == DisplayType.unlocked ? "solid" : game.getHexBorderStyle();
                     BufferedImage border = DrawingUtil.hexBorder(
                             hexBorderStyle, Mapper.getColor(controllingPlayer.getColor()), openSides);
@@ -419,7 +419,7 @@ public class TileGenerator {
                     drawOnWormhole(tile, tileGraphics, doubleWormholeImage, 0, "b");
                 }
                 if ((ButtonHelper.isLawInPlay(game, "nexus") || ButtonHelper.isLawInPlay(game, "absol_nexus"))
-                        && (tile.getTileID().equals("82b"))
+                        && ("82b".equals(tile.getTileID()))
                         && !(ButtonHelper.isLawInPlay(game, "travel_ban")
                                 || ButtonHelper.isLawInPlay(game, "absol_travelban")) //
                 ) {
@@ -952,8 +952,7 @@ public class TileGenerator {
                         int numberOfDice = coverage.getCount();
                         boolean rerolls = coverage.isHasRerolls();
                         float expectedHits = coverage.getExpected();
-                        if (DrawingUtil.getBlackWhiteFileSuffix(player.getColorID())
-                                .equals("_wht.png")) {
+                        if ("_wht.png".equals(DrawingUtil.getBlackWhiteFileSuffix(player.getColorID()))) {
                             tileGraphics.setColor(Color.WHITE);
                         } else {
                             tileGraphics.setColor(Color.BLACK);
@@ -1094,7 +1093,7 @@ public class TileGenerator {
                         t += traits.contains("cultural") ? "C" : "";
                         t += traits.contains("hazardous") ? "H" : "";
                         t += traits.contains("industrial") ? "I" : "";
-                        if (t.equals("CHI")) {
+                        if ("CHI".equals(t)) {
                             traitFile =
                                     ResourceHelper.getInstance().getPlanetResource("pc_attribute_combo_CHI_big.png");
                         } else {
@@ -1417,7 +1416,7 @@ public class TileGenerator {
             arrow.setColor(Color.BLACK);
 
             if (direction >= 2 && direction <= 4) { // all the south directions
-                arrow.rotate(Math.toRadians(180), imageCenterX, imageCenterY);
+                arrow.rotate(3.141592653589793, imageCenterX, imageCenterY);
                 textOffsetY = 25;
             }
             arrow.drawString(secondaryTile, textOffsetX, textOffsetY);
@@ -1575,8 +1574,7 @@ public class TileGenerator {
                     && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
                 scale = 1.65f;
             }
-            if (unitHolder.getName().equalsIgnoreCase("elysium")
-                    || unitHolder.getName().equalsIgnoreCase("magna")) {
+            if ("elysium".equalsIgnoreCase(unitHolder.getName()) || "magna".equalsIgnoreCase(unitHolder.getName())) {
                 scale = 1.65f;
             }
             if (Constants.MECATOLS.contains(unitHolder.getName())) {
@@ -1605,7 +1603,7 @@ public class TileGenerator {
                             && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
                         scale = 0.53f;
                     }
-                    if (unitHolder.getName().equalsIgnoreCase("elysium")) {
+                    if ("elysium".equalsIgnoreCase(unitHolder.getName())) {
                         scale = 0.50f;
                     }
                     if (Constants.MECATOLS.contains(unitHolder.getName())) {
@@ -1685,7 +1683,7 @@ public class TileGenerator {
                             && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
                         scale = 0.53f;
                     }
-                    if (unitHolder.getName().equalsIgnoreCase("elysium")) {
+                    if ("elysium".equalsIgnoreCase(unitHolder.getName())) {
                         scale = 0.50f;
                     }
                     if (Constants.MECATOLS.contains(unitHolder.getName())) {
@@ -1763,7 +1761,7 @@ public class TileGenerator {
                     continue;
                 }
                 if (unitModel.getPlanetaryShield()) {
-                    return !unitModel.getBaseType().equalsIgnoreCase("mech")
+                    return !"mech".equalsIgnoreCase(unitModel.getBaseType())
                             || !ButtonHelper.isLawInPlay(game, "articles_war");
                 }
             }
@@ -1915,7 +1913,7 @@ public class TileGenerator {
                     tileGraphics.drawImage(doubleWormholeImage, drawX + offsetX, drawY + offsetY, null);
                 }
                 if ((ButtonHelper.isLawInPlay(game, "nexus") || ButtonHelper.isLawInPlay(game, "absol_nexus"))
-                        && (tile.getTileID().equals("82b"))
+                        && ("82b".equals(tile.getTileID()))
                         && !(ButtonHelper.isLawInPlay(game, "travel_ban")
                                 || ButtonHelper.isLawInPlay(game, "absol_travelban"))
                         && (tokenPath.toLowerCase().contains("alpha")

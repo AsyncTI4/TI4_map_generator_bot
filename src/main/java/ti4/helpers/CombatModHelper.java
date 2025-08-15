@@ -52,7 +52,7 @@ public class CombatModHelper {
         List<NamedCombatModifierModel> modifiers = new ArrayList<>();
         HashMap<String, CombatModifierModel> combatModifiers = new HashMap<>(Mapper.getCombatModifiers());
         combatModifiers = new HashMap<>(combatModifiers.entrySet().stream()
-                .filter(entry -> entry.getValue().getForCombatAbility().equals(rollType))
+                .filter(entry -> entry.getValue().getForCombatAbility() == rollType)
                 .filter(entry -> entry.getValue().getType().equals(modifierType))
                 .filter(entry -> !entry.getValue().getApplyToOpponent())
                 .filter(entry -> IsModInScopeForUnits(
@@ -294,7 +294,8 @@ public class CombatModHelper {
                     if (opponentFaction.contains("keleres")) {
                         meetsCondition = player.getTechs().stream()
                                 .map(Mapper::getTech)
-                                .anyMatch(tech -> tech.getFaction().orElse("").equals("keleres"));
+                                .anyMatch(tech ->
+                                        "keleres".equals(tech.getFaction().orElse("")));
                     } else {
                         meetsCondition = player.getTechs().stream()
                                 .map(Mapper::getTech)
@@ -341,23 +342,23 @@ public class CombatModHelper {
                     Entry<UnitModel, Integer> unitByQuantity2 = new ArrayList<>(unitsByQuantity.entrySet()).get(1);
                     String baseType1 = unitByQuantity.getKey().getBaseType();
                     String baseType2 = unitByQuantity2.getKey().getBaseType();
-                    if (baseType1.equalsIgnoreCase("fighter") || baseType2.equalsIgnoreCase("fighter")) {
-                        if (!baseType1.equalsIgnoreCase("fighter")) {
+                    if ("fighter".equalsIgnoreCase(baseType1) || "fighter".equalsIgnoreCase(baseType2)) {
+                        if (!"fighter".equalsIgnoreCase(baseType1)) {
                             meetsCondition = unitByQuantity.getValue() == 2;
                         } else {
                             meetsCondition = unitByQuantity2.getValue() == 2;
                         }
-                    } else if ((baseType1.equalsIgnoreCase("flagship") || baseType1.equalsIgnoreCase("lady"))
-                            && (baseType2.equalsIgnoreCase("flagship") || baseType2.equalsIgnoreCase("lady"))) {
+                    } else if (("flagship".equalsIgnoreCase(baseType1) || "lady".equalsIgnoreCase(baseType1))
+                            && ("flagship".equalsIgnoreCase(baseType2) || "lady".equalsIgnoreCase(baseType2))) {
                         meetsCondition = true;
                     }
                 } else if (unitsByQuantity.size() == 3) {
                     List<Entry<UnitModel, Integer>> entries = new ArrayList<>(unitsByQuantity.entrySet());
                     meetsCondition = entries.stream().limit(3).allMatch(entry -> {
                         String baseType = entry.getKey().getBaseType();
-                        return baseType.equalsIgnoreCase("fighter")
-                                || baseType.equalsIgnoreCase("flagship")
-                                || baseType.equalsIgnoreCase("lady");
+                        return "fighter".equalsIgnoreCase(baseType)
+                                || "flagship".equalsIgnoreCase(baseType)
+                                || "lady".equalsIgnoreCase(baseType);
                     });
                 }
             }
@@ -411,7 +412,7 @@ public class CombatModHelper {
                 }
             }
             case "thalnosPlusOne" -> {
-                if (game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
+                if ("true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"))) {
                     meetsCondition = true;
                 }
             }
@@ -440,12 +441,12 @@ public class CombatModHelper {
                     int ships = 0;
                     for (UnitModel unitM : unitsByQuantity.keySet()) {
                         if (unitM.getIsShip()) {
-                            if (!unitM.getBaseType().equalsIgnoreCase("fighter")) {
+                            if (!"fighter".equalsIgnoreCase(unitM.getBaseType())) {
                                 nonFighter += unitsByQuantity.get(unitM);
                             }
                             ships += unitsByQuantity.get(unitM);
                         } else {
-                            if (unitM.getBaseType().equalsIgnoreCase("infantry")) {
+                            if ("infantry".equalsIgnoreCase(unitM.getBaseType())) {
                                 infantry += unitsByQuantity.get(unitM);
                             }
                         }
@@ -644,7 +645,7 @@ public class CombatModHelper {
                 }
                 default -> {}
             }
-            value *= multiplier * (double) scalingCount;
+            value *= multiplier * scalingCount;
         }
         value = Math.floor(value); // to make sure eg +1 per 2 destroyer doesn't return 2.5 etc
         return (int) value;

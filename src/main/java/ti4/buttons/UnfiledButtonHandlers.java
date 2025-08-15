@@ -164,13 +164,13 @@ public class UnfiledButtonHandlers {
     @ButtonHandler("enableDaneMode_")
     public static void enableDaneMode(ButtonInteractionEvent event, String buttonID, Game game) {
         String mode = buttonID.split("_")[1];
-        boolean enable = buttonID.split("_")[2].equalsIgnoreCase("enable");
+        boolean enable = "enable".equalsIgnoreCase(buttonID.split("_")[2]);
         String message = "Successfully " + buttonID.split("_")[2] + "d the ";
-        if (mode.equalsIgnoreCase("hiddenagenda")) {
+        if ("hiddenagenda".equalsIgnoreCase(mode)) {
             game.setHiddenAgendaMode(enable);
             message += "Hidden Agenda Mode. Nothing more needs to be done.";
         }
-        if (mode.equalsIgnoreCase("minorFactions")) {
+        if ("minorFactions".equalsIgnoreCase(mode)) {
             game.setMinorFactionsMode(enable);
             message += "Minor Factions Mode. ";
             if (enable) {
@@ -180,30 +180,30 @@ public class UnfiledButtonHandlers {
                                 + "after the draft finishes with `/special2 setup_neutral_player`, and you can add 3 infantry to the minor faction planets pretty easily with `/add_units`.";
             }
         }
-        if (mode.equalsIgnoreCase("ageOfExploration")) {
+        if ("ageOfExploration".equalsIgnoreCase(mode)) {
             game.setAgeOfExplorationMode(enable);
             message += "Age of Exploration Mode. Nothing more needs to be done.";
         }
-        if (mode.equalsIgnoreCase("ageOfCommerce")) {
+        if ("ageOfCommerce".equalsIgnoreCase(mode)) {
             game.setAgeOfCommerceMode(enable);
             message += "Age of Commerce Mode. Nothing more needs to be done.";
         }
-        if (mode.equalsIgnoreCase("totalWar")) {
+        if ("totalWar".equalsIgnoreCase(mode)) {
             game.setTotalWarMode(enable);
             message += "Total War Mode. Nothing more needs to be done.";
         }
-        if (mode.equalsIgnoreCase("DangerousWilds")) {
+        if ("DangerousWilds".equalsIgnoreCase(mode)) {
             game.setDangerousWildsMode(enable);
             message += "Dangerous Wilds Mode. Nothing more needs to be done.";
             if (enable) {
                 message += " The game will automatically put down infantry upon the start of every strategy phase.";
             }
         }
-        if (mode.equalsIgnoreCase("CivilizedSociety")) {
+        if ("CivilizedSociety".equalsIgnoreCase(mode)) {
             game.setCivilizedSocietyMode(enable);
             message += "Civilized Society Mode. Nothing more needs to be done.";
         }
-        if (mode.equalsIgnoreCase("AgeOfFighters")) {
+        if ("AgeOfFighters".equalsIgnoreCase(mode)) {
             game.setAgeOfFightersMode(enable);
             message += "Age Of Fighters Mode. Nothing more needs to be done.";
             if (enable) {
@@ -231,7 +231,7 @@ public class UnfiledButtonHandlers {
                 }
             }
         }
-        if (mode.equalsIgnoreCase("StellarAtomics")) {
+        if ("StellarAtomics".equalsIgnoreCase(mode)) {
             if (enable) {
                 game.setStellarAtomicsMode(enable);
                 int poIndex = game.addCustomPO("Stellar Atomics", 0);
@@ -251,7 +251,7 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler(value = "requestAllFollow_", save = false)
     public static void requestAllFollow(ButtonInteractionEvent event, Game game) {
-        if (game.getName().equalsIgnoreCase("fow273")) {
+        if ("fow273".equalsIgnoreCase(game.getName())) {
             event.getMessage()
                     .reply(
                             event.getUser().getAsMention()
@@ -613,7 +613,7 @@ public class UnfiledButtonHandlers {
     public static void useTech(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String tech = buttonID.replace("useTech_", "");
         TechnologyModel techModel = Mapper.getTech(tech);
-        if (!tech.equalsIgnoreCase("st")) {
+        if (!"st".equalsIgnoreCase(tech)) {
             String useMessage =
                     player.getRepresentation() + " used the _" + techModel.getRepresentation(false) + "_ technology.";
             if (game.isShowFullComponentTextEmbeds()) {
@@ -1421,7 +1421,7 @@ public class UnfiledButtonHandlers {
     public static void revealPOStage(ButtonInteractionEvent event, String buttonID, Game game) {
         String stage = buttonID.replace("reveal_stage_", "");
         if ("true".equalsIgnoreCase(game.getStoredValue("forcedScoringOrder"))) {
-            if (game.getPhaseOfGame().equalsIgnoreCase("statusScoring")) {
+            if ("statusScoring".equalsIgnoreCase(game.getPhaseOfGame())) {
                 StringBuilder missingPeople = new StringBuilder();
                 for (Player player : game.getRealPlayers()) {
                     String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
@@ -1478,7 +1478,7 @@ public class UnfiledButtonHandlers {
         if (!game.isOmegaPhaseMode()) {
             StartPhaseService.startStatusHomework(event, game);
         } else {
-            if (revealedObjective != null && revealedObjective.equalsIgnoreCase(Constants.IMPERIUM_REX_ID)) {
+            if (Constants.IMPERIUM_REX_ID.equalsIgnoreCase(revealedObjective)) {
                 EndGameService.secondHalfOfGameEnd(event, game, true, true, false);
             } else {
                 var speakerPlayer = game.getSpeaker();
@@ -1597,7 +1597,7 @@ public class UnfiledButtonHandlers {
                 String poID = buttonID.replace(Constants.PO_SCORING, "");
                 try {
                     int poIndex = Integer.parseInt(poID);
-                    if (!game.getPhaseOfGame().equalsIgnoreCase("action")) {
+                    if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
                         game.setStoredValue(player.getFaction() + "round" + game.getRound() + "PO", "Queued");
                     }
                     game.setStoredValue(player.getFaction() + "queuedPOScore", "" + poIndex);
@@ -1613,12 +1613,12 @@ public class UnfiledButtonHandlers {
             }
         }
         if (!game.getStoredValue("newStatusScoringMode").isEmpty()
-                && !game.getPhaseOfGame().equalsIgnoreCase("action")) {
+                && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             String msg = "Please score objectives.";
             msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
         }
-        if (game.getPhaseOfGame().equalsIgnoreCase("action")) {
+        if ("action".equalsIgnoreCase(game.getPhaseOfGame())) {
             event.getMessage().delete().queue();
         }
     }
@@ -1770,7 +1770,7 @@ public class UnfiledButtonHandlers {
                             message += player2.getRepresentationUnfogged()
                                     + " is the one the game is currently waiting on.";
                         }
-                        if (!game.getPhaseOfGame().equalsIgnoreCase("action")) {
+                        if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
                             game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "Queued");
                         }
                         MessageHelper.sendMessageToChannel(channel, message);
@@ -2465,7 +2465,7 @@ public class UnfiledButtonHandlers {
         }
         facilityID = "facilitynavalbase";
         if (!usedFacilities.contains(facilityID)
-                && (uH.getPlanetTypes().contains("industrial") || tPlanet.equalsIgnoreCase("mr") || uH.isLegendary())) {
+                && (uH.getPlanetTypes().contains("industrial") || "mr".equalsIgnoreCase(tPlanet) || uH.isLegendary())) {
             facilities.add(Buttons.green("addFacility_" + tPlanet + "_" + facilityID + "_dont", "Naval Base"));
         }
         facilityID = "facilitylogisticshub";
@@ -2482,7 +2482,7 @@ public class UnfiledButtonHandlers {
                 break;
             }
         }
-        if (!hasEmbassy && (uH.getPlanetTypes().contains("industrial") || tPlanet.equalsIgnoreCase("mr"))) {
+        if (!hasEmbassy && (uH.getPlanetTypes().contains("industrial") || "mr".equalsIgnoreCase(tPlanet))) {
             facilities.add(Buttons.green("addFacility_" + tPlanet + "_" + facilityID + "_dont", "Embassy"));
         }
         int colonies = 0;
