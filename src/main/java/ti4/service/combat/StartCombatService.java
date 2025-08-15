@@ -1649,7 +1649,7 @@ public class StartCombatService {
                     }
                 }
             }
-            if (!game.getCustomPublicVP().keySet().contains("Control Ordinian")) {
+            if (!game.getCustomPublicVP().containsKey("Control Ordinian")) {
                 Player nekro = game.getPlayerFromColorOrFaction("nekro");
                 if (nekro == p1 || nekro == p2) {
                     String po_name = "Liberate Ordinian";

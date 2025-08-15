@@ -705,7 +705,7 @@ public class ComponentActionHelper {
                                 + " remaining.");
                 String customPOName = "Total War VPs (" + p1.getFaction() + ")";
                 int vp = 1;
-                if (game.getCustomPublicVP().keySet().contains(customPOName)) {
+                if (game.getCustomPublicVP().containsKey(customPOName)) {
                     vp = game.getCustomPublicVP().get(customPOName) + 1;
                     game.removeCustomPO(customPOName);
                 }
