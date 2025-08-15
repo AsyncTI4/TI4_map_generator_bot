@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -70,9 +71,6 @@ public class AutoCompleteProvider {
 
     public static void handleAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
         try {
-            // System.out.println("\nIn handleAutoCompleteEvent: " + event.getName() + " > " + event.getSubcommandName()
-            // + " -> " + event.getFocusedOption().getName() + " :: " + event.getFocusedOption().getValue()); // Debug
-            // line
             resolveAutoCompleteEvent(event);
         } catch (Exception e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(event), "Error in handleAutoCompleteEvent", e);
