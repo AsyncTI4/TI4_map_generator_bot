@@ -88,10 +88,10 @@ public class ButtonHelperModifyUnits {
             UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
             if (unitModel == null) continue;
 
-            if (unitModel.getBaseType().equalsIgnoreCase("warsun") && ButtonHelper.isLawInPlay(game, "schematics")) {
+            if ("warsun".equalsIgnoreCase(unitModel.getBaseType()) && ButtonHelper.isLawInPlay(game, "schematics")) {
                 continue;
             }
-            if (unitModel.getBaseType().equalsIgnoreCase("mech") && spacecannonoffence) {
+            if ("mech".equalsIgnoreCase(unitModel.getBaseType()) && spacecannonoffence) {
                 continue;
             }
             UnitKey unitKey = unitEntry.getKey();
@@ -124,7 +124,7 @@ public class ButtonHelperModifyUnits {
                 String unitName = unitKey.unitName();
                 int totalUnits = unitEntry.getValue();
                 int min = Math.min(totalUnits, hits);
-                if (unitName.equalsIgnoreCase("fighter") && min > 0) {
+                if ("fighter".equalsIgnoreCase(unitName) && min > 0) {
                     msg.append("> Destroyed ")
                             .append(min)
                             .append(" ")
@@ -147,7 +147,7 @@ public class ButtonHelperModifyUnits {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
                 if (unitModel == null) continue;
-                if (unitModel.getBaseType().equalsIgnoreCase("warsun")
+                if ("warsun".equalsIgnoreCase(unitModel.getBaseType())
                         && ButtonHelper.isLawInPlay(game, "schematics")) {
                     continue;
                 }
@@ -196,17 +196,17 @@ public class ButtonHelperModifyUnits {
             int p1SardakkMechHits;
             int p2SardakkMechHits;
             if (p1.getPlanets().contains(planet)) {
-                p2SardakkMechHits = ButtonHelperModifyUnits.autoAssignGroundCombatHits(p2, game, planet, hitP1, event);
-                p1SardakkMechHits = ButtonHelperModifyUnits.autoAssignGroundCombatHits(p1, game, planet, hitP2, event);
+                p2SardakkMechHits = autoAssignGroundCombatHits(p2, game, planet, hitP1, event);
+                p1SardakkMechHits = autoAssignGroundCombatHits(p1, game, planet, hitP2, event);
             } else {
-                p1SardakkMechHits = ButtonHelperModifyUnits.autoAssignGroundCombatHits(p1, game, planet, hitP2, event);
-                p2SardakkMechHits = ButtonHelperModifyUnits.autoAssignGroundCombatHits(p2, game, planet, hitP1, event);
+                p1SardakkMechHits = autoAssignGroundCombatHits(p1, game, planet, hitP2, event);
+                p2SardakkMechHits = autoAssignGroundCombatHits(p2, game, planet, hitP1, event);
             }
             if (p2SardakkMechHits > 0) {
-                ButtonHelperModifyUnits.autoAssignGroundCombatHits(p1, game, planet, p2SardakkMechHits, event);
+                autoAssignGroundCombatHits(p1, game, planet, p2SardakkMechHits, event);
             }
             if (p1SardakkMechHits > 0) {
-                ButtonHelperModifyUnits.autoAssignGroundCombatHits(p2, game, planet, p1SardakkMechHits, event);
+                autoAssignGroundCombatHits(p2, game, planet, p1SardakkMechHits, event);
             }
 
             if (!doesPlayerHaveGfOnPlanet(unitHolder, p2) || !doesPlayerHaveGfOnPlanet(unitHolder, p1)) {
@@ -357,7 +357,7 @@ public class ButtonHelperModifyUnits {
                 int totalUnits = unitEntry.getValue();
                 int min = Math.min(totalUnits, hits);
 
-                if (unitName.equalsIgnoreCase("mech") && min > 0) {
+                if ("mech".equalsIgnoreCase(unitName) && min > 0) {
                     msg.append("> Destroyed ")
                             .append(min)
                             .append(" ")
@@ -496,11 +496,11 @@ public class ButtonHelperModifyUnits {
                 if (unitModel == null
                         || !unitModel.getSustainDamage()
                         || (!unitModel.getIsShip() && !isNomadMechApplicable(player, noMechPowers, unitKey))) continue;
-                if (unitModel.getBaseType().equalsIgnoreCase("warsun") && ButtonHelper.isLawInPlay(game, "schematics"))
+                if ("warsun".equalsIgnoreCase(unitModel.getBaseType()) && ButtonHelper.isLawInPlay(game, "schematics"))
                     continue;
 
                 String unitName = unitKey.unitName();
-                if (!unitName.equalsIgnoreCase("dreadnought") || !player.hasUpgradedUnit("dn2")) continue;
+                if (!"dreadnought".equalsIgnoreCase(unitName) || !player.hasUpgradedUnit("dn2")) continue;
 
                 int damagedUnits = (unitHolder.getUnitDamage() != null)
                         ? unitHolder.getUnitDamage().getOrDefault(unitKey, 0)
@@ -548,11 +548,11 @@ public class ButtonHelperModifyUnits {
                 if (!unitModel.getIsShip() && spaceCannonOffence) {
                     continue;
                 }
-                if (unitModel.getBaseType().equalsIgnoreCase("warsun") && ButtonHelper.isLawInPlay(game, "schematics"))
+                if ("warsun".equalsIgnoreCase(unitModel.getBaseType()) && ButtonHelper.isLawInPlay(game, "schematics"))
                     continue;
                 String unitName = unitKey.unitName();
 
-                if (unitName.equalsIgnoreCase("dreadnought") && player.hasUpgradedUnit("dn2")) continue;
+                if ("dreadnought".equalsIgnoreCase(unitName) && player.hasUpgradedUnit("dn2")) continue;
 
                 // Get damaged units count
                 int damagedUnits = (unitHolder.getUnitDamage() != null)
@@ -633,8 +633,8 @@ public class ButtonHelperModifyUnits {
         for (String thingToHit : assignHitOrder) {
             if (hits <= 0) continue;
 
-            boolean isNraShenanigans = thingToHit.equalsIgnoreCase("nraShenanigans");
-            boolean isRemainingSustains = thingToHit.equalsIgnoreCase("remainingSustains");
+            boolean isNraShenanigans = "nraShenanigans".equalsIgnoreCase(thingToHit);
+            boolean isRemainingSustains = "remainingSustains".equalsIgnoreCase(thingToHit);
             if (isRemainingSustains && numSustains < 1) continue;
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 UnitKey unitKey = unitEntry.getKey();
@@ -655,7 +655,7 @@ public class ButtonHelperModifyUnits {
                 int min = Math.min(effectiveUnits, hits);
                 if (isNraShenanigans
                         && player.getUnitsOwned().contains("naaz_mech_space")
-                        && unitName.equalsIgnoreCase("mech")
+                        && "mech".equalsIgnoreCase(unitName)
                         && min > 0) {
                     hits -= min;
                     repairableUnitsByUnitKey.computeIfPresent(unitKey, (key, value) -> value -= min);
@@ -682,7 +682,7 @@ public class ButtonHelperModifyUnits {
                         stuffNotToSustain = "warsun";
                     }
                     if (!stuffNotToSustain.contains(unitName.toLowerCase())
-                            || (unitName.equalsIgnoreCase("dreadnought") && player.hasUpgradedUnit("dn2"))) {
+                            || ("dreadnought".equalsIgnoreCase(unitName) && player.hasUpgradedUnit("dn2"))) {
                         continue; // Skip to the next unit since these sustains are already handled
                     }
                     hits -= min;
@@ -740,7 +740,7 @@ public class ButtonHelperModifyUnits {
 
                 String unitName = unitKey.unitName();
 
-                if ((unitName.equalsIgnoreCase("mech") || unitName.equalsIgnoreCase("infantry"))
+                if (("mech".equalsIgnoreCase(unitName) || "infantry".equalsIgnoreCase(unitName))
                         && !((ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)
                                         || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)
                                         || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_2", player, tile))
@@ -1112,7 +1112,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
         event.getMessage().delete().queue();
         String devoteOrNo = buttonID.split("_")[3];
-        if (devoteOrNo.equalsIgnoreCase("devote")) {
+        if ("devote".equalsIgnoreCase(devoteOrNo)) {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             CommanderUnlockCheckService.checkPlayer(player, "yin");
         }
@@ -1651,8 +1651,8 @@ public class ButtonHelperModifyUnits {
                     StrategyCardModel scModel =
                             game.getStrategyCardModelByInitiative(sc).orElse(null);
                     if (scModel != null
-                            && (scModel.getBotSCAutomationID().equalsIgnoreCase("pok4construction")
-                                    || scModel.getBotSCAutomationID().equalsIgnoreCase("monuments4construction"))
+                            && ("pok4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())
+                                    || "monuments4construction".equalsIgnoreCase(scModel.getBotSCAutomationID()))
                             && game.getScPlayed().containsKey(sc)) {
                         hasConstruction = true;
                         break;
@@ -1776,7 +1776,7 @@ public class ButtonHelperModifyUnits {
                         + " using a Nightshade Vanguard (Kollecc Mech).");
         AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), unit);
         UnitHolder uh = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        if (unit.equalsIgnoreCase("mech")) {
+        if ("mech".equalsIgnoreCase(unit)) {
             if (uh.getUnitCount(UnitType.Mech, player.getColor()) < 1) {
                 ButtonHelper.deleteTheOneButton(event);
             }
@@ -2184,7 +2184,7 @@ public class ButtonHelperModifyUnits {
     }
 
     private static boolean isNomadMechApplicable(Player player, boolean noMechPowers, UnitKey unitKey) {
-        return unitKey.unitName().equalsIgnoreCase("mech") && player.hasUnit("nomad_mech") && !noMechPowers;
+        return "mech".equalsIgnoreCase(unitKey.unitName()) && player.hasUnit("nomad_mech") && !noMechPowers;
     }
 
     public static List<Button> getContractualObligationsButtons(Game game, Player player) {

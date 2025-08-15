@@ -200,7 +200,7 @@ public class UserLeaveServerListener extends ListenerAdapter {
         try {
             String msg = generateBothelperReport(guild, player, games);
             StringBuilder gs = new StringBuilder();
-            if (!msg.equalsIgnoreCase("dud")) {
+            if (!"dud".equalsIgnoreCase(msg)) {
                 var userSettings = UserSettingsManager.get(player.getId());
                 String prevRecord = userSettings.getTrackRecord();
                 for (Game game : games) {
@@ -216,7 +216,7 @@ public class UserLeaveServerListener extends ListenerAdapter {
                 for (Game game : games) {
                     gs.append(game.getActionsChannel().getJumpUrl()).append("\n");
                 }
-                final String gss = gs.toString();
+                String gss = gs.toString();
                 MessageHelper.sendMessageToChannel(
                         moderationLogChannel,
                         player.getName()

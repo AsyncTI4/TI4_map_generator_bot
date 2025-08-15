@@ -352,7 +352,7 @@ public class CustomHyperlaneService {
 
             for (String cell : cells) {
                 String trimmed = cell.trim();
-                if (!trimmed.equals("0") && !trimmed.equals("1")) return false;
+                if (!"0".equals(trimmed) && !"1".equals(trimmed)) return false;
             }
         }
 
@@ -405,7 +405,7 @@ public class CustomHyperlaneService {
             String[] cols = rows[i].split(",");
             if (cols.length != 6) continue;
 
-            if (cols[i].trim().equals("1")) {
+            if ("1".equals(cols[i].trim())) {
                 return true;
             }
         }

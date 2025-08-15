@@ -194,7 +194,7 @@ class CustomizationOptions extends GameStateSubcommand {
         String hexStyle = event.getOption(Constants.SHOW_HEX_BORDERS, null, OptionMapping::getAsString);
         if (hexStyle != null) {
             hexStyle = hexStyle.toLowerCase();
-            if (hexStyle.equals("dash") || hexStyle.equals("off") || hexStyle.equals("solid")) {
+            if ("dash".equals(hexStyle) || "off".equals(hexStyle) || "solid".equals(hexStyle)) {
                 game.setHexBorderStyle(hexStyle);
             }
         }

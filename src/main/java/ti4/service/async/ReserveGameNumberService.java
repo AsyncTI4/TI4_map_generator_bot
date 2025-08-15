@@ -11,7 +11,7 @@ import ti4.message.BotLogger;
 public class ReserveGameNumberService {
 
     private static final String fileName = "reservedGameNumbers.json";
-    private static List<String> reservedGameCache = null;
+    private static List<String> reservedGameCache;
 
     public static void addReservedGame(String gameNum) {
         List<String> reserved = readReservedList();

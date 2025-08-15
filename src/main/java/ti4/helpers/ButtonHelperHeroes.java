@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.DiceHelper.Die;
@@ -688,8 +687,8 @@ public class ButtonHelperHeroes {
     public static void resolveFlorzenHeroStep1(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
         for (String attachment : getAttachmentsForFlorzenHero(game, player)) {
-            String planet = StringUtils.substringBefore(attachment, "_");
-            String attach = StringUtils.substringAfter(attachment, "_");
+            String planet = substringBefore(attachment, "_");
+            String attach = substringAfter(attachment, "_");
             buttons.add(Buttons.green(
                     "florzenHeroStep2_" + attachment, attach + " on " + Helper.getPlanetRepresentation(planet, game)));
         }
@@ -702,8 +701,8 @@ public class ButtonHelperHeroes {
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         buttonID = buttonID.replace("florzenHeroStep2_", "");
 
-        String planet = StringUtils.substringBefore(buttonID, "_");
-        String attachment = StringUtils.substringAfter(buttonID, "_");
+        String planet = substringBefore(buttonID, "_");
+        String attachment = substringAfter(buttonID, "_");
         List<Button> buttons = new ArrayList<>();
         Tile hs = player.getHomeSystemTile();
         for (UnitHolder uh : hs.getPlanetUnitHolders()) {
@@ -1720,8 +1719,8 @@ public class ButtonHelperHeroes {
     @ButtonHandler("augerHeroSwap.")
     public static void augersHeroSwap(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         buttonID = buttonID.replace("augerHeroSwap.", "");
-        String id = StringUtils.substringAfter(buttonID, ".");
-        String num = StringUtils.substringBefore(buttonID, ".");
+        String id = substringAfter(buttonID, ".");
+        String num = substringBefore(buttonID, ".");
         if ("1".equalsIgnoreCase(num)) {
             game.swapObjectiveOut(1, 0, id);
         } else {
@@ -1896,7 +1895,7 @@ public class ButtonHelperHeroes {
         int n = Integer.parseInt(num);
         List<Button> buttons = new ArrayList<>();
         MessageChannel channel = player.getCorrectChannel();
-        if (!game.getPhaseOfGame().equalsIgnoreCase("action")) {
+        if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             channel = player.getCardsInfoThread();
         }
         for (int x = 0; x < n; x++) {
@@ -1918,7 +1917,7 @@ public class ButtonHelperHeroes {
         String acID = buttonID.replace("cymiaeHeroStep2_", "");
         List<Button> buttons = new ArrayList<>();
         MessageChannel channel = player.getCorrectChannel();
-        if (!game.getPhaseOfGame().equalsIgnoreCase("action")) {
+        if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             channel = player.getCardsInfoThread();
         }
         for (Player p2 : game.getRealPlayers()) {
@@ -1950,7 +1949,7 @@ public class ButtonHelperHeroes {
             return;
         }
         ActionCardHelper.sendActionCardInfo(game, p2, event);
-        if (game.getPhaseOfGame().equalsIgnoreCase("action")) {
+        if ("action".equalsIgnoreCase(game.getPhaseOfGame())) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " has given "
@@ -1961,7 +1960,7 @@ public class ButtonHelperHeroes {
                     player.getRepresentation() + " has given an action card to " + p2.getRepresentation() + ".");
         }
         ButtonHelper.deleteMessage(event);
-        if (p2 != player && game.getPhaseOfGame().equalsIgnoreCase("action")) {
+        if (p2 != player && "action".equalsIgnoreCase(game.getPhaseOfGame())) {
             MessageHelper.sendMessageToChannel(
                     p2.getCardsInfoThread(),
                     "The Voice United, the Cymiae hero, has given "
@@ -2546,7 +2545,7 @@ public class ButtonHelperHeroes {
     public static void yinHeroStart(ButtonInteractionEvent event, Game game) {
         List<Button> buttons = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "yinHeroTarget", null);
         if (game.getTileByPosition("tl") != null
-                && game.getTileByPosition("tl").getTileID().equalsIgnoreCase("82a")) {
+                && "82a".equalsIgnoreCase(game.getTileByPosition("tl").getTileID())) {
             buttons.add(Buttons.green("yinHeroPlanet_lockedmallice", "Invade Mallice"));
         }
         MessageHelper.sendMessageToChannelWithButtons(
@@ -2573,10 +2572,10 @@ public class ButtonHelperHeroes {
     @ButtonHandler("yinHeroPlanet_")
     public static void yinHeroPlanet(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String planet = buttonID.replace("yinHeroPlanet_", "");
-        if (planet.equalsIgnoreCase("lockedmallice")) {
+        if ("lockedmallice".equalsIgnoreCase(planet)) {
             planet = "mallice";
             FlipTileService.flipTileIfNeeded(event, game.getTileFromPlanet("lockedmallice"), game);
-        } else if (planet.equalsIgnoreCase("hexlockedmallice")) {
+        } else if ("hexlockedmallice".equalsIgnoreCase(planet)) {
             planet = "hexmallice";
             FlipTileService.flipTileIfNeeded(event, game.getTileFromPlanet("hexlockedmallice"), game);
         }

@@ -87,7 +87,7 @@ public class EndTurnService {
         } else {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), mainPlayer.getRepresentation(true, false) + " ended turn.");
-            if (game.getPhaseOfGame().equalsIgnoreCase("statushomework")) {
+            if ("statushomework".equalsIgnoreCase(game.getPhaseOfGame())) {
                 return;
             }
         }
@@ -135,7 +135,7 @@ public class EndTurnService {
                 && !game.getStoredValue("currentActionSummary" + mainPlayer.getFaction())
                         .isEmpty()) {
             for (ThreadChannel summary : game.getActionsChannel().getThreadChannels()) {
-                if (summary.getName().equalsIgnoreCase("Turn Summary")) {
+                if ("Turn Summary".equalsIgnoreCase(summary.getName())) {
                     MessageHelper.sendMessageToChannel(
                             summary,
                             "(Turn " + mainPlayer.getInRoundTurnCount() + ") " + mainPlayer.getFactionEmoji()

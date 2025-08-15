@@ -49,7 +49,7 @@ public class TransactionHelper {
         players.add(p2);
         boolean debtOnly = true;
         MessageChannel channel = p1.getCorrectChannel();
-        if (game.getName().equalsIgnoreCase("pbd1000")) {
+        if ("pbd1000".equalsIgnoreCase(game.getName())) {
             channel = game.getTableTalkChannel();
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
@@ -72,7 +72,7 @@ public class TransactionHelper {
                     String thingToTransact = item.split("_")[2];
                     String furtherDetail = item.split("_")[3];
                     int amountToTransact = 1;
-                    if (((thingToTransact.equalsIgnoreCase("ACs") || thingToTransact.equalsIgnoreCase("PNs"))
+                    if ((("ACs".equalsIgnoreCase(thingToTransact) || "PNs".equalsIgnoreCase(thingToTransact))
                             && furtherDetail.contains("generic"))) {
                         amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
                         furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
@@ -176,8 +176,8 @@ public class TransactionHelper {
                 String thingToTransact = item.split("_")[2];
                 String furtherDetail = item.split("_")[3];
                 int amountToTransact = 1;
-                if (thingToTransact.equalsIgnoreCase("frags")
-                        || ((thingToTransact.equalsIgnoreCase("PNs") || thingToTransact.equalsIgnoreCase("ACs"))
+                if ("frags".equalsIgnoreCase(thingToTransact)
+                        || (("PNs".equalsIgnoreCase(thingToTransact) || "ACs".equalsIgnoreCase(thingToTransact))
                                 && furtherDetail.contains("generic"))) {
                     amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
                     furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
@@ -486,7 +486,7 @@ public class TransactionHelper {
 
     @ButtonHandler(value = "transaction", save = false)
     public static void transaction(Player player, Game game) {
-        List<Button> buttons = TransactionHelper.getPlayersToTransact(game, player);
+        List<Button> buttons = getPlayersToTransact(game, player);
         String message = player.getRepresentation() + ", please choose which player you wish to transact with.";
         if (game.isHiddenAgendaMode() && !game.getPhaseOfGame().toLowerCase().contains("action")) {
             message = player.getRepresentation()
@@ -514,8 +514,8 @@ public class TransactionHelper {
         if (player == p2) {
             opposing = p1;
         }
-        String message = "Current Transaction Offer is:\n"
-                + TransactionHelper.buildTransactionOffer(player, opposing, game, false) + "\n";
+        String message =
+                "Current Transaction Offer is:\n" + buildTransactionOffer(player, opposing, game, false) + "\n";
         String requestOrOffer = "offer";
         if (requesting) {
             requestOrOffer = "request";
@@ -805,7 +805,7 @@ public class TransactionHelper {
         player.addTransactionItem("sending" + player.getFaction() + "_receiving" + modalID.split("_")[1] + "_details_"
                 + thoughts.replace("_", "").replace(",", "").replace("\n", "").replace(" ", "fin777"));
         String message = "Current transaction offer is:\n"
-                + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
+                + buildTransactionOffer(player, opposing, game, false)
                 + "### Click something that you wish to __offer to__ " + opposing.getRepresentation(false, false);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, player, opposing));
@@ -830,7 +830,7 @@ public class TransactionHelper {
         player.addTransactionItem("sending" + modalID.split("_")[1] + "_receiving" + player.getFaction() + "_details_"
                 + thoughts.replace("_", "").replace(",", "").replace("\n", "").replace(" ", "fin777"));
         String message = "Current transaction offer is:\n"
-                + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
+                + buildTransactionOffer(player, opposing, game, false)
                 + "### Click something that you wish to __request from__ " + opposing.getRepresentation(false, false);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, opposing, player));
@@ -845,7 +845,7 @@ public class TransactionHelper {
         Player p1 = game.getPlayerFromColorOrFaction(sender);
         Player p2 = game.getPlayerFromColorOrFaction(receiver);
         if (p1 == null || p2 == null) return;
-        if (item.equalsIgnoreCase("washComms")) {
+        if ("washComms".equalsIgnoreCase(item)) {
             int oldP1Comms = p1.getCommodities();
             int newP1Comms = 0;
             int totalWashPowerP1 = p1.getCommodities() + p1.getTg();
@@ -885,7 +885,7 @@ public class TransactionHelper {
             }
         }
 
-        if ((item.equalsIgnoreCase("tgs") || item.equalsIgnoreCase("Comms"))
+        if (("tgs".equalsIgnoreCase(item) || "Comms".equalsIgnoreCase(item))
                 && p2.getDebtTokenCount(p1.getColor()) > 0
                 && !p2.hasAbility("binding_debts")
                 && !p2.hasAbility("data_recovery")) {
@@ -900,11 +900,11 @@ public class TransactionHelper {
             opposing = p1;
         }
         String message = "Current Transaction Offer is:\n"
-                + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
+                + buildTransactionOffer(player, opposing, game, false)
                 + "### Click something else that you wish to __request from__ " + p1.getRepresentation(false, false);
         if (p1 == player) {
             message = "Current Transaction Offer is:\n"
-                    + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
+                    + buildTransactionOffer(player, opposing, game, false)
                     + "### Click something else that you wish to __offer to__ " + p2.getRepresentation(false, false);
         }
         event.getMessage().delete().queue();
@@ -924,11 +924,11 @@ public class TransactionHelper {
             opposing = p1;
         }
         String message = "Current transaction offer is:\n"
-                + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
+                + buildTransactionOffer(player, opposing, game, false)
                 + "### Click something that you wish to __request from__ " + p1.getRepresentation(false, false);
         if (p1 == player) {
             message = "Current Transaction Offer is:\n"
-                    + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
+                    + buildTransactionOffer(player, opposing, game, false)
                     + "### Click something that you wish to __offer to__ " + p2.getRepresentation(false, false);
         }
         event.getMessage().delete().queue();
@@ -944,7 +944,7 @@ public class TransactionHelper {
         return RandomHelper.isOneInX(1000);
     }
 
-    @ButtonHandler(value = "sendOffer_")
+    @ButtonHandler("sendOffer_")
     public static void sendOffer(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p2 == null) return;
@@ -954,7 +954,7 @@ public class TransactionHelper {
                         + ".");
         if (game.getTableTalkChannel() != null) {
             boolean sentMeme = false;
-            String publicOfferText = TransactionHelper.buildTransactionOffer(player, p2, game, true);
+            String publicOfferText = buildTransactionOffer(player, p2, game, true);
             if (sendMemeInsteadOfText(event, game)) {
                 BufferedImage tradeOfferMeme = TransactionGenerator.drawTradeOfferMeme(game, player, p2);
                 if (tradeOfferMeme != null) {
@@ -1433,7 +1433,7 @@ public class TransactionHelper {
             MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
         } else {
             TextChannel channel = game.getMainGameChannel();
-            if (game.getName().equalsIgnoreCase("pbd1000")) {
+            if ("pbd1000".equalsIgnoreCase(game.getName())) {
                 channel = game.getTableTalkChannel();
             }
             if (oldWay
@@ -1618,7 +1618,7 @@ public class TransactionHelper {
 
     @ButtonHandler("send_")
     public static void send(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        TransactionHelper.resolveSpecificTransButtonPress(game, player, buttonID, event, true);
+        resolveSpecificTransButtonPress(game, player, buttonID, event, true);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1730,7 +1730,7 @@ public class TransactionHelper {
                 return;
             }
         }
-        TransactionHelper.acceptTransactionOffer(p1, player, game, event);
+        acceptTransactionOffer(p1, player, game, event);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1750,7 +1750,7 @@ public class TransactionHelper {
         String player2Color = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(player2Color);
         if (p2 != null) {
-            List<Button> buttons = TransactionHelper.getStuffToTransButtonsOld(game, p2, player);
+            List<Button> buttons = getStuffToTransButtonsOld(game, p2, player);
             String message = p2.getRepresentationUnfogged()
                     + " you have been given something on the condition that you give something in return. Hopefully the player explained what."
                     + " If you don't hand it over, please return what they sent. Use buttons to send something to "
@@ -1767,9 +1767,9 @@ public class TransactionHelper {
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 != null) {
             player.clearTransactionItemsWithPlayer(p2);
-            List<Button> buttons = TransactionHelper.getStuffToTransButtonsOld(game, player, p2);
+            List<Button> buttons = getStuffToTransButtonsOld(game, player, p2);
             if (!game.isFowMode() && game.isNewTransactionMethod()) {
-                buttons = TransactionHelper.getStuffToTransButtonsNew(game, player, player, p2);
+                buttons = getStuffToTransButtonsNew(game, player, player, p2);
                 if (player.getUserSettings().isShowTransactables() && buttonID.startsWith("transactWith_")) {
                     BufferedImage image = TransactionGenerator.drawTransactableStuffImage(player, p2);
                     FileUpload upload = FileUploadService.createFileUpload(image, "transactable_items");
@@ -1779,7 +1779,7 @@ public class TransactionHelper {
             String message = player.getRepresentation(true, false) + ", please choose what you wish to transact with "
                     + p2.getRepresentation(false, false) + ".";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-            TransactionHelper.checkTransactionLegality(game, player, p2);
+            checkTransactionLegality(game, player, p2);
             ButtonHelper.deleteMessage(event);
         }
     }

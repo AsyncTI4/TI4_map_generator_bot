@@ -49,7 +49,7 @@ public class PlayerStatsHelper {
         boolean rand = randomizeLocation;
         PriorityQueue<String> pq = new PriorityQueue<>(Comparator.comparingDouble(pos -> {
             Point positionPoint = PositionMapper.getTilePosition(pos);
-            if (positionPoint == null) return 100000000f;
+            if (positionPoint == null) return 100000000.0f;
             int ring = tileRing(pos);
             Point realPosition = PositionMapper.getScaledTilePosition(game, pos, positionPoint.x, positionPoint.y);
             double distance = realPosition.distance(anchorPt);
