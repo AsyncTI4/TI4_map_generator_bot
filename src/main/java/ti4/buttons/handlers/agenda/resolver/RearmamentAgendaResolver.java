@@ -21,7 +21,7 @@ public class RearmamentAgendaResolver implements AgendaResolver {
     public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         if ("for".equalsIgnoreCase(winner)) {
             for (Player player : game.getRealPlayers()) {
-                String message = player.getRepresentation() + " Use buttons to drop 1 mech on a home system planet.";
+                String message = player.getRepresentation() + ", please place a mech on a planet in your home system.";
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         message,
@@ -42,7 +42,7 @@ public class RearmamentAgendaResolver implements AgendaResolver {
                     }
                 }
             }
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Removed all mechs.");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Replaced all mechs with infantry.");
         }
     }
 }

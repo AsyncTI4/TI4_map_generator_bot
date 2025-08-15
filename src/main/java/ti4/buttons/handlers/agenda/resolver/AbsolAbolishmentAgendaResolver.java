@@ -14,7 +14,7 @@ public class AbsolAbolishmentAgendaResolver implements AgendaResolver {
     @Override
     public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(), "# Abolished the " + Mapper.getAgendaTitleNoCap(winner) + " law");
+                game.getMainGameChannel(), "# Abolished the _" + Mapper.getAgendaTitleNoCap(winner) + "_ law.");
         game.removeLaw(winner);
     }
 }

@@ -22,7 +22,7 @@ public class AbsolConstitutionAgendaResolver implements AgendaResolver {
             for (String law : laws) {
                 game.removeLaw(law);
             }
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# Removed all laws");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# Removed all laws.");
             int counter = 40;
             boolean lawFound = false;
             ArrayList<String> discardedAgendas = new ArrayList<>();
@@ -34,7 +34,8 @@ public class AbsolConstitutionAgendaResolver implements AgendaResolver {
                     lawFound = true;
                     game.putAgendaBackIntoDeckOnTop(id2);
                     AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
-                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Shuffled the found agendas back in");
+                    MessageHelper.sendMessageToChannel(
+                            game.getMainGameChannel(), "Shuffled the found agendas back in.");
                     for (String id3 : discardedAgendas) {
                         game.putAgendaBackIntoDeckOnTop(id3);
                     }
@@ -42,7 +43,7 @@ public class AbsolConstitutionAgendaResolver implements AgendaResolver {
                 } else {
                     discardedAgendas.add(id2);
                     MessageHelper.sendMessageToChannel(
-                            game.getMainGameChannel(), "Found the non-law agenda: " + agendaDetails.getName());
+                            game.getMainGameChannel(), "Found the non-law agenda: _" + agendaDetails.getName() + "_.");
                 }
             }
         }

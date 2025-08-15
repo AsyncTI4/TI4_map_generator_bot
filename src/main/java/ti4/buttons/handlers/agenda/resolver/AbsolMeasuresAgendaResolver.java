@@ -30,7 +30,7 @@ public class AbsolMeasuresAgendaResolver implements AgendaResolver {
                         ActionCardHelper.sendActionCardInfo(game, playerWL, event);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 playerWL.getCardsInfoThread(),
-                                playerWL.getRepresentationUnfogged() + " use buttons to discard",
+                                playerWL.getRepresentationUnfogged() + ", please discard an action card.",
                                 ActionCardHelper.getDiscardActionCardButtons(playerWL, false));
                     } else {
                         ActionCardHelper.sendActionCardInfo(game, playerWL, event);
