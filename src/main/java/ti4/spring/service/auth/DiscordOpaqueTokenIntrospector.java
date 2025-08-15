@@ -51,7 +51,7 @@ public class DiscordOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
             return handleSuccessfulAuthenticate(response, token);
         }
 
-        BotLogger.error(String.format("Discord did not indicate success getting the user token: %s", response.body()));
+        BotLogger.info(String.format("Discord did not indicate success getting the user token: %s", response.body()));
         throw newAuthenticationFailureException();
     }
 
