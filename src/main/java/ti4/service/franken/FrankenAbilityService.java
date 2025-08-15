@@ -32,7 +32,7 @@ public class FrankenAbilityService {
             }
             sb.append("\n");
             player.addAbility(abilityID);
-            if ("cunning".equalsIgnoreCase(abilityID)) {
+            if (abilityID.equalsIgnoreCase("cunning")) {
                 Map<String, GenericCardModel> traps = Mapper.getTraps();
                 for (Map.Entry<String, GenericCardModel> entry : traps.entrySet()) {
                     String key = entry.getKey();
@@ -41,7 +41,7 @@ public class FrankenAbilityService {
                     }
                 }
             }
-            if ("private_fleet".equalsIgnoreCase(abilityID)) {
+            if (abilityID.equalsIgnoreCase("private_fleet")) {
                 String unitID = AliasHandler.resolveUnit("destroyer");
                 player.setUnitCap(unitID, 12);
                 MessageHelper.sendMessageToChannel(
@@ -49,7 +49,7 @@ public class FrankenAbilityService {
                         "Set destroyer max to 12 for " + player.getRepresentation()
                                 + " due to the **Private Fleet** ability.");
             }
-            if ("policies".equalsIgnoreCase(abilityID)) {
+            if (abilityID.equalsIgnoreCase("policies")) {
                 player.removeAbility("policies");
                 player.addAbility("policy_the_people_connect");
                 player.addAbility("policy_the_environment_preserve");
@@ -64,7 +64,7 @@ public class FrankenAbilityService {
                 ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
                 ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
             }
-            if ("industrialists".equalsIgnoreCase(abilityID)) {
+            if (abilityID.equalsIgnoreCase("industrialists")) {
                 String unitID = AliasHandler.resolveUnit("spacedock");
                 player.setUnitCap(unitID, 4);
                 MessageHelper.sendMessageToChannel(
@@ -72,7 +72,7 @@ public class FrankenAbilityService {
                         "Set space dock max to 4 for " + player.getRepresentation()
                                 + " due to the **Industrialists** ability.");
             }
-            if ("teeming".equalsIgnoreCase(abilityID)) {
+            if (abilityID.equalsIgnoreCase("teeming")) {
                 String unitID = AliasHandler.resolveUnit("dreadnought");
                 player.setUnitCap(unitID, 7);
                 unitID = AliasHandler.resolveUnit("mech");
@@ -82,7 +82,7 @@ public class FrankenAbilityService {
                         "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
                                 + " due to the **Teeming** ability.");
             }
-            if ("machine_cult".equalsIgnoreCase(abilityID)) {
+            if (abilityID.equalsIgnoreCase("machine_cult")) {
                 String unitID = AliasHandler.resolveUnit("mech");
                 player.setUnitCap(unitID, 6);
                 MessageHelper.sendMessageToChannel(
@@ -90,17 +90,17 @@ public class FrankenAbilityService {
                         "Set mech unit maximum to 6 for " + player.getRepresentation()
                                 + ", due to their **Machine Cult** ability.");
             }
-            if ("diplomats".equalsIgnoreCase(abilityID)) {
+            if (abilityID.equalsIgnoreCase("diplomats")) {
                 ButtonHelperAbilities.resolveFreePeopleAbility(player.getGame());
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         "Set up **Free People** ability markers. " + player.getRepresentationUnfogged()
                                 + ", any planet with a **Free People** token on it will show up as spendable in your various spends. Once spent, the token will be removed.");
             }
-            if ("the_lady_and_the_lord".equalsIgnoreCase(abilityID)) {
+            if (abilityID.equalsIgnoreCase("the_lady_and_the_lord")) {
                 player.addOwnedUnitByID("ghemina_flagship_lady");
             }
-            if ("ancient_empire".equalsIgnoreCase(abilityID)) {
+            if (abilityID.equalsIgnoreCase("ancient_empire")) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("startAncientEmpire", "Place a Tomb Token"));
                 MessageHelper.sendMessageToChannelWithButtons(

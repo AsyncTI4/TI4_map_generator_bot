@@ -16,7 +16,7 @@ import ti4.service.info.TechInfoService;
 
 abstract class FactionTechAddRemove extends GameStateSubcommand {
 
-    protected FactionTechAddRemove(String name, String description) {
+    public FactionTechAddRemove(String name, String description) {
         super(name, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Technology Name")
                 .setRequired(true)

@@ -127,8 +127,8 @@ public enum MiscEmojis implements TI4Emoji {
     }
 
     public static String getTGorNomadCoinEmoji(Game game) {
-        if (game == null) return tg.toString();
-        return game.isNomadCoin() ? NomadCoin.toString() : tg.toString();
+        if (game == null) return MiscEmojis.tg.toString();
+        return game.isNomadCoin() ? MiscEmojis.NomadCoin.toString() : MiscEmojis.tg.toString();
     }
 
     public static String comm(int x) {

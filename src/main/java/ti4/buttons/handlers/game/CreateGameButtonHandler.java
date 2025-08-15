@@ -47,7 +47,7 @@ class CreateGameButtonHandler {
         String gameName = CreateGameService.getNextGameName();
         String lastGame = CreateGameService.getLastGameName();
         Game game;
-        if (!"pbd1".equalsIgnoreCase(lastGame)) {
+        if (!lastGame.equalsIgnoreCase("pbd1")) {
             if (!GameManager.isValid(lastGame)) {
                 BotLogger.warning(
                         new BotLogger.LogMessageOrigin(event),

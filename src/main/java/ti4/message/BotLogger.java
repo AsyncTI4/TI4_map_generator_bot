@@ -4,7 +4,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import lombok.Getter;
-import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -32,12 +31,11 @@ import ti4.map.Player;
 import ti4.selections.SelectionMenuProcessor;
 import ti4.settings.GlobalSettings;
 
-@UtilityClass
 public class BotLogger {
 
-    private static volatile long lastScheduledWebhook;
+    private static volatile long lastScheduledWebhook = 0;
     private static final Object lastScheduledWebhookLock = new Object();
-    private static final long DISCORD_RATE_LIMIT = 50; // Min time in millis between discord webhook messages
+    public static final long DISCORD_RATE_LIMIT = 50; // Min time in millis between discord webhook messages
 
     /**
      * Sends a message to #bot-log-info in the offending server, else resorting to #bot-log and finally webhook.
@@ -230,7 +228,7 @@ public class BotLogger {
             @Nonnull String message,
             @Nullable Throwable err,
             @Nonnull LogSeverity severity) {
-        TextChannel channel;
+        TextChannel channel = null;
         StringBuilder msg = new StringBuilder();
 
         // **__`2025-01-01 xx:xx:xx.xxx`__** user pressed button blahblahblah
@@ -271,22 +269,19 @@ public class BotLogger {
                 else channel.sendMessage(msgChunk).queue(); // Send message on channel
 
             } else { // Handle error on last send
-                if (origin.getGuild() != null) { // Second check may not be necessary but this is a hotfix.
-                    ThreadArchiveHelper.checkThreadLimitAndArchive(origin.getGuild());
-                } else {
-                    ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
-                }
+                if (origin != null
+                        && origin.getGuild() != null) // Second check may not be necessary but this is a hotfix.
+                ThreadArchiveHelper.checkThreadLimitAndArchive(origin.getGuild());
+                else ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
 
-                if (channel == null) {
-                    scheduleWebhookMessage(msgChunk); // Send message on webhook
-                } else {
+                if (channel == null) scheduleWebhookMessage(msgChunk); // Send message on webhook
+                else
                     channel.sendMessage(msgChunk).queue(m -> m.createThreadChannel("Stack Trace")
                             .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
                             .queue(t -> {
                                 MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(err));
                                 t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
                             }));
-                }
             }
         }
     }
@@ -580,7 +575,7 @@ public class BotLogger {
         if (System.getenv("TESTING") != null || debugMode) {
             // if it's ignored, it's not actionable. Simple
             if (ignoredError(e)) return;
-            error("Encountered REST error", e);
+            BotLogger.error("Encountered REST error", e);
         }
     }
 
@@ -639,68 +634,69 @@ public class BotLogger {
 
         public LogMessageOrigin(@Nonnull Guild guild) {
             this.guild = guild;
-            originTime = DateTimeHelper.getCurrentTimestamp();
+            this.originTime = DateTimeHelper.getCurrentTimestamp();
         }
 
         public LogMessageOrigin(@Nonnull GuildChannel channel) {
             this.channel = channel;
-            guild = channel.getGuild();
-            originTime = DateTimeHelper.getCurrentTimestamp();
+            this.guild = channel.getGuild();
+            this.originTime = DateTimeHelper.getCurrentTimestamp();
         }
 
         public LogMessageOrigin(@Nonnull GenericInteractionCreateEvent event) {
             this.event = event;
             if (event.isFromGuild()) {
-                channel = event.getGuildChannel();
-                guild = event.getGuild();
+                this.channel = event.getGuildChannel();
+                this.guild = event.getGuild();
             } else {
-                warning("LocationSource created from non-guild event. This will not attribute messages.");
+                BotLogger.warning("LocationSource created from non-guild event. This will not attribute messages.");
             }
-            originTime = DateTimeHelper.getCurrentTimestamp();
+            this.originTime = DateTimeHelper.getCurrentTimestamp();
         }
 
         public LogMessageOrigin(@Nonnull Game game) {
             this.game = game;
-            guild = game.getGuild();
-            channel = game.getMainGameChannel();
-            originTime = DateTimeHelper.getCurrentTimestamp();
+            this.guild = game.getGuild();
+            this.channel = game.getMainGameChannel();
+            this.originTime = DateTimeHelper.getCurrentTimestamp();
         }
 
         public LogMessageOrigin(@Nullable Player player) {
             if (player != null) {
                 this.player = player;
-                game = player.getGame();
+                this.game = player.getGame();
             }
             if (game != null) {
-                guild = game.getGuild();
-                channel = game.getMainGameChannel();
+                this.guild = game.getGuild();
+                this.channel = game.getMainGameChannel();
             } else {
-                warning("LocationSource created from player with null game. This will not attribute messages.");
+                BotLogger.warning(
+                        "LocationSource created from player with null game. This will not attribute messages.");
             }
-            originTime = DateTimeHelper.getCurrentTimestamp();
+            this.originTime = DateTimeHelper.getCurrentTimestamp();
         }
 
         public LogMessageOrigin(@Nonnull GenericInteractionCreateEvent event, @Nonnull Game game) {
             this.game = game;
-            guild = game.getGuild();
+            this.guild = game.getGuild();
             this.event = event;
-            if (event.isFromGuild()) channel = event.getGuildChannel();
-            else channel = game.getMainGameChannel();
-            originTime = DateTimeHelper.getCurrentTimestamp();
+            if (event.isFromGuild()) this.channel = event.getGuildChannel();
+            else this.channel = game.getMainGameChannel();
+            this.originTime = DateTimeHelper.getCurrentTimestamp();
         }
 
         public LogMessageOrigin(@Nonnull GenericInteractionCreateEvent event, @Nonnull Player player) {
             this.player = player;
-            game = player.getGame();
-            if (game != null) guild = game.getGuild();
+            this.game = player.getGame();
+            if (game != null) this.guild = game.getGuild();
             this.event = event;
             if (event.isFromGuild()) {
-                channel = event.getGuildChannel();
-                guild = event.getGuild();
+                this.channel = event.getGuildChannel();
+                this.guild = event.getGuild();
             } else {
-                channel = game.getMainGameChannel();
+                this.channel = game.getMainGameChannel();
             }
-            originTime = DateTimeHelper.getCurrentTimestamp();
+            this.originTime = DateTimeHelper.getCurrentTimestamp();
         }
 
         /**
@@ -806,7 +802,7 @@ public class BotLogger {
 
         @Nonnull
         public String getOriginTimeFormatted() {
-            return String.format("**__%s__** ", originTime);
+            return String.format("**__%s__** ", getOriginTime());
         }
     }
 
@@ -844,7 +840,7 @@ public class BotLogger {
             }
 
             if (!this.message.isEmpty()) {
-                message.append(messagePrefix).append(this.message).append("\n");
+                message.append(getMessagePrefix()).append(this.message).append("\n");
             }
 
             message.append("\n");
@@ -879,7 +875,7 @@ public class BotLogger {
 
             SlashCommand(LogMessageOrigin source, Message commandResponse) {
                 super(source);
-                message = commandResponse.getContentDisplay();
+                super.message = commandResponse.getContentDisplay();
             }
         }
     }

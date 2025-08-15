@@ -28,7 +28,7 @@ public class PlanetTypeModel {
                         case HAZARDOUS -> ExploreEmojis.Hazardous;
                         case INDUSTRIAL -> ExploreEmojis.Industrial;
                         case MR -> PlanetEmojis.Mecatol;
-                        case FACTION, NONE, FAKE -> TI4Emoji.getRandomGoodDog(toString());
+                        case FACTION, NONE, FAKE -> TI4Emoji.getRandomGoodDog(this.toString());
                     })
                     .toString();
         }

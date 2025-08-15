@@ -29,7 +29,7 @@ public class FrankenUnitService {
                 sb.append("> ").append(unitID);
                 player.addOwnedUnitByID(unitID);
             }
-            if ("naaz_mech".equalsIgnoreCase(unitID)) {
+            if (unitID.equalsIgnoreCase("naaz_mech")) {
                 player.addOwnedUnitByID("naaz_mech_space");
                 sb.append("> naaz_mech_space");
             }
@@ -49,7 +49,7 @@ public class FrankenUnitService {
             sb.append("\n");
             player.removeOwnedUnitByID(unitID);
 
-            if ("naaz_mech".equalsIgnoreCase(unitID)) {
+            if (unitID.equalsIgnoreCase("naaz_mech")) {
                 player.removeOwnedUnitByID("naaz_mech_space");
             }
         }

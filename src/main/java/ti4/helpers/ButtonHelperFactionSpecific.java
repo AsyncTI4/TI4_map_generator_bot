@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -645,7 +646,7 @@ public class ButtonHelperFactionSpecific {
                 && !player.getFollowedSCs().contains(scNum)
                 && game.getPlayedSCs().contains(scNum)) {
             player.addFollowedSC(scNum, event);
-            resolveVadenSCDebt(player, scNum, game, event);
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
             if (player.getStrategicCC() > 0) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Construction**");
             }
@@ -1207,7 +1208,7 @@ public class ButtonHelperFactionSpecific {
     public static void rohdhnaDeploy(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
 
-        if (!"space".equalsIgnoreCase(planet)) {
+        if (!planet.equalsIgnoreCase("space")) {
             AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "1 mech " + planet);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -1803,7 +1804,7 @@ public class ButtonHelperFactionSpecific {
         String[] fields = buttonID.split("_");
         Player mahactPlayer = game.getPlayer(fields[1]);
         String choice = fields[2];
-        if ("accept".equals(choice)) {
+        if (choice.equals("accept")) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     player.getRepresentation()
@@ -2218,7 +2219,7 @@ public class ButtonHelperFactionSpecific {
             if (hasSpecialUpgrade) {
                 continue;
             }
-            String owner = "jolnar".equalsIgnoreCase(game.getPNOwner("ra").getFaction())
+            String owner = game.getPNOwner("ra").getFaction().equalsIgnoreCase("jolnar")
                     ? "Jol-Nar player"
                     : "_Research Agreement_ owner";
             String msg = p2.getRepresentationUnfogged() + ", the " + owner + " has researched the technology "
@@ -2304,7 +2305,7 @@ public class ButtonHelperFactionSpecific {
 
             String deckType = "industrial";
             List<String> deck = game.getExploreDeck(deckType);
-            String msg2 = capitalize(deckType);
+            String msg2 = StringUtils.capitalize(deckType);
             if (game.getStoredValue("lastExpLookedAt" + player.getFaction() + deckType)
                     .equalsIgnoreCase(deck.getFirst())) {
                 msg2 += " (same as last time)";
@@ -2312,7 +2313,7 @@ public class ButtonHelperFactionSpecific {
             Button transact1 = Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveExp_Look_industrial", msg2);
             deckType = "hazardous";
             deck = game.getExploreDeck(deckType);
-            msg2 = capitalize(deckType);
+            msg2 = StringUtils.capitalize(deckType);
             if (game.getStoredValue("lastExpLookedAt" + player.getFaction() + deckType)
                     .equalsIgnoreCase(deck.getFirst())) {
                 msg2 += " (same as last time)";
@@ -2320,7 +2321,7 @@ public class ButtonHelperFactionSpecific {
             Button transact2 = Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveExp_Look_hazardous", msg2);
             deckType = "cultural";
             deck = game.getExploreDeck(deckType);
-            msg2 = capitalize(deckType);
+            msg2 = StringUtils.capitalize(deckType);
             if (game.getStoredValue("lastExpLookedAt" + player.getFaction() + deckType)
                     .equalsIgnoreCase(deck.getFirst())) {
                 msg2 += " (same as last time)";
@@ -3020,7 +3021,7 @@ public class ButtonHelperFactionSpecific {
         UnitHolder uH = tile.getSpaceUnitHolder();
         uH.addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
         sb.append(" damaged their " + unit + " in ").append(tile.getRepresentation());
-        if ("flagship".equalsIgnoreCase(unit)) {
+        if (unit.equalsIgnoreCase("flagship")) {
             if (player.ownsUnit("belkosea_flagship")) {
                 sb.append(" to produce 1 hit against the opponents non-fighter ships.");
                 ButtonHelperModifyUnits.resolveAssaultCannonNDihmohnCommander(
@@ -3218,7 +3219,7 @@ public class ButtonHelperFactionSpecific {
 
     @ButtonHandler("blindIFFSelection_")
     public static void offerBlindIFFSelection(ButtonInteractionEvent event, String buttonID) {
-        String type = substringBetween(buttonID, "blindIFFSelection_", "~MDL");
+        String type = StringUtils.substringBetween(buttonID, "blindIFFSelection_", "~MDL");
         TextInput position = TextInput.create(Constants.POSITION, "Position for " + type, TextInputStyle.SHORT)
                 .setRequired(true)
                 .build();
@@ -3506,7 +3507,7 @@ public class ButtonHelperFactionSpecific {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 String id = "rohdhnaDeploy_" + unitHolder.getName() + "_" + tile.getPosition();
                 String label;
-                if ("space".equalsIgnoreCase(unitHolder.getName())) {
+                if (unitHolder.getName().equalsIgnoreCase("space")) {
                     label = "Deploy Mech in Space";
                 } else {
                     label = "Deploy Mech on " + Helper.getPlanetRepresentation(unitHolder.getName(), game);

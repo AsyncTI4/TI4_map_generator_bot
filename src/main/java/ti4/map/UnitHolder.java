@@ -46,7 +46,7 @@ public abstract class UnitHolder {
     }
 
     @JsonCreator
-    protected UnitHolder(
+    public UnitHolder(
             @JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
         this.name = name;
         this.holderCenterPosition = holderCenterPosition;
@@ -55,11 +55,11 @@ public abstract class UnitHolder {
     public abstract String getRepresentation(Game game);
 
     public void inheritEverythingFrom(UnitHolder other) {
-        unitsByState.putAll(other.unitsByState);
+        unitsByState.putAll(other.getUnitsByState());
 
-        ccList.addAll(other.ccList);
-        controlList.addAll(other.controlList);
-        tokenList.addAll(other.tokenList);
+        ccList.addAll(other.getCcList());
+        controlList.addAll(other.getControlList());
+        tokenList.addAll(other.getTokenList());
     }
 
     public void addUnit(UnitKey unit, Integer count) {
@@ -285,7 +285,7 @@ public abstract class UnitHolder {
     }
 
     public int getUnitCountForState(UnitKey unitKey, UnitState state) {
-        List<Integer> states = unitsByState.getOrDefault(unitKey, UnitState.emptyList());
+        List<Integer> states = getUnitsByState().getOrDefault(unitKey, UnitState.emptyList());
         if (states.size() <= state.ordinal()) return 0;
         return states.get(state.ordinal());
     }
@@ -345,8 +345,8 @@ public abstract class UnitHolder {
     }
 
     public Point getHolderCenterPosition(Tile tile) {
-        if (Constants.TOKEN_PLANETS.contains(name)) {
-            return Helper.getTokenPlanetCenterPosition(tile, name);
+        if (Constants.TOKEN_PLANETS.contains(this.getName())) {
+            return Helper.getTokenPlanetCenterPosition(tile, this.getName());
         }
         return getHolderCenterPosition();
     }
@@ -364,7 +364,7 @@ public abstract class UnitHolder {
     }
 
     public Map<String, Integer> getUnitAsyncIdsOnHolder(String colorID) {
-        return new HashMap<>(unitsByState.keySet().stream()
+        return new HashMap<>(getUnitsByState().keySet().stream()
                 .filter(uk -> uk.getColorID().equals(Mapper.getColorID(colorID)))
                 .collect(Collectors.toMap(UnitKey::asyncID, this::getUnitCount)));
     }

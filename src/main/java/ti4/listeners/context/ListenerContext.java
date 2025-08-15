@@ -40,9 +40,9 @@ public abstract class ListenerContext {
         return contextIsValid;
     }
 
-    protected ListenerContext(GenericInteractionCreateEvent event, String compID) {
+    public ListenerContext(GenericInteractionCreateEvent event, String compID) {
         this.event = event;
-        componentID = origComponentID = compID;
+        this.componentID = this.origComponentID = compID;
 
         String gameName = GameNameService.getGameNameFromChannel(event);
         game = GameManager.isValid(gameName)
@@ -64,7 +64,7 @@ public abstract class ListenerContext {
                 return;
             }
 
-            if ("button".equals(getContextType())) {
+            if (getContextType().equals("button")) {
                 componentID = componentID.replace("delete_buttons_", "resolveAgendaVote_");
                 game.increaseButtonPressCount();
             }

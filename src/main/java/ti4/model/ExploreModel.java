@@ -36,7 +36,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAlias() {
-        return id;
+        return getId();
     }
 
     public Optional<String> getAttachmentId() {
@@ -54,34 +54,34 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     public String getRepresentation() {
         return String.format(
                 "%s;%s;%s;%s;%s;%s;%s",
-                name,
-                type.toLowerCase(),
+                getName(),
+                getType().toLowerCase(),
                 -1,
-                resolution,
-                text,
+                getResolution(),
+                getText(),
                 getAttachmentId().orElse(""),
-                source);
+                getSource());
     }
 
     public String textRepresentation() {
         StringBuilder sb = new StringBuilder(getTypeEmoji()).append(" ");
         if (source != null) sb.append(source.emoji()).append(" ");
-        sb.append("_").append(name).append("_\n> ");
-        sb.append(text.replaceAll("\n(> )?", "\n> "));
+        sb.append("_").append(getName()).append("_\n> ");
+        sb.append(getText().replaceAll("\n(> )?", "\n> "));
         return sb.toString();
     }
 
     public boolean search(String searchString) {
         searchString = searchString.toLowerCase();
-        return name.toLowerCase().contains(searchString)
-                || text.toLowerCase().contains(searchString)
-                || id.toLowerCase().contains(searchString)
-                || type.toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
+        return getName().toLowerCase().contains(searchString)
+                || getText().toLowerCase().contains(searchString)
+                || getId().toLowerCase().contains(searchString)
+                || getType().toLowerCase().contains(searchString)
+                || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return name + " (" + type + ") [" + source + "]";
+        return getName() + " (" + getType() + ") [" + getSource() + "]";
     }
 
     public MessageEmbed getRepresentationEmbed() {
@@ -90,15 +90,15 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
 
     public MessageEmbed getRepresentationEmbed(boolean includeID, boolean showFlavorText) {
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(getTypeEmoji() + "__" + name + "__" + source.emoji(), null);
+        eb.setTitle(getTypeEmoji() + "__" + getName() + "__" + getSource().emoji(), null);
         eb.setColor(getEmbedColor());
-        eb.setDescription(text);
+        eb.setDescription(getText());
 
         if (includeID) {
             StringBuilder sb = new StringBuilder();
             if (getAttachmentId().isPresent())
                 sb.append("Attachment: ").append(getAttachmentId().get()).append("\n");
-            sb.append("ID: ").append(id).append("  Source: ").append(source);
+            sb.append("ID: ").append(getId()).append("  Source: ").append(getSource());
             eb.setFooter(sb.toString());
         }
 
@@ -110,7 +110,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     }
 
     private Color getEmbedColor() {
-        return switch (type.toLowerCase()) {
+        return switch (getType().toLowerCase()) {
             case "cultural" -> Color.blue;
             case "hazardous" -> Color.red;
             case "industrial" -> Color.green;
@@ -120,7 +120,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     }
 
     private String getTypeEmoji() {
-        return switch (type.toLowerCase()) {
+        return switch (getType().toLowerCase()) {
             case "cultural" -> ExploreEmojis.Cultural.toString();
             case "hazardous" -> ExploreEmojis.Hazardous.toString();
             case "industrial" -> ExploreEmojis.Industrial.toString();

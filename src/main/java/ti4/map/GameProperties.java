@@ -85,7 +85,7 @@ public class GameProperties {
     private boolean showUnitTags;
     private boolean stratPings = true;
     private boolean testBetaFeaturesMode;
-    private boolean showOwnedPNsInPlayerArea;
+    private boolean showOwnedPNsInPlayerArea = false;
     private String hexBorderStyle = "off"; // values are off/dash/solid
     private String textSize = "medium";
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
@@ -165,6 +165,6 @@ public class GameProperties {
 
     // Misc Helpers
     public String getID() {
-        return name;
+        return getName();
     }
 }

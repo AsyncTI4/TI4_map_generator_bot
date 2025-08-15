@@ -14,7 +14,7 @@ public class RespositoryDispatchClientPayload {
     }
 
     public RespositoryDispatchClientPayload() {
-        records = new HashMap<>(1);
+        this.records = new HashMap<>(1);
     }
 
     public void addRecord(String key, String value) {

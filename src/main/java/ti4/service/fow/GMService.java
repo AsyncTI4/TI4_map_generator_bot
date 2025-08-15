@@ -117,7 +117,7 @@ public class GMService {
         if (!game.isFowMode()) return;
 
         String timestamp = "`[" + LocalDateTime.now().format(formatter) + "]` ";
-        String log = timestamp + eventLog + (ping ? " - " + gmPing(game) : "");
+        final String log = timestamp + eventLog + (ping ? " - " + gmPing(game) : "");
         ThreadGetter.getThreadInChannel(
                 getGMChannel(game), game.getName() + ACTIVITY_LOG_THREAD, true, false, threadChannel -> {
                     if (jumpUrl != null) {

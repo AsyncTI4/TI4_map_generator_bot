@@ -51,19 +51,19 @@ public class FrankenItemTest extends BaseTi4Test {
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
             // PoK
-            assert (!"ABILITY:mitosis".equals(card.getAlias()));
-            assert (!"ABILITY:hubris".equals(card.getAlias()));
-            assert (!"ABILITY:fragile".equals(card.getAlias()));
-            assert (!"STARTINGTECH:sardakk".equals(card.getAlias()));
-            assert (!"AGENT:mentakagent".equals(card.getAlias()));
-            assert (!"ABILITY:creuss_gate".equals(card.getAlias()));
+            assert (!card.getAlias().equals("ABILITY:mitosis"));
+            assert (!card.getAlias().equals("ABILITY:hubris"));
+            assert (!card.getAlias().equals("ABILITY:fragile"));
+            assert (!card.getAlias().equals("STARTINGTECH:sardakk"));
+            assert (!card.getAlias().equals("AGENT:mentakagent"));
+            assert (!card.getAlias().equals("ABILITY:creuss_gate"));
 
             // DS
-            assert (!"ABILITY:probability_algorithms".equals(card.getAlias()));
-            assert (!"MECH:kjalengard_mech".equals(card.getAlias()));
-            assert (!"ABILITY:singularity_point".equals(card.getAlias()));
-            assert (!"AGENT:mykomentoriagent".equals(card.getAlias()));
-            assert (!"ABILITY:stealth_insertion".equals(card.getAlias()));
+            assert (!card.getAlias().equals("ABILITY:probability_algorithms"));
+            assert (!card.getAlias().equals("MECH:kjalengard_mech"));
+            assert (!card.getAlias().equals("ABILITY:singularity_point"));
+            assert (!card.getAlias().equals("AGENT:mykomentoriagent"));
+            assert (!card.getAlias().equals("ABILITY:stealth_insertion"));
         }
     }
 }

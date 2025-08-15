@@ -80,7 +80,7 @@ public class MechDraftItem extends DraftItem {
         for (FactionModel faction : factions) {
             var units = faction.getUnits();
             units.removeIf((String unit) -> !"mech".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(generate(Category.MECH, units.getFirst()));
+            allItems.add(DraftItem.generate(Category.MECH, units.getFirst()));
         }
         return allItems;
     }
@@ -101,7 +101,7 @@ public class MechDraftItem extends DraftItem {
             }
             var units = faction.getUnits();
             units.removeIf((String unit) -> !"mech".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(generate(Category.MECH, units.getFirst()));
+            allItems.add(DraftItem.generate(Category.MECH, units.getFirst()));
         }
         return allItems;
     }

@@ -59,7 +59,7 @@ public class Buttons {
             green(Constants.REFRESH_PLANET_INFO, "Planet Info", PlanetEmojis.SemLor);
 
     public static final Button OFFER_PING_OPTIONS_BUTTON =
-            gray("playerPref_personalPingInterval", "Personal Ping Interval");
+            Buttons.gray("playerPref_personalPingInterval", "Personal Ping Interval");
 
     // Map buttons
     public static final Button REFRESH_CARDS_INFO = green("cardsInfo", "Cards Info");
@@ -262,10 +262,10 @@ public class Buttons {
         // Add navigation buttons if more than one page
         if (totalPages > 1) {
             if (currentPage > 1) {
-                persistentAndNav.add(gray(pageButtonId + "_page" + (currentPage - 1), "Previous Page", "⏪"));
+                persistentAndNav.add(Buttons.gray(pageButtonId + "_page" + (currentPage - 1), "Previous Page", "⏪"));
             }
             if (currentPage < totalPages) {
-                persistentAndNav.add(gray(pageButtonId + "_page" + (currentPage + 1), "Next Page", "⏩"));
+                persistentAndNav.add(Buttons.gray(pageButtonId + "_page" + (currentPage + 1), "Next Page", "⏩"));
             }
         }
         if (!persistentAndNav.isEmpty()) {

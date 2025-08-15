@@ -126,7 +126,8 @@ public class ButtonHelperAgents {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String am = buttonID.split("_")[2];
         int amount = Integer.parseInt(am);
-        exhaustAgent("exhaustAgent_toldaragent_startToldarAgent_" + p2.getFaction(), event, game, toldar);
+        ButtonHelperAgents.exhaustAgent(
+                "exhaustAgent_toldaragent_startToldarAgent_" + p2.getFaction(), event, game, toldar);
         int commodities = p2.getCommodities();
         MessageHelper.sendMessageToChannel(
                 p2.getCorrectChannel(),
@@ -344,7 +345,7 @@ public class ButtonHelperAgents {
         String thing = buttonID.split("_")[0];
         String detail = buttonID.replace(thing + "_", "");
         String msg = player.getFactionEmoji() + " exhausted _Synchrony Matrix_ to ready " + detail + ".";
-        if ("agent".equalsIgnoreCase(thing)) {
+        if (thing.equalsIgnoreCase("agent")) {
             String agent = detail;
             Leader playerLeader = player.getLeader(agent).orElse(null);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -359,7 +360,7 @@ public class ButtonHelperAgents {
             }
             RefreshLeaderService.refreshLeader(player, playerLeader, game);
         } else {
-            if ("planet".equalsIgnoreCase(thing)) {
+            if (thing.equalsIgnoreCase("planet")) {
                 player.removeExhaustedAbility(detail);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             } else {

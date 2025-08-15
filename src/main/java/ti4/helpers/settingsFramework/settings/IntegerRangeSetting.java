@@ -38,8 +38,8 @@ public class IntegerRangeSetting extends SettingInterface {
             int delta) {
         super(id, name);
 
-        defaultHigh = this.valHigh = valHigh;
-        defaultLow = this.valLow = valLow;
+        this.defaultHigh = this.valHigh = valHigh;
+        this.defaultLow = this.valLow = valLow;
         this.minHigh = minHigh;
         this.maxHigh = maxHigh;
         this.minLow = minLow;

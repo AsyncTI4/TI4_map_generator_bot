@@ -20,7 +20,7 @@ public class Storage {
     public static final String DELETED_GAMES_PATH = "/deletedmaps/";
     public static final String TTPG_EXPORTS = "/ttpg_exports/";
 
-    private static String resourcePath;
+    private static String resourcePath = null;
 
     private static Font EMOJI_FONT_40;
 
@@ -49,14 +49,14 @@ public class Storage {
 
     public static Font getEmojiFont() {
         if (EMOJI_FONT_40 != null) return EMOJI_FONT_40;
-        return EMOJI_FONT_40 = getEmojiFont(40.0f);
+        return EMOJI_FONT_40 = getEmojiFont(40f);
     }
 
     public static Font getFont8() {
         if (TI_FONT_8 != null) {
             return TI_FONT_8;
         }
-        TI_FONT_8 = getFont(8.0f);
+        TI_FONT_8 = getFont(8f);
         return TI_FONT_8;
     }
 
@@ -64,7 +64,7 @@ public class Storage {
         if (TI_FONT_12 != null) {
             return TI_FONT_12;
         }
-        TI_FONT_12 = getFont(12.0f);
+        TI_FONT_12 = getFont(12f);
         return TI_FONT_12;
     }
 
@@ -72,7 +72,7 @@ public class Storage {
         if (TI_FONT_13 != null) {
             return TI_FONT_13;
         }
-        TI_FONT_13 = getFont(13.0f);
+        TI_FONT_13 = getFont(13f);
         return TI_FONT_13;
     }
 
@@ -80,7 +80,7 @@ public class Storage {
         if (TI_FONT_14 != null) {
             return TI_FONT_14;
         }
-        TI_FONT_14 = getFont(14.0f);
+        TI_FONT_14 = getFont(14f);
         return TI_FONT_14;
     }
 
@@ -88,7 +88,7 @@ public class Storage {
         if (TI_FONT_16 != null) {
             return TI_FONT_16;
         }
-        TI_FONT_16 = getFont(16.0f);
+        TI_FONT_16 = getFont(16f);
         return TI_FONT_16;
     }
 
@@ -96,7 +96,7 @@ public class Storage {
         if (TI_FONT_18 != null) {
             return TI_FONT_18;
         }
-        TI_FONT_18 = getFont(18.0f);
+        TI_FONT_18 = getFont(18f);
         return TI_FONT_18;
     }
 
@@ -104,7 +104,7 @@ public class Storage {
         if (TI_FONT_20 != null) {
             return TI_FONT_20;
         }
-        TI_FONT_20 = getFont(20.0f);
+        TI_FONT_20 = getFont(20f);
         return TI_FONT_20;
     }
 
@@ -112,7 +112,7 @@ public class Storage {
         if (TI_FONT_21 != null) {
             return TI_FONT_21;
         }
-        TI_FONT_21 = getFont(21.0f);
+        TI_FONT_21 = getFont(21f);
         return TI_FONT_21;
     }
 
@@ -120,7 +120,7 @@ public class Storage {
         if (TI_FONT_26 != null) {
             return TI_FONT_26;
         }
-        TI_FONT_26 = getFont(26.0f);
+        TI_FONT_26 = getFont(26f);
         return TI_FONT_26;
     }
 
@@ -128,7 +128,7 @@ public class Storage {
         if (TI_FONT_28 != null) {
             return TI_FONT_28;
         }
-        TI_FONT_28 = getFont(28.0f);
+        TI_FONT_28 = getFont(28f);
         return TI_FONT_28;
     }
 
@@ -136,7 +136,7 @@ public class Storage {
         if (TI_FONT_30 != null) {
             return TI_FONT_30;
         }
-        TI_FONT_30 = getFont(30.0f);
+        TI_FONT_30 = getFont(30f);
         return TI_FONT_30;
     }
 
@@ -144,7 +144,7 @@ public class Storage {
         if (TI_FONT_24 != null) {
             return TI_FONT_24;
         }
-        TI_FONT_24 = getFont(24.0f);
+        TI_FONT_24 = getFont(24f);
         return TI_FONT_24;
     }
 
@@ -152,7 +152,7 @@ public class Storage {
         if (TI_FONT_32 != null) {
             return TI_FONT_32;
         }
-        TI_FONT_32 = getFont(32.0f);
+        TI_FONT_32 = getFont(32f);
         return TI_FONT_32;
     }
 
@@ -160,7 +160,7 @@ public class Storage {
         if (TI_FONT_35 != null) {
             return TI_FONT_35;
         }
-        TI_FONT_35 = getFont(35.0f);
+        TI_FONT_35 = getFont(35f);
         return TI_FONT_35;
     }
 
@@ -168,7 +168,7 @@ public class Storage {
         if (TI_FONT_40 != null) {
             return TI_FONT_40;
         }
-        TI_FONT_40 = getFont(40.0f);
+        TI_FONT_40 = getFont(40f);
         return TI_FONT_40;
     }
 
@@ -176,7 +176,7 @@ public class Storage {
         if (TI_FONT_48 != null) {
             return TI_FONT_48;
         }
-        TI_FONT_48 = getFont(48.0f);
+        TI_FONT_48 = getFont(48f);
         return TI_FONT_48;
     }
 
@@ -184,7 +184,7 @@ public class Storage {
         if (TI_FONT_50 != null) {
             return TI_FONT_50;
         }
-        TI_FONT_50 = getFont(50.0f);
+        TI_FONT_50 = getFont(50f);
         return TI_FONT_50;
     }
 
@@ -192,7 +192,7 @@ public class Storage {
         if (TI_FONT_64 != null) {
             return TI_FONT_64;
         }
-        TI_FONT_64 = getFont(64.0f);
+        TI_FONT_64 = getFont(64f);
         return TI_FONT_64;
     }
 
@@ -200,7 +200,7 @@ public class Storage {
         if (TI_FONT_80 != null) {
             return TI_FONT_80;
         }
-        TI_FONT_80 = getFont(80.0f);
+        TI_FONT_80 = getFont(80f);
         return TI_FONT_80;
     }
 
@@ -208,7 +208,7 @@ public class Storage {
         if (TI_FONT_90 != null) {
             return TI_FONT_90;
         }
-        TI_FONT_90 = getFont(90.0f);
+        TI_FONT_90 = getFont(90f);
         return TI_FONT_90;
     }
 
@@ -216,7 +216,7 @@ public class Storage {
         if (TI_FONT_100 != null) {
             return TI_FONT_100;
         }
-        TI_FONT_100 = getFont(100.0f);
+        TI_FONT_100 = getFont(100f);
         return TI_FONT_100;
     }
 
@@ -224,7 +224,7 @@ public class Storage {
         if (TI_FONT_110 != null) {
             return TI_FONT_110;
         }
-        TI_FONT_110 = getFont(110.0f);
+        TI_FONT_110 = getFont(110f);
         return TI_FONT_110;
     }
 

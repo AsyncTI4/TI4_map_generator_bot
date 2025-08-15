@@ -53,7 +53,7 @@ public class PNDraftItem extends DraftItem {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
             for (String pnID : faction.getPromissoryNotes()) {
-                allItems.add(generate(Category.PN, pnID));
+                allItems.add(DraftItem.generate(Category.PN, pnID));
             }
         }
         return allItems;
@@ -73,7 +73,7 @@ public class PNDraftItem extends DraftItem {
                 if (Arrays.asList(results).contains(pnID)) {
                     continue;
                 }
-                allItems.add(generate(Category.PN, pnID));
+                allItems.add(DraftItem.generate(Category.PN, pnID));
             }
         }
         return allItems;
