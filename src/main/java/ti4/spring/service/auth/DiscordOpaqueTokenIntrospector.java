@@ -35,7 +35,7 @@ public class DiscordOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(ME_ENDPOINT))
-                    .header("Authorization", token)
+                    .header("Authorization", String.format("Bearer %s", token))
                     .build();
 
             HttpResponse<String> response =
