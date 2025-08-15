@@ -57,7 +57,7 @@ public class CircuitBreaker {
 
     public static boolean checkIsOpenAndPostWarningIfTrue(MessageChannel messageChannel) {
         if (open) {
-            Duration durationUntilCircuitCloses = getDurationUtilClose();
+            Duration durationUntilCircuitCloses = CircuitBreaker.getDurationUtilClose();
             MessageHelper.sendMessageToChannel(
                     messageChannel,
                     "The bot is taking a breather. Try again in " + durationUntilCircuitCloses.toMinutes()

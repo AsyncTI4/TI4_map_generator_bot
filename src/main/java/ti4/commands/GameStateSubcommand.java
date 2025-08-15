@@ -11,7 +11,7 @@ public abstract class GameStateSubcommand extends Subcommand {
     private final boolean saveGame;
     private final boolean playerCommand;
 
-    protected GameStateSubcommand(
+    public GameStateSubcommand(
             @NotNull String name, @NotNull String description, boolean saveGame, boolean playerCommand) {
         super(name, description);
         this.saveGame = saveGame;

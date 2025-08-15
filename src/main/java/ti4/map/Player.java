@@ -131,7 +131,7 @@ public class Player extends PlayerProperties {
     public String getDecalFile(String unitType) {
         if (getDecalSet() == null) return null;
         // TODO: Eventually remove if we stop setting values to string literal null, which is not good...
-        if ("null".equals(getDecalSet())) {
+        if (getDecalSet().equals("null")) {
             setDecalSet(null);
             return null;
         }
@@ -207,8 +207,8 @@ public class Player extends PlayerProperties {
                 newTransactionItems.add(item);
             }
         }
-        game.setStoredValue(player.getFaction() + "NothingMessage", "");
-        game.setStoredValue(getFaction() + "NothingMessage", "");
+        getGame().setStoredValue(player.getFaction() + "NothingMessage", "");
+        getGame().setStoredValue(getFaction() + "NothingMessage", "");
         setTransactionItems(newTransactionItems);
     }
 
@@ -397,7 +397,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     @Nullable
     private ThreadChannel getCardsInfoThread(boolean useComplete, boolean createWithQueue) {
-        Game game = this.game;
+        Game game = getGame();
         TextChannel actionsChannel = game.getMainGameChannel();
         if (game.isFowMode() || game.isCommunityMode()) {
             actionsChannel = (TextChannel) getPrivateChannel();
@@ -591,12 +591,12 @@ public class Player extends PlayerProperties {
 
     public boolean hasTheZeroToken() {
         if (hasAbility("telepathic")) {
-            for (Player p : game.getPlayers().values())
+            for (Player p : getGame().getPlayers().values())
                 if (p.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) return false;
             return true;
         } else if (getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
             return true;
-        } else return game.getStoredValue("naaluPNUser").equalsIgnoreCase(getFaction());
+        } else return getGame().getStoredValue("naaluPNUser").equalsIgnoreCase(getFaction());
     }
 
     @JsonIgnore
@@ -628,7 +628,7 @@ public class Player extends PlayerProperties {
      * @param unitIDSubstring The substring to
      * @return true if player owns a unit containing the given substring; false otherwise
      */
-    public boolean ownsUnitSubstring(String unitIDSubstring) {
+    public boolean ownsUnitSubstring(final String unitIDSubstring) {
         return getUnitModels().stream().anyMatch(unit -> unit.getId().contains(unitIDSubstring));
     }
 
@@ -696,7 +696,7 @@ public class Player extends PlayerProperties {
                         + " has more than one of the same unit type.\n> Unit Counts: `" + getUnitsOwnedByBaseType()
                         + "`\n> Units Owned: `"
                         + getUnitsOwned() + "`";
-                if (!game.isFrankenGame()) {
+                if (!getGame().isFrankenGame()) {
                     BotLogger.warning(new BotLogger.LogMessageOrigin(this), message);
                 }
                 return message;
@@ -779,7 +779,8 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasPlayablePromissoryInHand(String pn) {
-        return promissoryNotes.containsKey(pn) && !getPromissoryNotesOwned().contains(pn);
+        return getPromissoryNotes().containsKey(pn)
+                && !getPromissoryNotesOwned().contains(pn);
     }
 
     public void setPromissoryNote(String id) {
@@ -867,7 +868,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public int getMaxSOCount() {
-        int maxSOCount = game.getMaxSOCountPerPlayer();
+        int maxSOCount = getGame().getMaxSOCountPerPlayer();
         if (hasRelic("obsidian")) maxSOCount++;
         if (hasRelic("absol_obsidian")) maxSOCount++;
         if (hasAbility("information_brokers")) maxSOCount++;
@@ -942,8 +943,8 @@ public class Player extends PlayerProperties {
 
     public void setSecretScored(String id) {
         Collection<Integer> values = secretsScored.values();
-        List<Integer> allIDs = game.getPlayers().values().stream()
-                .flatMap(player -> player.secretsScored.values().stream())
+        List<Integer> allIDs = getGame().getPlayers().values().stream()
+                .flatMap(player -> player.getSecretsScored().values().stream())
                 .toList();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier) || allIDs.contains(identifier)) {
@@ -978,8 +979,8 @@ public class Player extends PlayerProperties {
         int ind = getIrf();
         int cult = getCrf();
         int frontier = getUrf();
-        boolean blackMarket = hasAbility("fabrication") || promissoryNotes.containsKey("bmf");
-        boolean exploration = game.isAgeOfExplorationMode();
+        boolean blackMarket = hasAbility("fabrication") || getPromissoryNotes().containsKey("bmf");
+        boolean exploration = getGame().isAgeOfExplorationMode();
 
         int targetToHit = 3;
         if (exploration || blackMarket) targetToHit = 2;
@@ -1054,9 +1055,9 @@ public class Player extends PlayerProperties {
                 }
             }
             if (hasUnit("bentor_mech") && firstTime > 0) {
-                int mechsRemain = 4 - ButtonHelper.getNumberOfUnitsOnTheBoard(game, this, "mech", true);
+                int mechsRemain = 4 - ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), this, "mech", true);
                 List<Button> buttons = new ArrayList<>(
-                        Helper.getPlanetPlaceUnitButtons(this, game, "mech", "placeOneNDone_skipbuild"));
+                        Helper.getPlanetPlaceUnitButtons(this, getGame(), "mech", "placeOneNDone_skipbuild"));
                 String message = getRepresentation()
                         + " due to your mech deploy ability, you may now place a mech on a planet you control.";
                 for (int i = 0; i < firstTime && i < mechsRemain; i++) {
@@ -1088,7 +1089,7 @@ public class Player extends PlayerProperties {
 
     public int getCommoditiesBonus() {
         int bonus = 0;
-        if (game.playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
+        if (getGame().playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
             bonus++;
         }
         if (getAbilities().contains("policy_the_economy_exploit")) {
@@ -1096,14 +1097,14 @@ public class Player extends PlayerProperties {
         }
         if (hasAbility("necrophage")) {
             bonus += ButtonHelper.getNumberOfUnitsOnTheBoard(
-                    game, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), getColor()));
+                    getGame(), Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), getColor()));
         }
         if (getRelics().contains("dynamiscore") || getRelics().contains("absol_dynamiscore")) {
             bonus += 2;
         }
-        if (game.isFacilitiesMode()) {
+        if (getGame().isFacilitiesMode()) {
             for (String planet : getPlanets()) {
-                UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
+                UnitHolder unitHolder = getGame().getUnitHolderFromPlanet(planet);
                 if (unitHolder != null) {
                     for (String token : unitHolder.getTokenList()) {
                         if (token.contains("facility")) {
@@ -1119,7 +1120,7 @@ public class Player extends PlayerProperties {
     }
 
     public int getCommoditiesTotal(boolean old) {
-        return commoditiesTotal;
+        return this.commoditiesTotal;
     }
 
     public void addRelic(String relicID) {
@@ -1142,7 +1143,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public Member getMember() {
-        Game game = this.game;
+        Game game = getGame();
         if (game == null) return null;
         Guild guild = game.getGuild();
         if (guild == null) return null;
@@ -1223,7 +1224,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public String getRepresentation(boolean overrideFow, boolean ping, boolean noColor, boolean noFactionIcon) {
-        Game game = this.game;
+        Game game = getGame();
         boolean privateGame = FoWHelper.isPrivateGame(game);
         if (privateGame && !overrideFow) {
             return ColorEmojis.getColorEmojiWithName(getColor());
@@ -1305,14 +1306,14 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public String fogSafeEmoji() {
-        if (game != null && game.isFowMode())
+        if (getGame() != null && getGame().isFowMode())
             return ColorEmojis.getColorEmoji(getColor()).toString();
         return getFactionEmoji();
     }
 
     @JsonIgnore
     public String getFactionEmojiOrColor() {
-        if (game.isFowMode() || FoWHelper.isPrivateGame(game)) {
+        if (getGame().isFowMode() || FoWHelper.isPrivateGame(getGame())) {
             return ColorEmojis.getColorEmojiWithName(getColor());
         }
         return getFactionEmoji();
@@ -1320,7 +1321,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public String getFactionNameOrColor() {
-        if (game.isFowMode() || FoWHelper.isPrivateGame(game)) {
+        if (getGame().isFowMode() || FoWHelper.isPrivateGame(getGame())) {
             return StringUtils.capitalize(getColor());
         }
         return Mapper.getFaction(getFaction()).getFactionName();
@@ -1328,7 +1329,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public String getColorIfCanSeeStats(Player viewingPlayer) {
-        if (game.isFowMode() && !FoWHelper.canSeeStatsOfPlayer(game, this, viewingPlayer)) {
+        if (getGame().isFowMode() && !FoWHelper.canSeeStatsOfPlayer(getGame(), this, viewingPlayer)) {
             return "???";
         }
         return getColor();
@@ -1455,7 +1456,7 @@ public class Player extends PlayerProperties {
     }
 
     public List<String> getLeaderIDs() {
-        return leaders.stream().map(Leader::getId).toList();
+        return getLeaders().stream().map(Leader::getId).toList();
     }
 
     /**
@@ -1465,7 +1466,7 @@ public class Player extends PlayerProperties {
      */
     public boolean hasExternalAccessToLeader(String leaderID) {
         if (!hasLeader(leaderID) && leaderID.contains("agent") && getLeaderIDs().contains("yssarilagent")) {
-            return game.isLeaderInGame(leaderID);
+            return getGame().isLeaderInGame(leaderID);
         }
         return false;
     }
@@ -1517,7 +1518,7 @@ public class Player extends PlayerProperties {
     @Override
     public String getColor() {
         String color = super.getColor();
-        return (color != null && !"null".equals(color)) ? Mapper.getColorName(color) : "null";
+        return (color != null && !color.equals("null")) ? Mapper.getColorName(color) : "null";
     }
 
     @Override
@@ -1528,7 +1529,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public String getColorID() {
         String color = getColor();
-        return (color != null && !"null".equals(color)) ? Mapper.getColorID(color) : "null";
+        return (color != null && !color.equals("null")) ? Mapper.getColorID(color) : "null";
     }
 
     public void addAllianceMember(String color) {
@@ -1544,14 +1545,14 @@ public class Player extends PlayerProperties {
     }
 
     public void initPNs() {
-        if (game != null
+        if (getGame() != null
                 && getColor() != null
                 && getFaction() != null
                 && Mapper.isValidColor(getColor())
                 && Mapper.isValidFaction(getFaction())) {
             promissoryNotes.clear();
             List<String> promissoryNotes = Mapper.getColorPromissoryNoteIDs(
-                    game, getColor()); // TODO: switch this to an explicit game.getPNSet() DeckModel
+                    getGame(), getColor()); // TODO: switch this to an explicit game.getPNSet() DeckModel
             for (String promissoryNote : promissoryNotes) {
                 if (promissoryNote.endsWith("_an") && hasAbility("hubris")) {
                     continue;
@@ -1594,7 +1595,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public int getPublicVictoryPoints(boolean countCustoms) {
-        Game game = this.game;
+        Game game = getGame();
         Map<String, List<String>> scoredPOs = game.getScoredPublicObjectives();
         int vpCount = 0;
         for (Entry<String, List<String>> scoredPOEntry : scoredPOs.entrySet()) {
@@ -1625,8 +1626,8 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public int getSecretVictoryPoints() {
-        Map<String, Integer> scoredSecrets = secretsScored;
-        for (String id : game.getSoToPoList()) {
+        Map<String, Integer> scoredSecrets = getSecretsScored();
+        for (String id : getGame().getSoToPoList()) {
             scoredSecrets.remove(id);
         }
         return scoredSecrets.size();
@@ -1665,7 +1666,7 @@ public class Player extends PlayerProperties {
     public String gainTG(int count, boolean checkForPillage) {
         String message = gainTG(count);
         if (checkForPillage) {
-            ButtonHelperAbilities.pillageCheck(this, game);
+            ButtonHelperAbilities.pillageCheck(this, getGame());
         }
         return message;
     }
@@ -1675,7 +1676,7 @@ public class Player extends PlayerProperties {
     }
 
     public void addFollowedSC(Integer sc, GenericInteractionCreateEvent event) {
-        Game game = this.game;
+        Game game = getGame();
 
         getFollowedSCs().add(sc);
         if (game != null && game.getActivePlayer() != null) {
@@ -1725,7 +1726,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public int getPnCount() {
-        return (promissoryNotes.size() - getPromissoryNotesInPlayArea().size());
+        return (getPromissoryNotes().size() - getPromissoryNotesInPlayArea().size());
     }
 
     @JsonIgnore
@@ -1755,7 +1756,7 @@ public class Player extends PlayerProperties {
         try {
 
             int min = 100;
-            Game game = this.game;
+            Game game = getGame();
             for (int SC : getSCs()) {
                 if (SC == ButtonHelper.getKyroHeroSC(game)) {
                     min = Math.min(game.getSCList().size() + 1, min);
@@ -1775,10 +1776,10 @@ public class Player extends PlayerProperties {
         if (hasAbility("necrophage") && (getCommoditiesBonus() == 0 || getCommoditiesBase() == 0)) {
             num = Math.clamp(comms, 0, getCommoditiesBase() + 10);
         }
-        if (game.isAgeOfCommerceMode() && comms > 0) {
+        if (getGame().isAgeOfCommerceMode() && comms > 0) {
             num = comms;
         }
-        if ("no".equalsIgnoreCase(getGame().getStoredValue("loadedGame"))) {
+        if (getGame().getStoredValue("loadedGame").equalsIgnoreCase("no")) {
             num = comms;
         }
         super.setCommodities(num);
@@ -1860,8 +1861,8 @@ public class Player extends PlayerProperties {
 
     public boolean controlsMecatol(boolean includeAlliance) {
 
-        if (game.isOrdinianC1Mode()) {
-            Player p2 = ButtonHelper.getPlayerWhoControlsCoatl(game);
+        if (getGame().isOrdinianC1Mode()) {
+            Player p2 = ButtonHelper.getPlayerWhoControlsCoatl(getGame());
             return p2 != null && p2.getFaction().equalsIgnoreCase(getFaction());
         }
         if (includeAlliance) return CollectionUtils.containsAny(getPlanetsAllianceMode(), Constants.MECATOLS);
@@ -1876,7 +1877,7 @@ public class Player extends PlayerProperties {
     public List<String> getPlanetsAllianceMode() {
         List<String> newPlanets = new ArrayList<>(getPlanets());
         if (!"".equalsIgnoreCase(getAllianceMembers())) {
-            for (Player player2 : game.getRealPlayers()) {
+            for (Player player2 : getGame().getRealPlayers()) {
                 if (getAllianceMembers().contains(player2.getFaction())) {
                     newPlanets.addAll(player2.getPlanets());
                 }
@@ -1969,7 +1970,7 @@ public class Player extends PlayerProperties {
         exhaustPlanet("custodiavigilia");
 
         if (getPlanets().contains(Constants.MR)) {
-            Planet mecatolRex = game.getPlanetsInfo().get(Constants.MR);
+            Planet mecatolRex = getGame().getPlanetsInfo().get(Constants.MR);
             if (mecatolRex != null) {
                 PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
                 mecatolRex.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
@@ -1981,7 +1982,7 @@ public class Player extends PlayerProperties {
     public void removeCustodiaVigilia() {
         removePlanet("custodiavigilia");
         if (getPlanets().contains(Constants.MR)) {
-            Planet mecatolRex = game.getPlanetsInfo().get(Constants.MR);
+            Planet mecatolRex = getGame().getPlanetsInfo().get(Constants.MR);
             if (mecatolRex != null) {
                 mecatolRex.setSpaceCannonDieCount(0);
                 mecatolRex.setSpaceCannonHitsOn(0);
@@ -2093,7 +2094,7 @@ public class Player extends PlayerProperties {
     public void addPlanet(String planet) {
         if (!getPlanets().contains(planet)) {
             getPlanets().add(planet);
-            LoreService.showPlanetLore(this, game, planet);
+            LoreService.showPlanetLore(this, getGame(), planet);
         }
     }
 
@@ -2101,7 +2102,7 @@ public class Player extends PlayerProperties {
         if (getPlanets().contains(planet) && !getExhaustedPlanets().contains(planet)) {
             getExhaustedPlanets().add(planet);
         }
-        Game game = this.game;
+        Game game = getGame();
         if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null
                 && game.isAbsolMode()
                 && ButtonHelper.getUnitHolderFromPlanetName(planet, game)
@@ -2313,7 +2314,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public Set<Player> getNeighbouringPlayers(boolean checkEquiv) {
-        Game game = this.game;
+        Game game = getGame();
         Set<Player> adjacentPlayers = new HashSet<>();
         Set<Player> realPlayers = new HashSet<>(
                 game.getPlayers().values().stream().filter(Player::isRealPlayer).toList());
@@ -2399,7 +2400,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public float getTotalResourceValueOfUnits(String type) {
         float count = 0;
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : getGame().getTileMap().values()) {
             count += ButtonHelper.checkValuesOfUnits(this, tile, type);
         }
         return count;
@@ -2408,7 +2409,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public int getTotalHPValueOfUnits(String type) {
         int count = 0;
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : getGame().getTileMap().values()) {
             count += ButtonHelper.checkHPOfUnits(this, tile, type);
         }
         return count;
@@ -2417,19 +2418,19 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public float getTotalCombatValueOfUnits(String type) {
         float count = 0;
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : getGame().getTileMap().values()) {
             count += ButtonHelper.checkCombatValuesOfUnits(this, tile, type);
         }
-        return Math.round(count * 10) / 10.0f;
+        return Math.round(count * 10) / (float) 10.0;
     }
 
     @JsonIgnore
     public float getTotalUnitAbilityValueOfUnits() {
         float count = 0;
-        for (Tile tile : game.getTileMap().values()) {
-            count += ButtonHelper.checkUnitAbilityValuesOfUnits(this, game, tile);
+        for (Tile tile : getGame().getTileMap().values()) {
+            count += ButtonHelper.checkUnitAbilityValuesOfUnits(this, getGame(), tile);
         }
-        return Math.round(count * 10) / 10.0f;
+        return Math.round(count * 10) / (float) 10.0;
     }
 
     @JsonIgnore
@@ -2451,7 +2452,7 @@ public class Player extends PlayerProperties {
         String color = getUserSettings().getPreferredColors().stream()
                 .filter(c -> !ColorChangeHelper.colorIsExclusive(c, this))
                 .findFirst()
-                .orElse(game.getUnusedColorsPreferringBase().stream()
+                .orElse(getGame().getUnusedColorsPreferringBase().stream()
                         .filter(nonExclusive)
                         .findFirst()
                         .map(ColorModel::getName)
@@ -2461,7 +2462,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public boolean isSpeaker() {
-        return game.getSpeakerUserID().equals(getUserID());
+        return getGame().getSpeakerUserID().equals(getUserID());
     }
 
     /**
@@ -2470,10 +2471,10 @@ public class Player extends PlayerProperties {
      */
     @JsonIgnore
     public MessageChannel getCorrectChannel() {
-        if (game.isFowMode()) {
+        if (getGame().isFowMode()) {
             return getPrivateChannel();
         }
-        return game.getMainGameChannel();
+        return getGame().getMainGameChannel();
     }
 
     public String bannerName() {
@@ -2484,7 +2485,7 @@ public class Player extends PlayerProperties {
         if (name.contains("FRANKEN")
                 && getDisplayName() != null
                 && !getDisplayName().isEmpty()
-                && !"null".equalsIgnoreCase(getDisplayName())) {
+                && !getDisplayName().equalsIgnoreCase("null")) {
             return getDisplayName().toUpperCase();
         }
         return name;
@@ -2492,7 +2493,9 @@ public class Player extends PlayerProperties {
 
     public String getFlexibleDisplayName() {
         String name = getFaction();
-        if (getDisplayName() != null && !getDisplayName().isEmpty() && !"null".equals(getDisplayName())) {
+        if (getDisplayName() != null
+                && !getDisplayName().isEmpty()
+                && !getDisplayName().equals("null")) {
             name = getDisplayName();
         }
         return StringUtils.capitalize(name);
@@ -2601,7 +2604,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public Tile getHomeSystemTile() {
-        Game game = this.game;
+        Game game = getGame();
         if (getFaction() == null) {
             return null;
         }
@@ -2637,7 +2640,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public List<Integer> getUnfollowedSCs() {
         List<Integer> unfollowedSCs = new ArrayList<>();
-        for (int sc : game.getPlayedSCsInOrder(this)) {
+        for (int sc : getGame().getPlayedSCsInOrder(this)) {
             if (!hasFollowedSC(sc)) {
                 unfollowedSCs.add(sc);
             }
@@ -2649,7 +2652,7 @@ public class Player extends PlayerProperties {
     public List<Integer> getExhaustedSCs() {
         List<Integer> exhaustedSCs = new ArrayList<>();
         for (int sc : getSCs()) {
-            if (game.getPlayedSCs().contains(sc)) {
+            if (getGame().getPlayedSCs().contains(sc)) {
                 exhaustedSCs.add(sc);
             }
         }
@@ -2662,12 +2665,12 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public List<Player> getOtherRealPlayers() {
-        return game.getRealPlayers().stream().filter(p -> !p.equals(this)).toList();
+        return getGame().getRealPlayers().stream().filter(p -> !p.equals(this)).toList();
     }
 
     @JsonIgnore
     public boolean isActivePlayer() {
-        return equals(game.getActivePlayer());
+        return this.equals(getGame().getActivePlayer());
     }
 
     public void clearDebt(Player player, int count) {
@@ -2677,12 +2680,12 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public boolean isGM() {
-        return game.getPlayersWithGMRole().contains(this);
+        return getGame().getPlayersWithGMRole().contains(this);
     }
 
     @JsonIgnore
     public boolean hasPriorityPosition() {
-        return getPriorityPosition() != -1 && getPriorityPosition() != 0;
+        return this.getPriorityPosition() != -1 && this.getPriorityPosition() != 0;
     }
 
     @Override

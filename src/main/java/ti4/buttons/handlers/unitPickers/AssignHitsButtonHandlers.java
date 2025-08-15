@@ -35,7 +35,7 @@ public class AssignHitsButtonHandlers {
     public static void assignHits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String assignHitsType = getAssignHitsType(game, player);
         boolean combat = assignHitsType.contains("combat");
-        boolean remove = "remove".equals(assignHitsType);
+        boolean remove = assignHitsType.equals("remove");
 
         // Assign hits to single unit
         String regexSingleUnit = UnitPickerHandlerHelper.singleUnitRegex(game, "assignHits");

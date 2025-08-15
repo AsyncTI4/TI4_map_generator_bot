@@ -122,7 +122,7 @@ public class MigrationHelper {
         boolean anyChanged = false;
         for (Player p : game.getPlayers().values()) {
             String rawEmoji = p.getFactionEmojiRaw();
-            if (rawEmoji == null || "null".equals(rawEmoji)) continue;
+            if (rawEmoji == null || rawEmoji.equals("null")) continue;
 
             Emoji e = Emoji.fromFormatted(rawEmoji);
             if (e.getName().equalsIgnoreCase(p.getFaction())) {

@@ -31,7 +31,7 @@ import ti4.map.Player;
 @Documented
 @Retention(RUNTIME)
 @Repeatable(ManyButtonHandlers.class)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD})
 public @interface ButtonHandler {
     String value();
 

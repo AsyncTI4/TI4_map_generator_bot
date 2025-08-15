@@ -152,7 +152,7 @@ public class MiltyService {
                 .filter(f -> specs.factionSources.contains(f.getSource()))
                 .filter(f -> !specs.bannedFactions.contains(f.getAlias()))
                 .filter(f -> !f.getAlias().contains("keleres")
-                        || "keleresm".equals(f.getAlias())) // Limit the pool to only 1 keleres flavor
+                        || f.getAlias().equals("keleresm")) // Limit the pool to only 1 keleres flavor
                 .map(FactionModel::getAlias)
                 .toList());
         List<String> factionDraft = createFactionDraft(specs.numFactions, unbannedFactions, specs.priorityFactions);
@@ -266,7 +266,7 @@ public class MiltyService {
         Integer minLegend = 1, maxLegend = 2;
 
         // other
-        List<MiltyDraftSlice> presetSlices;
+        List<MiltyDraftSlice> presetSlices = null;
 
         public DraftSpec(Game game) {
             this.game = game;
@@ -309,7 +309,7 @@ public class MiltyService {
                             "Setup Failed - Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
                     return;
                 }
-                if ("franken1".equalsIgnoreCase(faction) || "franken2".equalsIgnoreCase(faction)) {
+                if (faction.equalsIgnoreCase("franken1") || faction.equalsIgnoreCase("franken2")) {
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
                             "Setup Failed - Franken1 and Franken2 have issues and should not be used by anyone going forward. Try a different franken number");
@@ -344,7 +344,7 @@ public class MiltyService {
             player.setLeaders(new ArrayList<>());
         }
 
-        if (Source.ComponentSource.miltymod == factionModel.getSource() && !game.isMiltyModMode()) {
+        if (Source.ComponentSource.miltymod.equals(factionModel.getSource()) && !game.isMiltyModMode()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
@@ -371,10 +371,10 @@ public class MiltyService {
         if ("ghost".equals(faction) || "miltymod_ghost".equals(faction)) {
             tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
             String pos = "tr";
-            if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
+            if (positionHS.equalsIgnoreCase("307") || positionHS.equalsIgnoreCase("310")) {
                 pos = "br";
             }
-            if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
+            if (positionHS.equalsIgnoreCase("313") || positionHS.equalsIgnoreCase("316")) {
                 pos = "bl";
             }
             tile = new Tile("51", pos);
@@ -645,10 +645,10 @@ public class MiltyService {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
             }
         }
-        if ("d11".equalsIgnoreCase(hsTile)) {
+        if (hsTile.equalsIgnoreCase("d11")) {
             AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
         }
-        if ("true".equalsIgnoreCase(game.getStoredValue("removeSupports"))) {
+        if (game.getStoredValue("removeSupports").equalsIgnoreCase("true")) {
             player.removeOwnedPromissoryNoteByID(player.getColor() + "_sftt");
             player.removePromissoryNote(player.getColor() + "_sftt");
         }

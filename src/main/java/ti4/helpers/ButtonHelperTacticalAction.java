@@ -87,7 +87,7 @@ public class ButtonHelperTacticalAction {
         if (game.isNaaluAgent()) {
             player = game.getPlayer(game.getActivePlayerID());
         }
-        resetStoredValuesForTacticalAction(game);
+        ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
         game.removeStoredValue("producedUnitCostFor" + player.getFaction());
         String message = player.getRepresentationUnfogged() + ", use buttons to end turn, or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
@@ -546,7 +546,7 @@ public class ButtonHelperTacticalAction {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         List<UnitType> movableFromPlanets = new ArrayList<>(List.of(UnitType.Infantry, UnitType.Mech));
-        boolean remove = "remove".equalsIgnoreCase(moveOrRemove);
+        boolean remove = moveOrRemove.equalsIgnoreCase("remove");
 
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         for (Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {

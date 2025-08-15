@@ -166,18 +166,18 @@ public class GameSettings extends SettingsMenu {
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
     private String preset444() {
-        pointTotal.setVal(12);
-        stage1s.setVal(4);
-        stage2s.setVal(4);
-        secrets.setVal(4);
+        this.pointTotal.setVal(12);
+        this.stage1s.setVal(4);
+        this.stage2s.setVal(4);
+        this.secrets.setVal(4);
         return null;
     }
 
     private String preset14vp() {
-        pointTotal.setVal(14);
-        stage1s.setVal(5);
-        stage2s.setVal(5);
-        secrets.setVal(3);
+        this.pointTotal.setVal(14);
+        this.stage1s.setVal(5);
+        this.stage2s.setVal(5);
+        this.secrets.setVal(3);
         return null;
     }
 

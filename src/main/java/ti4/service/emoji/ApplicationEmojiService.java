@@ -30,9 +30,9 @@ public class ApplicationEmojiService {
     private static final Map<String, CachedEmoji> emojis = new HashMap<>();
     private static final Map<String, EmojiFileData> emojiFiles = new HashMap<>();
 
-    private static boolean spoofing;
-    private static boolean cacheInitialized;
-    private static boolean filesInitialized;
+    private static boolean spoofing = false;
+    private static boolean cacheInitialized = false;
+    private static boolean filesInitialized = false;
 
     private static void initAll() {
         initFromCache();
@@ -242,7 +242,7 @@ public class ApplicationEmojiService {
     public static class EmojiFileData {
         private final File file;
         private final String name;
-        private Icon icon;
+        private Icon icon = null;
 
         public Icon getIcon() throws IOException {
             if (icon == null) icon = Icon.from(file);
@@ -250,8 +250,8 @@ public class ApplicationEmojiService {
         }
 
         public EmojiFileData(File f) {
-            file = f;
-            name = fileName(f);
+            this.file = f;
+            this.name = fileName(f);
         }
     }
 

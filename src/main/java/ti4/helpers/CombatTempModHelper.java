@@ -67,7 +67,7 @@ public class CombatTempModHelper {
         }
         currentRoundResults = currentRoundResults.stream()
                 .filter(mod -> mod.getModifier().getApplyToOpponent().equals(isApplyToOpponent))
-                .filter(mod -> mod.getModifier().getForCombatAbility() == rollType)
+                .filter(mod -> mod.getModifier().getForCombatAbility().equals(rollType))
                 .toList();
 
         return currentRoundResults;

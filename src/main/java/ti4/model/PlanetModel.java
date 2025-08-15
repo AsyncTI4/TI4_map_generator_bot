@@ -64,11 +64,11 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public String getAlias() {
-        return id;
+        return getId();
     }
 
     public String getShortName() {
-        return Optional.ofNullable(shortName).orElse(name);
+        return Optional.ofNullable(shortName).orElse(getName());
     }
 
     public boolean getShrinkName() {
@@ -124,7 +124,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         StringBuilder sb = new StringBuilder();
-        sb.append(getEmoji()).append("__").append(name).append("__");
+        sb.append(getEmoji()).append("__").append(getName()).append("__");
         eb.setTitle(sb.toString());
 
         if (getPlanetType() != null) {
@@ -136,20 +136,20 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
             }
         }
 
-        TileModel tile = TileHelper.getTileById(tileId);
+        TileModel tile = TileHelper.getTileById(getTileId());
         sb = new StringBuilder();
         sb.append(getInfResEmojis()).append(getPlanetTypeEmoji()).append(getTechSpecialtyEmoji());
         if (tile != null) sb.append("\nSystem: ").append(tile.getName());
         eb.setDescription(sb.toString());
-        if (basicAbilityText != null) eb.addField("Ability:", basicAbilityText, false);
-        if (legendaryAbilityName != null)
-            eb.addField(MiscEmojis.LegendaryPlanet + legendaryAbilityName, legendaryAbilityText, false);
-        if (legendaryAbilityFlavourText != null) eb.addField("", legendaryAbilityFlavourText, false);
-        if (flavourText != null) eb.addField("", flavourText, false);
+        if (getBasicAbilityText() != null) eb.addField("Ability:", getBasicAbilityText(), false);
+        if (getLegendaryAbilityName() != null)
+            eb.addField(MiscEmojis.LegendaryPlanet + getLegendaryAbilityName(), getLegendaryAbilityText(), false);
+        if (getLegendaryAbilityFlavourText() != null) eb.addField("", getLegendaryAbilityFlavourText(), false);
+        if (getFlavourText() != null) eb.addField("", getFlavourText(), false);
 
         sb = new StringBuilder();
-        sb.append("ID: ").append(id);
-        if (includeAliases) sb.append("\nAliases: ").append(aliases);
+        sb.append("ID: ").append(getId());
+        if (includeAliases) sb.append("\nAliases: ").append(getAliases());
         eb.setFooter(sb.toString());
 
         if (getStickerOrEmojiURL() != null) eb.setThumbnail(getStickerOrEmojiURL());
@@ -159,15 +159,15 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public MessageEmbed getLegendaryEmbed() {
-        if (StringUtils.isBlank(legendaryAbilityName)) return null; // no ability name, no embed
-        if (StringUtils.isBlank(legendaryAbilityText)) return null; // no ability text, no embed
+        if (StringUtils.isBlank(getLegendaryAbilityName())) return null; // no ability name, no embed
+        if (StringUtils.isBlank(getLegendaryAbilityText())) return null; // no ability text, no embed
 
         EmbedBuilder eb = new EmbedBuilder();
 
-        eb.setTitle(MiscEmojis.LegendaryPlanet + "__" + legendaryAbilityName + "__");
+        eb.setTitle(MiscEmojis.LegendaryPlanet + "__" + getLegendaryAbilityName() + "__");
         eb.setColor(Color.black);
 
-        eb.setDescription(legendaryAbilityText);
+        eb.setDescription(getLegendaryAbilityText());
         if (getStickerOrEmojiURL() != null) eb.setThumbnail(getStickerOrEmojiURL());
         return eb.build();
     }
@@ -189,9 +189,9 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     private String getTechSpecialtyEmoji() {
-        if (techSpecialties == null || techSpecialties.isEmpty()) return "";
+        if (getTechSpecialties() == null || getTechSpecialties().isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
-        for (TechSpecialty techSpecialty : techSpecialties) {
+        for (TechSpecialty techSpecialty : getTechSpecialties()) {
             switch (techSpecialty) {
                 case BIOTIC -> sb.append(TechEmojis.BioticTech);
                 case CYBERNETIC -> sb.append(TechEmojis.CyberneticTech);
@@ -206,9 +206,9 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     private String getTechSpecialtyStringRepresentation() {
-        if (techSpecialties == null || techSpecialties.isEmpty()) return "";
+        if (getTechSpecialties() == null || getTechSpecialties().isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
-        for (TechSpecialty techSpecialty : techSpecialties) {
+        for (TechSpecialty techSpecialty : getTechSpecialties()) {
             switch (techSpecialty) {
                 case BIOTIC -> sb.append("G");
                 case CYBERNETIC -> sb.append("Y");
@@ -223,18 +223,18 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public boolean isLegendary() {
-        return legendaryAbilityName != null;
+        return getLegendaryAbilityName() != null;
     }
 
     @JsonIgnore
     public TI4Emoji getEmoji() {
-        return PlanetEmojis.getPlanetEmoji(id);
+        return PlanetEmojis.getPlanetEmoji(getId());
     }
 
     @JsonIgnore
     public String getEmojiURL() {
         TI4Emoji emoji = getEmoji();
-        if (getEmoji().equals(PlanetEmojis.SemLore) && !"semlore".equals(getId())) {
+        if (getEmoji().equals(PlanetEmojis.SemLore) && !getId().equals("semlore")) {
             return null;
         }
         if (emoji.asEmoji() instanceof CustomEmoji customEmoji) {
@@ -249,7 +249,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
             return cachedStickerUrl;
         }
 
-        long ident = Stickers.getPlanetSticker(id);
+        long ident = Stickers.getPlanetSticker(getId());
         if (ident == -1) {
             cachedStickerUrl = getEmojiURL();
         } else {
@@ -263,16 +263,16 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return name.toLowerCase().contains(searchString)
-                || id.toLowerCase().contains(searchString)
-                || source.toString().contains(searchString)
-                || searchTags.contains(searchString);
+        return getName().toLowerCase().contains(searchString)
+                || getId().toLowerCase().contains(searchString)
+                || getSource().toString().contains(searchString)
+                || getSearchTags().contains(searchString);
     }
 
     @JsonIgnore
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
-        sb.append(name).append(" (").append(resources).append("/").append(influence);
+        sb.append(getName()).append(" (").append(getResources()).append("/").append(getInfluence());
         if (!getTechSpecialtyStringRepresentation().isBlank())
             sb.append(" ").append(getTechSpecialtyStringRepresentation());
         sb.append(")");

@@ -26,7 +26,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAlias() {
-        return source.toString();
+        return getSource().toString();
     }
 
     @Override
@@ -37,23 +37,25 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(HashMap<String, Integer> occurrences) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        eb.setTitle(source.emoji() + " " + name);
+        eb.setTitle(getSource().emoji() + " " + getName());
 
         StringBuilder content = new StringBuilder();
-        if (description != null) content.append("*").append(description).append("*\n\n");
-        if (data != null) content.append("Links:\n").append(getDataFormatted()).append("\n");
+        if (getDescription() != null)
+            content.append("*").append(getDescription()).append("*\n\n");
+        if (getData() != null)
+            content.append("Links:\n").append(getDataFormatted()).append("\n");
         if (occurrences != null) content.append("Implementation: ").append(compTypeOccurrences(occurrences));
         eb.setDescription(content);
 
         StringBuilder footer = new StringBuilder();
-        footer.append("Source: ").append(source).append("    Type: ").append(canal);
-        if (subcanal != null) footer.append(" > ").append(subcanal);
-        footer.append("\nCredits: ").append(credits);
+        footer.append("Source: ").append(getSource()).append("    Type: ").append(getCanal());
+        if (getSubcanal() != null) footer.append(" > ").append(getSubcanal());
+        footer.append("\nCredits: ").append(getCredits());
         eb.setFooter(footer.toString());
 
-        if ("official".equals(getCanal())) {
+        if (getCanal().equals("official")) {
             eb.setColor(Color.green);
-        } else if ("community".equals(getCanal())) {
+        } else if (getCanal().equals("community")) {
             eb.setColor(Color.gray);
         } else {
             eb.setColor(Color.red);
@@ -67,8 +69,8 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
      */
     @Override
     public boolean search(String searchString) {
-        return name.toLowerCase().contains(searchString)
-                || source.toString().toLowerCase().contains(searchString);
+        return getName().toLowerCase().contains(searchString)
+                || getSource().toString().toLowerCase().contains(searchString);
     }
 
     /**
@@ -76,7 +78,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
      */
     @Override
     public String getAutoCompleteName() {
-        return name;
+        return getName();
     }
 
     /**
@@ -96,7 +98,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
      * @return true if field 'Canal' = "Official", false otherwise
      */
     public boolean isCanalOfficial() {
-        boolean official = "official".equals(getCanal());
+        boolean official = getCanal().equals("official");
         return official;
     }
 

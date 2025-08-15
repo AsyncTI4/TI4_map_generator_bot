@@ -217,7 +217,7 @@ public class AsyncTi4WebsiteHelper {
         long fileSize = Files.size(tempFile);
         String msg = String.format(
                 "# Uploading statistics to S3 (%.2f MB)... \nOut of %d eligible games, %d games are being uploaded.",
-                fileSize / (1024.0d * 1024.0d), eligible, uploaded);
+                fileSize / (1024d * 1024d), eligible, uploaded);
         if (eligible != uploaded) {
             msg += "\nBad games (first 10):\n- "
                     + String.join("\n- ", badGames.subList(0, Math.min(10, badGames.size())));

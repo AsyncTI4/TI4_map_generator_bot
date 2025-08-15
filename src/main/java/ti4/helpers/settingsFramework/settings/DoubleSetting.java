@@ -24,7 +24,7 @@ public class DoubleSetting extends SettingInterface {
     public DoubleSetting(String id, String name, double defaultValue, double min, double max, double delta) {
         super(id, name);
 
-        this.defaultValue = val = defaultValue;
+        this.defaultValue = this.val = defaultValue;
         this.min = min;
         this.max = max;
         this.delta = delta;

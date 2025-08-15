@@ -64,7 +64,7 @@ public class MessageListener extends ListenerAdapter {
                     if (addFactionEmojiReactionsToMessages(event, gameName)) return;
                 }
             }
-            if ("572698679618568193".equalsIgnoreCase(event.getAuthor().getId())) {
+            if (event.getAuthor().getId().equalsIgnoreCase("572698679618568193")) {
                 TextChannel deletionLogChannel =
                         AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
                                 .findFirst()

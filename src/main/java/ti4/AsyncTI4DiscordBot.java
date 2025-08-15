@@ -81,7 +81,7 @@ public class AsyncTI4DiscordBot {
     public static JDA jda;
     public static String userID;
     public static String guildPrimaryID;
-    public static boolean testingMode;
+    public static boolean testingMode = false;
     public static Guild guildPrimary;
     public static Guild guildSecondary;
     public static Guild guildTertiary;
@@ -287,7 +287,7 @@ public class AsyncTI4DiscordBot {
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
-        jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
+        AsyncTI4DiscordBot.jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
         updatePresence();
         BotLogger.info("FINISHED LOADING GAMES");
 
@@ -370,7 +370,7 @@ public class AsyncTI4DiscordBot {
 
     public static void updatePresence() {
         long activeGames = GameManager.getActiveGameCount();
-        jda.getPresence().setActivity(Activity.playing(activeGames + " games of Async TI4"));
+        AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(activeGames + " games of Async TI4"));
     }
 
     /**
@@ -495,6 +495,6 @@ public class AsyncTI4DiscordBot {
     }
 
     public static boolean isValidGuild(String guildId) {
-        return guilds.stream().anyMatch(g -> g.getId().equals(guildId));
+        return AsyncTI4DiscordBot.guilds.stream().anyMatch(g -> g.getId().equals(guildId));
     }
 }

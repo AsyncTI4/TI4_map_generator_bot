@@ -62,13 +62,13 @@ public class ImageHelper {
     @Nullable
     public static BufferedImage readEmojiImageScaled(String emoji, int size) {
         Emoji em = Emoji.fromFormatted(emoji);
-        if (em instanceof CustomEmoji e) return readURLScaled(e.getImageUrl(), size, size);
+        if (em instanceof CustomEmoji e) return ImageHelper.readURLScaled(e.getImageUrl(), size, size);
         return null;
     }
 
     @Nullable
     public static BufferedImage readEmojiImageScaled(TI4Emoji emoji, int size) {
-        return readEmojiImageScaled(emoji.emojiString(), size);
+        return ImageHelper.readEmojiImageScaled(emoji.emojiString(), size);
     }
 
     @Nullable

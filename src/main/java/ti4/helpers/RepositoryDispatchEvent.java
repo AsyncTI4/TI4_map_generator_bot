@@ -23,7 +23,7 @@ public class RepositoryDispatchEvent {
      */
     public RepositoryDispatchEvent(String eventType, Map<String, String> payloadMap) {
         this.eventType = eventType;
-        payload = new RespositoryDispatchClientPayload(payloadMap);
+        this.payload = new RespositoryDispatchClientPayload(payloadMap);
     }
 
     public void sendEvent() {

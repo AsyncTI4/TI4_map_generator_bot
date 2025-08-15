@@ -1,6 +1,5 @@
 package ti4.service.fow;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class CreateFoWGameService {
         String gameName = getNextFOWGameName();
         String lastGame = getLastFOWGameName();
         Game game;
-        if (!"fow1".equalsIgnoreCase(lastGame)) {
+        if (!lastGame.equalsIgnoreCase("fow1")) {
             if (!GameManager.isValid(lastGame)) {
                 BotLogger.warning(
                         new BotLogger.LogMessageOrigin(event),
@@ -239,7 +238,7 @@ public class CreateFoWGameService {
         GameManager.save(newGame, "Create FOW Game Channels");
 
         if (eventChannel instanceof ThreadChannel thread
-                && "making-fow-games".equals(thread.getParentChannel().getName())) {
+                && thread.getParentChannel().getName().equals("making-fow-games")) {
             newGame.setLaunchPostThreadID(thread.getId());
             ThreadChannelManager manager = thread.getManager()
                     .setName(StringUtils.left(newGame.getName().toUpperCase() + "-LAUNCHED - " + thread.getName(), 100))
@@ -251,7 +250,7 @@ public class CreateFoWGameService {
     private static String getInfoTextFromFile(String file) {
         String path = ResourceHelper.getInstance().getHelpFile(file);
         try {
-            return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+            return new String(Files.readAllBytes(Paths.get(path)));
         } catch (Exception e) {
             return file + " IS BLANK";
         }

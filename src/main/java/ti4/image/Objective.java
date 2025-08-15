@@ -79,8 +79,8 @@ public record Objective(
     }
 
     public String getDisplayText(Game game) {
-        String name = getName();
-        Integer worth = getWorth(game);
+        String name = this.getName();
+        Integer worth = this.getWorth(game);
         if (revealed) {
             return String.format(
                     "(%d) %s - %d VP", game.getRevealedPublicObjectives().get(key), name, worth);

@@ -15,7 +15,7 @@ public class WinningPathCacheService {
 
     private static final Cache<CacheKey, Map<String, Integer>> WINNING_PATH_CACHE =
             Caffeine.newBuilder().build();
-    private static boolean hasBeenComputed;
+    private static boolean hasBeenComputed = false;
 
     public static synchronized void recomputeCache() {
         BotLogger.info("**Recomputing win path cache**");
