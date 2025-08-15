@@ -20,8 +20,7 @@ public class ClandestineAgendaResolver implements ForAgainstAgendaResolver {
             String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
             Button loseTactic = Buttons.red(finsFactionCheckerPrefix + "decrease_tactic_cc", "Lose 1 Tactic Token");
             Button loseFleet = Buttons.red(finsFactionCheckerPrefix + "decrease_fleet_cc", "Lose 1 Fleet Token");
-            Button loseStrat =
-                    Buttons.red(finsFactionCheckerPrefix + "decrease_strategy_cc", "Lose 1 Strategy Token");
+            Button loseStrat = Buttons.red(finsFactionCheckerPrefix + "decrease_strategy_cc", "Lose 1 Strategy Token");
             Button done = Buttons.red(finsFactionCheckerPrefix + "deleteButtons", "Done Losing Command Tokens");
             List<Button> buttons = List.of(loseTactic, loseFleet, loseStrat, done);
             String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "

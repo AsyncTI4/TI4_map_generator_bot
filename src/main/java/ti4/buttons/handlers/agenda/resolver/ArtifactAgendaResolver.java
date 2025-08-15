@@ -47,21 +47,6 @@ public class ArtifactAgendaResolver implements ForAgainstAgendaResolver {
 
     @Override
     public void handleAgainst(Game game, ButtonInteractionEvent event, int agendaNumericId) {
-        TextChannel watchParty = AgendaHelper.watchPartyChannel(game);
-        String watchPartyPing = AgendaHelper.watchPartyPing(game);
-        if (watchParty != null && !game.isFowMode()) {
-            Tile tile = game.getMecatolTile();
-            if (tile != null) {
-                FileUpload systemWithContext =
-                        new TileGenerator(game, event, null, 1, tile.getPosition()).createFileUpload();
-                String message = "# Ixthian Artifact has resolved! " + watchPartyPing + "\n"
-                        + AgendaHelper.getSummaryOfVotes(game, true);
-                MessageHelper.sendMessageToChannel(watchParty, message);
-                MessageHelper.sendMessageWithFile(
-                        watchParty, systemWithContext, "Surrounding Mecatol Rex In " + game.getName(), false);
-            }
-        }
-        MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(), "Against on _Ixthian Artifact_‽ Disgraceful.");
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Against on _Ixthian Artifact_‽ Disgraceful.");
     }
 }
