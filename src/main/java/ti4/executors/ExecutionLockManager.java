@@ -45,7 +45,7 @@ public class ExecutionLockManager {
     public static Runnable wrapWithTryLockAndRelease(
             String lockName, LockType lockType, Runnable task, MessageChannel messageChannel) {
         return () -> {
-            boolean gotLock = tryLock(lockName, ExecutionLockManager.LockType.WRITE);
+            boolean gotLock = ExecutionLockManager.tryLock(lockName, ExecutionLockManager.LockType.WRITE);
             if (gotLock) {
                 runAndUnlock(lockName, lockType, task);
                 return;
@@ -74,7 +74,7 @@ public class ExecutionLockManager {
 
     public static Runnable wrapWithLockAndRelease(String lockName, LockType lockType, Runnable task) {
         return () -> {
-            lock(lockName, ExecutionLockManager.LockType.WRITE);
+            ExecutionLockManager.lock(lockName, ExecutionLockManager.LockType.WRITE);
             runAndUnlock(lockName, lockType, task);
         };
     }

@@ -34,7 +34,7 @@ public class PlayerStatsDashboardPayload {
 
     public PlayerStatsDashboardPayload(Player player) {
         this.player = player;
-        game = player.getGame();
+        this.game = player.getGame();
     }
 
     @JsonIgnore
@@ -246,13 +246,13 @@ public class PlayerStatsDashboardPayload {
                 .flatMap(Collection::stream)
                 .map(String::toLowerCase)
                 .forEach(speciality -> {
-                    if ("propulsion".equalsIgnoreCase(speciality)) {
+                    if (speciality.equalsIgnoreCase("propulsion")) {
                         blueCount.getAndIncrement();
-                    } else if ("cybernetic".equalsIgnoreCase(speciality)) {
+                    } else if (speciality.equalsIgnoreCase("cybernetic")) {
                         yellowCount.getAndIncrement();
-                    } else if ("biotic".equalsIgnoreCase(speciality)) {
+                    } else if (speciality.equalsIgnoreCase("biotic")) {
                         greenCount.getAndIncrement();
-                    } else if ("warfare".equalsIgnoreCase(speciality)) {
+                    } else if (speciality.equalsIgnoreCase("warfare")) {
                         redCount.getAndIncrement();
                     }
                 });

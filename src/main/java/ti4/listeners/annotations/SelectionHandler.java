@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RUNTIME)
 @Repeatable(ManySelectionHandlers.class)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD})
 public @interface SelectionHandler {
     String value();
 }

@@ -38,17 +38,17 @@ public class TransactionGenerator {
         String pn1 = "pa_pn_color_" + Mapper.getColorID(p1.getColor()) + ".png";
         BufferedImage color1 =
                 ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn1), pnHeight, pnWidth);
-        g2.rotate(-1.5707963267948966);
+        g2.rotate(Math.toRadians(-90));
         g2.drawImage(color1, -1 * pnHeight, 0, null);
-        g2.rotate(1.5707963267948966);
+        g2.rotate(Math.toRadians(90));
 
         // Add player 2's color
         String pn2 = "pa_pn_color_" + Mapper.getColorID(p2.getColor()) + ".png";
         BufferedImage color2 =
                 ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn2), pnHeight, pnWidth);
-        g2.rotate(1.5707963267948966);
+        g2.rotate(Math.toRadians(90));
         g2.drawImage(color2, height - pnHeight, -1 * width, null);
-        g2.rotate(-1.5707963267948966);
+        g2.rotate(Math.toRadians(-90));
 
         // Faction Icons
         int x = 5, y = 5;
@@ -149,8 +149,8 @@ public class TransactionGenerator {
                 String thingToTransact = item.split("_")[2];
                 String furtherDetail = item.split("_")[3];
                 int amountToTransact = 1;
-                if ("frags".equalsIgnoreCase(thingToTransact)
-                        || (("PNs".equalsIgnoreCase(thingToTransact) || "ACs".equalsIgnoreCase(thingToTransact))
+                if (thingToTransact.equalsIgnoreCase("frags")
+                        || ((thingToTransact.equalsIgnoreCase("PNs") || thingToTransact.equalsIgnoreCase("ACs"))
                                 && furtherDetail.contains("generic"))) {
                     amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
                     furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);

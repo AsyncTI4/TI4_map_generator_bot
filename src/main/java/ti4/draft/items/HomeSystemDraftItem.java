@@ -68,7 +68,7 @@ public class HomeSystemDraftItem extends DraftItem {
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            allItems.add(generate(Category.HOMESYSTEM, faction.getAlias()));
+            allItems.add(DraftItem.generate(Category.HOMESYSTEM, faction.getAlias()));
         }
         return allItems;
     }
@@ -86,7 +86,7 @@ public class HomeSystemDraftItem extends DraftItem {
             if (Arrays.asList(results).contains(faction.getAlias())) {
                 continue;
             }
-            allItems.add(generate(Category.HOMESYSTEM, faction.getAlias()));
+            allItems.add(DraftItem.generate(Category.HOMESYSTEM, faction.getAlias()));
         }
         return allItems;
     }

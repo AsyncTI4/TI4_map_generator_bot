@@ -38,14 +38,14 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
     @Override
     public SecretObjectiveModel duplicateAndSetColor(ColorModel newColor) {
         SecretObjectiveModel so = new SecretObjectiveModel();
-        so.setAlias(alias.replace("<color>", newColor.getName()));
-        so.setName(name.replace("<color>", newColor.getDisplayName()));
-        so.setPhase(phase);
-        so.setText(text.replace("<color>", newColor.getName()));
-        so.setPoints(points);
-        so.setHomebrewReplacesID(homebrewReplacesID);
-        so.setImageURL(imageURL);
-        so.setSource(source);
+        so.setAlias(this.alias.replace("<color>", newColor.getName()));
+        so.setName(this.name.replace("<color>", newColor.getDisplayName()));
+        so.setPhase(this.phase);
+        so.setText(this.text.replace("<color>", newColor.getName()));
+        so.setPoints(this.points);
+        so.setHomebrewReplacesID(this.homebrewReplacesID);
+        so.setImageURL(this.getImageURL());
+        so.setSource(this.source);
         so.setSearchTags(new ArrayList<>(searchTags));
         so.setSourceModel(this);
         return so;
@@ -56,10 +56,10 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
     }
 
     public static final Comparator<SecretObjectiveModel> sortByPointsAndName = (po1, po2) -> {
-        if (po1.points == po2.points) {
-            return po1.name.compareTo(po2.name);
+        if (po1.getPoints() == po2.getPoints()) {
+            return po1.getName().compareTo(po2.getName());
         } else {
-            return po1.points < po2.points ? -1 : 1;
+            return po1.getPoints() < po2.getPoints() ? -1 : 1;
         }
     };
 
@@ -79,16 +79,17 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
         EmbedBuilder eb = new EmbedBuilder();
 
         // TITLE
-        String title = CardEmojis.SecretObjective + "__**" + name + "**__" + source.emoji();
+        String title = CardEmojis.SecretObjective + "__**" + getName() + "**__"
+                + getSource().emoji();
         eb.setTitle(title);
 
         // DESCRIPTION
-        eb.setDescription(text);
+        eb.setDescription(getText());
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
         if (includeID)
-            footer.append("ID: ").append(alias).append("    Source: ").append(source);
+            footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         eb.setFooter(footer.toString());
 
         eb.setColor(getEmbedColor());
@@ -96,20 +97,20 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
     }
 
     public Color getEmbedColor() {
-        return switch (points) {
+        return switch (getPoints()) {
             case 2 -> Color.BLACK;
             default -> Color.RED;
         };
     }
 
     public boolean search(String searchString) {
-        return alias.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
+        return getAlias().toLowerCase().contains(searchString)
+                || getName().toLowerCase().contains(searchString)
+                || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return name + " (" + source + ")";
+        return getName() + " (" + getSource() + ")";
     }
 
     public Optional<String> getHomebrewReplacesID() {

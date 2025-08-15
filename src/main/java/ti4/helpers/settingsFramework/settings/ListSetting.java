@@ -49,13 +49,13 @@ public class ListSetting<T> extends SettingInterface {
             Set<String> defaults) {
         super(id, name);
 
-        includeLang = include;
-        removeLang = remove;
+        this.includeLang = include;
+        this.removeLang = remove;
         if (allVals != null) {
             for (Map.Entry<String, T> entry : allVals) allValues.put(entry.getKey(), entry.getValue());
         }
         if (defaults != null) defaultKeys.addAll(defaults);
-        if (values != null) keys.addAll(values);
+        if (values != null) this.keys.addAll(values);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ public class ListSetting<T> extends SettingInterface {
         Button remove = Buttons.red(idPrefix + "remove" + id, removeLang).withEmoji(emojiDown);
         List<Button> ls = new ArrayList<>();
         if (!keys.isEmpty()) ls.add(remove);
-        if (keys.size() != allValues.size()) ls.add(include);
+        if (!(keys.size() == allValues.size())) ls.add(include);
         return ls;
     }
 

@@ -26,8 +26,8 @@ public class SelectionMenuContext extends ListenerContext {
         if (!isValid()) return; // super failed
 
         // Proceed with additional context
-        menuID = componentID; // ID after checking faction
-        messageID = event.getMessageId();
-        values = new ArrayList<>(event.getValues());
+        this.menuID = this.componentID; // ID after checking faction
+        this.messageID = event.getMessageId();
+        this.values = new ArrayList<>(event.getValues());
     }
 }

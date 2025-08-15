@@ -25,7 +25,7 @@ import ti4.service.emoji.PlanetEmojis;
 
 abstract class PlanetAddRemove extends GameStateSubcommand {
 
-    protected PlanetAddRemove(String id, String description) {
+    public PlanetAddRemove(String id, String description) {
         super(id, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet")
                 .setRequired(true)

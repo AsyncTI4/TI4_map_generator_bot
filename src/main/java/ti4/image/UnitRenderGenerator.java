@@ -294,7 +294,7 @@ public class UnitRenderGenerator {
     }
 
     private void drawUnitTags(UnitKey unitKey, Player player, ImagePosition imagePos, int iteration) {
-        if (iteration != 0 || UnitType.Infantry == unitKey.getUnitType() || !game.isShowUnitTags()) {
+        if (iteration != 0 || UnitType.Infantry.equals(unitKey.getUnitType()) || !game.isShowUnitTags()) {
             return;
         }
 

@@ -207,7 +207,7 @@ public class HyperlaneTileGenerator {
         for (int i = 0; i < 6; i++) {
             String[] cols = rows[i].split(",");
             for (int j = 0; j < 6; j++) {
-                if ("1".equals(cols[j].trim()) && (!selfConnections || i == j)) {
+                if (cols[j].trim().equals("1") && (!selfConnections || i == j)) {
                     pairs.add(List.of(Math.min(i, j), Math.max(i, j)));
                 }
             }

@@ -32,7 +32,7 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAlias() {
-        return id; // looks like were using the attachment_<name>.png for identification for now.
+        return getId(); // looks like were using the attachment_<name>.png for identification for now.
     }
 
     public String getName() {
@@ -58,7 +58,7 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
     @Override
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
-        sb.append(id);
+        sb.append(getId());
         if (name != null) sb.append(" ").append(getName());
         if (resourcesModifier != 0) sb.append(" R").append(resourcesModifier);
         if (influenceModifier != 0) sb.append(" I").append(influenceModifier);
@@ -77,26 +77,27 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(sb.toString());
 
         sb = new StringBuilder();
-        if (spaceCannonHitsOn != 0 || spaceCannonDieCount != 0)
+        if (getSpaceCannonHitsOn() != 0 || getSpaceCannonDieCount() != 0)
             sb.append("Space Cannon: ")
-                    .append(spaceCannonHitsOn)
+                    .append(getSpaceCannonHitsOn())
                     .append("x")
-                    .append(spaceCannonDieCount)
+                    .append(getSpaceCannonDieCount())
                     .append("\n");
-        if (abilityText != null) sb.append("Ability: ").append(abilityText).append("\n");
+        if (getAbilityText() != null)
+            sb.append("Ability: ").append(getAbilityText()).append("\n");
         if (getToken().isPresent())
             sb.append("Token: ").append(getToken().get()).append("\n");
-        if (isFakeAttachment != null) sb.append("(fake attachment)\n");
+        if (getIsFakeAttachment() != null) sb.append("(fake attachment)\n");
         eb.setDescription(sb.toString());
 
         sb = new StringBuilder();
-        sb.append("ID: ").append(id);
-        sb.append(" Source: ").append(source);
+        sb.append("ID: ").append(getId());
+        sb.append(" Source: ").append(getSource());
         eb.setFooter(sb.toString());
 
         eb.setThumbnail(
                 "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/attachment_token/"
-                        + imagePath + "?raw=true");
+                        + getImagePath() + "?raw=true");
 
         return eb.build();
     }
@@ -104,14 +105,15 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         return getName().toLowerCase().contains(searchString.toLowerCase())
-                || id.toLowerCase().contains(searchString.toLowerCase())
+                || getId().toLowerCase().contains(searchString.toLowerCase())
                 || (getToken().isPresent() && getToken().get().toLowerCase().contains(searchString.toLowerCase()))
-                || (resourcesModifier != 0 && "resources".contains(searchString.toLowerCase()))
-                || (influenceModifier != 0 && "influence".contains(searchString.toLowerCase()))
-                || (planetTypes != null && planetTypes.toString().contains(searchString.toLowerCase()))
-                || (techSpeciality != null && techSpeciality.toString().contains(searchString.toLowerCase()))
+                || (getResourcesModifier() != 0 && "resources".contains(searchString.toLowerCase()))
+                || (getInfluenceModifier() != 0 && "influence".contains(searchString.toLowerCase()))
+                || (getPlanetTypes() != null && getPlanetTypes().toString().contains(searchString.toLowerCase()))
+                || (getTechSpeciality() != null
+                        && getTechSpeciality().toString().contains(searchString.toLowerCase()))
                 || (isLegendary() && "legendary".contains(searchString.toLowerCase()))
-                || (spaceCannonHitsOn != 0 && "space cannon".contains(searchString.toLowerCase()))
+                || (getSpaceCannonHitsOn() != 0 && "space cannon".contains(searchString.toLowerCase()))
                 || (isFakeAttachment() && "fake".contains(searchString.toLowerCase()))
                 || getAutoCompleteName().toLowerCase().contains(searchString.toLowerCase());
     }

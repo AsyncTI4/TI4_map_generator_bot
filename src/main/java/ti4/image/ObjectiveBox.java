@@ -33,7 +33,7 @@ public class ObjectiveBox {
         this.boxWidth = boxWidth;
         this.maxTextWidth = maxTextWidth;
         this.scoreTokenSpacing = scoreTokenSpacing;
-        spaceForTokens = boxWidth - (maxTextWidth + bufferBetweenTextAndTokens * 2);
+        this.spaceForTokens = boxWidth - (maxTextWidth + bufferBetweenTextAndTokens * 2);
     }
 
     public void display(Game game, Graphics graphics, MapGenerator generator, Objective objective) {

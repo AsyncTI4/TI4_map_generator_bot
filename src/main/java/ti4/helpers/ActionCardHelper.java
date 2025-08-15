@@ -86,11 +86,10 @@ public class ActionCardHelper {
             } else {
                 for (Map.Entry<String, Integer> trapCard : trapCards.entrySet()) {
                     Integer value = trapCard.getValue();
-                    sb.append(index)
+                    sb.append(index++)
                             .append(". ")
                             .append(Helper.leftpad("(" + value, 4))
                             .append(")`");
-                    index++;
                     sb.append(getTrapCardRepresentation(trapCard.getKey(), trapCardsPlanets));
                 }
             }
@@ -136,8 +135,7 @@ public class ActionCardHelper {
 
         for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
             ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
-            sb.append(index).append("\\. ");
-            index++;
+            sb.append(index++).append("\\. ");
 
             if (actionCard == null) {
                 sb.append("Something broke here");
@@ -408,24 +406,24 @@ public class ActionCardHelper {
                     + " The bot thinks you are over the limit and thus will not allow you to play action cards at this time."
                     + " You may discard the action cards and manually resolve if you need to.";
         }
-        if ("agenda".equalsIgnoreCase(actionCard.getPhase())
+        if (actionCard.getPhase().equalsIgnoreCase("agenda")
                 && game.getPhaseOfGame() != null
-                && "action".equalsIgnoreCase(game.getPhaseOfGame())) {
-            if (!"edyn".equalsIgnoreCase(player.getFaction())
+                && game.getPhaseOfGame().equalsIgnoreCase("action")) {
+            if (!player.getFaction().equalsIgnoreCase("edyn")
                     && !player.getFaction().contains("franken")) {
                 return player.getRepresentationUnfogged()
                         + ", the bot thinks it is the Action Phase and this is an Agenda Phase card. If this is a mistake, ping bothelper in the actions channel.";
             }
         }
         if (game.isStellarAtomicsMode()
-                && "agenda".equalsIgnoreCase(actionCard.getPhase())
+                && actionCard.getPhase().equalsIgnoreCase("agenda")
                 && game.getRevealedPublicObjectives().get("Stellar Atomics") != null) {
             if (!game.getScoredPublicObjectives().get("Stellar Atomics").contains(player.getUserID())) {
                 return player.getRepresentationUnfogged() + ", the bot thinks you have committed some light war crimes,"
                         + " thus you no longer have your token on the _Stellar Atomics_ event card, and therefore cannot play action cards during the Agenda Phase.";
             }
         }
-        if ("action".equalsIgnoreCase(actionCard.getPhase())
+        if (actionCard.getPhase().equalsIgnoreCase("action")
                 && game.getPhaseOfGame() != null
                 && game.getPhaseOfGame().contains("agenda")) {
             if (!actionCard.getName().toLowerCase().contains("war machine")) {
@@ -525,7 +523,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannel(mainGameChannel, noSabosMessage.toString());
             }
             MessageChannel channel2 = player.getCorrectChannel();
-            if ("investments".equals(automationID)) {
+            if (automationID.equals("investments")) {
                 List<Button> scButtons = new ArrayList<>();
                 for (int sc : game.getSCList()) {
                     Button button;
@@ -546,7 +544,7 @@ public class ActionCardHelper {
                                 + ", please use buttons to increase trade goods on strategy cards. Each button press adds 1 trade good.",
                         scButtons);
             }
-            if ("deflection".equals(automationID)) {
+            if (automationID.equals("deflection")) {
                 List<Button> scButtons = new ArrayList<>();
                 for (int sc : game.getSCList()) {
                     TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
@@ -566,7 +564,7 @@ public class ActionCardHelper {
                         scButtons);
             }
 
-            if ("arch_expedition".equals(automationID)) {
+            if (automationID.equals("arch_expedition")) {
                 List<Button> scButtons = ButtonHelperActionCards.getArcExpButtons(game, player);
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2,
@@ -575,7 +573,7 @@ public class ActionCardHelper {
                         scButtons);
             }
 
-            if ("planetary_rigs".equals(automationID)) {
+            if (automationID.equals("planetary_rigs")) {
                 List<Button> acbuttons = ButtonHelperHeroes.getAttachmentSearchButtons(game, player);
                 String msg = player.getRepresentation()
                         + ", after checking for Sabos, first declare what planet you mean to put an attachment on, then hit the button to resolve.";
@@ -592,62 +590,62 @@ public class ActionCardHelper {
                     " A reminder that you should declare which %s you are targeting now, before other players choose whether they will Sabo.";
 
             List<Button> codedButtons = new ArrayList<>();
-            if ("plagiarize".equals(automationID)) {
+            if (automationID.equals("plagiarize")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "getPlagiarizeButtons", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "technology"), codedButtons);
             }
 
-            if ("mining_initiative".equals(automationID)) {
+            if (automationID.equals("mining_initiative")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "miningInitiative", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
             }
 
-            if ("revolution".equals(automationID)) {
+            if (automationID.equals("revolution")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "willRevolution", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("last_minute_deliberation".equals(automationID)) {
+            if (automationID.equals("last_minute_deliberation")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "lastMinuteDeliberation", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("professional_archeologists".equals(automationID)) {
+            if (automationID.equals("professional_archeologists")) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveProfessionalArcheologists", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("special_session".equals(automationID)) {
+            if (automationID.equals("special_session")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveVeto", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("war_machine".equals(automationID)) {
+            if (automationID.equals("war_machine")) {
                 player.addSpentThing("warmachine");
             }
 
-            if ("economic_initiative".equals(automationID)) {
+            if (automationID.equals("economic_initiative")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "economicInitiative", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("confounding".equals(automationID)) {
+            if (automationID.equals("confounding")) {
                 codedButtons.add(Buttons.green("autoresolve_manual", buttonLabel));
                 sendResolveMsgToMainChannel(introMsg, codedButtons, player, game);
             }
 
-            if ("confusing".equals(automationID)) {
+            if (automationID.equals("confusing")) {
                 codedButtons.add(Buttons.green("autoresolve_manual", buttonLabel));
                 sendResolveMsgToMainChannel(introMsg + String.format(targetMsg, "player"), codedButtons, player, game);
             }
 
-            if ("reveal_prototype".equals(automationID)) {
+            if (automationID.equals("reveal_prototype")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveResearch", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2,
@@ -656,14 +654,14 @@ public class ActionCardHelper {
                         codedButtons);
             }
 
-            if ("spatial_collapse".equals(automationID)) {
+            if (automationID.equals("spatial_collapse")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "spatialCollapseStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "systems"), codedButtons);
             }
 
-            if ("side_project".equals(automationID)) {
+            if (automationID.equals("side_project")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "sideProject", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2,
@@ -672,19 +670,19 @@ public class ActionCardHelper {
                         codedButtons);
             }
 
-            if ("brutal_occupation".equals(automationID)) {
+            if (automationID.equals("brutal_occupation")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "brutalOccupation", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
             }
 
-            if ("stolen_prototype".equals(automationID)) {
+            if (automationID.equals("stolen_prototype")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveResearch", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "destroyed unit"), codedButtons);
             }
 
-            if ("skilled_retreat".equals(automationID)) {
+            if (automationID.equals("skilled_retreat")) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "retreat_" + game.getActiveSystem() + "_skilled",
                         buttonLabel));
@@ -695,63 +693,63 @@ public class ActionCardHelper {
                         codedButtons);
             }
 
-            if ("reparations".equals(automationID)) {
+            if (automationID.equals("reparations")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveReparationsStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planets"), codedButtons);
             }
 
-            if ("distinguished".equals(automationID)) {
+            if (automationID.equals("distinguished")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveDistinguished", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("uprising".equals(automationID)) {
+            if (automationID.equals("uprising")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveUprisingStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
             }
 
-            if ("tomb_raiders".equals(automationID)) {
+            if (automationID.equals("tomb_raiders")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveTombRaiders", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("innovation".equals(automationID)) {
+            if (automationID.equals("innovation")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "innovation", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("jamming".equals(automationID)) {
+            if (automationID.equals("jamming")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveSignalJammingStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "system and player"), codedButtons);
             }
 
-            if ("spy".equals(automationID)) {
+            if (automationID.equals("spy")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveSpyStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
 
-            if ("stability".equals(automationID)) {
+            if (automationID.equals("stability")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolvePSStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("plague".equals(automationID)) {
+            if (automationID.equals("plague")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolvePlagueStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
             }
 
-            if ("experimental".equals(automationID)) {
+            if (automationID.equals("experimental")) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveEBSStep1_" + game.getActiveSystem(),
                         buttonLabel));
@@ -764,13 +762,13 @@ public class ActionCardHelper {
                         codedButtons);
             }
 
-            if ("blitz".equals(automationID)) {
+            if (automationID.equals("blitz")) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveBlitz_" + game.getActiveSystem(), buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("shrapnel_turrets".equals(automationID)) {
+            if (automationID.equals("shrapnel_turrets")) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveShrapnelTurrets_" + game.getActiveSystem(),
                         buttonLabel));
@@ -778,14 +776,14 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "ships"), codedButtons);
             }
 
-            if ("micrometeoroid_storm".equals(automationID)) {
+            if (automationID.equals("micrometeoroid_storm")) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveMicrometeoroidStormStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "system"), codedButtons);
             }
 
-            if ("upgrade".equals(automationID)) {
+            if (automationID.equals("upgrade")) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveUpgrade_" + game.getActiveSystem(),
                         buttonLabel));
@@ -797,7 +795,7 @@ public class ActionCardHelper {
                 }
             }
 
-            if ("infiltrate".equals(automationID)) {
+            if (automationID.equals("infiltrate")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveInfiltrateStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -807,7 +805,7 @@ public class ActionCardHelper {
                         codedButtons);
             }
 
-            if ("emergency_repairs".equals(automationID)) {
+            if (automationID.equals("emergency_repairs")) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveEmergencyRepairs_" + game.getActiveSystem(),
                         buttonLabel));
@@ -819,182 +817,182 @@ public class ActionCardHelper {
                 }
             }
 
-            if ("cripple".equals(automationID)) {
+            if (automationID.equals("cripple")) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveCrippleDefensesStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
             }
 
-            if ("impersonation".equals(automationID)) {
+            if (automationID.equals("impersonation")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveImpersonation", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("abs".equals(automationID)) {
+            if (automationID.equals("abs")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveABSStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
 
-            if ("salvage".equals(automationID)) {
+            if (automationID.equals("salvage")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveSalvageStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("insub".equals(automationID)) {
+            if (automationID.equals("insub")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveInsubStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
-            if ("parley".equals(automationID)) {
+            if (automationID.equals("parley")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveParleyStep1", buttonLabel));
                 // MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + String.format(targetMsg,
                 // "player"), codedButtons);
             }
 
-            if ("f_deployment".equals(automationID)) {
+            if (automationID.equals("f_deployment")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveFrontline", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
             }
 
-            if ("unexpected".equals(automationID)) {
+            if (automationID.equals("unexpected")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveUnexpected", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "system"), codedButtons);
             }
 
-            if ("data_archive".equals(automationID)) {
+            if (automationID.equals("data_archive")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveDataArchive", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planets"), codedButtons);
             }
 
-            if ("ancient_trade_routes".equals(automationID)) {
+            if (automationID.equals("ancient_trade_routes")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveAncientTradeRoutes", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "players"), codedButtons);
             }
 
-            if ("flank_speed".equals(automationID)) {
+            if (automationID.equals("flank_speed")) {
                 game.setStoredValue("flankspeedBoost", "1");
             }
 
-            if ("sister_ship".equals(automationID)) {
+            if (automationID.equals("sister_ship")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveSisterShip", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "destroyed ship"), codedButtons);
             }
 
-            if ("boarding_party".equals(automationID)) {
+            if (automationID.equals("boarding_party")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveBoardingParty", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "destroyed ship"), codedButtons);
             }
 
-            if ("mercenary_contract".equals(automationID)) {
+            if (automationID.equals("mercenary_contract")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveMercenaryContract", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("chain_reaction".equals(automationID)) {
+            if (automationID.equals("chain_reaction")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveChainReaction", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("rendezvous_point".equals(automationID) || "rendezvous".equals(automationID)) {
+            if (automationID.equals("rendezvous_point") || automationID.equals("rendezvous")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveRendezvousPoint", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("flawless_strategy".equals(automationID)) {
+            if (automationID.equals("flawless_strategy")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveFlawlessStrategy", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("arms_deal".equals(automationID)) {
+            if (automationID.equals("arms_deal")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveArmsDeal", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
 
-            if ("defense_installation".equals(automationID)) {
+            if (automationID.equals("defense_installation")) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveDefenseInstallation", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
             }
 
-            if ("harness".equals(automationID)) {
+            if (automationID.equals("harness")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveHarness", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("war_effort".equals(automationID)) {
+            if (automationID.equals("war_effort")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveWarEffort", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "system"), codedButtons);
             }
 
-            if ("free_trade_network".equals(automationID)) {
+            if (automationID.equals("free_trade_network")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveFreeTrade", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("preparation".equals(automationID)) {
+            if (automationID.equals("preparation")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolvePreparation", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("summit".equals(automationID)) {
+            if (automationID.equals("summit")) {
                 codedButtons.add(Buttons.green("resolveSummit", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("scuttle".equals(automationID)) {
+            if (automationID.equals("scuttle")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "startToScuttleAUnit_0", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "ships"), codedButtons);
             }
 
-            if ("lucky".equals(automationID)) {
+            if (automationID.equals("lucky")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "startToLuckyShotAUnit_0", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "ship"), codedButtons);
             }
 
-            if ("refit".equals(automationID)) {
+            if (automationID.equals("refit")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveRefitTroops", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "infantry"), codedButtons);
             }
 
-            if ("seize".equals(automationID)) {
+            if (automationID.equals("seize")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveSeizeArtifactStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
 
-            if ("diplo_pressure".equals(automationID)) {
+            if (automationID.equals("diplo_pressure")) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveDiplomaticPressureStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -1003,14 +1001,14 @@ public class ActionCardHelper {
                         codedButtons);
             }
 
-            if ("renegotiation".equals(automationID)) {
+            if (automationID.equals("renegotiation")) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveDiplomaticPressureStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
 
-            if ("decoy".equals(automationID)) {
+            if (automationID.equals("decoy")) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveDecoyOperationStep1_" + game.getActiveSystem(),
                         buttonLabel));
@@ -1023,67 +1021,67 @@ public class ActionCardHelper {
                 }
             }
 
-            if ("meltdown".equals(automationID)) {
+            if (automationID.equals("meltdown")) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveReactorMeltdownStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "space dock"), codedButtons);
             }
 
-            if ("unstable".equals(automationID)) {
+            if (automationID.equals("unstable")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveUnstableStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
             }
 
-            if ("ghost_ship".equals(automationID)) {
+            if (automationID.equals("ghost_ship")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveGhostShipStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "system"), codedButtons);
             }
 
-            if ("stranded_ship".equals(automationID)) {
+            if (automationID.equals("stranded_ship")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "strandedShipStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "system"), codedButtons);
             }
 
-            if ("tactical".equals(automationID)) {
+            if (automationID.equals("tactical")) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveTacticalBombardmentStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "system"), codedButtons);
             }
 
-            if ("probe".equals(automationID)) {
+            if (automationID.equals("probe")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveProbeStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "system"), codedButtons);
             }
 
-            if ("rally".equals(automationID)) {
+            if (automationID.equals("rally")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveRally", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("industrial_initiative".equals(automationID)) {
+            if (automationID.equals("industrial_initiative")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "industrialInitiative", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("repeal".equals(automationID)) {
+            if (automationID.equals("repeal")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "getRepealLawButtons", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "law"), codedButtons);
             }
 
-            if ("divert_funding".equals(automationID)) {
+            if (automationID.equals("divert_funding")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "getDivertFundingButtons", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -1095,13 +1093,13 @@ public class ActionCardHelper {
                         codedButtons);
             }
 
-            if ("emergency_meeting".equals(automationID)) {
+            if (automationID.equals("emergency_meeting")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveEmergencyMeeting", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("f_researched".equals(automationID)) {
+            if (automationID.equals("f_researched")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "focusedResearch", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2,
@@ -1110,35 +1108,35 @@ public class ActionCardHelper {
                         codedButtons);
             }
 
-            if ("fsb".equals(automationID)) {
+            if (automationID.equals("fsb")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "forwardSupplyBase", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
 
-            if ("messiah".equals(automationID)) {
+            if (automationID.equals("messiah")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "riseOfAMessiah", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
-            if ("courageous".equals(automationID)) {
+            if (automationID.equals("courageous")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "courageousStarter", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
-            if ("veto".equals(automationID)) {
+            if (automationID.equals("veto")) {
                 codedButtons.add(
                         Buttons.blue(player.getFinsFactionCheckerPrefix() + "resolveVeto", "Reveal next Agenda"));
                 sendResolveMsgToMainChannel(introMsg, codedButtons, player, game);
             }
 
-            if ("f_conscription".equals(automationID)) {
+            if (automationID.equals("f_conscription")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "fighterConscription", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("bribery".equals(automationID)) {
+            if (automationID.equals("bribery")) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2,
                         player.getRepresentation()
@@ -1146,7 +1144,7 @@ public class ActionCardHelper {
                         codedButtons);
             }
 
-            if ("investments".equals(automationID)) {
+            if (automationID.equals("investments")) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2,
                         player.getRepresentation()
@@ -1154,7 +1152,7 @@ public class ActionCardHelper {
                         codedButtons);
             }
 
-            if ("psionic_hammer".equals(automationID)) {
+            if (automationID.equals("psionic_hammer")) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "psionicHammerStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -1164,16 +1162,16 @@ public class ActionCardHelper {
             targetMsg = player.getRepresentation()
                     + ", a reminder that you should declare which %s you are targeting now, before other players choose whether they will Sabo.";
 
-            if ("silence_space".equals(automationID)) {
+            if (automationID.equals("silence_space")) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, String.format(targetMsg, "system"), codedButtons);
             }
 
-            if ("direct_hit".equals(automationID) || "courageous".equals(automationID)) {
+            if (automationID.equals("direct_hit") || automationID.equals("courageous")) {
                 MessageHelper.sendMessageToChannel(channel2, String.format(targetMsg, "ship (if multiple)"));
             }
 
-            if ("parley".equals(automationID)) {
+            if (automationID.equals("parley")) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, String.format(targetMsg, "planet (if multiple)"), codedButtons);
             }
@@ -1183,7 +1181,7 @@ public class ActionCardHelper {
             // multiple)"), codedButtons);
             // }
 
-            if ("ghost_squad".equals(automationID)) {
+            if (automationID.equals("ghost_squad")) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, String.format(targetMsg, "ground forces"), codedButtons);
             }
@@ -1220,7 +1218,7 @@ public class ActionCardHelper {
                         }
                     }
                 }
-                if ("hack".equals(automationID)) {
+                if (automationID.equals("hack")) {
                     game.setHasHackElectionBeenPlayed(true);
                     Button resetHack = Buttons.red("hack_election", "Set the Voting Order as Normal");
                     List<Button> hackButtons = List.of(resetHack);
@@ -1231,12 +1229,12 @@ public class ActionCardHelper {
                             player,
                             hackButtons);
                 }
-                if ("insider".equals(automationID)) {
+                if (automationID.equals("insider")) {
                     codedButtons.add(Buttons.green(
                             player.getFinsFactionCheckerPrefix() + "resolveInsiderInformation", buttonLabel));
                     MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
                 }
-                if ("assassin".equals(automationID)) {
+                if (automationID.equals("assassin")) {
                     codedButtons.add(
                             Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveAssRepsStep1", buttonLabel));
                     MessageHelper.sendMessageToChannelWithButtons(
@@ -1477,8 +1475,7 @@ public class ActionCardHelper {
         List<Map.Entry<String, List<String>>> displayOrder = new ArrayList<>(cardsByName.entrySet());
         displayOrder.sort(Map.Entry.comparingByKey());
         for (Map.Entry<String, List<String>> acEntryList : displayOrder) {
-            sb.append("\n").append(index).append("\\. ");
-            index++;
+            sb.append("\n").append(index++).append("\\. ");
             sb.append(CardEmojis.ActionCard.toString()
                     .repeat(acEntryList.getValue().size()));
             sb.append(" _").append(acEntryList.getKey()).append("_");
@@ -1522,7 +1519,7 @@ public class ActionCardHelper {
                 + Mapper.getActionCard(acID).getName() + "_ from the action card discard pile.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
 
-        sendActionCardInfo(game, player, event);
+        ActionCardHelper.sendActionCardInfo(game, player, event);
         if (player.hasAbility("autonetic_memory")) {
             String message;
             if (player.hasRelic("codex") || player.hasRelic("absol_codex")) {
@@ -1534,7 +1531,7 @@ public class ActionCardHelper {
                         + ", please discard 1 action card due to your **Cybernetic Madness** ability.";
             }
             MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(), message, getDiscardActionCardButtons(player, false));
+                    player.getCardsInfoThread(), message, ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
         ButtonHelper.checkACLimit(game, player);
     }
@@ -1563,12 +1560,12 @@ public class ActionCardHelper {
                 + "\n";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
 
-        sendActionCardInfo(game, player);
+        ActionCardHelper.sendActionCardInfo(game, player);
     }
 
     @ButtonHandler("riseOfAMessiah")
     public static void riseOfAMessiah(ButtonInteractionEvent event, Player player, Game game) {
-        doRise(player, event, game);
+        ActionCardHelper.doRise(player, event, game);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1616,7 +1613,7 @@ public class ActionCardHelper {
 
     @ButtonHandler("fighterConscription")
     public static void fighterConscription(ButtonInteractionEvent event, Player player, Game game) {
-        doFfCon(event, player, game);
+        ActionCardHelper.doFfCon(event, player, game);
         ButtonHelper.deleteMessage(event);
     }
 

@@ -17,7 +17,7 @@ import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
 public interface TI4Emoji {
 
     default Emoji asEmoji() {
-        String mention = toString();
+        String mention = this.toString();
         if (mention.isBlank()) return null;
         return Emoji.fromFormatted(mention);
     }

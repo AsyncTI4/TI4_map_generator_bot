@@ -117,7 +117,7 @@ public class StartingTechDraftItem extends DraftItem {
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            allItems.add(generate(Category.STARTINGTECH, faction.getAlias()));
+            allItems.add(DraftItem.generate(Category.STARTINGTECH, faction.getAlias()));
         }
         return allItems;
     }
@@ -135,7 +135,7 @@ public class StartingTechDraftItem extends DraftItem {
             if (Arrays.asList(results).contains(faction.getAlias())) {
                 continue;
             }
-            allItems.add(generate(Category.STARTINGTECH, faction.getAlias()));
+            allItems.add(DraftItem.generate(Category.STARTINGTECH, faction.getAlias()));
         }
         return allItems;
     }

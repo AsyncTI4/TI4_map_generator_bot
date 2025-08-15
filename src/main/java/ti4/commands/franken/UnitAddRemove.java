@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 
 abstract class UnitAddRemove extends GameStateSubcommand {
 
-    protected UnitAddRemove(String name, String description) {
+    public UnitAddRemove(String name, String description) {
         super(name, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_ID, "Unit Name")
                 .setRequired(true)

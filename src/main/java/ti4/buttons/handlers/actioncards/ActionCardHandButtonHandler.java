@@ -53,7 +53,7 @@ class ActionCardHandButtonHandler {
     }
 
     // TODO: bake this into /ac discard
-    @ButtonHandler("ac_discard_from_hand_")
+    @ButtonHandler(value = "ac_discard_from_hand_")
     static void acDiscardFromHand(
             ButtonInteractionEvent event, String buttonID, Game game, Player player, MessageChannel actionsChannel) {
         String acIndex = buttonID.replace("ac_discard_from_hand_", "");

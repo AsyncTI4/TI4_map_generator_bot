@@ -263,7 +263,7 @@ public class StartCombatService {
                 new TileGenerator(game, event, null, context, tile.getPosition(), player1).createFileUpload();
 
         // Create the thread
-        String finalThreadName = threadName;
+        final String finalThreadName = threadName;
 
         channel.sendMessage("Resolve combat in this thread:").queue(m -> {
             ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, m.getId());
@@ -663,7 +663,7 @@ public class StartCombatService {
                                 + " to force the other player to send you a random action card. It will send buttons to the other player to confirm.",
                         buttons);
             }
-            if ("space".equalsIgnoreCase(type)
+            if (type.equalsIgnoreCase("space")
                     && player.getSecretsUnscored().containsKey("uf")
                     && tile.getUnitHolders().get("space").getUnitCount(Units.UnitType.Flagship, player.getColor())
                             > 0) {
@@ -672,7 +672,7 @@ public class StartCombatService {
                         msg
                                 + ", a reminder that if you win the combat, and your flagship survives, you could score _Unveil Flagship_.");
             }
-            if ("space".equalsIgnoreCase(type)
+            if (type.equalsIgnoreCase("space")
                     && player.getSecretsUnscored().containsKey("dtgs")
                     && (tile.getUnitHolders().get("space").getUnitCount(Units.UnitType.Flagship, otherPlayer.getColor())
                                     > 0
@@ -760,7 +760,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, steal);
             }
             if (player.hasUnit("ghemina_mech")
-                    && "ground".equalsIgnoreCase(type)
+                    && type.equalsIgnoreCase("ground")
                     && ButtonHelper.getUnitHolderFromPlanetName(unitHolderName, game)
                                     .getUnitCount(Units.UnitType.Mech, player)
                             == 2) {
@@ -773,7 +773,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, explore);
             }
 
-            if ("space".equalsIgnoreCase(type) && player.hasTech("so")) {
+            if (type.equalsIgnoreCase("space") && player.hasTech("so")) {
                 buttons = new ArrayList<>();
                 buttons.add(
                         Buttons.gray("salvageOps_" + tile.getPosition(), "Salvage Operations", FactionEmojis.Mentak));
@@ -783,7 +783,7 @@ public class StartCombatService {
                                 + ", a reminder that if the combat does not end in a draw, you may use the button to resolve _Salvage Operations_.",
                         buttons);
             }
-            if ("space".equalsIgnoreCase(type) && game.playerHasLeaderUnlockedOrAlliance(player, "mentakcommander")) {
+            if (type.equalsIgnoreCase("space") && game.playerHasLeaderUnlockedOrAlliance(player, "mentakcommander")) {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(
@@ -1337,7 +1337,7 @@ public class StartCombatService {
         if ((p2.hasAbility("collateralized_loans"))
                 && !game.isFowMode()
                 && p2.getDebtTokenCount(p1.getColor()) > 0
-                && "space".equalsIgnoreCase(groundOrSpace)) {
+                && groundOrSpace.equalsIgnoreCase("space")) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(
                     finChecker + "collateralizedLoans_" + pos + "_" + p1.getFaction(),
@@ -1346,7 +1346,7 @@ public class StartCombatService {
         }
         if ((p1.hasAbility("collateralized_loans"))
                 && p1.getDebtTokenCount(p2.getColor()) > 0
-                && "space".equalsIgnoreCase(groundOrSpace)) {
+                && groundOrSpace.equalsIgnoreCase("space")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(
                     finChecker + "collateralizedLoans_" + pos + "_" + p2.getFaction(),
@@ -1637,7 +1637,7 @@ public class StartCombatService {
         }
 
         if (game.isLiberationC4Mode()) {
-            if ("c41".equalsIgnoreCase(tile.getTileID())) {
+            if (tile.getTileID().equalsIgnoreCase("c41")) {
                 Player sol = game.getPlayerFromColorOrFaction("sol");
                 Player xxcha = game.getPlayerFromColorOrFaction("xxcha");
                 if (sol == p1 || sol == p2 || xxcha == p1 || xxcha == p2) {

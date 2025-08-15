@@ -68,8 +68,7 @@ class ButtonRuntimeWarningService {
                 message += "\nContext time: " + contextRuntime + "ms\nResolve time: " + resolveRuntime
                         + "ms\nSave time: " + saveRuntime + "ms";
                 BotLogger.warning(new BotLogger.LogMessageOrigin(event), message);
-                ++runtimeWarningCount;
-                if (runtimeWarningCount > 20) {
+                if (++runtimeWarningCount > 20) {
                     pauseWarningsUntil = now.plusMinutes(5);
                     BotLogger.error(
                             new BotLogger.LogMessageOrigin(event),

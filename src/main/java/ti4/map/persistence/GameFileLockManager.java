@@ -13,7 +13,7 @@ class GameFileLockManager {
     }
 
     public static void wrapWithWriteLock(String gameName, Runnable runnable) {
-        ReentrantReadWriteLock lock = getLock(gameName);
+        ReentrantReadWriteLock lock = GameFileLockManager.getLock(gameName);
         lock.writeLock().lock();
         try {
             runnable.run();
@@ -23,7 +23,7 @@ class GameFileLockManager {
     }
 
     public static <T> T wrapWithWriteLock(String gameName, Supplier<T> supplier) {
-        ReentrantReadWriteLock lock = getLock(gameName);
+        ReentrantReadWriteLock lock = GameFileLockManager.getLock(gameName);
         lock.writeLock().lock();
         try {
             return supplier.get();

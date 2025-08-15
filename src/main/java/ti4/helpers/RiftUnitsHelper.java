@@ -230,7 +230,7 @@ public class RiftUnitsHelper {
         if (game.getActiveSystem() != null) {
             tile = game.getTileByPosition(game.getActiveSystem());
         }
-        if (tile != null && "82b".equalsIgnoreCase(tile.getTileID())) {
+        if (tile != null && tile.getTileID().equalsIgnoreCase("82b")) {
             for (Player p : game.getRealPlayers()) {
                 if (FoWHelper.playerHasUnitsInSystem(p, tile)) {
                     return;
@@ -266,7 +266,7 @@ public class RiftUnitsHelper {
                     channel,
                     player.getRepresentationNoPing()
                             + " is rifting some units. Please use the the buttons to choose the units you wish to risk in the gravity rift.",
-                    getButtonsForRiftingUnitsInSystem(player, game, tile));
+                    RiftUnitsHelper.getButtonsForRiftingUnitsInSystem(player, game, tile));
         }
     }
 }

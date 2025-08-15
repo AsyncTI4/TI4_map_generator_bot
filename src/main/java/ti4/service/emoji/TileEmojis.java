@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import ti4.image.TileHelper;
 import ti4.model.TileModel;
+import ti4.model.TileModel.TileBack;
 
 public enum TileEmojis implements TI4Emoji {
 
@@ -354,9 +355,9 @@ public enum TileEmojis implements TI4Emoji {
         TileModel tileModel = TileHelper.getTileById(tileID);
 
         return switch (tileModel.getTileBack()) {
-            case GREEN -> TileGreenBack;
-            case BLUE -> TileBlueBack;
-            case RED -> TileRedBack;
+            case TileBack.GREEN -> TileGreenBack;
+            case TileBack.BLUE -> TileBlueBack;
+            case TileBack.RED -> TileRedBack;
             default -> TileBlackBack;
         };
     }

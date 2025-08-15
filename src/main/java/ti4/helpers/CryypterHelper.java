@@ -192,14 +192,14 @@ public class CryypterHelper {
         String[] fields = buttonID.split("_");
         Player mentakPlayer = game.getPlayerFromColorOrFaction(fields[1]);
         String choice = fields[2];
-        if ("accept".equals(choice)) {
+        if (choice.equals("accept")) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     player.getRepresentation()
                             + " has chosen to vote for the outcome indicated by "
                             + mentakPlayer.getRepresentation()
                             + ".");
-        } else if ("PNdecline".equals(choice)) {
+        } else if (choice.equals("PNdecline")) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     player.getRepresentation()
@@ -275,7 +275,7 @@ public class CryypterHelper {
     public static void resolveYssarilEnvoy(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String[] fields = buttonID.split("_");
         String choice = fields[1];
-        if ("decline".equals(choice)) {
+        if (choice.equals("decline")) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     player.getRepresentation() + " has chosen not to resolve the effect of the Yssaril Envoy.");

@@ -103,7 +103,7 @@ public class FoWHelper {
                 && !game.getFowOption(FOWOption.STATS_FROM_HS_ONLY)) {
             return true;
         }
-        initializeFog(game, viewingPlayer, false);
+        FoWHelper.initializeFog(game, viewingPlayer, false);
         return hasHomeSystemInView(player, viewingPlayer);
     }
 
@@ -635,7 +635,7 @@ public class FoWHelper {
                 for (String token : tokenList) {
                     for (String wormholeID : wormholeIDs) {
                         if (token.contains(wormholeID)
-                                && !("eta".equals(wormholeID)
+                                && !(wormholeID.equals("eta")
                                         && (token.contains("beta")
                                                 || token.contains("theta")
                                                 || token.contains("zeta")))) {
@@ -859,7 +859,7 @@ public class FoWHelper {
 
         for (String pos : getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
             Tile tile2 = game.getTileByPosition(pos);
-            if (playerHasActualShipsInSystem(player, tile2)) {
+            if (FoWHelper.playerHasActualShipsInSystem(player, tile2)) {
                 return true;
             }
         }

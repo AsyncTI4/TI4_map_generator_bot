@@ -21,10 +21,10 @@ public abstract class SettingInterface {
 
     protected String id;
     protected String name;
-    protected String emoji;
+    protected String emoji = null;
     protected boolean editable = true;
-    protected boolean disabled;
-    protected String extraInfo;
+    protected boolean disabled = false;
+    protected String extraInfo = null;
 
     SettingInterface(String id, String name) {
         this.id = id;
@@ -82,7 +82,7 @@ public abstract class SettingInterface {
         if (emoji == null) {
             this.emoji = null;
         } else {
-            this.emoji = emoji.toString();
+            setEmoji(emoji.toString());
         }
     }
 }

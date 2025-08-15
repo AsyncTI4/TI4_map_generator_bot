@@ -409,8 +409,8 @@ public class ButtonHelperCommanders {
             AddUnitService.addUnits(context.getEvent(), to, game, player.getColor(), unitStringTo);
 
             String fromLang = "from " + planetName
-                    + ("space".equals(planetName) ? " in " + from.getRepresentationForButtons(game, player) : "");
-            String toLang = "space".equals(planetNameTo)
+                    + (planetName.equals("space") ? " in " + from.getRepresentationForButtons(game, player) : "");
+            String toLang = planetNameTo.equals("space")
                     ? "in space of tile " + to.getRepresentationForButtons(game, player)
                     : "on " + planetNameTo;
             String message = player.getRepresentation() + " your " + unitType.humanReadableName()
@@ -567,7 +567,7 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " is paying 1 trade good to look at the top card of a deck.");
-        List<Button> buttons = getUydaiCommanderButtons(game, false, player);
+        List<Button> buttons = ButtonHelperCommanders.getUydaiCommanderButtons(game, false, player);
         String message =
                 player.getRepresentationUnfogged() + ", please choose which deck you wish to look at the top of.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
@@ -618,7 +618,7 @@ public class ButtonHelperCommanders {
                 MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
             }
         }
-        if ("yes".equalsIgnoreCase(ableToBot)) {
+        if (ableToBot.equalsIgnoreCase("yes")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(
                     Buttons.red(player.getFinsFactionCheckerPrefix() + "uydaiCommanderBottom_" + target, "Bottom It"));

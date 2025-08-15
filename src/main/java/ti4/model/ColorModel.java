@@ -97,9 +97,9 @@ public class ColorModel implements ModelInterface {
     //    else                      X = ((XsRGB+0.055)/1.055) ^ 2.4
     private static double relativeLuminance(Color color) {
         if (color == null) return 0;
-        double RsRGB = color.getRed() / 255.0;
-        double GsRGB = color.getGreen() / 255.0;
-        double BsRGB = color.getBlue() / 255.0;
+        double RsRGB = ((double) color.getRed()) / 255.0;
+        double GsRGB = ((double) color.getGreen()) / 255.0;
+        double BsRGB = ((double) color.getBlue()) / 255.0;
         double r = color.getRed() <= 10 ? RsRGB / 12.92 : Math.pow((RsRGB + 0.055) / 1.055, 2.4);
         double g = color.getGreen() <= 10 ? GsRGB / 12.92 : Math.pow((GsRGB + 0.055) / 1.055, 2.4);
         double b = color.getBlue() <= 10 ? BsRGB / 12.92 : Math.pow((BsRGB + 0.055) / 1.055, 2.4);

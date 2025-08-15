@@ -33,7 +33,7 @@ public abstract class BagDraft {
         return null;
     }
 
-    protected BagDraft(Game owner) {
+    public BagDraft(Game owner) {
         this.owner = owner;
     }
 

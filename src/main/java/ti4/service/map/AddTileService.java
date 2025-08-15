@@ -98,7 +98,7 @@ public class AddTileService {
                 break;
             case HS:
                 availableTiles = TileHelper.getAllTileModels().stream()
-                        .filter(tileModel -> TileBack.GREEN == tileModel.getTileBack())
+                        .filter(tileModel -> TileBack.GREEN.equals(tileModel.getTileBack()))
                         .filter(tileModel -> sources.contains(tileModel.getSource()))
                         .filter(tileModel -> !existingTileModels.contains(tileModel))
                         .filter(tileModel -> !drawnTiles.contains(tileModel.getId()))
@@ -117,7 +117,7 @@ public class AddTileService {
     private static List<TileModel> findBlueTiles(
             Set<ComponentSource> sources, Set<TileModel> existingTileModels, List<String> drawnTiles) {
         return TileHelper.getAllTileModels().stream()
-                .filter(tileModel -> TileBack.BLUE == tileModel.getTileBack())
+                .filter(tileModel -> TileBack.BLUE.equals(tileModel.getTileBack()))
                 .filter(tileModel -> sources.contains(tileModel.getSource()))
                 .filter(tileModel -> !existingTileModels.contains(tileModel))
                 .filter(tileModel -> !drawnTiles.contains(tileModel.getId()))
@@ -127,7 +127,7 @@ public class AddTileService {
     private static List<TileModel> findRedTiles(
             Set<ComponentSource> sources, Set<TileModel> existingTileModels, List<String> drawnTiles) {
         return TileHelper.getAllTileModels().stream()
-                .filter(tileModel -> TileBack.RED == tileModel.getTileBack())
+                .filter(tileModel -> TileBack.RED.equals(tileModel.getTileBack()))
                 .filter(tileModel -> sources.contains(tileModel.getSource()))
                 // Allow duplicate tiles if they are empty
                 .filter(tileModel -> tileModel.isEmpty()

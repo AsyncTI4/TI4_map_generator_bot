@@ -106,7 +106,7 @@ public class StartTurnService {
         }
 
         String buttonText = "Use buttons to do your turn. ";
-        if ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName())) {
+        if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
             buttonText +=
                     "Your strategy card initiative number is " + player.getSCs().toArray()[0] + ".";
         }
@@ -244,7 +244,7 @@ public class StartTurnService {
         sb.append(player.getRepresentationUnfogged());
         sb.append(" Please resolve these before doing anything else:\n");
         for (int sc : game.getPlayedSCsInOrder(player)) {
-            if ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName())) {
+            if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
                 String num = sc + "";
                 num = num.substring(num.length() - 1);
                 for (Integer sc2 : player.getSCs()) {
@@ -315,7 +315,7 @@ public class StartTurnService {
                 if (!game.getPlayedSCs().contains(SC)) {
                     hadAnyUnplayedSCs = true;
                     String name = Helper.getSCName(SC, game);
-                    if ("pbd1000".equalsIgnoreCase(game.getName())) {
+                    if (game.getName().equalsIgnoreCase("pbd1000")) {
                         name += "(" + SC + ")";
                     }
                     Button strategicAction = Buttons.green(
@@ -345,7 +345,7 @@ public class StartTurnService {
                                 startButtons.add(lButton);
                             }
                         } else {
-                            if ("naaluagent".equalsIgnoreCase(leaderID)) {
+                            if (leaderID.equalsIgnoreCase("naaluagent")) {
                                 Button lButton = Buttons.gray(
                                         finChecker + prefix + "leader_" + leaderID, "Use " + leaderName, leaderEmoji);
                                 startButtons.add(lButton);

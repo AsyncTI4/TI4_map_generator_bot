@@ -68,7 +68,7 @@ public class MiltySettings extends SettingsMenu {
         sliceSettings = new SliceGenerationSettings(game, json, this);
 
         if (json != null && json.has("messageId")) {
-            setMessageId(json.get("messageId").asText(null));
+            this.setMessageId(json.get("messageId").asText(null));
         }
     }
 

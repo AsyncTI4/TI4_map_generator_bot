@@ -96,7 +96,7 @@ class Setup extends GameStateSubcommand {
         if (pingHours != null) {
             if (pingHours == 0) {
                 game.setAutoPing(false);
-                game.setAutoPingSpacer(0);
+                game.setAutoPingSpacer(pingHours);
             } else {
                 game.setAutoPing(true);
                 if (pingHours < 1) {

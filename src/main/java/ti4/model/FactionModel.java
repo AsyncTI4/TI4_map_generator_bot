@@ -60,15 +60,16 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     public String getFactionEmoji() {
         if (homebrewReplacesID != null)
             return FactionEmojis.getFactionIcon(homebrewReplacesID).toString();
-        return FactionEmojis.getFactionIcon(alias).toString();
+        return FactionEmojis.getFactionIcon(getAlias()).toString();
     }
 
     public String getShortName() {
-        return Optional.ofNullable(shortName).orElse(factionName.replace("The ", ""));
+        return Optional.ofNullable(shortName).orElse(getFactionName().replace("The ", ""));
     }
 
     public String getShortTag() {
-        return StringUtils.left(Optional.ofNullable(shortTag).orElse(alias), 3).toUpperCase();
+        return StringUtils.left(Optional.ofNullable(shortTag).orElse(getAlias()), 3)
+                .toUpperCase();
     }
 
     public List<String> getFactionTech() {
@@ -83,8 +84,8 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     public int finalStartingTechAmount() {
         int amount = 0;
         if (getStartingTech() != null) amount += getStartingTech().size();
-        if (startingTechAmount != null) amount += startingTechAmount;
-        if (alias.startsWith("keleres")) amount += 2;
+        if (getStartingTechAmount() != null) amount += getStartingTechAmount();
+        if (getAlias().startsWith("keleres")) amount += 2;
         return amount;
     }
 
@@ -184,8 +185,8 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         // FOOTER
         StringBuilder footer = new StringBuilder();
         if (includeID)
-            footer.append("ID: ").append(alias).append("    Source: ").append(source);
-        if (includeAliases) footer.append("\nAliases: ").append(AliasHandler.getFactionAliasEntryList(alias));
+            footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
+        if (includeAliases) footer.append("\nAliases: ").append(AliasHandler.getFactionAliasEntryList(getAlias()));
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.black);
@@ -199,7 +200,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(getFactionEmoji() + " " + getFactionNameWithSourceEmoji());
 
         // DESCRIPTION - <Commodity><Commodity><Commodity>
-        eb.setDescription("\n" + MiscEmojis.comm(commodities));
+        eb.setDescription("\n" + MiscEmojis.comm(getCommodities()));
 
         // FIELDS
         // Abilities
@@ -261,7 +262,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         eb.addField("__Leaders__", sb.toString(), false);
 
         sb = new StringBuilder();
-        sb.append(Helper.getUnitListEmojis(startingFleet)).append("\n");
+        sb.append(Helper.getUnitListEmojis(getStartingFleet())).append("\n");
         eb.addField("__Starting Fleet__", sb.toString(), false);
 
         sb = new StringBuilder();
@@ -272,16 +273,18 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
                 // sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
             }
         } else {
-            if (startingTechOptions != null && startingTechAmount != 0 && !startingTechOptions.isEmpty()) {
-                sb.append("\nPick ").append(startingTechAmount).append(" of the following:\n");
-                for (String id : startingTechOptions) {
+            if (getStartingTechOptions() != null
+                    && getStartingTechAmount() != 0
+                    && !getStartingTechOptions().isEmpty()) {
+                sb.append("\nPick ").append(getStartingTechAmount()).append(" of the following:\n");
+                for (String id : getStartingTechOptions()) {
                     TechnologyModel model = Mapper.getTech(id);
                     sb.append(model.getCondensedReqsEmojis(false)).append(" ").append(model.getName());
                     // sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
                 }
             }
         }
-        if (factionName.toLowerCase().contains("keleres")) {
+        if (getFactionName().toLowerCase().contains("keleres")) {
             sb = new StringBuilder();
             sb.append("Choose 2 non-faction technologies owned by other players.");
         }
@@ -293,23 +296,24 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         searchString = searchString.toLowerCase();
-        return factionName.contains(searchString)
-                || alias.contains(searchString)
+        return getFactionName().contains(searchString)
+                || getAlias().contains(searchString)
                 || getShortTag().contains(searchString)
-                || source.toString().contains(searchString)
-                || alias.equals(AliasHandler.resolveFaction(searchString));
+                || getSource().toString().contains(searchString)
+                || getAlias().equals(AliasHandler.resolveFaction(searchString));
     }
 
     @Override
     public String getAutoCompleteName() {
-        return factionName + " [" + source + "]";
+        return getFactionName() + " [" + source + "]";
     }
 
     public String getFactionNameWithSourceEmoji() {
-        return factionName + source.emoji();
+        return getFactionName() + getSource().emoji();
     }
 
     public String getFactionTitle() {
-        return getFactionEmoji() + " __**" + factionName + "**__" + source.emoji();
+        return getFactionEmoji() + " __**" + getFactionName() + "**__"
+                + getSource().emoji();
     }
 }

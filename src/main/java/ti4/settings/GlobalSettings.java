@@ -82,7 +82,7 @@ public class GlobalSettings {
     public static String getSettingsRepresentation() {
         StringBuilder sb = new StringBuilder("### Global Settings:\n```");
         for (Entry<String, Object> entries :
-                settings.entrySet().stream().sorted(Entry.comparingByKey()).toList()) {
+                getSettings().entrySet().stream().sorted(Entry.comparingByKey()).toList()) {
             sb.append(entries.getKey()).append(": ").append(entries.getValue()).append("\n");
         }
         sb.append("```");

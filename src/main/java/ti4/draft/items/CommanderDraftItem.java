@@ -68,7 +68,7 @@ public class CommanderDraftItem extends DraftItem {
             leaders.removeIf((String leader) ->
                     !"commander".equals(allLeaders.get(leader).getType()));
             for (String leader : leaders) {
-                allItems.add(generate(Category.COMMANDER, leader));
+                allItems.add(DraftItem.generate(Category.COMMANDER, leader));
             }
         }
         return allItems;
@@ -92,7 +92,7 @@ public class CommanderDraftItem extends DraftItem {
                 if (Arrays.asList(results).contains(leader)) {
                     continue;
                 }
-                allItems.add(generate(Category.COMMANDER, leader));
+                allItems.add(DraftItem.generate(Category.COMMANDER, leader));
             }
         }
         return allItems;

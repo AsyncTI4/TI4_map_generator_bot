@@ -16,9 +16,9 @@ import ti4.map.Player;
 public class HeroUnlockCheckService {
     public static void checkIfHeroUnlocked(Game game, Player player) {
         Leader playerLeader = player.getLeader(Constants.HERO).orElse(null);
-        if (game.isLiberationC4Mode() && "nekro".equalsIgnoreCase(player.getFaction())) {
+        if (game.isLiberationC4Mode() && player.getFaction().equalsIgnoreCase("nekro")) {
             for (Player p2 : game.getRealPlayers()) {
-                if (!"nekro".equalsIgnoreCase(p2.getFaction())) {
+                if (!p2.getFaction().equalsIgnoreCase("nekro")) {
                     checkIfHeroUnlocked(game, p2);
                 }
             }
