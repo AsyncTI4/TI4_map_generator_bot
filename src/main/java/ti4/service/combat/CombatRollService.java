@@ -611,8 +611,8 @@ public class CombatRollService {
         UnitHolder space = activeSystem.getUnitHolders().get("space");
         StringBuilder extra = new StringBuilder();
         boolean usesX89c4 = player.hasTech("x89c4")
-            && (rollType == CombatRollType.combatround || rollType == CombatRollType.bombardment)
-            && (!unitHolder.getName().equalsIgnoreCase("space") || rollType == CombatRollType.bombardment);
+                && (rollType == CombatRollType.combatround || rollType == CombatRollType.bombardment)
+                && (!unitHolder.getName().equalsIgnoreCase("space") || rollType == CombatRollType.bombardment);
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unitModel = entry.getKey();
             int numOfUnit = entry.getValue();
