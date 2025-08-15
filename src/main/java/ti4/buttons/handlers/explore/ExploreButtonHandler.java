@@ -1,5 +1,6 @@
 package ti4.buttons.handlers.explore;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -463,7 +464,7 @@ class ExploreButtonHandler {
                     player.getCorrectChannel(), info[1] + " was exhausted by _Impressment Programs_.");
         }
         if (tile != null && player.getTechs().contains("dsdihmy")) {
-            List<Button> produce = new java.util.ArrayList<>();
+            var produce = new ArrayList<Button>();
             String pos = tile.getPosition();
             produce.add(Buttons.blue("dsdihmy_" + pos, "Produce (1) Units"));
             MessageHelper.sendMessageToChannelWithButtons(

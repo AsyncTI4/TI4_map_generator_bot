@@ -1,5 +1,6 @@
 package ti4.buttons.handlers.agenda.resolver;
 
+import java.util.List;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
@@ -28,7 +29,7 @@ public class WormholeResearchAgendaResolver implements ForAgainstAgendaResolver 
             Button loseStrat =
                     Buttons.red(finsFactionCheckerPrefix + "decrease_strategy_cc", "Lose 1 Strategy Token");
             Button done = Buttons.red(finsFactionCheckerPrefix + "deleteButtons", "Done Losing Command Tokens");
-            var buttons = java.util.List.of(loseTactic, loseFleet, loseStrat, done);
+            var buttons = List.of(loseTactic, loseFleet, loseStrat, done);
             String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
                     + player.getCCRepresentation() + ". Use buttons to lose command tokens.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);

@@ -2,6 +2,7 @@ package ti4.buttons;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -116,7 +117,7 @@ public class Buttons {
                     || !game.checkAllTilesAreOfficial()
                     || game.getFactions().stream()
                             .map(Mapper::getFaction)
-                            .filter(java.util.Objects::nonNull)
+                            .filter(Objects::nonNull)
                             .anyMatch(faction -> !faction.getSource().isOfficial())) {
                 return false;
             }

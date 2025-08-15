@@ -526,7 +526,7 @@ public class TileGenerator {
                         if (prodInSystem == 11) {
                             textModifer = 0;
                         }
-                        List<String> problematicTiles = java.util.List.of("25", "26", "64"); // quann, lodor, atlas
+                        var problematicTiles = List.of("25", "26", "64"); // quann, lodor, atlas
                         BufferedImage gearImage = ImageHelper.readScaled(
                                 ResourceHelper.getInstance().getTileFile("production_representation.png"), 64, 64);
                         int xMod;
@@ -554,7 +554,7 @@ public class TileGenerator {
 
                         int xMod = -155;
                         int yMod = -290;
-                        List<String> problematicTiles = java.util.List.of("25", "26", "64"); // quann, lodor, atlas
+                        var problematicTiles = List.of("25", "26", "64"); // quann, lodor, atlas
                         if (tile.getUnitHolders().size() != 4 || problematicTiles.contains(tile.getTileID())) {
                             xMod = -15;
                         }
