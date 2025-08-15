@@ -1,9 +1,8 @@
 package ti4.message;
 
+import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.concurrent.TimeUnit;
-
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
@@ -282,11 +281,11 @@ public class BotLogger {
                     scheduleWebhookMessage(msgChunk); // Send message on webhook
                 } else {
                     channel.sendMessage(msgChunk).queue(m -> m.createThreadChannel("Stack Trace")
-                        .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-                        .queue(t -> {
-                            MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(err));
-                            t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
-                        }));
+                            .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
+                            .queue(t -> {
+                                MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(err));
+                                t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
+                            }));
                 }
             }
         }
