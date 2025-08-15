@@ -13,6 +13,7 @@ public final class PlanetAbilities {
 
     public interface PlanetButtonAbility {
         boolean enabled(LandingContext ctx);
+
         void contribute(LandingContext ctx, List<Button> buttons);
     }
 

@@ -5,5 +5,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public interface MoveAbility {
     boolean enabled(MoveContext ctx);
+
     void contribute(MoveContext ctx, List<Button> buttons);
 }
