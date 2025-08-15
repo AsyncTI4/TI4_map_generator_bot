@@ -25,7 +25,7 @@ public class AbsolConstitutionAgendaResolver implements AgendaResolver {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# Removed all laws");
             int counter = 40;
             boolean lawFound = false;
-            ArrayList<String> discardedAgendas = new ArrayList<>();
+            List<String> discardedAgendas = new ArrayList<>();
             while (counter > 0 && !lawFound) {
                 counter--;
                 String id2 = game.revealAgenda(false);

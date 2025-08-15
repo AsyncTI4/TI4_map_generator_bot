@@ -134,26 +134,15 @@ public class StartScenario extends GameStateSubcommand {
                 }
                 boolean speaker = faction.equalsIgnoreCase("nekro");
                 String color = players.get(face).getNextAvailableColour();
-                switch (faction.toLowerCase()) {
-                    case "ghost":
-                        color = RandomHelper.isOneInX(2) ? "ruby" : "bloodred";
-                        break;
-                    case "xxcha":
-                        color = RandomHelper.isOneInX(2) ? "sunset" : "tropical";
-                        break;
-                    case "sol":
-                        color = RandomHelper.isOneInX(2) ? "dawn" : "wasp";
-                        break;
-                    case "naaz":
-                        color = RandomHelper.isOneInX(2) ? "lime" : "sherbet";
-                        break;
-                    case "nekro":
-                        color = RandomHelper.isOneInX(2) ? "black" : "poison";
-                        break;
-                    case "nomad":
-                        color = RandomHelper.isOneInX(2) ? "navy" : "glacier";
-                        break;
-                }
+                color = switch (faction.toLowerCase()) {
+                    case "ghost" -> RandomHelper.isOneInX(2) ? "ruby" : "bloodred";
+                    case "xxcha" -> RandomHelper.isOneInX(2) ? "sunset" : "tropical";
+                    case "sol" -> RandomHelper.isOneInX(2) ? "dawn" : "wasp";
+                    case "naaz" -> RandomHelper.isOneInX(2) ? "lime" : "sherbet";
+                    case "nekro" -> RandomHelper.isOneInX(2) ? "black" : "poison";
+                    case "nomad" -> RandomHelper.isOneInX(2) ? "navy" : "glacier";
+                    default -> color;
+                };
                 if (tile != null) {
                     MiltyService.secondHalfOfPlayerSetup(
                             players.get(face), game, color, faction, tile.getPosition(), event, speaker);
