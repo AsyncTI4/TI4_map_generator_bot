@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -990,7 +991,6 @@ public class AutoCompleteProvider {
                 /* From others */
                 // none of them are populated from here
         }
-        // System.out.println(options.toString()); // Debug line
         event.replyChoices(Objects.requireNonNullElse(options, Collections.emptyList()))
                 .queue();
     }

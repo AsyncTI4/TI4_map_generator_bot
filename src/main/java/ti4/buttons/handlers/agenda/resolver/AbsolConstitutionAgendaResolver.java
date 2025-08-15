@@ -2,6 +2,7 @@ package ti4.buttons.handlers.agenda.resolver;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.AgendaHelper;
 import ti4.image.Mapper;
@@ -25,7 +26,7 @@ public class AbsolConstitutionAgendaResolver implements AgendaResolver {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# Removed all laws");
             int counter = 40;
             boolean lawFound = false;
-            ArrayList<String> discardedAgendas = new ArrayList<>();
+            List<String> discardedAgendas = new ArrayList<>();
             while (counter > 0 && !lawFound) {
                 counter--;
                 String id2 = game.revealAgenda(false);

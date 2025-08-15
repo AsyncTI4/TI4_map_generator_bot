@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -281,7 +282,7 @@ public class StartPhaseService {
         if (!game.getStoredValue("agendaConstitution").isEmpty()) {
             game.setStoredValue("agendaConstitution", "");
             for (Player player2 : game.getRealPlayers()) {
-                ArrayList<String> exhausted = new ArrayList<>();
+                List<String> exhausted = new ArrayList<>();
                 for (String planet : player2.getPlanets()) {
                     if (planet.contains("custodia") || planet.contains("ghoti")) {
                         continue;
@@ -317,7 +318,7 @@ public class StartPhaseService {
         if (!game.getStoredValue("agendaArmsReduction").isEmpty()) {
             game.setStoredValue("agendaArmsReduction", "");
             for (Player player2 : game.getRealPlayers()) {
-                ArrayList<String> exhausted = new ArrayList<>();
+                List<String> exhausted = new ArrayList<>();
                 for (String planet : player2.getPlanets()) {
                     if (planet.contains("custodia") || planet.contains("ghoti")) {
                         continue;
@@ -386,7 +387,7 @@ public class StartPhaseService {
         if (!game.getStoredValue("agendaRepGov").isEmpty()) {
             for (Player player2 : game.getRealPlayers()) {
                 if (game.getStoredValue("agendaRepGov").contains(player2.getFaction())) {
-                    ArrayList<String> exhausted = new ArrayList<>();
+                    List<String> exhausted = new ArrayList<>();
                     for (String planet : player2.getPlanets()) {
                         Planet p = game.getPlanetsInfo().get(planet);
                         if (p != null && p.getPlanetTypes().contains("cultural")) {

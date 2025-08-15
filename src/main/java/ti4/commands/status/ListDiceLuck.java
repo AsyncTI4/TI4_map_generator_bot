@@ -3,6 +3,7 @@ package ti4.commands.status;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -37,7 +38,7 @@ class ListDiceLuck extends GameStateSubcommand {
             if (!player.isRealPlayer()) continue;
             playerAverageDiceLuck(player, record);
         }
-        ArrayList<String> lines = new ArrayList<>();
+        var lines = new ArrayList<String>();
         for (Map.Entry<String, Double> entry : record.entrySet()) {
             lines.add(entry.getKey());
         }
