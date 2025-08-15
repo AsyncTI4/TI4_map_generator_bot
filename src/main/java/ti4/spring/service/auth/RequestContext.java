@@ -11,7 +11,7 @@ public class RequestContext {
     private static final ThreadLocal<Game> game = new ThreadLocal<>();
 
     @NotNull
-    static String getUserId() {
+    public static String getUserId() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
