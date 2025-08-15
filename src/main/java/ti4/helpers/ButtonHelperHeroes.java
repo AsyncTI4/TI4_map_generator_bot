@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -53,6 +52,10 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 public class ButtonHelperHeroes {
 
@@ -1288,7 +1291,7 @@ public class ButtonHelperHeroes {
     @ButtonHandler("cabalHeroAll")
     public static void resolveCabalHero(ButtonInteractionEvent event, Player player, Game game) {
         List<Tile> tiles = new ArrayList<>();
-        Map<String, List<TI4Emoji>> totalLosses = new HashMap();
+        Map<String, List<TI4Emoji>> totalLosses = new HashMap<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2.hasTech("dt2")
                     || p2.getUnitsOwned().contains("cabal_spacedock")

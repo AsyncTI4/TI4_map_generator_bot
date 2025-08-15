@@ -1,12 +1,12 @@
 package ti4.service.fow;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -251,7 +251,7 @@ public class CreateFoWGameService {
     private static String getInfoTextFromFile(String file) {
         String path = ResourceHelper.getInstance().getHelpFile(file);
         try {
-            return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+            return Files.readString(Paths.get(path));
         } catch (Exception e) {
             return file + " IS BLANK";
         }

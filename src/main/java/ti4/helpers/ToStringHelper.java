@@ -1,11 +1,12 @@
 package ti4.helpers;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Arrays;
 import java.util.Objects;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class ToStringHelper {
+public final class ToStringHelper {
 
     public static ToStringHelper of(Object self) {
         return new ToStringHelper(self.getClass().getSimpleName());

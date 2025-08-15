@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -98,7 +99,7 @@ public class AddTileService {
                 break;
             case HS:
                 availableTiles = TileHelper.getAllTileModels().stream()
-                        .filter(tileModel -> TileBack.GREEN == tileModel.getTileBack())
+                        .filter(tileModel -> tileModel.getTileBack() == TileBack.GREEN)
                         .filter(tileModel -> sources.contains(tileModel.getSource()))
                         .filter(tileModel -> !existingTileModels.contains(tileModel))
                         .filter(tileModel -> !drawnTiles.contains(tileModel.getId()))
@@ -117,7 +118,7 @@ public class AddTileService {
     private static List<TileModel> findBlueTiles(
             Set<ComponentSource> sources, Set<TileModel> existingTileModels, List<String> drawnTiles) {
         return TileHelper.getAllTileModels().stream()
-                .filter(tileModel -> TileBack.BLUE == tileModel.getTileBack())
+                .filter(tileModel -> tileModel.getTileBack() == TileBack.BLUE)
                 .filter(tileModel -> sources.contains(tileModel.getSource()))
                 .filter(tileModel -> !existingTileModels.contains(tileModel))
                 .filter(tileModel -> !drawnTiles.contains(tileModel.getId()))
@@ -127,7 +128,7 @@ public class AddTileService {
     private static List<TileModel> findRedTiles(
             Set<ComponentSource> sources, Set<TileModel> existingTileModels, List<String> drawnTiles) {
         return TileHelper.getAllTileModels().stream()
-                .filter(tileModel -> TileBack.RED == tileModel.getTileBack())
+                .filter(tileModel -> tileModel.getTileBack() == TileBack.RED)
                 .filter(tileModel -> sources.contains(tileModel.getSource()))
                 // Allow duplicate tiles if they are empty
                 .filter(tileModel -> tileModel.isEmpty()

@@ -1,11 +1,12 @@
 package ti4.cron;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Nonnull;
+
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import ti4.AsyncTI4DiscordBot;
@@ -80,10 +81,8 @@ public class InteractionLogCron {
                     ThreadGetter.getThreadInChannel(
                             primaryBotLogChannel,
                             (String) entry.getKey().getMethod("getThreadName").invoke(null),
-                            (threadChannel) -> {
-                                MessageHelper.sendMessageToChannel(
-                                        threadChannel, entry.getValue().toString());
-                            });
+                            (threadChannel) -> MessageHelper.sendMessageToChannel(
+                                    threadChannel, entry.getValue().toString()));
                 } catch (Exception e) {
                     BotLogger.error(
                             "Failed to send a message via ThreadGetter in InteractionLogCron (this should not happen)",

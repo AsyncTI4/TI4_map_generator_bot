@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -207,14 +208,14 @@ public class GameStatisticsFilterer {
     private static boolean isDiscordantStarsGame(Game game) {
         return game.isDiscordantStarsMode()
                 || Mapper.getFactionsValues().stream()
-                        .filter(faction -> ComponentSource.ds == faction.getSource())
+                        .filter(faction -> faction.getSource() == ComponentSource.ds)
                         .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
     }
 
     private static boolean isMiltyModGame(Game game) {
         return game.isMiltyModMode()
                 || Mapper.getFactionsValues().stream()
-                        .filter(faction -> ComponentSource.miltymod == faction.getSource())
+                        .filter(faction -> faction.getSource() == ComponentSource.miltymod)
                         .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
     }
 

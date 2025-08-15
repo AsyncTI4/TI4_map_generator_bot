@@ -1,10 +1,5 @@
 package ti4.image;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,6 +19,12 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
@@ -660,7 +661,7 @@ public class Mapper {
     }
 
     public static List<String> getDraftErratasSources(ComponentSource CompSource) {
-        return getFrankenErrata().values().stream()
+        return frankenErrata.values().stream()
                 .filter(model -> model.searchSource(CompSource)) // searchSource not implemented
                 .map(model -> model.getSource().toString())
                 .toList();
@@ -786,7 +787,7 @@ public class Mapper {
     }
 
     public static List<String> getPromissoryNotesSources(ComponentSource CompSource) {
-        return getPromissoryNotes().values().stream()
+        return promissoryNotes.values().stream()
                 .filter(model -> model.searchSource(CompSource))
                 .map(model -> model.getSource().toString())
                 .toList();
@@ -1009,7 +1010,7 @@ public class Mapper {
     }
 
     public static List<String> getTechnologiesSources(ComponentSource CompSource) {
-        return getTechs().values().stream()
+        return technologies.values().stream()
                 .filter(model -> model.searchSource(CompSource))
                 .map(model -> model.getSource().toString())
                 .toList();
@@ -1160,7 +1161,7 @@ public class Mapper {
     }
 
     public static List<String> getUnitsSources(ComponentSource CompSource) {
-        return getUnits().values().stream()
+        return units.values().stream()
                 .filter(model -> model.searchSource(CompSource))
                 .map(model -> model.getSource().toString())
                 .toList();

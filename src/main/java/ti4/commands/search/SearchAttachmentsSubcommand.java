@@ -1,11 +1,14 @@
 package ti4.commands.search;
 
+import java.util.Comparator;
 import java.util.List;
+
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
+import ti4.model.AttachmentModel;
 import ti4.model.Source.ComponentSource;
 
 public class SearchAttachmentsSubcommand extends SearchComponentModelSubcommand {
@@ -29,8 +32,8 @@ public class SearchAttachmentsSubcommand extends SearchComponentModelSubcommand 
 
         List<MessageEmbed> messageEmbeds = Mapper.getAttachments().values().stream()
                 .filter(model -> model.search(searchString, source))
-                .sorted((r1, r2) -> r1.getSource().compareTo(r2.getSource()))
-                .map(model -> model.getRepresentationEmbed())
+                .sorted(Comparator.comparing(AttachmentModel::getSource))
+                .map(AttachmentModel::getRepresentationEmbed)
                 .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }

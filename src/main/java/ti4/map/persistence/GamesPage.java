@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
 import lombok.Getter;
 import ti4.map.Game;
 
-public class GamesPage {
+public final class GamesPage {
 
     public static final int PAGE_SIZE = 100;
 

@@ -1,6 +1,5 @@
 package ti4.map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,6 +17,8 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -168,7 +169,7 @@ public class Player extends PlayerProperties {
     }
 
     public static Comparator<Player> comparingInitiative() {
-        return (p1, p2) -> Integer.compare(p1.getInitiative(), p2.getInitiative());
+        return Comparator.comparingInt(Player::getInitiative);
     }
 
     public int getSpentTgsThisWindow() {
@@ -601,9 +602,8 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public Set<String> getSpecialUnitsOwned() {
-        return new HashSet<>(getUnitsOwned().stream()
-                .filter(u -> Mapper.getUnit(u).getFaction().isPresent())
-                .collect(Collectors.toSet()));
+        return getUnitsOwned().stream()
+            .filter(u -> Mapper.getUnit(u).getFaction().isPresent()).collect(Collectors.toSet());
     }
 
     public boolean hasUnit(String unitID) {
@@ -1778,7 +1778,7 @@ public class Player extends PlayerProperties {
         if (game.isAgeOfCommerceMode() && comms > 0) {
             num = comms;
         }
-        if ("no".equalsIgnoreCase(getGame().getStoredValue("loadedGame"))) {
+        if ("no".equalsIgnoreCase(game.getStoredValue("loadedGame"))) {
             num = comms;
         }
         super.setCommodities(num);

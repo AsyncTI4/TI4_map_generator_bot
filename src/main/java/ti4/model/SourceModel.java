@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -51,9 +52,9 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
         footer.append("\nCredits: ").append(credits);
         eb.setFooter(footer.toString());
 
-        if ("official".equals(getCanal())) {
+        if ("official".equals(canal)) {
             eb.setColor(Color.green);
-        } else if ("community".equals(getCanal())) {
+        } else if ("community".equals(canal)) {
             eb.setColor(Color.gray);
         } else {
             eb.setColor(Color.red);
@@ -96,7 +97,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
      * @return true if field 'Canal' = "Official", false otherwise
      */
     public boolean isCanalOfficial() {
-        boolean official = "official".equals(getCanal());
+        boolean official = "official".equals(canal);
         return official;
     }
 

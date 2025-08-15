@@ -1,9 +1,10 @@
 package ti4.listeners;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-import javax.annotation.Nonnull;
+
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
@@ -16,7 +17,7 @@ import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.service.game.GameNameService;
 
-public class ModalListener extends ListenerAdapter {
+public final class ModalListener extends ListenerAdapter {
 
     public static ModalListener instance;
 

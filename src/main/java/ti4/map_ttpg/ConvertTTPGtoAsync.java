@@ -1,13 +1,6 @@
 package ti4.map_ttpg;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
@@ -21,6 +14,13 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -775,11 +775,11 @@ public class ConvertTTPGtoAsync {
     }
 
     public static String readFileAsString(String filepath) throws Exception {
-        return new String(Files.readAllBytes(Paths.get(filepath)), StandardCharsets.UTF_8);
+        return Files.readString(Paths.get(filepath));
     }
 
     public static String readFileAsString(File file) throws Exception {
-        return new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())), StandardCharsets.UTF_8);
+        return Files.readString(Paths.get(file.getAbsolutePath()));
     }
 
     public static JsonNode parse(String source) throws JsonProcessingException {

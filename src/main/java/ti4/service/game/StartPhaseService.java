@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -551,18 +552,16 @@ public class StartPhaseService {
         // Pulsar destruction logic
         game.getTileMap().values().stream()
                 .filter(tile -> "sig02".equals(tile.getTileID()))
-                .forEach(pulsar -> {
-                    pulsar.getSpaceUnitHolder().getUnitColorsOnHolder().forEach(playerColor -> {
-                        pulsar.removeAllUnits(playerColor);
-                        Player p = game.getPlayerFromColorOrFaction(playerColor);
-                        if (p.isRealPlayer()) {
-                            MessageHelper.sendMessageToChannel(
-                                    p.getCorrectChannel(),
-                                    p.getRepresentationUnfogged() + ", units in Pulsar (" + pulsar.getPosition()
-                                            + ") were destroyed.");
-                        }
-                    });
-                });
+                .forEach(pulsar -> pulsar.getSpaceUnitHolder().getUnitColorsOnHolder().forEach(playerColor -> {
+                    pulsar.removeAllUnits(playerColor);
+                    Player p = game.getPlayerFromColorOrFaction(playerColor);
+                    if (p.isRealPlayer()) {
+                        MessageHelper.sendMessageToChannel(
+                                p.getCorrectChannel(),
+                                p.getRepresentationUnfogged() + ", units in Pulsar (" + pulsar.getPosition()
+                                        + ") were destroyed.");
+                    }
+                }));
 
         if ("action_deck_2".equals(game.getAcDeckID()) && game.getRound() > 1) {
             handleStartOfStrategyForAcd2(game);
@@ -1052,7 +1051,7 @@ public class StartPhaseService {
                             p2.getCorrectChannel(),
                             p2.getRepresentationUnfogged() + ", you have the opportunity to use _Imperial Arbiter_.",
                             buttons);
-                    hold.append((hold.length() == 0) ? "" : " or ").append("_Imperial Arbiter_");
+                    hold.append((hold.isEmpty()) ? "" : " or ").append("_Imperial Arbiter_");
                 }
             }
             if (game.isShowBanners()) {
@@ -1086,7 +1085,7 @@ public class StartPhaseService {
                             numUnpassed + " other player" + (numUnpassed == 1 ? " is" : "s are") + " still unpassed.";
                 }
             }
-            if (hold.length() > 0) {
+            if (!hold.isEmpty()) {
                 msgExtra += "\nYou may wish to hold your turn until you have confirmation of no " + hold + ".";
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);

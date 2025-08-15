@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -70,7 +71,7 @@ public class CustomHyperlaneService {
                 Buttons.paginateButtons(hyperlaneTileButtons, HYPERLANE_BUTTONS, pageNum, "customHyperlanePagination");
 
         if (StringUtils.isBlank(page)) {
-            StringBuffer sb = new StringBuffer("### Manage Custom Hyperlanes");
+            StringBuilder sb = new StringBuilder("### Manage Custom Hyperlanes");
             if (hyperlaneTileButtons.isEmpty()) {
                 sb.append("\nNo hyperlane tiles found. Use `/map add_tile tile_name:")
                         .append(HYPERLANE_TILEID)
@@ -299,7 +300,7 @@ public class CustomHyperlaneService {
 
     private static List<String> getStaticHyperlanePositions(Game game) {
         return game.getTileMap().values().stream()
-                .filter(tile -> isStaticHyperlane(tile))
+                .filter(CustomHyperlaneService::isStaticHyperlane)
                 .map(Tile::getPosition)
                 .collect(Collectors.toList());
     }

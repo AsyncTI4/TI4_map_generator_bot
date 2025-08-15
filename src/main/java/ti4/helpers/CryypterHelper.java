@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -347,10 +348,10 @@ public class CryypterHelper {
         // identifier]_[number];[faction identifier]_[rider name]
         if (game.isVotcMode()) {
             Map<String, Player> usedEnvoy = new HashMap<>();
-            List<Player> committedWinner = new ArrayList<Player>();
-            List<Player> committedLoser = new ArrayList<Player>();
-            List<Player> counterWinners = new ArrayList<Player>();
-            List<Player> counterLosers = new ArrayList<Player>();
+            List<Player> committedWinner = new ArrayList<>();
+            List<Player> committedLoser = new ArrayList<>();
+            List<Player> counterWinners = new ArrayList<>();
+            List<Player> counterLosers = new ArrayList<>();
             boolean empy = false;
 
             Map<String, String> outcomes = game.getCurrentAgendaVotes();
@@ -383,7 +384,7 @@ public class CryypterHelper {
                         Space space = arbotile.getSpaceUnitHolder();
                         Integer totalLetani = ButtonHelper.getNumberOfGroundForces(envoyPlayer, space);
                         List<Planet> arboPlanets = arbotile.getPlanetUnitHolders();
-                        if (arboPlanets.size() > 0) {
+                        if (!arboPlanets.isEmpty()) {
                             for (Planet arboPlanet : arboPlanets) {
                                 totalLetani += ButtonHelper.getNumberOfGroundForces(envoyPlayer, arboPlanet);
                             }
@@ -403,7 +404,7 @@ public class CryypterHelper {
                         }
                     }
 
-                    List<Button> planetButtons = new ArrayList<Button>();
+                    List<Button> planetButtons = new ArrayList<>();
                     for (Planet planet : eligiblePlanets.keySet()) {
                         if (eligiblePlanets.get(planet) > 1
                                 && !planet.getTokenList().stream().anyMatch(token -> token.contains("dmz"))) {
@@ -427,7 +428,7 @@ public class CryypterHelper {
                     String message = envoyPlayer.getRepresentationUnfogged()
                             + ", you have the Creuss Envoy to resolve. Choose the system you wish to place a Creuss wormhole token in.";
 
-                    List<Planet> eligiblePlanets = new ArrayList<Planet>();
+                    List<Planet> eligiblePlanets = new ArrayList<>();
                     List<Button> buttons = new ArrayList<>();
 
                     for (Player counterPlayer : counterWinners) {
@@ -630,7 +631,7 @@ public class CryypterHelper {
         } else {
             List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, planet);
             players.remove(envoyPlayer);
-            if (players.size() == 0) {
+            if (players.isEmpty()) {
                 eligiblePlanets.merge(
                         planet, totalLetani - ButtonHelper.getNumberOfGroundForces(envoyPlayer, planet), Integer::sum);
             }

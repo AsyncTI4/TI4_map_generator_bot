@@ -1,11 +1,6 @@
 package ti4.image;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
+
 import ti4.ResourceHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CalendarHelper;
@@ -69,7 +65,7 @@ public class UnitRenderGenerator {
     private final Tile tile;
     private final DisplayType displayType;
     private static final Point numberPositionPoint = new Point(40, 27);
-    private final int TILE_PADDING = 100;
+    private static final int TILE_PADDING = 100;
     private final Graphics tileGraphics;
     private final List<Rectangle> rectangles;
     private final int degree;
@@ -294,7 +290,7 @@ public class UnitRenderGenerator {
     }
 
     private void drawUnitTags(UnitKey unitKey, Player player, ImagePosition imagePos, int iteration) {
-        if (iteration != 0 || UnitType.Infantry == unitKey.getUnitType() || !game.isShowUnitTags()) {
+        if (iteration != 0 || unitKey.getUnitType() == UnitType.Infantry || !game.isShowUnitTags()) {
             return;
         }
 

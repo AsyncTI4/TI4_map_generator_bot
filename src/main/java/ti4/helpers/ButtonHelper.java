@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,6 +14,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -109,6 +108,12 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.website.AsyncTi4WebsiteHelper;
+
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 public class ButtonHelper {
 
@@ -3829,7 +3834,7 @@ public class ButtonHelper {
                 List<MiltyDraftTile> tileToPullFromUnshuffled = new ArrayList<>(unusedBlueTiles);
                 Collections.shuffle(unusedBlueTiles);
 
-                if (unusedBlueTiles.size() < 1) {
+                if (unusedBlueTiles.isEmpty()) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from.");
                     return;
                 }
@@ -3837,7 +3842,7 @@ public class ButtonHelper {
                 List<MessageEmbed> tileEmbeds = new ArrayList<>();
                 List<String> ids = new ArrayList<>();
 
-                Tile tile = unusedBlueTiles.get(0).getTile();
+                Tile tile = unusedBlueTiles.getFirst().getTile();
                 TileModel tileModel = tile.getTileModel();
                 tileEmbeds.add(tileModel.getRepresentationEmbed(false));
                 ids.add(tile.getTileID());
@@ -3859,7 +3864,7 @@ public class ButtonHelper {
                 List<String> tileToPullFromUnshuffled = new ArrayList<>(redTilesToPullFrom);
                 Collections.shuffle(redTilesToPullFrom);
 
-                if (redTilesToPullFrom.size() < 1) {
+                if (redTilesToPullFrom.isEmpty()) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from.");
                     return;
                 }
@@ -3867,7 +3872,7 @@ public class ButtonHelper {
                 List<MessageEmbed> tileEmbeds = new ArrayList<>();
                 List<String> ids = new ArrayList<>();
 
-                String tileID = redTilesToPullFrom.get(0);
+                String tileID = redTilesToPullFrom.getFirst();
                 ids.add(tileID);
                 TileModel tile = TileHelper.getTileById(tileID);
                 tileEmbeds.add(tile.getRepresentationEmbed(false));

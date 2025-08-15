@@ -1,6 +1,7 @@
 package ti4.image;
 
 import java.util.HashSet;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -33,7 +34,7 @@ public class TileImageTest extends BaseTi4Test {
     public static Player testPlayer1;
     public static Player testPlayer2;
 
-    public static TestMode testMode = TestMode.Compare;
+    public static final TestMode testMode = TestMode.Compare;
 
     @AfterAll
     public static void readyForProduction() {

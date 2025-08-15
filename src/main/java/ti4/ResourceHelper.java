@@ -4,13 +4,14 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+
 import org.jetbrains.annotations.Nullable;
 import ti4.helpers.Constants;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 
-public class ResourceHelper {
+public final class ResourceHelper {
     private static ResourceHelper resourceHelper;
     private final Map<String, String> unitCache = new HashMap<>();
     private final Map<String, String> decalCache = new HashMap<>();

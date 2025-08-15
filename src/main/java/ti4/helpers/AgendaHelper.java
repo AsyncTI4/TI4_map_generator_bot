@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
@@ -2688,7 +2689,7 @@ public class AgendaHelper {
             }
             if (game.getCurrentAgendaInfo().contains("Player")
                     && ButtonHelper.isPlayerElected(game, player, "committee")) {
-                List<Button> buttons = new ArrayList<Button>();
+                List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("presetCommitteeFormation", "Preset Committee Formation"));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -4590,7 +4591,7 @@ public class AgendaHelper {
             return result;
         }
 
-        int highestBid = playerBids.get(0).getBid();
+        int highestBid = playerBids.getFirst().getBid();
         for (PlayerBid pb : playerBids) {
             if (pb.getBid() == highestBid) {
                 first.add(pb.getPlayer());

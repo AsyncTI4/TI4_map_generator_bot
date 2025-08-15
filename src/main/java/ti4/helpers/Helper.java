@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.Point;
+import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,6 +19,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -444,7 +445,7 @@ public class Helper {
             return getSpeakerOrderFromThisPlayer(game.getSpeaker(), game);
         }
 
-        List<Player> arrayPlayers = new ArrayList<Player>();
+        List<Player> arrayPlayers = new ArrayList<>();
         arrayPlayers.addAll(PriorityTrackHelper.GetPriorityTrack(game).stream()
                 .filter(Objects::nonNull)
                 .toList());
@@ -2712,7 +2713,7 @@ public class Helper {
         List<Player> sortedPlayers1 = game.getRealPlayers();
         List<Player> sortedPlayers = new ArrayList<>();
         for (Player player : sortedPlayers1) {
-            sortedPlayers.add(0, player);
+            sortedPlayers.addFirst(player);
         }
         Map<String, Player> playersBackup = new LinkedHashMap<>(game.getPlayers());
         try {

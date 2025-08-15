@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -175,20 +175,20 @@ public class Constants {
 
     public static final String ALPHA = "alpha";
     public static final String BETA = "beta";
-    public static String GAMMA = "gamma";
+    public static final String GAMMA = "gamma";
     public static final String DELTA = "delta";
-    public static String EPSILON = "whepsilon";
-    public static String NARROWS = "whnarrows";
-    public static String PROBABILITY = "whprobability";
-    public static String CHAMPION = "whchampion";
-    public static String VOYAGE = "whvoyage";
-    public static String ZETA = "whzeta";
-    public static String ETA = "wheta";
-    public static String CUSTOM_ERONOUS_WHEPSILON = "custom_eronous_whepsilon";
-    public static String CUSTOM_ERONOUS_WHETA = "custom_eronous_wheta";
-    public static String CUSTOM_ERONOUS_WHIOTA = "custom_eronous_whiota";
-    public static String CUSTOM_ERONOUS_WHTHETA = "custom_eronous_whtheta";
-    public static String CUSTOM_ERONOUS_WHZETA = "custom_eronous_whzeta";
+    public static final String EPSILON = "whepsilon";
+    public static final String NARROWS = "whnarrows";
+    public static final String PROBABILITY = "whprobability";
+    public static final String CHAMPION = "whchampion";
+    public static final String VOYAGE = "whvoyage";
+    public static final String ZETA = "whzeta";
+    public static final String ETA = "wheta";
+    public static final String CUSTOM_ERONOUS_WHEPSILON = "custom_eronous_whepsilon";
+    public static final String CUSTOM_ERONOUS_WHETA = "custom_eronous_wheta";
+    public static final String CUSTOM_ERONOUS_WHIOTA = "custom_eronous_whiota";
+    public static final String CUSTOM_ERONOUS_WHTHETA = "custom_eronous_whtheta";
+    public static final String CUSTOM_ERONOUS_WHZETA = "custom_eronous_whzeta";
 
     public static final String DRAW_SPECIFIC_SO_FOR_PLAYER = "draw_specific_so_for_player";
     public static final String DRAW_SPECIFIC_SO = "draw_specific_so";

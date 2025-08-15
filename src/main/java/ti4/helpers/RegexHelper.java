@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
@@ -291,7 +292,7 @@ public class RegexHelper {
         Set<String> allPNs = new HashSet<>();
         if (player != null) {
             allPNs.addAll(player.getPromissoryNotes().keySet());
-            allPNs.removeAll(player.getPromissoryNotesInPlayArea());
+            player.getPromissoryNotesInPlayArea().forEach(allPNs::remove);
         } else {
             return pnRegex(game);
         }

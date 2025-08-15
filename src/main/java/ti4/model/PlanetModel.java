@@ -1,10 +1,11 @@
 package ti4.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -234,7 +235,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public String getEmojiURL() {
         TI4Emoji emoji = getEmoji();
-        if (getEmoji().equals(PlanetEmojis.SemLore) && !"semlore".equals(getId())) {
+        if (getEmoji().equals(PlanetEmojis.SemLore) && !"semlore".equals(id)) {
             return null;
         }
         if (emoji.asEmoji() instanceof CustomEmoji customEmoji) {

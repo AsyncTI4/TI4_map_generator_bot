@@ -1,12 +1,13 @@
 package ti4.service.fow;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -56,9 +57,12 @@ public class LoreService {
         List<ActionRow> buttons = Buttons.paginateButtons(getLoreButtons(game), LORE_BUTTONS, pageNum, "gmLore");
 
         if (StringUtils.isBlank(page)) {
-            String msg = "### Lore Management"
-                    + "\n-# System Lore is shown to the first player to conclude an action with units in the system."
-                    + "\n-# Planet Lore is shown to the first player to gain control of the planet.";
+            String msg = """
+                ### Lore Management\
+                
+                -# System Lore is shown to the first player to conclude an action with units in the system.\
+                
+                -# Planet Lore is shown to the first player to gain control of the planet.""";
             event.getChannel().sendMessage(msg).setComponents(buttons).queue();
         } else {
             event.getHook().editOriginalComponents(buttons).queue();

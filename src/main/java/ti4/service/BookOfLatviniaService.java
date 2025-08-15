@@ -2,6 +2,7 @@ package ti4.service;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -23,11 +24,6 @@ public class BookOfLatviniaService {
 
     private static String rep() {
         return relic().getSimpleRepresentation();
-    }
-
-    public static void gainBookOfLatvinia(ButtonInteractionEvent event, Game game, Player player) {
-        // done elsewhere
-
     }
 
     public static void purgeBookOfLatvinia(ButtonInteractionEvent event, Game game, Player player) {

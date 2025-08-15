@@ -1,10 +1,6 @@
 package ti4.service.milty;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -357,7 +354,7 @@ public class MiltyDraftHelper {
 
     private static boolean isInvalid(TileModel tileModel) {
         TileModel.TileBack back = tileModel.getTileBack();
-        if (TileBack.RED != back && TileBack.BLUE != back) {
+        if (back != TileBack.RED && back != TileBack.BLUE) {
             return true;
         }
 

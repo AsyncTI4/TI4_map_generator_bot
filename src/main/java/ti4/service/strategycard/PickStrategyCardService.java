@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -179,7 +180,7 @@ public class PickStrategyCardService {
                 Player speaker = game.getSpeaker();
                 if (speaker != null) {
                     pickOrder.remove(speaker);
-                    pickOrder.add(0, speaker);
+                    pickOrder.addFirst(speaker);
                 }
             }
             return pickOrder;

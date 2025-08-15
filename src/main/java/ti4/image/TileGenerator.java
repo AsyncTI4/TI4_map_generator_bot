@@ -1,13 +1,6 @@
 package ti4.image;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.time.ZoneOffset;
@@ -24,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +25,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
-import ti4.helpers.*;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
+import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
+import ti4.helpers.PdsCoverage;
+import ti4.helpers.PdsCoverageHelper;
+import ti4.helpers.RandomHelper;
+import ti4.helpers.Storage;
+import ti4.helpers.Units;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -1813,7 +1816,7 @@ public class TileGenerator {
 
     private static void drawTokensOnTile(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Game game) {
         List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
-        Collections.sort(tokenList, sortTokensForDisplay());
+        tokenList.sort(sortTokensForDisplay());
 
         Point centerPosition = unitHolder.getHolderCenterPosition(tile);
         int x = 0;

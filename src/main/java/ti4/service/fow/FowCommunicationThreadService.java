@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -97,7 +98,7 @@ public class FowCommunicationThreadService {
                 .retrieveArchivedPrivateThreadChannels()
                 .queue(
                         pagination -> {
-                            pagination.forEach(result::add);
+                            result.addAll(pagination);
                             future.complete(result);
                         },
                         future::completeExceptionally);

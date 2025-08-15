@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -65,7 +66,7 @@ public class FOWCombatThreadMirroring {
         String hits = matchPattern(messageText, "Total hits (\\d+)");
 
         return player.getRepresentationNoPing() + " rolled for " + combat + ": "
-                + CombatMessageHelper.displayHitResults(Integer.valueOf(hits)).replace("\n", "");
+                + CombatMessageHelper.displayHitResults(Integer.parseInt(hits)).replace("\n", "");
     }
 
     private static boolean isFowCombatThread(Channel eventChannel) {

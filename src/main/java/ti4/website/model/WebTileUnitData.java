@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.Data;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -114,9 +115,7 @@ public class WebTileUnitData {
                 if (!factionEntities.isEmpty()) {
                     if (isSpace) {
                         // For space, merge all factions directly into the space map
-                        for (Map.Entry<String, List<WebEntityData>> factionEntry : factionEntities.entrySet()) {
-                            tileData.space.put(factionEntry.getKey(), factionEntry.getValue());
-                        }
+                        tileData.space.putAll(factionEntities);
                     } else {
                         // For planets, create or get existing WebTilePlanet
                         WebTilePlanet planetData =

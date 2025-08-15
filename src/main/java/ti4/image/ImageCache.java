@@ -1,15 +1,16 @@
 package ti4.image;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import ti4.cache.CacheManager;
 import ti4.message.BotLogger;
 import ti4.settings.GlobalSettings;
 
-public class ImageCache {
+public final class ImageCache {
 
     private static final int FILE_IMAGE_CACHE_SIZE = GlobalSettings.getSetting(
             GlobalSettings.ImplementedSettings.FILE_IMAGE_CACHE_MAX_SIZE.toString(), Integer.class, 2000);

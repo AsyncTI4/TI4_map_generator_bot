@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -207,12 +208,12 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     private boolean isWarsunOrDreadnought() {
-        return "warsun".equalsIgnoreCase(getBaseType()) || "dreadnought".equalsIgnoreCase(getBaseType());
+        return "warsun".equalsIgnoreCase(baseType) || "dreadnought".equalsIgnoreCase(baseType);
     }
 
     public int getSpaceCannonDieCount(Player player, Game game) {
         if (game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
-            if ("spacedock".equalsIgnoreCase(getBaseType())) {
+            if ("spacedock".equalsIgnoreCase(baseType)) {
                 return 3;
             }
         }
@@ -222,7 +223,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     public int getSpaceCannonHitsOn(Player player, Game game) {
         if (game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())
                 || player.hasRelic("lightrailordnance")) {
-            if ("spacedock".equalsIgnoreCase(getBaseType())) {
+            if ("spacedock".equalsIgnoreCase(baseType)) {
                 return 5;
             }
         }
@@ -252,7 +253,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             }
             return bombardDieCount;
         } else {
-            if (getIsShip() && !"fighter".equalsIgnoreCase(getBaseType()) && bombardDieCount == 0) {
+            if (getIsShip() && !"fighter".equalsIgnoreCase(baseType) && bombardDieCount == 0) {
                 return 1;
             } else {
                 return bombardDieCount;
@@ -269,7 +270,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             }
             return bombardHitsOn;
         } else {
-            if (isShip != null && isShip && !"fighter".equalsIgnoreCase(getBaseType()) && bombardDieCount == 0) {
+            if (isShip != null && isShip && !"fighter".equalsIgnoreCase(baseType) && bombardDieCount == 0) {
                 return 6;
             } else {
                 return bombardHitsOn;

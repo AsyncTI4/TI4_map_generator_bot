@@ -2,6 +2,7 @@ package ti4.service.option;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -172,7 +173,7 @@ public class FOWOptionService {
 
         FOWOption fowOption = FOWOption.fromString(option);
         boolean newValue = Boolean.parseBoolean(value);
-        if (FOWOption.FOW_PLUS == fowOption) {
+        if (fowOption == FOWOption.FOW_PLUS) {
             FOWPlusService.toggleTag(game, newValue);
             if (newValue) {
                 game.setFowOption(FOWOption.ALLOW_AGENDA_COMMS, false);

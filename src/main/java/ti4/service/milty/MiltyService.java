@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -344,7 +345,7 @@ public class MiltyService {
             player.setLeaders(new ArrayList<>());
         }
 
-        if (Source.ComponentSource.miltymod == factionModel.getSource() && !game.isMiltyModMode()) {
+        if (factionModel.getSource() == Source.ComponentSource.miltymod && !game.isMiltyModMode()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");

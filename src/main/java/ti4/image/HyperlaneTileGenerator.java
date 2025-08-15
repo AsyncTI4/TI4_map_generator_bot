@@ -1,8 +1,5 @@
 package ti4.image;
 
-import static ti4.image.TileGenerator.TILE_HEIGHT;
-import static ti4.image.TileGenerator.TILE_WIDTH;
-
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
@@ -16,10 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
 import ti4.ResourceHelper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.service.map.CustomHyperlaneService;
+
+import static ti4.image.TileGenerator.TILE_HEIGHT;
+import static ti4.image.TileGenerator.TILE_WIDTH;
 
 public class HyperlaneTileGenerator {
 
@@ -345,8 +346,8 @@ public class HyperlaneTileGenerator {
 
     // Helper class to hold canonical matrix and rotation
     private static class MatrixRotationResult {
-        String matrix;
-        int rotation; // in degrees, 0, 60, ..., 300
+        final String matrix;
+        final int rotation; // in degrees, 0, 60, ..., 300
 
         MatrixRotationResult(String matrix, int rotation) {
             this.matrix = matrix;

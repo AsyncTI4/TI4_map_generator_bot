@@ -13,6 +13,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
 import org.apache.commons.lang3.StringUtils;
 import ti4.image.TileHelper;
 import ti4.model.Source.ComponentSource;
@@ -164,13 +165,13 @@ public class JimboConst {
                 TileHelper.getAllTileModels().stream().sorted(comp).toList();
 
         blueTiles = allTilesSorted.stream()
-                .filter(t -> "0b".equals(t.getAlias()) || TileBack.BLUE == t.getTileBack())
+                .filter(t -> "0b".equals(t.getAlias()) || t.getTileBack() == TileBack.BLUE)
                 .toList();
         redTiles = allTilesSorted.stream()
-                .filter(t -> "0r".equals(t.getAlias()) || TileBack.RED == t.getTileBack())
+                .filter(t -> "0r".equals(t.getAlias()) || t.getTileBack() == TileBack.RED)
                 .toList();
         greenTiles = allTilesSorted.stream()
-                .filter(t -> "0g".equals(t.getAlias()) || TileBack.GREEN == t.getTileBack())
+                .filter(t -> "0g".equals(t.getAlias()) || t.getTileBack() == TileBack.GREEN)
                 .toList();
         hyperlaneTiles = allTilesSorted.stream()
                 .filter(t -> t.getName() != null && "hyperlane".equalsIgnoreCase(t.getName()))

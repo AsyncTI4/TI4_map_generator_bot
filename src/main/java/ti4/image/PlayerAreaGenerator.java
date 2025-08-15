@@ -1,13 +1,6 @@
 package ti4.image;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -25,6 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -1593,7 +1587,7 @@ public class PlayerAreaGenerator {
                 UnitType.Fighter,
                 UnitType.Infantry);
 
-        Map<UnitType, List<UnitKey>> collect = units.stream().collect(Collectors.groupingBy(key -> key.getUnitType()));
+        Map<UnitType, List<UnitKey>> collect = units.stream().collect(Collectors.groupingBy(UnitKey::getUnitType));
         for (UnitType orderKey : order) {
             List<UnitKey> keys = collect.get(orderKey);
             if (keys == null) {

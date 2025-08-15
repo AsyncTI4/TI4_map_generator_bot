@@ -1,12 +1,11 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -48,6 +47,9 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.MoveUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
+
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelperAbilities {
 
@@ -94,7 +96,7 @@ public class ButtonHelperAbilities {
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
-            if (p2.getSecretsUnscored().size() > 0) {
+            if (!p2.getSecretsUnscored().isEmpty()) {
                 int randInt = ThreadLocalRandom.current()
                         .nextInt(0, p2.getSecretsUnscored().size());
                 List<Map.Entry<String, Integer>> entries =
@@ -2259,7 +2261,7 @@ public class ButtonHelperAbilities {
                     event.getMessageChannel(),
                     player.getFactionEmoji() + " replaced 1 of their opponent's infantry with 1 " + unit + " on "
                             + Helper.getPlanetRepresentation(planet, game) + " using **Indoctrination**.");
-        } else if (RandomHelper.isOneInX(100) && colour.length() > 0 && "infantry".equals(unit)) {
+        } else if (RandomHelper.isOneInX(100) && !colour.isEmpty() && "infantry".equals(unit)) {
             String poem = "";
             switch (ThreadLocalRandom.current().nextInt(20)) {
                 case 0:

@@ -1,6 +1,7 @@
 package ti4.service.unit;
 
 import java.util.List;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
@@ -110,7 +111,7 @@ public class AddUnitService {
             }
         }
         if (amtRemaining > 0) {
-            states.set(0, states.get(0) + amtRemaining);
+            states.set(0, states.getFirst() + amtRemaining);
         }
         return states;
     }

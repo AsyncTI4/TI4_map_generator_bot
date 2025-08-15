@@ -1,6 +1,7 @@
 package ti4.model;
 
 import java.util.List;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -68,7 +69,7 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
             sb.append("Planet: ").append(tokenPlanetName).append("\n");
         if (attachmentID != null) sb.append("Attachment: ").append(attachmentID).append("\n");
         if (wormholes != null)
-            sb.append("Wormhole(s): ").append(wormholes.toString()).append("\n");
+            sb.append("Wormhole(s): ").append(wormholes).append("\n");
         if (isAnomaly != null) sb.append("Anomaly ");
         if (isRift != null) sb.append("Rift ");
         if (isNebula != null) sb.append("Nebula ");
@@ -77,7 +78,7 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
         sb = new StringBuilder();
         sb.append("ID: ").append(id);
         sb.append(" Source: ").append(source);
-        if (aliasList != null) sb.append("\nAlias list: ").append(aliasList.toString());
+        if (aliasList != null) sb.append("\nAlias list: ").append(aliasList);
         eb.setFooter(sb.toString());
 
         eb.setThumbnail("https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tokens/"

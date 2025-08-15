@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.emoji.ApplicationEmoji;
@@ -105,7 +106,7 @@ public class ApplicationEmojiService {
         if (cacheInitialized) return;
 
         List<CachedEmoji> cached = ApplicationEmojiCacheService.readCachedEmojis();
-        if (cached.size() == 0) {
+        if (cached.isEmpty()) {
             BotLogger.info("No cached emojis found. Initializing from Discord.");
             resetCacheFromDiscord();
         } else {

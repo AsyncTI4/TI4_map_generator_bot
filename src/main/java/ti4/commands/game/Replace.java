@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -227,13 +228,7 @@ class Replace extends GameStateSubcommand {
                 .queue(
                         oldThreadMember -> thread.getManager()
                                 .setArchived(false)
-                                .queue(success -> {
-                                    thread.removeThreadMember(oldMember).queue(success2 -> {
-                                        thread.addThreadMember(newMember).queue(success3 -> {
-                                            accessMessage(thread, newMember);
-                                        });
-                                    });
-                                }),
+                                .queue(success -> thread.removeThreadMember(oldMember).queue(success2 -> thread.addThreadMember(newMember).queue(success3 -> accessMessage(thread, newMember)))),
                         failure -> {
                             /* Old member is not in the thread -> Do nothing */
                         });

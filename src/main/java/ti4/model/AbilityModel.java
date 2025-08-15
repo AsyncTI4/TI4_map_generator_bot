@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -91,7 +92,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
         // FOOTER
         StringBuilder footer = new StringBuilder();
         if (includeID)
-            footer.append("ID: ").append(getAlias()).append("    Source: ").append(source);
+            footer.append("ID: ").append(id).append("    Source: ").append(source);
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.black);

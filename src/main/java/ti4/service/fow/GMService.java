@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -125,9 +126,7 @@ public class GMService {
                     } else if (player == null) {
                         MessageHelper.sendMessageToChannel(threadChannel, log);
                     } else {
-                        jumpToLatestMessage(player, latestJumpUrl -> {
-                            MessageHelper.sendMessageToChannel(threadChannel, log + " - " + latestJumpUrl);
-                        });
+                        jumpToLatestMessage(player, latestJumpUrl -> MessageHelper.sendMessageToChannel(threadChannel, log + " - " + latestJumpUrl));
                     }
                 });
     }
@@ -139,12 +138,8 @@ public class GMService {
                     .getHistory()
                     .retrievePast(1)
                     .queue(
-                            messages -> {
-                                callback.accept(messages.get(0).getJumpUrl());
-                            },
-                            throwable -> {
-                                callback.accept("No latest message.");
-                            });
+                            messages -> callback.accept(messages.get(0).getJumpUrl()),
+                            throwable -> callback.accept("No latest message."));
         } else {
             callback.accept("No private channel.");
         }
