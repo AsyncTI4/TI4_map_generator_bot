@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -41,7 +42,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     }
 
     public boolean isColorable() {
-        return color.equals("<color>");
+        return "<color>".equals(color);
     }
 
     @Override
@@ -213,7 +214,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         String formattedText = text;
         formattedText = formattedText.replace("\n", "\n> ");
         StringBuilder replaceText = new StringBuilder();
-        Player pnOwner = game.getPNOwner(getID());
+        Player pnOwner = game.getPNOwner(alias);
         if (pnOwner != null && pnOwner.isRealPlayer()) {
             if (!game.isFowMode()) replaceText.append(pnOwner.getFactionEmoji()); // add Owner's Faction Emoji
             replaceText.append(pnOwner.getColor());
