@@ -288,7 +288,7 @@ public class ListPlayerInfoService {
                         || Mapper.getPublicObjective(id).getSource() == Source.ComponentSource.base) {
                     if (stage1sOrTwos.equalsIgnoreCase(
                                     "" + Mapper.getPublicObjective(id).getPoints())
-                            || stage1sOrTwos.equalsIgnoreCase("both")) {
+                            || "both".equalsIgnoreCase(stage1sOrTwos)) {
                         msg.append(representScoring(game, id, x)).append("\n");
                         x++;
                     }

@@ -50,7 +50,7 @@ public class ComponentActionHelper {
             String techEmoji = techRep.getCondensedReqsEmojis(true);
             String techText = techRep.getText();
 
-            boolean detAgeOfExp = (tech.equalsIgnoreCase("det") || tech.equalsIgnoreCase("absol_det"))
+            boolean detAgeOfExp = ("det".equalsIgnoreCase(tech) || "absol_det".equalsIgnoreCase(tech))
                     && game.isAgeOfExplorationMode();
             if (techText.contains("ACTION") || detAgeOfExp) {
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
@@ -814,7 +814,7 @@ public class ComponentActionHelper {
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons3);
                 }
             }
-        } else if (relicID.equalsIgnoreCase("circletofthevoid")) {
+        } else if ("circletofthevoid".equalsIgnoreCase(relicID)) {
             player.addExhaustedRelic(relicID);
             purgeOrExhaust = "exhausted";
             List<Button> buttons2 = ButtonHelperActionCards.getCircletButtons(game, player);

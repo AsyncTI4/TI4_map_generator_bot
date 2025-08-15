@@ -54,7 +54,7 @@ public class ScorePublicObjectiveService {
             }
         }
         boolean scored = game.scorePublicObjective(player.getUserID(), poID);
-        if (!game.getPhaseOfGame().equalsIgnoreCase("action")) {
+        if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setStoredValue(player.getFaction() + "round" + game.getRound() + "PO", poName);
         }
         if (!scored) {

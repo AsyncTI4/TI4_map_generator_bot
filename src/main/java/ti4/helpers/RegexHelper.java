@@ -225,7 +225,7 @@ public class RegexHelper {
         Set<String> agents = new HashSet<>();
         for (Player p : game.getRealPlayers()) {
             for (Leader l : p.getLeaders()) {
-                if (l.getType().equals("agent")) {
+                if ("agent".equals(l.getType())) {
                     agents.add(l.getId());
                 }
             }
@@ -300,7 +300,7 @@ public class RegexHelper {
 
     /** @return group "page" matching an integer */
     public static String pageRegex() {
-        return "page" + RegexHelper.intRegex("page") + "$";
+        return "page" + intRegex("page") + "$";
     }
 
     /** @return group "token" */

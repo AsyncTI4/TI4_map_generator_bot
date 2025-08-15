@@ -68,16 +68,16 @@ public class Units {
             if (unitType == UnitType.Destroyer && eyes) {
                 return String.format("%s_dd_eyes.png", colorID);
             }
-            if (UnitType.Lady == unitType || UnitType.Cavalry == unitType) {
+            if (unitType == UnitType.Lady || unitType == UnitType.Cavalry) {
                 return String.format("%s_%s.png", colorID, "fs");
             }
-            if (UnitType.TyrantsLament == unitType) {
+            if (unitType == UnitType.TyrantsLament) {
                 return "TyrantsLament.png";
             }
-            if (UnitType.PlenaryOrbital == unitType) {
+            if (unitType == UnitType.PlenaryOrbital) {
                 return "PlenaryOrbital.png";
             }
-            if (UnitType.Monument == unitType) {
+            if (unitType == UnitType.Monument) {
                 return getColor() + "_monument.png";
             }
 

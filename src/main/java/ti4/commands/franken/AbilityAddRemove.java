@@ -14,7 +14,7 @@ import ti4.map.Player;
 
 abstract class AbilityAddRemove extends GameStateSubcommand {
 
-    public AbilityAddRemove(String name, String description) {
+    protected AbilityAddRemove(String name, String description) {
         super(name, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.ABILITY, "Ability Name")
                 .setRequired(true)

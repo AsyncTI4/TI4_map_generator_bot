@@ -89,7 +89,7 @@ class RoundTimeStatisticsService {
     }
 
     private static String convertMillisecondsToDays(float milliseconds) {
-        final float millisecondsInADay = TimeUnit.DAYS.toMillis(1);
+        float millisecondsInADay = TimeUnit.DAYS.toMillis(1);
         float days = milliseconds / millisecondsInADay;
         DecimalFormat decimalFormat = new DecimalFormat("#.00");
         return decimalFormat.format(days);

@@ -2,6 +2,7 @@ package ti4.commands.special;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,7 @@ class CheckAllDistance extends GameStateSubcommand {
         }
 
         File csv = new File("distances.csv");
-        try (PrintWriter pw = new PrintWriter(csv)) {
+        try (PrintWriter pw = new PrintWriter(csv, StandardCharsets.UTF_8)) {
             for (String s : data) {
                 pw.print(s);
                 pw.println();

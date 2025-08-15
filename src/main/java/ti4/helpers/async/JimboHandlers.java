@@ -315,14 +315,14 @@ public class JimboHandlers {
 
     private static List<Button> getRotateTileButtons(String type, String pageNum, int rotation) {
         List<Button> bonusButtons = new ArrayList<>();
-        if (type.equals("hyperlane")) {
+        if ("hyperlane".equals(type)) {
             int prev = (rotation + 5) % 6, next = (rotation + 1) % 6;
             String page = "_page" + pageNum;
             bonusButtons.add(
                     Buttons.gray(JimboConst.tileAdd + "_hyperlane_rot" + prev + page, "Rotate CCW")); // TODO: emoji
             bonusButtons.add(
                     Buttons.gray(JimboConst.tileAdd + "_hyperlane_rot" + next + page, "Rotate CW")); // TODO: emoji
-        } else if (type.equals("draft")) {
+        } else if ("draft".equals(type)) {
             int prev = rotation - 1, next = rotation + 1;
             String page = "_page" + pageNum;
             String decString = prev == -1 ? "Get Home Tile" : "Decrement Tile Number";
