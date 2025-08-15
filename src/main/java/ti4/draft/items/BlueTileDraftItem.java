@@ -79,7 +79,7 @@ public class BlueTileDraftItem extends DraftItem {
     public static List<DraftItem> buildAllDraftableItems(MiltyDraftManager draftManager) {
         List<DraftItem> allItems = new ArrayList<>();
         for (MiltyDraftTile tile : draftManager.getBlue()) {
-            allItems.add(DraftItem.generate(
+            allItems.add(generate(
                     DraftItem.Category.BLUETILE, tile.getTile().getTileID()));
         }
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.BLUETILE);
@@ -93,7 +93,7 @@ public class BlueTileDraftItem extends DraftItem {
             if (Arrays.asList(results).contains(tile.getTile().getTileID())) {
                 continue;
             }
-            allItems.add(DraftItem.generate(
+            allItems.add(generate(
                     DraftItem.Category.BLUETILE, tile.getTile().getTileID()));
         }
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.BLUETILE);

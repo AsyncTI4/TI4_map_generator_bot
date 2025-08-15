@@ -13,11 +13,11 @@ public interface EmbeddableModel {
     String getAutoCompleteName();
 
     default boolean search(String searchString, ComponentSource searchSource) {
-        return (searchSource == null || (getSource() != null && getSource().equals(searchSource)))
+        return (searchSource == null || (getSource() != null && getSource() == searchSource))
                 && (searchString == null || search(searchString));
     }
 
     default boolean searchSource(ComponentSource searchSource) {
-        return (searchSource == null || (getSource() != null && getSource().equals(searchSource)));
+        return (searchSource == null || (getSource() != null && getSource() == searchSource));
     }
 }

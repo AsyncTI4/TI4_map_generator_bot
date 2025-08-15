@@ -305,7 +305,7 @@ public class DrawingUtil {
 
     @Nullable
     public static String getFactionIconPath(String factionID) {
-        if ("null".equals(factionID) || StringUtils.isBlank(factionID)) {
+        if ("null".equals(factionID) || isBlank(factionID)) {
             return null;
         }
         String factionFile = ResourceHelper.getInstance().getFactionFile(factionID + ".png");
@@ -320,10 +320,10 @@ public class DrawingUtil {
             }
         }
         if (factionFile == null) {
-            factionFile = ResourceHelper.getInstance().getFactionFile(StringUtils.capitalize(factionID) + ".png");
+            factionFile = ResourceHelper.getInstance().getFactionFile(capitalize(factionID) + ".png");
         }
         if (factionFile == null) {
-            if (factionID.equalsIgnoreCase("fogalliance") || factionID.equalsIgnoreCase("generic")) {
+            if ("fogalliance".equalsIgnoreCase(factionID) || "generic".equalsIgnoreCase(factionID)) {
                 return null;
             }
             BotLogger.warning("Could not find image file for faction icon: " + factionID);
@@ -375,7 +375,7 @@ public class DrawingUtil {
 
         if (hideFactionIcon) return;
         scale *= 0.50f;
-        BufferedImage factionImage = DrawingUtil.getPlayerFactionIconImageScaled(player, scale);
+        BufferedImage factionImage = getPlayerFactionIconImageScaled(player, scale);
         if (factionImage == null) return;
 
         int centreCustomTokenHorizontally = bottomTokenImage.getWidth() / 2 - factionImage.getWidth() / 2;
@@ -403,14 +403,14 @@ public class DrawingUtil {
     }
 
     public static String getBlackWhiteFileSuffix(String colorID) {
-        if (Mapper.getColor(colorID).getTextColor().equalsIgnoreCase("black")) {
+        if ("black".equalsIgnoreCase(Mapper.getColor(colorID).getTextColor())) {
             return "_blk.png";
         }
         return "_wht.png";
     }
 
     public BufferedImage hexBorder(String hexBorderStyle, ColorModel color, List<Integer> openSides) {
-        return hexBorder(color, openSides, hexBorderStyle.equals("solid"));
+        return hexBorder(color, openSides, "solid".equals(hexBorderStyle));
     }
 
     public BufferedImage tintedBackground(Color color, float alpha) {
@@ -449,7 +449,7 @@ public class DrawingUtil {
         Color primary = color.primaryColor();
         Color secondary = color.secondaryColor();
         if (secondary == null) secondary = primary;
-        if (color.getName().equals("black")) primary = secondary = Color.darkGray;
+        if ("black".equals(color.getName())) primary = secondary = Color.darkGray;
 
         List<Point> corners = List.of(
                 new Point(88, 2),
@@ -516,7 +516,7 @@ public class DrawingUtil {
 
     public static void drawPlayerFactionIconImageOpaque(
             Graphics graphics, Player player, int x, int y, int width, int height, Float opacity) {
-        BufferedImage resourceBufferedImage = DrawingUtil.getPlayerFactionIconImageScaled(player, width, height);
+        BufferedImage resourceBufferedImage = getPlayerFactionIconImageScaled(player, width, height);
         if (resourceBufferedImage == null) return;
         try {
             Graphics2D g2 = (Graphics2D) graphics;
@@ -532,7 +532,7 @@ public class DrawingUtil {
 
     public static void drawPlayerFactionIconImageUnderlay(
             Graphics graphics, Player player, int x, int y, int width, int height) {
-        BufferedImage faction = DrawingUtil.getPlayerFactionIconImageScaled(player, width, height);
+        BufferedImage faction = getPlayerFactionIconImageScaled(player, width, height);
         if (faction == null) return;
         try {
             BufferedImage underlay = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -630,7 +630,7 @@ public class DrawingUtil {
     public static void drawTextVertically(Graphics graphics, String text, int x, int y, Font font, boolean rightAlign) {
         Graphics2D graphics2D = (Graphics2D) graphics;
         AffineTransform originalTransform = graphics2D.getTransform();
-        graphics2D.rotate(Math.toRadians(-90));
+        graphics2D.rotate(-1.5707963267948966);
         graphics2D.setFont(font);
 
         if (rightAlign) {
@@ -667,7 +667,7 @@ public class DrawingUtil {
         int spacing = graphics.getFontMetrics().getAscent()
                 + graphics.getFontMetrics().getLeading();
         text = text.toUpperCase();
-        String firstRow = StringUtils.substringBefore(text, "\n");
+        String firstRow = substringBefore(text, "\n");
         firstRow = trimTextToPixelWidth(graphics, firstRow, maxWidth);
         String secondRow = text.substring(firstRow.length()).replace("\n", "");
         secondRow = trimTextToPixelWidth(graphics, secondRow, maxWidth);

@@ -33,12 +33,12 @@ public class TileModel implements ModelInterface, EmbeddableModel {
 
         @JsonCreator
         public static TileBack fromString(String value) {
-            return value == null ? TileBack.BLACK : TileBack.valueOf(value.toUpperCase());
+            return value == null ? BLACK : valueOf(value.toUpperCase());
         }
 
         @JsonValue
         public String toValue() {
-            return this.name().toLowerCase();
+            return name().toLowerCase();
         }
     }
 
@@ -53,11 +53,11 @@ public class TileModel implements ModelInterface, EmbeddableModel {
 
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
-    private @JsonProperty("isHyperlane") boolean hyperlane = false;
-    private @JsonProperty("isAsteroidField") boolean asteroidField = false;
-    private @JsonProperty("isSupernova") boolean supernova = false;
-    private @JsonProperty("isNebula") boolean nebula = false;
-    private @JsonProperty("isGravityRift") boolean gravityRift = false;
+    private @JsonProperty("isHyperlane") boolean hyperlane;
+    private @JsonProperty("isAsteroidField") boolean asteroidField;
+    private @JsonProperty("isSupernova") boolean supernova;
+    private @JsonProperty("isNebula") boolean nebula;
+    private @JsonProperty("isGravityRift") boolean gravityRift;
     private String imageURL;
     private ComponentSource source;
     private TileBack tileBack = TileBack.BLACK;
@@ -81,32 +81,32 @@ public class TileModel implements ModelInterface, EmbeddableModel {
 
         StringBuilder sb = new StringBuilder();
         if (isEmpty()) sb.append(ExploreEmojis.Frontier);
-        if (isAsteroidField()) sb.append(MiscEmojis.Asteroids);
-        if (isSupernova()) sb.append(MiscEmojis.Supernova);
-        if (isNebula()) sb.append(MiscEmojis.Nebula);
-        if (isGravityRift()) sb.append(MiscEmojis.GravityRift);
-        if (hasPlanets()) sb.append("\nPlanets: ").append(getPlanets().toString());
+        if (asteroidField) sb.append(MiscEmojis.Asteroids);
+        if (supernova) sb.append(MiscEmojis.Supernova);
+        if (nebula) sb.append(MiscEmojis.Nebula);
+        if (gravityRift) sb.append(MiscEmojis.GravityRift);
+        if (hasPlanets()) sb.append("\nPlanets: ").append(planets.toString());
         eb.setDescription(sb.toString());
 
         // Image
         TI4Emoji emoji = getEmoji();
         if (emoji != null && emoji.asEmoji() instanceof CustomEmoji customEmoji) {
-            if (emoji.name().endsWith("Back") && !StringUtils.isEmpty(getImagePath())) {
+            if (emoji.name().endsWith("Back") && !StringUtils.isEmpty(imagePath)) {
                 eb.setThumbnail(
                         "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tiles/"
-                                + getImagePath() + "?raw=true");
+                                + imagePath + "?raw=true");
             } else {
                 eb.setThumbnail(customEmoji.getImageUrl());
             }
         }
 
-        if (includeAliases) eb.setFooter("Aliases: " + getAliases());
+        if (includeAliases) eb.setFooter("Aliases: " + aliases);
         return eb.build();
     }
 
     public String getEmbedTitle() {
         StringBuilder sb = new StringBuilder();
-        sb.append("(").append(getId()).append(") ");
+        sb.append("(").append(id).append(") ");
         if (getEmoji() != null) sb.append(getEmoji().emojiString()).append(" ");
         if (!getNameNullSafe().isEmpty())
             sb.append("__").append(getNameNullSafe()).append("__");
@@ -115,23 +115,23 @@ public class TileModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public String getTilePath() {
-        String tileName = Mapper.getTileID(getId());
+        String tileName = Mapper.getTileID(id);
         return ResourceHelper.getInstance().getTileFile(tileName);
     }
 
     @JsonIgnore
     public boolean hasWormhole() {
-        return getWormholes() != null && !getWormholes().isEmpty();
+        return wormholes != null && !wormholes.isEmpty();
     }
 
     @JsonIgnore
     public boolean hasPlanets() {
-        return getPlanets() != null && !getPlanets().isEmpty();
+        return planets != null && !planets.isEmpty();
     }
 
     @JsonIgnore
     public int getNumPlanets() {
-        return getPlanets() == null ? 0 : getPlanets().size();
+        return planets == null ? 0 : planets.size();
     }
 
     @JsonIgnore
@@ -161,23 +161,23 @@ public class TileModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public boolean isAnomaly() {
-        return isAsteroidField() || isGravityRift() || isNebula() || isSupernova();
+        return asteroidField || gravityRift || nebula || supernova;
     }
 
     @JsonIgnore
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getId()).append(" ");
-        if (getName() != null) sb.append(getName());
+        sb.append(id).append(" ");
+        if (name != null) sb.append(name);
         return sb.toString();
     }
 
     @JsonIgnore
     public boolean search(String searchString) {
-        return getId().toLowerCase().contains(searchString)
+        return id.toLowerCase().contains(searchString)
                 || getNameNullSafe().toLowerCase().contains(searchString)
-                || (getAliases() != null
-                        && getAliases().stream().anyMatch(a -> a.toLowerCase().contains(searchString)));
+                || (aliases != null
+                        && aliases.stream().anyMatch(a -> a.toLowerCase().contains(searchString)));
     }
 
     @JsonIgnore
@@ -187,12 +187,12 @@ public class TileModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public String getAlias() {
-        return getId();
+        return id;
     }
 
     @JsonIgnore
     @Nullable
     public TI4Emoji getEmoji() {
-        return TileEmojis.getTileEmojiFromTileID(getId());
+        return TileEmojis.getTileEmojiFromTileID(id);
     }
 }

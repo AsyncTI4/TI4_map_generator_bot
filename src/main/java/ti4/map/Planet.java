@@ -71,7 +71,7 @@ public class Planet extends UnitHolder {
                         .map(TechSpecialtyModel.TechSpecialty::toString)
                         .toList());
             }
-            if (!StringUtils.isBlank(planetInfo.getLegendaryAbilityName())) hasAbility = true;
+            if (!isBlank(planetInfo.getLegendaryAbilityName())) hasAbility = true;
         }
         resetOriginalPlanetResInf();
     }
@@ -313,7 +313,7 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public boolean isLegendary() {
         PlanetModel model = getPlanetModel();
-        if (getName().equalsIgnoreCase("ghoti")) {
+        if ("ghoti".equalsIgnoreCase(getName())) {
             return false;
         }
         if (model != null && model.isLegendary()) return true;

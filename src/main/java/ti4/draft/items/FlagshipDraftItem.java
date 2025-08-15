@@ -88,7 +88,7 @@ public class FlagshipDraftItem extends DraftItem {
             var units = faction.getUnits();
             units.removeIf(
                     (String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(DraftItem.generate(Category.FLAGSHIP, units.getFirst()));
+            allItems.add(generate(Category.FLAGSHIP, units.getFirst()));
         }
         return allItems;
     }
@@ -110,7 +110,7 @@ public class FlagshipDraftItem extends DraftItem {
             var units = faction.getUnits();
             units.removeIf(
                     (String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(DraftItem.generate(Category.FLAGSHIP, units.getFirst()));
+            allItems.add(generate(Category.FLAGSHIP, units.getFirst()));
         }
         return allItems;
     }

@@ -212,14 +212,14 @@ public class CombatMessageHelper {
             if (game.getStoredValue(combatName).isEmpty()) {
                 round = 1;
             } else {
-                if (game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
+                if ("true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"))) {
                     round = Integer.parseInt(game.getStoredValue(combatName));
                 } else {
                     round = Integer.parseInt(game.getStoredValue(combatName)) + 1;
                 }
             }
             game.setStoredValue(combatName, "" + round);
-            if (game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
+            if ("true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"))) {
                 combatTypeName += " (_Crown of Thalnos_ reroll for round #" + round + ")";
             } else {
                 combatTypeName += " (round #" + round + ")";

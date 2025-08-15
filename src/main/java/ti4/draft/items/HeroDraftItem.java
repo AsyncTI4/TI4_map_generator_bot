@@ -68,7 +68,7 @@ public class HeroDraftItem extends DraftItem {
             leaders.removeIf(
                     (String leader) -> !"hero".equals(allLeaders.get(leader).getType()));
             for (String leader : leaders) {
-                allItems.add(DraftItem.generate(Category.HERO, leader));
+                allItems.add(generate(Category.HERO, leader));
             }
         }
         return allItems;
@@ -92,7 +92,7 @@ public class HeroDraftItem extends DraftItem {
                 if (Arrays.asList(results).contains(leader)) {
                     continue;
                 }
-                allItems.add(DraftItem.generate(Category.HERO, leader));
+                allItems.add(generate(Category.HERO, leader));
             }
         }
         return allItems;

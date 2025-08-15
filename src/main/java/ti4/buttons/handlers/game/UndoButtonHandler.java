@@ -29,7 +29,7 @@ class UndoButtonHandler {
             String buttonString = game.getSavedButtons().getFirst();
             String colorOrFaction = buttonString.split(";")[0];
             Player p = game.getPlayerFromColorOrFaction(colorOrFaction);
-            if (p != null && player != p && !colorOrFaction.equals("null")) {
+            if (p != null && player != p && !"null".equals(colorOrFaction)) {
                 // if the last button was pressed by a non-faction player, allow anyone to undo
                 // it
                 String msg =

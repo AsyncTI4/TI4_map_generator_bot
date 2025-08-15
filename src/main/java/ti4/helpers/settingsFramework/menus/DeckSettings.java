@@ -17,7 +17,7 @@ import ti4.service.emoji.CardEmojis;
 
 // This is a sub-menu
 @Getter
-@JsonIgnoreProperties({"messageId"})
+@JsonIgnoreProperties("messageId")
 public class DeckSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus

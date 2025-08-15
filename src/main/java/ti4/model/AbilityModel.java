@@ -34,12 +34,12 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAlias() {
-        return getId();
+        return id;
     }
 
     public String getShortName() {
         if (getHomebrewReplacesID().isEmpty()) {
-            return Optional.ofNullable(shortName).orElse(getName());
+            return Optional.ofNullable(shortName).orElse(name);
         }
         return Optional.ofNullable(shortName)
                 .orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShortName());
@@ -78,7 +78,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
 
         // TITLE
         String title =
-                getFactionEmoji() + " __**" + getName() + "**__" + getSource().emoji();
+                getFactionEmoji() + " __**" + name + "**__" + source.emoji();
         eb.setTitle(title);
 
         // DESCRIPTION
@@ -92,7 +92,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
         // FOOTER
         StringBuilder footer = new StringBuilder();
         if (includeID)
-            footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
+            footer.append("ID: ").append(getAlias()).append("    Source: ").append(source);
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.black);
@@ -100,12 +100,12 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        return getFactionEmoji() + " " + getName() + " " + getSource().emoji();
+        return getFactionEmoji() + " " + name + " " + source.emoji();
     }
 
     public String getRepresentation() {
-        String abilityName = getName();
-        String abilitySourceFaction = getFaction();
+        String abilityName = name;
+        String abilitySourceFaction = faction;
         String abilityRawModifier = getPermanentEffect().orElse("");
         String abilityWindow = getWindow().orElse("");
         String abilityText = getWindowEffect().orElse("");
@@ -124,19 +124,19 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public boolean search(String searchString) {
-        return getId().contains(searchString)
-                || getName().toLowerCase().contains(searchString)
-                || getFaction().toLowerCase().contains(searchString)
-                || getSource().toString().toLowerCase().contains(searchString)
-                || getSearchTags().contains(searchString);
+        return id.contains(searchString)
+                || name.toLowerCase().contains(searchString)
+                || faction.toLowerCase().contains(searchString)
+                || source.toString().toLowerCase().contains(searchString)
+                || searchTags.contains(searchString);
     }
 
     @Override
     public String getAutoCompleteName() {
-        return getName() + " (" + getFaction() + ")" + " [" + getSource() + "]";
+        return name + " (" + faction + ")" + " [" + source + "]";
     }
 
     public TI4Emoji getFactionEmoji() {
-        return FactionEmojis.getFactionIcon(getFaction());
+        return FactionEmojis.getFactionIcon(faction);
     }
 }

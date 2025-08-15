@@ -32,8 +32,9 @@ public class GamesPage {
         int currentPage = 0;
         GamesPage pagedGames;
         do {
-            pagedGames = GamesPage.getPage(currentPage++);
-            pagedGames.getGames().stream().filter(filter).forEach(consumer);
+            pagedGames = getPage(currentPage);
+            currentPage++;
+            pagedGames.games.stream().filter(filter).forEach(consumer);
         } while (pagedGames.hasNextPage());
     }
 
@@ -42,7 +43,7 @@ public class GamesPage {
         var gameNames = GameManager.getGameNames();
         var pagedGames = new GamesPage();
         for (int i = PAGE_SIZE * page;
-                i < gameNames.size() && pagedGames.getGames().size() < PAGE_SIZE;
+                i < gameNames.size() && pagedGames.games.size() < PAGE_SIZE;
                 i++) {
             var game = GameManager.getManagedGame(gameNames.get(i)).getGame();
             pagedGames.games.add(game);

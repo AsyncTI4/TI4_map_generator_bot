@@ -34,43 +34,43 @@ public class GameStatisticsFilterer {
         List<OptionData> filters = new ArrayList<>();
         filters.add(new OptionData(
                 OptionType.INTEGER,
-                GameStatisticsFilterer.PLAYER_COUNT_FILTER,
+                PLAYER_COUNT_FILTER,
                 "Filter games by player count, e.g. 3-8"));
         filters.add(new OptionData(
                 OptionType.INTEGER,
-                GameStatisticsFilterer.MIN_PLAYER_COUNT_FILTER,
+                MIN_PLAYER_COUNT_FILTER,
                 "Filter games by minimum player count, e.g. 3-8"));
         filters.add(new OptionData(
                 OptionType.INTEGER,
-                GameStatisticsFilterer.VICTORY_POINT_GOAL_FILTER,
+                VICTORY_POINT_GOAL_FILTER,
                 "Filter games by victory point goal, e.g. 10-14"));
         filters.add(new OptionData(
                         OptionType.STRING,
-                        GameStatisticsFilterer.GAME_TYPES_FILTER,
+                        GAME_TYPES_FILTER,
                         "Filter games by game type, comma seperated, e.g. base, pok, absol, ds, action_deck_2")
                 .setAutoComplete(true));
         filters.add(new OptionData(
                         OptionType.STRING,
-                        GameStatisticsFilterer.EXCLUDED_GAME_TYPES_FILTER,
+                        EXCLUDED_GAME_TYPES_FILTER,
                         "Filter excluded games by game type, comma seperated, e.g. base, pok, absol, ds, action_deck_2")
                 .setAutoComplete(true));
         filters.add(new OptionData(
-                OptionType.BOOLEAN, GameStatisticsFilterer.FOG_FILTER, "Filter games by if the game is a fog game"));
+                OptionType.BOOLEAN, FOG_FILTER, "Filter games by if the game is a fog game"));
         filters.add(new OptionData(
                 OptionType.BOOLEAN,
-                GameStatisticsFilterer.HOMEBREW_FILTER,
+                HOMEBREW_FILTER,
                 "Filter games by if the game has any homebrew"));
         filters.add(new OptionData(
                 OptionType.BOOLEAN,
-                GameStatisticsFilterer.HAS_WINNER_FILTER,
+                HAS_WINNER_FILTER,
                 "Filter games by if the game has a winner"));
         filters.add(new OptionData(
                 OptionType.BOOLEAN,
-                GameStatisticsFilterer.HAS_GALACTIC_EVENT_FILTER,
+                HAS_GALACTIC_EVENT_FILTER,
                 "Filter games by if the game has a galactic event"));
         filters.add(new OptionData(
                 OptionType.BOOLEAN,
-                GameStatisticsFilterer.HAS_SCENARIO_FILTER,
+                HAS_SCENARIO_FILTER,
                 "Filter games by if the game has a scenario"));
         return filters;
     }
@@ -224,14 +224,14 @@ public class GameStatisticsFilterer {
     private static boolean isDiscordantStarsGame(Game game) {
         return game.isDiscordantStarsMode()
                 || Mapper.getFactionsValues().stream()
-                        .filter(faction -> ComponentSource.ds.equals(faction.getSource()))
+                        .filter(faction -> ComponentSource.ds == faction.getSource())
                         .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
     }
 
     private static boolean isMiltyModGame(Game game) {
         return game.isMiltyModMode()
                 || Mapper.getFactionsValues().stream()
-                        .filter(faction -> ComponentSource.miltymod.equals(faction.getSource()))
+                        .filter(faction -> ComponentSource.miltymod == faction.getSource())
                         .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
     }
 

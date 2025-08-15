@@ -466,7 +466,7 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(),
                 "Please choose the law you wish to repeal.",
-                ButtonHelperActionCards.getRepealLawButtons(game, player));
+                getRepealLawButtons(game, player));
         ButtonHelper.deleteMessage(event);
     }
 
@@ -483,7 +483,7 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(),
                 "Please choose the technology you wish to return.",
-                ButtonHelperActionCards.getDivertFundingLoseTechOptions(player, game));
+                getDivertFundingLoseTechOptions(player, game));
         ButtonHelper.deleteMessage(event);
     }
 
@@ -565,7 +565,7 @@ public class ButtonHelperActionCards {
         int extraRollsForUnit = 0;
         int numRollsPerUnit = 1;
 
-        if (type.equalsIgnoreCase("courageous")) {
+        if ("courageous".equalsIgnoreCase(type)) {
             StringBuilder resultBuilder = new StringBuilder(result);
 
             int numOfUnit = 2;
@@ -2454,7 +2454,7 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(),
                 "Please choose the technology you wish to acquire by violating intellectual property law.",
-                ButtonHelperActionCards.getPlagiarizeButtons(game, player));
+                getPlagiarizeButtons(game, player));
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
         Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
         buttons.add(doneExhausting);
