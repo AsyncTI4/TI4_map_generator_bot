@@ -81,7 +81,7 @@ class Replace extends GameStateSubcommand {
         Player possibleSpectatorToRemove = game.getPlayer(replacementUser.getId());
         if (possibleSpectatorToRemove != null
                 && possibleSpectatorToRemove.getFaction() != null
-                && !possibleSpectatorToRemove.getFaction().equalsIgnoreCase("null")) {
+                && !"null".equalsIgnoreCase(possibleSpectatorToRemove.getFaction())) {
             MessageHelper.replyToMessage(event, "Specify player that is **__not__** in the game to be the replacement");
             return;
         } else if (possibleSpectatorToRemove != null) {

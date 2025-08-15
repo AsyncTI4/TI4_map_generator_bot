@@ -43,7 +43,7 @@ public class LeaderInfoService {
             for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (promissoryNotesInPlayArea.contains(pn.getKey())) {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn.getKey());
-                    if (pnModel.getName().equals("Alliance")) {
+                    if ("Alliance".equals(pnModel.getName())) {
                         String color = pnModel.getColor().orElse(null);
                         for (Player otherPlayer : game.getPlayers().values()) {
                             if (otherPlayer.getColor().equalsIgnoreCase(color)) {

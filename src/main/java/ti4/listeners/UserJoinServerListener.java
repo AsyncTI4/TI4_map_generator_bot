@@ -107,7 +107,7 @@ public class UserJoinServerListener extends ListenerAdapter {
         String msg = user.getAsMention() + " ping here";
         List<ThreadChannel> threadChannels = game.getTableTalkChannel().getThreadChannels();
         for (ThreadChannel threadChannel_ : threadChannels) {
-            if (threadChannel_.getName().equalsIgnoreCase("Info for new players")) {
+            if ("Info for new players".equalsIgnoreCase(threadChannel_.getName())) {
                 MessageHelper.sendMessageToChannel(threadChannel_, msg);
             }
         }

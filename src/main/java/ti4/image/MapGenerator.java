@@ -1362,8 +1362,7 @@ public class MapGenerator implements AutoCloseable {
                             null);
                     offBoardHighlighting++;
                 }
-            } else if (displayType == DisplayType.wormholes
-                    && player.getFaction().equalsIgnoreCase("ghost")) {
+            } else if (displayType == DisplayType.wormholes && "ghost".equalsIgnoreCase(player.getFaction())) {
                 boolean alphaOnMap = false;
                 boolean betaOnMap = false;
                 boolean gammaOnMap = false;
@@ -1473,7 +1472,7 @@ public class MapGenerator implements AutoCloseable {
                             t += traits.contains("cultural") ? "C" : "";
                             t += traits.contains("hazardous") ? "H" : "";
                             t += traits.contains("industrial") ? "I" : "";
-                            if (t.equals("CHI")) {
+                            if ("CHI".equals(t)) {
                                 traitFile = ResourceHelper.getInstance()
                                         .getPlanetResource("pc_attribute_combo_CHI_big.png");
                             } else {
@@ -2343,7 +2342,7 @@ public class MapGenerator implements AutoCloseable {
     }
 
     protected static int getMaxObjectiveWidth(Game game) {
-        return (MapGenerator.getMapWidth(game) - MapGenerator.SPACING_BETWEEN_OBJECTIVE_TYPES * 4) / 3;
+        return (getMapWidth(game) - SPACING_BETWEEN_OBJECTIVE_TYPES * 4) / 3;
     }
 
     // The first parameter is the scale factor (contrast), the second is the offset

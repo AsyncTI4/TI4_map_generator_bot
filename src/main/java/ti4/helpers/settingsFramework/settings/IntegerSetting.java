@@ -23,7 +23,7 @@ public class IntegerSetting extends SettingInterface {
     public IntegerSetting(String id, String name, int val, int min, int max, int delta) {
         super(id, name);
 
-        this.defaultValue = this.val = val;
+        defaultValue = this.val = val;
         this.min = min;
         this.max = max;
         this.delta = delta;

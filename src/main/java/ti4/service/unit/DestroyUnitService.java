@@ -199,8 +199,7 @@ public class DestroyUnitService {
                     DisasterWatchHelper.postTileInDisasterWatch(game, event, unit.tile(), 0, message1);
                     UnitHolder uh = unit.tile().getSpaceUnitHolder();
                     for (Player player_ : game.getPlayers().values()) {
-                        DestroyUnitService.destroyAllPlayerNonStructureUnits(
-                                event, game, player_, unit.tile(), uh, combat);
+                        destroyAllPlayerNonStructureUnits(event, game, player_, unit.tile(), uh, combat);
                     }
                     DisasterWatchHelper.postTileInDisasterWatch(
                             game, event, unit.tile(), 0, player.getRepresentation() + " has detonated the bomb.");
