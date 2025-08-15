@@ -72,16 +72,16 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
         ComponentSource source =
                 ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
-        int min_planets = event.getOption(MIN_NUM_PLANET, 0, OptionMapping::getAsInt);
-        int max_planets = event.getOption(MAX_NUM_PLANET, Integer.MAX_VALUE, OptionMapping::getAsInt);
-        boolean include_draft = event.getOption(INCLUDE_DRAFT_TILES, false, OptionMapping::getAsBoolean);
-        boolean include_hyperlanes = event.getOption(INCLUDE_HYPERLANES, false, OptionMapping::getAsBoolean);
-        Boolean with_anomalies = event.getOption(WITH_ANOMALY, null, OptionMapping::getAsBoolean);
-        Boolean with_asteroids = event.getOption(WITH_ASTEROID, null, OptionMapping::getAsBoolean);
-        Boolean with_grifts = event.getOption(WITH_GRAVITY_RIFT, null, OptionMapping::getAsBoolean);
-        Boolean with_nebula = event.getOption(WITH_NEBULA, null, OptionMapping::getAsBoolean);
-        Boolean with_supernova = event.getOption(WITH_SUPERNOVA, null, OptionMapping::getAsBoolean);
-        Boolean with_legendaries = event.getOption(WITH_LEGENDARIES, null, OptionMapping::getAsBoolean);
+        int minPlanets = event.getOption(MIN_NUM_PLANET, 0, OptionMapping::getAsInt);
+        int maxPlanets = event.getOption(MAX_NUM_PLANET, Integer.MAX_VALUE, OptionMapping::getAsInt);
+        boolean includeDraft = event.getOption(INCLUDE_DRAFT_TILES, false, OptionMapping::getAsBoolean);
+        boolean includeHyperlanes = event.getOption(INCLUDE_HYPERLANES, false, OptionMapping::getAsBoolean);
+        Boolean withAnomalies = event.getOption(WITH_ANOMALY, null, OptionMapping::getAsBoolean);
+        Boolean withAsteroids = event.getOption(WITH_ASTEROID, null, OptionMapping::getAsBoolean);
+        Boolean withGrifts = event.getOption(WITH_GRAVITY_RIFT, null, OptionMapping::getAsBoolean);
+        Boolean withNebula = event.getOption(WITH_NEBULA, null, OptionMapping::getAsBoolean);
+        Boolean withSupernova = event.getOption(WITH_SUPERNOVA, null, OptionMapping::getAsBoolean);
+        Boolean withLegendaries = event.getOption(WITH_LEGENDARIES, null, OptionMapping::getAsBoolean);
 
         List<Entry<TileModel, MessageEmbed>> tileEmbeds = new ArrayList<>();
         if (TileHelper.isValidTile(searchString)) {
@@ -90,19 +90,19 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
         } else {
             TileHelper.getAllTileModels().stream()
                     .filter(tile -> tile.search(searchString, source))
-                    .filter(tile -> tile.getNumPlanets() <= max_planets)
-                    .filter(tile -> tile.getNumPlanets() >= min_planets)
-                    .filter(tile -> include_draft || tile.getSource() != ComponentSource.draft)
-                    .filter(tile -> include_hyperlanes || !tile.isHyperlane())
-                    .filter(tile -> with_anomalies == null || with_anomalies == tile.isAnomaly())
-                    .filter(tile -> with_asteroids == null || with_asteroids == tile.isAsteroidField())
-                    .filter(tile -> with_grifts == null || with_grifts == tile.isGravityRift())
-                    .filter(tile -> with_nebula == null || with_nebula == tile.isNebula())
-                    .filter(tile -> with_supernova == null || with_supernova == tile.isSupernova())
-                    .filter(tile -> with_legendaries == null
+                    .filter(tile -> tile.getNumPlanets() <= maxPlanets)
+                    .filter(tile -> tile.getNumPlanets() >= minPlanets)
+                    .filter(tile -> includeDraft || tile.getSource() != ComponentSource.draft)
+                    .filter(tile -> includeHyperlanes || !tile.isHyperlane())
+                    .filter(tile -> withAnomalies == null || withAnomalies == tile.isAnomaly())
+                    .filter(tile -> withAsteroids == null || withAsteroids == tile.isAsteroidField())
+                    .filter(tile -> withGrifts == null || withGrifts == tile.isGravityRift())
+                    .filter(tile -> withNebula == null || withNebula == tile.isNebula())
+                    .filter(tile -> withSupernova == null || withSupernova == tile.isSupernova())
+                    .filter(tile -> withLegendaries == null
                             || tile.getPlanets().stream()
                                     .map(Mapper::getPlanet)
-                                    .anyMatch(planet -> planet.isLegendary() == with_legendaries))
+                                    .anyMatch(planet -> planet.isLegendary() == withLegendaries))
                     .sorted(Comparator.comparing(TileModel::getId))
                     .map(tile -> Map.entry(tile, tile.getRepresentationEmbed(includeAliases)))
                     .forEach(tileEmbeds::add);
