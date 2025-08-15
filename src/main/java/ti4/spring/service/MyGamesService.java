@@ -21,6 +21,7 @@ public class MyGamesService {
         if (managedPlayer == null) return List.of();
 
         return managedPlayer.getGames().stream()
+                .filter(ManagedGame::isActive)
                 .map(game -> toSummary(game, userId))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
