@@ -1,6 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -1449,13 +1449,13 @@ public class UnfiledButtonHandlers {
         String revealedObjective = null;
         if (!game.isRedTapeMode() && !game.isCivilizedSocietyMode()) {
             if ("2".equalsIgnoreCase(stage)) {
-                RevealPublicObjectiveService.revealS2(game, event, event.getChannel());
+                RevealPublicObjectiveService.revealS2(game, event);
             } else if ("2x2".equalsIgnoreCase(stage)) {
-                RevealPublicObjectiveService.revealTwoStage2(game, event, event.getChannel());
+                RevealPublicObjectiveService.revealTwoStage2(game, event.getChannel());
             } else if ("none".equalsIgnoreCase(stage)) {
                 // continue without revealing anything
             } else {
-                revealedObjective = RevealPublicObjectiveService.revealS1(game, event, event.getChannel());
+                revealedObjective = RevealPublicObjectiveService.revealS1(game, event);
             }
         } else {
             MessageHelper.sendMessageToChannel(

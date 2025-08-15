@@ -9,16 +9,18 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ArticlesOfWarAgendaResolver implements AgendaResolver {
+public class ArticlesOfWarAgendaResolver implements ForAgainstAgendaResolver {
     @Override
     public String getAgendaId() {
         return "articles_war";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
-        if ("for".equalsIgnoreCase(winner)) return;
-        List<Player> winOrLose = AgendaHelper.getLosingVoters(winner, game);
+    public void handleFor(Game game, ButtonInteractionEvent event, int agendaNumericId) {}
+
+    @Override
+    public void handleAgainst(Game game, ButtonInteractionEvent event, int agendaNumericId) {
+        List<Player> winOrLose = AgendaHelper.getLosingVoters("against", game);
         for (Player playerWL : winOrLose) {
             playerWL.setTg(playerWL.getTg() + 3);
             ButtonHelperAbilities.pillageCheck(playerWL, game);

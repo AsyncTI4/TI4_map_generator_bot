@@ -115,11 +115,11 @@ class RelicButtonHandler {
                 + ", to replace the recently revealed objective with a random " + type + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (type.equalsIgnoreCase("stage1")) {
-            RevealPublicObjectiveService.revealS1(game, event, game.getActionsChannel(), true);
+            RevealPublicObjectiveService.revealS1(game, event, true);
         } else if (type.equalsIgnoreCase("stage2")) {
-            RevealPublicObjectiveService.revealS2(game, event, game.getActionsChannel(), true);
+            RevealPublicObjectiveService.revealS2(game, event, true);
         } else {
-            RevealPublicObjectiveService.revealSO(game, event, game.getActionsChannel());
+            RevealPublicObjectiveService.revealSO(game, event.getMessageChannel());
         }
         ButtonHelper.deleteMessage(event);
     }
