@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -166,22 +165,28 @@ public class StartPhaseService {
         if (alreadyQueued.isEmpty()) {
             numQueued = 0;
         }
-        StringBuilder msg =
-            new StringBuilder(player.getRepresentation() + " you are #" + number + " pick in this Strategy Phase and so can queue "
-                + number + " strategy cards." + " So far you have queued " + numQueued + " cards. ");
+        StringBuilder msg = new StringBuilder(
+                player.getRepresentation() + " you are #" + number + " pick in this Strategy Phase and so can queue "
+                        + number + " strategy cards." + " So far you have queued " + numQueued + " cards. ");
         if (game.isFowMode()) {
-            msg = new StringBuilder(player.getRepresentation() + " you can queue up to 8 cards." + " So far you have queued " + numQueued
-                + " cards. ");
+            msg = new StringBuilder(player.getRepresentation() + " you can queue up to 8 cards."
+                    + " So far you have queued " + numQueued + " cards. ");
         }
         if (numQueued > 0) {
-            msg.append("The queued strategy cards are as follows (in the order the bot will attempt to select them for you):\n");
+            msg.append(
+                    "The queued strategy cards are as follows (in the order the bot will attempt to select them for you):\n");
             int count = 1;
             for (String num : alreadyQueued.split("_")) {
                 if (num.isEmpty()) {
                     continue;
                 }
                 TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(Integer.parseInt(num));
-                msg.append(count).append(". ").append(Helper.getSCName(Integer.parseInt(num), game)).append(" ").append(scEmoji).append("\n");
+                msg.append(count)
+                        .append(". ")
+                        .append(Helper.getSCName(Integer.parseInt(num), game))
+                        .append(" ")
+                        .append(scEmoji)
+                        .append("\n");
             }
         }
         return msg.toString();

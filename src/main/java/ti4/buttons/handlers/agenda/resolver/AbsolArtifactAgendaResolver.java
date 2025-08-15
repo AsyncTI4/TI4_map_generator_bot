@@ -42,8 +42,7 @@ public class AbsolArtifactAgendaResolver implements ForAgainstAgendaResolver {
 
     @Override
     public void handleAgainst(Game game, ButtonInteractionEvent event, int agendaNumericId) {
-        MessageHelper.sendMessageToChannel(
-            game.getMainGameChannel(), "Against on _Ixthian Artifact_‽ Disgraceful.");
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Against on _Ixthian Artifact_‽ Disgraceful.");
         Integer poIndex = game.addCustomPO("Ixthian Rex Point", 1);
         StringBuilder message = new StringBuilder();
         message.append("Custom objective _Ixthian Rex Point_ has been added.\n");

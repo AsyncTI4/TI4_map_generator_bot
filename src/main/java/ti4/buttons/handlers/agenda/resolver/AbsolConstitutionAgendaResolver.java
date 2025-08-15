@@ -2,7 +2,6 @@ package ti4.buttons.handlers.agenda.resolver;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.AgendaHelper;
 import ti4.image.Mapper;
@@ -42,7 +41,7 @@ public class AbsolConstitutionAgendaResolver implements ForAgainstAgendaResolver
             } else {
                 discardedAgendas.add(id2);
                 MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Found the non-law agenda: " + agendaDetails.getName());
+                        game.getMainGameChannel(), "Found the non-law agenda: " + agendaDetails.getName());
             }
         }
     }
