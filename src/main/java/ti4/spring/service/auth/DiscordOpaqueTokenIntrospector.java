@@ -27,7 +27,7 @@ public class DiscordOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
 
     @Override
     public OAuth2AuthenticatedPrincipal introspect(String token) {
-        if (token == null) throw new OAuth2AuthenticationException("Invalid Discord token");
+        if (token == null) throw new OAuth2AuthenticationException("No token provided");
 
         try {
             OAuth2AuthenticatedPrincipal principal = CACHE.getIfPresent(token);
@@ -50,11 +50,14 @@ public class DiscordOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
                         Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
                 CACHE.put(token, principal);
                 return principal;
+            } else {
+                BotLogger.error(String.format(
+                        "Discord did not indicate success getting the user token.   %s", response.body()));
             }
         } catch (Exception e) {
             BotLogger.error("Error retrieving Discord user id from token", e);
         }
 
-        throw new OAuth2AuthenticationException("Invalid Discord token");
+        throw new OAuth2AuthenticationException("Discord token provided, but did not auth");
     }
 }
