@@ -31,13 +31,10 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
         }
 
         if (cachingResponse.getStatus() >= 400) {
-            String body =
-                    new String(cachingResponse.getContentAsByteArray(), cachingResponse.getCharacterEncoding());
+            String body = new String(cachingResponse.getContentAsByteArray(), cachingResponse.getCharacterEncoding());
             String error = String.format(
                     "Request to %s returned status %s with body: %s",
-                    request.getRequestURI(),
-                    cachingResponse.getStatus(),
-                    body);
+                    request.getRequestURI(), cachingResponse.getStatus(), body);
             BotLogger.error(error);
         }
 
