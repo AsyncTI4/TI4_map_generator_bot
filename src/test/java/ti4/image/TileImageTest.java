@@ -29,9 +29,9 @@ import ti4.testUtils.BaseTi4Test;
 // @org.junit.jupiter.api.Disabled
 public class TileImageTest extends BaseTi4Test {
 
-    public static Game testGame = null;
-    public static Player testPlayer1 = null;
-    public static Player testPlayer2 = null;
+    public static Game testGame;
+    public static Player testPlayer1;
+    public static Player testPlayer2;
 
     public static TestMode testMode = TestMode.Compare;
 

@@ -1,5 +1,6 @@
 package ti4.commands.help;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -22,7 +23,7 @@ class Monuments extends Subcommand {
     public static void showMonumentsHelp(GenericInteractionCreateEvent event) {
         String path = ResourceHelper.getInstance().getHelpFile("Monuments.txt");
         try {
-            String message = new String(Files.readAllBytes(Paths.get(path)));
+            String message = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
             MessageHelper.sendMessageToEventChannel(event, message);
         } catch (Exception e) {
             MessageHelper.sendMessageToEventChannel(event, "MONUMENTS HELP FILE IS BLANK");

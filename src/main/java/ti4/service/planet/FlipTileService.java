@@ -60,7 +60,7 @@ public class FlipTileService {
             }
             tile = new Tile(planetTileName, position);
             game.setTile(tile);
-        } else if (game.getMapTemplateID().equals("2025scptFinals")
+        } else if ("2025scptFinals".equals(game.getMapTemplateID())
                 && List.of("528", "529", "530", "501", "502", "503", "504").contains(tile.getPosition())) {
             boolean anything = false;
             for (String pos : List.of("528", "529", "530", "501", "502", "503", "504")) {

@@ -23,18 +23,18 @@ public class GenericCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public String autoCompleteString() {
-        return getAlias() + ": " + getName() + " [" + getSource().toString() + "]";
+        return alias + ": " + name + " [" + source.toString() + "]";
     }
 
     public String getAutoCompleteName() {
-        return getAlias() + ": " + getName() + " [" + getSource().toString() + "]";
+        return alias + ": " + name + " [" + source.toString() + "]";
     }
 
     public boolean search(String searchString) {
         searchString = searchString.toLowerCase();
-        return getAlias().toLowerCase().contains(searchString)
-                || getName().toLowerCase().contains(searchString)
-                || getCardType().toString().contains(searchString);
+        return alias.toLowerCase().contains(searchString)
+                || name.toLowerCase().contains(searchString)
+                || cardType.toString().contains(searchString);
     }
 
     public String getRepresentation() {

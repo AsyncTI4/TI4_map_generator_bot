@@ -97,7 +97,7 @@ class SecretObjectiveButtonHandler {
                 && game.getPlayerFromColorOrFaction("keleres") == null) {
             Player keleres = null;
             for (String playerID : manager.getPlayers())
-                if (manager.getPlayerDraft(playerID).getFaction().equals("keleresm"))
+                if ("keleresm".equals(manager.getPlayerDraft(playerID).getFaction()))
                     keleres = game.getPlayer(playerID);
             if (keleres != null) {
                 MessageHelper.sendMessageToChannel(

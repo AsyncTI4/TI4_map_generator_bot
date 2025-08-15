@@ -57,7 +57,7 @@ public class CommoditiesDraftItem extends DraftItem {
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            allItems.add(DraftItem.generate(Category.COMMODITIES, faction.getAlias()));
+            allItems.add(generate(Category.COMMODITIES, faction.getAlias()));
         }
         return allItems;
     }
@@ -75,7 +75,7 @@ public class CommoditiesDraftItem extends DraftItem {
             if (Arrays.asList(results).contains(faction.getAlias())) {
                 continue;
             }
-            allItems.add(DraftItem.generate(Category.COMMODITIES, faction.getAlias()));
+            allItems.add(generate(Category.COMMODITIES, faction.getAlias()));
         }
         return allItems;
     }

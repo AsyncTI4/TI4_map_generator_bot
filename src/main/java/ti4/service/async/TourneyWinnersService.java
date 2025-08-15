@@ -14,7 +14,7 @@ import ti4.message.BotLogger;
 public class TourneyWinnersService {
 
     private static final String fileName = "tourneyWinners.json";
-    private static List<TournamentWinner> winnerCache = null;
+    private static List<TournamentWinner> winnerCache;
 
     public static void addTourneyWinner(User user, String tourneyName) {
         List<TournamentWinner> winners = readWinnerList();

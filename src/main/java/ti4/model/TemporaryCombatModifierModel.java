@@ -34,9 +34,9 @@ public class TemporaryCombatModifierModel {
     }
 
     public String getSaveString() {
-        if (getModifier() != null) {
+        if (modifier != null) {
             return relatedID + "," + relatedType + "," + useInTurn + "," + useInSystem + "," + useInUnitHolder + ","
-                    + getModifier().getAlias();
+                    + modifier.getAlias();
         } else {
             return relatedID + "," + relatedType + "," + useInTurn + "," + useInSystem + "," + useInUnitHolder
                     + ",bleh";

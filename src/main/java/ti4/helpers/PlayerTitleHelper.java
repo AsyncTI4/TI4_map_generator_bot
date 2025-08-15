@@ -124,7 +124,7 @@ public class PlayerTitleHelper {
         return buttons;
     }
 
-    @ButtonHandler(value = "purgeSupports")
+    @ButtonHandler("purgeSupports")
     public static void purgeSupports(ButtonInteractionEvent event, String buttonID, Game game) {
         ButtonHelper.deleteMessage(event);
         if (buttonID.contains("confirmed")) {
@@ -146,7 +146,7 @@ public class PlayerTitleHelper {
         }
     }
 
-    @ButtonHandler(value = "noSupportSwaps")
+    @ButtonHandler("noSupportSwaps")
     public static void noSupportSwaps(ButtonInteractionEvent event, String buttonID, Game game) {
         game.setNoSwapMode(true);
         ButtonHelper.deleteMessage(event);
@@ -154,7 +154,7 @@ public class PlayerTitleHelper {
                 event.getChannel(), "Made it so you cannot swap _Supports For The Thrones_ in this game.");
     }
 
-    @ButtonHandler(value = "setLimitedWhispers")
+    @ButtonHandler("setLimitedWhispers")
     public static void setLimitedWhispers(ButtonInteractionEvent event, String buttonID, Game game) {
         game.setLimitedWhispersMode(true);
         ButtonHelper.deleteMessage(event);
@@ -228,49 +228,49 @@ public class PlayerTitleHelper {
     public static List<Button> getOptInButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         String key = player.getFaction() + "optin" + "winrate";
-        if (game.getStoredValue(key).isEmpty() || game.getStoredValue(key).equalsIgnoreCase("no")) {
+        if (game.getStoredValue(key).isEmpty() || "no".equalsIgnoreCase(game.getStoredValue(key))) {
             buttons.add(Buttons.green("setOptInSinglePreference_" + key + "_yes", "Click To Display Win Rate"));
         } else {
             buttons.add(Buttons.red("setOptInSinglePreference_" + key + "_no", "Click To Not Display Win Rate"));
         }
 
         key = player.getFaction() + "optin" + "vps";
-        if (game.getStoredValue(key).isEmpty() || game.getStoredValue(key).equalsIgnoreCase("no")) {
+        if (game.getStoredValue(key).isEmpty() || "no".equalsIgnoreCase(game.getStoredValue(key))) {
             buttons.add(Buttons.green("setOptInSinglePreference_" + key + "_yes", "Click To Display Victory Points"));
         } else {
             buttons.add(Buttons.red("setOptInSinglePreference_" + key + "_no", "Click To Not Display Victory Points"));
         }
 
         key = player.getFaction() + "optin" + "turns";
-        if (game.getStoredValue(key).isEmpty() || game.getStoredValue(key).equalsIgnoreCase("no")) {
+        if (game.getStoredValue(key).isEmpty() || "no".equalsIgnoreCase(game.getStoredValue(key))) {
             buttons.add(Buttons.green("setOptInSinglePreference_" + key + "_yes", "Click To Display Turn Time Stats"));
         } else {
             buttons.add(Buttons.red("setOptInSinglePreference_" + key + "_no", "Click To Not Display Turn Time Stats"));
         }
 
         key = player.getFaction() + "optin" + "combats";
-        if (game.getStoredValue(key).isEmpty() || game.getStoredValue(key).equalsIgnoreCase("no")) {
+        if (game.getStoredValue(key).isEmpty() || "no".equalsIgnoreCase(game.getStoredValue(key))) {
             buttons.add(Buttons.green("setOptInSinglePreference_" + key + "_yes", "Click To Display Combat Data"));
         } else {
             buttons.add(Buttons.red("setOptInSinglePreference_" + key + "_no", "Click To Not Display Combat Data"));
         }
 
         key = player.getFaction() + "optin" + "opponents";
-        if (game.getStoredValue(key).isEmpty() || game.getStoredValue(key).equalsIgnoreCase("no")) {
+        if (game.getStoredValue(key).isEmpty() || "no".equalsIgnoreCase(game.getStoredValue(key))) {
             buttons.add(Buttons.green("setOptInSinglePreference_" + key + "_yes", "Click To Display Opponents"));
         } else {
             buttons.add(Buttons.red("setOptInSinglePreference_" + key + "_no", "Click To Not Display Opponents"));
         }
 
         key = player.getFaction() + "optin" + "factions";
-        if (game.getStoredValue(key).isEmpty() || game.getStoredValue(key).equalsIgnoreCase("no")) {
+        if (game.getStoredValue(key).isEmpty() || "no".equalsIgnoreCase(game.getStoredValue(key))) {
             buttons.add(Buttons.green("setOptInSinglePreference_" + key + "_yes", "Click To Display Factions Played"));
         } else {
             buttons.add(Buttons.red("setOptInSinglePreference_" + key + "_no", "Click To Not Display Factions Played"));
         }
 
         key = player.getFaction() + "optin" + "games";
-        if (game.getStoredValue(key).isEmpty() || game.getStoredValue(key).equalsIgnoreCase("no")) {
+        if (game.getStoredValue(key).isEmpty() || "no".equalsIgnoreCase(game.getStoredValue(key))) {
             buttons.add(Buttons.green("setOptInSinglePreference_" + key + "_yes", "Click To Display Games"));
         } else {
             buttons.add(Buttons.red("setOptInSinglePreference_" + key + "_no", "Click To Not Display Games"));
@@ -282,7 +282,7 @@ public class PlayerTitleHelper {
         return buttons;
     }
 
-    @ButtonHandler(value = "setOptInSinglePreference_")
+    @ButtonHandler("setOptInSinglePreference_")
     public static void setOptInSinglePreference(
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         game.setStoredValue(buttonID.split("_")[1], buttonID.split("_")[2]);
@@ -293,7 +293,7 @@ public class PlayerTitleHelper {
                 .queue();
     }
 
-    @ButtonHandler(value = "setOptInStats_")
+    @ButtonHandler("setOptInStats_")
     public static void setOptInStats(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         var userSettings = UserSettingsManager.get(player.getUserID());
         userSettings.setHasIndicatedStatPreferences(true);
@@ -301,7 +301,7 @@ public class PlayerTitleHelper {
         String decision = buttonID.split("_")[1];
         var statisticsOpIn = new StatisticOptIn();
         statisticsOpIn.setPlayerDiscordId(event.getUser().getId());
-        if (decision.equalsIgnoreCase("acceptAll")) {
+        if ("acceptAll".equalsIgnoreCase(decision)) {
             statisticsOpIn.setShowWinRates(true);
             statisticsOpIn.setShowTurnStats(true);
             statisticsOpIn.setShowCombatStats(true);
@@ -310,7 +310,7 @@ public class PlayerTitleHelper {
             statisticsOpIn.setShowOpponents(true);
             statisticsOpIn.setShowGames(true);
         }
-        if (decision.equalsIgnoreCase("declineAll")) {
+        if ("declineAll".equalsIgnoreCase(decision)) {
             statisticsOpIn.setShowWinRates(false);
             statisticsOpIn.setShowTurnStats(false);
             statisticsOpIn.setShowCombatStats(false);
@@ -319,21 +319,21 @@ public class PlayerTitleHelper {
             statisticsOpIn.setShowOpponents(false);
             statisticsOpIn.setShowGames(false);
         }
-        if (decision.equalsIgnoreCase("some")) {
+        if ("some".equalsIgnoreCase(decision)) {
             String key = player.getFaction() + "optin" + "winrate";
-            statisticsOpIn.setShowWinRates(game.getStoredValue(key).equalsIgnoreCase("yes"));
+            statisticsOpIn.setShowWinRates("yes".equalsIgnoreCase(game.getStoredValue(key)));
             key = player.getFaction() + "optin" + "turns";
-            statisticsOpIn.setShowTurnStats(game.getStoredValue(key).equalsIgnoreCase("yes"));
+            statisticsOpIn.setShowTurnStats("yes".equalsIgnoreCase(game.getStoredValue(key)));
             key = player.getFaction() + "optin" + "combats";
-            statisticsOpIn.setShowCombatStats(game.getStoredValue(key).equalsIgnoreCase("yes"));
+            statisticsOpIn.setShowCombatStats("yes".equalsIgnoreCase(game.getStoredValue(key)));
             key = player.getFaction() + "optin" + "vps";
-            statisticsOpIn.setShowVpStats(game.getStoredValue(key).equalsIgnoreCase("yes"));
+            statisticsOpIn.setShowVpStats("yes".equalsIgnoreCase(game.getStoredValue(key)));
             key = player.getFaction() + "optin" + "factions";
-            statisticsOpIn.setShowFactionStats(game.getStoredValue(key).equalsIgnoreCase("yes"));
+            statisticsOpIn.setShowFactionStats("yes".equalsIgnoreCase(game.getStoredValue(key)));
             key = player.getFaction() + "optin" + "opponents";
-            statisticsOpIn.setShowOpponents(game.getStoredValue(key).equalsIgnoreCase("yes"));
+            statisticsOpIn.setShowOpponents("yes".equalsIgnoreCase(game.getStoredValue(key)));
             key = player.getFaction() + "optin" + "games";
-            statisticsOpIn.setShowGames(game.getStoredValue(key).equalsIgnoreCase("yes"));
+            statisticsOpIn.setShowGames("yes".equalsIgnoreCase(game.getStoredValue(key)));
         }
 
         UltimateStatisticsWebsiteHelper.sendStatisticsOptIn(statisticsOpIn, player.getCardsInfoThread());
@@ -360,7 +360,7 @@ public class PlayerTitleHelper {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler(value = "bestowTitleStep2_")
+    @ButtonHandler("bestowTitleStep2_")
     public static void resolveBestowTitleStep2(
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String title = buttonID.split("_")[1];

@@ -29,12 +29,12 @@ public class WebTileUnitData {
     private Map<String, WebPdsCoverage> pds; // PDS coverage data per faction
 
     public WebTileUnitData() {
-        this.space = new HashMap<>();
-        this.planets = new HashMap<>();
-        this.ccs = new ArrayList<>();
-        this.isAnomaly = false;
-        this.production = new HashMap<>();
-        this.pds = null; // Only populated if there is PDS coverage
+        space = new HashMap<>();
+        planets = new HashMap<>();
+        ccs = new ArrayList<>();
+        isAnomaly = false;
+        production = new HashMap<>();
+        pds = null; // Only populated if there is PDS coverage
     }
 
     public static Map<String, WebTileUnitData> fromGame(Game game) {

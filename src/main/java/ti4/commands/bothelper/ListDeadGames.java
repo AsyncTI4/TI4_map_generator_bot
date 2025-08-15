@@ -43,9 +43,9 @@ class ListDeadGames extends Subcommand {
             if (game.getName().contains("pbd1000")
                     || game.getName().contains("pbd2863")
                     || game.getName().contains("pbd3000")
-                    || game.getName().equalsIgnoreCase("pbd104")
-                    || game.getName().equalsIgnoreCase("pbd100")
-                    || game.getName().equalsIgnoreCase("pbd100two")) {
+                    || "pbd104".equalsIgnoreCase(game.getName())
+                    || "pbd100".equalsIgnoreCase(game.getName())
+                    || "pbd100two".equalsIgnoreCase(game.getName())) {
                 continue;
             }
             long milliSinceLastTurnChange = System.currentTimeMillis() - game.getLastActivePlayerChange();

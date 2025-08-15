@@ -52,7 +52,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
                 .append("** __")
                 .append(name)
                 .append("__")
-                .append(getSource().emoji());
+                .append(source.emoji());
         eb.setTitle(sb.toString());
 
         // PRIMARY
@@ -73,7 +73,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         if (includeID) {
             sb = new StringBuilder();
             sb.append("ID: ").append(id).append("  source: ").append(source.toString());
-            if (!getId().equals(getBotSCAutomationID())) {
+            if (!id.equals(getBotSCAutomationID())) {
                 sb.append("\nUses automation of SCID: ").append(getBotSCAutomationID());
             }
             eb.setFooter(sb.toString());
@@ -129,7 +129,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getColourHexCode() {
-        if (colourHexCode == null && getId().equals(getBotSCAutomationID())) {
+        if (colourHexCode == null && id.equals(getBotSCAutomationID())) {
             return "#ffffff";
         } else if (colourHexCode == null) {
             if (Mapper.getStrategyCard(getBotSCAutomationID()) == null
@@ -148,7 +148,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
      * Then set botSCAutomationID = "pok1leadership".
      */
     public String getBotSCAutomationID() {
-        return Optional.ofNullable(botSCAutomationID).orElse(getId());
+        return Optional.ofNullable(botSCAutomationID).orElse(id);
     }
 
     public boolean usesAutomationForSCID(String scID) {
@@ -161,6 +161,6 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getImageFilePath() {
-        return ResourceHelper.getResourceFromFolder("strat_cards/", getImageFileName() + ".png");
+        return ResourceHelper.getResourceFromFolder("strat_cards/", imageFileName + ".png");
     }
 }
