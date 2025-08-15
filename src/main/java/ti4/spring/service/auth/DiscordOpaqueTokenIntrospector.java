@@ -52,31 +52,31 @@ public class DiscordOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
             return handleSuccessfulAuthenticate(response, token);
         }
 
-        BotLogger.error(String.format(
-            "Discord did not indicate success getting the user token: %s", response.body()));
+        BotLogger.error(String.format("Discord did not indicate success getting the user token: %s", response.body()));
         throw newAuthenticationFailureException();
     }
 
     private HttpResponse<String> authenticateWithDiscord(String token) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
-            .GET()
-            .uri(URI.create(ME_ENDPOINT))
-            .header("Accept", "application/json")
-            .header("Authorization", "Bearer " + token)
-            .build();
+                .GET()
+                .uri(URI.create(ME_ENDPOINT))
+                .header("Accept", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
 
         return EgressClientManager.getHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    private OAuth2AuthenticatedPrincipal handleSuccessfulAuthenticate(HttpResponse<String> response, String token) throws JsonProcessingException {
+    private OAuth2AuthenticatedPrincipal handleSuccessfulAuthenticate(HttpResponse<String> response, String token)
+            throws JsonProcessingException {
         JsonNode node = EgressClientManager.getObjectMapper().readTree(response.body());
 
         OAuth2AuthenticatedPrincipal principal = new DefaultOAuth2AuthenticatedPrincipal(
-            node.get("id").asText(),
-            Map.of(
-                "id", node.get("id").asText(),
-                "username", node.get("username").asText()),
-            Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
+                node.get("id").asText(),
+                Map.of(
+                        "id", node.get("id").asText(),
+                        "username", node.get("username").asText()),
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
 
         CACHE.put(token, principal);
 
