@@ -885,13 +885,11 @@ public class Helper {
         // Helper.getPlanetInfluence(planet, game);
         if ("inf".equalsIgnoreCase(whatIsItFor)) {
             planets = planets.stream()
-                    .sorted((p1, p2) ->
-                            Integer.compare(getPlanetInfluence(p2, game), getPlanetInfluence(p1, game)))
+                    .sorted((p1, p2) -> Integer.compare(getPlanetInfluence(p2, game), getPlanetInfluence(p1, game)))
                     .collect(Collectors.toList());
         } else {
             planets = planets.stream()
-                    .sorted((p1, p2) ->
-                            Integer.compare(getPlanetResources(p2, game), getPlanetResources(p1, game)))
+                    .sorted((p1, p2) -> Integer.compare(getPlanetResources(p2, game), getPlanetResources(p1, game)))
                     .collect(Collectors.toList());
         }
         for (String planet : planets) {
@@ -2896,8 +2894,7 @@ public class Helper {
     public static void checkEndGame(Game game, Player player) {
         if (player.getTotalVictoryPoints() >= game.getVp()) {
             if (game.isLiberationC4Mode()) {
-                if ("sol".equalsIgnoreCase(player.getFaction())
-                        || "xxcha".equalsIgnoreCase(player.getFaction())) {
+                if ("sol".equalsIgnoreCase(player.getFaction()) || "xxcha".equalsIgnoreCase(player.getFaction())) {
                     Player xxcha = game.getPlayerFromColorOrFaction("xxcha");
                     Player sol = game.getPlayerFromColorOrFaction("sol");
                     if (sol != null

@@ -952,8 +952,7 @@ public class TileGenerator {
                         int numberOfDice = coverage.getCount();
                         boolean rerolls = coverage.isHasRerolls();
                         float expectedHits = coverage.getExpected();
-                        if ("_wht.png"
-                                .equals(DrawingUtil.getBlackWhiteFileSuffix(player.getColorID()))) {
+                        if ("_wht.png".equals(DrawingUtil.getBlackWhiteFileSuffix(player.getColorID()))) {
                             tileGraphics.setColor(Color.WHITE);
                         } else {
                             tileGraphics.setColor(Color.BLACK);
@@ -1575,8 +1574,7 @@ public class TileGenerator {
                     && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
                 scale = 1.65f;
             }
-            if ("elysium".equalsIgnoreCase(unitHolder.getName())
-                    || "magna".equalsIgnoreCase(unitHolder.getName())) {
+            if ("elysium".equalsIgnoreCase(unitHolder.getName()) || "magna".equalsIgnoreCase(unitHolder.getName())) {
                 scale = 1.65f;
             }
             if (Constants.MECATOLS.contains(unitHolder.getName())) {

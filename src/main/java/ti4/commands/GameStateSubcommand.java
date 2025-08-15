@@ -12,7 +12,7 @@ public abstract class GameStateSubcommand extends Subcommand {
     private final boolean playerCommand;
 
     protected GameStateSubcommand(
-        @NotNull String name, @NotNull String description, boolean saveGame, boolean playerCommand) {
+            @NotNull String name, @NotNull String description, boolean saveGame, boolean playerCommand) {
         super(name, description);
         this.saveGame = saveGame;
         this.playerCommand = playerCommand;

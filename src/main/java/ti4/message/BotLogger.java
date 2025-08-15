@@ -670,8 +670,7 @@ public class BotLogger {
                 guild = game.getGuild();
                 channel = game.getMainGameChannel();
             } else {
-                warning(
-                        "LocationSource created from player with null game. This will not attribute messages.");
+                warning("LocationSource created from player with null game. This will not attribute messages.");
             }
             originTime = DateTimeHelper.getCurrentTimestamp();
         }

@@ -938,7 +938,8 @@ public class PlayerAreaGenerator {
                 drawPAImage(x + deltaX, y, "pa_tech_techicons_cyberneticwarfare" + relicStatus + ".png");
             }
             if ("titanprototype".equals(relicID)
-                    || "titanprototype".equals(relicModel.getHomebrewReplacesID().orElse(""))) {
+                    || "titanprototype"
+                            .equals(relicModel.getHomebrewReplacesID().orElse(""))) {
                 drawFactionIconImage(graphics, "relic", x + deltaX - 1, y + 108, 42, 42);
             }
 
@@ -1329,8 +1330,8 @@ public class PlayerAreaGenerator {
             }
             graphics.setColor(playerWhoHasIt != null ? Color.GRAY : Color.WHITE);
 
-            if ("dspntnel".equals(
-                pnID)) { // for some reason "Plots Within Plots" gets cut off weirdly if handled normally
+            if ("dspntnel"
+                    .equals(pnID)) { // for some reason "Plots Within Plots" gets cut off weirdly if handled normally
                 graphics.setFont(Storage.getFont16());
                 DrawingUtil.drawOneOrTwoLinesOfTextVertically(
                         graphics, "Plots Within Plots", x + deltaX + 9, y + 144, 150);
@@ -2367,13 +2368,11 @@ public class PlayerAreaGenerator {
                 techIcon += "cybernetic";
             }
             if (techModel.isBioticTech()) {
-                if (types < 2)
-                    techIcon += "biotic";
+                if (types < 2) techIcon += "biotic";
                 types++;
             }
             if (techModel.isWarfareTech()) {
-                if (types < 2)
-                    techIcon += "warfare";
+                if (types < 2) techIcon += "warfare";
                 types++;
             }
 

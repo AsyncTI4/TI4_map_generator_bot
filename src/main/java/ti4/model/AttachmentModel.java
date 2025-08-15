@@ -83,8 +83,7 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
                     .append("x")
                     .append(spaceCannonDieCount)
                     .append("\n");
-        if (abilityText != null)
-            sb.append("Ability: ").append(abilityText).append("\n");
+        if (abilityText != null) sb.append("Ability: ").append(abilityText).append("\n");
         if (getToken().isPresent())
             sb.append("Token: ").append(getToken().get()).append("\n");
         if (isFakeAttachment != null) sb.append("(fake attachment)\n");
@@ -110,8 +109,7 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
                 || (resourcesModifier != 0 && "resources".contains(searchString.toLowerCase()))
                 || (influenceModifier != 0 && "influence".contains(searchString.toLowerCase()))
                 || (planetTypes != null && planetTypes.toString().contains(searchString.toLowerCase()))
-                || (techSpeciality != null
-                        && techSpeciality.toString().contains(searchString.toLowerCase()))
+                || (techSpeciality != null && techSpeciality.toString().contains(searchString.toLowerCase()))
                 || (isLegendary() && "legendary".contains(searchString.toLowerCase()))
                 || (spaceCannonHitsOn != 0 && "space cannon".contains(searchString.toLowerCase()))
                 || (isFakeAttachment() && "fake".contains(searchString.toLowerCase()))

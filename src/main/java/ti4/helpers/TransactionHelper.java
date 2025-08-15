@@ -514,8 +514,8 @@ public class TransactionHelper {
         if (player == p2) {
             opposing = p1;
         }
-        String message = "Current Transaction Offer is:\n"
-                + buildTransactionOffer(player, opposing, game, false) + "\n";
+        String message =
+                "Current Transaction Offer is:\n" + buildTransactionOffer(player, opposing, game, false) + "\n";
         String requestOrOffer = "offer";
         if (requesting) {
             requestOrOffer = "request";

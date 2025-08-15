@@ -779,8 +779,7 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasPlayablePromissoryInHand(String pn) {
-        return promissoryNotes.containsKey(pn)
-                && !getPromissoryNotesOwned().contains(pn);
+        return promissoryNotes.containsKey(pn) && !getPromissoryNotesOwned().contains(pn);
     }
 
     public void setPromissoryNote(String id) {
@@ -1097,7 +1096,7 @@ public class Player extends PlayerProperties {
         }
         if (hasAbility("necrophage")) {
             bonus += ButtonHelper.getNumberOfUnitsOnTheBoard(
-                game, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), getColor()));
+                    game, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), getColor()));
         }
         if (getRelics().contains("dynamiscore") || getRelics().contains("absol_dynamiscore")) {
             bonus += 2;
@@ -1552,7 +1551,7 @@ public class Player extends PlayerProperties {
                 && Mapper.isValidFaction(getFaction())) {
             promissoryNotes.clear();
             List<String> promissoryNotes = Mapper.getColorPromissoryNoteIDs(
-                game, getColor()); // TODO: switch this to an explicit game.getPNSet() DeckModel
+                    game, getColor()); // TODO: switch this to an explicit game.getPNSet() DeckModel
             for (String promissoryNote : promissoryNotes) {
                 if (promissoryNote.endsWith("_an") && hasAbility("hubris")) {
                     continue;
@@ -2493,9 +2492,7 @@ public class Player extends PlayerProperties {
 
     public String getFlexibleDisplayName() {
         String name = getFaction();
-        if (getDisplayName() != null
-                && !getDisplayName().isEmpty()
-                && !"null".equals(getDisplayName())) {
+        if (getDisplayName() != null && !getDisplayName().isEmpty() && !"null".equals(getDisplayName())) {
             name = getDisplayName();
         }
         return StringUtils.capitalize(name);

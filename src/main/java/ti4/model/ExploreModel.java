@@ -54,13 +54,13 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     public String getRepresentation() {
         return String.format(
                 "%s;%s;%s;%s;%s;%s;%s",
-            name,
+                name,
                 type.toLowerCase(),
                 -1,
-            resolution,
-            text,
+                resolution,
+                text,
                 getAttachmentId().orElse(""),
-            source);
+                source);
     }
 
     public String textRepresentation() {

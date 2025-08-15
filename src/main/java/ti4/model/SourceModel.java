@@ -40,10 +40,8 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(source.emoji() + " " + name);
 
         StringBuilder content = new StringBuilder();
-        if (description != null)
-            content.append("*").append(description).append("*\n\n");
-        if (data != null)
-            content.append("Links:\n").append(getDataFormatted()).append("\n");
+        if (description != null) content.append("*").append(description).append("*\n\n");
+        if (data != null) content.append("Links:\n").append(getDataFormatted()).append("\n");
         if (occurrences != null) content.append("Implementation: ").append(compTypeOccurrences(occurrences));
         eb.setDescription(content);
 

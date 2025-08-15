@@ -52,7 +52,8 @@ class ServerGameStats extends Subcommand {
                 .filter(Objects::nonNull)
                 .distinct()
                 .filter(channel -> channel.getParentCategory() != null
-                        && !"The in-limbo PBD Archive".equals(channel.getParentCategory().getName()))
+                        && !"The in-limbo PBD Archive"
+                                .equals(channel.getParentCategory().getName()))
                 .forEach(channel -> guildToGameCount.merge(channel.getGuild().getId(), 1, Integer::sum));
 
         StringBuilder sb = new StringBuilder();

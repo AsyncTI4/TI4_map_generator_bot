@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -219,8 +218,7 @@ public class PlayerPreferenceHelper {
             if (stuffNotToSustain.contains(unit)) {
                 buttons.add(Buttons.red("riskDirectHit_" + unit + "_yes", "Risk " + capitalize(unit)));
             } else {
-                buttons.add(
-                        Buttons.green("riskDirectHit_" + unit + "_no", "Don't Risk " + capitalize(unit)));
+                buttons.add(Buttons.green("riskDirectHit_" + unit + "_no", "Don't Risk " + capitalize(unit)));
             }
         }
         buttons.add(Buttons.gray("deleteButtons", "Done"));

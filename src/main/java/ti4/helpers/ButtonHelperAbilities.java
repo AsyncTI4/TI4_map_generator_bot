@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.DiceHelper.Die;
@@ -1870,8 +1869,7 @@ public class ButtonHelperAbilities {
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", you already had the _" + capitalize(protocol)
-                            + "_ Protocol.");
+                    player.getRepresentation() + ", you already had the _" + capitalize(protocol) + "_ Protocol.");
         }
     }
 

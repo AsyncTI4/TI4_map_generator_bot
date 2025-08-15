@@ -174,8 +174,7 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
     @Override
     public String getAutoCompleteName() {
         return StringUtils.left(
-                StringUtils.substringBefore("[" + type + "] " + name + " --> " + description, "\n"),
-                100);
+                StringUtils.substringBefore("[" + type + "] " + name + " --> " + description, "\n"), 100);
     }
 
     public ComponentSource getSource() {

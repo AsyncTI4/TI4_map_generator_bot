@@ -776,8 +776,7 @@ public class AgendaHelper {
                 + "). They have been pinged in their private thread. ";
         if (game.isHiddenAgendaMode() || game.isOmegaPhaseMode()) {
             msg += "The "
-                    + pluralPerson(
-                            getPlayersWhoNeedToPreVoted(game).size())
+                    + pluralPerson(getPlayersWhoNeedToPreVoted(game).size())
                     + " who still need to decide on voting were also reminded.";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -1412,8 +1411,7 @@ public class AgendaHelper {
             int[] voteInfo = getVoteTotal(nextInLine, game);
             boolean willPrevote =
                     !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty()
-                            && !"0"
-                                    .equalsIgnoreCase(game.getStoredValue("preVoting" + nextInLine.getFaction()));
+                            && !"0".equalsIgnoreCase(game.getStoredValue("preVoting" + nextInLine.getFaction()));
             while ((voteInfo[0] < 1 && !nextInLine.getColor().equalsIgnoreCase(player.getColor()))
                     || game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())
                     || willPrevote) {
@@ -1462,8 +1460,7 @@ public class AgendaHelper {
                 voteInfo = getVoteTotal(nextInLine, game);
                 willPrevote = !game.getStoredValue("preVoting" + nextInLine.getFaction())
                                 .isEmpty()
-                        && !"0"
-                                .equalsIgnoreCase(game.getStoredValue("preVoting" + nextInLine.getFaction()));
+                        && !"0".equalsIgnoreCase(game.getStoredValue("preVoting" + nextInLine.getFaction()));
             }
 
             if (!nextInLine.getColor().equalsIgnoreCase(player.getColor())) {
@@ -1924,8 +1921,7 @@ public class AgendaHelper {
             int counter = 0;
             boolean willPrevote =
                     !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty()
-                            && !"0"
-                                    .equalsIgnoreCase(game.getStoredValue("preVoting" + nextInLine.getFaction()));
+                            && !"0".equalsIgnoreCase(game.getStoredValue("preVoting" + nextInLine.getFaction()));
             while ((voteInfo[0] < 1
                             || game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())
                             || willPrevote)
@@ -1964,8 +1960,7 @@ public class AgendaHelper {
                 voteInfo = getVoteTotal(nextInLine, game);
                 willPrevote = !game.getStoredValue("preVoting" + nextInLine.getFaction())
                                 .isEmpty()
-                        && !"0"
-                                .equalsIgnoreCase(game.getStoredValue("preVoting" + nextInLine.getFaction()));
+                        && !"0".equalsIgnoreCase(game.getStoredValue("preVoting" + nextInLine.getFaction()));
                 counter += 1;
             }
 
@@ -2308,8 +2303,7 @@ public class AgendaHelper {
                         }
                         if (specificVote.contains("Atokera Commander")) {
                             if (!getWinningVoters(winner, game).contains(winningR)
-                                    && !getLosingVoters(winner, game)
-                                            .contains(winningR)) {
+                                    && !getLosingVoters(winner, game).contains(winningR)) {
                                 List<Button> buttons = ButtonHelper.getGainCCButtons(winningR);
                                 String message = identity + ", your current command tokens are "
                                         + winningR.getCCRepresentation()

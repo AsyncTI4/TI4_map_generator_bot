@@ -562,9 +562,7 @@ public class Game extends GameProperties {
     }
 
     public int getSlashCommandsRunCount() {
-        return slashCommandsUsed.values().stream()
-                .mapToInt(Integer::intValue)
-                .sum();
+        return slashCommandsUsed.values().stream().mapToInt(Integer::intValue).sum();
     }
 
     public boolean isACInDiscard(String name) {
@@ -3159,8 +3157,8 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public boolean islandMode() {
-        boolean otherThings = getName().contains("island")
-                || (getMapTemplateID() != null && "1pIsland".equals(getMapTemplateID()));
+        boolean otherThings =
+                getName().contains("island") || (getMapTemplateID() != null && "1pIsland".equals(getMapTemplateID()));
         if (otherThings) setStoredValue("IslandMode", "true");
         return "true".equals(getStoredValue("IslandMode"));
     }
@@ -3582,8 +3580,7 @@ public class Game extends GameProperties {
     @JsonIgnore
     public List<Player> getRealPlayersNNeutral() {
         return players.values().stream()
-                .filter(p -> p.isRealPlayer()
-                        || (p.getFaction() != null && "neutral".equals(p.getFaction())))
+                .filter(p -> p.isRealPlayer() || (p.getFaction() != null && "neutral".equals(p.getFaction())))
                 .toList();
     }
 
@@ -3766,9 +3763,9 @@ public class Game extends GameProperties {
 
     public void rebuildTilePositionAutoCompleteList() {
         tileNameAutocompleteOptionsCache = tileMap.values().stream()
-            .map(tile -> new SimpleEntry<>(tile.getAutoCompleteName(), tile.getPosition()))
-            .filter(e -> !e.getKey().toLowerCase().contains("hyperlane"))
-            .toList();
+                .map(tile -> new SimpleEntry<>(tile.getAutoCompleteName(), tile.getPosition()))
+                .filter(e -> !e.getKey().toLowerCase().contains("hyperlane"))
+                .toList();
     }
 
     @JsonIgnore

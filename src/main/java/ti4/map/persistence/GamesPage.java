@@ -42,9 +42,7 @@ public class GamesPage {
     private static GamesPage getPage(int page) {
         var gameNames = GameManager.getGameNames();
         var pagedGames = new GamesPage();
-        for (int i = PAGE_SIZE * page;
-                i < gameNames.size() && pagedGames.games.size() < PAGE_SIZE;
-                i++) {
+        for (int i = PAGE_SIZE * page; i < gameNames.size() && pagedGames.games.size() < PAGE_SIZE; i++) {
             var game = GameManager.getManagedGame(gameNames.get(i)).getGame();
             pagedGames.games.add(game);
         }

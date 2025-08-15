@@ -153,8 +153,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         if (getUnlock().isPresent()) eb.addField("Unlock:", getUnlock().get(), false);
         // if (getImageURL() != null) eb.setThumbnail(getImageURL());
 
-        if (includeAliases)
-            eb.setFooter("UnitID: " + id + "\nAliases: " + getAsyncIDAliases() + "\nSource: " + source);
+        if (includeAliases) eb.setFooter("UnitID: " + id + "\nAliases: " + getAsyncIDAliases() + "\nSource: " + source);
 
         return eb.build();
     }

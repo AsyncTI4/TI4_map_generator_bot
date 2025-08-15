@@ -294,7 +294,8 @@ public class CombatModHelper {
                     if (opponentFaction.contains("keleres")) {
                         meetsCondition = player.getTechs().stream()
                                 .map(Mapper::getTech)
-                                .anyMatch(tech -> "keleres".equals(tech.getFaction().orElse("")));
+                                .anyMatch(tech ->
+                                        "keleres".equals(tech.getFaction().orElse("")));
                     } else {
                         meetsCondition = player.getTechs().stream()
                                 .map(Mapper::getTech)

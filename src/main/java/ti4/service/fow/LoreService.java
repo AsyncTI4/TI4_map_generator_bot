@@ -32,7 +32,6 @@ import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
-import ti4.model.TileModel.TileBack;
 
 public class LoreService {
 
@@ -156,7 +155,7 @@ public class LoreService {
         String target = event.getValue(Constants.POSITION).getAsString();
         String loreText = event.getValue(Constants.MESSAGE).getAsString();
         String footerText = event.getValue("footer").getAsString();
-        boolean systemLore = event.getModalId().replace("gmLoreSave", "").equals("System");
+        boolean systemLore = "System".equals(event.getModalId().replace("gmLoreSave", ""));
         PlanetModel planet = null;
 
         if (systemLore) {
@@ -213,9 +212,9 @@ public class LoreService {
         Color embedColor = Color.black;
         if (tile != null && tile.getTileModel() != null) {
             switch (tile.getTileModel().getTileBack()) {
-                case TileBack.RED -> embedColor = Color.red;
-                case TileBack.BLUE -> embedColor = Color.blue;
-                case TileBack.GREEN -> embedColor = Color.green;
+                case RED -> embedColor = Color.red;
+                case BLUE -> embedColor = Color.blue;
+                case GREEN -> embedColor = Color.green;
                 default -> embedColor = Color.black;
             }
         }

@@ -1362,8 +1362,7 @@ public class MapGenerator implements AutoCloseable {
                             null);
                     offBoardHighlighting++;
                 }
-            } else if (displayType == DisplayType.wormholes
-                    && "ghost".equalsIgnoreCase(player.getFaction())) {
+            } else if (displayType == DisplayType.wormholes && "ghost".equalsIgnoreCase(player.getFaction())) {
                 boolean alphaOnMap = false;
                 boolean betaOnMap = false;
                 boolean gammaOnMap = false;

@@ -68,8 +68,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getShortTag() {
-        return StringUtils.left(Optional.ofNullable(shortTag).orElse(alias), 3)
-                .toUpperCase();
+        return StringUtils.left(Optional.ofNullable(shortTag).orElse(alias), 3).toUpperCase();
     }
 
     public List<String> getFactionTech() {
@@ -273,9 +272,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
                 // sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
             }
         } else {
-            if (startingTechOptions != null
-                    && startingTechAmount != 0
-                    && !startingTechOptions.isEmpty()) {
+            if (startingTechOptions != null && startingTechAmount != 0 && !startingTechOptions.isEmpty()) {
                 sb.append("\nPick ").append(startingTechAmount).append(" of the following:\n");
                 for (String id : startingTechOptions) {
                     TechnologyModel model = Mapper.getTech(id);
@@ -313,7 +310,6 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getFactionTitle() {
-        return getFactionEmoji() + " __**" + factionName + "**__"
-                + source.emoji();
+        return getFactionEmoji() + " __**" + factionName + "**__" + source.emoji();
     }
 }

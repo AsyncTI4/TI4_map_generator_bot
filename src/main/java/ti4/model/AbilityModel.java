@@ -77,8 +77,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         // TITLE
-        String title =
-                getFactionEmoji() + " __**" + name + "**__" + source.emoji();
+        String title = getFactionEmoji() + " __**" + name + "**__" + source.emoji();
         eb.setTitle(title);
 
         // DESCRIPTION

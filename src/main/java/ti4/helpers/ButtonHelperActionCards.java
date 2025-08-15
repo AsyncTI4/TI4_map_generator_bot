@@ -464,9 +464,7 @@ public class ButtonHelperActionCards {
     @ButtonHandler("getRepealLawButtons")
     public static void getRepealLawButtons(ButtonInteractionEvent event, Player player, Game game) {
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getChannel(),
-                "Please choose the law you wish to repeal.",
-                getRepealLawButtons(game, player));
+                event.getChannel(), "Please choose the law you wish to repeal.", getRepealLawButtons(game, player));
         ButtonHelper.deleteMessage(event);
     }
 

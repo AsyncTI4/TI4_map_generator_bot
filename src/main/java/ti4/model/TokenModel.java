@@ -50,8 +50,7 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
         sb.append(id);
-        if (spaceOrPlanet != null)
-            sb.append(" [").append(spaceOrPlanet).append("]");
+        if (spaceOrPlanet != null) sb.append(" [").append(spaceOrPlanet).append("]");
         return sb.toString();
     }
 
@@ -64,12 +63,10 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(sb.toString());
 
         sb = new StringBuilder();
-        if (spaceOrPlanet != null)
-            sb.append("Location: ").append(spaceOrPlanet).append("\n");
+        if (spaceOrPlanet != null) sb.append("Location: ").append(spaceOrPlanet).append("\n");
         if (tokenPlanetName != null)
             sb.append("Planet: ").append(tokenPlanetName).append("\n");
-        if (attachmentID != null)
-            sb.append("Attachment: ").append(attachmentID).append("\n");
+        if (attachmentID != null) sb.append("Attachment: ").append(attachmentID).append("\n");
         if (wormholes != null)
             sb.append("Wormhole(s): ").append(wormholes.toString()).append("\n");
         if (isAnomaly != null) sb.append("Anomaly ");
@@ -80,8 +77,7 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
         sb = new StringBuilder();
         sb.append("ID: ").append(id);
         sb.append(" Source: ").append(source);
-        if (aliasList != null)
-            sb.append("\nAlias list: ").append(aliasList.toString());
+        if (aliasList != null) sb.append("\nAlias list: ").append(aliasList.toString());
         eb.setFooter(sb.toString());
 
         eb.setThumbnail("https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tokens/"
@@ -93,15 +89,11 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         return id.toLowerCase().contains(searchString.toLowerCase())
-                || (aliasList != null
-                        && aliasList.toString().toLowerCase().contains(searchString.toLowerCase()))
-                || (spaceOrPlanet != null
-                        && spaceOrPlanet.toLowerCase().contains(searchString.toLowerCase()))
-                || (tokenPlanetName != null
-                        && tokenPlanetName.toLowerCase().contains(searchString.toLowerCase()))
+                || (aliasList != null && aliasList.toString().toLowerCase().contains(searchString.toLowerCase()))
+                || (spaceOrPlanet != null && spaceOrPlanet.toLowerCase().contains(searchString.toLowerCase()))
+                || (tokenPlanetName != null && tokenPlanetName.toLowerCase().contains(searchString.toLowerCase()))
                 || (attachmentID != null && attachmentID.toLowerCase().contains(searchString.toLowerCase()))
-                || (wormholes != null
-                        && wormholes.toString().toLowerCase().contains(searchString.toLowerCase()))
+                || (wormholes != null && wormholes.toString().toLowerCase().contains(searchString.toLowerCase()))
                 || (isAnomaly != null && isAnomaly && "anomaly".contains(searchString.toLowerCase()))
                 || (isRift != null && isRift && "gravity rift".contains(searchString.toLowerCase()))
                 || (isNebula != null && isNebula && "nebula".contains(searchString.toLowerCase()))

@@ -93,11 +93,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
                     .append(getAbilityName())
                     .append("**__"); // add hero ability name
         if (includeAbility)
-            representation
-                    .append(" - *")
-                    .append(abilityWindow)
-                    .append("* ")
-                    .append(abilityText); // add ability
+            representation.append(" - *").append(abilityWindow).append("* ").append(abilityText); // add ability
         if (includeUnlockCondition) representation.append(" *Unlock:* ").append(unlockCondition);
 
         return representation.toString();
@@ -176,7 +172,6 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getAutoCompleteName() {
-        return name + " (" + faction + " " + type + ") ["
-                + source.toString() + "]";
+        return name + " (" + faction + " " + type + ") [" + source.toString() + "]";
     }
 }

@@ -126,8 +126,7 @@ public class ButtonHelperAgents {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String am = buttonID.split("_")[2];
         int amount = Integer.parseInt(am);
-        exhaustAgent(
-                "exhaustAgent_toldaragent_startToldarAgent_" + p2.getFaction(), event, game, toldar);
+        exhaustAgent("exhaustAgent_toldaragent_startToldarAgent_" + p2.getFaction(), event, game, toldar);
         int commodities = p2.getCommodities();
         MessageHelper.sendMessageToChannel(
                 p2.getCorrectChannel(),

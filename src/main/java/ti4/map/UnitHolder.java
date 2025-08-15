@@ -47,7 +47,7 @@ public abstract class UnitHolder {
 
     @JsonCreator
     protected UnitHolder(
-        @JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
+            @JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
         this.name = name;
         this.holderCenterPosition = holderCenterPosition;
     }

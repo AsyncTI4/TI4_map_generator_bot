@@ -79,8 +79,7 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
         EmbedBuilder eb = new EmbedBuilder();
 
         // TITLE
-        String title = CardEmojis.SecretObjective + "__**" + name + "**__"
-                + source.emoji();
+        String title = CardEmojis.SecretObjective + "__**" + name + "**__" + source.emoji();
         eb.setTitle(title);
 
         // DESCRIPTION

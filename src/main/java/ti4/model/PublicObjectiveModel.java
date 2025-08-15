@@ -61,8 +61,7 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         // TITLE
-        String title =
-                getObjectiveEmoji() + "__**" + name + "**__" + source.emoji();
+        String title = getObjectiveEmoji() + "__**" + name + "**__" + source.emoji();
         eb.setTitle(title);
 
         // DESCRIPTION
