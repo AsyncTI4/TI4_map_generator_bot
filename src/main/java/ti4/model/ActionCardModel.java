@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -59,8 +58,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         // TITLE
-        String title = CardEmojis.ActionCard + "__**" + name + "**__"
-                + source.emoji();
+        String title = CardEmojis.ActionCard + "__**" + name + "**__" + source.emoji();
         eb.setTitle(title);
 
         // DESCRIPTION
