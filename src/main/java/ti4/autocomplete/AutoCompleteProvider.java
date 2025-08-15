@@ -990,7 +990,6 @@ public class AutoCompleteProvider {
                 /* From others */
                 // none of them are populated from here
         }
-        // System.out.println(options.toString()); // Debug line
         event.replyChoices(Objects.requireNonNullElse(options, Collections.emptyList()))
                 .queue();
     }
