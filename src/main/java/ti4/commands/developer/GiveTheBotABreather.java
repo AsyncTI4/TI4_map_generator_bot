@@ -5,10 +5,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
+import ti4.executors.CircuitBreaker;
 import ti4.helpers.Constants;
-import ti4.message.BotLogger;
-import ti4.settings.GlobalSettings;
-import ti4.settings.GlobalSettings.ImplementedSettings;
+import ti4.message.MessageHelper;
 
 class GiveTheBotABreather extends Subcommand {
 
@@ -20,13 +19,8 @@ class GiveTheBotABreather extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
         int seconds = event.getOption(Constants.SECONDS, 10, OptionMapping::getAsInt);
-        try {
-            Thread.sleep(seconds * 1000L);
-        } catch (InterruptedException e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Forced Sleep interrupted", e);
-        }
-        GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
+        CircuitBreaker.openForSeconds(seconds);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Circuit breaker opened for " + seconds + " seconds.");
     }
 }
