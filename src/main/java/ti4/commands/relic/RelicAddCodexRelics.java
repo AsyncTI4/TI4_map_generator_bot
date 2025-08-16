@@ -10,9 +10,9 @@ import ti4.message.MessageHelper;
 
 class RelicAddCodexRelics extends GameStateSubcommand {
 
-    private static final Pattern PATTERN = Pattern.compile(" and ");
+    private static final Pattern AND_PATTERN = Pattern.compile(" and ");
 
-    public RelicAddCodexRelics() {
+    RelicAddCodexRelics() {
         super(Constants.ADD_CODEX_RELICS, "Add the three codex 4 relics into the deck and shuffle", true, false);
     }
 
@@ -42,7 +42,9 @@ class RelicAddCodexRelics extends GameStateSubcommand {
         } else {
             MessageHelper.sendMessageToEventChannel(
                     event,
-                    (relicCount == 2 ? newRelics : PATTERN.matcher(newRelics).replaceFirst(", "))
+                    (relicCount == 2
+                                    ? newRelics
+                                    : AND_PATTERN.matcher(newRelics).replaceFirst(", "))
                             + (relicCount == 1 ? "has" : "have") + " been shuffled into the relic deck.");
         }
     }

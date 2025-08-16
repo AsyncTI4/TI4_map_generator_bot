@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 import ti4.service.franken.FrankenDraftBagService;
 
 public abstract class BagDraft {
-    private static final Pattern PATTERN = Pattern.compile("/");
+    private static final Pattern FORWARD_SLASH_PATTERN = Pattern.compile("/");
     private final Game owner;
 
     public static BagDraft GenerateDraft(String draftType, Game game) {
@@ -138,10 +138,10 @@ public abstract class BagDraft {
         }
 
         String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-"
-                + PATTERN.matcher(player.getUserName()).replaceAll("");
+                + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("");
         if (owner.isFowMode()) {
             threadName = owner.getName() + "-" + "bag-info-"
-                    + PATTERN.matcher(player.getUserName()).replaceAll("") + "-private";
+                    + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("") + "-private";
         }
 
         ThreadChannel existingChannel = findExistingBagChannel(player, threadName);
@@ -188,10 +188,10 @@ public abstract class BagDraft {
 
     public ThreadChannel findExistingBagChannel(Player player) {
         String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-"
-                + PATTERN.matcher(player.getUserName()).replaceAll("");
+                + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("");
         if (owner.isFowMode()) {
             threadName = owner.getName() + "-" + "bag-info-"
-                    + PATTERN.matcher(player.getUserName()).replaceAll("") + "-private";
+                    + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("") + "-private";
         }
         return findExistingBagChannel(player, threadName);
     }

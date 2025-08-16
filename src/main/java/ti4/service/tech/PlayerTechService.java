@@ -3,7 +3,6 @@ package ti4.service.tech;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -25,6 +24,7 @@ import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.PatternHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
@@ -51,8 +51,6 @@ import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 public class PlayerTechService {
-
-    private static final Pattern PATTERN = Pattern.compile("__");
 
     public static void addTech(GenericInteractionCreateEvent event, Game game, Player player, String techID) {
         player.addTech(techID);
@@ -468,7 +466,7 @@ public class PlayerTechService {
         boolean isStrat = !buttonID.contains("__comp");
         boolean paymentRequired = !buttonID.contains("__noPay");
 
-        List<String> buttonIDComponents = Arrays.asList(PATTERN.split(buttonID));
+        List<String> buttonIDComponents = Arrays.asList(PatternHelper.DOUBLE_UNDERSCORE_PATTERN.split(buttonID));
         buttonID = buttonIDComponents.getFirst();
         String paymentType = buttonIDComponents.size() > 1 ? buttonIDComponents.get(1) : "res";
 

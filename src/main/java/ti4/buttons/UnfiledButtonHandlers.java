@@ -158,7 +158,7 @@ public class UnfiledButtonHandlers {
     @ButtonHandler("fogAllianceAgentStep3_")
     public static void fogAllianceAgentStep3(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         ButtonHelper.deleteMessage(event);
-        ButtonHelperHeroes.argentHeroStep3(game, player, event, buttonID);
+        ButtonHelperHeroes.argentHeroStep3(game, player, buttonID);
     }
 
     @ButtonHandler("enableDaneMode_")

@@ -19,7 +19,7 @@ import ti4.service.statistics.game.WinningPathHelper;
 
 class SearchWinningPath extends Subcommand {
 
-    private static final Pattern PATTERN = Pattern.compile("_");
+    private static final Pattern UNDERSCORE_PATTERN = Pattern.compile("_");
 
     public SearchWinningPath() {
         super(Constants.SEARCH_WINNING_PATH, "List games with the provided winning path");
@@ -54,7 +54,8 @@ class SearchWinningPath extends Subcommand {
     }
 
     private static boolean hasWinningPath(Game game, Player winner, String searchedPath) {
-        return PATTERN.matcher(WinningPathHelper.buildWinningPath(game, winner))
+        return UNDERSCORE_PATTERN
+                .matcher(WinningPathHelper.buildWinningPath(game, winner))
                 .replaceAll("") // needed due to Support for the Throne being italicized
                 .contains(searchedPath);
     }

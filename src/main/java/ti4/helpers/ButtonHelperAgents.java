@@ -1415,10 +1415,8 @@ public class ButtonHelperAgents {
                 + tile2.getRepresentation() + " (along with any units it transports).";
         String message2 = ", please choose the one ship you wish to move from " + tile2.getRepresentation() + " to "
                 + tile.getRepresentation() + " (along with any units it transports).";
-        List<Button> buttons =
-                ButtonHelperHeroes.getArgentHeroStep3Buttons(game, player, event, "spoof_" + pos2 + "_" + pos);
-        List<Button> buttons2 =
-                ButtonHelperHeroes.getArgentHeroStep3Buttons(game, player, event, "spoof_" + pos + "_" + pos2);
+        List<Button> buttons = ButtonHelperHeroes.getArgentHeroStep3Buttons(game, player, "spoof_" + pos2 + "_" + pos);
+        List<Button> buttons2 = ButtonHelperHeroes.getArgentHeroStep3Buttons(game, player, "spoof_" + pos + "_" + pos2);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), player.getRepresentationUnfogged() + message, buttons);
         MessageHelper.sendMessageToChannelWithButtons(

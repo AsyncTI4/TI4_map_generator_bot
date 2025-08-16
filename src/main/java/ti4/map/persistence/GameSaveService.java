@@ -34,12 +34,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.PatternHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
@@ -61,9 +61,8 @@ import ti4.service.option.FOWOptionService.FOWOption;
 class GameSaveService {
 
     private static final ObjectMapper mapper = ObjectMapperFactory.build();
-    private static final Pattern PATTERN = Pattern.compile(" ");
 
-    public static boolean save(Game game, String reason) {
+    static boolean save(Game game, String reason) {
         return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> {
             game.setLatestCommand(Objects.requireNonNullElse(reason, "Command Unknown"));
             return save(game);
@@ -897,7 +896,8 @@ class GameSaveService {
                 String key = entry.getKey();
                 String system = entry.getValue();
                 String label = fowLabels.get(key);
-                if (label != null) label = PATTERN.matcher(label).replaceAll("—"); // replace spaces with em dash
+                if (label != null)
+                    label = PatternHelper.SPACE_PATTERN.matcher(label).replaceAll("—"); // replace spaces with em dash
                 fogOfWarSystems.append(key);
                 fogOfWarSystems.append(",");
                 fogOfWarSystems.append(system);

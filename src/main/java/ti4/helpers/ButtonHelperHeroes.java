@@ -1,6 +1,8 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -57,8 +58,6 @@ import ti4.service.unit.RemoveUnitService;
 
 public class ButtonHelperHeroes {
 
-    private static final Pattern PATTERN = Pattern.compile("__");
-
     public static void argentHeroStep1(Game game, Player player, GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : ButtonHelper.getTilesWithYourCC(player, game, event)) {
@@ -89,8 +88,7 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 
-    public static List<Button> getArgentHeroStep3Buttons(
-            Game game, Player player, GenericInteractionCreateEvent event, String buttonID) {
+    static List<Button> getArgentHeroStep3Buttons(Game game, Player player, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         String pos1 = buttonID.split("_")[1];
         Tile destination = game.getTileByPosition(pos1);
@@ -136,8 +134,8 @@ public class ButtonHelperHeroes {
     }
 
     @ButtonHandler("argentHeroStep3_")
-    public static void argentHeroStep3(Game game, Player player, GenericInteractionCreateEvent event, String buttonID) {
-        List<Button> buttons = getArgentHeroStep3Buttons(game, player, event, buttonID);
+    public static void argentHeroStep3(Game game, Player player, String buttonID) {
+        List<Button> buttons = getArgentHeroStep3Buttons(game, player, buttonID);
         String pos1 = buttonID.split("_")[1];
         Tile destination = game.getTileByPosition(pos1);
         String msg =
@@ -148,7 +146,7 @@ public class ButtonHelperHeroes {
 
     @ButtonHandler("argentHeroStep4_")
     public static void argentHeroStep4(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = getArgentHeroStep3Buttons(game, player, event, buttonID);
+        List<Button> buttons = getArgentHeroStep3Buttons(game, player, buttonID);
         String pos1 = buttonID.split("_")[1];
         Tile destination = game.getTileByPosition(pos1);
         String pos2 = buttonID.split("_")[2];
@@ -2094,11 +2092,10 @@ public class ButtonHelperHeroes {
     }
 
     @ButtonHandler("swapTechs_")
-    public static void resolveAJolNarSwapStep2(
-            Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+    public static void resolveAJolNarSwapStep2(Player player, String buttonID, ButtonInteractionEvent event) {
         buttonID = buttonID.replace("swapTechs__", "");
-        String techOut = PATTERN.split(buttonID)[0];
-        String techIn = PATTERN.split(buttonID)[1];
+        String techOut = PatternHelper.DOUBLE_UNDERSCORE_PATTERN.split(buttonID)[0];
+        String techIn = PatternHelper.DOUBLE_UNDERSCORE_PATTERN.split(buttonID)[1];
         TechnologyModel techM1 = Mapper.getTech(techOut);
         TechnologyModel techM2 = Mapper.getTech(techIn);
         player.addTech(techIn);

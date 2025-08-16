@@ -36,7 +36,7 @@ class Replace extends GameStateSubcommand {
 
     private static final Pattern PATTERN = Pattern.compile("^-|-$");
 
-    public Replace() {
+    Replace() {
         super(Constants.REPLACE, "Replace player in game", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.PLAYER_FACTION, "Player being replaced")
                 .setAutoComplete(true)
