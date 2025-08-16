@@ -23,7 +23,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     private Boolean isFakeRelic;
     private String imageURL;
     private ComponentSource source;
-    private ComponentSource actual_source;
+    private ComponentSource actualSource;
     private List<String> searchTags = new ArrayList<>();
     private String homebrewReplacesID;
 
@@ -32,7 +32,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getSimpleRepresentation() {
-        return getSource().emoji() + String.format("_%s_ - %s (%s)", getName(), getText(), getSource());
+        return source.emoji() + String.format("_%s_ - %s (%s)", name, text, source);
     }
 
     /**
@@ -44,7 +44,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
 
     public String getShortName() {
         if (getHomebrewReplacesID().isEmpty()) {
-            return Optional.ofNullable(shortName).orElse(getName());
+            return Optional.ofNullable(shortName).orElse(name);
         }
         return Optional.ofNullable(shortName)
                 .orElse(Mapper.getRelic(getHomebrewReplacesID().get()).getShortName());
@@ -78,11 +78,11 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
         StringBuilder title = new StringBuilder();
         if (!isFakeRelic()) title.append(ExploreEmojis.Relic);
-        title.append("__").append(getName()).append("__").append(getSource().emoji());
+        title.append("__").append(name).append("__").append(source.emoji());
         eb.setTitle(title.toString(), null);
 
-        eb.setDescription(getText());
-        if (includeFlavourText && getFlavourText() != null) eb.addField("", getFlavourText(), false);
+        eb.setDescription(text);
+        if (includeFlavourText && flavourText != null) eb.addField("", flavourText, false);
 
         // Colour
         if (isFakeRelic()) {
@@ -97,7 +97,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
         // Footer
         StringBuilder footer = new StringBuilder();
         if (includeID) {
-            footer.append("ID: ").append(getAlias()).append("  Source: ").append(getSource());
+            footer.append("ID: ").append(alias).append("  Source: ").append(source);
         }
         if (isFakeRelic()) footer.append("\nNOTE: NOT ACTUALLY A RELIC");
         if (!footer.isEmpty()) eb.setFooter(footer.toString());
@@ -106,13 +106,13 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString)
-                || getName().toLowerCase().contains(searchString)
-                || getText().toLowerCase().contains(searchString)
-                || getSearchTags().contains(searchString);
+        return alias.toLowerCase().contains(searchString)
+                || name.toLowerCase().contains(searchString)
+                || text.toLowerCase().contains(searchString)
+                || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return getName() + " (" + getSource() + ")";
+        return name + " (" + source + ")";
     }
 }

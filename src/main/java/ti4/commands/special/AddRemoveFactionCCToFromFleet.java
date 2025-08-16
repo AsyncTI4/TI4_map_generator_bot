@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 
 abstract class AddRemoveFactionCCToFromFleet extends GameStateSubcommand {
 
-    public AddRemoveFactionCCToFromFleet(String id, String description) {
+    protected AddRemoveFactionCCToFromFleet(String id, String description) {
         super(id, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Faction Color for command token")
                 .setRequired(true)

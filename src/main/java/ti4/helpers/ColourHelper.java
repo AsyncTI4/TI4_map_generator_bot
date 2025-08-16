@@ -794,7 +794,7 @@ public class ColourHelper {
                         return 30;
                 }
         }
-        if (colour.equals("orca")) {
+        if ("orca".equals(colour)) {
             return 5;
         }
         return 15;

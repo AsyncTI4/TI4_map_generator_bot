@@ -2,6 +2,7 @@ package ti4.service.statistics;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
@@ -34,7 +35,7 @@ public class ExportToCsvService {
         }
 
         File outputCSV = new File("output.csv");
-        try (PrintWriter pw = new PrintWriter(outputCSV)) {
+        try (PrintWriter pw = new PrintWriter(outputCSV, StandardCharsets.UTF_8)) {
             pw.print(output);
             pw.close();
             MessageHelper.sendFileToChannel(event.getChannel(), outputCSV);

@@ -190,7 +190,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         if (r1 != r2) return r1 < r2 ? -1 : 1;
 
         int factionOrder = sortFactionTechsFirst(t1, t2);
-        return factionOrder == 0 ? t1.getName().compareTo(t2.getName()) : factionOrder;
+        return factionOrder == 0 ? t1.name.compareTo(t2.name) : factionOrder;
     }
 
     public static int sortFactionTechsFirst(TechnologyModel t1, TechnologyModel t2) {
@@ -228,7 +228,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public String getShortName() {
         if (getHomebrewReplacesID().isEmpty()) {
-            return Optional.ofNullable(shortName).orElse(getName());
+            return Optional.ofNullable(shortName).orElse(name);
         }
         return Optional.ofNullable(shortName)
                 .orElse(Mapper.getTech(getHomebrewReplacesID().get()).getShortName());
@@ -244,14 +244,14 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public String getInitials() {
         if (getHomebrewReplacesID().isEmpty()) {
-            return Optional.ofNullable(initials).orElse(getName().substring(0, 1));
+            return Optional.ofNullable(initials).orElse(name.substring(0, 1));
         }
         return Optional.ofNullable(initials)
                 .orElse(Mapper.getTech(getHomebrewReplacesID().get()).getInitials());
     }
 
     public String getRepresentation(boolean includeCardText) {
-        String techName = getName();
+        String techName = name;
         TechnologyType techType = getType();
         String techFaction = getFaction().orElse("");
         String factionEmoji = "";
@@ -260,8 +260,8 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         String techEmoji = techType.emoji();
         StringBuilder sb = new StringBuilder();
         sb.append(techEmoji).append("_").append(techName).append("_").append(factionEmoji);
-        sb.append(getSource().emoji());
-        if (includeCardText) sb.append("\n").append("> ").append(getText()).append("\n");
+        sb.append(source.emoji());
+        if (includeCardText) sb.append("\n").append("> ").append(text).append("\n");
         return sb.toString();
     }
 
@@ -277,23 +277,23 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         for (TechnologyType techType : types) {
             title.append(techType.emoji());
         }
-        title.append("**__").append(getName()).append("__**");
+        title.append("**__").append(name).append("__**");
         if (getFaction().isPresent())
             title.append(FactionEmojis.getFactionIcon(getFaction().get()));
-        title.append(getSource().emoji());
+        title.append(source.emoji());
         eb.setTitle(title.toString());
 
         // DESCRIPTION
         StringBuilder description = new StringBuilder();
         if (includeRequirements)
             description.append("*Requirements: ").append(getRequirementsEmoji()).append("*\n");
-        description.append(getText());
+        description.append(text);
         eb.setDescription(description.toString());
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
         if (includeID)
-            footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
+            footer.append("ID: ").append(alias).append("    Source: ").append(source);
         eb.setFooter(footer.toString());
 
         eb.setColor(getEmbedColor());
@@ -310,9 +310,9 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         title.append(factionEmoji)
                 .append(techEmoji)
                 .append(" ")
-                .append(getName())
+                .append(name)
                 .append(" ")
-                .append(getSource().emoji());
+                .append(source.emoji());
         return title.toString();
     }
 
@@ -334,7 +334,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     public String getCondensedReqsEmojis(boolean single) {
         String reqs = getRequirements().orElse("");
         StringBuilder output = new StringBuilder();
-        Set<TechnologyType> types = new HashSet<>(getTypes());
+        Set<TechnologyType> types = new HashSet<>(this.types);
         for (TechnologyType type : types) {
             switch (type) {
                 case PROPULSION -> {
@@ -375,7 +375,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                 }
                 case UNITUPGRADE -> {
                     String unitType = getBaseUpgrade().isEmpty()
-                            ? getAlias()
+                            ? alias
                             : getBaseUpgrade().get();
                     switch (unitType) {
                         case "inf2" -> output.append(UnitEmojis.infantry);
@@ -410,16 +410,16 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString)
-                || getName().toLowerCase().contains(searchString)
+        return alias.toLowerCase().contains(searchString)
+                || name.toLowerCase().contains(searchString)
                 || getFaction().orElse("").contains(searchString)
-                || getSearchTags().contains(searchString);
+                || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        StringBuilder sb = new StringBuilder(getName());
+        StringBuilder sb = new StringBuilder(name);
         if (getFaction().isPresent()) sb.append(" (").append(getFaction().get()).append(")");
-        sb.append(" [").append(getSource()).append("]");
+        sb.append(" [").append(source).append("]");
         return sb.toString();
     }
 }

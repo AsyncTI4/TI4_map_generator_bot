@@ -42,7 +42,7 @@ public class TourneyWinner extends Subcommand {
         }
 
         String removeStr = event.getOption("remove", "no", OptionMapping::getAsString);
-        boolean remove = removeStr.equalsIgnoreCase("remove");
+        boolean remove = "remove".equalsIgnoreCase(removeStr);
 
         String output;
         if (remove) {

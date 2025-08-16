@@ -68,11 +68,11 @@ public class TIGLHelper {
         }
 
         public String getName() {
-            return this.name;
+            return name;
         }
 
         public String getShortName() {
-            return StringUtils.substringAfter(getName(), "- ");
+            return StringUtils.substringAfter(name, "- ");
         }
 
         public Integer getIndex() {
@@ -94,11 +94,11 @@ public class TIGLHelper {
 
         public TIGLRank getNextRank() {
             return switch (this) {
-                case UNRANKED -> TIGLRank.MINISTER;
-                case MINISTER -> TIGLRank.AGENT;
-                case AGENT -> TIGLRank.COMMANDER;
-                case COMMANDER -> TIGLRank.HERO;
-                case HERO, EMPEROR -> TIGLRank.EMPEROR;
+                case UNRANKED -> MINISTER;
+                case MINISTER -> AGENT;
+                case AGENT -> COMMANDER;
+                case COMMANDER -> HERO;
+                case HERO, EMPEROR -> EMPEROR;
                 default -> null;
             };
         }

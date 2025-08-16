@@ -37,7 +37,7 @@ public final class ExecutionHistoryManager {
     private ExecutionHistoryManager() {}
 
     public static void runWithExecutionHistory(ExecutorService executorService, TimedRunnable timedRunnable) {
-        var executionHistoryRunnable = ExecutionHistoryManager.wrapWithExecutionHistory(timedRunnable);
+        var executionHistoryRunnable = wrapWithExecutionHistory(timedRunnable);
         executorService.execute(executionHistoryRunnable);
     }
 

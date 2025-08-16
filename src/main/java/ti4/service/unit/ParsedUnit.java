@@ -14,8 +14,8 @@ public class ParsedUnit {
 
     public ParsedUnit(Units.UnitKey unitKey) {
         this.unitKey = unitKey;
-        this.count = 1;
-        this.location = Constants.SPACE;
+        count = 1;
+        location = Constants.SPACE;
     }
 
     public ParsedUnit(Units.UnitKey unitKey, int count, String location) {

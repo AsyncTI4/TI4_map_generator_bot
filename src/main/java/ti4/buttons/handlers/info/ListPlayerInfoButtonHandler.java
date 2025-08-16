@@ -49,7 +49,7 @@ class ListPlayerInfoButtonHandler {
         String category = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();
         String msg = "";
-        if (category.equalsIgnoreCase("objective")) {
+        if ("objective".equalsIgnoreCase(category)) {
             buttons.add(Buttons.green("showObjInfo_both", "All Objectives in Game"));
             buttons.add(Buttons.blue("showObjInfo_1", "All Stage 1s Possible"));
             buttons.add(Buttons.blue("showObjInfo_2", "All Stage 2s Possible"));
@@ -162,7 +162,7 @@ class ListPlayerInfoButtonHandler {
     @ButtonHandler(value = "showObjInfo_", save = false)
     public static void showObjInfo(ButtonInteractionEvent event, String buttonID, Game game) {
         String extent = buttonID.split("_")[1];
-        if (extent.equalsIgnoreCase("both")) {
+        if ("both".equalsIgnoreCase(extent)) {
             ListPlayerInfoService.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
         } else {
             ListPlayerInfoService.displayerScoringProgression(game, false, event.getMessageChannel(), extent);

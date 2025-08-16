@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.DiceHelper.Die;
@@ -336,7 +335,7 @@ public class ButtonHelperAbilities {
             if (FoWHelper.playerHasShipsInSystem(p2, tile)) {
                 String id = "mercenariesStep4_" + pos2 + "_" + pos + "_" + fighters + "_" + p2.getFaction();
                 if (game.isFowMode()) {
-                    buttons.add(Buttons.green(id, StringUtils.capitalize(p2.getColor())));
+                    buttons.add(Buttons.green(id, capitalize(p2.getColor())));
                 } else {
                     buttons.add(Buttons.green(id, p2.getFactionModel().getFactionName()));
                 }
@@ -359,7 +358,7 @@ public class ButtonHelperAbilities {
         RemoveUnitService.removeUnits(event, tile2, game, player.getColor(), fighters + " fighters");
         AddUnitService.addUnits(event, tile, game, p2.getColor(), fighters + " fighters");
         String msg = player.getRepresentation() + " used their **Mercenaries** ability and transferred " + fighters
-                + " fighter" + (fighters.equals("1") ? "" : "s") + " from "
+                + " fighter" + ("1".equals(fighters) ? "" : "s") + " from "
                 + tile2.getRepresentationForButtons(game, player) + " to "
                 + tile.getRepresentationForButtons(game, player) + " and gave them to "
                 + p2.getFactionEmojiOrColor() + ".";
@@ -743,7 +742,7 @@ public class ButtonHelperAbilities {
     @ButtonHandler("useOmenDie_")
     public static void useOmenDie(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         int die = Integer.parseInt(buttonID.split("_")[1]);
-        if (buttonID.split("_")[2].equalsIgnoreCase("no")) {
+        if ("no".equalsIgnoreCase(buttonID.split("_")[2])) {
             removeOmenDie(game, die);
         }
         String msg = player.getRepresentationUnfogged() + " used an **Omen** die with the number " + die + ".";
@@ -1335,7 +1334,7 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing()
-                        + " put the _" + StringUtils.capitalize(superweaponName) + "_ Superweapon on the planet "
+                        + " put the _" + capitalize(superweaponName) + "_ Superweapon on the planet "
                         + Helper.getPlanetName(planetName) + " for a cost of 5 resources or influence."
                         + Mapper.getRelic("superweapon" + superweaponName).getSimpleRepresentation());
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
@@ -1764,7 +1763,7 @@ public class ButtonHelperAbilities {
             player.getDisplayName();
             MessageChannel channel = game.getMainGameChannel();
             if (game.isFowMode()) {
-                playerIdent = StringUtils.capitalize(player.getColor());
+                playerIdent = capitalize(player.getColor());
                 channel = pillager.getPrivateChannel();
             }
             String message = pillager.getRepresentationUnfogged() + " you may have the opportunity to **Pillage** "
@@ -1865,13 +1864,12 @@ public class ButtonHelperAbilities {
             player.addAbility("protocol_" + protocol);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " gained the _" + StringUtils.capitalize(protocol) + "_ Protocol.");
+                    player.getRepresentation() + " gained the _" + capitalize(protocol) + "_ Protocol.");
             event.getMessage().delete().queue();
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", you already had the _" + StringUtils.capitalize(protocol)
-                            + "_ Protocol.");
+                    player.getRepresentation() + ", you already had the _" + capitalize(protocol) + "_ Protocol.");
         }
     }
 
@@ -1879,31 +1877,31 @@ public class ButtonHelperAbilities {
         List<Button> buttons = new ArrayList<>();
         String protocol = "distribution";
         if (!player.hasAbility("protocol_" + protocol)) {
-            buttons.add(Buttons.gray("addProtocol_" + protocol, StringUtils.capitalize(protocol)));
+            buttons.add(Buttons.gray("addProtocol_" + protocol, capitalize(protocol)));
         } else {
             player.removeAbility("protocol_" + protocol);
         }
         protocol = "command";
         if (!player.hasAbility("protocol_" + protocol)) {
-            buttons.add(Buttons.gray("addProtocol_" + protocol, StringUtils.capitalize(protocol)));
+            buttons.add(Buttons.gray("addProtocol_" + protocol, capitalize(protocol)));
         } else {
             player.removeAbility("protocol_" + protocol);
         }
         protocol = "excavation";
         if (!player.hasAbility("protocol_" + protocol)) {
-            buttons.add(Buttons.gray("addProtocol_" + protocol, StringUtils.capitalize(protocol)));
+            buttons.add(Buttons.gray("addProtocol_" + protocol, capitalize(protocol)));
         } else {
             player.removeAbility("protocol_" + protocol);
         }
         protocol = "espionage";
         if (!player.hasAbility("protocol_" + protocol)) {
-            buttons.add(Buttons.gray("addProtocol_" + protocol, StringUtils.capitalize(protocol)));
+            buttons.add(Buttons.gray("addProtocol_" + protocol, capitalize(protocol)));
         } else {
             player.removeAbility("protocol_" + protocol);
         }
         protocol = "conflict";
         if (!player.hasAbility("protocol_" + protocol)) {
-            buttons.add(Buttons.gray("addProtocol_" + protocol, StringUtils.capitalize(protocol)));
+            buttons.add(Buttons.gray("addProtocol_" + protocol, capitalize(protocol)));
         } else {
             player.removeAbility("protocol_" + protocol);
         }
@@ -2354,7 +2352,7 @@ public class ButtonHelperAbilities {
             message = player.getFactionEmoji() + " used their **Deep Mining** ability to gain 1 trade good "
                     + player.gainTG(1) + ".";
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
-            ButtonHelperAbilities.pillageCheck(player, game);
+            pillageCheck(player, game);
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         }
 
@@ -2429,7 +2427,7 @@ public class ButtonHelperAbilities {
         RemoveUnitService.removeUnits(event, tile2, game, player.getColor(), fighters + " fighters");
         AddUnitService.addUnits(event, tile, game, player.getColor(), fighters + " fighters");
         String msg = player.getRepresentation() + " used the _Availyn_ Superweapon ability and transferred " + fighters
-                + " fighter" + (fighters.equals("1") ? "" : "s") + " from "
+                + " fighter" + ("1".equals(fighters) ? "" : "s") + " from "
                 + tile2.getRepresentationForButtons(game, player) + " to "
                 + tile.getRepresentationForButtons(game, player) + ".";
         event.getMessage().delete().queue();

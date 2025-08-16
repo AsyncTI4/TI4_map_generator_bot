@@ -32,7 +32,7 @@ public class SetMapTemplate extends GameStateSubcommand {
         if (!Mapper.isValidMapTemplate(mapTemplate)) {
             MessageHelper.sendMessageToEventChannel(event, "Invalid map template: " + mapTemplate);
         }
-        if (game.getMapTemplateID() != null && !game.getMapTemplateID().equals("null") && !transform) {
+        if (game.getMapTemplateID() != null && !"null".equals(game.getMapTemplateID()) && !transform) {
             MessageHelper.sendMessageToEventChannel(
                     event,
                     "Map template already set to: `" + game.getMapTemplateID()

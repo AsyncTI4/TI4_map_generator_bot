@@ -37,7 +37,7 @@ class ListDiceLuck extends GameStateSubcommand {
             if (!player.isRealPlayer()) continue;
             playerAverageDiceLuck(player, record);
         }
-        ArrayList<String> lines = new ArrayList<>();
+        var lines = new ArrayList<String>();
         for (Map.Entry<String, Double> entry : record.entrySet()) {
             lines.add(entry.getKey());
         }

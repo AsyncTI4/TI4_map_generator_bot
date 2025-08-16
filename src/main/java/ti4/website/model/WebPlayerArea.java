@@ -20,6 +20,7 @@ public class WebPlayerArea {
     private String faction;
     private String color;
     private String displayName;
+    private String discordId;
     private boolean passed;
     private boolean eliminated;
     private boolean active;
@@ -144,6 +145,7 @@ public class WebPlayerArea {
         webPlayerArea.setFaction(player.getFaction());
         webPlayerArea.setColor(player.getColor());
         webPlayerArea.setDisplayName(player.getDisplayName());
+        webPlayerArea.setDiscordId(player.getUserID());
         webPlayerArea.setPassed(player.isPassed());
         webPlayerArea.setEliminated(player.isEliminated());
         webPlayerArea.setActive(player.isActivePlayer());

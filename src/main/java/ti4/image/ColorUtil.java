@@ -44,7 +44,7 @@ public class ColorUtil {
     public Color getColor(String color) {
         color = Mapper.getColorName(color);
         if (color == null) return Color.WHITE;
-        if (color.equals("orca")) return getColor("gray");
+        if ("orca".equals(color)) return getColor("gray");
         ColorModel model = Mapper.getColor(color);
         return model.getPrimaryColor();
     }

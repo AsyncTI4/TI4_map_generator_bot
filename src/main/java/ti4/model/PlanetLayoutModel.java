@@ -75,7 +75,7 @@ public class PlanetLayoutModel {
     }
 
     private Point getStructureOffset(int index) {
-        Integer icons = getExtraIcons() != null ? getExtraIcons() : 0;
+        Integer icons = extraIcons != null ? extraIcons : 0;
         double deltaTheta =
                 switch (resourcesLocation) {
                     case BottomLeft, TopRight -> -30.0;

@@ -239,7 +239,7 @@ public class TacticalActionButtonHandlers {
                     if (color != null && game.getPlayerFromColorOrFaction(color) != null) {
                         owner = game.getPlayerFromColorOrFaction(color);
                         if (owner != player) {
-                            colorMsg = " " + StringUtils.capitalize(owner.getColor()) + "";
+                            colorMsg = " " + StringUtils.capitalize(owner.getColor());
                         }
                     }
                     Tile tile = game.getTileByPosition(pos);

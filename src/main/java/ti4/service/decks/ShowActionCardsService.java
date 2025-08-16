@@ -62,7 +62,8 @@ public class ShowActionCardsService {
             List<String> ids = acEntryList.getValue().stream()
                     .map(i -> "`(" + i.getValue() + ")`")
                     .toList();
-            sb.append("\n").append(index++).append("\\. ");
+            sb.append("\n").append(index).append("\\. ");
+            index++;
             sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
             sb.append(" _").append(acEntryList.getKey()).append("_ ");
             sb.append(String.join(", ", ids)).append("\n> ");
@@ -93,7 +94,8 @@ public class ShowActionCardsService {
             List<String> ids = acEntryList.getValue().stream()
                     .map(i -> "`(" + i.getValue() + ")`")
                     .toList();
-            sb.append("\n").append(index++).append("\\. ");
+            sb.append("\n").append(index).append("\\. ");
+            index++;
             sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
             sb.append(" _").append(acEntryList.getKey()).append("_");
             sb.append(String.join(", ", ids));

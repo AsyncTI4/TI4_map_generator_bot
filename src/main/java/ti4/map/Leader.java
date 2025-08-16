@@ -93,7 +93,7 @@ public class Leader {
 
     @JsonIgnore
     public Optional<LeaderModel> getLeaderModel() {
-        return Optional.ofNullable(Mapper.getLeader(getId()));
+        return Optional.ofNullable(Mapper.getLeader(id));
     }
 
     @JsonIgnore
@@ -107,26 +107,26 @@ public class Leader {
             return null;
         }
         EmbedBuilder eb = new EmbedBuilder();
-        MessageEmbed modelEmbed = getLeaderModel().get().getRepresentationEmbed(false, false, isLocked(), false);
+        MessageEmbed modelEmbed = getLeaderModel().get().getRepresentationEmbed(false, false, locked, false);
         eb.copyFrom(modelEmbed);
 
-        if (getTgCount() > 0) {
+        if (tgCount > 0) {
             String desc = modelEmbed.getDescription();
-            eb.setDescription(desc + "\n" + MiscEmojis.tg(getTgCount()));
+            eb.setDescription(desc + "\n" + MiscEmojis.tg(tgCount));
         }
 
-        if (isExhausted()) {
+        if (exhausted) {
             eb.setColor(Color.GRAY);
         } else {
             eb.setColor(Color.GREEN);
         }
 
-        if (isLocked()) {
+        if (locked) {
             eb.setColor(Color.RED);
             eb.setAuthor("🔒 Locked");
         }
 
-        if (isActive()) {
+        if (active) {
             eb.setColor(Color.BLUE);
             eb.setAuthor("🔒 ACTIVE - Leader will be purged during Status Phase cleanup");
         }
