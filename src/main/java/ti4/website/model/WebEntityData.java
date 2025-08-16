@@ -3,7 +3,7 @@ package ti4.website.model;
 import lombok.Data;
 
 @Data
-public class WebEntityData {
+class WebEntityData {
     private String entityId;
     private String entityType; // "unit" or "token"
     private int count;

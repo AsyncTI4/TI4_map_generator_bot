@@ -6,7 +6,7 @@ import ti4.spring.exception.InvalidGameNameException;
 import ti4.spring.exception.UserNotInGameForbiddenException;
 
 @Component("security")
-public class GameSecurityService {
+class GameSecurityService {
 
     public boolean canAccessGame(String gameName) {
         if (!GameManager.isValid(gameName)) throw new InvalidGameNameException(gameName);

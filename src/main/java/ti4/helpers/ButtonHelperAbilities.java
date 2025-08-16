@@ -1,6 +1,7 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +95,7 @@ public class ButtonHelperAbilities {
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
-            if (p2.getSecretsUnscored().size() > 0) {
+            if (!p2.getSecretsUnscored().isEmpty()) {
                 int randInt = ThreadLocalRandom.current()
                         .nextInt(0, p2.getSecretsUnscored().size());
                 List<Map.Entry<String, Integer>> entries =
@@ -225,12 +226,12 @@ public class ButtonHelperAbilities {
             return;
         }
         player.setTg(player.getTg() - 1);
-        List<Button> buttons = new ArrayList<>();
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation()
                         + " paid 1 trade good to DEPLOY a mech to a planet adjacent the system they are resolving **Rally to the Cause** in.");
-        buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
+        List<Button> buttons =
+                new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 "Use buttons to deploy a mech to a system adjacent to the Rally'd system.",
@@ -394,7 +395,7 @@ public class ButtonHelperAbilities {
         ButtonHelper.checkACLimit(game, player);
     }
 
-    public static List<String> getTrapNames() {
+    private static List<String> getTrapNames() {
         List<String> trapNames = new ArrayList<>();
         trapNames.add("Minefields");
         trapNames.add("Interference Grid");
@@ -571,7 +572,7 @@ public class ButtonHelperAbilities {
         return trappedPlanets;
     }
 
-    public static List<String> getUnusedTraps(Game game, Player player) {
+    private static List<String> getUnusedTraps(Game game, Player player) {
         List<String> unusedTraps = new ArrayList<>();
         for (String trapName : getTrapNames()) {
             if (!player.getTrapCardsPlanets().containsKey(translateNameIntoTrapIDOrReverse(trapName))) {
@@ -697,7 +698,7 @@ public class ButtonHelperAbilities {
         }
     }
 
-    public static void removeOmenDie(Game game, int omenDie) {
+    private static void removeOmenDie(Game game, int omenDie) {
         String omenDice;
         if (!game.getStoredValue("OmenDice").isEmpty()) {
             omenDice = game.getStoredValue("OmenDice");
@@ -750,7 +751,7 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
-    public static void rollOmenDiceAtStartOfStrat(Game game, Player myko) {
+    private static void rollOmenDiceAtStartOfStrat(Game game, Player myko) {
         game.setStoredValue("OmenDice", "");
         StringBuilder msg = new StringBuilder(
                 myko.getRepresentationUnfogged() + " rolled 4 **Omen** dice and rolled the following numbers:");
@@ -1118,7 +1119,7 @@ public class ButtonHelperAbilities {
         return buttons;
     }
 
-    public static Tile getLocationOfSuperweapon(Game game, String name) {
+    private static Tile getLocationOfSuperweapon(Game game, String name) {
         Tile tile = null;
         for (Tile loc : game.getTileMap().values()) {
             for (UnitHolder uH : loc.getPlanetUnitHolders()) {
@@ -1279,7 +1280,7 @@ public class ButtonHelperAbilities {
             Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planetName = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();
-        String extra = "";
+        String extra;
 
         if (player.hasRelic("superweaponavailyn")) {
             extra = " (In Use)";
@@ -1461,7 +1462,7 @@ public class ButtonHelperAbilities {
         return buttons;
     }
 
-    public static List<Button> getReturnableAxisOrders(Player player, Game game) {
+    private static List<Button> getReturnableAxisOrders(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
 
         Map<String, Integer> orderDeck = Map.of(
@@ -1873,7 +1874,7 @@ public class ButtonHelperAbilities {
         }
     }
 
-    public static List<Button> getAvailableProtocols(Player player) {
+    private static List<Button> getAvailableProtocols(Player player) {
         List<Button> buttons = new ArrayList<>();
         String protocol = "distribution";
         if (!player.hasAbility("protocol_" + protocol)) {
@@ -2259,7 +2260,7 @@ public class ButtonHelperAbilities {
                     event.getMessageChannel(),
                     player.getFactionEmoji() + " replaced 1 of their opponent's infantry with 1 " + unit + " on "
                             + Helper.getPlanetRepresentation(planet, game) + " using **Indoctrination**.");
-        } else if (RandomHelper.isOneInX(100) && colour.length() > 0 && "infantry".equals(unit)) {
+        } else if (RandomHelper.isOneInX(100) && !colour.isEmpty() && "infantry".equals(unit)) {
             String poem = "";
             switch (ThreadLocalRandom.current().nextInt(20)) {
                 case 0:
@@ -2379,7 +2380,7 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
-    public static void availynStep1(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+    private static void availynStep1(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String destination = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();
         for (Tile tile2 : game.getTileMap().values()) {

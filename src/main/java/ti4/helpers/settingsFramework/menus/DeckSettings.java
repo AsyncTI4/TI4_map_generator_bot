@@ -47,7 +47,7 @@ public class DeckSettings extends SettingsMenu {
         return choice;
     }
 
-    protected DeckSettings(JsonNode json, SettingsMenu parent, Optional<Game> game) {
+    DeckSettings(JsonNode json, SettingsMenu parent, Optional<Game> game) {
         super(
                 "decks",
                 "Card Decks",

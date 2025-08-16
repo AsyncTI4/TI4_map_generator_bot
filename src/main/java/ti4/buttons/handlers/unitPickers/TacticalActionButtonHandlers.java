@@ -26,7 +26,7 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
-public class TacticalActionButtonHandlers {
+class TacticalActionButtonHandlers {
 
     @ButtonHandler("unitTacticalMove")
     @ButtonHandler("unitTacticalRemove")

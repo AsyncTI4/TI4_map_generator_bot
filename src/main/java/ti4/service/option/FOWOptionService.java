@@ -2,6 +2,7 @@ package ti4.service.option;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -14,6 +15,8 @@ import ti4.service.fow.GMService;
 
 @UtilityClass
 public class FOWOptionService {
+
+    private static final Pattern FOW_OPTION_ = Pattern.compile("fowOption_");
 
     public enum FOWOptionCategory {
         GAME,
@@ -79,7 +82,7 @@ public class FOWOptionService {
             this.visible = visible;
         }
 
-        public FOWOptionCategory getCategory() {
+        FOWOptionCategory getCategory() {
             return category;
         }
 
@@ -87,11 +90,11 @@ public class FOWOptionService {
             return title;
         }
 
-        public String getDescription() {
+        String getDescription() {
             return description;
         }
 
-        public boolean isVisible() {
+        boolean isVisible() {
             return visible;
         }
 
@@ -165,14 +168,14 @@ public class FOWOptionService {
 
     @ButtonHandler("fowOption_")
     public static void changeFOWOptions(ButtonInteractionEvent event, Game game, String buttonID) {
-        String[] parts = buttonID.split("fowOption_")[1].split("_", 3);
+        String[] parts = FOW_OPTION_.split(buttonID)[1].split("_", 3);
         FOWOptionCategory category = FOWOptionCategory.fromString(parts[0]);
         String value = parts[1];
         String option = parts[2];
 
         FOWOption fowOption = FOWOption.fromString(option);
         boolean newValue = Boolean.parseBoolean(value);
-        if (FOWOption.FOW_PLUS == fowOption) {
+        if (fowOption == FOWOption.FOW_PLUS) {
             FOWPlusService.toggleTag(game, newValue);
             if (newValue) {
                 game.setFowOption(FOWOption.ALLOW_AGENDA_COMMS, false);

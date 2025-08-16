@@ -329,7 +329,7 @@ public class EndGameService {
         }
     }
 
-    public static String getGameEndText(Game game, GenericInteractionCreateEvent event) {
+    private static String getGameEndText(Game game, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
         sb.append("**Game: __").append(game.getName()).append("__**");
         if (!game.getCustomName().isEmpty()) {
@@ -397,7 +397,7 @@ public class EndGameService {
         return sb.toString();
     }
 
-    public static String getTIGLFormattedGameEndText(Game game, GenericInteractionCreateEvent event) {
+    private static String getTIGLFormattedGameEndText(Game game, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
         sb.append("# ").append(MiscEmojis.TIGL).append("TIGL\n\n");
         sb.append("This was a TIGL game! 👑")
@@ -458,7 +458,7 @@ public class EndGameService {
         return report;
     }
 
-    public static void cleanUpInLimboCategory(Guild guild, int channelCountToDelete) {
+    private static void cleanUpInLimboCategory(Guild guild, int channelCountToDelete) {
         Category inLimboCategory =
                 guild.getCategoriesByName("The in-limbo PBD Archive", true).getFirst();
         if (inLimboCategory == null) {

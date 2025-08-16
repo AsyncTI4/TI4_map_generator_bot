@@ -8,9 +8,9 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
-public class UnitModelTest extends BaseTi4Test {
+class UnitModelTest extends BaseTi4Test {
     @Test
-    public void testUnitModels() {
+    void testUnitModels() {
         for (UnitModel unitModel : Mapper.getUnits().values()) {
             assertTrue(
                     validateBaseType(unitModel),

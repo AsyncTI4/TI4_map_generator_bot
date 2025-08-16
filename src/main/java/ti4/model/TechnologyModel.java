@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.regex.Pattern;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -22,6 +23,10 @@ import ti4.service.emoji.UnitEmojis;
 @Data
 public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
+    private static final Pattern PATTERN = Pattern.compile("[^R]");
+    private static final Pattern REGEX = Pattern.compile("[^G]");
+    private static final Pattern REGEXP = Pattern.compile("[^Y]");
+    private static final Pattern PATTERN1 = Pattern.compile("[^B]");
     private String alias;
     private String name;
     private String shortName;
@@ -131,27 +136,27 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         return types.contains(TechnologyType.UNITUPGRADE);
     }
 
-    public boolean isDualPropulsionCybernetic() {
+    private boolean isDualPropulsionCybernetic() {
         return isPropulsionTech() && isCyberneticTech();
     }
 
-    public boolean isDualPropulsionBiotic() {
+    private boolean isDualPropulsionBiotic() {
         return isPropulsionTech() && isBioticTech();
     }
 
-    public boolean isDualPropulsionWarfare() {
+    private boolean isDualPropulsionWarfare() {
         return isPropulsionTech() && isWarfareTech();
     }
 
-    public boolean isDualCyberneticBiotic() {
+    private boolean isDualCyberneticBiotic() {
         return isCyberneticTech() && isBioticTech();
     }
 
-    public boolean isDualCyberneticWarfare() {
+    private boolean isDualCyberneticWarfare() {
         return isCyberneticTech() && isWarfareTech();
     }
 
-    public boolean isDualWarfareBiotic() {
+    private boolean isDualWarfareBiotic() {
         return isWarfareTech() && isBioticTech();
     }
 
@@ -206,7 +211,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public static final Comparator<TechnologyModel> sortByType = TechnologyModel::sortByType;
 
-    public static int sortByType(TechnologyModel t1, TechnologyModel t2) {
+    private static int sortByType(TechnologyModel t1, TechnologyModel t2) {
         return t1.getType().compareTo(t2.getType());
     }
 
@@ -338,7 +343,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         for (TechnologyType type : types) {
             switch (type) {
                 case PROPULSION -> {
-                    String blues = reqs.replaceAll("[^B]", "");
+                    String blues = PATTERN1.matcher(reqs).replaceAll("");
                     switch (blues) {
                         case "" -> output.append(TechEmojis.PropulsionDisabled);
                         case "B" -> output.append(TechEmojis.PropulsionTech);
@@ -347,7 +352,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                     }
                 }
                 case CYBERNETIC -> {
-                    String yellows = reqs.replaceAll("[^Y]", "");
+                    String yellows = REGEXP.matcher(reqs).replaceAll("");
                     switch (yellows) {
                         case "" -> output.append(TechEmojis.CyberneticDisabled);
                         case "Y" -> output.append(TechEmojis.CyberneticTech);
@@ -356,7 +361,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                     }
                 }
                 case BIOTIC -> {
-                    String greens = reqs.replaceAll("[^G]", "");
+                    String greens = REGEX.matcher(reqs).replaceAll("");
                     switch (greens) {
                         case "" -> output.append(TechEmojis.BioticDisabled);
                         case "G" -> output.append(TechEmojis.BioticTech);
@@ -365,7 +370,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                     }
                 }
                 case WARFARE -> {
-                    String reds = reqs.replaceAll("[^R]", "");
+                    String reds = PATTERN.matcher(reqs).replaceAll("");
                     switch (reds) {
                         case "" -> output.append(TechEmojis.WarfareDisabled);
                         case "R" -> output.append(TechEmojis.WarfareTech);

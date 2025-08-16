@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -15,6 +16,8 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.TI4Emoji;
 
 public class AgentDraftItem extends DraftItem {
+    private static final Pattern FIN_SEP = Pattern.compile("finSep");
+
     public AgentDraftItem(String itemId) {
         super(Category.AGENT, itemId);
     }
@@ -80,10 +83,10 @@ public class AgentDraftItem extends DraftItem {
         return allItems;
     }
 
-    public static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
+    private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
         Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
-        String[] results = game.getStoredValue("bannedLeaders").split("finSep");
+        String[] results = FIN_SEP.split(game.getStoredValue("bannedLeaders"));
         for (FactionModel faction : factions) {
             List<String> agents = faction.getLeaders();
             agents.removeIf(

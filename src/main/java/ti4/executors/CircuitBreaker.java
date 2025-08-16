@@ -22,7 +22,7 @@ public class CircuitBreaker {
 
     private static LocalDateTime closeDateTime;
 
-    public static synchronized boolean incrementThresholdCount() {
+    static synchronized boolean incrementThresholdCount() {
         if (open) {
             return false;
         }

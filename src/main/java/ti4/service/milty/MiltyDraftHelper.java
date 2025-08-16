@@ -357,7 +357,7 @@ public class MiltyDraftHelper {
 
     private static boolean isInvalid(TileModel tileModel) {
         TileModel.TileBack back = tileModel.getTileBack();
-        if (TileBack.RED != back && TileBack.BLUE != back) {
+        if (back != TileBack.RED && back != TileBack.BLUE) {
             return true;
         }
 

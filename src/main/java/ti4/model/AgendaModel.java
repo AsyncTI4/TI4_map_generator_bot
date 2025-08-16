@@ -58,11 +58,11 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         return name;
     }
 
-    public String getCategory() {
+    private String getCategory() {
         return Optional.ofNullable(category).orElse("");
     }
 
-    public String getCategoryDescription() {
+    private String getCategoryDescription() {
         return Optional.ofNullable(categoryDescription).orElse("");
     }
 

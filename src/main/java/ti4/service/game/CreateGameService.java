@@ -1,7 +1,6 @@
 package ti4.service.game;
 
 import java.awt.image.BufferedImage;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -67,7 +66,7 @@ public class CreateGameService {
         return newGame;
     }
 
-    public static void reportNewGameCreated(Game game) {
+    private static void reportNewGameCreated(Game game) {
         if (game == null) return;
 
         TextChannel bothelperLoungeChannel =
@@ -678,7 +677,7 @@ public class CreateGameService {
     public static String getNewPlayerInfoText() {
         String path = ResourceHelper.getInstance().getHelpFile("NewPlayerIntro.txt");
         try {
-            return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+            return Files.readString(Paths.get(path));
         } catch (Exception e) {
             return "NewPlayerIntro HELP FILE IS BLANK";
         }

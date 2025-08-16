@@ -73,7 +73,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(abilityName);
     }
 
-    public Optional<String> getFlavourText() {
+    private Optional<String> getFlavourText() {
         return Optional.ofNullable(flavourText);
     }
 
@@ -142,8 +142,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID)
-            footer.append("ID: ").append(getAlias()).append("    Source: ").append(source);
+        if (includeID) footer.append("ID: ").append(ID).append("    Source: ").append(source);
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.black);

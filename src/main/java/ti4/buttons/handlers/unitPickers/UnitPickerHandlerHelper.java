@@ -11,7 +11,7 @@ import ti4.map.Player;
 import ti4.service.unit.ParsedUnit;
 
 @UtilityClass
-public class UnitPickerHandlerHelper {
+class UnitPickerHandlerHelper {
 
     public String singleUnitRegex(Game game, String action) {
         String regexSingleUnit = action;

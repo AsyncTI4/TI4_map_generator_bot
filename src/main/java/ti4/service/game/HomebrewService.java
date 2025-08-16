@@ -230,9 +230,7 @@ public class HomebrewService {
                 VoiceOfTheCouncilHelper.ResetVoiceOfTheCouncil(game);
                 OmegaPhaseModStatusHelper.PrintGreeting(game);
             }
-            case HBVOTC -> {
-                CryypterHelper.votcSetup(game, event);
-            }
+            case HBVOTC -> CryypterHelper.votcSetup(game, event);
         }
     }
 }

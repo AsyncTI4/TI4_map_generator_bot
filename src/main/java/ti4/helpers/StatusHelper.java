@@ -211,22 +211,26 @@ public class StatusHelper {
             }
 
             int count = 0;
-            String message3a = "";
+            StringBuilder message3a = new StringBuilder();
             for (String soID : player.getSecretsUnscored().keySet()) {
                 if (ListPlayerInfoService.getObjectiveThreshold(soID, game) > 0
                         && ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player)
                                 > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1)
                         && !"dp".equalsIgnoreCase(soID)) {
-                    message3a += "\n" + Mapper.getSecretObjective(soID).getRepresentation(false);
+                    message3a
+                            .append("\n")
+                            .append(Mapper.getSecretObjective(soID).getRepresentation(false));
                     count++;
                 }
             }
             var userSettings = UserSettingsManager.get(player.getUserID());
             if (count > 0 && player.isRealPlayer() && !player.isNpc()) {
-                message3a = player.getRepresentation()
-                        + ", as a reminder, the bot believes you are capable of scoring the following secret objective"
-                        + (count == 1 ? "" : "s") + ":" + message3a;
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message3a);
+                message3a.insert(
+                        0,
+                        player.getRepresentation()
+                                + ", as a reminder, the bot believes you are capable of scoring the following secret objective"
+                                + (count == 1 ? "" : "s") + ":");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message3a.toString());
             } else if (player.getSo() == 0
                     || player.isNpc()
                     || userSettings.getSandbagPref().contains("bot")) {
@@ -411,7 +415,7 @@ public class StatusHelper {
         }
     }
 
-    public static List<Button> getScoreObjectiveButtons(Game game) {
+    private static List<Button> getScoreObjectiveButtons(Game game) {
         return getScoreObjectiveButtons(game, "");
     }
 

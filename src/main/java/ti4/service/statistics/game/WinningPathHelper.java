@@ -2,6 +2,7 @@ package ti4.service.statistics.game;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.image.Mapper;
@@ -10,6 +11,8 @@ import ti4.map.Player;
 
 @UtilityClass
 public class WinningPathHelper {
+
+    private static final Pattern PATTERN = Pattern.compile("[^a-z]");
 
     public static String buildWinningPath(Game game, Player winner) {
         int stage1Count = countPublicVictoryPoints(game, winner.getUserID(), 1);
@@ -62,7 +65,7 @@ public class WinningPathHelper {
     }
 
     private static String normalizeVictoryPointKey(String poID) {
-        String normalized = poID.toLowerCase().replaceAll("[^a-z]", "");
+        String normalized = PATTERN.matcher(poID.toLowerCase()).replaceAll("");
         if (normalized.contains("seed")) return "seed";
         if (normalized.contains("mutiny")) return "mutiny";
         if (normalized.contains("shard")) return "shard";

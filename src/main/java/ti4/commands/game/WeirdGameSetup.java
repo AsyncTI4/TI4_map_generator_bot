@@ -136,7 +136,7 @@ class WeirdGameSetup extends GameStateSubcommand {
         }
     }
 
-    public static boolean setGameMode(SlashCommandInteractionEvent event, Game game) {
+    private static boolean setGameMode(SlashCommandInteractionEvent event, Game game) {
         if (event.getOption(Constants.TIGL_GAME) == null
                 && event.getOption(Constants.ABSOL_MODE) == null
                 && event.getOption(Constants.DISCORDANT_STARS_MODE) == null

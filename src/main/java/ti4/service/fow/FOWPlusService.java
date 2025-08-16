@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -55,8 +54,8 @@ import ti4.service.unit.RemoveUnitService.RemovedUnit;
  * Prevents looking at explore/relic decks
 */
 public class FOWPlusService {
-    public static final String FOWPLUS_TAG = "FoW+";
-    public static final String VOID_TILEID = "-1";
+    private static final String FOWPLUS_TAG = "FoW+";
+    private static final String VOID_TILEID = "-1";
 
     private static final String FOWPLUS_EXPLORE_WAVE = "fowplus_wave";
     private static final String FOWPLUS_EXPLORE_VORTEX = "fowplus_vortex";
@@ -173,14 +172,14 @@ public class FOWPlusService {
 
         Map<String, Map<UnitKey, List<Integer>>> unitsGoingToVoid = game.getTacticalActionDisplacement();
         float valueOfUnitsLost = 0.0f;
-        String unitEmojis = "";
+        StringBuilder unitEmojis = new StringBuilder();
         for (var unitHolder : unitsGoingToVoid.values()) {
             for (var unit : unitHolder.entrySet()) {
-                int total = unit.getValue().stream().collect(Collectors.summingInt(x -> x));
+                int total = unit.getValue().stream().mapToInt(x -> x).sum();
                 UnitModel model = player.getUnitFromUnitKey(unit.getKey());
                 if (model != null) {
                     valueOfUnitsLost += model.getCost() * total;
-                    unitEmojis += StringUtils.repeat("" + model.getUnitEmoji(), total);
+                    unitEmojis.append(StringUtils.repeat("" + model.getUnitEmoji(), total));
                 }
             }
         }

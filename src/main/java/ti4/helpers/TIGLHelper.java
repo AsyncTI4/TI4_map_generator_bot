@@ -75,7 +75,7 @@ public class TIGLHelper {
             return StringUtils.substringAfter(name, "- ");
         }
 
-        public Integer getIndex() {
+        Integer getIndex() {
             return index;
         }
 
@@ -92,7 +92,7 @@ public class TIGLHelper {
             return roles.getFirst();
         }
 
-        public TIGLRank getNextRank() {
+        TIGLRank getNextRank() {
             return switch (this) {
                 case UNRANKED -> MINISTER;
                 case MINISTER -> AGENT;
@@ -176,7 +176,7 @@ public class TIGLHelper {
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
     }
 
-    public static List<Role> getAllTIGLRoles() {
+    private static List<Role> getAllTIGLRoles() {
         List<Role> roles = new ArrayList<>();
         for (TIGLRank rank : TIGLRank.values()) {
             roles.add(rank.getRole());
@@ -218,7 +218,7 @@ public class TIGLHelper {
         return lowestRank;
     }
 
-    public static List<TIGLRank> getUsersTIGLRanks(User user) {
+    private static List<TIGLRank> getUsersTIGLRanks(User user) {
         Member hubMember = AsyncTI4DiscordBot.guildPrimary.getMemberById(user.getId());
         if (hubMember == null) {
             return new ArrayList<>();

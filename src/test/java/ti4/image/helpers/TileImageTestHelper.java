@@ -27,7 +27,7 @@ public class TileImageTestHelper {
     private static final String staticDir =
             String.join(File.separator, List.of(".", "src", "test", "java", "ti4", "image", "static", "tileLayout"));
 
-    public static BufferedImage generateTestImage(Tile tile) {
+    private static BufferedImage generateTestImage(Tile tile) {
         TileGenerator gen = new TileGenerator(TileImageTest.testGame, null, DisplayType.all, 0, tile.getPosition());
         return gen.createMainImage();
     }
@@ -74,7 +74,7 @@ public class TileImageTestHelper {
         Assertions.assertTrue(totalDist < 10);
     }
 
-    public void compareToStatic(Tile tile, String fileName) {
+    private void compareToStatic(Tile tile, String fileName) {
         String referenceImagePath = staticDir + File.separator + fileName;
         BufferedImage ref = ImageHelper.read(referenceImagePath);
         BufferedImage test = generateTestImage(tile);

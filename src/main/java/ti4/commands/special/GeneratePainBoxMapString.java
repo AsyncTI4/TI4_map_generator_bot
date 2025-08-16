@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -19,10 +20,12 @@ import ti4.service.map.AddTileService.RandomOption;
 
 class GeneratePainBoxMapString extends GameStateSubcommand {
 
+    private static final Pattern COMMA_OR_WHITESPACE_PATTERN = Pattern.compile("[,\\s]+");
+
     /*
       Generates a map string for Eronous PainBox type map where no tiles are adjacent to each other.
     */
-    public GeneratePainBoxMapString() {
+    GeneratePainBoxMapString() {
         super(Constants.GENERATE_PAINBOX_MAP, "Generate random map string for Eronous Pain Box", false, false);
         addOption(OptionType.INTEGER, Constants.BLUE_TILES, "How many random Blue tiles", true);
         addOption(OptionType.INTEGER, Constants.RED_TILES, "How many random Red tiles", true);
@@ -42,7 +45,7 @@ class GeneratePainBoxMapString extends GameStateSubcommand {
         String fixedTiles = event.getOption(Constants.TILE_LIST, "", OptionMapping::getAsString);
         List<String> fixedTilesList = fixedTiles.isEmpty()
                 ? new ArrayList<>()
-                : Arrays.asList(fixedTiles.split("[,\\s]+")).stream()
+                : Arrays.stream(COMMA_OR_WHITESPACE_PATTERN.split(fixedTiles))
                         .map(String::trim)
                         .toList();
 

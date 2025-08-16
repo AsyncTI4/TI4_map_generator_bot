@@ -26,7 +26,7 @@ class PutEventTop extends GameStateSubcommand {
         putTop(numericalID, game, player);
     }
 
-    public void putTop(int eventID, Game game, Player player) {
+    private void putTop(int eventID, Game game, Player player) {
         boolean success = game.putEventTop(eventID, player);
         if (success) {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Event put on top of deck.");

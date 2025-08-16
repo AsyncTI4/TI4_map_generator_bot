@@ -18,7 +18,7 @@ import ti4.service.game.GameNameService;
 
 public class ModalListener extends ListenerAdapter {
 
-    public static ModalListener instance;
+    private static ModalListener instance;
 
     private final Map<String, Consumer<ModalContext>> knownModals = new HashMap<>();
 
@@ -73,9 +73,9 @@ public class ModalListener extends ListenerAdapter {
         }
 
         // Then check for prefix match
-        for (String key : knownModals.keySet()) {
-            if (modalID.startsWith(key)) {
-                knownModals.get(key).accept(context);
+        for (Map.Entry<String, Consumer<ModalContext>> entry : knownModals.entrySet()) {
+            if (modalID.startsWith(entry.getKey())) {
+                entry.getValue().accept(context);
                 return true;
             }
         }

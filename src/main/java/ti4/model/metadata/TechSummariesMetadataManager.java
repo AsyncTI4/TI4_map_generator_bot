@@ -94,18 +94,18 @@ public class TechSummariesMetadataManager {
         private List<String> tech;
         private List<String> researchAgreementTech;
 
-        public FactionTechSummary(String faction) {
+        FactionTechSummary(String faction) {
             this.faction = faction;
         }
 
-        public void addTech(String techId) {
+        void addTech(String techId) {
             if (tech == null) {
                 tech = new ArrayList<>();
             }
             tech.add(techId);
         }
 
-        public void addResearchAgreementTech(String techId) {
+        void addResearchAgreementTech(String techId) {
             if (researchAgreementTech == null) {
                 researchAgreementTech = new ArrayList<>();
             }

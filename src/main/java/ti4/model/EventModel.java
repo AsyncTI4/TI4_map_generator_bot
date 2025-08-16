@@ -59,15 +59,15 @@ public class EventModel implements ModelInterface, EmbeddableModel {
         return name;
     }
 
-    public String getCategory() {
+    private String getCategory() {
         return Optional.ofNullable(category).orElse("");
     }
 
-    public String getCategoryDescription() {
+    private String getCategoryDescription() {
         return Optional.ofNullable(categoryDescription).orElse("");
     }
 
-    public String getType() {
+    private String getType() {
         return Optional.ofNullable(type).orElse("");
     }
 
@@ -75,7 +75,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(target).orElse("");
     }
 
-    public String getText() {
+    private String getText() {
         return Optional.ofNullable(text).orElse("");
     }
 

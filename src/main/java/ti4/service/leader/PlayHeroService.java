@@ -382,9 +382,7 @@ public class PlayHeroService {
                         event.getMessageChannel(),
                         player.getFactionEmoji() + " has been offered buttons to explore all their planets.");
             }
-            case "toldarhero" -> {
-                ButtonHelperHeroes.resolveToldarHero(game, player);
-            }
+            case "toldarhero" -> ButtonHelperHeroes.resolveToldarHero(game, player);
             case "nivynhero" -> {
                 ButtonHelperHeroes.resolveNivynHeroSustainEverything(game, player);
                 MessageHelper.sendMessageToChannel(

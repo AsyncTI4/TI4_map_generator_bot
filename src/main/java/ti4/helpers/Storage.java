@@ -14,11 +14,11 @@ import ti4.message.BotLogger;
 public class Storage {
 
     public static final String ENV_VAR_RESOURCE_PATH = "RESOURCE_PATH";
-    public static final String ENV_VAR_DB_PATH = "DB_PATH";
-    public static final String GAMES_UNDO = "/maps/undo/";
-    public static final String GAMES_PATH = "/maps/";
-    public static final String DELETED_GAMES_PATH = "/deletedmaps/";
-    public static final String TTPG_EXPORTS = "/ttpg_exports/";
+    private static final String ENV_VAR_DB_PATH = "DB_PATH";
+    private static final String GAMES_UNDO = "/maps/undo/";
+    private static final String GAMES_PATH = "/maps/";
+    private static final String DELETED_GAMES_PATH = "/deletedmaps/";
+    private static final String TTPG_EXPORTS = "/ttpg_exports/";
 
     private static String resourcePath;
 

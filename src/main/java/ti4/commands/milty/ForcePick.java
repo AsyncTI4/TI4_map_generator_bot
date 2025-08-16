@@ -13,7 +13,7 @@ import ti4.service.milty.MiltyDraftManager;
 
 class ForcePick extends GameStateSubcommand {
 
-    public static final String PICK = "draft_pick";
+    private static final String PICK = "draft_pick";
 
     public ForcePick() {
         super("force_pick", "Pick for the active player in milty draft", true, false);

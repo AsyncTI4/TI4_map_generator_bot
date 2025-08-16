@@ -183,9 +183,7 @@ public class DiscordantStarsHelper {
             resolveEconomyEmpowerAbility(player, planetModel);
             for (String type : ButtonHelper.getTypeOfPlanet(game, planet)) {
                 switch (type) {
-                    case "industrial" -> {
-                        resolveEconomyExploitAbility(player, planetModel, game);
-                    }
+                    case "industrial" -> resolveEconomyExploitAbility(player, planetModel, game);
                 }
             }
             resolvePeopleConnectAbility(player, planetModel, game);

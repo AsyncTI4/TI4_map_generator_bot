@@ -1,16 +1,24 @@
 package ti4.website.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.Data;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Leader;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 
 @Data
 public class WebPlayerArea {
     @Data
-    public static class UnitCountInfo {
+    private static class UnitCountInfo {
         private final int unitCap;
         private final int deployedCount;
     }

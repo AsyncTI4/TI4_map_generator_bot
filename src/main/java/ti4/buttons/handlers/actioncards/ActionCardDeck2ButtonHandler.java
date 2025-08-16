@@ -364,7 +364,7 @@ class ActionCardDeck2ButtonHandler {
                 buttons);
     }
 
-    public static List<Button> getSpatialCollapseTilesStep1(Game game, Player player) {
+    private static List<Button> getSpatialCollapseTilesStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (tile.getPosition().contains("t")
@@ -429,7 +429,7 @@ class ActionCardDeck2ButtonHandler {
         event.getMessage().delete().queue();
     }
 
-    public static List<Button> getStrandedShipButtons(Game game, Player player) {
+    private static List<Button> getStrandedShipButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (tile.getPlanetUnitHolders().isEmpty() && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {

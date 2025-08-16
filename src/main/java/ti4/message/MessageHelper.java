@@ -188,7 +188,7 @@ public class MessageHelper {
         sendMessageToChannelWithFactionReact(channel, messageText, game, player, buttons, false);
     }
 
-    public static void sendMessageToChannelWithFactionReact(
+    private static void sendMessageToChannelWithFactionReact(
             MessageChannel channel,
             String messageText,
             Game game,
@@ -387,7 +387,7 @@ public class MessageHelper {
         editMessageWithButtonsAndFiles(event, message, buttons, Collections.emptyList());
     }
 
-    public static void editMessageWithButtonsAndFiles(
+    private static void editMessageWithButtonsAndFiles(
             ButtonInteractionEvent event, String message, List<Button> buttons, List<FileUpload> files) {
         editMessageWithActionRowsAndFiles(event, message, ActionRow.partitionOf(buttons), files);
     }
@@ -404,7 +404,7 @@ public class MessageHelper {
                 .queue();
     }
 
-    public static void replyToMessage(
+    private static void replyToMessage(
             GenericInteractionCreateEvent event,
             FileUpload fileUpload,
             boolean forceShowMap,
@@ -688,7 +688,7 @@ public class MessageHelper {
         return privatelyPingPlayerList(players, game, null, message, null, null);
     }
 
-    public static boolean privatelyPingPlayerList(
+    private static boolean privatelyPingPlayerList(
             List<Player> players,
             Game game,
             MessageChannel feedbackChannel,
@@ -713,11 +713,11 @@ public class MessageHelper {
         sendMessageToUser(messageText, user, null);
     }
 
-    public static void sendMessageToUser(String messageText, User user, @Nullable MessageChannel failureChannel) {
+    private static void sendMessageToUser(String messageText, User user, @Nullable MessageChannel failureChannel) {
         sendMessageToUser(messageText, user, failureChannel, null);
     }
 
-    public static void sendMessageToUser(
+    private static void sendMessageToUser(
             String messageText, User user, @Nullable MessageChannel failureChannel, @Nullable String failText) {
         if (user == null) {
             return;
@@ -794,7 +794,7 @@ public class MessageHelper {
      * }
      * </pre>
      */
-    public static List<MessageCreateData> getMessageCreateDataObjects(
+    private static List<MessageCreateData> getMessageCreateDataObjects(
             String message, List<MessageEmbed> embeds, List<Button> buttons) {
         List<MessageCreateData> messageCreateDataList = new ArrayList<>();
 
@@ -885,7 +885,7 @@ public class MessageHelper {
         return getMessageCreateDataObjects(message, null, buttons);
     }
 
-    public static List<List<ActionRow>> getPartitionedButtonLists(List<Button> buttons) {
+    private static List<List<ActionRow>> getPartitionedButtonLists(List<Button> buttons) {
         List<List<ActionRow>> partitionedButtonRows = new ArrayList<>();
         try {
             buttons.removeIf(Objects::isNull);

@@ -14,7 +14,7 @@ import ti4.map.Player;
 
 abstract class AbilityAddRemove extends GameStateSubcommand {
 
-    protected AbilityAddRemove(String name, String description) {
+    AbilityAddRemove(String name, String description) {
         super(name, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.ABILITY, "Ability Name")
                 .setRequired(true)
@@ -45,5 +45,5 @@ abstract class AbilityAddRemove extends GameStateSubcommand {
         doAction(getPlayer(), abilityIDs, event);
     }
 
-    public abstract void doAction(Player player, List<String> abilityIDs, SlashCommandInteractionEvent event);
+    protected abstract void doAction(Player player, List<String> abilityIDs, SlashCommandInteractionEvent event);
 }

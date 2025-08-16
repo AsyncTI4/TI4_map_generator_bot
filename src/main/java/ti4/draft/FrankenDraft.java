@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import ti4.draft.items.AbilityDraftItem;
 import ti4.draft.items.AgentDraftItem;
 import ti4.draft.items.BlueTileDraftItem;
@@ -27,6 +28,8 @@ import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 
 public class FrankenDraft extends BagDraft {
+    private static final Pattern FIN_SEP = Pattern.compile("finSep");
+
     public FrankenDraft(Game owner) {
         super(owner);
     }
@@ -113,9 +116,9 @@ public class FrankenDraft extends BagDraft {
         "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral"
     };
 
-    public static List<FactionModel> getDraftableFactionsForGame(Game game) {
+    private static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllFrankenLegalFactions();
-        String[] results = game.getStoredValue("bannedFactions").split("finSep");
+        String[] results = FIN_SEP.split(game.getStoredValue("bannedFactions"));
         if (!game.isDiscordantStarsMode()) {
             factionSet.removeIf(factionModel ->
                     factionModel.getSource().isDs() && !factionModel.getSource().isPok());
@@ -125,7 +128,7 @@ public class FrankenDraft extends BagDraft {
         return factionSet;
     }
 
-    public static boolean contains(String[] array, String target) {
+    private static boolean contains(String[] array, String target) {
         for (String str : array) {
             if (str.equalsIgnoreCase(target)) {
                 return true;

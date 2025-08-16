@@ -1,6 +1,6 @@
 package ti4.service.fow;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -56,9 +56,13 @@ public class LoreService {
         List<ActionRow> buttons = Buttons.paginateButtons(getLoreButtons(game), LORE_BUTTONS, pageNum, "gmLore");
 
         if (StringUtils.isBlank(page)) {
-            String msg = "### Lore Management"
-                    + "\n-# System Lore is shown to the first player to conclude an action with units in the system."
-                    + "\n-# Planet Lore is shown to the first player to gain control of the planet.";
+            String msg =
+                    """
+                ### Lore Management\
+
+                -# System Lore is shown to the first player to conclude an action with units in the system.\
+
+                -# Planet Lore is shown to the first player to gain control of the planet.""";
             event.getChannel().sendMessage(msg).setComponents(buttons).queue();
         } else {
             event.getHook().editOriginalComponents(buttons).queue();
@@ -68,8 +72,8 @@ public class LoreService {
     private static List<Button> getLoreButtons(Game game) {
         List<Button> loreButtons = new ArrayList<>();
         for (String target : getSavedLore(game).keySet()) {
-            String buttonLabel = "";
-            String emoji = null;
+            String buttonLabel;
+            String emoji;
             boolean isValidLore = true;
 
             if (PositionMapper.isTilePositionValid(target)) {

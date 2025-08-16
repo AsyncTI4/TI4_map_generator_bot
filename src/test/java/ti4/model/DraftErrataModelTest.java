@@ -8,9 +8,9 @@ import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
-public class DraftErrataModelTest extends BaseTi4Test {
+class DraftErrataModelTest extends BaseTi4Test {
     @Test
-    public void testDraftErrata() {
+    void testDraftErrata() {
         for (DraftErrataModel model : Mapper.getFrankenErrata().values()) {
             assertTrue(model.isValid(), model.getAlias() + ": object is invalid");
             assertTrue(validateAlias(model), model.getAlias() + ": invalid Alias: ");

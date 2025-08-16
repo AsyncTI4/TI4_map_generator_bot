@@ -276,7 +276,7 @@ public class ButtonHelperTacticalAction {
         game.getTacticalActionDisplacement().clear();
     }
 
-    public static void beginTacticalAction(Game game, Player player) {
+    private static void beginTacticalAction(Game game, Player player) {
         boolean prefersDistanceBasedTacticalActions =
                 UserSettingsManager.get(player.getUserID()).isPrefersDistanceBasedTacticalActions();
         if (!game.isFowMode() && game.getRingCount() < 5 && prefersDistanceBasedTacticalActions) {
@@ -293,7 +293,7 @@ public class ButtonHelperTacticalAction {
         }
     }
 
-    public static void alternateWayOfOfferingTiles(Player player, Game game) {
+    private static void alternateWayOfOfferingTiles(Player player, Game game) {
         Map<String, Integer> distances =
                 CheckDistanceHelper.getTileDistancesRelativeToAllYourUnlockedTiles(game, player);
         List<String> initialOffering =
@@ -464,19 +464,12 @@ public class ButtonHelperTacticalAction {
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", Please resolve _Scanlink Drone Network_.",
                     button2);
-            if (player.hasAbility("awaken")
-                    || player.hasUnit("titans_flagship")
-                    || player.hasUnit("sigma_ul_flagship_1")
-                    || player.hasUnit("sigma_ul_flagship_2")) {
-                ButtonHelper.resolveTitanShenanigansOnActivation(player, game, tile, event);
-            }
-        } else {
-            if (player.hasAbility("awaken")
-                    || player.hasUnit("titans_flagship")
-                    || player.hasUnit("sigma_ul_flagship_1")
-                    || player.hasUnit("sigma_ul_flagship_2")) {
-                ButtonHelper.resolveTitanShenanigansOnActivation(player, game, tile, event);
-            }
+        }
+        if (player.hasAbility("awaken")
+                || player.hasUnit("titans_flagship")
+                || player.hasUnit("sigma_ul_flagship_1")
+                || player.hasUnit("sigma_ul_flagship_2")) {
+            ButtonHelper.resolveTitanShenanigansOnActivation(player, game, tile, event);
         }
         if (player.hasAbility("plague_reservoir") && player.hasTech("dxa")) {
             for (Planet planetUH : tile.getPlanetUnitHolders()) {
@@ -614,13 +607,13 @@ public class ButtonHelperTacticalAction {
             if (!displacedUnits.containsKey(uhKey)) continue;
 
             Map<UnitKey, List<Integer>> unitsMovedFromUnitHolder = displacedUnits.get(uhKey);
-            for (UnitKey unitKey : unitsMovedFromUnitHolder.keySet()) {
-                List<Integer> states = unitsMovedFromUnitHolder.get(unitKey);
+            for (Entry<UnitKey, List<Integer>> entry : unitsMovedFromUnitHolder.entrySet()) {
+                List<Integer> states = entry.getValue();
                 for (UnitState state : UnitState.values()) {
                     int amt = states.get(state.ordinal());
                     for (int x = 1; x <= Math.min(2, amt); x++) {
-                        Button reverse =
-                                ButtonHelper.buildMoveUnitButton(player, tile, uh, state, unitKey, x, true, false);
+                        Button reverse = ButtonHelper.buildMoveUnitButton(
+                                player, tile, uh, state, entry.getKey(), x, true, false);
                         buttons.add(reverse);
                     }
                 }

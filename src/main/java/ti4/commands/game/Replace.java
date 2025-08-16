@@ -33,7 +33,7 @@ import ti4.settings.users.UserSettingsManager;
 
 class Replace extends GameStateSubcommand {
 
-    public Replace() {
+    Replace() {
         super(Constants.REPLACE, "Replace player in game", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.PLAYER_FACTION, "Player being replaced")
                 .setAutoComplete(true)
@@ -136,11 +136,12 @@ class Replace extends GameStateSubcommand {
         }
         Map<String, Player> playersById = game.getPlayers();
         Map<String, Player> updatedPlayersById = new LinkedHashMap<>();
-        for (String userId : playersById.keySet()) {
+        for (Map.Entry<String, Player> entry : playersById.entrySet()) {
+            String userId = entry.getKey();
             if (userId.equalsIgnoreCase(oldPlayerUserId)) {
                 updatedPlayersById.put(replacedPlayer.getUserID(), replacedPlayer);
             } else {
-                updatedPlayersById.put(userId, playersById.get(userId));
+                updatedPlayersById.put(userId, entry.getValue());
             }
         }
         game.setPlayers(updatedPlayersById);
@@ -227,13 +228,9 @@ class Replace extends GameStateSubcommand {
                 .queue(
                         oldThreadMember -> thread.getManager()
                                 .setArchived(false)
-                                .queue(success -> {
-                                    thread.removeThreadMember(oldMember).queue(success2 -> {
-                                        thread.addThreadMember(newMember).queue(success3 -> {
-                                            accessMessage(thread, newMember);
-                                        });
-                                    });
-                                }),
+                                .queue(success -> thread.removeThreadMember(oldMember)
+                                        .queue(success2 -> thread.addThreadMember(newMember)
+                                                .queue(success3 -> accessMessage(thread, newMember)))),
                         failure -> {
                             /* Old member is not in the thread -> Do nothing */
                         });

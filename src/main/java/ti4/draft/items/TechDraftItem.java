@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -13,6 +14,8 @@ import ti4.model.TechnologyModel;
 import ti4.service.emoji.TI4Emoji;
 
 public class TechDraftItem extends DraftItem {
+    private static final Pattern FIN_SEP = Pattern.compile("finSep");
+
     public TechDraftItem(String itemId) {
         super(Category.TECH, itemId);
     }
@@ -61,9 +64,9 @@ public class TechDraftItem extends DraftItem {
         return allItems;
     }
 
-    public static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
+    private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
-        String[] results = game.getStoredValue("bannedTechs").split("finSep");
+        String[] results = FIN_SEP.split(game.getStoredValue("bannedTechs"));
         for (FactionModel faction : factions) {
             for (var tech : faction.getFactionTech()) {
                 if (Arrays.asList(results).contains(tech)) {

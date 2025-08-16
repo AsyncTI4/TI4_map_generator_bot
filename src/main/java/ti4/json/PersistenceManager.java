@@ -14,7 +14,7 @@ import ti4.message.BotLogger;
 @UtilityClass
 public class PersistenceManager {
 
-    public static final String PERSISTENCE_MANAGER_JSON_PATH = Storage.getStoragePath() + "/pm_json/";
+    private static final String PERSISTENCE_MANAGER_JSON_PATH = Storage.getStoragePath() + "/pm_json/";
     private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     public static void writeObjectToJsonFile(String fileName, Object object) throws IOException {
@@ -41,7 +41,7 @@ public class PersistenceManager {
         return readListFromJsonFile(PERSISTENCE_MANAGER_JSON_PATH, fileName, clazz);
     }
 
-    public static <T> List<T> readListFromJsonFile(String directory, String fileName, Class<T> clazz)
+    private static <T> List<T> readListFromJsonFile(String directory, String fileName, Class<T> clazz)
             throws IOException {
         JavaType ref = objectMapper.getTypeFactory().constructParametricType(List.class, clazz);
         return readObjectFromJsonFile(directory, fileName, ref);

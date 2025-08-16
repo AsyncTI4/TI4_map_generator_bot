@@ -95,7 +95,7 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
         return eb.build();
     }
 
-    public Color getEmbedColor() {
+    private Color getEmbedColor() {
         return switch (points) {
             case 2 -> Color.BLACK;
             default -> Color.RED;

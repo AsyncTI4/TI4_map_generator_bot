@@ -67,8 +67,7 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
         if (tokenPlanetName != null)
             sb.append("Planet: ").append(tokenPlanetName).append("\n");
         if (attachmentID != null) sb.append("Attachment: ").append(attachmentID).append("\n");
-        if (wormholes != null)
-            sb.append("Wormhole(s): ").append(wormholes.toString()).append("\n");
+        if (wormholes != null) sb.append("Wormhole(s): ").append(wormholes).append("\n");
         if (isAnomaly != null) sb.append("Anomaly ");
         if (isRift != null) sb.append("Rift ");
         if (isNebula != null) sb.append("Nebula ");
@@ -77,7 +76,7 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
         sb = new StringBuilder();
         sb.append("ID: ").append(id);
         sb.append(" Source: ").append(source);
-        if (aliasList != null) sb.append("\nAlias list: ").append(aliasList.toString());
+        if (aliasList != null) sb.append("\nAlias list: ").append(aliasList);
         eb.setFooter(sb.toString());
 
         eb.setThumbnail("https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tokens/"

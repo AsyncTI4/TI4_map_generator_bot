@@ -48,7 +48,7 @@ class CorrectFaction extends GameStateSubcommand {
         }
     }
 
-    public void changeFactionSheetAndComponents(
+    private void changeFactionSheetAndComponents(
             GenericInteractionCreateEvent event, Game game, Player player, String newFaction) {
         Map<String, Player> players = game.getPlayers();
         for (Player playerInfo : players.values()) {

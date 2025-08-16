@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -88,7 +87,7 @@ public class TacticalActionService {
         reverseTileUnitMovement(event, game, player, tile, moveOrRemove, false);
     }
 
-    public void reverseTileUnitMovement(
+    private void reverseTileUnitMovement(
             ButtonInteractionEvent event,
             Game game,
             Player player,
@@ -271,7 +270,7 @@ public class TacticalActionService {
         TacticalActionOutputService.refreshButtonsAndMessageForTile(event, game, player, tile, moveOrRemove);
     }
 
-    public boolean spendAndPlaceTokenIfNecessary(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
+    private boolean spendAndPlaceTokenIfNecessary(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
         boolean skipPlacingAbilities = game.isNaaluAgent()
                 || game.isL1Hero()
                 || (!game.getStoredValue("hiredGunsInPlay").isEmpty() && player != game.getActivePlayer());
@@ -288,7 +287,7 @@ public class TacticalActionService {
         return false;
     }
 
-    public boolean moveUnitsIntoActiveSystem(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
+    private boolean moveUnitsIntoActiveSystem(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
         // Flip mallice
         if (!game.getTacticalActionDisplacement().isEmpty()) {
             tile = FlipTileService.flipTileIfNeeded(event, tile, game);
@@ -304,7 +303,7 @@ public class TacticalActionService {
         for (Entry<String, Map<UnitKey, List<Integer>>> e :
                 game.getTacticalActionDisplacement().entrySet()) {
             for (Entry<UnitKey, List<Integer>> unit : e.getValue().entrySet()) {
-                if (unit.getValue().stream().collect(Collectors.summingInt(x -> x)) > 0) moved = true;
+                if (unit.getValue().stream().mapToInt(x -> x).sum() > 0) moved = true;
                 activeSystemSpace.addUnitsWithStates(unit.getKey(), unit.getValue());
             }
         }

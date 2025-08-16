@@ -24,6 +24,7 @@ import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.PatternHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
@@ -465,7 +466,7 @@ public class PlayerTechService {
         boolean isStrat = !buttonID.contains("__comp");
         boolean paymentRequired = !buttonID.contains("__noPay");
 
-        List<String> buttonIDComponents = Arrays.asList(buttonID.split("__"));
+        List<String> buttonIDComponents = Arrays.asList(PatternHelper.DOUBLE_UNDERSCORE_PATTERN.split(buttonID));
         buttonID = buttonIDComponents.getFirst();
         String paymentType = buttonIDComponents.size() > 1 ? buttonIDComponents.get(1) : "res";
 
@@ -653,7 +654,8 @@ public class PlayerTechService {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void payForTech(Game game, Player player, ButtonInteractionEvent event, String tech, String payWith) {
+    private static void payForTech(
+            Game game, Player player, ButtonInteractionEvent event, String tech, String payWith) {
         String trueIdentity = player.getRepresentationUnfogged();
         String message2 = trueIdentity + ", please choose the planets you wish to exhaust. ";
         String payType = payWith != null ? payWith : "res";

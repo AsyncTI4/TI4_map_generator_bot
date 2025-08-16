@@ -160,8 +160,7 @@ public class AddPlanetService {
                             player.addPromissoryNoteToPlayArea(pn);
                         }
                     }
-                    Set<String> tokens = new HashSet<>();
-                    tokens.addAll(unitHolder.getTokenList());
+                    Set<String> tokens = new HashSet<>(unitHolder.getTokenList());
                     for (String token : tokens) {
                         if (token.contains("facility") || token.contains("superweapon")) {
                             unitHolder.removeToken(token);
@@ -340,7 +339,7 @@ public class AddPlanetService {
                 && player.hasTech("absol_dxa")
                 && !doubleCheck
                 && !setup) {
-            String message = "";
+            String message;
             if (tile != null && planet != null) {
                 Set<String> tokenList =
                         ButtonHelper.getUnitHolderFromPlanetName(planet, game).getTokenList();

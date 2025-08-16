@@ -14,7 +14,7 @@ import ti4.service.regex.RegexService;
 
 public class ButtonHelperStats {
 
-    static final Pattern convertCommsRegex =
+    private static final Pattern convertCommsRegex =
             Pattern.compile("convertComms_" + RegexHelper.intRegex("amt") + "(_stay)?");
 
     @ButtonHandler("convertComms_") // convertComms_12(_stay)
@@ -26,7 +26,8 @@ public class ButtonHelperStats {
         });
     }
 
-    static final Pattern gainCommsRegex = Pattern.compile("gainComms_" + RegexHelper.intRegex("amt") + "(_stay)?");
+    private static final Pattern gainCommsRegex =
+            Pattern.compile("gainComms_" + RegexHelper.intRegex("amt") + "(_stay)?");
 
     @ButtonHandler("gainComms_") // gainComms_12(_stay)
     public static void gainCommsButton(ButtonInteractionEvent event, Game game, Player player, String buttonID) {

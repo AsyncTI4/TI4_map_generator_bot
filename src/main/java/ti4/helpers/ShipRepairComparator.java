@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 import ti4.helpers.Units.UnitKey;
 
-public class ShipRepairComparator implements Comparator<UnitKey>, Serializable {
+class ShipRepairComparator implements Comparator<UnitKey>, Serializable {
 
     @Override
     public int compare(UnitKey o1, UnitKey o2) {

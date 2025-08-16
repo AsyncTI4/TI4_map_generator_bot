@@ -24,9 +24,9 @@ import ti4.service.map.AddTileListService;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
 
 @UtilityClass
-public class FinishDraftService {
+class FinishDraftService {
 
-    public FactionModel determineKeleresFlavor(MiltyDraftManager manager, Game game) {
+    private FactionModel determineKeleresFlavor(MiltyDraftManager manager, Game game) {
         List<String> flavors = List.of("mentak", "xxcha", "argent");
         List<String> valid =
                 flavors.stream().filter(Predicate.not(manager::isFactionTaken)).toList();

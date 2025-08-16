@@ -97,7 +97,7 @@ public class FowCommunicationThreadService {
                 .retrieveArchivedPrivateThreadChannels()
                 .queue(
                         pagination -> {
-                            pagination.forEach(result::add);
+                            result.addAll(pagination);
                             future.complete(result);
                         },
                         future::completeExceptionally);

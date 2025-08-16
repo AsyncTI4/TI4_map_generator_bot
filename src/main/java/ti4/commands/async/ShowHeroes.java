@@ -26,7 +26,7 @@ class ShowHeroes extends Subcommand {
         showTIGLHeroes(event);
     }
 
-    public static void showTIGLHeroes(GenericInteractionCreateEvent event) {
+    private static void showTIGLHeroes(GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder("__**TIGL Heroes**__\n");
         List<TIGLRank> heroRanks = TIGLHelper.getAllHeroTIGLRanks();
 

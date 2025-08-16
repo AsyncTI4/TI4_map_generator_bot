@@ -14,7 +14,7 @@ import ti4.model.ColorModel;
 import ti4.model.StrategyCardModel;
 
 @UtilityClass
-public class ColorUtil {
+class ColorUtil {
 
     public static final Color EliminatedColor = new Color(150, 0, 24); // Carmine
     public static final Color ActiveColor = new Color(80, 200, 120); // Emerald
@@ -41,7 +41,7 @@ public class ColorUtil {
                 : getPlayerMainColor(p);
     }
 
-    public Color getColor(String color) {
+    private Color getColor(String color) {
         color = Mapper.getColorName(color);
         if (color == null) return Color.WHITE;
         if ("orca".equals(color)) return getColor("gray");
