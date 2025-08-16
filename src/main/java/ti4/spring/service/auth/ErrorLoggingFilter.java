@@ -18,7 +18,7 @@ import ti4.message.BotLogger;
 public class ErrorLoggingFilter extends OncePerRequestFilter {
 
     private static final int START_OF_HTTP_ERROR_RANGE = 400;
-    
+
     @Override
     protected void doFilterInternal(
             @NotNull HttpServletRequest request,
