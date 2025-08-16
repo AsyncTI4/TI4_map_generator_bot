@@ -249,11 +249,11 @@ class Replace extends GameStateSubcommand {
         if (name == null) {
             name = member.getEffectiveName();
         }
-        name = PATTERN.matcher(name.toLowerCase()
-                        .replaceAll("[\\s]+", "-")
-                        .replaceAll("[^a-z0-9-]", "")
-                        .replaceAll("-{2,}", "-"))
-                .replaceAll("");
+        name = name.toLowerCase()
+                .replaceAll("[\\s]+", "-")
+                .replaceAll("[^a-z0-9-]", "")
+                .replaceAll("-{2,}", "-")
+                .replaceAll("^-|-$", "");
         return name;
     }
 }
