@@ -44,22 +44,11 @@ class Replace extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Member member = event.getMember();
-        boolean isAdmin = false;
-        if (member != null) {
-            List<Role> roles = member.getRoles();
-            for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
-                if (roles.contains(role)) {
-                    isAdmin = true;
-                    break;
-                }
-            }
-        }
-
+        boolean isBotHelper = CommandHelper.hasRole(event, AsyncTI4DiscordBot.bothelperRoles);
         Game game = getGame();
-        if (game.getPlayer(event.getUser().getId()) == null && !isAdmin) {
+        if (game.getPlayer(event.getUser().getId()) == null && !isBotHelper) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Only game players or Bothelpers can replace a player.");
+                    event.getChannel(), "Only game players or BotHelpers can replace a player.");
             return;
         }
 

@@ -16,18 +16,16 @@ public class AdminCommand implements ParentCommand {
                     new DeleteGame(),
                     new DisableBot(),
                     new ReloadMapperObjects(),
-                    new RestoreGame(),
                     new TourneyWinner(),
                     new DeletePersistenceManagerFile(),
                     new CardsInfoForPlayer(),
-                    new UpdateThreadArchiveTime() //
-                    )
+                    new UpdateThreadArchiveTime())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         return ParentCommand.super.accept(event)
-                && CommandHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.developerRoles);
+                && CommandHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.adminRoles);
     }
 
     @Override

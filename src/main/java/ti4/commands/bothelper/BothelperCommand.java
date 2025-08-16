@@ -24,13 +24,13 @@ public class BothelperCommand implements ParentCommand {
                     new ListButtons(),
                     new ReloadGame(),
                     new ServerGameStats(),
+                    new CorrectFaction(),
                     new ListDeadGames(),
                     new RemoveTitle(),
                     new EditTrackRecord(),
                     new CheckNextPingTime(),
                     new ListSlashCommandsUsed(),
-                    new ReserveGame() //
-                    )
+                    new ReserveGame())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

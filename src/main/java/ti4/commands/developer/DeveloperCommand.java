@@ -17,7 +17,8 @@ public class DeveloperCommand implements ParentCommand {
                     new RunManualDataMigration(),
                     new GiveTheBotABreather(),
                     new ButtonProcessingStatistics(),
-                    new CacheStatistics())
+                    new CacheStatistics(),
+                    new RestoreGame())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
