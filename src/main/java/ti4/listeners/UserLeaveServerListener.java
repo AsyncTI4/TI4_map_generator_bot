@@ -82,7 +82,7 @@ public class UserLeaveServerListener extends ListenerAdapter {
         // and then checks that require loading the game
         Game game = mGame.getGame();
         Player player = game.getPlayer(mPlayer.getId());
-        if (player.isEliminated() || player.isDummy()) return null;
+        if (player.isEliminated() || player.isDummy() || player.isNpc()) return null;
         if (game.isHasHadAStatusPhase() && !player.isRealPlayer()) return null;
         return game;
     }

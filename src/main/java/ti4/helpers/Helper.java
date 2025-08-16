@@ -280,6 +280,9 @@ public class Helper {
     }
 
     public static boolean canPlayerScorePOs(Game game, Player player) {
+        if (player.isNpc()) {
+            return false;
+        }
         if (player.hasAbility("nomadic")) {
             return true;
         }

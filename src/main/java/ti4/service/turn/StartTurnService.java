@@ -38,6 +38,7 @@ import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.WhisperService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -69,6 +70,19 @@ public class StartTurnService {
                 goingToPass = true;
             }
         }
+
+        if (player.isNpc()) {
+            boolean hadAnyUnplayedSCs = false;
+            for (Integer SC : player.getSCs()) {
+                if (!game.getPlayedSCs().contains(SC)) {
+                    hadAnyUnplayedSCs = true;
+                }
+            }
+            if (!hadAnyUnplayedSCs) {
+                goingToPass = true;
+            }
+        }
+
         String text = player.getRepresentationUnfogged() + ", it is now your turn (your "
                 + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
         Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
@@ -202,6 +216,16 @@ public class StartTurnService {
 
         if (goingToPass) {
             PassService.passPlayerForRound(event, game, player, true);
+        } else {
+            if (player.isNpc()) {
+
+                for (Integer SC : player.getSCs()) {
+                    if (!game.getPlayedSCs().contains(SC)) {
+                        PlayStrategyCardService.playSC(event, SC, game, game.getMainGameChannel(), player);
+                        return;
+                    }
+                }
+            }
         }
     }
 

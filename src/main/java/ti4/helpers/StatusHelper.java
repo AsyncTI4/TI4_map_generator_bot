@@ -33,6 +33,7 @@ import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.turn.StartTurnService;
+import ti4.settings.users.UserSettingsManager;
 
 public class StatusHelper {
 
@@ -220,12 +221,15 @@ public class StatusHelper {
                     count++;
                 }
             }
-            if (count > 0 && player.isRealPlayer()) {
+            var userSettings = UserSettingsManager.get(player.getUserID());
+            if (count > 0 && player.isRealPlayer() && !player.isNpc()) {
                 message3a = player.getRepresentation()
                         + ", as a reminder, the bot believes you are capable of scoring the following secret objective"
                         + (count == 1 ? "" : "s") + ":" + message3a;
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message3a);
-            } else if (player.getSo() == 0) {
+            } else if (player.getSo() == 0
+                    || player.isNpc()
+                    || userSettings.getSandbagPref().contains("bot")) {
                 String message = player.getRepresentation() + " has no secret objectives to score at this time.";
                 game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "None");
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
