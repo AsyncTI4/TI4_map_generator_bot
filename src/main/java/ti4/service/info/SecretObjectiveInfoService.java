@@ -81,7 +81,7 @@ public class SecretObjectiveInfoService {
         } else {
             for (Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
                 SecretObjectiveModel soModel = Mapper.getSecretObjective(so.getKey());
-                sb.append(index++)
+                sb.append(index)
                         .append("\\. ")
                         .append(CardEmojis.SecretObjectiveAlt)
                         .append(" _")
@@ -89,6 +89,7 @@ public class SecretObjectiveInfoService {
                         .append("_ `(")
                         .append(so.getValue())
                         .append(")`\n");
+                index++;
             }
         }
         sb.append("\n");
@@ -101,7 +102,7 @@ public class SecretObjectiveInfoService {
             } else {
                 for (Map.Entry<String, Integer> so : secretObjective.entrySet()) {
                     SecretObjectiveModel soModel = Mapper.getSecretObjective(so.getKey());
-                    sb.append(index++)
+                    sb.append(index)
                             .append("\\. ")
                             .append(CardEmojis.SecretObjectiveAlt)
                             .append(" _")
@@ -112,6 +113,7 @@ public class SecretObjectiveInfoService {
                             .append(Helper.leftpad("" + so.getValue(), 3))
                             .append(")`\n> ")
                             .append(soModel.getText());
+                    index++;
 
                     int threshold = ListPlayerInfoService.getObjectiveThreshold(so.getKey(), game);
                     if (threshold > 0) {

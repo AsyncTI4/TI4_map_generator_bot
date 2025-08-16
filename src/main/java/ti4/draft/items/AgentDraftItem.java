@@ -68,7 +68,7 @@ public class AgentDraftItem extends DraftItem {
             agents.removeIf(
                     (String leader) -> !"agent".equals(allLeaders.get(leader).getType()));
             for (String agent : agents) {
-                allItems.add(DraftItem.generate(Category.AGENT, agent));
+                allItems.add(generate(Category.AGENT, agent));
             }
         }
         return allItems;
@@ -92,7 +92,7 @@ public class AgentDraftItem extends DraftItem {
                 if (Arrays.asList(results).contains(agent)) {
                     continue;
                 }
-                allItems.add(DraftItem.generate(Category.AGENT, agent));
+                allItems.add(generate(Category.AGENT, agent));
             }
         }
         return allItems;

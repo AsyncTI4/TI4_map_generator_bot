@@ -10,7 +10,51 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.buttons.handlers.agenda.resolver.*;
+import ti4.buttons.handlers.agenda.resolver.AbolishmentAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.AbsolAbolishmentAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.AbsolArtifactAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.AbsolChecksAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.AbsolConstitutionAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.AbsolMeasuresAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.AbsolSeedsAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.AgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.ArmsReductionAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.ArticlesOfWarAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.ArtifactAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.ChecksAndBalancesFlagAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.ClandestineAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.ConstitutionAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.ConventionsAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.CrisisAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.DefenseActAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.DisarmamentAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.EconomicEqualityAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.ElectSecretAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.ExecutionDirectiveAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.GrantReallocationAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.IncentiveAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.MinisterAntiquitiesAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.MiscountMessageAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.MutinyAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.NexusAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.PlowsharesAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.PoliticalCensureAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.RearmamentAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.RedistributionAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.RegulationsAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.RepresentativeGovernmentAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.RevolutionFlagAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.SanctionsAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.SchematicsAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.SeedEmpireAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.SharedResearchAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.StandardizationAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.TravelBanAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.UnconventionalAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.VoiceOfTheCouncilLawAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.WarrantAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.WormholeReconAgendaResolver;
+import ti4.buttons.handlers.agenda.resolver.WormholeResearchAgendaResolver;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -86,7 +130,7 @@ class AgendaResolveButtonHandler {
         String agendaid = game.getCurrentAgendaInfo().split("_")[2];
         if (guardDoublePress(game, winner, agendaid)) return;
 
-        int aID = computeAgendaNumericId(game, agendaid, event);
+        int aID = computeAgendaNumericId(game, agendaid);
         String agID = getAgendaId(game, aID);
 
         // Pre-resolution
@@ -124,18 +168,18 @@ class AgendaResolveButtonHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static boolean guardDoublePress(Game game, String winner, String agendaid) {
+    private static boolean guardDoublePress(Game game, String winner, String agendaId) {
         String key = "agendaRes" + game.getRound() + game.getDiscardAgendas().size();
-        if (game.getStoredValue(key).equalsIgnoreCase(winner + agendaid)) {
+        if (game.getStoredValue(key).equalsIgnoreCase(winner + agendaId)) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "Double press suspected, stopping resolution here.");
             return true;
         }
-        game.setStoredValue(key, winner + agendaid);
+        game.setStoredValue(key, winner + agendaId);
         return false;
     }
 
-    private static int computeAgendaNumericId(Game game, String agendaid, ButtonInteractionEvent event) {
+    private static int computeAgendaNumericId(Game game, String agendaid) {
         if ("CL".equalsIgnoreCase(agendaid)) {
             String id2 = game.revealAgenda(false);
             Map<String, Integer> discardAgendas = game.getDiscardAgendas();
@@ -156,7 +200,7 @@ class AgendaResolveButtonHandler {
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
         for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
             Integer value = agendas.getValue();
-            if (value != null && value.equals(agendaNumericId)) {
+            if (Integer.valueOf(agendaNumericId).equals(value)) {
                 return agendas.getKey();
             }
         }
@@ -397,7 +441,7 @@ class AgendaResolveButtonHandler {
     private static void sendNextStepUi(
             Game game, ButtonInteractionEvent event, String resMes, String voteMessage, List<Button> buttons) {
         MessageHelper.sendMessageToChannel(event.getChannel(), resMes);
-        if (!game.getPhaseOfGame().equalsIgnoreCase("action")) {
+        if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, buttons);
         }
     }

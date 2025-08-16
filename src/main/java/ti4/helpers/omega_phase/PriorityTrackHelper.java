@@ -185,7 +185,7 @@ public class PriorityTrackHelper {
         }
 
         public static PriorityTrackMode parse(String value) {
-            for (PriorityTrackMode mode : PriorityTrackMode.values()) {
+            for (PriorityTrackMode mode : values()) {
                 if (mode.name().equalsIgnoreCase(value) || mode.description.equalsIgnoreCase(value)) {
                     return mode;
                 }

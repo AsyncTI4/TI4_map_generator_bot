@@ -2,6 +2,7 @@ package ti4.buttons;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -58,7 +59,7 @@ public class Buttons {
             green(Constants.REFRESH_PLANET_INFO, "Planet Info", PlanetEmojis.SemLor);
 
     public static final Button OFFER_PING_OPTIONS_BUTTON =
-            Buttons.gray("playerPref_personalPingInterval", "Personal Ping Interval");
+            gray("playerPref_personalPingInterval", "Personal Ping Interval");
 
     // Map buttons
     public static final Button REFRESH_CARDS_INFO = green("cardsInfo", "Cards Info");
@@ -116,7 +117,7 @@ public class Buttons {
                     || !game.checkAllTilesAreOfficial()
                     || game.getFactions().stream()
                             .map(Mapper::getFaction)
-                            .filter(java.util.Objects::nonNull)
+                            .filter(Objects::nonNull)
                             .anyMatch(faction -> !faction.getSource().isOfficial())) {
                 return false;
             }
@@ -261,10 +262,10 @@ public class Buttons {
         // Add navigation buttons if more than one page
         if (totalPages > 1) {
             if (currentPage > 1) {
-                persistentAndNav.add(Buttons.gray(pageButtonId + "_page" + (currentPage - 1), "Previous Page", "⏪"));
+                persistentAndNav.add(gray(pageButtonId + "_page" + (currentPage - 1), "Previous Page", "⏪"));
             }
             if (currentPage < totalPages) {
-                persistentAndNav.add(Buttons.gray(pageButtonId + "_page" + (currentPage + 1), "Next Page", "⏩"));
+                persistentAndNav.add(gray(pageButtonId + "_page" + (currentPage + 1), "Next Page", "⏩"));
             }
         }
         if (!persistentAndNav.isEmpty()) {

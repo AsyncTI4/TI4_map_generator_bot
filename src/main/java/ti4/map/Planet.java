@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -71,7 +70,7 @@ public class Planet extends UnitHolder {
                         .map(TechSpecialtyModel.TechSpecialty::toString)
                         .toList());
             }
-            if (!StringUtils.isBlank(planetInfo.getLegendaryAbilityName())) hasAbility = true;
+            if (!isBlank(planetInfo.getLegendaryAbilityName())) hasAbility = true;
         }
         resetOriginalPlanetResInf();
     }
@@ -313,7 +312,7 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public boolean isLegendary() {
         PlanetModel model = getPlanetModel();
-        if (getName().equalsIgnoreCase("ghoti")) {
+        if ("ghoti".equalsIgnoreCase(getName())) {
             return false;
         }
         if (model != null && model.isLegendary()) return true;

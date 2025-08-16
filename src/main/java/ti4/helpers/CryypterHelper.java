@@ -192,14 +192,14 @@ public class CryypterHelper {
         String[] fields = buttonID.split("_");
         Player mentakPlayer = game.getPlayerFromColorOrFaction(fields[1]);
         String choice = fields[2];
-        if (choice.equals("accept")) {
+        if ("accept".equals(choice)) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     player.getRepresentation()
                             + " has chosen to vote for the outcome indicated by "
                             + mentakPlayer.getRepresentation()
                             + ".");
-        } else if (choice.equals("PNdecline")) {
+        } else if ("PNdecline".equals(choice)) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     player.getRepresentation()
@@ -275,7 +275,7 @@ public class CryypterHelper {
     public static void resolveYssarilEnvoy(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String[] fields = buttonID.split("_");
         String choice = fields[1];
-        if (choice.equals("decline")) {
+        if ("decline".equals(choice)) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     player.getRepresentation() + " has chosen not to resolve the effect of the Yssaril Envoy.");
@@ -312,10 +312,10 @@ public class CryypterHelper {
     private static void votcRiderButtons(Player player, List<Button> buttons, boolean play) {
         for (Leader leader : player.getLeaders()) {
             LeaderModel leaderModel = leader.getLeaderModel().orElse(null);
-            if (!leader.isLocked() && leaderModel.getAbilityWindow() == "After an agenda is revealed:") {
+            if (!leader.isLocked() && "After an agenda is revealed:".equals(leaderModel.getAbilityWindow())) {
                 FactionModel factionModel = Mapper.getFaction(leaderModel.getFaction());
                 String buttonID = "";
-                if (leaderModel.getType() == "hero") {
+                if ("hero".equals(leaderModel.getType())) {
                     buttonID = "Keleres Xxcha Hero";
                 } else {
                     buttonID = factionModel.getShortName() + " Envoy";

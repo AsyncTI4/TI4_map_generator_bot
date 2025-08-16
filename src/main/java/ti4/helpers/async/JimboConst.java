@@ -49,14 +49,14 @@ public class JimboConst {
     public static final String metaSymmetryRemove = "jimbo_metaSymmetryRemove";
 
     // Tile separation
-    public static List<TileModel> blueTiles = null;
-    public static List<TileModel> redTiles = null;
-    public static List<TileModel> greenTiles = null;
-    public static List<TileModel> hyperlaneTiles = null;
-    public static Map<Integer, List<TileModel>> hyperlanesByRotation = null;
-    public static List<TileModel> draftTiles = null;
-    public static Map<Integer, List<TileModel>> draftTilesByNumber = null;
-    public static List<TileModel> otherTiles = null;
+    public static List<TileModel> blueTiles;
+    public static List<TileModel> redTiles;
+    public static List<TileModel> greenTiles;
+    public static List<TileModel> hyperlaneTiles;
+    public static Map<Integer, List<TileModel>> hyperlanesByRotation;
+    public static List<TileModel> draftTiles;
+    public static Map<Integer, List<TileModel>> draftTilesByNumber;
+    public static List<TileModel> otherTiles;
 
     public static String o() {
         List<String> candidates = new ArrayList<>();
@@ -164,16 +164,16 @@ public class JimboConst {
                 TileHelper.getAllTileModels().stream().sorted(comp).toList();
 
         blueTiles = allTilesSorted.stream()
-                .filter(t -> "0b".equals(t.getAlias()) || TileBack.BLUE.equals(t.getTileBack()))
+                .filter(t -> "0b".equals(t.getAlias()) || TileBack.BLUE == t.getTileBack())
                 .toList();
         redTiles = allTilesSorted.stream()
-                .filter(t -> "0r".equals(t.getAlias()) || TileBack.RED.equals(t.getTileBack()))
+                .filter(t -> "0r".equals(t.getAlias()) || TileBack.RED == t.getTileBack())
                 .toList();
         greenTiles = allTilesSorted.stream()
-                .filter(t -> "0g".equals(t.getAlias()) || TileBack.GREEN.equals(t.getTileBack()))
+                .filter(t -> "0g".equals(t.getAlias()) || TileBack.GREEN == t.getTileBack())
                 .toList();
         hyperlaneTiles = allTilesSorted.stream()
-                .filter(t -> t.getName() != null && t.getName().equalsIgnoreCase("hyperlane"))
+                .filter(t -> t.getName() != null && "hyperlane".equalsIgnoreCase(t.getName()))
                 .toList();
         draftTiles = allTilesSorted.stream().filter(TileHelper::isDraftTile).toList();
         otherTiles = new ArrayList<>();

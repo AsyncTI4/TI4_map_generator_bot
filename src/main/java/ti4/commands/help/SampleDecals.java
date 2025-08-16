@@ -48,7 +48,7 @@ class SampleDecals extends Subcommand {
         if (input != null
                 && !input.getAsString().equals(Constants.ALL)
                 && !input.getAsString().isEmpty()) {
-            if (input.getAsString().equals("Other")) {
+            if ("Other".equals(input.getAsString())) {
                 List<String> others = List.of("cb_10", "cb_11", "cb_52", "cb_81");
                 decals = decals.stream().filter(others::contains).collect(Collectors.toList());
             } else {

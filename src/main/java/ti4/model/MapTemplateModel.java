@@ -47,7 +47,7 @@ public class MapTemplateModel implements ModelInterface {
     }
 
     public String autoCompleteString() {
-        return getAlias() + ": " + getPlayerCount() + " player map by " + getAuthor();
+        return alias + ": " + playerCount + " player map by " + author;
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ public class MapTemplateModel implements ModelInterface {
     }
 
     public List<String> emulatedTiles() {
-        List<String> emulate = getSliceEmulateTiles();
+        List<String> emulate = sliceEmulateTiles;
         if (emulate == null || emulate.isEmpty()) {
             emulate = List.of("310", "311", "207", "309", "208", "104");
         }
@@ -77,7 +77,7 @@ public class MapTemplateModel implements ModelInterface {
     }
 
     public List<Point> tileDisplayCoords() {
-        List<String> emulate = getSliceEmulateTiles();
+        List<String> emulate = sliceEmulateTiles;
         if (emulate == null || emulate.isEmpty()) {
             emulate = List.of("310", "311", "207", "309", "208", "104");
         }
@@ -104,7 +104,7 @@ public class MapTemplateModel implements ModelInterface {
     }
 
     public int numRings() {
-        String highestPosition = getTemplateTiles().stream()
+        String highestPosition = templateTiles.stream()
                 .map(MapTemplateTile::getPos)
                 .filter(Helper::isInteger)
                 .max(Comparator.comparingInt(Integer::parseInt))

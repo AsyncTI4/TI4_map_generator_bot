@@ -363,7 +363,7 @@ public class MiltyDraftManager {
             MessageHelper.sendMessageToChannel(mainGameChannel, drafted);
         }
 
-        if (category.equals("faction") && item.contains("keleres")) {
+        if ("faction".equals(category) && item.contains("keleres")) {
             MiltyService.offerKeleresSetupButtons(this, player);
         }
 
@@ -451,7 +451,7 @@ public class MiltyDraftManager {
 
     public List<Button> getSliceButtons() {
         List<Button> sliceButtons = new ArrayList<>();
-        for (MiltyDraftSlice slice : getSlices()) {
+        for (MiltyDraftSlice slice : slices) {
             if (isSliceTaken(slice.getName())) continue;
             sliceButtons.add(Buttons.green(
                     "milty_slice_" + slice.getName(), " ", MiltyDraftEmojis.getMiltyDraftEmoji(slice.getName())));
@@ -461,7 +461,7 @@ public class MiltyDraftManager {
 
     public List<Button> getFactionButtons() {
         List<Button> factionButtons = new ArrayList<>();
-        for (String faction : getFactionDraft()) {
+        for (String faction : factionDraft) {
             FactionModel model = Mapper.getFaction(faction);
             if (model == null || isFactionTaken(faction)) continue;
 
@@ -483,11 +483,11 @@ public class MiltyDraftManager {
     }
 
     public String getOverallSummaryString(Game game) {
-        int padding = String.format("%s", getPlayers().size()).length() + 1;
+        int padding = String.format("%s", players.size()).length() + 1;
         String goodDogOfTheDay = TI4Emoji.getRandomGoodDog().toString();
         StringBuilder sb = new StringBuilder(SUMMARY_START);
         int pickNum = 1;
-        for (String p : getPlayers()) {
+        for (String p : players) {
             Player player = game.getPlayer(p);
             PlayerDraft picks = getPlayerDraft(p);
             sb.append("\n> `").append(Helper.leftpad(pickNum + ".", padding)).append("` ");
@@ -517,7 +517,7 @@ public class MiltyDraftManager {
             String playerStr = String.join(",", players);
             String picksStr = String.join(
                     ";", players.stream().map(p -> getPlayerDraft(p).save()).toList());
-            String templateStr = getMapTemplate();
+            String templateStr = mapTemplate;
 
             List<String> lesserSaves =
                     Arrays.asList(sliceStr, factionStr, playerStr, picksStr, /* messagesStr, */ templateStr);
