@@ -817,8 +817,10 @@ public class ButtonHelperModifyUnits {
                         buttons.add(Buttons.red(
                                 "removeThisTypeOfUnit_" + type.humanReadableName() + "_" + tile.getPosition() + "_"
                                         + uH.getName(),
-                                type.humanReadableName() + " from " + tile.getRepresentation() + " in "
-                                        + uH.getName()));
+                                type.humanReadableName() + " from " + tile.getRepresentation() + " "
+                                        + (uH.getName().equals("space")
+                                                ? "in Space"
+                                                : "on " + StringUtils.capitalize(uH.getName()))));
                     }
                 }
             }
@@ -866,8 +868,10 @@ public class ButtonHelperModifyUnits {
                         buttons.add(Buttons.red(
                                 "removeNCaptureThisTypeOfUnit_" + type.humanReadableName() + "_" + tile.getPosition()
                                         + "_" + uH.getName() + "_" + vuilraith.getColor(),
-                                type.humanReadableName() + " from " + tile.getRepresentation() + " in "
-                                        + uH.getName()));
+                                type.humanReadableName() + " from " + tile.getRepresentation() + " "
+                                        + (uH.getName().equals("space")
+                                                ? "in Space"
+                                                : "on " + StringUtils.capitalize(uH.getName()))));
                     }
                 }
             }
@@ -877,7 +881,8 @@ public class ButtonHelperModifyUnits {
     }
 
     @ButtonHandler("removeNCaptureThisTypeOfUnit_")
-    public static void removeThisTypeOfUnit(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+    public static void removeNCaptureThisTypeOfUnit(
+            String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String unit = buttonID.split("_")[1].toLowerCase().replace(" ", "").replace("'", "");
         String tilePos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(tilePos);
