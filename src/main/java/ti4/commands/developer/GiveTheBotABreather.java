@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
-import ti4.helpers.Constants;
 import ti4.executors.CircuitBreaker;
+import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
 class GiveTheBotABreather extends Subcommand {
@@ -21,7 +21,6 @@ class GiveTheBotABreather extends Subcommand {
     public void execute(SlashCommandInteractionEvent event) {
         int seconds = event.getOption(Constants.SECONDS, 10, OptionMapping::getAsInt);
         CircuitBreaker.openForSeconds(seconds);
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(), "Circuit breaker opened for " + seconds + " seconds.");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Circuit breaker opened for " + seconds + " seconds.");
     }
 }
