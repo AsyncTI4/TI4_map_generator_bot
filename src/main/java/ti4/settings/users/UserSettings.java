@@ -32,6 +32,7 @@ public class UserSettings {
     private int autoNoSaboInterval = 0;
     private String whisperPref = "No Preference";
     private String supportPref = "No Preference";
+    private String sandbagPref = "No Preference";
     private String winmakingPref = "No Preference";
     private String takebackPref = "No Preference";
     private String metaPref = "No Preference";

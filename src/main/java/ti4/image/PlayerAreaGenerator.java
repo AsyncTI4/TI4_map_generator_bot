@@ -550,6 +550,8 @@ public class PlayerAreaGenerator {
                     g2, "ELIMINATED", 0, 0, ColorUtil.EliminatedColor, stroke4, Color.BLACK);
         } else if (player.isDummy()) {
             DrawingUtil.superDrawStringCentered(g2, "DUMMY", 0, 0, ColorUtil.EliminatedColor, stroke4, Color.BLACK);
+        } else if (player.isNpc()) {
+            DrawingUtil.superDrawStringCentered(g2, "NPC", 0, 0, ColorUtil.EliminatedColor, stroke4, Color.BLACK);
         } else if (player.isPassed()) {
             DrawingUtil.superDrawStringCentered(g2, "PASSED", 0, 0, ColorUtil.PassedColor, stroke4, Color.BLACK);
         } else if (player.getUserID().equals(activePlayerID) && "action".equals(phase)) {

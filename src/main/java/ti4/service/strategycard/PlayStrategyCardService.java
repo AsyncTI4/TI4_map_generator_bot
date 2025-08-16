@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
+import ti4.buttons.UnfiledButtonHandlers;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -39,6 +40,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 
 @UtilityClass
@@ -206,6 +208,9 @@ public class PlayStrategyCardService {
                         game.getMainGameChannel(),
                         "## Friendly reminder that _Executive Sanctions_ is a law in play, and so the action card hand limit is 3 instead of 7.");
             }
+            if (player.isNpc()) {
+                UnfiledButtonHandlers.sc3AssignSpeaker(null, player, player.getFaction(), game);
+            }
         }
 
         // Handle Kyro Hero
@@ -371,6 +376,9 @@ public class PlayStrategyCardService {
                 }
             }
         }
+        if (player.isNpc()) {
+            EndTurnService.endTurnAndUpdateMap(event, game, player);
+        }
     }
 
     private static void sendAndHandleMessageResponse(
@@ -392,10 +400,20 @@ public class PlayStrategyCardService {
         if (!game.isFowMode()
                 && !game.getName().equalsIgnoreCase("pbd1000")
                 && !game.isHomebrewSCMode()
-                && scToPlay != 5
                 && !game.getName().equalsIgnoreCase("pbd100two")) {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
+                    continue;
+                }
+                if (p2.isNpc()) {
+                    Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
+                    if (reactionEmoji2 != null) {
+                        message.addReaction(reactionEmoji2).queue();
+                        p2.addFollowedSC(scToPlay, event);
+                    }
+                    continue;
+                }
+                if (scToPlay == 5) {
                     continue;
                 }
                 if (!player.ownsPromissoryNote("acq")

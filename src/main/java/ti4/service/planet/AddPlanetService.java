@@ -19,6 +19,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -174,13 +175,23 @@ public class AddPlanetService {
                             }
                         }
                     }
-                    if (Mapper.getPlanet(planet) != null
-                            && !"action_deck_2".equals(game.getAcDeckID())
-                            && !game.isACInDiscard("Reparations")) {
+                    if (Mapper.getPlanet(planet) != null) {
                         String msg = player_.getRepresentation()
-                                + " has a window to play _Reparations_ for the taking of "
-                                + Mapper.getPlanet(planet).getName() + ".";
+                                + " lost the planet of "
+                                + Mapper.getPlanet(planet).getName() + " (and could perhaps play _Reparations_).";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                        if (player_.getPlanetsAllianceMode().isEmpty()
+                                && ButtonHelper.getTilesOfPlayersSpecificUnits(
+                                                game, player, UnitType.Infantry, UnitType.Mech, UnitType.Spacedock)
+                                        .isEmpty()) {
+                            List<Button> buttons = new ArrayList<>();
+                            buttons.add(Buttons.red(
+                                    "eliminatePlayer_" + player_.getFaction(),
+                                    "Eliminate " + player_.getDisplayName()));
+                            msg = player_.getRepresentation()
+                                    + " the game thinks you ought to be eliminated. Press the button if this is accurate (anyone can press the button)";
+                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+                        }
                     }
                 }
             }

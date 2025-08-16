@@ -38,6 +38,7 @@ public class PlayerProperties {
     private boolean readyToPassBag;
     private boolean searchWarrant;
     private boolean dummy;
+    private boolean npc;
     private boolean autoPassOnWhensAfters;
     private boolean eliminated;
     private boolean fogInitialized;
