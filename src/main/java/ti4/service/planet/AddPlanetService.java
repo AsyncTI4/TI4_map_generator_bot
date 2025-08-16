@@ -188,7 +188,7 @@ public class AddPlanetService {
                                     "eliminatePlayer_" + player_.getFaction(),
                                     "Eliminate " + player_.getDisplayName()));
                             msg = player_.getRepresentation()
-                                    + " the game thinks you ought to be eliminated. Press the button if this is accurate (anyone can press the button)";
+                                    + ", the game believes that you ought to be eliminated. Press the button if this is accurate (anyone can press the button).";
                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
                         }
                     }

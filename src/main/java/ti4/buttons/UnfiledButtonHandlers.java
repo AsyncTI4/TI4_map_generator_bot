@@ -482,7 +482,7 @@ public class UnfiledButtonHandlers {
         userSettings.setSandbagPref(buttonID.split("_")[1]);
         UserSettingsManager.save(userSettings);
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Thank you for answering");
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Thank you for answering.");
     }
 
     @ButtonHandler("setAutoPassMedian_")

@@ -1400,7 +1400,7 @@ public class Helper {
             if (!game.getStoredValue("producedUnitCostFor" + player.getFaction())
                     .isEmpty()) {
                 int amount = Integer.parseInt(game.getStoredValue("producedUnitCostFor" + player.getFaction()));
-                msg.append(" (Previous build cost ").append(amount).append(" resources).");
+                msg.append(" (preceding build cost ").append(amount).append(" resources).");
                 if (amount > res) {
                     msg.append("\n### WARNING: Have not spent enough resources yet.");
                 }

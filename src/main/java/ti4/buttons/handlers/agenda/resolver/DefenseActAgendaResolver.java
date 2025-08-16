@@ -22,12 +22,12 @@ public class DefenseActAgendaResolver implements AgendaResolver {
                         .isEmpty()) {
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCorrectChannel(),
-                            player.getRepresentation() + " remove 1 PDS",
+                            player.getRepresentation() + ", please destroy 1 of your PDS.",
                             ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "pds"));
                 }
             }
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Sent buttons for each player to remove 1 PDS.");
+                    game.getMainGameChannel(), "Sent buttons for each player to destroy 1 PDS.");
         }
     }
 }
