@@ -3,7 +3,6 @@ package ti4.service.strategycard;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
