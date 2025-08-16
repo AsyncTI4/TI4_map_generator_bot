@@ -25,7 +25,7 @@ public class CacheStatsToStringConverter {
                 .collect(Collectors.joining("\n\n"));
     }
 
-    public static String convert(String name, Cache<?, ?> cache) {
+    private static String convert(String name, Cache<?, ?> cache) {
         CacheStats stats = cache.stats();
         return ToStringHelper.of(name)
                 .add("liveTime", getLiveTime())

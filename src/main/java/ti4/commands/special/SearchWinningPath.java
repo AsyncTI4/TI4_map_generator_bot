@@ -1,7 +1,6 @@
 package ti4.commands.special;
 
 import java.util.HashSet;
-import java.util.Set;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -10,6 +9,7 @@ import ti4.commands.Subcommand;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.PatternHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GamesPage;
@@ -18,7 +18,7 @@ import ti4.service.statistics.game.WinningPathHelper;
 
 class SearchWinningPath extends Subcommand {
 
-    public SearchWinningPath() {
+    SearchWinningPath() {
         super(Constants.SEARCH_WINNING_PATH, "List games with the provided winning path");
         addOptions(new OptionData(OptionType.STRING, Constants.WINNING_PATH, "Winning path to search for")
                 .setRequired(true));
@@ -29,7 +29,7 @@ class SearchWinningPath extends Subcommand {
     public void execute(SlashCommandInteractionEvent event) {
         String searchedPath = event.getOption(Constants.WINNING_PATH, OptionMapping::getAsString);
 
-        Set<String> foundGames = new HashSet<>();
+        var foundGames = new HashSet<String>();
         StringBuilder sb = new StringBuilder("__**Games with Winning Path:**__ ")
                 .append(searchedPath)
                 .append("\n");
@@ -51,8 +51,9 @@ class SearchWinningPath extends Subcommand {
     }
 
     private static boolean hasWinningPath(Game game, Player winner, String searchedPath) {
-        return WinningPathHelper.buildWinningPath(game, winner)
-                .replaceAll("_", "") // needed due to Support for the Throne being italicized
+        return PatternHelper.UNDERSCORE_PATTERN
+                .matcher(WinningPathHelper.buildWinningPath(game, winner))
+                .replaceAll("") // needed due to Support for the Throne being italicized
                 .contains(searchedPath);
     }
 

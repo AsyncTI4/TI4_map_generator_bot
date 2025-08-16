@@ -48,9 +48,9 @@ public class InteractionLogCron {
 
     @SneakyThrows // The exceptions in this method are a result of getting abstract class methods, which are required to
     // be defined by the nature of an abstract class
-    public static void logInteractions() {
+    private static void logInteractions() {
         // Build event -> combined message map
-        HashMap<Class<?>, StringBuilder> messageBuilders = new HashMap<>();
+        Map<Class<?>, StringBuilder> messageBuilders = new HashMap<>();
         for (Class<?> logType : BotLogger.AbstractEventLog.class.getDeclaredClasses()) {
             messageBuilders.put(logType, new StringBuilder());
         }
@@ -80,10 +80,8 @@ public class InteractionLogCron {
                     ThreadGetter.getThreadInChannel(
                             primaryBotLogChannel,
                             (String) entry.getKey().getMethod("getThreadName").invoke(null),
-                            (threadChannel) -> {
-                                MessageHelper.sendMessageToChannel(
-                                        threadChannel, entry.getValue().toString());
-                            });
+                            (threadChannel) -> MessageHelper.sendMessageToChannel(
+                                    threadChannel, entry.getValue().toString()));
                 } catch (Exception e) {
                     BotLogger.error(
                             "Failed to send a message via ThreadGetter in InteractionLogCron (this should not happen)",

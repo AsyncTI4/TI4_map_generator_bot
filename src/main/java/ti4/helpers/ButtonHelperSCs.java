@@ -150,8 +150,8 @@ public class ButtonHelperSCs {
         String decision = buttonID.split("_")[2];
         List<Button> scButtons = new ArrayList<>();
         scButtons.add(Buttons.gray("getPreDeclineSCButtons_" + sc, "Undo Decision"));
-        String msg = "";
-        if (decision.equalsIgnoreCase("no")) {
+        String msg;
+        if ("no".equalsIgnoreCase(decision)) {
             msg = "Deciding later for **"
                     + game.getStrategyCardModelByInitiative(Integer.parseInt(sc))
                             .get()
@@ -455,7 +455,7 @@ public class ButtonHelperSCs {
         event.getMessage().delete().queue();
     }
 
-    public static List<Button> getAnarchy7Buttons(Game game, Player player) {
+    private static List<Button> getAnarchy7Buttons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : ButtonHelper.getTilesOfUnitsWithProduction(player, game)) {
             buttons.add(Buttons.green(
@@ -464,7 +464,7 @@ public class ButtonHelperSCs {
         return buttons;
     }
 
-    public static List<Button> getLumi7Buttons(Game game, Player player) {
+    private static List<Button> getLumi7Buttons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : ButtonHelper.getTilesOfUnitsWithProduction(player, game)) {
             buttons.add(
@@ -473,7 +473,7 @@ public class ButtonHelperSCs {
         return buttons;
     }
 
-    public static List<Button> getAnarchy3SecondaryButtons(Game game) {
+    private static List<Button> getAnarchy3SecondaryButtons(Game game) {
         List<Button> scButtons = new ArrayList<>();
         if (!Helper.getRemainingSCs(game).contains(1)
                 || (game.getScPlayed().get(1) != null && game.getScPlayed().get(1))) {
@@ -573,10 +573,9 @@ public class ButtonHelperSCs {
         event.getMessage().delete().queue();
     }
 
-    public static List<Button> getAnarchy2ReadyComponentButtons(Game game, Player player) {
+    private static List<Button> getAnarchy2ReadyComponentButtons(Game game, Player player) {
 
-        List<Button> buttons = new ArrayList<>();
-        buttons.addAll(ButtonHelper.getAllTechsToReady(player));
+        List<Button> buttons = new ArrayList<>(ButtonHelper.getAllTechsToReady(player));
         for (Player p2 : game.getRealPlayers()) {
             for (String leader : p2.getLeaderIDs()) {
                 if (!p2.hasUnexhaustedLeader(leader)) {
@@ -599,14 +598,14 @@ public class ButtonHelperSCs {
 
     @ButtonHandler("anarchy2secondary")
     public static void secondaryOfAnarchy2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = ButtonHelperSCs.getAnarchy2ReadyComponentButtons(game, player);
+        List<Button> buttons = getAnarchy2ReadyComponentButtons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation(true, true) + ", use the buttons to ready something.",
                 buttons);
     }
 
-    public static List<Button> getAnarchy1PrimaryButtons(Game game) {
+    private static List<Button> getAnarchy1PrimaryButtons(Game game) {
         List<Button> scButtons = new ArrayList<>();
         Button followButton = Buttons.green("sc_follow_12", "Spend A Strategy Token");
         scButtons.add(followButton);
@@ -662,7 +661,7 @@ public class ButtonHelperSCs {
 
     @ButtonHandler("primaryOfAnarchy1")
     public static void primaryOfAnarchy1(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = ButtonHelperSCs.getAnarchy1PrimaryButtons(game);
+        List<Button> buttons = getAnarchy1PrimaryButtons(game);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation(true, true)
@@ -672,7 +671,7 @@ public class ButtonHelperSCs {
 
     @ButtonHandler("anarchy3secondary")
     public static void anarchy3secondary(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = ButtonHelperSCs.getAnarchy3SecondaryButtons(game);
+        List<Button> buttons = getAnarchy3SecondaryButtons(game);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation(true, true) + ", use the buttons to resolve the secondary.",
@@ -681,7 +680,7 @@ public class ButtonHelperSCs {
 
     @ButtonHandler("primaryOfAnarchy7")
     public static void primaryOfAnarchy7(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = ButtonHelperSCs.getAnarchy7Buttons(game, player);
+        List<Button> buttons = getAnarchy7Buttons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation(true, true) + ", use the buttons to build in the desired system.",
@@ -690,7 +689,7 @@ public class ButtonHelperSCs {
 
     @ButtonHandler("primaryOfLumi7")
     public static void primaryOfLumi7(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = ButtonHelperSCs.getLumi7Buttons(game, player);
+        List<Button> buttons = getLumi7Buttons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation(true, true) + ", use the buttons to build in the desired system.",
@@ -786,7 +785,7 @@ public class ButtonHelperSCs {
         }
         ReactionService.addReaction(event, game, player);
         String unit = buttonID.replace("construction_", "");
-        if (unit.equalsIgnoreCase("facility")) {
+        if ("facility".equalsIgnoreCase(unit)) {
             String message = player.getRepresentationUnfogged() + ", please choose the facility you wish to place.";
             if (!player.getSCs().contains(4)) {
                 message += "\n## __It will place a command token in the system as well.__ ";
@@ -839,7 +838,7 @@ public class ButtonHelperSCs {
         MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
     }
 
-    public static List<Button> getPossibleFacilities(Game game, Player player) {
+    private static List<Button> getPossibleFacilities(Game game, Player player) {
         List<Button> facilities = new ArrayList<>();
         List<String> usedFacilities = findUsedFacilities(game, player);
         String facilityID = "facilitycorefactory";
@@ -896,7 +895,7 @@ public class ButtonHelperSCs {
         return facilities;
     }
 
-    public static List<String> findUsablePlanetsForFacility(Game game, Player player, String facility) {
+    private static List<String> findUsablePlanetsForFacility(Game game, Player player, String facility) {
         List<String> planets = new ArrayList<>();
         for (String planet : player.getPlanetsAllianceMode()) {
             Planet uH = game.getUnitHolderFromPlanet(planet);
@@ -912,7 +911,7 @@ public class ButtonHelperSCs {
                         && !facility.contains("embassy")
                         && !facility.contains("naval")) {
                     planets.add(planet);
-                } else if (planet.equalsIgnoreCase("mr")
+                } else if ("mr".equalsIgnoreCase(planet)
                         && !facility.contains("research")
                         && !facility.contains("logistics")) {
                     planets.add(planet);
@@ -950,8 +949,7 @@ public class ButtonHelperSCs {
         for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, true, true)) {
             Tile tile2 = game.getTileByPosition(pos);
             for (UnitHolder uH : tile2.getPlanetUnitHolders()) {
-                Set<String> tokens = new HashSet<>();
-                tokens.addAll(uH.getTokenList());
+                Set<String> tokens = new HashSet<>(uH.getTokenList());
                 for (String token : tokens) {
                     if (token.contains("facilityembassy")) {
                         uH.removeToken(token);

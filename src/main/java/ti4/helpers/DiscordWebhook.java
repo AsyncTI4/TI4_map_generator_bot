@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -170,7 +171,7 @@ public class DiscordWebhook {
         connection.setRequestMethod("POST");
 
         OutputStream stream = connection.getOutputStream();
-        stream.write(json.toString().getBytes());
+        stream.write(json.toString().getBytes(StandardCharsets.UTF_8));
         stream.flush();
         stream.close();
 
@@ -190,39 +191,39 @@ public class DiscordWebhook {
         private Author author;
         private final List<Field> fields = new ArrayList<>();
 
-        public String getTitle() {
+        String getTitle() {
             return title;
         }
 
-        public String getDescription() {
+        String getDescription() {
             return description;
         }
 
-        public String getUrl() {
+        String getUrl() {
             return url;
         }
 
-        public Color getColor() {
+        Color getColor() {
             return color;
         }
 
-        public Footer getFooter() {
+        Footer getFooter() {
             return footer;
         }
 
-        public Thumbnail getThumbnail() {
+        Thumbnail getThumbnail() {
             return thumbnail;
         }
 
-        public Image getImage() {
+        Image getImage() {
             return image;
         }
 
-        public Author getAuthor() {
+        Author getAuthor() {
             return author;
         }
 
-        public List<Field> getFields() {
+        List<Field> getFields() {
             return fields;
         }
 
@@ -320,7 +321,8 @@ public class DiscordWebhook {
                     builder.append("]");
                 }
 
-                builder.append(++i == entrySet.size() ? "}" : ",");
+                ++i;
+                builder.append(i == entrySet.size() ? "}" : ",");
             }
 
             return builder.toString().replace("\n", "\\n");

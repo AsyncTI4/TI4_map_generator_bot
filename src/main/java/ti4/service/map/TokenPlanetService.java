@@ -28,14 +28,12 @@ public class TokenPlanetService {
         return TokenPlanets.mirage.name();
     }
 
-    public static boolean isTokenPlanet(String tokenOrPlanetName) {
+    private static boolean isTokenPlanet(String tokenOrPlanetName) {
         if (tokenOrPlanetName == null || tokenOrPlanetName.isBlank()) return false;
         if (Constants.TOKEN_PLANETS.contains(tokenOrPlanetName)) return true;
 
         TokenModel token = Mapper.getToken(tokenOrPlanetName);
-        if (token.getTokenPlanetName() != null && Constants.TOKEN_PLANETS.contains(token.getTokenPlanetName()))
-            return true;
-        return false;
+        return token.getTokenPlanetName() != null && Constants.TOKEN_PLANETS.contains(token.getTokenPlanetName());
     }
 
     public static void moveTokenPlanet(Game game, Player player, Tile destination, String planetName) {

@@ -79,20 +79,20 @@ public class AsyncTI4DiscordBot {
     public static final List<Role> bothelperRoles = new ArrayList<>();
 
     public static JDA jda;
-    public static String userID;
+    private static String userID;
     public static String guildPrimaryID;
-    public static boolean testingMode = false;
+    public static boolean testingMode;
     public static Guild guildPrimary;
-    public static Guild guildSecondary;
-    public static Guild guildTertiary;
-    public static Guild guildQuaternary;
-    public static Guild guildQuinary;
-    public static Guild guildSenary;
-    public static Guild guildSeptenary;
-    public static Guild guildOctonary;
+    private static Guild guildSecondary;
+    private static Guild guildTertiary;
+    private static Guild guildQuaternary;
+    private static Guild guildQuinary;
+    private static Guild guildSenary;
+    private static Guild guildSeptenary;
+    private static Guild guildOctonary;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
-    public static Guild guildMegagame;
+    private static Guild guildMegagame;
     public static final Set<Guild> guilds = new HashSet<>();
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new LinkedList<>();
@@ -287,7 +287,7 @@ public class AsyncTI4DiscordBot {
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
-        AsyncTI4DiscordBot.jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
+        jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
         updatePresence();
         BotLogger.info("FINISHED LOADING GAMES");
 
@@ -370,7 +370,7 @@ public class AsyncTI4DiscordBot {
 
     public static void updatePresence() {
         long activeGames = GameManager.getActiveGameCount();
-        AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(activeGames + " games of Async TI4"));
+        jda.getPresence().setActivity(Activity.playing(activeGames + " games of Async TI4"));
     }
 
     /**
@@ -495,6 +495,6 @@ public class AsyncTI4DiscordBot {
     }
 
     public static boolean isValidGuild(String guildId) {
-        return AsyncTI4DiscordBot.guilds.stream().anyMatch(g -> g.getId().equals(guildId));
+        return guilds.stream().anyMatch(g -> g.getId().equals(guildId));
     }
 }

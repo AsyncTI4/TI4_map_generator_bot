@@ -34,7 +34,7 @@ public class PlayerStatsDashboardPayload {
 
     public PlayerStatsDashboardPayload(Player player) {
         this.player = player;
-        this.game = player.getGame();
+        game = player.getGame();
     }
 
     @JsonIgnore
@@ -73,7 +73,7 @@ public class PlayerStatsDashboardPayload {
                 .toList();
     }
 
-    public String getColor() {
+    private String getColor() {
         return player.getColor();
     }
 
@@ -246,13 +246,13 @@ public class PlayerStatsDashboardPayload {
                 .flatMap(Collection::stream)
                 .map(String::toLowerCase)
                 .forEach(speciality -> {
-                    if (speciality.equalsIgnoreCase("propulsion")) {
+                    if ("propulsion".equalsIgnoreCase(speciality)) {
                         blueCount.getAndIncrement();
-                    } else if (speciality.equalsIgnoreCase("cybernetic")) {
+                    } else if ("cybernetic".equalsIgnoreCase(speciality)) {
                         yellowCount.getAndIncrement();
-                    } else if (speciality.equalsIgnoreCase("biotic")) {
+                    } else if ("biotic".equalsIgnoreCase(speciality)) {
                         greenCount.getAndIncrement();
-                    } else if (speciality.equalsIgnoreCase("warfare")) {
+                    } else if ("warfare".equalsIgnoreCase(speciality)) {
                         redCount.getAndIncrement();
                     }
                 });

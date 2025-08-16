@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,7 +12,7 @@ public class Constants {
     public static final String tspId = "150809002974904321";
     public static final String jazzId = "228999251328368640";
     public static final String prisonerOneId = "481860200169472030";
-    public static final String bltId = "757405214398480486";
+    private static final String bltId = "757405214398480486";
     public static final String gedsDeadId = "586504147746947090";
     public static final String sigmaId = "214326507458396161";
     public static final String bambamId = "487030345812672523";
@@ -175,20 +175,20 @@ public class Constants {
 
     public static final String ALPHA = "alpha";
     public static final String BETA = "beta";
-    public static String GAMMA = "gamma";
+    public static final String GAMMA = "gamma";
     public static final String DELTA = "delta";
-    public static String EPSILON = "whepsilon";
-    public static String NARROWS = "whnarrows";
-    public static String PROBABILITY = "whprobability";
-    public static String CHAMPION = "whchampion";
-    public static String VOYAGE = "whvoyage";
-    public static String ZETA = "whzeta";
-    public static String ETA = "wheta";
-    public static String CUSTOM_ERONOUS_WHEPSILON = "custom_eronous_whepsilon";
-    public static String CUSTOM_ERONOUS_WHETA = "custom_eronous_wheta";
-    public static String CUSTOM_ERONOUS_WHIOTA = "custom_eronous_whiota";
-    public static String CUSTOM_ERONOUS_WHTHETA = "custom_eronous_whtheta";
-    public static String CUSTOM_ERONOUS_WHZETA = "custom_eronous_whzeta";
+    public static final String EPSILON = "whepsilon";
+    public static final String NARROWS = "whnarrows";
+    public static final String PROBABILITY = "whprobability";
+    public static final String CHAMPION = "whchampion";
+    public static final String VOYAGE = "whvoyage";
+    public static final String ZETA = "whzeta";
+    public static final String ETA = "wheta";
+    public static final String CUSTOM_ERONOUS_WHEPSILON = "custom_eronous_whepsilon";
+    public static final String CUSTOM_ERONOUS_WHETA = "custom_eronous_wheta";
+    public static final String CUSTOM_ERONOUS_WHIOTA = "custom_eronous_whiota";
+    public static final String CUSTOM_ERONOUS_WHTHETA = "custom_eronous_whtheta";
+    public static final String CUSTOM_ERONOUS_WHZETA = "custom_eronous_whzeta";
 
     public static final String DRAW_SPECIFIC_SO_FOR_PLAYER = "draw_specific_so_for_player";
     public static final String DRAW_SPECIFIC_SO = "draw_specific_so";
@@ -364,10 +364,10 @@ public class Constants {
 
     // Token planets: planets which are tokens placed on the tile
     public static final String MIRAGE = "mirage";
-    public static final String OASIS = "oasis";
-    public static final String CRADLE = "cradle";
-    public static final String ILLUSION = "illusion";
-    public static final String PHANTASM = "phantasm";
+    private static final String OASIS = "oasis";
+    private static final String CRADLE = "cradle";
+    private static final String ILLUSION = "illusion";
+    private static final String PHANTASM = "phantasm";
     public static final List<String> TOKEN_PLANETS = List.of(MIRAGE, OASIS, CRADLE, ILLUSION, PHANTASM);
 
     public static final String FRONTIER = "frontier";
@@ -671,6 +671,7 @@ public class Constants {
     public static final String SC6 = "6th_choice";
     public static final String STRAT_PINGS = "strat_pings";
     public static final String DUMMY = "dummy";
+    public static final String NPC = "npc";
 
     public static final String NUMBER_OF_TURNS = "number_of_turns";
     public static final String TOTAL_TURN_TIME = "total_turn_time";
@@ -915,7 +916,7 @@ public class Constants {
     public static final String COMMANDER = "commander";
     public static final String HERO = "hero";
     public static final String ENVOY = "envoy";
-    public static final List<String> leaderList = new ArrayList<>();
+    private static final List<String> leaderList = new ArrayList<>();
 
     static {
         leaderList.add(AGENT);
@@ -1064,8 +1065,8 @@ public class Constants {
 
     public static final String VERBOSITY = "verbosity";
     public static final String VERBOSITY_VERBOSE = "verbose";
-    public static final String VERBOSITY_AVERAGE = "average";
-    public static final String VERBOSITY_MINIMAL = "minimal";
+    private static final String VERBOSITY_AVERAGE = "average";
+    private static final String VERBOSITY_MINIMAL = "minimal";
     public static final List<String> VERBOSITY_OPTIONS = new ArrayList<>();
 
     static {

@@ -74,9 +74,10 @@ public class StrategyCardManager {
         }
 
         if (!game.islandMode()) {
-            for (Integer scNumber : strategyCardToTradeGoodCount.keySet()) {
+            for (Map.Entry<Integer, Integer> entry : strategyCardToTradeGoodCount.entrySet()) {
+                Integer scNumber = entry.getKey();
                 if (!pickedStrategyCards.contains(scNumber) && scNumber != 0) {
-                    Integer tgCount = strategyCardToTradeGoodCount.get(scNumber);
+                    Integer tgCount = entry.getValue();
                     tgCount = tgCount == null ? 1 : tgCount + 1;
                     setTradeGoodCount(scNumber, tgCount);
                 }

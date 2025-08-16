@@ -75,6 +75,10 @@ public class MessageHelper {
         splitAndSent(messageText, channel);
     }
 
+    public static void sendMessageToChannel(MessageChannel channel, String messageText, List<Button> buttons) {
+        sendMessageToChannelWithButtons(channel, messageText, buttons);
+    }
+
     public static void sendMessageToEventChannel(GenericInteractionCreateEvent event, String messageText) {
         sendMessageToChannel(event.getMessageChannel(), messageText);
     }
@@ -108,7 +112,7 @@ public class MessageHelper {
 
     public static void sendMessageToEventChannelWithEphemeralButtons(
             ButtonInteractionEvent event, String message, List<Button> buttons) {
-        List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(message, buttons);
+        List<MessageCreateData> messageList = getMessageCreateDataObjects(message, buttons);
         for (MessageCreateData messageD : messageList) {
             event.getHook().setEphemeral(true).sendMessage(messageD).queue();
         }
@@ -184,7 +188,7 @@ public class MessageHelper {
         sendMessageToChannelWithFactionReact(channel, messageText, game, player, buttons, false);
     }
 
-    public static void sendMessageToChannelWithFactionReact(
+    private static void sendMessageToChannelWithFactionReact(
             MessageChannel channel,
             String messageText,
             Game game,
@@ -344,7 +348,7 @@ public class MessageHelper {
             BotLogger.error("FileUpload null");
             return;
         }
-        final List<Button> realButtons = new ArrayList<>();
+        List<Button> realButtons = new ArrayList<>();
         channel.sendFiles(fileUpload)
                 .queue(
                         msg -> {
@@ -383,7 +387,7 @@ public class MessageHelper {
         editMessageWithButtonsAndFiles(event, message, buttons, Collections.emptyList());
     }
 
-    public static void editMessageWithButtonsAndFiles(
+    private static void editMessageWithButtonsAndFiles(
             ButtonInteractionEvent event, String message, List<Button> buttons, List<FileUpload> files) {
         editMessageWithActionRowsAndFiles(event, message, ActionRow.partitionOf(buttons), files);
     }
@@ -400,7 +404,7 @@ public class MessageHelper {
                 .queue();
     }
 
-    public static void replyToMessage(
+    private static void replyToMessage(
             GenericInteractionCreateEvent event,
             FileUpload fileUpload,
             boolean forceShowMap,
@@ -513,7 +517,7 @@ public class MessageHelper {
             }
         }
 
-        final String finalMessageText = messageText;
+        String finalMessageText = messageText;
         List<MessageCreateData> objects = getMessageCreateDataObjects(finalMessageText, sanitizedEmbeds, buttons);
         Iterator<MessageCreateData> iterator = objects.iterator();
         while (iterator.hasNext()) {
@@ -684,7 +688,7 @@ public class MessageHelper {
         return privatelyPingPlayerList(players, game, null, message, null, null);
     }
 
-    public static boolean privatelyPingPlayerList(
+    private static boolean privatelyPingPlayerList(
             List<Player> players,
             Game game,
             MessageChannel feedbackChannel,
@@ -709,11 +713,11 @@ public class MessageHelper {
         sendMessageToUser(messageText, user, null);
     }
 
-    public static void sendMessageToUser(String messageText, User user, @Nullable MessageChannel failureChannel) {
+    private static void sendMessageToUser(String messageText, User user, @Nullable MessageChannel failureChannel) {
         sendMessageToUser(messageText, user, failureChannel, null);
     }
 
-    public static void sendMessageToUser(
+    private static void sendMessageToUser(
             String messageText, User user, @Nullable MessageChannel failureChannel, @Nullable String failText) {
         if (user == null) {
             return;
@@ -756,7 +760,7 @@ public class MessageHelper {
         int index = 0;
         while (index < messageLength) {
             String nextChars = messageText.substring(index, Math.min(index + maxLength, messageLength));
-            int lastNewLineIndex = nextChars.lastIndexOf("\n") + 1; // number of chars until right after the last \n
+            int lastNewLineIndex = nextChars.lastIndexOf('\n') + 1; // number of chars until right after the last \n
             String textToAdd;
             if (lastNewLineIndex > 0) {
                 textToAdd = nextChars.substring(0, lastNewLineIndex);
@@ -790,7 +794,7 @@ public class MessageHelper {
      * }
      * </pre>
      */
-    public static List<MessageCreateData> getMessageCreateDataObjects(
+    private static List<MessageCreateData> getMessageCreateDataObjects(
             String message, List<MessageEmbed> embeds, List<Button> buttons) {
         List<MessageCreateData> messageCreateDataList = new ArrayList<>();
 
@@ -863,7 +867,7 @@ public class MessageHelper {
                 continue;
             }
             StringBuilder error = new StringBuilder("MessageCreateData is invalid for arguments: \n");
-            int cutoff = message.indexOf("\n");
+            int cutoff = message.indexOf('\n');
             error.append("> Message: ")
                     .append(cutoff == -1 ? message : message.substring(0, cutoff))
                     .append("...\n");
@@ -881,7 +885,7 @@ public class MessageHelper {
         return getMessageCreateDataObjects(message, null, buttons);
     }
 
-    public static List<List<ActionRow>> getPartitionedButtonLists(List<Button> buttons) {
+    private static List<List<ActionRow>> getPartitionedButtonLists(List<Button> buttons) {
         List<List<ActionRow>> partitionedButtonRows = new ArrayList<>();
         try {
             buttons.removeIf(Objects::isNull);
@@ -1080,8 +1084,8 @@ public class MessageHelper {
             StringBuilder edited = new StringBuilder(message);
             StringBuilder copy = new StringBuilder(message.toLowerCase());
             for (String keyWord : AliasHandler.getInjectedRules()) {
-                if (keyWord.equals("bombardment") && message.contains("Tactical Bombardment")) continue;
-                if (keyWord.equals("production") && message.contains("Monopolize Production")) continue;
+                if ("bombardment".equals(keyWord) && message.contains("Tactical Bombardment")) continue;
+                if ("production".equals(keyWord) && message.contains("Monopolize Production")) continue;
                 if (copy.indexOf(keyWord) > -1) {
                     String replace = "](https://www.tirules.com/" + AliasHandler.getInjectedRule(keyWord) + ")";
                     int firstIndex = copy.indexOf(keyWord);

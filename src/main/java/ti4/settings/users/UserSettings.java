@@ -27,11 +27,12 @@ public class UserSettings {
     private boolean hasAnsweredSurvey;
     private boolean prefersSarweenMsg = true;
     private boolean prefersPillageMsg = true;
-    private boolean prefersPassOnWhensAfters = false;
+    private boolean prefersPassOnWhensAfters;
     private boolean prefersPrePassOnSC = true;
-    private int autoNoSaboInterval = 0;
+    private int autoNoSaboInterval;
     private String whisperPref = "No Preference";
     private String supportPref = "No Preference";
+    private String sandbagPref = "No Preference";
     private String winmakingPref = "No Preference";
     private String takebackPref = "No Preference";
     private String metaPref = "No Preference";

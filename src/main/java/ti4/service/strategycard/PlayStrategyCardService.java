@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
+import ti4.buttons.UnfiledButtonHandlers;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -39,6 +40,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 
 @UtilityClass
@@ -124,7 +126,7 @@ public class PlayStrategyCardService {
         StringBuilder gamePing = new StringBuilder(game.getPing());
         List<Player> playersToFollow = game.getRealPlayers();
         if (!"All".equals(scModel.getGroup().orElse(""))
-                && (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two"))) {
+                && ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName()))) {
             playersToFollow = new ArrayList<>();
             String num = scToPlay + "";
             num = num.substring(num.length() - 1);
@@ -133,7 +135,7 @@ public class PlayStrategyCardService {
                 for (Integer sc : p2.getSCs()) {
                     String num2 = sc + "";
                     num2 = num2.substring(num2.length() - 1);
-                    if (num2.equalsIgnoreCase(num) || num.equalsIgnoreCase("0") || num2.equalsIgnoreCase("0")) {
+                    if (num2.equalsIgnoreCase(num) || "0".equalsIgnoreCase(num) || "0".equalsIgnoreCase(num2)) {
                         gamePing.append(p2.getRepresentation()).append(" ");
                         playersToFollow.add(p2);
                     }
@@ -205,6 +207,9 @@ public class PlayStrategyCardService {
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(),
                         "## Friendly reminder that _Executive Sanctions_ is a law in play, and so the action card hand limit is 3 instead of 7.");
+            }
+            if (player.isNpc()) {
+                UnfiledButtonHandlers.sc3AssignSpeaker(null, player, player.getFaction(), game);
             }
         }
 
@@ -371,6 +376,9 @@ public class PlayStrategyCardService {
                 }
             }
         }
+        if (player.isNpc()) {
+            EndTurnService.endTurnAndUpdateMap(event, game, player);
+        }
     }
 
     private static void sendAndHandleMessageResponse(
@@ -390,12 +398,22 @@ public class PlayStrategyCardService {
             player.addFollowedSC(scToPlay, event);
         }
         if (!game.isFowMode()
-                && !game.getName().equalsIgnoreCase("pbd1000")
+                && !"pbd1000".equalsIgnoreCase(game.getName())
                 && !game.isHomebrewSCMode()
-                && scToPlay != 5
-                && !game.getName().equalsIgnoreCase("pbd100two")) {
+                && !"pbd100two".equalsIgnoreCase(game.getName())) {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
+                    continue;
+                }
+                if (p2.isNpc()) {
+                    Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
+                    if (reactionEmoji2 != null) {
+                        message.addReaction(reactionEmoji2).queue();
+                        p2.addFollowedSC(scToPlay, event);
+                    }
+                    continue;
+                }
+                if (scToPlay == 5) {
                     continue;
                 }
                 if (!player.ownsPromissoryNote("acq")
@@ -435,7 +453,7 @@ public class PlayStrategyCardService {
                         Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                         if (reactionEmoji2 != null) {
                             message.addReaction(reactionEmoji2).queue();
-                            p2.addFollowedSC(scToPlay, event);
+                            p2.addFollowedSC(6, event);
                             MessageHelper.sendMessageToChannel(
                                     p2.getCardsInfoThread(),
                                     "You were automatically marked as not following **"
@@ -473,7 +491,7 @@ public class PlayStrategyCardService {
                         Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                         if (reactionEmoji2 != null) {
                             message.addReaction(reactionEmoji2).queue();
-                            p2.addFollowedSC(scToPlay, event);
+                            p2.addFollowedSC(8, event);
                             String key3 = "potentialBlockers";
                             if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
                                 game.setStoredValue(
@@ -522,8 +540,7 @@ public class PlayStrategyCardService {
                                 new StringBuilder("__Order for performing the secondary ability:__\n");
                         for (int i = 0; i < playersInOrder.size(); i++) {
                             playerOrder.append("`").append(i + 1).append(".` ");
-                            if (game.hasFullPriorityTrackMode()
-                                    && game.getPhaseOfGame().equals("action")) {
+                            if (game.hasFullPriorityTrackMode() && "action".equals(game.getPhaseOfGame())) {
                                 int lowestSC = playersInOrder.get(i).getLowestSC();
                                 TI4Emoji scEmoji = CardEmojis.getSCFrontFromInteger(lowestSC);
                                 playerOrder.append(scEmoji);
@@ -606,7 +623,7 @@ public class PlayStrategyCardService {
         String scAutomationID = scModel.getBotSCAutomationID();
 
         // Handle Special Cases
-        if (scAutomationID.equals("pok8imperial")) {
+        if ("pok8imperial".equals(scAutomationID)) {
             handleSOQueueing(game, winnuHero);
         }
 

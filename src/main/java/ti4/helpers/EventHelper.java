@@ -12,6 +12,7 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
 import ti4.service.emoji.TileEmojis;
+import ti4.service.milty.MiltyDraftTile;
 
 @UtilityClass
 public class EventHelper {
@@ -41,12 +42,12 @@ public class EventHelper {
 
         List<Tile> unusedBlueTiles = new ArrayList<>(Helper.getUnusedTiles(game).stream()
                 .filter(tile -> tile.getTierList().isBlue())
-                .map(tile -> tile.getTile())
+                .map(MiltyDraftTile::getTile)
                 .toList());
 
         List<Tile> unusedRedTiles = new ArrayList<>(Helper.getUnusedTiles(game).stream()
                 .filter(tile -> !tile.getTierList().isBlue())
-                .map(tile -> tile.getTile())
+                .map(MiltyDraftTile::getTile)
                 .toList());
 
         for (Tile tile : unusedBlueTiles) {

@@ -20,7 +20,7 @@ import ti4.message.MessageHelper;
 import ti4.service.fow.GMService;
 
 @UtilityClass
-public class MigrationHelper {
+class MigrationHelper {
 
     public static boolean replaceTokens(Game game, Map<String, String> replacements) {
         boolean found = false;
@@ -45,8 +45,9 @@ public class MigrationHelper {
         }
 
         boolean mapNeededMigrating = false;
-        for (String toReplace : replacements.keySet()) {
-            String replacement = replacements.get(toReplace);
+        for (Map.Entry<String, String> entry : replacements.entrySet()) {
+            String toReplace = entry.getKey();
+            String replacement = entry.getValue();
 
             mapNeededMigrating |= replace(game.getPublicObjectives1(), toReplace, replacement);
             mapNeededMigrating |= replaceKey(game.getRevealedPublicObjectives(), toReplace, replacement);
@@ -61,8 +62,9 @@ public class MigrationHelper {
         }
 
         boolean mapNeededMigrating = false;
-        for (String toReplace : replacements.keySet()) {
-            String replacement = replacements.get(toReplace);
+        for (Map.Entry<String, String> entry : replacements.entrySet()) {
+            String toReplace = entry.getKey();
+            String replacement = entry.getValue();
 
             mapNeededMigrating |= replace(game.getActionCards(), toReplace, replacement);
             mapNeededMigrating |= replaceKey(game.getDiscardActionCards(), toReplace, replacement);
@@ -80,8 +82,9 @@ public class MigrationHelper {
         }
 
         boolean mapNeededMigrating = false;
-        for (String toReplace : replacements.keySet()) {
-            String replacement = replacements.get(toReplace);
+        for (Map.Entry<String, String> entry : replacements.entrySet()) {
+            String toReplace = entry.getKey();
+            String replacement = entry.getValue();
 
             mapNeededMigrating |= replace(game.getAgendas(), toReplace, replacement);
             mapNeededMigrating |= replaceKey(game.getDiscardAgendas(), toReplace, replacement);
@@ -90,7 +93,7 @@ public class MigrationHelper {
         return mapNeededMigrating;
     }
 
-    public static <K, V> boolean replaceKey(Map<K, V> map, K toReplace, K replacement) {
+    private static <K, V> boolean replaceKey(Map<K, V> map, K toReplace, K replacement) {
         if (map.containsKey(toReplace)) {
             V value = map.get(toReplace);
             map.put(replacement, value);
@@ -100,7 +103,7 @@ public class MigrationHelper {
         return false;
     }
 
-    public static <K> boolean replace(List<K> list, K toReplace, K replacement) {
+    private static <K> boolean replace(List<K> list, K toReplace, K replacement) {
         int index = list.indexOf(toReplace);
         if (index > -1) {
             list.set(index, replacement);
@@ -122,7 +125,7 @@ public class MigrationHelper {
         boolean anyChanged = false;
         for (Player p : game.getPlayers().values()) {
             String rawEmoji = p.getFactionEmojiRaw();
-            if (rawEmoji == null || rawEmoji.equals("null")) continue;
+            if (rawEmoji == null || "null".equals(rawEmoji)) continue;
 
             Emoji e = Emoji.fromFormatted(rawEmoji);
             if (e.getName().equalsIgnoreCase(p.getFaction())) {

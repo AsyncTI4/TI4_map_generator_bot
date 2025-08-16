@@ -38,6 +38,7 @@ import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.WhisperService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -69,6 +70,19 @@ public class StartTurnService {
                 goingToPass = true;
             }
         }
+
+        if (player.isNpc()) {
+            boolean hadAnyUnplayedSCs = false;
+            for (Integer SC : player.getSCs()) {
+                if (!game.getPlayedSCs().contains(SC)) {
+                    hadAnyUnplayedSCs = true;
+                }
+            }
+            if (!hadAnyUnplayedSCs) {
+                goingToPass = true;
+            }
+        }
+
         String text = player.getRepresentationUnfogged() + ", it is now your turn (your "
                 + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
         Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
@@ -106,7 +120,7 @@ public class StartTurnService {
         }
 
         String buttonText = "Use buttons to do your turn. ";
-        if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
+        if ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName())) {
             buttonText +=
                     "Your strategy card initiative number is " + player.getSCs().toArray()[0] + ".";
         }
@@ -202,6 +216,16 @@ public class StartTurnService {
 
         if (goingToPass) {
             PassService.passPlayerForRound(event, game, player, true);
+        } else {
+            if (player.isNpc()) {
+
+                for (Integer SC : player.getSCs()) {
+                    if (!game.getPlayedSCs().contains(SC)) {
+                        PlayStrategyCardService.playSC(event, SC, game, game.getMainGameChannel(), player);
+                        return;
+                    }
+                }
+            }
         }
     }
 
@@ -244,7 +268,7 @@ public class StartTurnService {
         sb.append(player.getRepresentationUnfogged());
         sb.append(" Please resolve these before doing anything else:\n");
         for (int sc : game.getPlayedSCsInOrder(player)) {
-            if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
+            if ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName())) {
                 String num = sc + "";
                 num = num.substring(num.length() - 1);
                 for (Integer sc2 : player.getSCs()) {
@@ -315,7 +339,7 @@ public class StartTurnService {
                 if (!game.getPlayedSCs().contains(SC)) {
                     hadAnyUnplayedSCs = true;
                     String name = Helper.getSCName(SC, game);
-                    if (game.getName().equalsIgnoreCase("pbd1000")) {
+                    if ("pbd1000".equalsIgnoreCase(game.getName())) {
                         name += "(" + SC + ")";
                     }
                     Button strategicAction = Buttons.green(
@@ -345,7 +369,7 @@ public class StartTurnService {
                                 startButtons.add(lButton);
                             }
                         } else {
-                            if (leaderID.equalsIgnoreCase("naaluagent")) {
+                            if ("naaluagent".equalsIgnoreCase(leaderID)) {
                                 Button lButton = Buttons.gray(
                                         finChecker + prefix + "leader_" + leaderID, "Use " + leaderName, leaderEmoji);
                                 startButtons.add(lButton);

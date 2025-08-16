@@ -66,7 +66,7 @@ public class CreateGameService {
         return newGame;
     }
 
-    public static void reportNewGameCreated(Game game) {
+    private static void reportNewGameCreated(Game game) {
         if (game == null) return;
 
         TextChannel bothelperLoungeChannel =
@@ -217,7 +217,7 @@ public class CreateGameService {
 
         // AUTOCLOSE LAUNCH THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread
-                && thread.getParentChannel().getName().equals("making-new-games")) {
+                && "making-new-games".equals(thread.getParentChannel().getName())) {
             newGame.setLaunchPostThreadID(thread.getId());
             ThreadChannelManager manager = thread.getManager()
                     .setName(StringUtils.left(newGame.getName() + "-launched [FULL] - " + thread.getName(), 100))
@@ -677,7 +677,7 @@ public class CreateGameService {
     public static String getNewPlayerInfoText() {
         String path = ResourceHelper.getInstance().getHelpFile("NewPlayerIntro.txt");
         try {
-            return new String(Files.readAllBytes(Paths.get(path)));
+            return Files.readString(Paths.get(path));
         } catch (Exception e) {
             return "NewPlayerIntro HELP FILE IS BLANK";
         }

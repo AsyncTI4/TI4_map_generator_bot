@@ -39,6 +39,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.PatternHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
@@ -61,7 +62,7 @@ class GameSaveService {
 
     private static final ObjectMapper mapper = ObjectMapperFactory.build();
 
-    public static boolean save(Game game, String reason) {
+    static boolean save(Game game, String reason) {
         return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> {
             game.setLatestCommand(Objects.requireNonNullElse(reason, "Command Unknown"));
             return save(game);
@@ -688,6 +689,9 @@ class GameSaveService {
             writer.write(Constants.DUMMY + " " + player.isDummy());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.NPC + " " + player.isNpc());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.ELIMINATED + " " + player.isEliminated());
             writer.write(System.lineSeparator());
 
@@ -886,12 +890,14 @@ class GameSaveService {
             writer.write(System.lineSeparator());
 
             StringBuilder fogOfWarSystems = new StringBuilder();
-            Map<String, String> fow_systems = player.getFogTiles();
-            Map<String, String> fow_labels = player.getFogLabels();
-            for (String key : fow_systems.keySet()) {
-                String system = fow_systems.get(key);
-                String label = fow_labels.get(key);
-                if (label != null) label = label.replaceAll(" ", "—"); // replace spaces with em dash
+            Map<String, String> fowSystems = player.getFogTiles();
+            Map<String, String> fowLabels = player.getFogLabels();
+            for (Entry<String, String> entry : fowSystems.entrySet()) {
+                String key = entry.getKey();
+                String system = entry.getValue();
+                String label = fowLabels.get(key);
+                if (label != null)
+                    label = PatternHelper.SPACE_PATTERN.matcher(label).replaceAll("—"); // replace spaces with em dash
                 fogOfWarSystems.append(key);
                 fogOfWarSystems.append(",");
                 fogOfWarSystems.append(system);
@@ -1035,14 +1041,14 @@ class GameSaveService {
     }
 
     private static void savePeekedPublicObjectives(
-            Writer writer, final String constant, Map<String, List<String>> peekedPOs) {
+            Writer writer, String constant, Map<String, List<String>> peekedPOs) {
         try {
             writer.write(constant + " ");
 
-            for (String po : peekedPOs.keySet()) {
-                writer.write(po + ":");
+            for (Entry<String, List<String>> entry : peekedPOs.entrySet()) {
+                writer.write(entry.getKey() + ":");
 
-                for (String playerID : peekedPOs.get(po)) {
+                for (String playerID : entry.getValue()) {
                     writer.write(playerID + ",");
                 }
 

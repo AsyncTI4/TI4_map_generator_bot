@@ -6,7 +6,7 @@ import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 
-public class ElectVoiceOfTheCouncilButtonHandler {
+class ElectVoiceOfTheCouncilButtonHandler {
     @ButtonHandler("elect_voice_of_the_council")
     public static void electVoiceOfTheCouncil(ButtonInteractionEvent event, Game game) {
         VoiceOfTheCouncilHelper.RevealVoiceOfTheCouncil(game, event);

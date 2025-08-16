@@ -409,8 +409,8 @@ public class ButtonHelperCommanders {
             AddUnitService.addUnits(context.getEvent(), to, game, player.getColor(), unitStringTo);
 
             String fromLang = "from " + planetName
-                    + (planetName.equals("space") ? " in " + from.getRepresentationForButtons(game, player) : "");
-            String toLang = planetNameTo.equals("space")
+                    + ("space".equals(planetName) ? " in " + from.getRepresentationForButtons(game, player) : "");
+            String toLang = "space".equals(planetNameTo)
                     ? "in space of tile " + to.getRepresentationForButtons(game, player)
                     : "on " + planetNameTo;
             String message = player.getRepresentation() + " your " + unitType.humanReadableName()
@@ -567,7 +567,7 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " is paying 1 trade good to look at the top card of a deck.");
-        List<Button> buttons = ButtonHelperCommanders.getUydaiCommanderButtons(game, false, player);
+        List<Button> buttons = getUydaiCommanderButtons(game, false, player);
         String message =
                 player.getRepresentationUnfogged() + ", please choose which deck you wish to look at the top of.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
@@ -583,12 +583,9 @@ public class ButtonHelperCommanders {
                         + event.getButton().getLabel() + " deck.");
         event.getMessage().delete().queue();
         switch (target) {
-            case "industrial", "hazardous", "frontier", "cultural" -> {
+            case "industrial", "hazardous", "frontier", "cultural" ->
                 ButtonHelperFactionSpecific.resolveExpLook(player, game, event, target);
-            }
-            case "agenda" -> {
-                LookAgendaService.lookAtAgendas(game, player, 1, false);
-            }
+            case "agenda" -> LookAgendaService.lookAtAgendas(game, player, 1, false);
             case "relics" -> {
                 List<String> relicDeck = game.getAllRelics();
                 if (relicDeck.isEmpty()) {
@@ -618,7 +615,7 @@ public class ButtonHelperCommanders {
                 MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
             }
         }
-        if (ableToBot.equalsIgnoreCase("yes")) {
+        if ("yes".equalsIgnoreCase(ableToBot)) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(
                     Buttons.red(player.getFinsFactionCheckerPrefix() + "uydaiCommanderBottom_" + target, "Bottom It"));
@@ -638,12 +635,9 @@ public class ButtonHelperCommanders {
                 player.getRepresentationNoPing() + " is choosing to bottom the card they saw.");
         event.getMessage().delete().queue();
         switch (target) {
-            case "industrial", "hazardous", "frontier", "cultural" -> {
+            case "industrial", "hazardous", "frontier", "cultural" ->
                 game.putExploreBottom(game.getExploreDeck(target).getFirst());
-            }
-            case "agenda" -> {
-                AgendaHelper.putBottom(game.getAgendas().getFirst(), game);
-            }
+            case "agenda" -> AgendaHelper.putBottom(game.getAgendas().getFirst(), game);
             case "relics" -> {
                 List<String> relicDeck = game.getAllRelics();
                 if (relicDeck.isEmpty()) {

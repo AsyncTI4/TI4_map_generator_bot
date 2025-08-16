@@ -2,6 +2,7 @@ package ti4.buttons;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -41,11 +42,11 @@ public class Buttons {
     public static final Button EDIT_NOTEPAD = blue("notepadEdit~MDL", "Edit Notes");
     public static final Button POST_NOTEPAD = blue("notepadPost", "Post Notes");
     public static final Button REFRESH_INFO = green("refreshInfoButtons", "Other Info");
-    public static final Button REFRESH_AC_INFO = green("refreshACInfo", "Action Card Info", CardEmojis.ActionCard);
-    public static final Button REFRESH_PN_INFO = green("refreshPNInfo", "Promissory Notes Info", CardEmojis.PN);
-    public static final Button REFRESH_SO_INFO =
+    private static final Button REFRESH_AC_INFO = green("refreshACInfo", "Action Card Info", CardEmojis.ActionCard);
+    private static final Button REFRESH_PN_INFO = green("refreshPNInfo", "Promissory Notes Info", CardEmojis.PN);
+    private static final Button REFRESH_SO_INFO =
             green("refreshSOInfo", "Secret Objectives Info", CardEmojis.SecretObjective);
-    public static final Button REFRESH_ABILITY_INFO = green("refreshAbilityInfo", "Ability Info");
+    private static final Button REFRESH_ABILITY_INFO = green("refreshAbilityInfo", "Ability Info");
     public static final Button REFRESH_RELIC_INFO =
             green(Constants.REFRESH_RELIC_INFO, "Relic Info", ExploreEmojis.Relic);
     public static final Button REFRESH_LEADER_INFO =
@@ -58,13 +59,13 @@ public class Buttons {
             green(Constants.REFRESH_PLANET_INFO, "Planet Info", PlanetEmojis.SemLor);
 
     public static final Button OFFER_PING_OPTIONS_BUTTON =
-            Buttons.gray("playerPref_personalPingInterval", "Personal Ping Interval");
+            gray("playerPref_personalPingInterval", "Personal Ping Interval");
 
     // Map buttons
-    public static final Button REFRESH_CARDS_INFO = green("cardsInfo", "Cards Info");
+    private static final Button REFRESH_CARDS_INFO = green("cardsInfo", "Cards Info");
     public static final Button SHOW_DECKS = blue("offerDeckButtons", "Show Decks");
     public static final Button REFRESH_MAP = gray("showGameAgain", "Refresh Map");
-    public static final Button PLAYER_INFO = green("gameInfoButtons", "Player Info");
+    private static final Button PLAYER_INFO = green("gameInfoButtons", "Player Info");
 
     public static final List<Button> REFRESH_INFO_BUTTONS = List.of(
             REFRESH_AC_INFO,
@@ -116,7 +117,7 @@ public class Buttons {
                     || !game.checkAllTilesAreOfficial()
                     || game.getFactions().stream()
                             .map(Mapper::getFaction)
-                            .filter(java.util.Objects::nonNull)
+                            .filter(Objects::nonNull)
                             .anyMatch(faction -> !faction.getSource().isOfficial())) {
                 return false;
             }
@@ -261,10 +262,10 @@ public class Buttons {
         // Add navigation buttons if more than one page
         if (totalPages > 1) {
             if (currentPage > 1) {
-                persistentAndNav.add(Buttons.gray(pageButtonId + "_page" + (currentPage - 1), "Previous Page", "⏪"));
+                persistentAndNav.add(gray(pageButtonId + "_page" + (currentPage - 1), "Previous Page", "⏪"));
             }
             if (currentPage < totalPages) {
-                persistentAndNav.add(Buttons.gray(pageButtonId + "_page" + (currentPage + 1), "Next Page", "⏩"));
+                persistentAndNav.add(gray(pageButtonId + "_page" + (currentPage + 1), "Next Page", "⏩"));
             }
         }
         if (!persistentAndNav.isEmpty()) {

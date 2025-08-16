@@ -2,6 +2,7 @@ package ti4.service.statistics;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
@@ -34,7 +35,7 @@ public class ExportToCsvService {
         }
 
         File outputCSV = new File("output.csv");
-        try (PrintWriter pw = new PrintWriter(outputCSV)) {
+        try (PrintWriter pw = new PrintWriter(outputCSV, StandardCharsets.UTF_8)) {
             pw.print(output);
             pw.close();
             MessageHelper.sendFileToChannel(event.getChannel(), outputCSV);
@@ -43,7 +44,7 @@ public class ExportToCsvService {
         }
     }
 
-    public static String header(int players) {
+    private static String header(int players) {
         List<String> fields = new ArrayList<>();
         fields.add("game name");
         fields.add("playerCount");
@@ -64,7 +65,7 @@ public class ExportToCsvService {
         return String.join(",", fields);
     }
 
-    public static String gameToCsv(Game game) {
+    private static String gameToCsv(Game game) {
         List<String> fields = new ArrayList<>();
         fields.add(game.getName());
         fields.add(Integer.toString(game.getRealAndEliminatedAndDummyPlayers().size()));

@@ -39,7 +39,7 @@ public class StandardBagDraft extends BagDraft {
         "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral"
     };
 
-    public static List<FactionModel> getDraftableFactionsForGame(Game game) {
+    private static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllLegalFactions();
         if (!game.isDiscordantStarsMode()) {
             factionSet.removeIf(factionModel ->
@@ -48,7 +48,7 @@ public class StandardBagDraft extends BagDraft {
         return factionSet;
     }
 
-    public static List<FactionModel> getAllLegalFactions() {
+    private static List<FactionModel> getAllLegalFactions() {
         List<FactionModel> factionSet = Mapper.getFactionsValues();
         factionSet.removeIf((FactionModel model) -> {
             if (model.getSource().isPok() || model.getSource().isDs()) {

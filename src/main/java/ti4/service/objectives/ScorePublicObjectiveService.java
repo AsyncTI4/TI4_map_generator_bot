@@ -54,7 +54,7 @@ public class ScorePublicObjectiveService {
             }
         }
         boolean scored = game.scorePublicObjective(player.getUserID(), poID);
-        if (!game.getPhaseOfGame().equalsIgnoreCase("action")) {
+        if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setStoredValue(player.getFaction() + "round" + game.getRound() + "PO", poName);
         }
         if (!scored) {
@@ -78,7 +78,7 @@ public class ScorePublicObjectiveService {
         Helper.checkEndGame(game, player);
     }
 
-    public static String getNameNEMoji(Game game, int poID) {
+    private static String getNameNEMoji(Game game, int poID) {
         String id = "";
         Map<String, Integer> revealedPublicObjectives = game.getRevealedPublicObjectives();
         for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
@@ -103,7 +103,7 @@ public class ScorePublicObjectiveService {
         return poName + "_" + emojiName;
     }
 
-    public static void informAboutScoring(
+    private static void informAboutScoring(
             GenericInteractionCreateEvent event, MessageChannel channel, Game game, Player player, int poID) {
         String both = getNameNEMoji(game, poID);
         String poName = both.split("_")[0];

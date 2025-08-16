@@ -63,7 +63,7 @@ public class CreateFoWGameService {
         String gameName = getNextFOWGameName();
         String lastGame = getLastFOWGameName();
         Game game;
-        if (!lastGame.equalsIgnoreCase("fow1")) {
+        if (!"fow1".equalsIgnoreCase(lastGame)) {
             if (!GameManager.isValid(lastGame)) {
                 BotLogger.warning(
                         new BotLogger.LogMessageOrigin(event),
@@ -238,7 +238,7 @@ public class CreateFoWGameService {
         GameManager.save(newGame, "Create FOW Game Channels");
 
         if (eventChannel instanceof ThreadChannel thread
-                && thread.getParentChannel().getName().equals("making-fow-games")) {
+                && "making-fow-games".equals(thread.getParentChannel().getName())) {
             newGame.setLaunchPostThreadID(thread.getId());
             ThreadChannelManager manager = thread.getManager()
                     .setName(StringUtils.left(newGame.getName().toUpperCase() + "-LAUNCHED - " + thread.getName(), 100))
@@ -250,13 +250,13 @@ public class CreateFoWGameService {
     private static String getInfoTextFromFile(String file) {
         String path = ResourceHelper.getInstance().getHelpFile(file);
         try {
-            return new String(Files.readAllBytes(Paths.get(path)));
+            return Files.readString(Paths.get(path));
         } catch (Exception e) {
             return file + " IS BLANK";
         }
     }
 
-    public static String getLastFOWGameName() {
+    private static String getLastFOWGameName() {
         return "fow" + getLastFOWGameNumber();
     }
 
@@ -267,7 +267,7 @@ public class CreateFoWGameService {
     }
 
     private static int getLastFOWGameNumber() {
-        ArrayList<Integer> existingNums = getAllExistingFOWNumbers();
+        List<Integer> existingNums = getAllExistingFOWNumbers();
         if (existingNums.isEmpty()) {
             return 1;
         }

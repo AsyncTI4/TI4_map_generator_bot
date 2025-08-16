@@ -63,7 +63,7 @@ class PlayEvent extends GameStateSubcommand {
         playEventFromHand(event, getGame(), player, eventModel);
     }
 
-    public static void playEventFromHand(
+    private static void playEventFromHand(
             GenericInteractionCreateEvent event, Game game, Player player, EventModel eventModel) {
         game.discardEvent(eventModel.getAlias());
         player.removeEvent(eventModel.getAlias());

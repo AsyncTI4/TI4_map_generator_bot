@@ -13,6 +13,6 @@ class RevealStage1 extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        RevealPublicObjectiveService.revealS1(getGame(), event, event.getChannel());
+        RevealPublicObjectiveService.revealS1(getGame(), event);
     }
 }

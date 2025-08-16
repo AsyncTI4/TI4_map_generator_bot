@@ -17,7 +17,7 @@ import ti4.service.emoji.CardEmojis;
 
 // This is a sub-menu
 @Getter
-@JsonIgnoreProperties({"messageId"})
+@JsonIgnoreProperties("messageId")
 public class DeckSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
@@ -47,7 +47,7 @@ public class DeckSettings extends SettingsMenu {
         return choice;
     }
 
-    protected DeckSettings(JsonNode json, SettingsMenu parent, Optional<Game> game) {
+    DeckSettings(JsonNode json, SettingsMenu parent, Optional<Game> game) {
         super(
                 "decks",
                 "Card Decks",

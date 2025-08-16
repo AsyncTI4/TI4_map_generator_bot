@@ -6,12 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.image.Mapper;
-import ti4.model.DeckModel.DeckType;
 import ti4.testUtils.BaseTi4Test;
 
-public class DeckModelTest extends BaseTi4Test {
+class DeckModelTest extends BaseTi4Test {
     @Test
-    public void testDeckModels() {
+    void testDeckModels() {
         for (DeckModel deckModel : Mapper.getDecks().values()) {
             assertTrue(deckModel.isValid(), deckModel.getAlias() + " [" + deckModel.getType() + "]: invalid");
             assertTrue(
@@ -22,15 +21,14 @@ public class DeckModelTest extends BaseTi4Test {
 
     private static boolean validateCardIDs(DeckModel deckModel) {
         return switch (deckModel.getType()) {
-            case DeckType.TECHNOLOGY -> validateTechDeck(deckModel);
-            case DeckType.AGENDA -> validateAgendaDeck(deckModel);
-            case DeckType.EVENT -> validateEventDeck(deckModel);
-            case DeckType.ACTION_CARD -> validateActionCardDeck(deckModel);
-            case DeckType.SECRET_OBJECTIVE -> validateSecretObjectiveDeck(deckModel);
-            case DeckType.PUBLIC_STAGE_1_OBJECTIVE, DeckType.PUBLIC_STAGE_2_OBJECTIVE ->
-                validatePublicObjectiveDecks(deckModel);
-            case DeckType.RELIC -> validateRelicDeck(deckModel);
-            case DeckType.EXPLORE -> validateExploreDecks(deckModel);
+            case TECHNOLOGY -> validateTechDeck(deckModel);
+            case AGENDA -> validateAgendaDeck(deckModel);
+            case EVENT -> validateEventDeck(deckModel);
+            case ACTION_CARD -> validateActionCardDeck(deckModel);
+            case SECRET_OBJECTIVE -> validateSecretObjectiveDeck(deckModel);
+            case PUBLIC_STAGE_1_OBJECTIVE, PUBLIC_STAGE_2_OBJECTIVE -> validatePublicObjectiveDecks(deckModel);
+            case RELIC -> validateRelicDeck(deckModel);
+            case EXPLORE -> validateExploreDecks(deckModel);
             default -> false;
         };
     }

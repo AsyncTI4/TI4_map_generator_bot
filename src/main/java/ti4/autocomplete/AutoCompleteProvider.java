@@ -70,9 +70,6 @@ public class AutoCompleteProvider {
 
     public static void handleAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
         try {
-            // System.out.println("\nIn handleAutoCompleteEvent: " + event.getName() + " > " + event.getSubcommandName()
-            // + " -> " + event.getFocusedOption().getName() + " :: " + event.getFocusedOption().getValue()); // Debug
-            // line
             resolveAutoCompleteEvent(event);
         } catch (Exception e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(event), "Error in handleAutoCompleteEvent", e);
@@ -522,10 +519,9 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.AUTO_ARCHIVE_DURATION -> {
+            case Constants.AUTO_ARCHIVE_DURATION ->
                 event.replyChoiceStrings("1_HOUR", "24_HOURS", "3_DAYS", "1_WEEK")
                         .queue();
-            }
             case Constants.PLANET_TYPE -> {
                 List<String> allPlanetTypes = Arrays.stream(PlanetTypeModel.PlanetType.values())
                         .map(PlanetTypeModel.PlanetType::toString)
@@ -872,7 +868,7 @@ public class AutoCompleteProvider {
             }
             case Constants.RANDOM_TYPE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Arrays.asList(RandomOption.values()).stream()
+                List<Command.Choice> options = Arrays.stream(RandomOption.values())
                         .filter(value -> value.search(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getAutoCompleteName(), value.toString()))
@@ -881,7 +877,7 @@ public class AutoCompleteProvider {
             }
             case Constants.PRIORITY_TRACK -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Arrays.asList(PriorityTrackMode.values()).stream()
+                List<Command.Choice> options = Arrays.stream(PriorityTrackMode.values())
                         .filter(value -> value.search(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getAutoCompleteName(), value.toString()))
@@ -990,7 +986,6 @@ public class AutoCompleteProvider {
                 /* From others */
                 // none of them are populated from here
         }
-        // System.out.println(options.toString()); // Debug line
         event.replyChoices(Objects.requireNonNullElse(options, Collections.emptyList()))
                 .queue();
     }

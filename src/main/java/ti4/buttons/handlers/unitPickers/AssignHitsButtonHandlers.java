@@ -28,14 +28,14 @@ import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
-public class AssignHitsButtonHandlers {
+class AssignHitsButtonHandlers {
 
     @ButtonHandler("assignHits_")
     // assignHits_101_2_dd
     public static void assignHits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String assignHitsType = getAssignHitsType(game, player);
         boolean combat = assignHitsType.contains("combat");
-        boolean remove = assignHitsType.equals("remove");
+        boolean remove = "remove".equals(assignHitsType);
 
         // Assign hits to single unit
         String regexSingleUnit = UnitPickerHandlerHelper.singleUnitRegex(game, "assignHits");

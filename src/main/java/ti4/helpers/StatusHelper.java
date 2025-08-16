@@ -33,6 +33,7 @@ import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.turn.StartTurnService;
+import ti4.settings.users.UserSettingsManager;
 
 public class StatusHelper {
 
@@ -210,22 +211,29 @@ public class StatusHelper {
             }
 
             int count = 0;
-            String message3a = "";
+            StringBuilder message3a = new StringBuilder();
             for (String soID : player.getSecretsUnscored().keySet()) {
                 if (ListPlayerInfoService.getObjectiveThreshold(soID, game) > 0
                         && ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player)
                                 > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1)
-                        && !soID.equalsIgnoreCase("dp")) {
-                    message3a += "\n" + Mapper.getSecretObjective(soID).getRepresentation(false);
+                        && !"dp".equalsIgnoreCase(soID)) {
+                    message3a
+                            .append("\n")
+                            .append(Mapper.getSecretObjective(soID).getRepresentation(false));
                     count++;
                 }
             }
-            if (count > 0 && player.isRealPlayer()) {
-                message3a = player.getRepresentation()
-                        + ", as a reminder, the bot believes you are capable of scoring the following secret objective"
-                        + (count == 1 ? "" : "s") + ":" + message3a;
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message3a);
-            } else if (player.getSo() == 0) {
+            var userSettings = UserSettingsManager.get(player.getUserID());
+            if (count > 0 && player.isRealPlayer() && !player.isNpc()) {
+                message3a.insert(
+                        0,
+                        player.getRepresentation()
+                                + ", as a reminder, the bot believes you are capable of scoring the following secret objective"
+                                + (count == 1 ? "" : "s") + ":");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message3a.toString());
+            } else if (player.getSo() == 0
+                    || player.isNpc()
+                    || userSettings.getSandbagPref().contains("bot")) {
                 String message = player.getRepresentation() + " has no secret objectives to score at this time.";
                 game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "None");
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -407,7 +415,7 @@ public class StatusHelper {
         }
     }
 
-    public static List<Button> getScoreObjectiveButtons(Game game) {
+    private static List<Button> getScoreObjectiveButtons(Game game) {
         return getScoreObjectiveButtons(game, "");
     }
 
@@ -423,36 +431,36 @@ public class StatusHelper {
         int poStatus;
         for (Map.Entry<String, Integer> objective : revealedPublicObjectives.entrySet()) {
             String key = objective.getKey();
-            String po_name = publicObjectivesState1.get(key);
+            String poName = publicObjectivesState1.get(key);
             poStatus = 0;
-            if (po_name == null) {
-                po_name = publicObjectivesState2.get(key);
+            if (poName == null) {
+                poName = publicObjectivesState2.get(key);
                 poStatus = 1;
             }
-            if (po_name == null) {
+            if (poName == null) {
                 Integer integer = customPublicVP.get(key);
                 if (integer != null
                         && !key.toLowerCase().contains("custodian")
                         && !key.toLowerCase().contains("imperial")
                         && !key.contains("Shard of the Throne")
                         && !key.contains(Constants.VOICE_OF_THE_COUNCIL_PO)) {
-                    po_name = key;
+                    poName = key;
                     poStatus = 2;
                 }
             }
-            if (po_name != null) {
+            if (poName != null) {
                 Integer value = objective.getValue();
                 Button objectiveButton;
                 if (poStatus == 0) { // Stage 1 Objectives
                     objectiveButton = Buttons.green(
-                            prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name, CardEmojis.Public1alt);
+                            prefix + Constants.PO_SCORING + value, "(" + value + ") " + poName, CardEmojis.Public1alt);
                     poButtons1.add(objectiveButton);
                 } else if (poStatus == 1) { // Stage 2 Objectives
                     objectiveButton = Buttons.blue(
-                            prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name, CardEmojis.Public2alt);
+                            prefix + Constants.PO_SCORING + value, "(" + value + ") " + poName, CardEmojis.Public2alt);
                     poButtons2.add(objectiveButton);
                 } else { // Other Objectives
-                    objectiveButton = Buttons.gray(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name);
+                    objectiveButton = Buttons.gray(prefix + Constants.PO_SCORING + value, "(" + value + ") " + poName);
                     poButtonsCustom.add(objectiveButton);
                 }
             }

@@ -14,7 +14,7 @@ import ti4.service.info.ListPlayerInfoService;
 public class WebObjectives {
 
     @Data
-    public static class ObjectiveInfo {
+    static class ObjectiveInfo {
         private String key;
         private String name;
         private int pointValue;
@@ -25,7 +25,7 @@ public class WebObjectives {
         private Map<String, Integer> factionProgress;
         private int progressThreshold;
 
-        public ObjectiveInfo(
+        ObjectiveInfo(
                 String key,
                 String name,
                 int pointValue,

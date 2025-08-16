@@ -19,6 +19,7 @@ import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.draft.items.StartingFleetDraftItem;
 import ti4.draft.items.StartingTechDraftItem;
 import ti4.draft.items.TechDraftItem;
+import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.BotLogger;
@@ -27,6 +28,7 @@ import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 
 public class FrankenDraft extends BagDraft {
+
     public FrankenDraft(Game owner) {
         super(owner);
     }
@@ -113,9 +115,9 @@ public class FrankenDraft extends BagDraft {
         "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral"
     };
 
-    public static List<FactionModel> getDraftableFactionsForGame(Game game) {
+    private static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllFrankenLegalFactions();
-        String[] results = game.getStoredValue("bannedFactions").split("finSep");
+        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedFactions"));
         if (!game.isDiscordantStarsMode()) {
             factionSet.removeIf(factionModel ->
                     factionModel.getSource().isDs() && !factionModel.getSource().isPok());
@@ -125,7 +127,7 @@ public class FrankenDraft extends BagDraft {
         return factionSet;
     }
 
-    public static boolean contains(String[] array, String target) {
+    private static boolean contains(String[] array, String target) {
         for (String str : array) {
             if (str.equalsIgnoreCase(target)) {
                 return true;

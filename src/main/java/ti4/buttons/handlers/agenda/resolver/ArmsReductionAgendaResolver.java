@@ -10,22 +10,14 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ArmsReductionAgendaResolver implements AgendaResolver {
+public class ArmsReductionAgendaResolver implements ForAgainstAgendaResolver {
     @Override
     public String getAgendaId() {
         return "arms_reduction";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
-        if ("for".equalsIgnoreCase(winner)) {
-            handleFor(game);
-        } else {
-            handleAgainst(game);
-        }
-    }
-
-    private void handleFor(Game game) {
+    public void handleFor(Game game, ButtonInteractionEvent event, int agendaNumericId) {
         for (Player player : game.getRealPlayers()) {
             List<Button> removeButtons = new ArrayList<>();
             String message = "";
@@ -58,7 +50,8 @@ public class ArmsReductionAgendaResolver implements AgendaResolver {
                 game.getMainGameChannel(), "Sent buttons for each player to remove excess dreadnoughts and cruisers.");
     }
 
-    private void handleAgainst(Game game) {
+    @Override
+    public void handleAgainst(Game game, ButtonInteractionEvent event, int agendaNumericId) {
         game.setStoredValue("agendaArmsReduction", "true");
         MessageHelper.sendMessageToChannel(
                 game.getMainGameChannel(),

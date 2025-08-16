@@ -59,7 +59,7 @@ public class SearchGameForFactionHelper {
         return filteredManagedGames.size();
     }
 
-    public static String getPlayerMapListRepresentation(
+    private static String getPlayerMapListRepresentation(
             Game game, String userID, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes) {
         Player player = game.getPlayer(userID);
         if (player == null) return "";

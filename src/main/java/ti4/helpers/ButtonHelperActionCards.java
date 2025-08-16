@@ -43,7 +43,7 @@ import ti4.service.unit.RemoveUnitService;
 
 public class ButtonHelperActionCards {
 
-    public static List<Button> getTilesToScuttle(Player player, Game game, int tgAlready) {
+    private static List<Button> getTilesToScuttle(Player player, Game game, int tgAlready) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
@@ -60,7 +60,7 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
-    public static List<Button> getTilesToLuckyShot(Player player, Game game) {
+    private static List<Button> getTilesToLuckyShot(Player player, Game game) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
@@ -87,7 +87,7 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
-    public static List<Button> getUnitsToScuttle(Player player, Tile tile, int tgAlready) {
+    private static List<Button> getUnitsToScuttle(Player player, Tile tile, int tgAlready) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         Set<UnitType> allowedUnits = Set.of(
                 UnitType.Destroyer,
@@ -141,7 +141,7 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
-    public static List<Button> getUnitsToLuckyShot(Player player, Game game, Tile tile) {
+    private static List<Button> getUnitsToLuckyShot(Player player, Game game, Tile tile) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         Set<UnitType> allowedUnits = Set.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Dreadnought);
 
@@ -464,13 +464,11 @@ public class ButtonHelperActionCards {
     @ButtonHandler("getRepealLawButtons")
     public static void getRepealLawButtons(ButtonInteractionEvent event, Player player, Game game) {
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getChannel(),
-                "Please choose the law you wish to repeal.",
-                ButtonHelperActionCards.getRepealLawButtons(game, player));
+                event.getChannel(), "Please choose the law you wish to repeal.", getRepealLawButtons(game, player));
         ButtonHelper.deleteMessage(event);
     }
 
-    public static List<Button> getRepealLawButtons(Game game, Player player) {
+    private static List<Button> getRepealLawButtons(Game game, Player player) {
         List<Button> lawButtons = new ArrayList<>();
         for (String law : game.getLaws().keySet()) {
             lawButtons.add(Buttons.green("repealLaw_" + game.getLaws().get(law), Mapper.getAgendaTitle(law)));
@@ -483,11 +481,11 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(),
                 "Please choose the technology you wish to return.",
-                ButtonHelperActionCards.getDivertFundingLoseTechOptions(player, game));
+                getDivertFundingLoseTechOptions(player, game));
         ButtonHelper.deleteMessage(event);
     }
 
-    public static List<Button> getDivertFundingLoseTechOptions(Player player, Game game) {
+    private static List<Button> getDivertFundingLoseTechOptions(Player player, Game game) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
@@ -565,7 +563,7 @@ public class ButtonHelperActionCards {
         int extraRollsForUnit = 0;
         int numRollsPerUnit = 1;
 
-        if (type.equalsIgnoreCase("courageous")) {
+        if ("courageous".equalsIgnoreCase(type)) {
             StringBuilder resultBuilder = new StringBuilder(result);
 
             int numOfUnit = 2;
@@ -610,8 +608,14 @@ public class ButtonHelperActionCards {
                     totalHits = 0;
                     result = player.getFactionEmojiOrColor() + " rolling for " + type + ":\n";
                     StringBuilder resultBuilder = new StringBuilder(result);
-                    resultBuilder.append("Rolling against " + numOfUnit + " "
-                            + key.getUnitType().getUnitTypeEmoji() + " owned by " + key.getColor() + ".\n");
+                    resultBuilder
+                            .append("Rolling against ")
+                            .append(numOfUnit)
+                            .append(" ")
+                            .append(key.getUnitType().getUnitTypeEmoji())
+                            .append(" owned by ")
+                            .append(key.getColor())
+                            .append(".\n");
                     int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
                     List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
                     player.setExpectedHitsTimes10(
@@ -1471,6 +1475,9 @@ public class ButtonHelperActionCards {
                         + ", you've been hit by" + (RandomHelper.isOneInX(1000) ? ", you've been struck by" : "")
                         + " an ability which forces you to send a random action card to another player. Press the button to send a random action card to that player.",
                 buttons);
+        if (p2.isNpc()) {
+            ActionCardHelper.sendRandomACPart2(event, game, p2, player);
+        }
         ButtonHelper.deleteMessage(event);
     }
 
@@ -2454,7 +2461,7 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(),
                 "Please choose the technology you wish to acquire by violating intellectual property law.",
-                ButtonHelperActionCards.getPlagiarizeButtons(game, player));
+                getPlagiarizeButtons(game, player));
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
         Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
         buttons.add(doneExhausting);
@@ -2503,7 +2510,7 @@ public class ButtonHelperActionCards {
         return techs;
     }
 
-    public static List<Button> getGhostShipButtons(Game game, Player player) {
+    private static List<Button> getGhostShipButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.doesTileHaveWHs(game, tile.getPosition())) {
@@ -2525,7 +2532,7 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
-    public static List<Button> getTacticalBombardmentButtons(Game game, Player player) {
+    private static List<Button> getTacticalBombardmentButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : ButtonHelper.getTilesOfUnitsWithBombard(player, game)) {
             buttons.add(Buttons.green(
@@ -2534,7 +2541,7 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
-    public static List<Button> getProbeButtons(Game game, Player player) {
+    private static List<Button> getProbeButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
@@ -2599,12 +2606,13 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("economicInitiative")
     public static void economicInitiative(Player player, Game game, ButtonInteractionEvent event) {
-        String message = "";
+        StringBuilder message = new StringBuilder();
         List<String> exhaustedPlanets = new ArrayList<>(player.getExhaustedPlanets());
         for (String planet : exhaustedPlanets) {
             if (ButtonHelper.getTypeOfPlanet(game, planet).contains("cultural")) {
                 player.refreshPlanet(planet);
-                message += "\n> " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game);
+                message.append("\n> ")
+                        .append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game));
             }
         }
         if (!"".equalsIgnoreCase(player.getAllianceMembers())) {
@@ -2614,14 +2622,14 @@ public class ButtonHelperActionCards {
                     for (String planet : exhaustedPlanets) {
                         if (ButtonHelper.getTypeOfPlanet(game, planet).contains("cultural")) {
                             player2.refreshPlanet(planet);
-                            message +=
-                                    "\n> " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game);
+                            message.append("\n> ")
+                                    .append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game));
                         }
                     }
                 }
             }
         }
-        if (message.isEmpty()) {
+        if (message.length() == 0) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     player.getRepresentationUnfogged()

@@ -26,7 +26,7 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
-public class TacticalActionButtonHandlers {
+class TacticalActionButtonHandlers {
 
     @ButtonHandler("unitTacticalMove")
     @ButtonHandler("unitTacticalRemove")
@@ -239,7 +239,7 @@ public class TacticalActionButtonHandlers {
                     if (color != null && game.getPlayerFromColorOrFaction(color) != null) {
                         owner = game.getPlayerFromColorOrFaction(color);
                         if (owner != player) {
-                            colorMsg = " " + StringUtils.capitalize(owner.getColor()) + "";
+                            colorMsg = " " + StringUtils.capitalize(owner.getColor());
                         }
                     }
                     Tile tile = game.getTileByPosition(pos);

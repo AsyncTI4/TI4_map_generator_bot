@@ -18,7 +18,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.testUtils.BaseTi4Test;
 
-public class ColorModelTest extends BaseTi4Test {
+class ColorModelTest extends BaseTi4Test {
     @Test
     void testColors() {
         beforeAll();

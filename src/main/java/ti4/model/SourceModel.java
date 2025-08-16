@@ -26,7 +26,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAlias() {
-        return getSource().toString();
+        return source.toString();
     }
 
     @Override
@@ -37,25 +37,23 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(HashMap<String, Integer> occurrences) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        eb.setTitle(getSource().emoji() + " " + getName());
+        eb.setTitle(source.emoji() + " " + name);
 
         StringBuilder content = new StringBuilder();
-        if (getDescription() != null)
-            content.append("*").append(getDescription()).append("*\n\n");
-        if (getData() != null)
-            content.append("Links:\n").append(getDataFormatted()).append("\n");
+        if (description != null) content.append("*").append(description).append("*\n\n");
+        if (data != null) content.append("Links:\n").append(getDataFormatted()).append("\n");
         if (occurrences != null) content.append("Implementation: ").append(compTypeOccurrences(occurrences));
         eb.setDescription(content);
 
         StringBuilder footer = new StringBuilder();
-        footer.append("Source: ").append(getSource()).append("    Type: ").append(getCanal());
-        if (getSubcanal() != null) footer.append(" > ").append(getSubcanal());
-        footer.append("\nCredits: ").append(getCredits());
+        footer.append("Source: ").append(source).append("    Type: ").append(canal);
+        if (subcanal != null) footer.append(" > ").append(subcanal);
+        footer.append("\nCredits: ").append(credits);
         eb.setFooter(footer.toString());
 
-        if (getCanal().equals("official")) {
+        if ("official".equals(canal)) {
             eb.setColor(Color.green);
-        } else if (getCanal().equals("community")) {
+        } else if ("community".equals(canal)) {
             eb.setColor(Color.gray);
         } else {
             eb.setColor(Color.red);
@@ -69,8 +67,8 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
      */
     @Override
     public boolean search(String searchString) {
-        return getName().toLowerCase().contains(searchString)
-                || getSource().toString().toLowerCase().contains(searchString);
+        return name.toLowerCase().contains(searchString)
+                || source.toString().toLowerCase().contains(searchString);
     }
 
     /**
@@ -78,14 +76,14 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
      */
     @Override
     public String getAutoCompleteName() {
-        return getName();
+        return name;
     }
 
     /**
      * List all items of the 'data' field
      * @return StringBuilder
      */
-    public String getDataFormatted() {
+    private String getDataFormatted() {
         StringBuilder sb = new StringBuilder();
         for (String s : data) {
             sb.append("- ").append(s).append("\n");
@@ -98,7 +96,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
      * @return true if field 'Canal' = "Official", false otherwise
      */
     public boolean isCanalOfficial() {
-        boolean official = getCanal().equals("official");
+        boolean official = "official".equals(canal);
         return official;
     }
 
@@ -107,7 +105,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
      * @param occurrences HashMap with Key is Component Type and Value is occurrences for specific Source in Component Type json files
      * @return StringBuilder
      */
-    private String compTypeOccurrences(HashMap<String, Integer> occurrences) {
+    private String compTypeOccurrences(Map<String, Integer> occurrences) {
         StringBuilder implementation = new StringBuilder();
         for (Map.Entry<String, Integer> entry : occurrences.entrySet()) {
             if (entry.getValue() != 0) {

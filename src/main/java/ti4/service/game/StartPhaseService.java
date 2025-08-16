@@ -30,7 +30,6 @@ import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.StatusHelper;
-import ti4.helpers.StringHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.BannerGenerator;
@@ -62,7 +61,6 @@ import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.ListTurnOrderService;
 import ti4.service.strategycard.PickStrategyCardService;
-import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
 
@@ -165,26 +163,31 @@ public class StartPhaseService {
         if (alreadyQueued.isEmpty()) {
             numQueued = 0;
         }
-        String msg =
+        StringBuilder msg = new StringBuilder(
                 player.getRepresentation() + " you are #" + number + " pick in this Strategy Phase and so can queue "
-                        + number + " strategy cards." + " So far you have queued " + numQueued + " cards. ";
+                        + number + " strategy cards." + " So far you have queued " + numQueued + " cards. ");
         if (game.isFowMode()) {
-            msg = player.getRepresentation() + " you can queue up to 8 cards." + " So far you have queued " + numQueued
-                    + " cards. ";
+            msg = new StringBuilder(player.getRepresentation() + " you can queue up to 8 cards."
+                    + " So far you have queued " + numQueued + " cards. ");
         }
         if (numQueued > 0) {
-            msg +=
-                    "The queued strategy cards are as follows (in the order the bot will attempt to select them for you):\n";
+            msg.append(
+                    "The queued strategy cards are as follows (in the order the bot will attempt to select them for you):\n");
             int count = 1;
             for (String num : alreadyQueued.split("_")) {
                 if (num.isEmpty()) {
                     continue;
                 }
                 TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(Integer.parseInt(num));
-                msg += count + ". " + Helper.getSCName(Integer.parseInt(num), game) + " " + scEmoji + "\n";
+                msg.append(count)
+                        .append(". ")
+                        .append(Helper.getSCName(Integer.parseInt(num), game))
+                        .append(" ")
+                        .append(scEmoji)
+                        .append("\n");
             }
         }
-        return msg;
+        return msg.toString();
     }
 
     public static void startStrategyPhase(GenericInteractionCreateEvent event, Game game) {
@@ -281,7 +284,7 @@ public class StartPhaseService {
         if (!game.getStoredValue("agendaConstitution").isEmpty()) {
             game.setStoredValue("agendaConstitution", "");
             for (Player player2 : game.getRealPlayers()) {
-                ArrayList<String> exhausted = new ArrayList<>();
+                var exhausted = new ArrayList<String>();
                 for (String planet : player2.getPlanets()) {
                     if (planet.contains("custodia") || planet.contains("ghoti")) {
                         continue;
@@ -317,7 +320,7 @@ public class StartPhaseService {
         if (!game.getStoredValue("agendaArmsReduction").isEmpty()) {
             game.setStoredValue("agendaArmsReduction", "");
             for (Player player2 : game.getRealPlayers()) {
-                ArrayList<String> exhausted = new ArrayList<>();
+                var exhausted = new ArrayList<String>();
                 for (String planet : player2.getPlanets()) {
                     if (planet.contains("custodia") || planet.contains("ghoti")) {
                         continue;
@@ -386,7 +389,7 @@ public class StartPhaseService {
         if (!game.getStoredValue("agendaRepGov").isEmpty()) {
             for (Player player2 : game.getRealPlayers()) {
                 if (game.getStoredValue("agendaRepGov").contains(player2.getFaction())) {
-                    ArrayList<String> exhausted = new ArrayList<>();
+                    var exhausted = new ArrayList<String>();
                     for (String planet : player2.getPlanets()) {
                         Planet p = game.getPlanetsInfo().get(planet);
                         if (p != null && p.getPlanetTypes().contains("cultural")) {
@@ -470,7 +473,7 @@ public class StartPhaseService {
                     .filter(Objects::nonNull)
                     .filter(p -> p.getSCs().size() < game.getStrategyCardsPerPlayer())
                     .findFirst();
-            if (!firstInPriorityOrder.isPresent()) {
+            if (firstInPriorityOrder.isEmpty()) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "No player found on the Priority Track with fewer than the max strategy cards. Can't offer anyone Strategy Cards.");
@@ -508,10 +511,14 @@ public class StartPhaseService {
         }
         ButtonHelperAbilities.giveKeleresCommsNTg(game, event);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "Strategy", System.currentTimeMillis() + "");
-        MessageHelper.sendMessageToChannelWithButtons(
-                firstSCPicker.getCorrectChannel(),
-                message + pickSCMsg,
-                Helper.getRemainingSCButtons(game, firstSCPicker));
+        if (firstSCPicker.isNpc()) {
+            PickStrategyCardService.checkForQueuedSCPick(null, firstSCPicker, game, "");
+        } else {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    firstSCPicker.getCorrectChannel(),
+                    message + pickSCMsg,
+                    Helper.getRemainingSCButtons(game, firstSCPicker));
+        }
 
         if (!game.isFowMode()) {
             ButtonHelper.updateMap(game, event, "Start of the Strategy Phase for round #" + game.getRound() + ".");
@@ -545,19 +552,19 @@ public class StartPhaseService {
 
         // Pulsar destruction logic
         game.getTileMap().values().stream()
-                .filter(tile -> tile.getTileID().equals("sig02"))
-                .forEach(pulsar -> {
-                    pulsar.getSpaceUnitHolder().getUnitColorsOnHolder().forEach(playerColor -> {
-                        pulsar.removeAllUnits(playerColor);
-                        Player p = game.getPlayerFromColorOrFaction(playerColor);
-                        if (p.isRealPlayer()) {
-                            MessageHelper.sendMessageToChannel(
-                                    p.getCorrectChannel(),
-                                    p.getRepresentationUnfogged() + ", units in Pulsar (" + pulsar.getPosition()
-                                            + ") were destroyed.");
-                        }
-                    });
-                });
+                .filter(tile -> "sig02".equals(tile.getTileID()))
+                .forEach(pulsar -> pulsar.getSpaceUnitHolder()
+                        .getUnitColorsOnHolder()
+                        .forEach(playerColor -> {
+                            pulsar.removeAllUnits(playerColor);
+                            Player p = game.getPlayerFromColorOrFaction(playerColor);
+                            if (p.isRealPlayer()) {
+                                MessageHelper.sendMessageToChannel(
+                                        p.getCorrectChannel(),
+                                        p.getRepresentationUnfogged() + ", units in Pulsar (" + pulsar.getPosition()
+                                                + ") were destroyed.");
+                            }
+                        }));
 
         if ("action_deck_2".equals(game.getAcDeckID()) && game.getRound() > 1) {
             handleStartOfStrategyForAcd2(game);
@@ -843,7 +850,7 @@ public class StartPhaseService {
 
     public static void postSurveyResults(Game game) {
         int completedSurvey = 0;
-        if (game.getRealPlayers().size() > 0) {
+        if (!game.getRealPlayers().isEmpty()) {
             for (Player p2 : game.getRealPlayers()) {
                 var userSettings = UserSettingsManager.get(p2.getUserID());
                 if (userSettings.isHasAnsweredSurvey()) {
@@ -863,13 +870,13 @@ public class StartPhaseService {
                 && completedSurvey > 2
                 && game.getStoredValue("postedSurvey").isEmpty()) {
             String header = "# __Survey Results__\n";
-            String question1 = "## Question #1: Whispers\n";
-            String question2 = "## Question #2: Supports\n";
-            String question4 = "## Question #4: Winmaking\n";
-            String question3 = "## Question #3: How To Handle Rollback Disputes\n";
-            String question5 = "## Question #5: Meta Preferences\n";
+            StringBuilder question1 = new StringBuilder("## Question #1: Whispers\n");
+            StringBuilder question2 = new StringBuilder("## Question #2: Supports\n");
+            StringBuilder question4 = new StringBuilder("## Question #4: Winmaking\n");
+            StringBuilder question3 = new StringBuilder("## Question #3: How To Handle Rollback Disputes\n");
+            StringBuilder question5 = new StringBuilder("## Question #5: Meta Preferences\n");
             List<Player> randomPlayers = new ArrayList<>();
-            if (game.getRealPlayers().size() > 0) {
+            if (!game.getRealPlayers().isEmpty()) {
                 randomPlayers.addAll(game.getRealPlayers());
             } else {
                 randomPlayers.addAll(game.getPlayers().values());
@@ -883,8 +890,8 @@ public class StartPhaseService {
                 if (!userSettings.isHasAnsweredSurvey()) {
                     continue;
                 }
-                question1 += "* " + userSettings.getWhisperPref() + "\n";
-                question2 += "* " + userSettings.getSupportPref() + "\n";
+                question1.append("* ").append(userSettings.getWhisperPref()).append("\n");
+                question2.append("* ").append(userSettings.getSupportPref()).append("\n");
                 if (userSettings.getSupportPref().contains("Purge")) {
                     anyoneWantsToBan = true;
                 }
@@ -894,9 +901,9 @@ public class StartPhaseService {
                 if (userSettings.getWhisperPref().contains("Limited")) {
                     anyoneWantsLimitedWhispers = true;
                 }
-                question4 += "* " + userSettings.getWinmakingPref() + "\n";
-                question3 += "* " + userSettings.getTakebackPref() + "\n";
-                question5 += "* " + userSettings.getMetaPref() + "\n";
+                question4.append("* ").append(userSettings.getWinmakingPref()).append("\n");
+                question3.append("* ").append(userSettings.getTakebackPref()).append("\n");
+                question5.append("* ").append(userSettings.getMetaPref()).append("\n");
             }
             MessageHelper.sendMessageToChannelAndPin(
                     game.getTableTalkChannel(),
@@ -964,10 +971,10 @@ public class StartPhaseService {
         if (nextPlayer == null) {
             return;
         }
-        game.updateActivePlayer(nextPlayer);
-        if (game.isFowMode()) {
-            FoWHelper.pingAllPlayersWithFullStats(game, event, nextPlayer, "started turn");
-        }
+        // game.updateActivePlayer(nextPlayer);
+        // if (game.isFowMode()) {
+        //     FoWHelper.pingAllPlayersWithFullStats(game, event, nextPlayer, "started turn");
+        // }
         Set<Integer> scPickedList = new HashSet<>();
         for (Player player_ : game.getRealPlayers()) {
             scPickedList.addAll(player_.getSCs());
@@ -980,10 +987,10 @@ public class StartPhaseService {
                 game.setScTradeGood(sc, 0);
             }
         }
-        ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, game);
-        if (nextPlayer.getInRoundTurnCount() == 0) {
-            nextPlayer.setInRoundTurnCount(1);
-        }
+        // ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, game);
+        // if (nextPlayer.getInRoundTurnCount() == 0) {
+        //     nextPlayer.setInRoundTurnCount(1);
+        // }
         if (isFowPrivateGame) {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
@@ -1006,22 +1013,23 @@ public class StartPhaseService {
                             buttons);
                 }
             }
-            if (game.isShowBanners()) {
-                BannerGenerator.drawFactionBanner(nextPlayer);
-            }
-            String msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your "
-                    + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound()
-                    + ").";
-            game.updateActivePlayer(nextPlayer);
+            StartTurnService.turnStart(event, game, nextPlayer);
+            // if (game.isShowBanners()) {
+            //     BannerGenerator.drawFactionBanner(nextPlayer);
+            // }
+            // String msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your "
+            //         + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound()
+            //         + ").";
+            // game.updateActivePlayer(nextPlayer);
 
-            StartTurnService.reviveInfantryII(nextPlayer);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    nextPlayer.getPrivateChannel(),
-                    msgExtra + "\n Use buttons to do turn.",
-                    StartTurnService.getStartOfTurnButtons(nextPlayer, game, false, event));
-            FowCommunicationThreadService.checkNewNeighbors(game, nextPlayer);
+            // StartTurnService.reviveInfantryII(nextPlayer);
+            // MessageHelper.sendMessageToChannelWithButtons(
+            //         nextPlayer.getPrivateChannel(),
+            //         msgExtra + "\n Use buttons to do turn.",
+            //         StartTurnService.getStartOfTurnButtons(nextPlayer, game, false, event));
+            // FowCommunicationThreadService.checkNewNeighbors(game, nextPlayer);
         } else {
-            String hold = "";
+            StringBuilder hold = new StringBuilder();
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
                     "All players have picked a strategy card.\n" + nextPlayer.getRepresentation()
@@ -1037,7 +1045,7 @@ public class StartPhaseService {
                             p2.getRepresentationUnfogged()
                                     + ", you have the opportunity to use _Quantum Datahub Node_.",
                             buttons);
-                    hold = "_Quantum Datahub Node_";
+                    hold = new StringBuilder("_Quantum Datahub Node_");
                 }
                 if (ButtonHelper.isPlayerElected(game, p2, "arbiter")) {
                     List<Button> buttons = new ArrayList<>();
@@ -1047,50 +1055,53 @@ public class StartPhaseService {
                             p2.getCorrectChannel(),
                             p2.getRepresentationUnfogged() + ", you have the opportunity to use _Imperial Arbiter_.",
                             buttons);
-                    hold += (hold.isEmpty() ? "" : " or ") + "_Imperial Arbiter_";
+                    hold.append((hold.isEmpty()) ? "" : " or ").append("_Imperial Arbiter_");
                 }
             }
             if (game.isShowBanners()) {
                 BannerGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
             }
             ListTurnOrderService.turnOrder(event, game);
-            if (game.isShowBanners()) {
-                BannerGenerator.drawFactionBanner(nextPlayer);
-            }
-            String msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your "
-                    + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound()
-                    + ").";
-            Player nextNextPlayer = EndTurnService.findNextUnpassedPlayer(game, nextPlayer);
-            if (nextNextPlayer == nextPlayer) {
-                msgExtra +=
-                        "\n-# All other players are passed; you will take consecutive turns until you pass, ending the Action Phase.";
-            } else if (nextNextPlayer != null) {
-                String ping =
-                        UserSettingsManager.get(nextNextPlayer.getUserID()).isPingOnNextTurn()
-                                ? nextNextPlayer.getRepresentationUnfogged()
-                                : nextNextPlayer.getRepresentationNoPing();
-                int numUnpassed = -2;
-                for (Player p2 : game.getPlayers().values()) {
-                    numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
-                }
-                msgExtra += "\n-# " + ping + " will start their turn once you've ended yours. ";
-                if (numUnpassed == 0) {
-                    msgExtra += "No other players are unpassed.";
-                } else {
-                    msgExtra +=
-                            numUnpassed + " other player" + (numUnpassed == 1 ? " is" : "s are") + " still unpassed.";
-                }
-            }
-            if (!hold.isEmpty()) {
-                msgExtra += "\nYou may wish to hold your turn until you have confirmation of no " + hold + ".";
-            }
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
+            // if (game.isShowBanners()) {
+            //     BannerGenerator.drawFactionBanner(nextPlayer);
+            // }
+            // String msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your "
+            //         + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound()
+            //         + ").";
+            // Player nextNextPlayer = EndTurnService.findNextUnpassedPlayer(game, nextPlayer);
+            StartTurnService.turnStart(event, game, nextPlayer);
+            // if (nextNextPlayer == nextPlayer) {
+            //     msgExtra +=
+            //             "\n-# All other players are passed; you will take consecutive turns until you pass, ending
+            // the Action Phase.";
+            // } else if (nextNextPlayer != null) {
+            //     String ping =
+            //             UserSettingsManager.get(nextNextPlayer.getUserID()).isPingOnNextTurn()
+            //                     ? nextNextPlayer.getRepresentationUnfogged()
+            //                     : nextNextPlayer.getRepresentationNoPing();
+            //     int numUnpassed = -2;
+            //     for (Player p2 : game.getPlayers().values()) {
+            //         numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
+            //     }
+            //     msgExtra += "\n-# " + ping + " will start their turn once you've ended yours. ";
+            //     if (numUnpassed == 0) {
+            //         msgExtra += "No other players are unpassed.";
+            //     } else {
+            //         msgExtra +=
+            //                 numUnpassed + " other player" + (numUnpassed == 1 ? " is" : "s are") + " still
+            // unpassed.";
+            //     }
+            // }
+            // if (hold.length() > 0) {
+            //     msgExtra += "\nYou may wish to hold your turn until you have confirmation of no " + hold + ".";
+            // }
+            // MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
 
-            StartTurnService.reviveInfantryII(nextPlayer);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    game.getMainGameChannel(),
-                    "Use buttons to do turn.",
-                    StartTurnService.getStartOfTurnButtons(nextPlayer, game, false, event));
+            // StartTurnService.reviveInfantryII(nextPlayer);
+            // MessageHelper.sendMessageToChannelWithButtons(
+            //         game.getMainGameChannel(),
+            //         "Use buttons to do turn.",
+            //         StartTurnService.getStartOfTurnButtons(nextPlayer, game, false, event));
         }
         for (Player p2 : game.getRealPlayers()) {
             if (!game.isFowMode()) {

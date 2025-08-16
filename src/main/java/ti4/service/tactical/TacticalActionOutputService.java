@@ -38,7 +38,7 @@ public class TacticalActionOutputService {
 
     public void refreshButtonsAndMessageForTile(
             ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove) {
-        String message = TacticalActionOutputService.buildMessageForSingleSystem(game, player, tile);
+        String message = buildMessageForSingleSystem(game, player, tile);
         List<Button> systemButtons =
                 ButtonHelperTacticalAction.getButtonsForAllUnitsInSystem(player, game, tile, moveOrRemove);
         MessageHelper.editMessageWithButtons(event, message, systemButtons);
@@ -61,7 +61,7 @@ public class TacticalActionOutputService {
         return summaries;
     }
 
-    public String buildMessageForTacticalAction(Game game, Player player) {
+    private String buildMessageForTacticalAction(Game game, Player player) {
         StringBuilder sb = new StringBuilder("## Tactical Action in system ");
         Tile activeSystem = getActiveSystem(game);
         sb.append(activeSystem.getRepresentationForButtons(game, player)).append(":\n\n");
@@ -73,7 +73,7 @@ public class TacticalActionOutputService {
         return sb.toString();
     }
 
-    public String buildCondensedMessageForTacticalAction(Game game, Player player) {
+    private String buildCondensedMessageForTacticalAction(Game game, Player player) {
         StringBuilder sb = new StringBuilder("## Tactical Action in system ");
         Tile activeSystem = getActiveSystem(game);
         sb.append(activeSystem.getRepresentationForButtons(game, player)).append(":\n\n");
@@ -142,7 +142,7 @@ public class TacticalActionOutputService {
 
                 List<Integer> states = unitMap.get(key);
                 if (condensed) {
-                    int amt = states.stream().collect(Collectors.summingInt(i -> i));
+                    int amt = states.stream().mapToInt(i -> i).sum();
                     String unitStr = key.unitEmoji().emojiString().repeat(amt);
                     if (amt > 2) unitStr = amt + "x " + key.unitEmoji();
                     lines.add(unitStr);
@@ -186,14 +186,15 @@ public class TacticalActionOutputService {
             String pos = entry.getKey().split("-")[0];
             if (excludeTiles.contains(pos)) continue;
             for (var unitEntry : entry.getValue().entrySet()) {
-                int amt = unitEntry.getValue().stream().collect(Collectors.summingInt(a -> a));
+                int amt = unitEntry.getValue().stream().mapToInt(a -> a).sum();
                 UnitKey key = unitEntry.getKey();
                 quantities.put(key, quantities.getOrDefault(key, 0) + amt);
             }
         }
         List<String> units = new ArrayList<>();
-        for (UnitKey key : quantities.keySet()) {
-            int amt = quantities.get(key);
+        for (Entry<UnitKey, Integer> entry : quantities.entrySet()) {
+            UnitKey key = entry.getKey();
+            int amt = entry.getValue();
             String unitStr = key.unitEmoji().emojiString().repeat(amt);
             if (amt > 2) unitStr = amt + "x " + key.unitEmoji();
             units.add(unitStr);
@@ -203,7 +204,8 @@ public class TacticalActionOutputService {
         return sb.toString();
     }
 
-    public String validateMoveValue(Game game, Player player, Tile tile, UnitKey unit, int distance, int riftDistance) {
+    private String validateMoveValue(
+            Game game, Player player, Tile tile, UnitKey unit, int distance, int riftDistance) {
         int moveValue = getUnitMoveValue(game, player, tile, unit, false);
         if (moveValue == 0) return "";
 
@@ -239,7 +241,7 @@ public class TacticalActionOutputService {
         return output;
     }
 
-    public int getUnitMoveValue(Game game, Player player, Tile tile, UnitKey unit, boolean skipBonus) {
+    private int getUnitMoveValue(Game game, Player player, Tile tile, UnitKey unit, boolean skipBonus) {
         UnitModel model = player.getUnitFromUnitKey(unit);
         if (model == null) {
             return 0;

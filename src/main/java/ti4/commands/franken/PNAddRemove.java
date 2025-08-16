@@ -16,7 +16,7 @@ import ti4.map.Player;
 
 abstract class PNAddRemove extends GameStateSubcommand {
 
-    public PNAddRemove(String name, String description) {
+    PNAddRemove(String name, String description) {
         super(name, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID")
                 .setRequired(true)
@@ -47,5 +47,5 @@ abstract class PNAddRemove extends GameStateSubcommand {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false, event);
     }
 
-    public abstract void doAction(Player player, List<String> pnIDs, SlashCommandInteractionEvent event);
+    protected abstract void doAction(Player player, List<String> pnIDs, SlashCommandInteractionEvent event);
 }

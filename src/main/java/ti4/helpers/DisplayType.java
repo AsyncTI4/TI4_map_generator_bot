@@ -21,7 +21,7 @@ public enum DisplayType {
     unlocked("unlocked"); // Master Display Type = Map, force HexBorder = Solid, hide locked units (have a CC of their
     // colour in their system)
 
-    public final String value;
+    private final String value;
 
     DisplayType(String value) {
         this.value = value;

@@ -32,7 +32,7 @@ class DebugMilty extends GameStateSubcommand {
         }
     }
 
-    public static void postInfoInThread(Game game, ThreadChannel thread) {
+    private static void postInfoInThread(Game game, ThreadChannel thread) {
         MiltySettings menu = game.getMiltySettingsUnsafe();
         MiltyDraftManager manager = game.getMiltyDraftManager();
 

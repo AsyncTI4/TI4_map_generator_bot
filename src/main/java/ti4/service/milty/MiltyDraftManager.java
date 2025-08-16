@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Data;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -37,6 +38,9 @@ import ti4.service.emoji.TI4Emoji;
 @Data
 public class MiltyDraftManager {
     private static final String SUMMARY_START = "# **__Draft Picks So Far__**:";
+    private static final Pattern PATTERN = Pattern.compile("e\\d{1,3}");
+    private static final Pattern REGEX = Pattern.compile("d\\d{1,3}");
+    private static final Pattern MILTY_ = Pattern.compile("milty_");
 
     private final List<MiltyDraftTile> all = new ArrayList<>();
     private final List<MiltyDraftTile> blue = new ArrayList<>();
@@ -59,7 +63,7 @@ public class MiltyDraftManager {
         private MiltyDraftSlice slice;
         private Integer position;
 
-        public String summary(String doggy) {
+        String summary(String doggy) {
             return String.join(" ", factionEmoji(doggy), sliceEmoji(), positionEmoji());
         }
 
@@ -80,7 +84,7 @@ public class MiltyDraftManager {
         }
 
         @JsonIgnore
-        public String save() {
+        String save() {
             String factionStr = faction == null ? "null" : faction;
             String sliceStr = slice == null ? "null" : slice.getName();
             String orderStr = position == null ? "null" : Integer.toString(position);
@@ -97,12 +101,12 @@ public class MiltyDraftManager {
         all.add(draftTile);
     }
 
-    public String getCurrentDraftPlayer() {
+    private String getCurrentDraftPlayer() {
         if (draftOrder.size() <= draftIndex) return null;
         return draftOrder.get(draftIndex);
     }
 
-    public String getNextDraftPlayer() {
+    private String getNextDraftPlayer() {
         if (draftOrder.size() <= draftIndex + 1) return null;
         return draftOrder.get(draftIndex + 1);
     }
@@ -119,7 +123,7 @@ public class MiltyDraftManager {
         return game.getPlayer(user);
     }
 
-    public void setNextPlayerInDraft() {
+    private void setNextPlayerInDraft() {
         draftIndex++;
     }
 
@@ -266,7 +270,7 @@ public class MiltyDraftManager {
     }
 
     @JsonIgnore
-    public boolean isSliceTaken(String sliceName) {
+    private boolean isSliceTaken(String sliceName) {
         for (PlayerDraft pd : draft.values()) {
             if (pd.getSlice() != null && pd.getSlice().getName().equals(sliceName)) {
                 return true;
@@ -276,7 +280,7 @@ public class MiltyDraftManager {
     }
 
     @JsonIgnore
-    public boolean isOrderTaken(int value) {
+    private boolean isOrderTaken(int value) {
         for (PlayerDraft pd : draft.values()) {
             if (pd.getPosition() != null && pd.getPosition() == value) {
                 return true;
@@ -363,7 +367,7 @@ public class MiltyDraftManager {
             MessageHelper.sendMessageToChannel(mainGameChannel, drafted);
         }
 
-        if (category.equals("faction") && item.contains("keleres")) {
+        if ("faction".equals(category) && item.contains("keleres")) {
             MiltyService.offerKeleresSetupButtons(this, player);
         }
 
@@ -405,7 +409,8 @@ public class MiltyDraftManager {
     }
 
     private String getAutoButtonID(List<Button> buttons) {
-        if (buttons.size() == 1) return buttons.getFirst().getId().replaceFirst("milty_", "miltyAuto_");
+        if (buttons.size() == 1)
+            return MILTY_.matcher(buttons.getFirst().getId()).replaceFirst("miltyAuto_");
         return null;
     }
 
@@ -451,7 +456,7 @@ public class MiltyDraftManager {
 
     public List<Button> getSliceButtons() {
         List<Button> sliceButtons = new ArrayList<>();
-        for (MiltyDraftSlice slice : getSlices()) {
+        for (MiltyDraftSlice slice : slices) {
             if (isSliceTaken(slice.getName())) continue;
             sliceButtons.add(Buttons.green(
                     "milty_slice_" + slice.getName(), " ", MiltyDraftEmojis.getMiltyDraftEmoji(slice.getName())));
@@ -461,7 +466,7 @@ public class MiltyDraftManager {
 
     public List<Button> getFactionButtons() {
         List<Button> factionButtons = new ArrayList<>();
-        for (String faction : getFactionDraft()) {
+        for (String faction : factionDraft) {
             FactionModel model = Mapper.getFaction(faction);
             if (model == null || isFactionTaken(faction)) continue;
 
@@ -483,11 +488,11 @@ public class MiltyDraftManager {
     }
 
     public String getOverallSummaryString(Game game) {
-        int padding = String.format("%s", getPlayers().size()).length() + 1;
+        int padding = String.format("%s", players.size()).length() + 1;
         String goodDogOfTheDay = TI4Emoji.getRandomGoodDog().toString();
         StringBuilder sb = new StringBuilder(SUMMARY_START);
         int pickNum = 1;
-        for (String p : getPlayers()) {
+        for (String p : players) {
             Player player = game.getPlayer(p);
             PlayerDraft picks = getPlayerDraft(p);
             sb.append("\n> `").append(Helper.leftpad(pickNum + ".", padding)).append("` ");
@@ -517,7 +522,7 @@ public class MiltyDraftManager {
             String playerStr = String.join(",", players);
             String picksStr = String.join(
                     ";", players.stream().map(p -> getPlayerDraft(p).save()).toList());
-            String templateStr = getMapTemplate();
+            String templateStr = mapTemplate;
 
             List<String> lesserSaves =
                     Arrays.asList(sliceStr, factionStr, playerStr, picksStr, /* messagesStr, */ templateStr);
@@ -613,8 +618,8 @@ public class MiltyDraftManager {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
             if (tileRequested.getSource() != null) currentsources.add(tileRequested.getSource());
-            if (tileId.matches("d\\d{1,3}")) currentsources.add(ComponentSource.uncharted_space);
-            if (tileId.matches("e\\d{1,3}")) currentsources.add(ComponentSource.eronous);
+            if (REGEX.matcher(tileId).matches()) currentsources.add(ComponentSource.uncharted_space);
+            if (PATTERN.matcher(tileId).matches()) currentsources.add(ComponentSource.eronous);
             MiltyDraftHelper.initDraftTiles(this, new ArrayList<>(currentsources));
             result = all.stream()
                     .filter(t -> t.getTile().getTileID().equals(tileId))

@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 
 abstract class UnitAddRemove extends GameStateSubcommand {
 
-    public UnitAddRemove(String name, String description) {
+    UnitAddRemove(String name, String description) {
         super(name, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_ID, "Unit Name")
                 .setRequired(true)
@@ -48,5 +48,5 @@ abstract class UnitAddRemove extends GameStateSubcommand {
         MessageHelper.sendMessageToChannel(event.getChannel(), player.checkUnitsOwned());
     }
 
-    public abstract void doAction(Player player, List<String> unitIDs, SlashCommandInteractionEvent event);
+    protected abstract void doAction(Player player, List<String> unitIDs, SlashCommandInteractionEvent event);
 }

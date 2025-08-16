@@ -23,7 +23,7 @@ public class IntegerSetting extends SettingInterface {
     public IntegerSetting(String id, String name, int val, int min, int max, int delta) {
         super(id, name);
 
-        this.defaultValue = this.val = val;
+        defaultValue = this.val = val;
         this.min = min;
         this.max = max;
         this.delta = delta;
@@ -66,13 +66,13 @@ public class IntegerSetting extends SettingInterface {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Helper Methods
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public String increment() {
+    private String increment() {
         if (val + delta > max) return "[" + name + " cannot go above " + max + "]";
         val += delta;
         return null;
     }
 
-    public String decrement() {
+    private String decrement() {
         if (val - delta < min) return "[" + name + " cannot go below " + min + "]";
         val -= delta;
         return null;

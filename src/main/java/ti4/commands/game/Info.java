@@ -37,7 +37,7 @@ class Info extends GameStateSubcommand {
         MessageHelper.replyToMessage(event, sb.toString());
     }
 
-    public static StringBuilder getGameInfo(Game game, SlashCommandInteractionEvent event) {
+    private static StringBuilder getGameInfo(Game game, SlashCommandInteractionEvent event) {
         boolean privateGame = FoWHelper.isPrivateGame(game, event);
 
         StringBuilder sb = new StringBuilder();

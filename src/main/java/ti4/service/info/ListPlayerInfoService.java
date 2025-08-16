@@ -124,7 +124,7 @@ public class ListPlayerInfoService {
 
     record ObjectiveResult(boolean canFullyMeet, int closenessScore) {}
 
-    public ObjectiveResult checkObjective(
+    private ObjectiveResult checkObjective(
             List<String> planets, int tradeGoods, int goal, Player player, Game game, int closestScore) {
         return backtrack(planets, 0, 0, 0, new HashSet<>(), tradeGoods, goal, player, game, closestScore);
     }
@@ -288,7 +288,7 @@ public class ListPlayerInfoService {
                         || Mapper.getPublicObjective(id).getSource() == Source.ComponentSource.base) {
                     if (stage1sOrTwos.equalsIgnoreCase(
                                     "" + Mapper.getPublicObjective(id).getPoints())
-                            || stage1sOrTwos.equalsIgnoreCase("both")) {
+                            || "both".equalsIgnoreCase(stage1sOrTwos)) {
                         msg.append(representScoring(game, id, x)).append("\n");
                         x++;
                     }
@@ -302,7 +302,7 @@ public class ListPlayerInfoService {
         return representScoring(game, objID, x, false);
     }
 
-    public static String representScoring(Game game, String objID, int x, boolean secret) {
+    private static String representScoring(Game game, String objID, int x, boolean secret) {
         StringBuilder representation;
         if (secret) {
             representation = new StringBuilder(
@@ -353,7 +353,7 @@ public class ListPlayerInfoService {
         return representation.toString();
     }
 
-    public static String representSecrets(Game game) {
+    private static String representSecrets(Game game) {
         StringBuilder representation = new StringBuilder("__**Scored Secret Objectives**__\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
@@ -369,7 +369,7 @@ public class ListPlayerInfoService {
         return representation.toString();
     }
 
-    public static String representSupports(Game game) {
+    private static String representSupports(Game game) {
         StringBuilder representation = new StringBuilder("__**Support Victory Points**__\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
@@ -383,7 +383,7 @@ public class ListPlayerInfoService {
         return representation.toString();
     }
 
-    public static String getTransferablePointRepresentation(String objectiveId) {
+    private static String getTransferablePointRepresentation(String objectiveId) {
         return switch (objectiveId) {
             case Constants.VOICE_OF_THE_COUNCIL_PO, "Shard of the Throne", "Political Censure" -> objectiveId;
             case "Shard of the Throne (1)", "Shard of the Throne (2)", "Shard of the Throne (3)" -> objectiveId;
@@ -392,12 +392,12 @@ public class ListPlayerInfoService {
         };
     }
 
-    public static boolean gameHasTransferablePoints(Game game) {
+    private static boolean gameHasTransferablePoints(Game game) {
         return game.getCustomPublicVP().keySet().stream()
                 .anyMatch(obj -> getTransferablePointRepresentation(obj) != null);
     }
 
-    public static String representTransferablePoints(Game game) {
+    private static String representTransferablePoints(Game game) {
         StringBuilder representation = new StringBuilder("__**Transferable Points**__");
         if (!game.isFowMode()) {
             for (var objective : game.getCustomPublicVP().entrySet()) {
@@ -426,7 +426,7 @@ public class ListPlayerInfoService {
         return representation.toString();
     }
 
-    public static String representTotalVPs(Game game) {
+    private static String representTotalVPs(Game game) {
         StringBuilder representation = new StringBuilder("__**Total Victory Points**__\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {

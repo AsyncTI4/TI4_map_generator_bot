@@ -3,7 +3,6 @@ package ti4.commands.special;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -68,7 +67,7 @@ class SwapTwoSystems extends GameStateSubcommand {
         List<Tile> availableTiles = getGame().getTileMap().values().stream()
                 .filter(tile -> !EXCLUDED_POSITIONS.contains(tile.getPosition()))
                 .filter(tile -> !tile.getTileModel().isHyperlane())
-                .collect(Collectors.toList());
+                .toList();
 
         if (availableTiles.isEmpty()) {
             return null;

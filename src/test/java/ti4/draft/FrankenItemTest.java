@@ -7,15 +7,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ti4.testUtils.BaseTi4Test;
 
-public class FrankenItemTest extends BaseTi4Test {
+class FrankenItemTest extends BaseTi4Test {
     @Test
-    public void testAllCardsGenerateSuccessfully() {
+    void testAllCardsGenerateSuccessfully() {
         beforeAll();
         assertDoesNotThrow(DraftItem::generateAllDraftableCards);
     }
 
     @Test
-    public void testAllCardsHaveValidShortNames() {
+    void testAllCardsHaveValidShortNames() {
         beforeAll();
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
@@ -24,7 +24,7 @@ public class FrankenItemTest extends BaseTi4Test {
     }
 
     @Test
-    public void testAllCardsHaveValidLongNames() {
+    void testAllCardsHaveValidLongNames() {
         beforeAll();
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
@@ -37,7 +37,7 @@ public class FrankenItemTest extends BaseTi4Test {
     }
 
     @Test
-    public void testAllCardsHaveValidEmoji() {
+    void testAllCardsHaveValidEmoji() {
         beforeAll();
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
@@ -46,24 +46,24 @@ public class FrankenItemTest extends BaseTi4Test {
     }
 
     @Test
-    public void errataFileSanityTest() {
+    void errataFileSanityTest() {
         beforeAll();
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
             // PoK
-            assert (!card.getAlias().equals("ABILITY:mitosis"));
-            assert (!card.getAlias().equals("ABILITY:hubris"));
-            assert (!card.getAlias().equals("ABILITY:fragile"));
-            assert (!card.getAlias().equals("STARTINGTECH:sardakk"));
-            assert (!card.getAlias().equals("AGENT:mentakagent"));
-            assert (!card.getAlias().equals("ABILITY:creuss_gate"));
+            assert (!"ABILITY:mitosis".equals(card.getAlias()));
+            assert (!"ABILITY:hubris".equals(card.getAlias()));
+            assert (!"ABILITY:fragile".equals(card.getAlias()));
+            assert (!"STARTINGTECH:sardakk".equals(card.getAlias()));
+            assert (!"AGENT:mentakagent".equals(card.getAlias()));
+            assert (!"ABILITY:creuss_gate".equals(card.getAlias()));
 
             // DS
-            assert (!card.getAlias().equals("ABILITY:probability_algorithms"));
-            assert (!card.getAlias().equals("MECH:kjalengard_mech"));
-            assert (!card.getAlias().equals("ABILITY:singularity_point"));
-            assert (!card.getAlias().equals("AGENT:mykomentoriagent"));
-            assert (!card.getAlias().equals("ABILITY:stealth_insertion"));
+            assert (!"ABILITY:probability_algorithms".equals(card.getAlias()));
+            assert (!"MECH:kjalengard_mech".equals(card.getAlias()));
+            assert (!"ABILITY:singularity_point".equals(card.getAlias()));
+            assert (!"AGENT:mykomentoriagent".equals(card.getAlias()));
+            assert (!"ABILITY:stealth_insertion".equals(card.getAlias()));
         }
     }
 }

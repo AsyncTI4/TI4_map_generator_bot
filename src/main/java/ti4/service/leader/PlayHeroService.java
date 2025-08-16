@@ -382,9 +382,7 @@ public class PlayHeroService {
                         event.getMessageChannel(),
                         player.getFactionEmoji() + " has been offered buttons to explore all their planets.");
             }
-            case "toldarhero" -> {
-                ButtonHelperHeroes.resolveToldarHero(game, player);
-            }
+            case "toldarhero" -> ButtonHelperHeroes.resolveToldarHero(game, player);
             case "nivynhero" -> {
                 ButtonHelperHeroes.resolveNivynHeroSustainEverything(game, player);
                 MessageHelper.sendMessageToChannel(
@@ -502,11 +500,11 @@ public class PlayHeroService {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                String ac_name = Mapper.getActionCard(key).getName();
-                if (ac_name != null) {
+                String acName = Mapper.getActionCard(key).getName();
+                if (acName != null) {
                     acButtons.add(Buttons.gray(
                             "yssarilHeroInitialOffering_" + value + "_" + yssaril.getFaction(),
-                            ac_name,
+                            acName,
                             CardEmojis.ActionCard));
                 }
             }

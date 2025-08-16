@@ -30,7 +30,7 @@ import ti4.service.emoji.CardEmojis;
 
 public class CombatModHelper {
 
-    public static Boolean IsModInScopeForUnits(
+    private static Boolean IsModInScopeForUnits(
             List<UnitModel> units, CombatModifierModel modifier, CombatRollType rollType, Game game, Player player) {
         for (UnitModel unit : units) {
             if (modifier.isInScopeForUnit(unit, units, rollType, game, player)) {
@@ -50,9 +50,9 @@ public class CombatModHelper {
             CombatRollType rollType,
             String modifierType) {
         List<NamedCombatModifierModel> modifiers = new ArrayList<>();
-        HashMap<String, CombatModifierModel> combatModifiers = new HashMap<>(Mapper.getCombatModifiers());
+        Map<String, CombatModifierModel> combatModifiers = new HashMap<>(Mapper.getCombatModifiers());
         combatModifiers = new HashMap<>(combatModifiers.entrySet().stream()
-                .filter(entry -> entry.getValue().getForCombatAbility().equals(rollType))
+                .filter(entry -> entry.getValue().getForCombatAbility() == rollType)
                 .filter(entry -> entry.getValue().getType().equals(modifierType))
                 .filter(entry -> !entry.getValue().getApplyToOpponent())
                 .filter(entry -> IsModInScopeForUnits(
@@ -248,7 +248,7 @@ public class CombatModHelper {
         return modsValue;
     }
 
-    public static Boolean checkModPassesCondition(
+    private static Boolean checkModPassesCondition(
             CombatModifierModel modifier,
             TileModel onTile,
             Player player,
@@ -294,7 +294,8 @@ public class CombatModHelper {
                     if (opponentFaction.contains("keleres")) {
                         meetsCondition = player.getTechs().stream()
                                 .map(Mapper::getTech)
-                                .anyMatch(tech -> tech.getFaction().orElse("").equals("keleres"));
+                                .anyMatch(tech ->
+                                        "keleres".equals(tech.getFaction().orElse("")));
                     } else {
                         meetsCondition = player.getTechs().stream()
                                 .map(Mapper::getTech)
@@ -341,23 +342,23 @@ public class CombatModHelper {
                     Entry<UnitModel, Integer> unitByQuantity2 = new ArrayList<>(unitsByQuantity.entrySet()).get(1);
                     String baseType1 = unitByQuantity.getKey().getBaseType();
                     String baseType2 = unitByQuantity2.getKey().getBaseType();
-                    if (baseType1.equalsIgnoreCase("fighter") || baseType2.equalsIgnoreCase("fighter")) {
-                        if (!baseType1.equalsIgnoreCase("fighter")) {
+                    if ("fighter".equalsIgnoreCase(baseType1) || "fighter".equalsIgnoreCase(baseType2)) {
+                        if (!"fighter".equalsIgnoreCase(baseType1)) {
                             meetsCondition = unitByQuantity.getValue() == 2;
                         } else {
                             meetsCondition = unitByQuantity2.getValue() == 2;
                         }
-                    } else if ((baseType1.equalsIgnoreCase("flagship") || baseType1.equalsIgnoreCase("lady"))
-                            && (baseType2.equalsIgnoreCase("flagship") || baseType2.equalsIgnoreCase("lady"))) {
+                    } else if (("flagship".equalsIgnoreCase(baseType1) || "lady".equalsIgnoreCase(baseType1))
+                            && ("flagship".equalsIgnoreCase(baseType2) || "lady".equalsIgnoreCase(baseType2))) {
                         meetsCondition = true;
                     }
                 } else if (unitsByQuantity.size() == 3) {
                     List<Entry<UnitModel, Integer>> entries = new ArrayList<>(unitsByQuantity.entrySet());
                     meetsCondition = entries.stream().limit(3).allMatch(entry -> {
                         String baseType = entry.getKey().getBaseType();
-                        return baseType.equalsIgnoreCase("fighter")
-                                || baseType.equalsIgnoreCase("flagship")
-                                || baseType.equalsIgnoreCase("lady");
+                        return "fighter".equalsIgnoreCase(baseType)
+                                || "flagship".equalsIgnoreCase(baseType)
+                                || "lady".equalsIgnoreCase(baseType);
                     });
                 }
             }
@@ -411,7 +412,7 @@ public class CombatModHelper {
                 }
             }
             case "thalnosPlusOne" -> {
-                if (game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
+                if ("true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"))) {
                     meetsCondition = true;
                 }
             }
@@ -424,11 +425,11 @@ public class CombatModHelper {
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "toldarcommander")) {
                     int ownUnits = 0;
                     int opponentUnits = 0;
-                    for (UnitModel unitM : unitsByQuantity.keySet()) {
-                        ownUnits += unitsByQuantity.get(unitM);
+                    for (Integer i : unitsByQuantity.values()) {
+                        ownUnits += i;
                     }
-                    for (UnitModel unitM : opponentUnitsByQuantity.keySet()) {
-                        opponentUnits += opponentUnitsByQuantity.get(unitM);
+                    for (Integer i : opponentUnitsByQuantity.values()) {
+                        opponentUnits += i;
                     }
                     meetsCondition = ownUnits < opponentUnits;
                 }
@@ -438,15 +439,16 @@ public class CombatModHelper {
                     int nonFighter = 0;
                     int infantry = 0;
                     int ships = 0;
-                    for (UnitModel unitM : unitsByQuantity.keySet()) {
+                    for (Entry<UnitModel, Integer> entry : unitsByQuantity.entrySet()) {
+                        UnitModel unitM = entry.getKey();
                         if (unitM.getIsShip()) {
-                            if (!unitM.getBaseType().equalsIgnoreCase("fighter")) {
-                                nonFighter += unitsByQuantity.get(unitM);
+                            if (!"fighter".equalsIgnoreCase(unitM.getBaseType())) {
+                                nonFighter += entry.getValue();
                             }
-                            ships += unitsByQuantity.get(unitM);
+                            ships += entry.getValue();
                         } else {
-                            if (unitM.getBaseType().equalsIgnoreCase("infantry")) {
-                                infantry += unitsByQuantity.get(unitM);
+                            if ("infantry".equalsIgnoreCase(unitM.getBaseType())) {
+                                infantry += entry.getValue();
                             }
                         }
                     }
@@ -465,10 +467,9 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
-            case "sigma_argent_flagship_1" -> {
+            case "sigma_argent_flagship_1" ->
                 meetsCondition = ButtonHelper.doesPlayerHaveFSHere(
                         "sigma_argent_flagship_1", player, game.getTileByPosition(game.getActiveSystem()));
-            }
             case "sigma_argent_flagship_2" -> {
                 meetsCondition = ButtonHelper.doesPlayerHaveFSHere("sigma_argent_flagship_2", player, tile);
                 for (String adjPos :
@@ -482,7 +483,7 @@ public class CombatModHelper {
         return meetsCondition;
     }
 
-    public static Integer getVariableModValue(
+    private static Integer getVariableModValue(
             CombatModifierModel mod,
             Player player,
             Player opponent,
@@ -556,15 +557,12 @@ public class CombatModHelper {
                             .map(Mapper::getTech)
                             .filter(TechnologyModel::isUnitUpgrade)
                             .count();
-                case Constants.MOD_DESTROYERS -> {
+                case Constants.MOD_DESTROYERS ->
                     scalingCount = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false);
-                }
-                case Constants.MOD_OPPONENT_NON_FIGHTER_SHIP -> {
+                case Constants.MOD_OPPONENT_NON_FIGHTER_SHIP ->
                     scalingCount += ButtonHelper.checkNumberNonFighterShips(opponent, activeSystem);
-                }
-                case Constants.MOD_OPPONENT_SHIP -> {
+                case Constants.MOD_OPPONENT_SHIP ->
                     scalingCount += ButtonHelper.checkNumberShips(opponent, activeSystem);
-                }
                 case "combat_round" -> {
                     int round;
                     String combatName = "combatRoundTracker" + player.getFaction() + activeSystem.getPosition()
@@ -644,7 +642,7 @@ public class CombatModHelper {
                 }
                 default -> {}
             }
-            value *= multiplier * (double) scalingCount;
+            value *= multiplier * scalingCount;
         }
         value = Math.floor(value); // to make sure eg +1 per 2 destroyer doesn't return 2.5 etc
         return (int) value;

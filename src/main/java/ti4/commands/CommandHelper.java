@@ -125,7 +125,7 @@ public class CommandHelper {
     }
 
     @Nullable
-    public static Player getPlayerByFactionColor(String factionColor, Game game) {
+    private static Player getPlayerByFactionColor(String factionColor, Game game) {
         factionColor = StringUtils.substringBefore(factionColor, " "); // TO HANDLE UNRESOLVED AUTOCOMPLETE
         factionColor = AliasHandler.resolveFaction(factionColor);
         for (Player player_ : game.getPlayers().values()) {
