@@ -23,7 +23,7 @@ public class TransactionGenerator {
 
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final BasicStroke stroke5 = new BasicStroke(5.0f);
-    private static final double NINETY_DEGREES_RADIANS = Math.toRadians(90);
+    private static final double NINETY_DEGREES_RADIANS = 1.5707963267948966;
     private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -NINETY_DEGREES_RADIANS;
 
     public static BufferedImage drawTransactableStuffImage(Player p1, Player p2) {

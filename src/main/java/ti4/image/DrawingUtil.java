@@ -38,8 +38,7 @@ public class DrawingUtil {
     }
 
     private static final int DELTA_Y = 26;
-    private static final double NINETY_DEGREES_RADIANS = Math.toRadians(90);
-    private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -NINETY_DEGREES_RADIANS;
+    private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -1.5707963267948966;
 
     public static void superDrawString(
             Graphics g,
