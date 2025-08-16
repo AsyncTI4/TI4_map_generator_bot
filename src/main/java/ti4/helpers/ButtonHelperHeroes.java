@@ -1624,7 +1624,7 @@ public class ButtonHelperHeroes {
                             + " purged It Feeds on Carrion, their hero, and captured... nothing " + MiscEmojis.TaDont
                             + ".");
         }
-        message.append("\n-# Please report any bugs to `\\#bot-bugs-and-feature-requests`.");
+        message.append("\n-# Please report any bugs to `#bot-bugs-and-feature-requests`.");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
 
         for (Map.Entry<Tile, Player> location : resolveFighter2s.entrySet()) {
