@@ -25,7 +25,7 @@ public class ImageHelper {
         if (filePath == null) {
             return null;
         }
-        return ImageCache.getInstance().getOrLoadStaticImage(filePath, k -> readImage(filePath));
+        return ImageCache.getOrLoadStaticImage(filePath, k -> readImage(filePath));
     }
 
     @Nullable
@@ -33,7 +33,7 @@ public class ImageHelper {
         if (filePath == null) {
             return null;
         }
-        return ImageCache.getInstance().getOrLoadStaticImage(percent + filePath, k -> {
+        return ImageCache.getOrLoadStaticImage(percent + filePath, k -> {
             BufferedImage image = readImage(filePath);
             if (image == null) {
                 return null;
@@ -47,7 +47,7 @@ public class ImageHelper {
         if (filePath == null) {
             return null;
         }
-        return ImageCache.getInstance().getOrLoadStaticImage(width + "x" + height + filePath, k -> {
+        return ImageCache.getOrLoadStaticImage(width + "x" + height + filePath, k -> {
             BufferedImage image = readImage(filePath);
             if (image == null) {
                 return null;
@@ -76,7 +76,7 @@ public class ImageHelper {
         if (imageURL == null) {
             return null;
         }
-        return ImageCache.getInstance().getOrLoadExpiringImage(width + "x" + height + imageURL, k -> {
+        return ImageCache.getOrLoadExpiringImage(width + "x" + height + imageURL, k -> {
             BufferedImage image = readImageURL(imageURL);
             if (image == null) {
                 return null;
@@ -106,7 +106,7 @@ public class ImageHelper {
         return square(originalImage, newSize);
     }
 
-    public static BufferedImage square(@NotNull BufferedImage originalImage, int newSize) {
+    private static BufferedImage square(@NotNull BufferedImage originalImage, int newSize) {
         BufferedImage outputImage = new BufferedImage(newSize, newSize, BufferedImage.TYPE_INT_ARGB);
         int newX = (newSize - originalImage.getWidth()) / 2;
         int newY = (newSize - originalImage.getHeight()) / 2;

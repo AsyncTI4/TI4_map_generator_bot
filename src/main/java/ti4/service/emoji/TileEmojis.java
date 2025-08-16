@@ -349,7 +349,7 @@ public enum TileEmojis implements TI4Emoji {
     }
 
     @Nullable
-    public static TI4Emoji getTileBackEmojiFromTileID(String tileID) {
+    private static TI4Emoji getTileBackEmojiFromTileID(String tileID) {
         if (!TileHelper.isValidTile(tileID)) return null;
         TileModel tileModel = TileHelper.getTileById(tileID);
 

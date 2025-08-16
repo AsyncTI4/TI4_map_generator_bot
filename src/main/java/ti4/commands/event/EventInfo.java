@@ -30,7 +30,7 @@ class EventInfo extends GameStateSubcommand {
         sendEventInfo(player);
     }
 
-    public static void sendEventInfo(Player player) {
+    private static void sendEventInfo(Player player) {
         MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "__Events in Hand:__", getEventMessageEmbeds(player));
     }
 

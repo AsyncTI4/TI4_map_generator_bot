@@ -11,7 +11,7 @@ import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class NotepadButtonHandler {
+class NotepadButtonHandler {
 
     private static String getNotes(Player player) {
         return StringHelper.unescape(player.getNotes());

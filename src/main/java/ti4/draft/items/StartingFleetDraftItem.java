@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import ti4.draft.DraftItem;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -14,6 +15,8 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 
 public class StartingFleetDraftItem extends DraftItem {
+    private static final Pattern FIN_SEP = Pattern.compile("finSep");
+
     public StartingFleetDraftItem(String itemId) {
         super(Category.STARTINGFLEET, itemId);
     }
@@ -61,9 +64,9 @@ public class StartingFleetDraftItem extends DraftItem {
         return allItems;
     }
 
-    public static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
+    private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
-        String[] results = game.getStoredValue("bannedFleets").split("finSep");
+        String[] results = FIN_SEP.split(game.getStoredValue("bannedFleets"));
         for (FactionModel faction : factions) {
             if (Arrays.asList(results).contains(faction.getAlias())) {
                 continue;

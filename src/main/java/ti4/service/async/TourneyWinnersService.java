@@ -35,7 +35,7 @@ public class TourneyWinnersService {
         return winnerIDs().contains(userID);
     }
 
-    public static List<String> winnerIDs() {
+    private static List<String> winnerIDs() {
         return readWinnerList().stream().map(TournamentWinner::getId).toList();
     }
 
@@ -77,12 +77,12 @@ public class TourneyWinnersService {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class TournamentWinner {
+    static class TournamentWinner {
         private String name;
         private String id;
         private String tourneyName;
 
-        public TournamentWinner(@NotNull User user, String tournament) {
+        TournamentWinner(@NotNull User user, String tournament) {
             name = user.getEffectiveName();
             id = user.getId();
             tourneyName = tournament;

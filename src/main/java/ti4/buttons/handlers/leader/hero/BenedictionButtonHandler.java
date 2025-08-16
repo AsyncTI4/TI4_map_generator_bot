@@ -43,7 +43,7 @@ class BenedictionButtonHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static List<Button> getBenediction2ndTileOptions(Player player, Game game, String pos1) {
+    private static List<Button> getBenediction2ndTileOptions(Player player, Game game, String pos1) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         Player origPlayer = player;

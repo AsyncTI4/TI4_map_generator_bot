@@ -97,7 +97,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         return Optional.ofNullable(color);
     }
 
-    public String getFactionOrColor() {
+    private String getFactionOrColor() {
         if (!StringUtils.isBlank(getFaction().orElse(""))) return faction;
         if (!StringUtils.isBlank(getColor().orElse(""))) {
             if ("<color>".equals(color)) return "generic";

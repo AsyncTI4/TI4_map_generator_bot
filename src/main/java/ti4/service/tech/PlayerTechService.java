@@ -3,6 +3,7 @@ package ti4.service.tech;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -50,6 +51,8 @@ import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 public class PlayerTechService {
+
+    private static final Pattern PATTERN = Pattern.compile("__");
 
     public static void addTech(GenericInteractionCreateEvent event, Game game, Player player, String techID) {
         player.addTech(techID);
@@ -465,7 +468,7 @@ public class PlayerTechService {
         boolean isStrat = !buttonID.contains("__comp");
         boolean paymentRequired = !buttonID.contains("__noPay");
 
-        List<String> buttonIDComponents = Arrays.asList(buttonID.split("__"));
+        List<String> buttonIDComponents = Arrays.asList(PATTERN.split(buttonID));
         buttonID = buttonIDComponents.getFirst();
         String paymentType = buttonIDComponents.size() > 1 ? buttonIDComponents.get(1) : "res";
 
@@ -653,7 +656,8 @@ public class PlayerTechService {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void payForTech(Game game, Player player, ButtonInteractionEvent event, String tech, String payWith) {
+    private static void payForTech(
+            Game game, Player player, ButtonInteractionEvent event, String tech, String payWith) {
         String trueIdentity = player.getRepresentationUnfogged();
         String message2 = trueIdentity + ", please choose the planets you wish to exhaust. ";
         String payType = payWith != null ? payWith : "res";

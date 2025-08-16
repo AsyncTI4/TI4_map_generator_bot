@@ -36,7 +36,7 @@ import java.util.Map;
     "tradeGoods",
     "maxCommodities"
 })
-public class TTPGPlayer {
+class TTPGPlayer {
 
     @JsonProperty("laws")
     private List<String> laws;

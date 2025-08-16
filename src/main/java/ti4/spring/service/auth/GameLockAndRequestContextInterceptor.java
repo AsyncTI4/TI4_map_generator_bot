@@ -20,7 +20,7 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
     @Override
     public boolean preHandle(
             @NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) {
-        String gameName = getPathVariable(request, "gameName");
+        String gameName = getGameNameFromUri(request);
         if (gameName == null) return true;
         if (!GameManager.isValid(gameName)) throw new InvalidGameNameException(gameName);
 
@@ -31,11 +31,11 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         return true;
     }
 
-    private String getPathVariable(HttpServletRequest request, String variable) {
+    private String getGameNameFromUri(HttpServletRequest request) {
         Map<String, String> uriTemplateVars =
                 (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
-        return uriTemplateVars.get(variable);
+        return uriTemplateVars.get("gameName");
     }
 
     private void setupGameRequestContext(String gameName) {

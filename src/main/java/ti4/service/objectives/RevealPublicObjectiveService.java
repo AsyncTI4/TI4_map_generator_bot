@@ -136,9 +136,9 @@ public class RevealPublicObjectiveService {
         SecretObjectiveModel po = Mapper.getSecretObjective(objective.getKey());
         if (po == null) {
             Map<String, String> sos = Mapper.getSecretObjectivesJustNames();
-            for (String key : sos.keySet()) {
-                if (sos.get(key).equalsIgnoreCase(objective.getKey())) {
-                    po = Mapper.getSecretObjective(key);
+            for (Map.Entry<String, String> entry : sos.entrySet()) {
+                if (entry.getValue().equalsIgnoreCase(objective.getKey())) {
+                    po = Mapper.getSecretObjective(entry.getKey());
                 }
             }
         }

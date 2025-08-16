@@ -17,7 +17,7 @@ import ti4.service.info.LeaderInfoService;
 
 abstract class LeaderAddRemove extends GameStateSubcommand {
 
-    protected LeaderAddRemove(String name, String description) {
+    LeaderAddRemove(String name, String description) {
         super(name, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader Name")
                 .setRequired(true)
@@ -58,5 +58,5 @@ abstract class LeaderAddRemove extends GameStateSubcommand {
         LeaderInfoService.sendLeadersInfo(game, player, event);
     }
 
-    public abstract void doAction(Player player, List<String> leaderIDs, SlashCommandInteractionEvent event);
+    protected abstract void doAction(Player player, List<String> leaderIDs, SlashCommandInteractionEvent event);
 }

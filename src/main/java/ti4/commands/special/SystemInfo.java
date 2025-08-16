@@ -151,7 +151,7 @@ class SystemInfo extends GameStateSubcommand {
                 Map<UnitKey, Integer> units = unitHolder.getUnits();
                 for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                     UnitKey unitKey = unitEntry.getKey();
-                    String color = AliasHandler.resolveColor(unitKey.getColorID());
+                    String color = AliasHandler.resolveColor(unitKey.colorID());
                     Player player = game.getPlayerFromColorOrFaction(color);
                     if (player == null) continue;
                     UnitModel unitModel = player.getUnitFromUnitKey(unitKey);

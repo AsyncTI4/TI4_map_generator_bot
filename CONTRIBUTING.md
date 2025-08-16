@@ -24,11 +24,11 @@ Branch permissions can be granted, but for now you may fork the repository and c
 2. Create a new Discord Server
 3. Record the Server's ID (right click Server Name -> "Copy Server ID")
 4. Setup a Test Bot - see [Step 1 from here](https://discord.com/developers/docs/getting-started#step-1-creating-an-app). The main steps are:
-* Note down the bot's credentials.
-* Enable "Privileged Gateway Intents".
-* Tick both Installation Contexts' Methods.
-* Ensure Default Install Settings are correct.
-* Create an install link, paste it into the discord server you want your bot in.
+   * Note down the bot's credentials.
+   * Enable "Privileged Gateway Intents".
+   * Tick both Installation Contexts' Methods.
+   * Ensure Default Install Settings are correct.
+   * Create an install link, paste it into the discord server you want your bot in.
 5. Invite your Test Bot to your server
 6. Create a `bot-log` channel, and `Admin`, `Developer` and `Bothelper` roles; add the role IDs to `src/main/java/ti4/AsyncTI4DiscordBot.java`
 

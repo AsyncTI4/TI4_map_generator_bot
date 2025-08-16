@@ -225,7 +225,7 @@ public abstract class UnitHolder {
     public void removeAllUnitDamage(String color) {
         String colorID = Mapper.getColorID(color);
         for (UnitKey uk : unitsByState.keySet())
-            if (uk.getColorID().equals(colorID)) removeDamagedUnit(uk, getUnitCount(uk));
+            if (uk.colorID().equals(colorID)) removeDamagedUnit(uk, getUnitCount(uk));
     }
 
     public void removeAllUnitDamage() {
@@ -235,7 +235,7 @@ public abstract class UnitHolder {
     public void removeAllUnits(String color) {
         String colorID = Mapper.getColorID(color);
         if (colorID == null) return;
-        unitsByState.keySet().removeIf(key -> key.getColorID().equals(colorID));
+        unitsByState.keySet().removeIf(key -> key.colorID().equals(colorID));
     }
 
     /** Return the set unit keys that are actually on this unitholder (quantity > 0) */
@@ -251,8 +251,9 @@ public abstract class UnitHolder {
     @JsonIgnore
     public Map<UnitKey, Integer> getUnits() {
         Map<UnitKey, Integer> units = new HashMap<>();
-        for (UnitKey uk : unitsByState.keySet()) {
-            List<Integer> counts = unitsByState.get(uk);
+        for (Entry<UnitKey, List<Integer>> entry : unitsByState.entrySet()) {
+            UnitKey uk = entry.getKey();
+            List<Integer> counts = entry.getValue();
             if (getTotalUnitCount(counts) <= 0) {
                 unitsByState.remove(uk);
             } else {
@@ -305,7 +306,7 @@ public abstract class UnitHolder {
 
     public int getUnitCount(String colorID) {
         return unitsByState.entrySet().stream()
-                .filter(e -> e.getKey().getColorID().equals(colorID))
+                .filter(e -> e.getKey().colorID().equals(colorID))
                 .mapToInt(e -> getTotalUnitCount(e.getValue()))
                 .sum();
     }
@@ -335,7 +336,7 @@ public abstract class UnitHolder {
 
     public int getDamagedUnitCount(String colorID) {
         return unitsByState.entrySet().stream()
-                .filter(e -> e.getKey().getColorID().equals(colorID))
+                .filter(e -> e.getKey().colorID().equals(colorID))
                 .mapToInt(e -> getDamagedUnitStateCount(e.getValue()))
                 .sum();
     }
@@ -353,19 +354,19 @@ public abstract class UnitHolder {
 
     public Map<UnitKey, List<Integer>> getUnitsByStateForPlayer(Player p) {
         return new HashMap<>(unitsByState.entrySet().stream()
-                .filter(e -> e.getKey().getColorID().equals(p.getColorID()))
+                .filter(e -> e.getKey().colorID().equals(p.getColorID()))
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
     }
 
     public Map<UnitKey, List<Integer>> getUnitsByStateForPlayer(String color) {
         return new HashMap<>(unitsByState.entrySet().stream()
-                .filter(e -> e.getKey().getColorID().equals(Mapper.getColorID(color)))
+                .filter(e -> e.getKey().colorID().equals(Mapper.getColorID(color)))
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
     }
 
     public Map<String, Integer> getUnitAsyncIdsOnHolder(String colorID) {
         return new HashMap<>(unitsByState.keySet().stream()
-                .filter(uk -> uk.getColorID().equals(Mapper.getColorID(colorID)))
+                .filter(uk -> uk.colorID().equals(Mapper.getColorID(colorID)))
                 .collect(Collectors.toMap(UnitKey::asyncID, this::getUnitCount)));
     }
 
@@ -381,7 +382,7 @@ public abstract class UnitHolder {
 
     @JsonIgnore
     public List<String> getUnitColorsOnHolder() {
-        return getUnits().keySet().stream().map(UnitKey::getColorID).distinct().collect(Collectors.toList());
+        return getUnits().keySet().stream().map(UnitKey::colorID).distinct().collect(Collectors.toList());
     }
 
     private static int getUnitStateCount(List<Integer> counts, UnitState state) {

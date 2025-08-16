@@ -72,7 +72,8 @@ class SCPick extends GameStateSubcommand {
         secondHalfOfSCPick(event, player, game, scPicked);
     }
 
-    public static void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game game, int scPicked) {
+    private static void secondHalfOfSCPick(
+            GenericInteractionCreateEvent event, Player player, Game game, int scPicked) {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
 
         String msgExtra = "";

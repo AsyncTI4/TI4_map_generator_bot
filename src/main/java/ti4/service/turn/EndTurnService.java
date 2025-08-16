@@ -57,7 +57,7 @@ public class EndTurnService {
         pingNextPlayer(event, game, mainPlayer, false);
     }
 
-    public static void resetStoredValuesEndOfTurn(Game game, Player player) {
+    private static void resetStoredValuesEndOfTurn(Game game, Player player) {
         game.setStoredValue("lawsDisabled", "no");
         game.removeStoredValue("endTurnWhenSCFinished");
         game.removeStoredValue("fleetLogWhenSCFinished");

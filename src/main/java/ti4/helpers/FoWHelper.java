@@ -752,7 +752,7 @@ public class FoWHelper {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
-            if (unitKey != null && unitKey.getColorID().equals(colorID)) {
+            if (unitKey != null && unitKey.colorID().equals(colorID)) {
                 return true;
             }
         }
@@ -768,7 +768,7 @@ public class FoWHelper {
 
         for (UnitKey unitKey : units.keySet()) {
             if (unitKey != null
-                    && unitKey.getColorID().equals(colorID)
+                    && unitKey.colorID().equals(colorID)
                     && player.getUnitFromAsyncID(unitKey.asyncID()) != null
                     && player.getUnitFromAsyncID(unitKey.asyncID()).getIsShip()) {
                 return true;
@@ -832,7 +832,7 @@ public class FoWHelper {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
-            if (unitKey != null && unitKey.getColorID().equals(colorID) && unitKey.getUnitType() == UnitType.Fighter) {
+            if (unitKey != null && unitKey.colorID().equals(colorID) && unitKey.unitType() == UnitType.Fighter) {
                 return true;
             }
         }
@@ -877,7 +877,7 @@ public class FoWHelper {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
-            if (unitKey != null && unitKey.getColorID().equals(colorID)) {
+            if (unitKey != null && unitKey.colorID().equals(colorID)) {
                 return true;
             }
         }
@@ -892,7 +892,7 @@ public class FoWHelper {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
-            if (unitKey != null && unitKey.getColorID().equals(colorID) && unitKey.getUnitType() == UnitType.Infantry) {
+            if (unitKey != null && unitKey.colorID().equals(colorID) && unitKey.unitType() == UnitType.Infantry) {
                 return true;
             }
         }

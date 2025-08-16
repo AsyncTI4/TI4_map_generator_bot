@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -18,6 +19,8 @@ import ti4.service.map.AddTileService;
 import ti4.service.map.AddTileService.RandomOption;
 
 class GeneratePainBoxMapString extends GameStateSubcommand {
+
+    private static final Pattern PATTERN = Pattern.compile("[,\\s]+");
 
     /*
       Generates a map string for Eronous PainBox type map where no tiles are adjacent to each other.
@@ -42,9 +45,7 @@ class GeneratePainBoxMapString extends GameStateSubcommand {
         String fixedTiles = event.getOption(Constants.TILE_LIST, "", OptionMapping::getAsString);
         List<String> fixedTilesList = fixedTiles.isEmpty()
                 ? new ArrayList<>()
-                : Arrays.asList(fixedTiles.split("[,\\s]+")).stream()
-                        .map(String::trim)
-                        .toList();
+                : Arrays.stream(PATTERN.split(fixedTiles)).map(String::trim).toList();
 
         List<String> tileList = new ArrayList<>();
         tileList.add("18");

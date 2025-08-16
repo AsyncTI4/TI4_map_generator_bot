@@ -73,7 +73,7 @@ public class ShowActionCardsService {
         return sb.toString();
     }
 
-    public static String discardListCondensed(List<Map.Entry<String, Integer>> discards, String title) {
+    private static String discardListCondensed(List<Map.Entry<String, Integer>> discards, String title) {
         // Set up the entry list
         List<Map.Entry<String, Integer>> aclist = new ArrayList<>(discards);
         Collections.reverse(aclist);

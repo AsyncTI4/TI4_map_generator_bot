@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
@@ -20,6 +21,8 @@ import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftTile;
 
 public class BlueTileDraftItem extends DraftItem {
+    private static final Pattern FIN_SEP = Pattern.compile("finSep");
+
     public BlueTileDraftItem(String itemId) {
         super(Category.BLUETILE, itemId);
     }
@@ -87,7 +90,7 @@ public class BlueTileDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(MiltyDraftManager draftManager, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
-        String[] results = game.getStoredValue("bannedTiles").split("finSep");
+        String[] results = FIN_SEP.split(game.getStoredValue("bannedTiles"));
         for (MiltyDraftTile tile : draftManager.getBlue()) {
             if (Arrays.asList(results).contains(tile.getTile().getTileID())) {
                 continue;

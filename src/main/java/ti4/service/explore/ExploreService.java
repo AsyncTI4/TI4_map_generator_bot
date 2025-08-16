@@ -388,7 +388,7 @@ public class ExploreService {
         MessageEmbed exploreEmbed = exploreModel.getRepresentationEmbed(false, true);
         MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), messageText, exploreEmbed);
 
-        String message = null;
+        String message;
         message = "found a " + exploreModel.getName();
         if (planetID != null) {
             message += " on " + Helper.getPlanetRepresentation(planetID, game) + ".";
@@ -453,7 +453,7 @@ public class ExploreService {
                             int amt = planetUnitHolder.getUnitCount(key);
                             var removed = planetUnitHolder.removeUnit(key, amt);
                             if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech)
-                                    .contains(key.getUnitType())) {
+                                    .contains(key.unitType())) {
                                 spaceUnitHolder.addUnitsWithStates(key, removed);
                             }
                         }
@@ -689,7 +689,7 @@ public class ExploreService {
                     message = "Resolve _Abandoned Warehouses_:\n-# You currently have "
                             + player.getCommoditiesRepresentation()
                             + " commodit" + (commod == 1 ? "y" : "ies") + ".";
-                    commod = commod > 2 ? 2 : commod;
+                    commod = Math.min(commod, 2);
                     Button convert = Buttons.green(
                             "convert_2_comms",
                             "Convert " + commod + " Commodit" + (commod == 1 ? "y" : "ies") + " Into "

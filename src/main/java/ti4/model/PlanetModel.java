@@ -71,7 +71,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(shortName).orElse(name);
     }
 
-    public boolean getShrinkName() {
+    private boolean getShrinkName() {
         return Optional.ofNullable(shrinkName).orElse(false);
     }
 
@@ -232,9 +232,9 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
-    public String getEmojiURL() {
+    private String getEmojiURL() {
         TI4Emoji emoji = getEmoji();
-        if (getEmoji().equals(PlanetEmojis.SemLore) && !"semlore".equals(getId())) {
+        if (getEmoji().equals(PlanetEmojis.SemLore) && !"semlore".equals(id)) {
             return null;
         }
         if (emoji.asEmoji() instanceof CustomEmoji customEmoji) {
@@ -244,7 +244,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
-    public String getStickerOrEmojiURL() {
+    private String getStickerOrEmojiURL() {
         if (cachedStickerUrl != null) {
             return cachedStickerUrl;
         }

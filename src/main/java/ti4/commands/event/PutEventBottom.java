@@ -26,7 +26,7 @@ class PutEventBottom extends GameStateSubcommand {
         putBottom(numericalID, game, player);
     }
 
-    public void putBottom(int eventID, Game game, Player player) {
+    private void putBottom(int eventID, Game game, Player player) {
         boolean success = game.putEventBottom(eventID, player);
         if (success) {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Event put on bottom of deck.");

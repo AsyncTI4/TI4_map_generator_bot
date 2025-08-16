@@ -62,9 +62,10 @@ class SCTradeGoods extends GameStateSubcommand {
         for (Player player_ : game.getPlayers().values()) {
             scPicked.addAll(player_.getSCs());
         }
-        for (Integer scNumber : strategyCardToTradeGoodCount.keySet()) {
+        for (Map.Entry<Integer, Integer> entry : strategyCardToTradeGoodCount.entrySet()) {
+            Integer scNumber = entry.getKey();
             if (!scPicked.contains(scNumber)) {
-                Integer tgCount = strategyCardToTradeGoodCount.get(scNumber);
+                Integer tgCount = entry.getValue();
                 tgCount = tgCount == null ? 1 : tgCount + 1;
                 game.setScTradeGood(scNumber, tgCount);
             }

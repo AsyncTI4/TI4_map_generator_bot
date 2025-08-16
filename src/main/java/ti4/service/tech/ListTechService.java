@@ -3,6 +3,7 @@ package ti4.service.tech;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -27,6 +28,11 @@ import ti4.service.button.ReactionService;
 @UtilityClass
 public class ListTechService {
 
+    private static final Pattern Y = Pattern.compile("Y");
+    private static final Pattern B = Pattern.compile("B");
+    private static final Pattern R = Pattern.compile("R");
+    private static final Pattern G = Pattern.compile("G");
+
     @ButtonHandler("acquireATechWithSC")
     public void acquireATechWithSC(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         acquireATechWithResources(event, game, player, true, buttonID.contains("first") || !buttonID.contains("_"));
@@ -49,7 +55,7 @@ public class ListTechService {
         acquireATech(event, game, player, sc, List.of(TechnologyType.UNITUPGRADE), firstTime);
     }
 
-    public void acquireATech(
+    private void acquireATech(
             ButtonInteractionEvent event,
             Game game,
             Player player,
@@ -114,7 +120,7 @@ public class ListTechService {
         getAllTechOfType(event, player, buttonID, game, event.getMessageChannel());
     }
 
-    public static void getAllTechOfType(
+    private static void getAllTechOfType(
             ButtonInteractionEvent event, Player player, String buttonID, Game game, MessageChannel channel) {
         String techType = buttonID.replace("getAllTechOfType_", "");
         String payType = null;
@@ -160,7 +166,7 @@ public class ListTechService {
         return getTechButtons(techs, player, "normal");
     }
 
-    public static boolean isTechResearchable(TechnologyModel tech, Player player) {
+    private static boolean isTechResearchable(TechnologyModel tech, Player player) {
         Game game = player.getGame();
         String requirements = tech.getRequirements().orElse("");
         int wilds = 0;
@@ -178,7 +184,7 @@ public class ListTechService {
             for (UnitKey uk :
                     player.getNomboxTile().getSpaceUnitHolder().getUnits().keySet()) {
                 if (player.getNomboxTile().getSpaceUnitHolder().getUnitCount(uk) <= 0) continue;
-                if (unit.startsWith(uk.getUnitType().getValue())) return true;
+                if (unit.startsWith(uk.unitType().getValue())) return true;
             }
         }
 
@@ -195,27 +201,27 @@ public class ListTechService {
                         wilds++;
                     } else {
                         if ("propulsion".equalsIgnoreCase(type)) {
-                            requirements = requirements.replaceFirst("B", "");
+                            requirements = B.matcher(requirements).replaceFirst("");
                             if (player.hasAbility("ancient_knowledge")) {
-                                requirements = requirements.replaceFirst("B", "");
+                                requirements = B.matcher(requirements).replaceFirst("");
                             }
                         }
                         if ("biotic".equalsIgnoreCase(type)) {
-                            requirements = requirements.replaceFirst("G", "");
+                            requirements = G.matcher(requirements).replaceFirst("");
                             if (player.hasAbility("ancient_knowledge")) {
-                                requirements = requirements.replaceFirst("G", "");
+                                requirements = G.matcher(requirements).replaceFirst("");
                             }
                         }
                         if ("warfare".equalsIgnoreCase(type)) {
-                            requirements = requirements.replaceFirst("R", "");
+                            requirements = R.matcher(requirements).replaceFirst("");
                             if (player.hasAbility("ancient_knowledge")) {
-                                requirements = requirements.replaceFirst("R", "");
+                                requirements = R.matcher(requirements).replaceFirst("");
                             }
                         }
                         if ("cybernetic".equalsIgnoreCase(type)) {
-                            requirements = requirements.replaceFirst("Y", "");
+                            requirements = Y.matcher(requirements).replaceFirst("");
                             if (player.hasAbility("ancient_knowledge")) {
-                                requirements = requirements.replaceFirst("Y", "");
+                                requirements = Y.matcher(requirements).replaceFirst("");
                             }
                         }
                     }
@@ -223,16 +229,16 @@ public class ListTechService {
             }
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
-            requirements = requirements.replaceFirst("G", "");
+            requirements = G.matcher(requirements).replaceFirst("");
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "kollecccommander")) {
-            requirements = requirements.replaceFirst("B", "");
+            requirements = B.matcher(requirements).replaceFirst("");
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "dihmohncommander")) {
-            requirements = requirements.replaceFirst("R", "");
+            requirements = R.matcher(requirements).replaceFirst("");
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "augerscommander")) {
-            requirements = requirements.replaceFirst("Y", "");
+            requirements = Y.matcher(requirements).replaceFirst("");
         }
         if (tech.getFirstType() == TechnologyType.UNITUPGRADE) {
             if (player.hasTechReady("aida") || player.hasTechReady("absol_aida")) {
@@ -251,10 +257,10 @@ public class ListTechService {
             if (playerTech == null) continue;
             for (TechnologyType type : playerTech.getTypes()) {
                 switch (type) {
-                    case BIOTIC -> requirements = requirements.replaceFirst("G", "");
-                    case WARFARE -> requirements = requirements.replaceFirst("R", "");
-                    case PROPULSION -> requirements = requirements.replaceFirst("B", "");
-                    case CYBERNETIC -> requirements = requirements.replaceFirst("Y", "");
+                    case BIOTIC -> requirements = G.matcher(requirements).replaceFirst("");
+                    case WARFARE -> requirements = R.matcher(requirements).replaceFirst("");
+                    case PROPULSION -> requirements = B.matcher(requirements).replaceFirst("");
+                    case CYBERNETIC -> requirements = Y.matcher(requirements).replaceFirst("");
                     case UNITUPGRADE -> {
                         if (game.playerHasLeaderUnlockedOrAlliance(player, "kjalengardcommander")) {
                             wilds++;
@@ -320,7 +326,7 @@ public class ListTechService {
         return getAllTechOfAType(game, techType, player, false);
     }
 
-    public static List<TechnologyModel> getAllTechOfAType(
+    private static List<TechnologyModel> getAllTechOfAType(
             Game game, String techType, Player player, boolean hasToBeResearchable) {
         List<TechnologyModel> validTechs = Mapper.getTechs().values().stream()
                 .filter(tech -> !hasToBeResearchable || isTechResearchable(tech, player))

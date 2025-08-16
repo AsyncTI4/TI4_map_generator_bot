@@ -10,10 +10,7 @@ import ti4.map.*;
 @Data
 public class WebPlayerArea {
     @Data
-    public static class UnitCountInfo {
-        private final int unitCap;
-        private final int deployedCount;
-    }
+    record UnitCountInfo(int unitCap, int deployedCount) {}
 
     // Basic properties
     private String userName;
@@ -351,7 +348,7 @@ public class WebPlayerArea {
             for (Units.UnitKey unitKey : nombox.getUnitKeys()) {
                 String unitId = unitKey.asyncID();
                 // Get the actual player/faction that owns this captured unit
-                Player unitOwner = game.getPlayerByColorID(unitKey.getColorID()).orElse(null);
+                Player unitOwner = game.getPlayerByColorID(unitKey.colorID()).orElse(null);
                 if (unitOwner != null) {
                     String unitFaction = unitOwner.getFaction();
                     int count = nombox.getUnitCount(unitKey);
@@ -396,7 +393,7 @@ public class WebPlayerArea {
 
     private static void fillUnits(Map<Units.UnitKey, Integer> unitCount, UnitHolder unitHolder) {
         for (Units.UnitKey uk : unitHolder.getUnitKeys()) {
-            if (uk.getUnitType() == Units.UnitType.Infantry || uk.getUnitType() == Units.UnitType.Fighter) {
+            if (uk.unitType() == Units.UnitType.Infantry || uk.unitType() == Units.UnitType.Fighter) {
                 unitCount.put(uk, unitCount.getOrDefault(uk, 0) + 1);
                 continue;
             }

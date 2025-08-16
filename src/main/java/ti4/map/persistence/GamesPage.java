@@ -9,7 +9,7 @@ import ti4.map.Game;
 
 public class GamesPage {
 
-    public static final int PAGE_SIZE = 100;
+    private static final int PAGE_SIZE = 100;
 
     private GamesPage() {}
 
@@ -18,7 +18,7 @@ public class GamesPage {
 
     private boolean hasNextPage;
 
-    public boolean hasNextPage() {
+    private boolean hasNextPage() {
         return hasNextPage;
     }
 

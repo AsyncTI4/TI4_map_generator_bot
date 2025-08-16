@@ -28,7 +28,7 @@ public class WebTileUnitData {
     private Map<String, Integer> production;
     private Map<String, WebPdsCoverage> pds; // PDS coverage data per faction
 
-    public WebTileUnitData() {
+    private WebTileUnitData() {
         space = new HashMap<>();
         planets = new HashMap<>();
         ccs = new ArrayList<>();
@@ -87,7 +87,7 @@ public class WebTileUnitData {
                 for (UnitKey unitKey : unitHolder.getUnitKeys()) {
                     Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
                     int unitCount = unitHolder.getUnitCount(unitKey);
-                    String unitId = getUnitIdFromType(unitKey.getUnitType());
+                    String unitId = getUnitIdFromType(unitKey.unitType());
 
                     if (player == null || unitId == null || unitCount <= 0) {
                         continue;
@@ -114,9 +114,7 @@ public class WebTileUnitData {
                 if (!factionEntities.isEmpty()) {
                     if (isSpace) {
                         // For space, merge all factions directly into the space map
-                        for (Map.Entry<String, List<WebEntityData>> factionEntry : factionEntities.entrySet()) {
-                            tileData.space.put(factionEntry.getKey(), factionEntry.getValue());
-                        }
+                        tileData.space.putAll(factionEntities);
                     } else {
                         // For planets, create or get existing WebTilePlanet
                         WebTilePlanet planetData =
@@ -225,7 +223,7 @@ public class WebTileUnitData {
             Map<String, WebPdsCoverage> pdsCoverage = new HashMap<>();
             for (Map.Entry<String, PdsCoverage> entry : pdsCoverageDetailed.entrySet()) {
                 ti4.helpers.PdsCoverage detailed = entry.getValue();
-                pdsCoverage.put(entry.getKey(), new WebPdsCoverage(detailed.getCount(), detailed.getExpected()));
+                pdsCoverage.put(entry.getKey(), new WebPdsCoverage(detailed.count(), detailed.expected()));
             }
             tileData.setPds(pdsCoverage);
         }

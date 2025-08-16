@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 import ti4.helpers.Units.UnitKey;
 
-public class ShipRepairComparator implements Comparator<UnitKey>, Serializable {
+class ShipRepairComparator implements Comparator<UnitKey>, Serializable {
 
     @Override
     public int compare(UnitKey o1, UnitKey o2) {
@@ -12,7 +12,7 @@ public class ShipRepairComparator implements Comparator<UnitKey>, Serializable {
     }
 
     private int getAssignedValue(UnitKey ship) {
-        return switch (ship.getUnitType()) {
+        return switch (ship.unitType()) {
             case Cruiser -> 4; // SE2 can have sustained damage
             case Dreadnought -> 3;
             case Flagship -> 2;

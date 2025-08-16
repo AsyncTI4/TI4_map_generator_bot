@@ -7,7 +7,7 @@ import ti4.helpers.AliasHandler;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 
-public class MapStringMapper {
+class MapStringMapper {
     public static Map<String, String> getMappedTilesToPosition(String tileListAsString, Game userActiveGame) {
         Map<String, String> mappedTiles = new HashMap<>();
         StringTokenizer tokenizer = new StringTokenizer(tileListAsString, " ");

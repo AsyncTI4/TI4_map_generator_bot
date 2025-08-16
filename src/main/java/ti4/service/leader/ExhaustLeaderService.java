@@ -35,9 +35,8 @@ public class ExhaustLeaderService {
             String leaderName = leaderModel.getName();
             if ("nomadagentartuno".equals(leaderModel.getID())) {
                 leaderName = "Artuno the Betrayer, a Nomad agent";
-            } else if ("nomadagentartuno".equals(leaderModel.getID())) {
-                leaderName = "Clever Clever Artuno the Betrayer, a Nomad/Yssaril agent";
             }
+
             sb.append(tgCount)
                     .append(" trade good")
                     .append(tgCount == 1 ? "" : "s")

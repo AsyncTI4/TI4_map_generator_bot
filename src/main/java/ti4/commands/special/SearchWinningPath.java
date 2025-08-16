@@ -2,6 +2,7 @@ package ti4.commands.special;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -17,6 +18,8 @@ import ti4.message.MessageHelper;
 import ti4.service.statistics.game.WinningPathHelper;
 
 class SearchWinningPath extends Subcommand {
+
+    private static final Pattern PATTERN = Pattern.compile("_");
 
     public SearchWinningPath() {
         super(Constants.SEARCH_WINNING_PATH, "List games with the provided winning path");
@@ -51,8 +54,8 @@ class SearchWinningPath extends Subcommand {
     }
 
     private static boolean hasWinningPath(Game game, Player winner, String searchedPath) {
-        return WinningPathHelper.buildWinningPath(game, winner)
-                .replaceAll("_", "") // needed due to Support for the Throne being italicized
+        return PATTERN.matcher(WinningPathHelper.buildWinningPath(game, winner))
+                .replaceAll("") // needed due to Support for the Throne being italicized
                 .contains(searchedPath);
     }
 

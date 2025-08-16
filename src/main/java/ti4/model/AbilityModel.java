@@ -90,8 +90,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID)
-            footer.append("ID: ").append(getAlias()).append("    Source: ").append(source);
+        if (includeID) footer.append("ID: ").append(id).append("    Source: ").append(source);
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.black);

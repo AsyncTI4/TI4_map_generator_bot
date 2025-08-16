@@ -68,7 +68,7 @@ class PingActivePlayer extends GameStateSubcommand {
         }
     }
 
-    public static String formatMillis(long millis) {
+    private static String formatMillis(long millis) {
         long totalMinutes = (millis + 59999) / 60000; // adds 59.999s before division to round up
         long hours = totalMinutes / 60;
         long minutes = totalMinutes % 60;

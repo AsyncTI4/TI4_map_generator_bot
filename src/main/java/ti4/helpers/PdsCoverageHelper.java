@@ -58,7 +58,7 @@ public class PdsCoverageHelper {
                         }
 
                         Units.UnitKey unitKey = unitEntry.getKey();
-                        if (game.getPlayerByColorID(unitKey.getColorID()).orElse(null) != player) {
+                        if (game.getPlayerByColorID(unitKey.colorID()).orElse(null) != player) {
                             continue;
                         }
 
@@ -151,7 +151,7 @@ public class PdsCoverageHelper {
         return pdsCoverage;
     }
 
-    public static int checkNumberNonFighterShipsWithoutSpaceCannon(Player player, Tile tile) {
+    private static int checkNumberNonFighterShipsWithoutSpaceCannon(Player player, Tile tile) {
         int count = 0;
         UnitHolder space = tile.getUnitHolders().get("space");
         for (Units.UnitKey unit : space.getUnitKeys()) {

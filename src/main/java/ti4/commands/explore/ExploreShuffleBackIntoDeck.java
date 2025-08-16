@@ -1,5 +1,6 @@
 package ti4.commands.explore;
 
+import java.util.regex.Pattern;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -11,6 +12,8 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
 class ExploreShuffleBackIntoDeck extends GameStateSubcommand {
+
+    private static final Pattern PATTERN = Pattern.compile(" ");
 
     public ExploreShuffleBackIntoDeck() {
         super(
@@ -26,7 +29,8 @@ class ExploreShuffleBackIntoDeck extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        String ids = event.getOption(Constants.EXPLORE_CARD_ID).getAsString().replaceAll(" ", "");
+        String ids = PATTERN.matcher(event.getOption(Constants.EXPLORE_CARD_ID).getAsString())
+                .replaceAll("");
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {

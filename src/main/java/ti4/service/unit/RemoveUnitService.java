@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -43,11 +42,11 @@ public class RemoveUnitService {
         }
 
         public RemovedUnit withColorID(String colorID) {
-            return new RemovedUnit(Units.getUnitKey(unitKey.getUnitType(), colorID), tile, uh, states);
+            return new RemovedUnit(Units.getUnitKey(unitKey.unitType(), colorID), tile, uh, states);
         }
 
         public Player getPlayer(Game game) {
-            return game.getPlayerFromColorOrFaction(unitKey().getColorID());
+            return game.getPlayerFromColorOrFaction(unitKey().colorID());
         }
     }
 
@@ -78,7 +77,7 @@ public class RemoveUnitService {
             GenericInteractionCreateEvent event, Game game, Player player, Tile tile, UnitHolder unitHolder) {
         List<RemovedUnit> removed = new ArrayList<>();
         for (UnitKey uk : Set.copyOf(unitHolder.getUnitsByStateForPlayer(player).keySet())) {
-            if (uk.getUnitType() == UnitType.Pds || uk.getUnitType() == UnitType.Spacedock) {
+            if (uk.unitType() == UnitType.Pds || uk.unitType() == UnitType.Spacedock) {
                 continue;
             }
             ParsedUnit u = new ParsedUnit(uk, unitHolder.getUnitCount(uk), unitHolder.getName());
@@ -184,7 +183,7 @@ public class RemoveUnitService {
             List<Integer> unitsRemovedCount =
                     unitHolder.removeUnit(parsedUnit.getUnitKey(), toRemoveCount, preferredState);
 
-            int tot = unitsRemovedCount.stream().collect(Collectors.summingInt(i -> i));
+            int tot = unitsRemovedCount.stream().mapToInt(i -> i).sum();
             if (tot > 0) {
                 allUnitsRemoved.add(new RemovedUnit(parsedUnit.getUnitKey(), tile, unitHolder, unitsRemovedCount));
                 toRemoveCount -= tot;
@@ -222,7 +221,7 @@ public class RemoveUnitService {
     }
 
     private static void handleEmptyUnitHolders(GenericInteractionCreateEvent event, Tile tile, ParsedUnit parsedUnit) {
-        if (event != null && event instanceof ButtonInteractionEvent) {
+        if (event instanceof ButtonInteractionEvent) {
             BotLogger.warning(
                     new BotLogger.LogMessageOrigin(event),
                     event.getId() + " found a null UnitHolder with the following info: " + tile.getRepresentation()

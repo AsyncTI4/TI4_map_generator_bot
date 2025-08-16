@@ -42,11 +42,11 @@ public class Buttons {
     public static final Button EDIT_NOTEPAD = blue("notepadEdit~MDL", "Edit Notes");
     public static final Button POST_NOTEPAD = blue("notepadPost", "Post Notes");
     public static final Button REFRESH_INFO = green("refreshInfoButtons", "Other Info");
-    public static final Button REFRESH_AC_INFO = green("refreshACInfo", "Action Card Info", CardEmojis.ActionCard);
-    public static final Button REFRESH_PN_INFO = green("refreshPNInfo", "Promissory Notes Info", CardEmojis.PN);
-    public static final Button REFRESH_SO_INFO =
+    private static final Button REFRESH_AC_INFO = green("refreshACInfo", "Action Card Info", CardEmojis.ActionCard);
+    private static final Button REFRESH_PN_INFO = green("refreshPNInfo", "Promissory Notes Info", CardEmojis.PN);
+    private static final Button REFRESH_SO_INFO =
             green("refreshSOInfo", "Secret Objectives Info", CardEmojis.SecretObjective);
-    public static final Button REFRESH_ABILITY_INFO = green("refreshAbilityInfo", "Ability Info");
+    private static final Button REFRESH_ABILITY_INFO = green("refreshAbilityInfo", "Ability Info");
     public static final Button REFRESH_RELIC_INFO =
             green(Constants.REFRESH_RELIC_INFO, "Relic Info", ExploreEmojis.Relic);
     public static final Button REFRESH_LEADER_INFO =
@@ -62,10 +62,10 @@ public class Buttons {
             gray("playerPref_personalPingInterval", "Personal Ping Interval");
 
     // Map buttons
-    public static final Button REFRESH_CARDS_INFO = green("cardsInfo", "Cards Info");
+    private static final Button REFRESH_CARDS_INFO = green("cardsInfo", "Cards Info");
     public static final Button SHOW_DECKS = blue("offerDeckButtons", "Show Decks");
     public static final Button REFRESH_MAP = gray("showGameAgain", "Refresh Map");
-    public static final Button PLAYER_INFO = green("gameInfoButtons", "Player Info");
+    private static final Button PLAYER_INFO = green("gameInfoButtons", "Player Info");
 
     public static final List<Button> REFRESH_INFO_BUTTONS = List.of(
             REFRESH_AC_INFO,

@@ -13,7 +13,7 @@ import ti4.service.emoji.ApplicationEmojiService.EmojiFileData;
 import ti4.service.emoji.TI4Emoji;
 import ti4.testUtils.BaseTi4Test;
 
-public class EmojisTest extends BaseTi4Test {
+class EmojisTest extends BaseTi4Test {
 
     @Test
     void testEmojis() {
@@ -34,7 +34,7 @@ public class EmojisTest extends BaseTi4Test {
         // checkMissing(new HashSet<>(emojiFileNames), new HashSet<>(emojiEnumNames), "enum consts");
     }
 
-    public static void checkForDupes(List<String> emojiNames, String descr) {
+    private static void checkForDupes(List<String> emojiNames, String descr) {
         Set<String> dupes = Helper.findDuplicateInList(
                 new ArrayList<>(emojiNames.stream().map(String::toLowerCase).toList()));
 

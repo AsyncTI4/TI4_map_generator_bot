@@ -46,7 +46,7 @@ class ZelianHero extends GameStateSubcommand {
         secondHalfOfCelestialImpact(getPlayer(), event, tile, getGame());
     }
 
-    public static void secondHalfOfCelestialImpact(
+    private static void secondHalfOfCelestialImpact(
             Player player, GenericInteractionCreateEvent event, Tile tile, Game game) {
         String message1 = "Moments before disaster in game " + game.getName() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 1, message1);

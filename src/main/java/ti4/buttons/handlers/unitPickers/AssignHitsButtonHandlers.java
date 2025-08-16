@@ -28,7 +28,7 @@ import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
-public class AssignHitsButtonHandlers {
+class AssignHitsButtonHandlers {
 
     @ButtonHandler("assignHits_")
     // assignHits_101_2_dd
@@ -98,7 +98,7 @@ public class AssignHitsButtonHandlers {
                                 if (!player.unitBelongsToPlayer(key)) continue;
                                 UnitModel model = player.getUnitFromUnitKey(key);
                                 ParsedUnit unit = ParseUnitService.simpleParsedUnit(
-                                        player, key.getUnitType(), space, space.getUnitCount(key));
+                                        player, key.unitType(), space, space.getUnitCount(key));
                                 if (model.getIsShip()) {
                                     DestroyUnitService.destroyUnit(event, tile, game, unit, combat);
                                 } else {

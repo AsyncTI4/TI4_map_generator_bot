@@ -170,7 +170,7 @@ public class PlayerPreferenceHelper {
                 buttons);
     }
 
-    public static List<Button> getSetAFKButtons() {
+    private static List<Button> getSetAFKButtons() {
         List<Button> buttons = new ArrayList<>();
         for (int x = 0; x < 24; x++) {
             buttons.add(Buttons.gray("setHourAsAFK_" + x, "" + x));
@@ -179,7 +179,7 @@ public class PlayerPreferenceHelper {
         return buttons;
     }
 
-    public static void offerDirectHitManagementOptions(Game game, Player player) {
+    private static void offerDirectHitManagementOptions(Game game, Player player) {
         List<Button> buttons = getDirectHitManagementButtons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
@@ -188,7 +188,7 @@ public class PlayerPreferenceHelper {
                 buttons);
     }
 
-    public static List<Button> getDirectHitManagementButtons(Game game, Player player) {
+    private static List<Button> getDirectHitManagementButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         String stuffNotToSustain = game.getStoredValue("stuffNotToSustainFor" + player.getFaction());
         if (stuffNotToSustain.isEmpty()) {

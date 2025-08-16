@@ -214,7 +214,7 @@ class SetPolicy extends GameStateSubcommand {
         MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "", List.of(unitModel.getRepresentationEmbed(false)));
     }
 
-    public static String convertChoice(String inputChoice) {
+    private static String convertChoice(String inputChoice) {
         if (inputChoice == null) {
             return null;
         }

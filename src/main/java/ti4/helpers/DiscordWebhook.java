@@ -191,39 +191,39 @@ public class DiscordWebhook {
         private Author author;
         private final List<Field> fields = new ArrayList<>();
 
-        public String getTitle() {
+        String getTitle() {
             return title;
         }
 
-        public String getDescription() {
+        String getDescription() {
             return description;
         }
 
-        public String getUrl() {
+        String getUrl() {
             return url;
         }
 
-        public Color getColor() {
+        Color getColor() {
             return color;
         }
 
-        public Footer getFooter() {
+        Footer getFooter() {
             return footer;
         }
 
-        public Thumbnail getThumbnail() {
+        Thumbnail getThumbnail() {
             return thumbnail;
         }
 
-        public Image getImage() {
+        Image getImage() {
             return image;
         }
 
-        public Author getAuthor() {
+        Author getAuthor() {
             return author;
         }
 
-        public List<Field> getFields() {
+        List<Field> getFields() {
             return fields;
         }
 

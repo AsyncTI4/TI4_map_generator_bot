@@ -83,9 +83,10 @@ public class ColorChangeHelper {
 
             // Debt Tokens
             Map<String, Integer> debtTokens = new LinkedHashMap<>(playerInfo.getDebtTokens());
-            for (String color : debtTokens.keySet()) {
+            for (Map.Entry<String, Integer> entry : debtTokens.entrySet()) {
+                String color = entry.getKey();
                 if (color.equals(oldColor)) {
-                    Integer count = debtTokens.get(color);
+                    Integer count = entry.getValue();
                     playerInfo.clearAllDebtTokens(color);
                     playerInfo.addDebtTokens(newColor, count);
                 }
@@ -122,8 +123,8 @@ public class ColorChangeHelper {
         String newColorSuffix = "_" + newColorID + ".";
 
         for (UnitKey unitKey : unitHolder.getUnitKeys()) {
-            if (unitKey.getColorID().equals(oldColorID)) {
-                UnitKey replacedKey = Units.getUnitKey(unitKey.getUnitType(), newColorID);
+            if (unitKey.colorID().equals(oldColorID)) {
+                UnitKey replacedKey = Units.getUnitKey(unitKey.unitType(), newColorID);
                 List<Integer> states = unitHolder.removeUnit(unitKey, unitHolder.getUnitCount(unitKey));
                 unitHolder.addUnitsWithStates(replacedKey, states);
             }

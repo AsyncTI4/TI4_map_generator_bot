@@ -73,12 +73,11 @@ public class RiftUnitsHelper {
                 if (unitModel == null) continue;
 
                 UnitKey key = unitEntry.getKey();
-                if (key.getUnitType() == UnitType.Infantry
-                        || key.getUnitType() == UnitType.Mech
-                        || (!player.hasFF2Tech() && key.getUnitType() == UnitType.Fighter)
+                if (key.unitType() == UnitType.Infantry
+                        || key.unitType() == UnitType.Mech
+                        || (!player.hasFF2Tech() && key.unitType() == UnitType.Fighter)
                         || (cabal != null
-                                && (key.getUnitType() == UnitType.Fighter
-                                        || key.getUnitType() == UnitType.Spacedock))) {
+                                && (key.unitType() == UnitType.Fighter || key.unitType() == UnitType.Spacedock))) {
                     continue;
                 }
 
@@ -166,7 +165,7 @@ public class RiftUnitsHelper {
         return msg;
     }
 
-    public static List<Button> getButtonsForRiftingUnitsInSystem(Player player, Game game, Tile tile) {
+    private static List<Button> getButtonsForRiftingUnitsInSystem(Player player, Game game, Tile tile) {
         String finChecker = player.getFinsFactionCheckerPrefix();
         List<Button> buttons = new ArrayList<>();
 
@@ -182,7 +181,7 @@ public class RiftUnitsHelper {
                     UnitModel unitModel = player.getUnitFromUnitKey(key);
                     if (unitModel == null) continue;
 
-                    UnitType unitType = key.getUnitType();
+                    UnitType unitType = key.unitType();
                     if ((!game.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")
                                     && (unitType == UnitType.Infantry || unitType == UnitType.Mech))
                             || (!player.hasFF2Tech() && unitType == UnitType.Fighter)) {

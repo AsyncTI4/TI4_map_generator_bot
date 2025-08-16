@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -32,6 +33,8 @@ import ti4.service.milty.MiltyDraftManager;
 import ti4.settings.users.UserSettingsManager;
 
 class Replace extends GameStateSubcommand {
+
+    private static final Pattern PATTERN = Pattern.compile("^-|-$");
 
     public Replace() {
         super(Constants.REPLACE, "Replace player in game", true, false);
@@ -136,11 +139,12 @@ class Replace extends GameStateSubcommand {
         }
         Map<String, Player> playersById = game.getPlayers();
         Map<String, Player> updatedPlayersById = new LinkedHashMap<>();
-        for (String userId : playersById.keySet()) {
+        for (Map.Entry<String, Player> entry : playersById.entrySet()) {
+            String userId = entry.getKey();
             if (userId.equalsIgnoreCase(oldPlayerUserId)) {
                 updatedPlayersById.put(replacedPlayer.getUserID(), replacedPlayer);
             } else {
-                updatedPlayersById.put(userId, playersById.get(userId));
+                updatedPlayersById.put(userId, entry.getValue());
             }
         }
         game.setPlayers(updatedPlayersById);
@@ -227,13 +231,9 @@ class Replace extends GameStateSubcommand {
                 .queue(
                         oldThreadMember -> thread.getManager()
                                 .setArchived(false)
-                                .queue(success -> {
-                                    thread.removeThreadMember(oldMember).queue(success2 -> {
-                                        thread.addThreadMember(newMember).queue(success3 -> {
-                                            accessMessage(thread, newMember);
-                                        });
-                                    });
-                                }),
+                                .queue(success -> thread.removeThreadMember(oldMember)
+                                        .queue(success2 -> thread.addThreadMember(newMember)
+                                                .queue(success3 -> accessMessage(thread, newMember)))),
                         failure -> {
                             /* Old member is not in the thread -> Do nothing */
                         });
@@ -249,11 +249,11 @@ class Replace extends GameStateSubcommand {
         if (name == null) {
             name = member.getEffectiveName();
         }
-        name = name.toLowerCase()
-                .replaceAll("[\\s]+", "-")
-                .replaceAll("[^a-z0-9-]", "")
-                .replaceAll("-{2,}", "-")
-                .replaceAll("^-|-$", "");
+        name = PATTERN.matcher(name.toLowerCase()
+                        .replaceAll("[\\s]+", "-")
+                        .replaceAll("[^a-z0-9-]", "")
+                        .replaceAll("-{2,}", "-"))
+                .replaceAll("");
         return name;
     }
 }

@@ -73,7 +73,7 @@ public class PlayerStatsDashboardPayload {
                 .toList();
     }
 
-    public String getColor() {
+    private String getColor() {
         return player.getColor();
     }
 

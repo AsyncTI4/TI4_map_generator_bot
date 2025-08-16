@@ -1,13 +1,6 @@
 package ti4.image;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -15,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -72,7 +66,7 @@ import ti4.service.fow.GMService;
 import ti4.service.user.AFKService;
 import ti4.website.model.WebsiteOverlay;
 
-public class PlayerAreaGenerator {
+class PlayerAreaGenerator {
 
     private final Graphics graphics;
     private final Game game;
@@ -131,7 +125,7 @@ public class PlayerAreaGenerator {
         return new Rectangle(topLeft);
     }
 
-    public Rectangle drawPlayerAreaOLD(Player player, Point topLeft) {
+    private Rectangle drawPlayerAreaOLD(Player player, Point topLeft) {
         int x = topLeft.x;
         int y = topLeft.y;
         Graphics2D g2 = (Graphics2D) graphics;
@@ -873,7 +867,7 @@ public class PlayerAreaGenerator {
     }
 
     private PlanetModel findAttachedPlanet(PromissoryNoteModel model) {
-        if (!model.getAttachment().isPresent() || model.getAttachment().get().isBlank()) return null;
+        if (model.getAttachment().isEmpty() || model.getAttachment().get().isBlank()) return null;
 
         String tokenID = model.getAttachment().get();
         for (Tile tile : game.getTileMap().values()) {
@@ -1410,7 +1404,7 @@ public class PlayerAreaGenerator {
                     if (onlyPaintOneUnit) break;
                 }
 
-                String unitName = unitKey.getUnitType().humanReadableName();
+                String unitName = unitKey.unitType().humanReadableName();
                 if (!game.isHasEnded() && numInReinforcements < 0 && game.isCcNPlasticLimit()) {
                     String warningMessage = player.getRepresentation()
                             + " is exceeding unit plastic or cardboard limits for " + unitName
@@ -1466,7 +1460,7 @@ public class PlayerAreaGenerator {
         for (UnitKey uk : unitHolder.getUnitKeys()) {
             int count = unitCount.getOrDefault(uk, 0);
 
-            if (uk.getUnitType() == UnitType.Infantry || uk.getUnitType() == UnitType.Fighter) {
+            if (uk.unitType() == UnitType.Infantry || uk.unitType() == UnitType.Fighter) {
                 if (ignoreInfantryFighters) continue;
                 count++;
             } else {
@@ -1476,7 +1470,7 @@ public class PlayerAreaGenerator {
         }
     }
 
-    public static boolean isWholeNumber(float number) {
+    private static boolean isWholeNumber(float number) {
         return number == Math.floor(number);
     }
 
@@ -1573,7 +1567,7 @@ public class PlayerAreaGenerator {
         Set<UnitKey> units = new HashSet<>();
 
         for (UnitKey id : tempUnits) {
-            if (id.getUnitType() == UnitType.Mech) {
+            if (id.unitType() == UnitType.Mech) {
                 units.add(id);
             }
         }
@@ -1595,7 +1589,7 @@ public class PlayerAreaGenerator {
                 UnitType.Fighter,
                 UnitType.Infantry);
 
-        Map<UnitType, List<UnitKey>> collect = units.stream().collect(Collectors.groupingBy(key -> key.getUnitType()));
+        Map<UnitType, List<UnitKey>> collect = units.stream().collect(Collectors.groupingBy(UnitKey::unitType));
         for (UnitType orderKey : order) {
             List<UnitKey> keys = collect.get(orderKey);
             if (keys == null) {
@@ -1615,10 +1609,10 @@ public class PlayerAreaGenerator {
                 try {
                     String unitPath = getUnitPath(unitKey);
                     if (unitPath != null) {
-                        if (unitKey.getUnitType() == UnitType.Fighter) {
+                        if (unitKey.unitType() == UnitType.Fighter) {
                             unitPath = unitPath.replace(Constants.COLOR_FF, Constants.BULK_FF);
                             bulkUnitCount = unitCount;
-                        } else if (unitKey.getUnitType() == UnitType.Infantry) {
+                        } else if (unitKey.unitType() == UnitType.Infantry) {
                             unitPath = unitPath.replace(Constants.COLOR_GF, Constants.BULK_GF);
                             bulkUnitCount = unitCount;
                         }
@@ -1641,7 +1635,7 @@ public class PlayerAreaGenerator {
 
                 Point position = new Point(x, y);
                 boolean justNumber = false;
-                switch (unitKey.getUnitType()) {
+                switch (unitKey.unitType()) {
                     case Fighter -> {
                         position.translate(fighterPoint.x, fighterPoint.y);
                         justNumber = true;
@@ -1660,7 +1654,7 @@ public class PlayerAreaGenerator {
                     default -> {}
                 }
                 BufferedImage spoopy = null;
-                if (unitKey.getUnitType() == UnitType.Warsun) {
+                if (unitKey.unitType() == UnitType.Warsun) {
                     int chanceToSeeSpoop = CalendarHelper.isNearHalloween() ? 10 : 1000;
                     if (ThreadLocalRandom.current().nextInt(chanceToSeeSpoop) == 0) {
                         String spoopyPath = ResourceHelper.getInstance().getSpoopyFile();
@@ -1684,7 +1678,7 @@ public class PlayerAreaGenerator {
                 for (int i = 0; i < unitCount; i++) {
                     graphics.drawImage(image, position.x, position.y + deltaY, null);
                     if (decal.isPresent()
-                            && !List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType())) {
+                            && !List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.unitType())) {
                         graphics.drawImage(decal.get(), position.x, position.y + deltaY, null);
                     }
                     if (spoopy != null) {
@@ -1859,7 +1853,7 @@ public class PlayerAreaGenerator {
         for (String planet : planets) {
             PlanetModel model = Mapper.getPlanet(planet);
 
-            Set<PlanetType> types = new HashSet<>();
+            Set<PlanetType> types = EnumSet.noneOf(PlanetType.class);
             if (model != null && model.getPlanetTypes() != null) types.addAll(model.getPlanetTypes());
 
             if (types.contains(PlanetType.FAKE)) {
@@ -2606,7 +2600,7 @@ public class PlayerAreaGenerator {
             BufferedImage wsCrackImage = ImageHelper.read(ResourceHelper.getInstance()
                     .getTokenFile("agenda_publicize_weapon_schematics"
                             + (player.hasWarsunTech()
-                                    ? DrawingUtil.getBlackWhiteFileSuffix(unitKey.getColorID())
+                                    ? DrawingUtil.getBlackWhiteFileSuffix(unitKey.colorID())
                                     : "_blk.png")));
             graphics.drawImage(wsCrackImage, deltaX + x + unitOffset.x, y + unitOffset.y, null);
         }

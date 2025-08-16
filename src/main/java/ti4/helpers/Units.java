@@ -26,16 +26,11 @@ public class Units {
     /**
      * <H3> DO NOT ADD NEW VALUES TO THIS OBJECT. </H3>
      * <p>
-     * It is being used as a key in some major hashmaps which causes issues when we attempt to
-     * save/restore from JSON as JSON map keys have to be strings, not JSON objects. This forces
-     * us to use custom mappers to resolve.
+     * It is being used as a key in some major hashmaps which causes issues when we attempt to save/restore from JSON as JSON map keys have to be strings, not JSON objects. This forces us to use custom mappers to resolve.
      * </p>
      */
     @Data
-    public static class UnitKey {
-
-        private final UnitType unitType;
-        private final String colorID;
+    public record UnitKey(UnitType unitType, String colorID) {
 
         @JsonIgnore
         public String getColor() {

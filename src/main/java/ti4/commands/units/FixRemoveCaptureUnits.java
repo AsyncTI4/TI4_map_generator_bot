@@ -44,10 +44,10 @@ class FixRemoveCaptureUnits extends GameStateSubcommand {
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
             // fighters and infantry are added as your own color
-            if (parsedUnit.getUnitKey().getUnitType() == Units.UnitType.Fighter
-                    || parsedUnit.getUnitKey().getUnitType() == Units.UnitType.Infantry) {
+            if (parsedUnit.getUnitKey().unitType() == Units.UnitType.Fighter
+                    || parsedUnit.getUnitKey().unitType() == Units.UnitType.Infantry) {
                 Units.UnitKey unitKey = new Units.UnitKey(
-                        parsedUnit.getUnitKey().getUnitType(), getPlayer().getColor());
+                        parsedUnit.getUnitKey().unitType(), getPlayer().getColor());
                 parsedUnit = new ParsedUnit(unitKey, parsedUnit.getCount(), "space");
             }
             tile.removeUnit("space", parsedUnit.getUnitKey(), parsedUnit.getCount());

@@ -136,7 +136,7 @@ public class PositionMapper {
         return getPoint(value);
     }
 
-    public static Point getPoint(String value) {
+    private static Point getPoint(String value) {
         if (value != null) {
             StringTokenizer tokenizer = new StringTokenizer(value, ",");
             try {
@@ -152,7 +152,7 @@ public class PositionMapper {
 
     public static Point getPlayerStats(String id) {
         Point point = new Point();
-        String info = (String) stats.getProperty(id);
+        String info = stats.getProperty(id);
         if (info == null) {
             return new Point(0, 0);
         }
@@ -170,7 +170,7 @@ public class PositionMapper {
 
     public static List<Point> getPlayerPosition(int playerPosition) {
         List<Point> positions = new ArrayList<>();
-        String info = (String) playerInfo8ring.getProperty(Integer.toString(playerPosition));
+        String info = playerInfo8ring.getProperty(Integer.toString(playerPosition));
         if (info == null) {
             return positions;
         }
@@ -232,7 +232,7 @@ public class PositionMapper {
         return new ShipPositionModel().getAllianceOffset();
     }
 
-    public static String getTileSpaceUnitLayout(String tileId) {
+    private static String getTileSpaceUnitLayout(String tileId) {
         return Optional.ofNullable(TileHelper.getTileById(tileId).getShipPositionsType())
                 .orElse(ShipPositionModel.ShipPosition.TYPE08)
                 .getPositions();
@@ -367,7 +367,7 @@ public class PositionMapper {
         return ring * 6;
     }
 
-    public static Integer getPositionWithinHexSide(String tileID) {
+    private static Integer getPositionWithinHexSide(String tileID) {
         if (!Helper.isInteger(tileID)) return null;
         int ring = Integer.parseInt(tileID) / 100;
         int tileNumber = Integer.parseInt(tileID) % 100;
@@ -379,7 +379,7 @@ public class PositionMapper {
         return null;
     }
 
-    public static String getTileIDAtPositionInRingSide(Integer ring, Integer side, Integer position) {
+    private static String getTileIDAtPositionInRingSide(Integer ring, Integer side, Integer position) {
         if (ring == null || side == null || position == null) return null;
         return ring + String.format("%02d", 1 + ring * (side - 1) + position);
     }

@@ -1,6 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -709,7 +709,7 @@ public class UnfiledButtonHandlers {
         }
     }
 
-    public static String getBestBombardablePlanet(Player player, Game game, Tile tile) {
+    private static String getBestBombardablePlanet(Player player, Game game, Tile tile) {
         String best = "";
         for (String planet : getBombardablePlanets(player, game, tile)) {
             best = planet;
@@ -730,9 +730,9 @@ public class UnfiledButtonHandlers {
         }
         Map<UnitModel, Integer> bombardUnits = CombatRollService.getUnitsInBombardment(tile, player, null);
         String planet = getBestBombardablePlanet(player, game, tile);
-        for (UnitModel mod : bombardUnits.keySet()) {
-            for (int x = 0; x < bombardUnits.get(mod); x++) {
-                String name = mod.getAsyncId() + "_" + x;
+        for (Map.Entry<UnitModel, Integer> entry : bombardUnits.entrySet()) {
+            for (int x = 0; x < entry.getValue(); x++) {
+                String name = entry.getKey().getAsyncId() + "_" + x;
 
                 String assignedUnit = name + "_" + planet;
                 game.setStoredValue(
@@ -753,7 +753,7 @@ public class UnfiledButtonHandlers {
         }
     }
 
-    public static List<Button> getBombardmentAssignmentButtons(Player player, Game game) {
+    private static List<Button> getBombardmentAssignmentButtons(Player player, Game game) {
 
         List<Button> buttons = new ArrayList<>();
         Tile tile = game.getTileByPosition(game.getActiveSystem());
@@ -763,8 +763,9 @@ public class UnfiledButtonHandlers {
         Map<UnitModel, Integer> bombardUnits = CombatRollService.getUnitsInBombardment(tile, player, null);
         String assignedUnits = game.getStoredValue("assignedBombardment" + player.getFaction());
         List<String> usedLabels = new ArrayList<>();
-        for (UnitModel mod : bombardUnits.keySet()) {
-            for (int x = 0; x < bombardUnits.get(mod); x++) {
+        for (Map.Entry<UnitModel, Integer> entry : bombardUnits.entrySet()) {
+            UnitModel mod = entry.getKey();
+            for (int x = 0; x < entry.getValue(); x++) {
                 String name = mod.getAsyncId() + "_" + x;
                 if (assignedUnits.contains(name)) {
                     for (String assignedUnit : assignedUnits.split(";")) {
@@ -884,24 +885,30 @@ public class UnfiledButtonHandlers {
         return planets;
     }
 
-    public static String getBombardmentSummary(Player player, Game game) {
-        String summary = "";
+    private static String getBombardmentSummary(Player player, Game game) {
+        StringBuilder summary = new StringBuilder();
         String assignedUnits = game.getStoredValue("assignedBombardment" + player.getFaction());
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         if (tile == null) {
-            return summary;
+            return summary.toString();
         }
         for (String planet : getBombardablePlanets(player, game, tile)) {
-            summary += "### " + player.getFactionEmoji() + " BOMBARDMENT of "
-                    + Helper.getPlanetRepresentationNoResInf(planet, game) + ":\n";
+            summary.append("### ")
+                    .append(player.getFactionEmoji())
+                    .append(" BOMBARDMENT of ")
+                    .append(Helper.getPlanetRepresentationNoResInf(planet, game))
+                    .append(":\n");
             for (Player p2 : game.getRealAndEliminatedPlayers()) {
                 if (p2 == player) {
                     continue;
                 }
                 if (FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(planet))) {
-                    summary += "-# " + p2.getFactionEmoji() + " currently has "
-                            + ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, p2, planet)
-                            + "\n";
+                    summary.append("-# ")
+                            .append(p2.getFactionEmoji())
+                            .append(" currently has ")
+                            .append(ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(
+                                    game, p2, planet))
+                            .append("\n");
                     break;
                 }
             }
@@ -910,19 +917,19 @@ public class UnfiledButtonHandlers {
                 if (assignedUnit.endsWith(planet)) {
                     if (assignedUnit.contains("99")) {
                         if (assignedUnit.contains("argent")) {
-                            summary += "- Trrakan Aun Zulok die\n";
+                            summary.append("- Trrakan Aun Zulok die\n");
                         } else {
-                            summary += "- _Plasma Scoring_ die\n";
+                            summary.append("- _Plasma Scoring_ die\n");
                         }
                     } else {
                         String asyncID = assignedUnit.split("_")[0];
                         UnitModel mod = player.getUnitFromAsyncID(asyncID);
-                        summary += "- " + mod.getUnitEmoji() + "\n";
+                        summary.append("- ").append(mod.getUnitEmoji()).append("\n");
                     }
                 }
             }
         }
-        return summary;
+        return summary.toString();
     }
 
     @ButtonHandler("bombardConfirm_")
@@ -971,9 +978,8 @@ public class UnfiledButtonHandlers {
         if (buttonID.split("_").length > 2) {
             whatIsItFor = buttonID.split("_")[2];
         }
-        String message = player.getFactionEmojiOrColor() + " reduced commodities by " + tgLoss + " ("
-                + player.getCommodities() + "->"
-                + (player.getCommodities() - tgLoss) + ").";
+        player.getFactionEmojiOrColor();
+        String message;
 
         if (tgLoss > player.getCommodities()) {
             message = "You don't have " + tgLoss + " commodit" + (tgLoss == 1 ? "y" : "ies") + ". No change made.";
@@ -2451,8 +2457,7 @@ public class UnfiledButtonHandlers {
             if (uH == null) {
                 continue;
             }
-            Set<String> tokens = new HashSet<>();
-            tokens.addAll(uH.getTokenList());
+            Set<String> tokens = new HashSet<>(uH.getTokenList());
             for (String token : tokens) {
                 if (token.contains("corefactory")) {
                     uH.removeToken(token);
@@ -2610,7 +2615,7 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("doAnotherAction")
     @ButtonHandler("finishComponentAction")
-    public static void doAnotherAction(ButtonInteractionEvent event, Player player, Game game) {
+    private static void doAnotherAction(ButtonInteractionEvent event, Player player, Game game) {
         String message = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
@@ -3412,7 +3417,7 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler("startOfGameObjReveal")
-    public static void startOfGameObjReveal(ButtonInteractionEvent event, Game game, Player player) {
+    public static void startOfGameObjReveal(ButtonInteractionEvent event, Game game) {
         for (Player p : game.getRealPlayers()) {
             if (p.getSecrets().size() > 1 && !game.isExtraSecretMode()) {
                 MessageHelper.sendMessageToChannel(
@@ -3429,7 +3434,7 @@ public class UnfiledButtonHandlers {
         if (speaker == null) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "Please assign speaker before hitting this button.");
-            ButtonHelper.offerSpeakerButtons(game, player);
+            ButtonHelper.offerSpeakerButtons(game);
             return;
         }
         if (game.hasAnyPriorityTrackMode()

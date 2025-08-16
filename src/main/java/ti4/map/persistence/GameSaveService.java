@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.helpers.Constants;
@@ -60,6 +61,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
 class GameSaveService {
 
     private static final ObjectMapper mapper = ObjectMapperFactory.build();
+    private static final Pattern PATTERN = Pattern.compile(" ");
 
     public static boolean save(Game game, String reason) {
         return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> {
@@ -891,10 +893,11 @@ class GameSaveService {
             StringBuilder fogOfWarSystems = new StringBuilder();
             Map<String, String> fowSystems = player.getFogTiles();
             Map<String, String> fowLabels = player.getFogLabels();
-            for (String key : fowSystems.keySet()) {
-                String system = fowSystems.get(key);
+            for (Entry<String, String> entry : fowSystems.entrySet()) {
+                String key = entry.getKey();
+                String system = entry.getValue();
                 String label = fowLabels.get(key);
-                if (label != null) label = label.replaceAll(" ", "—"); // replace spaces with em dash
+                if (label != null) label = PATTERN.matcher(label).replaceAll("—"); // replace spaces with em dash
                 fogOfWarSystems.append(key);
                 fogOfWarSystems.append(",");
                 fogOfWarSystems.append(system);
@@ -1042,10 +1045,10 @@ class GameSaveService {
         try {
             writer.write(constant + " ");
 
-            for (String po : peekedPOs.keySet()) {
-                writer.write(po + ":");
+            for (Entry<String, List<String>> entry : peekedPOs.entrySet()) {
+                writer.write(entry.getKey() + ":");
 
-                for (String playerID : peekedPOs.get(po)) {
+                for (String playerID : entry.getValue()) {
                     writer.write(playerID + ",");
                 }
 

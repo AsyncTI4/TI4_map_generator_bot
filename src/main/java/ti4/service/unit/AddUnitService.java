@@ -26,7 +26,7 @@ public class AddUnitService {
             AddPlanetToPlayAreaService.addPlanetToPlayArea(
                     event, tile, unit.uh().getName(), game);
 
-            String color = unit.unitKey().getColorID();
+            String color = unit.unitKey().colorID();
             handleFogOfWar(tile, color, game, unit.unitKey() + " " + unit.getTotalRemoved());
             checkFleetCapacity(tile, color, game);
         }
@@ -110,7 +110,7 @@ public class AddUnitService {
             }
         }
         if (amtRemaining > 0) {
-            states.set(0, states.get(0) + amtRemaining);
+            states.set(0, states.getFirst() + amtRemaining);
         }
         return states;
     }

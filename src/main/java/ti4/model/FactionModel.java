@@ -116,19 +116,19 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(complexity).orElse("Not added to bot yet");
     }
 
-    public Optional<String> getFactionSheetFrontImageURL() {
+    private Optional<String> getFactionSheetFrontImageURL() {
         return Optional.ofNullable(factionSheetFrontImageURL);
     }
 
-    public Optional<String> getFactionSheetBackImageURL() {
+    private Optional<String> getFactionSheetBackImageURL() {
         return Optional.ofNullable(factionSheetBackImageURL);
     }
 
-    public Optional<String> getFactionReferenceImageURL() {
+    private Optional<String> getFactionReferenceImageURL() {
         return Optional.ofNullable(factionReferenceImageURL);
     }
 
-    public Optional<String> getWikiURL() {
+    private Optional<String> getWikiURL() {
         return Optional.ofNullable(wikiURL);
     }
 

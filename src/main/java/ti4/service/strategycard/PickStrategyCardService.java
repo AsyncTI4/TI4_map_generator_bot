@@ -137,7 +137,7 @@ public class PickStrategyCardService {
         }
     }
 
-    public static boolean checkForQueuedSCPick(
+    private static boolean checkForQueuedSCPick(
             ButtonInteractionEvent event, Player privatePlayer, Game game, String msgExtra) {
         Player player = privatePlayer;
         String alreadyQueued = game.getStoredValue(player.getFaction() + "scpickqueue");
@@ -188,7 +188,7 @@ public class PickStrategyCardService {
                 Player speaker = game.getSpeaker();
                 if (speaker != null) {
                     pickOrder.remove(speaker);
-                    pickOrder.add(0, speaker);
+                    pickOrder.addFirst(speaker);
                 }
             }
             return pickOrder;
