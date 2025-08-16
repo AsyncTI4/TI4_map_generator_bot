@@ -46,6 +46,14 @@ public class CircuitBreaker {
         return true;
     }
 
+    public static synchronized void openForSeconds(long seconds) {
+        open = true;
+        thresholdCount = 0;
+        closeDateTime = LocalDateTime.now().plusSeconds(seconds);
+        CronManager.scheduleOnce(CircuitBreaker.class, CircuitBreaker::reset, seconds, TimeUnit.SECONDS);
+        BotLogger.info("Circuit breaker manually opened for " + seconds + " seconds.");
+    }
+
     private static synchronized void reset() {
         thresholdCount = 0;
         open = false;
