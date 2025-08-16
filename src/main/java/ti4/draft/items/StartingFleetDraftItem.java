@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import ti4.helpers.PatternHelper;
 import ti4.draft.DraftItem;
 import ti4.helpers.Helper;
+import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.DraftErrataModel;
@@ -65,7 +65,7 @@ public class StartingFleetDraftItem extends DraftItem {
 
     private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
-        String[] results = PatternHelper.STORAGE_SEPARATOR_PATTERN.split(game.getStoredValue("bannedFleets"));
+        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedFleets"));
         for (FactionModel faction : factions) {
             if (Arrays.asList(results).contains(faction.getAlias())) {
                 continue;

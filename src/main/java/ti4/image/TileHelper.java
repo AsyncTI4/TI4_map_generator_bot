@@ -11,11 +11,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import ti4.helpers.PatternHelper;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.collections4.CollectionUtils;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.PatternHelper;
 import ti4.helpers.Storage;
 import ti4.map.Game;
 import ti4.map.Tile;
@@ -26,6 +27,7 @@ import ti4.model.TileModel;
 
 public class TileHelper {
 
+    public static final Pattern TILE_WITH_NAME_PATTERN = Pattern.compile("^\\s*\\d{3} \\(\\w+\\)\\s*$");
     private static final Map<String, TileModel> tileIdsToTileModels = new HashMap<>();
     private static final Map<String, PlanetModel> planetIdsToPlanetModels = new HashMap<>();
     private static final Map<String, List<PlanetModel>> tileIdsToPlanetModels = new HashMap<>();
@@ -196,7 +198,7 @@ public class TileHelper {
     }
 
     public static Tile getTile(GenericInteractionCreateEvent event, String tileNameOrPos, Game game) {
-        if (PatternHelper.TILE_WITH_NAME_PATTERN.matcher(tileNameOrPos).matches()) {
+        if (TILE_WITH_NAME_PATTERN.matcher(tileNameOrPos).matches()) {
             // If the tileNameOrPos is in the format "123 (XYZ)", we extract the position only
             tileNameOrPos = tileNameOrPos
                     .trim()

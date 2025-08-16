@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import ti4.helpers.PatternHelper;
 import ti4.draft.DraftItem;
+import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.DraftErrataModel;
@@ -85,7 +85,7 @@ public class CommanderDraftItem extends DraftItem {
     private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
         Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
-        String[] results = PatternHelper.STORAGE_SEPARATOR_PATTERN.split(game.getStoredValue("bannedLeaders"));
+        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedLeaders"));
         for (FactionModel faction : factions) {
             List<String> leaders = faction.getLeaders();
             leaders.removeIf((String leader) ->

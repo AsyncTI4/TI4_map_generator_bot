@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import ti4.helpers.PatternHelper;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -30,6 +29,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.PatternHelper;
 import ti4.helpers.PdsCoverage;
 import ti4.helpers.PdsCoverageHelper;
 import ti4.helpers.RandomHelper;
@@ -356,8 +356,11 @@ public class TileGenerator {
                 // Draft Stuff
                 if (TileHelper.isDraftTile(tile.getTileModel())) {
                     String tileID = tile.getTileID();
-                    String draftNum = PatternHelper.LOWERCASE_LETTER_PATTERN.matcher(tileID).replaceAll("");
-                    String draftColor = PatternHelper.BLANK_WORD_PATTERN.matcher(tileID.replaceAll("[0-9]", ""))
+                    String draftNum = PatternHelper.LOWERCASE_LETTER_PATTERN
+                            .matcher(tileID)
+                            .replaceAll("");
+                    String draftColor = PatternHelper.BLANK_WORD_PATTERN
+                            .matcher(tileID.replaceAll("[0-9]", ""))
                             .replaceAll("")
                             .toUpperCase();
                     Point draftNumPosition = new Point(85, 140);

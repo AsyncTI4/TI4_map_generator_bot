@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import ti4.helpers.PatternHelper;
 import ti4.draft.DraftItem;
+import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.DraftErrataModel;
@@ -104,7 +104,7 @@ public class FlagshipDraftItem extends DraftItem {
     private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
         Map<String, UnitModel> allUnits = Mapper.getUnits();
-        String[] results = PatternHelper.STORAGE_SEPARATOR_PATTERN.split(game.getStoredValue("bannedFSs"));
+        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedFSs"));
         for (FactionModel faction : factions) {
             if (Arrays.asList(results).contains(faction.getAlias())) {
                 continue;
