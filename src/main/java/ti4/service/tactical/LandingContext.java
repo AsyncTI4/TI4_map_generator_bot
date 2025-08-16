@@ -1,4 +1,4 @@
-package ti4.service.tactical.planet;
+package ti4.service.tactical;
 
 import java.util.ArrayList;
 import java.util.List;

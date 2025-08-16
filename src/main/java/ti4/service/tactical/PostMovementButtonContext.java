@@ -1,4 +1,4 @@
-package ti4.service.tactical.postmovement;
+package ti4.service.tactical;
 
 import ti4.map.Game;
 import ti4.map.Player;
