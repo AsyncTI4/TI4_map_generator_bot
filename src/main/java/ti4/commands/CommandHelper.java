@@ -13,8 +13,11 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.commands.Command.Choice;
+import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.helpers.AliasHandler;
@@ -35,12 +38,11 @@ public class CommandHelper {
         return toChoices(Arrays.asList(values));
     }
 
-    public static List<Choice> toChoices(List<String> values) {
+    public static List<Choice> toChoices(Collection<String> values) {
         return values.stream().map(v -> new Choice(v, v)).toList();
     }
 
-    public static boolean acceptIfValidGame(
-            SlashCommandInteractionEvent event, boolean checkChannel, boolean checkPlayer) {
+    static boolean acceptIfValidGame(SlashCommandInteractionEvent event, boolean checkChannel, boolean checkPlayer) {
         var gameName = GameNameService.getGameName(event);
         var managedGame = GameManager.getManagedGame(gameName);
         if (managedGame == null) {
@@ -60,8 +62,7 @@ public class CommandHelper {
         }
         if (checkPlayer && getPlayerFromEvent(managedGame.getGame(), event) == null) {
             event.getHook()
-                    .editOriginal(
-                            "Command must be ran by a player in the game, please use `/game join gameName` or `/special2 setup_neutral_player`.")
+                    .editOriginal("Command must be ran by a player in the game, please use `/game join gameName`.")
                     .queue();
             return false;
         }
@@ -176,7 +177,7 @@ public class CommandHelper {
         return targetPlayers;
     }
 
-    public static boolean acceptIfHasRoles(SlashCommandInteractionEvent event, List<Role> acceptedRoles) {
+    public static boolean acceptIfHasRoles(SlashCommandInteractionEvent event, Collection<Role> acceptedRoles) {
         if (hasRole(event, acceptedRoles)) {
             return true;
         }
@@ -189,7 +190,7 @@ public class CommandHelper {
         return false;
     }
 
-    public static boolean hasRole(SlashCommandInteractionEvent event, List<Role> acceptedRoles) {
+    public static boolean hasRole(Interaction event, Collection<Role> acceptedRoles) {
         Member member = event.getMember();
         if (member == null) {
             return false;
@@ -205,10 +206,10 @@ public class CommandHelper {
 
     public static String getHeaderText(GenericInteractionCreateEvent event) {
         if (event instanceof SlashCommandInteractionEvent) {
-            return " used `" + ((SlashCommandInteractionEvent) event).getCommandString() + "`";
+            return " used `" + ((CommandInteractionPayload) event).getCommandString() + "`";
         }
         if (event instanceof ButtonInteractionEvent) {
-            return " pressed `" + ((ButtonInteractionEvent) event).getButton().getId() + "`";
+            return " pressed `" + ((ButtonInteraction) event).getButton().getId() + "`";
         }
         return " used the force";
     }

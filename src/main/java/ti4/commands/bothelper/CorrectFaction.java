@@ -1,4 +1,4 @@
-package ti4.commands.player;
+package ti4.commands.bothelper;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.AsyncTI4DiscordBot;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
@@ -22,30 +21,30 @@ import ti4.model.FactionModel;
 
 class CorrectFaction extends GameStateSubcommand {
 
-    public CorrectFaction() {
-        super(Constants.CORRECT_FACTION, "FOR BOTHELPER USE ONLY", true, true);
+    CorrectFaction() {
+        super(Constants.CORRECT_FACTION, "Change faction.", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "New faction")
                 .setRequired(true)
                 .setAutoComplete(true));
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setRequired(true)
                         .setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getGame();
-        if (CommandHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.bothelperRoles)) {
-            String newFaction = AliasHandler.resolveColor(
-                    event.getOption(Constants.FACTION).getAsString().toLowerCase());
-            newFaction = AliasHandler.resolveFaction(newFaction);
-            if (!Mapper.isValidFaction(newFaction)) {
-                MessageHelper.sendMessageToEventChannel(event, "Faction not valid");
-                return;
-            }
-
-            changeFactionSheetAndComponents(event, game, getPlayer(), newFaction);
+        String newFaction = AliasHandler.resolveColor(
+                event.getOption(Constants.FACTION).getAsString().toLowerCase());
+        newFaction = AliasHandler.resolveFaction(newFaction);
+        if (!Mapper.isValidFaction(newFaction)) {
+            MessageHelper.sendMessageToEventChannel(event, "Faction not valid");
+            return;
         }
+
+        Game game = getGame();
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
+        changeFactionSheetAndComponents(event, game, player, newFaction);
     }
 
     private void changeFactionSheetAndComponents(

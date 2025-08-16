@@ -74,12 +74,11 @@ import ti4.settings.GlobalSettings.ImplementedSettings;
 public class AsyncTI4DiscordBot {
 
     public static final long START_TIME_MILLISECONDS = System.currentTimeMillis();
-    public static final List<Role> adminRoles = new ArrayList<>();
-    public static final List<Role> developerRoles = new ArrayList<>();
-    public static final List<Role> bothelperRoles = new ArrayList<>();
+    public static final Set<Role> adminRoles = new HashSet<>();
+    public static final Set<Role> developerRoles = new HashSet<>();
+    public static final Set<Role> bothelperRoles = new HashSet<>();
 
     public static JDA jda;
-    private static String userID;
     public static String guildPrimaryID;
     public static boolean testingMode;
     public static Guild guildPrimary;
@@ -103,7 +102,6 @@ public class AsyncTI4DiscordBot {
         SpringApplication.run(AsyncTI4DiscordBot.class, args);
 
         // guildPrimaryID must be set before initializing listeners that use webhook logging
-        userID = args[1];
         guildPrimaryID = args[2];
 
         GlobalSettings.loadSettings();
@@ -404,7 +402,6 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("1126610851034583050")); // Fin's Server
         adminRoles.add(jda.getRoleById("824111008863092757")); // Fireseal's Server
         adminRoles.add(jda.getRoleById("336194595501244417")); // tedw4rd's Server
-        adminRoles.add(jda.getRoleById("1149705227625316352")); // who dis
         adminRoles.add(jda.getRoleById("1178659621225889875")); // Jepp2078's Server
         adminRoles.add(jda.getRoleById("1215451631622164610")); // Sigma's Server
         adminRoles.add(jda.getRoleById("1225597324206800996")); // ForlornGeas's Server
@@ -414,6 +411,7 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("1311111853912358922")); // TSI's Server
         adminRoles.add(jda.getRoleById("1368344911103000728")); // gozer's server (marshmallow manosphere)
         adminRoles.add(jda.getRoleById("1378475691531567185")); // Hadouken's Server
+        adminRoles.add(jda.getRoleById("1149705227625316352")); // Will's server
         adminRoles.removeIf(Objects::isNull);
 
         // DEVELOPER ROLES
@@ -437,10 +435,12 @@ public class AsyncTI4DiscordBot {
         developerRoles.add(jda.getRoleById("1311111944832553090")); // TSI's Server
         developerRoles.add(jda.getRoleById("1368344979579338762")); // gozer's server (marshmallow manosphere)
         developerRoles.add(jda.getRoleById("1378475796301217792")); // Hadouken's Server
+        developerRoles.add(jda.getRoleById("1406188584163213332")); // Will's server
         developerRoles.removeIf(Objects::isNull);
 
         // BOTHELPER ROLES
 
+        bothelperRoles.addAll(developerRoles); // developers may also execute bothelper commands
         bothelperRoles.addAll(adminRoles); // admins can also execute bothelper commands
         bothelperRoles.add(jda.getRoleById("1166011604488425482")); // Async Primary (Hub)
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary (Stroter's Paradise)
@@ -463,6 +463,7 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1311112004089548860")); // TSI's Server
         bothelperRoles.add(jda.getRoleById("1368345023745097898")); // gozer's server (marshmallow manosphere)
         bothelperRoles.add(jda.getRoleById("1378475822528204901")); // Hadouken's Server
+        bothelperRoles.add(jda.getRoleById("1150031360610799676")); // Will's server
         bothelperRoles.removeIf(Objects::isNull);
     }
 

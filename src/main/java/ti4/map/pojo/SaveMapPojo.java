@@ -13,7 +13,7 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 
 @UtilityClass
-class SaveMapPojo { //
+class SaveMapPojo {
 
     private static final ObjectMapper objectMapper = ObjectMapperFactory.build();
 
@@ -74,7 +74,7 @@ class SaveMapPojo { //
         try {
             field.setAccessible(true);
             String name = field.getName();
-            Object val = field.get(props); // throws
+            Object val = field.get(props);
 
             String strVal = getOutputFromField(val, name);
             return name + " " + strVal;
