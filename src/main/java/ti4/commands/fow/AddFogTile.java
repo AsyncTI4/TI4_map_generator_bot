@@ -49,14 +49,14 @@ class AddFogTile extends GameStateSubcommand {
 
         OptionMapping labelMapping = event.getOption(Constants.LABEL);
         String label = labelMapping == null ? "" : labelMapping.getAsString();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (String position : positions) {
             if (!PositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Tile position '" + position + "' is invalid");
                 continue;
             }
 
-            StringBuffer sb2 = new StringBuffer();
+            StringBuilder sb2 = new StringBuilder();
             for (Player target : targetPlayers) {
                 target.addFogTile(planetTileName, position, label);
                 sb2.append(" ").append(target.getRepresentation());

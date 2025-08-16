@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Pattern;
 import org.jetbrains.annotations.Nullable;
 import ti4.helpers.Constants;
 import ti4.helpers.RandomHelper;
@@ -11,6 +12,7 @@ import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 
 public class ResourceHelper {
+    private static final Pattern PATTERN = Pattern.compile(Constants.UNIT_DD);
     private static ResourceHelper resourceHelper;
     private final Map<String, String> unitCache = new HashMap<>();
     private final Map<String, String> decalCache = new HashMap<>();
@@ -67,7 +69,7 @@ public class ResourceHelper {
     public String getUnitFile(String name) {
         if (name.endsWith(Constants.UNIT_DD)) {
             if (RandomHelper.isOneInX(Constants.EYE_CHANCE)) {
-                return getResourceFromFolder("units/", name.replaceFirst(Constants.UNIT_DD, Constants.UNIT_DD_EYE));
+                return getResourceFromFolder("units/", PATTERN.matcher(name).replaceFirst(Constants.UNIT_DD_EYE));
             }
         }
         String unitPath = unitCache.get(name);

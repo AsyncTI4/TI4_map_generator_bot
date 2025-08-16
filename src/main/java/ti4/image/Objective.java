@@ -55,7 +55,7 @@ public record Objective(
         return objectives;
     }
 
-    public Integer getWorth(Game game) {
+    private Integer getWorth(Game game) {
         return switch (type) {
             case Stage1 -> 1;
             case Stage2 -> 2;
@@ -66,7 +66,7 @@ public record Objective(
         };
     }
 
-    public String getName() {
+    private String getName() {
         if (type == Type.Custom) {
             return key;
         }

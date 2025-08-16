@@ -553,18 +553,18 @@ public class StartPhaseService {
         // Pulsar destruction logic
         game.getTileMap().values().stream()
                 .filter(tile -> "sig02".equals(tile.getTileID()))
-                .forEach(pulsar -> {
-                    pulsar.getSpaceUnitHolder().getUnitColorsOnHolder().forEach(playerColor -> {
-                        pulsar.removeAllUnits(playerColor);
-                        Player p = game.getPlayerFromColorOrFaction(playerColor);
-                        if (p.isRealPlayer()) {
-                            MessageHelper.sendMessageToChannel(
-                                    p.getCorrectChannel(),
-                                    p.getRepresentationUnfogged() + ", units in Pulsar (" + pulsar.getPosition()
-                                            + ") were destroyed.");
-                        }
-                    });
-                });
+                .forEach(pulsar -> pulsar.getSpaceUnitHolder()
+                        .getUnitColorsOnHolder()
+                        .forEach(playerColor -> {
+                            pulsar.removeAllUnits(playerColor);
+                            Player p = game.getPlayerFromColorOrFaction(playerColor);
+                            if (p.isRealPlayer()) {
+                                MessageHelper.sendMessageToChannel(
+                                        p.getCorrectChannel(),
+                                        p.getRepresentationUnfogged() + ", units in Pulsar (" + pulsar.getPosition()
+                                                + ") were destroyed.");
+                            }
+                        }));
 
         if ("action_deck_2".equals(game.getAcDeckID()) && game.getRound() > 1) {
             handleStartOfStrategyForAcd2(game);
@@ -1055,7 +1055,7 @@ public class StartPhaseService {
                             p2.getCorrectChannel(),
                             p2.getRepresentationUnfogged() + ", you have the opportunity to use _Imperial Arbiter_.",
                             buttons);
-                    hold.append((hold.length() == 0) ? "" : " or ").append("_Imperial Arbiter_");
+                    hold.append((hold.isEmpty()) ? "" : " or ").append("_Imperial Arbiter_");
                 }
             }
             if (game.isShowBanners()) {

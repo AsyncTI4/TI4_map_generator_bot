@@ -29,7 +29,7 @@ class StasisInfantry extends GameStateSubcommand {
         setValue(event, player, player::setStasisInfantry, player::getStasisInfantry, count);
     }
 
-    public void setValue(
+    private void setValue(
             SlashCommandInteractionEvent event,
             Player player,
             Consumer<Integer> consumer,

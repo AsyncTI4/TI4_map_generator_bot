@@ -45,7 +45,7 @@ public class PlanetLayoutModel {
     }
 
     /** Center of control token relative to tile */
-    public Point getControlOffset() {
+    private Point getControlOffset() {
         return new Point(centerPosition.x + 2, centerPosition.y + 12);
     }
 
@@ -75,7 +75,7 @@ public class PlanetLayoutModel {
     }
 
     private Point getStructureOffset(int index) {
-        Integer icons = extraIcons != null ? extraIcons : 0;
+        int icons = extraIcons != null ? extraIcons : 0;
         double deltaTheta =
                 switch (resourcesLocation) {
                     case BottomLeft, TopRight -> -30.0;

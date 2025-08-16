@@ -66,7 +66,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(isFakeRelic).orElse(false);
     }
 
-    public Optional<String> getImageURL() {
+    private Optional<String> getImageURL() {
         return Optional.ofNullable(imageURL);
     }
 

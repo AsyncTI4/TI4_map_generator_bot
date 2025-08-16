@@ -1,6 +1,5 @@
 package ti4.service.fow;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -251,13 +250,13 @@ public class CreateFoWGameService {
     private static String getInfoTextFromFile(String file) {
         String path = ResourceHelper.getInstance().getHelpFile(file);
         try {
-            return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+            return Files.readString(Paths.get(path));
         } catch (Exception e) {
             return file + " IS BLANK";
         }
     }
 
-    public static String getLastFOWGameName() {
+    private static String getLastFOWGameName() {
         return "fow" + getLastFOWGameNumber();
     }
 
@@ -268,7 +267,7 @@ public class CreateFoWGameService {
     }
 
     private static int getLastFOWGameNumber() {
-        ArrayList<Integer> existingNums = getAllExistingFOWNumbers();
+        List<Integer> existingNums = getAllExistingFOWNumbers();
         if (existingNums.isEmpty()) {
             return 1;
         }

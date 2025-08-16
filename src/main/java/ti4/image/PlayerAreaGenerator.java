@@ -1,13 +1,6 @@
 package ti4.image;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -15,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -72,7 +66,7 @@ import ti4.service.fow.GMService;
 import ti4.service.user.AFKService;
 import ti4.website.model.WebsiteOverlay;
 
-public class PlayerAreaGenerator {
+class PlayerAreaGenerator {
 
     private final Graphics graphics;
     private final Game game;
@@ -131,7 +125,7 @@ public class PlayerAreaGenerator {
         return new Rectangle(topLeft);
     }
 
-    public Rectangle drawPlayerAreaOLD(Player player, Point topLeft) {
+    private Rectangle drawPlayerAreaOLD(Player player, Point topLeft) {
         int x = topLeft.x;
         int y = topLeft.y;
         Graphics2D g2 = (Graphics2D) graphics;
@@ -873,7 +867,7 @@ public class PlayerAreaGenerator {
     }
 
     private PlanetModel findAttachedPlanet(PromissoryNoteModel model) {
-        if (!model.getAttachment().isPresent() || model.getAttachment().get().isBlank()) return null;
+        if (model.getAttachment().isEmpty() || model.getAttachment().get().isBlank()) return null;
 
         String tokenID = model.getAttachment().get();
         for (Tile tile : game.getTileMap().values()) {
@@ -1476,7 +1470,7 @@ public class PlayerAreaGenerator {
         }
     }
 
-    public static boolean isWholeNumber(float number) {
+    private static boolean isWholeNumber(float number) {
         return number == Math.floor(number);
     }
 
@@ -1595,7 +1589,7 @@ public class PlayerAreaGenerator {
                 UnitType.Fighter,
                 UnitType.Infantry);
 
-        Map<UnitType, List<UnitKey>> collect = units.stream().collect(Collectors.groupingBy(key -> key.getUnitType()));
+        Map<UnitType, List<UnitKey>> collect = units.stream().collect(Collectors.groupingBy(UnitKey::getUnitType));
         for (UnitType orderKey : order) {
             List<UnitKey> keys = collect.get(orderKey);
             if (keys == null) {
@@ -1859,7 +1853,7 @@ public class PlayerAreaGenerator {
         for (String planet : planets) {
             PlanetModel model = Mapper.getPlanet(planet);
 
-            Set<PlanetType> types = new HashSet<>();
+            Set<PlanetType> types = EnumSet.noneOf(PlanetType.class);
             if (model != null && model.getPlanetTypes() != null) types.addAll(model.getPlanetTypes());
 
             if (types.contains(PlanetType.FAKE)) {

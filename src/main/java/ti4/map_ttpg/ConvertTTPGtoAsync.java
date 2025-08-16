@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
@@ -101,7 +100,7 @@ public class ConvertTTPGtoAsync {
         }
     };
 
-    public static final Map<String, String> fakePlayers = new HashMap<>() {
+    private static final Map<String, String> fakePlayers = new HashMap<>() {
         {
             put(Constants.prisonerOneId, "PrisonerOne");
             put(Constants.tspId, "Holytispoon");
@@ -156,7 +155,7 @@ public class ConvertTTPGtoAsync {
         return true;
     }
 
-    public static Game ConvertTTPGMaptoAsyncMap(TTPGMap ttpgMap, String gameName) {
+    private static Game ConvertTTPGMaptoAsyncMap(TTPGMap ttpgMap, String gameName) {
         Mapper.init();
         Game asyncGame = new Game() {
             {
@@ -581,7 +580,7 @@ public class ConvertTTPGtoAsync {
         }
     }
 
-    public static Tile ConvertTTPGHexToAsyncTile(Game asyncGame, String ttpgHex) {
+    private static Tile ConvertTTPGHexToAsyncTile(Game asyncGame, String ttpgHex) {
         // System.out.println(" Examining hex summary:  " + ttpgHex);
 
         // TILE +-X +-Y SPACE ; PLANET1 ; PLANET2 ; ...
@@ -765,7 +764,7 @@ public class ConvertTTPGtoAsync {
         return null;
     }
 
-    public static TTPGMap getTTPGMapFromJsonFile(File file) throws Exception {
+    private static TTPGMap getTTPGMapFromJsonFile(File file) throws Exception {
         String jsonSource = readFileAsString(file);
         if (isValid(jsonSource)) {
             JsonNode node = parse(jsonSource);
@@ -774,19 +773,19 @@ public class ConvertTTPGtoAsync {
         return null;
     }
 
-    public static String readFileAsString(String filepath) throws Exception {
-        return new String(Files.readAllBytes(Paths.get(filepath)), StandardCharsets.UTF_8);
+    private static String readFileAsString(String filepath) throws Exception {
+        return Files.readString(Paths.get(filepath));
     }
 
-    public static String readFileAsString(File file) throws Exception {
-        return new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())), StandardCharsets.UTF_8);
+    private static String readFileAsString(File file) throws Exception {
+        return Files.readString(Paths.get(file.getAbsolutePath()));
     }
 
-    public static JsonNode parse(String source) throws JsonProcessingException {
+    private static JsonNode parse(String source) throws JsonProcessingException {
         return objectMapper.readTree(source);
     }
 
-    public static boolean isValid(String json) {
+    private static boolean isValid(String json) {
         try {
             objectMapper.readTree(json);
         } catch (JacksonException e) {
@@ -797,7 +796,7 @@ public class ConvertTTPGtoAsync {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static <A> A fromJson(JsonNode node, Class<A> clazz)
+    private static <A> A fromJson(JsonNode node, Class<A> clazz)
             throws JsonProcessingException, IllegalArgumentException {
         return objectMapper.treeToValue(node, clazz);
     }
@@ -814,7 +813,7 @@ public class ConvertTTPGtoAsync {
         return generateString(node, true);
     }
 
-    public static String generateString(JsonNode node, Boolean prettyPrint) throws JsonProcessingException {
+    private static String generateString(JsonNode node, Boolean prettyPrint) throws JsonProcessingException {
         ObjectWriter objectWriter = objectMapper.writer();
         if (prettyPrint) objectWriter = objectWriter.with(SerializationFeature.INDENT_OUTPUT);
         return objectWriter.writeValueAsString(node);

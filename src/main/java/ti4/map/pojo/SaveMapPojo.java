@@ -13,7 +13,7 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 
 @UtilityClass
-public class SaveMapPojo { //
+class SaveMapPojo { //
 
     private static final ObjectMapper objectMapper = ObjectMapperFactory.build();
 
@@ -64,10 +64,7 @@ public class SaveMapPojo { //
         } catch (NoSuchFieldException e) {
             System.out.println("Failed to find field `" + fieldName + "` for class `" + clazz.getName() + "`");
             System.out.println(String.join(
-                    ", ",
-                    Arrays.asList(clazz.getFields()).stream()
-                            .map(Field::getName)
-                            .toList()));
+                    ", ", Arrays.stream(clazz.getFields()).map(Field::getName).toList()));
             throw e;
         } catch (Exception e) {
         }

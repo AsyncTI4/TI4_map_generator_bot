@@ -1,6 +1,8 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,8 +88,7 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 
-    public static List<Button> getArgentHeroStep3Buttons(
-            Game game, Player player, GenericInteractionCreateEvent event, String buttonID) {
+    static List<Button> getArgentHeroStep3Buttons(Game game, Player player, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         String pos1 = buttonID.split("_")[1];
         Tile destination = game.getTileByPosition(pos1);
@@ -133,8 +134,8 @@ public class ButtonHelperHeroes {
     }
 
     @ButtonHandler("argentHeroStep3_")
-    public static void argentHeroStep3(Game game, Player player, GenericInteractionCreateEvent event, String buttonID) {
-        List<Button> buttons = getArgentHeroStep3Buttons(game, player, event, buttonID);
+    public static void argentHeroStep3(Game game, Player player, String buttonID) {
+        List<Button> buttons = getArgentHeroStep3Buttons(game, player, buttonID);
         String pos1 = buttonID.split("_")[1];
         Tile destination = game.getTileByPosition(pos1);
         String msg =
@@ -145,7 +146,7 @@ public class ButtonHelperHeroes {
 
     @ButtonHandler("argentHeroStep4_")
     public static void argentHeroStep4(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = getArgentHeroStep3Buttons(game, player, event, buttonID);
+        List<Button> buttons = getArgentHeroStep3Buttons(game, player, buttonID);
         String pos1 = buttonID.split("_")[1];
         Tile destination = game.getTileByPosition(pos1);
         String pos2 = buttonID.split("_")[2];
@@ -186,7 +187,7 @@ public class ButtonHelperHeroes {
                 .queue();
     }
 
-    public static List<String> getAttachmentsForFlorzenHero(Game game, Player player) {
+    private static List<String> getAttachmentsForFlorzenHero(Game game, Player player) {
         List<String> legendaries = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (!FoWHelper.playerHasShipsInSystem(player, tile)) {
@@ -297,7 +298,7 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
-    public static List<String> getAllRevealedRelics(Game game) {
+    private static List<String> getAllRevealedRelics(Game game) {
         List<String> relicsTotal = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
             for (String relic : player.getRelics()) {
@@ -618,7 +619,7 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
 
-    public static List<Button> getAttachmentAttach(Game game, Player player, String type, String attachment) {
+    private static List<Button> getAttachmentAttach(Game game, Player player, String type, String attachment) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanetsAllianceMode()) {
             if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
@@ -670,7 +671,7 @@ public class ButtonHelperHeroes {
         }
     }
 
-    public static boolean doesExploreDeckHaveAnAttachmentLeft(String type, Game game) {
+    private static boolean doesExploreDeckHaveAnAttachmentLeft(String type, Game game) {
 
         List<String> deck = game.getExploreDeck(type);
         deck.addAll(game.getExploreDiscard(type));
@@ -723,9 +724,9 @@ public class ButtonHelperHeroes {
             Player tnelis, Game game, String buttonID, ButtonInteractionEvent event) {
         String soID = buttonID.split("_")[1];
         Map<String, Integer> customPOs = new HashMap<>(game.getRevealedPublicObjectives());
-        for (String customPO : customPOs.keySet()) {
-            if (customPO.contains("Tnelis Hero")) {
-                game.removeCustomPO(customPOs.get(customPO));
+        for (Map.Entry<String, Integer> entry : customPOs.entrySet()) {
+            if (entry.getKey().contains("Tnelis Hero")) {
+                game.removeCustomPO(entry.getValue());
                 String sb = "Removed Turra Sveyar, the Tnelis hero, from a secret objective.";
                 MessageHelper.sendMessageToChannel(tnelis.getCorrectChannel(), sb);
             }
@@ -1288,7 +1289,7 @@ public class ButtonHelperHeroes {
     @ButtonHandler("cabalHeroAll")
     public static void resolveCabalHero(ButtonInteractionEvent event, Player player, Game game) {
         List<Tile> tiles = new ArrayList<>();
-        Map<String, List<TI4Emoji>> totalLosses = new HashMap();
+        Map<String, List<TI4Emoji>> totalLosses = new HashMap<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2.hasTech("dt2")
                     || p2.getUnitsOwned().contains("cabal_spacedock")
@@ -1319,15 +1320,19 @@ public class ButtonHelperHeroes {
         StringBuilder message = new StringBuilder();
         for (Tile tile : adjTiles) {
             boolean content = false;
-            message.append("### Resolving for tile " + tile.getRepresentationForButtons() + "\n");
+            message.append("### Resolving for tile ")
+                    .append(tile.getRepresentationForButtons())
+                    .append("\n");
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
                     continue;
                 }
                 if (FoWHelper.playerHasShipsInSystem(p2, tile)
                         && ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, game, player)) {
-                    message.append(player.getRepresentationUnfogged() + " has failed to eat units owned by "
-                            + p2.getRepresentation() + " because they were blockaded. Womp Womp.\n");
+                    message.append(player.getRepresentationUnfogged())
+                            .append(" has failed to eat units owned by ")
+                            .append(p2.getRepresentation())
+                            .append(" because they were blockaded. Womp Womp.\n");
                     content = true;
                     continue;
                 }
@@ -1366,9 +1371,14 @@ public class ButtonHelperHeroes {
                             damagedUnits = unitHolder.getUnitDamage().get(key);
                         }
                         if (damagedUnits > 0) {
-                            message.append("Rolling for " + p2.getRepresentationNoPing() + " damaged "
-                                    + unitModel.getBaseType() + (damagedUnits == 1 ? "" : "s") + " :boom:"
-                                    + unitModel.getUnitEmoji() + ": ");
+                            message.append("Rolling for ")
+                                    .append(p2.getRepresentationNoPing())
+                                    .append(" damaged ")
+                                    .append(unitModel.getBaseType())
+                                    .append(damagedUnits == 1 ? "" : "s")
+                                    .append(" :boom:")
+                                    .append(unitModel.getUnitEmoji())
+                                    .append(": ");
                             for (int i = 0; i < damagedUnits; i++) {
                                 Die dice = new Die(4);
                                 message.append(dice.getGreenDieIfSuccessOrRedDieIfFailure());
@@ -1384,9 +1394,14 @@ public class ButtonHelperHeroes {
                             content = true;
                         }
                         if (totalUnits > damagedUnits) {
-                            message.append("Rolling for " + p2.getRepresentationNoPing() + " " + unitModel.getBaseType()
-                                    + (totalUnits - damagedUnits == 1 ? "" : "s") + " " + unitModel.getUnitEmoji()
-                                    + ": ");
+                            message.append("Rolling for ")
+                                    .append(p2.getRepresentationNoPing())
+                                    .append(" ")
+                                    .append(unitModel.getBaseType())
+                                    .append(totalUnits - damagedUnits == 1 ? "" : "s")
+                                    .append(" ")
+                                    .append(unitModel.getUnitEmoji())
+                                    .append(": ");
                             for (int i = 0; i < totalUnits - damagedUnits; i++) {
                                 Die dice = new Die(4);
                                 message.append(dice.getGreenDieIfSuccessOrRedDieIfFailure());
@@ -1416,9 +1431,12 @@ public class ButtonHelperHeroes {
                                 mechCount + infantryCount - capacity,
                                 mechCount + infantryCount + fighterCount - capacity - fightersIgnored);
                         if (mechCount == 0 && infantryCount == 0) {
-                            message.append(p2.getRepresentationNoPing() + " has " + overCapacity + " fighter"
-                                    + (overCapacity == 1 ? "" : "s")
-                                    + " in excess of their amended capacity; removing and capturing.\n");
+                            message.append(p2.getRepresentationNoPing())
+                                    .append(" has ")
+                                    .append(overCapacity)
+                                    .append(" fighter")
+                                    .append(overCapacity == 1 ? "" : "s")
+                                    .append(" in excess of their amended capacity; removing and capturing.\n");
                             RemoveUnitService.removeUnit(
                                     event, tile, game, p2, unitHolder, UnitType.Fighter, overCapacity, false);
                             AddUnitService.addUnits(
@@ -1466,10 +1484,14 @@ public class ButtonHelperHeroes {
                                         + (mechCount * infantryCount > 0 ? " and " : "")
                                         + (infantryCount >= 1 ? "infantry" : "");
                             }
-                            message.append(p2.getRepresentationNoPing() + " has a mixture of " + overCapacity + " "
-                                    + unitListing + " in excess of their amended capacity. Please remove "
-                                    + (overCapacity == 1 ? "this" : "these")
-                                    + " excess manually (they should be captured).\n");
+                            message.append(p2.getRepresentationNoPing())
+                                    .append(" has a mixture of ")
+                                    .append(overCapacity)
+                                    .append(" ")
+                                    .append(unitListing)
+                                    .append(" in excess of their amended capacity. Please remove ")
+                                    .append(overCapacity == 1 ? "this" : "these")
+                                    .append(" excess manually (they should be captured).\n");
                             message.append("-# We hope to add buttons for this Soon™.\n");
                             // TODO: Add buttons
                         }
@@ -1483,12 +1505,13 @@ public class ButtonHelperHeroes {
 
         message.append("## Capture Summary");
         boolean nothing = true;
-        for (String faction : totalLosses.keySet()) {
-            List<TI4Emoji> captured = totalLosses.get(faction);
+        for (Map.Entry<String, List<TI4Emoji>> entry : totalLosses.entrySet()) {
+            String faction = entry.getKey();
+            List<TI4Emoji> captured = entry.getValue();
             if (captured.isEmpty()) {
-                message.append("\n> " + faction + " - nothing.");
+                message.append("\n> ").append(faction).append(" - nothing.");
             } else {
-                message.append("\n> " + faction + " - ");
+                message.append("\n> ").append(faction).append(" - ");
                 List<TI4Emoji> orderedEmoji = Arrays.asList(
                         UnitEmojis.warsun,
                         UnitEmojis.flagship,
@@ -2050,7 +2073,7 @@ public class ButtonHelperHeroes {
         return buttons;
     }
 
-    public static List<Button> getJolNarHeroSwapInOptions(Player player, Game game, String buttonID) {
+    private static List<Button> getJolNarHeroSwapInOptions(Player player, Game game, String buttonID) {
         String tech = buttonID.replace("jnHeroSwapOut_", "");
         TechnologyModel techM = Mapper.getTech(tech);
         List<TechnologyModel> techs = new ArrayList<>();
@@ -2069,11 +2092,10 @@ public class ButtonHelperHeroes {
     }
 
     @ButtonHandler("swapTechs_")
-    public static void resolveAJolNarSwapStep2(
-            Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+    public static void resolveAJolNarSwapStep2(Player player, String buttonID, ButtonInteractionEvent event) {
         buttonID = buttonID.replace("swapTechs__", "");
-        String techOut = buttonID.split("__")[0];
-        String techIn = buttonID.split("__")[1];
+        String techOut = PatternHelper.DOUBLE_UNDERSCORE_PATTERN.split(buttonID)[0];
+        String techIn = PatternHelper.DOUBLE_UNDERSCORE_PATTERN.split(buttonID)[1];
         TechnologyModel techM1 = Mapper.getTech(techOut);
         TechnologyModel techM2 = Mapper.getTech(techIn);
         player.addTech(techIn);

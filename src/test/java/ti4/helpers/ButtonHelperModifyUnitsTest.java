@@ -13,7 +13,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.testUtils.BaseTi4Test;
 
-public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
+class ButtonHelperModifyUnitsTest extends BaseTi4Test {
     private final Game game = new Game();
     private final Tile tile = new Tile("tile 1", null, null, null, null);
 

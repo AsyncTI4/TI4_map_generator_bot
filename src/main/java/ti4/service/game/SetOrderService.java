@@ -39,7 +39,7 @@ public class SetOrderService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
-    public static void setPlayerOrder(Map<String, Player> newPlayerOrder, Map<String, Player> players, User user) {
+    private static void setPlayerOrder(Map<String, Player> newPlayerOrder, Map<String, Player> players, User user) {
         if (user == null) {
             return;
         }

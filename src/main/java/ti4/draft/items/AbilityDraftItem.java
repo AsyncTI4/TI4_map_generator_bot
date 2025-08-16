@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -13,6 +14,8 @@ import ti4.model.FactionModel;
 import ti4.service.emoji.TI4Emoji;
 
 public class AbilityDraftItem extends DraftItem {
+    private static final Pattern FIN_SEP = Pattern.compile("finSep");
+
     public AbilityDraftItem(String itemId) {
         super(Category.ABILITY, itemId);
     }
@@ -64,10 +67,10 @@ public class AbilityDraftItem extends DraftItem {
         return allItems;
     }
 
-    public static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
+    private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            String[] results = game.getStoredValue("bannedAbilities").split("finSep");
+            String[] results = FIN_SEP.split(game.getStoredValue("bannedAbilities"));
             for (String ability : faction.getAbilities()) {
                 if (Arrays.asList(results).contains(ability)) {
                     continue;

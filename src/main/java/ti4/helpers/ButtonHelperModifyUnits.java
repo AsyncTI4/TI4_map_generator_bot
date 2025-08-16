@@ -48,7 +48,7 @@ import ti4.service.unit.RemoveUnitService;
 
 public class ButtonHelperModifyUnits {
 
-    public static int getNumberOfSustainableUnits(
+    private static int getNumberOfSustainableUnits(
             Player player, Game game, UnitHolder unitHolder, boolean space, boolean spacecannonoffence) {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int sustains = 0;
@@ -226,7 +226,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
     }
 
-    public static String getDamagedUnits(Player player, UnitHolder unitHolder, Game game) {
+    private static String getDamagedUnits(Player player, UnitHolder unitHolder, Game game) {
         StringBuilder duraniumMsg = new StringBuilder();
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
@@ -318,7 +318,8 @@ public class ButtonHelperModifyUnits {
         unitTypes.put("fighter", UnitEmojis.fighter.toString());
         unitTypes.put("infantry", UnitEmojis.infantry.toString());
         unitTypes.put("pds", UnitEmojis.pds.toString());
-        for (String unitType : unitTypes.keySet()) {
+        for (Map.Entry<String, String> entry : unitTypes.entrySet()) {
+            String unitType = entry.getKey();
             if (shouldProcessUnit(player, unitType, unitHolder, hits)) {
                 for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                     if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
@@ -335,7 +336,7 @@ public class ButtonHelperModifyUnits {
                         msg.append("> Destroyed ")
                                 .append(min)
                                 .append(" ")
-                                .append(unitTypes.get(unitType))
+                                .append(entry.getValue())
                                 .append("\n");
                         hits -= min;
                         var unit = new ParsedUnit(unitKey, min, planet);
@@ -1057,7 +1058,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
-    public static List<Button> getUnitsToDevote(
+    private static List<Button> getUnitsToDevote(
             Player player, Game game, GenericInteractionCreateEvent event, Tile tile, String devoteOrNo) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         Set<UnitType> allowedUnits = Set.of(UnitType.Destroyer, UnitType.Cruiser);
@@ -1118,7 +1119,7 @@ public class ButtonHelperModifyUnits {
         }
     }
 
-    public static List<Button> getOpposingUnitsToHit(Player player, Game game, Tile tile, boolean exoHit) {
+    private static List<Button> getOpposingUnitsToHit(Player player, Game game, Tile tile, boolean exoHit) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
 
         String exo = "";
@@ -1185,7 +1186,7 @@ public class ButtonHelperModifyUnits {
                 getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet));
     }
 
-    public static List<Button> getOpposingUnitsToHitOnGround(Player player, Game game, Tile tile, String planet) {
+    private static List<Button> getOpposingUnitsToHitOnGround(Player player, Game game, Tile tile, String planet) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
 
         List<Button> buttons = new ArrayList<>();

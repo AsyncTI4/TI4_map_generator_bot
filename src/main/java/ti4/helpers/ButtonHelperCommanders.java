@@ -583,12 +583,9 @@ public class ButtonHelperCommanders {
                         + event.getButton().getLabel() + " deck.");
         event.getMessage().delete().queue();
         switch (target) {
-            case "industrial", "hazardous", "frontier", "cultural" -> {
+            case "industrial", "hazardous", "frontier", "cultural" ->
                 ButtonHelperFactionSpecific.resolveExpLook(player, game, event, target);
-            }
-            case "agenda" -> {
-                LookAgendaService.lookAtAgendas(game, player, 1, false);
-            }
+            case "agenda" -> LookAgendaService.lookAtAgendas(game, player, 1, false);
             case "relics" -> {
                 List<String> relicDeck = game.getAllRelics();
                 if (relicDeck.isEmpty()) {
@@ -638,12 +635,9 @@ public class ButtonHelperCommanders {
                 player.getRepresentationNoPing() + " is choosing to bottom the card they saw.");
         event.getMessage().delete().queue();
         switch (target) {
-            case "industrial", "hazardous", "frontier", "cultural" -> {
+            case "industrial", "hazardous", "frontier", "cultural" ->
                 game.putExploreBottom(game.getExploreDeck(target).getFirst());
-            }
-            case "agenda" -> {
-                AgendaHelper.putBottom(game.getAgendas().getFirst(), game);
-            }
+            case "agenda" -> AgendaHelper.putBottom(game.getAgendas().getFirst(), game);
             case "relics" -> {
                 List<String> relicDeck = game.getAllRelics();
                 if (relicDeck.isEmpty()) {

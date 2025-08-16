@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
-public class ExploreModelTest extends BaseTi4Test {
+class ExploreModelTest extends BaseTi4Test {
     @Test
-    public void testExplores() {
+    void testExplores() {
         for (ExploreModel model : Mapper.getExplores().values()) {
             assertTrue(model.isValid(), model.getAlias() + ": invalid");
             assertTrue(

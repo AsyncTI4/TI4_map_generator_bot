@@ -13,19 +13,19 @@ import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 import ti4.testUtils.JsonValidator;
 
-public class UnitsTest extends BaseTi4Test {
+class UnitsTest extends BaseTi4Test {
 
     @Nested
     class UnitKeyTest {
         private final UnitType expectedUnitType = UnitType.Carrier;
-        private final String expectedColorId = "blu";
+        private static final String expectedColorId = "blu";
 
         private UnitKey buildUnitKey() {
             return Units.getUnitKey(expectedUnitType, expectedColorId);
         }
 
         @Test
-        public void testUnitKeyHasNoUnexpectedProperties() throws Exception {
+        void testUnitKeyHasNoUnexpectedProperties() throws Exception {
             // Given
             UnitKey unitKey = buildUnitKey();
             // DO NOT ADD NEW JSON KEYS TO THIS OBJECT.
@@ -38,12 +38,12 @@ public class UnitsTest extends BaseTi4Test {
         }
 
         @Test
-        public void testUnitKeyIsJacksonSerializable() {
+        void testUnitKeyIsJacksonSerializable() {
             JsonValidator.assertIsJacksonSerializable(UnitKey.class);
         }
 
         @Test
-        public void testUnitKeyJsonSaveAndRestore() throws JsonProcessingException {
+        void testUnitKeyJsonSaveAndRestore() throws JsonProcessingException {
             // Given
             UnitKey unitKey = buildUnitKey();
 

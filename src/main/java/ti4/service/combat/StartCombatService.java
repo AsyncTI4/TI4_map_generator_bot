@@ -58,7 +58,7 @@ public class StartCombatService {
                 .forEach(unitHolder -> groundCombatCheck(game, unitHolder, tile, event));
     }
 
-    public static void spaceCombatCheck(Game game, Tile tile, GenericInteractionCreateEvent event) {
+    private static void spaceCombatCheck(Game game, Tile tile, GenericInteractionCreateEvent event) {
         List<Player> playersWithShipsInSystem = ButtonHelper.getPlayersWithShipsInTheSystem(game, tile);
         if (playersWithShipsInSystem.size() <= 1) {
             return;
@@ -527,7 +527,7 @@ public class StartCombatService {
         }
     }
 
-    public static void offerRedGhostCommanderButtons(Player player, Game game, GenericInteractionCreateEvent event) {
+    private static void offerRedGhostCommanderButtons(Player player, Game game, GenericInteractionCreateEvent event) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")) {
             String message = player.getRepresentation(true, true)
                     + ", you may, at the __end__ of combat, gain 1 commodity or convert 1 of your commodities to a trade good,"

@@ -21,7 +21,7 @@ public class ExecutionLockManager {
         }
     }
 
-    public static boolean tryLock(String lockName, LockType lockType) {
+    private static boolean tryLock(String lockName, LockType lockType) {
         var lock = getLock(lockName);
         if (lockType == LockType.READ) {
             return lock.readLock().tryLock();

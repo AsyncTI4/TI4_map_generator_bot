@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
-public class DeckModelTest extends BaseTi4Test {
+class DeckModelTest extends BaseTi4Test {
     @Test
-    public void testDeckModels() {
+    void testDeckModels() {
         for (DeckModel deckModel : Mapper.getDecks().values()) {
             assertTrue(deckModel.isValid(), deckModel.getAlias() + " [" + deckModel.getType() + "]: invalid");
             assertTrue(

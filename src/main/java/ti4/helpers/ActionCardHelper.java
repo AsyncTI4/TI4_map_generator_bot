@@ -98,7 +98,7 @@ public class ActionCardHelper {
         return sb.toString();
     }
 
-    public static String getTrapCardRepresentation(String trapID, Map<String, String> trapCardsPlanets) {
+    private static String getTrapCardRepresentation(String trapID, Map<String, String> trapCardsPlanets) {
         StringBuilder sb = new StringBuilder();
         GenericCardModel trap = Mapper.getTrap(trapID);
         String planet = trapCardsPlanets.get(trapID);
@@ -192,7 +192,7 @@ public class ActionCardHelper {
         return acButtons;
     }
 
-    public static boolean hasPrePlayCards(Game game, Player player) {
+    private static boolean hasPrePlayCards(Game game, Player player) {
         List<String> prePlayable = List.of(
                 "coup",
                 "disgrace",

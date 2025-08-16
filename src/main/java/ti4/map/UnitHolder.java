@@ -251,8 +251,9 @@ public abstract class UnitHolder {
     @JsonIgnore
     public Map<UnitKey, Integer> getUnits() {
         Map<UnitKey, Integer> units = new HashMap<>();
-        for (UnitKey uk : unitsByState.keySet()) {
-            List<Integer> counts = unitsByState.get(uk);
+        for (Entry<UnitKey, List<Integer>> entry : unitsByState.entrySet()) {
+            UnitKey uk = entry.getKey();
+            List<Integer> counts = entry.getValue();
             if (getTotalUnitCount(counts) <= 0) {
                 unitsByState.remove(uk);
             } else {

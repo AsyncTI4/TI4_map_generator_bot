@@ -244,12 +244,11 @@ public class BotLogger {
             msg.append(origin.getOriginTimeFormatted());
             if (origin.getEventString() != null) msg.append(origin.getEventString());
             if (origin.getGameInfo() != null) msg.append(origin.getGameInfo());
-            channel = origin.getLogChannel(severity);
         } else {
             origin = new LogMessageOrigin(AsyncTI4DiscordBot.guildPrimary);
             msg.append(origin.getOriginTimeFormatted());
-            channel = origin.getLogChannel(severity);
         }
+        channel = origin.getLogChannel(severity);
 
         if (multiline) {
             msg.append("Message: ");
@@ -601,8 +600,8 @@ public class BotLogger {
         Warning("bot-log-warning", "## WARNING\n"),
         Error("bot-log-error", "## ERROR\n");
 
-        public final String channelName;
-        public final String headerText;
+        final String channelName;
+        final String headerText;
 
         LogSeverity(String channelName, String headerText) {
             this.channelName = channelName;
@@ -742,7 +741,7 @@ public class BotLogger {
         }
 
         @Nullable
-        public StringBuilder getGameInfo() {
+        StringBuilder getGameInfo() {
             if (game != null) {
                 StringBuilder builder = new StringBuilder().append("\nGame info: ");
                 builder.append(game.gameJumpLinks());
@@ -752,7 +751,7 @@ public class BotLogger {
         }
 
         @Nullable
-        public StringBuilder getEventString() {
+        StringBuilder getEventString() {
             if (event == null) return null;
 
             StringBuilder builder = new StringBuilder()
@@ -792,7 +791,7 @@ public class BotLogger {
          * @return The most relevant logging TextChannel
          */
         @Nullable
-        public TextChannel getLogChannel(@Nonnull LogSeverity severity) {
+        TextChannel getLogChannel(@Nonnull LogSeverity severity) {
             Guild guild = AsyncTI4DiscordBot.guildPrimary;
             if (guild == null) guild = this.guild;
             if (guild == null) return null;
@@ -805,7 +804,7 @@ public class BotLogger {
         }
 
         @Nonnull
-        public String getOriginTimeFormatted() {
+        String getOriginTimeFormatted() {
             return String.format("**__%s__** ", originTime);
         }
     }
@@ -817,7 +816,7 @@ public class BotLogger {
     // long as channelName and threadName are defined.
     public abstract static sealed
     class AbstractEventLog { // Yes, this is basically trying to recreate a rust enum. No, I'm not sorry
-        protected final LogMessageOrigin source;
+        final LogMessageOrigin source;
 
         // Implementor's note: These fields must have getters, as this is how the subclasses override the statics
         // without changing them for all subclasses
@@ -830,7 +829,7 @@ public class BotLogger {
         @Getter
         private static final String messagePrefix = "";
 
-        protected String message = "";
+        String message = "";
 
         public String getLogString() {
             StringBuilder message = new StringBuilder();
@@ -855,7 +854,7 @@ public class BotLogger {
             this.source = source;
         }
 
-        public static final class ButtonInteraction extends AbstractEventLog {
+        static final class ButtonInteraction extends AbstractEventLog {
             @Getter
             static String channelName = "bot-button-log";
 
@@ -867,7 +866,7 @@ public class BotLogger {
             }
         }
 
-        public static final class SlashCommand extends AbstractEventLog {
+        static final class SlashCommand extends AbstractEventLog {
             @Getter
             static String channelName = "bot-slash-command-log";
 

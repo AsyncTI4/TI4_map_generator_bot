@@ -47,7 +47,7 @@ public class StartScenario extends GameStateSubcommand {
         MessageHelper.replyToMessage(event, "Successfully started the scenario.");
     }
 
-    public static void startOrdinianCodex1(Game game, GenericInteractionCreateEvent event) {
+    private static void startOrdinianCodex1(Game game, GenericInteractionCreateEvent event) {
         game.setOrdinianC1Mode(true);
         var factions = List.of("arborec", "ghost", "muaat", "letnev", "nekro", "l1z1x");
         if (game.getRealPlayers().isEmpty()) {
@@ -105,7 +105,7 @@ public class StartScenario extends GameStateSubcommand {
         CommanderUnlockCheckService.checkPlayer(nekro, "nekro");
     }
 
-    public static void startLiberationCodex4(Game game, GenericInteractionCreateEvent event) {
+    private static void startLiberationCodex4(Game game, GenericInteractionCreateEvent event) {
         game.setLiberationC4Mode(true);
         var factions = List.of("ghost", "xxcha", "sol", "naaz", "nekro", "nomad");
         if (game.getRealPlayers().isEmpty()) {

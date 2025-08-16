@@ -34,21 +34,19 @@ public class ListTitlesGivenService {
 
         StringBuilder longMsg = new StringBuilder("The number of each title that has been bestowed:\n");
         Map<String, Integer> sortedTitlesMapAsc = SortHelper.sortByValue(timesTitleHasBeenBestowed, false);
-        for (String title : sortedTitlesMapAsc.keySet()) {
-            longMsg.append(title)
-                    .append(": ")
-                    .append(sortedTitlesMapAsc.get(title))
-                    .append(" \n");
+        for (Map.Entry<String, Integer> entry : sortedTitlesMapAsc.entrySet()) {
+            longMsg.append(entry.getKey()).append(": ").append(entry.getValue()).append(" \n");
         }
         longMsg.append("\nThe number of titles each player has: \n");
         Map<String, Integer> sortedMapAscPlayers = SortHelper.sortByValue(titlesAPersonHas, false);
-        for (String person : sortedMapAscPlayers.keySet()) {
+        for (Map.Entry<String, Integer> entry : sortedMapAscPlayers.entrySet()) {
+            String person = entry.getKey();
             if (event.getGuild().getMemberById(person) == null) {
                 continue;
             }
             longMsg.append(event.getGuild().getMemberById(person).getEffectiveName())
                     .append(": ")
-                    .append(sortedMapAscPlayers.get(person))
+                    .append(entry.getValue())
                     .append(" \n");
         }
         if (titleOnly) {
@@ -57,7 +55,8 @@ public class ListTitlesGivenService {
             longMsg.append("\nThe number of titles each player has for the title of ")
                     .append(specificTitle)
                     .append(": \n");
-            for (String personNTitle : sortedMapAscPlayersNTitles.keySet()) {
+            for (Map.Entry<String, Integer> entry : sortedMapAscPlayersNTitles.entrySet()) {
+                String personNTitle = entry.getKey();
                 if (!personNTitle.toLowerCase().contains(specificTitle.toLowerCase())) {
                     continue;
                 }
@@ -67,7 +66,7 @@ public class ListTitlesGivenService {
                 }
                 longMsg.append(event.getGuild().getMemberById(person).getEffectiveName())
                         .append(": ")
-                        .append(sortedMapAscPlayersNTitles.get(personNTitle))
+                        .append(entry.getValue())
                         .append(" \n");
             }
         }

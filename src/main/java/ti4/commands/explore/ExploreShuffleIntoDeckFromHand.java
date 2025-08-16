@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -13,7 +14,7 @@ import ti4.model.ExploreModel;
 
 class ExploreShuffleIntoDeckFromHand extends GameStateSubcommand {
 
-    public ExploreShuffleIntoDeckFromHand() {
+    ExploreShuffleIntoDeckFromHand() {
         super(Constants.SHUFFLE_INTO_DECK_FROM_HAND, "Discard an Exploration Card from the hand to deck.", true, true);
         addOptions(new OptionData(
                         OptionType.STRING,
@@ -26,7 +27,9 @@ class ExploreShuffleIntoDeckFromHand extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         Player activePlayer = getPlayer();
-        String ids = event.getOption(Constants.EXPLORE_CARD_ID).getAsString().replaceAll(" ", "");
+        String ids = PatternHelper.SPACE_PATTERN
+                .matcher(event.getOption(Constants.EXPLORE_CARD_ID).getAsString())
+                .replaceAll("");
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {

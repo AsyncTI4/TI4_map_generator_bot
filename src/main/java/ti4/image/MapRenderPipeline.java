@@ -80,7 +80,7 @@ public class MapRenderPipeline {
         queue(game, event, displayType, callback, true, true);
     }
 
-    public static void queue(
+    private static void queue(
             Game game,
             @Nullable GenericInteractionCreateEvent event,
             @Nullable DisplayType displayType,
@@ -104,7 +104,7 @@ public class MapRenderPipeline {
         }
     }
 
-    public record RenderEvent(
+    record RenderEvent(
             Game game,
             GenericInteractionCreateEvent event,
             DisplayType displayType,

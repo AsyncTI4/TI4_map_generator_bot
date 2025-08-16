@@ -18,7 +18,7 @@ public class FileUploadService {
         return createFileUpload(bufferedImage, filenamePrefix, false);
     }
 
-    public static FileUpload createFileUpload(
+    private static FileUpload createFileUpload(
             BufferedImage bufferedImage, String filenamePrefix, boolean saveLocalCopy) {
         byte[] imageBytes = ImageHelper.writeJpg(bufferedImage);
         return createFileUpload(imageBytes, filenamePrefix, saveLocalCopy);

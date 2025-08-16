@@ -50,7 +50,7 @@ class ShowUserSettings extends Subcommand {
         }
     }
 
-    public static List<Button> getUserSettingsButtons() {
+    private static List<Button> getUserSettingsButtons() {
         return List.of(Buttons.OFFER_PING_OPTIONS_BUTTON, Buttons.DONE_DELETE_BUTTONS);
     }
 }

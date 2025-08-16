@@ -47,7 +47,7 @@ public class SpinRingsHelper {
                 if (ring <= 0) {
                     return false;
                 }
-                smallestRing = ring < smallestRing ? ring : smallestRing;
+                smallestRing = Math.min(ring, smallestRing);
             }
 
             String direction = spinSettings[1];
@@ -184,7 +184,7 @@ public class SpinRingsHelper {
 
                 if (y == 2) {
                     if ((x - 2) < 1) {
-                        tile.setPosition(y + "" + ((x - y) + (y * 6)));
+                        tile.setPosition(2 + "" + ((x - y) + (y * 6)));
                     } else {
                         if ((x - y) < 10) {
                             tile.setPosition(y + "0" + (x - y));

@@ -23,6 +23,9 @@ import ti4.service.emoji.TI4Emoji;
 
 public class RoundSummaryHelper {
 
+    private static final Pattern OPTIONAL_TRAILING_PERIOD_AND_SPACE = Pattern.compile("\\.? ?$");
+    private static final Pattern NON_DIGIT = Pattern.compile("[^0-9]");
+
     @ButtonHandler("editEndOfRoundSummaries")
     public static void serveEditSummaryButtons(Game game, Player player, MessageChannel eventChannel) {
         List<Button> buttons = new ArrayList<>();
@@ -75,12 +78,13 @@ public class RoundSummaryHelper {
 
     public static void storeEndOfRoundSummary(
             Game game, Player player, String roundNum, String thoughts, boolean append, MessageChannel eventChannel) {
-        roundNum = roundNum.replaceAll("[^0-9]", ""); // I only want the digits
+        roundNum = NON_DIGIT.matcher(roundNum).replaceAll(""); // I only want the digits
         String roundKey = resolveRoundSummaryKey(player, roundNum);
         String previousThoughts = "";
         if (append && !game.getStoredValue(roundKey).isEmpty()) {
             previousThoughts = game.getStoredValue(roundKey);
-            previousThoughts = previousThoughts.replaceFirst("\\.? ?$", "") + "\n";
+            previousThoughts =
+                    OPTIONAL_TRAILING_PERIOD_AND_SPACE.matcher(previousThoughts).replaceFirst("") + "\n";
         }
         game.setStoredValue(roundKey, previousThoughts + thoughts);
 

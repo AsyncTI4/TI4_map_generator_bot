@@ -7,15 +7,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ti4.testUtils.BaseTi4Test;
 
-public class FrankenItemTest extends BaseTi4Test {
+class FrankenItemTest extends BaseTi4Test {
     @Test
-    public void testAllCardsGenerateSuccessfully() {
+    void testAllCardsGenerateSuccessfully() {
         beforeAll();
         assertDoesNotThrow(DraftItem::generateAllDraftableCards);
     }
 
     @Test
-    public void testAllCardsHaveValidShortNames() {
+    void testAllCardsHaveValidShortNames() {
         beforeAll();
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
@@ -24,7 +24,7 @@ public class FrankenItemTest extends BaseTi4Test {
     }
 
     @Test
-    public void testAllCardsHaveValidLongNames() {
+    void testAllCardsHaveValidLongNames() {
         beforeAll();
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
@@ -37,7 +37,7 @@ public class FrankenItemTest extends BaseTi4Test {
     }
 
     @Test
-    public void testAllCardsHaveValidEmoji() {
+    void testAllCardsHaveValidEmoji() {
         beforeAll();
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
@@ -46,7 +46,7 @@ public class FrankenItemTest extends BaseTi4Test {
     }
 
     @Test
-    public void errataFileSanityTest() {
+    void errataFileSanityTest() {
         beforeAll();
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {

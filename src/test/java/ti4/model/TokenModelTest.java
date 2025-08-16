@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
-public class TokenModelTest extends BaseTi4Test {
+class TokenModelTest extends BaseTi4Test {
     private static String error(TokenModel token, String descr) {
         return "Error on token [" + token.getAlias() + "]: " + descr;
     }

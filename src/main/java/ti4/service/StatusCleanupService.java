@@ -140,7 +140,7 @@ public class StatusCleanupService {
         game.clearAllEmptyStoredValues();
     }
 
-    public void returnEndStatusPNs(Game game) {
+    private void returnEndStatusPNs(Game game) {
         Map<String, Player> players = game.getPlayers();
         for (Player player : players.values()) {
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());

@@ -7,10 +7,10 @@ import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.testUtils.BaseTi4Test;
 
-public class PlanetModelTest extends BaseTi4Test {
+class PlanetModelTest extends BaseTi4Test {
 
     @Test
-    public void testPlanets() {
+    void testPlanets() {
         for (PlanetModel model : TileHelper.getAllPlanetModels()) {
             assertTrue(model.isValid(), model.getAlias() + ": invalid");
             assertTrue(validateTileId(model), model.getAlias() + ": invalid TileID: (" + model.getTileId() + ")");

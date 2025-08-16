@@ -30,18 +30,18 @@ import ti4.testUtils.BaseTi4Test;
 public class TileImageTest extends BaseTi4Test {
 
     public static Game testGame;
-    public static Player testPlayer1;
-    public static Player testPlayer2;
+    private static Player testPlayer1;
+    private static Player testPlayer2;
 
-    public static TestMode testMode = TestMode.Compare;
+    public static final TestMode testMode = TestMode.Compare;
 
     @AfterAll
-    public static void readyForProduction() {
+    static void readyForProduction() {
         Assertions.assertEquals(TestMode.Compare, testMode);
     }
 
     @BeforeAll
-    public static void setupTestGame() {
+    static void setupTestGame() {
         if (testGame != null) return;
         testGame = new Game();
         testGame.setName(" Test Tile Image Generation    ");
@@ -64,7 +64,7 @@ public class TileImageTest extends BaseTi4Test {
     @Disabled
     @Test
     @Order(1)
-    public void generateDevilsTestImage() {
+    void generateDevilsTestImage() {
         Tile devils = new Tile("75", "000");
         testGame.setTile(devils);
         TileImageTestHelper.addUnitsToUnitHolder(
@@ -110,7 +110,7 @@ public class TileImageTest extends BaseTi4Test {
     @Disabled
     @Test
     @Order(2)
-    public void generateMirageTestImage() {
+    void generateMirageTestImage() {
         Tile emptyAlpha = new Tile("40", "101");
         testGame.setTile(emptyAlpha);
 
@@ -125,7 +125,7 @@ public class TileImageTest extends BaseTi4Test {
     @Disabled
     @Test
     @Order(3)
-    public void generateTripleMirageTestImage() {
+    void generateTripleMirageTestImage() {
         Tile rigels = new Tile("76", "102");
         testGame.setTile(rigels);
 
@@ -141,7 +141,7 @@ public class TileImageTest extends BaseTi4Test {
     @Disabled
     @Test
     @Order(4)
-    public void generateCabalDockTestImage() {
+    void generateCabalDockTestImage() {
         Tile acheron = new Tile("54", "301");
         testGame.setTile(acheron);
 

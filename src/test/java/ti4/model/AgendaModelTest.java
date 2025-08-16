@@ -12,16 +12,16 @@ import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.testUtils.BaseTi4Test;
 
-public class AgendaModelTest extends BaseTi4Test {
-    AgendaModel agendaModel = new AgendaModel();
+class AgendaModelTest extends BaseTi4Test {
+    private AgendaModel agendaModel = new AgendaModel();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         agendaModel = new AgendaModel();
     }
 
     @Test
-    public void testIsValid() {
+    void testIsValid() {
         AgendaModel ixthian = Mapper.getAgenda("artifact");
         assertTrue(ixthian.isValid());
 
@@ -46,7 +46,7 @@ public class AgendaModelTest extends BaseTi4Test {
     }
 
     @Test
-    public void testValidateCategory() {
+    void testValidateCategory() {
         agendaModel.setCategory("faction");
         agendaModel.setCategoryDescription("testFaction");
         assertFalse(agendaModel.isValid());
@@ -68,7 +68,7 @@ public class AgendaModelTest extends BaseTi4Test {
     }
 
     @Test
-    public void testSearchTags() {
+    void testSearchTags() {
         List<String> searchTags = new ArrayList<>();
         searchTags.add("testTag1");
         searchTags.add("testTag2");
