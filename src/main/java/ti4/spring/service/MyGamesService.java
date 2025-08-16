@@ -3,7 +3,6 @@ package ti4.spring.service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ti4.map.Game;

@@ -1,5 +1,11 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,7 +21,6 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -114,12 +119,6 @@ import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.website.AsyncTi4WebsiteHelper;
-
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 public class ButtonHelper {
 
@@ -1573,7 +1572,10 @@ public class ButtonHelper {
                             "Look at Promissory Notes (" + player.getPnCount() + ")");
                     Button lookAtSOs = Buttons.green(
                             fincheckerForNonActive + "yssarilcommander_so_" + player.getFaction(),
-                            "Look at" + (IsPlayerElectedService.isPlayerElected(game, player, "censure") ? " (Not So)" : "")
+                            "Look at"
+                                    + (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                                            ? " (Not So)"
+                                            : "")
                                     + " Secret Objectives (" + (player.getSo()) + ")");
                     Button decline = Buttons.red(fincheckerForNonActive + "deleteButtons", "Decline Yssaril Commander");
                     List<Button> buttons = List.of(lookAtACs, lookAtPNs, lookAtSOs, decline);
@@ -1771,7 +1773,8 @@ public class ButtonHelper {
         }
         String finChecker = "FFCC_" + player.getFaction() + "_";
         for (Tile tile : getTilesWithYourCC(player, game, event)) {
-            if (CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock).contains(tile)) {
+            if (CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
+                    .contains(tile)) {
                 buttonsToRemoveCC.add(Buttons.green(
                         finChecker + "removeCCFromBoard_celdauriRedTech_" + tile.getPosition(),
                         tile.getRepresentationForButtons(game, player)));
@@ -6239,7 +6242,8 @@ public class ButtonHelper {
             }
         }
         if (player.hasUnit("ghoti_flagship")) {
-            tilesWithProduction.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Flagship));
+            tilesWithProduction.addAll(
+                    CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Flagship));
         }
         if (player.hasTech("mr") || player.hasTech("absol_mr")) {
             List<Tile> tilesWithNovaAndUnits = game.getTileMap().values().stream()

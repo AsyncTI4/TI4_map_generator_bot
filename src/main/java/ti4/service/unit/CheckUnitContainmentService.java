@@ -3,7 +3,6 @@ package ti4.service.unit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Units;
 import ti4.map.Game;
@@ -18,7 +17,7 @@ public class CheckUnitContainmentService {
         Collections.addAll(unitTypes, type);
 
         return game.getTileMap().values().stream()
-            .filter(t -> t.containsPlayersUnitsWithKeyCondition(p1, unit -> unitTypes.contains(unit.getUnitType())))
-            .toList();
+                .filter(t -> t.containsPlayersUnitsWithKeyCondition(p1, unit -> unitTypes.contains(unit.getUnitType())))
+                .toList();
     }
 }

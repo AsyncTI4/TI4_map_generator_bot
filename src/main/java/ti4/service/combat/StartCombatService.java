@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -1573,7 +1572,8 @@ public class StartCombatService {
             gheminaCommanderApplicable = true;
         } else {
             for (Player p3 : game.getRealPlayers()) {
-                if (CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p3, Units.UnitType.Pds, Units.UnitType.Spacedock)
+                if (CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                game, p3, Units.UnitType.Pds, Units.UnitType.Spacedock)
                         .contains(tile)) {
                     gheminaCommanderApplicable = true;
                     break;

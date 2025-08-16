@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
@@ -1861,7 +1860,8 @@ public class AgendaHelper {
                 afterButtons.add(Buttons.gray(
                         finChecker + "play_after_Edyn Unity Algorithm", "Use Unity Algorithm", FactionEmojis.edyn));
             }
-            if (game.getCurrentAgendaInfo().contains("Player") && IsPlayerElectedService.isPlayerElected(game, p1, "committee")) {
+            if (game.getCurrentAgendaInfo().contains("Player")
+                    && IsPlayerElectedService.isPlayerElected(game, p1, "committee")) {
                 afterButtons.add(Buttons.gray(
                         finChecker + "autoresolve_manualcommittee", "Use Committee Formation", CardEmojis.Agenda));
             }
@@ -2277,8 +2277,8 @@ public class AgendaHelper {
                             String message = identity
                                     + ", you have an _Armament Rider_ to resolve. Please choose the system in which you wish to produce 2 units each with cost 4 or less.";
 
-                            List<Tile> tiles =
-                                    CheckUnitContainmentService.getTilesContainingPlayersUnits(game, winningR, UnitType.Spacedock);
+                            List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                    game, winningR, UnitType.Spacedock);
                             List<Button> buttons = new ArrayList<>();
                             for (Tile tile : tiles) {
                                 Button starTile = Buttons.green(
@@ -2305,8 +2305,8 @@ public class AgendaHelper {
                             RelicHelper.drawRelicAndNotify(winningR, event, game);
                         }
                         if (specificVote.contains("Radiance")) {
-                            List<Tile> tiles =
-                                    CheckUnitContainmentService.getTilesContainingPlayersUnits(game, winningR, UnitType.Mech);
+                            List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                    game, winningR, UnitType.Mech);
                             ButtonHelperFactionSpecific.resolveEdynAgendaStuffStep1(winningR, game, tiles);
                         }
                         if (specificVote.contains("Atokera Commander")) {

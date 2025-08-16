@@ -1,5 +1,9 @@
 package ti4.service.combat;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,7 +13,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -50,10 +53,6 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 @UtilityClass
 public class CombatRollService {
@@ -821,7 +820,8 @@ public class CombatRollService {
                             + ", with _Plasma Scoring_ applying to the last die. You can specify any order before rolling though.";
                     for (int x = 0; x < totalHits; x++) {
                         List<Button> buttons = new ArrayList<>();
-                        for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Pds)) {
+                        for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                game, player, UnitType.Pds)) {
                             for (String planet : ButtonHelper.getPlanetsWithSpecificUnit(player, tile, "pds")) {
                                 Planet planetUnit = game.getUnitHolderFromPlanet(planet);
                                 if (planetUnit == null) {

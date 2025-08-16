@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -417,7 +416,8 @@ public class ComponentActionHelper {
                                 + " ability.");
                 if ("starForge".equalsIgnoreCase(buttonID)) {
 
-                    List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Warsun);
+                    List<Tile> tiles =
+                            CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Warsun);
                     List<Button> buttons = new ArrayList<>();
                     String message = p1.getRepresentationNoPing()
                             + " is using their **Star Forge** ability.\n Please choose the system you wish to **Star Forge** in.";
@@ -454,7 +454,8 @@ public class ComponentActionHelper {
                             game,
                             event,
                             "built with " + FactionEmojis.Muaat + " " + UnitEmojis.flagship + "The Inferno");
-                    List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Flagship);
+                    List<Tile> tiles =
+                            CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Flagship);
                     Tile tile = tiles.getFirst();
                     List<Button> buttons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
                     AddUnitService.addUnits(event, tile, game, p1.getColor(), "cruiser");

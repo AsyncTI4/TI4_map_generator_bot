@@ -1,5 +1,9 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -8,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -53,10 +56,6 @@ import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 public class ButtonHelperHeroes {
 
@@ -851,8 +850,8 @@ public class ButtonHelperHeroes {
     public static List<Button> getButtonsForGheminaLadyHero(Player player, Game game) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
-        List<Tile> tilesWithBombard =
-                CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Lady, UnitType.Flagship);
+        List<Tile> tilesWithBombard = CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                game, player, UnitType.Lady, UnitType.Flagship);
         Set<String> adjacentTiles = FoWHelper.getAdjacentTilesAndNotThisTile(
                 game, tilesWithBombard.getFirst().getPosition(), player, false);
         for (Tile tile : tilesWithBombard) {
@@ -878,8 +877,8 @@ public class ButtonHelperHeroes {
     public static List<Button> getButtonsForGheminaLordHero(Player player, Game game) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
-        List<Tile> tilesWithBombard =
-                CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Lady, UnitType.Flagship);
+        List<Tile> tilesWithBombard = CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                game, player, UnitType.Lady, UnitType.Flagship);
         Set<String> adjacentTiles = FoWHelper.getAdjacentTilesAndNotThisTile(
                 game, tilesWithBombard.getFirst().getPosition(), player, false);
         for (Tile tile : tilesWithBombard) {
@@ -983,7 +982,8 @@ public class ButtonHelperHeroes {
     public static List<Button> getSaarHeroButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesUsed = new ArrayList<>();
-        for (Tile tile1 : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)) {
+        for (Tile tile1 :
+                CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)) {
             for (String tile2Pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile1.getPosition(), player, false)) {
                 Tile tile2 = game.getTileByPosition(tile2Pos);
                 if (!tilesUsed.contains(tile2)) {

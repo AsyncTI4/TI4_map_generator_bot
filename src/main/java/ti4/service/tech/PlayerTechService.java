@@ -3,7 +3,6 @@ package ti4.service.tech;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -404,7 +403,8 @@ public class PlayerTechService {
                 List<Tile> tiles = new ArrayList<>(CheckUnitContainmentService.getTilesContainingPlayersUnits(
                         game, player, Units.UnitType.Spacedock, Units.UnitType.PlenaryOrbital));
                 if (player.hasUnit("ghoti_flagship")) {
-                    tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Flagship));
+                    tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                            game, player, Units.UnitType.Flagship));
                 }
                 List<String> pos2 = new ArrayList<>();
                 for (Tile tile : tiles) {
@@ -526,9 +526,11 @@ public class PlayerTechService {
                 List<Button> buttons;
                 Tile tile = game.getTile(AliasHandler.resolveTile(player.getFaction()));
                 if (player.hasAbility("mobile_command")
-                        && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Flagship)
+                        && !CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                        game, player, Units.UnitType.Flagship)
                                 .isEmpty()) {
-                    tile = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Flagship)
+                    tile = CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                    game, player, Units.UnitType.Flagship)
                             .getFirst();
                 }
                 if (tile == null) {

@@ -1,10 +1,9 @@
 package ti4.service.statistics.game;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.experimental.UtilityClass;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.map.Game;

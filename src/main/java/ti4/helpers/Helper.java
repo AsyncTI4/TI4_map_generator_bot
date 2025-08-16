@@ -19,7 +19,6 @@ import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -1865,7 +1864,8 @@ public class Helper {
         List<Button> unitButtons = new ArrayList<>();
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "saarcommander")) {
-            for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)) {
+            for (Tile tile :
+                    CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)) {
                 if (tile.getPosition().equalsIgnoreCase(origTile.getPosition())
                         || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                     continue;

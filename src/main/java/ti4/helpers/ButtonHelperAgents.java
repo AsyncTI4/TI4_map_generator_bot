@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -1115,8 +1114,8 @@ public class ButtonHelperAgents {
             channel = p2.getCorrectChannel();
             message =
                     ", please choose which system to " + ssruuClever + "Umbat, the Muaat" + ssruuSlash + " agent, in.";
-            List<Tile> tiles =
-                    CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Warsun, UnitType.Flagship);
+            List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                    game, p2, UnitType.Warsun, UnitType.Flagship);
             List<Button> buttons = new ArrayList<>();
             for (Tile tile : tiles) {
                 Button starTile =

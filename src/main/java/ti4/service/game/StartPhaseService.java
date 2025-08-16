@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -766,7 +765,8 @@ public class StartPhaseService {
                 .withEmoji(Emoji.fromFormatted("🔺"));
         Button yssarilPolicy = null;
         for (Player player : game.getRealPlayers()) {
-            if (IsPlayerElectedService.isPlayerElected(game, player, "minister_policy") && player.hasAbility("scheming")) {
+            if (IsPlayerElectedService.isPlayerElected(game, player, "minister_policy")
+                    && player.hasAbility("scheming")) {
                 yssarilPolicy = Buttons.gray(
                         player.getFinsFactionCheckerPrefix() + "yssarilMinisterOfPolicy",
                         "Draw Minister of Policy Action Card",
