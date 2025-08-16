@@ -19,6 +19,8 @@ public class BannerGenerator {
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final BasicStroke stroke6 = new BasicStroke(6.0f);
     private static final BasicStroke stroke8 = new BasicStroke(8.0f);
+    private static final double NINETY_DEGREES_RADIANS = 1.5707963267948966;
+    private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -NINETY_DEGREES_RADIANS;
 
     public static void drawFactionBanner(Player player) {
         BufferedImage bannerImage = new BufferedImage(325, 50, BufferedImage.TYPE_INT_ARGB);
@@ -35,9 +37,9 @@ public class BannerGenerator {
 
         bannerG.drawImage(backgroundImage, 0, 0, null);
         Graphics2D bannerG2d = (Graphics2D) bannerG;
-        bannerG2d.rotate(-1.5707963267948966);
+        bannerG2d.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
         bannerG2d.drawImage(colorImage, -60, 0, null);
-        bannerG2d.rotate(1.5707963267948966);
+        bannerG2d.rotate(NINETY_DEGREES_RADIANS);
         bannerG2d.drawImage(gradientImage, 0, 0, null);
         bannerG2d.drawImage(smallFactionImage, 2, 24, null);
         bannerG.drawImage(largeFactionImage, 180, -42, null);
@@ -95,9 +97,9 @@ public class BannerGenerator {
         bannerG.drawImage(backgroundImage, 0, 0, null);
 
         Graphics2D bannerG2d = (Graphics2D) bannerG;
-        bannerG2d.rotate(-1.5707963267948966);
+        bannerG2d.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
         bannerG2d.drawImage(colorImage, -60, 0, null);
-        bannerG2d.rotate(1.5707963267948966);
+        bannerG2d.rotate(NINETY_DEGREES_RADIANS);
         bannerG2d.drawImage(gradientImage, 0, 0, null);
         bannerG.drawImage(agendaImage, 0, 0, null);
         bannerG.setFont(Storage.getFont28());
