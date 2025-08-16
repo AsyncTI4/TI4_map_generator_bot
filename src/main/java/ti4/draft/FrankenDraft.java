@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import ti4.draft.items.AbilityDraftItem;
 import ti4.draft.items.AgentDraftItem;
 import ti4.draft.items.BlueTileDraftItem;
@@ -20,6 +19,7 @@ import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.draft.items.StartingFleetDraftItem;
 import ti4.draft.items.StartingTechDraftItem;
 import ti4.draft.items.TechDraftItem;
+import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.BotLogger;
@@ -28,7 +28,6 @@ import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 
 public class FrankenDraft extends BagDraft {
-    private static final Pattern FIN_SEP = Pattern.compile("finSep");
 
     public FrankenDraft(Game owner) {
         super(owner);
@@ -118,7 +117,7 @@ public class FrankenDraft extends BagDraft {
 
     private static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllFrankenLegalFactions();
-        String[] results = FIN_SEP.split(game.getStoredValue("bannedFactions"));
+        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedFactions"));
         if (!game.isDiscordantStarsMode()) {
             factionSet.removeIf(factionModel ->
                     factionModel.getSource().isDs() && !factionModel.getSource().isPok());

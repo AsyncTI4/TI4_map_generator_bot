@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import ti4.draft.DraftItem;
+import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.DraftErrataModel;
@@ -16,7 +16,6 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 
 public class MechDraftItem extends DraftItem {
-    private static final Pattern FIN_SEP = Pattern.compile("finSep");
 
     public MechDraftItem(String itemId) {
         super(Category.MECH, itemId);
@@ -97,7 +96,7 @@ public class MechDraftItem extends DraftItem {
     private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
         Map<String, UnitModel> allUnits = Mapper.getUnits();
-        String[] results = FIN_SEP.split(game.getStoredValue("bannedMechs"));
+        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedMechs"));
         for (FactionModel faction : factions) {
             if (Arrays.asList(results).contains(faction.getAlias())) {
                 continue;
