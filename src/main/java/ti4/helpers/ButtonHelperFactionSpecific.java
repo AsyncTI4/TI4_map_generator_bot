@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -65,6 +64,10 @@ import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
+
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 public class ButtonHelperFactionSpecific {
 
@@ -1716,7 +1719,7 @@ public class ButtonHelperFactionSpecific {
         boolean hasInf = false;
         for (UnitHolder unitHolder : player.getNomboxTile().getUnitHolders().values()) {
             for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
-                if (unitKey.unitType() == UnitType.Infantry
+                if (unitKey.getUnitType() == UnitType.Infantry
                         && unitHolder.getUnits().get(unitKey) > 0) {
                     hasInf = true;
                 }
@@ -2594,7 +2597,7 @@ public class ButtonHelperFactionSpecific {
                 .flatMap(uh -> uh.getUnits().entrySet().stream()
                         .filter(e -> e.getValue() > 0)
                         .map(Map.Entry::getKey))
-                .filter(unitKey -> !colorsBlockading.contains(unitKey.colorID()))
+                .filter(unitKey -> !colorsBlockading.contains(unitKey.getColorID()))
                 .collect(Collectors.toSet());
         return availableUnits.stream()
                 .filter(unitKey -> vortexButtonAvailable(game, unitKey))
@@ -2604,7 +2607,7 @@ public class ButtonHelperFactionSpecific {
 
     public static boolean vortexButtonAvailable(Game game, UnitKey unitKey) {
         int baseUnitCap =
-                switch (unitKey.unitType()) {
+                switch (unitKey.getUnitType()) {
                     case Infantry, Fighter -> 10000;
                     case Destroyer, Cruiser -> 8;
                     case Dreadnought -> 5;
@@ -2613,22 +2616,22 @@ public class ButtonHelperFactionSpecific {
                     case Flagship -> 1;
                     default -> 0; // everything else that can't be captured
                 };
-        int unitCap = game.getPlayerByColorID(unitKey.colorID())
+        int unitCap = game.getPlayerByColorID(unitKey.getColorID())
                 .filter(p -> p.getUnitCap(unitKey.asyncID()) != 0)
                 .map(p -> p.getUnitCap(unitKey.asyncID()))
                 .orElse(baseUnitCap);
         return (ButtonHelper.getNumberOfUnitsOnTheBoard(game, unitKey) < unitCap
-                && unitKey.unitType() != UnitType.Spacedock
-                && unitKey.unitType() != UnitType.Pds);
+                && unitKey.getUnitType() != UnitType.Spacedock
+                && unitKey.getUnitType() != UnitType.Pds);
     }
 
     private static Button buildVortexButton(Game game, UnitKey unitKey) {
-        String faction = game.getPlayerByColorID(unitKey.colorID())
+        String faction = game.getPlayerByColorID(unitKey.getColorID())
                 .map(Player::getFaction)
                 .get();
         String buttonID = "cabalVortextCapture_" + unitKey.unitName() + "_" + faction;
         String buttonText = String.format(
-                "Capture %s %s", unitKey.getColor(), unitKey.unitType().humanReadableName());
+                "Capture %s %s", unitKey.getColor(), unitKey.getUnitType().humanReadableName());
         return Buttons.red(buttonID, buttonText, unitKey.unitEmoji());
     }
 
@@ -3460,9 +3463,9 @@ public class ButtonHelperFactionSpecific {
         Map<UnitKey, Integer> units = tile.getUnitHolders().get("space").getUnits();
         for (UnitKey unit : units.keySet()) {
             if (Objects.equals(unit.getColor(), player.getColor())
-                    && (unit.unitType() == UnitType.Cruiser
-                            || unit.unitType() == UnitType.Carrier
-                            || unit.unitType() == UnitType.Dreadnought)) {
+                    && (unit.getUnitType() == UnitType.Cruiser
+                            || unit.getUnitType() == UnitType.Carrier
+                            || unit.getUnitType() == UnitType.Dreadnought)) {
                 // if unit is not in the list, add it
                 if (!availableUnits.contains(unit)) {
                     availableUnits.add(unit);
@@ -3473,7 +3476,7 @@ public class ButtonHelperFactionSpecific {
         for (UnitKey unit : availableUnits) {
             buttons.add(Buttons.green(
                     "FFCC_" + player.getFaction() + "_rohdhnaRecycle_" + unit.unitName(),
-                    unit.unitType().humanReadableName(),
+                    unit.getUnitType().humanReadableName(),
                     unit.unitEmoji()));
         }
 

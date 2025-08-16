@@ -1,11 +1,6 @@
 package ti4.image;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
+
 import ti4.ResourceHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CalendarHelper;
@@ -129,7 +125,7 @@ class UnitRenderGenerator {
                 // line, but left as is for now in case of debugging), also is highly
                 // dependable on CC file name, TO DO : create a function to get colorIDs from
                 // tileCCs
-                String unitEntryColorID = unitKey.colorID();
+                String unitEntryColorID = unitKey.getColorID();
                 Set<String> tileCCs = tile.getSpaceUnitHolder().getCcList();
                 List<String> tileCCsColorIDs = tileCCs.stream()
                         .flatMap(str -> Stream.of(str.replace(".png", "").replace("command_", "")))
@@ -148,7 +144,7 @@ class UnitRenderGenerator {
             Integer bulkUnitCount = getBulkUnitCount(unitKey, unitCount);
             String unitPath = getUnitPath(unitKey);
 
-            unitTypeCounts.putIfAbsent(unitKey.unitType(), 0);
+            unitTypeCounts.putIfAbsent(unitKey.getUnitType(), 0);
 
             float scale = (bulkUnitCount != null && bulkUnitCount > 9) ? 1.2f : 1.0f;
             try {
@@ -183,11 +179,11 @@ class UnitRenderGenerator {
                     unitKey.asyncID(),
                     unitImage,
                     tile.getPlanetUnitHolders().size(),
-                    Set.of(UnitType.Infantry, UnitType.Fighter).contains(unitKey.unitType()));
+                    Set.of(UnitType.Infantry, UnitType.Fighter).contains(unitKey.getUnitType()));
 
             // DRAW UNITS
             for (int i = 0; i < unitCount; i++) {
-                Point position = calculateUnitPosition(posCtx, unitKey, i + unitTypeCounts.get(unitKey.unitType()));
+                Point position = calculateUnitPosition(posCtx, unitKey, i + unitTypeCounts.get(unitKey.getUnitType()));
                 ImagePosition imagePos = calculateImagePosition(posCtx, position);
                 int imageX = imagePos.x();
                 int imageY = imagePos.y();
@@ -210,7 +206,7 @@ class UnitRenderGenerator {
                     tileGraphics.drawImage(badPositionImage, imageX - 5, imageY - 5, null);
                 }
 
-                if (unitKey.unitType() == UnitType.Spacedock && player.ownsUnitSubstring("cabal_spacedock")) {
+                if (unitKey.getUnitType() == UnitType.Spacedock && player.ownsUnitSubstring("cabal_spacedock")) {
                     BufferedImage dimTear = ImageHelper.read(resourceHelper.getDecalFile("DimensionalTear.png"));
                     if (dimTear != null) {
                         int dtX = imageX + (unitImage.getWidth() - dimTear.getWidth()) / 2;
@@ -229,7 +225,7 @@ class UnitRenderGenerator {
 
                 if ("81".equals(tile.getTileID())
                         && "muaat".equals(player.getFaction())
-                        && unitKey.unitType() == UnitType.Warsun) {
+                        && unitKey.getUnitType() == UnitType.Warsun) {
                     BufferedImage faceNovaSeed = ImageHelper.read(resourceHelper.getDecalFile("NovaSeed.png"));
                     tileGraphics.drawImage(faceNovaSeed, imageX, imageY, null);
                 } else if (spoopy != null) {
@@ -245,12 +241,12 @@ class UnitRenderGenerator {
 
                 if (bulkUnitCount != null) {
                     Color groupUnitColor =
-                            switch (Mapper.getColor(unitKey.colorID()).getTextColor()) {
+                            switch (Mapper.getColor(unitKey.getColorID()).getTextColor()) {
                                 case "black" -> Color.BLACK;
                                 default -> Color.WHITE;
                             };
                     Color groupUnitStroke =
-                            switch (Mapper.getColor(unitKey.colorID()).getTextColor()) {
+                            switch (Mapper.getColor(unitKey.getColorID()).getTextColor()) {
                                 case "black" -> Color.WHITE;
                                 default -> Color.BLACK;
                             };
@@ -263,38 +259,38 @@ class UnitRenderGenerator {
                 }
 
                 if (unitDamageCount != null && unitDamageCount > 0 && dmgImage != null) {
-                    drawDamageIcon(position, imagePos, unitImage, dmgImage, unitKey.unitType());
+                    drawDamageIcon(position, imagePos, unitImage, dmgImage, unitKey.getUnitType());
                     unitDamageCount--;
                 }
             }
 
             // Persist unit type counts
-            if (unitTypeCounts.containsKey(unitKey.unitType())) {
-                unitTypeCounts.put(unitKey.unitType(), unitTypeCounts.get(unitKey.unitType()) + unitCount);
+            if (unitTypeCounts.containsKey(unitKey.getUnitType())) {
+                unitTypeCounts.put(unitKey.getUnitType(), unitTypeCounts.get(unitKey.getUnitType()) + unitCount);
             } else {
-                unitTypeCounts.put(unitKey.unitType(), unitCount);
+                unitTypeCounts.put(unitKey.getUnitType(), unitCount);
             }
         }
     }
 
     private void optionallyDrawMechTearDecal(UnitKey unitKey, int imageX, int imageY) {
-        if (unitKey.unitType() != UnitType.Mech
+        if (unitKey.getUnitType() != UnitType.Mech
                 || !ButtonHelper.anyLawInPlay(game, "articles_war", "absol_articleswar")) return;
-        String imagePath = "agenda_articles_of_war" + DrawingUtil.getBlackWhiteFileSuffix(unitKey.colorID());
+        String imagePath = "agenda_articles_of_war" + DrawingUtil.getBlackWhiteFileSuffix(unitKey.getColorID());
         BufferedImage mechTearImage = ImageHelper.read(resourceHelper.getTokenFile(imagePath));
         tileGraphics.drawImage(mechTearImage, imageX, imageY, null);
     }
 
     private void optionallyDrawWarsunCrackDecal(UnitKey unitKey, int imageX, int imageY) {
-        if (unitKey.unitType() != UnitType.Warsun || !ButtonHelper.isLawInPlay(game, "schematics")) return;
+        if (unitKey.getUnitType() != UnitType.Warsun || !ButtonHelper.isLawInPlay(game, "schematics")) return;
         String imagePath =
-                "agenda_publicize_weapon_schematics" + DrawingUtil.getBlackWhiteFileSuffix(unitKey.colorID());
+                "agenda_publicize_weapon_schematics" + DrawingUtil.getBlackWhiteFileSuffix(unitKey.getColorID());
         BufferedImage wsCrackImage = ImageHelper.read(resourceHelper.getTokenFile(imagePath));
         tileGraphics.drawImage(wsCrackImage, imageX, imageY, null);
     }
 
     private void drawUnitTags(UnitKey unitKey, Player player, ImagePosition imagePos, int iteration) {
-        if (iteration != 0 || unitKey.unitType() == UnitType.Infantry || !game.isShowUnitTags()) {
+        if (iteration != 0 || unitKey.getUnitType() == UnitType.Infantry || !game.isShowUnitTags()) {
             return;
         }
 
@@ -441,7 +437,7 @@ class UnitRenderGenerator {
             return false;
         }
         String colorID = Mapper.getColorID(frogPlayer.getColor());
-        return !ctx.showJail && !unitKey.colorID().equals(colorID);
+        return !ctx.showJail && !unitKey.getColorID().equals(colorID);
     }
 
     private String getUnitPath(UnitKey unitKey) {
@@ -449,17 +445,17 @@ class UnitRenderGenerator {
         if (unitPath == null) return null;
 
         // Handle bulk unit replacements
-        unitPath = switch (unitKey.unitType()) {
+        unitPath = switch (unitKey.getUnitType()) {
             case Fighter -> unitPath.replace(Constants.COLOR_FF, Constants.BULK_FF);
             case Infantry -> unitPath.replace(Constants.COLOR_GF, Constants.BULK_GF);
             default -> unitPath;
         };
 
-        Player player = game.getPlayerByColorID(unitKey.colorID()).orElse(null);
+        Player player = game.getPlayerByColorID(unitKey.getColorID()).orElse(null);
         if (player == null) return unitPath;
 
         // Handle special unit replacements
-        return switch (unitKey.unitType()) {
+        return switch (unitKey.getUnitType()) {
             case Lady -> unitPath.replace("lady", "fs");
             case Cavalry -> {
                 boolean hasM2Tech = game.getPNOwner("cavalry") != null
@@ -481,18 +477,18 @@ class UnitRenderGenerator {
 
         // Random spoopy warsun
         int spoopyChance = CalendarHelper.isNearHalloween() ? 10 : 1000;
-        if (unitKey.unitType() == UnitType.Warsun && RandomHelper.isOneInX(spoopyChance)) {
+        if (unitKey.getUnitType() == UnitType.Warsun && RandomHelper.isOneInX(spoopyChance)) {
             String spoopypath = resourceHelper.getSpoopyFile();
             spoopy = ImageHelper.read(spoopypath);
         }
 
         // Ghemina special units
-        if (unitKey.unitType() == UnitType.Lady) {
+        if (unitKey.getUnitType() == UnitType.Lady) {
             String name = "units_ds_ghemina_lady_wht.png";
             String spoopyPath = resourceHelper.getDecalFile(name);
             spoopy = ImageHelper.read(spoopyPath);
         }
-        if (unitKey.unitType() == UnitType.Flagship && player.ownsUnit("ghemina_flagship_lord")) {
+        if (unitKey.getUnitType() == UnitType.Flagship && player.ownsUnit("ghemina_flagship_lord")) {
             String name = "units_ds_ghemina_lord_wht.png";
             String spoopyPath = resourceHelper.getDecalFile(name);
             spoopy = ImageHelper.read(spoopyPath);
@@ -502,7 +498,7 @@ class UnitRenderGenerator {
     }
 
     private Integer getBulkUnitCount(UnitKey unitKey, int unitCount) {
-        return Set.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.unitType()) ? unitCount : null;
+        return Set.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType()) ? unitCount : null;
     }
 
     private List<UnitKey> sortUnits(List<UnitKey> tempUnits) {
@@ -540,7 +536,7 @@ class UnitRenderGenerator {
         for (UnitType type : typeOrder) {
             for (String colorID : playerOrder) {
                 for (UnitKey id : tempUnits) {
-                    if (id != null && id.unitType() == type && id.colorID().equals(colorID)) {
+                    if (id != null && id.getUnitType() == type && id.getColorID().equals(colorID)) {
                         sortedUnits.add(id);
                     }
                 }
@@ -584,7 +580,7 @@ class UnitRenderGenerator {
     }
 
     private Point getTokenPosition(UnitKey unitKey, PositioningContext posCtx) {
-        boolean fighterOrInfantry = Set.of(UnitType.Infantry, UnitType.Fighter).contains(unitKey.unitType());
+        boolean fighterOrInfantry = Set.of(UnitType.Infantry, UnitType.Fighter).contains(unitKey.getUnitType());
         String positionKey = fighterOrInfantry ? "tkn_" + posCtx.unitId : posCtx.unitId;
         return ctx.unitTokenPosition.getPosition(positionKey);
     }

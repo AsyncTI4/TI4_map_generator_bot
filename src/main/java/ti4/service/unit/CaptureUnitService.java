@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -20,7 +21,7 @@ class CaptureUnitService {
 
     public static List<Player> listCapturingMechPlayers(
             Game game, List<RemovedUnit> allUnits, RemovedUnit removedUnitType) {
-        if (removedUnitType.unitKey().unitType() != UnitType.Infantry) return List.of();
+        if (removedUnitType.unitKey().getUnitType() != UnitType.Infantry) return List.of();
         if (!(removedUnitType.uh() instanceof Planet planet)) return List.of();
         if (ButtonHelper.isLawInPlay(game, "articles_war")) return List.of();
         Player destroyedPlayer = removedUnitType.getPlayer(game);
@@ -46,7 +47,7 @@ class CaptureUnitService {
         List<Player> cabalsWithFs = new ArrayList<>();
         for (Player p : cabals) {
             // Flagship cannot capture itself
-            if (p.unitBelongsToPlayer(removed.unitKey()) && removed.unitKey().unitType() == UnitType.Flagship) continue;
+            if (p.unitBelongsToPlayer(removed.unitKey()) && removed.unitKey().getUnitType() == UnitType.Flagship) continue;
 
             // If the flagship was not destroyed
             if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, p) > 0) {
@@ -57,7 +58,7 @@ class CaptureUnitService {
             // Or if the flagship was destroyed
             for (RemovedUnit rm : allUnits) {
                 if (!p.unitBelongsToPlayer(rm.unitKey())) continue;
-                if (rm.unitKey().unitType() != UnitType.Flagship) continue;
+                if (rm.unitKey().getUnitType() != UnitType.Flagship) continue;
                 cabalsWithFs.add(p);
                 break;
             }
@@ -71,7 +72,7 @@ class CaptureUnitService {
         Set<String> counted = new HashSet<>();
         List<Player> playersWithDevour = new ArrayList<>();
         for (UnitKey key : combatOnHolder.getUnitKeys()) {
-            if (!counted.add(key.colorID())) continue;
+            if (!counted.add(key.getColorID())) continue;
 
             Player p2 = game.getPlayerByUnitKey(key).orElse(null);
             if (p2 != null && p2 != removed.getPlayer(game) && p2.hasAbility("devour")) {
@@ -87,7 +88,7 @@ class CaptureUnitService {
         List<Player> playerOpponents = new ArrayList<>();
         Player owner = removed.getPlayer(game);
         for (UnitKey key : combatOnHolder.getUnitKeys()) {
-            if (!counted.add(key.colorID())) continue;
+            if (!counted.add(key.getColorID())) continue;
 
             Player p2 = game.getPlayerByUnitKey(key).orElse(null);
             if (p2 != null && p2 != owner && !p2.getAllianceMembers().contains(owner.getFaction())) {

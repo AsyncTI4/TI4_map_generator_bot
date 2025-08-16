@@ -73,11 +73,11 @@ public class RiftUnitsHelper {
                 if (unitModel == null) continue;
 
                 UnitKey key = unitEntry.getKey();
-                if (key.unitType() == UnitType.Infantry
-                        || key.unitType() == UnitType.Mech
-                        || (!player.hasFF2Tech() && key.unitType() == UnitType.Fighter)
+                if (key.getUnitType() == UnitType.Infantry
+                        || key.getUnitType() == UnitType.Mech
+                        || (!player.hasFF2Tech() && key.getUnitType() == UnitType.Fighter)
                         || (cabal != null
-                                && (key.unitType() == UnitType.Fighter || key.unitType() == UnitType.Spacedock))) {
+                                && (key.getUnitType() == UnitType.Fighter || key.getUnitType() == UnitType.Spacedock))) {
                     continue;
                 }
 
@@ -181,7 +181,7 @@ public class RiftUnitsHelper {
                     UnitModel unitModel = player.getUnitFromUnitKey(key);
                     if (unitModel == null) continue;
 
-                    UnitType unitType = key.unitType();
+                    UnitType unitType = key.getUnitType();
                     if ((!game.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")
                                     && (unitType == UnitType.Infantry || unitType == UnitType.Mech))
                             || (!player.hasFF2Tech() && unitType == UnitType.Fighter)) {

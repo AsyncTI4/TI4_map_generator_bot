@@ -1,11 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,6 +15,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -117,6 +112,12 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.website.AsyncTi4WebsiteHelper;
+
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 public class ButtonHelper {
 
@@ -4372,7 +4373,7 @@ public class ButtonHelper {
                     if (nokar.unitBelongsToPlayer(key)
                             && nokar.getUnitFromUnitKey(key).getIsShip()) {
                         int amt = space.getUnitCount(key);
-                        RemoveUnitService.removeUnit(event, tile, game, nokar, space, key.unitType(), amt);
+                        RemoveUnitService.removeUnit(event, tile, game, nokar, space, key.getUnitType(), amt);
                         AddUnitService.addUnits(event, tile, game, player.getColor(), amt + " " + key.asyncID());
                     }
                 }
@@ -5314,7 +5315,7 @@ public class ButtonHelper {
         // label parts
         String labelStart = labelAction;
         String stateStr = state != UnitState.none ? state.humanDescr() + " " : "";
-        String unitName = key.unitType().humanReadableName();
+        String unitName = key.getUnitType().humanReadableName();
         String planetName = (uh instanceof Planet p)
                 ? " from " + Helper.getPlanetRepresentationNoResInf(p.getName(), player.getGame())
                 : "";
@@ -5382,12 +5383,12 @@ public class ButtonHelper {
                 if (unitModel == null) continue;
                 if ("assaultcannoncombat".equalsIgnoreCase(type)
                         && List.of(UnitType.Fighter, UnitType.Spacedock, UnitType.Mech, UnitType.Infantry)
-                                .contains(unitKey.unitType())) {
+                                .contains(unitKey.getUnitType())) {
                     continue;
                 }
                 if ("courageouscombat".equalsIgnoreCase(type)
                         && List.of(UnitType.Spacedock, UnitType.Mech, UnitType.Infantry)
-                                .contains(unitKey.unitType())) {
+                                .contains(unitKey.getUnitType())) {
                     continue;
                 }
 
@@ -6394,7 +6395,7 @@ public class ButtonHelper {
 
                     UnitKey unitKey = unitEntry.getKey();
                     Player owningPlayer =
-                            game.getPlayerByColorID(unitKey.colorID()).orElse(null);
+                            game.getPlayerByColorID(unitKey.getColorID()).orElse(null);
                     if (owningPlayer == null
                             || playersWithPds2.contains(owningPlayer)
                             || !FoWHelper.getAdjacentTiles(game, tilePos, owningPlayer, false, true)
@@ -6447,7 +6448,7 @@ public class ButtonHelper {
 
                     UnitKey unitKey = unitEntry.getKey();
                     Player owningPlayer =
-                            game.getPlayerByColorID(unitKey.colorID()).orElse(null);
+                            game.getPlayerByColorID(unitKey.getColorID()).orElse(null);
                     if (owningPlayer == null || owningPlayer == player) {
                         continue;
                     }
@@ -6989,7 +6990,7 @@ public class ButtonHelper {
         Collections.addAll(unitTypes, type);
 
         return game.getTileMap().values().stream()
-                .filter(t -> t.containsPlayersUnitsWithKeyCondition(p1, unit -> unitTypes.contains(unit.unitType())))
+                .filter(t -> t.containsPlayersUnitsWithKeyCondition(p1, unit -> unitTypes.contains(unit.getUnitType())))
                 .toList();
     }
 

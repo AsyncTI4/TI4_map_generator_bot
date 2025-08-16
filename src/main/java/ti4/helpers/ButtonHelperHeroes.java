@@ -782,11 +782,11 @@ public class ButtonHelperHeroes {
             for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
-                if (!allowedUnits.contains(unitKey.unitType())) {
+                if (!allowedUnits.contains(unitKey.getUnitType())) {
                     continue;
                 }
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                String prettyName = unitModel == null ? unitKey.unitType().humanReadableName() : unitModel.getName();
+                String prettyName = unitModel == null ? unitKey.getUnitType().humanReadableName() : unitModel.getName();
                 String unitName = unitKey.unitName();
                 Button validTile2 = Buttons.red(
                         finChecker + "glimmersHeroOn_" + tile.getPosition() + "_" + unitName,
@@ -1358,10 +1358,10 @@ public class ButtonHelperHeroes {
                         }
 
                         UnitKey key = unitEntry.getKey();
-                        if (key.unitType() == UnitType.Infantry
-                                || key.unitType() == UnitType.Mech
-                                || key.unitType() == UnitType.Fighter
-                                || key.unitType() == UnitType.Spacedock) {
+                        if (key.getUnitType() == UnitType.Infantry
+                                || key.getUnitType() == UnitType.Mech
+                                || key.getUnitType() == UnitType.Fighter
+                                || key.getUnitType() == UnitType.Spacedock) {
                             continue;
                         }
 
@@ -1386,7 +1386,7 @@ public class ButtonHelperHeroes {
                                 message.append(dice.getGreenDieIfSuccessOrRedDieIfFailure());
                                 if (!dice.isSuccess()) {
                                     RemoveUnitService.removeUnit(
-                                            event, tile, game, p2, unitHolder, key.unitType(), 1, true);
+                                            event, tile, game, p2, unitHolder, key.getUnitType(), 1, true);
                                     AddUnitService.addUnits(
                                             event, player.getNomboxTile(), game, p2.getColor(), "1 " + key.asyncID());
                                     totalLosses.get(p2.getFactionEmoji()).add(unitModel.getUnitEmoji());
@@ -1409,7 +1409,7 @@ public class ButtonHelperHeroes {
                                 message.append(dice.getGreenDieIfSuccessOrRedDieIfFailure());
                                 if (!dice.isSuccess()) {
                                     RemoveUnitService.removeUnit(
-                                            event, tile, game, p2, unitHolder, key.unitType(), 1, false);
+                                            event, tile, game, p2, unitHolder, key.getUnitType(), 1, false);
                                     AddUnitService.addUnits(
                                             event, player.getNomboxTile(), game, p2.getColor(), "1 " + key.asyncID());
                                     totalLosses.get(p2.getFactionEmoji()).add(unitModel.getUnitEmoji());
@@ -2317,7 +2317,7 @@ public class ButtonHelperHeroes {
 
                 UnitKey unitKey = unitEntry.getKey();
                 int totalUnits = unitEntry.getValue();
-                if (unitKey.unitType() != UnitType.Infantry && unitKey.unitType() != UnitType.Mech) {
+                if (unitKey.getUnitType() != UnitType.Infantry && unitKey.getUnitType() != UnitType.Mech) {
                     var parsedUnit = new ParsedUnit(unitKey, totalUnits, Constants.SPACE);
                     RemoveUnitService.removeUnit(event, tile1, game, parsedUnit);
                 }

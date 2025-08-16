@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
@@ -123,8 +124,8 @@ public class ColorChangeHelper {
         String newColorSuffix = "_" + newColorID + ".";
 
         for (UnitKey unitKey : unitHolder.getUnitKeys()) {
-            if (unitKey.colorID().equals(oldColorID)) {
-                UnitKey replacedKey = Units.getUnitKey(unitKey.unitType(), newColorID);
+            if (unitKey.getColorID().equals(oldColorID)) {
+                UnitKey replacedKey = Units.getUnitKey(unitKey.getUnitType(), newColorID);
                 List<Integer> states = unitHolder.removeUnit(unitKey, unitHolder.getUnitCount(unitKey));
                 unitHolder.addUnitsWithStates(replacedKey, states);
             }

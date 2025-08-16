@@ -751,7 +751,7 @@ public class ButtonHelperModifyUnits {
                     if (!justSummarizing) {
                         var unit = new ParsedUnit(unitKey, min, unitHolder.getName());
                         RemoveUnitService.removeUnit(event, tile, game, unit);
-                        if (unit.getUnitKey().unitType() == UnitType.Infantry)
+                        if (unit.getUnitKey().getUnitType() == UnitType.Infantry)
                             ButtonHelper.resolveInfantryRemoval(player, min);
                         msg.append("> Removed ")
                                 .append(min)
@@ -806,7 +806,7 @@ public class ButtonHelperModifyUnits {
     public static List<Button> getRemoveThisTypeOfUnitButton(Player player, Game game, String unit) {
         List<Button> buttons = new ArrayList<>();
         UnitType type = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID())
-                .unitType();
+                .getUnitType();
         for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, type)) {
             for (UnitHolder uH : tile.getUnitHolders().values()) {
                 if (uH.getUnitCount(type, player.getColor()) > 0) {
@@ -839,7 +839,7 @@ public class ButtonHelperModifyUnits {
                 event, tile, game, player.getColor(), "1 " + unit + " " + unitH.replace("space", ""));
         if (uH.getUnitCount(
                         Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID())
-                                .unitType(),
+                                .getUnitType(),
                         player.getColor())
                 < 1) {
             ButtonHelper.deleteTheOneButton(event);
@@ -1074,11 +1074,11 @@ public class ButtonHelperModifyUnits {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
 
-                if (!allowedUnits.contains(unitKey.unitType())) {
+                if (!allowedUnits.contains(unitKey.getUnitType())) {
                     continue;
                 }
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                String prettyName = unitModel == null ? unitKey.unitType().humanReadableName() : unitModel.getName();
+                String prettyName = unitModel == null ? unitKey.getUnitType().humanReadableName() : unitModel.getName();
                 String unitName = unitKey.unitName();
                 Button validTile2 = Buttons.red(
                         finChecker + "resolveDevote_" + tile.getPosition() + "_" + unitName + "_" + devoteOrNo,
@@ -2052,7 +2052,7 @@ public class ButtonHelperModifyUnits {
         Tile tile = game.getTileByPosition(pos);
         List<Button> buttons = new ArrayList<>();
         for (UnitKey unit : tile.getUnitHolders().get("space").getUnits().keySet()) {
-            if (unit.unitType() == UnitType.Infantry || unit.unitType() == UnitType.Mech) {
+            if (unit.getUnitType() == UnitType.Infantry || unit.getUnitType() == UnitType.Mech) {
                 continue;
             }
             String unitName = unit.unitName();

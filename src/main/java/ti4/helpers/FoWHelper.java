@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -752,7 +753,7 @@ public class FoWHelper {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
-            if (unitKey != null && unitKey.colorID().equals(colorID)) {
+            if (unitKey != null && unitKey.getColorID().equals(colorID)) {
                 return true;
             }
         }
@@ -768,7 +769,7 @@ public class FoWHelper {
 
         for (UnitKey unitKey : units.keySet()) {
             if (unitKey != null
-                    && unitKey.colorID().equals(colorID)
+                    && unitKey.getColorID().equals(colorID)
                     && player.getUnitFromAsyncID(unitKey.asyncID()) != null
                     && player.getUnitFromAsyncID(unitKey.asyncID()).getIsShip()) {
                 return true;
@@ -832,7 +833,7 @@ public class FoWHelper {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
-            if (unitKey != null && unitKey.colorID().equals(colorID) && unitKey.unitType() == UnitType.Fighter) {
+            if (unitKey != null && unitKey.getColorID().equals(colorID) && unitKey.getUnitType() == UnitType.Fighter) {
                 return true;
             }
         }
@@ -877,7 +878,7 @@ public class FoWHelper {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
-            if (unitKey != null && unitKey.colorID().equals(colorID)) {
+            if (unitKey != null && unitKey.getColorID().equals(colorID)) {
                 return true;
             }
         }
@@ -892,7 +893,7 @@ public class FoWHelper {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
-            if (unitKey != null && unitKey.colorID().equals(colorID) && unitKey.unitType() == UnitType.Infantry) {
+            if (unitKey != null && unitKey.getColorID().equals(colorID) && unitKey.getUnitType() == UnitType.Infantry) {
                 return true;
             }
         }

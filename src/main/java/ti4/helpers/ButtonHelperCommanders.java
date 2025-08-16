@@ -343,7 +343,7 @@ public class ButtonHelperCommanders {
                         .filter(uk -> !player.getUnitFromUnitKey(uk).getIsStructure())
                         .map(uk -> Buttons.gray(
                                 prefix + uk.asyncID(),
-                                uk.unitType().humanReadableName() + " " + planetName,
+                                uk.getUnitType().humanReadableName() + " " + planetName,
                                 uk.unitEmoji()))
                         .forEach(newButtons::add);
             }

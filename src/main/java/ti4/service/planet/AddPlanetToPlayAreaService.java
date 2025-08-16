@@ -2,6 +2,7 @@ package ti4.service.planet;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.Constants;
@@ -28,8 +29,8 @@ public class AddPlanetToPlayAreaService {
         Set<UnitKey> allUnitsOnPlanet = planet.getUnitKeys();
         Set<String> unitColors = new HashSet<>();
         for (UnitKey unit_ : allUnitsOnPlanet) {
-            String unitColor = unit_.colorID();
-            if (unit_.unitType() != UnitType.Fighter) {
+            String unitColor = unit_.getColorID();
+            if (unit_.getUnitType() != UnitType.Fighter) {
                 unitColors.add(unitColor);
             }
         }

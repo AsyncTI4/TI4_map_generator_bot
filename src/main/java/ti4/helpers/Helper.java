@@ -1562,11 +1562,11 @@ public class Helper {
         int productionValueTotal = 0;
         for (UnitKey unit : uH.getUnits().keySet()) {
             if (unit.getColor().equalsIgnoreCase(player.getColor())) {
-                if (unit.unitType() == UnitType.TyrantsLament
+                if (unit.getUnitType() == UnitType.TyrantsLament
                         && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()) {
                     player.addOwnedUnitByID("tyrantslament");
                 }
-                if (unit.unitType() == UnitType.PlenaryOrbital
+                if (unit.getUnitType() == UnitType.PlenaryOrbital
                         && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()) {
                     player.addOwnedUnitByID("plenaryorbital");
                 }

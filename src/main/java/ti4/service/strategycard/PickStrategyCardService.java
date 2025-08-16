@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -137,8 +138,8 @@ public class PickStrategyCardService {
         }
     }
 
-    private static boolean checkForQueuedSCPick(
-            ButtonInteractionEvent event, Player privatePlayer, Game game, String msgExtra) {
+    public static boolean checkForQueuedSCPick(
+        ButtonInteractionEvent event, Player privatePlayer, Game game, String msgExtra) {
         Player player = privatePlayer;
         String alreadyQueued = game.getStoredValue(player.getFaction() + "scpickqueue");
 

@@ -1,13 +1,14 @@
 package ti4.helpers;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +31,10 @@ public class Units {
      * </p>
      */
     @Data
-    public record UnitKey(UnitType unitType, String colorID) {
+    public static class UnitKey {
+
+        private final UnitType unitType;
+        private final String colorID;
 
         @JsonIgnore
         public String getColor() {

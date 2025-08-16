@@ -604,7 +604,7 @@ public class CombatModHelper {
                                             Mapper.getUnitKey(
                                                             AliasHandler.resolveUnit(origUnit.getBaseType()),
                                                             player.getColorID())
-                                                    .unitType(),
+                                                    .getUnitType(),
                                             player)
                                     > 0) {
                                 space = planet;

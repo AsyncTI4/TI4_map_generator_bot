@@ -108,12 +108,12 @@ public class ButtonHelperActionCards {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
 
-                if (!allowedUnits.contains(unitKey.unitType())) {
+                if (!allowedUnits.contains(unitKey.getUnitType())) {
                     continue;
                 }
 
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                String prettyName = unitModel == null ? unitKey.unitType().humanReadableName() : unitModel.getName();
+                String prettyName = unitModel == null ? unitKey.getUnitType().humanReadableName() : unitModel.getName();
                 String unitName = unitKey.unitName();
                 int totalUnits = unitEntry.getValue();
                 int damagedUnits = 0;
@@ -156,7 +156,7 @@ public class ButtonHelperActionCards {
                 UnitKey unitKey = unitEntry.getKey();
                 if (player.unitBelongsToPlayer(unitKey)) continue;
 
-                if (!allowedUnits.contains(unitKey.unitType())) {
+                if (!allowedUnits.contains(unitKey.getUnitType())) {
                     continue;
                 }
                 Player p2 = game.getPlayerFromColorOrFaction(unitKey.getColor());
@@ -165,7 +165,7 @@ public class ButtonHelperActionCards {
                 }
 
                 UnitModel unitModel = p2.getUnitFromUnitKey(unitKey);
-                String prettyName = unitModel == null ? unitKey.unitType().humanReadableName() : unitModel.getName();
+                String prettyName = unitModel == null ? unitKey.getUnitType().humanReadableName() : unitModel.getName();
                 String unitName = unitKey.unitName();
                 int totalUnits = unitEntry.getValue();
                 int damagedUnits = 0;
@@ -612,7 +612,7 @@ public class ButtonHelperActionCards {
                             .append("Rolling against ")
                             .append(numOfUnit)
                             .append(" ")
-                            .append(key.unitType().getUnitTypeEmoji())
+                            .append(key.getUnitType().getUnitTypeEmoji())
                             .append(" owned by ")
                             .append(key.getColor())
                             .append(".\n");

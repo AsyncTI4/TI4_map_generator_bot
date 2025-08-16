@@ -1,17 +1,18 @@
 package ti4.helpers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 import ti4.testUtils.JsonValidator;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UnitsTest extends BaseTi4Test {
 
@@ -51,8 +52,8 @@ class UnitsTest extends BaseTi4Test {
             UnitKey restoredUnitKey = JsonValidator.jsonCycleObject(unitKey, UnitKey.class);
 
             // Then
-            assertEquals(expectedColorId, restoredUnitKey.colorID());
-            assertEquals(expectedUnitType, restoredUnitKey.unitType());
+            assertEquals(expectedColorId, restoredUnitKey.getColorID());
+            assertEquals(expectedUnitType, restoredUnitKey.getUnitType());
         }
     }
 }

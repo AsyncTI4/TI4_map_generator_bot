@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.Data;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -87,7 +88,7 @@ public class WebTileUnitData {
                 for (UnitKey unitKey : unitHolder.getUnitKeys()) {
                     Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
                     int unitCount = unitHolder.getUnitCount(unitKey);
-                    String unitId = getUnitIdFromType(unitKey.unitType());
+                    String unitId = getUnitIdFromType(unitKey.getUnitType());
 
                     if (player == null || unitId == null || unitCount <= 0) {
                         continue;
@@ -223,7 +224,7 @@ public class WebTileUnitData {
             Map<String, WebPdsCoverage> pdsCoverage = new HashMap<>();
             for (Map.Entry<String, PdsCoverage> entry : pdsCoverageDetailed.entrySet()) {
                 ti4.helpers.PdsCoverage detailed = entry.getValue();
-                pdsCoverage.put(entry.getKey(), new WebPdsCoverage(detailed.count(), detailed.expected()));
+                pdsCoverage.put(entry.getKey(), new WebPdsCoverage(detailed.getCount(), detailed.getExpected()));
             }
             tileData.setPds(pdsCoverage);
         }

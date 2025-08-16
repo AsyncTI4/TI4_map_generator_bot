@@ -298,11 +298,11 @@ class RiftSetModeService {
                     UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
                     UnitKey key = unitEntry.getKey();
                     if (unitModel == null
-                            || key.unitType() == UnitType.Infantry
-                            || key.unitType() == UnitType.Mech
-                            || key.unitType() == UnitType.Fighter
-                            || key.unitType() == UnitType.Spacedock
-                            || key.unitType() == UnitType.Pds) {
+                            || key.getUnitType() == UnitType.Infantry
+                            || key.getUnitType() == UnitType.Mech
+                            || key.getUnitType() == UnitType.Fighter
+                            || key.getUnitType() == UnitType.Spacedock
+                            || key.getUnitType() == UnitType.Pds) {
                         continue;
                     }
 

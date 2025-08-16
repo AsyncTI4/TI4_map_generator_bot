@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.function.Consumers;
@@ -138,7 +139,7 @@ public class DestroyUnitService {
         for (Player player : game.getRealPlayers()) {
             int numInfantry = 0;
             for (RemovedUnit u : units) {
-                if (player.unitBelongsToPlayer(u.unitKey()) && u.unitKey().unitType() == UnitType.Infantry) {
+                if (player.unitBelongsToPlayer(u.unitKey()) && u.unitKey().getUnitType() == UnitType.Infantry) {
                     numInfantry += u.getTotalRemoved();
                 }
             }
@@ -160,7 +161,7 @@ public class DestroyUnitService {
             RemovedUnit unit,
             boolean combat) {
         int totalAmount = unit.getTotalRemoved();
-        Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
+        Player player = game.getPlayerFromColorOrFaction(unit.unitKey().getColorID());
 
         List<Player> capturing = CaptureUnitService.listCapturingFlagshipPlayers(game, allUnits, unit);
         List<Player> devours = CaptureUnitService.listCapturingCombatPlayers(game, unit);
@@ -170,7 +171,7 @@ public class DestroyUnitService {
 
         List<Player> killers = CaptureUnitService.listProbableKiller(game, unit);
 
-        switch (unit.unitKey().unitType()) {
+        switch (unit.unitKey().getUnitType()) {
             case Infantry -> capturing.addAll(CaptureUnitService.listCapturingMechPlayers(game, allUnits, unit));
             case Mech -> {
                 handleSelfAssemblyRoutines(player, totalAmount, game);
@@ -214,8 +215,8 @@ public class DestroyUnitService {
         if (player != null
                 && combat
                 && player.hasAbility("heroism")
-                && (unit.unitKey().unitType() == UnitType.Infantry
-                        || unit.unitKey().unitType() == UnitType.Fighter)) {
+                && (unit.unitKey().getUnitType() == UnitType.Infantry
+                        || unit.unitKey().getUnitType() == UnitType.Fighter)) {
             ButtonHelperFactionSpecific.cabalEatsUnit(
                     player, game, player, totalAmount, unit.unitKey().unitName(), event);
         }
@@ -261,7 +262,7 @@ public class DestroyUnitService {
                 buttons.add(Buttons.red("deleteButtons", "No one"));
                 String msg =
                         player.getRepresentation() + ", please tell the bot who killed your " + unit.getTotalRemoved()
-                                + " " + unit.unitKey().unitType().getUnitTypeEmoji() + ".";
+                                + " " + unit.unitKey().getUnitType().getUnitTypeEmoji() + ".";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             } else {
                 Player killer = killers.getFirst();
@@ -274,7 +275,7 @@ public class DestroyUnitService {
                                 + " (which has " + newAmount + " commodities on it now) by destroying "
                                 + unit.getTotalRemoved() + " of "
                                 + player.getRepresentationNoPing() + "'s "
-                                + unit.unitKey().unitType().getUnitTypeEmoji()
+                                + unit.unitKey().getUnitType().getUnitTypeEmoji()
                                 + "\nIf this was a mistake, adjust the commodities with `/ds set_planet_comms`.");
             }
         }
@@ -286,7 +287,7 @@ public class DestroyUnitService {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentationNoPing() + " purged 1 "
-                                + unit.unitKey().unitType().getUnitTypeEmoji() + " due to _Age of Fighters_."
+                                + unit.unitKey().getUnitType().getUnitTypeEmoji() + " due to _Age of Fighters_."
                                 + " You now have a total of " + player.getUnitCap(unitID)
                                 + " available to you  (on the game board or in your reinforcements)."
                                 + "\n-# If this was a mistake, readjust the limit with `/game set_unit_cap`.");

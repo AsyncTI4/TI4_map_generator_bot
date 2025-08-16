@@ -453,7 +453,7 @@ public class ExploreService {
                             int amt = planetUnitHolder.getUnitCount(key);
                             var removed = planetUnitHolder.removeUnit(key, amt);
                             if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech)
-                                    .contains(key.unitType())) {
+                                    .contains(key.getUnitType())) {
                                 spaceUnitHolder.addUnitsWithStates(key, removed);
                             }
                         }

@@ -98,7 +98,7 @@ class AssignHitsButtonHandlers {
                                 if (!player.unitBelongsToPlayer(key)) continue;
                                 UnitModel model = player.getUnitFromUnitKey(key);
                                 ParsedUnit unit = ParseUnitService.simpleParsedUnit(
-                                        player, key.unitType(), space, space.getUnitCount(key));
+                                        player, key.getUnitType(), space, space.getUnitCount(key));
                                 if (model.getIsShip()) {
                                     DestroyUnitService.destroyUnit(event, tile, game, unit, combat);
                                 } else {

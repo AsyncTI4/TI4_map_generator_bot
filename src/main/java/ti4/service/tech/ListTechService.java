@@ -184,7 +184,7 @@ public class ListTechService {
             for (UnitKey uk :
                     player.getNomboxTile().getSpaceUnitHolder().getUnits().keySet()) {
                 if (player.getNomboxTile().getSpaceUnitHolder().getUnitCount(uk) <= 0) continue;
-                if (unit.startsWith(uk.unitType().getValue())) return true;
+                if (unit.startsWith(uk.getUnitType().getValue())) return true;
             }
         }
 

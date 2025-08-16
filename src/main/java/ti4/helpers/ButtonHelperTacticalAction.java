@@ -552,7 +552,7 @@ public class ButtonHelperTacticalAction {
             for (UnitKey unitKey : unitHolder.getUnitKeys()) {
                 if (!player.unitBelongsToPlayer(unitKey)) {
                     boolean belongsToUnlockedAlly = false;
-                    UnitType uT = unitKey.unitType();
+                    UnitType uT = unitKey.getUnitType();
                     if (uT == UnitType.Infantry || uT == UnitType.Fighter || uT == UnitType.Mech) {
                         for (Player p2 : game.getRealPlayers()) {
                             if (p2.unitBelongsToPlayer(unitKey)
@@ -566,7 +566,7 @@ public class ButtonHelperTacticalAction {
                         continue;
                     }
                 }
-                if (unitHolder instanceof Planet && !(movableFromPlanets.contains(unitKey.unitType()))) continue;
+                if (unitHolder instanceof Planet && !(movableFromPlanets.contains(unitKey.getUnitType()))) continue;
 
                 List<Integer> states = unitHolder.getUnitsByState().get(unitKey);
                 for (UnitState state : UnitState.values()) {

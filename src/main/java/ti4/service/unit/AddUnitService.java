@@ -1,6 +1,7 @@
 package ti4.service.unit;
 
 import java.util.List;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
@@ -26,7 +27,7 @@ public class AddUnitService {
             AddPlanetToPlayAreaService.addPlanetToPlayArea(
                     event, tile, unit.uh().getName(), game);
 
-            String color = unit.unitKey().colorID();
+            String color = unit.unitKey().getColorID();
             handleFogOfWar(tile, color, game, unit.unitKey() + " " + unit.getTotalRemoved());
             checkFleetCapacity(tile, color, game);
         }

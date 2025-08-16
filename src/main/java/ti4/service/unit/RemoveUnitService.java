@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -42,11 +43,11 @@ public class RemoveUnitService {
         }
 
         public RemovedUnit withColorID(String colorID) {
-            return new RemovedUnit(Units.getUnitKey(unitKey.unitType(), colorID), tile, uh, states);
+            return new RemovedUnit(Units.getUnitKey(unitKey.getUnitType(), colorID), tile, uh, states);
         }
 
         public Player getPlayer(Game game) {
-            return game.getPlayerFromColorOrFaction(unitKey().colorID());
+            return game.getPlayerFromColorOrFaction(unitKey().getColorID());
         }
     }
 
@@ -77,7 +78,7 @@ public class RemoveUnitService {
             GenericInteractionCreateEvent event, Game game, Player player, Tile tile, UnitHolder unitHolder) {
         List<RemovedUnit> removed = new ArrayList<>();
         for (UnitKey uk : Set.copyOf(unitHolder.getUnitsByStateForPlayer(player).keySet())) {
-            if (uk.unitType() == UnitType.Pds || uk.unitType() == UnitType.Spacedock) {
+            if (uk.getUnitType() == UnitType.Pds || uk.getUnitType() == UnitType.Spacedock) {
                 continue;
             }
             ParsedUnit u = new ParsedUnit(uk, unitHolder.getUnitCount(uk), unitHolder.getName());

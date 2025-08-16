@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
@@ -909,7 +910,7 @@ public class TileGenerator {
                     for (Player player : game.getRealPlayers()) {
                         PdsCoverage coverage = pdsCoverageMap.get(player.getFaction());
                         if (coverage != null) {
-                            pdsDice.put(player.getUserID(), coverage.diceValues());
+                            pdsDice.put(player.getUserID(), coverage.getDiceValues());
                             pdsCoverageByFaction.put(player.getFaction(), coverage);
                         }
                     }
@@ -954,9 +955,9 @@ public class TileGenerator {
                         Player player = game.getPlayer(entry.getKey());
                         ti4.helpers.PdsCoverage coverage = pdsCoverageByFaction.get(player.getFaction());
 
-                        int numberOfDice = coverage.count();
-                        boolean rerolls = coverage.hasRerolls();
-                        float expectedHits = coverage.expected();
+                        int numberOfDice = coverage.getCount();
+                        boolean rerolls = coverage.isHasRerolls();
+                        float expectedHits = coverage.getExpected();
                         if ("_wht.png".equals(DrawingUtil.getBlackWhiteFileSuffix(player.getColorID()))) {
                             tileGraphics.setColor(Color.WHITE);
                         } else {

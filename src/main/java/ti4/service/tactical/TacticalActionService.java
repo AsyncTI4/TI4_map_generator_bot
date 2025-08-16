@@ -133,7 +133,7 @@ public class TacticalActionService {
 
         for (UnitKey unitKey : new HashSet<>(unitHolder.getUnitsByState().keySet())) {
             if (!canMoveUnit(player, allowedAllies, unitKey)) continue;
-            if (unitHolder instanceof Planet && !movableFromPlanets.contains(unitKey.unitType())) continue;
+            if (unitHolder instanceof Planet && !movableFromPlanets.contains(unitKey.getUnitType())) continue;
 
             List<Integer> states = unitHolder.removeUnit(unitKey, unitHolder.getUnitCount(unitKey));
             movement.put(unitKey, states);
@@ -144,7 +144,7 @@ public class TacticalActionService {
     private boolean canMoveUnit(Player player, Set<Player> allowedAllies, UnitKey unitKey) {
         if (player.unitBelongsToPlayer(unitKey)) return true;
 
-        UnitType unitType = unitKey.unitType();
+        UnitType unitType = unitKey.getUnitType();
         boolean eligibleType =
                 unitType == UnitType.Infantry || unitType == UnitType.Fighter || unitType == UnitType.Mech;
         if (!eligibleType) return false;

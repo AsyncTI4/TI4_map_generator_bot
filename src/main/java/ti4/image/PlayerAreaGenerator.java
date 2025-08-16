@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -1404,7 +1405,7 @@ class PlayerAreaGenerator {
                     if (onlyPaintOneUnit) break;
                 }
 
-                String unitName = unitKey.unitType().humanReadableName();
+                String unitName = unitKey.getUnitType().humanReadableName();
                 if (!game.isHasEnded() && numInReinforcements < 0 && game.isCcNPlasticLimit()) {
                     String warningMessage = player.getRepresentation()
                             + " is exceeding unit plastic or cardboard limits for " + unitName
@@ -1460,7 +1461,7 @@ class PlayerAreaGenerator {
         for (UnitKey uk : unitHolder.getUnitKeys()) {
             int count = unitCount.getOrDefault(uk, 0);
 
-            if (uk.unitType() == UnitType.Infantry || uk.unitType() == UnitType.Fighter) {
+            if (uk.getUnitType() == UnitType.Infantry || uk.getUnitType() == UnitType.Fighter) {
                 if (ignoreInfantryFighters) continue;
                 count++;
             } else {
@@ -1567,7 +1568,7 @@ class PlayerAreaGenerator {
         Set<UnitKey> units = new HashSet<>();
 
         for (UnitKey id : tempUnits) {
-            if (id.unitType() == UnitType.Mech) {
+            if (id.getUnitType() == UnitType.Mech) {
                 units.add(id);
             }
         }
@@ -1589,7 +1590,7 @@ class PlayerAreaGenerator {
                 UnitType.Fighter,
                 UnitType.Infantry);
 
-        Map<UnitType, List<UnitKey>> collect = units.stream().collect(Collectors.groupingBy(UnitKey::unitType));
+        Map<UnitType, List<UnitKey>> collect = units.stream().collect(Collectors.groupingBy(UnitKey::getUnitType));
         for (UnitType orderKey : order) {
             List<UnitKey> keys = collect.get(orderKey);
             if (keys == null) {
@@ -1609,10 +1610,10 @@ class PlayerAreaGenerator {
                 try {
                     String unitPath = getUnitPath(unitKey);
                     if (unitPath != null) {
-                        if (unitKey.unitType() == UnitType.Fighter) {
+                        if (unitKey.getUnitType() == UnitType.Fighter) {
                             unitPath = unitPath.replace(Constants.COLOR_FF, Constants.BULK_FF);
                             bulkUnitCount = unitCount;
-                        } else if (unitKey.unitType() == UnitType.Infantry) {
+                        } else if (unitKey.getUnitType() == UnitType.Infantry) {
                             unitPath = unitPath.replace(Constants.COLOR_GF, Constants.BULK_GF);
                             bulkUnitCount = unitCount;
                         }
@@ -1635,7 +1636,7 @@ class PlayerAreaGenerator {
 
                 Point position = new Point(x, y);
                 boolean justNumber = false;
-                switch (unitKey.unitType()) {
+                switch (unitKey.getUnitType()) {
                     case Fighter -> {
                         position.translate(fighterPoint.x, fighterPoint.y);
                         justNumber = true;
@@ -1654,7 +1655,7 @@ class PlayerAreaGenerator {
                     default -> {}
                 }
                 BufferedImage spoopy = null;
-                if (unitKey.unitType() == UnitType.Warsun) {
+                if (unitKey.getUnitType() == UnitType.Warsun) {
                     int chanceToSeeSpoop = CalendarHelper.isNearHalloween() ? 10 : 1000;
                     if (ThreadLocalRandom.current().nextInt(chanceToSeeSpoop) == 0) {
                         String spoopyPath = ResourceHelper.getInstance().getSpoopyFile();
@@ -1678,7 +1679,7 @@ class PlayerAreaGenerator {
                 for (int i = 0; i < unitCount; i++) {
                     graphics.drawImage(image, position.x, position.y + deltaY, null);
                     if (decal.isPresent()
-                            && !List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.unitType())) {
+                            && !List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType())) {
                         graphics.drawImage(decal.get(), position.x, position.y + deltaY, null);
                     }
                     if (spoopy != null) {
@@ -2600,7 +2601,7 @@ class PlayerAreaGenerator {
             BufferedImage wsCrackImage = ImageHelper.read(ResourceHelper.getInstance()
                     .getTokenFile("agenda_publicize_weapon_schematics"
                             + (player.hasWarsunTech()
-                                    ? DrawingUtil.getBlackWhiteFileSuffix(unitKey.colorID())
+                                    ? DrawingUtil.getBlackWhiteFileSuffix(unitKey.getColorID())
                                     : "_blk.png")));
             graphics.drawImage(wsCrackImage, deltaX + x + unitOffset.x, y + unitOffset.y, null);
         }
