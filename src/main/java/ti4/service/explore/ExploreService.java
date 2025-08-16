@@ -498,6 +498,21 @@ public class ExploreService {
                         Helper.addTokenPlanetToTile(game, tile, Constants.MIRAGE);
                         game.clearPlanetsCache();
                         message = "Mirage added to map, added to your play area, readied, and explored!";
+                        if (!game.isFowMode()
+                                && game.getRevealedPublicObjectives().keySet().contains("deep_space")
+                                && !game.didPlayerScoreThisAlready(player.getUserID(), "deep_space")) {
+                            DisasterWatchHelper.sendMessageInDisasterWatch(
+                                    game,
+                                    player.getRepresentation() + " is attempting to _Expore Deep Space_ in "
+                                            + game.getName() + ". Alas, alack, they have discovered Mirage!");
+                        } else if (!game.isFowMode()
+                                && game.getRevealedPublicObjectives().keySet().contains("vast_territories")
+                                && !game.didPlayerScoreThisAlready(player.getUserID(), "vast_territories")) {
+                            DisasterWatchHelper.sendMessageInDisasterWatch(
+                                    game,
+                                    player.getRepresentation() + " is attempting to _Patrol Vast Territories_ in "
+                                            + game.getName() + ". Alas, alack, they have discovered Mirage!");
+                        }
                     }
                     game.purgeExplore(ogID);
                 }

@@ -60,7 +60,7 @@ public class ScorePublicObjectiveService {
         if (!scored) {
             MessageHelper.sendMessageToChannel(
                     channel,
-                    player.getFactionEmoji() + "No such public objective ID found, or already scored, please retry.");
+                    player.getFactionEmoji() + ", no such public objective ID found, or already scored, please retry.");
         } else {
             informAboutScoring(event, channel, game, player, poID);
             for (Player p2 : player.getNeighbouringPlayers(true)) {
