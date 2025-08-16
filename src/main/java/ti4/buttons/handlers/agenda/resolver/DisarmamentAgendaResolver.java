@@ -22,6 +22,7 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
     public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         for (Player player : game.getRealPlayers()) {
             if (player.getPlanets().contains(winner.toLowerCase())) {
+                String units = "";
                 Tile tile = game.getTileFromPlanet(winner);
                 Planet uH = ButtonHelper.getUnitHolderFromPlanetName(winner, game);
                 int count = 0;
@@ -30,6 +31,7 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
                         int amt = uH.getUnitCount(uk);
                         count += amt;
                         DestroyUnitService.destroyUnit(event, tile, game, uk, amt, uH, false);
+                        units += uk.unitEmoji().emojiString().repeat(amt);
                     }
                 }
                 if (count > 0) {
@@ -37,9 +39,22 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
                     ButtonHelperAgents.resolveArtunoCheck(player, count);
                     ButtonHelperAbilities.pillageCheck(player, game);
                 }
-                MessageHelper.sendMessageToChannel(
-                        game.getMainGameChannel(),
-                        "Removed all ground forces and gave the player the appropriate amount of trade goods.");
+                if (game.isFowMode()) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getPrivateChannel(),
+                            "Destroyed all ground forces (" + units + ") on " + winner + ", and gave "
+                                    + player.getRepresentation() + " " + count + " trade good" + (count == 1 ? "" : "s")
+                                    + ".");
+                    MessageHelper.sendMessageToChannel(
+                            game.getMainGameChannel(),
+                            "Destroyed all ground forces on the elected planet. The owner of said units has been justly compensated.");
+                } else {
+                    MessageHelper.sendMessageToChannel(
+                            game.getMainGameChannel(),
+                            "Destroyed all ground forces (" + units + ") on " + winner + ", and gave "
+                                    + player.getRepresentation() + " " + count + " trade good" + (count == 1 ? "" : "s")
+                                    + " in compensation.");
+                }
             }
         }
     }

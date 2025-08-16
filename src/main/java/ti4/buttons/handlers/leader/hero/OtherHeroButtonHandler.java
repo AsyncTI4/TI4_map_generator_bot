@@ -221,7 +221,7 @@ class OtherHeroButtonHandler {
     @ButtonHandler("purgeOrlandoHero_")
     public static void purgeOrlandoHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
         StringBuilder p = new StringBuilder("p");
-        while (RandomHelper.isOneInX(20)) {
+        while (RandomHelper.isOneInX(12)) {
             p.append("p");
         }
         purgeHeroPreamble(event, player, game, "orlandohero", "F.S.S. Orlando, the Orlando hero");

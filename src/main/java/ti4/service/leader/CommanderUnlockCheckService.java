@@ -33,7 +33,7 @@ public class CommanderUnlockCheckService {
         }
     }
 
-    private static void checkConditionsAndUnlock(Player player, String faction) {
+    public static void checkConditionsAndUnlock(Player player, String faction) {
         Game game = player.getGame();
         boolean shouldBeUnlocked = false;
         switch (faction) {

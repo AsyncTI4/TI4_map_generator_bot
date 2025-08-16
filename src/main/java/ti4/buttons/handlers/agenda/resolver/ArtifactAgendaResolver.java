@@ -33,11 +33,11 @@ public class ArtifactAgendaResolver implements ForAgainstAgendaResolver {
             if (tile != null) {
                 FileUpload systemWithContext =
                         new TileGenerator(game, event, null, 1, tile.getPosition()).createFileUpload();
-                String message = "# Ixthian Artifact has resolved! " + watchPartyPing + "\n"
+                String message = "# _Ixthian Artifact_ has resolved! " + watchPartyPing + "\n"
                         + AgendaHelper.getSummaryOfVotes(game, true);
                 MessageHelper.sendMessageToChannel(watchParty, message);
                 MessageHelper.sendMessageWithFile(
-                        watchParty, systemWithContext, "Surrounding Mecatol Rex In " + game.getName(), false);
+                        watchParty, systemWithContext, "Surrounding Mecatol Rex in " + game.getName() + ".", false);
             }
         }
         var ixthianButton = Buttons.green("rollIxthian", "Roll Ixthian Artifact", PlanetEmojis.Mecatol);

@@ -817,8 +817,10 @@ public class ButtonHelperModifyUnits {
                         buttons.add(Buttons.red(
                                 "removeThisTypeOfUnit_" + type.humanReadableName() + "_" + tile.getPosition() + "_"
                                         + uH.getName(),
-                                type.humanReadableName() + " from " + tile.getRepresentation() + " in "
-                                        + uH.getName()));
+                                type.humanReadableName() + " from " + tile.getRepresentation() + " "
+                                        + (uH.getName().equals("space")
+                                                ? "in Space"
+                                                : "on " + StringUtils.capitalize(uH.getName()))));
                     }
                 }
             }
@@ -846,8 +848,64 @@ public class ButtonHelperModifyUnits {
         }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " removed 1 " + unit + " from tile "
-                        + tile.getRepresentationForButtons(game, player) + " location: " + unitH);
+                player.getRepresentationNoPing() + " removed 1 " + unit + " from "
+                        + ("space".equals(unitH) ? "the space area of" : StringUtils.capitalize(unitH) + ", in")
+                        + " tile " + tile.getRepresentationForButtons(game, player) + ".");
+    }
+
+    public static List<Button> getRemoveNCaptureThisTypeOfUnitButton(
+            Player player, Game game, String unit, Player vuilraith) {
+        List<Button> buttons = new ArrayList<>();
+        UnitType type = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID())
+                .getUnitType();
+        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, type)) {
+            for (UnitHolder uH : tile.getUnitHolders().values()) {
+                if (uH.getUnitCount(type, player.getColor()) > 0) {
+                    if (!CommandCounterHelper.hasCC(player, tile)
+                            || type == UnitType.Fighter
+                            || type == UnitType.Infantry
+                            || game.getActiveSystem().equalsIgnoreCase(tile.getPosition())) {
+                        buttons.add(Buttons.red(
+                                "removeNCaptureThisTypeOfUnit_" + type.humanReadableName() + "_" + tile.getPosition()
+                                        + "_" + uH.getName() + "_" + vuilraith.getColor(),
+                                type.humanReadableName() + " from " + tile.getRepresentation() + " "
+                                        + (uH.getName().equals("space")
+                                                ? "in Space"
+                                                : "on " + StringUtils.capitalize(uH.getName()))));
+                    }
+                }
+            }
+        }
+        buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+        return buttons;
+    }
+
+    @ButtonHandler("removeNCaptureThisTypeOfUnit_")
+    public static void removeNCaptureThisTypeOfUnit(
+            String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String unit = buttonID.split("_")[1].toLowerCase().replace(" ", "").replace("'", "");
+        String tilePos = buttonID.split("_")[2];
+        Tile tile = game.getTileByPosition(tilePos);
+        String unitH = buttonID.split("_")[3];
+        UnitHolder uH = tile.getUnitHolders().get(unitH);
+        Player vuilraith = game.getPlayerFromColorOrFaction(buttonID.split("_")[4]);
+
+        RemoveUnitService.removeUnits(
+                event, tile, game, player.getColor(), "1 " + unit + " " + unitH.replace("space", ""));
+        AddUnitService.addUnits(event, player.getNomboxTile(), game, vuilraith.getColor(), "1 " + unit);
+        if (uH.getUnitCount(
+                        Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID())
+                                .getUnitType(),
+                        player.getColor())
+                < 1) {
+            ButtonHelper.deleteTheOneButton(event);
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " removed 1 " + unit + " from "
+                        + ("space".equals(unitH) ? "the space area of" : StringUtils.capitalize(unitH) + ", in")
+                        + " tile " + tile.getRepresentationForButtons(game, player) + "; it has been captured by "
+                        + vuilraith.getRepresentation() + ".");
     }
 
     public static void infiltratePlanet(Player player, Game game, UnitHolder uH, ButtonInteractionEvent event) {

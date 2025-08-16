@@ -619,7 +619,7 @@ public class CombatRollService {
                 && ButtonHelper.doesPlayerHaveFSHere("letnev_flagship", player, activeSystem)
                 && "space".equalsIgnoreCase(unitHolder.getName())
                 && unitHolder.getDamagedUnitCount(UnitType.Flagship, player.getColorID()) > 0) {
-            result = "## Repaired Letnev Flagship at start of combat round due to its ability.\n\n" + result;
+            result = "Repaired the Arc Secundus at start of this combat round with its ability.\n" + result;
             activeSystem.removeUnitDamage(
                     unitHolder.getName(), Mapper.getUnitKey(AliasHandler.resolveUnit("fs"), player.getColorID()), 1);
         }
