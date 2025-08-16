@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.regex.Pattern;
+import ti4.helpers.PatternHelper;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -23,10 +23,6 @@ import ti4.service.emoji.UnitEmojis;
 @Data
 public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
-    private static final Pattern PATTERN = Pattern.compile("[^R]");
-    private static final Pattern REGEX = Pattern.compile("[^G]");
-    private static final Pattern REGEXP = Pattern.compile("[^Y]");
-    private static final Pattern PATTERN1 = Pattern.compile("[^B]");
     private String alias;
     private String name;
     private String shortName;
@@ -343,7 +339,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         for (TechnologyType type : types) {
             switch (type) {
                 case PROPULSION -> {
-                    String blues = PATTERN1.matcher(reqs).replaceAll("");
+                    String blues = PatternHelper.NON_BLUE_PATTERN.matcher(reqs).replaceAll("");
                     switch (blues) {
                         case "" -> output.append(TechEmojis.PropulsionDisabled);
                         case "B" -> output.append(TechEmojis.PropulsionTech);
@@ -352,7 +348,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                     }
                 }
                 case CYBERNETIC -> {
-                    String yellows = REGEXP.matcher(reqs).replaceAll("");
+                    String yellows = PatternHelper.NON_YELLOW_PATTERN.matcher(reqs).replaceAll("");
                     switch (yellows) {
                         case "" -> output.append(TechEmojis.CyberneticDisabled);
                         case "Y" -> output.append(TechEmojis.CyberneticTech);
@@ -361,7 +357,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                     }
                 }
                 case BIOTIC -> {
-                    String greens = REGEX.matcher(reqs).replaceAll("");
+                    String greens = PatternHelper.NON_GREEN_PATTERN.matcher(reqs).replaceAll("");
                     switch (greens) {
                         case "" -> output.append(TechEmojis.BioticDisabled);
                         case "G" -> output.append(TechEmojis.BioticTech);
@@ -370,7 +366,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                     }
                 }
                 case WARFARE -> {
-                    String reds = PATTERN.matcher(reqs).replaceAll("");
+                    String reds = PatternHelper.NON_RED_PATTERN.matcher(reqs).replaceAll("");
                     switch (reds) {
                         case "" -> output.append(TechEmojis.WarfareDisabled);
                         case "R" -> output.append(TechEmojis.WarfareTech);

@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Pattern;
+import ti4.helpers.PatternHelper;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.collections4.CollectionUtils;
@@ -29,8 +29,6 @@ public class TileHelper {
     private static final Map<String, TileModel> tileIdsToTileModels = new HashMap<>();
     private static final Map<String, PlanetModel> planetIdsToPlanetModels = new HashMap<>();
     private static final Map<String, List<PlanetModel>> tileIdsToPlanetModels = new HashMap<>();
-    private static final Pattern PATTERN = Pattern.compile("^\\s*\\d{3} \\(\\w+\\)\\s*$");
-    private static final Pattern BLANK = Pattern.compile("blank");
 
     public static void init() {
         BotLogger.info("Initiating Planets");
@@ -136,7 +134,7 @@ public class TileHelper {
     }
 
     private static void duplicateDraftTiles(TileModel tile) {
-        String color = BLANK.matcher(tile.getAlias()).replaceAll("");
+        String color = PatternHelper.BLANK_WORD_PATTERN.matcher(tile.getAlias()).replaceAll("");
         String namePre =
                 Character.toUpperCase(color.charAt(0)) + color.substring(1).toLowerCase() + ", draft tile ";
 
@@ -198,7 +196,7 @@ public class TileHelper {
     }
 
     public static Tile getTile(GenericInteractionCreateEvent event, String tileNameOrPos, Game game) {
-        if (PATTERN.matcher(tileNameOrPos).matches()) {
+        if (PatternHelper.TILE_WITH_NAME_PATTERN.matcher(tileNameOrPos).matches()) {
             // If the tileNameOrPos is in the format "123 (XYZ)", we extract the position only
             tileNameOrPos = tileNameOrPos
                     .trim()

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
+import ti4.helpers.PatternHelper;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -15,7 +15,6 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.TI4Emoji;
 
 public class PNDraftItem extends DraftItem {
-    private static final Pattern FIN_SEP = Pattern.compile("finSep");
 
     public PNDraftItem(String itemId) {
         super(Category.PN, itemId);
@@ -70,7 +69,7 @@ public class PNDraftItem extends DraftItem {
 
     private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
-        String[] results = FIN_SEP.split(game.getStoredValue("bannedPNs"));
+        String[] results = PatternHelper.STORAGE_SEPARATOR_PATTERN.split(game.getStoredValue("bannedPNs"));
         for (FactionModel faction : factions) {
             for (String pnID : faction.getPromissoryNotes()) {
                 if (Arrays.asList(results).contains(pnID)) {

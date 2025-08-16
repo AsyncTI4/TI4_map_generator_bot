@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
+import ti4.helpers.PatternHelper;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -13,7 +13,6 @@ import ti4.service.emoji.ExploreEmojis;
 
 @Data
 public class ExploreModel implements ModelInterface, EmbeddableModel {
-    private static final Pattern PATTERN = Pattern.compile("\n(> )?");
     private String id;
     private String name;
     private String type;
@@ -69,7 +68,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
         StringBuilder sb = new StringBuilder(getTypeEmoji()).append(" ");
         if (source != null) sb.append(source.emoji()).append(" ");
         sb.append("_").append(name).append("_\n> ");
-        sb.append(PATTERN.matcher(text).replaceAll("\n> "));
+        sb.append(PatternHelper.NEWLINE_OPTIONAL_GT_PATTERN.matcher(text).replaceAll("\n> "));
         return sb.toString();
     }
 
