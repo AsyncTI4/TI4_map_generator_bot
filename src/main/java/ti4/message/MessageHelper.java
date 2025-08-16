@@ -75,6 +75,10 @@ public class MessageHelper {
         splitAndSent(messageText, channel);
     }
 
+    public static void sendMessageToChannel(MessageChannel channel, String messageText, List<Button> buttons) {
+        sendMessageToChannelWithButtons(channel, messageText, buttons);
+    }
+
     public static void sendMessageToEventChannel(GenericInteractionCreateEvent event, String messageText) {
         sendMessageToChannel(event.getMessageChannel(), messageText);
     }

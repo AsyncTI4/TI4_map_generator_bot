@@ -3309,7 +3309,7 @@ public class AgendaHelper {
                 && !game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")
                 && game.getRevealedPublicObjectives().get("Stellar Atomics") != null
                 && !game.getScoredPublicObjectives().get("Stellar Atomics").contains(player.getUserID())) {
-            sb.append(" __cannot__ voting due to having used _Stellar Atomics_.");
+            sb.append(" __cannot__ vote due to having used _Stellar Atomics_.**");
 
         } else if (player.hasLeaderUnlocked("xxchahero")) {
             sb.append(" vote count: **" + MiscEmojis.ResInf + " ").append(voteCount);
@@ -3368,6 +3368,9 @@ public class AgendaHelper {
 
         // NEKRO unless XXCHA ALLIANCE
         if (player.hasAbility("galactic_threat") && !game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
+            return 0;
+        }
+        if (player.isNpc()) {
             return 0;
         }
 

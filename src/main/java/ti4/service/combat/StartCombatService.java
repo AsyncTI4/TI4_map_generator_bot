@@ -750,7 +750,7 @@ public class StartCombatService {
                                 + ", a reminder that if you win the combat, you may use this button to remove a command token from the system.",
                         buttons);
             }
-            if (player.hasAbility("technological_singularity")) {
+            if (player.hasAbility("technological_singularity") && !otherPlayer.isDummy()) {
                 Button steal = Buttons.gray(
                         player.finChecker() + "nekroStealTech_" + otherPlayer.getFaction(),
                         "Copy a Technology",
@@ -940,6 +940,13 @@ public class StartCombatService {
         List<Button> afbButtons = new ArrayList<>();
         afbButtons.add(Buttons.gray(
                 "combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));
+        for (Player player : combatPlayers) {
+            if (player.isNpc() || player.isDummy()) {
+                afbButtons.add(Buttons.green(
+                        player.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_space_afb",
+                        "Roll " + CombatRollType.AFB.getValue() + " for Dummy"));
+            }
+        }
         MessageHelper.sendMessageToChannelWithButtons(
                 threadChannel, "Buttons to roll ANTI-FIGHTER BARRAGE (if applicable).", afbButtons);
         if (!game.isFowMode()) {
@@ -1811,13 +1818,13 @@ public class StartCombatService {
             }
             if ("space".equalsIgnoreCase(nameOfHolder) && isSpaceCombat) {
                 buttons.add(Buttons.gray("combatRoll_" + pos + "_" + unitH.getName(), "Roll Space Combat"));
-                if (p1.isDummy()) {
+                if (p1.isDummy() || p1.isNpc()) {
                     buttons.add(Buttons.gray(
                                     p1.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(),
                                     "Roll Space Combat For Dummy")
                             .withEmoji(Emoji.fromFormatted(p1.getFactionEmoji())));
                 }
-                if (p2.isDummy()) {
+                if (p2.isDummy() || p2.isNpc()) {
                     buttons.add(Buttons.gray(
                                     p2.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(),
                                     "Roll Space Combat For Dummy")
@@ -1831,13 +1838,13 @@ public class StartCombatService {
                     if (p1 == game.getActivePlayer()) {
                         nonActive = p2;
                     }
-                    if (p1.isDummy()) {
+                    if (p1.isDummy() || p1.isNpc()) {
                         buttons.add(Buttons.gray(
                                         p1.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(),
                                         "Roll Ground Combat for " + nameOfHolder + " for Dummy")
                                 .withEmoji(Emoji.fromFormatted(p1.getFactionEmoji())));
                     }
-                    if (p2.isDummy()) {
+                    if (p2.isDummy() || p2.isNpc()) {
                         buttons.add(Buttons.gray(
                                         p2.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(),
                                         "Roll Ground Combat for " + nameOfHolder + " for Dummy")

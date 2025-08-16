@@ -10,6 +10,9 @@ import ti4.map.Player;
 public class SabotageService {
 
     public static boolean couldFeasiblySabotage(Player player, Game game) {
+        if (player.isNpc()) {
+            return false;
+        }
         if (player.hasTechReady("it") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))) {
             return true;
         }
