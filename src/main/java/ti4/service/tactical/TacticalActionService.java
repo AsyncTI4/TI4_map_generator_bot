@@ -31,14 +31,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
-import ti4.service.tactical.movement.MoveAbilities;
-import ti4.service.tactical.movement.MoveAbility;
-import ti4.service.tactical.movement.MoveContext;
-import ti4.service.tactical.planet.LandingContext;
-import ti4.service.tactical.planet.PlanetAbilities;
-import ti4.service.tactical.postmovement.PostMovementAbilities;
-import ti4.service.tactical.postmovement.PostMovementButtonAbility;
-import ti4.service.tactical.postmovement.PostMovementButtonContext;
+import ti4.service.tactical.movement.MoveAbilityButtons;
 
 @UtilityClass
 public class TacticalActionService {
@@ -293,8 +286,8 @@ public class TacticalActionService {
 
         // Ability contributions
         MoveContext pubCtx = new MoveContext(player, game, event);
-        for (MoveAbility ability : MoveAbilities.ABILITIES) {
-            if (ability.enabled(pubCtx)) ability.contribute(pubCtx, buttons);
+        for (MoveAbilityButton ability : MoveAbilityButtons.ABILITIES) {
+            if (ability.enabled(pubCtx)) buttons.addAll(ability.build(pubCtx));
         }
 
         // Finish movement controls
@@ -341,8 +334,8 @@ public class TacticalActionService {
                     LandingContext.of(game, player, tile, space, planet, landPrefix, unlandPrefix, committable);
 
             addLandingAndUnlandingButtonsForPlanet(ctx, buttons, unlandUnitButtons);
-            for (PlanetAbilities.PlanetButtonAbility ability : PlanetAbilities.ABILITIES) {
-                if (ability.enabled(ctx)) ability.contribute(ctx, buttons);
+            for (PlanetAbilityButton ability : PlanetAbilityButtons.ABILITIES) {
+                if (ability.enabled(ctx)) buttons.addAll(ability.build(ctx));
             }
 
             buttons.addAll(unlandUnitButtons);
@@ -350,8 +343,8 @@ public class TacticalActionService {
         }
 
         PostMovementButtonContext ctx = new PostMovementButtonContext(game, player, tile);
-        for (PostMovementButtonAbility ability : PostMovementAbilities.ABILITIES) {
-            if (ability.enabled(ctx)) ability.contribute(ctx, buttons);
+        for (PostMovementAbilityButton ability : PostMovementAbilityButtons.ABILITIES) {
+            if (ability.enabled(ctx)) buttons.addAll(ability.build(ctx));
         }
 
         return buttons;

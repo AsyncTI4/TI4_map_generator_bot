@@ -1,4 +1,4 @@
-package ti4.service.tactical.movement;
+package ti4.service.tactical;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.map.Game;

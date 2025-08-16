@@ -1,10 +1,12 @@
-package ti4.service.tactical.movement;
+package ti4.service.tactical;
 
 import java.util.List;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
-public interface MoveAbility {
+public interface MoveAbilityButton {
     boolean enabled(MoveContext ctx);
 
-    void contribute(MoveContext ctx, List<Button> buttons);
+    List<Button> build(MoveContext ctx);
 }
+
+
