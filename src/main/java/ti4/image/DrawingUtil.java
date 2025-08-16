@@ -38,6 +38,8 @@ public class DrawingUtil {
     }
 
     private static final int DELTA_Y = 26;
+    private static final double NINETY_DEGREES_RADIANS = Math.toRadians(90);
+    private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -NINETY_DEGREES_RADIANS;
 
     public static void superDrawString(
             Graphics g,
@@ -617,7 +619,7 @@ public class DrawingUtil {
     public static void drawTextVertically(Graphics graphics, String text, int x, int y, Font font, boolean rightAlign) {
         Graphics2D graphics2D = (Graphics2D) graphics;
         AffineTransform originalTransform = graphics2D.getTransform();
-        graphics2D.rotate(-1.5707963267948966);
+        graphics2D.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
         graphics2D.setFont(font);
 
         if (rightAlign) {
