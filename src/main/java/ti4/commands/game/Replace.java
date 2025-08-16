@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -33,8 +32,6 @@ import ti4.service.milty.MiltyDraftManager;
 import ti4.settings.users.UserSettingsManager;
 
 class Replace extends GameStateSubcommand {
-
-    private static final Pattern PATTERN = Pattern.compile("^-|-$");
 
     Replace() {
         super(Constants.REPLACE, "Replace player in game", true, false);
