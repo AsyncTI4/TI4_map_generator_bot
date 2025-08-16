@@ -1,4 +1,4 @@
-package ti4.commands.admin;
+package ti4.commands.developer;
 
 import java.io.File;
 import net.dv8tion.jda.api.entities.Message.Attachment;
@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 
 class RestoreGame extends Subcommand {
 
-    public RestoreGame() {
+    RestoreGame() {
         super(Constants.RESTORE_GAME, "Restore a game by uploading a save file");
         addOptions(
                 new OptionData(OptionType.ATTACHMENT, Constants.SAVE_FILE, "Save file to reload").setRequired(true),

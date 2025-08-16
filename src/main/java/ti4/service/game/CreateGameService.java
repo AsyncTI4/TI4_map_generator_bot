@@ -32,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
+import ti4.commands.CommandHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -684,14 +685,8 @@ public class CreateGameService {
     }
 
     public static boolean isLockedFromCreatingGames(GenericInteractionCreateEvent event) {
-        Member member = event.getMember();
-        if (member != null) {
-            List<Role> roles = member.getRoles();
-            for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
-                if (roles.contains(role)) {
-                    return false;
-                }
-            }
+        if (CommandHelper.hasRole(event, AsyncTI4DiscordBot.bothelperRoles)) {
+            return false;
         }
 
         var userSettings = UserSettingsManager.get(event.getUser().getId());
