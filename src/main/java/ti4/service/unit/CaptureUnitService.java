@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -47,7 +46,8 @@ class CaptureUnitService {
         List<Player> cabalsWithFs = new ArrayList<>();
         for (Player p : cabals) {
             // Flagship cannot capture itself
-            if (p.unitBelongsToPlayer(removed.unitKey()) && removed.unitKey().getUnitType() == UnitType.Flagship) continue;
+            if (p.unitBelongsToPlayer(removed.unitKey()) && removed.unitKey().getUnitType() == UnitType.Flagship)
+                continue;
 
             // If the flagship was not destroyed
             if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, p) > 0) {

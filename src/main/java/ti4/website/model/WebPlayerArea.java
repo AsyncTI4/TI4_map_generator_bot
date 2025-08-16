@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.Data;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;

@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;

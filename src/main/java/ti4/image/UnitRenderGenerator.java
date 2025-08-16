@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
-
 import ti4.ResourceHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CalendarHelper;
@@ -536,7 +535,9 @@ class UnitRenderGenerator {
         for (UnitType type : typeOrder) {
             for (String colorID : playerOrder) {
                 for (UnitKey id : tempUnits) {
-                    if (id != null && id.getUnitType() == type && id.getColorID().equals(colorID)) {
+                    if (id != null
+                            && id.getUnitType() == type
+                            && id.getColorID().equals(colorID)) {
                         sortedUnits.add(id);
                     }
                 }

@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
