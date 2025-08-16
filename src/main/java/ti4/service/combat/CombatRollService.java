@@ -11,16 +11,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.commands.planet.PlanetExhaust;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -328,7 +331,7 @@ public class CombatRollService {
                     String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit"
                             + (h == 1 ? "" : "s") + ".";
                     List<Button> buttons = new ArrayList<>();
-                    if (opponent.isDummy()) {
+                    if (opponent.isDummy() || opponent.isNpc()) {
                         if (round2 > round) {
                             buttons.add(Buttons.blue(
                                     opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_"
@@ -379,7 +382,7 @@ public class CombatRollService {
                     String msg = opponent.getRepresentationUnfogged() + " you may roll dice for Combat Round #"
                             + (round + 1) + ".";
                     List<Button> buttons = new ArrayList<>();
-                    if (opponent.isDummy()) {
+                    if (opponent.isDummy() || opponent.isNpc()) {
                         if (round2 > round) {
                             buttons.add(Buttons.blue(
                                     opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_"
@@ -408,7 +411,7 @@ public class CombatRollService {
             List<Button> buttons = new ArrayList<>();
             if (!game.isFowMode() && rollType == CombatRollType.combatround && opponent != player) {
                 if (round2 > round) {
-                    if (opponent.isDummy()) {
+                    if (opponent.isDummy() || opponent.isNpc()) {
                         buttons.add(Buttons.blue(
                                 opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_"
                                         + combatOnHolder.getName(),
@@ -424,7 +427,7 @@ public class CombatRollService {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 if (h > 0) {
                     String finChecker = "FFCC_" + opponent.getFaction() + "_";
-                    if (opponent.isDummy()) {
+                    if (opponent.isDummy() || opponent.isNpc()) {
                         buttons.add(Buttons.green(
                                 opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
                                 "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
@@ -453,7 +456,7 @@ public class CombatRollService {
                 }
 
             } else {
-                if (game.isFowMode() && opponent.isDummy() && h > 0) {
+                if (game.isFowMode() && (opponent.isDummy() || opponent.isNpc()) && h > 0) {
                     if (combatOnHolder instanceof Planet) {
                         if (round2 > round) {
                             buttons.add(Buttons.blue(
@@ -605,7 +608,7 @@ public class CombatRollService {
 
         // Actually roll for each unit
         int totalHits = 0;
-        StringBuilder resultBuilder = new StringBuilder(result);
+        
         List<UnitModel> playerUnitsList = new ArrayList<>(playerUnits.keySet());
         int totalMisses = 0;
         UnitHolder space = activeSystem.getUnitHolders().get("space");
@@ -616,6 +619,15 @@ public class CombatRollService {
                 && (!unitHolder.getName().equalsIgnoreCase("space") || rollType == CombatRollType.bombardment)) {
             usesX89c4 = true;
         }
+        if (rollType == CombatRollType.combatround
+                && ButtonHelper.doesPlayerHaveFSHere("letnev_flagship", player, activeSystem)
+                && unitHolder.getName().equalsIgnoreCase("space")
+                && unitHolder.getDamagedUnitCount(UnitType.Flagship, player.getColorID()) > 0) {
+            result = "## Repaired Letnev Flagship at start of combat round due to its ability.\n\n" + result;
+            activeSystem.removeUnitDamage(
+                    unitHolder.getName(), Mapper.getUnitKey(AliasHandler.resolveUnit("fs"), player.getColorID()), 1);
+        }
+        StringBuilder resultBuilder = new StringBuilder(result);
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unitModel = entry.getKey();
             int numOfUnit = entry.getValue();

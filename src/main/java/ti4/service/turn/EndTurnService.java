@@ -1,11 +1,14 @@
 package ti4.service.turn;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.FoWHelper;
@@ -17,6 +20,7 @@ import ti4.message.MessageHelper;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 public class EndTurnService {
@@ -65,6 +69,18 @@ public class EndTurnService {
     public static void pingNextPlayer(
             GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
         resetStoredValuesEndOfTurn(game, mainPlayer);
+
+        var userSettings = UserSettingsManager.get(mainPlayer.getUserID());
+
+        if ("No Preference".equalsIgnoreCase(userSettings.getSandbagPref())) {
+            String msg = mainPlayer.getRepresentation() + " the bot could auto pass on scoring secrets for you in the "
+                    + "status phase if you cannot score any secrets. This might speed up the game as people won't be waiting on you in the cases "
+                    + "where you can score nothing. Do you want to enable this feature? Once you answer, you will not be asked again. ";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("sandbagPref_bot", "Allow the bot"));
+            buttons.add(Buttons.red("sandbagPref_manual", "Always manual"));
+            MessageHelper.sendMessageToChannel(mainPlayer.getCardsInfoThread(), msg, buttons);
+        }
 
         CommanderUnlockCheckService.checkPlayer(mainPlayer, "sol", "hacan");
         for (Player player : game.getRealPlayers()) {

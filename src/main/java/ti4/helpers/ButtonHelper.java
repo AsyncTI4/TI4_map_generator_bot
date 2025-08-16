@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,9 +18,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Data;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageReaction;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -309,6 +313,7 @@ public class ButtonHelper {
 
     public static List<Button> getForcedPNSendButtons(Game game, Player receiver, Player sender) {
         List<Button> stuffToTransButtons = new ArrayList<>();
+        String idNPC = "";
         for (String pnShortHand : sender.getPromissoryNotes().keySet()) {
             if (sender.getPromissoryNotesInPlayArea().contains(pnShortHand)
                     || (receiver.getAbilities().contains("hubris") && pnShortHand.endsWith("_an"))) {
@@ -331,9 +336,14 @@ public class ButtonHelper {
             } else {
                 String id = "naaluHeroSend_" + receiver.getFaction() + "_"
                         + sender.getPromissoryNotes().get(pnShortHand);
+                idNPC = id;
                 transact = Buttons.green(id, promissoryNote.getName(), owner.getFactionEmoji());
             }
             stuffToTransButtons.add(transact);
+        }
+
+        if (sender.isNpc() && !idNPC.isEmpty()) {
+            ButtonHelperHeroes.resolveNaaluHeroSend(sender, game, idNPC, null);
         }
         return stuffToTransButtons;
     }
@@ -618,6 +628,134 @@ public class ButtonHelper {
             }
         }
         return buttons;
+    }
+
+    public static void removeUser(
+            GenericInteractionCreateEvent event, Game game, Player player, StringBuilder stringBuilder) {
+
+        Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();
+        if (player == null) return;
+        if (player.getColor() == null
+                || player.getFaction() == null
+                || "null".equalsIgnoreCase(player.getFaction())
+                || !player.isRealPlayer()
+                || "".equalsIgnoreCase(player.getFaction())) {
+            game.removePlayer(player.getUserID());
+        } else {
+            if (!player.getPlanetsAllianceMode().isEmpty()) {
+                String msg =
+                        "This player doesn't meet the elimination conditions. If you wish to replace a player, run `/game replace`. Ping a bothelper for assistance if you need it.";
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+                return;
+            }
+            if (game.getSpeakerUserID().equalsIgnoreCase(player.getUserID())) {
+                boolean foundSpeaker = false;
+                for (Player p4 : Helper.getSpeakerOrderFromThisPlayer(player, game)) {
+                    if (foundSpeaker) {
+                        game.setSpeakerUserID(p4.getUserID());
+                        break;
+                    }
+                    if (p4 == player) {
+                        foundSpeaker = true;
+                    }
+                }
+            }
+            // send back all the PNs of others that the player was holding
+            Set<String> pns = new HashSet<>(player.getPromissoryNotes().keySet());
+            for (String pnID : pns) {
+                PromissoryNoteModel pn = promissoryNotes.get(pnID);
+                if (pn != null
+                        && !pn.getOwner().equalsIgnoreCase(player.getColor())
+                        && !pn.getOwner().equalsIgnoreCase(player.getFaction())) {
+                    Player p2 = game.getPlayerFromColorOrFaction(pn.getOwner());
+                    player.removePromissoryNote(pnID);
+                    if (p2 == null) {
+                        BotLogger.warning(
+                                new BotLogger.LogMessageOrigin(event),
+                                "Could not find player when removing eliminated player's PN: " + pn.getOwner());
+                    } else {
+                        p2.setPromissoryNote(pnID);
+                        PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
+                    }
+                }
+            }
+
+            // Purge all the PNs of the eliminated player that other players were holding
+            for (Player p2 : game.getPlayers().values()) {
+                pns = new HashSet<>(p2.getPromissoryNotes().keySet());
+                for (String pnID : pns) {
+                    PromissoryNoteModel pn = promissoryNotes.get(pnID);
+                    if (pn != null
+                            && (pn.getOwner().equalsIgnoreCase(player.getColor())
+                                    || pn.getOwner().equalsIgnoreCase(player.getFaction()))) {
+                        p2.removePromissoryNote(pnID);
+                        PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
+                    }
+                }
+            }
+            // Remove all the players units and ccs from the board
+            for (Tile tile : game.getTileMap().values()) {
+                tile.removeAllUnits(player.getColor());
+                if (!"null".equalsIgnoreCase(player.getColor())
+                        && CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
+                    RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
+                }
+            }
+            // discard all of a players ACs
+            Map<String, Integer> acs = new LinkedHashMap<>(player.getActionCards());
+            for (Map.Entry<String, Integer> ac : acs.entrySet()) {
+                game.discardActionCard(player.getUserID(), ac.getValue());
+                String sb = "Player: " + player.getUserName() + " - " + "Discarded action card:" + "\n"
+                        + Mapper.getActionCard(ac.getKey()).getRepresentation() + "\n";
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb);
+            }
+            ActionCardHelper.serveReverseEngineerButtons(game, player, new ArrayList<>(acs.keySet()));
+
+            // unscore all of a players SOs
+            acs = new LinkedHashMap<>(player.getSecretsScored());
+            for (int so : acs.values()) {
+                game.unscoreSecretObjective(player.getUserID(), so);
+            }
+            // discard all of a players SOs
+
+            acs = new LinkedHashMap<>(player.getSecrets());
+            for (int so : acs.values()) {
+                game.discardSecretObjective(player.getUserID(), so);
+            }
+            // return SCs
+            Set<Integer> scs = new HashSet<>(player.getSCs());
+            for (int sc : scs) {
+                player.removeSC(sc);
+            }
+            player.setEliminated(true);
+            player.setDummy(true);
+            if (!game.isFowMode()) {
+                Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), game.getName());
+            }
+        }
+
+        Guild guild = event.getGuild();
+        Member removedMember = guild.getMemberById(player.getUserID());
+        List<Role> roles = guild.getRolesByName(game.getName(), true);
+        if (removedMember != null && roles.size() == 1) {
+            guild.removeRoleFromMember(removedMember, roles.getFirst()).queue();
+        }
+        stringBuilder
+                .append("Eliminated player: ")
+                .append(player.getUserName())
+                .append(" from game: ")
+                .append(game.getName())
+                .append("\n");
+    }
+
+    @ButtonHandler("eliminatePlayer")
+    public static void eliminatePlayer(Game game, ButtonInteractionEvent event, String buttonID) {
+        Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        StringBuilder stringBuilder = new StringBuilder();
+        removeUser(event, game, player, stringBuilder);
+        Helper.fixGameChannelPermissions(event.getGuild(), game);
+        deleteMessage(event);
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), stringBuilder.toString());
     }
 
     @ButtonHandler("resolveAlliancePlanetTrade_")
@@ -994,7 +1132,7 @@ public class ButtonHelper {
         if (game.isCustodiansScored()) {
             List<String> whens = AgendaHelper.getPossibleWhenNames(player);
             List<String> afters = AgendaHelper.getPossibleAfterNames(player);
-            if (player.isAutoPassOnWhensAfters() && whens.isEmpty() && afters.isEmpty()) {
+            if ((player.isAutoPassOnWhensAfters() && whens.isEmpty() && afters.isEmpty()) || player.isNpc()) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.red("undoPassOnAllWhensNAfters", "Undo Pass"));
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -2743,7 +2881,7 @@ public class ButtonHelper {
 
     @ButtonHandler("deleteMessage_") // deleteMessage_{Optional String to send to the event channel after}
     public static void deleteMessage(GenericInteractionCreateEvent event) {
-        if (event instanceof ButtonInteractionEvent bevent) {
+        if (event != null && event instanceof ButtonInteractionEvent bevent) {
             bevent.getMessage().delete().queue();
         }
     }

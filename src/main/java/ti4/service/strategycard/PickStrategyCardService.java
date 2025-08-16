@@ -86,8 +86,10 @@ public class PickStrategyCardService {
                 game.updateActivePlayer(privatePlayer);
                 game.setPhaseOfGame("strategy");
                 boolean queuedPick = false;
-                if (event instanceof ButtonInteractionEvent bevent) {
+                if (event != null && event instanceof ButtonInteractionEvent bevent) {
                     queuedPick = checkForQueuedSCPick(bevent, privatePlayer, game, msgExtra);
+                } else {
+                    queuedPick = checkForQueuedSCPick(null, privatePlayer, game, msgExtra);
                 }
                 if (!queuedPick) {
                     checkForForcePickLastStratCard(event, privatePlayer, game, msgExtra);
@@ -139,12 +141,19 @@ public class PickStrategyCardService {
             ButtonInteractionEvent event, Player privatePlayer, Game game, String msgExtra) {
         Player player = privatePlayer;
         String alreadyQueued = game.getStoredValue(player.getFaction() + "scpickqueue");
+
+        if (player.isNpc()) {
+            alreadyQueued = "1_2_3_4_5_6_7_8";
+        }
         if (!alreadyQueued.isEmpty()) {
             int unpickedStrategyCard = 0;
             for (String scNum : alreadyQueued.split("_")) {
-                game.setStoredValue(
-                        player.getFaction() + "scpickqueue",
-                        game.getStoredValue(player.getFaction() + "scpickqueue").replace(scNum + "_", ""));
+                if (!player.isNpc()) {
+                    game.setStoredValue(
+                            player.getFaction() + "scpickqueue",
+                            game.getStoredValue(player.getFaction() + "scpickqueue")
+                                    .replace(scNum + "_", ""));
+                }
                 int sc = Integer.parseInt(scNum);
                 boolean held = false;
                 for (Player p : game.getRealPlayers()) {

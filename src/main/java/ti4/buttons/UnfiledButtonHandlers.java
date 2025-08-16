@@ -232,8 +232,8 @@ public class UnfiledButtonHandlers {
             }
         }
         if (mode.equalsIgnoreCase("StellarAtomics")) {
+            game.setStellarAtomicsMode(enable);
             if (enable) {
-                game.setStellarAtomicsMode(enable);
                 int poIndex = game.addCustomPO("Stellar Atomics", 0);
                 for (Player playerWL : game.getRealPlayers()) {
                     game.scorePublicObjective(playerWL.getUserID(), poIndex);
@@ -474,6 +474,15 @@ public class UnfiledButtonHandlers {
                 player.getRepresentationUnfogged() + ", please choose which unit you wish to place down.",
                 buttons);
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("sandbagPref_")
+    public static void sandbagPref(ButtonInteractionEvent event, Player player, String buttonID) {
+        var userSettings = UserSettingsManager.get(player.getUserID());
+        userSettings.setSandbagPref(buttonID.split("_")[1]);
+        UserSettingsManager.save(userSettings);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Thank you for answering");
     }
 
     @ButtonHandler("setAutoPassMedian_")
@@ -1534,7 +1543,7 @@ public class UnfiledButtonHandlers {
                 game.setSpeakerUserID(player_.getUserID());
                 String message =
                         MiscEmojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation(false, true);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if (game.isFowMode() && player != player_) {
                     MessageHelper.sendMessageToChannel(player_.getPrivateChannel(), message);
                 }
@@ -3084,6 +3093,12 @@ public class UnfiledButtonHandlers {
 
         if (!game.isFowMode() && "statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
             ReactionService.addReaction(event, game, player);
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.isNpc() && !game.getCurrentACDrawStatusInfo().contains(p2.getFaction())) {
+                    ButtonHelper.drawStatusACs(game, p2, event);
+                    ReactionService.addReaction(event, game, p2);
+                }
+            }
         }
 
         if ("statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
@@ -3111,7 +3126,7 @@ public class UnfiledButtonHandlers {
                 if (properGain > 2) {
                     MessageHelper.sendMessageToChannel(
                             player.getCardsInfoThread(),
-                            player.getRepresentationUnfogged()
+                            "## " + player.getRepresentationUnfogged()
                                     + ", heads up, the bot thinks you should gain " + properGain + " command token"
                                     + (properGain == 1 ? "" : "s") + " now due to: " + reasons + ".");
                 }

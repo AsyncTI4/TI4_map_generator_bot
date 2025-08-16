@@ -1471,6 +1471,9 @@ public class ButtonHelperActionCards {
                         + ", you've been hit by" + (RandomHelper.isOneInX(1000) ? ", you've been struck by" : "")
                         + " an ability which forces you to send a random action card to another player. Press the button to send a random action card to that player.",
                 buttons);
+        if (p2.isNpc()) {
+            ActionCardHelper.sendRandomACPart2(event, game, p2, player);
+        }
         ButtonHelper.deleteMessage(event);
     }
 
