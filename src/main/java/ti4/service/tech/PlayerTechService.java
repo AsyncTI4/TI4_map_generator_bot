@@ -3,6 +3,7 @@ package ti4.service.tech;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -39,6 +40,7 @@ import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.metadata.TechSummariesMetadataManager;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -47,6 +49,7 @@ import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -398,10 +401,10 @@ public class PlayerTechService {
             case "sr", "absol_sar" -> { // Sling Relay or Absol Self Assembley Routines
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();
-                List<Tile> tiles = new ArrayList<>(ButtonHelper.getTilesOfPlayersSpecificUnits(
+                List<Tile> tiles = new ArrayList<>(CheckUnitContainmentService.getTilesContainingPlayersUnits(
                         game, player, Units.UnitType.Spacedock, Units.UnitType.PlenaryOrbital));
                 if (player.hasUnit("ghoti_flagship")) {
-                    tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship));
+                    tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Flagship));
                 }
                 List<String> pos2 = new ArrayList<>();
                 for (Tile tile : tiles) {
@@ -523,9 +526,9 @@ public class PlayerTechService {
                 List<Button> buttons;
                 Tile tile = game.getTile(AliasHandler.resolveTile(player.getFaction()));
                 if (player.hasAbility("mobile_command")
-                        && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship)
+                        && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Flagship)
                                 .isEmpty()) {
-                    tile = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship)
+                    tile = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Flagship)
                             .getFirst();
                 }
                 if (tile == null) {
@@ -544,7 +547,7 @@ public class PlayerTechService {
                             + ". You also have the That Which Molds Flesh, the Vuil'raith commander,"
                             + " which allows you to produce 2 fighters/infantry that don't count towards the PRODUCTION limit";
                 }
-                if (val > 0 && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
+                if (val > 0 && IsPlayerElectedService.isPlayerElected(game, player, "prophecy")) {
                     message2 +=
                             ". And reminder that you have _Prophecy of Ixth_ and should produce 2 fighters if you wish to keep it. Its removal is not automated.";
                 }

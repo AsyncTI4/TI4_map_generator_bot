@@ -2,6 +2,7 @@ package ti4.service.info;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -15,6 +16,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
@@ -70,7 +72,7 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("pharadnagent")) {
             buttons.add(Buttons.gray("exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));
         }
-        if (ButtonHelper.isPlayerElected(game, player, "minister_peace")) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "minister_peace")) {
             buttons.add(Buttons.gray("ministerOfPeace", "Use Minister of Peace", CardEmojis.Agenda));
         }
         if (player.hasUnexhaustedLeader("vadenagent")) {

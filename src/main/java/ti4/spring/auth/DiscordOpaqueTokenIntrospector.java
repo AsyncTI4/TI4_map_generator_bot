@@ -1,9 +1,5 @@
-package ti4.spring.service.auth;
+package ti4.spring.auth;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -11,6 +7,11 @@ import java.net.http.HttpResponse;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.DefaultOAuth2AuthenticatedPrincipal;
@@ -26,7 +27,10 @@ public class DiscordOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
 
     private static final String ME_ENDPOINT = "https://discord.com/api/v10/users/@me";
     private static final Cache<String, OAuth2AuthenticatedPrincipal> AUTH_CACHE =
-            Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
+            Caffeine.newBuilder()
+                .maximumSize(1000)
+                .expireAfterWrite(30, TimeUnit.MINUTES)
+                .build();
 
     @Override
     public OAuth2AuthenticatedPrincipal introspect(String token) {

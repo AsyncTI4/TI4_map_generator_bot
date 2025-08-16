@@ -1,11 +1,13 @@
 package ti4.helpers.settingsFramework.menus;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -211,7 +213,7 @@ public class SliceGenerationSettings extends SettingsMenu {
             game = ms.getGame();
             ms.getGameSettings().getMapTemplate().setChosenKey("2025scptFinals");
             List<String> factions = new ArrayList<>(List.of("sol", "xxcha", "jolnar", "keleresm", "ghost", "naalu"));
-            ms.getPlayerSettings().getBanFactions().setKeys(List.of());
+            ms.getPlayerSettings().getBanFactions().setKeys(Collections.emptyList());
             ms.getPlayerSettings().getPriFactions().setKeys(factions);
         }
         numSlices.setVal(6);

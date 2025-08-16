@@ -1,9 +1,11 @@
 package ti4.service.milty;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
@@ -97,7 +99,7 @@ public class DraftDisplayService {
                     case "slice" -> manager.getSliceButtons();
                     case "faction" -> manager.getFactionButtons();
                     case "order" -> manager.getPositionButtons();
-                    default -> List.of();
+                    default -> Collections.emptyList();
                 };
         String newSummary = manager.getOverallSummaryString(game);
         return hist -> {

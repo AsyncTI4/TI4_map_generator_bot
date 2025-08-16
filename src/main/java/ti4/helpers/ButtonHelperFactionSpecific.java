@@ -1,10 +1,7 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -66,7 +64,12 @@ import ti4.service.tech.PlayerTechService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
+
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 public class ButtonHelperFactionSpecific {
 
@@ -2400,7 +2403,7 @@ public class ButtonHelperFactionSpecific {
         if (cabal == player) {
             return false;
         }
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, cabal, UnitType.Spacedock);
+        List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, cabal, UnitType.Spacedock);
         if (tiles.isEmpty()) {
             return false;
         }
@@ -2576,10 +2579,10 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static List<Button> getUnitButtonsForVortex(Player player, Game game, GenericInteractionCreateEvent event) {
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock);
+        List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock);
         if (tiles.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Couldn't find any Dimensional Tears.");
-            return List.of();
+            return Collections.emptyList();
         }
         Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tiles.getFirst().getPosition(), player, false);
         for (Tile tile : tiles) {
@@ -3063,7 +3066,7 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("creussMechStep1_")
     public static void creussMechStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)) {
+        for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Mech)) {
             buttons.add(Buttons.green(
                     "creussMechStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
         }
@@ -3077,7 +3080,7 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("nivynMechStep1_")
     public static void nivynMechStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)) {
+        for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Mech)) {
             buttons.add(Buttons.green(
                     "nivynMechStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
         }
@@ -3359,7 +3362,7 @@ public class ButtonHelperFactionSpecific {
         if (ACPlayer.getFaction().equalsIgnoreCase(EmpyPlayer.getFaction())) {
             return false;
         }
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, EmpyPlayer, UnitType.Mech);
+        List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, EmpyPlayer, UnitType.Mech);
         for (Tile tile : tiles) {
             Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tile.getPosition(), EmpyPlayer, true);
             for (String adjTile : adjTiles) {

@@ -1,11 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,6 +15,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -87,6 +82,7 @@ import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.selections.selectmenus.SelectFaction;
 import ti4.service.PlanetService;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -114,9 +110,16 @@ import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.website.AsyncTi4WebsiteHelper;
+
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 public class ButtonHelper {
 
@@ -1029,24 +1032,6 @@ public class ButtonHelper {
         return Arrays.stream(lawIDs).anyMatch(lawID -> game.getLaws().containsKey(lawID));
     }
 
-    public static boolean isPlayerElected(Game game, Player player, String lawID) {
-        if ("yes".equalsIgnoreCase(game.getStoredValue("lawsDisabled"))) {
-            return false;
-        }
-        if (player == null) {
-            return false;
-        }
-        for (String law : game.getLaws().keySet()) {
-            if (lawID.equalsIgnoreCase(law) && game.getLawsInfo().get(law) != null) {
-                if (game.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())
-                        || game.getLawsInfo().get(law).equalsIgnoreCase(player.getColor())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     @ButtonHandler("drawStatusACs")
     public static void drawStatusACs(Game game, Player player, ButtonInteractionEvent event) {
         if (game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
@@ -1090,7 +1075,7 @@ public class ButtonHelper {
             }
         }
 
-        if (isPlayerElected(game, player, "minister_policy") && !player.hasAbility("scheming")) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "minister_policy") && !player.hasAbility("scheming")) {
             String acAlias = null;
             for (Map.Entry<String, Integer> ac : Helper.getLastEntryInHashMap(game.drawActionCard(player.getUserID()))
                     .entrySet()) {
@@ -1245,7 +1230,7 @@ public class ButtonHelper {
         if (!game.isFowMode() && isLawInPlay(game, "minister_peace")) {
             if (FoWHelper.otherPlayersHaveUnitsInSystem(player, activeSystem, game)) {
                 for (Player p2 : game.getRealPlayers()) {
-                    if (isPlayerElected(game, p2, "minister_peace")) {
+                    if (IsPlayerElectedService.isPlayerElected(game, p2, "minister_peace")) {
                         if (p2 != player) {
                             List<Button> buttons2 = new ArrayList<>();
                             Button hacanButton =
@@ -1427,8 +1412,8 @@ public class ButtonHelper {
 
             if (CommandCounterHelper.hasCC(nonActivePlayer, activeSystem)) {
                 if (nonActivePlayer.getActionCards().containsKey("counterstroke")
-                        && !isPlayerElected(game, player, "censure")
-                        && !isPlayerElected(game, player, "absol_censure")) {
+                        && !IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                        && !IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
                     List<Button> reverseButtons = new ArrayList<>();
                     String key = "counterstroke";
                     String ac_name = Mapper.getActionCard(key).getName();
@@ -1448,7 +1433,7 @@ public class ButtonHelper {
                 }
             }
             if (nonActivePlayer.ownsUnit("nivyn_mech")
-                    && getTilesOfPlayersSpecificUnits(game, nonActivePlayer, UnitType.Mech)
+                    && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, nonActivePlayer, UnitType.Mech)
                             .contains(activeSystem)) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.gray("nivynMechStep1_", "Use Nivyn Mech", FactionEmojis.nivyn));
@@ -1588,7 +1573,7 @@ public class ButtonHelper {
                             "Look at Promissory Notes (" + player.getPnCount() + ")");
                     Button lookAtSOs = Buttons.green(
                             fincheckerForNonActive + "yssarilcommander_so_" + player.getFaction(),
-                            "Look at" + (isPlayerElected(game, player, "censure") ? " (Not So)" : "")
+                            "Look at" + (IsPlayerElectedService.isPlayerElected(game, player, "censure") ? " (Not So)" : "")
                                     + " Secret Objectives (" + (player.getSo()) + ")");
                     Button decline = Buttons.red(fincheckerForNonActive + "deleteButtons", "Decline Yssaril Commander");
                     List<Button> buttons = List.of(lookAtACs, lookAtPNs, lookAtSOs, decline);
@@ -1786,7 +1771,7 @@ public class ButtonHelper {
         }
         String finChecker = "FFCC_" + player.getFaction() + "_";
         for (Tile tile : getTilesWithYourCC(player, game, event)) {
-            if (getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock).contains(tile)) {
+            if (CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock).contains(tile)) {
                 buttonsToRemoveCC.add(Buttons.green(
                         finChecker + "removeCCFromBoard_celdauriRedTech_" + tile.getPosition(),
                         tile.getRepresentationForButtons(game, player)));
@@ -2907,7 +2892,7 @@ public class ButtonHelper {
 
     public static void deleteAllButtons(ButtonInteractionEvent event) {
         if (event == null) return;
-        event.getMessage().editMessageComponents(List.of()).queue();
+        event.getMessage().editMessageComponents(Collections.emptyList()).queue();
     }
 
     public static void deleteTheOneButton(GenericInteractionCreateEvent event) {
@@ -4147,7 +4132,7 @@ public class ButtonHelper {
             }
         }
         int rings = game.getRingCount();
-        for (Tile tile : getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
+        for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)) {
             if (!canActivateTile(game, player, tile)) continue;
             ringButtons.add(Buttons.green(
                     finChecker + "ringTile_" + tile.getPosition(),
@@ -6254,7 +6239,7 @@ public class ButtonHelper {
             }
         }
         if (player.hasUnit("ghoti_flagship")) {
-            tilesWithProduction.addAll(getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship));
+            tilesWithProduction.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Flagship));
         }
         if (player.hasTech("mr") || player.hasTech("absol_mr")) {
             List<Tile> tilesWithNovaAndUnits = game.getTileMap().values().stream()
@@ -6982,15 +6967,6 @@ public class ButtonHelper {
                     .append(" during the PRODUCTION.");
         }
         return youCanSpend.toString();
-    }
-
-    public static List<Tile> getTilesOfPlayersSpecificUnits(Game game, Player p1, UnitType... type) {
-        List<UnitType> unitTypes = new ArrayList<>();
-        Collections.addAll(unitTypes, type);
-
-        return game.getTileMap().values().stream()
-                .filter(t -> t.containsPlayersUnitsWithKeyCondition(p1, unit -> unitTypes.contains(unit.getUnitType())))
-                .toList();
     }
 
     public static int getNumberOfUnitsOnTheBoard(Game game, Player p1, String unit) {

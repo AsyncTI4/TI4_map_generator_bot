@@ -1,9 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -52,9 +49,14 @@ import ti4.service.planet.FlipTileService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 public class ButtonHelperHeroes {
 
@@ -850,7 +852,7 @@ public class ButtonHelperHeroes {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesWithBombard =
-                ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Lady, UnitType.Flagship);
+                CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Lady, UnitType.Flagship);
         Set<String> adjacentTiles = FoWHelper.getAdjacentTilesAndNotThisTile(
                 game, tilesWithBombard.getFirst().getPosition(), player, false);
         for (Tile tile : tilesWithBombard) {
@@ -877,7 +879,7 @@ public class ButtonHelperHeroes {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesWithBombard =
-                ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Lady, UnitType.Flagship);
+                CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Lady, UnitType.Flagship);
         Set<String> adjacentTiles = FoWHelper.getAdjacentTilesAndNotThisTile(
                 game, tilesWithBombard.getFirst().getPosition(), player, false);
         for (Tile tile : tilesWithBombard) {
@@ -964,8 +966,8 @@ public class ButtonHelperHeroes {
     public static List<Button> getArboHeroButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         List<Tile> tiles = new ArrayList<>();
-        tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Infantry));
-        tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech));
+        tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Infantry));
+        tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Mech));
         List<String> poses = new ArrayList<>();
         for (Tile tile : tiles) {
             if (!poses.contains(tile.getPosition())) {
@@ -981,7 +983,7 @@ public class ButtonHelperHeroes {
     public static List<Button> getSaarHeroButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesUsed = new ArrayList<>();
-        for (Tile tile1 : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
+        for (Tile tile1 : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)) {
             for (String tile2Pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile1.getPosition(), player, false)) {
                 Tile tile2 = game.getTileByPosition(tile2Pos);
                 if (!tilesUsed.contains(tile2)) {
@@ -1260,7 +1262,7 @@ public class ButtonHelperHeroes {
                     || p.hasTech("absol_dt2")
                     || p.getUnitsOwned().contains("absol_cabal_spacedock")
                     || p.getUnitsOwned().contains("absol_cabal_spacedock2")) {
-                tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, p, UnitType.Spacedock));
+                tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p, UnitType.Spacedock));
             }
         }
 
@@ -1297,7 +1299,7 @@ public class ButtonHelperHeroes {
                     || p2.hasTech("absol_dt2")
                     || p2.getUnitsOwned().contains("absol_cabal_spacedock")
                     || p2.getUnitsOwned().contains("absol_cabal_spacedock2")) {
-                tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock));
+                tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Spacedock));
             }
             if (p2 != player) {
                 totalLosses.put(p2.getFactionEmoji(), new ArrayList<>());

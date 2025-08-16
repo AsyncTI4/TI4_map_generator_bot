@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -86,7 +87,7 @@ class JimboButtons {
                                 TRANSFORM_TRANSLATE_4,
                                 TRANSFORM_TRANSLATE_5);
                     case JimboConst.metaAction -> List.of(MAIN_PAGE, META_SYMMETRY_ADD, META_SYMMETRY_REMOVE);
-                    default -> List.of();
+                    default -> Collections.emptyList();
                 };
         return new ArrayList<>(buttons);
     }

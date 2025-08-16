@@ -1,8 +1,10 @@
 package ti4.service.emoji;
 
 import java.time.temporal.ChronoField;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +22,7 @@ public class ApplicationEmojiCacheService {
         } catch (Exception e) {
             BotLogger.error("Failed to read json data for EmojiCache.", e);
         }
-        if (cache == null) return List.of();
+        if (cache == null) return Collections.emptyList();
         return cache;
     }
 

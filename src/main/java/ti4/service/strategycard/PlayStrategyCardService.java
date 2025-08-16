@@ -3,6 +3,7 @@ package ti4.service.strategycard;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -42,6 +43,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
 public class PlayStrategyCardService {
@@ -448,7 +450,7 @@ public class PlayStrategyCardService {
                 } else {
                     if (scToPlay == 6
                             && !p2.hasUnit("ghoti_flagship")
-                            && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, Units.UnitType.Spacedock)
+                            && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, Units.UnitType.Spacedock)
                                     .contains(p2.getHomeSystemTile())) {
                         Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                         if (reactionEmoji2 != null) {

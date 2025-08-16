@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -29,6 +30,7 @@ import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.StrategyCardModel;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -742,7 +744,7 @@ public class ButtonHelperSCs {
             message +=
                     ". You also have the That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 fighters/infantry that don't count towards PRODUCTION limit. ";
         }
-        if (val > 0 && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
+        if (val > 0 && IsPlayerElectedService.isPlayerElected(game, player, "prophecy")) {
             message +=
                     "Reminder that you have _Prophecy of Ixth_ and should produce at least 2 fighters if you wish to keep it. Its removal is not automated.";
         }

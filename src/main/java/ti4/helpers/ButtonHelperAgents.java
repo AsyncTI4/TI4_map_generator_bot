@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -45,6 +46,7 @@ import ti4.service.leader.RefreshLeaderService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
@@ -1114,7 +1116,7 @@ public class ButtonHelperAgents {
             message =
                     ", please choose which system to " + ssruuClever + "Umbat, the Muaat" + ssruuSlash + " agent, in.";
             List<Tile> tiles =
-                    ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Warsun, UnitType.Flagship);
+                    CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Warsun, UnitType.Flagship);
             List<Button> buttons = new ArrayList<>();
             for (Tile tile : tiles) {
                 Button starTile =
@@ -2542,7 +2544,7 @@ public class ButtonHelperAgents {
 
     private static List<Button> getJolNarAgentButtons(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Infantry)) {
+        for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Infantry)) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
                     buttons.add(Buttons.green(

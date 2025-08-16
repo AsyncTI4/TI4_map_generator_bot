@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -163,8 +164,8 @@ public class ActionCardHelper {
 
         if (actionCards != null
                 && !actionCards.isEmpty()
-                && !ButtonHelper.isPlayerElected(game, player, "censure")
-                && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
+                && !IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                && !IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
@@ -175,8 +176,8 @@ public class ActionCardHelper {
                 }
             }
         }
-        if (ButtonHelper.isPlayerElected(game, player, "censure")
-                || ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             acButtons.add(
                     Buttons.blue("getDiscardButtonsACs", "Discard an Action Card (You Are Politically Censured)"));
         } else {
@@ -184,7 +185,7 @@ public class ActionCardHelper {
         }
         if (actionCards != null
                 && !actionCards.isEmpty()
-                && !ButtonHelper.isPlayerElected(game, player, "censure")
+                && !IsPlayerElectedService.isPlayerElected(game, player, "censure")
                 && hasPrePlayCards(game, player)) {
             acButtons.add(Buttons.gray("checkForAllACAssignments", "Pre-Assign Action Cards"));
         }
@@ -1305,8 +1306,8 @@ public class ActionCardHelper {
     public static void serveReverseEngineerButtons(Game game, Player discardingPlayer, List<String> actionCards) {
         for (Player player : game.getRealPlayers()) {
             if (player == discardingPlayer) continue;
-            if (ButtonHelper.isPlayerElected(game, player, "censure")) continue;
-            if (ButtonHelper.isPlayerElected(game, player, "absol_censure")) continue;
+            if (IsPlayerElectedService.isPlayerElected(game, player, "censure")) continue;
+            if (IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) continue;
 
             String reverseEngineerID = "reverse_engineer";
             if (player.getActionCards().containsKey(reverseEngineerID)) {

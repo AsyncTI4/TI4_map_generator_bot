@@ -1,9 +1,11 @@
 package ti4.service.async;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -72,8 +74,8 @@ public class DrumrollService {
             Predicate<Game> resolve,
             MessageChannel channel2,
             String msg2) {
-        List<MessageChannel> chans = channel2 == null ? List.of() : List.of(channel2);
-        List<String> msgs = msg2 == null ? List.of() : List.of(msg2);
+        List<MessageChannel> chans = channel2 == null ? Collections.emptyList() : List.of(channel2);
+        List<String> msgs = msg2 == null ? Collections.emptyList() : List.of(msg2);
         doDrumrollMultiChannel(main, msg, sec, gameName, resolve, chans, msgs);
     }
 

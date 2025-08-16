@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -30,6 +31,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -37,6 +39,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
 public class AddPlanetService {
@@ -180,7 +183,7 @@ public class AddPlanetService {
                                 + Mapper.getPlanet(planet).getName() + " (and could perhaps play _Reparations_).";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                         if (player_.getPlanetsAllianceMode().isEmpty()
-                                && ButtonHelper.getTilesOfPlayersSpecificUnits(
+                                && CheckUnitContainmentService.getTilesContainingPlayersUnits(
                                                 game, player, UnitType.Infantry, UnitType.Mech, UnitType.Spacedock)
                                         .isEmpty()) {
                             List<Button> buttons = new ArrayList<>();
@@ -446,7 +449,7 @@ public class AddPlanetService {
                         buttons);
             }
         }
-        if (ButtonHelper.isPlayerElected(game, player, "minister_exploration")) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "minister_exploration")) {
             String fac = player.getFactionEmoji();
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

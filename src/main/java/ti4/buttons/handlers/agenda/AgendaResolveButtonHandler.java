@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -127,10 +128,10 @@ class AgendaResolveButtonHandler {
     @ButtonHandler("agendaResolution_")
     public static void resolveAgenda(Game game, String buttonID, ButtonInteractionEvent event) {
         String winner = buttonID.substring(buttonID.indexOf('_') + 1);
-        String agendaid = game.getCurrentAgendaInfo().split("_")[2];
-        if (guardDoublePress(game, winner, agendaid)) return;
+        String agendaId = game.getCurrentAgendaInfo().split("_")[2];
+        if (guardDoublePress(game, winner, agendaId)) return;
 
-        int aID = computeAgendaNumericId(game, agendaid);
+        int aID = computeAgendaNumericId(game, agendaId);
         String agID = getAgendaId(game, aID);
 
         // Pre-resolution

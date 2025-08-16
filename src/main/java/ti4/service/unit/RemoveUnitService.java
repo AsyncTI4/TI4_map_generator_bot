@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -174,7 +175,7 @@ public class RemoveUnitService {
 
         if (unitHoldersToRemoveFrom.isEmpty()) {
             handleEmptyUnitHolders(event, tile, parsedUnit);
-            return List.of();
+            return Collections.emptyList();
         }
 
         int toRemoveCount = parsedUnit.getCount();

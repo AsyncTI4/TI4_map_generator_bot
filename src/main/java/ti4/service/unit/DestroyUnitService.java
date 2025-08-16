@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.function.Consumers;
@@ -232,7 +233,7 @@ public class DestroyUnitService {
             UnitModel uni = player.getUnitFromUnitKey(unit.unitKey());
             if (uni != null && uni.getIsShip()) {
                 if (player.hasUnit("ghoti_flagship")
-                        || ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                        || CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
                                 .contains(player.getHomeSystemTile())) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green(

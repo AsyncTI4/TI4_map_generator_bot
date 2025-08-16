@@ -1,10 +1,12 @@
 package ti4.service.info;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.helpers.ButtonHelper;
@@ -24,6 +26,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
 public class ListPlayerInfoService {
@@ -406,7 +409,7 @@ public class ListPlayerInfoService {
 
                 List<String> scoringPlayers = game.getScoredPublicObjectives().get(objective.getKey());
                 if (scoringPlayers == null) {
-                    scoringPlayers = List.of();
+                    scoringPlayers = Collections.emptyList();
                 }
                 representation
                         .append("\n> ")
@@ -674,7 +677,7 @@ public class ListPlayerInfoService {
             }
             case "supremacy", "supremacy_omegaphase" -> {
                 int count = 0;
-                for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(
+                for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(
                         game, player, Units.UnitType.Flagship, Units.UnitType.Warsun, Units.UnitType.Lady)) {
                     if ((tile.isHomeSystem(game) && tile != player.getHomeSystemTile()) || tile.isMecatol()) {
                         count++;
@@ -913,7 +916,7 @@ public class ListPlayerInfoService {
                     if (p2 == player) {
                         continue;
                     }
-                    for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, Units.UnitType.Spacedock)) {
+                    for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, Units.UnitType.Spacedock)) {
                         if (ButtonHelper.checkNumberShips(player, tile) > 0) {
                             count++;
                         }

@@ -1,6 +1,5 @@
 package ti4.map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,6 +17,8 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -76,6 +77,7 @@ import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.user.AFKService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
@@ -2613,11 +2615,11 @@ public class Player extends PlayerProperties {
         }
 
         if (hasAbility("mobile_command")) {
-            if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, this, UnitType.Flagship)
+            if (CheckUnitContainmentService.getTilesContainingPlayersUnits(game, this, UnitType.Flagship)
                     .isEmpty()) {
                 return null;
             }
-            return ButtonHelper.getTilesOfPlayersSpecificUnits(game, this, UnitType.Flagship)
+            return CheckUnitContainmentService.getTilesContainingPlayersUnits(game, this, UnitType.Flagship)
                     .getFirst();
         }
         if (!getFaction().contains("franken") && game.getTile(AliasHandler.resolveTile(getFaction())) != null) {
