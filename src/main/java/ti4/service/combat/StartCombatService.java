@@ -36,11 +36,13 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
 public class StartCombatService {
@@ -355,8 +357,8 @@ public class StartCombatService {
                         threadChannel,
                         player2.getRepresentation()
                                 + ", your opponent has zero action cards in hand, so if they have no applicable technologies/abilities/retreats you can roll.");
-            } else if (ButtonHelper.isPlayerElected(game, player1, "censure")
-                    || ButtonHelper.isPlayerElected(game, player1, "absol_censure")) {
+            } else if (IsPlayerElectedService.isPlayerElected(game, player1, "censure")
+                    || IsPlayerElectedService.isPlayerElected(game, player1, "absol_censure")) {
                 MessageHelper.sendMessageToChannel(
                         threadChannel,
                         player2.getRepresentation()
@@ -367,8 +369,8 @@ public class StartCombatService {
                         threadChannel,
                         player1.getRepresentation()
                                 + " your opponent has zero action cards in hand, so if they have no applicable technologies/abilities/retreats you can roll.");
-            } else if (ButtonHelper.isPlayerElected(game, player2, "censure")
-                    || ButtonHelper.isPlayerElected(game, player2, "absol_censure")) {
+            } else if (IsPlayerElectedService.isPlayerElected(game, player2, "censure")
+                    || IsPlayerElectedService.isPlayerElected(game, player2, "absol_censure")) {
                 MessageHelper.sendMessageToChannel(
                         threadChannel,
                         player1.getRepresentation()
@@ -1127,7 +1129,7 @@ public class StartCombatService {
                 && tile != p1.getHomeSystemTile()
                 && p1.getHomeSystemTile() != null) {
             if (p1.hasUnit("ghoti_flagship")
-                    || ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Spacedock)
+                    || CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Spacedock)
                             .contains(p1.getHomeSystemTile())) {
                 buttons.add(Buttons.green(
                         p1.getFinsFactionCheckerPrefix() + "useNekroNullRef",
@@ -1141,7 +1143,7 @@ public class StartCombatService {
                 && p2.getHomeSystemTile() != null
                 && !game.isFowMode()) {
             if (p2.hasUnit("ghoti_flagship")
-                    || ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock)
+                    || CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Spacedock)
                             .contains(p2.getHomeSystemTile())) {
                 buttons.add(Buttons.green(
                         p2.getFinsFactionCheckerPrefix() + "useNekroNullRef",
@@ -1570,7 +1572,8 @@ public class StartCombatService {
             gheminaCommanderApplicable = true;
         } else {
             for (Player p3 : game.getRealPlayers()) {
-                if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, p3, Units.UnitType.Pds, Units.UnitType.Spacedock)
+                if (CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                game, p3, Units.UnitType.Pds, Units.UnitType.Spacedock)
                         .contains(tile)) {
                     gheminaCommanderApplicable = true;
                     break;

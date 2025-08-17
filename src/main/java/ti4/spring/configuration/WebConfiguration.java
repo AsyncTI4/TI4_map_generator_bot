@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import ti4.spring.service.auth.GameLockAndRequestContextInterceptor;
+import ti4.spring.auth.GameLockAndRequestContextInterceptor;
 
 @RequiredArgsConstructor
 @Configuration

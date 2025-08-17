@@ -68,6 +68,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.emoji.CardEmojis;
@@ -87,6 +88,7 @@ import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
 
 public class Helper {
@@ -287,7 +289,7 @@ public class Helper {
             return true;
         }
         if (player.hasAbility("mobile_command")
-                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship)
+                && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Flagship)
                         .isEmpty()) {
             return false;
         }
@@ -1594,7 +1596,7 @@ public class Helper {
                             productionValue = planet.getResources() + productionValue;
                         }
                     }
-                    if (ButtonHelper.isPlayerElected(game, player, "absol_minsindus")) {
+                    if (IsPlayerElectedService.isPlayerElected(game, player, "absol_minsindus")) {
                         productionValue += 4;
                     }
                 }
@@ -1862,7 +1864,8 @@ public class Helper {
         List<Button> unitButtons = new ArrayList<>();
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "saarcommander")) {
-            for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
+            for (Tile tile :
+                    CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)) {
                 if (tile.getPosition().equalsIgnoreCase(origTile.getPosition())
                         || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                     continue;

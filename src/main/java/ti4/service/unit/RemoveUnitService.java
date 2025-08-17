@@ -174,7 +174,7 @@ public class RemoveUnitService {
 
         if (unitHoldersToRemoveFrom.isEmpty()) {
             handleEmptyUnitHolders(event, tile, parsedUnit);
-            return List.of();
+            return Collections.emptyList();
         }
 
         int toRemoveCount = parsedUnit.getCount();

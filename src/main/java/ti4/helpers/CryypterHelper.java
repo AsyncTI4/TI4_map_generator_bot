@@ -35,6 +35,7 @@ import ti4.service.emoji.TechEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.unit.CheckUnitContainmentService;
 
 public class CryypterHelper {
     // Revised Politics SC
@@ -375,7 +376,7 @@ public class CryypterHelper {
                 if (key.contains("arborecenvoy") && committedWinner.contains(envoyPlayer)) {
                     String message = envoyPlayer.getRepresentationUnfogged()
                             + ", you have the Arborec Envoy to resolve. Choose the planet you wish to place an infantry on.";
-                    List<Tile> arboTiles = ButtonHelper.getTilesOfPlayersSpecificUnits(
+                    List<Tile> arboTiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(
                             game, envoyPlayer, UnitType.Mech, UnitType.Infantry);
                     Map<Planet, Integer> eligiblePlanets = new HashMap<>();
 

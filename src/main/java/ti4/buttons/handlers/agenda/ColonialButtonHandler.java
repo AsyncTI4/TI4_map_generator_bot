@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
-class ColonialButtonHelper {
+class ColonialButtonHandler {
 
     @ButtonHandler("colonialRedTarget_")
     public static void resolveColonialRedTarget(Game game, String buttonID, ButtonInteractionEvent event) {
