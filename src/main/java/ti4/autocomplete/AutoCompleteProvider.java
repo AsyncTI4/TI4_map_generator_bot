@@ -666,8 +666,7 @@ public class AutoCompleteProvider {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 String latestCommand;
-                if (game.isFowMode()) { // !event.getUser().getID().equals(activeMap.getGMID()); //TODO: Validate that
-                    // the user running the command is the FoW GM, if so, display command.
+                if (game.isFowMode() && !FoWHelper.isGameMaster(event.getUser().getId(), game)) {
                     latestCommand = "Game is Fog of War mode - last command is hidden.";
                 } else {
                     latestCommand = StringUtils.left(game.getLatestCommand(), 100);
@@ -677,8 +676,7 @@ public class AutoCompleteProvider {
             case Constants.UNDO_TO_COMMAND -> {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
-                if (game.isFowMode()
-                        && !game.getFogOfWarGMIDs().contains(event.getUser().getId())) {
+                if (game.isFowMode() && !FoWHelper.isGameMaster(event.getUser().getId(), game)) {
                     event.replyChoiceStrings("Game is Fog of War mode - you can't see what you are undoing.")
                             .queue();
                     return;

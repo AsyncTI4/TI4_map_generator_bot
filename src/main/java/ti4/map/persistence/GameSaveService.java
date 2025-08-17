@@ -604,10 +604,6 @@ class GameSaveService {
         writer.write(Constants.IMAGE_GEN_COUNT + " " + game.getMapImageGenerationCount());
         writer.write(System.lineSeparator());
 
-        game.getPlayersWithGMRole(); // init gmIds
-        writer.write(Constants.FOW_GM_IDS + " " + String.join(",", game.getFogOfWarGMIDs()));
-        writer.write(System.lineSeparator());
-
         writer.write(Constants.RUN_DATA_MIGRATIONS + " " + String.join(",", game.getRunMigrations()));
         writer.write(System.lineSeparator());
 

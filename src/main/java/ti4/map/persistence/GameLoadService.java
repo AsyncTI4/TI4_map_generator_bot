@@ -772,7 +772,6 @@ class GameLoadService {
                     } catch (Exception e) {
                     }
                 }
-                case Constants.FOW_GM_IDS -> game.setFogOfWarGMIDs(Helper.getListFromCSV(info));
                 case Constants.RUN_DATA_MIGRATIONS -> {
                     StringTokenizer migrationInfo = new StringTokenizer(info, ",");
 
