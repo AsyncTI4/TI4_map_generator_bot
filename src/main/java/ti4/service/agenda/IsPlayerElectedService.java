@@ -12,9 +12,8 @@ public class IsPlayerElectedService {
         if (player == null) {
             return false;
         }
-        if ("yes"
-                .equalsIgnoreCase(
-                        game.getStoredValue("lawsDisabled"))) { // TODO: we should move away from these and use fields.
+        // TODO: we should move away from these and use fields.
+        if ("yes".equalsIgnoreCase(game.getStoredValue("lawsDisabled"))) {
             return false;
         }
         return game.getLaws().keySet().stream()

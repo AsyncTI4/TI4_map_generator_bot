@@ -278,7 +278,6 @@ public class AsyncTI4DiscordBot {
         LogButtonRuntimeStatisticsCron.register();
         TechSummaryCron.register();
         SabotageAutoReactCron.register();
-        // AgendaPhaseAutoReactCron.register();  Disabled due to new afters/whens handling
         FastScFollowCron.register();
         CloseLaunchThreadsCron.register();
         InteractionLogCron.register();
