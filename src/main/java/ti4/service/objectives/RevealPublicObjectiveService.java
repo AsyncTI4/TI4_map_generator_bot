@@ -3,7 +3,6 @@ package ti4.service.objectives;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
