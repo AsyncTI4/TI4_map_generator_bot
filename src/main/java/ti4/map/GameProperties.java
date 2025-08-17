@@ -140,7 +140,6 @@ public class GameProperties {
     private @ExportableField String tableTalkChannelID;
     private @ExportableField String mainChannelID;
     private String savedChannelID;
-    private @ExportableField List<String> fogOfWarGMIDs = new ArrayList<>(1); // Game Masters
 
     // More complex objects below
     private @ExportableField String mapString;

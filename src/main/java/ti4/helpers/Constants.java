@@ -1308,7 +1308,6 @@ public class Constants {
     public static final String VOTC_MODE = "votc_mode";
     public static final String OPTIONS = "options";
     public static final String SHOW_FULL_TEXT = "show_full_text";
-    public static final String FOW_GM_IDS = "fogOfWarGMIDs";
     public static final String STARTED_DATE = "started_date";
     public static final String MODIFY_UNITS = "modify_units";
     public static final String SHOW_OWNED_PNS_IN_PLAYER_AREA = "show_owned_pns_in_player_area";

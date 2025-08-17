@@ -1152,19 +1152,20 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public User getUser() {
-        return AsyncTI4DiscordBot.jda.getUserById(getUserID());
+        // TODO: This is to handle JDA being null during tests. We should think of a cleaner solution.
+        return AsyncTI4DiscordBot.jda == null ? null : AsyncTI4DiscordBot.jda.getUserById(getUserID());
     }
 
     @Override
     public String getUserName() {
         User userById = getUser();
-        if (userById != null) {
-            Member member = AsyncTI4DiscordBot.guildPrimary.getMemberById(getUserID());
-            if (member != null) {
-                setUserName(member.getEffectiveName());
-            } else {
-                setUserName(userById.getName());
-            }
+        if (userById == null) return super.getUserName();
+
+        Member member = AsyncTI4DiscordBot.guildPrimary.getMemberById(getUserID());
+        if (member == null) {
+            setUserName(userById.getName());
+        } else {
+            setUserName(member.getEffectiveName());
         }
         return super.getUserName();
     }
