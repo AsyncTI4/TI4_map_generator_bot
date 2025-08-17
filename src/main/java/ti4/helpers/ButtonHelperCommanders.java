@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +43,7 @@ import ti4.service.planet.FlipTileService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.RemoveUnitService;
 
@@ -253,7 +254,7 @@ public class ButtonHelperCommanders {
     @ButtonHandler("yinCommanderStep1_")
     public static void yinCommanderStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Infantry)) {
+        for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Infantry)) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
                     buttons.add(Buttons.green(

@@ -1,4 +1,4 @@
-package ti4.spring.service.auth;
+package ti4.spring.auth;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

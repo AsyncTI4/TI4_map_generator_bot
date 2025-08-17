@@ -28,6 +28,7 @@ import ti4.model.ActionCardModel;
 import ti4.model.ExploreModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -1863,8 +1864,8 @@ public class ButtonHelperActionCards {
     }
 
     public static void checkForAssigningCoup(Game game, Player player) {
-        if (ButtonHelper.isPlayerElected(game, player, "censure")
-                || ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             return;
         }
         if (player.getActionCards().containsKey("coup")) {
@@ -1892,8 +1893,8 @@ public class ButtonHelperActionCards {
     }
 
     public static void checkForPlayingSummit(Game game, Player player) {
-        if (ButtonHelper.isPlayerElected(game, player, "censure")
-                || ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             return;
         }
         if (player.getActionCards().containsKey("summit")) {
@@ -1909,8 +1910,8 @@ public class ButtonHelperActionCards {
     }
 
     public static void checkForPlayingManipulateInvestments(Game game, Player player) {
-        if (ButtonHelper.isPlayerElected(game, player, "censure")
-                || ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             return;
         }
         if (player.getActionCards().containsKey("investments")) {
@@ -1981,8 +1982,8 @@ public class ButtonHelperActionCards {
     }
 
     public static void checkForAssigningPublicDisgrace(Game game, Player player) {
-        if (ButtonHelper.isPlayerElected(game, player, "censure")
-                || ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             return;
         }
         if (player.getActionCards().containsKey("disgrace")) {

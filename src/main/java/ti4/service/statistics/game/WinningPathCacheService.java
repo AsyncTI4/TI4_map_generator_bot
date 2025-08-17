@@ -35,7 +35,7 @@ public class WinningPathCacheService {
         });
     }
 
-    public static synchronized Map<String, Integer> getWinningPathCounts(int playerCount, int victoryPoints) {
+    static synchronized Map<String, Integer> getWinningPathCounts(int playerCount, int victoryPoints) {
         if (!hasBeenComputed) recomputeCache();
         Map<String, Integer> map = WINNING_PATH_CACHE.getIfPresent(new CacheKey(playerCount, victoryPoints));
         return map == null ? Map.of() : Map.copyOf(map);

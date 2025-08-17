@@ -51,6 +51,7 @@ import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 
 @UtilityClass
@@ -819,7 +820,8 @@ public class CombatRollService {
                             + ", with _Plasma Scoring_ applying to the last die. You can specify any order before rolling though.";
                     for (int x = 0; x < totalHits; x++) {
                         List<Button> buttons = new ArrayList<>();
-                        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Pds)) {
+                        for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                game, player, UnitType.Pds)) {
                             for (String planet : ButtonHelper.getPlanetsWithSpecificUnit(player, tile, "pds")) {
                                 Planet planetUnit = game.getUnitHolderFromPlanet(planet);
                                 if (planetUnit == null) {

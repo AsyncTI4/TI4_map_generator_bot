@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ti4.spring.auth.RequestContext;
 import ti4.spring.service.ActionCardDeckService;
-import ti4.spring.service.auth.RequestContext;
 
 @RequiredArgsConstructor
 @RestController

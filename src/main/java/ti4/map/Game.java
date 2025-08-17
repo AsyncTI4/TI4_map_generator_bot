@@ -93,6 +93,7 @@ import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -2088,7 +2089,7 @@ public class Game extends GameProperties {
         if (!id.isEmpty()) {
             if ("warrant".equalsIgnoreCase(id)) {
                 for (Player p2 : getRealPlayers()) {
-                    if (ButtonHelper.isPlayerElected(this, p2, id)) {
+                    if (IsPlayerElectedService.isPlayerElected(this, p2, id)) {
                         p2.setSearchWarrant(false);
                     }
                 }
@@ -2236,7 +2237,7 @@ public class Game extends GameProperties {
         }
         if ("warrant".equalsIgnoreCase(id)) {
             for (Player p2 : getRealPlayers()) {
-                if (ButtonHelper.isPlayerElected(this, p2, id)) {
+                if (IsPlayerElectedService.isPlayerElected(this, p2, id)) {
                     p2.setSearchWarrant(false);
                 }
             }
@@ -2264,7 +2265,7 @@ public class Game extends GameProperties {
             }
             if ("warrant".equalsIgnoreCase(id)) {
                 for (Player p2 : getRealPlayers()) {
-                    if (ButtonHelper.isPlayerElected(this, p2, id)) {
+                    if (IsPlayerElectedService.isPlayerElected(this, p2, id)) {
                         p2.setSearchWarrant(false);
                     }
                 }

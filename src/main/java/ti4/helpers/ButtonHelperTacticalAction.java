@@ -20,6 +20,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -29,6 +30,7 @@ import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.settings.users.UserSettingsManager;
 
 public class ButtonHelperTacticalAction {
@@ -117,7 +119,7 @@ public class ButtonHelperTacticalAction {
                     + UnitEmojis.fighter + "/" + UnitEmojis.infantry + " that don't count towards PRODUCTION limit.\n";
         }
         if (Helper.getProductionValue(player, game, game.getTileByPosition(pos), false) > 0
-                && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
+                && IsPlayerElectedService.isPlayerElected(game, player, "prophecy")) {
             message3 +=
                     "Reminder that you have _Prophecy of Ixth_ and should produce at least 2 fighters if you wish to keep it. Its removal is not automated.\n";
         }
@@ -402,7 +404,7 @@ public class ButtonHelperTacticalAction {
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Activated "
                         + tile.getRepresentationForButtons(game, player) + ".");
         if (game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")
-                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
                         .contains(tile)) {
             List<Button> buttons = new ArrayList<>();
             Button getCommButton = Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm);

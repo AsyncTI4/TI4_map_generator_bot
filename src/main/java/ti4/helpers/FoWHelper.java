@@ -33,6 +33,7 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.game.GameNameService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.unit.CheckUnitContainmentService;
 
 public class FoWHelper {
 
@@ -802,8 +803,8 @@ public class FoWHelper {
             }
             if (p2.hasAbility("decree") && tile.isAnomaly(game)) {
                 List<Tile> tiles = new ArrayList<>();
-                tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Infantry));
-                tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Mech));
+                tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Infantry));
+                tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Mech));
                 if (tiles.contains(tile)) {
                     return true;
                 }

@@ -49,6 +49,7 @@ import ti4.model.ExploreModel;
 import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
 import ti4.service.PlanetService;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -499,14 +500,14 @@ public class ExploreService {
                         game.clearPlanetsCache();
                         message = "Mirage added to map, added to your play area, readied, and explored!";
                         if (!game.isFowMode()
-                                && game.getRevealedPublicObjectives().keySet().contains("deep_space")
+                                && game.getRevealedPublicObjectives().containsKey("deep_space")
                                 && !game.didPlayerScoreThisAlready(player.getUserID(), "deep_space")) {
                             DisasterWatchHelper.sendMessageInDisasterWatch(
                                     game,
                                     player.getRepresentation() + " is attempting to _Expore Deep Space_ in "
                                             + game.getName() + ". Alas, alack, they have discovered Mirage!");
                         } else if (!game.isFowMode()
-                                && game.getRevealedPublicObjectives().keySet().contains("vast_territories")
+                                && game.getRevealedPublicObjectives().containsKey("vast_territories")
                                 && !game.didPlayerScoreThisAlready(player.getUserID(), "vast_territories")) {
                             DisasterWatchHelper.sendMessageInDisasterWatch(
                                     game,
@@ -663,7 +664,7 @@ public class ExploreService {
                             saarButton);
                 }
 
-                if (ButtonHelper.isPlayerElected(game, player, "minister_exploration")) {
+                if (IsPlayerElectedService.isPlayerElected(game, player, "minister_exploration")) {
                     String fac = player.getFactionEmoji();
                     message = fac + " gained 1 trade good from _Minister of Exploration_ " + player.gainTG(1)
                             + ". You do have this trade good prior to exploring.";
@@ -975,7 +976,7 @@ public class ExploreService {
             }
             case "ancientshipyard" -> {
                 List<String> colors = tile == null
-                        ? List.of()
+                        ? Collections.emptyList()
                         : tile.getUnitHolders().get("space").getUnitColorsOnHolder();
                 if (colors.isEmpty() || colors.contains(player.getColorID())) {
                     AddUnitService.addUnits(event, tile, game, player.getColor(), "cruiser");
