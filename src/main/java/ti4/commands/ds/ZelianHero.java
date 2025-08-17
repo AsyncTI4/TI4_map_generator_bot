@@ -83,7 +83,8 @@ class ZelianHero extends GameStateSubcommand {
         game.setTile(asteroidTile);
 
         // After shot to disaster channel
-        String message2 = tile.getRepresentation() + " has been celestially impacted by " + player.getRepresentation();
+        String message2 =
+                tile.getRepresentation() + " has been _Celestial Impact_'d by " + player.getRepresentation() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, asteroidTile, 1, message2);
 
         if (player.hasLeaderUnlocked("zelianhero")) {
