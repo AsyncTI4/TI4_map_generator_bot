@@ -747,7 +747,6 @@ public class Game extends GameProperties {
                 setTableTalkChannelID(tableTalkChannel.getId());
                 return tableTalkChannel;
             }
-            // BotLogger.log("Could not retrieve TableTalkChannel for " + getName(), e);
         }
         return null;
     }
@@ -3613,14 +3612,12 @@ public class Game extends GameProperties {
         if (getGuild() == null) return Collections.emptyList();
         List<Role> roles = getGuild().getRolesByName(getName() + " GM", true);
         Role gmRole = roles.isEmpty() ? null : roles.getFirst();
-        List<Player> gmPlayers = players.values().stream()
+        return players.values().stream()
                 .filter(player -> {
                     Member user = getGuild().getMemberById(player.getUserID());
                     return user != null && user.getRoles().contains(gmRole);
                 })
                 .toList();
-        setFogOfWarGMIDs(gmPlayers.stream().map(Player::getUserID).toList()); // For @ExportableField (Website)
-        return gmPlayers;
     }
 
     @JsonIgnore
