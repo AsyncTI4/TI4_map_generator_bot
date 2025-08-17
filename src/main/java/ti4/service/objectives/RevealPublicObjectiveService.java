@@ -3,6 +3,7 @@ package ti4.service.objectives;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -38,7 +39,7 @@ public class RevealPublicObjectiveService {
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         RelicHelper.offerInitialNeuraLoopChoice(game, objective.getKey());
-        var channel = event.getMessageChannel();
+        var channel = game.getActionsChannel();
         if (game.isLiberationC4Mode()) {
             if (game.getRevealedPublicObjectives().get("Control Ordinian") == null
                     || game.getRevealedPublicObjectives().get("Control Ordinian") == 0) {
@@ -162,7 +163,7 @@ public class RevealPublicObjectiveService {
             objective = game.revealStage1();
         }
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-        var channel = event.getMessageChannel();
+        var channel = game.getActionsChannel();
         MessageHelper.sendMessageToChannel(
                 channel, "### " + game.getPing() + ", a stage 1 public objective has been revealed.");
         channel.sendMessageEmbeds(po.getRepresentationEmbed())
@@ -211,7 +212,7 @@ public class RevealPublicObjectiveService {
 
         PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());
-        var channel = game.getMainGameChannel();
+        var channel = game.getActionsChannel();
         if (game.isLiberationC4Mode()) {
             MessageHelper.sendMessageToChannel(
                     channel,
