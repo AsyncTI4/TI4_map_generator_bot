@@ -81,7 +81,7 @@ public class DrawSecretService {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 count + " " + CardEmojis.SecretObjective + " dealt to all players. Check your `#cards-info` threads.");
-        if (game.getRound() == 1 && !game.isFowMode()) {
+        if (game.getRound() == 1) {
             String message = "Here are the quick reference cards for the factions in this game.";
             List<FileUpload> files = new ArrayList<>();
             for (Player player : game.getRealPlayers()) {
@@ -93,7 +93,7 @@ public class DrawSecretService {
                     files.add(FileUploadService.createFileUpload(ImageHelper.read(path), player.getFaction() + "_ref"));
                 }
             }
-            if (!files.isEmpty() && files.size() <= 10) {
+            if (!files.isEmpty() && files.size() <= 10 && !game.isFowMode()) {
                 message +=
                         "\n-# A reminder that these reference cards are general overviews, and not specific mechanical text.";
                 MessageHelper.sendMessageWithFiles(game.getActionsChannel(), files, message, true, false);
