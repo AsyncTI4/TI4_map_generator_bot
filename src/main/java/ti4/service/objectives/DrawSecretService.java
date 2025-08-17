@@ -81,7 +81,7 @@ public class DrawSecretService {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 count + " " + CardEmojis.SecretObjective + " dealt to all players. Check your `#cards-info` threads.");
-        if (game.getRound() == 1) {
+        if (game.getRound() == 1 && !game.isFowMode()) {
             String message = "Here are the quick reference cards for the factions in this game.";
             List<FileUpload> files = new ArrayList<>();
             for (Player player : game.getRealPlayers()) {
