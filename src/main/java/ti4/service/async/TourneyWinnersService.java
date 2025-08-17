@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
 import org.jetbrains.annotations.NotNull;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.json.PersistenceManager;
 import ti4.message.BotLogger;
 
@@ -42,7 +42,7 @@ public class TourneyWinnersService {
     public static String tournamentWinnersOutputString() {
         StringBuilder sb = new StringBuilder("__**All Async TI4 Tournament Winners:**__");
         for (TournamentWinner w : readWinnerList()) {
-            User winner = AsyncTI4DiscordBot.jda.getUserById(w.getId());
+            User winner = JdaService.jda.getUserById(w.getId());
             String name = winner != null ? winner.getEffectiveName() : w.getName();
             sb.append("\n> ").append(name).append(" won ").append(w.getTourneyName());
         }

@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -92,7 +92,7 @@ class ListDeadGames extends Subcommand {
         boolean warned = false;
         int channelCount = 0;
 
-        if (AsyncTI4DiscordBot.getAvailablePBDCategories().contains(actionsChannel.getParentCategory())
+        if (JdaService.getAvailablePBDCategories().contains(actionsChannel.getParentCategory())
                 && actionsChannel.getParentCategory() != null
                 && !actionsChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
             sb.append(actionsChannel.getJumpUrl()).append("\n");
@@ -108,7 +108,7 @@ class ListDeadGames extends Subcommand {
 
         var tableTalkChannel = game.getTableTalkChannel();
         if (tableTalkChannel != null
-                && AsyncTI4DiscordBot.getAvailablePBDCategories().contains(tableTalkChannel.getParentCategory())
+                && JdaService.getAvailablePBDCategories().contains(tableTalkChannel.getParentCategory())
                 && tableTalkChannel.getParentCategory() != null
                 && !tableTalkChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
             if (tableTalkChannel.getName().contains(game.getName() + "-")) {

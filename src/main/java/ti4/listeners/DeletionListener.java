@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -22,17 +22,17 @@ public class DeletionListener extends ListenerAdapter {
     }
 
     private static boolean validateEvent(MessageDeleteEvent event) {
-        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
+        if (!JdaService.isReadyToReceiveCommands()) {
             return false;
         }
         String eventGuild = event.getGuild().getId();
-        return AsyncTI4DiscordBot.isValidGuild(eventGuild);
+        return JdaService.isValidGuild(eventGuild);
     }
 
     private void handleMessageDelete(MessageDeleteEvent event) {
         try {
             TextChannel deletionLogChannel =
-                    AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
+                    JdaService.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
                             .findFirst()
                             .orElse(null);
             if (deletionLogChannel == null) return;

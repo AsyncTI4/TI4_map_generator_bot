@@ -24,7 +24,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -166,7 +166,7 @@ class PlayerAreaGenerator {
 
         // Player/Teammate Names
         for (String teammateID : teammateIDs) {
-            User user = AsyncTI4DiscordBot.jda.getUserById(teammateID);
+            User user = JdaService.jda.getUserById(teammateID);
 
             int leftJustified = x;
             int topOfName = y + 10;
@@ -176,7 +176,7 @@ class PlayerAreaGenerator {
                 Guild guild = game.getGuild();
                 Member member = guild != null ? guild.getMemberById(teammateID) : null;
                 if (member == null) {
-                    member = AsyncTI4DiscordBot.guildPrimary.getMemberById(teammateID);
+                    member = JdaService.guildPrimary.getMemberById(teammateID);
                 }
                 userName.append(" ");
 

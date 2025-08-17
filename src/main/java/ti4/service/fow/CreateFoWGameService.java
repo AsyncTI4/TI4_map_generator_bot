@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import org.apache.commons.lang3.StringUtils;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.ResourceHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -275,7 +275,7 @@ public class CreateFoWGameService {
     }
 
     private static ArrayList<Integer> getAllExistingFOWNumbers() {
-        List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
+        List<Guild> guilds = JdaService.jda.getGuilds();
         ArrayList<Integer> fowNumbers = new ArrayList<>();
 
         // GET ALL FOW ROLES FROM ALL GUILDS
@@ -362,7 +362,7 @@ public class CreateFoWGameService {
             return eventGuild;
         }
 
-        for (Guild fowGuild : AsyncTI4DiscordBot.fowServers) {
+        for (Guild fowGuild : JdaService.fowServers) {
             if (fowGuild != eventGuild && serverCanHostNewGame(fowGuild, playerCount)) {
                 return fowGuild;
             }

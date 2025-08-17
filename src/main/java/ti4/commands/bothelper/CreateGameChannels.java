@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -71,7 +71,7 @@ class CreateGameChannels extends Subcommand {
         String categoryChannelName = event.getOption(Constants.CATEGORY, null, OptionMapping::getAsString);
         Category categoryChannel = null;
         if (categoryChannelName != null && !categoryChannelName.isEmpty()) {
-            List<Category> categoriesWithName = AsyncTI4DiscordBot.jda.getCategoriesByName(categoryChannelName, false);
+            List<Category> categoriesWithName = JdaService.jda.getCategoriesByName(categoryChannelName, false);
             if (categoriesWithName.size() > 1) {
                 MessageHelper.sendMessageToEventChannel(event, "Too many categories with this name!!");
                 return;
@@ -79,7 +79,7 @@ class CreateGameChannels extends Subcommand {
                 MessageHelper.sendMessageToEventChannel(event, "Category not found");
                 return;
             } else {
-                categoryChannel = AsyncTI4DiscordBot.jda
+                categoryChannel = JdaService.jda
                         .getCategoriesByName(categoryChannelName, false)
                         .getFirst();
             }

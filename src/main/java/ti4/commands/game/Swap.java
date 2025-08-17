@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -31,7 +31,7 @@ class Swap extends GameStateSubcommand {
         User callerUser = event.getUser();
         Game game = getGame();
         Collection<Player> players = game.getPlayers().values();
-        boolean isAdmin = CommandHelper.hasRole(event, AsyncTI4DiscordBot.adminRoles);
+        boolean isAdmin = CommandHelper.hasRole(event, JdaService.adminRoles);
         if (players.stream().noneMatch(player -> player.getUserID().equals(callerUser.getId())) && !isAdmin) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Only game players can swap with a player.");
             return;

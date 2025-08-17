@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.apache.commons.lang3.StringUtils;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -85,7 +85,7 @@ public class TIGLHelper {
         }
 
         public Role getRole() {
-            List<Role> roles = AsyncTI4DiscordBot.guildPrimary.getRolesByName(name, false);
+            List<Role> roles = JdaService.guildPrimary.getRolesByName(name, false);
             if (roles.isEmpty()) {
                 return null;
             }
@@ -135,7 +135,7 @@ public class TIGLHelper {
             BotLogger.warning("TIGLHelper.validateTIGLness: missing thread: `" + TIGL_ADMIN_THREAD + "`");
             tiglProblem = true;
         }
-        if (!AsyncTI4DiscordBot.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) {
+        if (!JdaService.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) {
             return tiglProblem;
         }
         for (TIGLRank rank : TIGLRank.values()) {
@@ -219,7 +219,7 @@ public class TIGLHelper {
     }
 
     private static List<TIGLRank> getUsersTIGLRanks(User user) {
-        Member hubMember = AsyncTI4DiscordBot.guildPrimary.getMemberById(user.getId());
+        Member hubMember = JdaService.guildPrimary.getMemberById(user.getId());
         if (hubMember == null) {
             return new ArrayList<>();
         }
@@ -241,7 +241,7 @@ public class TIGLHelper {
 
     private static boolean allUsersAreMembersOfHubServer(List<User> users) {
         for (User user : users) {
-            Member hubMember = AsyncTI4DiscordBot.guildPrimary.getMemberById(user.getId());
+            Member hubMember = JdaService.guildPrimary.getMemberById(user.getId());
             if (hubMember == null) {
                 return false;
             }
@@ -252,10 +252,10 @@ public class TIGLHelper {
     private static void promoteUser(User user, TIGLRank toRank) {
         TIGLRank currentRank = getUsersHighestTIGLRank(user);
         if (toRank.getIndex() - currentRank.getIndex() == 1) {
-            AsyncTI4DiscordBot.guildPrimary
+            JdaService.guildPrimary
                     .addRoleToMember(user, toRank.getRole())
                     .queue();
-            // AsyncTI4DiscordBot.guildPrimary.removeRoleFromMember(user, currentRank.getRole()).queueAfter(5,
+            // JdaService.guildPrimary.removeRoleFromMember(user, currentRank.getRole()).queueAfter(5,
             // TimeUnit.SECONDS);
         }
         String message = user.getAsMention() + " has been promoted to **"
@@ -272,7 +272,7 @@ public class TIGLHelper {
         Role heroRole = heroRank.getRole();
         StringBuilder sb = new StringBuilder(user.getAsMention());
         sb.append(" has taken ").append(heroRole.getAsMention());
-        List<Member> membersWithRole = AsyncTI4DiscordBot.guildPrimary.getMembersWithRoles(heroRole);
+        List<Member> membersWithRole = JdaService.guildPrimary.getMembersWithRoles(heroRole);
         if (membersWithRole.isEmpty()) {
             sb.append("!");
         } else {
@@ -280,11 +280,11 @@ public class TIGLHelper {
         }
         for (Member member : membersWithRole) {
             sb.append(member.getAsMention());
-            AsyncTI4DiscordBot.guildPrimary
+            JdaService.guildPrimary
                     .removeRoleFromMember(member, heroRank.getRole())
                     .queueAfter(10, TimeUnit.SECONDS);
         }
-        AsyncTI4DiscordBot.guildPrimary
+        JdaService.guildPrimary
                 .addRoleToMember(user, heroRank.getRole())
                 .queue();
         MessageHelper.sendMessageToChannel(
@@ -311,7 +311,7 @@ public class TIGLHelper {
     }
 
     private static TextChannel getTIGLChannel() {
-        List<TextChannel> channels = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName(TIGL_CHANNEL_NAME, false);
+        List<TextChannel> channels = JdaService.guildPrimary.getTextChannelsByName(TIGL_CHANNEL_NAME, false);
         if (channels.isEmpty()) {
             return null;
         } else if (channels.size() > 1) {

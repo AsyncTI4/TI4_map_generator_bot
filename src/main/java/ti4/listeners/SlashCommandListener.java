@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.executors.ExecutorServiceManager;
@@ -26,7 +26,7 @@ public class SlashCommandListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
-        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()
+        if (!JdaService.isReadyToReceiveCommands()
                 && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
             event.getInteraction()
                     .reply("Please try again in a moment.\nThe bot is rebooting and is not ready to receive commands.")

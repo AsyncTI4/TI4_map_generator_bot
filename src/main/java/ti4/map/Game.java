@@ -46,7 +46,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftItem;
@@ -734,10 +734,10 @@ public class Game extends GameProperties {
     @Nullable
     public TextChannel getTableTalkChannel() {
         try {
-            return AsyncTI4DiscordBot.jda.getTextChannelById(getTableTalkChannelID());
+            return JdaService.jda.getTextChannelById(getTableTalkChannelID());
         } catch (Exception e) {
             TextChannel tableTalkChannel;
-            List<TextChannel> gameChannels = AsyncTI4DiscordBot.jda.getTextChannels().stream()
+            List<TextChannel> gameChannels = JdaService.jda.getTextChannels().stream()
                     .filter(c -> c.getName().startsWith(getName()))
                     .filter(not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
                     .toList();
@@ -754,10 +754,10 @@ public class Game extends GameProperties {
     @JsonIgnore
     public TextChannel getMainGameChannel() {
         try {
-            return AsyncTI4DiscordBot.jda.getTextChannelById(getMainChannelID());
+            return JdaService.jda.getTextChannelById(getMainChannelID());
         } catch (Exception e) {
             List<TextChannel> gameChannels =
-                    AsyncTI4DiscordBot.jda.getTextChannelsByName(getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
+                    JdaService.jda.getTextChannelsByName(getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
             if (gameChannels.size() == 1) {
                 TextChannel mainGameChannel = gameChannels.getFirst();
                 setMainChannelID(mainGameChannel.getId());
@@ -771,7 +771,7 @@ public class Game extends GameProperties {
     @JsonIgnore
     public TextChannel getSavedChannel() {
         try {
-            return AsyncTI4DiscordBot.jda.getTextChannelById(getSavedChannelID());
+            return JdaService.jda.getTextChannelById(getSavedChannelID());
         } catch (Exception e) {
             return getMainGameChannel();
         }
@@ -790,7 +790,7 @@ public class Game extends GameProperties {
 
         // FIND BY ID
         if (StringUtils.isNumeric(getBotMapUpdatesThreadID())) {
-            ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(getBotMapUpdatesThreadID());
+            ThreadChannel threadChannel = JdaService.jda.getThreadChannelById(getBotMapUpdatesThreadID());
             if (threadChannel != null) {
                 return threadChannel;
             }
@@ -798,7 +798,7 @@ public class Game extends GameProperties {
 
         // FIND BY NAME
         List<ThreadChannel> botChannels =
-                AsyncTI4DiscordBot.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
+                JdaService.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
         if (botChannels.size() == 1) {
             return botChannels.getFirst();
         } else if (botChannels.size() > 1) {
@@ -828,7 +828,7 @@ public class Game extends GameProperties {
 
     public ThreadChannel getLaunchPostThread() {
         if (StringUtils.isNumeric(getLaunchPostThreadID())) {
-            return AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(getLaunchPostThreadID());
+            return JdaService.guildPrimary.getThreadChannelById(getLaunchPostThreadID());
         }
         return null;
     }
@@ -3493,7 +3493,7 @@ public class Game extends GameProperties {
         }
         StringBuilder sb = new StringBuilder(getName()).append(" ");
         for (String playerID : getPlayerIDs()) {
-            User user = AsyncTI4DiscordBot.jda.getUserById(playerID);
+            User user = JdaService.jda.getUserById(playerID);
             if (user != null) sb.append(user.getAsMention()).append(" ");
         }
         return sb.toString();

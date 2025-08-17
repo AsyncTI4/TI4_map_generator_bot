@@ -6,7 +6,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
@@ -22,7 +22,7 @@ public class GameLaunchThreadHelper {
         if (!ButtonHelper.isNumeric(threadID)) {
             return;
         }
-        ThreadChannel threadChannel = AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(threadID);
+        ThreadChannel threadChannel = JdaService.guildPrimary.getThreadChannelById(threadID);
         if (threadChannel == null) {
             return;
         }
