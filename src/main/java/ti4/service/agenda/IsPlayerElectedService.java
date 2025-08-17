@@ -12,16 +12,17 @@ public class IsPlayerElectedService {
         if (player == null) {
             return false;
         }
-        if ("yes"
-                .equalsIgnoreCase(
-                        game.getStoredValue("lawsDisabled"))) { // TODO: we should move away from these and use fields.
+        // TODO: we should move away from these and use fields.
+        if ("yes".equalsIgnoreCase(game.getStoredValue("lawsDisabled"))) {
             return false;
         }
         return game.getLaws().keySet().stream()
                 .filter(currentLawId -> currentLawId.equalsIgnoreCase(lawId))
                 .map(currentLawId -> game.getLawsInfo().get(currentLawId))
                 .filter(Objects::nonNull)
-                .anyMatch(lawInfo ->
-                        lawInfo.equalsIgnoreCase(player.getFaction()) || lawInfo.equalsIgnoreCase(player.getColor()));
+                .findFirst()
+                .filter(lawInfo ->
+                        lawInfo.equalsIgnoreCase(player.getFaction()) || lawInfo.equalsIgnoreCase(player.getColor()))
+                .isPresent();
     }
 }
