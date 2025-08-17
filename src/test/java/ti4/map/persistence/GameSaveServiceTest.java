@@ -1,16 +1,15 @@
 package ti4.map.persistence;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.api.Test;
-
 import ti4.map.Game;
 import ti4.testUtils.BaseTi4Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class GameSaveServiceTest extends BaseTi4Test {
 
     @Test
-    void shouldSaveAndReloadGame() throws Exception {
+    void shouldSaveAndReloadGame() {
         Game game = GameTestHelper.loadGame();
         game.setLatestOutcomeVotedFor("testOutcome");
 
