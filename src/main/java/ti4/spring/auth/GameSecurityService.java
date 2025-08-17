@@ -1,4 +1,4 @@
-package ti4.spring.service.auth;
+package ti4.spring.auth;
 
 import org.springframework.stereotype.Component;
 import ti4.map.persistence.GameManager;

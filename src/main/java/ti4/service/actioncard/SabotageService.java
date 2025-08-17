@@ -1,10 +1,11 @@
 package ti4.service.actioncard;
 
 import lombok.experimental.UtilityClass;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
 public class SabotageService {
@@ -13,18 +14,19 @@ public class SabotageService {
         if (player.isNpc()) {
             return false;
         }
+
         if (player.hasTechReady("it") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))) {
             return true;
         }
 
         if (player.hasUnit("empyrean_mech")
-                && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Mech)
+                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Mech)
                         .isEmpty()) {
             return true;
         }
 
-        if (ButtonHelper.isPlayerElected(game, player, "censure")
-                || ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             return false;
         }
 
@@ -51,7 +53,7 @@ public class SabotageService {
         }
 
         if (player.hasUnit("empyrean_mech")
-                && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Mech)
+                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Mech)
                         .isEmpty()) {
             return true;
         }
@@ -59,8 +61,8 @@ public class SabotageService {
         boolean bigAcDeckGame =
                 (game.getActionCardDeckSize() + game.getDiscardActionCards().size()) > 180;
         return (bigAcDeckGame || playerHasSabotage(player))
-                && !ButtonHelper.isPlayerElected(game, player, "censure")
-                && !ButtonHelper.isPlayerElected(game, player, "absol_censure");
+                && !IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                && !IsPlayerElectedService.isPlayerElected(game, player, "absol_censure");
     }
 
     private static boolean playerHasSabotage(Player player) {

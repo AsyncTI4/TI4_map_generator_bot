@@ -1,8 +1,8 @@
 package ti4.spring.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ti4.map.Game;
@@ -18,13 +18,13 @@ public class MyGamesService {
 
     public List<MyGameSummary> getMyGames(String userId) {
         ManagedPlayer managedPlayer = GameManager.getManagedPlayer(userId);
-        if (managedPlayer == null) return List.of();
+        if (managedPlayer == null) return Collections.emptyList();
 
         return managedPlayer.getGames().stream()
                 .filter(ManagedGame::isActive)
                 .map(game -> toSummary(game, userId))
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private MyGameSummary toSummary(ManagedGame managedGame, String userId) {

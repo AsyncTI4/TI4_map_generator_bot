@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.Data;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -26,6 +25,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.agenda.IsPlayerElectedService;
 
 public class PlayerStatsDashboardPayload {
 
@@ -118,7 +118,7 @@ public class PlayerStatsDashboardPayload {
 
     public List<String> getLaws() {
         return game.getLaws().keySet().stream()
-                .filter(lawId -> ButtonHelper.isPlayerElected(game, player, lawId))
+                .filter(lawId -> IsPlayerElectedService.isPlayerElected(game, player, lawId))
                 .map(Mapper::getAgenda)
                 .filter(Objects::nonNull)
                 .map(AgendaModel::getName)

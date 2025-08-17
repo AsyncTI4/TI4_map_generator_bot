@@ -232,7 +232,7 @@ public class DestroyUnitService {
             UnitModel uni = player.getUnitFromUnitKey(unit.unitKey());
             if (uni != null && uni.getIsShip()) {
                 if (player.hasUnit("ghoti_flagship")
-                        || ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                        || CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
                                 .contains(player.getHomeSystemTile())) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green(

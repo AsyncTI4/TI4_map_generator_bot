@@ -60,6 +60,7 @@ import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.async.DrumrollService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
@@ -75,6 +76,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 
 public class AgendaHelper {
@@ -398,7 +400,7 @@ public class AgendaHelper {
         if (player.hasTechReady("dsedyng")) {
             names.add("Unity Algorithm");
         }
-        // if (ButtonHelper.isPlayerElected(player.getGame(), player, "committee")) {
+        // if (IsPlayerElectedService.isPlayerElected(player.getGame(), player, "committee")) {
         //     names.add("Committee Formation (technically resolves after all afters)");
         // }
         return names;
@@ -453,7 +455,7 @@ public class AgendaHelper {
         if (player.hasTechReady("dsedyng")) {
             buttons.add(Buttons.red("queueAfter_tech_dsedyng", "Unity Algorithm"));
         }
-        // if (ButtonHelper.isPlayerElected(player.getGame(), player, "committee")) {
+        // if (IsPlayerElectedService.isPlayerElected(player.getGame(), player, "committee")) {
         //     buttons.add(Buttons.red("queueAfter_agenda_committee", "Committee Formation"));
         // }
         CryypterHelper.addVotCRiderQueueButtons(player, buttons);
@@ -1858,7 +1860,8 @@ public class AgendaHelper {
                 afterButtons.add(Buttons.gray(
                         finChecker + "play_after_Edyn Unity Algorithm", "Use Unity Algorithm", FactionEmojis.edyn));
             }
-            if (game.getCurrentAgendaInfo().contains("Player") && ButtonHelper.isPlayerElected(game, p1, "committee")) {
+            if (game.getCurrentAgendaInfo().contains("Player")
+                    && IsPlayerElectedService.isPlayerElected(game, p1, "committee")) {
                 afterButtons.add(Buttons.gray(
                         finChecker + "autoresolve_manualcommittee", "Use Committee Formation", CardEmojis.Agenda));
             }
@@ -1871,7 +1874,7 @@ public class AgendaHelper {
 
     public static void ministerOfIndustryCheck(
             Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
-        if (ButtonHelper.isPlayerElected(game, player, "minister_industry")) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "minister_industry")) {
             String msg = player.getRepresentationUnfogged()
                     + "since you have _Minister of Industry_, you may build in tile "
                     + tile.getRepresentationForButtons(game, player) + ". You have "
@@ -2274,8 +2277,8 @@ public class AgendaHelper {
                             String message = identity
                                     + ", you have an _Armament Rider_ to resolve. Please choose the system in which you wish to produce 2 units each with cost 4 or less.";
 
-                            List<Tile> tiles =
-                                    ButtonHelper.getTilesOfPlayersSpecificUnits(game, winningR, UnitType.Spacedock);
+                            List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                    game, winningR, UnitType.Spacedock);
                             List<Button> buttons = new ArrayList<>();
                             for (Tile tile : tiles) {
                                 Button starTile = Buttons.green(
@@ -2302,8 +2305,8 @@ public class AgendaHelper {
                             RelicHelper.drawRelicAndNotify(winningR, event, game);
                         }
                         if (specificVote.contains("Radiance")) {
-                            List<Tile> tiles =
-                                    ButtonHelper.getTilesOfPlayersSpecificUnits(game, winningR, UnitType.Mech);
+                            List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                    game, winningR, UnitType.Mech);
                             ButtonHelperFactionSpecific.resolveEdynAgendaStuffStep1(winningR, game, tiles);
                         }
                         if (specificVote.contains("Atokera Commander")) {
@@ -2692,7 +2695,7 @@ public class AgendaHelper {
                                 + " Any \"when\"s or \"after\"s that you queue will be automatically cancelled if it is played by another player.");
             }
             if (game.getCurrentAgendaInfo().contains("Player")
-                    && ButtonHelper.isPlayerElected(game, player, "committee")) {
+                    && IsPlayerElectedService.isPlayerElected(game, player, "committee")) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("presetCommitteeFormation", "Preset Committee Formation"));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
