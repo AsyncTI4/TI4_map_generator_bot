@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.persistence.GameManager;
@@ -36,7 +36,7 @@ class ServerGameStats extends Subcommand {
         int hostedGames = 0;
         int roomForGames = 0;
 
-        List<Guild> guilds = AsyncTI4DiscordBot.guilds.stream()
+        List<Guild> guilds = JdaService.guilds.stream()
                 .filter(g -> !skipGuilds.contains(g.getId()))
                 .sorted(Comparator.comparing(Guild::getIdLong)) // Sort by creation date
                 .toList();

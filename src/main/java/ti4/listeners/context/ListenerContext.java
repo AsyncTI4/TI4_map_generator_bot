@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.commands.CommandHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -103,7 +103,7 @@ public abstract class ListenerContext {
         }
 
         actionsChannel = null;
-        for (TextChannel textChannel_ : AsyncTI4DiscordBot.jda.getTextChannels()) {
+        for (TextChannel textChannel_ : JdaService.jda.getTextChannels()) {
             if (textChannel_.getName().equals(gameName + Constants.ACTIONS_CHANNEL_SUFFIX)) {
                 actionsChannel = textChannel_;
                 break;

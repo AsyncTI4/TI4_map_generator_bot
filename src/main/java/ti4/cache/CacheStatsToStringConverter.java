@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.helpers.ToStringHelper;
 
 @UtilityClass
@@ -44,7 +44,7 @@ public class CacheStatsToStringConverter {
     }
 
     private static String getLiveTime() {
-        long millisecondsSinceBotStarted = System.currentTimeMillis() - AsyncTI4DiscordBot.START_TIME_MILLISECONDS;
+        long millisecondsSinceBotStarted = System.currentTimeMillis() - JdaService.START_TIME_MILLISECONDS;
         long liveTimeHours = TimeUnit.HOURS.convert(millisecondsSinceBotStarted, TimeUnit.MILLISECONDS);
         long liveTimeMinutes =
                 TimeUnit.MINUTES.convert(millisecondsSinceBotStarted, TimeUnit.MILLISECONDS) - liveTimeHours * 60;

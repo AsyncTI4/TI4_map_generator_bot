@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.sticker.Sticker;
 import org.apache.commons.lang3.StringUtils;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.helpers.Stickers;
 import ti4.image.TileHelper;
 import ti4.image.UnitTokenPosition;
@@ -253,7 +253,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (ident == -1) {
             cachedStickerUrl = getEmojiURL();
         } else {
-            cachedStickerUrl = AsyncTI4DiscordBot.jda
+            cachedStickerUrl = JdaService.jda
                     .retrieveSticker(Sticker.fromId(ident))
                     .complete()
                     .getIconUrl();

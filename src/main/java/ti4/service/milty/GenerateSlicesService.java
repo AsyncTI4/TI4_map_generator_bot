@@ -10,7 +10,7 @@ import java.util.function.Function;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.collections4.ListUtils;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
 import ti4.image.PositionMapper;
@@ -70,7 +70,7 @@ class GenerateSlicesService {
             long elapTime = System.nanoTime() - startTime;
             if (i % 1000 == 0) {
                 // check if the bot is shutting down
-                if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) break;
+                if (!JdaService.isReadyToReceiveCommands()) break;
             }
             if (elapTime > quitDiff && i > minAttempts) {
                 break;

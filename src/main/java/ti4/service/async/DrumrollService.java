@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
@@ -48,7 +48,7 @@ public class DrumrollService {
                 }
                 iteration++;
                 sleepForTwoSeconds();
-                if (!AsyncTI4DiscordBot.isReadyToReceiveCommands())
+                if (!JdaService.isReadyToReceiveCommands())
                     break; // if the bot needs to shut down, cancel all drumrolls
             }
             msg.delete().queue(null, null);

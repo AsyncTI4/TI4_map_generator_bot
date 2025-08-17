@@ -39,7 +39,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
-import ti4.AsyncTI4DiscordBot;
+import ti4.service.JdaService;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -665,7 +665,7 @@ public class MessageHelper {
             String failText,
             String successText) {
         if (messageText == null || messageText.isEmpty()) return true; // blank message counts as a success
-        User user = player == null ? null : AsyncTI4DiscordBot.jda.getUserById(player.getUserID());
+        User user = player == null ? null : JdaService.jda.getUserById(player.getUserID());
         if (user == null) {
             sendMessageToChannel(feedbackChannel, failText);
             return false;
@@ -1010,7 +1010,7 @@ public class MessageHelper {
      */
     @Deprecated
     public static String getBotLogWebhookURL() {
-        return switch (AsyncTI4DiscordBot.guildPrimaryID) {
+        return switch (JdaService.guildPrimaryID) {
             case Constants.ASYNCTI4_HUB_SERVER_ID -> // AsyncTI4 Primary HUB Production Server
                 "https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v";
             case "1059645656295292968" -> // PrisonerOne's Test Server
@@ -1039,7 +1039,7 @@ public class MessageHelper {
             // REMOVE EMOJIS IF BOT CAN'T SEE IT
             if (button.getEmoji() instanceof CustomEmoji emoji
                     && !ApplicationEmojiService.isValidAppEmoji(emoji)
-                    && AsyncTI4DiscordBot.jda.getEmojiById(emoji.getId()) == null) {
+                    && JdaService.jda.getEmojiById(emoji.getId()) == null) {
                 String label = button.getLabel();
                 if (label.isBlank()) {
                     label = String.format(":%s:", emoji.getName());
