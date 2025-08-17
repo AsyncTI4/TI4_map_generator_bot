@@ -20,9 +20,7 @@ public class IsPlayerElectedService {
                 .filter(currentLawId -> currentLawId.equalsIgnoreCase(lawId))
                 .map(currentLawId -> game.getLawsInfo().get(currentLawId))
                 .filter(Objects::nonNull)
-                .findFirst()
-                .filter(lawInfo ->
-                        lawInfo.equalsIgnoreCase(player.getFaction()) || lawInfo.equalsIgnoreCase(player.getColor()))
-                .isPresent();
+                .allMatch(lawInfo ->
+                        lawInfo.equalsIgnoreCase(player.getFaction()) || lawInfo.equalsIgnoreCase(player.getColor()));
     }
 }
