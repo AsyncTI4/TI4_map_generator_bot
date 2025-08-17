@@ -1158,13 +1158,13 @@ public class Player extends PlayerProperties {
     @Override
     public String getUserName() {
         User userById = getUser();
-        if (userById != null) {
-            Member member = JdaService.guildPrimary.getMemberById(getUserID());
-            if (member != null) {
-                setUserName(member.getEffectiveName());
-            } else {
-                setUserName(userById.getName());
-            }
+        if (userById == null) return super.getUserName();
+
+        Member member = JdaService.guildPrimary.getMemberById(getUserID());
+        if (member != null) {
+            setUserName(member.getEffectiveName());
+        } else {
+            setUserName(userById.getName());
         }
         return super.getUserName();
     }
