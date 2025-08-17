@@ -93,7 +93,7 @@ public class DrawSecretService {
                     files.add(FileUploadService.createFileUpload(ImageHelper.read(path), player.getFaction() + "_ref"));
                 }
             }
-            if (!files.isEmpty() && files.size() <= 10) {
+            if (!files.isEmpty() && files.size() <= 10 && !game.isFowMode()) {
                 message +=
                         "\n-# A reminder that these reference cards are general overviews, and not specific mechanical text.";
                 MessageHelper.sendMessageWithFiles(game.getActionsChannel(), files, message, true, false);
