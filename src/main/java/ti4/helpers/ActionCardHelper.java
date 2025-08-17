@@ -30,6 +30,7 @@ import ti4.model.PlanetModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;

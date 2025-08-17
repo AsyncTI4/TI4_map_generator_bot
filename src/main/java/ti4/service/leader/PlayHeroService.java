@@ -41,6 +41,7 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.explore.AddFrontierTokensService;
 import ti4.service.info.ListTurnOrderService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
 public class PlayHeroService {
