@@ -425,7 +425,16 @@ public class MessageHelper {
 
     public static void sendMessageWithFile(
             MessageChannel channel, FileUpload fileUpload, String messageText, boolean pinMessage) {
-        if (channel.getName().contains("-actions")) {
+        sendMessageWithFile(channel, fileUpload, messageText, pinMessage, true);
+    }
+
+    public static void sendMessageWithFile(
+            MessageChannel channel,
+            FileUpload fileUpload,
+            String messageText,
+            boolean pinMessage,
+            boolean overrideActionChannel) {
+        if (overrideActionChannel && channel.getName().contains("-actions")) {
             String threadName = channel.getName().replace("-actions", "") + "-bot-map-updates";
             List<ThreadChannel> threadChannels = ((IThreadContainer) channel).getThreadChannels();
             for (ThreadChannel threadChannel_ : threadChannels) {
@@ -440,6 +449,37 @@ public class MessageHelper {
             message.addContent(messageText);
         }
         MessageCreateData messageObject = message.addFiles(fileUpload).build();
+        channel.sendMessage(messageObject).queue(msg -> {
+            if (pinMessage) msg.pin().queue();
+        });
+    }
+
+    public static void sendMessageWithFiles(
+            MessageChannel channel, List<FileUpload> filesUpload, String messageText, boolean pinMessage) {
+        sendMessageWithFiles(channel, filesUpload, messageText, pinMessage, true);
+    }
+
+    public static void sendMessageWithFiles(
+            MessageChannel channel,
+            List<FileUpload> filesUpload,
+            String messageText,
+            boolean pinMessage,
+            boolean overrideActionChannel) {
+        if (overrideActionChannel && channel.getName().contains("-actions")) {
+            String threadName = channel.getName().replace("-actions", "") + "-bot-map-updates";
+            List<ThreadChannel> threadChannels = ((IThreadContainer) channel).getThreadChannels();
+            for (ThreadChannel threadChannel_ : threadChannels) {
+                if (threadChannel_.getName().equals(threadName)) {
+                    channel = threadChannel_;
+                }
+            }
+        }
+
+        MessageCreateBuilder message = new MessageCreateBuilder();
+        if (messageText != null) {
+            message.addContent(messageText);
+        }
+        MessageCreateData messageObject = message.setFiles(filesUpload).build();
         channel.sendMessage(messageObject).queue(msg -> {
             if (pinMessage) msg.pin().queue();
         });
