@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import ti4.AsyncTI4DiscordBot;
 import ti4.commands.CommandHelper;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.commands.uncategorized.ServerPromoteCommand;
@@ -30,6 +29,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
+import ti4.jda.JdaService;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
@@ -338,7 +338,7 @@ public class AutoCompleteProvider {
             case Constants.CATEGORY -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Category> categories = new ArrayList<>();
-                for (Guild guild : AsyncTI4DiscordBot.guilds) {
+                for (Guild guild : JdaService.guilds) {
                     categories.addAll(guild.getCategories());
                 }
                 List<Command.Choice> options = categories.stream()

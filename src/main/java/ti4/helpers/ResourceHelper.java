@@ -1,4 +1,4 @@
-package ti4;
+package ti4.helpers;
 
 import java.io.File;
 import java.util.HashMap;
@@ -6,9 +6,6 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.Nullable;
-import ti4.helpers.Constants;
-import ti4.helpers.RandomHelper;
-import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 
 public class ResourceHelper {

@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import org.jetbrains.annotations.Nullable;
-import ti4.ResourceHelper;
+import ti4.helpers.ResourceHelper;
 import ti4.helpers.Storage;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.MapGenerator.VerticalAlign;

@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Getter;
-import ti4.ResourceHelper;
+import ti4.helpers.ResourceHelper;
 
 public class BorderAnomalyModel {
 

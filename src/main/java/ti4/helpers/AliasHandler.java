@@ -13,7 +13,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import lombok.Getter;
-import ti4.ResourceHelper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.message.BotLogger;

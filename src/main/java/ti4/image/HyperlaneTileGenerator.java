@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import ti4.ResourceHelper;
+import ti4.helpers.ResourceHelper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.service.map.CustomHyperlaneService;

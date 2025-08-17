@@ -3,8 +3,8 @@ package ti4.commands.help;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.ResourceHelper;
 import ti4.commands.Subcommand;
+import ti4.helpers.ResourceHelper;
 import ti4.message.MessageHelper;
 
 class WhatsTIGL extends Subcommand {

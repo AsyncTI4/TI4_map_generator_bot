@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
@@ -28,6 +27,7 @@ import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.MapRenderPipeline;
+import ti4.jda.JdaService;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -157,8 +157,7 @@ public class EndGameService {
         gameEndStuff(game, event, publish);
 
         // GET BOTHELPER LOUNGE
-        List<TextChannel> bothelperLoungeChannels =
-                AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true);
+        List<TextChannel> bothelperLoungeChannels = JdaService.guildPrimary.getTextChannelsByName("staff-lounge", true);
         TextChannel bothelperLoungeChannel =
                 !bothelperLoungeChannels.isEmpty() ? bothelperLoungeChannels.getFirst() : null;
         if (bothelperLoungeChannel != null) {
@@ -310,12 +309,12 @@ public class EndGameService {
 
     private static TextChannel getGameSummaryChannel(Game game) {
         List<TextChannel> textChannels;
-        if (game.isFowMode() && AsyncTI4DiscordBot.guildFogOfWar != null) {
-            ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildFogOfWar);
-            textChannels = AsyncTI4DiscordBot.guildFogOfWar.getTextChannelsByName("fow-war-stories", true);
+        if (game.isFowMode() && JdaService.guildFogOfWar != null) {
+            ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildFogOfWar);
+            textChannels = JdaService.guildFogOfWar.getTextChannelsByName("fow-war-stories", true);
         } else {
-            ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
-            textChannels = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true);
+            ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildPrimary);
+            textChannels = JdaService.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true);
         }
         return textChannels.isEmpty() ? null : textChannels.getFirst();
     }

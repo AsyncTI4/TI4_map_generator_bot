@@ -5,8 +5,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
+import ti4.jda.JdaService;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
@@ -107,7 +107,7 @@ public class SusSlashCommandService {
 
     private static void reportSusSlashCommand(SlashCommandInteractionEvent event, String jumpUrl) {
         TextChannel moderationLogChannel =
-                AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("moderation-log", true).stream()
+                JdaService.guildPrimary.getTextChannelsByName("moderation-log", true).stream()
                         .findFirst()
                         .orElse(null);
         if (moderationLogChannel == null) return;
