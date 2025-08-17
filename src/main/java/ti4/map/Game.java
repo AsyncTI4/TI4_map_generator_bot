@@ -1,15 +1,5 @@
 package ti4.map;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
@@ -31,6 +21,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
@@ -99,6 +97,9 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
+
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 public class Game extends GameProperties {
 
@@ -3198,7 +3199,7 @@ public class Game extends GameProperties {
         success &= validateAndSetActionCardDeck(
                 event, deckSettings.getActionCards().getValue());
         success &= validateAndSetExploreDeck(event, deckSettings.getExplores().getValue());
-        success &= validateAndSetTechnologyDeck(event, deckSettings.getTechs().getValue());
+        success &= validateAndSetTechnologyDeck(deckSettings.getTechs().getValue());
         setStrategyCardSet(deckSettings.getStratCards().getChosenKey());
 
         // Setup peakable objectives
@@ -3439,7 +3440,7 @@ public class Game extends GameProperties {
         return true;
     }
 
-    private boolean validateAndSetTechnologyDeck(GenericInteractionCreateEvent event, DeckModel deck) {
+    private boolean validateAndSetTechnologyDeck(DeckModel deck) {
         if (getTechnologyDeckID().equals(deck.getAlias())) return true;
 
         swapOutVariantTechs();
