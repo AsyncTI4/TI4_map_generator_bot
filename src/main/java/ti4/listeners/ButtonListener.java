@@ -4,8 +4,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import ti4.JdaService;
 import ti4.helpers.ButtonHelper;
+import ti4.jda.JdaService;
 import ti4.processors.ButtonProcessor;
 
 public class ButtonListener extends ListenerAdapter {

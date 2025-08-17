@@ -19,10 +19,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import org.apache.commons.lang3.StringUtils;
-import ti4.JdaService;
-import ti4.ResourceHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.ResourceHelper;
+import ti4.jda.JdaService;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;

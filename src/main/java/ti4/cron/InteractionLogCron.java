@@ -8,8 +8,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import ti4.JdaService;
 import ti4.helpers.ThreadGetter;
+import ti4.jda.JdaService;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 

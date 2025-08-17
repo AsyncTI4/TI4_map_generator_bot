@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
 import org.jetbrains.annotations.NotNull;
-import ti4.JdaService;
+import ti4.jda.JdaService;
 import ti4.json.PersistenceManager;
 import ti4.message.BotLogger;
 

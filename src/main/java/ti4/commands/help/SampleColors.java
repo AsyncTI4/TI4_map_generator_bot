@@ -11,9 +11,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.ResourceHelper;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.ResourceHelper;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;

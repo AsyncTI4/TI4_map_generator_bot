@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import ti4.JdaService;
+import ti4.jda.JdaService;
 
 public class ChannelCreationListener extends ListenerAdapter {
 

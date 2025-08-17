@@ -1,5 +1,7 @@
 package ti4.listeners.annotations;
 
+import static org.reflections.scanners.Scanners.SubTypes;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -17,7 +19,10 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import ti4.JdaService;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import ti4.helpers.Constants;
 import ti4.listeners.context.ButtonContext;
 import ti4.listeners.context.ListenerContext;
@@ -29,6 +34,8 @@ import ti4.message.BotLogger;
 import ti4.message.BotLogger.LogMessageOrigin;
 
 public class AnnotationHandler {
+
+    private static final List<Class<?>> classes = new ArrayList<>();
 
     private static <C extends ListenerContext> boolean validateParams(Method method, Class<C> contextClass) {
         boolean hasComponentID = false;
@@ -242,7 +249,7 @@ public class AnnotationHandler {
                         "Unknown context class `" + contextClass.getName() + "`. Please fix " + Constants.jazzPing());
                 return consumers;
             }
-            for (Class<?> klass : JdaService.getAllClasses()) {
+            for (Class<?> klass : getAllClasses()) {
                 for (Method method : klass.getDeclaredMethods()) {
                     method.setAccessible(true);
                     List<H> handlers = Arrays.asList(method.getAnnotationsByType(handlerClass));
@@ -283,5 +290,17 @@ public class AnnotationHandler {
 
         BotLogger.info("Registered " + consumers.size() + " handlers of type " + handlerClass.getName());
         return consumers;
+    }
+
+    private static List<Class<?>> getAllClasses() {
+        if (classes.isEmpty()) {
+            Reflections reflections = new Reflections(new ConfigurationBuilder()
+                    .setUrls(ClasspathHelper.forJavaClassPath())
+                    .setScanners(new SubTypesScanner(false)));
+            reflections.get(SubTypes.of(Object.class).asClass()).stream()
+                    .filter(c -> c.getPackageName().startsWith("ti4"))
+                    .forEach(classes::add);
+        }
+        return classes;
     }
 }

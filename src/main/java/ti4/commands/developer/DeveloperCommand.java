@@ -4,11 +4,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.JdaService;
 import ti4.commands.CommandHelper;
 import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
+import ti4.jda.JdaService;
 
 public class DeveloperCommand implements ParentCommand {
 
@@ -32,8 +32,7 @@ public class DeveloperCommand implements ParentCommand {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return ParentCommand.super.accept(event)
-                && CommandHelper.acceptIfHasRoles(event, JdaService.developerRoles);
+        return ParentCommand.super.accept(event) && CommandHelper.acceptIfHasRoles(event, JdaService.developerRoles);
     }
 
     @Override

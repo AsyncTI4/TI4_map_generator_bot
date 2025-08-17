@@ -1,6 +1,4 @@
-package ti4;
-
-import static org.reflections.scanners.Scanners.SubTypes;
+package ti4.jda;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -21,10 +19,6 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 import ti4.commands.CommandManager;
@@ -73,7 +67,7 @@ import ti4.settings.GlobalSettings.ImplementedSettings;
 @Service
 public class JdaService implements CommandLineRunner {
 
-    public static final long START_TIME_MILLISECONDS = System.currentTimeMillis();
+    // TODO: Eventually we need to make these non-static and autowire in this service.
     public static final Set<Role> adminRoles = new HashSet<>();
     public static final Set<Role> developerRoles = new HashSet<>();
     public static final Set<Role> bothelperRoles = new HashSet<>();
@@ -95,8 +89,6 @@ public class JdaService implements CommandLineRunner {
     public static final Set<Guild> guilds = new HashSet<>();
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new LinkedList<>();
-
-    private static final List<Class<?>> classes = new ArrayList<>();
 
     @Override
     public void run(String... args) {
@@ -479,18 +471,6 @@ public class JdaService implements CommandLineRunner {
                 .flatMap(guild -> guild.getCategories().stream())
                 .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
                 .toList();
-    }
-
-    public static List<Class<?>> getAllClasses() {
-        if (classes.isEmpty()) {
-            Reflections reflections = new Reflections(new ConfigurationBuilder()
-                    .setUrls(ClasspathHelper.forJavaClassPath())
-                    .setScanners(new SubTypesScanner(false)));
-            reflections.get(SubTypes.of(Object.class).asClass()).stream()
-                    .filter(c -> c.getPackageName().startsWith("ti4"))
-                    .forEach(classes::add);
-        }
-        return classes;
     }
 
     public static boolean isValidGuild(String guildId) {

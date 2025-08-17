@@ -12,12 +12,12 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
-import ti4.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.Mapper;
+import ti4.jda.JdaService;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
@@ -341,12 +341,9 @@ public class MessageListener extends ListenerAdapter {
                 && // fog servers exists
                 !JdaService.fowServers.contains(event.getGuild())
                 && // event server IS NOT the fog server
-                !JdaService.guildCommunityPlays
-                        .getId()
-                        .equals(event.getGuild().getId())
+                !JdaService.guildCommunityPlays.getId().equals(event.getGuild().getId())
                 && // NOR the community server
-                JdaService.guildPrimaryID.equals(
-                        Constants.ASYNCTI4_HUB_SERVER_ID)) { // bot is running in production
+                JdaService.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) { // bot is running in production
             return;
         } // else it's probably a dev/test server, so execute
 

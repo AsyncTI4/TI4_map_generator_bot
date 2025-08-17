@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.apache.commons.lang3.StringUtils;
-import ti4.JdaService;
+import ti4.jda.JdaService;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -252,9 +252,7 @@ public class TIGLHelper {
     private static void promoteUser(User user, TIGLRank toRank) {
         TIGLRank currentRank = getUsersHighestTIGLRank(user);
         if (toRank.getIndex() - currentRank.getIndex() == 1) {
-            JdaService.guildPrimary
-                    .addRoleToMember(user, toRank.getRole())
-                    .queue();
+            JdaService.guildPrimary.addRoleToMember(user, toRank.getRole()).queue();
             // JdaService.guildPrimary.removeRoleFromMember(user, currentRank.getRole()).queueAfter(5,
             // TimeUnit.SECONDS);
         }
@@ -284,9 +282,7 @@ public class TIGLHelper {
                     .removeRoleFromMember(member, heroRank.getRole())
                     .queueAfter(10, TimeUnit.SECONDS);
         }
-        JdaService.guildPrimary
-                .addRoleToMember(user, heroRank.getRole())
-                .queue();
+        JdaService.guildPrimary.addRoleToMember(user, heroRank.getRole()).queue();
         MessageHelper.sendMessageToChannel(
                 getTIGLChannel(), LeaderEmojis.getLeaderEmoji(faction + "hero").toString());
         MessageHelper.sendMessageToChannel(getTIGLChannel(), sb.toString());

@@ -1,12 +1,12 @@
 package ti4.testUtils;
 
 import org.junit.jupiter.api.BeforeAll;
-import ti4.JdaService;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
+import ti4.jda.JdaService;
 import ti4.service.emoji.ApplicationEmojiService;
 
 /**

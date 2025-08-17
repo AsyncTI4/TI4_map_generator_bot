@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
-import ti4.JdaService;
+import ti4.jda.JdaService;
 import ti4.map.Game;
 import ti4.map.Player;
 

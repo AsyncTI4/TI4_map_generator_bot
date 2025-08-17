@@ -8,8 +8,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import ti4.JdaService;
 import ti4.executors.ExecutorServiceManager;
+import ti4.jda.JdaService;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 

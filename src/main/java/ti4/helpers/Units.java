@@ -11,8 +11,8 @@ import java.util.regex.Pattern;
 import lombok.Data;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
-import ti4.JdaService;
 import ti4.image.Mapper;
+import ti4.jda.JdaService;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 

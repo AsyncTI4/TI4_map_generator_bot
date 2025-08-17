@@ -18,9 +18,9 @@ import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.emoji.ApplicationEmoji;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import org.apache.commons.collections4.SetUtils;
-import ti4.JdaService;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
+import ti4.jda.JdaService;
 import ti4.message.BotLogger;
 import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
 

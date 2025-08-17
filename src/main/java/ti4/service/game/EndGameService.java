@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.JdaService;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
@@ -28,6 +27,7 @@ import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.MapRenderPipeline;
+import ti4.jda.JdaService;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -157,8 +157,7 @@ public class EndGameService {
         gameEndStuff(game, event, publish);
 
         // GET BOTHELPER LOUNGE
-        List<TextChannel> bothelperLoungeChannels =
-                JdaService.guildPrimary.getTextChannelsByName("staff-lounge", true);
+        List<TextChannel> bothelperLoungeChannels = JdaService.guildPrimary.getTextChannelsByName("staff-lounge", true);
         TextChannel bothelperLoungeChannel =
                 !bothelperLoungeChannels.isEmpty() ? bothelperLoungeChannels.getFirst() : null;
         if (bothelperLoungeChannel != null) {
