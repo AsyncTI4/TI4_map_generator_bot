@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.AsyncTI4DiscordBot;
+import ti4.JdaService;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
@@ -20,7 +20,7 @@ class ServerLimitStats extends Subcommand {
 
     public void execute(SlashCommandInteractionEvent event) {
         Guild guild = event.getGuild();
-        boolean isFoWGuild = AsyncTI4DiscordBot.fowServers.contains(event.getGuild());
+        boolean isFoWGuild = JdaService.fowServers.contains(event.getGuild());
 
         int memberCount = guild.getMemberCount();
         int roomForGames;

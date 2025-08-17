@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import ti4.AsyncTI4DiscordBot;
+import ti4.JdaService;
 import ti4.executors.CircuitBreaker;
 import ti4.spring.exception.ServiceUnavailableException;
 
@@ -25,7 +25,7 @@ public class CircuitBreakerFilter extends OncePerRequestFilter {
             @NotNull HttpServletResponse response,
             @NotNull FilterChain filterChain)
             throws ServletException, IOException {
-        if (CircuitBreaker.isOpen() || !AsyncTI4DiscordBot.isReadyToReceiveCommands())
+        if (CircuitBreaker.isOpen() || !JdaService.isReadyToReceiveCommands())
             throw new ServiceUnavailableException();
 
         filterChain.doFilter(request, response);

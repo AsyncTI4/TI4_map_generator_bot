@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
-import ti4.AsyncTI4DiscordBot;
+import ti4.JdaService;
 import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -204,7 +204,7 @@ public abstract class BagDraft {
             if (bagInfoThread != null && !bagInfoThread.isBlank() && !"null".equals(bagInfoThread)) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
 
-                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(bagInfoThread);
+                ThreadChannel threadChannel = JdaService.jda.getThreadChannelById(bagInfoThread);
                 if (threadChannel != null) return threadChannel;
 
                 // SEARCH FOR EXISTING OPEN THREAD
@@ -239,7 +239,7 @@ public abstract class BagDraft {
             if (bagInfoThread != null && !bagInfoThread.isBlank() && !"null".equals(bagInfoThread)) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
 
-                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(bagInfoThread);
+                ThreadChannel threadChannel = JdaService.jda.getThreadChannelById(bagInfoThread);
                 if (threadChannel != null) return threadChannel;
 
                 // SEARCH FOR EXISTING OPEN THREAD

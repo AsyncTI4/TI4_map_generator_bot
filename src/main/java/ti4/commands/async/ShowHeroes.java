@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.AsyncTI4DiscordBot;
+import ti4.JdaService;
 import ti4.commands.Subcommand;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
@@ -36,7 +36,7 @@ class ShowHeroes extends Subcommand {
             String faction = StringUtils.substringAfter(rank.toString(), "_");
             TI4Emoji factionIcon = FactionEmojis.getFactionIcon(faction);
             TI4Emoji heroEmoji = LeaderEmojis.getLeaderEmoji(faction + "hero");
-            List<Member> members = AsyncTI4DiscordBot.guildPrimary.getMembersWithRoles(role);
+            List<Member> members = JdaService.guildPrimary.getMembersWithRoles(role);
 
             sb.append("> ").append(factionIcon);
             for (Member member : members) {

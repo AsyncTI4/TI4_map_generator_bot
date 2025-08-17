@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.AsyncTI4DiscordBot;
+import ti4.JdaService;
 import ti4.buttons.Buttons;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -104,7 +104,7 @@ public class DraftDisplayService {
         return hist -> {
             boolean summaryDone = false, categoryDone = false, sliceImgDone = false;
             for (Message msg : hist.getRetrievedHistory()) {
-                if (!msg.getAuthor().getId().equals(AsyncTI4DiscordBot.getBotId())) continue;
+                if (!msg.getAuthor().getId().equals(JdaService.getBotId())) continue;
                 String txt = msg.getContentRaw();
 
                 if (!summaryDone && txt.startsWith(SUMMARY_START)) {

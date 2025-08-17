@@ -4,7 +4,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import ti4.AsyncTI4DiscordBot;
+import ti4.JdaService;
 import ti4.helpers.ButtonHelper;
 import ti4.processors.ButtonProcessor;
 
@@ -19,7 +19,7 @@ public class ButtonListener extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(@Nonnull ButtonInteractionEvent event) {
-        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
+        if (!JdaService.isReadyToReceiveCommands()) {
             event.reply("You pressed: " + ButtonHelper.getButtonRepresentation(event.getButton())
                             + "\nPlease try again in a few minutes. The bot is rebooting.")
                     .setEphemeral(true)

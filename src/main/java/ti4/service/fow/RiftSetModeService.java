@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.AsyncTI4DiscordBot;
+import ti4.JdaService;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AgendaHelper;
@@ -72,7 +72,7 @@ class RiftSetModeService {
     private static final int CHANCE_TO_STELLAR_CONVERT_MIN = 25; // 1/25
 
     public static boolean activate(GenericInteractionCreateEvent event, Game game) {
-        if (game.getPlayer(Constants.eronousId) == null && !AsyncTI4DiscordBot.fowServers.isEmpty()) {
+        if (game.getPlayer(Constants.eronousId) == null && !JdaService.fowServers.isEmpty()) {
             MessageHelper.replyToMessage(event, "Can only use RiftSetMode if Eronous is in the game.");
             return false;
         }

@@ -6,7 +6,7 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.AsyncTI4DiscordBot;
+import ti4.JdaService;
 import ti4.buttons.Buttons;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
@@ -58,13 +58,13 @@ class JazzCommand extends Subcommand {
 
     @ButtonHandler("jazzButton")
     private static void jazzButton() {
-        AsyncTI4DiscordBot.jda
+        JdaService.jda
                 .getGuildById("847560709730730064")
                 .getTextChannelById("1352824638354231439")
                 .sendMessage("```fix\nBorgJedi used /search my_titles player: @Mentak\n```")
                 .queue();
 
-        AsyncTI4DiscordBot.jda
+        JdaService.jda
                 .getGuildById("847560709730730064")
                 .getTextChannelById("1352824638354231439")
                 .sendMessage("**__Mentak's Titles__**\n` 1.`**You Made Me Mad** x5 (g15, g15, g15, g15, g15)")

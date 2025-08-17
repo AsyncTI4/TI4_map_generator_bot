@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import ti4.AsyncTI4DiscordBot;
+import ti4.JdaService;
 import ti4.helpers.ThreadGetter;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -35,7 +35,7 @@ public class InteractionLogCron {
         BotLogger.info("Registering bot log cron");
         isRegistered = true;
 
-        List<TextChannel> logCandidates = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bot-log", false);
+        List<TextChannel> logCandidates = JdaService.guildPrimary.getTextChannelsByName("bot-log", false);
         if (logCandidates.isEmpty()) {
             BotLogger.error("Primary log channel could not be found in InteractionLogCron");
             return;
@@ -67,7 +67,7 @@ public class InteractionLogCron {
         for (Map.Entry<Class<?>, StringBuilder> entry : messageBuilders.entrySet()) {
             if (entry.getValue().isEmpty()) return;
 
-            List<TextChannel> logCandidates = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName(
+            List<TextChannel> logCandidates = JdaService.guildPrimary.getTextChannelsByName(
                     (String) entry.getKey().getMethod("getChannelName").invoke(null), false);
 
             if (!logCandidates.isEmpty()) {

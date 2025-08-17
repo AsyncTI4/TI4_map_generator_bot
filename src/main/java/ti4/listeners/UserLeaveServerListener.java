@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import ti4.AsyncTI4DiscordBot;
+import ti4.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -60,11 +60,11 @@ public class UserLeaveServerListener extends ListenerAdapter {
     }
 
     private static boolean validateEvent(GenericGuildEvent event) {
-        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
+        if (!JdaService.isReadyToReceiveCommands()) {
             return false;
         }
         String eventGuild = event.getGuild().getId();
-        return AsyncTI4DiscordBot.isValidGuild(eventGuild);
+        return JdaService.isValidGuild(eventGuild);
     }
 
     private static int userTotalGames(ManagedPlayer user) {
@@ -109,7 +109,7 @@ public class UserLeaveServerListener extends ListenerAdapter {
 
             if (voluntary) {
                 String inviteBack = Helper.getGuildInviteURL(guild, 1);
-                String primaryInvite = Helper.getGuildInviteURL(AsyncTI4DiscordBot.guildPrimary, 1, true);
+                String primaryInvite = Helper.getGuildInviteURL(JdaService.guildPrimary, 1, true);
                 String usermsg = "It looks like you left a server while playing in `" + gamesQuit.size() + "` games.";
                 usermsg +=
                         " Please consider making a post in https://discord.com/channels/943410040369479690/1176191865188536500 to get a replacement player.\n\n";
@@ -192,7 +192,7 @@ public class UserLeaveServerListener extends ListenerAdapter {
 
     private static void reportUserLeftServer(Guild guild, ManagedPlayer player, List<Game> games) {
         TextChannel moderationLogChannel =
-                AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("moderation-log", true).stream()
+                JdaService.guildPrimary.getTextChannelsByName("moderation-log", true).stream()
                         .findFirst()
                         .orElse(null);
         if (moderationLogChannel == null) return;

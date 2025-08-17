@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import ti4.AsyncTI4DiscordBot;
+import ti4.JdaService;
 import ti4.cron.CronManager;
 import ti4.cron.InteractionLogCron;
 import ti4.helpers.ButtonHelper;
@@ -245,7 +245,7 @@ public class BotLogger {
             if (origin.getEventString() != null) msg.append(origin.getEventString());
             if (origin.getGameInfo() != null) msg.append(origin.getGameInfo());
         } else {
-            origin = new LogMessageOrigin(AsyncTI4DiscordBot.guildPrimary);
+            origin = new LogMessageOrigin(JdaService.guildPrimary);
             msg.append(origin.getOriginTimeFormatted());
         }
         channel = origin.getLogChannel(severity);
@@ -273,7 +273,7 @@ public class BotLogger {
                 if (origin.getGuild() != null) { // Second check may not be necessary but this is a hotfix.
                     ThreadArchiveHelper.checkThreadLimitAndArchive(origin.getGuild());
                 } else {
-                    ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
+                    ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildPrimary);
                 }
 
                 if (channel == null) {
@@ -316,7 +316,7 @@ public class BotLogger {
 
     private static void sendMessageToBotLogWebhook(String message) {
         String botLogWebhookURL =
-                switch (AsyncTI4DiscordBot.guildPrimaryID) {
+                switch (JdaService.guildPrimaryID) {
                     case Constants.ASYNCTI4_HUB_SERVER_ID -> // AsyncTI4 Primary HUB Production Server
                         "https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v";
                     case "1059645656295292968" -> // PrisonerOne's Test Server
@@ -556,7 +556,7 @@ public class BotLogger {
                 }
             }
         }
-        if (botLogChannel == null && AsyncTI4DiscordBot.guildPrimary != null) { // USE PRIMARY SERVER'S BOTLOG CHANNEL
+        if (botLogChannel == null && JdaService.guildPrimary != null) { // USE PRIMARY SERVER'S BOTLOG CHANNEL
             botLogChannel = getPrimaryBotLogChannel();
         }
         return botLogChannel;
@@ -564,7 +564,7 @@ public class BotLogger {
 
     @Deprecated
     public static TextChannel getPrimaryBotLogChannel() {
-        for (TextChannel textChannel : AsyncTI4DiscordBot.guildPrimary.getTextChannels()) {
+        for (TextChannel textChannel : JdaService.guildPrimary.getTextChannels()) {
             if ("bot-log".equals(textChannel.getName())) {
                 return textChannel;
             }
@@ -792,7 +792,7 @@ public class BotLogger {
          */
         @Nullable
         TextChannel getLogChannel(@Nonnull LogSeverity severity) {
-            Guild guild = AsyncTI4DiscordBot.guildPrimary;
+            Guild guild = JdaService.guildPrimary;
             if (guild == null) guild = this.guild;
             if (guild == null) return null;
 

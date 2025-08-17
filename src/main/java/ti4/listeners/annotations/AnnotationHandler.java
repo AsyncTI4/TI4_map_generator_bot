@@ -17,7 +17,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import ti4.AsyncTI4DiscordBot;
+import ti4.JdaService;
 import ti4.helpers.Constants;
 import ti4.listeners.context.ButtonContext;
 import ti4.listeners.context.ListenerContext;
@@ -242,7 +242,7 @@ public class AnnotationHandler {
                         "Unknown context class `" + contextClass.getName() + "`. Please fix " + Constants.jazzPing());
                 return consumers;
             }
-            for (Class<?> klass : AsyncTI4DiscordBot.getAllClasses()) {
+            for (Class<?> klass : JdaService.getAllClasses()) {
                 for (Method method : klass.getDeclaredMethods()) {
                     method.setAccessible(true);
                     List<H> handlers = Arrays.asList(method.getAnnotationsByType(handlerClass));

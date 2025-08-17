@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.AsyncTI4DiscordBot;
+import ti4.JdaService;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
@@ -33,7 +33,7 @@ class SearchEmojis extends Subcommand {
         String searchString = event.getOption(Constants.SEARCH, "", OptionMapping::getAsString);
         boolean includeRAW = event.getOption(Constants.INCLUDE_RAW_STRING, false, OptionMapping::getAsBoolean);
 
-        List<Emoji> emojis = AsyncTI4DiscordBot.jda.getEmojis().stream()
+        List<Emoji> emojis = JdaService.jda.getEmojis().stream()
                 .filter(RichCustomEmoji::isAvailable)
                 .filter(e -> e.getFormatted().toLowerCase().contains(searchString.toLowerCase()))
                 .sorted(Comparator.comparing(e -> e.getGuild().getName()))

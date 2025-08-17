@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import ti4.AsyncTI4DiscordBot;
+import ti4.JdaService;
 
 public class ChannelCreationListener extends ListenerAdapter {
 
@@ -15,14 +15,14 @@ public class ChannelCreationListener extends ListenerAdapter {
 
     @Override
     public void onChannelCreate(ChannelCreateEvent event) {
-        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
+        if (!JdaService.isReadyToReceiveCommands()) {
             return;
         }
         handleMakingNewGamesThreadCreation(event);
     }
 
     private void handleMakingNewGamesThreadCreation(ChannelCreateEvent event) {
-        if (!AsyncTI4DiscordBot.isValidGuild(event.getGuild().getId())
+        if (!JdaService.isValidGuild(event.getGuild().getId())
                 || !(event.getChannel() instanceof ThreadChannel channel)) {
             return;
         }

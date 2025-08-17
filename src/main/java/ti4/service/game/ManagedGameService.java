@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import org.apache.commons.lang3.StringUtils;
-import ti4.AsyncTI4DiscordBot;
+import ti4.JdaService;
 import ti4.map.persistence.ManagedGame;
 
 @UtilityClass
@@ -33,7 +33,7 @@ public class ManagedGameService {
         }
         StringBuilder sb = new StringBuilder(game.getName()).append(" ");
         for (var player : game.getPlayers()) {
-            User user = AsyncTI4DiscordBot.jda.getUserById(player.getId());
+            User user = JdaService.jda.getUserById(player.getId());
             if (user != null) sb.append(user.getAsMention()).append(" ");
         }
         return sb.toString();
