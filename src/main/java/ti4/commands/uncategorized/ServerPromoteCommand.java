@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 
 public class ServerPromoteCommand implements ParentCommand {
 
-    public static final String DEV_CHANNEL = "947520255826198549";
+    private static final String DEV_CHANNEL = "947520255826198549";
     public static final Map<String, String> Servers = new HashMap<>() {
         {
             put(Constants.ASYNCTI4_HUB_SERVER_ID, "Async Hub");

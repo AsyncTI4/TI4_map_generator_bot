@@ -39,17 +39,18 @@ public class CheckDistanceHelper {
         }
         for (Tile tile : originTiles) {
             Map<String, Integer> someDistances = getTileDistances(game, player, tile.getPosition(), 15, true);
-            for (String tilePos : someDistances.keySet()) {
+            for (Map.Entry<String, Integer> entry : someDistances.entrySet()) {
+                String tilePos = entry.getKey();
                 if (!ButtonHelper.canActivateTile(game, player, game.getTileByPosition(tilePos))) {
                     continue;
                 }
-                if (distances.get(tilePos) == null && someDistances.get(tilePos) != null) {
-                    distances.put(tilePos, someDistances.get(tilePos));
+                if (distances.get(tilePos) == null && entry.getValue() != null) {
+                    distances.put(tilePos, entry.getValue());
                 } else {
                     if (distances.get(tilePos) != null
-                            && someDistances.get(tilePos) != null
-                            && distances.get(tilePos) > someDistances.get(tilePos)) {
-                        distances.put(tilePos, someDistances.get(tilePos));
+                            && entry.getValue() != null
+                            && distances.get(tilePos) > entry.getValue()) {
+                        distances.put(tilePos, entry.getValue());
                     }
                 }
             }
@@ -60,9 +61,9 @@ public class CheckDistanceHelper {
     public static List<String> getAllTilesACertainDistanceAway(
             Game game, Player player, Map<String, Integer> distances, int target) {
         List<String> tiles = new ArrayList<>();
-        for (String pos : distances.keySet()) {
-            if (distances.get(pos) != null && distances.get(pos) == target) {
-                tiles.add(pos);
+        for (Map.Entry<String, Integer> entry : distances.entrySet()) {
+            if (entry.getValue() != null && entry.getValue() == target) {
+                tiles.add(entry.getKey());
             }
         }
         Collections.sort(tiles);

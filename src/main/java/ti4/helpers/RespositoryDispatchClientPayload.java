@@ -3,7 +3,7 @@ package ti4.helpers;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RespositoryDispatchClientPayload {
+class RespositoryDispatchClientPayload {
     private final Map<String, String> records;
 
     /**

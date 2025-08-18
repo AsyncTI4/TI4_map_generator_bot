@@ -45,7 +45,7 @@ public class ShowGameService {
         });
     }
 
-    public static void ephemeralShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
+    private static void ephemeralShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
         MapRenderPipeline.queue(
                 game,
                 event,
@@ -79,7 +79,7 @@ public class ShowGameService {
         return channel;
     }
 
-    public static boolean includeButtons(DisplayType displayType) {
+    private static boolean includeButtons(DisplayType displayType) {
         return switch (displayType) {
             case wormholes,
                     anomalies,

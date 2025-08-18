@@ -325,16 +325,16 @@ public class HyperlaneTileGenerator {
         private final Map<List<Integer>, Integer> angleMap;
         private final Shape template;
 
-        public ConnectionRule(Map<List<Integer>, Integer> angleMap, Shape template) {
+        ConnectionRule(Map<List<Integer>, Integer> angleMap, Shape template) {
             this.angleMap = angleMap;
             this.template = template;
         }
 
-        public boolean matches(List<Integer> connection) {
+        boolean matches(List<Integer> connection) {
             return angleMap.containsKey(connection);
         }
 
-        public Shape getShape(List<Integer> connection) {
+        Shape getShape(List<Integer> connection) {
             return rotatedCache.computeIfAbsent(connection, conn -> {
                 double angleRad = Math.toRadians(angleMap.get(conn));
                 AffineTransform transform = AffineTransform.getRotateInstance(angleRad, CENTER_X, CENTER_Y);

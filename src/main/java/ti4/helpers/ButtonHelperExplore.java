@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 
-public class ButtonHelperExplore {
+class ButtonHelperExplore {
 
     @ButtonHandler("exploreFront_")
     public static void exploreFront(Game game, Player player, ButtonInteractionEvent event, String buttonID) {

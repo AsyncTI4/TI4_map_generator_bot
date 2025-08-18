@@ -1,8 +1,11 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -64,6 +67,7 @@ import ti4.service.tech.PlayerTechService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
 
 public class ButtonHelperFactionSpecific {
@@ -849,7 +853,7 @@ public class ButtonHelperFactionSpecific {
         return false;
     }
 
-    public static Player findPNOwner(String pn, Game game) {
+    private static Player findPNOwner(String pn, Game game) {
         for (Player player : game.getRealPlayers()) {
             if (player.ownsPromissoryNote(pn)) {
                 return player;
@@ -858,7 +862,7 @@ public class ButtonHelperFactionSpecific {
         return null;
     }
 
-    public static void delete(ButtonInteractionEvent event) {
+    private static void delete(ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
     }
 
@@ -1632,7 +1636,7 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
-    public static boolean doesPlayerHaveAnyCapturedUnits(Player cabal, Player blockader) {
+    private static boolean doesPlayerHaveAnyCapturedUnits(Player cabal, Player blockader) {
         if (cabal == blockader) {
             return false;
         }
@@ -1647,7 +1651,8 @@ public class ButtonHelperFactionSpecific {
         return false;
     }
 
-    public static void releaseAllUnits(Player cabal, Game game, Player blockader, GenericInteractionCreateEvent event) {
+    private static void releaseAllUnits(
+            Player cabal, Game game, Player blockader, GenericInteractionCreateEvent event) {
         for (UnitHolder unitHolder : cabal.getNomboxTile().getUnitHolders().values()) {
             List<UnitKey> unitKeys = new ArrayList<>(unitHolder.getUnits().keySet());
             for (UnitKey unitKey : unitKeys) {
@@ -1881,7 +1886,7 @@ public class ButtonHelperFactionSpecific {
         game.setStoredValue("mykoMech", "" + amount);
     }
 
-    public static void decreaseMykoMech(Game game) {
+    private static void decreaseMykoMech(Game game) {
         int amount = 0;
         if (!game.getStoredValue("mykoMech").isEmpty()) {
             amount = Integer.parseInt(game.getStoredValue("mykoMech"));
@@ -2397,7 +2402,7 @@ public class ButtonHelperFactionSpecific {
         if (cabal == player) {
             return false;
         }
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, cabal, UnitType.Spacedock);
+        List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, cabal, UnitType.Spacedock);
         if (tiles.isEmpty()) {
             return false;
         }
@@ -2573,10 +2578,10 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static List<Button> getUnitButtonsForVortex(Player player, Game game, GenericInteractionCreateEvent event) {
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock);
+        List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock);
         if (tiles.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Couldn't find any Dimensional Tears.");
-            return List.of();
+            return Collections.emptyList();
         }
         Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tiles.getFirst().getPosition(), player, false);
         for (Tile tile : tiles) {
@@ -2621,7 +2626,7 @@ public class ButtonHelperFactionSpecific {
                 && unitKey.getUnitType() != UnitType.Pds);
     }
 
-    public static Button buildVortexButton(Game game, UnitKey unitKey) {
+    private static Button buildVortexButton(Game game, UnitKey unitKey) {
         String faction = game.getPlayerByColorID(unitKey.getColorID())
                 .map(Player::getFaction)
                 .get();
@@ -3019,7 +3024,7 @@ public class ButtonHelperFactionSpecific {
         StringBuilder sb = new StringBuilder(player.getRepresentation());
         UnitHolder uH = tile.getSpaceUnitHolder();
         uH.addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
-        sb.append(" damaged their " + unit + " in ").append(tile.getRepresentation());
+        sb.append(" damaged their ").append(unit).append(" in ").append(tile.getRepresentation());
         if ("flagship".equalsIgnoreCase(unit)) {
             if (player.ownsUnit("belkosea_flagship")) {
                 sb.append(" to produce 1 hit against the opponents non-fighter ships.");
@@ -3060,7 +3065,7 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("creussMechStep1_")
     public static void creussMechStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)) {
+        for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Mech)) {
             buttons.add(Buttons.green(
                     "creussMechStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
         }
@@ -3074,7 +3079,7 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("nivynMechStep1_")
     public static void nivynMechStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)) {
+        for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Mech)) {
             buttons.add(Buttons.green(
                     "nivynMechStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
         }
@@ -3198,7 +3203,7 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
-    public static List<Button> getCreusIFFLocationOptions(Game game, @NotNull Player player, String type) {
+    private static List<Button> getCreusIFFLocationOptions(Game game, @NotNull Player player, String type) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (isTileCreussIFFSuitable(game, player, tile)
@@ -3259,7 +3264,7 @@ public class ButtonHelperFactionSpecific {
         event.getMessageChannel().deleteMessageById(origMessageId).queue();
     }
 
-    public static boolean isTileCreussIFFSuitable(Game game, Player player, Tile tile) {
+    private static boolean isTileCreussIFFSuitable(Game game, Player player, Tile tile) {
         if (tile == null || tile.getTileModel() != null && tile.getTileModel().isHyperlane()) {
             return false;
         }
@@ -3356,7 +3361,7 @@ public class ButtonHelperFactionSpecific {
         if (ACPlayer.getFaction().equalsIgnoreCase(EmpyPlayer.getFaction())) {
             return false;
         }
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, EmpyPlayer, UnitType.Mech);
+        List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, EmpyPlayer, UnitType.Mech);
         for (Tile tile : tiles) {
             Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tile.getPosition(), EmpyPlayer, true);
             for (String adjTile : adjTiles) {

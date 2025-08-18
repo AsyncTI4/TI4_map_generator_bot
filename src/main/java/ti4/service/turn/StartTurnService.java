@@ -28,6 +28,7 @@ import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -428,7 +429,7 @@ public class StartTurnService {
                                         - 1) + ")"));
             }
             startButtons.add(Buttons.red(finChecker + "turnEnd", "End Turn"));
-            if (ButtonHelper.isPlayerElected(game, player, "minister_war")) {
+            if (IsPlayerElectedService.isPlayerElected(game, player, "minister_war")) {
                 startButtons.add(Buttons.gray(finChecker + "ministerOfWar", "Use Minister of War"));
             }
             if (!game.isJustPlayedComponentAC()) {

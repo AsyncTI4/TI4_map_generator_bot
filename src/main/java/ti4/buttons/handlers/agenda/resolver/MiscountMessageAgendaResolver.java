@@ -25,7 +25,7 @@ public class MiscountMessageAgendaResolver implements AgendaResolver {
     public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         MessageHelper.sendMessageToChannel(
                 game.getMainGameChannel(),
-                "# Repealed the " + Mapper.getAgendaTitleNoCap(winner)
-                        + " law and will now reveal it for the purposes of revoting. It is technically still in effect");
+                "# Repealed the _" + Mapper.getAgendaTitleNoCap(winner)
+                        + "_ law.\nIt will will now be revealed for the purposes of revoting.\n-# It is technically still in effect during the revote, if relevant.");
     }
 }

@@ -80,7 +80,7 @@ public class PlayerTitleHelper {
         }
     }
 
-    public static List<Button> getUserSurveyButtons(String buttonID) {
+    private static List<Button> getUserSurveyButtons(String buttonID) {
         String questionNum = buttonID.split("_")[2];
         List<Button> buttons = new ArrayList<>();
 
@@ -225,7 +225,7 @@ public class PlayerTitleHelper {
         UserSettingsManager.save(userSettings);
     }
 
-    public static List<Button> getOptInButtons(Game game, Player player) {
+    private static List<Button> getOptInButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         String key = player.getFaction() + "optin" + "winrate";
         if (game.getStoredValue(key).isEmpty() || "no".equalsIgnoreCase(game.getStoredValue(key))) {

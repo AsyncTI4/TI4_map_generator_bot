@@ -120,7 +120,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(group);
     }
 
-    public Optional<String> getFlavourText() {
+    private Optional<String> getFlavourText() {
         return Optional.ofNullable(flavourText);
     }
 
@@ -128,7 +128,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         return Color.decode(getColourHexCode());
     }
 
-    public String getColourHexCode() {
+    private String getColourHexCode() {
         if (colourHexCode == null && id.equals(getBotSCAutomationID())) {
             return "#ffffff";
         } else if (colourHexCode == null) {

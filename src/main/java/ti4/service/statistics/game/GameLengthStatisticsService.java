@@ -33,13 +33,13 @@ class GameLengthStatisticsService {
         if (num != 0) {
             Map<String, Integer> sortedMapAsc = SortHelper.sortByValue(endedGames, false);
             int num2 = 0;
-            for (String command : sortedMapAsc.keySet()) {
+            for (Map.Entry<String, Integer> entry : sortedMapAsc.entrySet()) {
                 num2++;
                 longMsg.append(num2)
                         .append(". ")
-                        .append(command)
+                        .append(entry.getKey())
                         .append(": ")
-                        .append(sortedMapAsc.get(command))
+                        .append(entry.getValue())
                         .append(" \n");
             }
             longMsg.append("\n The average completion time of these games is: ")

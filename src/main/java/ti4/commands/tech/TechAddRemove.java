@@ -17,7 +17,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 
 abstract class TechAddRemove extends GameStateSubcommand {
 
-    protected TechAddRemove(String id, String description) {
+    TechAddRemove(String id, String description) {
         super(id, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Technology")
                 .setRequired(true)
@@ -65,5 +65,5 @@ abstract class TechAddRemove extends GameStateSubcommand {
         }
     }
 
-    public abstract void doAction(Player player, String techID, SlashCommandInteractionEvent event);
+    protected abstract void doAction(Player player, String techID, SlashCommandInteractionEvent event);
 }

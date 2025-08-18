@@ -2,6 +2,7 @@ package ti4.draft;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
+import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
@@ -15,7 +16,8 @@ import ti4.message.MessageHelper;
 import ti4.service.franken.FrankenDraftBagService;
 
 public abstract class BagDraft {
-    protected final Game owner;
+    private static final Pattern FORWARD_SLASH_PATTERN = Pattern.compile("/");
+    private final Game owner;
 
     public static BagDraft GenerateDraft(String draftType, Game game) {
         if ("franken".equals(draftType)) {
@@ -33,7 +35,7 @@ public abstract class BagDraft {
         return null;
     }
 
-    protected BagDraft(Game owner) {
+    BagDraft(Game owner) {
         this.owner = owner;
     }
 
@@ -136,10 +138,10 @@ public abstract class BagDraft {
         }
 
         String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-"
-                + player.getUserName().replaceAll("/", "");
+                + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("");
         if (owner.isFowMode()) {
-            threadName =
-                    owner.getName() + "-" + "bag-info-" + player.getUserName().replaceAll("/", "") + "-private";
+            threadName = owner.getName() + "-" + "bag-info-"
+                    + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("") + "-private";
         }
 
         ThreadChannel existingChannel = findExistingBagChannel(player, threadName);
@@ -186,10 +188,10 @@ public abstract class BagDraft {
 
     public ThreadChannel findExistingBagChannel(Player player) {
         String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-"
-                + player.getUserName().replaceAll("/", "");
+                + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("");
         if (owner.isFowMode()) {
-            threadName =
-                    owner.getName() + "-" + "bag-info-" + player.getUserName().replaceAll("/", "") + "-private";
+            threadName = owner.getName() + "-" + "bag-info-"
+                    + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("") + "-private";
         }
         return findExistingBagChannel(player, threadName);
     }

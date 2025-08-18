@@ -67,13 +67,13 @@ public class DoubleSetting extends SettingInterface {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Helper Methods
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public String increment() {
+    private String increment() {
         if (val + delta > max + eps) return String.format("[%s cannot go above %0.1f]", name, max);
         val += delta;
         return null;
     }
 
-    public String decrement() {
+    private String decrement() {
         if (val - delta < min - eps) return String.format("[%s cannot go below %0.1f]", name, min);
         val -= delta;
         return null;

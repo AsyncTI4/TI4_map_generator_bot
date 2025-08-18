@@ -12,6 +12,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
 public class CommanderUnlockCheckService {
@@ -33,7 +34,7 @@ public class CommanderUnlockCheckService {
         }
     }
 
-    private static void checkConditionsAndUnlock(Player player, String faction) {
+    public static void checkConditionsAndUnlock(Player player, String faction) {
         Game game = player.getGame();
         boolean shouldBeUnlocked = false;
         switch (faction) {
@@ -290,7 +291,7 @@ public class CommanderUnlockCheckService {
                 }
             }
             case "naaz" -> {
-                if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)
+                if (CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Mech)
                                 .size()
                         > 2) {
                     shouldBeUnlocked = true;

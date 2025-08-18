@@ -33,6 +33,7 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.game.GameNameService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.unit.CheckUnitContainmentService;
 
 public class FoWHelper {
 
@@ -62,7 +63,7 @@ public class FoWHelper {
         if (channel == null) {
             return game.isFowMode();
         }
-        if (channel != null && channel instanceof ThreadChannel) {
+        if (channel instanceof ThreadChannel) {
             channel = ((ThreadChannel) channel).getParentChannel();
         }
 
@@ -318,7 +319,7 @@ public class FoWHelper {
      * Does not traverse wormholes
      */
     public static Set<String> traverseAdjacencies(Game game, boolean naturalMapOnly, String position) {
-        return traverseAdjacencies(game, naturalMapOnly, position, -1, new HashSet<>(), null);
+        return traverseAdjacencies(game, naturalMapOnly, position, -1, new HashSet<>());
     }
 
     /**
@@ -328,12 +329,7 @@ public class FoWHelper {
      * Does not traverse wormholes
      */
     private static Set<String> traverseAdjacencies(
-            Game game,
-            boolean naturalMapOnly,
-            String position,
-            Integer sourceDirection,
-            Set<String> exploredSet,
-            String prevTile) {
+            Game game, boolean naturalMapOnly, String position, Integer sourceDirection, Set<String> exploredSet) {
         Set<String> tiles = new HashSet<>();
         if (exploredSet.contains(position + sourceDirection)) {
             // We already explored this tile from this direction!
@@ -399,8 +395,7 @@ public class FoWHelper {
 
             // explore that tile now!
             int direcetionFrom = naturalMapOnly ? -2 : dirFrom;
-            Set<String> newTiles = traverseAdjacencies(
-                    game, naturalMapOnly, position_, direcetionFrom, exploredSet, position + sourceDirection);
+            Set<String> newTiles = traverseAdjacencies(game, naturalMapOnly, position_, direcetionFrom, exploredSet);
             tiles.addAll(newTiles);
         }
         return tiles;
@@ -802,8 +797,8 @@ public class FoWHelper {
             }
             if (p2.hasAbility("decree") && tile.isAnomaly(game)) {
                 List<Tile> tiles = new ArrayList<>();
-                tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Infantry));
-                tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Mech));
+                tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Infantry));
+                tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Mech));
                 if (tiles.contains(tile)) {
                     return true;
                 }
@@ -1003,5 +998,10 @@ public class FoWHelper {
         if ("null".equals(viewer.getColor())) return false;
         initializeFog(game, viewer, false);
         return canSeeStatsOfPlayer(game, player, viewer);
+    }
+
+    public static boolean isGameMaster(String userId, Game game) {
+        return game.getPlayersWithGMRole().stream()
+                .anyMatch(player -> player.getUserID().equals(userId));
     }
 }

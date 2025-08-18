@@ -15,9 +15,9 @@ import ti4.service.emoji.TI4Emoji;
 @Getter
 @Setter
 public abstract class SettingInterface {
-    protected static final Emoji emojiUp = Emoji.fromUnicode("📈"); // Other up options: [⬆️,⏫,☝️,🔺]
-    protected static final Emoji emojiDown = Emoji.fromUnicode("📉"); // Other down options: []
-    protected static final Emoji emojiToggle = Emoji.fromUnicode("🔁");
+    static final Emoji emojiUp = Emoji.fromUnicode("📈"); // Other up options: [⬆️,⏫,☝️,🔺]
+    static final Emoji emojiDown = Emoji.fromUnicode("📉"); // Other down options: []
+    static final Emoji emojiToggle = Emoji.fromUnicode("🔁");
 
     protected String id;
     protected String name;

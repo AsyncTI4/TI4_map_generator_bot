@@ -1,7 +1,6 @@
 package ti4.commands.map;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -35,7 +34,7 @@ class RemoveBorderAnomaly extends GameStateSubcommand {
         Game game = getGame();
 
         String tilesString = event.getOption(Constants.PRIMARY_TILE).getAsString();
-        Set<String> tiles = new HashSet<>();
+        Set<String> tiles;
         if (Constants.ALL.equals(tilesString)) {
             tiles = game.getTileMap().values().stream().map(Tile::getTileID).collect(Collectors.toSet());
         } else {

@@ -1,6 +1,7 @@
 package ti4.service.unit;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,15 +17,15 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
-public class CaptureUnitService {
+class CaptureUnitService {
 
     public static List<Player> listCapturingMechPlayers(
             Game game, List<RemovedUnit> allUnits, RemovedUnit removedUnitType) {
-        if (removedUnitType.unitKey().getUnitType() != UnitType.Infantry) return List.of();
-        if (!(removedUnitType.uh() instanceof Planet planet)) return List.of();
-        if (ButtonHelper.isLawInPlay(game, "articles_war")) return List.of();
+        if (removedUnitType.unitKey().getUnitType() != UnitType.Infantry) return Collections.emptyList();
+        if (!(removedUnitType.uh() instanceof Planet planet)) return Collections.emptyList();
+        if (ButtonHelper.isLawInPlay(game, "articles_war")) return Collections.emptyList();
         Player destroyedPlayer = removedUnitType.getPlayer(game);
-        if (destroyedPlayer == null) return List.of();
+        if (destroyedPlayer == null) return Collections.emptyList();
 
         List<Player> capturing = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {

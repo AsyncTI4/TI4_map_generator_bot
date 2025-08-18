@@ -7,7 +7,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
-import ti4.spring.service.auth.DiscordOpaqueTokenIntrospector;
+import ti4.spring.auth.DiscordOpaqueTokenIntrospector;
 
 @RequiredArgsConstructor
 @EnableMethodSecurity

@@ -10,67 +10,67 @@ import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.testUtils.BaseTi4Test;
 
-public class ActionCardModelTest extends BaseTi4Test {
-    final ActionCardModel actionCardModel = new ActionCardModel();
+class ActionCardModelTest extends BaseTi4Test {
+    private final ActionCardModel actionCardModel = new ActionCardModel();
 
     @Test
     // test a specific card
-    public void testDirectHit() {
+    void testDirectHit() {
         ActionCardModel dhActionCardModel = Mapper.getActionCard("dh1");
         assertEquals("Direct Hit", dhActionCardModel.getName());
     }
 
     @Test
-    public void testAlias() {
+    void testAlias() {
         String alias = "testAlias";
         actionCardModel.setAlias(alias);
         assertEquals(alias, actionCardModel.getAlias());
     }
 
     @Test
-    public void testName() {
+    void testName() {
         String name = "testName";
         actionCardModel.setName(name);
         assertEquals(name, actionCardModel.getName());
     }
 
     @Test
-    public void testPhase() {
+    void testPhase() {
         String phase = "testPhase";
         actionCardModel.setPhase(phase);
         assertEquals(phase, actionCardModel.getPhase());
     }
 
     @Test
-    public void testWindow() {
+    void testWindow() {
         String window = "testWindow";
         actionCardModel.setWindow(window);
         assertEquals(window, actionCardModel.getWindow());
     }
 
     @Test
-    public void testText() {
+    void testText() {
         String text = "testText";
         actionCardModel.setText(text);
         assertEquals(text, actionCardModel.getText());
     }
 
     @Test
-    public void testFlavorText() {
+    void testFlavorText() {
         String flavorText = "testFlavorText";
         actionCardModel.setFlavorText(flavorText);
         assertEquals(flavorText, actionCardModel.getFlavorText().get());
     }
 
     @Test
-    public void testSource() {
+    void testSource() {
         ComponentSource source = ComponentSource.testsource;
         actionCardModel.setSource(source);
         assertEquals(ComponentSource.testsource, actionCardModel.getSource());
     }
 
     @Test
-    public void testSearchTags() {
+    void testSearchTags() {
         List<String> searchTags = new ArrayList<>();
         searchTags.add("testTag1");
         searchTags.add("testTag2");
@@ -79,7 +79,7 @@ public class ActionCardModelTest extends BaseTi4Test {
     }
 
     @Test
-    public void testIsValid() {
+    void testIsValid() {
         actionCardModel.setAlias("testAlias");
         actionCardModel.setName("testName");
         actionCardModel.setPhase("testPhase");
@@ -91,14 +91,14 @@ public class ActionCardModelTest extends BaseTi4Test {
     }
 
     @Test
-    public void testSearch() {
+    void testSearch() {
         String searchString = "testAlias";
         actionCardModel.setAlias(searchString);
         assertTrue(actionCardModel.search(searchString.toLowerCase()));
     }
 
     @Test
-    public void testAutoCompleteName() {
+    void testAutoCompleteName() {
         String name = "testName";
         ComponentSource source = ComponentSource.testsource;
         actionCardModel.setName(name);

@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
-public class StrategyCardSetModelTest extends BaseTi4Test {
+class StrategyCardSetModelTest extends BaseTi4Test {
     @Test
-    public void testSCSetModels() {
+    void testSCSetModels() {
         for (StrategyCardSetModel scSetModel : Mapper.getStrategyCardSets().values()) {
             assertTrue(scSetModel.isValid(), scSetModel.getAlias() + "'s data is invalid");
             assertTrue(

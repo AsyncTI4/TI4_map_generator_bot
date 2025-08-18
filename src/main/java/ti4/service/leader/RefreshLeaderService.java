@@ -20,9 +20,8 @@ public class RefreshLeaderService {
             String leaderName = playerLeader.getId();
             if ("nomadagentartuno".equals(leaderName)) {
                 leaderName = "Artuno the Betrayer, a Nomad agent,";
-            } else if ("nomadagentartuno".equals(leaderName)) {
-                leaderName = "Clever Clever Artuno the Betrayer, a Nomad/Yssaril agent,";
             }
+
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " you gained " + tgCount + " trade good"

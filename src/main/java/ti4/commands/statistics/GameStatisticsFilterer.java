@@ -17,16 +17,16 @@ import ti4.model.Source.ComponentSource;
 public class GameStatisticsFilterer {
 
     public static final String PLAYER_COUNT_FILTER = "player_count";
-    public static final String MIN_PLAYER_COUNT_FILTER = "min_player_count";
-    public static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";
+    private static final String MIN_PLAYER_COUNT_FILTER = "min_player_count";
+    private static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";
     public static final String GAME_TYPES_FILTER = "game_type";
-    public static final String FOG_FILTER = "is_fog";
-    public static final String HOMEBREW_FILTER = "has_homebrew";
-    public static final String HAS_WINNER_FILTER = "has_winner";
+    private static final String FOG_FILTER = "is_fog";
+    private static final String HOMEBREW_FILTER = "has_homebrew";
+    private static final String HAS_WINNER_FILTER = "has_winner";
     public static final String WINNING_FACTION_FILTER = "winning_faction";
     public static final String EXCLUDED_GAME_TYPES_FILTER = "exclude_game_types";
-    public static final String HAS_GALACTIC_EVENT_FILTER = "has_galactic_event";
-    public static final String HAS_SCENARIO_FILTER = "has_scenario";
+    private static final String HAS_GALACTIC_EVENT_FILTER = "has_galactic_event";
+    private static final String HAS_SCENARIO_FILTER = "has_scenario";
 
     private static final int MINIMUM_ROUND = 3;
 
@@ -207,14 +207,14 @@ public class GameStatisticsFilterer {
     private static boolean isDiscordantStarsGame(Game game) {
         return game.isDiscordantStarsMode()
                 || Mapper.getFactionsValues().stream()
-                        .filter(faction -> ComponentSource.ds == faction.getSource())
+                        .filter(faction -> faction.getSource() == ComponentSource.ds)
                         .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
     }
 
     private static boolean isMiltyModGame(Game game) {
         return game.isMiltyModMode()
                 || Mapper.getFactionsValues().stream()
-                        .filter(faction -> ComponentSource.miltymod == faction.getSource())
+                        .filter(faction -> faction.getSource() == ComponentSource.miltymod)
                         .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
     }
 

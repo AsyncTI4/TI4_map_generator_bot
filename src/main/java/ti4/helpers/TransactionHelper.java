@@ -42,7 +42,7 @@ import ti4.settings.users.UserSettingsManager;
 
 public class TransactionHelper {
 
-    public static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
+    private static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
         List<Player> players = new ArrayList<>();
         players.add(p1);
@@ -277,7 +277,9 @@ public class TransactionHelper {
                                                         .getName())
                                                 .append("_");
                                     } else {
-                                        trans.append(" ").append("null pn info for " + id);
+                                        trans.append(" ")
+                                                .append("null pn info for ")
+                                                .append(id);
                                     }
                                 }
                             }
@@ -784,7 +786,7 @@ public class TransactionHelper {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, stuffToTransButtons);
     }
 
-    public static boolean resolveAgeOfCommerceTechCheck(Player owner, Player receiver, String tech, Game game) {
+    private static boolean resolveAgeOfCommerceTechCheck(Player owner, Player receiver, String tech, Game game) {
         if (!Mapper.getTech(AliasHandler.resolveTech(tech))
                 .getFaction()
                 .orElse("")
@@ -1184,7 +1186,7 @@ public class TransactionHelper {
         }
     }
 
-    public static void resolveSpecificTransButtonPress(
+    private static void resolveSpecificTransButtonPress(
             Game game, Player p1, String buttonID, ButtonInteractionEvent event, boolean oldWay) {
         String finChecker = "FFCC_" + p1.getFaction() + "_";
         buttonID = buttonID.replace("send_", "");
@@ -1448,7 +1450,7 @@ public class TransactionHelper {
         }
     }
 
-    public static boolean canTheseTwoTransact(Game game, Player player, Player player2) {
+    private static boolean canTheseTwoTransact(Game game, Player player, Player player2) {
         // if(game.getRealPlayers().size() > 26){
         //     return true;
         // }
@@ -1489,7 +1491,7 @@ public class TransactionHelper {
         }
     }
 
-    public static List<Button> getPlayersToTransact(Game game, Player p) {
+    private static List<Button> getPlayersToTransact(Game game, Player p) {
         List<Button> playerButtons = new ArrayList<>();
         String finChecker = "FFCC_" + p.getFaction() + "_";
         for (Player player : game.getPlayers().values()) {
@@ -1519,7 +1521,7 @@ public class TransactionHelper {
         return playerButtons;
     }
 
-    public static List<Button> getStuffToTransButtonsNew(Game game, Player player, Player p1, Player p2) {
+    private static List<Button> getStuffToTransButtonsNew(Game game, Player player, Player p1, Player p2) {
         List<Button> stuffToTransButtons = new ArrayList<>();
         if (p1.getTg() > 0) {
             stuffToTransButtons.add(
@@ -1622,7 +1624,7 @@ public class TransactionHelper {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static List<Button> getStuffToTransButtonsOld(Game game, Player p1, Player p2) {
+    private static List<Button> getStuffToTransButtonsOld(Game game, Player p1, Player p2) {
         String finChecker = "FFCC_" + p1.getFaction() + "_";
         List<Button> stuffToTransButtons = new ArrayList<>();
         if (p1.getTg() > 0) {

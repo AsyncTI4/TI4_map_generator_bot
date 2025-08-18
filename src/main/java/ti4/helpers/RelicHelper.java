@@ -186,7 +186,7 @@ public class RelicHelper {
     public static void offerInitialNeuraLoopChoice(Game game, String poID) {
         for (Player player : game.getRealPlayers()) {
             if (player.hasRelic("neuraloop")) {
-                String name = "";
+                String name;
                 if (Mapper.getPublicObjective(poID) != null) {
                     name = Mapper.getPublicObjective(poID).getName();
                 } else {

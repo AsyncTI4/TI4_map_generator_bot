@@ -348,7 +348,7 @@ class ExploreButtonHandler {
     static void commForAC(ButtonInteractionEvent event, Game game, Player player) {
         boolean hasSchemingAbility = player.hasAbility("scheming");
         int count2 = hasSchemingAbility ? 2 : 1;
-        String commOrTg = "";
+        String commOrTg;
         if (player.getCommodities() > 0) {
             commOrTg = "commodity";
             player.setCommodities(player.getCommodities() - 1);

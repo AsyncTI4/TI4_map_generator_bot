@@ -1,28 +1,18 @@
 package ti4.image;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
@@ -41,11 +31,14 @@ import ti4.service.emoji.TI4Emoji;
 @UtilityClass
 public class DrawingUtil {
 
+    private static final Pattern PATTERN = Pattern.compile("[\\n\n]");
+
     private static BasicStroke stroke(int size) {
         return new BasicStroke(size);
     }
 
     private static final int DELTA_Y = 26;
+    private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -1.5707963267948966;
 
     public static void superDrawString(
             Graphics g,
@@ -303,7 +296,7 @@ public class DrawingUtil {
     }
 
     @Nullable
-    public static String getFactionIconPath(String factionID) {
+    private static String getFactionIconPath(String factionID) {
         if ("null".equals(factionID) || isBlank(factionID)) {
             return null;
         }
@@ -350,7 +343,7 @@ public class DrawingUtil {
         drawCenteredString(g, text, x, y, font);
     }
 
-    public static void drawCenteredString(Graphics g, String text, int x, int y, Font font) {
+    private static void drawCenteredString(Graphics g, String text, int x, int y, Font font) {
         g.setFont(font);
         superDrawString(g, text, x, y, null, HorizontalAlign.Center, VerticalAlign.Center, null, null);
     }
@@ -480,7 +473,7 @@ public class DrawingUtil {
             Point c1 = corners.get(i);
             Point c2 = corners.get((i + 1) % 6);
 
-            GradientPaint gpOne = null, gpTwo = null;
+            GradientPaint gpOne, gpTwo = null;
             if (rainbow) { // special handling for rainbow
                 Point mid = new Point((c1.x + c2.x) / 2, (c1.y + c2.y) / 2);
                 if (i % 2 == 0) {
@@ -555,14 +548,14 @@ public class DrawingUtil {
         g2.drawImage(ImageHelper.readEmojiImageScaled(emoji, size), x, y, null);
     }
 
-    public static int width(Graphics2D g, String str) {
+    private static int width(Graphics2D g, String str) {
         int w = 0;
         if (str != null && !str.isBlank()) w = g.getFontMetrics().stringWidth(str);
         return w;
     }
 
     public static List<String> layoutText(Graphics2D g2, String inputText, int maxWidth) {
-        List<String> initialSplit = new ArrayList<>(Arrays.asList(inputText.split("[\\n\n]")));
+        List<String> initialSplit = new ArrayList<>(Arrays.asList(PATTERN.split(inputText)));
         List<String> finalSplit = new ArrayList<>();
         for (String line : initialSplit) {
             line = line.trim();
@@ -600,11 +593,7 @@ public class DrawingUtil {
     public static void drawRectWithTwoColorGradient(
             Graphics2D g2, Color mainColor, Color accentColor, int x, int y, int width, int height) {
         Rectangle rect = new Rectangle(x, y, width, height);
-        Paint gradient = ColorUtil.gradient(mainColor, accentColor, rect);
-        Paint old = g2.getPaint();
-        g2.setPaint(gradient);
-        g2.draw(rect);
-        g2.setPaint(old);
+        drawRectWithTwoColorGradient(g2, mainColor, accentColor, rect);
     }
 
     public static void drawRectWithTwoColorGradient(Graphics2D g2, Color mainColor, Color accentColor, Rectangle rect) {
@@ -629,7 +618,7 @@ public class DrawingUtil {
     public static void drawTextVertically(Graphics graphics, String text, int x, int y, Font font, boolean rightAlign) {
         Graphics2D graphics2D = (Graphics2D) graphics;
         AffineTransform originalTransform = graphics2D.getTransform();
-        graphics2D.rotate(-1.5707963267948966);
+        graphics2D.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
         graphics2D.setFont(font);
 
         if (rightAlign) {
@@ -661,7 +650,7 @@ public class DrawingUtil {
         drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, false);
     }
 
-    public static void drawTwoLinesOfTextVertically(
+    private static void drawTwoLinesOfTextVertically(
             Graphics graphics, String text, int x, int y, int maxWidth, boolean rightAlign) {
         int spacing = graphics.getFontMetrics().getAscent()
                 + graphics.getFontMetrics().getLeading();
@@ -730,7 +719,7 @@ public class DrawingUtil {
         drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, rightAlign);
     }
 
-    public static String trimTextToPixelWidth(Graphics graphics, String text, int pixelLength) {
+    private static String trimTextToPixelWidth(Graphics graphics, String text, int pixelLength) {
         for (int i = 0; i < text.length(); i++) {
             if (graphics.getFontMetrics().stringWidth(text.substring(0, i + 1)) > pixelLength) {
                 return text.substring(0, i);

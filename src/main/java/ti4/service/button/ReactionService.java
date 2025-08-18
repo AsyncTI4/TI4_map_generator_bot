@@ -209,7 +209,7 @@ public class ReactionService {
         GameMessageManager.remove(game.getName(), message.getId());
     }
 
-    public static boolean checkForSpecificPlayerReact(Player player, GameMessageManager.GameMessage gameMessage) {
+    private static boolean checkForSpecificPlayerReact(Player player, GameMessageManager.GameMessage gameMessage) {
         return gameMessage.factionsThatReacted().contains(player.getFaction());
     }
 

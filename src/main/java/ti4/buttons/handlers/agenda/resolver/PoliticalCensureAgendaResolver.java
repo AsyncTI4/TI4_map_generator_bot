@@ -7,6 +7,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class PoliticalCensureAgendaResolver implements AgendaResolver {
+
     private final String agendaId;
 
     public PoliticalCensureAgendaResolver(String agendaId) {

@@ -1,7 +1,15 @@
 package ti4.helpers;
 
-import java.util.*;
-import ti4.map.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import ti4.map.Game;
+import ti4.map.Planet;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.model.UnitModel;
 
 public class PdsCoverageHelper {
@@ -151,7 +159,7 @@ public class PdsCoverageHelper {
         return pdsCoverage;
     }
 
-    public static int checkNumberNonFighterShipsWithoutSpaceCannon(Player player, Tile tile) {
+    private static int checkNumberNonFighterShipsWithoutSpaceCannon(Player player, Tile tile) {
         int count = 0;
         UnitHolder space = tile.getUnitHolders().get("space");
         for (Units.UnitKey unit : space.getUnitKeys()) {

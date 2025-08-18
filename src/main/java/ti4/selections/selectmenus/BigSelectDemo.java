@@ -11,7 +11,7 @@ import ti4.selections.Selection;
 
 public class BigSelectDemo implements Selection {
 
-    public static final String selectionID = "demo";
+    private static final String selectionID = "demo";
 
     private static List<String> options;
 
@@ -57,7 +57,7 @@ public class BigSelectDemo implements Selection {
         serveDemoSelectMenu(event, null, 0);
     }
 
-    public static void serveDemoSelectMenu(
+    private static void serveDemoSelectMenu(
             GenericInteractionCreateEvent event, List<String> preselected, int startIdx) {
         StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(selectionID);
         int padding = 0;

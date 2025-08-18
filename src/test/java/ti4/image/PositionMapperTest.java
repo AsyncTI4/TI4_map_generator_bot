@@ -8,9 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import ti4.testUtils.BaseTi4Test;
 
-public class PositionMapperTest extends BaseTi4Test {
+class PositionMapperTest extends BaseTi4Test {
     @Test
-    public void testIsCornerOfHexRing() {
+    void testIsCornerOfHexRing() {
         assertTrue(PositionMapper.isCornerOfHexRing("201"));
         assertTrue(PositionMapper.isCornerOfHexRing("203"));
         assertTrue(PositionMapper.isCornerOfHexRing("526"));
@@ -26,7 +26,7 @@ public class PositionMapperTest extends BaseTi4Test {
     }
 
     @Test
-    public void testGetSideNumberOfHexRing() {
+    void testGetSideNumberOfHexRing() {
         assertSame(1, PositionMapper.getRingSideNumberOfTileID("201"));
         assertSame(1, PositionMapper.getRingSideNumberOfTileID("202"));
         assertSame(2, PositionMapper.getRingSideNumberOfTileID("203"));
@@ -49,7 +49,7 @@ public class PositionMapperTest extends BaseTi4Test {
     }
 
     @Test
-    public void testGetCornerPositionOfHexRing() {
+    void testGetCornerPositionOfHexRing() {
         assertEquals("201", PositionMapper.getTileIDAtCornerPositionOfRing(2, 1));
         assertEquals("203", PositionMapper.getTileIDAtCornerPositionOfRing(2, 2));
         assertEquals("205", PositionMapper.getTileIDAtCornerPositionOfRing(2, 3));

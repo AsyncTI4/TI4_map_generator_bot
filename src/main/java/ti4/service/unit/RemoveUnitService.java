@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -175,7 +174,7 @@ public class RemoveUnitService {
 
         if (unitHoldersToRemoveFrom.isEmpty()) {
             handleEmptyUnitHolders(event, tile, parsedUnit);
-            return List.of();
+            return Collections.emptyList();
         }
 
         int toRemoveCount = parsedUnit.getCount();
@@ -184,7 +183,7 @@ public class RemoveUnitService {
             List<Integer> unitsRemovedCount =
                     unitHolder.removeUnit(parsedUnit.getUnitKey(), toRemoveCount, preferredState);
 
-            int tot = unitsRemovedCount.stream().collect(Collectors.summingInt(i -> i));
+            int tot = unitsRemovedCount.stream().mapToInt(i -> i).sum();
             if (tot > 0) {
                 allUnitsRemoved.add(new RemovedUnit(parsedUnit.getUnitKey(), tile, unitHolder, unitsRemovedCount));
                 toRemoveCount -= tot;
@@ -222,7 +221,7 @@ public class RemoveUnitService {
     }
 
     private static void handleEmptyUnitHolders(GenericInteractionCreateEvent event, Tile tile, ParsedUnit parsedUnit) {
-        if (event != null && event instanceof ButtonInteractionEvent) {
+        if (event instanceof ButtonInteractionEvent) {
             BotLogger.warning(
                     new BotLogger.LogMessageOrigin(event),
                     event.getId() + " found a null UnitHolder with the following info: " + tile.getRepresentation()

@@ -1,5 +1,6 @@
 package ti4.service.info;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +25,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
 public class ListPlayerInfoService {
@@ -124,7 +126,7 @@ public class ListPlayerInfoService {
 
     record ObjectiveResult(boolean canFullyMeet, int closenessScore) {}
 
-    public ObjectiveResult checkObjective(
+    private ObjectiveResult checkObjective(
             List<String> planets, int tradeGoods, int goal, Player player, Game game, int closestScore) {
         return backtrack(planets, 0, 0, 0, new HashSet<>(), tradeGoods, goal, player, game, closestScore);
     }
@@ -302,7 +304,7 @@ public class ListPlayerInfoService {
         return representScoring(game, objID, x, false);
     }
 
-    public static String representScoring(Game game, String objID, int x, boolean secret) {
+    private static String representScoring(Game game, String objID, int x, boolean secret) {
         StringBuilder representation;
         if (secret) {
             representation = new StringBuilder(
@@ -353,7 +355,7 @@ public class ListPlayerInfoService {
         return representation.toString();
     }
 
-    public static String representSecrets(Game game) {
+    private static String representSecrets(Game game) {
         StringBuilder representation = new StringBuilder("__**Scored Secret Objectives**__\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
@@ -369,7 +371,7 @@ public class ListPlayerInfoService {
         return representation.toString();
     }
 
-    public static String representSupports(Game game) {
+    private static String representSupports(Game game) {
         StringBuilder representation = new StringBuilder("__**Support Victory Points**__\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
@@ -383,7 +385,7 @@ public class ListPlayerInfoService {
         return representation.toString();
     }
 
-    public static String getTransferablePointRepresentation(String objectiveId) {
+    private static String getTransferablePointRepresentation(String objectiveId) {
         return switch (objectiveId) {
             case Constants.VOICE_OF_THE_COUNCIL_PO, "Shard of the Throne", "Political Censure" -> objectiveId;
             case "Shard of the Throne (1)", "Shard of the Throne (2)", "Shard of the Throne (3)" -> objectiveId;
@@ -392,12 +394,12 @@ public class ListPlayerInfoService {
         };
     }
 
-    public static boolean gameHasTransferablePoints(Game game) {
+    private static boolean gameHasTransferablePoints(Game game) {
         return game.getCustomPublicVP().keySet().stream()
                 .anyMatch(obj -> getTransferablePointRepresentation(obj) != null);
     }
 
-    public static String representTransferablePoints(Game game) {
+    private static String representTransferablePoints(Game game) {
         StringBuilder representation = new StringBuilder("__**Transferable Points**__");
         if (!game.isFowMode()) {
             for (var objective : game.getCustomPublicVP().entrySet()) {
@@ -406,7 +408,7 @@ public class ListPlayerInfoService {
 
                 List<String> scoringPlayers = game.getScoredPublicObjectives().get(objective.getKey());
                 if (scoringPlayers == null) {
-                    scoringPlayers = List.of();
+                    scoringPlayers = Collections.emptyList();
                 }
                 representation
                         .append("\n> ")
@@ -426,7 +428,7 @@ public class ListPlayerInfoService {
         return representation.toString();
     }
 
-    public static String representTotalVPs(Game game) {
+    private static String representTotalVPs(Game game) {
         StringBuilder representation = new StringBuilder("__**Total Victory Points**__\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
@@ -674,7 +676,7 @@ public class ListPlayerInfoService {
             }
             case "supremacy", "supremacy_omegaphase" -> {
                 int count = 0;
-                for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(
+                for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(
                         game, player, Units.UnitType.Flagship, Units.UnitType.Warsun, Units.UnitType.Lady)) {
                     if ((tile.isHomeSystem(game) && tile != player.getHomeSystemTile()) || tile.isMecatol()) {
                         count++;
@@ -913,7 +915,8 @@ public class ListPlayerInfoService {
                     if (p2 == player) {
                         continue;
                     }
-                    for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, Units.UnitType.Spacedock)) {
+                    for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                            game, p2, Units.UnitType.Spacedock)) {
                         if (ButtonHelper.checkNumberShips(player, tile) > 0) {
                             count++;
                         }

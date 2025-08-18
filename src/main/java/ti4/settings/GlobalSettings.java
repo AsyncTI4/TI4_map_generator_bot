@@ -53,7 +53,7 @@ public class GlobalSettings {
         saveSettings();
     }
 
-    public static void saveSettings() {
+    private static void saveSettings() {
         ObjectMapper mapper = new ObjectMapper();
         ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
         try {

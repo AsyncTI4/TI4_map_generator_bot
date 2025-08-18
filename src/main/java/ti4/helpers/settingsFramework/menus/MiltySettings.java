@@ -135,7 +135,7 @@ public class MiltySettings extends SettingsMenu {
         }
     }
 
-    protected List<SettingsMenu> draftModeCategories() {
+    private List<SettingsMenu> draftModeCategories() {
         List<SettingsMenu> draftCategories = new ArrayList<>();
         switch (draftMode.getValue()) {
             // case franken -> draftCategories.add(frankenSettings);
@@ -144,7 +144,7 @@ public class MiltySettings extends SettingsMenu {
         return draftCategories;
     }
 
-    protected String startMilty(GenericInteractionCreateEvent event) {
+    private String startMilty(GenericInteractionCreateEvent event) {
         return MiltyService.startFromSettings(event, this);
     }
 }

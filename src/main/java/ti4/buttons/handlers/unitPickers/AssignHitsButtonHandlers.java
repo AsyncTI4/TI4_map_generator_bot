@@ -28,7 +28,7 @@ import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
-public class AssignHitsButtonHandlers {
+class AssignHitsButtonHandlers {
 
     @ButtonHandler("assignHits_")
     // assignHits_101_2_dd

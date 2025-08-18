@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 
 class WipeTurnTime extends Subcommand {
 
-    public WipeTurnTime() {
+    WipeTurnTime() {
         super(Constants.WIPE_TURN_TIME, "Wipe your turn time in all games");
     }
 
@@ -31,15 +31,13 @@ class WipeTurnTime extends Subcommand {
                 .map(ManagedGame::getName)
                 .distinct()
                 .forEach(gameName -> ExecutionLockManager.wrapWithLockAndRelease(
-                                gameName,
-                                ExecutionLockManager.LockType.WRITE,
-                                () -> wipeTurnTime(gameName, userId, event))
+                                gameName, ExecutionLockManager.LockType.WRITE, () -> wipeTurnTime(gameName, userId))
                         .run());
 
         MessageHelper.sendMessageToChannel(event.getChannel(), "Wiped all of your turn times");
     }
 
-    private void wipeTurnTime(String gameName, String playerId, SlashCommandInteractionEvent event) {
+    private void wipeTurnTime(String gameName, String playerId) {
         Game game = GameManager.getManagedGame(gameName).getGame();
         Player player = game.getPlayer(playerId);
         if (player != null) {
@@ -47,6 +45,5 @@ class WipeTurnTime extends Subcommand {
             player.setNumberOfTurns(0);
             GameManager.save(game, "Wiped turn time.");
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Wiped all of your turn times");
     }
 }

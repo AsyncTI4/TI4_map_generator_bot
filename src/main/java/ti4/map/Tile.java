@@ -6,8 +6,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -311,11 +311,11 @@ public class Tile {
         if (label2 != null) fogLabel.put(player1.getUserID(), label2);
     }
 
-    public Map<String, Boolean> getFog() {
+    private Map<String, Boolean> getFog() {
         return new HashMap<>(fog);
     }
 
-    public Map<String, String> getFogLabel() {
+    private Map<String, String> getFogLabel() {
         return new HashMap<>(fogLabel);
     }
 
@@ -513,7 +513,7 @@ public class Tile {
 
     @JsonIgnore
     public Set<WormholeModel.Wormhole> getWormholes() {
-        Set<WormholeModel.Wormhole> whs = new HashSet<>();
+        Set<WormholeModel.Wormhole> whs = EnumSet.noneOf(WormholeModel.Wormhole.class);
         if (getTileModel().getWormholes() != null) whs.addAll(getTileModel().getWormholes());
         for (String token : getSpaceUnitHolder().getTokenList()) {
             if (token.contains("alpha") || token.contains("sigma_weirdway")) whs.add(WormholeModel.Wormhole.ALPHA);
@@ -524,7 +524,7 @@ public class Tile {
     }
 
     @JsonIgnore
-    public boolean hasCabalSpaceDockOrGravRiftToken() {
+    private boolean hasCabalSpaceDockOrGravRiftToken() {
         return hasCabalSpaceDockOrGravRiftToken(null);
     }
 
@@ -676,7 +676,7 @@ public class Tile {
                 .sum();
     }
 
-    public static Predicate<Tile> tileHasPlayerShips(Player player) {
+    private static Predicate<Tile> tileHasPlayerShips(Player player) {
         return tile -> tile.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip);
     }
 
@@ -684,7 +684,7 @@ public class Tile {
         return tile -> tile.containsPlayersUnits(player);
     }
 
-    public static Predicate<Tile> tileHasPlayerPlanet(Player player) {
+    private static Predicate<Tile> tileHasPlayerPlanet(Player player) {
         return tile -> CollectionUtils.containsAny(
                 player.getPlanets(),
                 tile.getPlanetUnitHolders().stream().map(Planet::getName).toList());

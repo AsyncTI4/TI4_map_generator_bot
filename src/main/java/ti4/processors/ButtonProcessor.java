@@ -100,7 +100,7 @@ public class ButtonProcessor {
         return false;
     }
 
-    public static void resolveButtonInteractionEvent(ButtonContext context) {
+    private static void resolveButtonInteractionEvent(ButtonContext context) {
         // pull values from context for easier access
         ButtonInteractionEvent event = context.getEvent();
         Player player = context.getPlayer();

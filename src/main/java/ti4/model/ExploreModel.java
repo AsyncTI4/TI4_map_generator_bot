@@ -7,6 +7,7 @@ import java.util.Optional;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import ti4.helpers.PatternHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.ExploreEmojis;
 
@@ -43,7 +44,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(attachmentId);
     }
 
-    public Optional<String> getFlavorText() {
+    private Optional<String> getFlavorText() {
         return Optional.ofNullable(flavorText);
     }
 
@@ -67,7 +68,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
         StringBuilder sb = new StringBuilder(getTypeEmoji()).append(" ");
         if (source != null) sb.append(source.emoji()).append(" ");
         sb.append("_").append(name).append("_\n> ");
-        sb.append(text.replaceAll("\n(> )?", "\n> "));
+        sb.append(PatternHelper.NEWLINE_OPTIONAL_GT_PATTERN.matcher(text).replaceAll("\n> "));
         return sb.toString();
     }
 

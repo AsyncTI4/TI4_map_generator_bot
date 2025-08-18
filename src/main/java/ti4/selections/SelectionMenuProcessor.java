@@ -65,7 +65,7 @@ public class SelectionMenuProcessor {
         return false;
     }
 
-    public static void resolveSelectionMenu(SelectionMenuContext context) {
+    private static void resolveSelectionMenu(SelectionMenuContext context) {
         if (handleKnownMenus(context)) {
             return;
         }

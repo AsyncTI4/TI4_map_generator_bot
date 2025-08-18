@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
-public class LeaderModelTest extends BaseTi4Test {
+class LeaderModelTest extends BaseTi4Test {
     @Test
-    public void testLeaders() {
+    void testLeaders() {
         for (LeaderModel model : Mapper.getLeaders().values()) {
             assertTrue(model.isValid(), model.getAlias() + ": invalid");
             assertTrue(validateFaction(model), model.getAlias() + ": invalid FactionID");

@@ -1,7 +1,6 @@
 package ti4.service.game;
 
 import java.awt.image.BufferedImage;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -33,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
+import ti4.commands.CommandHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -67,7 +67,7 @@ public class CreateGameService {
         return newGame;
     }
 
-    public static void reportNewGameCreated(Game game) {
+    private static void reportNewGameCreated(Game game) {
         if (game == null) return;
 
         TextChannel bothelperLoungeChannel =
@@ -678,21 +678,15 @@ public class CreateGameService {
     public static String getNewPlayerInfoText() {
         String path = ResourceHelper.getInstance().getHelpFile("NewPlayerIntro.txt");
         try {
-            return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+            return Files.readString(Paths.get(path));
         } catch (Exception e) {
             return "NewPlayerIntro HELP FILE IS BLANK";
         }
     }
 
     public static boolean isLockedFromCreatingGames(GenericInteractionCreateEvent event) {
-        Member member = event.getMember();
-        if (member != null) {
-            List<Role> roles = member.getRoles();
-            for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
-                if (roles.contains(role)) {
-                    return false;
-                }
-            }
+        if (CommandHelper.hasRole(event, AsyncTI4DiscordBot.bothelperRoles)) {
+            return false;
         }
 
         var userSettings = UserSettingsManager.get(event.getUser().getId());
