@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
@@ -176,7 +177,7 @@ public class BotLogger {
             origin = new LogOrigin(AsyncTI4DiscordBot.guildPrimary);
             msg.append(origin.getOriginTimeFormatted());
         }
-        channel = origin.getLogChannel(severity);
+        channel = getLogChannel(severity);
 
         if (multiline) {
             msg.append("Message: ");
@@ -294,5 +295,23 @@ public class BotLogger {
             return restError.getErrorCode() == DISCORD_UNKNOWN_ERROR_STATUS_CODE;
         }
         return false;
+    }
+
+    /**
+     * Get the most relevant log channel for this source. Priority is to severity.channelName, then "#bot-log", then returns null.
+     *
+     * @param severity - The severity of the log message, used to find the appropriate channel based on LogSeverity.channelName
+     * @return The most relevant logging TextChannel
+     */
+    @Nullable
+    private TextChannel getLogChannel(@Nonnull LogSeverity severity) {
+        Guild guild = AsyncTI4DiscordBot.guildPrimary;
+        if (guild == null) return null;
+
+        return guild.getTextChannelsByName(severity.channelName, false).stream()
+                .findFirst()
+                .orElse(guild.getTextChannelsByName("bot-log", false).stream()
+                        .findFirst()
+                        .orElse(null));
     }
 }
