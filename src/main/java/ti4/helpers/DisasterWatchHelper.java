@@ -11,6 +11,7 @@ import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 
 @UtilityClass
 public class DisasterWatchHelper {
@@ -30,7 +31,7 @@ public class DisasterWatchHelper {
                 new TileGenerator(game, event, null, rings, tile.getPosition()).createFileUpload()) {
             MessageHelper.sendMessageWithFile(watchParty, systemWithContext, message, false);
         } catch (IOException e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event, game), "Exception while closing FileUpload", e);
+            BotLogger.error(new LogOrigin(event, game), "Exception while closing FileUpload", e);
         }
     }
 

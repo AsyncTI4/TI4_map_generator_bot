@@ -29,6 +29,7 @@ import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.async.ReserveGameNumberService;
 import ti4.service.game.CreateGameService;
 import ti4.service.game.HomebrewService;
@@ -66,7 +67,7 @@ public class CreateFoWGameService {
         if (!"fow1".equalsIgnoreCase(lastGame)) {
             if (!GameManager.isValid(lastGame)) {
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(event),
+                        new LogOrigin(event),
                         "**Unable to create new games because the last game cannot be found. Was it deleted but the roles still exist?**");
                 return;
             }

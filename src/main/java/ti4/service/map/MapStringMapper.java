@@ -6,6 +6,7 @@ import java.util.StringTokenizer;
 import ti4.helpers.AliasHandler;
 import ti4.map.Game;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 
 class MapStringMapper {
     public static Map<String, String> getMappedTilesToPosition(String tileListAsString, Game userActiveGame) {
@@ -31,8 +32,7 @@ class MapStringMapper {
 
             if (ringCount > 16) {
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(userActiveGame),
-                        "Exceeding max ring (16) count for " + userActiveGame.getName());
+                        new LogOrigin(userActiveGame), "Exceeding max ring (16) count for " + userActiveGame.getName());
                 break;
             }
         }

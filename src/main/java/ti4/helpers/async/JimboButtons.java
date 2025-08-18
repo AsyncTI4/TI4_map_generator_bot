@@ -19,6 +19,7 @@ import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.TileModel;
 
 // Jazz's Interactive Map Builder
@@ -139,7 +140,7 @@ class JimboButtons {
             MessageHelper.editMessageWithActionRowsAndFiles(event, msg, rowsToSend, listToSend);
             return true; // no further actions needed
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Unexpected exception in JIMBO pagination:", e);
+            BotLogger.error(new LogOrigin(event), "Unexpected exception in JIMBO pagination:", e);
             return true; // we still want to abort any further actions
         }
     }

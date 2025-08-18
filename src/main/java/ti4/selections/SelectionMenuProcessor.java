@@ -10,6 +10,7 @@ import ti4.listeners.annotations.SelectionHandler;
 import ti4.listeners.context.SelectionMenuContext;
 import ti4.map.Game;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.game.GameNameService;
 
 public class SelectionMenuProcessor {
@@ -36,7 +37,7 @@ public class SelectionMenuProcessor {
         } catch (Exception e) {
             String message = "Selection Menu issue in event: " + event.getComponentId() + "\n> Channel: "
                     + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), message, e);
+            BotLogger.error(new LogOrigin(event), message, e);
         }
     }
 
@@ -79,7 +80,7 @@ public class SelectionMenuProcessor {
                     selection.postExecute(event);
                 } catch (Exception e) {
                     String messageText = "Error trying to execute selection: " + event.getComponentId();
-                    BotLogger.error(new BotLogger.LogMessageOrigin(event), messageText, e);
+                    BotLogger.error(new LogOrigin(event), messageText, e);
                 }
                 return;
             }

@@ -345,7 +345,7 @@ public class MessageHelper {
     public static void sendEphemeralFileInResponseToButtonPress(
             FileUpload fileUpload, GenericInteractionCreateEvent event) {
         if (fileUpload == null) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), "FileUpload null");
+            BotLogger.error(new LogOrigin(event), "FileUpload null");
             return;
         }
         if (event instanceof ButtonInteractionEvent button)

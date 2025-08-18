@@ -71,6 +71,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.map.CustomHyperlaneService;
@@ -247,7 +248,7 @@ class GameLoadService {
                                 }
                                 if (!found && !tile.isSpaceHolderValid(unitHolderName)) {
                                     BotLogger.warning(
-                                            game,
+                                            new LogOrigin(game),
                                             game.getName() + ": Not valid unitholder detected: " + unitHolderName);
                                 }
                             }

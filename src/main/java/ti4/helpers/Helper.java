@@ -58,6 +58,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.ColorModel;
@@ -1174,7 +1175,8 @@ public class Helper {
         for (String thing : spentThings) {
             if (!thing.contains("_")) {
                 BotLogger.warning(
-                        player, "Caught the following thing in the voting " + thing + " in game " + game.getName());
+                        new LogOrigin(player),
+                        "Caught the following thing in the voting " + thing + " in game " + game.getName());
                 continue;
             }
             String secondHalf = thing.split("_")[1];
@@ -2539,7 +2541,7 @@ public class Helper {
         if (!roles.isEmpty()) {
             if (roles.size() > 1) {
                 BotLogger.warning(
-                        game,
+                        new LogOrigin(game),
                         "There are " + roles.size() + " roles that match the game name: `" + gameName
                                 + "` - please investigate, as this may cause issues.");
                 return;
@@ -2593,8 +2595,7 @@ public class Helper {
     public static void addBotHelperPermissionsToGameChannels(GenericInteractionCreateEvent event) {
         var guild = event.getGuild();
         if (guild == null) {
-            BotLogger.error(
-                    new BotLogger.LogMessageOrigin(event), "Guild was null in addBotHelperPermissionsToGameChannels.");
+            BotLogger.error(new LogOrigin(event), "Guild was null in addBotHelperPermissionsToGameChannels.");
             return;
         }
         // long role = 1093925613288562768L;
@@ -2671,7 +2672,7 @@ public class Helper {
             }
             return (GuildMessageChannel) messageChannel;
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Something went wrong getting thread channels.", e);
+            BotLogger.error(new LogOrigin(event), "Something went wrong getting thread channels.", e);
             return null;
         }
     }

@@ -15,6 +15,7 @@ import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
 import ti4.image.PositionMapper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.MapTemplateModel;
 import ti4.service.milty.MiltyService.DraftSpec;
 import ti4.settings.GlobalSettings;
@@ -139,7 +140,7 @@ class GenerateSlicesService {
                         .append(reason.getValue())
                         .append("\n");
             }
-            BotLogger.warning(new BotLogger.LogMessageOrigin(event), sb.toString());
+            BotLogger.warning(new LogOrigin(event), sb.toString());
         }
         return slicesCreated;
     }

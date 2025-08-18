@@ -14,6 +14,7 @@ import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.SusSlashCommandService;
 import ti4.service.game.GameNameService;
 
@@ -72,7 +73,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 String messageText = "Error trying to execute command: " + command.getName();
                 String errorMessage = ExceptionUtils.getMessage(e);
                 event.getHook().editOriginal(errorMessage).queue();
-                BotLogger.error(new BotLogger.LogMessageOrigin(event), messageText, e);
+                BotLogger.error(new LogOrigin(event), messageText, e);
             }
         }
 
@@ -94,7 +95,7 @@ public class SlashCommandListener extends ListenerAdapter {
                     + " `" + responseTime + "` to respond\n> "
                     + DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime)
                     + " `" + executionTime + "` to execute" + (processingRuntime > eventDelay ? "😲" : "");
-            BotLogger.warning(new BotLogger.LogMessageOrigin(event), message);
+            BotLogger.warning(new LogOrigin(event), message);
         }
     }
 

@@ -27,6 +27,7 @@ import ti4.json.ObjectMapperFactory;
 import ti4.listeners.context.ListenerContext;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 
 /**
  * <h1>Jazzxhands Menu Framework</h1>
@@ -201,8 +202,7 @@ public abstract class SettingsMenu {
     private void buttonFailed(GenericInteractionCreateEvent event, String userMsg, boolean pingJazz) {
         if (pingJazz) {
             BotLogger.error(
-                    new BotLogger.LogMessageOrigin(event),
-                    userMsg + "\n" + Constants.jazzPing() + " Menu Framework button has failed.");
+                    new LogOrigin(event), userMsg + "\n" + Constants.jazzPing() + " Menu Framework button has failed.");
             userMsg += "\n> *Jazz has been pinged to take a look.*";
         }
         if (event instanceof ButtonInteractionEvent buttonEvent)

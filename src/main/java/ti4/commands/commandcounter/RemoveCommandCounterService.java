@@ -11,6 +11,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.emoji.ColorEmojis;
 
 @UtilityClass
@@ -18,8 +19,7 @@ public class RemoveCommandCounterService {
 
     public static void fromTile(GenericInteractionCreateEvent event, Player player, Tile tile) {
         if (player == null) {
-            BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(event), "Player cannot be found for removing command counter");
+            BotLogger.warning(new LogOrigin(event), "Player cannot be found for removing command counter");
             return;
         }
         fromTile(player.getColor(), tile, player.getGame());

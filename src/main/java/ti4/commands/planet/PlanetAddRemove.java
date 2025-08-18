@@ -20,6 +20,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 
@@ -93,14 +94,14 @@ abstract class PlanetAddRemove extends GameStateSubcommand {
                 }
                 String planet = possiblePlanets.getFirst();
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(event),
+                        new LogOrigin(event),
                         "`PlanetAddRemove.parseParameter - " + getName() + " - isValidPlanet(" + planetID
                                 + ") = false` - attempting to use planet: " + planet);
                 doAction(event, player, planet, game);
                 MessageHelper.sendMessageToEventChannel(event, "> " + resolvePlanetMessage(planet));
             }
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Error parsing planet: " + planetID, e);
+            BotLogger.error(new LogOrigin(event, player), "Error parsing planet: " + planetID, e);
         }
     }
 

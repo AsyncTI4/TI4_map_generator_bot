@@ -18,13 +18,14 @@ import ti4.map.Player;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.game.GameUndoNameService;
 import ti4.service.info.CardsInfoService;
 
 @UtilityClass
 class GameUndoService {
 
-    public static void createUndoCopy(String gameName) {
+    static void createUndoCopy(String gameName) {
         GameFileLockManager.wrapWithReadLock(gameName, () -> {
             int latestIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(gameName);
             if (latestIndex < 0) return;
@@ -61,13 +62,13 @@ class GameUndoService {
     }
 
     @Nullable
-    public static Game undo(Game game) {
+    static Game undo(Game game) {
         int latestUndoIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(game.getName());
         return lockAndUndo(game, latestUndoIndex - 1, latestUndoIndex);
     }
 
     @Nullable
-    public static Game undo(Game game, int undoIndex) {
+    static Game undo(Game game, int undoIndex) {
         if (undoIndex <= 0) return null;
         int latestUndoIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(game.getName());
         return lockAndUndo(game, undoIndex, latestUndoIndex);
@@ -84,8 +85,7 @@ class GameUndoService {
         try {
             File currentGameFile = Storage.getGameFile(gameName + Constants.TXT);
             if (!currentGameFile.exists()) {
-                BotLogger.error(
-                        new BotLogger.LogMessageOrigin(gameToUndo), "Game file for " + gameName + " doesn't exist!");
+                BotLogger.error(new LogOrigin(gameToUndo), "Game file for " + gameName + " doesn't exist!");
                 return null;
             }
 
@@ -103,7 +103,7 @@ class GameUndoService {
             sendUndoConfirmationMessage(gameToUndo, undoIndex, latestUndoIndex);
             return loadedGame;
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(gameToUndo), "Error trying to undo: " + gameName, e);
+            BotLogger.error(new LogOrigin(gameToUndo), "Error trying to undo: " + gameName, e);
             return null;
         }
     }
@@ -138,8 +138,7 @@ class GameUndoService {
             undoCommands.add(undoNamesToCommandText.get(fileName));
             Path currentUndo = Storage.getGameUndo(gameToUndo.getName(), fileName);
             if (!currentUndo.toFile().delete()) {
-                BotLogger.error(
-                        new BotLogger.LogMessageOrigin(gameToUndo), "Failed to delete undo file: " + currentUndo);
+                BotLogger.error(new LogOrigin(gameToUndo), "Failed to delete undo file: " + currentUndo);
             }
         }
 
@@ -174,7 +173,7 @@ class GameUndoService {
                         game.getSavedChannel(), game.getSavedMessage(), ButtonHelper.getSavedButtons(game));
             }
         } catch (Exception e) {
-            BotLogger.error(game, "Error trying to generated saved buttons for " + game.getName(), e);
+            BotLogger.error(new LogOrigin(game), "Error trying to generated saved buttons for " + game.getName(), e);
         }
     }
 
@@ -186,7 +185,7 @@ class GameUndoService {
         }
     }
 
-    public static Game loadUndoForMissingGame(String gameName) {
+    static Game loadUndoForMissingGame(String gameName) {
         List<Integer> sortedUndoNumbers = GameUndoNameService.getSortedUndoNumbers(gameName);
         if (sortedUndoNumbers.isEmpty()) {
             BotLogger.warning("Attempted to load undo for missing game, but one did not exist: " + gameName);

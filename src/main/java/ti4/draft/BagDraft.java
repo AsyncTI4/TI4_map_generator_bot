@@ -13,6 +13,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.franken.FrankenDraftBagService;
 
 public abstract class BagDraft {
@@ -131,7 +132,7 @@ public abstract class BagDraft {
         TextChannel actionsChannel = owner.getMainGameChannel();
         if (actionsChannel == null) {
             BotLogger.warning(
-                    player,
+                    new LogOrigin(player),
                     "`Helper.getBagChannel`: actionsChannel is null for game, or community game private channel not set: "
                             + owner.getName());
             return null;

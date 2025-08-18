@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 
 class ButtonRuntimeWarningService {
 
@@ -67,13 +68,12 @@ class ButtonRuntimeWarningService {
                         + " `" + executionTime + "` to execute" + (processingTime > eventDelay ? "😲" : "");
                 message += "\nContext time: " + contextRuntime + "ms\nResolve time: " + resolveRuntime
                         + "ms\nSave time: " + saveRuntime + "ms";
-                BotLogger.warning(new BotLogger.LogMessageOrigin(event), message);
+                BotLogger.warning(new LogOrigin(event), message);
                 ++runtimeWarningCount;
                 if (runtimeWarningCount > 20) {
                     pauseWarningsUntil = now.plusMinutes(5);
                     BotLogger.error(
-                            new BotLogger.LogMessageOrigin(event),
-                            "**Buttons are processing slowly. Pausing warnings for 5 minutes.**");
+                            new LogOrigin(event), "**Buttons are processing slowly. Pausing warnings for 5 minutes.**");
                     runtimeWarningCount = 0;
                 }
                 lastWarningTime = now;

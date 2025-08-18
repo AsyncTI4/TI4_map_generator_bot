@@ -677,7 +677,7 @@ public class ButtonHelper {
                     player.removePromissoryNote(pnID);
                     if (p2 == null) {
                         BotLogger.warning(
-                                new BotLogger.LogMessageOrigin(event),
+                                new LogOrigin(event),
                                 "Could not find player when removing eliminated player's PN: " + pn.getOwner());
                     } else {
                         p2.setPromissoryNote(pnID);
@@ -4587,8 +4587,7 @@ public class ButtonHelper {
         }
         if (tradeHolder == null) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(event, player),
-                    "`ButtonHelper.sendTradeHolderSomething` tradeHolder was **null**");
+                    new LogOrigin(event, player), "`ButtonHelper.sendTradeHolderSomething` tradeHolder was **null**");
             return;
         }
         if ("tg".equalsIgnoreCase(tgOrDebt)) {
@@ -6487,8 +6486,7 @@ public class ButtonHelper {
 
             game.setPhaseOfGame("action");
         } else {
-            BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(event, player), "`ButtonHelper.startMyTurn` player is null");
+            BotLogger.warning(new LogOrigin(event, player), "`ButtonHelper.startMyTurn` player is null");
             return;
         }
 

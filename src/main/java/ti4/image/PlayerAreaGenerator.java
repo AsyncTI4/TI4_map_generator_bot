@@ -2515,7 +2515,7 @@ class PlayerAreaGenerator {
                 UnitModel unit = Mapper.getUnitModelByTechUpgrade(techInformation.getAlias());
                 if (unit == null) {
                     BotLogger.warning(
-                            player,
+                            new LogOrigin(player),
                             game.getName() + " " + player.getUserName() + " Could not load unit associated with tech: "
                                     + techInformation.getAlias());
                     continue;

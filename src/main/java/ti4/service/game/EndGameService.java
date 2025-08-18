@@ -33,6 +33,7 @@ import ti4.map.Player;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.statistics.game.WinningPathCacheService;
@@ -218,7 +219,7 @@ public class EndGameService {
                 if (publish) {
                     if (summaryChannel == null) {
                         BotLogger.warning(
-                                new BotLogger.LogMessageOrigin(event),
+                                new LogOrigin(event),
                                 "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
                         return;
                     }
@@ -259,8 +260,7 @@ public class EndGameService {
         } else if (publish) { // FOW SUMMARY
             if (summaryChannel == null) {
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(event),
-                        "`#fow-war-stories` channel not found - `/game end` cannot post summary");
+                        new LogOrigin(event), "`#fow-war-stories` channel not found - `/game end` cannot post summary");
                 return;
             }
             MessageHelper.sendMessageToChannel(summaryChannel, gameEndText);

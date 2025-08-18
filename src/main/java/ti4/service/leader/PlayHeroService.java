@@ -32,6 +32,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.ActionCardModel;
 import ti4.model.LeaderModel;
 import ti4.model.TemporaryCombatModifierModel;
@@ -62,7 +63,7 @@ public class PlayHeroService {
             sb.append(player.getRepresentation())
                     .append(" played ")
                     .append(Helper.getLeaderFullRepresentation(playerLeader));
-            BotLogger.warning(new BotLogger.LogMessageOrigin(event), "Missing LeaderModel: " + playerLeader.getId());
+            BotLogger.warning(new LogOrigin(event), "Missing LeaderModel: " + playerLeader.getId());
         }
 
         if ("letnevhero".equals(playerLeader.getId())

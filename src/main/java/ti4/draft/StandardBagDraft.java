@@ -11,6 +11,7 @@ import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.FactionModel;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
@@ -93,7 +94,7 @@ public class StandardBagDraft extends BagDraft {
                         bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
                         BotLogger.warning(
-                                game,
+                                new LogOrigin(game),
                                 "Game: `" + game.getName() + "` error - empty franken draftableCollection: "
                                         + category.name());
                     }

@@ -19,6 +19,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.FactionModel;
 import ti4.service.map.AddTileListService;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
@@ -117,7 +118,7 @@ class FinishDraftService {
                         .append(d.getSlice().ttsString());
             }
             MessageHelper.sendMessageToChannel(mainGameChannel, error.toString());
-            BotLogger.error(new BotLogger.LogMessageOrigin(event, game), e.getMessage(), e);
+            BotLogger.error(new LogOrigin(event, game), e.getMessage(), e);
         }
     }
 }

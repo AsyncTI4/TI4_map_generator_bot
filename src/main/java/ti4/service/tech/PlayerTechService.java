@@ -36,6 +36,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.metadata.TechSummariesMetadataManager;
@@ -482,8 +483,7 @@ public class PlayerTechService {
         techID = AliasHandler.resolveTech(techID);
         if (!Mapper.isValidTech(techID)) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(event),
-                    "`ButtonHelper.getTech` Invalid TechID in 'getTech_' Button: " + techID);
+                    new LogOrigin(event), "`ButtonHelper.getTech` Invalid TechID in 'getTech_' Button: " + techID);
             return;
         }
         TechnologyModel techM = Mapper.getTech(techID);

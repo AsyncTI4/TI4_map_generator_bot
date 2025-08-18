@@ -321,10 +321,6 @@ public class DrawingUtil {
         return factionFile;
     }
 
-    public static Image getPlayerDiscordAvatar(Player player) {
-        return getUserDiscordAvatar(player.getUser());
-    }
-
     public static Image getUserDiscordAvatar(User user) {
         try {
             if (user == null) return null;

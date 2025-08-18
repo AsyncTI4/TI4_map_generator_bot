@@ -56,7 +56,7 @@ class RunManualDataMigration extends Subcommand {
                 | InvocationTargetException
                 | NoSuchMethodException
                 | SecurityException e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), "failed to run data migration", e);
+            BotLogger.error(new LogOrigin(event), "failed to run data migration", e);
         }
     }
 }
