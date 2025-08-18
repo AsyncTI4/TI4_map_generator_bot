@@ -24,7 +24,7 @@ import ti4.helpers.Storage;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.MapGenerator.VerticalAlign;
 import ti4.map.Player;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.model.ColorModel;
 import ti4.service.emoji.TI4Emoji;
 

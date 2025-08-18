@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.executors.ExecutorServiceManager;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.settings.GlobalSettings;
 
 public class ThreadArchiveHelper {

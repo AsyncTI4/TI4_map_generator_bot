@@ -1,4 +1,4 @@
-package ti4.message;
+package ti4.message.logging;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -6,16 +6,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.ThreadGetter;
+import ti4.message.MessageHelper;
 
+@UtilityClass
 public class LogBufferManager {
 
     private static final int INITIAL_BUFFER_SIZE = 500;
     private static final Object BUFFER_LOCK = new Object();
 
-    private static Deque<BotLogger.AbstractEventLog> messageBuffer = new ArrayDeque<>(INITIAL_BUFFER_SIZE);
+    private static Deque<AbstractEventLog> messageBuffer = new ArrayDeque<>(INITIAL_BUFFER_SIZE);
     private static TextChannel primaryBotLogChannel;
 
     public static void initialize() {
@@ -27,7 +30,7 @@ public class LogBufferManager {
         primaryBotLogChannel = logCandidates.getFirst();
     }
 
-    public static void addLogMessage(@Nonnull BotLogger.AbstractEventLog logMessage) {
+    static void addLogMessage(@Nonnull AbstractEventLog logMessage) {
         synchronized (BUFFER_LOCK) {
             messageBuffer.add(logMessage);
         }
@@ -45,7 +48,7 @@ public class LogBufferManager {
     }
 
     private static Map<LogTarget, StringBuilder> drainMessageBufferIntoMessageBuilders() {
-        Deque<BotLogger.AbstractEventLog> toProcess;
+        Deque<AbstractEventLog> toProcess;
         synchronized (BUFFER_LOCK) {
             toProcess = messageBuffer;
             messageBuffer = new ArrayDeque<>(INITIAL_BUFFER_SIZE);
@@ -53,7 +56,7 @@ public class LogBufferManager {
 
         Map<LogTarget, StringBuilder> messageBuilders = new HashMap<>();
         while (!toProcess.isEmpty()) {
-            BotLogger.AbstractEventLog e = toProcess.pollFirst();
+            AbstractEventLog e = toProcess.pollFirst();
             LogTarget target = new LogTarget(e.getChannelName(), e.getThreadName());
             messageBuilders.computeIfAbsent(target, k -> new StringBuilder()).append(e.getLogString());
         }

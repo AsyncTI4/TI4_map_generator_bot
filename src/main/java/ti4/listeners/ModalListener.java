@@ -13,7 +13,7 @@ import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.listeners.context.ModalContext;
 import ti4.map.Game;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.service.game.GameNameService;
 
 public class ModalListener extends ListenerAdapter {

@@ -25,8 +25,8 @@ import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.json.ObjectMapperFactory;
 import ti4.listeners.context.ListenerContext;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 
 /**
  * <h1>Jazzxhands Menu Framework</h1>

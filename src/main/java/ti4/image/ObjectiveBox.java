@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 class ObjectiveBox {
     private static final int objectiveBoxHeight = 38;

@@ -25,8 +25,8 @@ import ti4.listeners.context.ModalContext;
 import ti4.listeners.context.SelectionMenuContext;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
-import ti4.message.BotLogger.LogMessageOrigin;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.BotLogger.LogMessageOrigin;
 
 public class AnnotationHandler {
 

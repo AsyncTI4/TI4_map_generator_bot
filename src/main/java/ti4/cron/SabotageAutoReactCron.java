@@ -10,9 +10,9 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
+import ti4.message.logging.BotLogger;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
 

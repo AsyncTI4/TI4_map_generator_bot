@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import ti4.json.PersistenceManager;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class GameMessageManager {

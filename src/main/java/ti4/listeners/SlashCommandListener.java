@@ -13,7 +13,7 @@ import ti4.commands.CommandManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.service.SusSlashCommandService;
 import ti4.service.game.GameNameService;
 

@@ -1,8 +1,8 @@
 package ti4.cron;
 
 import java.util.concurrent.TimeUnit;
-import ti4.message.BotLogger;
-import ti4.message.LogBufferManager;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogBufferManager;
 
 public class InteractionLogCron {
 

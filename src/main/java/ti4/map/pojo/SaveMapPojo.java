@@ -10,7 +10,7 @@ import ti4.json.ObjectMapperFactory;
 import ti4.map.Game;
 import ti4.map.GameProperties;
 import ti4.map.Player;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 class SaveMapPojo {

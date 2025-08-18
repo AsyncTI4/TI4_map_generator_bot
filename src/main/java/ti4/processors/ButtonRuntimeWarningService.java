@@ -5,7 +5,7 @@ import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 class ButtonRuntimeWarningService {
 

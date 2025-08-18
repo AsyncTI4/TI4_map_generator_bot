@@ -14,7 +14,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
 import ti4.image.PositionMapper;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.model.MapTemplateModel;
 import ti4.service.milty.MiltyService.DraftSpec;
 import ti4.settings.GlobalSettings;

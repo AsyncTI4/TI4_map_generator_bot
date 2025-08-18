@@ -3,7 +3,7 @@ package ti4.map.persistence;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.DiscordantStarsHelper;
 import ti4.map.Game;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 class TransientGameInfoUpdater {
 

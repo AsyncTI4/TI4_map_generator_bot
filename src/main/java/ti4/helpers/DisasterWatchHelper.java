@@ -9,8 +9,8 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.image.TileGenerator;
 import ti4.map.Game;
 import ti4.map.Tile;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class DisasterWatchHelper {

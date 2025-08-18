@@ -1,15 +1,13 @@
-package ti4.message;
+package ti4.message.logging;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import lombok.Getter;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -22,21 +20,22 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.cron.CronManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.listeners.ModalListener;
 import ti4.map.Game;
-import ti4.map.Player;
+import ti4.message.MessageHelper;
 import ti4.selections.SelectionMenuProcessor;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass
 public class BotLogger {
 
-    private static volatile long lastScheduledWebhook;
-    private static final Object lastScheduledWebhookLock = new Object();
+    private static final int DISCORD_UNKNOWN_ERROR_STATUS_CODE = 10008;
+    private static final Object LAST_SCHEDULED_WEBHOOK_LOCK = new Object();
     private static final long DISCORD_RATE_LIMIT = 50; // Min time in millis between discord webhook messages
+
+    private static volatile long lastScheduledWebhook;
 
     /**
      * Sends a message to #bot-log-info in the offending server, else resorting to #bot-log and finally webhook.
@@ -297,7 +296,7 @@ public class BotLogger {
      */
     private static void scheduleWebhookMessage(@Nonnull String message) {
         long timeToNextMessage;
-        synchronized (lastScheduledWebhookLock) {
+        synchronized (LAST_SCHEDULED_WEBHOOK_LOCK) {
             timeToNextMessage = lastScheduledWebhook + DISCORD_RATE_LIMIT - System.currentTimeMillis();
             lastScheduledWebhook = System.currentTimeMillis() + Math.max(timeToNextMessage, 0);
         }
@@ -481,41 +480,28 @@ public class BotLogger {
         }
     }
 
-    /**
-     * This class represents an event to be logged via InteractionLogCron.
-     * It contains all the necessary data to find the correct logging channel or thread in the primary server and write a log message.
-     */
     public static void logButton(ButtonInteractionEvent event) {
-        LogBufferManager.addLogMessage(new AbstractEventLog.ButtonInteraction(new LogMessageOrigin(event)));
+        LogBufferManager.addLogMessage(new ButtonInteractionEventLog(new LogMessageOrigin(event)));
     }
 
     public static void logSlashCommand(SlashCommandInteractionEvent event, Message commandResponseMessage) {
-        LogBufferManager.addLogMessage(
-                new AbstractEventLog.SlashCommand(new LogMessageOrigin(event), commandResponseMessage));
+        LogBufferManager.addLogMessage(new SlashCommandEventLog(new LogMessageOrigin(event), commandResponseMessage));
     }
 
-    /**
-     * Retreives either the event's guild's #bot-log channel, or, if that is null, the Primary server's #bot-log channel.
-     */
     @Deprecated
     public static TextChannel getBotLogChannel(GenericInteractionCreateEvent event) {
         TextChannel botLogChannel = null;
         if (event != null) {
-            for (TextChannel textChannel : event.getGuild().getTextChannels()) {
-                if ("bot-log".equals(textChannel.getName())) {
-                    botLogChannel = textChannel;
-                }
-            }
+            botLogChannel = getBotLogChannel(event.getGuild().getTextChannels());
         }
-        if (botLogChannel == null && AsyncTI4DiscordBot.guildPrimary != null) { // USE PRIMARY SERVER'S BOTLOG CHANNEL
-            botLogChannel = getPrimaryBotLogChannel();
+        if (botLogChannel == null) {
+            botLogChannel = getBotLogChannel(AsyncTI4DiscordBot.guildPrimary.getTextChannels());
         }
         return botLogChannel;
     }
 
-    @Deprecated
-    public static TextChannel getPrimaryBotLogChannel() {
-        for (TextChannel textChannel : AsyncTI4DiscordBot.guildPrimary.getTextChannels()) {
+    private static TextChannel getBotLogChannel(List<TextChannel> textChannels) {
+        for (TextChannel textChannel : textChannels) {
             if ("bot-log".equals(textChannel.getName())) {
                 return textChannel;
             }
@@ -524,11 +510,11 @@ public class BotLogger {
     }
 
     public static void catchRestError(Throwable e) {
-        // This has become too annoying, so we are limitting to testing mode/debug mode
+        // This has become too annoying, so we are limiting to testing mode/debug mode
         boolean debugMode =
                 GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
         if (System.getenv("TESTING") != null || debugMode) {
-            // if it's ignored, it's not actionable. Simple
+            // if it's ignored, it's not actionable.
             if (ignoredError(e)) return;
             error("Encountered REST error", e);
         }
@@ -536,269 +522,9 @@ public class BotLogger {
 
     private static boolean ignoredError(Throwable error) {
         if (error instanceof ErrorResponseException restError) {
-            // This is an "unknown message" error. Typically caused by the bot trying to delete or edit
-            // a message that has already been deleted. We don't care about these
-            return restError.getErrorCode() == 10008;
+            // Typically caused by the bot trying to delete or edit a message that has already been deleted.
+            return restError.getErrorCode() == DISCORD_UNKNOWN_ERROR_STATUS_CODE;
         }
         return false;
-    }
-
-    /**
-     * Enum for data associated with log severity
-     */
-    private enum LogSeverity {
-        Info("bot-log-info", "### INFO\n"),
-        Warning("bot-log-warning", "## WARNING\n"),
-        Error("bot-log-error", "## ERROR\n");
-
-        final String channelName;
-        final String headerText;
-
-        LogSeverity(String channelName, String headerText) {
-            this.channelName = channelName;
-            this.headerText = headerText;
-        }
-    }
-
-    /**
-     * Describes the discord-based origin of a log message and handles fetching data for log messages from these sources.
-     */
-    public static class LogMessageOrigin {
-        @Getter
-        @Nullable
-        private Guild guild;
-
-        @Getter
-        @Nullable
-        private GuildChannel channel;
-
-        @Getter
-        @Nullable
-        private GenericInteractionCreateEvent event;
-
-        @Getter
-        @Nullable
-        private Game game;
-
-        @Getter
-        @Nullable
-        private Player player;
-
-        @Getter
-        private final String originTime;
-
-        public LogMessageOrigin(@Nonnull Guild guild) {
-            this.guild = guild;
-            originTime = DateTimeHelper.getCurrentTimestamp();
-        }
-
-        public LogMessageOrigin(@Nonnull GuildChannel channel) {
-            this.channel = channel;
-            guild = channel.getGuild();
-            originTime = DateTimeHelper.getCurrentTimestamp();
-        }
-
-        public LogMessageOrigin(@Nonnull GenericInteractionCreateEvent event) {
-            this.event = event;
-            if (event.isFromGuild()) {
-                channel = event.getGuildChannel();
-                guild = event.getGuild();
-            } else {
-                warning("LocationSource created from non-guild event. This will not attribute messages.");
-            }
-            originTime = DateTimeHelper.getCurrentTimestamp();
-        }
-
-        public LogMessageOrigin(@Nonnull Game game) {
-            this.game = game;
-            guild = game.getGuild();
-            channel = game.getMainGameChannel();
-            originTime = DateTimeHelper.getCurrentTimestamp();
-        }
-
-        public LogMessageOrigin(@Nullable Player player) {
-            if (player != null) {
-                this.player = player;
-                game = player.getGame();
-            }
-            if (game != null) {
-                guild = game.getGuild();
-                channel = game.getMainGameChannel();
-            } else {
-                warning("LocationSource created from player with null game. This will not attribute messages.");
-            }
-            originTime = DateTimeHelper.getCurrentTimestamp();
-        }
-
-        public LogMessageOrigin(@Nonnull GenericInteractionCreateEvent event, @Nonnull Game game) {
-            this.game = game;
-            guild = game.getGuild();
-            this.event = event;
-            if (event.isFromGuild()) channel = event.getGuildChannel();
-            else channel = game.getMainGameChannel();
-            originTime = DateTimeHelper.getCurrentTimestamp();
-        }
-
-        public LogMessageOrigin(@Nonnull GenericInteractionCreateEvent event, @Nonnull Player player) {
-            this.player = player;
-            game = player.getGame();
-            if (game != null) guild = game.getGuild();
-            this.event = event;
-            if (event.isFromGuild()) {
-                channel = event.getGuildChannel();
-                guild = event.getGuild();
-            } else {
-                channel = game.getMainGameChannel();
-            }
-            originTime = DateTimeHelper.getCurrentTimestamp();
-        }
-
-        @Nullable
-        StringBuilder getGameInfo() {
-            if (game != null) {
-                StringBuilder builder = new StringBuilder().append("\nGame info: ");
-                builder.append(game.gameJumpLinks());
-                return builder;
-            }
-            return null;
-        }
-
-        @Nullable
-        StringBuilder getEventString() {
-            if (event == null) return null;
-
-            StringBuilder builder = new StringBuilder()
-                    .append(event.getUser().getEffectiveName())
-                    .append(" ");
-
-            switch (event) {
-                case SlashCommandInteractionEvent sEvent ->
-                    builder.append("used command `")
-                            .append(sEvent.getCommandString())
-                            .append("`\n");
-                case ButtonInteractionEvent bEvent ->
-                    builder.append("pressed button ")
-                            .append(ButtonHelper.getButtonRepresentation(bEvent.getButton()))
-                            .append("\n");
-                case StringSelectInteractionEvent sEvent ->
-                    builder.append("selected ")
-                            .append(SelectionMenuProcessor.getSelectionMenuDebugText(sEvent))
-                            .append("\n");
-                case ModalInteractionEvent mEvent ->
-                    builder.append("used modal ")
-                            .append(ModalListener.getModalDebugText(mEvent))
-                            .append("\n");
-                default ->
-                    builder.append("initiated an unexpected event of type `")
-                            .append(event.getType())
-                            .append("`\n");
-            }
-
-            return builder;
-        }
-
-        /**
-         * Get the most relevant log channel for this source. Priority is to severity.channelName, then "#bot-log", then returns null.
-         *
-         * @param severity - The severity of the log message, used to find the appropriate channel based on LogSeverity.channelName
-         * @return The most relevant logging TextChannel
-         */
-        @Nullable
-        TextChannel getLogChannel(@Nonnull LogSeverity severity) {
-            Guild guild = AsyncTI4DiscordBot.guildPrimary;
-            if (guild == null) guild = this.guild;
-            if (guild == null) return null;
-
-            return guild.getTextChannelsByName(severity.channelName, false).stream()
-                    .findFirst()
-                    .orElse(guild.getTextChannelsByName("bot-log", false).stream()
-                            .findFirst()
-                            .orElse(null));
-        }
-
-        @Nonnull
-        String getOriginTimeFormatted() {
-            return String.format("**__%s__** ", originTime);
-        }
-    }
-
-    /**
-     * Describes event logs to be sent to InteractionLogCron
-     */
-    // Implementor's note: all subclasses of AbstractEventLog are automatically accounted for in InteractionLogCron as
-    // long as channelName and threadName are defined.
-    // Yes, this is basically trying to recreate a rust enum. No, I'm not sorry
-    public abstract static sealed class AbstractEventLog {
-        final LogMessageOrigin source;
-
-        String message = "";
-
-        public abstract String getChannelName();
-
-        public abstract String getThreadName();
-
-        String getMessagePrefix() {
-            return "";
-        }
-
-        public String getLogString() {
-            StringBuilder message = new StringBuilder();
-
-            message.append(source.getOriginTimeFormatted());
-            if (source.getEventString() != null) {
-                message.append(source.getEventString());
-            }
-            if (source.getGameInfo() != null) {
-                message.append(source.getGameInfo());
-            }
-            if (!this.message.isEmpty()) {
-                message.append(getMessagePrefix()).append(this.message).append("\n");
-            }
-
-            message.append("\n");
-            return message.toString();
-        }
-
-        AbstractEventLog(LogMessageOrigin source) {
-            this.source = source;
-        }
-
-        static final class ButtonInteraction extends AbstractEventLog {
-            ButtonInteraction(LogMessageOrigin source) {
-                super(source);
-            }
-
-            @Override
-            public String getChannelName() {
-                return "bot-button-log";
-            }
-
-            @Override
-            public String getThreadName() {
-                return "button-log";
-            }
-        }
-
-        static final class SlashCommand extends AbstractEventLog {
-            SlashCommand(LogMessageOrigin source, Message commandResponse) {
-                super(source);
-                message = commandResponse.getContentDisplay();
-            }
-
-            @Override
-            public String getChannelName() {
-                return "bot-slash-command-log";
-            }
-
-            @Override
-            public String getThreadName() {
-                return "slash-command-log";
-            }
-
-            @Override
-            String getMessagePrefix() {
-                return "Response: ";
-            }
-        }
     }
 }

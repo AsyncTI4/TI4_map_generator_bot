@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import ti4.helpers.Constants;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 public class RegexService {
 

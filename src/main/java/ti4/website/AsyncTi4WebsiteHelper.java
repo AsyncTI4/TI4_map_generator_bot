@@ -21,7 +21,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.settings.GlobalSettings;
 import ti4.website.model.WebCardPool;
 import ti4.website.model.WebLaw;
