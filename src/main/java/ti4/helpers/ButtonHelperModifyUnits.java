@@ -806,6 +806,11 @@ public class ButtonHelperModifyUnits {
     }
 
     public static List<Button> getRemoveThisTypeOfUnitButton(Player player, Game game, String unit) {
+        return getRemoveThisTypeOfUnitButton(player, game, unit, false);
+    }
+
+    public static List<Button> getRemoveThisTypeOfUnitButton(
+            Player player, Game game, String unit, boolean canBeLocked) {
         List<Button> buttons = new ArrayList<>();
         UnitType type = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID())
                 .getUnitType();
@@ -813,6 +818,7 @@ public class ButtonHelperModifyUnits {
             for (UnitHolder uH : tile.getUnitHolders().values()) {
                 if (uH.getUnitCount(type, player.getColor()) > 0) {
                     if (!CommandCounterHelper.hasCC(player, tile)
+                            || canBeLocked
                             || type == UnitType.Fighter
                             || type == UnitType.Infantry
                             || game.getActiveSystem().equalsIgnoreCase(tile.getPosition())) {

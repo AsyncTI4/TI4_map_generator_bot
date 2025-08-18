@@ -370,7 +370,8 @@ public class TacticalActionService {
 
     public List<Button> getLandingTroopsButtons(Game game, Player player, Tile tile) {
         List<Button> buttons = getLandingUnitsButtons(game, player, tile);
-        if (game.isNaaluAgent() || player == game.getActivePlayer()) {
+        if ((game.isNaaluAgent() || player == game.getActivePlayer())
+                && tile.getPosition().equalsIgnoreCase(game.getActiveSystem())) {
             buttons.add(Buttons.red(player.finChecker() + "doneLanding_" + tile.getPosition(), "Done Landing Troops"));
         } else {
             buttons.add(Buttons.red(player.finChecker() + "deleteButtons", "Done Resolving"));

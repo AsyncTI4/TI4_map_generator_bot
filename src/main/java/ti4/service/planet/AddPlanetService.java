@@ -191,7 +191,7 @@ public class AddPlanetService {
                                     "Eliminate " + player_.getDisplayName()));
                             msg = player_.getRepresentation()
                                     + ", the game believes that you ought to be eliminated. Press the button if this is accurate (anyone can press the button).";
-                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+                            MessageHelper.sendMessageToChannel(player_.getCorrectChannel(), msg, buttons);
                         }
                     }
                 }
