@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -806,13 +807,19 @@ public class ButtonHelperModifyUnits {
     }
 
     public static List<Button> getRemoveThisTypeOfUnitButton(Player player, Game game, String unit) {
+        return getRemoveThisTypeOfUnitButton(player, game, unit, false);
+
+    }
+
+    public static List<Button> getRemoveThisTypeOfUnitButton(Player player, Game game, String unit, boolean canBeLocked) {
         List<Button> buttons = new ArrayList<>();
         UnitType type = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID())
                 .getUnitType();
         for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, type)) {
             for (UnitHolder uH : tile.getUnitHolders().values()) {
                 if (uH.getUnitCount(type, player.getColor()) > 0) {
-                    if (!CommandCounterHelper.hasCC(player, tile)
+                    if (!CommandCounterHelper.hasCC(player, tile) 
+                            || canBeLocked
                             || type == UnitType.Fighter
                             || type == UnitType.Infantry
                             || game.getActiveSystem().equalsIgnoreCase(tile.getPosition())) {

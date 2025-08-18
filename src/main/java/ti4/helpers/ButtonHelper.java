@@ -1310,6 +1310,13 @@ public class ButtonHelper {
                     }
                 }
             }
+            for (UnitHolder p : activeSystem.getPlanetUnitHolders()) {
+                for (String token : p.getTokenList()) {
+                    if (magenPlayer.getPlanets().contains(p.getName()) && token.contains("superweapon")) {
+                        has = true;
+                    }
+                }
+            }
             if (!has || !magenPlayer.hasTech("md")) continue;
 
             String id = magenPlayer.finChecker() + "useMagenDefense_" + activeSystem.getPosition();
@@ -2967,6 +2974,13 @@ public class ButtonHelper {
             for (UnitHolder uh : tile.getUnitHolders().values()) {
                 int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
                 if (player.hasAbility("byssus")) count += uh.getUnitCount(UnitType.Mech, player);
+
+                for (String token : uh.getTokenList()) {
+                    if (player.getPlanets().contains(uh.getName()) && token.contains("superweapon")) {
+                        count++;
+                    }
+                }
+            
                 if (count > 0) {
                     total += count;
                     uh.addUnit(infKey, count);
