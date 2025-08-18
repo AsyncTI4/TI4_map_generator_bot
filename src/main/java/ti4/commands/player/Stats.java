@@ -1,5 +1,6 @@
 package ti4.commands.player;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import net.dv8tion.jda.api.entities.Guild;
@@ -9,6 +10,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelperAbilities;
@@ -304,6 +307,14 @@ class Stats extends GameStateSubcommand {
                 if (removedMember != null && roles.size() == 1) {
                     guild.removeRoleFromMember(removedMember, roles.getFirst()).queue();
                 }
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.gray(
+                        player.getFinsFactionCheckerPrefix() + "removePlayerPermissions_" + player.getFaction(),
+                        "Remove View Permissions " + player.getDisplayName()));
+                buttons.add(Buttons.red("deleteButtons", "Stay in channels"));
+                String msg = player.getRepresentation()
+                        + " do you want to remove yourself from the game channels? If so, press this button.";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
             }
         }
     }

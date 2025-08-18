@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.*;
+import java.awt.Point;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -2636,6 +2636,17 @@ public class Helper {
                 long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
                 textChannelManager = textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
             }
+            textChannelManager.queue();
+        }
+    }
+
+    public static void removePlayerPermissionsToGameChannel(Guild guild, GuildChannel channel, String playerID) {
+        TextChannel textChannel = guild.getTextChannelById(channel.getId());
+        if (textChannel != null) {
+            TextChannelManager textChannelManager = textChannel.getManager();
+            Member member = guild.getMemberById(playerID);
+            long deny = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+            textChannelManager = textChannelManager.putMemberPermissionOverride(member.getIdLong(), 0, deny);
             textChannelManager.queue();
         }
     }
