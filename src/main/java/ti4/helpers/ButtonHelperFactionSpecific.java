@@ -1,8 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -828,7 +826,7 @@ public class ButtonHelperFactionSpecific {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         String msg = player.getFactionEmoji() + " is resolving _Agency Supply Network_ in tile "
                 + tile.getRepresentation() + ".";
-
+        game.setStoredValue("ASN" + player.getFaction(), "used");
         String warfareOrTactical = buttonID.split("_")[2];
         ButtonHelper.sendMessageToRightStratThread(player, game, msg, warfareOrTactical);
         List<Button> buttons;

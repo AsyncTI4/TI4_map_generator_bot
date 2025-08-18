@@ -1781,6 +1781,13 @@ public class StartCombatService {
                         String label = "Use Magen Defense Grid on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, TechEmojis.WarfareTech));
                     }
+                    if (p.hasAbility("ruthless")
+                            && isGroundCombat
+                            && otherP.getExhaustedPlanets().contains(unitH.getName())) {
+                        String id = p.finChecker() + "ruthlessHit_" + unitH.getName();
+                        String label = "Use Ruthless on " + nameOfHolder;
+                        buttons.add(Buttons.gray(id, label, FactionEmojis.kortali));
+                    }
                     // Letnev Mech
                     if (p.hasUnit("letnev_mech")
                             && !ButtonHelper.isLawInPlay(game, "articles_war")

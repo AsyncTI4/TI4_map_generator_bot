@@ -1,6 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -1047,7 +1047,7 @@ public class UnfiledButtonHandlers {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     "Remove the Watcher",
-                    ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "mech"));
+                    ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "mech", true));
             ButtonHelper.deleteMessage(event);
         } else if ("xxcha".equalsIgnoreCase(type)) {
             message +=
@@ -2058,6 +2058,7 @@ public class UnfiledButtonHandlers {
         }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
             if (player.hasTech("asn")
+                    && game.getStoredValue("ASN" + player.getFaction()).isEmpty()
                     && (buttonID.contains("tacticalAction")
                             || buttonID.contains("warfare")
                             || buttonID.contains("anarchy7Build")
@@ -2079,7 +2080,8 @@ public class UnfiledButtonHandlers {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 }
             }
-            if (buttonID.contains("tacticalAction")) {
+            if (buttonID.contains("tacticalAction")
+                    && game.getStoredValue("ASN" + player.getFaction()).isEmpty()) {
                 ButtonHelper.exploreDET(player, game, event);
                 ButtonHelperFactionSpecific.cleanCavUp(game, event);
                 if (player.hasAbility("cunning")) {

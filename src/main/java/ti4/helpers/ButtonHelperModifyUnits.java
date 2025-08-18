@@ -807,6 +807,11 @@ public class ButtonHelperModifyUnits {
     }
 
     public static List<Button> getRemoveThisTypeOfUnitButton(Player player, Game game, String unit) {
+        return getRemoveThisTypeOfUnitButton(player, game, unit, false);
+    }
+
+    public static List<Button> getRemoveThisTypeOfUnitButton(
+            Player player, Game game, String unit, boolean canBeLocked) {
         List<Button> buttons = new ArrayList<>();
         UnitType type = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID())
                 .getUnitType();
@@ -814,6 +819,7 @@ public class ButtonHelperModifyUnits {
             for (UnitHolder uH : tile.getUnitHolders().values()) {
                 if (uH.getUnitCount(type, player.getColor()) > 0) {
                     if (!CommandCounterHelper.hasCC(player, tile)
+                            || canBeLocked
                             || type == UnitType.Fighter
                             || type == UnitType.Infantry
                             || game.getActiveSystem().equalsIgnoreCase(tile.getPosition())) {
@@ -1247,7 +1253,19 @@ public class ButtonHelperModifyUnits {
                 getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet));
     }
 
-    private static List<Button> getOpposingUnitsToHitOnGround(Player player, Game game, Tile tile, String planet) {
+    @ButtonHandler("ruthlessHit_")
+    public static void ruthlessHit(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        ButtonHelper.deleteTheOneButton(event);
+        String planet = buttonID.split("_")[1];
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), player.getRepresentationNoPing() + " is resolving the Ruthless ability.");
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentation() + ", please choose the opposing unit to hit.",
+                getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet));
+    }
+
+    public static List<Button> getOpposingUnitsToHitOnGround(Player player, Game game, Tile tile, String planet) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
 
         List<Button> buttons = new ArrayList<>();
@@ -1309,7 +1327,7 @@ public class ButtonHelperModifyUnits {
             channel = player.getPrivateChannel();
         }
         String msg = player.getRepresentation()
-                + ", you have had one of your units assigned a hit with _Magen Defense Grid_."
+                + ", you have had one of your units assigned a hit (via either Magen Defence Grid or Ruthless)."
                 + " Please either cancel the hit somehow, or accept the loss of the unit.";
         List<Button> buttons = new ArrayList<>();
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());

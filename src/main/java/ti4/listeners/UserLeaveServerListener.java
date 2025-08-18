@@ -102,7 +102,7 @@ public class UserLeaveServerListener extends ListenerAdapter {
                 if (voluntary) gameMessage += " has left the server.\n> If this was not a mistake, you may make ";
                 if (!voluntary) gameMessage += " was removed from the server.\n> Make ";
                 gameMessage +=
-                        "a post in https://discord.com/channels/943410040369479690/1176191865188536500 to get a replacement player";
+                        "a post in https://discord.com/channels/943410040369479690/1176191865188536500 to get a replacement player. You can also use /player stats to set them to an NPC (bot will play SC and pass for them every round)";
                 MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), gameMessage);
             }
             reportUserLeftServer(guild, player, gamesQuit);
