@@ -46,10 +46,7 @@ public class SabotageAutoReactCron {
         try {
             automaticallyReactToSabotageWindows(game);
         } catch (Exception e) {
-            BotLogger.error(
-                    new BotLogger.LogMessageOrigin(game),
-                    "SabotageAutoReactCron failed for game: " + game.getName(),
-                    e);
+            BotLogger.error(game, "SabotageAutoReactCron failed for game: " + game.getName(), e);
         }
     }
 

@@ -790,7 +790,7 @@ class PlayerAreaGenerator {
                 String error = game.getName() + " " + player.getUserName()
                         + "  `GenerateMap.pnInfo` is trying to display a Promissory Note without an owner - possibly an eliminated player: "
                         + pn;
-                BotLogger.warning(new BotLogger.LogMessageOrigin(player), error);
+                BotLogger.warning(player, error);
                 continue;
             }
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pn);
@@ -991,7 +991,7 @@ class PlayerAreaGenerator {
                     graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
                 }
             } catch (Exception e) {
-                BotLogger.error(new BotLogger.LogMessageOrigin(player), "Bad file: " + relicFileName, e);
+                BotLogger.error(player, "Bad file: " + relicFileName, e);
             }
 
             deltaX += 48;
@@ -1441,10 +1441,7 @@ class PlayerAreaGenerator {
                         Point position = reinforcementsPosition.getPosition(CC_TAG);
                         DrawingUtil.drawCCOfPlayer(graphics, ccID, x + position.x, y + position.y, 1, player, false);
                     } catch (Exception e) {
-                        BotLogger.error(
-                                new BotLogger.LogMessageOrigin(player),
-                                "Could not parse file for CC: " + playerColor,
-                                e);
+                        BotLogger.error(player, "Could not parse file for CC: " + playerColor, e);
                     }
                 }
             }
@@ -1620,16 +1617,13 @@ class PlayerAreaGenerator {
                     image = ImageHelper.read(unitPath);
                 } catch (Exception e) {
                     BotLogger.error(
-                            new BotLogger.LogMessageOrigin(player),
-                            "Could not parse unit file for: " + unitKey + " in game " + game.getName(),
-                            e);
+                            player, "Could not parse unit file for: " + unitKey + " in game " + game.getName(), e);
                 }
                 if (bulkUnitCount != null && bulkUnitCount > 0) {
                     unitCount = 1;
                 }
                 if (image == null) {
-                    BotLogger.error(
-                            new BotLogger.LogMessageOrigin(player), "Could not find unit image for: " + unitKey);
+                    BotLogger.error(player, "Could not find unit image for: " + unitKey);
                     continue;
                 }
 
@@ -1940,7 +1934,7 @@ class PlayerAreaGenerator {
             if (planet == null) {
                 player.removePlanet(planetName);
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(player),
+                        player,
                         "Planet " + planetName + " not found in game " + game.getName()
                                 + ". Removing planet from player.");
                 return deltaX;
@@ -2110,10 +2104,7 @@ class PlayerAreaGenerator {
 
             return deltaX + 56;
         } catch (Exception e) {
-            BotLogger.error(
-                    new BotLogger.LogMessageOrigin(player),
-                    "could not print out planet: " + planetName.toLowerCase(),
-                    e);
+            BotLogger.error(player, "could not print out planet: " + planetName.toLowerCase(), e);
         }
         return deltaX;
     }
@@ -2521,7 +2512,7 @@ class PlayerAreaGenerator {
                 UnitModel unit = Mapper.getUnitModelByTechUpgrade(techInformation.getAlias());
                 if (unit == null) {
                     BotLogger.warning(
-                            new BotLogger.LogMessageOrigin(player),
+                            player,
                             game.getName() + " " + player.getUserName() + " Could not load unit associated with tech: "
                                     + techInformation.getAlias());
                     continue;
@@ -2539,8 +2530,7 @@ class PlayerAreaGenerator {
                         graphics.drawImage(img, deltaX + x + unitOffset.x, y + unitOffset.y, null);
                     } catch (Exception e) {
                         // Do Nothing
-                        BotLogger.error(
-                                new BotLogger.LogMessageOrigin(player), "Could not display active zealot tech", e);
+                        BotLogger.error(player, "Could not display active zealot tech", e);
                     }
                 }
             }
@@ -2574,7 +2564,7 @@ class PlayerAreaGenerator {
                 UnitModel unit = Mapper.getUnitModelByTechUpgrade(techInformation.getAlias());
                 if (unit == null) {
                     BotLogger.warning(
-                            new BotLogger.LogMessageOrigin(player),
+                            player,
                             game.getName() + " " + player.getUserName() + " Could not load unit associated with tech: "
                                     + techInformation.getAlias());
                     continue;
@@ -2588,7 +2578,7 @@ class PlayerAreaGenerator {
                     graphics.drawImage(img, deltaX + x + unitOffset.x, y + unitOffset.y, null);
                 } catch (Exception e) {
                     // Do Nothing
-                    BotLogger.error(new BotLogger.LogMessageOrigin(player), "Could not display purged zealot tech", e);
+                    BotLogger.error(player, "Could not display purged zealot tech", e);
                 }
             }
         }

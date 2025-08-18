@@ -16,6 +16,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
 import ti4.listeners.ModalListener;
 import ti4.map.Game;
+import ti4.map.Player;
 import ti4.selections.SelectionMenuProcessor;
 
 @Getter
@@ -33,10 +34,19 @@ class LogMessageOrigin {
     @Nullable
     private Game game;
 
+    @Nullable
+    private Player player;
+
     private final String originTime;
 
     LogMessageOrigin(@Nonnull Guild guild) {
         this.guild = guild;
+        originTime = DateTimeHelper.getCurrentTimestamp();
+    }
+
+    public LogMessageOrigin(@Nonnull GuildChannel channel) {
+        this.channel = channel;
+        guild = channel.getGuild();
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 
@@ -58,12 +68,40 @@ class LogMessageOrigin {
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 
+    LogMessageOrigin(@Nullable Player player) {
+        if (player != null) {
+            this.player = player;
+            game = player.getGame();
+        }
+        if (game != null) {
+            guild = game.getGuild();
+            channel = game.getMainGameChannel();
+        } else {
+            BotLogger.warning("LocationSource created from player with null game. This will not attribute messages.");
+        }
+        originTime = DateTimeHelper.getCurrentTimestamp();
+    }
+
     LogMessageOrigin(@Nonnull GenericInteractionCreateEvent event, @Nonnull Game game) {
         this.game = game;
         guild = game.getGuild();
         this.event = event;
         if (event.isFromGuild()) channel = event.getGuildChannel();
         else channel = game.getMainGameChannel();
+        originTime = DateTimeHelper.getCurrentTimestamp();
+    }
+
+    LogMessageOrigin(@Nonnull GenericInteractionCreateEvent event, @Nonnull Player player) {
+        this.player = player;
+        game = player.getGame();
+        if (game != null) guild = game.getGuild();
+        this.event = event;
+        if (event.isFromGuild()) {
+            channel = event.getGuildChannel();
+            guild = event.getGuild();
+        } else {
+            channel = game.getMainGameChannel();
+        }
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 

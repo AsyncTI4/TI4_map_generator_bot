@@ -174,10 +174,7 @@ class GameUndoService {
                         game.getSavedChannel(), game.getSavedMessage(), ButtonHelper.getSavedButtons(game));
             }
         } catch (Exception e) {
-            BotLogger.error(
-                    new BotLogger.LogMessageOrigin(game),
-                    "Error trying to generated saved buttons for " + game.getName(),
-                    e);
+            BotLogger.error(game, "Error trying to generated saved buttons for " + game.getName(), e);
         }
     }
 

@@ -1973,7 +1973,7 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(player), "Ignored exception during map generation", e);
+            BotLogger.error(player, "Ignored exception during map generation", e);
         }
     }
 

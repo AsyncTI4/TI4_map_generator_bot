@@ -39,7 +39,7 @@ public class GameUndoNameService {
                     .collect(Collectors.toMap(
                             File::getName, GameUndoNameService::getLastModifiedDateAndLastCommandTextFromFile));
         } catch (IOException e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Error listing files in directory: " + undoPath, e);
+            BotLogger.error(game, "Error listing files in directory: " + undoPath, e);
             return Collections.emptyMap();
         }
     }

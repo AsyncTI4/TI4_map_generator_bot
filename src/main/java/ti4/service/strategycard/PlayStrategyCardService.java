@@ -67,7 +67,7 @@ public class PlayStrategyCardService {
                 game.getStrategyCardModelByInitiative(scToPlay).orElse(null);
         if (scModel == null) { // Temporary Error Reporting
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(player),
+                    player,
                     "`PlayStrategyCardService.playSC` - Game: `" + game.getName() + "` - SC Model not found for SC `"
                             + scToPlay + "` from set `" + game.getScSetID() + "`");
         }

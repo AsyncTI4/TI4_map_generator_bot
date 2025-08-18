@@ -16,10 +16,7 @@ class TransientGameInfoUpdater {
             DiscordantStarsHelper.checkSaeraMech(game);
             DiscordantStarsHelper.checkOlradinMech(game);
         } catch (Exception e) {
-            BotLogger.error(
-                    new BotLogger.LogMessageOrigin(game),
-                    "Error adding transient attachment tokens for game " + game.getName(),
-                    e);
+            BotLogger.error(game, "Error adding transient attachment tokens for game " + game.getName(), e);
         }
     }
 }

@@ -209,7 +209,7 @@ public class FrankenDraft extends BagDraft {
                         bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
                         BotLogger.warning(
-                                new BotLogger.LogMessageOrigin(game),
+                                game,
                                 "Game: `" + game.getName() + "` error - empty franken draftableCollection: "
                                         + category.name());
                     }

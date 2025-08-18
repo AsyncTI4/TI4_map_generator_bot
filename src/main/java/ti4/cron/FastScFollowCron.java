@@ -47,8 +47,7 @@ public class FastScFollowCron {
             GameManager.save(
                     game, "FastScFollowCron"); // TODO: This should be a property outside game, as it can be UNDO'd
         } catch (Exception e) {
-            BotLogger.error(
-                    new BotLogger.LogMessageOrigin(game), "FastScFollowCron failed for game: " + game.getName(), e);
+            BotLogger.error(game, "FastScFollowCron failed for game: " + game.getName(), e);
         }
     }
 

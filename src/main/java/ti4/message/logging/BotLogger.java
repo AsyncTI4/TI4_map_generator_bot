@@ -1,6 +1,5 @@
 package ti4.message.logging;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -9,23 +8,18 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.cron.CronManager;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.ThreadArchiveHelper;
-import ti4.listeners.ModalListener;
 import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.selections.SelectionMenuProcessor;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass
@@ -36,21 +30,6 @@ public class BotLogger {
     private static final long DISCORD_RATE_LIMIT = 50; // Min time in millis between discord webhook messages
 
     private static volatile long lastScheduledWebhook;
-
-    /**
-     * Sends a message to #bot-log-info in the offending server, else resorting to #bot-log and finally webhook.
-     * <p>
-     * If err is not null, a full stack trace will be sent in a thread.
-     * <p>
-     * Assumes that the event specified in data has a guild if it exists.
-     *
-     * @param origin  - The discord-based source of this log entry
-     * @param message - The message associated with this log entry
-     * @param err     - The error associated with this log entry. A full stack trace will be sent if this is not null
-     */
-    public static void info(@Nullable LogMessageOrigin origin, @Nonnull String message, @Nullable Throwable err) {
-        logToChannel(origin, message, err, LogSeverity.Info);
-    }
 
     /**
      * Sends a message to the primary server's webhook.
@@ -80,35 +59,6 @@ public class BotLogger {
     }
 
     /**
-     * Sends a message to #bot-log-info in offending server, else resorting to #bot-log and finally webhook.
-     * <p>
-     * If err is not null, a full stack trace will be sent in a thread.
-     * <p>
-     * Assumes that the event specified in data has a guild if it exists.
-     *
-     * @param origin  - The discord-based source of this log entry
-     * @param message - The message associated with this log entry
-     */
-    public static void info(@Nullable LogMessageOrigin origin, @Nonnull String message) {
-        logToChannel(origin, message, null, LogSeverity.Info);
-    }
-
-    /**
-     * Sends a message to #bot-log-warning in offending server, else resorting to #bot-log and finally webhook.
-     * <p>
-     * If err is not null, a full stack trace will be sent in a thread.
-     * <p>
-     * Assumes that the event specified in data has a guild if it exists.
-     *
-     * @param origin  - The discord-based source of this log entry
-     * @param message - The message associated with this log entry
-     * @param err     - The error associated with this log entry. A full stack trace will be sent if this is not null
-     */
-    public static void warning(@Nullable LogMessageOrigin origin, @Nonnull String message, @Nullable Throwable err) {
-        logToChannel(origin, message, err, LogSeverity.Warning);
-    }
-
-    /**
      * Sends a message to the primary server's webhook.
      * <p>
      * If err is not null, a full stack trace will be sent in a thread.
@@ -119,6 +69,14 @@ public class BotLogger {
      */
     public static void warning(@Nonnull String message) {
         logToChannel(null, message, null, LogSeverity.Warning);
+    }
+
+    public static void warning(@Nonnull Player player, @Nonnull String message) {
+        logToChannel(new LogMessageOrigin(player), message, null, LogSeverity.Warning);
+    }
+
+    public static void warning(@Nonnull Game game, @Nonnull String message) {
+        logToChannel(new LogMessageOrigin(game), message, null, LogSeverity.Warning);
     }
 
     /**
@@ -136,35 +94,6 @@ public class BotLogger {
     }
 
     /**
-     * Sends a message to #bot-log-warning in offending server, else resorting to #bot-log and finally webhook.
-     * <p>
-     * If err is not null, a full stack trace will be sent in a thread.
-     * <p>
-     * Assumes that the event specified in data has a guild if it exists.
-     *
-     * @param origin  - The discord-based source of this log entry
-     * @param message - The message associated with this log entry
-     */
-    public static void warning(@Nullable LogMessageOrigin origin, @Nonnull String message) {
-        logToChannel(origin, message, null, LogSeverity.Warning);
-    }
-
-    /**
-     * Sends a message to #bot-log-error in offending server, else resorting to #bot-log and finally webhook.
-     * <p>
-     * If err is not null, a full stack trace will be sent in a thread.
-     * <p>
-     * Assumes that the event specified in data has a guild if it exists.
-     *
-     * @param origin  - The discord-based source of this log entry
-     * @param message - The message associated with this log entry
-     * @param err     - The error associated with this log entry. A full stack trace will be sent if this is not null
-     */
-    public static void error(@Nullable LogMessageOrigin origin, @Nonnull String message, @Nullable Throwable err) {
-        logToChannel(origin, message, err, LogSeverity.Error);
-    }
-
-    /**
      * Sends a message to the primary server's webhook.
      * <p>
      * If err is not null, a full stack trace will be sent in a thread.
@@ -175,6 +104,11 @@ public class BotLogger {
      */
     public static void error(@Nonnull String message) {
         logToChannel(null, message, null, LogSeverity.Error);
+    }
+
+    public static void error(
+            @Nonnull GenericInteractionCreateEvent event, @Nonnull String message, Throwable throwable) {
+        logToChannel(new LogMessageOrigin(event), message, throwable, LogSeverity.Error);
     }
 
     /**
@@ -191,6 +125,14 @@ public class BotLogger {
         logToChannel(null, message, err, LogSeverity.Error);
     }
 
+    public static void error(@Nonnull Player player, @Nonnull String message, @Nullable Throwable err) {
+        logToChannel(new LogMessageOrigin(player), message, err, LogSeverity.Error);
+    }
+
+    public static void error(@Nonnull Game game, @Nonnull String message, @Nullable Throwable err) {
+        logToChannel(new LogMessageOrigin(game), message, err, LogSeverity.Error);
+    }
+
     /**
      * Sends a message to #bot-log-error in offending server, else resorting to #bot-log and finally webhook.
      * <p>
@@ -201,7 +143,7 @@ public class BotLogger {
      * @param origin  - The discord-based source of this log entry
      * @param message - The message associated with this log entry
      */
-    public static void error(@Nullable LogMessageOrigin origin, @Nonnull String message) {
+    private static void error(@Nullable LogMessageOrigin origin, @Nonnull String message) {
         logToChannel(origin, message, null, LogSeverity.Error);
     }
 
@@ -335,178 +277,12 @@ public class BotLogger {
         }
     }
 
-    /**
-     * Sends a message to the Primary Async Server's #bot-log channel
-     *
-     * @param msg - message to send to the #bot-log channel
-     */
-    @Deprecated
-    public static void log(String msg) {
-        info(msg);
-    }
-
-    @Deprecated
-    public static void logWithTimestamp(String msg) {
-        info(msg);
-    }
-
-    /**
-     * Sends a message to the Primary Async Server's #bot-log channel, including stack trace.
-     * <p>
-     * Will create a thread and post the full Stack Trace when supplied with an Exception
-     *
-     * @param msg - message to send to the #bot-log channel
-     * @e - Exception
-     */
-    @Deprecated
-    public static void log(String msg, Throwable e) {
-        error(msg, e);
-    }
-
-    /**
-     * Sends a message to the offending server's #bot-log channel, or if it does not exist, the Primary server's #bot-log channel
-     *
-     * @param event GenericInteractionCreateEvent, handling for null, SlashCommandInteractionEvent, and ButtonInteractionEvent
-     */
-    @Deprecated
-    public static void log(GenericInteractionCreateEvent event, String msg) {
-        info(new LogMessageOrigin(event), msg);
-    }
-
-    /**
-     * Sends just the stack trace the offending server's #bot-log channel, or if it does not exist, the Primary server's #bot-log channel
-     * <p>
-     * Will create a thread and post the full Stack Trace
-     *
-     * @param event GenericInteractionCreateEvent, handling for null, SlashCommandInteractionEvent, and ButtonInteractionEvent
-     */
-    @Deprecated
-    public static void log(GenericInteractionCreateEvent event, Exception e) {
-        error(new LogMessageOrigin(event), "", e);
-    }
-
-    /**
-     * Sends a message to the offending server's #bot-log channel, or if it does not exist, the Primary server's #bot-log channel
-     * <p>
-     * Will create a thread and post the full Stack Trace when supplied with an Exception
-     *
-     * @param event GenericInteractionCreateEvent, handling for null, SlashCommandInteractionEvent, and ButtonInteractionEvent
-     * @param e Exception
-     */
-    @Deprecated
-    public static void log(GenericInteractionCreateEvent event, String msg, Throwable e) {
-        if (ignoredError(e)) return;
-
-        TextChannel botLogChannel = getBotLogChannel(event);
-        if (msg == null) msg = "";
-
-        String sysOut = "[BOT-LOG] " + msg;
-        if (e != null) {
-            sysOut += "\n> - " + e.getMessage();
-        }
-        System.out.println(sysOut);
-        if (e != null) e.printStackTrace();
-
-        // Adding so we don't cause an exception by attempting to log
-        if (msg.length() > 2000) {
-            // TODO: handle this better, don't truncate
-            String ellipses = "...\n### Error message was too long and was truncated here\n";
-            msg = msg.substring(0, 2000 - ellipses.length() - 1) + ellipses;
-        }
-
-        if (botLogChannel == null) {
-            String name;
-            if (event == null) {
-                return;
-            } else {
-                name = event.getGuild().getName();
-            }
-            MessageHelper.sendMessageToBotLogWebhook("Failed to find bot-log channel for server: " + name
-                    + "\nSending via webhook to main server.\n>" + msg);
-            return;
-        }
-
-        switch (event) {
-            case SlashCommandInteractionEvent slashCommandInteractionEvent -> { // SLASH COMMAND EVENT LOGS
-                String channelName = event.getChannel().getName();
-                String channelMention = event.getChannel().getAsMention();
-                String commandString = slashCommandInteractionEvent.getCommandString();
-                String message = "[" + channelName + "](" + channelMention + ") "
-                        + event.getUser().getEffectiveName() + " used: `" + commandString + "`\n> Error: " + msg;
-                logMessage(event, e, botLogChannel, message);
-            }
-            case ButtonInteractionEvent buttonInteractionEvent -> { // BUTTON EVENT LOGS
-                String channelName = event.getChannel().getName();
-                Button button = buttonInteractionEvent.getButton();
-                String message = "[" + channelName + "]("
-                        + buttonInteractionEvent.getMessage().getJumpUrl() + ") "
-                        + event.getUser().getEffectiveName() + " pressed button: "
-                        + ButtonHelper.getButtonRepresentation(button) + "\n> Error: " + msg;
-                logMessage(event, e, botLogChannel, message);
-            }
-            case StringSelectInteractionEvent sEvent -> { // SELECTION EVENT LOGS
-                String channelName = event.getChannel().getName();
-                String channelMention = event.getChannel().getAsMention();
-
-                String menuInfo = SelectionMenuProcessor.getSelectionMenuDebugText(sEvent);
-                String logMsg = channelMention + "\n" + channelName + ". " + menuInfo + "\n" + msg;
-                logMessage(event, e, botLogChannel, logMsg);
-            }
-            case ModalInteractionEvent mEvent -> { // MODAL EVENT LOGS
-                String channelName = event.getChannel().getName();
-                String channelMention = event.getChannel().getAsMention();
-
-                String menuInfo = ModalListener.getModalDebugText(mEvent);
-                String logMsg = channelMention + "\n" + channelName + ". " + menuInfo + "\n" + msg;
-                logMessage(event, e, botLogChannel, logMsg);
-            }
-            case null -> logMessage(event, e, botLogChannel, msg); // NON-EVENT LOGS
-            default -> logMessage(event, e, botLogChannel, "[unknown event]\n" + msg);
-        }
-    }
-
-    private static void logMessage(
-            GenericInteractionCreateEvent event, Throwable e, TextChannel botLogChannel, String message) {
-        if (e == null) {
-            botLogChannel.sendMessage(message).queue();
-        } else {
-            ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
-            botLogChannel.sendMessage(message).queue(m -> m.createThreadChannel("Stack Trace")
-                    .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-                    .queue(t -> {
-                        MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
-                        t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
-                    }));
-        }
-    }
-
     public static void logButton(ButtonInteractionEvent event) {
         LogBufferManager.addLogMessage(new ButtonInteractionEventLog(new LogMessageOrigin(event)));
     }
 
     public static void logSlashCommand(SlashCommandInteractionEvent event, Message commandResponseMessage) {
         LogBufferManager.addLogMessage(new SlashCommandEventLog(new LogMessageOrigin(event), commandResponseMessage));
-    }
-
-    @Deprecated
-    public static TextChannel getBotLogChannel(GenericInteractionCreateEvent event) {
-        TextChannel botLogChannel = null;
-        if (event != null) {
-            botLogChannel = getBotLogChannel(event.getGuild().getTextChannels());
-        }
-        if (botLogChannel == null) {
-            botLogChannel = getBotLogChannel(AsyncTI4DiscordBot.guildPrimary.getTextChannels());
-        }
-        return botLogChannel;
-    }
-
-    private static TextChannel getBotLogChannel(List<TextChannel> textChannels) {
-        for (TextChannel textChannel : textChannels) {
-            if ("bot-log".equals(textChannel.getName())) {
-                return textChannel;
-            }
-        }
-        return null;
     }
 
     public static void catchRestError(Throwable e) {

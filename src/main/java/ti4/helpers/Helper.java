@@ -1042,8 +1042,7 @@ public class Helper {
             int count;
             if (!thing.contains("_")) {
                 BotLogger.info(
-                        new BotLogger.LogMessageOrigin(game),
-                        "Caught the following thing in the voting " + thing + " in game " + game.getName());
+                        game, "Caught the following thing in the voting " + thing + " in game " + game.getName());
                 continue;
             }
             String secondHalf = thing.split("_")[1];
@@ -1175,8 +1174,7 @@ public class Helper {
         for (String thing : spentThings) {
             if (!thing.contains("_")) {
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(player),
-                        "Caught the following thing in the voting " + thing + " in game " + game.getName());
+                        player, "Caught the following thing in the voting " + thing + " in game " + game.getName());
                 continue;
             }
             String secondHalf = thing.split("_")[1];
@@ -2541,7 +2539,7 @@ public class Helper {
         if (!roles.isEmpty()) {
             if (roles.size() > 1) {
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(game),
+                        game,
                         "There are " + roles.size() + " roles that match the game name: `" + gameName
                                 + "` - please investigate, as this may cause issues.");
                 return;

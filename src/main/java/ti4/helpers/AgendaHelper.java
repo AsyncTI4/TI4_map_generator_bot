@@ -1917,10 +1917,10 @@ public class AgendaHelper {
             try {
                 nextInLine = getNextInLine(null, getVotingOrder(game), game);
             } catch (Exception e) {
-                BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not find next in line", e);
+                BotLogger.error(game, "Could not find next in line", e);
             }
             if (nextInLine == null) {
-                BotLogger.warning(new BotLogger.LogMessageOrigin(game), "`startTheVoting` is **null**");
+                BotLogger.warning(game, "`startTheVoting` is **null**");
                 return;
             }
             String realIdentity = nextInLine.getRepresentationUnfogged();
@@ -1989,7 +1989,7 @@ public class AgendaHelper {
                 game.updateActivePlayer(nextInLine);
                 game.setStoredValue("preVoting" + nextInLine.getFaction(), "");
             } catch (Exception e) {
-                BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not update active player", e);
+                BotLogger.error(game, "Could not update active player", e);
             }
             List<Button> buttons = List.of(Vote, Abstain, ForcedAbstain);
             if (game.isFowMode()) {
@@ -2651,9 +2651,7 @@ public class AgendaHelper {
                 if (x < votingOrder.size()) {
                     Player player = votingOrder.get(x);
                     if (player == null) {
-                        BotLogger.warning(
-                                new BotLogger.LogMessageOrigin(game),
-                                "`getNextInLine` Hit a null player in game " + game.getName());
+                        BotLogger.warning(game, "`getNextInLine` Hit a null player in game " + game.getName());
                         return null;
                     }
 
@@ -2661,7 +2659,7 @@ public class AgendaHelper {
                         return player;
                     } else {
                         BotLogger.warning(
-                                new BotLogger.LogMessageOrigin(game),
+                                game,
                                 "`getNextInLine` Hit a notRealPlayer player in game " + game.getName() + " on player "
                                         + player.getUserName());
                     }

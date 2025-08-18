@@ -68,14 +68,14 @@ public class AsyncTi4WebsiteHelper {
                         .sendAsync(request, HttpResponse.BodyHandlers.ofString())
                         .exceptionally(e -> {
                             BotLogger.error(
-                                    new BotLogger.LogMessageOrigin(game),
+                                    game,
                                     "An exception occurred while performing an async send of game data to: " + url,
                                     e);
                             return null;
                         });
             }
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
+            BotLogger.error(game, "Could not put data to web server", e);
         }
     }
 
@@ -141,7 +141,7 @@ public class AsyncTi4WebsiteHelper {
                     "no-cache, no-store, must-revalidate",
                     bucket);
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
+            BotLogger.error(game, "Could not put data to web server", e);
         }
     }
 
@@ -276,7 +276,7 @@ public class AsyncTi4WebsiteHelper {
                     bucket);
         } catch (Exception e) {
             BotLogger.error(
-                    new BotLogger.LogMessageOrigin(player),
+                    player,
                     "Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.",
                     e);
         }

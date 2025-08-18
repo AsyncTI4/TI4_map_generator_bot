@@ -365,7 +365,7 @@ public class Tile {
         String tileName = Mapper.getTileID(fowTileID);
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(player), "Could not find tile: " + fowTileID);
+            BotLogger.warning(player, "Could not find tile: " + fowTileID);
         }
         return tilePath;
     }

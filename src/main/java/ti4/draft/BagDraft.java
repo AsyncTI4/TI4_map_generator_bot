@@ -131,7 +131,7 @@ public abstract class BagDraft {
         TextChannel actionsChannel = owner.getMainGameChannel();
         if (actionsChannel == null) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(player),
+                    player,
                     "`Helper.getBagChannel`: actionsChannel is null for game, or community game private channel not set: "
                             + owner.getName());
             return null;
@@ -228,7 +228,7 @@ public abstract class BagDraft {
             }
         } catch (Exception e) {
             BotLogger.error(
-                    new BotLogger.LogMessageOrigin(player),
+                    player,
                     "`Player.getBagInfoThread`: Could not find existing Bag Info thead using ID: " + bagInfoThread
                             + " for potential thread name: " + threadName,
                     e);
@@ -263,7 +263,7 @@ public abstract class BagDraft {
             }
         } catch (Exception e) {
             BotLogger.error(
-                    new BotLogger.LogMessageOrigin(player),
+                    player,
                     "`Player.getBagInfoThread`: Could not find existing Bag Info thead using name: " + threadName,
                     e);
         }

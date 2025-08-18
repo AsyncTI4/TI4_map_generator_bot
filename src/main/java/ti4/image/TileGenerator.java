@@ -1596,8 +1596,7 @@ public class TileGenerator {
             if (isValid.apply(tokenID)) {
                 String tokenPath = tile.getTokenPath(tokenID);
                 if (tokenPath == null) {
-                    BotLogger.warning(
-                            new BotLogger.LogMessageOrigin(game), "Could not find token file for: " + tokenID);
+                    BotLogger.warning(game, "Could not find token file for: " + tokenID);
                     continue;
                 }
                 float scale = 0.85f;
@@ -1848,7 +1847,7 @@ public class TileGenerator {
             String tokenName = Mapper.getTokenKey(tokenID);
 
             if (tokenPath == null) {
-                BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Could not parse token file for: " + tokenID);
+                BotLogger.warning(game, "Could not parse token file for: " + tokenID);
                 continue;
             }
             if (game.isCptiExploreMode() && tokenPath.toLowerCase().contains("token_frontier")) {

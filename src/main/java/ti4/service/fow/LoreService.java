@@ -112,7 +112,7 @@ public class LoreService {
                     savedLoreMap.put(
                             splitLore[0], new String[] {splitLore[1], splitLore.length == 3 ? splitLore[2] : ""});
                 } else {
-                    BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Invalid lore string: " + savedLore);
+                    BotLogger.warning(game, "Invalid lore string: " + savedLore);
                 }
             }
         }

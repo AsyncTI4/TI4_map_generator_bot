@@ -372,7 +372,7 @@ public class CreateGameService {
                                 FileUpload fileUpload = FileUploadService.createFileUpload(colorsImage, "colors");
                                 MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
                             } catch (Exception e) {
-                                BotLogger.error(new BotLogger.LogMessageOrigin(game), "newPlayerIntro", e);
+                                BotLogger.error(game, "newPlayerIntro", e);
                             }
                         },
                         null);
