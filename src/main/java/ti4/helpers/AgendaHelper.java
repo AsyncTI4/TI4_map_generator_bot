@@ -1920,7 +1920,7 @@ public class AgendaHelper {
                 BotLogger.error(game, "Could not find next in line", e);
             }
             if (nextInLine == null) {
-                BotLogger.warning(game, "`startTheVoting` is **null**");
+                BotLogger.warning(new LogOrigin(game), "`startTheVoting` is **null**");
                 return;
             }
             String realIdentity = nextInLine.getRepresentationUnfogged();
@@ -2651,7 +2651,8 @@ public class AgendaHelper {
                 if (x < votingOrder.size()) {
                     Player player = votingOrder.get(x);
                     if (player == null) {
-                        BotLogger.warning(game, "`getNextInLine` Hit a null player in game " + game.getName());
+                        BotLogger.warning(
+                                new LogOrigin(game), "`getNextInLine` Hit a null player in game " + game.getName());
                         return null;
                     }
 

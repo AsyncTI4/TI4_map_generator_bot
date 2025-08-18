@@ -6,6 +6,7 @@ import java.util.List;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 
 class ObjectiveBox {
     private static final int objectiveBoxHeight = 38;
@@ -131,7 +132,7 @@ class ObjectiveBox {
                 }
             }
         } catch (Exception e) {
-            BotLogger.error(game, "Error drawing score control token markers", e);
+            BotLogger.error(new LogOrigin(game), "Error drawing score control token markers", e);
         }
     }
 

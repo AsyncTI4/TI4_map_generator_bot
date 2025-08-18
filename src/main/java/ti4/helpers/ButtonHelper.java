@@ -74,6 +74,7 @@ import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedPlayer;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.ColorModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
@@ -600,7 +601,7 @@ public class ButtonHelper {
             }
             Planet p = game.getPlanetsInfo().get(planet);
             if (p == null) {
-                BotLogger.warning(player, "Null unitholder for planet " + planet);
+                BotLogger.warning(new LogOrigin(player), "Null unitholder for planet " + planet);
                 continue;
             }
             Set<String> tokenList = p.getTokenList();
@@ -1646,12 +1647,14 @@ public class ButtonHelper {
         if (tile == null) {
             List<String> fakePlanets = new ArrayList<>(List.of("custodiavigilia", "ghoti"));
             if (!fakePlanets.contains(planetName))
-                BotLogger.warning(game, "Couldn't find tile for " + planetName + " in game " + game.getName());
+                BotLogger.warning(
+                        new LogOrigin(game), "Couldn't find tile for " + planetName + " in game " + game.getName());
             return "none";
         }
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
         if (unitHolder == null) {
-            BotLogger.warning(game, "Couldn't find unitholder for " + planetName + " in game " + game.getName());
+            BotLogger.warning(
+                    new LogOrigin(game), "Couldn't find unitholder for " + planetName + " in game " + game.getName());
             return "none";
         }
         Set<String> tokenList = unitHolder.getTokenList();
@@ -2375,7 +2378,8 @@ public class ButtonHelper {
         int count = 0;
         Tile hs = player.getHomeSystemTile();
         if (hs == null) {
-            BotLogger.warning(player, "not finding a HS for " + player.getFaction() + " in " + game.getName());
+            BotLogger.warning(
+                    new LogOrigin(player), "not finding a HS for " + player.getFaction() + " in " + game.getName());
             return 0;
         }
         String hsPos = hs.getPosition();

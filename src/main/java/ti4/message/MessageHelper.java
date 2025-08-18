@@ -52,6 +52,7 @@ import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.ApplicationEmojiService;
@@ -305,7 +306,7 @@ public class MessageHelper {
                             yield new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
                         }
                         default -> {
-                            BotLogger.warning(game, "Unable to handle message type: " + messageType);
+                            BotLogger.warning(new LogOrigin(game), "Unable to handle message type: " + messageType);
                             yield null;
                         }
                     };

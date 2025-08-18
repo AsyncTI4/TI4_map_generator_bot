@@ -25,6 +25,7 @@ import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.MapGenerator.VerticalAlign;
 import ti4.map.Player;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.ColorModel;
 import ti4.service.emoji.TI4Emoji;
 
@@ -242,7 +243,7 @@ public class DrawingUtil {
             if (player != null && player.getGame() != null)
                 gameName = player.getGame().getName();
             if (player != null) {
-                BotLogger.error(player, "Ignored error during map generation for `" + gameName + "`", e);
+                BotLogger.error(new LogOrigin(player), "Ignored error during map generation for `" + gameName + "`", e);
             } else {
                 BotLogger.error("Ignored error during map generation for `" + gameName + "`", e);
             }
@@ -515,7 +516,7 @@ public class DrawingUtil {
             g2.drawImage(resourceBufferedImage, x, y, null);
             if (setOpacity) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         } catch (Exception e) {
-            BotLogger.error(player, "Could not display player's faction icon image", e);
+            BotLogger.error(new LogOrigin(player), "Could not display player's faction icon image", e);
         }
     }
 
@@ -537,7 +538,7 @@ public class DrawingUtil {
             Graphics2D g2 = (Graphics2D) graphics;
             g2.drawImage(underlay, x, y, null);
         } catch (Exception e) {
-            BotLogger.error(player, "Could not display player's faction icon image", e);
+            BotLogger.error(new LogOrigin(player), "Could not display player's faction icon image", e);
         }
     }
 

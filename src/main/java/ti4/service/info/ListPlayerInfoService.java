@@ -21,6 +21,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source;
 import ti4.model.TechnologyModel.TechnologyType;
@@ -725,7 +726,8 @@ public class ListPlayerInfoService {
                 for (String p : player.getPlanets()) {
                     Planet planet = game.getPlanetsInfo().get(p);
                     if (planet == null) {
-                        BotLogger.warning(player, "Planet \"" + p + "\" not found for game " + game.getName());
+                        BotLogger.warning(
+                                new LogOrigin(player), "Planet \"" + p + "\" not found for game " + game.getName());
                     } else if (planet.isLegendary()) {
                         count++;
                     }
