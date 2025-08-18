@@ -12,10 +12,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
@@ -28,6 +24,8 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.helpers.ActionCardHelper;
@@ -2059,6 +2057,7 @@ public class UnfiledButtonHandlers {
         }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
             if (player.hasTech("asn")
+                    && game.getStoredValue("ASN" + player.getFaction()).isEmpty()
                     && (buttonID.contains("tacticalAction")
                             || buttonID.contains("warfare")
                             || buttonID.contains("anarchy7Build")
@@ -2080,7 +2079,8 @@ public class UnfiledButtonHandlers {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 }
             }
-            if (buttonID.contains("tacticalAction")) {
+            if (buttonID.contains("tacticalAction")
+                    && game.getStoredValue("ASN" + player.getFaction()).isEmpty()) {
                 ButtonHelper.exploreDET(player, game, event);
                 ButtonHelperFactionSpecific.cleanCavUp(game, event);
                 if (player.hasAbility("cunning")) {
