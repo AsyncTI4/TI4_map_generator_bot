@@ -1,9 +1,8 @@
 package ti4.message;
 
+import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.concurrent.TimeUnit;
-
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
@@ -413,8 +412,7 @@ public class BotLogger {
         // Adding so we don't cause an exception by attempting to log
         if (msg.length() > 2000) {
             // TODO: handle this better, don't truncate
-            String ellipses =
-                    "...\n### Error message was too long and was truncated here\n";
+            String ellipses = "...\n### Error message was too long and was truncated here\n";
             msg = msg.substring(0, 2000 - ellipses.length() - 1) + ellipses;
         }
 
@@ -469,7 +467,8 @@ public class BotLogger {
         }
     }
 
-    private static void logMessage(GenericInteractionCreateEvent event, Throwable e, TextChannel botLogChannel, String message) {
+    private static void logMessage(
+            GenericInteractionCreateEvent event, Throwable e, TextChannel botLogChannel, String message) {
         if (e == null) {
             botLogChannel.sendMessage(message).queue();
         } else {

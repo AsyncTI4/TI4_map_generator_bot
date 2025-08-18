@@ -75,8 +75,8 @@ public class InteractionLogCron {
         while (!toProcess.isEmpty()) {
             BotLogger.AbstractEventLog e = toProcess.pollFirst();
             messageBuilders
-                .computeIfAbsent(e.getClass(), k -> new StringBuilder())
-                .append(e.getLogString());
+                    .computeIfAbsent(e.getClass(), k -> new StringBuilder())
+                    .append(e.getLogString());
         }
         return messageBuilders;
     }
@@ -84,24 +84,19 @@ public class InteractionLogCron {
     @SneakyThrows
     private static void sendByChannelOrThread(Class<?> clazz, StringBuilder message) {
         List<TextChannel> logCandidates = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName(
-            (String) clazz.getMethod("getChannelName").invoke(null), false);
+                (String) clazz.getMethod("getChannelName").invoke(null), false);
 
         if (!logCandidates.isEmpty()) {
-            logCandidates
-                .getFirst()
-                .sendMessage(message.toString())
-                .queue();
+            logCandidates.getFirst().sendMessage(message.toString()).queue();
         } else {
             try {
                 ThreadGetter.getThreadInChannel(
-                    primaryBotLogChannel,
-                    (String) clazz.getMethod("getThreadName").invoke(null),
-                    (threadChannel) -> MessageHelper.sendMessageToChannel(
-                        threadChannel, message.toString()));
+                        primaryBotLogChannel,
+                        (String) clazz.getMethod("getThreadName").invoke(null),
+                        (threadChannel) -> MessageHelper.sendMessageToChannel(threadChannel, message.toString()));
             } catch (Exception e) {
                 BotLogger.error(
-                    "Failed to send a message via ThreadGetter in InteractionLogCron (this should not happen)",
-                    e);
+                        "Failed to send a message via ThreadGetter in InteractionLogCron (this should not happen)", e);
             }
         }
     }
