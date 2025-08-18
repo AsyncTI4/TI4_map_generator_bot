@@ -51,7 +51,7 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(isLegendary).orElse(false);
     }
 
-    public Optional<String> getToken() {
+    private Optional<String> getToken() {
         return Optional.ofNullable(token);
     }
 

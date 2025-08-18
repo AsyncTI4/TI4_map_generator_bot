@@ -166,7 +166,7 @@ public class RiftUnitsHelper {
         return msg;
     }
 
-    public static List<Button> getButtonsForRiftingUnitsInSystem(Player player, Game game, Tile tile) {
+    private static List<Button> getButtonsForRiftingUnitsInSystem(Player player, Game game, Tile tile) {
         String finChecker = player.getFinsFactionCheckerPrefix();
         List<Button> buttons = new ArrayList<>();
 

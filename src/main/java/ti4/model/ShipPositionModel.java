@@ -93,7 +93,7 @@ public class ShipPositionModel {
             };
         }
 
-        public String getName() {
+        String getName() {
             return switch (this) {
                 // HS system layouts
                 case TYPE01 -> "1-planet HS (Jord-Style)";

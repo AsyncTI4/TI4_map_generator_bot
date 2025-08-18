@@ -76,6 +76,7 @@ import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.user.AFKService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
@@ -168,7 +169,7 @@ public class Player extends PlayerProperties {
     }
 
     public static Comparator<Player> comparingInitiative() {
-        return (p1, p2) -> Integer.compare(p1.getInitiative(), p2.getInitiative());
+        return Comparator.comparingInt(Player::getInitiative);
     }
 
     public int getSpentTgsThisWindow() {
@@ -261,7 +262,7 @@ public class Player extends PlayerProperties {
         currentProducedUnits.put(unit, count);
     }
 
-    public int getProducedUnit(String unit) {
+    private int getProducedUnit(String unit) {
         if (currentProducedUnits.get(unit) == null) {
             return 0;
         } else {
@@ -601,9 +602,9 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public Set<String> getSpecialUnitsOwned() {
-        return new HashSet<>(getUnitsOwned().stream()
+        return getUnitsOwned().stream()
                 .filter(u -> Mapper.getUnit(u).getFaction().isPresent())
-                .collect(Collectors.toSet()));
+                .collect(Collectors.toSet());
     }
 
     public boolean hasUnit(String unitID) {
@@ -760,7 +761,7 @@ public class Player extends PlayerProperties {
     }
 
     @JsonIgnore
-    public Set<String> getSpecialPromissoryNotesOwned() {
+    private Set<String> getSpecialPromissoryNotesOwned() {
         return getPromissoryNotesOwned().stream()
                 .filter(pn -> Mapper.getPromissoryNotes().get(pn).isNotWellKnown())
                 .collect(Collectors.toSet());
@@ -809,7 +810,7 @@ public class Player extends PlayerProperties {
         }
     }
 
-    public void removePromissoryNoteFromPlayArea(String id) {
+    private void removePromissoryNoteFromPlayArea(String id) {
         getPromissoryNotesInPlayArea().remove(id);
     }
 
@@ -1151,19 +1152,20 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public User getUser() {
-        return AsyncTI4DiscordBot.jda.getUserById(getUserID());
+        // TODO: This is to handle JDA being null during tests. We should think of a cleaner solution.
+        return AsyncTI4DiscordBot.jda == null ? null : AsyncTI4DiscordBot.jda.getUserById(getUserID());
     }
 
     @Override
     public String getUserName() {
         User userById = getUser();
-        if (userById != null) {
-            Member member = AsyncTI4DiscordBot.guildPrimary.getMemberById(getUserID());
-            if (member != null) {
-                setUserName(member.getEffectiveName());
-            } else {
-                setUserName(userById.getName());
-            }
+        if (userById == null) return super.getUserName();
+
+        Member member = AsyncTI4DiscordBot.guildPrimary.getMemberById(getUserID());
+        if (member == null) {
+            setUserName(userById.getName());
+        } else {
+            setUserName(member.getEffectiveName());
         }
         return super.getUserName();
     }
@@ -1358,7 +1360,7 @@ public class Player extends PlayerProperties {
 
         if (hasAbility("cunning")) {
             List<GenericCardModel> allTraps = new ArrayList<>(Mapper.getTraps().values());
-            allTraps.stream().forEach(trap -> setTrapCard(trap.getAlias()));
+            allTraps.forEach(trap -> setTrapCard(trap.getAlias()));
         }
     }
 
@@ -1778,7 +1780,7 @@ public class Player extends PlayerProperties {
         if (game.isAgeOfCommerceMode() && comms > 0) {
             num = comms;
         }
-        if ("no".equalsIgnoreCase(getGame().getStoredValue("loadedGame"))) {
+        if ("no".equalsIgnoreCase(game.getStoredValue("loadedGame"))) {
             num = comms;
         }
         super.setCommodities(num);
@@ -1964,7 +1966,7 @@ public class Player extends PlayerProperties {
         doAdditionalThingsWhenAddingTech(techID);
     }
 
-    public void gainCustodiaVigilia() {
+    private void gainCustodiaVigilia() {
         addPlanet("custodiavigilia");
         exhaustPlanet("custodiavigilia");
 
@@ -1978,7 +1980,7 @@ public class Player extends PlayerProperties {
         }
     }
 
-    public void removeCustodiaVigilia() {
+    private void removeCustodiaVigilia() {
         removePlanet("custodiavigilia");
         if (getPlanets().contains(Constants.MR)) {
             Planet mecatolRex = game.getPlanetsInfo().get(Constants.MR);
@@ -2217,7 +2219,7 @@ public class Player extends PlayerProperties {
     }
 
     @JsonIgnore
-    public String getAutoCompleteRepresentation(boolean reset) {
+    private String getAutoCompleteRepresentation(boolean reset) {
         if (reset || super.getAutoCompleteRepresentation() == null) {
             String faction = getFaction();
             if (faction == null || "null".equals(faction)) {
@@ -2613,11 +2615,11 @@ public class Player extends PlayerProperties {
         }
 
         if (hasAbility("mobile_command")) {
-            if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, this, UnitType.Flagship)
+            if (CheckUnitContainmentService.getTilesContainingPlayersUnits(game, this, UnitType.Flagship)
                     .isEmpty()) {
                 return null;
             }
-            return ButtonHelper.getTilesOfPlayersSpecificUnits(game, this, UnitType.Flagship)
+            return CheckUnitContainmentService.getTilesContainingPlayersUnits(game, this, UnitType.Flagship)
                     .getFirst();
         }
         if (!getFaction().contains("franken") && game.getTile(AliasHandler.resolveTile(getFaction())) != null) {

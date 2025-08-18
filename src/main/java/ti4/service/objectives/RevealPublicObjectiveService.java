@@ -38,7 +38,7 @@ public class RevealPublicObjectiveService {
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         RelicHelper.offerInitialNeuraLoopChoice(game, objective.getKey());
-        var channel = event.getMessageChannel();
+        var channel = game.getActionsChannel();
         if (game.isLiberationC4Mode()) {
             if (game.getRevealedPublicObjectives().get("Control Ordinian") == null
                     || game.getRevealedPublicObjectives().get("Control Ordinian") == 0) {
@@ -136,9 +136,9 @@ public class RevealPublicObjectiveService {
         SecretObjectiveModel po = Mapper.getSecretObjective(objective.getKey());
         if (po == null) {
             Map<String, String> sos = Mapper.getSecretObjectivesJustNames();
-            for (String key : sos.keySet()) {
-                if (sos.get(key).equalsIgnoreCase(objective.getKey())) {
-                    po = Mapper.getSecretObjective(key);
+            for (Map.Entry<String, String> entry : sos.entrySet()) {
+                if (entry.getValue().equalsIgnoreCase(objective.getKey())) {
+                    po = Mapper.getSecretObjective(entry.getKey());
                 }
             }
         }
@@ -162,7 +162,7 @@ public class RevealPublicObjectiveService {
             objective = game.revealStage1();
         }
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-        var channel = event.getMessageChannel();
+        var channel = game.getActionsChannel();
         MessageHelper.sendMessageToChannel(
                 channel, "### " + game.getPing() + ", a stage 1 public objective has been revealed.");
         channel.sendMessageEmbeds(po.getRepresentationEmbed())
@@ -211,7 +211,7 @@ public class RevealPublicObjectiveService {
 
         PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());
-        var channel = game.getMainGameChannel();
+        var channel = game.getActionsChannel();
         if (game.isLiberationC4Mode()) {
             MessageHelper.sendMessageToChannel(
                     channel,

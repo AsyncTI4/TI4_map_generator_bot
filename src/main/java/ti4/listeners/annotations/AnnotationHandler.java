@@ -262,7 +262,7 @@ public class AnnotationHandler {
 
                     for (H handler : handlers) {
                         String val = null;
-                        Boolean save = true;
+                        boolean save = true;
                         if (handler instanceof ButtonHandler bh) {
                             val = bh.value();
                             save = bh.save();

@@ -41,6 +41,7 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.explore.AddFrontierTokensService;
 import ti4.service.info.ListTurnOrderService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
 public class PlayHeroService {
@@ -268,7 +269,7 @@ public class PlayHeroService {
                         buttons);
             }
             case "edynhero" -> {
-                int size = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)
+                int size = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Mech)
                         .size();
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
@@ -382,9 +383,7 @@ public class PlayHeroService {
                         event.getMessageChannel(),
                         player.getFactionEmoji() + " has been offered buttons to explore all their planets.");
             }
-            case "toldarhero" -> {
-                ButtonHelperHeroes.resolveToldarHero(game, player);
-            }
+            case "toldarhero" -> ButtonHelperHeroes.resolveToldarHero(game, player);
             case "nivynhero" -> {
                 ButtonHelperHeroes.resolveNivynHeroSustainEverything(game, player);
                 MessageHelper.sendMessageToChannel(

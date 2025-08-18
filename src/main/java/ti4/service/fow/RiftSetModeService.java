@@ -61,7 +61,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
  * - Exploring a planet has chance of Stellar Converting it (with a custom token)
  *
  */
-public class RiftSetModeService {
+class RiftSetModeService {
     private static final String CRUCIBLE_PN = "crucible";
     private static final String CRUCIBLE_AGENDA = "riftset_crucible";
     private static final String RIFTSET_INVASION_EXPLORE = "riftset_invasion";
@@ -91,7 +91,7 @@ public class RiftSetModeService {
         return true;
     }
 
-    public static boolean isActive(Game game) {
+    private static boolean isActive(Game game) {
         return game.getFowOption(FOWOption.RIFTSET_MODE);
     }
 
@@ -222,21 +222,11 @@ public class RiftSetModeService {
         String msg =
                 "T##m% & sp¿c€ ß̶e̷g̷i̵n̸ T0øøø U̴̪̖͒͛͗̏N̸̻̦̜̊͒̈́̄R̵͎̅͆͘Ȧ̵̳̔̚V̴̹̜̽̾̄̓L̶̥̩̎.̷̨͕̻͑̄̓̕.̸̙̏̄̄͜.̷̼̝̲̩̆́̕";
         switch (game.getRound()) {
-            case 1, 2 -> {
-                msg = "Time and space begin to unravel.";
-            }
-            case 3 -> {
-                msg = "Tíme and space bégin tto unravl...";
-            }
-            case 4 -> {
-                msg = "Ti.m.e an d spa-ce bgin t.o u̷nravl..";
-            }
-            case 5 -> {
-                msg = "T!m- ænd sp^ce b...ggn t0 üñr@vl~";
-            }
-            case 6 -> {
-                msg = "T#m% & spa¿c€ ßegi_n tØøø u̘͔͜ń̢͜r̶͙̜a͓͉͟v̷̪͎l...";
-            }
+            case 1, 2 -> msg = "Time and space begin to unravel.";
+            case 3 -> msg = "Tíme and space bégin tto unravl...";
+            case 4 -> msg = "Ti.m.e an d spa-ce bgin t.o u̷nravl..";
+            case 5 -> msg = "T!m- ænd sp^ce b...ggn t0 üñr@vl~";
+            case 6 -> msg = "T#m% & spa¿c€ ßegi_n tØøø u̘͔͜ń̢͜r̶͙̜a͓͉͟v̷̪͎l...";
         }
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), "# " + msg);
     }

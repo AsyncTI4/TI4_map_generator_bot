@@ -22,7 +22,7 @@ public class CircuitBreaker {
 
     private static LocalDateTime closeDateTime;
 
-    public static synchronized boolean incrementThresholdCount() {
+    static synchronized boolean incrementThresholdCount() {
         if (open) {
             return false;
         }
@@ -44,6 +44,14 @@ public class CircuitBreaker {
                             + MINUTES_TO_WAIT_BEFORE_CLOSING + " minutes.");
         }
         return true;
+    }
+
+    public static synchronized void openForSeconds(long seconds) {
+        open = true;
+        thresholdCount = 0;
+        closeDateTime = LocalDateTime.now().plusSeconds(seconds);
+        CronManager.scheduleOnce(CircuitBreaker.class, CircuitBreaker::reset, seconds, TimeUnit.SECONDS);
+        BotLogger.info("Circuit breaker manually opened for " + seconds + " seconds.");
     }
 
     private static synchronized void reset() {

@@ -33,7 +33,7 @@ import ti4.settings.users.UserSettingsManager;
 
 class Replace extends GameStateSubcommand {
 
-    public Replace() {
+    Replace() {
         super(Constants.REPLACE, "Replace player in game", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.PLAYER_FACTION, "Player being replaced")
                 .setAutoComplete(true)
@@ -44,22 +44,11 @@ class Replace extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Member member = event.getMember();
-        boolean isAdmin = false;
-        if (member != null) {
-            List<Role> roles = member.getRoles();
-            for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
-                if (roles.contains(role)) {
-                    isAdmin = true;
-                    break;
-                }
-            }
-        }
-
+        boolean isBotHelper = CommandHelper.hasRole(event, AsyncTI4DiscordBot.bothelperRoles);
         Game game = getGame();
-        if (game.getPlayer(event.getUser().getId()) == null && !isAdmin) {
+        if (game.getPlayer(event.getUser().getId()) == null && !isBotHelper) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Only game players or Bothelpers can replace a player.");
+                    event.getChannel(), "Only game players or BotHelpers can replace a player.");
             return;
         }
 
@@ -136,11 +125,12 @@ class Replace extends GameStateSubcommand {
         }
         Map<String, Player> playersById = game.getPlayers();
         Map<String, Player> updatedPlayersById = new LinkedHashMap<>();
-        for (String userId : playersById.keySet()) {
+        for (Map.Entry<String, Player> entry : playersById.entrySet()) {
+            String userId = entry.getKey();
             if (userId.equalsIgnoreCase(oldPlayerUserId)) {
                 updatedPlayersById.put(replacedPlayer.getUserID(), replacedPlayer);
             } else {
-                updatedPlayersById.put(userId, playersById.get(userId));
+                updatedPlayersById.put(userId, entry.getValue());
             }
         }
         game.setPlayers(updatedPlayersById);
@@ -227,13 +217,9 @@ class Replace extends GameStateSubcommand {
                 .queue(
                         oldThreadMember -> thread.getManager()
                                 .setArchived(false)
-                                .queue(success -> {
-                                    thread.removeThreadMember(oldMember).queue(success2 -> {
-                                        thread.addThreadMember(newMember).queue(success3 -> {
-                                            accessMessage(thread, newMember);
-                                        });
-                                    });
-                                }),
+                                .queue(success -> thread.removeThreadMember(oldMember)
+                                        .queue(success2 -> thread.addThreadMember(newMember)
+                                                .queue(success3 -> accessMessage(thread, newMember)))),
                         failure -> {
                             /* Old member is not in the thread -> Do nothing */
                         });

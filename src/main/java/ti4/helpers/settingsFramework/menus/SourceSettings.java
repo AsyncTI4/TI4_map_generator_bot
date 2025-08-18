@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -19,6 +20,7 @@ import ti4.service.emoji.SourceEmojis;
 @Getter
 @JsonIgnoreProperties("messageId")
 public class SourceSettings extends SettingsMenu {
+    private static final Pattern TOG = Pattern.compile("tog");
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -117,7 +119,7 @@ public class SourceSettings extends SettingsMenu {
     @Override
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
         if (action.startsWith("tog") && event instanceof ButtonInteractionEvent bEvent) {
-            String setting = action.replaceFirst("tog", "");
+            String setting = TOG.matcher(action).replaceFirst("");
             afterChangeSources(bEvent, setting);
         }
         return null;

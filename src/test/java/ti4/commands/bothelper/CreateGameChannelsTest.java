@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import ti4.service.game.CreateGameService;
 import ti4.testUtils.BaseTi4Test;
 
-public class CreateGameChannelsTest extends BaseTi4Test {
+class CreateGameChannelsTest extends BaseTi4Test {
     @Test
-    public void testGetCategoryNameForGame() {
+    void testGetCategoryNameForGame() {
         // // Tests when hardcoded to 25 games per category
         // assertEquals("PBD #76-100", CreateGameService.getCategoryNameForGame("pbd99"));
         // assertEquals("PBD #76-100", CreateGameService.getCategoryNameForGame("pbd100"));

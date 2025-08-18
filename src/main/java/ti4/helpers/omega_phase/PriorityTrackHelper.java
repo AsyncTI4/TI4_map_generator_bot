@@ -3,6 +3,7 @@ package ti4.helpers.omega_phase;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -10,20 +11,20 @@ import ti4.message.MessageHelper;
 
 public class PriorityTrackHelper {
     public static void PrintPriorityTrack(Game game) {
-        var sb = "**Priority Track**\n";
+        StringBuilder sb = new StringBuilder("**Priority Track**\n");
 
         var priorityTrack = GetPriorityTrack(game);
         for (var i = 0; i < priorityTrack.size(); i++) {
             int priority = i + 1;
             if (priorityTrack.get(i) != null) {
                 var player = priorityTrack.get(i);
-                sb += String.format("%d. %s\n", priority, player.getRepresentation());
+                sb.append(String.format("%d. %s\n", priority, player.getRepresentation()));
             } else {
-                sb += String.format("%d.\n", priority);
+                sb.append(String.format("%d.\n", priority));
             }
         }
 
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), sb);
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), sb.toString());
     }
 
     /*
@@ -33,7 +34,7 @@ public class PriorityTrackHelper {
     public static void AssignPlayerToPriority(Game game, Player player, Integer priority) {
         // Ensure player exists in the game
         var players = game.getPlayers().values();
-        if (players.stream().noneMatch(p -> p.getUserID() == player.getUserID())) {
+        if (players.stream().noneMatch(p -> Objects.equals(p.getUserID(), player.getUserID()))) {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Player not found in the game.");
             return;
         }

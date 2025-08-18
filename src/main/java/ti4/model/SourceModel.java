@@ -51,9 +51,9 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
         footer.append("\nCredits: ").append(credits);
         eb.setFooter(footer.toString());
 
-        if ("official".equals(getCanal())) {
+        if ("official".equals(canal)) {
             eb.setColor(Color.green);
-        } else if ("community".equals(getCanal())) {
+        } else if ("community".equals(canal)) {
             eb.setColor(Color.gray);
         } else {
             eb.setColor(Color.red);
@@ -83,7 +83,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
      * List all items of the 'data' field
      * @return StringBuilder
      */
-    public String getDataFormatted() {
+    private String getDataFormatted() {
         StringBuilder sb = new StringBuilder();
         for (String s : data) {
             sb.append("- ").append(s).append("\n");
@@ -96,7 +96,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
      * @return true if field 'Canal' = "Official", false otherwise
      */
     public boolean isCanalOfficial() {
-        boolean official = "official".equals(getCanal());
+        boolean official = "official".equals(canal);
         return official;
     }
 
@@ -105,7 +105,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
      * @param occurrences HashMap with Key is Component Type and Value is occurrences for specific Source in Component Type json files
      * @return StringBuilder
      */
-    private String compTypeOccurrences(HashMap<String, Integer> occurrences) {
+    private String compTypeOccurrences(Map<String, Integer> occurrences) {
         StringBuilder implementation = new StringBuilder();
         for (Map.Entry<String, Integer> entry : occurrences.entrySet()) {
             if (entry.getValue() != 0) {

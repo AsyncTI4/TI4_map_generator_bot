@@ -34,10 +34,10 @@ class VictoryPointsScoredStatisticsService {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         int index = 1;
         StringBuilder sb = new StringBuilder("List of times a particular secret objective has been scored.\n");
-        for (String ket : topThousand.keySet()) {
+        for (Map.Entry<String, Integer> entry : topThousand.entrySet()) {
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
-            sb.append("` ").append(ket).append(": ");
-            sb.append(topThousand.get(ket));
+            sb.append("` ").append(entry.getKey()).append(": ");
+            sb.append(entry.getValue());
             sb.append("\n");
             index++;
         }
@@ -49,10 +49,10 @@ class VictoryPointsScoredStatisticsService {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         index = 1;
         sb = new StringBuilder("List of times a particular public objective has been revealed \n");
-        for (String ket : topThousand.keySet()) {
+        for (Map.Entry<String, Integer> entry : topThousand.entrySet()) {
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
-            sb.append("` ").append(ket).append(": ");
-            sb.append(topThousand.get(ket));
+            sb.append("` ").append(entry.getKey()).append(": ");
+            sb.append(entry.getValue());
             sb.append("\n");
             index++;
         }
@@ -64,10 +64,10 @@ class VictoryPointsScoredStatisticsService {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         index = 1;
         sb = new StringBuilder("List of times a particular relic has been drawn \n");
-        for (String ket : topThousand.keySet()) {
+        for (Map.Entry<String, Integer> entry : topThousand.entrySet()) {
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
-            sb.append("` ").append(ket).append(": ");
-            sb.append(topThousand.get(ket));
+            sb.append("` ").append(entry.getKey()).append(": ");
+            sb.append(entry.getValue());
             sb.append("\n");
             index++;
         }

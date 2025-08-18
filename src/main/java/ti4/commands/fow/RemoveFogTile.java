@@ -37,9 +37,9 @@ class RemoveFogTile extends GameStateSubcommand {
         }
 
         Set<String> positions = new HashSet<>(Helper.getListFromCSV(positionMapping));
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (Player targetPlayer : targetPlayers) {
-            StringBuffer sb2 = new StringBuffer();
+            StringBuilder sb2 = new StringBuilder();
             Set<String> positionsToRemove = Constants.ALL.equals(positionMapping)
                     ? new HashSet<>(targetPlayer.getFogTiles().keySet())
                     : positions;

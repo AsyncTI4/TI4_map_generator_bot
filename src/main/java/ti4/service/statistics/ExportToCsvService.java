@@ -44,7 +44,7 @@ public class ExportToCsvService {
         }
     }
 
-    public static String header(int players) {
+    private static String header(int players) {
         List<String> fields = new ArrayList<>();
         fields.add("game name");
         fields.add("playerCount");
@@ -65,7 +65,7 @@ public class ExportToCsvService {
         return String.join(",", fields);
     }
 
-    public static String gameToCsv(Game game) {
+    private static String gameToCsv(Game game) {
         List<String> fields = new ArrayList<>();
         fields.add(game.getName());
         fields.add(Integer.toString(game.getRealAndEliminatedAndDummyPlayers().size()));

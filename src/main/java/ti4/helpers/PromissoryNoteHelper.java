@@ -159,7 +159,7 @@ public class PromissoryNoteHelper {
         }
     }
 
-    public static List<Button> getPNButtons(Game game, Player player) {
+    private static List<Button> getPNButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String pnShortHand : player.getPromissoryNotes().keySet()) {
             if (player.getPromissoryNotesInPlayArea().contains(pnShortHand)) {

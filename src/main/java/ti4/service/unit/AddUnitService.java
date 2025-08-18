@@ -110,7 +110,7 @@ public class AddUnitService {
             }
         }
         if (amtRemaining > 0) {
-            states.set(0, states.get(0) + amtRemaining);
+            states.set(0, states.getFirst() + amtRemaining);
         }
         return states;
     }

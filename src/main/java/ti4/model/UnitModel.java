@@ -98,7 +98,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return id;
     }
 
-    public String getImageFileSuffix() {
+    private String getImageFileSuffix() {
         return "_" + asyncId + ".png";
     }
 
@@ -108,7 +108,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return color + getImageFileSuffix();
     }
 
-    public TI4Emoji getFactionEmoji() {
+    private TI4Emoji getFactionEmoji() {
         return FactionEmojis.getFactionIcon(getFaction().orElse(""));
     }
 
@@ -165,7 +165,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return factionEmoji + unitEmoji + " " + name + " " + getSourceEmoji();
     }
 
-    public String getSourceEmoji() {
+    private String getSourceEmoji() {
         return source.emoji();
     }
 
@@ -207,22 +207,22 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     private boolean isWarsunOrDreadnought() {
-        return "warsun".equalsIgnoreCase(getBaseType()) || "dreadnought".equalsIgnoreCase(getBaseType());
+        return "warsun".equalsIgnoreCase(baseType) || "dreadnought".equalsIgnoreCase(baseType);
     }
 
     public int getSpaceCannonDieCount(Player player, Game game) {
         if (game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
-            if ("spacedock".equalsIgnoreCase(getBaseType())) {
+            if ("spacedock".equalsIgnoreCase(baseType)) {
                 return 3;
             }
         }
         return spaceCannonDieCount;
     }
 
-    public int getSpaceCannonHitsOn(Player player, Game game) {
+    private int getSpaceCannonHitsOn(Player player, Game game) {
         if (game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())
                 || player.hasRelic("lightrailordnance")) {
-            if ("spacedock".equalsIgnoreCase(getBaseType())) {
+            if ("spacedock".equalsIgnoreCase(baseType)) {
                 return 5;
             }
         }
@@ -252,7 +252,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             }
             return bombardDieCount;
         } else {
-            if (getIsShip() && !"fighter".equalsIgnoreCase(getBaseType()) && bombardDieCount == 0) {
+            if (getIsShip() && !"fighter".equalsIgnoreCase(baseType) && bombardDieCount == 0) {
                 return 1;
             } else {
                 return bombardDieCount;
@@ -260,7 +260,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         }
     }
 
-    public int getBombardHitsOn(Player player, Game game) {
+    private int getBombardHitsOn(Player player, Game game) {
         if (!game.getStoredValue("BlitzFaction").equalsIgnoreCase(player.getFaction())) {
             if (game.getStoredValue("TnelisAgentFaction").equalsIgnoreCase(player.getFaction())
                     && bombardDieCount == 0
@@ -269,7 +269,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             }
             return bombardHitsOn;
         } else {
-            if (isShip != null && isShip && !"fighter".equalsIgnoreCase(getBaseType()) && bombardDieCount == 0) {
+            if (isShip != null && isShip && !"fighter".equalsIgnoreCase(baseType) && bombardDieCount == 0) {
                 return 6;
             } else {
                 return bombardHitsOn;
@@ -484,7 +484,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(requiredTechId);
     }
 
-    public Optional<String> getSubtitle() {
+    private Optional<String> getSubtitle() {
         return Optional.ofNullable(subtitle);
     }
 
@@ -496,7 +496,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(ability);
     }
 
-    public Optional<String> getUnlock() {
+    private Optional<String> getUnlock() {
         return Optional.ofNullable(unlock);
     }
 
@@ -504,11 +504,11 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(homebrewReplacesID);
     }
 
-    public List<String> getEligiblePlanetTypes() {
+    private List<String> getEligiblePlanetTypes() {
         return Optional.ofNullable(eligiblePlanetTypes).orElse(Collections.emptyList());
     }
 
-    public TI4Emoji getMonumentPlanetTypeEmoji(String planetType) {
+    private TI4Emoji getMonumentPlanetTypeEmoji(String planetType) {
         return switch (planetType.toLowerCase()) {
             case "cultural", "industrial", "hazardous" -> ExploreEmojis.getTraitEmoji(planetType);
             case "legendary" -> MiscEmojis.LegendaryPlanet;
@@ -519,7 +519,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         };
     }
 
-    public String getEligiblePlanetEmojis() {
+    private String getEligiblePlanetEmojis() {
         StringBuilder sb = new StringBuilder();
         for (String type : getEligiblePlanetTypes()) {
             sb.append(getMonumentPlanetTypeEmoji(type));

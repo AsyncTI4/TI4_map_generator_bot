@@ -2,7 +2,6 @@ package ti4.service.map;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -50,7 +49,7 @@ public class AddTileService {
 
     // This should be changed to support multiple sources and not just Eronous
     public static Set<ComponentSource> getSources(Game game, boolean eronousTiles) {
-        Set<ComponentSource> sources = new HashSet<>();
+        Set<ComponentSource> sources = EnumSet.noneOf(ComponentSource.class);
         sources.add(ComponentSource.base);
         sources.add(ComponentSource.codex1);
         sources.add(ComponentSource.codex2);
@@ -98,7 +97,7 @@ public class AddTileService {
                 break;
             case HS:
                 availableTiles = TileHelper.getAllTileModels().stream()
-                        .filter(tileModel -> TileBack.GREEN == tileModel.getTileBack())
+                        .filter(tileModel -> tileModel.getTileBack() == TileBack.GREEN)
                         .filter(tileModel -> sources.contains(tileModel.getSource()))
                         .filter(tileModel -> !existingTileModels.contains(tileModel))
                         .filter(tileModel -> !drawnTiles.contains(tileModel.getId()))
@@ -117,7 +116,7 @@ public class AddTileService {
     private static List<TileModel> findBlueTiles(
             Set<ComponentSource> sources, Set<TileModel> existingTileModels, List<String> drawnTiles) {
         return TileHelper.getAllTileModels().stream()
-                .filter(tileModel -> TileBack.BLUE == tileModel.getTileBack())
+                .filter(tileModel -> tileModel.getTileBack() == TileBack.BLUE)
                 .filter(tileModel -> sources.contains(tileModel.getSource()))
                 .filter(tileModel -> !existingTileModels.contains(tileModel))
                 .filter(tileModel -> !drawnTiles.contains(tileModel.getId()))
@@ -127,7 +126,7 @@ public class AddTileService {
     private static List<TileModel> findRedTiles(
             Set<ComponentSource> sources, Set<TileModel> existingTileModels, List<String> drawnTiles) {
         return TileHelper.getAllTileModels().stream()
-                .filter(tileModel -> TileBack.RED == tileModel.getTileBack())
+                .filter(tileModel -> tileModel.getTileBack() == TileBack.RED)
                 .filter(tileModel -> sources.contains(tileModel.getSource()))
                 // Allow duplicate tiles if they are empty
                 .filter(tileModel -> tileModel.isEmpty()

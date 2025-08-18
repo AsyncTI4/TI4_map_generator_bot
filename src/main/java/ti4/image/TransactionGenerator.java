@@ -23,6 +23,8 @@ public class TransactionGenerator {
 
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final BasicStroke stroke5 = new BasicStroke(5.0f);
+    private static final double NINETY_DEGREES_RADIANS = 1.5707963267948966;
+    private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -NINETY_DEGREES_RADIANS;
 
     public static BufferedImage drawTransactableStuffImage(Player p1, Player p2) {
         int width = 500, height = 160;
@@ -38,17 +40,17 @@ public class TransactionGenerator {
         String pn1 = "pa_pn_color_" + Mapper.getColorID(p1.getColor()) + ".png";
         BufferedImage color1 =
                 ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn1), pnHeight, pnWidth);
-        g2.rotate(-1.5707963267948966);
+        g2.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
         g2.drawImage(color1, -1 * pnHeight, 0, null);
-        g2.rotate(1.5707963267948966);
+        g2.rotate(NINETY_DEGREES_RADIANS);
 
         // Add player 2's color
         String pn2 = "pa_pn_color_" + Mapper.getColorID(p2.getColor()) + ".png";
         BufferedImage color2 =
                 ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn2), pnHeight, pnWidth);
-        g2.rotate(1.5707963267948966);
+        g2.rotate(NINETY_DEGREES_RADIANS);
         g2.drawImage(color2, height - pnHeight, -1 * width, null);
-        g2.rotate(-1.5707963267948966);
+        g2.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
 
         // Faction Icons
         int x = 5, y = 5;

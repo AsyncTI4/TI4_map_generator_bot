@@ -51,7 +51,7 @@ public class CommandCounterHelper {
         return tile.hasCC(ccID);
     }
 
-    public static boolean hasCC(String color, Tile tile) {
+    private static boolean hasCC(String color, Tile tile) {
         return hasCC(null, color, tile);
     }
 

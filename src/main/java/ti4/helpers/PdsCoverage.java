@@ -10,7 +10,7 @@ public class PdsCoverage {
     private final List<Integer> diceValues;
     private final boolean hasRerolls;
 
-    public PdsCoverage(int count, float expected, List<Integer> diceValues, boolean hasRerolls) {
+    PdsCoverage(int count, float expected, List<Integer> diceValues, boolean hasRerolls) {
         this.count = count;
         this.expected = expected;
         this.diceValues = diceValues;

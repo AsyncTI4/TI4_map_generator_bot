@@ -1,13 +1,6 @@
 package ti4.image;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.time.ZoneOffset;
@@ -31,7 +24,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
-import ti4.helpers.*;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
+import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
+import ti4.helpers.PatternHelper;
+import ti4.helpers.PdsCoverage;
+import ti4.helpers.PdsCoverageHelper;
+import ti4.helpers.RandomHelper;
+import ti4.helpers.Storage;
+import ti4.helpers.Units;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -353,9 +356,12 @@ public class TileGenerator {
                 // Draft Stuff
                 if (TileHelper.isDraftTile(tile.getTileModel())) {
                     String tileID = tile.getTileID();
-                    String draftNum = tileID.replaceAll("[a-z]", "");
-                    String draftColor = tileID.replaceAll("[0-9]", "")
-                            .replaceAll("blank", "")
+                    String draftNum = PatternHelper.LOWERCASE_LETTER_PATTERN
+                            .matcher(tileID)
+                            .replaceAll("");
+                    String draftColor = PatternHelper.BLANK_WORD_PATTERN
+                            .matcher(tileID.replaceAll("[0-9]", ""))
+                            .replaceAll("")
                             .toUpperCase();
                     Point draftNumPosition = new Point(85, 140);
 
@@ -898,7 +904,7 @@ public class TileGenerator {
                 int x = TILE_PADDING;
                 int y = TILE_PADDING;
 
-                HashMap<String, List<Integer>> pdsDice = new HashMap<>();
+                Map<String, List<Integer>> pdsDice = new HashMap<>();
                 Map<String, PdsCoverage> pdsCoverageByFaction = new HashMap<>();
                 if (pdsCoverageMap != null) {
                     for (Player player : game.getRealPlayers()) {
@@ -945,8 +951,8 @@ public class TileGenerator {
 
                     x += (int) ((345 - 73 * scale) / 2);
                     y += (int) ((300 - pdsDice.size() * 48 * scale) / 2);
-                    for (String playerID : pdsDice.keySet()) {
-                        Player player = game.getPlayer(playerID);
+                    for (Map.Entry<String, List<Integer>> entry : pdsDice.entrySet()) {
+                        Player player = game.getPlayer(entry.getKey());
                         ti4.helpers.PdsCoverage coverage = pdsCoverageByFaction.get(player.getFaction());
 
                         int numberOfDice = coverage.getCount();
@@ -981,7 +987,7 @@ public class TileGenerator {
                         if (numberOfDice >= 5) {
                             DrawingUtil.drawCenteredString(
                                     tileGraphics,
-                                    pdsDice.get(playerID).subList(0, numberOfDice / 3).stream()
+                                    entry.getValue().subList(0, numberOfDice / 3).stream()
                                                     .map(Object::toString)
                                                     .collect(Collectors.joining(","))
                                             + ",",
@@ -993,7 +999,7 @@ public class TileGenerator {
                                     smallFont);
                             DrawingUtil.drawCenteredString(
                                     tileGraphics,
-                                    pdsDice.get(playerID).subList(numberOfDice / 3, 2 * numberOfDice / 3).stream()
+                                    entry.getValue().subList(numberOfDice / 3, 2 * numberOfDice / 3).stream()
                                                     .map(Object::toString)
                                                     .collect(Collectors.joining(","))
                                             + ",",
@@ -1005,7 +1011,7 @@ public class TileGenerator {
                                     smallFont);
                             DrawingUtil.drawCenteredString(
                                     tileGraphics,
-                                    pdsDice.get(playerID).subList(2 * numberOfDice / 3, numberOfDice).stream()
+                                    entry.getValue().subList(2 * numberOfDice / 3, numberOfDice).stream()
                                             .map(Object::toString)
                                             .collect(Collectors.joining(",")),
                                     new Rectangle(
@@ -1017,7 +1023,7 @@ public class TileGenerator {
                         } else if (numberOfDice >= 3) {
                             DrawingUtil.drawCenteredString(
                                     tileGraphics,
-                                    pdsDice.get(playerID).subList(0, numberOfDice / 2).stream()
+                                    entry.getValue().subList(0, numberOfDice / 2).stream()
                                                     .map(Object::toString)
                                                     .collect(Collectors.joining(","))
                                             + ",",
@@ -1029,7 +1035,7 @@ public class TileGenerator {
                                     smallFont);
                             DrawingUtil.drawCenteredString(
                                     tileGraphics,
-                                    pdsDice.get(playerID).subList(numberOfDice / 2, numberOfDice).stream()
+                                    entry.getValue().subList(numberOfDice / 2, numberOfDice).stream()
                                             .map(Object::toString)
                                             .collect(Collectors.joining(",")),
                                     new Rectangle(
@@ -1041,7 +1047,7 @@ public class TileGenerator {
                         } else {
                             DrawingUtil.drawCenteredString(
                                     tileGraphics,
-                                    pdsDice.get(playerID).stream()
+                                    entry.getValue().stream()
                                             .map(Object::toString)
                                             .collect(Collectors.joining(",")),
                                     new Rectangle(
@@ -1813,7 +1819,7 @@ public class TileGenerator {
 
     private static void drawTokensOnTile(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Game game) {
         List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
-        Collections.sort(tokenList, sortTokensForDisplay());
+        tokenList.sort(sortTokensForDisplay());
 
         Point centerPosition = unitHolder.getHolderCenterPosition(tile);
         int x = 0;

@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -316,7 +317,7 @@ public class Mapper {
     }
 
     public static Map<String, ActionCardModel> getActionCards(String extra) {
-        HashMap<String, ActionCardModel> acList = new HashMap<>();
+        Map<String, ActionCardModel> acList = new HashMap<>();
         for (Map.Entry<String, ActionCardModel> entry : actionCards.entrySet()) {
             acList.put(entry.getKey() + extra, entry.getValue());
         }
@@ -1045,7 +1046,7 @@ public class Mapper {
                 .filter(String.class::isInstance)
                 .map(String.class::cast)
                 .sorted()
-                .collect(Collectors.toSet())
+                .collect(Collectors.toCollection(LinkedHashSet::new))
                 .stream()
                 .toList();
     }
@@ -1187,7 +1188,7 @@ public class Mapper {
         return Units.getUnitKey(unitID, actuallyColorID);
     }
 
-    public static boolean isValidAsyncUnitID(String asyncUnitID) {
+    private static boolean isValidAsyncUnitID(String asyncUnitID) {
         return getUnitIDList().contains(asyncUnitID);
     }
 

@@ -260,14 +260,14 @@ public enum PlanetEmojis implements TI4Emoji {
     SemiLor,
     ArchonFail;
 
-    public static TI4Emoji getRandomSemLore() {
+    private static TI4Emoji getRandomSemLore() {
         List<TI4Emoji> semLores = new ArrayList<>(List.of(SemLor, SemLord, SemiLor, SemLore));
         Random seed = ThreadLocalRandom.current();
         Collections.shuffle(semLores, seed);
         return semLores.getFirst();
     }
 
-    public static TI4Emoji getRandomArchonVail() {
+    private static TI4Emoji getRandomArchonVail() {
         return ThreadLocalRandom.current().nextInt() % 2 == 0 ? ArchonVail : ArchonFail;
     }
 

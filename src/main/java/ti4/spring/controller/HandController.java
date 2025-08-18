@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ti4.spring.auth.RequestContext;
 import ti4.spring.model.GetHandResponse;
 import ti4.spring.service.HandService;
-import ti4.spring.service.auth.RequestContext;
 
 @RequiredArgsConstructor
 @RestController

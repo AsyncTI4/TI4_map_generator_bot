@@ -30,7 +30,7 @@ public class DraftErrataModel implements ModelInterface {
     public DraftErrataModel[] AdditionalComponents;
     public DraftErrataModel[] OptionalSwaps;
     public boolean Undraftable;
-    private String alternateText;
+    public String alternateText;
 
     public boolean AlwaysAddToPool;
 

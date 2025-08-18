@@ -27,7 +27,7 @@ class SetPlanetTradeGoods extends GameStateSubcommand {
         int count = Math.max(event.getOption("count").getAsInt(), 0);
 
         String planet = event.getOption("planet").getAsString();
-        int old = 0;
+        int old;
         if ("uikos".equalsIgnoreCase(planet)) {
             old = getPlayer().getHarvestCounter();
             if (count > -1) {

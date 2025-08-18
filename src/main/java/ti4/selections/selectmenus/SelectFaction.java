@@ -21,7 +21,7 @@ import ti4.service.emoji.FactionEmojis;
 
 public class SelectFaction implements Selection {
 
-    public static final String selectionID = "selectFaction";
+    private static final String selectionID = "selectFaction";
 
     @Override
     public String getSelectionID() {

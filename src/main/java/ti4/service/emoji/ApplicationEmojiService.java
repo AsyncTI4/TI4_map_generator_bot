@@ -105,7 +105,7 @@ public class ApplicationEmojiService {
         if (cacheInitialized) return;
 
         List<CachedEmoji> cached = ApplicationEmojiCacheService.readCachedEmojis();
-        if (cached.size() == 0) {
+        if (cached.isEmpty()) {
             BotLogger.info("No cached emojis found. Initializing from Discord.");
             resetCacheFromDiscord();
         } else {
@@ -244,7 +244,7 @@ public class ApplicationEmojiService {
         private final String name;
         private Icon icon;
 
-        public Icon getIcon() throws IOException {
+        Icon getIcon() throws IOException {
             if (icon == null) icon = Icon.from(file);
             return icon;
         }
@@ -279,7 +279,7 @@ public class ApplicationEmojiService {
         });
     }
 
-    public static String fileName(File file) {
+    private static String fileName(File file) {
         return file.getName()
                 .replace(".png", "")
                 .replace(".jpg", "")

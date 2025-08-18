@@ -1,6 +1,8 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,6 +51,7 @@ import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 
 @UtilityClass
@@ -123,9 +126,8 @@ public class CombatRollService {
                         .isEmpty()) {
             bombardPlanet = game.getStoredValue("bombardmentTarget" + player.getFaction());
             String assignedUnits = game.getStoredValue("assignedBombardment" + player.getFaction());
-            int count = 0;
-            List<UnitModel> unitMods = new ArrayList<>();
-            unitMods.addAll(playerUnitsByQuantity.keySet());
+            int count;
+            List<UnitModel> unitMods = new ArrayList<>(playerUnitsByQuantity.keySet());
             for (UnitModel mod : unitMods) {
                 count = 0;
                 for (String assignedUnit : assignedUnits.split(";")) {
@@ -224,8 +226,7 @@ public class CombatRollService {
                 rollType,
                 Constants.COMBAT_EXTRA_ROLLS);
 
-        List<NamedCombatModifierModel> extraRollsDup = new ArrayList<>();
-        extraRollsDup.addAll(extraRolls);
+        List<NamedCombatModifierModel> extraRollsDup = new ArrayList<>(extraRolls);
         for (NamedCombatModifierModel mod : extraRollsDup) {
             if ("plus1_roll_plasmascoring".equalsIgnoreCase(mod.getModifier().getAlias())) {
                 if (!game.getStoredValue("assignedBombardment" + player.getFaction())
@@ -617,9 +618,9 @@ public class CombatRollService {
                 && (!"space".equalsIgnoreCase(unitHolder.getName()) || rollType == CombatRollType.bombardment);
         if (rollType == CombatRollType.combatround
                 && ButtonHelper.doesPlayerHaveFSHere("letnev_flagship", player, activeSystem)
-                && unitHolder.getName().equalsIgnoreCase("space")
+                && "space".equalsIgnoreCase(unitHolder.getName())
                 && unitHolder.getDamagedUnitCount(UnitType.Flagship, player.getColorID()) > 0) {
-            result = "## Repaired Letnev Flagship at start of combat round due to its ability.\n\n" + result;
+            result = "Repaired the Arc Secundus at start of this combat round with its ability.\n" + result;
             activeSystem.removeUnitDamage(
                     unitHolder.getName(), Mapper.getUnitKey(AliasHandler.resolveUnit("fs"), player.getColorID()), 1);
         }
@@ -819,7 +820,8 @@ public class CombatRollService {
                             + ", with _Plasma Scoring_ applying to the last die. You can specify any order before rolling though.";
                     for (int x = 0; x < totalHits; x++) {
                         List<Button> buttons = new ArrayList<>();
-                        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Pds)) {
+                        for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                game, player, UnitType.Pds)) {
                             for (String planet : ButtonHelper.getPlanetsWithSpecificUnit(player, tile, "pds")) {
                                 Planet planetUnit = game.getUnitHolderFromPlanet(planet);
                                 if (planetUnit == null) {
@@ -1031,7 +1033,7 @@ public class CombatRollService {
         };
     }
 
-    public static Map<UnitModel, Integer> getUnitsInCombatRound(
+    private static Map<UnitModel, Integer> getUnitsInCombatRound(
             UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event, Tile tile) {
         String colorID = Mapper.getColorID(player.getColor());
         Map<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
@@ -1063,11 +1065,12 @@ public class CombatRollService {
                                     && (entry.getKey().getIsGroundForce()
                                             || entry.getKey().getIsShip()))
                             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-                    for (UnitModel unit : output2.keySet()) {
+                    for (Map.Entry<UnitModel, Integer> entry : output2.entrySet()) {
+                        UnitModel unit = entry.getKey();
                         if (output.containsKey(unit)) {
-                            output.put(unit, output.get(unit) + output2.get(unit));
+                            output.put(unit, output.get(unit) + entry.getValue());
                         } else {
-                            output.put(unit, output2.get(unit));
+                            output.put(unit, entry.getValue());
                         }
                     }
                 }
@@ -1089,7 +1092,8 @@ public class CombatRollService {
         return output;
     }
 
-    public static Map<UnitModel, Integer> getUnitsInAFB(Tile tile, Player player, GenericInteractionCreateEvent event) {
+    private static Map<UnitModel, Integer> getUnitsInAFB(
+            Tile tile, Player player, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
 
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
@@ -1144,7 +1148,7 @@ public class CombatRollService {
         return output;
     }
 
-    public static Map<UnitModel, Integer> getUnitsInSpaceCannonDefence(
+    private static Map<UnitModel, Integer> getUnitsInSpaceCannonDefence(
             Planet planet, Player player, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
 
@@ -1196,7 +1200,7 @@ public class CombatRollService {
         return output;
     }
 
-    public static Map<UnitModel, Integer> getUnitsInSpaceCannonOffense(
+    private static Map<UnitModel, Integer> getUnitsInSpaceCannonOffense(
             Tile tile, Player player, GenericInteractionCreateEvent event, Game game) {
         String colorID = Mapper.getColorID(player.getColor());
 
@@ -1280,7 +1284,7 @@ public class CombatRollService {
                 .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount(player, game) > 0)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 
-        HashMap<UnitModel, Integer> adjacentOutput = new HashMap<>(unitsOnAdjacentTiles.entrySet().stream()
+        Map<UnitModel, Integer> adjacentOutput = new HashMap<>(unitsOnAdjacentTiles.entrySet().stream()
                 .filter(entry -> entry.getKey() != null
                         && entry.getKey().getSpaceCannonDieCount(player, game) > 0
                         && (entry.getKey().getDeepSpaceCannon()
@@ -1316,7 +1320,7 @@ public class CombatRollService {
             Player player,
             GenericInteractionCreateEvent event,
             Map<String, Integer> unitsByAsyncId,
-            HashMap<UnitModel, Integer> output) {
+            Map<UnitModel, Integer> output) {
         Set<String> duplicates = new HashSet<>();
         List<String> dupes = output.keySet().stream()
                 .filter(unit -> !duplicates.add(unit.getAsyncId()))

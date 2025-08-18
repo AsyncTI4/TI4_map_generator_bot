@@ -1,6 +1,7 @@
 package ti4.commands.search;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -209,7 +210,7 @@ class SearchSources extends Subcommand {
                         planetSources,
                         tileSources //
                         )
-                .flatMap(i -> i.stream())
+                .flatMap(Collection::stream)
                 .toList();
 
         Map<String, Long> uniqueComponentSources = componentSources.stream()
@@ -232,8 +233,8 @@ class SearchSources extends Subcommand {
                 .toList();
 
         // Sources from Source.java Enum file
-        List<String> enumSources = Arrays.asList(ComponentSource.values()).stream()
-                .map(entry -> entry.toString())
+        List<String> enumSources = Arrays.stream(ComponentSource.values())
+                .map(ComponentSource::toString)
                 .toList();
 
         // Build answer
@@ -260,20 +261,14 @@ class SearchSources extends Subcommand {
 
         uniqueComponentSourcesTextList.append("**Implementation missing in \\resources\\ JSON content:**\n");
         uniqueComponentSourcesTextList.append("Compared to sources.json\n");
-        for (int i = 0; i < sources.size(); i++) {
-            if (!uniqueComponentSources.containsKey(sources.get(i)))
-                uniqueComponentSourcesTextList
-                        .append("- ")
-                        .append(sources.get(i))
-                        .append("\n");
+        for (String string : sources) {
+            if (!uniqueComponentSources.containsKey(string))
+                uniqueComponentSourcesTextList.append("- ").append(string).append("\n");
         }
         uniqueComponentSourcesTextList.append("Compared to Source.java Enum\n");
-        for (int i = 0; i < enumSources.size(); i++) {
-            if (!uniqueComponentSources.containsKey(enumSources.get(i)))
-                uniqueComponentSourcesTextList
-                        .append("- ")
-                        .append(enumSources.get(i))
-                        .append("\n");
+        for (String s : enumSources) {
+            if (!uniqueComponentSources.containsKey(s))
+                uniqueComponentSourcesTextList.append("- ").append(s).append("\n");
         }
 
         uniqueComponentSourcesTextList.append("\n");
@@ -288,12 +283,9 @@ class SearchSources extends Subcommand {
                         .append("\n");
         }
         uniqueComponentSourcesTextList.append("Compared to Source.java Enum\n");
-        for (int i = 0; i < enumSources.size(); i++) {
-            if (!sources.contains(enumSources.get(i)))
-                uniqueComponentSourcesTextList
-                        .append("- ")
-                        .append(enumSources.get(i))
-                        .append("\n");
+        for (String enumSource : enumSources) {
+            if (!sources.contains(enumSource))
+                uniqueComponentSourcesTextList.append("- ").append(enumSource).append("\n");
         }
 
         uniqueComponentSourcesTextList.append("\n");
@@ -308,12 +300,9 @@ class SearchSources extends Subcommand {
                         .append("\n");
         }
         uniqueComponentSourcesTextList.append("Compared to sources.json\n");
-        for (int i = 0; i < sources.size(); i++) {
-            if (!enumSources.contains(sources.get(i)))
-                uniqueComponentSourcesTextList
-                        .append("- ")
-                        .append(sources.get(i))
-                        .append("\n");
+        for (String source : sources) {
+            if (!enumSources.contains(source))
+                uniqueComponentSourcesTextList.append("- ").append(source).append("\n");
         }
 
         // Send answer

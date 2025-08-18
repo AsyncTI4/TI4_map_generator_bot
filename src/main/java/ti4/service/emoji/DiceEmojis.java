@@ -88,7 +88,7 @@ public enum DiceEmojis implements TI4Emoji {
         };
     }
 
-    public static String getBlueDieEmoji(int value) {
+    private static String getBlueDieEmoji(int value) {
         return switch (value) {
             case 0, 10 -> d10blue_0.toString();
             case 1 -> d10blue_1.toString();

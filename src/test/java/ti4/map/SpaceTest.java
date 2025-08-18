@@ -15,17 +15,17 @@ import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 import ti4.testUtils.JsonValidator;
 
-public class SpaceTest extends BaseTi4Test {
-    private final String expectedName = "space";
+class SpaceTest extends BaseTi4Test {
+    private static final String expectedName = "space";
     private final Point expectedHolderCenterPosition = new Point(1, 2);
     private final UnitType expectedUnitType = UnitType.Carrier;
-    private final String expectedColorID = "blu";
+    private static final String expectedColorID = "blu";
     private final UnitKey expectedUnitKey = Units.getUnitKey(expectedUnitType, expectedColorID);
-    private final int expectedUnitCount = 4;
-    private final int expectedUnitDamage = 1;
-    private final String expectedCommandCounter = "Random Command Counter";
-    private final String expectedControl = "Random Control";
-    private final String expectedToken = "token_frontier.png";
+    private static final int expectedUnitCount = 4;
+    private static final int expectedUnitDamage = 1;
+    private static final String expectedCommandCounter = "Random Command Counter";
+    private static final String expectedControl = "Random Control";
+    private static final String expectedToken = "token_frontier.png";
 
     private Space buildSpace() {
         Space space = new Space(expectedName, expectedHolderCenterPosition);
@@ -40,7 +40,7 @@ public class SpaceTest extends BaseTi4Test {
     }
 
     @Test
-    public void testSpaceHasNoUnexpectedProperties() throws Exception {
+    void testSpaceHasNoUnexpectedProperties() throws Exception {
         // Given
         Space space = buildSpace();
         Set<String> knownJsonAttributes = new HashSet<>(Arrays.asList(
@@ -51,12 +51,12 @@ public class SpaceTest extends BaseTi4Test {
     }
 
     @Test
-    public void testSpaceIsJacksonSerializable() {
+    void testSpaceIsJacksonSerializable() {
         JsonValidator.assertIsJacksonSerializable(Space.class);
     }
 
     @Test
-    public void testSpaceJsonSaveAndRestore() throws JsonProcessingException {
+    void testSpaceJsonSaveAndRestore() throws JsonProcessingException {
         // Given
         Space space = buildSpace();
 

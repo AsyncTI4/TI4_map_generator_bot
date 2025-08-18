@@ -88,7 +88,7 @@ public class SearchGameHelper {
         return filteredManagedGames.size();
     }
 
-    public static ArrayList<Integer> getGameDaysLength(
+    private static List<Integer> getGameDaysLength(
             User user,
             GenericInteractionCreateEvent event,
             boolean onlyMyTurn,
@@ -126,7 +126,7 @@ public class SearchGameHelper {
 
         int index = 1;
 
-        ArrayList<Integer> days = new ArrayList<>();
+        var days = new ArrayList<Integer>();
 
         StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
         for (var managedGame : filteredManagedGames) {
@@ -147,7 +147,7 @@ public class SearchGameHelper {
         return days;
     }
 
-    public static double getWinPercentage(
+    private static double getWinPercentage(
             User user,
             GenericInteractionCreateEvent event,
             boolean onlyMyTurn,
@@ -223,15 +223,16 @@ public class SearchGameHelper {
                 sb.append("\n");
                 double getWinPercentage =
                         getWinPercentage(user, event, false, true, false, true, false, true, true, true);
-                sb.append("> Player win percentage across all games was: " + String.format("%.2f", getWinPercentage)
-                        + "\n");
+                sb.append("> Player win percentage across all games was: ")
+                        .append(String.format("%.2f", getWinPercentage))
+                        .append("\n");
             }
             index.getAndIncrement();
         }
         return sb.toString();
     }
 
-    public static String getPlayerMapListRepresentation(
+    private static String getPlayerMapListRepresentation(
             Game game, String userID, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes) {
         Player player = game.getPlayer(userID);
         if (player == null) return "";

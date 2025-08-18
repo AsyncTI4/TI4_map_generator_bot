@@ -81,6 +81,7 @@ class GameLoadService {
 
     private static final Pattern PEEKED_OBJECTIVE_PATTERN = Pattern.compile("(?>([a-z_]+):((?>\\d+,)+);)");
     private static final ObjectMapper mapper = ObjectMapperFactory.build();
+    private static final Pattern PATTERN = Pattern.compile("—");
 
     public static List<ManagedGame> loadManagedGames() {
         try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
@@ -122,7 +123,7 @@ class GameLoadService {
     }
 
     @Nullable
-    public static Game readGame(@NotNull File gameFile) {
+    private static Game readGame(@NotNull File gameFile) {
         if (!gameFile.exists()) {
             BotLogger.error("Could not load map, map file does not exist: " + gameFile.getAbsolutePath());
             return null;
@@ -771,7 +772,6 @@ class GameLoadService {
                     } catch (Exception e) {
                     }
                 }
-                case Constants.FOW_GM_IDS -> game.setFogOfWarGMIDs(Helper.getListFromCSV(info));
                 case Constants.RUN_DATA_MIGRATIONS -> {
                     StringTokenizer migrationInfo = new StringTokenizer(info, ",");
 
@@ -1041,7 +1041,8 @@ class GameLoadService {
                             String position = system[0];
                             String tileID = system[1];
                             String label = system[2];
-                            if (label != null) label = label.replaceAll("—", " "); // replace em dash with spaces
+                            if (label != null)
+                                label = PATTERN.matcher(label).replaceAll(" "); // replace em dash with spaces
                             player.addFogTile(tileID, position, label);
                         }
                     } catch (Exception e) {

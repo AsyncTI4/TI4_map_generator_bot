@@ -1,5 +1,6 @@
 package ti4.commands.search;
 
+import java.util.Comparator;
 import java.util.List;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -7,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TokenModel;
 
 public class SearchTokensSubcommand extends SearchComponentModelSubcommand {
 
@@ -29,8 +31,8 @@ public class SearchTokensSubcommand extends SearchComponentModelSubcommand {
 
         List<MessageEmbed> messageEmbeds = Mapper.getTokens().values().stream()
                 .filter(model -> model.search(searchString, source))
-                .sorted((r1, r2) -> r1.getSource().compareTo(r2.getSource()))
-                .map(model -> model.getRepresentationEmbed())
+                .sorted(Comparator.comparing(TokenModel::getSource))
+                .map(TokenModel::getRepresentationEmbed)
                 .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }

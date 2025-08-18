@@ -53,7 +53,7 @@ public class MapTemplateModel implements ModelInterface {
     // ---------------------------------------------------------------------------------------------
     // Helper Functions
     // ---------------------------------------------------------------------------------------------
-    public int tilesPerPlayer() {
+    private int tilesPerPlayer() {
         int calculated = (int) templateTiles.stream()
                 .filter(t -> t.playerNumber != null && t.miltyTileIndex != null && t.playerNumber == 1)
                 .count();

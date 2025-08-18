@@ -23,12 +23,12 @@ public class RegexService {
         };
     }
 
-    public static void defaultHandleFailure(String buttonID, String regex, Exception e) {
+    private static void defaultHandleFailure(String buttonID, String regex, Exception e) {
         BotLogger.error(
                 "Error matching regex: " + buttonID + "\nExpected: `" + regex + "`\n" + Constants.jazzPing(), e);
     }
 
-    public static void defaultHandleFailure(String buttonID, Pattern regex, Exception e) {
+    private static void defaultHandleFailure(String buttonID, Pattern regex, Exception e) {
         BotLogger.error(
                 "Error matching regex: " + buttonID + "\nExpected: `" + regex.toString() + "`\n" + Constants.jazzPing(),
                 e);
@@ -38,7 +38,7 @@ public class RegexService {
         throwFailure("Unknown error");
     }
 
-    public static void throwFailure(String error) throws Exception {
+    private static void throwFailure(String error) throws Exception {
         throw new Exception(error);
     }
 
@@ -69,7 +69,7 @@ public class RegexService {
         return runMatcher(regex, buttonID, function, e -> defaultHandleFailure(buttonID, regex, e));
     }
 
-    public static boolean runMatcher(
+    private static boolean runMatcher(
             Pattern regex, String buttonID, CheckedPredicate<Matcher> function, Consumer<Exception> failure) {
         Matcher matcher = regex.matcher(buttonID);
         if (matcher.matches()) {

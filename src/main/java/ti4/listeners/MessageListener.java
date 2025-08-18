@@ -2,6 +2,7 @@ package ti4.listeners;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
@@ -33,6 +34,8 @@ import ti4.service.game.GameNameService;
 public class MessageListener extends ListenerAdapter {
 
     private static final int EXECUTION_TIME_WARNING_THRESHOLD_SECONDS = 1;
+    private static final Pattern FUTURE = Pattern.compile("future");
+    private static final Pattern PATTERN = Pattern.compile("[^a-zA-Z0-9]+$");
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
@@ -183,8 +186,8 @@ public class MessageListener extends ListenerAdapter {
         }
 
         String messageLowerCase = messageText.toLowerCase();
-        String receivingColorOrFaction =
-                StringUtils.substringBetween(messageLowerCase, "to", " ").replaceAll("[^a-zA-Z0-9]+$", "");
+        String receivingColorOrFaction = PATTERN.matcher(StringUtils.substringBetween(messageLowerCase, "to", " "))
+                .replaceAll("");
 
         if ("futureme".equals(receivingColorOrFaction)) {
             whisperToFutureMe(event, game, sender);
@@ -195,7 +198,7 @@ public class MessageListener extends ListenerAdapter {
         }
 
         boolean future = receivingColorOrFaction.startsWith("future");
-        receivingColorOrFaction = receivingColorOrFaction.replaceFirst("future", "");
+        receivingColorOrFaction = FUTURE.matcher(receivingColorOrFaction).replaceFirst("");
         if (receivingColorOrFaction.isEmpty()) {
             return true;
         }

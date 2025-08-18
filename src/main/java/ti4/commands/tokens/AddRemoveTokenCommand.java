@@ -19,7 +19,7 @@ import ti4.message.MessageHelper;
 
 abstract class AddRemoveTokenCommand extends GameStateCommand {
 
-    protected AddRemoveTokenCommand() {
+    AddRemoveTokenCommand() {
         super(true, true);
     }
 

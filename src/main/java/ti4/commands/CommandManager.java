@@ -62,7 +62,7 @@ import ti4.commands.user.UserCommand;
 
 public class CommandManager {
 
-    public static final Map<String, ParentCommand> commands = Stream.of(
+    private static final Map<String, ParentCommand> commands = Stream.of(
                     new AddUnits(),
                     new RemoveUnits(),
                     new RemoveAllUnits(),

@@ -125,7 +125,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
-    public boolean hasPlanets() {
+    private boolean hasPlanets() {
         return planets != null && !planets.isEmpty();
     }
 

@@ -35,8 +35,9 @@ public class RedistributionAgendaResolver implements AgendaResolver {
                 boolean containsDMZ = uH.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
                 if (containsDMZ) {
                     String dmzString =
-                            "Because " + Helper.getPlanetRepresentation(winner, game) + " is the _Demilitarized Zone_,";
-                    dmzString += " there is no point in choosing a player to place an infantry.";
+                            "Because " + Helper.getPlanetRepresentation(winner, game) + " is the _Demilitarized Zone_"
+                                    + ", there is no point in choosing a player to place an infantry."
+                                    + " Feel free to curry favour with another player by claiming you would have chosen them.";
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), dmzString);
                     continue;
                 }
@@ -45,7 +46,8 @@ public class RedistributionAgendaResolver implements AgendaResolver {
                     if (tile != null) {
                         AddUnitService.addUnits(event, tile, game, p2.getColor(), "1 inf " + winner);
                     }
-                    String resolveStr = "1 " + p2.getColor() + " infantry was added to "
+                    String resolveStr = p2.getRepresentation()
+                            + " outright has the fewest victory points, and so 1 of their infantry infantry was added to "
                             + Helper.getPlanetRepresentation(winner, game) + " automatically.";
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), resolveStr);
                     continue;

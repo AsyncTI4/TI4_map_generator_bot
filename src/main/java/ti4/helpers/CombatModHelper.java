@@ -30,7 +30,7 @@ import ti4.service.emoji.CardEmojis;
 
 public class CombatModHelper {
 
-    public static Boolean IsModInScopeForUnits(
+    private static Boolean IsModInScopeForUnits(
             List<UnitModel> units, CombatModifierModel modifier, CombatRollType rollType, Game game, Player player) {
         for (UnitModel unit : units) {
             if (modifier.isInScopeForUnit(unit, units, rollType, game, player)) {
@@ -50,7 +50,7 @@ public class CombatModHelper {
             CombatRollType rollType,
             String modifierType) {
         List<NamedCombatModifierModel> modifiers = new ArrayList<>();
-        HashMap<String, CombatModifierModel> combatModifiers = new HashMap<>(Mapper.getCombatModifiers());
+        Map<String, CombatModifierModel> combatModifiers = new HashMap<>(Mapper.getCombatModifiers());
         combatModifiers = new HashMap<>(combatModifiers.entrySet().stream()
                 .filter(entry -> entry.getValue().getForCombatAbility() == rollType)
                 .filter(entry -> entry.getValue().getType().equals(modifierType))
@@ -248,7 +248,7 @@ public class CombatModHelper {
         return modsValue;
     }
 
-    public static Boolean checkModPassesCondition(
+    private static Boolean checkModPassesCondition(
             CombatModifierModel modifier,
             TileModel onTile,
             Player player,
@@ -425,11 +425,11 @@ public class CombatModHelper {
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "toldarcommander")) {
                     int ownUnits = 0;
                     int opponentUnits = 0;
-                    for (UnitModel unitM : unitsByQuantity.keySet()) {
-                        ownUnits += unitsByQuantity.get(unitM);
+                    for (Integer i : unitsByQuantity.values()) {
+                        ownUnits += i;
                     }
-                    for (UnitModel unitM : opponentUnitsByQuantity.keySet()) {
-                        opponentUnits += opponentUnitsByQuantity.get(unitM);
+                    for (Integer i : opponentUnitsByQuantity.values()) {
+                        opponentUnits += i;
                     }
                     meetsCondition = ownUnits < opponentUnits;
                 }
@@ -439,15 +439,16 @@ public class CombatModHelper {
                     int nonFighter = 0;
                     int infantry = 0;
                     int ships = 0;
-                    for (UnitModel unitM : unitsByQuantity.keySet()) {
+                    for (Entry<UnitModel, Integer> entry : unitsByQuantity.entrySet()) {
+                        UnitModel unitM = entry.getKey();
                         if (unitM.getIsShip()) {
                             if (!"fighter".equalsIgnoreCase(unitM.getBaseType())) {
-                                nonFighter += unitsByQuantity.get(unitM);
+                                nonFighter += entry.getValue();
                             }
-                            ships += unitsByQuantity.get(unitM);
+                            ships += entry.getValue();
                         } else {
                             if ("infantry".equalsIgnoreCase(unitM.getBaseType())) {
-                                infantry += unitsByQuantity.get(unitM);
+                                infantry += entry.getValue();
                             }
                         }
                     }
@@ -466,10 +467,9 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
-            case "sigma_argent_flagship_1" -> {
+            case "sigma_argent_flagship_1" ->
                 meetsCondition = ButtonHelper.doesPlayerHaveFSHere(
                         "sigma_argent_flagship_1", player, game.getTileByPosition(game.getActiveSystem()));
-            }
             case "sigma_argent_flagship_2" -> {
                 meetsCondition = ButtonHelper.doesPlayerHaveFSHere("sigma_argent_flagship_2", player, tile);
                 for (String adjPos :
@@ -483,7 +483,7 @@ public class CombatModHelper {
         return meetsCondition;
     }
 
-    public static Integer getVariableModValue(
+    private static Integer getVariableModValue(
             CombatModifierModel mod,
             Player player,
             Player opponent,
@@ -557,15 +557,12 @@ public class CombatModHelper {
                             .map(Mapper::getTech)
                             .filter(TechnologyModel::isUnitUpgrade)
                             .count();
-                case Constants.MOD_DESTROYERS -> {
+                case Constants.MOD_DESTROYERS ->
                     scalingCount = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false);
-                }
-                case Constants.MOD_OPPONENT_NON_FIGHTER_SHIP -> {
+                case Constants.MOD_OPPONENT_NON_FIGHTER_SHIP ->
                     scalingCount += ButtonHelper.checkNumberNonFighterShips(opponent, activeSystem);
-                }
-                case Constants.MOD_OPPONENT_SHIP -> {
+                case Constants.MOD_OPPONENT_SHIP ->
                     scalingCount += ButtonHelper.checkNumberShips(opponent, activeSystem);
-                }
                 case "combat_round" -> {
                     int round;
                     String combatName = "combatRoundTracker" + player.getFaction() + activeSystem.getPosition()

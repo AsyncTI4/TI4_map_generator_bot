@@ -1,6 +1,7 @@
 package ti4.cron;
 
 import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,14 +15,16 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class InteractionLogCron {
-    @Nonnull
-    private static final ArrayDeque<BotLogger.AbstractEventLog> messageBuffer = new ArrayDeque<>(500);
 
-    private static TextChannel primaryBotLogChannel; // It is safe to store this channel as it should always exist
+    private static final int INITIAL_BUFFER_SIZE = 500;
+    private static final Object BUFFER_LOCK = new Object();
+
+    private static Deque<BotLogger.AbstractEventLog> messageBuffer = new ArrayDeque<>(INITIAL_BUFFER_SIZE);
+    private static TextChannel primaryBotLogChannel;
     private static boolean isRegistered;
 
     public static void addLogMessage(@Nonnull BotLogger.AbstractEventLog logMessage) {
-        synchronized (messageBuffer) {
+        synchronized (BUFFER_LOCK) {
             messageBuffer.add(logMessage);
         }
     }
@@ -46,49 +49,53 @@ public class InteractionLogCron {
                 InteractionLogCron.class, InteractionLogCron::logInteractions, 2, 2, TimeUnit.MINUTES);
     }
 
-    @SneakyThrows // The exceptions in this method are a result of getting abstract class methods, which are required to
+    // The exceptions in this method are a result of getting abstract class methods, which are required to
     // be defined by the nature of an abstract class
-    public static void logInteractions() {
-        // Build event -> combined message map
-        HashMap<Class<?>, StringBuilder> messageBuilders = new HashMap<>();
-        for (Class<?> logType : BotLogger.AbstractEventLog.class.getDeclaredClasses()) {
-            messageBuilders.put(logType, new StringBuilder());
-        }
-
-        // Get messages from buffer
-        synchronized (messageBuffer) {
-            for (BotLogger.AbstractEventLog eventLog : messageBuffer) {
-                messageBuilders.get(eventLog.getClass()).append(eventLog.getLogString());
-            }
-            messageBuffer.clear();
-        }
+    @SneakyThrows
+    private static void logInteractions() {
+        Map<Class<?>, StringBuilder> messageBuilders = drainMessageBufferIntoMessageBuilders();
 
         // For each class of message either send by channel (if exists) or thread
         for (Map.Entry<Class<?>, StringBuilder> entry : messageBuilders.entrySet()) {
-            if (entry.getValue().isEmpty()) return;
+            StringBuilder message = entry.getValue();
+            if (message.isEmpty()) continue;
+            sendByChannelOrThread(entry.getKey(), message);
+        }
+    }
 
-            List<TextChannel> logCandidates = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName(
-                    (String) entry.getKey().getMethod("getChannelName").invoke(null), false);
+    private static Map<Class<?>, StringBuilder> drainMessageBufferIntoMessageBuilders() {
+        Deque<BotLogger.AbstractEventLog> toProcess;
+        synchronized (BUFFER_LOCK) {
+            toProcess = messageBuffer;
+            messageBuffer = new ArrayDeque<>(INITIAL_BUFFER_SIZE);
+        }
 
-            if (!logCandidates.isEmpty()) {
-                logCandidates
-                        .getFirst()
-                        .sendMessage(entry.getValue().toString())
-                        .queue();
-            } else {
-                try {
-                    ThreadGetter.getThreadInChannel(
-                            primaryBotLogChannel,
-                            (String) entry.getKey().getMethod("getThreadName").invoke(null),
-                            (threadChannel) -> {
-                                MessageHelper.sendMessageToChannel(
-                                        threadChannel, entry.getValue().toString());
-                            });
-                } catch (Exception e) {
-                    BotLogger.error(
-                            "Failed to send a message via ThreadGetter in InteractionLogCron (this should not happen)",
-                            e);
-                }
+        Map<Class<?>, StringBuilder> messageBuilders = new HashMap<>();
+        while (!toProcess.isEmpty()) {
+            BotLogger.AbstractEventLog e = toProcess.pollFirst();
+            messageBuilders
+                    .computeIfAbsent(e.getClass(), k -> new StringBuilder())
+                    .append(e.getLogString());
+        }
+        return messageBuilders;
+    }
+
+    @SneakyThrows
+    private static void sendByChannelOrThread(Class<?> clazz, StringBuilder message) {
+        List<TextChannel> logCandidates = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName(
+                (String) clazz.getMethod("getChannelName").invoke(null), false);
+
+        if (!logCandidates.isEmpty()) {
+            logCandidates.getFirst().sendMessage(message.toString()).queue();
+        } else {
+            try {
+                ThreadGetter.getThreadInChannel(
+                        primaryBotLogChannel,
+                        (String) clazz.getMethod("getThreadName").invoke(null),
+                        (threadChannel) -> MessageHelper.sendMessageToChannel(threadChannel, message.toString()));
+            } catch (Exception e) {
+                BotLogger.error(
+                        "Failed to send a message via ThreadGetter in InteractionLogCron (this should not happen)", e);
             }
         }
     }

@@ -42,17 +42,17 @@ import ti4.message.MessageHelper;
 @Getter
 public abstract class SettingsMenu {
     // Prefix "Jazz Menu Framework"
-    protected static final @JsonIgnore String menuNav = "jmfN";
-    protected static final @JsonIgnore String menuAction = "jmfA";
+    private static final @JsonIgnore String menuNav = "jmfN";
+    static final @JsonIgnore String menuAction = "jmfA";
 
     protected final @JsonIgnore String menuName;
     protected final @JsonIgnore List<String> description = new ArrayList<>();
     protected final @JsonIgnore SettingsMenu parent;
 
     protected final String menuId;
-    protected String messageId;
+    private String messageId;
 
-    protected SettingsMenu(String menuId, String menuName, String description, SettingsMenu parent) {
+    SettingsMenu(String menuId, String menuName, String description, SettingsMenu parent) {
         this.menuId = menuId;
         this.menuName = menuName;
         this.description.add(description);
@@ -63,42 +63,42 @@ public abstract class SettingsMenu {
     // Overridable Methods:
     //  - Override these as needed
     // ---------------------------------------------------------------------------------------------------------------------------------
-    protected List<SettingInterface> settings() {
+    List<SettingInterface> settings() {
         return Collections.emptyList();
     }
 
-    protected List<SettingsMenu> categories() {
+    List<SettingsMenu> categories() {
         return Collections.emptyList();
     }
 
-    protected List<Button> specialButtons() {
+    List<Button> specialButtons() {
         return Collections.emptyList();
     }
 
     /** Action Handler. Returns "success" on a success, returns null if the action was not found */
-    protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
+    String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
         return null;
     }
 
     /** Action Handler. Returns null on a success */
-    protected String resetSettings() {
+    String resetSettings() {
         if (enabledSettings().isEmpty()) return "No settings to reset.";
         for (SettingInterface setting : enabledSettings()) setting.reset();
         return null;
     }
 
-    protected void updateTransientSettings() {}
+    void updateTransientSettings() {}
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // "Static" methods:
     //  - These methods should only rarely need to be overridden
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public List<SettingInterface> enabledSettings() {
+    List<SettingInterface> enabledSettings() {
         updateTransientSettings();
         return settings().stream().filter(x -> !x.isDisabled()).toList();
     }
 
-    public String menuSummaryString(String lastSettingTouched) {
+    String menuSummaryString(String lastSettingTouched) {
         StringBuilder sb = new StringBuilder("# **__").append(menuName).append(":__**");
         for (String line : description) sb.append("\n- *").append(line).append("*");
         sb.append("\n");
@@ -133,7 +133,7 @@ public abstract class SettingsMenu {
         return sb.toString();
     }
 
-    public String shortSummaryString(boolean shortDescrOnly) {
+    String shortSummaryString(boolean shortDescrOnly) {
         StringBuilder sb = new StringBuilder("**__" + menuName + ":__**");
         for (String line : description) {
             sb.append("\n- *").append(line).append("*");
@@ -189,16 +189,16 @@ public abstract class SettingsMenu {
         }
     }
 
-    protected String navId() {
+    String navId() {
         String base = parent != null ? parent.navId() + "." : "";
         return base + menuId;
     }
 
-    protected void buttonFailed(GenericInteractionCreateEvent event, String userMsg) {
+    private void buttonFailed(GenericInteractionCreateEvent event, String userMsg) {
         buttonFailed(event, userMsg, true);
     }
 
-    protected void buttonFailed(GenericInteractionCreateEvent event, String userMsg, boolean pingJazz) {
+    private void buttonFailed(GenericInteractionCreateEvent event, String userMsg, boolean pingJazz) {
         if (pingJazz) {
             BotLogger.error(
                     new BotLogger.LogMessageOrigin(event),
@@ -213,14 +213,14 @@ public abstract class SettingsMenu {
             stringEvent.getHook().sendMessage(userMsg).setEphemeral(true).queue();
     }
 
-    public String getMessageId() {
+    private String getMessageId() {
         if (parent != null) {
             return parent.getMessageId();
         }
         return messageId;
     }
 
-    public void setMessageId(String messageId) {
+    void setMessageId(String messageId) {
         if (Objects.equals(this.messageId, messageId)) return;
         this.messageId = messageId;
         for (SettingsMenu cat : categories()) {

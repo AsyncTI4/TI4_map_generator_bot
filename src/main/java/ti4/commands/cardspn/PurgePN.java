@@ -42,7 +42,7 @@ public class PurgePN extends GameStateSubcommand {
         MessageHelper.sendMessageToEventChannel(event, "Promissory note purged.");
     }
 
-    public static void purgePromissoryFromHand(Game game, Player player, String pn) {
+    private static void purgePromissoryFromHand(Game game, Player player, String pn) {
         game.setPurgedPN(pn);
         player.removePromissoryNote(pn);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);

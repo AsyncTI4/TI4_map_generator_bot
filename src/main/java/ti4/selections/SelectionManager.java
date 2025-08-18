@@ -23,7 +23,7 @@ public class SelectionManager {
         return selectionMenuList;
     }
 
-    public void addSelectionMenu(Selection selectionMenu) {
+    private void addSelectionMenu(Selection selectionMenu) {
         selectionMenuList.add(selectionMenu);
     }
 

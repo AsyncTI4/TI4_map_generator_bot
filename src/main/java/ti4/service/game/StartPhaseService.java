@@ -49,6 +49,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.service.PlanetService;
 import ti4.service.StatusCleanupService;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -553,18 +554,18 @@ public class StartPhaseService {
         // Pulsar destruction logic
         game.getTileMap().values().stream()
                 .filter(tile -> "sig02".equals(tile.getTileID()))
-                .forEach(pulsar -> {
-                    pulsar.getSpaceUnitHolder().getUnitColorsOnHolder().forEach(playerColor -> {
-                        pulsar.removeAllUnits(playerColor);
-                        Player p = game.getPlayerFromColorOrFaction(playerColor);
-                        if (p.isRealPlayer()) {
-                            MessageHelper.sendMessageToChannel(
-                                    p.getCorrectChannel(),
-                                    p.getRepresentationUnfogged() + ", units in Pulsar (" + pulsar.getPosition()
-                                            + ") were destroyed.");
-                        }
-                    });
-                });
+                .forEach(pulsar -> pulsar.getSpaceUnitHolder()
+                        .getUnitColorsOnHolder()
+                        .forEach(playerColor -> {
+                            pulsar.removeAllUnits(playerColor);
+                            Player p = game.getPlayerFromColorOrFaction(playerColor);
+                            if (p.isRealPlayer()) {
+                                MessageHelper.sendMessageToChannel(
+                                        p.getCorrectChannel(),
+                                        p.getRepresentationUnfogged() + ", units in Pulsar (" + pulsar.getPosition()
+                                                + ") were destroyed.");
+                            }
+                        }));
 
         if ("action_deck_2".equals(game.getAcDeckID()) && game.getRound() > 1) {
             handleStartOfStrategyForAcd2(game);
@@ -764,14 +765,15 @@ public class StartPhaseService {
                 .withEmoji(Emoji.fromFormatted("🔺"));
         Button yssarilPolicy = null;
         for (Player player : game.getRealPlayers()) {
-            if (ButtonHelper.isPlayerElected(game, player, "minister_policy") && player.hasAbility("scheming")) {
+            if (IsPlayerElectedService.isPlayerElected(game, player, "minister_policy")
+                    && player.hasAbility("scheming")) {
                 yssarilPolicy = Buttons.gray(
                         player.getFinsFactionCheckerPrefix() + "yssarilMinisterOfPolicy",
                         "Draw Minister of Policy Action Card",
                         FactionEmojis.Yssaril);
             }
             if (ButtonHelper.isLawInPlay(game, "absol_minspolicy")
-                    && ButtonHelper.isPlayerElected(game, player, "absol_minspolicy")) {
+                    && IsPlayerElectedService.isPlayerElected(game, player, "absol_minspolicy")) {
                 List<Button> absButtons = new ArrayList<>();
                 absButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "cymiaeHeroStep1_"
@@ -1003,7 +1005,7 @@ public class StartPhaseService {
                                     + ", you have the opportunity to use _Quantum Datahub Node_.",
                             buttons);
                 }
-                if (ButtonHelper.isPlayerElected(game, p2, "arbiter")) {
+                if (IsPlayerElectedService.isPlayerElected(game, p2, "arbiter")) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("startArbiter", "Use Imperial Arbiter", CardEmojis.Agenda));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
@@ -1047,7 +1049,7 @@ public class StartPhaseService {
                             buttons);
                     hold = new StringBuilder("_Quantum Datahub Node_");
                 }
-                if (ButtonHelper.isPlayerElected(game, p2, "arbiter")) {
+                if (IsPlayerElectedService.isPlayerElected(game, p2, "arbiter")) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("startArbiter", "Use Imperial Arbiter", CardEmojis.Agenda));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
@@ -1055,7 +1057,7 @@ public class StartPhaseService {
                             p2.getCorrectChannel(),
                             p2.getRepresentationUnfogged() + ", you have the opportunity to use _Imperial Arbiter_.",
                             buttons);
-                    hold.append((hold.length() == 0) ? "" : " or ").append("_Imperial Arbiter_");
+                    hold.append((hold.isEmpty()) ? "" : " or ").append("_Imperial Arbiter_");
                 }
             }
             if (game.isShowBanners()) {

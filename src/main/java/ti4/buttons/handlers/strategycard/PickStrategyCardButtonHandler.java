@@ -236,7 +236,7 @@ public class PickStrategyCardButtonHandler {
         return buttons;
     }
 
-    public static void secondHalfOfSCPickWhenChecksNBalances(
+    private static void secondHalfOfSCPickWhenChecksNBalances(
             ButtonInteractionEvent event, Player player, Game game, int scPicked) {
         List<Button> buttons = getPlayerOptionsForChecksNBalances(player, game, scPicked);
         Map<Integer, Integer> strategyCardToTradeGoodCount = game.getScTradeGoods();

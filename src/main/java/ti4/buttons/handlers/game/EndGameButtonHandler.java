@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 import ti4.service.game.EndGameService;
 
 @UtilityClass
-public class EndGameButtonHandler {
+class EndGameButtonHandler {
 
     @ButtonHandler("gameEnd")
     public static void gameEnd(ButtonInteractionEvent event, Game game) {

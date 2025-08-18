@@ -28,7 +28,7 @@ public class TokenPlanetService {
         return TokenPlanets.mirage.name();
     }
 
-    public static boolean isTokenPlanet(String tokenOrPlanetName) {
+    private static boolean isTokenPlanet(String tokenOrPlanetName) {
         if (tokenOrPlanetName == null || tokenOrPlanetName.isBlank()) return false;
         if (Constants.TOKEN_PLANETS.contains(tokenOrPlanetName)) return true;
 

@@ -61,7 +61,7 @@ public class ColorModel implements ModelInterface {
     }
 
     @JsonIgnore
-    public String getRepresentation(boolean includeName) {
+    private String getRepresentation(boolean includeName) {
         if (includeName) return ColorEmojis.getColorEmojiWithName(name);
         return ColorEmojis.getColorEmoji(name).toString();
     }

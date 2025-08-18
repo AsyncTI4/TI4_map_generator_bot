@@ -31,7 +31,7 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
-    public TI4Emoji getObjectiveEmoji() {
+    private TI4Emoji getObjectiveEmoji() {
         return CardEmojis.getObjectiveEmoji(Integer.toString(points));
     }
 
@@ -77,7 +77,7 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
         return eb.build();
     }
 
-    public Color getEmbedColor() {
+    private Color getEmbedColor() {
         return switch (points) {
             case 1 -> Color.ORANGE;
             case 2 -> Color.BLUE;

@@ -67,7 +67,6 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "botSCAutomationID": "anarchy7",
-        "botSCAutomationID": "anarchy7",
         "imageFileName": "anarchy_7",
         "source": "asteroid"
     },
@@ -77,7 +76,6 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "anarchy8",
         "botSCAutomationID": "anarchy8",
         "imageFileName": "anarchy_8",
         "source": "asteroid"
@@ -99,7 +97,6 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "botSCAutomationID": "anarchy10",
-        "botSCAutomationID": "anarchy10",
         "imageFileName": "anarchy_10",
         "source": "asteroid"
     },
@@ -109,7 +106,6 @@
         "name": "Imperial",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "anarchy11",
         "botSCAutomationID": "anarchy11",
         "imageFileName": "anarchy_11",
         "source": "asteroid"

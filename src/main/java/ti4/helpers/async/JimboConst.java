@@ -20,7 +20,7 @@ import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 
 // Jazz's Interactive Map Builder
-public class JimboConst {
+class JimboConst {
     // Main Page
     public static final String mainPage = "jimbo_mainPage";
     public static final String exit = "jimbo_exit";
@@ -47,14 +47,15 @@ public class JimboConst {
     public static final String metaAction = "jimbo_metaAction";
     public static final String metaSymmetryAdd = "jimbo_metaSymmetryAdd";
     public static final String metaSymmetryRemove = "jimbo_metaSymmetryRemove";
+    private static final Pattern PATTERN = Pattern.compile("(blank|\\d+)$");
 
     // Tile separation
     public static List<TileModel> blueTiles;
     public static List<TileModel> redTiles;
     public static List<TileModel> greenTiles;
-    public static List<TileModel> hyperlaneTiles;
+    private static List<TileModel> hyperlaneTiles;
     public static Map<Integer, List<TileModel>> hyperlanesByRotation;
-    public static List<TileModel> draftTiles;
+    private static List<TileModel> draftTiles;
     public static Map<Integer, List<TileModel>> draftTilesByNumber;
     public static List<TileModel> otherTiles;
 
@@ -164,13 +165,13 @@ public class JimboConst {
                 TileHelper.getAllTileModels().stream().sorted(comp).toList();
 
         blueTiles = allTilesSorted.stream()
-                .filter(t -> "0b".equals(t.getAlias()) || TileBack.BLUE == t.getTileBack())
+                .filter(t -> "0b".equals(t.getAlias()) || t.getTileBack() == TileBack.BLUE)
                 .toList();
         redTiles = allTilesSorted.stream()
-                .filter(t -> "0r".equals(t.getAlias()) || TileBack.RED == t.getTileBack())
+                .filter(t -> "0r".equals(t.getAlias()) || t.getTileBack() == TileBack.RED)
                 .toList();
         greenTiles = allTilesSorted.stream()
-                .filter(t -> "0g".equals(t.getAlias()) || TileBack.GREEN == t.getTileBack())
+                .filter(t -> "0g".equals(t.getAlias()) || t.getTileBack() == TileBack.GREEN)
                 .toList();
         hyperlaneTiles = allTilesSorted.stream()
                 .filter(t -> t.getName() != null && "hyperlane".equalsIgnoreCase(t.getName()))
@@ -249,7 +250,7 @@ public class JimboConst {
         Set<String> baseStringOrder = new LinkedHashSet<>();
         Map<Integer, Map<String, TileModel>> tilesByNum = new HashMap<>();
         for (TileModel tile : draftTiles) {
-            String color = tile.getId().replaceAll("(blank|\\d+)$", "");
+            String color = PATTERN.matcher(tile.getId()).replaceAll("");
             String indexStr = tile.getId().replace(color, "");
             int index;
             switch (indexStr) {
@@ -270,10 +271,11 @@ public class JimboConst {
 
         // Store the data for convenient use later
         draftTilesByNumber = new HashMap<>();
-        for (Integer x : tilesByNum.keySet()) {
+        for (Map.Entry<Integer, Map<String, TileModel>> entry : tilesByNum.entrySet()) {
+            Integer x = entry.getKey();
             draftTilesByNumber.put(x, new ArrayList<>());
             for (String base : baseStringOrder) {
-                draftTilesByNumber.get(x).add(tilesByNum.get(x).get(base));
+                draftTilesByNumber.get(x).add(entry.getValue().get(base));
             }
         }
     }

@@ -35,7 +35,7 @@ class SecretObjectiveButtonHandler {
         try {
             int soIndex = Integer.parseInt(soID);
 
-            String msg = player.getRepresentation() + " discarded a secret objective.";
+            String msg = player.getRepresentation() + " discarded a secret objective";
             if (game.getRound() == 1 && !game.isFowMode()) {
                 int amountLeftToDiscard = -1;
                 for (Player p2 : game.getRealPlayers()) {
@@ -43,9 +43,10 @@ class SecretObjectiveButtonHandler {
                         amountLeftToDiscard++;
                     }
                 }
-                msg += " (" + amountLeftToDiscard + " players still to discard)";
+                msg += " (" + amountLeftToDiscard + " player" + (amountLeftToDiscard == 1 ? "" : "s")
+                        + " still to discard)";
             }
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg + ".");
             DiscardSecretService.discardSO(player, soIndex, game);
 
             if (drawReplacement) {

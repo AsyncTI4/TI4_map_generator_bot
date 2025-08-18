@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.Point;
+import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -68,6 +68,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.emoji.CardEmojis;
@@ -87,6 +88,7 @@ import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
 
 public class Helper {
@@ -287,7 +289,7 @@ public class Helper {
             return true;
         }
         if (player.hasAbility("mobile_command")
-                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship)
+                && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Flagship)
                         .isEmpty()) {
             return false;
         }
@@ -321,7 +323,8 @@ public class Helper {
                         .append(player.getRepresentation(false, false))
                         .append("\n");
             } else {
-                rep.append(player.getPriorityPosition() + ". ")
+                rep.append(player.getPriorityPosition())
+                        .append(". ")
                         .append(player.getRepresentation(false, false))
                         .append("\n");
             }
@@ -447,8 +450,7 @@ public class Helper {
             return getSpeakerOrderFromThisPlayer(game.getSpeaker(), game);
         }
 
-        List<Player> arrayPlayers = new ArrayList<Player>();
-        arrayPlayers.addAll(PriorityTrackHelper.GetPriorityTrack(game).stream()
+        List<Player> arrayPlayers = new ArrayList<>(PriorityTrackHelper.GetPriorityTrack(game).stream()
                 .filter(Objects::nonNull)
                 .toList());
         return arrayPlayers;
@@ -761,7 +763,7 @@ public class Helper {
         }
     }
 
-    public static String getPlanetRepresentationPlusEmojiPlusInfluence(String planetID, Game game) {
+    private static String getPlanetRepresentationPlusEmojiPlusInfluence(String planetID, Game game) {
         Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
@@ -771,12 +773,12 @@ public class Helper {
         }
     }
 
-    public static String getPlanetRepresentationPlusEmojiPlusResources(String planetID, Game game) {
+    private static String getPlanetRepresentationPlusEmojiPlusResources(String planetID, Game game) {
         Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
-            String techType = "";
+            String techType;
             String techEmoji = "";
             if (Mapper.getPlanet(planetID).getTechSpecialties() != null
                     && !Mapper.getPlanet(planetID).getTechSpecialties().isEmpty()) {
@@ -1391,14 +1393,16 @@ public class Helper {
                 double existingDiscount = Double.parseDouble(game.getStoredValue("amalgAmount")) + 0.5;
                 int discount = (int) existingDiscount;
                 res += discount;
-                msg.append("> Released units with a total resource value of " + discount + "\n");
+                msg.append("> Released units with a total resource value of ")
+                        .append(discount)
+                        .append("\n");
             }
             msg.append("for a total spend of ").append(res).append(" resources.");
 
             if (!game.getStoredValue("producedUnitCostFor" + player.getFaction())
                     .isEmpty()) {
                 int amount = Integer.parseInt(game.getStoredValue("producedUnitCostFor" + player.getFaction()));
-                msg.append(" (Previous build cost " + amount + " resources).");
+                msg.append(" (preceding build cost ").append(amount).append(" resources).");
                 if (amount > res) {
                     msg.append("\n### WARNING: Have not spent enough resources yet.");
                 }
@@ -1451,7 +1455,8 @@ public class Helper {
                         .append(getPlanetRepresentation(planetOrSpace2, game))
                         .append(".\n");
             }
-            for (String unit : producedUnits.keySet()) {
+            for (Map.Entry<String, Integer> entry : producedUnits.entrySet()) {
+                String unit = entry.getKey();
                 String tilePos = unit.split("_")[1];
                 String planetOrSpace = unit.split("_")[2];
                 String un = unit.split("_")[0];
@@ -1459,15 +1464,15 @@ public class Helper {
                 UnitModel removedUnit =
                         player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
                 if (uniquePlace.equalsIgnoreCase(tilePos + "_" + planetOrSpace)) {
-                    if (producedUnits.get(unit) < 10) {
+                    if (entry.getValue() < 10) {
                         localPlace
                                 .append("> ")
-                                .append(removedUnit.getUnitEmoji().toString().repeat(producedUnits.get(unit)))
+                                .append(removedUnit.getUnitEmoji().toString().repeat(entry.getValue()))
                                 .append("\n");
                     } else {
                         localPlace
                                 .append("> ")
-                                .append(producedUnits.get(unit))
+                                .append(entry.getValue())
                                 .append("x ")
                                 .append(removedUnit.getUnitEmoji())
                                 .append("\n");
@@ -1485,11 +1490,8 @@ public class Helper {
                     .append(cost == 1 ? "" : "s")
                     .append(".");
         } else {
-            int productionLimit = 0;
-            if (tile != null
-                    && activeSystem != null
-                    && tile == activeSystem
-                    && getProductionValue(player, game, tile, false) > 0) {
+            int productionLimit;
+            if (activeSystem != null && tile == activeSystem && getProductionValue(player, game, tile, false) > 0) {
                 if (!player.hasUnit("arborec_mech")
                         && !player.hasUnit("arborec_infantry")
                         && !player.hasUnit("arborec_infantry2")) {
@@ -1504,14 +1506,18 @@ public class Helper {
                     }
                     msg.append("Producing a total of ")
                             .append(unitCount)
-                            .append(" units (PRODUCTION limit is " + productionLimit + ")")
+                            .append(" units (PRODUCTION limit is ")
+                            .append(productionLimit)
+                            .append(")")
                             .append(" for a total cost of ")
                             .append(cost)
                             .append(" resource")
                             .append(cost == 1 ? "" : "s")
                             .append(".");
                     if (productionLimit < unitCount) {
-                        msg.append("\n### Warning! Exceeding PRODUCTION limit of " + productionLimit + "!");
+                        msg.append("\n### Warning! Exceeding PRODUCTION limit of ")
+                                .append(productionLimit)
+                                .append("!");
                     }
                 }
             } else {
@@ -1532,7 +1538,8 @@ public class Helper {
     public static void resetProducedUnits(Player player, Game game, GenericInteractionCreateEvent event) {
         Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
 
-        for (String unit : producedUnits.keySet()) {
+        for (Map.Entry<String, Integer> entry : producedUnits.entrySet()) {
+            String unit = entry.getKey();
             String tilePos = unit.split("_")[1];
             String planetOrSpace = unit.split("_")[2];
             if ("space".equalsIgnoreCase(planetOrSpace)) {
@@ -1547,7 +1554,7 @@ public class Helper {
                     tile,
                     game,
                     player.getColor(),
-                    producedUnits.get(unit) + " " + AliasHandler.resolveUnit(un) + planetOrSpace);
+                    entry.getValue() + " " + AliasHandler.resolveUnit(un) + planetOrSpace);
         }
 
         player.resetProducedUnits();
@@ -1589,7 +1596,7 @@ public class Helper {
                             productionValue = planet.getResources() + productionValue;
                         }
                     }
-                    if (ButtonHelper.isPlayerElected(game, player, "absol_minsindus")) {
+                    if (IsPlayerElectedService.isPlayerElected(game, player, "absol_minsindus")) {
                         productionValue += 4;
                     }
                 }
@@ -1816,21 +1823,22 @@ public class Helper {
         int totalUnits = 0;
         boolean regulated =
                 ButtonHelper.isLawInPlay(game, "conscription") || ButtonHelper.isLawInPlay(game, "absol_conscription");
-        for (String unit : producedUnits.keySet()) {
+        for (Map.Entry<String, Integer> entry : producedUnits.entrySet()) {
+            String unit = entry.getKey();
             String unit2 = unit.split("_")[0];
             if (unit.contains("gf")) {
-                numInf += producedUnits.get(unit);
+                numInf += entry.getValue();
             } else if (unit.contains("ff")) {
-                numFF += producedUnits.get(unit);
+                numFF += entry.getValue();
             } else {
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit2), player.getColor());
                 UnitModel removedUnit =
                         player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
                 if (!"flagship".equalsIgnoreCase(removedUnit.getBaseType())
                         || !game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")) {
-                    cost += (int) removedUnit.getCost() * producedUnits.get(unit);
+                    cost += (int) removedUnit.getCost() * entry.getValue();
                 }
-                totalUnits += producedUnits.get(unit);
+                totalUnits += entry.getValue();
             }
         }
         if (regulated) {
@@ -1851,12 +1859,13 @@ public class Helper {
         }
     }
 
-    public static List<Button> getPlaceUnitButtonsForSaarCommander(
+    private static List<Button> getPlaceUnitButtonsForSaarCommander(
             Player player, Tile origTile, Game game, String placePrefix) {
         List<Button> unitButtons = new ArrayList<>();
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "saarcommander")) {
-            for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
+            for (Tile tile :
+                    CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)) {
                 if (tile.getPosition().equalsIgnoreCase(origTile.getPosition())
                         || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                     continue;
@@ -2547,7 +2556,7 @@ public class Helper {
         }
     }
 
-    public static void addPlayerPermissionsToPrivateChannels(Game game) {
+    private static void addPlayerPermissionsToPrivateChannels(Game game) {
         // Make sure everyone has access to their own private thread
         long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
         for (Player player : game.getPlayers().values()) {
@@ -2715,7 +2724,7 @@ public class Helper {
         List<Player> sortedPlayers1 = game.getRealPlayers();
         List<Player> sortedPlayers = new ArrayList<>();
         for (Player player : sortedPlayers1) {
-            sortedPlayers.add(0, player);
+            sortedPlayers.addFirst(player);
         }
         Map<String, Player> playersBackup = new LinkedHashMap<>(game.getPlayers());
         try {
@@ -2825,7 +2834,7 @@ public class Helper {
         }
     }
 
-    public static void checkEndGameCivilizedSociety(Game game) {
+    private static void checkEndGameCivilizedSociety(Game game) {
         if (!"statusHomeWork".equalsIgnoreCase(game.getPhaseOfGame())) {
             return;
         }

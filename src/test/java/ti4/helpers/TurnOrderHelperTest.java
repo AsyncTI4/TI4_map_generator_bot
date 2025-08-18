@@ -10,7 +10,7 @@ import ti4.map.Player;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.testUtils.BaseTi4Test;
 
-public class TurnOrderHelperTest extends BaseTi4Test {
+class TurnOrderHelperTest extends BaseTi4Test {
     @Test
     void GetNonInitiativeOrderFromPlayer_IncompletePriorityTrack_OmegaPhase() {
         var game = createTestGame(PriorityTrackMode.FULL);

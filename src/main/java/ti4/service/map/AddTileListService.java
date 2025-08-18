@@ -132,11 +132,7 @@ public class AddTileListService {
         TextInput tags = TextInput.create(fieldId, "Enter Map String", TextInputStyle.PARAGRAPH)
                 .setPlaceholder("Paste the map string here.")
                 .setValue(game.getMapString()
-                        .substring(
-                                0,
-                                game.getMapString().length() > 4000
-                                        ? 4000
-                                        : game.getMapString().length()))
+                        .substring(0, Math.min(game.getMapString().length(), 4000)))
                 .setRequired(true)
                 .build();
         return Modal.create(modalId, "Add Map String for " + game.getName())

@@ -188,7 +188,7 @@ public class PickStrategyCardService {
                 Player speaker = game.getSpeaker();
                 if (speaker != null) {
                     pickOrder.remove(speaker);
-                    pickOrder.add(0, speaker);
+                    pickOrder.addFirst(speaker);
                 }
             }
             return pickOrder;
