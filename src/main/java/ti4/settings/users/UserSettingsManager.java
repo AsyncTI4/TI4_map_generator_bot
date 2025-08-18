@@ -57,12 +57,11 @@ public class UserSettingsManager {
         List<UserSettings> allUserSettings = new ArrayList<>();
         for (File file : settingsFiles) {
             try {
-                // Extract userId from filename (remove .json extension)
                 String userId = file.getName().replace(".json", "");
-
-                // Use existing get method to read each user's settings
-                UserSettings userSettings = get(userId);
-                allUserSettings.add(userSettings);
+                UserSettings userSettings = readFile(userId);
+                if (userSettings != null) {
+                    allUserSettings.add(userSettings);
+                }
             } catch (Exception e) {
                 BotLogger.error("Failed to read user settings from file: " + file.getName(), e);
             }
