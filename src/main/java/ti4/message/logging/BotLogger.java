@@ -26,6 +26,8 @@ public class BotLogger {
     private static final int DISCORD_UNKNOWN_ERROR_STATUS_CODE = 10008;
     private static final Object LAST_SCHEDULED_WEBHOOK_LOCK = new Object();
     private static final long DISCORD_RATE_LIMIT = 50; // Min time in millis between discord webhook messages
+    private static final int MAX_DISCORD_MESSAGE_SIZE = 2000;
+    private static final int SECONDS_TO_WAIT_BEFORE_QUEUEING_STACKTRACE = 15;
 
     private static volatile long lastScheduledWebhook;
 
@@ -188,10 +190,12 @@ public class BotLogger {
         int msgLength = compiledMessage.length();
 
         // Handle message length overflow. Overflow length is derived from previous implementation
-        for (int i = 0; i <= msgLength; i += 2000) {
-            String msgChunk = compiledMessage.substring(i, Math.min(i + 2000, msgLength));
+        for (int i = 0; i <= msgLength; i += MAX_DISCORD_MESSAGE_SIZE) {
+            String msgChunk = compiledMessage.substring(i, Math.min(i + MAX_DISCORD_MESSAGE_SIZE, msgLength));
 
-            if (err == null || i + 2000 < msgLength) { // If length could overflow or there is no error to trace
+            if (err == null
+                    || i + MAX_DISCORD_MESSAGE_SIZE
+                            < msgLength) { // If length could overflow or there is no error to trace
                 if (channel == null) scheduleWebhookMessage(msgChunk); // Send message on webhook
                 else channel.sendMessage(msgChunk).queue(); // Send message on channel
 
@@ -209,7 +213,9 @@ public class BotLogger {
                             .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
                             .queue(t -> {
                                 MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(err));
-                                t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
+                                t.getManager()
+                                        .setArchived(true)
+                                        .queueAfter(SECONDS_TO_WAIT_BEFORE_QUEUEING_STACKTRACE, TimeUnit.SECONDS);
                             }));
                 }
             }
