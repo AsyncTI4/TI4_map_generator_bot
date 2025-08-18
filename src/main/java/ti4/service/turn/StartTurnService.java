@@ -48,6 +48,7 @@ public class StartTurnService {
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
         player.setInRoundTurnCount(player.getInRoundTurnCount() + 1);
         game.removeStoredValue("currentActionSummary" + player.getFaction());
+
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         Map<String, String> maps = new HashMap<>(game.getMessagesThatICheckedForAllReacts());
         for (String id : maps.keySet()) {

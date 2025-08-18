@@ -64,7 +64,7 @@ public class CommanderUnlockCheckService {
                 }
             }
             case "cheiran" -> {
-                if (ButtonHelper.getNumberOfPlanetsWithStructuresNotInHS(player, game) > 3) {
+                if (ButtonHelper.getNumberOfStructuresOnNonHomePlanets(player, game) > 3) {
                     shouldBeUnlocked = true;
                 }
             }

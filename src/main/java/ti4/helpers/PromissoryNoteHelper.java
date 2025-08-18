@@ -344,7 +344,7 @@ public class PromissoryNoteHelper {
             String message = player.getRepresentationUnfogged() + " Use buttons to drop 2 infantry on a planet";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
-        if (!"agendas_absol".equals(game.getAgendaDeckID()) && id.endsWith("_ps")) {
+        if (!"agendas_absol".equals(game.getAgendaDeckID()) && id.endsWith("_ps") && !id.contains("absol")) {
             if (game.playerHasLeaderUnlockedOrAlliance(owner, "xxchacommander")) {
                 MessageHelper.sendMessageToChannel(
                         owner.getCorrectChannel(),

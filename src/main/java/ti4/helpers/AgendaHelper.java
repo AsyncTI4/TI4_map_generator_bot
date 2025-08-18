@@ -262,7 +262,7 @@ public class AgendaHelper {
             }
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
-            if (!player.ownsPromissoryNote(pnId) && pnId.endsWith("_ps")) {
+            if (!player.ownsPromissoryNote(pnId) && pnId.endsWith("_ps") && !pnId.contains("absol")) {
                 names.add(Mapper.getPromissoryNote(pnId).getName());
             }
         }
@@ -282,7 +282,7 @@ public class AgendaHelper {
             }
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
-            if (!player.ownsPromissoryNote(pnId) && pnId.endsWith("_ps")) {
+            if (!player.ownsPromissoryNote(pnId) && pnId.endsWith("_ps") && !pnId.contains("absol")) {
                 buttons.add(Buttons.red(
                         "queueWhen_pn_" + pnId, Mapper.getPromissoryNote(pnId).getName()));
             }
@@ -3318,8 +3318,11 @@ public class AgendaHelper {
             return sb.toString();
         } else if (game.isStellarAtomicsMode()
                 && !game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")
-                && game.getRevealedPublicObjectives().get("Stellar Atomics") != null
-                && !game.getScoredPublicObjectives().get("Stellar Atomics").contains(player.getUserID())) {
+                && (game.getScoredPublicObjectives().get("Stellar Atomics") == null
+                        || (game.getRevealedPublicObjectives().get("Stellar Atomics") != null
+                                && !game.getScoredPublicObjectives()
+                                        .get("Stellar Atomics")
+                                        .contains(player.getUserID())))) {
             sb.append(" __cannot__ vote due to having used _Stellar Atomics_.**");
 
         } else if (player.hasLeaderUnlocked("xxchahero")) {
