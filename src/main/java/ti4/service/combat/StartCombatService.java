@@ -4,9 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import org.jetbrains.annotations.Nullable;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -16,6 +13,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
@@ -1783,9 +1781,9 @@ public class StartCombatService {
                         String label = "Use Magen Defense Grid on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, TechEmojis.WarfareTech));
                     }
-                    if(p.hasAbility("ruthless")
+                    if (p.hasAbility("ruthless")
                             && isGroundCombat
-                            && otherP.getExhaustedPlanets().contains(unitH.getName())){
+                            && otherP.getExhaustedPlanets().contains(unitH.getName())) {
                         String id = p.finChecker() + "ruthlessHit_" + unitH.getName();
                         String label = "Use Ruthless on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.kortali));
