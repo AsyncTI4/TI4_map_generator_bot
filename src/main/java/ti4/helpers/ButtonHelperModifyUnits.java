@@ -1243,10 +1243,25 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", please choose the opposing unit to hit.",
-                getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet));
+                getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet),
+                "magen");
     }
 
-    private static List<Button> getOpposingUnitsToHitOnGround(Player player, Game game, Tile tile, String planet) {
+    @ButtonHandler("ruthlessHit_")
+    public static void ruthlessHit(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        ButtonHelper.deleteTheOneButton(event);
+        String planet = buttonID.split("_")[1];
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), player.getRepresentationNoPing() + " is resolving **Ruthless**.");
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentation() + ", please choose the opposing unit to hit.",
+                getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet),
+                "ruthless");
+    }
+
+    public static List<Button> getOpposingUnitsToHitOnGround(
+            Player player, Game game, Tile tile, String planet, String source) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
 
         List<Button> buttons = new ArrayList<>();
@@ -1275,14 +1290,15 @@ public class ButtonHelperModifyUnits {
 
             for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
                 String buttonID = finChecker + "hitOpponentGround_" + planet + "_" + unitName + "damaged" + "_"
-                        + unitKey.getColor();
+                        + unitKey.getColor() + "_" + source;
                 Button validTile2 = Buttons.red(buttonID, "Damaged " + prettyName, unitKey.unitEmoji());
                 buttons.add(validTile2);
             }
             totalUnits -= damagedUnits;
             for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                 Button validTile2 = Buttons.red(
-                        finChecker + "hitOpponentGround_" + planet + "_" + unitName + "_" + unitKey.getColor(),
+                        finChecker + "hitOpponentGround_" + planet + "_" + unitName + "_" + unitKey.getColor() + "_"
+                                + source,
                         prettyName,
                         unitKey.unitEmoji());
                 buttons.add(validTile2);
@@ -1302,14 +1318,17 @@ public class ButtonHelperModifyUnits {
             unit = unit.replace("damaged", "");
         }
         String playerColor = buttonID.split("_")[3];
+        String source = buttonID.split("_")[4];
         Player player = game.getPlayerFromColorOrFaction(playerColor);
         MessageChannel channel = event.getChannel();
         if (game.isFowMode()) {
             channel = player.getPrivateChannel();
         }
         String msg = player.getRepresentation()
-                + ", you have had one of your units assigned a hit with _Magen Defense Grid_."
-                + " Please either cancel the hit somehow, or accept the loss of the unit.";
+                + ", one of your units has been assigned a hit"
+                + ("magen".equals(source) ? " with _Magen Defense Grid_" : "")
+                + ("ruthless".equals(source) ? " by **Ruthless**" : "")
+                + ". Please either cancel the hit somehow, or accept the loss of the unit.";
         List<Button> buttons = new ArrayList<>();
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
         UnitModel unitModel = player.getUnitFromUnitKey(key);
