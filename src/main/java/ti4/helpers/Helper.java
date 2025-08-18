@@ -1043,7 +1043,8 @@ public class Helper {
             int count;
             if (!thing.contains("_")) {
                 BotLogger.info(
-                        game, "Caught the following thing in the voting " + thing + " in game " + game.getName());
+                        new LogOrigin(game),
+                        "Caught the following thing in the voting " + thing + " in game " + game.getName());
                 continue;
             }
             String secondHalf = thing.split("_")[1];
@@ -3046,7 +3047,9 @@ public class Helper {
     public static String getGuildInviteURL(Guild guild, int uses, boolean forever) {
         DefaultGuildChannelUnion defaultChannel = guild.getDefaultChannel();
         if (!(defaultChannel instanceof TextChannel tc)) {
-            BotLogger.error(guild, "Default channel is not available or is not a text channel on " + guild.getName());
+            BotLogger.error(
+                    new LogOrigin(guild),
+                    "Default channel is not available or is not a text channel on " + guild.getName());
         } else {
             return tc.createInvite()
                     .setMaxUses(uses)

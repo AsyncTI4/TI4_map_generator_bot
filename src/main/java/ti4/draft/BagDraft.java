@@ -229,7 +229,7 @@ public abstract class BagDraft {
             }
         } catch (Exception e) {
             BotLogger.error(
-                    player,
+                    new LogOrigin(player),
                     "`Player.getBagInfoThread`: Could not find existing Bag Info thead using ID: " + bagInfoThread
                             + " for potential thread name: " + threadName,
                     e);
@@ -264,7 +264,7 @@ public abstract class BagDraft {
             }
         } catch (Exception e) {
             BotLogger.error(
-                    player,
+                    new LogOrigin(player),
                     "`Player.getBagInfoThread`: Could not find existing Bag Info thead using name: " + threadName,
                     e);
         }

@@ -56,6 +56,10 @@ public class BotLogger {
         logToChannel(null, message, err, LogSeverity.Info);
     }
 
+    public static void info(@Nonnull LogOrigin logOrigin, @Nonnull String message) {
+        logToChannel(logOrigin, message, null, LogSeverity.Info);
+    }
+
     /**
      * Sends a message to the primary server's webhook.
      * <p>

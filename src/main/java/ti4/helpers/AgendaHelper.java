@@ -2658,7 +2658,7 @@ public class AgendaHelper {
                         return player;
                     } else {
                         BotLogger.warning(
-                                game,
+                                new LogOrigin(game),
                                 "`getNextInLine` Hit a notRealPlayer player in game " + game.getName() + " on player "
                                         + player.getUserName());
                     }

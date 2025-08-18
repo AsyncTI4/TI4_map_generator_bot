@@ -11,6 +11,7 @@ import ti4.map.Game;
 import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.migration.DataMigrationManager;
 
 class RunManualDataMigration extends Subcommand {

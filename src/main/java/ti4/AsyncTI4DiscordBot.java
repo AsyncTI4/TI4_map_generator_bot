@@ -64,6 +64,7 @@ import ti4.listeners.UserLeaveServerListener;
 import ti4.map.persistence.GameManager;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogBufferManager;
+import ti4.message.logging.LogOrigin;
 import ti4.migration.DataMigrationManager;
 import ti4.selections.SelectionManager;
 import ti4.service.emoji.ApplicationEmojiService;
@@ -335,10 +336,10 @@ public class AsyncTI4DiscordBot {
             CommandListUpdateAction commands = guild.updateCommands();
             CommandManager.getCommands().forEach(command -> command.register(commands));
             commands.queue();
-            BotLogger.info(guild, "BOT STARTED UP: " + guild.getName());
+            BotLogger.info(new LogOrigin(guild), "BOT STARTED UP: " + guild.getName());
             guilds.add(guild);
         } catch (Exception e) {
-            BotLogger.error(guild, "\n# FAILED TO START BOT ", e);
+            BotLogger.error(new LogOrigin(guild), "\n# FAILED TO START BOT ", e);
         }
         return true;
     }
@@ -357,10 +358,10 @@ public class AsyncTI4DiscordBot {
             CommandListUpdateAction commands = guild.updateCommands();
             CommandManager.getCommands().forEach(command -> command.registerSearchCommands(commands));
             commands.queue();
-            BotLogger.info(guild, "SEARCH-ONLY BOT STARTED UP: " + guild.getName());
+            BotLogger.info(new LogOrigin(guild), "SEARCH-ONLY BOT STARTED UP: " + guild.getName());
             guilds.add(guild);
         } catch (Exception e) {
-            BotLogger.error(guild, "\n# SEARCH-ONLY BOT FAILED TO START: " + guild.getName(), e);
+            BotLogger.error(new LogOrigin(guild), "\n# SEARCH-ONLY BOT FAILED TO START: " + guild.getName(), e);
         }
         return true;
     }
