@@ -1,6 +1,7 @@
 package ti4.buttons.handlers.relics;
 
 import java.util.List;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -119,7 +120,7 @@ class RelicButtonHandler {
         } else if ("stage2".equalsIgnoreCase(type)) {
             RevealPublicObjectiveService.revealS2(game, event, true);
         } else {
-            RevealPublicObjectiveService.revealSO(game, event.getMessageChannel());
+            RevealPublicObjectiveService.revealSO(game, game.getActionsChannel());
         }
         ButtonHelper.deleteMessage(event);
     }
