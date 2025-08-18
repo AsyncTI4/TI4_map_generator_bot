@@ -22,103 +22,83 @@ import ti4.selections.SelectionMenuProcessor;
 @Getter
 public class LogOrigin {
 
-    @Nullable
-    private Guild guild;
-
-    @Nullable
-    private GuildChannel channel;
-
-    @Nullable
-    private GenericInteractionCreateEvent event;
-
-    @Nullable
-    private Game game;
-
-    @Nullable
-    private Player player;
-
+    @Nullable private final String guildId;
+    @Nullable private final String eventString;
+    @Nullable private final String gameInfo;
     private final String originTime;
 
     public LogOrigin(@Nonnull Guild guild) {
-        this.guild = guild;
+        guildId = guild.getId();
+        eventString = null;
+        gameInfo = null;
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 
     public LogOrigin(@Nonnull GuildChannel channel) {
-        this.channel = channel;
-        guild = channel.getGuild();
+        guildId = channel.getGuild().getId();
+        eventString = null;
+        gameInfo = null;
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 
     public LogOrigin(@Nonnull GenericInteractionCreateEvent event) {
-        this.event = event;
-        if (event.isFromGuild()) {
-            channel = event.getGuildChannel();
-            guild = event.getGuild();
-        } else {
-            BotLogger.warning("LocationSource created from non-guild event. This will not attribute messages.");
+        guildId = event.isFromGuild() ? event.getGuild().getId() : null;
+        if (!event.isFromGuild()) {
+            BotLogger.warning(
+                    "LocationSource created from non-guild event. This will not attribute messages.");
         }
+        eventString = buildEventString(event);
+        gameInfo = null;
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 
     public LogOrigin(@Nonnull Game game) {
-        this.game = game;
-        guild = game.getGuild();
-        channel = game.getMainGameChannel();
+        guildId = game.getGuild() != null ? game.getGuild().getId() : null;
+        eventString = null;
+        gameInfo = buildGameInfo(game);
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 
     public LogOrigin(@Nullable Player player) {
-        if (player != null) {
-            this.player = player;
-            game = player.getGame();
+        Game g = player != null ? player.getGame() : null;
+        if (g == null) {
+            BotLogger.warning(
+                    "LocationSource created from player with null game. This will not attribute messages.");
         }
-        if (game != null) {
-            guild = game.getGuild();
-            channel = game.getMainGameChannel();
-        } else {
-            BotLogger.warning("LocationSource created from player with null game. This will not attribute messages.");
-        }
+        guildId = g != null && g.getGuild() != null ? g.getGuild().getId() : null;
+        eventString = null;
+        gameInfo = g != null ? buildGameInfo(g) : null;
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 
     public LogOrigin(@Nullable GenericInteractionCreateEvent event, @Nonnull Game game) {
-        this.game = game;
-        guild = game.getGuild();
-        this.event = event;
-        if (event != null && event.isFromGuild()) channel = event.getGuildChannel();
-        else channel = game.getMainGameChannel();
+        guildId =
+                event != null && event.isFromGuild()
+                        ? event.getGuild().getId()
+                        : game.getGuild() != null ? game.getGuild().getId() : null;
+        eventString = event != null ? buildEventString(event) : null;
+        gameInfo = buildGameInfo(game);
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 
     public LogOrigin(@Nullable GenericInteractionCreateEvent event, @Nonnull Player player) {
-        this.player = player;
-        game = player.getGame();
-        if (game != null) guild = game.getGuild();
-        this.event = event;
-        if (event != null && event.isFromGuild()) {
-            channel = event.getGuildChannel();
-            guild = event.getGuild();
-        } else if (game != null) {
-            channel = game.getMainGameChannel();
-        }
+        Game g = player.getGame();
+        guildId =
+                event != null && event.isFromGuild()
+                        ? event.getGuild().getId()
+                        : g != null && g.getGuild() != null ? g.getGuild().getId() : null;
+        eventString = event != null ? buildEventString(event) : null;
+        gameInfo = g != null ? buildGameInfo(g) : null;
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 
     @Nullable
-    StringBuilder getGameInfo() {
-        if (game != null) {
-            StringBuilder builder = new StringBuilder().append("\nGame info: ");
-            builder.append(game.gameJumpLinks());
-            return builder;
-        }
-        return null;
+    private static String buildGameInfo(@Nonnull Game game) {
+        return "\nGame info: " + game.gameJumpLinks();
     }
 
     @Nullable
-    StringBuilder getEventString() {
-        if (event == null) return null;
-
+    private static String buildEventString(@Nonnull GenericInteractionCreateEvent event) {
         StringBuilder builder =
                 new StringBuilder().append(event.getUser().getEffectiveName()).append(" ");
 
@@ -145,7 +125,7 @@ public class LogOrigin {
                         .append("`\n");
         }
 
-        return builder;
+        return builder.toString();
     }
 
     /**
@@ -157,7 +137,9 @@ public class LogOrigin {
     @Nullable
     TextChannel getLogChannel(@Nonnull LogSeverity severity) {
         Guild guild = AsyncTI4DiscordBot.guildPrimary;
-        if (guild == null) guild = this.guild;
+        if (guild == null && guildId != null) {
+            guild = AsyncTI4DiscordBot.jda.getGuildById(guildId);
+        }
         if (guild == null) return null;
 
         return guild.getTextChannelsByName(severity.channelName, false).stream()
@@ -165,6 +147,10 @@ public class LogOrigin {
                 .orElse(guild.getTextChannelsByName("bot-log", false).stream()
                         .findFirst()
                         .orElse(null));
+    }
+
+    public Guild getGuild() {
+        return guildId == null ? null : AsyncTI4DiscordBot.jda.getGuildById(guildId);
     }
 
     @Nonnull
