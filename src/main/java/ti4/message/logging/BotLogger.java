@@ -16,6 +16,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.cron.CronManager;
 import ti4.helpers.Constants;
+import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.message.MessageHelper;
@@ -174,8 +175,7 @@ public class BotLogger {
             if (origin.getEventString() != null) msg.append(origin.getEventString());
             if (origin.getGameInfo() != null) msg.append(origin.getGameInfo());
         } else {
-            origin = new LogOrigin(AsyncTI4DiscordBot.guildPrimary);
-            msg.append(origin.getOriginTimeFormatted());
+            msg.append(DateTimeHelper.getCurrentTimestamp());
         }
         channel = getLogChannel(severity);
 
@@ -201,11 +201,7 @@ public class BotLogger {
                 else channel.sendMessage(msgChunk).queue(); // Send message on channel
 
             } else { // Handle error on last send
-                if (origin.getGuild() != null) { // Second check may not be necessary but this is a hotfix.
-                    ThreadArchiveHelper.checkThreadLimitAndArchive(origin.getGuild());
-                } else {
-                    ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
-                }
+                ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
 
                 if (channel == null) {
                     scheduleWebhookMessage(msgChunk); // Send message on webhook

@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.Point;
+import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -3058,9 +3058,7 @@ public class Helper {
     public static String getGuildInviteURL(Guild guild, int uses, boolean forever) {
         DefaultGuildChannelUnion defaultChannel = guild.getDefaultChannel();
         if (!(defaultChannel instanceof TextChannel tc)) {
-            BotLogger.error(
-                    new LogOrigin(guild),
-                    "Default channel is not available or is not a text channel on " + guild.getName());
+            BotLogger.error("Default channel is not available or is not a text channel on " + guild.getName());
         } else {
             return tc.createInvite()
                     .setMaxUses(uses)

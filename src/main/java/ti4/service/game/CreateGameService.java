@@ -519,10 +519,8 @@ public class CreateGameService {
     private static boolean serverHasRoomForNewRole(Guild guild) {
         int roleCount = guild.getRoles().size();
         if (roleCount >= MAX_ROLE_COUNT) {
-            BotLogger.warning(
-                    new LogOrigin(guild),
-                    "`CreateGameService.serverHasRoomForNewRole` Cannot create a new role. Server **" + guild.getName()
-                            + "** currently has **" + roleCount + "** roles.");
+            BotLogger.warning("`CreateGameService.serverHasRoomForNewRole` Cannot create a new role. Server **"
+                    + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return false;
         }
         return true;
@@ -549,7 +547,6 @@ public class CreateGameService {
         int roleCount = guild.getRoles().size();
         if (roleCount > (MAX_ROLE_COUNT - maxGamesPerCategory)) {
             BotLogger.warning(
-                    new LogOrigin(guild),
                     "`CreateGameService.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
                             + guild.getName() + "** currently has **" + roleCount
                             + "** roles and a new category requires space for " + maxGamesPerCategory + " roles.");
@@ -561,7 +558,6 @@ public class CreateGameService {
         int channelsCountRequiredForNewCategory = 1 + 2 * maxGamesPerCategory;
         if (channelCount > (MAX_CHANNEL_COUNT - channelsCountRequiredForNewCategory)) {
             BotLogger.warning(
-                    new LogOrigin(guild),
                     "`CreateGameService.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
                             + guild.getName() + "** currently has " + channelCount
                             + " channels and a new category requires space for "
@@ -577,10 +573,8 @@ public class CreateGameService {
         int channelCount = guild.getChannels().size();
         int channelsCountRequiredForNewGame = 2;
         if (channelCount > (MAX_CHANNEL_COUNT - channelsCountRequiredForNewGame)) {
-            BotLogger.warning(
-                    new LogOrigin(guild),
-                    "`CreateGameService.serverHasRoomForNewChannels` Cannot create new channels. Server **"
-                            + guild.getName() + "** currently has " + channelCount + " channels.");
+            BotLogger.warning("`CreateGameService.serverHasRoomForNewChannels` Cannot create new channels. Server **"
+                    + guild.getName() + "** currently has " + channelCount + " channels.");
             return false;
         }
         return true;
