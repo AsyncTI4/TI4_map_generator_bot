@@ -26,8 +26,9 @@ import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
@@ -374,7 +375,7 @@ public class MiltyDraftManager {
         try {
             MiltyDraftHelper.buildPartialMap(game, event);
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event, game), "err", e);
+            BotLogger.error(new LogOrigin(event, game), "err", e);
         }
 
         setNextPlayerInDraft();

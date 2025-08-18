@@ -30,9 +30,10 @@ import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.statistics.game.WinningPathCacheService;
@@ -218,7 +219,7 @@ public class EndGameService {
                 if (publish) {
                     if (summaryChannel == null) {
                         BotLogger.warning(
-                                new BotLogger.LogMessageOrigin(event),
+                                new LogOrigin(event),
                                 "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
                         return;
                     }
@@ -259,8 +260,7 @@ public class EndGameService {
         } else if (publish) { // FOW SUMMARY
             if (summaryChannel == null) {
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(event),
-                        "`#fow-war-stories` channel not found - `/game end` cannot post summary");
+                        new LogOrigin(event), "`#fow-war-stories` channel not found - `/game end` cannot post summary");
                 return;
             }
             MessageHelper.sendMessageToChannel(summaryChannel, gameEndText);
@@ -463,7 +463,7 @@ public class EndGameService {
                 guild.getCategoriesByName("The in-limbo PBD Archive", true).getFirst();
         if (inLimboCategory == null) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(guild),
+                    new LogOrigin(guild),
                     "`GameEnd.cleanUpInLimboCategory`\nA clean up of in-limbo was attempted but could not find the **The in-limbo PBD Archive** category on server: "
                             + guild.getName());
             return;

@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.executors.CircuitBreaker;
 import ti4.executors.ExecutionHistoryManager;
 import ti4.helpers.TimedRunnable;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 public class StatisticsPipeline {
 

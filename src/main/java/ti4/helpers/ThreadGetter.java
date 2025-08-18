@@ -7,7 +7,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 
 @UtilityClass
 public class ThreadGetter {
@@ -34,10 +35,7 @@ public class ThreadGetter {
                             () -> searchForArchivedThreadOrCreateNew(
                                     channel, threadName, createIfDoesntExist, createAsPrivate, consumer));
         } catch (Exception e) {
-            BotLogger.error(
-                    new BotLogger.LogMessageOrigin(channel),
-                    "Could not find existing thread using name: " + threadName,
-                    e);
+            BotLogger.error(new LogOrigin(channel), "Could not find existing thread using name: " + threadName, e);
         }
     }
 
@@ -83,8 +81,7 @@ public class ThreadGetter {
             @Nonnull Consumer<ThreadChannel> consumer) {
         if (thread.isArchived()) {
             thread.getManager().setArchived(false).queue(success -> consumer.accept(thread), error -> {
-                BotLogger.error(
-                        new BotLogger.LogMessageOrigin(channel), "Failed to unarchive thread: " + threadName, error);
+                BotLogger.error(new LogOrigin(channel), "Failed to unarchive thread: " + threadName, error);
                 if (createIfDoesntExist) {
                     createNewThreadChannel(channel, threadName, createAsPrivate, consumer);
                 }

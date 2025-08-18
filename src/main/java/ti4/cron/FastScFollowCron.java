@@ -11,8 +11,9 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.StrategyCardModel;
 import ti4.service.button.ReactionService;
 
@@ -47,8 +48,7 @@ public class FastScFollowCron {
             GameManager.save(
                     game, "FastScFollowCron"); // TODO: This should be a property outside game, as it can be UNDO'd
         } catch (Exception e) {
-            BotLogger.error(
-                    new BotLogger.LogMessageOrigin(game), "FastScFollowCron failed for game: " + game.getName(), e);
+            BotLogger.error(new LogOrigin(game), "FastScFollowCron failed for game: " + game.getName(), e);
         }
     }
 

@@ -10,7 +10,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingResponseWrapper;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @Order(3)
 @Component

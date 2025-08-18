@@ -19,8 +19,9 @@ import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
 import ti4.image.MapGenerator;
 import ti4.image.Mapper;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.ColorModel;
 import ti4.service.image.FileUploadService;
 
@@ -182,7 +183,7 @@ class SampleColors extends Subcommand {
                     "Colour samples for " + (hues.size() == 1 ? "all the " + hues.getFirst() : "ALL the") + " units.");
             MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
         } catch (IOException e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Exception when closing FileUpload.", e);
+            BotLogger.error(new LogOrigin(event), "Exception when closing FileUpload.", e);
         }
     }
 }

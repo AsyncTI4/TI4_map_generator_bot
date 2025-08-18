@@ -18,8 +18,8 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 
 public class UserJoinServerListener extends ListenerAdapter {
 

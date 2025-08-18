@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import lombok.experimental.UtilityClass;
 import ti4.cache.CacheManager;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass

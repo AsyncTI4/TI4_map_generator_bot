@@ -16,7 +16,7 @@ import lombok.Getter;
 import ti4.ResourceHelper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.model.ColorModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;

@@ -22,7 +22,8 @@ import ti4.draft.items.TechDraftItem;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.FactionModel;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
@@ -209,7 +210,7 @@ public class FrankenDraft extends BagDraft {
                         bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
                         BotLogger.warning(
-                                new BotLogger.LogMessageOrigin(game),
+                                new LogOrigin(game),
                                 "Game: `" + game.getName() + "` error - empty franken draftableCollection: "
                                         + category.name());
                     }

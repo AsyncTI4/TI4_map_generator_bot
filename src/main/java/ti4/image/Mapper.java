@@ -33,7 +33,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.model.AbilityModel;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
