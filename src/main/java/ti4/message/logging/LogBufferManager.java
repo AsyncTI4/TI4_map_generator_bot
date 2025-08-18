@@ -15,10 +15,11 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class LogBufferManager {
 
+    private static final int INITIAL_STRING_BUFFER_SIZE = 1000;
     private static final int INITIAL_BUFFER_SIZE = 500;
     private static final Object BUFFER_LOCK = new Object();
 
-    private static Deque<AbstractEventLog> messageBuffer = new ArrayDeque<>(INITIAL_BUFFER_SIZE);
+    private static Deque<AbstractEventLog> logBuffer = new ArrayDeque<>(INITIAL_BUFFER_SIZE);
     private static TextChannel primaryBotLogChannel;
 
     public static void initialize() {
@@ -32,7 +33,7 @@ public class LogBufferManager {
 
     static void addLogMessage(@Nonnull AbstractEventLog logMessage) {
         synchronized (BUFFER_LOCK) {
-            messageBuffer.add(logMessage);
+            logBuffer.add(logMessage);
         }
     }
 
@@ -50,15 +51,17 @@ public class LogBufferManager {
     private static Map<LogTarget, StringBuilder> drainMessageBufferIntoMessageBuilders() {
         Deque<AbstractEventLog> toProcess;
         synchronized (BUFFER_LOCK) {
-            toProcess = messageBuffer;
-            messageBuffer = new ArrayDeque<>(INITIAL_BUFFER_SIZE);
+            toProcess = logBuffer;
+            logBuffer = new ArrayDeque<>(INITIAL_BUFFER_SIZE);
         }
 
         Map<LogTarget, StringBuilder> messageBuilders = new HashMap<>();
         while (!toProcess.isEmpty()) {
             AbstractEventLog e = toProcess.pollFirst();
             LogTarget target = new LogTarget(e.getChannelName(), e.getThreadName());
-            messageBuilders.computeIfAbsent(target, k -> new StringBuilder()).append(e.getLogString());
+            messageBuilders
+                    .computeIfAbsent(target, k -> new StringBuilder(INITIAL_STRING_BUFFER_SIZE))
+                    .append(e.getLogString());
         }
         return messageBuilders;
     }
