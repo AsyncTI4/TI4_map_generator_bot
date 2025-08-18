@@ -245,7 +245,7 @@ class TacticalActionButtonHandlers {
                     Tile tile = game.getTileByPosition(pos);
                     UnitHolder removeFromHolder = tile.getSpaceUnitHolder();
                     UnitHolder addToHolder = tile.getUnitHolderFromPlanet(planet);
-                    game.setActiveSystem(pos);
+                    // game.setActiveSystem(pos);
 
                     List<RemovedUnit> removed = RemoveUnitService.removeUnit(
                             event, tile, game, owner, removeFromHolder, type, amount, damaged);

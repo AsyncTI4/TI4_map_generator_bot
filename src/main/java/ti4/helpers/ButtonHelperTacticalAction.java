@@ -266,6 +266,9 @@ public class ButtonHelperTacticalAction {
         game.removeStoredValue("violatedSystems");
         game.removeStoredValue("vaylerianHeroActive");
         game.removeStoredValue("tnelisCommanderTracker");
+        for (Player player : game.getRealPlayers()) {
+            game.removeStoredValue("ASN" + player.getFaction());
+        }
         game.removeStoredValue("planetsTakenThisRound");
         game.removeStoredValue("fortuneSeekers");
         game.removeStoredValue("hiredGunsInPlay");

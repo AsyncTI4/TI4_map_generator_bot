@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.awt.*;
+import java.awt.Point;
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -525,6 +525,21 @@ public class Game extends GameProperties {
     }
 
     private Player compareWinners(Player contender, Player current) {
+
+        if (isCivilizedSocietyMode()) {
+            if (contender.getTotalVictoryPoints() > current.getTotalVictoryPoints()) {
+                return contender;
+            }
+            if (contender.getTotalVictoryPoints() == current.getTotalVictoryPoints()) {
+                if (Helper.getPlayerInfluenceTotal(current, this) + current.getTg()
+                        < Helper.getPlayerInfluenceTotal(contender, this) + contender.getTg()) {
+                    return contender;
+                } else {
+                    return current;
+                }
+            }
+            return current;
+        }
         if (hasFullPriorityTrackMode()) {
             if (contender.hasPriorityPosition() && !current.hasPriorityPosition()) {
                 return contender;

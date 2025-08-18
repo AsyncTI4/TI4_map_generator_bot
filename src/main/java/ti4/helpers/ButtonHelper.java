@@ -1,10 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +26,7 @@ import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
@@ -745,6 +742,14 @@ public class ButtonHelper {
         if (removedMember != null && roles.size() == 1) {
             guild.removeRoleFromMember(removedMember, roles.getFirst()).queue();
         }
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.gray(
+                player.getFinsFactionCheckerPrefix() + "removePlayerPermissions_" + player.getFaction(),
+                "Remove View Permissions " + player.getDisplayName()));
+        buttons.add(Buttons.red("deleteButtons", "Stay in channels"));
+        String msg = player.getRepresentation()
+                + " do you want to remove yourself from the game channels? If so, press this button.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         stringBuilder
                 .append("Eliminated player: ")
                 .append(player.getUserName())
@@ -753,7 +758,7 @@ public class ButtonHelper {
                 .append("\n");
     }
 
-    @ButtonHandler("eliminatePlayer")
+    @ButtonHandler("eliminatePlayer_")
     public static void eliminatePlayer(Game game, ButtonInteractionEvent event, String buttonID) {
         Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         StringBuilder stringBuilder = new StringBuilder();
@@ -761,6 +766,19 @@ public class ButtonHelper {
         Helper.fixGameChannelPermissions(event.getGuild(), game);
         deleteMessage(event);
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), stringBuilder.toString());
+    }
+
+    @ButtonHandler("removePlayerPermissions_")
+    public static void removePlayerPermissions(Game game, ButtonInteractionEvent event, String buttonID) {
+        Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<GuildChannel> channels = event.getGuild().getChannels().stream()
+                .filter(c -> c.getName().startsWith(game.getName()))
+                .toList();
+        for (GuildChannel channel : channels) {
+            Helper.removePlayerPermissionsToGameChannel(event.getGuild(), channel, player.getUserID());
+        }
+        deleteMessage(event);
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Removed Permissions");
     }
 
     @ButtonHandler("resolveAlliancePlanetTrade_")
@@ -1286,6 +1304,13 @@ public class ButtonHelper {
             if (magenPlayer.hasAbility("byssus")) {
                 for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
                     if (planet.getUnitCount(UnitType.Mech, magenPlayer) > 0) {
+                        has = true;
+                    }
+                }
+            }
+            for (UnitHolder p : activeSystem.getPlanetUnitHolders()) {
+                for (String token : p.getTokenList()) {
+                    if (magenPlayer.getPlanets().contains(p.getName()) && token.contains("superweapon")) {
                         has = true;
                     }
                 }
@@ -2309,6 +2334,33 @@ public class ButtonHelper {
         return count;
     }
 
+    public static int getNumberOfStructuresOnNonHomePlanets(Player player, Game game) {
+        int count = 0;
+        for (String planet : player.getPlanetsAllianceMode()) {
+            if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
+                continue;
+            }
+            Tile tile = game.getTileFromPlanet(planet);
+            if (tile != null && tile.isHomeSystem(game)) {
+                continue;
+            }
+            Planet p = getUnitHolderFromPlanetName(planet, game);
+            if (p != null) {
+                count += p.getUnitCount(UnitType.Spacedock, player.getColor());
+                count += p.getUnitCount(UnitType.Pds, player.getColor());
+                if (player.hasAbility("byssus")) {
+                    count += p.getUnitCount(UnitType.Mech, player.getColor());
+                }
+                for (String token : p.getTokenList()) {
+                    if (player.getPlanets().contains(p.getName()) && token.contains("superweapon")) {
+                        count++;
+                    }
+                }
+            }
+        }
+        return count;
+    }
+
     public static List<String> getPlanetsWithStructures(Player player, Game game) {
         List<String> planets = new ArrayList<>();
         for (String planet : player.getPlanetsAllianceMode()) {
@@ -2920,6 +2972,13 @@ public class ButtonHelper {
             for (UnitHolder uh : tile.getUnitHolders().values()) {
                 int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
                 if (player.hasAbility("byssus")) count += uh.getUnitCount(UnitType.Mech, player);
+
+                for (String token : uh.getTokenList()) {
+                    if (player.getPlanets().contains(uh.getName()) && token.contains("superweapon")) {
+                        count++;
+                    }
+                }
+
                 if (count > 0) {
                     total += count;
                     uh.addUnit(infKey, count);
