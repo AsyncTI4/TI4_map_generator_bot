@@ -17,7 +17,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
-import ti4.message.logging.BotLogger.LogMessageOrigin;
+import ti4.message.logging.LogMessageOrigin;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.emoji.CardEmojis;
