@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.cron.CronManager;
-import ti4.cron.InteractionLogCron;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
@@ -487,11 +486,11 @@ public class BotLogger {
      * It contains all the necessary data to find the correct logging channel or thread in the primary server and write a log message.
      */
     public static void logButton(ButtonInteractionEvent event) {
-        InteractionLogCron.addLogMessage(new AbstractEventLog.ButtonInteraction(new LogMessageOrigin(event)));
+        LogBufferManager.addLogMessage(new AbstractEventLog.ButtonInteraction(new LogMessageOrigin(event)));
     }
 
     public static void logSlashCommand(SlashCommandInteractionEvent event, Message commandResponseMessage) {
-        InteractionLogCron.addLogMessage(
+        LogBufferManager.addLogMessage(
                 new AbstractEventLog.SlashCommand(new LogMessageOrigin(event), commandResponseMessage));
     }
 
@@ -734,9 +733,9 @@ public class BotLogger {
 
         String message = "";
 
-        abstract String getChannelName();
+        public abstract String getChannelName();
 
-        abstract String getThreadName();
+        public abstract String getThreadName();
 
         String getMessagePrefix() {
             return "";
@@ -770,12 +769,12 @@ public class BotLogger {
             }
 
             @Override
-            String getChannelName() {
+            public String getChannelName() {
                 return "bot-button-log";
             }
 
             @Override
-            String getThreadName() {
+            public String getThreadName() {
                 return "button-log";
             }
         }
@@ -787,12 +786,12 @@ public class BotLogger {
             }
 
             @Override
-            String getChannelName() {
+            public String getChannelName() {
                 return "bot-slash-command-log";
             }
 
             @Override
-            String getThreadName() {
+            public String getThreadName() {
                 return "slash-command-log";
             }
 

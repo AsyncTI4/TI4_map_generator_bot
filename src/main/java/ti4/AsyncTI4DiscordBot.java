@@ -63,6 +63,7 @@ import ti4.listeners.UserJoinServerListener;
 import ti4.listeners.UserLeaveServerListener;
 import ti4.map.persistence.GameManager;
 import ti4.message.BotLogger;
+import ti4.message.LogBufferManager;
 import ti4.migration.DataMigrationManager;
 import ti4.selections.SelectionManager;
 import ti4.service.emoji.ApplicationEmojiService;
@@ -280,6 +281,7 @@ public class AsyncTI4DiscordBot {
         SabotageAutoReactCron.register();
         FastScFollowCron.register();
         CloseLaunchThreadsCron.register();
+        LogBufferManager.initialize();
         InteractionLogCron.register();
 
         // BOT IS READY
@@ -313,6 +315,7 @@ public class AsyncTI4DiscordBot {
                     BotLogger.info("DID NOT FINISH PROCESSING STATISTICS");
                 }
                 CronManager.shutdown(); // will wait for up to an additional 20 seconds
+                LogBufferManager.sendBufferedLogsToDiscord(); // will drain the log buffer and doesn't have a timeout
                 BotLogger.info("SHUTDOWN PROCESS COMPLETE");
                 TimeUnit.SECONDS.sleep(1); // wait for BotLogger
                 jda.shutdown();
