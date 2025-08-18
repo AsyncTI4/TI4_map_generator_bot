@@ -1,5 +1,10 @@
 package ti4.message.logging;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
@@ -9,11 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import ti4.helpers.DateTimeHelper;
 import ti4.map.Game;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
 class LogOriginTest {
 
@@ -45,9 +45,9 @@ class LogOriginTest {
             String log = new TestEventLog(origin).getLogString();
 
             String expected =
-                """
+                    """
                 **__`timestamp`__** Tester used command `/ping`
-                
+
                 Game info: TestGame [tt] [act]
                 """;
             assertThat(log).isEqualTo(expected);
