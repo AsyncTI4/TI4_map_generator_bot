@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
-import lombok.SneakyThrows;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.ThreadGetter;
@@ -49,41 +48,38 @@ public class InteractionLogCron {
                 InteractionLogCron.class, InteractionLogCron::logInteractions, 2, 2, TimeUnit.MINUTES);
     }
 
-    // The exceptions in this method are a result of getting abstract class methods, which are required to
-    // be defined by the nature of an abstract class
-    @SneakyThrows
     private static void logInteractions() {
-        Map<Class<?>, StringBuilder> messageBuilders = drainMessageBufferIntoMessageBuilders();
+        Map<LogTarget, StringBuilder> messageBuilders = drainMessageBufferIntoMessageBuilders();
 
         // For each class of message either send by channel (if exists) or thread
-        for (Map.Entry<Class<?>, StringBuilder> entry : messageBuilders.entrySet()) {
+        for (Map.Entry<LogTarget, StringBuilder> entry : messageBuilders.entrySet()) {
             StringBuilder message = entry.getValue();
             if (message.isEmpty()) continue;
             sendByChannelOrThread(entry.getKey(), message);
         }
     }
 
-    private static Map<Class<?>, StringBuilder> drainMessageBufferIntoMessageBuilders() {
+    private static Map<LogTarget, StringBuilder> drainMessageBufferIntoMessageBuilders() {
         Deque<BotLogger.AbstractEventLog> toProcess;
         synchronized (BUFFER_LOCK) {
             toProcess = messageBuffer;
             messageBuffer = new ArrayDeque<>(INITIAL_BUFFER_SIZE);
         }
 
-        Map<Class<?>, StringBuilder> messageBuilders = new HashMap<>();
+        Map<LogTarget, StringBuilder> messageBuilders = new HashMap<>();
         while (!toProcess.isEmpty()) {
             BotLogger.AbstractEventLog e = toProcess.pollFirst();
+            LogTarget target = new LogTarget(e.getChannelName(), e.getThreadName());
             messageBuilders
-                    .computeIfAbsent(e.getClass(), k -> new StringBuilder())
+                    .computeIfAbsent(target, k -> new StringBuilder())
                     .append(e.getLogString());
         }
         return messageBuilders;
     }
 
-    @SneakyThrows
-    private static void sendByChannelOrThread(Class<?> clazz, StringBuilder message) {
+    private static void sendByChannelOrThread(LogTarget target, StringBuilder message) {
         List<TextChannel> logCandidates = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName(
-                (String) clazz.getMethod("getChannelName").invoke(null), false);
+                target.channelName(), false);
 
         if (!logCandidates.isEmpty()) {
             logCandidates.getFirst().sendMessage(message.toString()).queue();
@@ -91,7 +87,7 @@ public class InteractionLogCron {
             try {
                 ThreadGetter.getThreadInChannel(
                         primaryBotLogChannel,
-                        (String) clazz.getMethod("getThreadName").invoke(null),
+                        target.threadName(),
                         (threadChannel) -> MessageHelper.sendMessageToChannel(threadChannel, message.toString()));
             } catch (Exception e) {
                 BotLogger.error(
@@ -99,4 +95,6 @@ public class InteractionLogCron {
             }
         }
     }
+
+    private static record LogTarget(String channelName, String threadName) {}
 }

@@ -732,18 +732,15 @@ public class BotLogger {
     public abstract static sealed class AbstractEventLog {
         final LogMessageOrigin source;
 
-        // Implementor's note: These fields must have getters, as this is how the subclasses override the statics
-        // without changing them for all subclasses
-        @Getter
-        private static final String channelName = "";
-
-        @Getter
-        private static final String threadName = "";
-
-        @Getter
-        private static final String messagePrefix = "";
-
         String message = "";
+
+        abstract String getChannelName();
+
+        abstract String getThreadName();
+
+        String getMessagePrefix() {
+            return "";
+        }
 
         public String getLogString() {
             StringBuilder message = new StringBuilder();
@@ -756,7 +753,7 @@ public class BotLogger {
                 message.append(source.getGameInfo());
             }
             if (!this.message.isEmpty()) {
-                message.append(messagePrefix).append(this.message).append("\n");
+                message.append(getMessagePrefix()).append(this.message).append("\n");
             }
 
             message.append("\n");
@@ -768,30 +765,40 @@ public class BotLogger {
         }
 
         static final class ButtonInteraction extends AbstractEventLog {
-            @Getter
-            static String channelName = "bot-button-log";
-
-            @Getter
-            static String threadName = "button-log";
-
             ButtonInteraction(LogMessageOrigin source) {
                 super(source);
+            }
+
+            @Override
+            String getChannelName() {
+                return "bot-button-log";
+            }
+
+            @Override
+            String getThreadName() {
+                return "button-log";
             }
         }
 
         static final class SlashCommand extends AbstractEventLog {
-            @Getter
-            static String channelName = "bot-slash-command-log";
-
-            @Getter
-            static String threadName = "slash-command-log";
-
-            @Getter
-            static String messagePrefix = "Response: ";
-
             SlashCommand(LogMessageOrigin source, Message commandResponse) {
                 super(source);
                 message = commandResponse.getContentDisplay();
+            }
+
+            @Override
+            String getChannelName() {
+                return "bot-slash-command-log";
+            }
+
+            @Override
+            String getThreadName() {
+                return "slash-command-log";
+            }
+
+            @Override
+            String getMessagePrefix() {
+                return "Response: ";
             }
         }
     }
