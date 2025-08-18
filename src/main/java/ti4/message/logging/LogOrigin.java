@@ -20,7 +20,7 @@ import ti4.map.Player;
 import ti4.selections.SelectionMenuProcessor;
 
 @Getter
-class LogMessageOrigin {
+public class LogOrigin {
 
     @Nullable
     private Guild guild;
@@ -39,18 +39,18 @@ class LogMessageOrigin {
 
     private final String originTime;
 
-    LogMessageOrigin(@Nonnull Guild guild) {
+    public LogOrigin(@Nonnull Guild guild) {
         this.guild = guild;
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 
-    public LogMessageOrigin(@Nonnull GuildChannel channel) {
+    public LogOrigin(@Nonnull GuildChannel channel) {
         this.channel = channel;
         guild = channel.getGuild();
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 
-    LogMessageOrigin(@Nonnull GenericInteractionCreateEvent event) {
+    public LogOrigin(@Nonnull GenericInteractionCreateEvent event) {
         this.event = event;
         if (event.isFromGuild()) {
             channel = event.getGuildChannel();
@@ -61,14 +61,14 @@ class LogMessageOrigin {
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 
-    LogMessageOrigin(@Nonnull Game game) {
+    public LogOrigin(@Nonnull Game game) {
         this.game = game;
         guild = game.getGuild();
         channel = game.getMainGameChannel();
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 
-    LogMessageOrigin(@Nullable Player player) {
+    public LogOrigin(@Nullable Player player) {
         if (player != null) {
             this.player = player;
             game = player.getGame();
@@ -82,7 +82,7 @@ class LogMessageOrigin {
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 
-    LogMessageOrigin(@Nonnull GenericInteractionCreateEvent event, @Nonnull Game game) {
+    public LogOrigin(@Nonnull GenericInteractionCreateEvent event, @Nonnull Game game) {
         this.game = game;
         guild = game.getGuild();
         this.event = event;
@@ -91,7 +91,7 @@ class LogMessageOrigin {
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 
-    LogMessageOrigin(@Nonnull GenericInteractionCreateEvent event, @Nonnull Player player) {
+    public LogOrigin(@Nonnull GenericInteractionCreateEvent event, @Nonnull Player player) {
         this.player = player;
         game = player.getGame();
         if (game != null) guild = game.getGuild();

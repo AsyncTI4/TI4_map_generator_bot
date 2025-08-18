@@ -26,16 +26,13 @@ public class ThreadArchiveHelper {
 
                 if (threadCount > maxThreadCount) {
                     BotLogger.info(
-                            new BotLogger.LogMessageOrigin(guild),
+                            guild,
                             "**" + guild.getName() + "** Max Threads Reached (" + threadCount + " out of  "
                                     + maxThreadCount + ") - Archiving " + closeCount + " threads");
                     archiveOldThreads(guild, closeCount);
                 }
             } catch (Exception e) {
-                BotLogger.error(
-                        new BotLogger.LogMessageOrigin(guild),
-                        "Error in checkThreadLimitAndArchive for " + guild.getName(),
-                        e);
+                BotLogger.error(guild, "Error in checkThreadLimitAndArchive for " + guild.getName(), e);
             }
         });
     }

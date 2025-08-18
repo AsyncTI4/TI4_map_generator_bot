@@ -335,10 +335,10 @@ public class AsyncTI4DiscordBot {
             CommandListUpdateAction commands = guild.updateCommands();
             CommandManager.getCommands().forEach(command -> command.register(commands));
             commands.queue();
-            BotLogger.info(new BotLogger.LogMessageOrigin(guild), "BOT STARTED UP: " + guild.getName());
+            BotLogger.info(guild, "BOT STARTED UP: " + guild.getName());
             guilds.add(guild);
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(guild), "\n# FAILED TO START BOT ", e);
+            BotLogger.error(guild, "\n# FAILED TO START BOT ", e);
         }
         return true;
     }
@@ -357,13 +357,10 @@ public class AsyncTI4DiscordBot {
             CommandListUpdateAction commands = guild.updateCommands();
             CommandManager.getCommands().forEach(command -> command.registerSearchCommands(commands));
             commands.queue();
-            BotLogger.info(new BotLogger.LogMessageOrigin(guild), "SEARCH-ONLY BOT STARTED UP: " + guild.getName());
+            BotLogger.info(guild, "SEARCH-ONLY BOT STARTED UP: " + guild.getName());
             guilds.add(guild);
         } catch (Exception e) {
-            BotLogger.error(
-                    new BotLogger.LogMessageOrigin(guild),
-                    "\n# SEARCH-ONLY BOT FAILED TO START: " + guild.getName(),
-                    e);
+            BotLogger.error(guild, "\n# SEARCH-ONLY BOT FAILED TO START: " + guild.getName(), e);
         }
         return true;
     }

@@ -2,7 +2,7 @@ package ti4.message.logging;
 
 final class ButtonInteractionEventLog extends AbstractEventLog {
 
-    ButtonInteractionEventLog(LogMessageOrigin source) {
+    ButtonInteractionEventLog(LogOrigin source) {
         super(source);
     }
 

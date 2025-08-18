@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.entities.Message;
 
 final class SlashCommandEventLog extends AbstractEventLog {
 
-    SlashCommandEventLog(LogMessageOrigin source, Message commandResponse) {
+    SlashCommandEventLog(LogOrigin source, Message commandResponse) {
         super(source, commandResponse.getContentDisplay());
     }
 

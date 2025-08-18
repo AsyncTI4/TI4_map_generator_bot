@@ -335,7 +335,7 @@ public class CreateFoWGameService {
         int roleCount = guild.getRoles().size();
         if (roleCount >= 250) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(guild),
+                    guild,
                     "`CreateFoWGameService.serverHasRoomForNewRole` Cannot create a new role. Server **"
                             + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return false;
@@ -349,7 +349,7 @@ public class CreateFoWGameService {
         int channelsCountRequiredForNewGame = playerCount + 2;
         if (channelCount > (channelMax - channelsCountRequiredForNewGame)) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(guild),
+                    guild,
                     "`CreateFoWGameService.serverHasRoomForNewChannels` Cannot create new channels. Server **"
                             + guild.getName() + "** currently has " + channelCount + " channels.");
             return false;

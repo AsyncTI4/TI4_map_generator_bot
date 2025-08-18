@@ -17,8 +17,6 @@ import ti4.cron.CronManager;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.ThreadArchiveHelper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.settings.GlobalSettings;
 
@@ -71,12 +69,8 @@ public class BotLogger {
         logToChannel(null, message, null, LogSeverity.Warning);
     }
 
-    public static void warning(@Nonnull Player player, @Nonnull String message) {
-        logToChannel(new LogMessageOrigin(player), message, null, LogSeverity.Warning);
-    }
-
-    public static void warning(@Nonnull Game game, @Nonnull String message) {
-        logToChannel(new LogMessageOrigin(game), message, null, LogSeverity.Warning);
+    public static void warning(@Nonnull LogOrigin logOrigin, @Nonnull String message) {
+        logToChannel(logOrigin, message, null, LogSeverity.Warning);
     }
 
     /**
@@ -108,7 +102,7 @@ public class BotLogger {
 
     public static void error(
             @Nonnull GenericInteractionCreateEvent event, @Nonnull String message, Throwable throwable) {
-        logToChannel(new LogMessageOrigin(event), message, throwable, LogSeverity.Error);
+        logToChannel(new LogOrigin(event), message, throwable, LogSeverity.Error);
     }
 
     /**
@@ -125,12 +119,8 @@ public class BotLogger {
         logToChannel(null, message, err, LogSeverity.Error);
     }
 
-    public static void error(@Nonnull Player player, @Nonnull String message, @Nullable Throwable err) {
-        logToChannel(new LogMessageOrigin(player), message, err, LogSeverity.Error);
-    }
-
-    public static void error(@Nonnull Game game, @Nonnull String message, @Nullable Throwable err) {
-        logToChannel(new LogMessageOrigin(game), message, err, LogSeverity.Error);
+    public static void error(@Nonnull LogOrigin logOrigin, @Nonnull String message, @Nullable Throwable err) {
+        logToChannel(logOrigin, message, err, LogSeverity.Error);
     }
 
     /**
@@ -143,16 +133,8 @@ public class BotLogger {
      * @param origin  - The discord-based source of this log entry
      * @param message - The message associated with this log entry
      */
-    private static void error(@Nullable LogMessageOrigin origin, @Nonnull String message) {
+    public static void error(@Nullable LogOrigin origin, @Nonnull String message) {
         logToChannel(origin, message, null, LogSeverity.Error);
-    }
-
-    public static void error(
-            @Nonnull String message, @Nullable Game game, @Nullable GenericInteractionCreateEvent event) {
-        if (event != null && game != null) error(new LogMessageOrigin(event, game), message);
-        else if (event != null) error(new LogMessageOrigin(event), message);
-        else if (game != null) error(new LogMessageOrigin(game), message);
-        else error(message);
     }
 
     /**
@@ -166,7 +148,7 @@ public class BotLogger {
      * @param severity - The severity of the log message
      */
     private static void logToChannel(
-            @Nullable LogMessageOrigin origin,
+            @Nullable LogOrigin origin,
             @Nonnull String message,
             @Nullable Throwable err,
             @Nonnull LogSeverity severity) {
@@ -185,7 +167,7 @@ public class BotLogger {
             if (origin.getEventString() != null) msg.append(origin.getEventString());
             if (origin.getGameInfo() != null) msg.append(origin.getGameInfo());
         } else {
-            origin = new LogMessageOrigin(AsyncTI4DiscordBot.guildPrimary);
+            origin = new LogOrigin(AsyncTI4DiscordBot.guildPrimary);
             msg.append(origin.getOriginTimeFormatted());
         }
         channel = origin.getLogChannel(severity);
@@ -278,11 +260,11 @@ public class BotLogger {
     }
 
     public static void logButton(ButtonInteractionEvent event) {
-        LogBufferManager.addLogMessage(new ButtonInteractionEventLog(new LogMessageOrigin(event)));
+        LogBufferManager.addLogMessage(new ButtonInteractionEventLog(new LogOrigin(event)));
     }
 
     public static void logSlashCommand(SlashCommandInteractionEvent event, Message commandResponseMessage) {
-        LogBufferManager.addLogMessage(new SlashCommandEventLog(new LogMessageOrigin(event), commandResponseMessage));
+        LogBufferManager.addLogMessage(new SlashCommandEventLog(new LogOrigin(event), commandResponseMessage));
     }
 
     public static void catchRestError(Throwable e) {

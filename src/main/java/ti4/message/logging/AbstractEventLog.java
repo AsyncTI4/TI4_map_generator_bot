@@ -2,7 +2,7 @@ package ti4.message.logging;
 
 abstract class AbstractEventLog {
 
-    private final LogMessageOrigin source;
+    private final LogOrigin source;
     private final String message;
 
     public abstract String getChannelName();
@@ -29,12 +29,12 @@ abstract class AbstractEventLog {
         return log.toString();
     }
 
-    AbstractEventLog(LogMessageOrigin source) {
+    AbstractEventLog(LogOrigin source) {
         this.source = source;
         message = null;
     }
 
-    AbstractEventLog(LogMessageOrigin source, String message) {
+    AbstractEventLog(LogOrigin source, String message) {
         this.source = source;
         this.message = message;
     }

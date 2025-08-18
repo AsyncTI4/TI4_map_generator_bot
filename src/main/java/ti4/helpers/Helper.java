@@ -3045,9 +3045,7 @@ public class Helper {
     public static String getGuildInviteURL(Guild guild, int uses, boolean forever) {
         DefaultGuildChannelUnion defaultChannel = guild.getDefaultChannel();
         if (!(defaultChannel instanceof TextChannel tc)) {
-            BotLogger.error(
-                    new BotLogger.LogMessageOrigin(guild),
-                    "Default channel is not available or is not a text channel on " + guild.getName());
+            BotLogger.error(guild, "Default channel is not available or is not a text channel on " + guild.getName());
         } else {
             return tc.createInvite()
                     .setMaxUses(uses)
