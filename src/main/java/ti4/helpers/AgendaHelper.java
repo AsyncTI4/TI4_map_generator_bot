@@ -1987,7 +1987,7 @@ public class AgendaHelper {
                 game.updateActivePlayer(nextInLine);
                 game.setStoredValue("preVoting" + nextInLine.getFaction(), "");
             } catch (Exception e) {
-                BotLogger.error(game, "Could not update active player", e);
+                BotLogger.error(new LogOrigin(game), "Could not update active player", e);
             }
             List<Button> buttons = List.of(Vote, Abstain, ForcedAbstain);
             if (game.isFowMode()) {

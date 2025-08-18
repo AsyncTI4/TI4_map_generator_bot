@@ -5866,7 +5866,8 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(), player.getRepresentation() + message, buttons);
             } catch (Exception e) {
-                BotLogger.error(game, "Failing to set up player #cards-info thread in " + game.getName(), e);
+                BotLogger.error(
+                        new LogOrigin(game), "Failing to set up player #cards-info thread in " + game.getName(), e);
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);

@@ -463,7 +463,7 @@ public class EndGameService {
                 guild.getCategoriesByName("The in-limbo PBD Archive", true).getFirst();
         if (inLimboCategory == null) {
             BotLogger.warning(
-                    guild,
+                    new LogOrigin(guild),
                     "`GameEnd.cleanUpInLimboCategory`\nA clean up of in-limbo was attempted but could not find the **The in-limbo PBD Archive** category on server: "
                             + guild.getName());
             return;

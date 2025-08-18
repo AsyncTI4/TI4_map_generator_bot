@@ -13,6 +13,7 @@ import ti4.map.persistence.ManagedGame;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
 
@@ -46,7 +47,7 @@ public class SabotageAutoReactCron {
         try {
             automaticallyReactToSabotageWindows(game);
         } catch (Exception e) {
-            BotLogger.error(game, "SabotageAutoReactCron failed for game: " + game.getName(), e);
+            BotLogger.error(new LogOrigin(game), "SabotageAutoReactCron failed for game: " + game.getName(), e);
         }
     }
 

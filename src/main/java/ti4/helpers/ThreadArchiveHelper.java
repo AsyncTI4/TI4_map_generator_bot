@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.executors.ExecutorServiceManager;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.settings.GlobalSettings;
 
 public class ThreadArchiveHelper {
@@ -32,7 +33,7 @@ public class ThreadArchiveHelper {
                     archiveOldThreads(guild, closeCount);
                 }
             } catch (Exception e) {
-                BotLogger.error(guild, "Error in checkThreadLimitAndArchive for " + guild.getName(), e);
+                BotLogger.error(new LogOrigin(guild), "Error in checkThreadLimitAndArchive for " + guild.getName(), e);
             }
         });
     }

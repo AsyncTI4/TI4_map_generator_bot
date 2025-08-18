@@ -17,6 +17,7 @@ import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.settings.users.UserSettingsManager;
 
@@ -113,7 +114,7 @@ public class AutoPingCron {
         try {
             handleAutoPing(game);
         } catch (Exception e) {
-            BotLogger.error(game, "AutoPing failed for game: " + game.getName(), e);
+            BotLogger.error(new LogOrigin(game), "AutoPing failed for game: " + game.getName(), e);
         }
     }
 

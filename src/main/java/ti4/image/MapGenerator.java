@@ -40,6 +40,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.AgendaModel;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.ColorModel;
@@ -1973,7 +1974,7 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
         } catch (Exception e) {
-            BotLogger.error(player, "Ignored exception during map generation", e);
+            BotLogger.error(new LogOrigin(player), "Ignored exception during map generation", e);
         }
     }
 

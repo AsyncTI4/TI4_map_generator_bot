@@ -193,7 +193,8 @@ public class ListPlayerInfoService {
         Planet planet = game.getPlanetsInfo().get(current);
         if (planet == null) {
             BotLogger.warning(
-                    player, "ListPlayerInfoService: Planet \"" + current + "\" not found for game " + game.getName());
+                    new LogOrigin(player),
+                    "ListPlayerInfoService: Planet \"" + current + "\" not found for game " + game.getName());
             return backtrack(
                     planets,
                     currentResources,

@@ -82,24 +82,24 @@ public class LogOrigin {
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 
-    public LogOrigin(@Nonnull GenericInteractionCreateEvent event, @Nonnull Game game) {
+    public LogOrigin(@Nullable GenericInteractionCreateEvent event, @Nonnull Game game) {
         this.game = game;
         guild = game.getGuild();
         this.event = event;
-        if (event.isFromGuild()) channel = event.getGuildChannel();
+        if (event != null && event.isFromGuild()) channel = event.getGuildChannel();
         else channel = game.getMainGameChannel();
         originTime = DateTimeHelper.getCurrentTimestamp();
     }
 
-    public LogOrigin(@Nonnull GenericInteractionCreateEvent event, @Nonnull Player player) {
+    public LogOrigin(@Nullable GenericInteractionCreateEvent event, @Nonnull Player player) {
         this.player = player;
         game = player.getGame();
         if (game != null) guild = game.getGuild();
         this.event = event;
-        if (event.isFromGuild()) {
+        if (event != null && event.isFromGuild()) {
             channel = event.getGuildChannel();
             guild = event.getGuild();
-        } else {
+        } else if (game != null) {
             channel = game.getMainGameChannel();
         }
         originTime = DateTimeHelper.getCurrentTimestamp();

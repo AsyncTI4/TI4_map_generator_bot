@@ -38,6 +38,9 @@ import ti4.service.option.FOWOptionService.FOWOption;
 @UtilityClass
 public class CreateFoWGameService {
 
+    private static final int MAX_CHANNELS_MINUS_5 = 495;
+    private static final int MAX_ROLE_COUNT = 250;
+
     @ButtonHandler("createFoWGameChannels")
     public static void createFoWGameChannels(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToEventChannel(
@@ -334,9 +337,9 @@ public class CreateFoWGameService {
 
     private static boolean serverHasRoomForNewRole(Guild guild) {
         int roleCount = guild.getRoles().size();
-        if (roleCount >= 250) {
+        if (roleCount >= MAX_ROLE_COUNT) {
             BotLogger.warning(
-                    guild,
+                    new LogOrigin(guild),
                     "`CreateFoWGameService.serverHasRoomForNewRole` Cannot create a new role. Server **"
                             + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return false;
@@ -346,11 +349,10 @@ public class CreateFoWGameService {
 
     private static boolean serverHasRoomForNewChannels(Guild guild, int playerCount) {
         int channelCount = guild.getChannels().size();
-        int channelMax = 495; // to keep 5 channels free always
         int channelsCountRequiredForNewGame = playerCount + 2;
-        if (channelCount > (channelMax - channelsCountRequiredForNewGame)) {
+        if (channelCount > (MAX_CHANNELS_MINUS_5 - channelsCountRequiredForNewGame)) {
             BotLogger.warning(
-                    guild,
+                    new LogOrigin(guild),
                     "`CreateFoWGameService.serverHasRoomForNewChannels` Cannot create new channels. Server **"
                             + guild.getName() + "** currently has " + channelCount + " channels.");
             return false;

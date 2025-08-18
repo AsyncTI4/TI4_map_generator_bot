@@ -219,7 +219,7 @@ class GameLoadService {
                     tileMap.put(tile.getPosition(), tile);
                 } else {
                     BotLogger.error(
-                            game,
+                            new LogOrigin(game),
                             "Error loading Map: `" + game.getName() + "` -> Tile is null: `" + tileData
                                     + "` - tile will be skipped - check save file");
                 }
@@ -301,7 +301,7 @@ class GameLoadService {
                 }
             }
         } catch (Exception e) {
-            BotLogger.error(game, "Data read error: " + gameFile.getName(), e);
+            BotLogger.error(new LogOrigin(game), "Data read error: " + gameFile.getName(), e);
             return null;
         }
         return tileMap;
@@ -377,14 +377,14 @@ class GameLoadService {
                                 mapper.getTypeFactory().constructParametricType(List.class, BorderAnomalyHolder.class);
                         game.setBorderAnomalies(mapper.readValue(info, reference));
                     } catch (Exception e) {
-                        BotLogger.error(game, "Error reading border anomalies from save file!", e);
+                        BotLogger.error(new LogOrigin(game), "Error reading border anomalies from save file!", e);
                     }
                 }
                 case Constants.ADJACENCY_OVERRIDES -> {
                     try {
                         game.setAdjacentTileOverride(getParsedAdjacencyOverrides(info));
                     } catch (Exception e) {
-                        BotLogger.error(game, "Failed to load adjacency overrides", e);
+                        BotLogger.error(new LogOrigin(game), "Failed to load adjacency overrides", e);
                     }
                 }
                 case Constants.REVERSE_SPEAKER_ORDER -> game.setReverseSpeakerOrder("true".equals(info));
@@ -728,35 +728,35 @@ class GameLoadService {
                     try {
                         game.setRound(Integer.parseInt(info));
                     } catch (Exception exception) {
-                        BotLogger.error(game, "Could not parse round number", exception);
+                        BotLogger.error(new LogOrigin(game), "Could not parse round number", exception);
                     }
                 }
                 case Constants.BUTTON_PRESS_COUNT -> {
                     try {
                         game.setButtonPressCount(Integer.parseInt(info));
                     } catch (Exception exception) {
-                        BotLogger.error(game, "Could not parse button press count", exception);
+                        BotLogger.error(new LogOrigin(game), "Could not parse button press count", exception);
                     }
                 }
                 case Constants.STARTED_DATE -> {
                     try {
                         game.setStartedDate(Long.parseLong(info));
                     } catch (Exception exception) {
-                        BotLogger.error(game, "Could not parse started date", exception);
+                        BotLogger.error(new LogOrigin(game), "Could not parse started date", exception);
                     }
                 }
                 case Constants.LAST_MODIFIED_DATE -> {
                     try {
                         game.setLastModifiedDate(Long.parseLong(info));
                     } catch (Exception exception) {
-                        BotLogger.error(game, "Could not parse last modified date", exception);
+                        BotLogger.error(new LogOrigin(game), "Could not parse last modified date", exception);
                     }
                 }
                 case Constants.ENDED_DATE -> {
                     try {
                         game.setEndedDate(Long.parseLong(info));
                     } catch (Exception exception) {
-                        BotLogger.error(game, "Could not parse ended date", exception);
+                        BotLogger.error(new LogOrigin(game), "Could not parse ended date", exception);
                     }
                 }
                 case Constants.IMAGE_GEN_COUNT -> {
@@ -1023,7 +1023,7 @@ class GameLoadService {
                         }
                         player.setLeaders(leaderList);
                     } catch (Exception e) {
-                        BotLogger.error(player, "Could not parse leaders loading map", e);
+                        BotLogger.error(new LogOrigin(player), "Could not parse leaders loading map", e);
                     }
                 }
                 case Constants.FOW_SYSTEMS -> {
@@ -1040,7 +1040,7 @@ class GameLoadService {
                         }
                     } catch (Exception e) {
                         BotLogger.error(
-                                player,
+                                new LogOrigin(player),
                                 "Could not parse fog of war systems for player when loading the map: "
                                         + player.getColor(),
                                 e);

@@ -20,6 +20,7 @@ import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Storage;
 import ti4.map.Game;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 
 @UtilityClass
 public class GameUndoNameService {
@@ -39,7 +40,7 @@ public class GameUndoNameService {
                     .collect(Collectors.toMap(
                             File::getName, GameUndoNameService::getLastModifiedDateAndLastCommandTextFromFile));
         } catch (IOException e) {
-            BotLogger.error(game, "Error listing files in directory: " + undoPath, e);
+            BotLogger.error(new LogOrigin(game), "Error listing files in directory: " + undoPath, e);
             return Collections.emptyMap();
         }
     }

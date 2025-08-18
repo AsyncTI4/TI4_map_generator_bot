@@ -11,6 +11,7 @@ import ti4.message.logging.LogOrigin;
 class ButtonRuntimeWarningService {
 
     private static final int WARNING_THRESHOLD_MILLISECONDS = 1500;
+    private static final int RUNTIME_WARNING_COUNT_THRESHOLD = 20;
 
     private int runtimeWarningCount;
     private LocalDateTime pauseWarningsUntil = LocalDateTime.now();
@@ -70,7 +71,7 @@ class ButtonRuntimeWarningService {
                         + "ms\nSave time: " + saveRuntime + "ms";
                 BotLogger.warning(new LogOrigin(event), message);
                 ++runtimeWarningCount;
-                if (runtimeWarningCount > 20) {
+                if (runtimeWarningCount > RUNTIME_WARNING_COUNT_THRESHOLD) {
                     pauseWarningsUntil = now.plusMinutes(5);
                     BotLogger.error(
                             new LogOrigin(event), "**Buttons are processing slowly. Pausing warnings for 5 minutes.**");
