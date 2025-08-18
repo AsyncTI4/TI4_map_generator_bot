@@ -3245,6 +3245,7 @@ public class AgendaHelper {
 
                     if (!game.isFowMode() && game.getCurrentAgendaInfo().contains("Elect Player")) {
                         summaryBuilder
+                                .append("- ")
                                 .append(FactionEmojis.getFactionIcon(outcome.toLowerCase()))
                                 .append(" ")
                                 .append(outcome)
@@ -3257,6 +3258,7 @@ public class AgendaHelper {
                     } else if (!game.isHomebrewSCMode()
                             && game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
                         summaryBuilder
+                                .append("- ")
                                 .append(CardEmojis.getSCFrontFromInteger(Integer.parseInt(outcome)))
                                 .append(" **")
                                 .append(Helper.getSCName(Integer.parseInt(outcome), game))
@@ -3267,6 +3269,7 @@ public class AgendaHelper {
                                 .append(")\n");
                     } else {
                         summaryBuilder
+                                .append("- ")
                                 .append(outcome)
                                 .append(": ")
                                 .append(totalVotes)
@@ -3276,6 +3279,7 @@ public class AgendaHelper {
                     }
                 } else {
                     summaryBuilder
+                            .append("- ")
                             .append(outcome)
                             .append(": Total votes ")
                             .append(totalVotes)
