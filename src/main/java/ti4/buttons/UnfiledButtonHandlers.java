@@ -933,9 +933,7 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler("bombardConfirm_")
-    public static void bombardConfirm(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        // List<Button> buttons = new ArrayList<>();
-
+    public static void bombardConfirm(ButtonInteractionEvent event, Player player, Game game) {
         if (getBombardablePlanets(player, game, game.getTileByPosition(game.getActiveSystem()))
                 .isEmpty()) {
             MessageHelper.sendMessageToChannel(
