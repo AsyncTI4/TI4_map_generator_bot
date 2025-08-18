@@ -78,8 +78,9 @@ import ti4.map.persistence.GameManager;
 import ti4.map.pojo.ExportableField;
 import ti4.map.pojo.MapPairKeyDeserializer;
 import ti4.map.pojo.MapPairKeySerializer;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.ColorModel;
@@ -342,8 +343,7 @@ public class Game extends GameProperties {
                     returnValue.put(field.getName(), field.get(this));
                 } catch (IllegalAccessException e) {
                     // This shouldn't really happen since we can even see private fields.
-                    BotLogger.error(
-                            new BotLogger.LogMessageOrigin(this), "Unknown error exporting fields from Game.", e);
+                    BotLogger.error(new LogOrigin(this), "Unknown error exporting fields from Game.", e);
                 }
             }
         }
@@ -389,7 +389,7 @@ public class Game extends GameProperties {
                     miltySettings = new MiltySettings(this, json);
                 } catch (Exception e) {
                     BotLogger.error(
-                            new BotLogger.LogMessageOrigin(this),
+                            new LogOrigin(this),
                             "Failed loading milty draft settings for `" + getName() + "` " + Constants.jazzPing(),
                             e);
                     MessageHelper.sendMessageToChannel(
@@ -817,7 +817,7 @@ public class Game extends GameProperties {
             return botChannels.getFirst();
         } else if (botChannels.size() > 1) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(this),
+                    new LogOrigin(this),
                     getName() + " appears to have more than one bot-map-updates channel:\n"
                             + botChannels.stream()
                                     .map(ThreadChannel::getJumpUrl)
@@ -2661,7 +2661,7 @@ public class Game extends GameProperties {
             shuffleDiscardsIntoExploreDeck(reqType);
             deck = getExplores(reqType, explore);
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(this),
+                    new LogOrigin(this),
                     "Map: `" + getName() + "` MIGRATION CODE TRIGGERED: Explore " + reqType
                             + " deck was empty, shuffling discards into deck.");
         } // end of migration code
@@ -3809,7 +3809,7 @@ public class Game extends GameProperties {
         // Find duplicate PNs - PNs that are in multiple players' hands or play areas
         if (!Helper.findDuplicateInList(allPlayerHandPromissoryNotes).isEmpty()) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(this),
+                    new LogOrigin(this),
                     "`" + getName() + "`: there are duplicate promissory notes in the game:\n> `"
                             + Helper.findDuplicateInList(allPlayerHandPromissoryNotes) + "`");
         }
@@ -3821,7 +3821,7 @@ public class Game extends GameProperties {
         unOwnedPromissoryNotes.removeAll(allOwnedPromissoryNotes);
         if (!unOwnedPromissoryNotes.isEmpty()) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(this),
+                    new LogOrigin(this),
                     "`" + getName() + "`: there are promissory notes in the game that no player owns:\n> `"
                             + unOwnedPromissoryNotes + "`");
             purgedPN.removeAll(unOwnedPromissoryNotes);
@@ -3844,7 +3844,7 @@ public class Game extends GameProperties {
         missingPromissoryNotes.removeAll(allPromissoryNotes);
         if (!missingPromissoryNotes.isEmpty()) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(this),
+                    new LogOrigin(this),
                     "`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `"
                             + missingPromissoryNotes + "`");
             for (Player player : players.values()) {

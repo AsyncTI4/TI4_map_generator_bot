@@ -34,7 +34,8 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.AbilityModel;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.ColorableModelInterface;
@@ -72,7 +73,7 @@ public class AutoCompleteProvider {
         try {
             resolveAutoCompleteEvent(event);
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Error in handleAutoCompleteEvent", e);
+            BotLogger.error(new LogOrigin(event), "Error in handleAutoCompleteEvent", e);
         }
     }
 
@@ -853,7 +854,7 @@ public class AutoCompleteProvider {
                         abilities = Mapper.getAbilities();
                     }
                 } catch (Exception e) {
-                    BotLogger.error(new BotLogger.LogMessageOrigin(event), "Ability Autocomplete Setup Error", e);
+                    BotLogger.error(new LogOrigin(event), "Ability Autocomplete Setup Error", e);
                     abilities = Mapper.getAbilities();
                 }
 

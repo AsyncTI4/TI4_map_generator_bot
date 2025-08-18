@@ -15,7 +15,7 @@ import ti4.executors.ExecutionHistoryManager;
 import ti4.helpers.DisplayType;
 import ti4.helpers.TimedRunnable;
 import ti4.map.Game;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.settings.GlobalSettings;
 
 public class MapRenderPipeline {

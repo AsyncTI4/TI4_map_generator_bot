@@ -27,8 +27,9 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -1786,7 +1787,7 @@ public class ButtonHelperModifyUnits {
                         .queue(
                                 null,
                                 (error) -> BotLogger.error(
-                                        new BotLogger.LogMessageOrigin(event, player),
+                                        new LogOrigin(event, player),
                                         MessageHelper.getRestActionFailureMessage(
                                                 event.getMessageChannel(), "Failed to edit message", null, error),
                                         error));

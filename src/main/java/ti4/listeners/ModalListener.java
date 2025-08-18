@@ -13,7 +13,8 @@ import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.listeners.context.ModalContext;
 import ti4.map.Game;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.game.GameNameService;
 
 public class ModalListener extends ListenerAdapter {
@@ -60,7 +61,7 @@ public class ModalListener extends ListenerAdapter {
         } catch (Exception e) {
             String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: "
                     + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), message, e);
+            BotLogger.error(new LogOrigin(event), message, e);
         }
     }
 

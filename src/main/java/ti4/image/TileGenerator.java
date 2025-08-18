@@ -41,7 +41,8 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.ShipPositionModel.ShipPosition;
@@ -1596,8 +1597,7 @@ public class TileGenerator {
             if (isValid.apply(tokenID)) {
                 String tokenPath = tile.getTokenPath(tokenID);
                 if (tokenPath == null) {
-                    BotLogger.warning(
-                            new BotLogger.LogMessageOrigin(game), "Could not find token file for: " + tokenID);
+                    BotLogger.warning(new LogOrigin(game), "Could not find token file for: " + tokenID);
                     continue;
                 }
                 float scale = 0.85f;
@@ -1848,7 +1848,7 @@ public class TileGenerator {
             String tokenName = Mapper.getTokenKey(tokenID);
 
             if (tokenPath == null) {
-                BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Could not parse token file for: " + tokenID);
+                BotLogger.warning(new LogOrigin(game), "Could not parse token file for: " + tokenID);
                 continue;
             }
             if (game.isCptiExploreMode() && tokenPath.toLowerCase().contains("token_frontier")) {

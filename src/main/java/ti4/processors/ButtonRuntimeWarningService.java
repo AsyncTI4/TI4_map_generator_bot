@@ -5,11 +5,13 @@ import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 
 class ButtonRuntimeWarningService {
 
     private static final int WARNING_THRESHOLD_MILLISECONDS = 1500;
+    private static final int RUNTIME_WARNING_COUNT_THRESHOLD = 20;
 
     private int runtimeWarningCount;
     private LocalDateTime pauseWarningsUntil = LocalDateTime.now();
@@ -67,13 +69,12 @@ class ButtonRuntimeWarningService {
                         + " `" + executionTime + "` to execute" + (processingTime > eventDelay ? "😲" : "");
                 message += "\nContext time: " + contextRuntime + "ms\nResolve time: " + resolveRuntime
                         + "ms\nSave time: " + saveRuntime + "ms";
-                BotLogger.warning(new BotLogger.LogMessageOrigin(event), message);
+                BotLogger.warning(new LogOrigin(event), message);
                 ++runtimeWarningCount;
-                if (runtimeWarningCount > 20) {
+                if (runtimeWarningCount > RUNTIME_WARNING_COUNT_THRESHOLD) {
                     pauseWarningsUntil = now.plusMinutes(5);
                     BotLogger.error(
-                            new BotLogger.LogMessageOrigin(event),
-                            "**Buttons are processing slowly. Pausing warnings for 5 minutes.**");
+                            new LogOrigin(event), "**Buttons are processing slowly. Pausing warnings for 5 minutes.**");
                     runtimeWarningCount = 0;
                 }
                 lastWarningTime = now;

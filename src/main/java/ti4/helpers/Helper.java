@@ -54,10 +54,11 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.ColorModel;
@@ -1042,7 +1043,7 @@ public class Helper {
             int count;
             if (!thing.contains("_")) {
                 BotLogger.info(
-                        new BotLogger.LogMessageOrigin(game),
+                        new LogOrigin(game),
                         "Caught the following thing in the voting " + thing + " in game " + game.getName());
                 continue;
             }
@@ -1175,7 +1176,7 @@ public class Helper {
         for (String thing : spentThings) {
             if (!thing.contains("_")) {
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(player),
+                        new LogOrigin(player),
                         "Caught the following thing in the voting " + thing + " in game " + game.getName());
                 continue;
             }
@@ -2541,7 +2542,7 @@ public class Helper {
         if (!roles.isEmpty()) {
             if (roles.size() > 1) {
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(game),
+                        new LogOrigin(game),
                         "There are " + roles.size() + " roles that match the game name: `" + gameName
                                 + "` - please investigate, as this may cause issues.");
                 return;
@@ -2595,8 +2596,7 @@ public class Helper {
     public static void addBotHelperPermissionsToGameChannels(GenericInteractionCreateEvent event) {
         var guild = event.getGuild();
         if (guild == null) {
-            BotLogger.error(
-                    new BotLogger.LogMessageOrigin(event), "Guild was null in addBotHelperPermissionsToGameChannels.");
+            BotLogger.error(new LogOrigin(event), "Guild was null in addBotHelperPermissionsToGameChannels.");
             return;
         }
         // long role = 1093925613288562768L;
@@ -2684,7 +2684,7 @@ public class Helper {
             }
             return (GuildMessageChannel) messageChannel;
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Something went wrong getting thread channels.", e);
+            BotLogger.error(new LogOrigin(event), "Something went wrong getting thread channels.", e);
             return null;
         }
     }
@@ -3059,7 +3059,7 @@ public class Helper {
         DefaultGuildChannelUnion defaultChannel = guild.getDefaultChannel();
         if (!(defaultChannel instanceof TextChannel tc)) {
             BotLogger.error(
-                    new BotLogger.LogMessageOrigin(guild),
+                    new LogOrigin(guild),
                     "Default channel is not available or is not a text channel on " + guild.getName());
         } else {
             return tc.createInvite()

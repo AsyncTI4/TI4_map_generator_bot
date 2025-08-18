@@ -10,8 +10,9 @@ import ti4.helpers.ButtonHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.objectives.DiscardSecretService;
@@ -64,7 +65,7 @@ class SecretObjectiveButtonHandler {
                 }
             }
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Could not parse SO ID: " + soID, e);
+            BotLogger.error(new LogOrigin(event, player), "Could not parse SO ID: " + soID, e);
             event.getChannel()
                     .sendMessage("Could not parse secret objective ID: " + soID + ". Please discard manually.")
                     .queue();

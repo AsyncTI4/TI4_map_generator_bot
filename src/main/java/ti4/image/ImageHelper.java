@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.service.emoji.TI4Emoji;
 
 @UtilityClass

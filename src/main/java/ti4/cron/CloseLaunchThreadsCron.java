@@ -5,7 +5,7 @@ import lombok.experimental.UtilityClass;
 import ti4.helpers.GameLaunchThreadHelper;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class CloseLaunchThreadsCron {

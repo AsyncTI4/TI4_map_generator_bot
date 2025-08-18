@@ -24,6 +24,8 @@ import ti4.service.info.ListPlayerInfoService;
 @UtilityClass
 public class RevealPublicObjectiveService {
 
+    private static final int WHITE_COLOR = 0xFFFFFF;
+
     public static void revealS2(Game game, GenericInteractionCreateEvent event) {
         revealS2(game, event, false);
     }
@@ -51,7 +53,7 @@ public class RevealPublicObjectiveService {
                 EmbedBuilder control = new EmbedBuilder();
                 control.setTitle(SourceEmojis.Codex + "__**Control Ordinian**__");
                 control.setDescription("Control Ordinian.");
-                control.setColor(0xFFFFFF);
+                control.setColor(WHITE_COLOR);
                 channel.sendMessageEmbeds(List.of(po.getRepresentationEmbed(), control.build()))
                         .queue(m -> m.pin().queue());
             } else {
@@ -220,7 +222,7 @@ public class RevealPublicObjectiveService {
             EmbedBuilder liberate = new EmbedBuilder();
             liberate.setTitle(SourceEmojis.Codex + "__**Liberate Ordinian**__");
             liberate.setDescription("Win a combat against the Nekro Virus.");
-            liberate.setColor(0xFFFFFF);
+            liberate.setColor(WHITE_COLOR);
             channel.sendMessageEmbeds(
                             List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed(), liberate.build()))
                     .queue(m -> m.pin().queue());
