@@ -119,7 +119,7 @@ class RelicButtonHandler {
         } else if ("stage2".equalsIgnoreCase(type)) {
             RevealPublicObjectiveService.revealS2(game, event, true);
         } else {
-            RevealPublicObjectiveService.revealSO(game, event.getMessageChannel());
+            RevealPublicObjectiveService.revealSO(game, game.getActionsChannel());
         }
         ButtonHelper.deleteMessage(event);
     }
