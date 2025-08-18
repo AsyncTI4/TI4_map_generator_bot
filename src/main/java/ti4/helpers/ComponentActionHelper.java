@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -62,6 +63,7 @@ public class ComponentActionHelper {
         }
         if (game.isStellarAtomicsMode()
                 && game.getRevealedPublicObjectives().get("Stellar Atomics") != null
+                && game.getScoredPublicObjectives().get("Stellar Atomics") != null
                 && game.getScoredPublicObjectives().get("Stellar Atomics").contains(p1.getUserID())) {
             compButtons.add(Buttons.red(finChecker + prefix + "stellarAtomicsAction_", "Use Stellar Atomics"));
         }

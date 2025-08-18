@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -1185,6 +1186,18 @@ public class ButtonHelperModifyUnits {
                 getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet));
     }
 
+    @ButtonHandler("ruthlessHit_")
+    public static void ruthlessHit(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        ButtonHelper.deleteTheOneButton(event);
+        String planet = buttonID.split("_")[1];
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), player.getRepresentationNoPing() + " is resolving the Ruthless ability.");
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentation() + ", please choose the opposing unit to hit.",
+                getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet));
+    }
+
     public static List<Button> getOpposingUnitsToHitOnGround(Player player, Game game, Tile tile, String planet) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
 
@@ -1247,7 +1260,7 @@ public class ButtonHelperModifyUnits {
             channel = player.getPrivateChannel();
         }
         String msg = player.getRepresentation()
-                + ", you have had one of your units assigned a hit with _Magen Defense Grid_."
+                + ", you have had one of your units assigned a hit (via either Magen Defence Grid or Ruthless)."
                 + " Please either cancel the hit somehow, or accept the loss of the unit.";
         List<Button> buttons = new ArrayList<>();
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
