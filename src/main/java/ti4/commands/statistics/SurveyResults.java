@@ -12,7 +12,7 @@ import ti4.settings.users.UserSettingsManager;
 
 class SurveyResults extends Subcommand {
 
-    public SurveyResults() {
+    SurveyResults() {
         super("survey_results", "See overall results of bots survey");
     }
 

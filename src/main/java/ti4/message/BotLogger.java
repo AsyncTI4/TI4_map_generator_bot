@@ -411,9 +411,8 @@ public class BotLogger {
 
         // Adding so we don't cause an exception by attempting to log
         if (msg.length() > 2000) {
-            String ellipses =
-                    "...\n### Error message was too long and was truncated here\n"; // TODO: handle this better, don't
-            // truncate
+            // TODO: handle this better, don't truncate
+            String ellipses = "...\n### Error message was too long and was truncated here\n";
             msg = msg.substring(0, 2000 - ellipses.length() - 1) + ellipses;
         }
 
@@ -430,34 +429,13 @@ public class BotLogger {
         }
 
         switch (event) {
-            case null -> {
-                if (e == null) {
-                    botLogChannel.sendMessage(msg).queue();
-                } else {
-                    botLogChannel.sendMessage(msg).queue(m -> m.createThreadChannel("Stack Trace")
-                            .queue(t -> {
-                                MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
-                                t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
-                            }));
-                } // NON-EVENT LOGS
-            }
             case SlashCommandInteractionEvent slashCommandInteractionEvent -> { // SLASH COMMAND EVENT LOGS
                 String channelName = event.getChannel().getName();
                 String channelMention = event.getChannel().getAsMention();
                 String commandString = slashCommandInteractionEvent.getCommandString();
                 String message = "[" + channelName + "](" + channelMention + ") "
                         + event.getUser().getEffectiveName() + " used: `" + commandString + "`\n> Error: " + msg;
-                if (e == null) {
-                    botLogChannel.sendMessage(message).queue();
-                } else {
-                    ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
-                    botLogChannel.sendMessage(message).queue(m -> m.createThreadChannel("Stack Trace")
-                            .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-                            .queue(t -> {
-                                MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
-                                t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
-                            }));
-                }
+                logMessage(event, e, botLogChannel, message);
             }
             case ButtonInteractionEvent buttonInteractionEvent -> { // BUTTON EVENT LOGS
                 String channelName = event.getChannel().getName();
@@ -466,17 +444,7 @@ public class BotLogger {
                         + buttonInteractionEvent.getMessage().getJumpUrl() + ") "
                         + event.getUser().getEffectiveName() + " pressed button: "
                         + ButtonHelper.getButtonRepresentation(button) + "\n> Error: " + msg;
-                if (e == null) {
-                    botLogChannel.sendMessage(message).queue();
-                } else {
-                    ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
-                    botLogChannel.sendMessage(message).queue(m -> m.createThreadChannel("Stack Trace")
-                            .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-                            .queue(t -> {
-                                MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
-                                t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
-                            }));
-                }
+                logMessage(event, e, botLogChannel, message);
             }
             case StringSelectInteractionEvent sEvent -> { // SELECTION EVENT LOGS
                 String channelName = event.getChannel().getName();
@@ -484,17 +452,7 @@ public class BotLogger {
 
                 String menuInfo = SelectionMenuProcessor.getSelectionMenuDebugText(sEvent);
                 String logMsg = channelMention + "\n" + channelName + ". " + menuInfo + "\n" + msg;
-                if (e == null) {
-                    botLogChannel.sendMessage(logMsg).queue();
-                } else {
-                    ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
-                    botLogChannel.sendMessage(logMsg).queue(m -> m.createThreadChannel("Stack Trace")
-                            .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-                            .queue(t -> {
-                                MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
-                                t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
-                            }));
-                }
+                logMessage(event, e, botLogChannel, logMsg);
             }
             case ModalInteractionEvent mEvent -> { // MODAL EVENT LOGS
                 String channelName = event.getChannel().getName();
@@ -502,31 +460,25 @@ public class BotLogger {
 
                 String menuInfo = ModalListener.getModalDebugText(mEvent);
                 String logMsg = channelMention + "\n" + channelName + ". " + menuInfo + "\n" + msg;
-                if (e == null) {
-                    botLogChannel.sendMessage(logMsg).queue();
-                } else {
-                    ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
-                    botLogChannel.sendMessage(logMsg).queue(m -> m.createThreadChannel("Stack Trace")
-                            .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-                            .queue(t -> {
-                                MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
-                                t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
-                            }));
-                }
+                logMessage(event, e, botLogChannel, logMsg);
             }
-            default -> {
-                if (e == null) {
-                    botLogChannel.sendMessage("[unknown event]\n" + msg).queue();
-                } else {
-                    ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
-                    botLogChannel.sendMessage("[unknown event]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace")
-                            .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-                            .queue(t -> {
-                                MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
-                                t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
-                            }));
-                }
-            }
+            case null -> logMessage(event, e, botLogChannel, msg); // NON-EVENT LOGS
+            default -> logMessage(event, e, botLogChannel, "[unknown event]\n" + msg);
+        }
+    }
+
+    private static void logMessage(
+            GenericInteractionCreateEvent event, Throwable e, TextChannel botLogChannel, String message) {
+        if (e == null) {
+            botLogChannel.sendMessage(message).queue();
+        } else {
+            ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
+            botLogChannel.sendMessage(message).queue(m -> m.createThreadChannel("Stack Trace")
+                    .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
+                    .queue(t -> {
+                        MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
+                        t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
+                    }));
         }
     }
 
@@ -702,44 +654,6 @@ public class BotLogger {
             originTime = DateTimeHelper.getCurrentTimestamp();
         }
 
-        /**
-         * Get mention for the most granular source.
-         * @return The most granular mention as a string
-         */
-        @Nonnull
-        public String getStrictestMention() {
-            switch (event) {
-                case ButtonInteractionEvent bEvent -> {
-                    return bEvent.getMessage().getJumpUrl();
-                }
-                case StringSelectInteractionEvent sEvent -> {
-                    return sEvent.getMessage().getJumpUrl();
-                }
-                case ModalInteractionEvent mEvent -> {
-                    if (mEvent.getMessage() != null) return mEvent.getMessage().getJumpUrl();
-                }
-                case null -> {}
-                default -> {} // This will default to the GuildChannel in which the event was sent.
-            }
-
-            if (channel != null) return channel.getAsMention();
-
-            if (guild != null) return "<Location source is a guild>";
-
-            warning("A LocationSource was created with no location");
-            return "No mention available";
-        }
-
-        @Nonnull
-        public String getStrictestName() {
-            if (channel != null) return "| Channel \"" + channel.getName() + "\"";
-
-            if (guild != null) return "| Guild \"" + guild.getName() + "\"";
-
-            warning("A LocationSource was created with no location");
-            return "No name available";
-        }
-
         @Nullable
         StringBuilder getGameInfo() {
             if (game != null) {
@@ -814,8 +728,8 @@ public class BotLogger {
      */
     // Implementor's note: all subclasses of AbstractEventLog are automatically accounted for in InteractionLogCron as
     // long as channelName and threadName are defined.
-    public abstract static sealed
-    class AbstractEventLog { // Yes, this is basically trying to recreate a rust enum. No, I'm not sorry
+    // Yes, this is basically trying to recreate a rust enum. No, I'm not sorry
+    public abstract static sealed class AbstractEventLog {
         final LogMessageOrigin source;
 
         // Implementor's note: These fields must have getters, as this is how the subclasses override the statics
@@ -841,7 +755,6 @@ public class BotLogger {
             if (source.getGameInfo() != null) {
                 message.append(source.getGameInfo());
             }
-
             if (!this.message.isEmpty()) {
                 message.append(messagePrefix).append(this.message).append("\n");
             }
