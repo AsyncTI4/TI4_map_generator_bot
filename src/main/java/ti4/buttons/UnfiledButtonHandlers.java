@@ -1,7 +1,5 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
@@ -101,6 +100,8 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.settings.users.UserSettingsManager;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * TODO: move all of these methods to a better location, closer to the original button call and/or other related code
@@ -933,9 +934,7 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler("bombardConfirm_")
-    public static void bombardConfirm(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        // List<Button> buttons = new ArrayList<>();
-
+    public static void bombardConfirm(ButtonInteractionEvent event, Player player, Game game) {
         if (getBombardablePlanets(player, game, game.getTileByPosition(game.getActiveSystem()))
                 .isEmpty()) {
             MessageHelper.sendMessageToChannel(
