@@ -6,14 +6,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.helpers.Units.UnitKey;
@@ -1078,13 +1080,13 @@ public class ButtonHelperSCs {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     "You have " + (limit - ccCount) + " command token" + (limit - ccCount == 1 ? "" : "s")
-                            + " in your reinforcements that you could gain.");
+                            + " in your reinforcements that you could gain, and "+player.getTg()+" tgs to spend.");
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getPrivateChannel(),
                     "You have " + (limit - ccCount) + " command token" + (limit - ccCount == 1 ? "" : "s")
-                            + " in your reinforcements that you could gain.");
+                            + " in your reinforcements that you could gain, and "+player.getTg()+" tgs to spend.");
             MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
         }
         // MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
