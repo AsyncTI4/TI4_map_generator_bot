@@ -25,7 +25,8 @@ public class Leave extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
                     "You are a real player, and thus should not do `/game leave`."
-                            + " You should do `/game eliminate`, or `/game replace`, depending on what you are looking for. You can also potentially use /player stats to set yourself to an NPC");
+                            + " You should do `/game eliminate`, or `/game replace`, depending on what you are looking for."
+                            + " You may also use `/player stats` to set yourself as an NPC.");
             return;
         }
         game.removePlayer(user.getId());
