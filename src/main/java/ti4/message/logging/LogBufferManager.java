@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class LogBufferManager {
 
-    private static final int INITIAL_STRING_BUFFER_SIZE = 1000;
+    private static final int INITIAL_STRING_BUFFER_SIZE = 2000;
     private static final int INITIAL_BUFFER_SIZE = 500;
     private static final Object BUFFER_LOCK = new Object();
 

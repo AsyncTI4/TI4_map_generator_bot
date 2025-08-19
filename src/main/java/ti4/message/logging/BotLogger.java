@@ -199,7 +199,6 @@ public class BotLogger {
                             < msgLength) { // If length could overflow or there is no error to trace
                 if (channel == null) scheduleWebhookMessage(msgChunk); // Send message on webhook
                 else channel.sendMessage(msgChunk).queue(); // Send message on channel
-
             } else { // Handle error on last send
                 ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
 
