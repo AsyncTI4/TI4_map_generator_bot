@@ -1,6 +1,7 @@
 package ti4.message.logging;
 
 import java.util.ArrayDeque;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -49,21 +50,34 @@ public class LogBufferManager {
     }
 
     private static Map<LogTarget, StringBuilder> drainMessageBufferIntoMessageBuilders() {
-        Deque<AbstractEventLog> toProcess;
-        synchronized (BUFFER_LOCK) {
-            toProcess = logBuffer;
-            logBuffer = new ArrayDeque<>(INITIAL_BUFFER_SIZE);
-        }
+        try {
+            Deque<AbstractEventLog> toProcess;
+            synchronized (BUFFER_LOCK) {
+                toProcess = logBuffer;
+                logBuffer = new ArrayDeque<>(INITIAL_BUFFER_SIZE);
+            }
 
-        Map<LogTarget, StringBuilder> messageBuilders = new HashMap<>();
-        while (!toProcess.isEmpty()) {
-            AbstractEventLog e = toProcess.pollFirst();
-            LogTarget target = new LogTarget(e.getChannelName(), e.getThreadName());
+            Map<LogTarget, StringBuilder> messageBuilders = new HashMap<>();
+            while (!toProcess.isEmpty()) {
+                AbstractEventLog eventLog = toProcess.pollFirst();
+                tryToHandleEventLog(eventLog, messageBuilders);
+            }
+            return messageBuilders;
+        } catch (Exception e) {
+            BotLogger.error("Error draining message buffer.", e);
+            return Collections.emptyMap();
+        }
+    }
+
+    private static void tryToHandleEventLog(AbstractEventLog eventLog, Map<LogTarget, StringBuilder> messageBuilders) {
+        try {
+            LogTarget target = new LogTarget(eventLog.getChannelName(), eventLog.getThreadName());
             messageBuilders
                     .computeIfAbsent(target, k -> new StringBuilder(INITIAL_STRING_BUFFER_SIZE))
-                    .append(e.getLogString());
+                    .append(eventLog.getLogString());
+        } catch (Exception e) {
+            BotLogger.error("Error draining message buffer for single event log.", e);
         }
-        return messageBuilders;
     }
 
     private static void sendByChannelOrThread(LogTarget target, StringBuilder message) {
@@ -72,16 +86,17 @@ public class LogBufferManager {
 
         if (!logCandidates.isEmpty()) {
             logCandidates.getFirst().sendMessage(message.toString()).queue();
-        } else {
-            try {
-                ThreadGetter.getThreadInChannel(
-                        primaryBotLogChannel,
-                        target.threadName(),
-                        (threadChannel) -> MessageHelper.sendMessageToChannel(threadChannel, message.toString()));
-            } catch (Exception e) {
-                BotLogger.error(
-                        "Failed to send a message via ThreadGetter in InteractionLogCron (this should not happen)", e);
-            }
+            return;
+        }
+
+        try {
+            ThreadGetter.getThreadInChannel(
+                    primaryBotLogChannel,
+                    target.threadName(),
+                    (threadChannel) -> MessageHelper.sendMessageToChannel(threadChannel, message.toString()));
+        } catch (Exception e) {
+            BotLogger.error(
+                    "Failed to send a message via ThreadGetter in InteractionLogCron (this should not happen)", e);
         }
     }
 
