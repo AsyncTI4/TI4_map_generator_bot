@@ -471,7 +471,8 @@ public class StartCombatService {
                                         + player.getFactionEmoji() + " uses _Death Binding_.",
                                 buttons);
                     }
-                    if (player.hasTech("md") && player.getPlanetsAllianceMode().contains(unitHolderName)) {
+                    if ((player.hasTech("md") || player.hasTech("md_c1"))
+                            && player.getPlanetsAllianceMode().contains(unitHolderName)) {
                         if (uH.getUnitCount(UnitType.Pds, player) > 0
                                 || uH.getUnitCount(UnitType.Spacedock, player) > 0) {
                             MessageHelper.sendMessageToChannel(
@@ -1773,7 +1774,7 @@ public class StartCombatService {
                     }
 
                     // Magen
-                    if (p.hasTech("md")
+                    if ((p.hasTech("md") || p.hasTech("md_c1"))
                             && isGroundCombat
                             && (unitH.getUnitCount(Units.UnitType.Spacedock, p.getColor()) > 0
                                     || unitH.getUnitCount(Units.UnitType.Pds, p.getColor()) > 0)) {

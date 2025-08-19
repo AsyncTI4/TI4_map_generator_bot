@@ -1249,8 +1249,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", please choose the opposing unit to hit.",
-                getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet, "magen"),
-                "magen");
+                getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet, "magen"));
     }
 
     @ButtonHandler("ruthlessHit_")
@@ -1262,8 +1261,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", please choose the opposing unit to hit.",
-                getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet, "ruthless"),
-                "ruthless");
+                getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet, "ruthless"));
     }
 
     public static List<Button> getOpposingUnitsToHitOnGround(
