@@ -13,9 +13,7 @@ public final class RohdhnaHeroButton implements PostMovementAbilityButton {
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
-        return List.of(Buttons.blue(
-                ctx.player.finChecker() + "purgeRohdhnaHero", "Use Roh'Dhna Hero", FactionEmojis.rohdhna));
+        return List.of(
+                Buttons.blue(ctx.player.finChecker() + "purgeRohdhnaHero", "Use Roh'Dhna Hero", FactionEmojis.rohdhna));
     }
 }
-
-

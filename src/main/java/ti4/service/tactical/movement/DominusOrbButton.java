@@ -16,5 +16,3 @@ public final class DominusOrbButton implements MoveAbilityButton {
         return List.of(Buttons.gray("dominusOrb", "Purge Dominus Orb", ExploreEmojis.Relic));
     }
 }
-
-

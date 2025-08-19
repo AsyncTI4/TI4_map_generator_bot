@@ -18,5 +18,3 @@ public final class CombatDronesButton implements PostMovementAbilityButton {
                 ctx.player.finChecker() + "combatDrones", "Use Combat Drones Ability", FactionEmojis.mirveda));
     }
 }
-
-

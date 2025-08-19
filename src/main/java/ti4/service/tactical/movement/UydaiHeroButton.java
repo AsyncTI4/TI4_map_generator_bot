@@ -9,15 +9,11 @@ import ti4.service.tactical.MoveContext;
 
 public final class UydaiHeroButton implements MoveAbilityButton {
     public boolean enabled(MoveContext ctx) {
-        return ctx.active != null
-                && !ctx.active.isHomeSystem(ctx.game)
-                && ctx.player.hasLeaderUnlocked("uydaihero");
+        return ctx.active != null && !ctx.active.isHomeSystem(ctx.game) && ctx.player.hasLeaderUnlocked("uydaihero");
     }
 
     public List<Button> build(MoveContext ctx) {
-        return List.of(Buttons.blue(
-                ctx.player.finChecker() + "purgeUydaiHero", "Use Uydai Hero", FactionEmojis.vaylerian));
+        return List.of(
+                Buttons.blue(ctx.player.finChecker() + "purgeUydaiHero", "Use Uydai Hero", FactionEmojis.vaylerian));
     }
 }
-
-

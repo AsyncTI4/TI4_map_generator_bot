@@ -8,5 +8,3 @@ public interface MoveAbilityButton {
 
     List<Button> build(MoveContext ctx);
 }
-
-

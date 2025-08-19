@@ -17,5 +17,3 @@ public final class RealityFieldImpactorButton implements MoveAbilityButton {
                 "declareUse_Reality Field Impactor", "Declare Reality Field Impactor", FactionEmojis.pharadn));
     }
 }
-
-

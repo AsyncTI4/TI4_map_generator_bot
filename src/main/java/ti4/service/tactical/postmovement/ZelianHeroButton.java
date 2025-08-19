@@ -22,5 +22,3 @@ public final class ZelianHeroButton implements PostMovementAbilityButton {
                 FactionEmojis.zelian));
     }
 }
-
-

@@ -9,13 +9,12 @@ import ti4.service.tactical.PostMovementButtonContext;
 
 public final class SardakkHeroButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.player.hasLeaderUnlocked("sardakkhero") && !ctx.tile.getPlanetUnitHolders().isEmpty();
+        return ctx.player.hasLeaderUnlocked("sardakkhero")
+                && !ctx.tile.getPlanetUnitHolders().isEmpty();
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
-        return List.of(Buttons.blue(
-                ctx.player.finChecker() + "purgeSardakkHero", "Use N'orr Hero", FactionEmojis.Sardakk));
+        return List.of(
+                Buttons.blue(ctx.player.finChecker() + "purgeSardakkHero", "Use N'orr Hero", FactionEmojis.Sardakk));
     }
 }
-
-

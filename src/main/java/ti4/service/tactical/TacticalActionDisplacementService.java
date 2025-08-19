@@ -175,6 +175,48 @@ public class TacticalActionDisplacementService {
         return moved;
     }
 
+    /**
+     * Stage a full displacement payload and remove units from their origin unit-holders accordingly.
+     * This does not move units into the active system; it only prepares the staged state for review.
+     */
+    public Map<String, Map<UnitKey, List<Integer>>> stageFullDisplacementAndRemoveFromOrigins(
+            Game game, Player player, Map<String, Map<UnitKey, List<Integer>>> displacement) {
+        if (displacement == null) {
+            game.setTacticalActionDisplacement(new HashMap<>());
+            return game.getTacticalActionDisplacement();
+        }
+
+        for (Entry<String, Map<UnitKey, List<Integer>>> e : displacement.entrySet()) {
+            String uhKey = e.getKey();
+            if (uhKey == null || "unk".equals(uhKey)) continue;
+            int dash = uhKey.indexOf('-');
+            if (dash <= 0) continue;
+
+            String pos = uhKey.substring(0, dash);
+            String uhName = uhKey.substring(dash + 1);
+            Tile srcTile = game.getTileByPosition(pos);
+            if (srcTile == null) continue;
+
+            UnitHolder srcHolder = "space".equalsIgnoreCase(uhName)
+                    ? srcTile.getSpaceUnitHolder()
+                    : srcTile.getUnitHolderFromPlanet(uhName);
+            if (srcHolder == null) continue;
+
+            for (Entry<UnitKey, List<Integer>> unitEntry : e.getValue().entrySet()) {
+                List<Integer> states = unitEntry.getValue();
+                if (states == null) continue;
+                for (int i = 0; i < states.size() && i < UnitState.values().length; i++) {
+                    int amt = states.get(i) == null ? 0 : states.get(i);
+                    if (amt <= 0) continue;
+                    srcHolder.removeUnit(unitEntry.getKey(), amt, UnitState.values()[i]);
+                }
+            }
+        }
+
+        game.setTacticalActionDisplacement(displacement);
+        return game.getTacticalActionDisplacement();
+    }
+
     private void processUnitHolderMovement(
             Game game,
             Player player,

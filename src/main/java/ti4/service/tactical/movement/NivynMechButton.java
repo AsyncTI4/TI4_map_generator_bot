@@ -1,7 +1,7 @@
 package ti4.service.tactical.movement;
 
 import java.util.List;
-import net.dv8tion.jda.api.interactions/components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
@@ -21,5 +21,3 @@ public final class NivynMechButton implements MoveAbilityButton {
         return List.of(Buttons.gray("nivynMechStep1_", "Use Nivyn Mech", FactionEmojis.nivyn));
     }
 }
-
-

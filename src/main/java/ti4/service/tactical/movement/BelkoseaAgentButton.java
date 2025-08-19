@@ -16,5 +16,3 @@ public final class BelkoseaAgentButton implements MoveAbilityButton {
         return List.of(Buttons.gray("exhaustAgent_belkoseaagent", "Use Belkosea Agent", FactionEmojis.belkosea));
     }
 }
-
-

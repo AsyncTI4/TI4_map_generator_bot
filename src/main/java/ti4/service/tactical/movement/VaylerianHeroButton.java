@@ -17,5 +17,3 @@ public final class VaylerianHeroButton implements MoveAbilityButton {
                 ctx.player.finChecker() + "purgeVaylerianHero", "Use Vaylerian Hero", FactionEmojis.vaylerian));
     }
 }
-
-

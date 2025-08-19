@@ -1,8 +1,7 @@
 package ti4.service.tactical;
 
-import ti4.service.tactical.postmovement.*;
-
 import java.util.List;
+import ti4.service.tactical.postmovement.*;
 
 public final class PostMovementAbilityButtons {
     private PostMovementAbilityButtons() {}
@@ -26,5 +25,3 @@ public final class PostMovementAbilityButtons {
             new RohdhnaHeroButton(),
             new BombardmentButton());
 }
-
-

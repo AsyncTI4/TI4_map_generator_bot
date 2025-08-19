@@ -8,5 +8,3 @@ public interface PlanetAbilityButton {
 
     List<Button> build(LandingContext ctx);
 }
-
-

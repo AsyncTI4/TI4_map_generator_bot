@@ -20,5 +20,3 @@ public final class TnelisAgentButton implements PostMovementAbilityButton {
                 "exhaustAgent_tnelisagent_" + ctx.player.getFaction(), "Use Tnelis Agent", FactionEmojis.tnelis));
     }
 }
-
-

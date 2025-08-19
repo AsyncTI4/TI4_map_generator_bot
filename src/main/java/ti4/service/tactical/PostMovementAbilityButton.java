@@ -8,5 +8,3 @@ public interface PostMovementAbilityButton {
 
     List<Button> build(PostMovementButtonContext ctx);
 }
-
-

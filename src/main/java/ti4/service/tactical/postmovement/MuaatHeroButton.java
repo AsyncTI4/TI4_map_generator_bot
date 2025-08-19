@@ -14,7 +14,8 @@ public final class MuaatHeroButton implements PostMovementAbilityButton {
         return ctx.player.hasLeaderUnlocked("muaathero")
                 && !ctx.tile.isMecatol()
                 && !ctx.tile.isHomeSystem(ctx.game)
-                && ButtonHelper.getTilesOfPlayersSpecificUnits(ctx.game, ctx.player, UnitType.Warsun).contains(ctx.tile);
+                && ButtonHelper.getTilesOfPlayersSpecificUnits(ctx.game, ctx.player, UnitType.Warsun)
+                        .contains(ctx.tile);
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
@@ -24,5 +25,3 @@ public final class MuaatHeroButton implements PostMovementAbilityButton {
                 FactionEmojis.Muaat));
     }
 }
-
-

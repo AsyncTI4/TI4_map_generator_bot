@@ -24,5 +24,3 @@ public final class TnelisDeployButton implements PlanetAbilityButton {
         return List.of(Buttons.green(id, label, FactionEmojis.tnelis));
     }
 }
-
-

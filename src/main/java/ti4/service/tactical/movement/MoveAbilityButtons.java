@@ -1,8 +1,7 @@
 package ti4.service.tactical.movement;
 
-import ti4.service.tactical.MoveAbilityButton;
-
 import java.util.List;
+import ti4.service.tactical.MoveAbilityButton;
 
 public final class MoveAbilityButtons {
     private MoveAbilityButtons() {}
@@ -31,5 +30,3 @@ public final class MoveAbilityButtons {
             new WraithEngineButton(),
             new EkoPlanetAbilityButton());
 }
-
-
