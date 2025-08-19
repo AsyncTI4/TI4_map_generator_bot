@@ -14,7 +14,6 @@ import ti4.map.Tile;
 import ti4.spring.auth.RequestContext;
 import ti4.spring.model.MovementDisplacementRequest;
 import ti4.spring.service.MovementService;
-import ti4.spring.service.auth.RequestContext;
 
 @RequiredArgsConstructor
 @RestController
