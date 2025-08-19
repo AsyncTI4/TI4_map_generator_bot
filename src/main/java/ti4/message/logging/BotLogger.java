@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
@@ -15,6 +16,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.cron.CronManager;
 import ti4.helpers.Constants;
+import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.message.MessageHelper;
@@ -173,10 +175,9 @@ public class BotLogger {
             if (origin.getEventString() != null) msg.append(origin.getEventString());
             if (origin.getGameInfo() != null) msg.append(origin.getGameInfo());
         } else {
-            origin = new LogOrigin(AsyncTI4DiscordBot.guildPrimary);
-            msg.append(origin.getOriginTimeFormatted());
+            msg.append(DateTimeHelper.getCurrentTimestamp());
         }
-        channel = origin.getLogChannel(severity);
+        channel = getLogChannel(severity);
 
         if (multiline) {
             msg.append("Message: ");
@@ -198,13 +199,8 @@ public class BotLogger {
                             < msgLength) { // If length could overflow or there is no error to trace
                 if (channel == null) scheduleWebhookMessage(msgChunk); // Send message on webhook
                 else channel.sendMessage(msgChunk).queue(); // Send message on channel
-
             } else { // Handle error on last send
-                if (origin.getGuild() != null) { // Second check may not be necessary but this is a hotfix.
-                    ThreadArchiveHelper.checkThreadLimitAndArchive(origin.getGuild());
-                } else {
-                    ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
-                }
+                ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
 
                 if (channel == null) {
                     scheduleWebhookMessage(msgChunk); // Send message on webhook
@@ -294,5 +290,23 @@ public class BotLogger {
             return restError.getErrorCode() == DISCORD_UNKNOWN_ERROR_STATUS_CODE;
         }
         return false;
+    }
+
+    /**
+     * Get the most relevant log channel for this source. Priority is to severity.channelName, then "#bot-log", then returns null.
+     *
+     * @param severity - The severity of the log message, used to find the appropriate channel based on LogSeverity.channelName
+     * @return The most relevant logging TextChannel
+     */
+    @Nullable
+    private TextChannel getLogChannel(@Nonnull LogSeverity severity) {
+        Guild guild = AsyncTI4DiscordBot.guildPrimary;
+        if (guild == null) return null;
+
+        return guild.getTextChannelsByName(severity.channelName, false).stream()
+                .findFirst()
+                .orElse(guild.getTextChannelsByName("bot-log", false).stream()
+                        .findFirst()
+                        .orElse(null));
     }
 }

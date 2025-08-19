@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.executors.ExecutorServiceManager;
 import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.settings.GlobalSettings;
 
 public class ThreadArchiveHelper {
@@ -33,14 +32,12 @@ public class ThreadArchiveHelper {
                         DEFAULT_MAX_THREAD_COUNT);
 
                 if (threadCount > maxThreadCount) {
-                    BotLogger.info(
-                            new LogOrigin(guild),
-                            "**" + guild.getName() + "** Max Threads Reached (" + threadCount + " out of  "
-                                    + maxThreadCount + ") - Archiving " + closeCount + " threads");
+                    BotLogger.info("**" + guild.getName() + "** Max Threads Reached (" + threadCount + " out of  "
+                            + maxThreadCount + ") - Archiving " + closeCount + " threads");
                     archiveOldThreads(guild, closeCount);
                 }
             } catch (Exception e) {
-                BotLogger.error(new LogOrigin(guild), "Error in checkThreadLimitAndArchive for " + guild.getName(), e);
+                BotLogger.error("Error in checkThreadLimitAndArchive for " + guild.getName(), e);
             }
         });
     }
