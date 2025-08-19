@@ -17,8 +17,9 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 
 @UtilityClass
 class UndoButtonHandler {
@@ -29,7 +30,7 @@ class UndoButtonHandler {
             String buttonString = game.getSavedButtons().getFirst();
             String colorOrFaction = buttonString.split(";")[0];
             Player p = game.getPlayerFromColorOrFaction(colorOrFaction);
-            if (p != null && player != p && !colorOrFaction.equals("null")) {
+            if (p != null && player != p && !"null".equals(colorOrFaction)) {
                 // if the last button was pressed by a non-faction player, allow anyone to undo
                 // it
                 String msg =
@@ -55,10 +56,7 @@ class UndoButtonHandler {
                 numbers.add(Integer.parseInt(fileName));
             }
         } catch (IOException e) {
-            BotLogger.error(
-                    new BotLogger.LogMessageOrigin(event),
-                    "Error while reading game undo directory: " + gameUndoDirectory,
-                    e);
+            BotLogger.error(new LogOrigin(event), "Error while reading game undo directory: " + gameUndoDirectory, e);
         }
 
         int maxNumber = numbers.isEmpty()

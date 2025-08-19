@@ -36,11 +36,13 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
 public class StartCombatService {
@@ -58,7 +60,7 @@ public class StartCombatService {
                 .forEach(unitHolder -> groundCombatCheck(game, unitHolder, tile, event));
     }
 
-    public static void spaceCombatCheck(Game game, Tile tile, GenericInteractionCreateEvent event) {
+    private static void spaceCombatCheck(Game game, Tile tile, GenericInteractionCreateEvent event) {
         List<Player> playersWithShipsInSystem = ButtonHelper.getPlayersWithShipsInTheSystem(game, tile);
         if (playersWithShipsInSystem.size() <= 1) {
             return;
@@ -263,7 +265,7 @@ public class StartCombatService {
                 new TileGenerator(game, event, null, context, tile.getPosition(), player1).createFileUpload();
 
         // Create the thread
-        final String finalThreadName = threadName;
+        String finalThreadName = threadName;
 
         channel.sendMessage("Resolve combat in this thread:").queue(m -> {
             ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, m.getId());
@@ -355,8 +357,8 @@ public class StartCombatService {
                         threadChannel,
                         player2.getRepresentation()
                                 + ", your opponent has zero action cards in hand, so if they have no applicable technologies/abilities/retreats you can roll.");
-            } else if (ButtonHelper.isPlayerElected(game, player1, "censure")
-                    || ButtonHelper.isPlayerElected(game, player1, "absol_censure")) {
+            } else if (IsPlayerElectedService.isPlayerElected(game, player1, "censure")
+                    || IsPlayerElectedService.isPlayerElected(game, player1, "absol_censure")) {
                 MessageHelper.sendMessageToChannel(
                         threadChannel,
                         player2.getRepresentation()
@@ -367,8 +369,8 @@ public class StartCombatService {
                         threadChannel,
                         player1.getRepresentation()
                                 + " your opponent has zero action cards in hand, so if they have no applicable technologies/abilities/retreats you can roll.");
-            } else if (ButtonHelper.isPlayerElected(game, player2, "censure")
-                    || ButtonHelper.isPlayerElected(game, player2, "absol_censure")) {
+            } else if (IsPlayerElectedService.isPlayerElected(game, player2, "censure")
+                    || IsPlayerElectedService.isPlayerElected(game, player2, "absol_censure")) {
                 MessageHelper.sendMessageToChannel(
                         threadChannel,
                         player1.getRepresentation()
@@ -469,7 +471,8 @@ public class StartCombatService {
                                         + player.getFactionEmoji() + " uses _Death Binding_.",
                                 buttons);
                     }
-                    if (player.hasTech("md") && player.getPlanetsAllianceMode().contains(unitHolderName)) {
+                    if ((player.hasTech("md") || player.hasTech("md_c1"))
+                            && player.getPlanetsAllianceMode().contains(unitHolderName)) {
                         if (uH.getUnitCount(UnitType.Pds, player) > 0
                                 || uH.getUnitCount(UnitType.Spacedock, player) > 0) {
                             MessageHelper.sendMessageToChannel(
@@ -527,7 +530,7 @@ public class StartCombatService {
         }
     }
 
-    public static void offerRedGhostCommanderButtons(Player player, Game game, GenericInteractionCreateEvent event) {
+    private static void offerRedGhostCommanderButtons(Player player, Game game, GenericInteractionCreateEvent event) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")) {
             String message = player.getRepresentation(true, true)
                     + ", you may, at the __end__ of combat, gain 1 commodity or convert 1 of your commodities to a trade good,"
@@ -663,7 +666,7 @@ public class StartCombatService {
                                 + " to force the other player to send you a random action card. It will send buttons to the other player to confirm.",
                         buttons);
             }
-            if (type.equalsIgnoreCase("space")
+            if ("space".equalsIgnoreCase(type)
                     && player.getSecretsUnscored().containsKey("uf")
                     && tile.getUnitHolders().get("space").getUnitCount(Units.UnitType.Flagship, player.getColor())
                             > 0) {
@@ -672,7 +675,7 @@ public class StartCombatService {
                         msg
                                 + ", a reminder that if you win the combat, and your flagship survives, you could score _Unveil Flagship_.");
             }
-            if (type.equalsIgnoreCase("space")
+            if ("space".equalsIgnoreCase(type)
                     && player.getSecretsUnscored().containsKey("dtgs")
                     && (tile.getUnitHolders().get("space").getUnitCount(Units.UnitType.Flagship, otherPlayer.getColor())
                                     > 0
@@ -750,7 +753,7 @@ public class StartCombatService {
                                 + ", a reminder that if you win the combat, you may use this button to remove a command token from the system.",
                         buttons);
             }
-            if (player.hasAbility("technological_singularity")) {
+            if (player.hasAbility("technological_singularity") && !otherPlayer.isDummy()) {
                 Button steal = Buttons.gray(
                         player.finChecker() + "nekroStealTech_" + otherPlayer.getFaction(),
                         "Copy a Technology",
@@ -760,7 +763,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, steal);
             }
             if (player.hasUnit("ghemina_mech")
-                    && type.equalsIgnoreCase("ground")
+                    && "ground".equalsIgnoreCase(type)
                     && ButtonHelper.getUnitHolderFromPlanetName(unitHolderName, game)
                                     .getUnitCount(Units.UnitType.Mech, player)
                             == 2) {
@@ -773,7 +776,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, explore);
             }
 
-            if (type.equalsIgnoreCase("space") && player.hasTech("so")) {
+            if ("space".equalsIgnoreCase(type) && player.hasTech("so")) {
                 buttons = new ArrayList<>();
                 buttons.add(
                         Buttons.gray("salvageOps_" + tile.getPosition(), "Salvage Operations", FactionEmojis.Mentak));
@@ -783,7 +786,7 @@ public class StartCombatService {
                                 + ", a reminder that if the combat does not end in a draw, you may use the button to resolve _Salvage Operations_.",
                         buttons);
             }
-            if (type.equalsIgnoreCase("space") && game.playerHasLeaderUnlockedOrAlliance(player, "mentakcommander")) {
+            if ("space".equalsIgnoreCase(type) && game.playerHasLeaderUnlockedOrAlliance(player, "mentakcommander")) {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(
@@ -940,6 +943,13 @@ public class StartCombatService {
         List<Button> afbButtons = new ArrayList<>();
         afbButtons.add(Buttons.gray(
                 "combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));
+        for (Player player : combatPlayers) {
+            if (player.isNpc() || player.isDummy()) {
+                afbButtons.add(Buttons.green(
+                        player.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_space_afb",
+                        "Roll " + CombatRollType.AFB.getValue() + " for Dummy"));
+            }
+        }
         MessageHelper.sendMessageToChannelWithButtons(
                 threadChannel, "Buttons to roll ANTI-FIGHTER BARRAGE (if applicable).", afbButtons);
         if (!game.isFowMode()) {
@@ -1120,7 +1130,7 @@ public class StartCombatService {
                 && tile != p1.getHomeSystemTile()
                 && p1.getHomeSystemTile() != null) {
             if (p1.hasUnit("ghoti_flagship")
-                    || ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Spacedock)
+                    || CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Spacedock)
                             .contains(p1.getHomeSystemTile())) {
                 buttons.add(Buttons.green(
                         p1.getFinsFactionCheckerPrefix() + "useNekroNullRef",
@@ -1134,7 +1144,7 @@ public class StartCombatService {
                 && p2.getHomeSystemTile() != null
                 && !game.isFowMode()) {
             if (p2.hasUnit("ghoti_flagship")
-                    || ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock)
+                    || CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Spacedock)
                             .contains(p2.getHomeSystemTile())) {
                 buttons.add(Buttons.green(
                         p2.getFinsFactionCheckerPrefix() + "useNekroNullRef",
@@ -1337,7 +1347,7 @@ public class StartCombatService {
         if ((p2.hasAbility("collateralized_loans"))
                 && !game.isFowMode()
                 && p2.getDebtTokenCount(p1.getColor()) > 0
-                && groundOrSpace.equalsIgnoreCase("space")) {
+                && "space".equalsIgnoreCase(groundOrSpace)) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(
                     finChecker + "collateralizedLoans_" + pos + "_" + p1.getFaction(),
@@ -1346,7 +1356,7 @@ public class StartCombatService {
         }
         if ((p1.hasAbility("collateralized_loans"))
                 && p1.getDebtTokenCount(p2.getColor()) > 0
-                && groundOrSpace.equalsIgnoreCase("space")) {
+                && "space".equalsIgnoreCase(groundOrSpace)) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(
                     finChecker + "collateralizedLoans_" + pos + "_" + p2.getFaction(),
@@ -1563,7 +1573,8 @@ public class StartCombatService {
             gheminaCommanderApplicable = true;
         } else {
             for (Player p3 : game.getRealPlayers()) {
-                if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, p3, Units.UnitType.Pds, Units.UnitType.Spacedock)
+                if (CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                game, p3, Units.UnitType.Pds, Units.UnitType.Spacedock)
                         .contains(tile)) {
                     gheminaCommanderApplicable = true;
                     break;
@@ -1637,7 +1648,7 @@ public class StartCombatService {
         }
 
         if (game.isLiberationC4Mode()) {
-            if (tile.getTileID().equalsIgnoreCase("c41")) {
+            if ("c41".equalsIgnoreCase(tile.getTileID())) {
                 Player sol = game.getPlayerFromColorOrFaction("sol");
                 Player xxcha = game.getPlayerFromColorOrFaction("xxcha");
                 if (sol == p1 || sol == p2 || xxcha == p1 || xxcha == p2) {
@@ -1763,13 +1774,20 @@ public class StartCombatService {
                     }
 
                     // Magen
-                    if (p.hasTech("md")
+                    if ((p.hasTech("md") || p.hasTech("md_c1"))
                             && isGroundCombat
                             && (unitH.getUnitCount(Units.UnitType.Spacedock, p.getColor()) > 0
                                     || unitH.getUnitCount(Units.UnitType.Pds, p.getColor()) > 0)) {
                         String id = p.finChecker() + "magenHit_" + unitH.getName();
                         String label = "Use Magen Defense Grid on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, TechEmojis.WarfareTech));
+                    }
+                    if (p.hasAbility("ruthless")
+                            && isGroundCombat
+                            && otherP.getExhaustedPlanets().contains(unitH.getName())) {
+                        String id = p.finChecker() + "ruthlessHit_" + unitH.getName();
+                        String label = "Use Ruthless on " + nameOfHolder;
+                        buttons.add(Buttons.gray(id, label, FactionEmojis.kortali));
                     }
                     // Letnev Mech
                     if (p.hasUnit("letnev_mech")
@@ -1811,13 +1829,13 @@ public class StartCombatService {
             }
             if ("space".equalsIgnoreCase(nameOfHolder) && isSpaceCombat) {
                 buttons.add(Buttons.gray("combatRoll_" + pos + "_" + unitH.getName(), "Roll Space Combat"));
-                if (p1.isDummy()) {
+                if (p1.isDummy() || p1.isNpc()) {
                     buttons.add(Buttons.gray(
                                     p1.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(),
                                     "Roll Space Combat For Dummy")
                             .withEmoji(Emoji.fromFormatted(p1.getFactionEmoji())));
                 }
-                if (p2.isDummy()) {
+                if (p2.isDummy() || p2.isNpc()) {
                     buttons.add(Buttons.gray(
                                     p2.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(),
                                     "Roll Space Combat For Dummy")
@@ -1831,13 +1849,13 @@ public class StartCombatService {
                     if (p1 == game.getActivePlayer()) {
                         nonActive = p2;
                     }
-                    if (p1.isDummy()) {
+                    if (p1.isDummy() || p1.isNpc()) {
                         buttons.add(Buttons.gray(
                                         p1.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(),
                                         "Roll Ground Combat for " + nameOfHolder + " for Dummy")
                                 .withEmoji(Emoji.fromFormatted(p1.getFactionEmoji())));
                     }
-                    if (p2.isDummy()) {
+                    if (p2.isDummy() || p2.isNpc()) {
                         buttons.add(Buttons.gray(
                                         p2.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(),
                                         "Roll Ground Combat for " + nameOfHolder + " for Dummy")

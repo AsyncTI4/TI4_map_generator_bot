@@ -23,7 +23,7 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.model.AgendaModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;

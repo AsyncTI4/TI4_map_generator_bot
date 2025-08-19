@@ -24,6 +24,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.service.BookOfLatviniaService;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -32,6 +33,7 @@ import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 
 public class ComponentActionHelper {
@@ -50,7 +52,7 @@ public class ComponentActionHelper {
             String techEmoji = techRep.getCondensedReqsEmojis(true);
             String techText = techRep.getText();
 
-            boolean detAgeOfExp = (tech.equalsIgnoreCase("det") || tech.equalsIgnoreCase("absol_det"))
+            boolean detAgeOfExp = ("det".equalsIgnoreCase(tech) || "absol_det".equalsIgnoreCase(tech))
                     && game.isAgeOfExplorationMode();
             if (techText.contains("ACTION") || detAgeOfExp) {
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
@@ -62,6 +64,7 @@ public class ComponentActionHelper {
         }
         if (game.isStellarAtomicsMode()
                 && game.getRevealedPublicObjectives().get("Stellar Atomics") != null
+                && game.getScoredPublicObjectives().get("Stellar Atomics") != null
                 && game.getScoredPublicObjectives().get("Stellar Atomics").contains(p1.getUserID())) {
             compButtons.add(Buttons.red(finChecker + prefix + "stellarAtomicsAction_", "Use Stellar Atomics"));
         }
@@ -248,7 +251,7 @@ public class ComponentActionHelper {
         // Abilities
         if (p1.hasAbility("star_forge")
                 && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar"))
-                && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Warsun)
+                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Warsun)
                         .isEmpty()) {
             Button abilityButton =
                     Buttons.green(finChecker + prefix + "ability_starForge", "Starforge", FactionEmojis.Muaat);
@@ -312,7 +315,7 @@ public class ComponentActionHelper {
         // Other "abilities"
         if (p1.getUnitsOwned().contains("muaat_flagship")
                 && p1.getStrategicCC() > 0
-                && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship)
+                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Flagship)
                         .isEmpty()) {
             Button abilityButton =
                     Buttons.green(finChecker + prefix + "ability_muaatFS", "Use Flagship Ability", FactionEmojis.Muaat);
@@ -320,7 +323,7 @@ public class ComponentActionHelper {
         }
         if (p1.getUnitsOwned().contains("sigma_muaat_flagship_1")
                 && p1.getStrategicCC() > 0
-                && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship)
+                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Flagship)
                         .isEmpty()) {
             Button abilityButton = Buttons.green(
                     finChecker + prefix + "ability_muaatFSsigma", "Use Flagship Ability", FactionEmojis.Muaat);
@@ -345,7 +348,7 @@ public class ComponentActionHelper {
         compButtons.addAll(acButtons);
 
         // absol
-        if (ButtonHelper.isPlayerElected(game, p1, "absol_minswar")
+        if (IsPlayerElectedService.isPlayerElected(game, p1, "absol_minswar")
                 && !game.getStoredValue("absolMOW").contains(p1.getFaction())) {
             Button absolButton = Buttons.gray(finChecker + prefix + "absolMOW_", "Minister of War Action");
             compButtons.add(absolButton);
@@ -414,7 +417,8 @@ public class ComponentActionHelper {
                                 + " ability.");
                 if ("starForge".equalsIgnoreCase(buttonID)) {
 
-                    List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Warsun);
+                    List<Tile> tiles =
+                            CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Warsun);
                     List<Button> buttons = new ArrayList<>();
                     String message = p1.getRepresentationNoPing()
                             + " is using their **Star Forge** ability.\n Please choose the system you wish to **Star Forge** in.";
@@ -451,7 +455,8 @@ public class ComponentActionHelper {
                             game,
                             event,
                             "built with " + FactionEmojis.Muaat + " " + UnitEmojis.flagship + "The Inferno");
-                    List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship);
+                    List<Tile> tiles =
+                            CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Flagship);
                     Tile tile = tiles.getFirst();
                     List<Button> buttons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
                     AddUnitService.addUnits(event, tile, game, p1.getColor(), "cruiser");
@@ -814,7 +819,7 @@ public class ComponentActionHelper {
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons3);
                 }
             }
-        } else if (relicID.equalsIgnoreCase("circletofthevoid")) {
+        } else if ("circletofthevoid".equalsIgnoreCase(relicID)) {
             player.addExhaustedRelic(relicID);
             purgeOrExhaust = "exhausted";
             List<Button> buttons2 = ButtonHelperActionCards.getCircletButtons(game, player);

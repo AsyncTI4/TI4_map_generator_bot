@@ -21,7 +21,7 @@ import org.apache.commons.collections4.SetUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
 
 public class ApplicationEmojiService {
@@ -30,9 +30,9 @@ public class ApplicationEmojiService {
     private static final Map<String, CachedEmoji> emojis = new HashMap<>();
     private static final Map<String, EmojiFileData> emojiFiles = new HashMap<>();
 
-    private static boolean spoofing = false;
-    private static boolean cacheInitialized = false;
-    private static boolean filesInitialized = false;
+    private static boolean spoofing;
+    private static boolean cacheInitialized;
+    private static boolean filesInitialized;
 
     private static void initAll() {
         initFromCache();
@@ -105,7 +105,7 @@ public class ApplicationEmojiService {
         if (cacheInitialized) return;
 
         List<CachedEmoji> cached = ApplicationEmojiCacheService.readCachedEmojis();
-        if (cached.size() == 0) {
+        if (cached.isEmpty()) {
             BotLogger.info("No cached emojis found. Initializing from Discord.");
             resetCacheFromDiscord();
         } else {
@@ -242,16 +242,16 @@ public class ApplicationEmojiService {
     public static class EmojiFileData {
         private final File file;
         private final String name;
-        private Icon icon = null;
+        private Icon icon;
 
-        public Icon getIcon() throws IOException {
+        Icon getIcon() throws IOException {
             if (icon == null) icon = Icon.from(file);
             return icon;
         }
 
         public EmojiFileData(File f) {
-            this.file = f;
-            this.name = fileName(f);
+            file = f;
+            name = fileName(f);
         }
     }
 
@@ -279,7 +279,7 @@ public class ApplicationEmojiService {
         });
     }
 
-    public static String fileName(File file) {
+    private static String fileName(File file) {
         return file.getName()
                 .replace(".png", "")
                 .replace(".jpg", "")

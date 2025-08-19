@@ -30,7 +30,7 @@ public class DraftErrataModel implements ModelInterface {
     public DraftErrataModel[] AdditionalComponents;
     public DraftErrataModel[] OptionalSwaps;
     public boolean Undraftable;
-    private String alternateText;
+    public String alternateText;
 
     public boolean AlwaysAddToPool;
 
@@ -75,6 +75,6 @@ public class DraftErrataModel implements ModelInterface {
     }
 
     public boolean searchSource(ComponentSource searchSource) {
-        return (searchSource == null || (getSource() != null && getSource().equals(searchSource)));
+        return (searchSource == null || (source != null && source == searchSource));
     }
 }

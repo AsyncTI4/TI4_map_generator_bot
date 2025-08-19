@@ -19,7 +19,7 @@ import ti4.service.milty.MiltyService;
 import ti4.service.regex.RegexService;
 
 @UtilityClass
-public class MiltyDraftButtonHandlers {
+class MiltyDraftButtonHandlers {
 
     @ButtonHandler("showMiltyDraft")
     private void postDraftInfo(ButtonInteractionEvent event, Game game) {

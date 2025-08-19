@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.service.emoji.TI4Emoji;
 
 @UtilityClass
@@ -25,7 +25,7 @@ public class ImageHelper {
         if (filePath == null) {
             return null;
         }
-        return ImageCache.getInstance().getOrLoadStaticImage(filePath, k -> readImage(filePath));
+        return ImageCache.getOrLoadStaticImage(filePath, k -> readImage(filePath));
     }
 
     @Nullable
@@ -33,7 +33,7 @@ public class ImageHelper {
         if (filePath == null) {
             return null;
         }
-        return ImageCache.getInstance().getOrLoadStaticImage(percent + filePath, k -> {
+        return ImageCache.getOrLoadStaticImage(percent + filePath, k -> {
             BufferedImage image = readImage(filePath);
             if (image == null) {
                 return null;
@@ -47,7 +47,7 @@ public class ImageHelper {
         if (filePath == null) {
             return null;
         }
-        return ImageCache.getInstance().getOrLoadStaticImage(width + "x" + height + filePath, k -> {
+        return ImageCache.getOrLoadStaticImage(width + "x" + height + filePath, k -> {
             BufferedImage image = readImage(filePath);
             if (image == null) {
                 return null;
@@ -62,13 +62,13 @@ public class ImageHelper {
     @Nullable
     public static BufferedImage readEmojiImageScaled(String emoji, int size) {
         Emoji em = Emoji.fromFormatted(emoji);
-        if (em instanceof CustomEmoji e) return ImageHelper.readURLScaled(e.getImageUrl(), size, size);
+        if (em instanceof CustomEmoji e) return readURLScaled(e.getImageUrl(), size, size);
         return null;
     }
 
     @Nullable
     public static BufferedImage readEmojiImageScaled(TI4Emoji emoji, int size) {
-        return ImageHelper.readEmojiImageScaled(emoji.emojiString(), size);
+        return readEmojiImageScaled(emoji.emojiString(), size);
     }
 
     @Nullable
@@ -76,7 +76,7 @@ public class ImageHelper {
         if (imageURL == null) {
             return null;
         }
-        return ImageCache.getInstance().getOrLoadExpiringImage(width + "x" + height + imageURL, k -> {
+        return ImageCache.getOrLoadExpiringImage(width + "x" + height + imageURL, k -> {
             BufferedImage image = readImageURL(imageURL);
             if (image == null) {
                 return null;
@@ -106,7 +106,7 @@ public class ImageHelper {
         return square(originalImage, newSize);
     }
 
-    public static BufferedImage square(@NotNull BufferedImage originalImage, int newSize) {
+    private static BufferedImage square(@NotNull BufferedImage originalImage, int newSize) {
         BufferedImage outputImage = new BufferedImage(newSize, newSize, BufferedImage.TYPE_INT_ARGB);
         int newX = (newSize - originalImage.getWidth()) / 2;
         int newY = (newSize - originalImage.getHeight()) / 2;

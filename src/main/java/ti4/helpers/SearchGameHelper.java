@@ -88,7 +88,7 @@ public class SearchGameHelper {
         return filteredManagedGames.size();
     }
 
-    public static ArrayList<Integer> getGameDaysLength(
+    private static List<Integer> getGameDaysLength(
             User user,
             GenericInteractionCreateEvent event,
             boolean onlyMyTurn,
@@ -126,7 +126,7 @@ public class SearchGameHelper {
 
         int index = 1;
 
-        ArrayList<Integer> days = new ArrayList<>();
+        var days = new ArrayList<Integer>();
 
         StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
         for (var managedGame : filteredManagedGames) {
@@ -147,7 +147,7 @@ public class SearchGameHelper {
         return days;
     }
 
-    public static double getWinPercentage(
+    private static double getWinPercentage(
             User user,
             GenericInteractionCreateEvent event,
             boolean onlyMyTurn,
@@ -204,10 +204,8 @@ public class SearchGameHelper {
         AtomicInteger index = new AtomicInteger(1);
         sb.append("## __**Games**__\n");
         for (User user : users) {
-            int ongoingAmount =
-                    SearchGameHelper.searchGames(user, event, false, false, false, true, false, true, true, true);
-            int completedAndOngoingAmount =
-                    SearchGameHelper.searchGames(user, event, false, true, false, true, false, true, true, true);
+            int ongoingAmount = searchGames(user, event, false, false, false, true, false, true, true, true);
+            int completedAndOngoingAmount = searchGames(user, event, false, true, false, true, false, true, true, true);
             int completedGames = completedAndOngoingAmount - ongoingAmount;
             sb.append("`")
                     .append(Helper.leftpad(String.valueOf(index.get()), 3))
@@ -218,23 +216,23 @@ public class SearchGameHelper {
             sb.append("\n");
             if (completedGames > 0) {
                 sb.append("> The completed games took the following amount of time to complete (in days):");
-                List<Integer> days = SearchGameHelper.getGameDaysLength(
-                        user, event, false, true, false, true, false, true, true, true);
+                List<Integer> days = getGameDaysLength(user, event, false, true, false, true, false, true, true, true);
                 for (int day : days) {
                     sb.append(" ").append(day);
                 }
                 sb.append("\n");
-                double getWinPercentage = SearchGameHelper.getWinPercentage(
-                        user, event, false, true, false, true, false, true, true, true);
-                sb.append("> Player win percentage across all games was: " + String.format("%.2f", getWinPercentage)
-                        + "\n");
+                double getWinPercentage =
+                        getWinPercentage(user, event, false, true, false, true, false, true, true, true);
+                sb.append("> Player win percentage across all games was: ")
+                        .append(String.format("%.2f", getWinPercentage))
+                        .append("\n");
             }
             index.getAndIncrement();
         }
         return sb.toString();
     }
 
-    public static String getPlayerMapListRepresentation(
+    private static String getPlayerMapListRepresentation(
             Game game, String userID, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes) {
         Player player = game.getPlayer(userID);
         if (player == null) return "";

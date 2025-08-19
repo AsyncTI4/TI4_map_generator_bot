@@ -19,6 +19,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -29,6 +30,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -36,6 +38,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
 public class AddPlanetService {
@@ -112,7 +115,7 @@ public class AddPlanetService {
                     player_.removePlanet(planet);
                     CommanderUnlockCheckService.checkPlayer(player_, "uydai");
                     List<String> relics = new ArrayList<>(player_.getRelics());
-                    if (planet.equalsIgnoreCase("mr")) {
+                    if ("mr".equalsIgnoreCase(planet)) {
                         String customPOName = "Ixthian Rex Point";
                         if (game.getRevealedPublicObjectives().get(customPOName) != null) {
                             int shardID = game.getRevealedPublicObjectives().get(customPOName);
@@ -159,8 +162,7 @@ public class AddPlanetService {
                             player.addPromissoryNoteToPlayArea(pn);
                         }
                     }
-                    Set<String> tokens = new HashSet<>();
-                    tokens.addAll(unitHolder.getTokenList());
+                    Set<String> tokens = new HashSet<>(unitHolder.getTokenList());
                     for (String token : tokens) {
                         if (token.contains("facility") || token.contains("superweapon")) {
                             unitHolder.removeToken(token);
@@ -174,13 +176,23 @@ public class AddPlanetService {
                             }
                         }
                     }
-                    if (Mapper.getPlanet(planet) != null
-                            && !"action_deck_2".equals(game.getAcDeckID())
-                            && !game.isACInDiscard("Reparations")) {
+                    if (Mapper.getPlanet(planet) != null) {
                         String msg = player_.getRepresentation()
-                                + " has a window to play _Reparations_ for the taking of "
-                                + Mapper.getPlanet(planet).getName() + ".";
+                                + " lost the planet of "
+                                + Mapper.getPlanet(planet).getName() + " (and could perhaps play _Reparations_).";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                        if (player_.getPlanetsAllianceMode().isEmpty()
+                                && CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                                game, player, UnitType.Infantry, UnitType.Mech, UnitType.Spacedock)
+                                        .isEmpty()) {
+                            List<Button> buttons = new ArrayList<>();
+                            buttons.add(Buttons.red(
+                                    "eliminatePlayer_" + player_.getFaction(),
+                                    "Eliminate " + player_.getDisplayName()));
+                            msg = player_.getRepresentation()
+                                    + ", the game believes that you ought to be eliminated. Press the button if this is accurate (anyone can press the button).";
+                            MessageHelper.sendMessageToChannel(player_.getCorrectChannel(), msg, buttons);
+                        }
                     }
                 }
             }
@@ -329,7 +341,7 @@ public class AddPlanetService {
                 && player.hasTech("absol_dxa")
                 && !doubleCheck
                 && !setup) {
-            String message = "";
+            String message;
             if (tile != null && planet != null) {
                 Set<String> tokenList =
                         ButtonHelper.getUnitHolderFromPlanetName(planet, game).getTokenList();
@@ -436,7 +448,7 @@ public class AddPlanetService {
                         buttons);
             }
         }
-        if (ButtonHelper.isPlayerElected(game, player, "minister_exploration")) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "minister_exploration")) {
             String fac = player.getFactionEmoji();
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

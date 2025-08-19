@@ -16,7 +16,7 @@ public class MinisterAntiquitiesAgendaResolver implements AgendaResolver {
     public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         Player player2 = game.getPlayerFromColorOrFaction(winner);
         if (player2 == null) return;
+        MessageHelper.sendMessageToChannel(event.getChannel(), player2.getRepresentation() + " is drawing a relic.");
         RelicHelper.drawRelicAndNotify(player2, event, game);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Drew relic for " + player2.getFactionEmojiOrColor());
     }
 }

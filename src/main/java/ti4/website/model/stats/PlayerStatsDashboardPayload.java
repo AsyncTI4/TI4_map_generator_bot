@@ -12,20 +12,20 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.Data;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.model.AgendaModel;
 import ti4.model.RelicModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.agenda.IsPlayerElectedService;
 
 public class PlayerStatsDashboardPayload {
 
@@ -34,7 +34,7 @@ public class PlayerStatsDashboardPayload {
 
     public PlayerStatsDashboardPayload(Player player) {
         this.player = player;
-        this.game = player.getGame();
+        game = player.getGame();
     }
 
     @JsonIgnore
@@ -73,7 +73,7 @@ public class PlayerStatsDashboardPayload {
                 .toList();
     }
 
-    public String getColor() {
+    private String getColor() {
         return player.getColor();
     }
 
@@ -118,7 +118,7 @@ public class PlayerStatsDashboardPayload {
 
     public List<String> getLaws() {
         return game.getLaws().keySet().stream()
-                .filter(lawId -> ButtonHelper.isPlayerElected(game, player, lawId))
+                .filter(lawId -> IsPlayerElectedService.isPlayerElected(game, player, lawId))
                 .map(Mapper::getAgenda)
                 .filter(Objects::nonNull)
                 .map(AgendaModel::getName)
@@ -246,13 +246,13 @@ public class PlayerStatsDashboardPayload {
                 .flatMap(Collection::stream)
                 .map(String::toLowerCase)
                 .forEach(speciality -> {
-                    if (speciality.equalsIgnoreCase("propulsion")) {
+                    if ("propulsion".equalsIgnoreCase(speciality)) {
                         blueCount.getAndIncrement();
-                    } else if (speciality.equalsIgnoreCase("cybernetic")) {
+                    } else if ("cybernetic".equalsIgnoreCase(speciality)) {
                         yellowCount.getAndIncrement();
-                    } else if (speciality.equalsIgnoreCase("biotic")) {
+                    } else if ("biotic".equalsIgnoreCase(speciality)) {
                         greenCount.getAndIncrement();
-                    } else if (speciality.equalsIgnoreCase("warfare")) {
+                    } else if ("warfare".equalsIgnoreCase(speciality)) {
                         redCount.getAndIncrement();
                     }
                 });

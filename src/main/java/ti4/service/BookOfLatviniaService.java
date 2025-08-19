@@ -21,15 +21,6 @@ public class BookOfLatviniaService {
         return Mapper.getRelic(id);
     }
 
-    private static String rep() {
-        return relic().getSimpleRepresentation();
-    }
-
-    public static void gainBookOfLatvinia(ButtonInteractionEvent event, Game game, Player player) {
-        // done elsewhere
-
-    }
-
     public static void purgeBookOfLatvinia(ButtonInteractionEvent event, Game game, Player player) {
         Set<String> skips = new HashSet<>();
         for (String planet : player.getPlanetsAllianceMode()) {
@@ -66,7 +57,7 @@ public class BookOfLatviniaService {
         String book = relic().getName();
         Integer id = game.getRevealedPublicObjectives().getOrDefault(book, null);
 
-        String message = null;
+        String message;
         if (id != null) {
             game.scorePublicObjective(player.getUserID(), id);
             message = player.getRepresentation() + " has scored the \"Book of Latvinia\" custom objective.";

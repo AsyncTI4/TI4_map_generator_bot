@@ -15,8 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 
@@ -68,14 +68,14 @@ public class TIGLHelper {
         }
 
         public String getName() {
-            return this.name;
+            return name;
         }
 
         public String getShortName() {
-            return StringUtils.substringAfter(getName(), "- ");
+            return StringUtils.substringAfter(name, "- ");
         }
 
-        public Integer getIndex() {
+        Integer getIndex() {
             return index;
         }
 
@@ -92,13 +92,13 @@ public class TIGLHelper {
             return roles.getFirst();
         }
 
-        public TIGLRank getNextRank() {
+        TIGLRank getNextRank() {
             return switch (this) {
-                case UNRANKED -> TIGLRank.MINISTER;
-                case MINISTER -> TIGLRank.AGENT;
-                case AGENT -> TIGLRank.COMMANDER;
-                case COMMANDER -> TIGLRank.HERO;
-                case HERO, EMPEROR -> TIGLRank.EMPEROR;
+                case UNRANKED -> MINISTER;
+                case MINISTER -> AGENT;
+                case AGENT -> COMMANDER;
+                case COMMANDER -> HERO;
+                case HERO, EMPEROR -> EMPEROR;
                 default -> null;
             };
         }
@@ -176,7 +176,7 @@ public class TIGLHelper {
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
     }
 
-    public static List<Role> getAllTIGLRoles() {
+    private static List<Role> getAllTIGLRoles() {
         List<Role> roles = new ArrayList<>();
         for (TIGLRank rank : TIGLRank.values()) {
             roles.add(rank.getRole());
@@ -218,7 +218,7 @@ public class TIGLHelper {
         return lowestRank;
     }
 
-    public static List<TIGLRank> getUsersTIGLRanks(User user) {
+    private static List<TIGLRank> getUsersTIGLRanks(User user) {
         Member hubMember = AsyncTI4DiscordBot.guildPrimary.getMemberById(user.getId());
         if (hubMember == null) {
             return new ArrayList<>();

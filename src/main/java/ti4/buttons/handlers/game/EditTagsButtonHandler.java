@@ -16,7 +16,7 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 @UtilityClass
-public class EditTagsButtonHandler {
+class EditTagsButtonHandler {
 
     @ButtonHandler("editTags~MDL")
     public static void handleEditTags(ButtonInteractionEvent event, Game game) {

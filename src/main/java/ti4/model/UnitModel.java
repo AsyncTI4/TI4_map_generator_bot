@@ -95,11 +95,11 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getAlias() {
-        return getId();
+        return id;
     }
 
-    public String getImageFileSuffix() {
-        return "_" + getAsyncId() + ".png";
+    private String getImageFileSuffix() {
+        return "_" + asyncId + ".png";
     }
 
     public String getColorAsyncID(String color) {
@@ -108,12 +108,12 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return color + getImageFileSuffix();
     }
 
-    public TI4Emoji getFactionEmoji() {
+    private TI4Emoji getFactionEmoji() {
         return FactionEmojis.getFactionIcon(getFaction().orElse(""));
     }
 
     public UnitType getUnitType() {
-        return Units.findUnitType(getAsyncId());
+        return Units.findUnitType(asyncId);
     }
 
     public TI4Emoji getUnitEmoji() {
@@ -125,7 +125,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         String factionEmoji = getFaction().isEmpty() ? "" : getFactionEmoji().toString();
         TI4Emoji unitEmoji = getUnitEmoji();
 
-        String unitString = unitEmoji + " " + getName() + factionEmoji;
+        String unitString = unitEmoji + " " + name + factionEmoji;
         if (getAbility().isPresent()) {
             unitString += ": " + getAbility().get();
         }
@@ -142,7 +142,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
         EmbedBuilder eb = new EmbedBuilder();
 
-        String name = getName();
+        String name = this.name;
         eb.setTitle(factionEmoji + unitEmoji + " __" + name + "__ " + getSourceEmoji(), null);
         if (getSubtitle().isPresent()) eb.setDescription("-# " + getSubtitle().get() + " " + getEligiblePlanetEmojis());
 
@@ -153,8 +153,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         if (getUnlock().isPresent()) eb.addField("Unlock:", getUnlock().get(), false);
         // if (getImageURL() != null) eb.setThumbnail(getImageURL());
 
-        if (includeAliases)
-            eb.setFooter("UnitID: " + getId() + "\nAliases: " + getAsyncIDAliases() + "\nSource: " + getSource());
+        if (includeAliases) eb.setFooter("UnitID: " + id + "\nAliases: " + getAsyncIDAliases() + "\nSource: " + source);
 
         return eb.build();
     }
@@ -162,11 +161,11 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     public String getNameRepresentation() {
         String factionEmoji = getFaction().isEmpty() ? "" : getFactionEmoji().toString();
         TI4Emoji unitEmoji = getUnitEmoji();
-        String name = getName() == null ? "" : getName();
+        String name = this.name == null ? "" : this.name;
         return factionEmoji + unitEmoji + " " + name + " " + getSourceEmoji();
     }
 
-    public String getSourceEmoji() {
+    private String getSourceEmoji() {
         return source.emoji();
     }
 
@@ -190,90 +189,90 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getAfbDieCount(Player player, Game game) {
-        if (getCapacityValue() > 0
+        if (capacityValue > 0
                 && player.getFaction().equalsIgnoreCase(game.getStoredValue("ShrapnelTurretsFaction"))
-                && getExpectedAfbHits() < .6) {
+                && getExpectedAfbHits() < 0.6) {
             return 2;
         }
-        if (getAfbDieCount() == 0
+        if (afbDieCount == 0
                 && isWarsunOrDreadnought()
                 && game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
             return 1;
         }
-        return getAfbDieCount();
+        return afbDieCount;
     }
 
     private double getExpectedAfbHits() {
-        return getAfbDieCount() * ((10 - getAfbHitsOn()) / 10d);
+        return afbDieCount * ((10 - afbHitsOn) / 10.0d);
     }
 
     private boolean isWarsunOrDreadnought() {
-        return getBaseType().equalsIgnoreCase("warsun") || getBaseType().equalsIgnoreCase("dreadnought");
+        return "warsun".equalsIgnoreCase(baseType) || "dreadnought".equalsIgnoreCase(baseType);
     }
 
     public int getSpaceCannonDieCount(Player player, Game game) {
         if (game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
-            if (getBaseType().equalsIgnoreCase("spacedock")) {
+            if ("spacedock".equalsIgnoreCase(baseType)) {
                 return 3;
             }
         }
-        return getSpaceCannonDieCount();
+        return spaceCannonDieCount;
     }
 
-    public int getSpaceCannonHitsOn(Player player, Game game) {
+    private int getSpaceCannonHitsOn(Player player, Game game) {
         if (game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())
                 || player.hasRelic("lightrailordnance")) {
-            if (getBaseType().equalsIgnoreCase("spacedock")) {
+            if ("spacedock".equalsIgnoreCase(baseType)) {
                 return 5;
             }
         }
-        return getSpaceCannonHitsOn();
+        return spaceCannonHitsOn;
     }
 
     public int getAfbHitsOn(Player player, Game game) {
-        if (getCapacityValue() > 0
+        if (capacityValue > 0
                 && game.getStoredValue("ShrapnelTurretsFaction").equalsIgnoreCase(player.getFaction())
-                && getExpectedAfbHits() < .6) {
+                && getExpectedAfbHits() < 0.6) {
             return 8;
         }
-        if (getAfbDieCount() == 0
+        if (afbDieCount == 0
                 && isWarsunOrDreadnought()
                 && game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
             return 5;
         }
-        return getAfbHitsOn();
+        return afbHitsOn;
     }
 
     public int getBombardDieCount(Player player, Game game) {
         if (!game.getStoredValue("BlitzFaction").equalsIgnoreCase(player.getFaction())) {
             if (game.getStoredValue("TnelisAgentFaction").equalsIgnoreCase(player.getFaction())
-                    && getBombardDieCount() == 0
-                    && getAfbDieCount() > 0) {
-                return getAfbDieCount();
+                    && bombardDieCount == 0
+                    && afbDieCount > 0) {
+                return afbDieCount;
             }
-            return getBombardDieCount();
+            return bombardDieCount;
         } else {
-            if (getIsShip() && !getBaseType().equalsIgnoreCase("fighter") && getBombardDieCount() == 0) {
+            if (getIsShip() && !"fighter".equalsIgnoreCase(baseType) && bombardDieCount == 0) {
                 return 1;
             } else {
-                return getBombardDieCount();
+                return bombardDieCount;
             }
         }
     }
 
-    public int getBombardHitsOn(Player player, Game game) {
+    private int getBombardHitsOn(Player player, Game game) {
         if (!game.getStoredValue("BlitzFaction").equalsIgnoreCase(player.getFaction())) {
             if (game.getStoredValue("TnelisAgentFaction").equalsIgnoreCase(player.getFaction())
-                    && getBombardDieCount() == 0
-                    && getAfbDieCount() > 0) {
-                return getAfbHitsOn();
+                    && bombardDieCount == 0
+                    && afbDieCount > 0) {
+                return afbHitsOn;
             }
-            return getBombardHitsOn();
+            return bombardHitsOn;
         } else {
-            if (isShip != null && isShip && !getBaseType().equalsIgnoreCase("fighter") && getBombardDieCount() == 0) {
+            if (isShip != null && isShip && !"fighter".equalsIgnoreCase(baseType) && bombardDieCount == 0) {
                 return 6;
             } else {
-                return getBombardHitsOn();
+                return bombardHitsOn;
             }
         }
     }
@@ -299,7 +298,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     private String getAsyncIDAliases() {
         String aliases = AliasHandler.getUnitListForHelp().getOrDefault(asyncId, asyncId);
-        return getAsyncId() + "=" + aliases;
+        return asyncId + "=" + aliases;
     }
 
     private String getValuesText() {
@@ -315,75 +314,75 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     private String getCostText() {
-        if (getCost() >= 1) {
-            return "Cost: " + MiscEmojis.getResourceEmoji(Math.round(getCost())) + "\n";
-        } else if (getCost() == 0.5) {
+        if (cost >= 1) {
+            return "Cost: " + MiscEmojis.getResourceEmoji(Math.round(cost)) + "\n";
+        } else if (cost == 0.5) {
             return "Cost: " + MiscEmojis.Resources_1 + " per 2 " + getUnitEmoji() + "\n";
         }
         return "";
     }
 
     private String getMoveText() {
-        if (getMoveValue() > 0) {
-            return "Move: " + getMoveValue() + "\n";
+        if (moveValue > 0) {
+            return "Move: " + moveValue + "\n";
         }
         return "";
     }
 
     private String getProductionText() {
-        if ("res".equals(getBasicProduction())) {
-            return "PRODUCTION: " + MiscEmojis.resources + "+" + getProductionValue() + "\n";
+        if ("res".equals(basicProduction)) {
+            return "PRODUCTION: " + MiscEmojis.resources + "+" + productionValue + "\n";
         }
-        if (getBasicProduction() != null) {
-            return "PRODUCTION: *️⃣+" + getProductionValue() + "\n";
+        if (basicProduction != null) {
+            return "PRODUCTION: *️⃣+" + productionValue + "\n";
         }
-        if (getProductionValue() > 0) {
-            return "PRODUCTION: " + getProductionValue() + "\n";
+        if (productionValue > 0) {
+            return "PRODUCTION: " + productionValue + "\n";
         }
         return "";
     }
 
     private String getCapacityText() {
-        if (getCapacityValue() > 0) {
-            return "Capacity: " + getCapacityValue() + "\n";
+        if (capacityValue > 0) {
+            return "Capacity: " + capacityValue + "\n";
         }
         return "";
     }
 
     private String getCombatText() {
-        if (getCombatDieCount() == 1) {
-            return "Combat: " + getCombatHitsOn() + "\n";
-        } else if (getCombatDieCount() > 1) {
-            return "Combat: " + getCombatHitsOn() + " (x" + getCombatDieCount() + ")\n";
-        } else if ("winnu_flagship".equals(getId())) {
-            return "Combat: " + getCombatHitsOn() + " (x # of opponent's non-fighter ships)\n";
+        if (combatDieCount == 1) {
+            return "Combat: " + combatHitsOn + "\n";
+        } else if (combatDieCount > 1) {
+            return "Combat: " + combatHitsOn + " (x" + combatDieCount + ")\n";
+        } else if ("winnu_flagship".equals(id)) {
+            return "Combat: " + combatHitsOn + " (x # of opponent's non-fighter ships)\n";
         }
         return "";
     }
 
     private String getAFBText() {
-        if (getAfbDieCount() == 1) {
-            return "ANTI-FIGHTER BARRAGE " + getAfbHitsOn() + "\n";
-        } else if (getAfbDieCount() >= 2) {
-            return "ANTI-FIGHTER BARRAGE " + getAfbHitsOn() + " (x" + getAfbDieCount() + ")\n";
+        if (afbDieCount == 1) {
+            return "ANTI-FIGHTER BARRAGE " + afbHitsOn + "\n";
+        } else if (afbDieCount >= 2) {
+            return "ANTI-FIGHTER BARRAGE " + afbHitsOn + " (x" + afbDieCount + ")\n";
         }
         return "";
     }
 
     private String getBombardText() {
-        if (getBombardDieCount() == 1) {
-            return "BOMBARDMENT: " + getBombardHitsOn() + "\n";
-        } else if (getBombardDieCount() >= 2) {
-            return "BOMBARDMENT: " + getBombardHitsOn() + " (x" + getBombardDieCount() + ")\n";
+        if (bombardDieCount == 1) {
+            return "BOMBARDMENT: " + bombardHitsOn + "\n";
+        } else if (bombardDieCount >= 2) {
+            return "BOMBARDMENT: " + bombardHitsOn + " (x" + bombardDieCount + ")\n";
         }
         return "";
     }
 
     private String getSpaceCannonText() {
-        if (getSpaceCannonDieCount() == 1) {
-            return "SPACE CANNON " + getSpaceCannonHitsOn() + "\n";
-        } else if (getSpaceCannonDieCount() >= 2) {
-            return "SPACE CANNON " + getSpaceCannonHitsOn() + " (x" + getSpaceCannonDieCount() + ")\n";
+        if (spaceCannonDieCount == 1) {
+            return "SPACE CANNON " + spaceCannonHitsOn + "\n";
+        } else if (spaceCannonDieCount >= 2) {
+            return "SPACE CANNON " + spaceCannonHitsOn + " (x" + spaceCannonDieCount + ")\n";
         }
         return "";
     }
@@ -403,12 +402,12 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getName().toLowerCase().contains(searchString)
+        return name.toLowerCase().contains(searchString)
                 || getFaction().orElse("").toLowerCase().contains(searchString)
-                || getId().toLowerCase().contains(searchString)
-                || getBaseType().toLowerCase().contains(searchString)
+                || id.toLowerCase().contains(searchString)
+                || baseType.toLowerCase().contains(searchString)
                 || getSubtitle().orElse("").toLowerCase().contains(searchString)
-                || getSearchTags().contains(searchString);
+                || searchTags.contains(searchString);
     }
 
     public static int sortFactionUnitsFirst(UnitModel a, UnitModel b) {
@@ -422,10 +421,10 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getName()).append(" (");
+        sb.append(name).append(" (");
         if (getFaction().isPresent()) sb.append(getFaction().get()).append(" ");
-        sb.append(getBaseType()).append(") [");
-        sb.append(getSource()).append("]");
+        sb.append(baseType).append(") [");
+        sb.append(source).append("]");
         return sb.toString();
     }
 
@@ -485,7 +484,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(requiredTechId);
     }
 
-    public Optional<String> getSubtitle() {
+    private Optional<String> getSubtitle() {
         return Optional.ofNullable(subtitle);
     }
 
@@ -497,7 +496,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(ability);
     }
 
-    public Optional<String> getUnlock() {
+    private Optional<String> getUnlock() {
         return Optional.ofNullable(unlock);
     }
 
@@ -505,11 +504,11 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(homebrewReplacesID);
     }
 
-    public List<String> getEligiblePlanetTypes() {
+    private List<String> getEligiblePlanetTypes() {
         return Optional.ofNullable(eligiblePlanetTypes).orElse(Collections.emptyList());
     }
 
-    public TI4Emoji getMonumentPlanetTypeEmoji(String planetType) {
+    private TI4Emoji getMonumentPlanetTypeEmoji(String planetType) {
         return switch (planetType.toLowerCase()) {
             case "cultural", "industrial", "hazardous" -> ExploreEmojis.getTraitEmoji(planetType);
             case "legendary" -> MiscEmojis.LegendaryPlanet;
@@ -520,7 +519,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         };
     }
 
-    public String getEligiblePlanetEmojis() {
+    private String getEligiblePlanetEmojis() {
         StringBuilder sb = new StringBuilder();
         for (String type : getEligiblePlanetTypes()) {
             sb.append(getMonumentPlanetTypeEmoji(type));

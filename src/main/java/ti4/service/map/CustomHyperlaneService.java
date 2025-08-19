@@ -70,7 +70,7 @@ public class CustomHyperlaneService {
                 Buttons.paginateButtons(hyperlaneTileButtons, HYPERLANE_BUTTONS, pageNum, "customHyperlanePagination");
 
         if (StringUtils.isBlank(page)) {
-            StringBuffer sb = new StringBuffer("### Manage Custom Hyperlanes");
+            StringBuilder sb = new StringBuilder("### Manage Custom Hyperlanes");
             if (hyperlaneTileButtons.isEmpty()) {
                 sb.append("\nNo hyperlane tiles found. Use `/map add_tile tile_name:")
                         .append(HYPERLANE_TILEID)
@@ -299,7 +299,7 @@ public class CustomHyperlaneService {
 
     private static List<String> getStaticHyperlanePositions(Game game) {
         return game.getTileMap().values().stream()
-                .filter(tile -> isStaticHyperlane(tile))
+                .filter(CustomHyperlaneService::isStaticHyperlane)
                 .map(Tile::getPosition)
                 .collect(Collectors.toList());
     }
@@ -342,7 +342,7 @@ public class CustomHyperlaneService {
         return matrixBuilder.toString();
     }
 
-    public static boolean isValidConnectionMatrix(String input) {
+    private static boolean isValidConnectionMatrix(String input) {
         String[] rows = input.split(";");
         if (rows.length != 6) return false;
 
@@ -352,7 +352,7 @@ public class CustomHyperlaneService {
 
             for (String cell : cells) {
                 String trimmed = cell.trim();
-                if (!trimmed.equals("0") && !trimmed.equals("1")) return false;
+                if (!"0".equals(trimmed) && !"1".equals(trimmed)) return false;
             }
         }
 
@@ -360,7 +360,7 @@ public class CustomHyperlaneService {
     }
 
     // Ensure connections are always marked both ways
-    public static String normalizeMatrix(String matrix) {
+    private static String normalizeMatrix(String matrix) {
         String[] rows = matrix.split(";");
         int[][] grid = new int[6][6];
 
@@ -405,7 +405,7 @@ public class CustomHyperlaneService {
             String[] cols = rows[i].split(",");
             if (cols.length != 6) continue;
 
-            if (cols[i].trim().equals("1")) {
+            if ("1".equals(cols[i].trim())) {
                 return true;
             }
         }

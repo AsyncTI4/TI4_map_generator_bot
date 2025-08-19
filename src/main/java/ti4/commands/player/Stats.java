@@ -1,11 +1,17 @@
 package ti4.commands.player;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelperAbilities;
@@ -54,6 +60,7 @@ class Stats extends GameStateSubcommand {
                 .addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Set whether player has passed y/n"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Set whether player is speaker y/n"))
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
+                .addOptions(new OptionData(OptionType.BOOLEAN, Constants.NPC, "Player is an NPC"))
                 .addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
                 .addOptions(new OptionData(
                                 OptionType.STRING, Constants.FACTION_COLOR, "Set stats for another Faction or Color")
@@ -282,6 +289,33 @@ class Stats extends GameStateSubcommand {
             boolean value = optionDummy.getAsBoolean();
             player.setDummy(value);
             MessageHelper.sendMessageToEventChannel(event, getGeneralMessage(optionDummy));
+        }
+
+        OptionMapping optionNPC = event.getOption(Constants.NPC);
+        if (optionNPC != null) {
+            boolean value = optionNPC.getAsBoolean();
+            player.setNpc(value);
+            MessageHelper.sendMessageToEventChannel(event, getGeneralMessage(optionNPC));
+            if (value) {
+                if (!game.isFowMode()) {
+                    Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), game.getName());
+                }
+
+                Guild guild = event.getGuild();
+                Member removedMember = guild.getMemberById(player.getUserID());
+                List<Role> roles = guild.getRolesByName(game.getName(), true);
+                if (removedMember != null && roles.size() == 1) {
+                    guild.removeRoleFromMember(removedMember, roles.getFirst()).queue();
+                }
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.gray(
+                        player.getFinsFactionCheckerPrefix() + "removePlayerPermissions_" + player.getFaction(),
+                        "Remove View Permissions " + player.getDisplayName()));
+                buttons.add(Buttons.red("deleteButtons", "Stay in channels"));
+                String msg = player.getRepresentation()
+                        + " do you want to remove yourself from the game channels? If so, press this button.";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+            }
         }
     }
 

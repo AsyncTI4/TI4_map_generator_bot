@@ -1,6 +1,7 @@
 package ti4.service.milty;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -22,9 +23,9 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.message.MessageHelper.MessageFunction;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class DraftDisplayService {
@@ -97,7 +98,7 @@ public class DraftDisplayService {
                     case "slice" -> manager.getSliceButtons();
                     case "faction" -> manager.getFactionButtons();
                     case "order" -> manager.getPositionButtons();
-                    default -> List.of();
+                    default -> Collections.emptyList();
                 };
         String newSummary = manager.getOverallSummaryString(game);
         return hist -> {

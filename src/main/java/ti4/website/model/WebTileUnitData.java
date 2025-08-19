@@ -28,13 +28,13 @@ public class WebTileUnitData {
     private Map<String, Integer> production;
     private Map<String, WebPdsCoverage> pds; // PDS coverage data per faction
 
-    public WebTileUnitData() {
-        this.space = new HashMap<>();
-        this.planets = new HashMap<>();
-        this.ccs = new ArrayList<>();
-        this.isAnomaly = false;
-        this.production = new HashMap<>();
-        this.pds = null; // Only populated if there is PDS coverage
+    private WebTileUnitData() {
+        space = new HashMap<>();
+        planets = new HashMap<>();
+        ccs = new ArrayList<>();
+        isAnomaly = false;
+        production = new HashMap<>();
+        pds = null; // Only populated if there is PDS coverage
     }
 
     public static Map<String, WebTileUnitData> fromGame(Game game) {
@@ -114,9 +114,7 @@ public class WebTileUnitData {
                 if (!factionEntities.isEmpty()) {
                     if (isSpace) {
                         // For space, merge all factions directly into the space map
-                        for (Map.Entry<String, List<WebEntityData>> factionEntry : factionEntities.entrySet()) {
-                            tileData.space.put(factionEntry.getKey(), factionEntry.getValue());
-                        }
+                        tileData.space.putAll(factionEntities);
                     } else {
                         // For planets, create or get existing WebTilePlanet
                         WebTilePlanet planetData =

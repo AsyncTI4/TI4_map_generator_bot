@@ -17,7 +17,7 @@ import ti4.model.TileModel;
 import ti4.service.image.FileUploadService;
 
 // Jazz's Interactive Map Builder
-public class JimboImageHelper {
+class JimboImageHelper {
 
     public static FileUpload tilesImage(List<TileModel> tiles) {
         return generateImage(tiles, TileModel::getTilePath, TileModel::getAlias);

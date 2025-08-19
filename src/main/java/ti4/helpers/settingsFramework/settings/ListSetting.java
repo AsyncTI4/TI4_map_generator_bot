@@ -25,7 +25,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @Getter
 @Setter
@@ -49,13 +49,13 @@ public class ListSetting<T> extends SettingInterface {
             Set<String> defaults) {
         super(id, name);
 
-        this.includeLang = include;
-        this.removeLang = remove;
+        includeLang = include;
+        removeLang = remove;
         if (allVals != null) {
             for (Map.Entry<String, T> entry : allVals) allValues.put(entry.getKey(), entry.getValue());
         }
         if (defaults != null) defaultKeys.addAll(defaults);
-        if (values != null) this.keys.addAll(values);
+        if (values != null) keys.addAll(values);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ public class ListSetting<T> extends SettingInterface {
         Button remove = Buttons.red(idPrefix + "remove" + id, removeLang).withEmoji(emojiDown);
         List<Button> ls = new ArrayList<>();
         if (!keys.isEmpty()) ls.add(remove);
-        if (!(keys.size() == allValues.size())) ls.add(include);
+        if (keys.size() != allValues.size()) ls.add(include);
         return ls;
     }
 

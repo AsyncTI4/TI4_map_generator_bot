@@ -19,10 +19,10 @@ class DiscordantStars extends Subcommand {
         showDSStuff(event);
     }
 
-    public static void showDSStuff(GenericInteractionCreateEvent event) {
+    private static void showDSStuff(GenericInteractionCreateEvent event) {
         String path = ResourceHelper.getInstance().getHelpFile("DS.txt");
         try {
-            String message = new String(Files.readAllBytes(Paths.get(path)));
+            String message = Files.readString(Paths.get(path));
             MessageHelper.sendMessageToEventChannel(event, message);
         } catch (Exception e) {
             MessageHelper.sendMessageToEventChannel(event, "DS HELP FILE IS BLANK");

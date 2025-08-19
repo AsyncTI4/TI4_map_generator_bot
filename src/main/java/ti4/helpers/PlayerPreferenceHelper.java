@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -171,7 +170,7 @@ public class PlayerPreferenceHelper {
                 buttons);
     }
 
-    public static List<Button> getSetAFKButtons() {
+    private static List<Button> getSetAFKButtons() {
         List<Button> buttons = new ArrayList<>();
         for (int x = 0; x < 24; x++) {
             buttons.add(Buttons.gray("setHourAsAFK_" + x, "" + x));
@@ -180,7 +179,7 @@ public class PlayerPreferenceHelper {
         return buttons;
     }
 
-    public static void offerDirectHitManagementOptions(Game game, Player player) {
+    private static void offerDirectHitManagementOptions(Game game, Player player) {
         List<Button> buttons = getDirectHitManagementButtons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
@@ -189,7 +188,7 @@ public class PlayerPreferenceHelper {
                 buttons);
     }
 
-    public static List<Button> getDirectHitManagementButtons(Game game, Player player) {
+    private static List<Button> getDirectHitManagementButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         String stuffNotToSustain = game.getStoredValue("stuffNotToSustainFor" + player.getFaction());
         if (stuffNotToSustain.isEmpty()) {
@@ -198,36 +197,35 @@ public class PlayerPreferenceHelper {
         }
         String unit = "warsun";
         if (stuffNotToSustain.contains(unit)) {
-            buttons.add(Buttons.red("riskDirectHit_" + unit + "_yes", "Risk " + StringUtils.capitalize(unit)));
+            buttons.add(Buttons.red("riskDirectHit_" + unit + "_yes", "Risk " + capitalize(unit)));
         } else {
-            buttons.add(Buttons.green("riskDirectHit_" + unit + "_no", "Don't Risk " + StringUtils.capitalize(unit)));
+            buttons.add(Buttons.green("riskDirectHit_" + unit + "_no", "Don't Risk " + capitalize(unit)));
         }
         unit = "flagship";
         if (stuffNotToSustain.contains(unit)) {
-            buttons.add(Buttons.red("riskDirectHit_" + unit + "_yes", "Risk " + StringUtils.capitalize(unit)));
+            buttons.add(Buttons.red("riskDirectHit_" + unit + "_yes", "Risk " + capitalize(unit)));
         } else {
-            buttons.add(Buttons.green("riskDirectHit_" + unit + "_no", "Don't Risk " + StringUtils.capitalize(unit)));
+            buttons.add(Buttons.green("riskDirectHit_" + unit + "_no", "Don't Risk " + capitalize(unit)));
         }
         unit = "dreadnought";
         if (stuffNotToSustain.contains(unit)) {
-            buttons.add(Buttons.red("riskDirectHit_" + unit + "_yes", "Risk " + StringUtils.capitalize(unit)));
+            buttons.add(Buttons.red("riskDirectHit_" + unit + "_yes", "Risk " + capitalize(unit)));
         } else {
-            buttons.add(Buttons.green("riskDirectHit_" + unit + "_no", "Don't Risk " + StringUtils.capitalize(unit)));
+            buttons.add(Buttons.green("riskDirectHit_" + unit + "_no", "Don't Risk " + capitalize(unit)));
         }
         unit = "cruiser";
         if (player.hasTech("se2")) {
             if (stuffNotToSustain.contains(unit)) {
-                buttons.add(Buttons.red("riskDirectHit_" + unit + "_yes", "Risk " + StringUtils.capitalize(unit)));
+                buttons.add(Buttons.red("riskDirectHit_" + unit + "_yes", "Risk " + capitalize(unit)));
             } else {
-                buttons.add(
-                        Buttons.green("riskDirectHit_" + unit + "_no", "Don't Risk " + StringUtils.capitalize(unit)));
+                buttons.add(Buttons.green("riskDirectHit_" + unit + "_no", "Don't Risk " + capitalize(unit)));
             }
         }
         buttons.add(Buttons.gray("deleteButtons", "Done"));
         return buttons;
     }
 
-    @ButtonHandler(value = "riskDirectHit_")
+    @ButtonHandler("riskDirectHit_")
     public static void resolveRiskDirectHit(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String yesOrNo = buttonID.split("_")[2];
         String unit = buttonID.split("_")[1];

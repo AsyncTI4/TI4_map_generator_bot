@@ -32,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
+import ti4.commands.CommandHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -41,8 +42,9 @@ import ti4.image.ImageHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.async.ReserveGameNumberService;
 import ti4.service.image.FileUploadService;
 import ti4.service.option.GameOptionService;
@@ -51,6 +53,9 @@ import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 public class CreateGameService {
+
+    private static final int MAX_ROLE_COUNT = 250;
+    private static final int MAX_CHANNEL_COUNT = 500;
 
     public static Game createNewGame(String gameName, Member gameOwner) {
         Game newGame = new Game();
@@ -66,7 +71,7 @@ public class CreateGameService {
         return newGame;
     }
 
-    public static void reportNewGameCreated(Game game) {
+    private static void reportNewGameCreated(Game game) {
         if (game == null) return;
 
         TextChannel bothelperLoungeChannel =
@@ -217,7 +222,7 @@ public class CreateGameService {
 
         // AUTOCLOSE LAUNCH THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread
-                && thread.getParentChannel().getName().equals("making-new-games")) {
+                && "making-new-games".equals(thread.getParentChannel().getName())) {
             newGame.setLaunchPostThreadID(thread.getId());
             ThreadChannelManager manager = thread.getManager()
                     .setName(StringUtils.left(newGame.getName() + "-launched [FULL] - " + thread.getName(), 100))
@@ -285,7 +290,7 @@ public class CreateGameService {
     private static void sendMessageAboutAggressionMetas(Game game) {
         String aggressionMsg =
                 """
-            Strangers playing with eachother for the first time can have different aggression metas, and be unpleasantly surprised when they find themselves playing with others who don't share that meta.\
+            Strangers playing with each other for the first time can have different aggression metas, and be unpleasantly surprised when they find themselves playing with others who don't share that meta.\
              Therefore, you can use the buttons below to anonymously share your aggression meta, and if a conflict seems apparent, you can have a conversation about it, or leave the game if the difference is too much and the conversation went badly. These have no binding effect on the game, they just are for setting expectations and starting necessary conversations at the start, rather than in a tense moment 3 weeks down the line\
             .\s
             The conflict metas are loosely classified as the following:\s
@@ -371,7 +376,7 @@ public class CreateGameService {
                                 FileUpload fileUpload = FileUploadService.createFileUpload(colorsImage, "colors");
                                 MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
                             } catch (Exception e) {
-                                BotLogger.error(new BotLogger.LogMessageOrigin(game), "newPlayerIntro", e);
+                                BotLogger.error(new LogOrigin(game), "newPlayerIntro", e);
                             }
                         },
                         null);
@@ -513,24 +518,20 @@ public class CreateGameService {
 
     private static boolean serverHasRoomForNewRole(Guild guild) {
         int roleCount = guild.getRoles().size();
-        if (roleCount >= 250) {
-            BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(guild),
-                    "`CreateGameService.serverHasRoomForNewRole` Cannot create a new role. Server **" + guild.getName()
-                            + "** currently has **" + roleCount + "** roles.");
+        if (roleCount >= MAX_ROLE_COUNT) {
+            BotLogger.warning("`CreateGameService.serverHasRoomForNewRole` Cannot create a new role. Server **"
+                    + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return false;
         }
         return true;
     }
 
     private static int getServerCapacityForNewGames(Guild guild) {
-        int maxRoleCount = 250;
         int roleCount = guild.getRoles().size();
-        int gameCountByRole = maxRoleCount - roleCount;
+        int gameCountByRole = MAX_ROLE_COUNT - roleCount;
 
-        int maxChannelCount = 500;
         int channelCount = guild.getChannels().size();
-        int gameCountByChannel = (maxChannelCount - channelCount) / 2;
+        int gameCountByChannel = (MAX_CHANNEL_COUNT - channelCount) / 2;
 
         return Math.min(gameCountByRole, gameCountByChannel);
     }
@@ -538,20 +539,14 @@ public class CreateGameService {
     private static boolean serverHasRoomForNewFullCategory(Guild guild) {
         if (guild == null) return false;
 
-        int maxGamesPerCategory = Math.max(
-                1,
-                Math.min(
-                        25,
-                        GlobalSettings.getSetting(
-                                GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(),
-                                Integer.class,
-                                10)));
+        int settingForMaxGamesPerCategory = GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10);
+        int maxGamesPerCategory = Math.max(1, Math.min(25, settingForMaxGamesPerCategory));
 
         // SPACE FOR 25 ROLES
         int roleCount = guild.getRoles().size();
-        if (roleCount > (250 - maxGamesPerCategory)) {
+        if (roleCount > (MAX_ROLE_COUNT - maxGamesPerCategory)) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(guild),
                     "`CreateGameService.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
                             + guild.getName() + "** currently has **" + roleCount
                             + "** roles and a new category requires space for " + maxGamesPerCategory + " roles.");
@@ -560,11 +555,9 @@ public class CreateGameService {
 
         // SPACE FOR 50 CHANNELS
         int channelCount = guild.getChannels().size();
-        int channelMax = 500;
         int channelsCountRequiredForNewCategory = 1 + 2 * maxGamesPerCategory;
-        if (channelCount > (channelMax - channelsCountRequiredForNewCategory)) {
+        if (channelCount > (MAX_CHANNEL_COUNT - channelsCountRequiredForNewCategory)) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(guild),
                     "`CreateGameService.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
                             + guild.getName() + "** currently has " + channelCount
                             + " channels and a new category requires space for "
@@ -578,13 +571,10 @@ public class CreateGameService {
 
     private static boolean serverHasRoomForNewChannels(Guild guild) {
         int channelCount = guild.getChannels().size();
-        int channelMax = 500;
         int channelsCountRequiredForNewGame = 2;
-        if (channelCount > (channelMax - channelsCountRequiredForNewGame)) {
-            BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(guild),
-                    "`CreateGameService.serverHasRoomForNewChannels` Cannot create new channels. Server **"
-                            + guild.getName() + "** currently has " + channelCount + " channels.");
+        if (channelCount > (MAX_CHANNEL_COUNT - channelsCountRequiredForNewGame)) {
+            BotLogger.warning("`CreateGameService.serverHasRoomForNewChannels` Cannot create new channels. Server **"
+                    + guild.getName() + "** currently has " + channelCount + " channels.");
             return false;
         }
         return true;
@@ -616,14 +606,9 @@ public class CreateGameService {
         }
 
         // Derive a category name logically
-        int maxGamesPerCategory = Math.max(
-                1,
-                Math.min(
-                        25,
-                        GlobalSettings.getSetting(
-                                GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(),
-                                Integer.class,
-                                10)));
+        int settingForMaxGamePerCategory = GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10);
+        int maxGamesPerCategory = Math.max(1, Math.min(25, settingForMaxGamePerCategory));
         int gameNumberMod = gameNumber % maxGamesPerCategory;
         int lowerBound = gameNumber - gameNumberMod;
         int upperBound = lowerBound + maxGamesPerCategory - 1;
@@ -677,21 +662,15 @@ public class CreateGameService {
     public static String getNewPlayerInfoText() {
         String path = ResourceHelper.getInstance().getHelpFile("NewPlayerIntro.txt");
         try {
-            return new String(Files.readAllBytes(Paths.get(path)));
+            return Files.readString(Paths.get(path));
         } catch (Exception e) {
             return "NewPlayerIntro HELP FILE IS BLANK";
         }
     }
 
     public static boolean isLockedFromCreatingGames(GenericInteractionCreateEvent event) {
-        Member member = event.getMember();
-        if (member != null) {
-            List<Role> roles = member.getRoles();
-            for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
-                if (roles.contains(role)) {
-                    return false;
-                }
-            }
+        if (CommandHelper.hasRole(event, AsyncTI4DiscordBot.bothelperRoles)) {
+            return false;
         }
 
         var userSettings = UserSettingsManager.get(event.getUser().getId());

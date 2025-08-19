@@ -17,7 +17,7 @@ class ShowMapString extends GameStateSubcommand {
         showMapString(event, getGame());
     }
 
-    public static void showMapString(GenericInteractionCreateEvent event, Game game) {
+    private static void showMapString(GenericInteractionCreateEvent event, Game game) {
         MessageHelper.sendMessageToEventChannel(event, game.getName() + " map string below:");
         MessageHelper.sendMessageToEventChannel(event, game.getMapString());
     }

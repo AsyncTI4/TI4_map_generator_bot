@@ -63,7 +63,7 @@ public class DestroyUnitService {
         handleDestroyedUnits(event, game, units, combat);
     }
 
-    public static void destroyAllPlayerNonStructureUnits(
+    private static void destroyAllPlayerNonStructureUnits(
             GenericInteractionCreateEvent event,
             Game game,
             Player player,
@@ -80,7 +80,7 @@ public class DestroyUnitService {
         destroyUnits(event, tile, game, color, unitList, combat, true);
     }
 
-    public static void destroyUnits(
+    private static void destroyUnits(
             GenericInteractionCreateEvent event,
             Tile tile,
             Game game,
@@ -171,9 +171,7 @@ public class DestroyUnitService {
         List<Player> killers = CaptureUnitService.listProbableKiller(game, unit);
 
         switch (unit.unitKey().getUnitType()) {
-            case Infantry -> {
-                capturing.addAll(CaptureUnitService.listCapturingMechPlayers(game, allUnits, unit));
-            }
+            case Infantry -> capturing.addAll(CaptureUnitService.listCapturingMechPlayers(game, allUnits, unit));
             case Mech -> {
                 handleSelfAssemblyRoutines(player, totalAmount, game);
                 if (player != null && player.hasUnit("mykomentori_mech")) {
@@ -199,8 +197,7 @@ public class DestroyUnitService {
                     DisasterWatchHelper.postTileInDisasterWatch(game, event, unit.tile(), 0, message1);
                     UnitHolder uh = unit.tile().getSpaceUnitHolder();
                     for (Player player_ : game.getPlayers().values()) {
-                        DestroyUnitService.destroyAllPlayerNonStructureUnits(
-                                event, game, player_, unit.tile(), uh, combat);
+                        destroyAllPlayerNonStructureUnits(event, game, player_, unit.tile(), uh, combat);
                     }
                     DisasterWatchHelper.postTileInDisasterWatch(
                             game, event, unit.tile(), 0, player.getRepresentation() + " has detonated the bomb.");
@@ -235,7 +232,7 @@ public class DestroyUnitService {
             UnitModel uni = player.getUnitFromUnitKey(unit.unitKey());
             if (uni != null && uni.getIsShip()) {
                 if (player.hasUnit("ghoti_flagship")
-                        || ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                        || CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
                                 .contains(player.getHomeSystemTile())) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green(
@@ -297,7 +294,7 @@ public class DestroyUnitService {
         }
     }
 
-    public static void handleSelfAssemblyRoutines(Player player, int min, Game game) {
+    private static void handleSelfAssemblyRoutines(Player player, int min, Game game) {
         if (player.hasTech("sar")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

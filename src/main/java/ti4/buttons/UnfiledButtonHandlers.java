@@ -1,6 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -65,9 +65,10 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
@@ -158,19 +159,19 @@ public class UnfiledButtonHandlers {
     @ButtonHandler("fogAllianceAgentStep3_")
     public static void fogAllianceAgentStep3(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         ButtonHelper.deleteMessage(event);
-        ButtonHelperHeroes.argentHeroStep3(game, player, event, buttonID);
+        ButtonHelperHeroes.argentHeroStep3(game, player, buttonID);
     }
 
     @ButtonHandler("enableDaneMode_")
     public static void enableDaneMode(ButtonInteractionEvent event, String buttonID, Game game) {
         String mode = buttonID.split("_")[1];
-        boolean enable = buttonID.split("_")[2].equalsIgnoreCase("enable");
+        boolean enable = "enable".equalsIgnoreCase(buttonID.split("_")[2]);
         String message = "Successfully " + buttonID.split("_")[2] + "d the ";
-        if (mode.equalsIgnoreCase("hiddenagenda")) {
+        if ("hiddenagenda".equalsIgnoreCase(mode)) {
             game.setHiddenAgendaMode(enable);
             message += "Hidden Agenda Mode. Nothing more needs to be done.";
         }
-        if (mode.equalsIgnoreCase("minorFactions")) {
+        if ("minorFactions".equalsIgnoreCase(mode)) {
             game.setMinorFactionsMode(enable);
             message += "Minor Factions Mode. ";
             if (enable) {
@@ -180,30 +181,30 @@ public class UnfiledButtonHandlers {
                                 + "after the draft finishes with `/special2 setup_neutral_player`, and you can add 3 infantry to the minor faction planets pretty easily with `/add_units`.";
             }
         }
-        if (mode.equalsIgnoreCase("ageOfExploration")) {
+        if ("ageOfExploration".equalsIgnoreCase(mode)) {
             game.setAgeOfExplorationMode(enable);
             message += "Age of Exploration Mode. Nothing more needs to be done.";
         }
-        if (mode.equalsIgnoreCase("ageOfCommerce")) {
+        if ("ageOfCommerce".equalsIgnoreCase(mode)) {
             game.setAgeOfCommerceMode(enable);
             message += "Age of Commerce Mode. Nothing more needs to be done.";
         }
-        if (mode.equalsIgnoreCase("totalWar")) {
+        if ("totalWar".equalsIgnoreCase(mode)) {
             game.setTotalWarMode(enable);
             message += "Total War Mode. Nothing more needs to be done.";
         }
-        if (mode.equalsIgnoreCase("DangerousWilds")) {
+        if ("DangerousWilds".equalsIgnoreCase(mode)) {
             game.setDangerousWildsMode(enable);
             message += "Dangerous Wilds Mode. Nothing more needs to be done.";
             if (enable) {
                 message += " The game will automatically put down infantry upon the start of every strategy phase.";
             }
         }
-        if (mode.equalsIgnoreCase("CivilizedSociety")) {
+        if ("CivilizedSociety".equalsIgnoreCase(mode)) {
             game.setCivilizedSocietyMode(enable);
             message += "Civilized Society Mode. Nothing more needs to be done.";
         }
-        if (mode.equalsIgnoreCase("AgeOfFighters")) {
+        if ("AgeOfFighters".equalsIgnoreCase(mode)) {
             game.setAgeOfFightersMode(enable);
             message += "Age Of Fighters Mode. Nothing more needs to be done.";
             if (enable) {
@@ -231,9 +232,9 @@ public class UnfiledButtonHandlers {
                 }
             }
         }
-        if (mode.equalsIgnoreCase("StellarAtomics")) {
+        if ("StellarAtomics".equalsIgnoreCase(mode)) {
+            game.setStellarAtomicsMode(enable);
             if (enable) {
-                game.setStellarAtomicsMode(enable);
                 int poIndex = game.addCustomPO("Stellar Atomics", 0);
                 for (Player playerWL : game.getRealPlayers()) {
                     game.scorePublicObjective(playerWL.getUserID(), poIndex);
@@ -251,7 +252,7 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler(value = "requestAllFollow_", save = false)
     public static void requestAllFollow(ButtonInteractionEvent event, Game game) {
-        if (game.getName().equalsIgnoreCase("fow273")) {
+        if ("fow273".equalsIgnoreCase(game.getName())) {
             event.getMessage()
                     .reply(
                             event.getUser().getAsMention()
@@ -476,6 +477,15 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("sandbagPref_")
+    public static void sandbagPref(ButtonInteractionEvent event, Player player, String buttonID) {
+        var userSettings = UserSettingsManager.get(player.getUserID());
+        userSettings.setSandbagPref(buttonID.split("_")[1]);
+        UserSettingsManager.save(userSettings);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Thank you for answering.");
+    }
+
     @ButtonHandler("setAutoPassMedian_")
     public static void setAutoPassMedian(ButtonInteractionEvent event, Player player, String buttonID) {
         String hours = buttonID.split("_")[1];
@@ -613,7 +623,7 @@ public class UnfiledButtonHandlers {
     public static void useTech(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String tech = buttonID.replace("useTech_", "");
         TechnologyModel techModel = Mapper.getTech(tech);
-        if (!tech.equalsIgnoreCase("st")) {
+        if (!"st".equalsIgnoreCase(tech)) {
             String useMessage =
                     player.getRepresentation() + " used the _" + techModel.getRepresentation(false) + "_ technology.";
             if (game.isShowFullComponentTextEmbeds()) {
@@ -700,7 +710,7 @@ public class UnfiledButtonHandlers {
         }
     }
 
-    public static String getBestBombardablePlanet(Player player, Game game, Tile tile) {
+    private static String getBestBombardablePlanet(Player player, Game game, Tile tile) {
         String best = "";
         for (String planet : getBombardablePlanets(player, game, tile)) {
             best = planet;
@@ -721,9 +731,9 @@ public class UnfiledButtonHandlers {
         }
         Map<UnitModel, Integer> bombardUnits = CombatRollService.getUnitsInBombardment(tile, player, null);
         String planet = getBestBombardablePlanet(player, game, tile);
-        for (UnitModel mod : bombardUnits.keySet()) {
-            for (int x = 0; x < bombardUnits.get(mod); x++) {
-                String name = mod.getAsyncId() + "_" + x;
+        for (Map.Entry<UnitModel, Integer> entry : bombardUnits.entrySet()) {
+            for (int x = 0; x < entry.getValue(); x++) {
+                String name = entry.getKey().getAsyncId() + "_" + x;
 
                 String assignedUnit = name + "_" + planet;
                 game.setStoredValue(
@@ -744,7 +754,7 @@ public class UnfiledButtonHandlers {
         }
     }
 
-    public static List<Button> getBombardmentAssignmentButtons(Player player, Game game) {
+    private static List<Button> getBombardmentAssignmentButtons(Player player, Game game) {
 
         List<Button> buttons = new ArrayList<>();
         Tile tile = game.getTileByPosition(game.getActiveSystem());
@@ -754,8 +764,9 @@ public class UnfiledButtonHandlers {
         Map<UnitModel, Integer> bombardUnits = CombatRollService.getUnitsInBombardment(tile, player, null);
         String assignedUnits = game.getStoredValue("assignedBombardment" + player.getFaction());
         List<String> usedLabels = new ArrayList<>();
-        for (UnitModel mod : bombardUnits.keySet()) {
-            for (int x = 0; x < bombardUnits.get(mod); x++) {
+        for (Map.Entry<UnitModel, Integer> entry : bombardUnits.entrySet()) {
+            UnitModel mod = entry.getKey();
+            for (int x = 0; x < entry.getValue(); x++) {
                 String name = mod.getAsyncId() + "_" + x;
                 if (assignedUnits.contains(name)) {
                     for (String assignedUnit : assignedUnits.split(";")) {
@@ -875,24 +886,30 @@ public class UnfiledButtonHandlers {
         return planets;
     }
 
-    public static String getBombardmentSummary(Player player, Game game) {
-        String summary = "";
+    private static String getBombardmentSummary(Player player, Game game) {
+        StringBuilder summary = new StringBuilder();
         String assignedUnits = game.getStoredValue("assignedBombardment" + player.getFaction());
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         if (tile == null) {
-            return summary;
+            return summary.toString();
         }
         for (String planet : getBombardablePlanets(player, game, tile)) {
-            summary += "### " + player.getFactionEmoji() + " BOMBARDMENT of "
-                    + Helper.getPlanetRepresentationNoResInf(planet, game) + ":\n";
+            summary.append("### ")
+                    .append(player.getFactionEmoji())
+                    .append(" BOMBARDMENT of ")
+                    .append(Helper.getPlanetRepresentationNoResInf(planet, game))
+                    .append(":\n");
             for (Player p2 : game.getRealAndEliminatedPlayers()) {
                 if (p2 == player) {
                     continue;
                 }
                 if (FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(planet))) {
-                    summary += "-# " + p2.getFactionEmoji() + " currently has "
-                            + ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, p2, planet)
-                            + "\n";
+                    summary.append("-# ")
+                            .append(p2.getFactionEmoji())
+                            .append(" currently has ")
+                            .append(ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(
+                                    game, p2, planet))
+                            .append("\n");
                     break;
                 }
             }
@@ -901,25 +918,23 @@ public class UnfiledButtonHandlers {
                 if (assignedUnit.endsWith(planet)) {
                     if (assignedUnit.contains("99")) {
                         if (assignedUnit.contains("argent")) {
-                            summary += "- Trrakan Aun Zulok die\n";
+                            summary.append("- Trrakan Aun Zulok die\n");
                         } else {
-                            summary += "- _Plasma Scoring_ die\n";
+                            summary.append("- _Plasma Scoring_ die\n");
                         }
                     } else {
                         String asyncID = assignedUnit.split("_")[0];
                         UnitModel mod = player.getUnitFromAsyncID(asyncID);
-                        summary += "- " + mod.getUnitEmoji() + "\n";
+                        summary.append("- ").append(mod.getUnitEmoji()).append("\n");
                     }
                 }
             }
         }
-        return summary;
+        return summary.toString();
     }
 
     @ButtonHandler("bombardConfirm_")
-    public static void bombardConfirm(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        // List<Button> buttons = new ArrayList<>();
-
+    public static void bombardConfirm(ButtonInteractionEvent event, Player player, Game game) {
         if (getBombardablePlanets(player, game, game.getTileByPosition(game.getActiveSystem()))
                 .isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -962,9 +977,8 @@ public class UnfiledButtonHandlers {
         if (buttonID.split("_").length > 2) {
             whatIsItFor = buttonID.split("_")[2];
         }
-        String message = player.getFactionEmojiOrColor() + " reduced commodities by " + tgLoss + " ("
-                + player.getCommodities() + "->"
-                + (player.getCommodities() - tgLoss) + ").";
+        player.getFactionEmojiOrColor();
+        String message;
 
         if (tgLoss > player.getCommodities()) {
             message = "You don't have " + tgLoss + " commodit" + (tgLoss == 1 ? "y" : "ies") + ". No change made.";
@@ -1033,7 +1047,7 @@ public class UnfiledButtonHandlers {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     "Remove the Watcher",
-                    ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "mech"));
+                    ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "mech", true));
             ButtonHelper.deleteMessage(event);
         } else if ("xxcha".equalsIgnoreCase(type)) {
             message +=
@@ -1212,7 +1226,7 @@ public class UnfiledButtonHandlers {
             List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, pos, p1, p2, groundOrSpace);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
         } catch (IOException e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Failed to close FileUpload", e);
+            BotLogger.error(new LogOrigin(event), "Failed to close FileUpload", e);
         }
     }
 
@@ -1421,7 +1435,7 @@ public class UnfiledButtonHandlers {
     public static void revealPOStage(ButtonInteractionEvent event, String buttonID, Game game) {
         String stage = buttonID.replace("reveal_stage_", "");
         if ("true".equalsIgnoreCase(game.getStoredValue("forcedScoringOrder"))) {
-            if (game.getPhaseOfGame().equalsIgnoreCase("statusScoring")) {
+            if ("statusScoring".equalsIgnoreCase(game.getPhaseOfGame())) {
                 StringBuilder missingPeople = new StringBuilder();
                 for (Player player : game.getRealPlayers()) {
                     String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
@@ -1478,7 +1492,7 @@ public class UnfiledButtonHandlers {
         if (!game.isOmegaPhaseMode()) {
             StartPhaseService.startStatusHomework(event, game);
         } else {
-            if (revealedObjective != null && revealedObjective.equalsIgnoreCase(Constants.IMPERIUM_REX_ID)) {
+            if (Constants.IMPERIUM_REX_ID.equalsIgnoreCase(revealedObjective)) {
                 EndGameService.secondHalfOfGameEnd(event, game, true, true, false);
             } else {
                 var speakerPlayer = game.getSpeaker();
@@ -1534,7 +1548,7 @@ public class UnfiledButtonHandlers {
                 game.setSpeakerUserID(player_.getUserID());
                 String message =
                         MiscEmojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation(false, true);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if (game.isFowMode() && player != player_) {
                     MessageHelper.sendMessageToChannel(player_.getPrivateChannel(), message);
                 }
@@ -1560,7 +1574,7 @@ public class UnfiledButtonHandlers {
                     event.getMessage().editMessage(msg).queue();
                 }
             } catch (Exception e) {
-                BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Could not parse PO ID: " + poID, e);
+                BotLogger.error(new LogOrigin(event, player), "Could not parse PO ID: " + poID, e);
                 event.getChannel()
                         .sendMessage("Could not parse public objective ID: " + poID + ". Please score manually.")
                         .queue();
@@ -1597,12 +1611,12 @@ public class UnfiledButtonHandlers {
                 String poID = buttonID.replace(Constants.PO_SCORING, "");
                 try {
                     int poIndex = Integer.parseInt(poID);
-                    if (!game.getPhaseOfGame().equalsIgnoreCase("action")) {
+                    if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
                         game.setStoredValue(player.getFaction() + "round" + game.getRound() + "PO", "Queued");
                     }
                     game.setStoredValue(player.getFaction() + "queuedPOScore", "" + poIndex);
                 } catch (Exception e) {
-                    BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Could not parse PO ID: " + poID, e);
+                    BotLogger.error(new LogOrigin(event, player), "Could not parse PO ID: " + poID, e);
                     event.getChannel()
                             .sendMessage("Could not parse public objective ID: " + poID + ". Please score manually.")
                             .queue();
@@ -1613,12 +1627,12 @@ public class UnfiledButtonHandlers {
             }
         }
         if (!game.getStoredValue("newStatusScoringMode").isEmpty()
-                && !game.getPhaseOfGame().equalsIgnoreCase("action")) {
+                && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             String msg = "Please score objectives.";
             msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
         }
-        if (game.getPhaseOfGame().equalsIgnoreCase("action")) {
+        if ("action".equalsIgnoreCase(game.getPhaseOfGame())) {
             event.getMessage().delete().queue();
         }
     }
@@ -1770,7 +1784,7 @@ public class UnfiledButtonHandlers {
                             message += player2.getRepresentationUnfogged()
                                     + " is the one the game is currently waiting on.";
                         }
-                        if (!game.getPhaseOfGame().equalsIgnoreCase("action")) {
+                        if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
                             game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "Queued");
                         }
                         MessageHelper.sendMessageToChannel(channel, message);
@@ -1785,7 +1799,7 @@ public class UnfiledButtonHandlers {
                     int soIndex = Integer.parseInt(soID);
                     SecretObjectiveHelper.scoreSO(event, game, player, soIndex, channel);
                 } catch (Exception e) {
-                    BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Could not parse SO ID: " + soID, e);
+                    BotLogger.error(new LogOrigin(event, player), "Could not parse SO ID: " + soID, e);
                     event.getChannel()
                             .sendMessage("Could not parse secret objective ID: " + soID + ". Please score manually.")
                             .queue();
@@ -2044,6 +2058,7 @@ public class UnfiledButtonHandlers {
         }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
             if (player.hasTech("asn")
+                    && game.getStoredValue("ASN" + player.getFaction()).isEmpty()
                     && (buttonID.contains("tacticalAction")
                             || buttonID.contains("warfare")
                             || buttonID.contains("anarchy7Build")
@@ -2065,7 +2080,8 @@ public class UnfiledButtonHandlers {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 }
             }
-            if (buttonID.contains("tacticalAction")) {
+            if (buttonID.contains("tacticalAction")
+                    && game.getStoredValue("ASN" + player.getFaction()).isEmpty()) {
                 ButtonHelper.exploreDET(player, game, event);
                 ButtonHelperFactionSpecific.cleanCavUp(game, event);
                 if (player.hasAbility("cunning")) {
@@ -2442,8 +2458,7 @@ public class UnfiledButtonHandlers {
             if (uH == null) {
                 continue;
             }
-            Set<String> tokens = new HashSet<>();
-            tokens.addAll(uH.getTokenList());
+            Set<String> tokens = new HashSet<>(uH.getTokenList());
             for (String token : tokens) {
                 if (token.contains("corefactory")) {
                     uH.removeToken(token);
@@ -2465,7 +2480,7 @@ public class UnfiledButtonHandlers {
         }
         facilityID = "facilitynavalbase";
         if (!usedFacilities.contains(facilityID)
-                && (uH.getPlanetTypes().contains("industrial") || tPlanet.equalsIgnoreCase("mr") || uH.isLegendary())) {
+                && (uH.getPlanetTypes().contains("industrial") || "mr".equalsIgnoreCase(tPlanet) || uH.isLegendary())) {
             facilities.add(Buttons.green("addFacility_" + tPlanet + "_" + facilityID + "_dont", "Naval Base"));
         }
         facilityID = "facilitylogisticshub";
@@ -2482,7 +2497,7 @@ public class UnfiledButtonHandlers {
                 break;
             }
         }
-        if (!hasEmbassy && (uH.getPlanetTypes().contains("industrial") || tPlanet.equalsIgnoreCase("mr"))) {
+        if (!hasEmbassy && (uH.getPlanetTypes().contains("industrial") || "mr".equalsIgnoreCase(tPlanet))) {
             facilities.add(Buttons.green("addFacility_" + tPlanet + "_" + facilityID + "_dont", "Embassy"));
         }
         int colonies = 0;
@@ -2601,7 +2616,7 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("doAnotherAction")
     @ButtonHandler("finishComponentAction")
-    public static void doAnotherAction(ButtonInteractionEvent event, Player player, Game game) {
+    private static void doAnotherAction(ButtonInteractionEvent event, Player player, Game game) {
         String message = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
@@ -3084,6 +3099,12 @@ public class UnfiledButtonHandlers {
 
         if (!game.isFowMode() && "statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
             ReactionService.addReaction(event, game, player);
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.isNpc() && !game.getCurrentACDrawStatusInfo().contains(p2.getFaction())) {
+                    ButtonHelper.drawStatusACs(game, p2, event);
+                    ReactionService.addReaction(event, game, p2);
+                }
+            }
         }
 
         if ("statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
@@ -3111,7 +3132,7 @@ public class UnfiledButtonHandlers {
                 if (properGain > 2) {
                     MessageHelper.sendMessageToChannel(
                             player.getCardsInfoThread(),
-                            player.getRepresentationUnfogged()
+                            "## " + player.getRepresentationUnfogged()
                                     + ", heads up, the bot thinks you should gain " + properGain + " command token"
                                     + (properGain == 1 ? "" : "s") + " now due to: " + reasons + ".");
                 }
@@ -3397,7 +3418,7 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler("startOfGameObjReveal")
-    public static void startOfGameObjReveal(ButtonInteractionEvent event, Game game, Player player) {
+    public static void startOfGameObjReveal(ButtonInteractionEvent event, Game game) {
         for (Player p : game.getRealPlayers()) {
             if (p.getSecrets().size() > 1 && !game.isExtraSecretMode()) {
                 MessageHelper.sendMessageToChannel(
@@ -3414,7 +3435,7 @@ public class UnfiledButtonHandlers {
         if (speaker == null) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "Please assign speaker before hitting this button.");
-            ButtonHelper.offerSpeakerButtons(game, player);
+            ButtonHelper.offerSpeakerButtons(game);
             return;
         }
         if (game.hasAnyPriorityTrackMode()

@@ -37,7 +37,7 @@ class Info extends GameStateSubcommand {
         MessageHelper.replyToMessage(event, sb.toString());
     }
 
-    public static StringBuilder getGameInfo(Game game, SlashCommandInteractionEvent event) {
+    private static StringBuilder getGameInfo(Game game, SlashCommandInteractionEvent event) {
         boolean privateGame = FoWHelper.isPrivateGame(game, event);
 
         StringBuilder sb = new StringBuilder();
@@ -296,7 +296,6 @@ class Info extends GameStateSubcommand {
         sb.append("Game Real Player Count: ")
                 .append(game.getRealPlayers().size())
                 .append("\n");
-        sb.append("GMIDs: `").append(game.getFogOfWarGMIDs()).append("`\n");
         sb.append("SCs per player: ").append(game.getStrategyCardsPerPlayer()).append("\n");
         sb.append("TopMostTileOffset: `")
                 .append(PositionMapper.getTopMostTileOffsetInGame(game))

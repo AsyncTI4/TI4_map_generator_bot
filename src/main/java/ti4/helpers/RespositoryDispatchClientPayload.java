@@ -3,7 +3,7 @@ package ti4.helpers;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RespositoryDispatchClientPayload {
+class RespositoryDispatchClientPayload {
     private final Map<String, String> records;
 
     /**
@@ -14,7 +14,7 @@ public class RespositoryDispatchClientPayload {
     }
 
     public RespositoryDispatchClientPayload() {
-        this.records = new HashMap<>(1);
+        records = new HashMap<>(1);
     }
 
     public void addRecord(String key, String value) {

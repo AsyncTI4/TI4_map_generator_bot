@@ -10,8 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.game.CreateGameService;
 
 @UtilityClass
@@ -47,10 +48,10 @@ class CreateGameButtonHandler {
         String gameName = CreateGameService.getNextGameName();
         String lastGame = CreateGameService.getLastGameName();
         Game game;
-        if (!lastGame.equalsIgnoreCase("pbd1")) {
+        if (!"pbd1".equalsIgnoreCase(lastGame)) {
             if (!GameManager.isValid(lastGame)) {
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(event),
+                        new LogOrigin(event),
                         "**Unable to create new games because the last game cannot be found. Was it deleted but the roles still exist?**");
                 return;
             }

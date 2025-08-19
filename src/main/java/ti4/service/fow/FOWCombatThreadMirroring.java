@@ -65,7 +65,7 @@ public class FOWCombatThreadMirroring {
         String hits = matchPattern(messageText, "Total hits (\\d+)");
 
         return player.getRepresentationNoPing() + " rolled for " + combat + ": "
-                + CombatMessageHelper.displayHitResults(Integer.valueOf(hits)).replace("\n", "");
+                + CombatMessageHelper.displayHitResults(Integer.parseInt(hits)).replace("\n", "");
     }
 
     private static boolean isFowCombatThread(Channel eventChannel) {

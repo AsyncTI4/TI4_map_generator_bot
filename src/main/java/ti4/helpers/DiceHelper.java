@@ -21,7 +21,7 @@ public class DiceHelper {
             return result;
         }
 
-        public int getThreshold() {
+        int getThreshold() {
             return threshold;
         }
 
@@ -38,7 +38,7 @@ public class DiceHelper {
             else return DiceEmojis.getGrayDieEmoji(result);
         }
 
-        public String printResult() {
+        String printResult() {
             if (isSuccess()) {
                 return String.format("**%d**", result);
             }
@@ -50,7 +50,7 @@ public class DiceHelper {
         }
     }
 
-    public static Die rollDie(int threshold) {
+    private static Die rollDie(int threshold) {
         return new Die(threshold);
     }
 
@@ -62,7 +62,7 @@ public class DiceHelper {
         return output;
     }
 
-    public static String formatDiceResults(List<Die> dice) {
+    private static String formatDiceResults(List<Die> dice) {
         List<String> resultStrings = dice.stream().map(Die::printResult).toList();
         if (dice.size() == 2 && dice.get(0).getResult() == 6 && dice.get(1).getResult() == 9) {
             return String.format("[%s] = %d hits (nice)", String.join(", ", resultStrings), countSuccesses(dice));

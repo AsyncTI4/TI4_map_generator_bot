@@ -26,9 +26,7 @@ public class Units {
     /**
      * <H3> DO NOT ADD NEW VALUES TO THIS OBJECT. </H3>
      * <p>
-     * It is being used as a key in some major hashmaps which causes issues when we attempt to
-     * save/restore from JSON as JSON map keys have to be strings, not JSON objects. This forces
-     * us to use custom mappers to resolve.
+     * It is being used as a key in some major hashmaps which causes issues when we attempt to save/restore from JSON as JSON map keys have to be strings, not JSON objects. This forces us to use custom mappers to resolve.
      * </p>
      */
     @Data
@@ -68,16 +66,16 @@ public class Units {
             if (unitType == UnitType.Destroyer && eyes) {
                 return String.format("%s_dd_eyes.png", colorID);
             }
-            if (UnitType.Lady == unitType || UnitType.Cavalry == unitType) {
+            if (unitType == UnitType.Lady || unitType == UnitType.Cavalry) {
                 return String.format("%s_%s.png", colorID, "fs");
             }
-            if (UnitType.TyrantsLament == unitType) {
+            if (unitType == UnitType.TyrantsLament) {
                 return "TyrantsLament.png";
             }
-            if (UnitType.PlenaryOrbital == unitType) {
+            if (unitType == UnitType.PlenaryOrbital) {
                 return "PlenaryOrbital.png";
             }
-            if (UnitType.Monument == unitType) {
+            if (unitType == UnitType.Monument) {
                 return getColor() + "_monument.png";
             }
 

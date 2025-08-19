@@ -103,7 +103,6 @@ public enum CardEmojis implements TI4Emoji {
             case "public1" -> Public1;
             case "public2" -> Public2;
             case "secretobjective" -> SecretObjective;
-
             default -> SecretObjective;
         };
     }

@@ -10,7 +10,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Storage;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class OldUndoFileCleanupCron {

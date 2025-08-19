@@ -18,8 +18,9 @@ import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -53,7 +54,7 @@ class ActionCardHandButtonHandler {
     }
 
     // TODO: bake this into /ac discard
-    @ButtonHandler(value = "ac_discard_from_hand_")
+    @ButtonHandler("ac_discard_from_hand_")
     static void acDiscardFromHand(
             ButtonInteractionEvent event, String buttonID, Game game, Player player, MessageChannel actionsChannel) {
         String acIndex = buttonID.replace("ac_discard_from_hand_", "");
@@ -141,7 +142,7 @@ class ActionCardHandButtonHandler {
             }
             ActionCardHelper.serveReverseEngineerButtons(game, player, List.of(acID));
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Something went wrong discarding", e);
+            BotLogger.error(new LogOrigin(event, player), "Something went wrong discarding", e);
         }
     }
 
@@ -193,7 +194,7 @@ class ActionCardHandButtonHandler {
                 event.getChannel().sendMessage(error).queue();
             }
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Could not parse AC ID: " + acID, e);
+            BotLogger.error(new LogOrigin(event, player), "Could not parse AC ID: " + acID, e);
             event.getChannel()
                     .asThreadChannel()
                     .sendMessage("Could not parse action card ID: " + acID + ". Please play manually.")

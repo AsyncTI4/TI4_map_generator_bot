@@ -1,13 +1,6 @@
 package ti4.image;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
@@ -45,8 +38,9 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.AgendaModel;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.ColorModel;
@@ -1362,8 +1356,7 @@ public class MapGenerator implements AutoCloseable {
                             null);
                     offBoardHighlighting++;
                 }
-            } else if (displayType == DisplayType.wormholes
-                    && player.getFaction().equalsIgnoreCase("ghost")) {
+            } else if (displayType == DisplayType.wormholes && "ghost".equalsIgnoreCase(player.getFaction())) {
                 boolean alphaOnMap = false;
                 boolean betaOnMap = false;
                 boolean gammaOnMap = false;
@@ -1473,7 +1466,7 @@ public class MapGenerator implements AutoCloseable {
                             t += traits.contains("cultural") ? "C" : "";
                             t += traits.contains("hazardous") ? "H" : "";
                             t += traits.contains("industrial") ? "I" : "";
-                            if (t.equals("CHI")) {
+                            if ("CHI".equals(t)) {
                                 traitFile = ResourceHelper.getInstance()
                                         .getPlanetResource("pc_attribute_combo_CHI_big.png");
                             } else {
@@ -1606,8 +1599,9 @@ public class MapGenerator implements AutoCloseable {
                     }
                 }
                 if (offBoardHighlighting >= 2) {
-                    for (String planet : attachFiles.keySet()) {
-                        BufferedImage bufferedImage = ImageHelper.read(attachFiles.get(planet));
+                    for (Map.Entry<String, String> entry : attachFiles.entrySet()) {
+                        String planet = entry.getKey();
+                        BufferedImage bufferedImage = ImageHelper.read(entry.getValue());
                         bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f
                                 / offBoardHighlighting
                                 / bufferedImage.getWidth()
@@ -1747,8 +1741,8 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private void paintPlayerInfoOld(Game game, Player player, int ringCount) {
-        int deltaX = 0, deltaSplitX = 0;
-        int deltaY = 0, deltaSplitY = 0;
+        int deltaX, deltaSplitX = 0;
+        int deltaY, deltaSplitY = 0;
 
         String playerStatsAnchor = player.getPlayerStatsAnchorPosition();
         if (playerStatsAnchor != null) {
@@ -1980,7 +1974,7 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(player), "Ignored exception during map generation", e);
+            BotLogger.error(new LogOrigin(player), "Ignored exception during map generation", e);
         }
     }
 
@@ -2294,7 +2288,7 @@ public class MapGenerator implements AutoCloseable {
      * @param game
      * @return between 3 and 8 (bounds based on constants)
      */
-    public static int getRingCount(Game game) {
+    private static int getRingCount(Game game) {
         return Math.max(Math.min(game.getRingCount(), RING_MAX_COUNT), RING_MIN_COUNT);
     }
 
@@ -2342,8 +2336,8 @@ public class MapGenerator implements AutoCloseable {
         return mapWidth;
     }
 
-    protected static int getMaxObjectiveWidth(Game game) {
-        return (MapGenerator.getMapWidth(game) - MapGenerator.SPACING_BETWEEN_OBJECTIVE_TYPES * 4) / 3;
+    static int getMaxObjectiveWidth(Game game) {
+        return (getMapWidth(game) - SPACING_BETWEEN_OBJECTIVE_TYPES * 4) / 3;
     }
 
     // The first parameter is the scale factor (contrast), the second is the offset
@@ -2354,7 +2348,7 @@ public class MapGenerator implements AutoCloseable {
         return op.filter(image, null);
     }
 
-    void addWebsiteOverlay(String overlayTitle, String overlayText, int x, int y, int width, int height) {
+    private void addWebsiteOverlay(String overlayTitle, String overlayText, int x, int y, int width, int height) {
         addWebsiteOverlay(websiteOverlays, overlayTitle, overlayText, x, y, width, height);
     }
 
@@ -2404,7 +2398,7 @@ public class MapGenerator implements AutoCloseable {
                     // Apply global translation to each coordinate
                     List<Point> globalCoordinates = coordinates.stream()
                             .map(point -> new Point(point.x + tileX, point.y + tileY))
-                            .collect(Collectors.toList());
+                            .toList();
 
                     globalUnitCoordinatesByFaction
                             .computeIfAbsent(faction, k -> new HashMap<>())

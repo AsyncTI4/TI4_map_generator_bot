@@ -17,53 +17,54 @@ import ti4.helpers.RegexHelper;
 import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Tile;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.TileModel;
 
 // Jazz's Interactive Map Builder
-public class JimboButtons {
+class JimboButtons {
     // Main Page
     public static final Button MAIN_PAGE = Buttons.gray(JimboConst.mainPage, "Go back to main menu");
-    public static final Button EXIT = Buttons.red(JimboConst.exit, "Exit");
+    private static final Button EXIT = Buttons.red(JimboConst.exit, "Exit");
 
     // Tiles: red/blue/green/hyperlane/draft/{other?}
-    public static final Button TILE_ACTION = Buttons.blue(JimboConst.tileAction, "Adjust tiles");
-    public static final Button TILE_ADD = Buttons.green(JimboConst.tileAdd, "Add a tile");
-    public static final Button TILE_MOVE = Buttons.blue(JimboConst.tileRemove, "Remove a tile");
-    public static final Button TILE_REMOVE = Buttons.red(JimboConst.tileMove, "Move a tile");
+    private static final Button TILE_ACTION = Buttons.blue(JimboConst.tileAction, "Adjust tiles");
+    private static final Button TILE_ADD = Buttons.green(JimboConst.tileAdd, "Add a tile");
+    private static final Button TILE_MOVE = Buttons.blue(JimboConst.tileRemove, "Remove a tile");
+    private static final Button TILE_REMOVE = Buttons.red(JimboConst.tileMove, "Move a tile");
 
     // Features : border anomalies and tokens / attachments
-    public static final Button FEATURE_ACTION = Buttons.blue(JimboConst.featureAction, "Adjust tokens");
-    public static final Button TOKEN_ADD = Buttons.green(JimboConst.tokenAdd, "Add a token");
-    public static final Button TOKEN_REMOVE = Buttons.red(JimboConst.tokenRemove, "Remove a token");
-    public static final Button BORDER_ADD = Buttons.green(JimboConst.borderAdd, "Add a border anomaly");
-    public static final Button BORDER_REMOVE = Buttons.red(JimboConst.borderRemove, "Remove a border anomaly");
+    private static final Button FEATURE_ACTION = Buttons.blue(JimboConst.featureAction, "Adjust tokens");
+    private static final Button TOKEN_ADD = Buttons.green(JimboConst.tokenAdd, "Add a token");
+    private static final Button TOKEN_REMOVE = Buttons.red(JimboConst.tokenRemove, "Remove a token");
+    private static final Button BORDER_ADD = Buttons.green(JimboConst.borderAdd, "Add a border anomaly");
+    private static final Button BORDER_REMOVE = Buttons.red(JimboConst.borderRemove, "Remove a border anomaly");
 
     // Transformations: Rotate, Translate
-    public static final Button TRANSFORM_ACTION =
+    private static final Button TRANSFORM_ACTION =
             Buttons.blue(JimboConst.transformAction, "Transform the map (rotate/shift)");
-    public static final Button TRANSFORM_ROTATE_CW = Buttons.green(
+    private static final Button TRANSFORM_ROTATE_CW = Buttons.green(
             JimboConst.transformRotate + "cw", "Rotate clockwise"); // . . . . . . . TODO (Jazz): add emoji
-    public static final Button TRANSFORM_ROTATE_CCW =
+    private static final Button TRANSFORM_ROTATE_CCW =
             Buttons.green(JimboConst.transformRotate + "ccw", "Rotate counter-clockwise"); // . . TODO (Jazz): add emoji
-    public static final Button TRANSFORM_TRANSLATE_0 =
+    private static final Button TRANSFORM_TRANSLATE_0 =
             Buttons.blue(JimboConst.transformTranslate + "0", "Shift the map UP"); // . . . . . TODO (Jazz): add emoji
-    public static final Button TRANSFORM_TRANSLATE_1 =
+    private static final Button TRANSFORM_TRANSLATE_1 =
             Buttons.blue(JimboConst.transformTranslate + "1", "Shift the map UP & RIGHT"); // . TODO (Jazz): add emoji
-    public static final Button TRANSFORM_TRANSLATE_2 =
+    private static final Button TRANSFORM_TRANSLATE_2 =
             Buttons.blue(JimboConst.transformTranslate + "2", "Shift the map DOWN & RIGHT"); // TODO (Jazz): add emoji
-    public static final Button TRANSFORM_TRANSLATE_3 =
+    private static final Button TRANSFORM_TRANSLATE_3 =
             Buttons.blue(JimboConst.transformTranslate + "3", "Shift the map DOWN"); // . . . . TODO (Jazz): add emoji
-    public static final Button TRANSFORM_TRANSLATE_4 =
+    private static final Button TRANSFORM_TRANSLATE_4 =
             Buttons.blue(JimboConst.transformTranslate + "4", "Shift the map DOWN & LEFT"); // . TODO (Jazz): add emoji
-    public static final Button TRANSFORM_TRANSLATE_5 =
+    private static final Button TRANSFORM_TRANSLATE_5 =
             Buttons.blue(JimboConst.transformTranslate + "5", "Shift the map UP & LEFT"); // . . TODO (Jazz): add emoji
 
     // Meta Actions: Add symmetry (and other settings TBD)
-    public static final Button META_ACTION = Buttons.blue(JimboConst.metaAction, "Adjust map settings");
-    public static final Button META_SYMMETRY_ADD = Buttons.green(JimboConst.metaSymmetryAdd, "Add Symmetry");
-    public static final Button META_SYMMETRY_REMOVE = Buttons.green(JimboConst.metaSymmetryRemove, "Remove Symmetry");
+    private static final Button META_ACTION = Buttons.blue(JimboConst.metaAction, "Adjust map settings");
+    private static final Button META_SYMMETRY_ADD = Buttons.green(JimboConst.metaSymmetryAdd, "Add Symmetry");
+    private static final Button META_SYMMETRY_REMOVE = Buttons.green(JimboConst.metaSymmetryRemove, "Remove Symmetry");
 
     public static List<Button> getMenuButtons(String submenu) {
         if (submenu == null) return null;
@@ -86,7 +87,7 @@ public class JimboButtons {
                                 TRANSFORM_TRANSLATE_4,
                                 TRANSFORM_TRANSLATE_5);
                     case JimboConst.metaAction -> List.of(MAIN_PAGE, META_SYMMETRY_ADD, META_SYMMETRY_REMOVE);
-                    default -> List.of();
+                    default -> Collections.emptyList();
                 };
         return new ArrayList<>(buttons);
     }
@@ -139,7 +140,7 @@ public class JimboButtons {
             MessageHelper.editMessageWithActionRowsAndFiles(event, msg, rowsToSend, listToSend);
             return true; // no further actions needed
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Unexpected exception in JIMBO pagination:", e);
+            BotLogger.error(new LogOrigin(event), "Unexpected exception in JIMBO pagination:", e);
             return true; // we still want to abort any further actions
         }
     }

@@ -58,7 +58,7 @@ class KollectAgentButtonHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static List<Button> getKolleccAgentButtons(Game game, Player player) {
+    private static List<Button> getKolleccAgentButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         Set<String> types = ButtonHelper.getTypesOfPlanetPlayerHas(game, player);
         for (String type : types) {

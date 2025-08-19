@@ -4,8 +4,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class ExecutionLockManager {
@@ -21,7 +21,7 @@ public class ExecutionLockManager {
         }
     }
 
-    public static boolean tryLock(String lockName, LockType lockType) {
+    private static boolean tryLock(String lockName, LockType lockType) {
         var lock = getLock(lockName);
         if (lockType == LockType.READ) {
             return lock.readLock().tryLock();
@@ -45,7 +45,7 @@ public class ExecutionLockManager {
     public static Runnable wrapWithTryLockAndRelease(
             String lockName, LockType lockType, Runnable task, MessageChannel messageChannel) {
         return () -> {
-            boolean gotLock = ExecutionLockManager.tryLock(lockName, ExecutionLockManager.LockType.WRITE);
+            boolean gotLock = tryLock(lockName, ExecutionLockManager.LockType.WRITE);
             if (gotLock) {
                 runAndUnlock(lockName, lockType, task);
                 return;
@@ -74,7 +74,7 @@ public class ExecutionLockManager {
 
     public static Runnable wrapWithLockAndRelease(String lockName, LockType lockType, Runnable task) {
         return () -> {
-            ExecutionLockManager.lock(lockName, ExecutionLockManager.LockType.WRITE);
+            lock(lockName, ExecutionLockManager.LockType.WRITE);
             runAndUnlock(lockName, lockType, task);
         };
     }

@@ -19,10 +19,10 @@ class Monuments extends Subcommand {
         showMonumentsHelp(event);
     }
 
-    public static void showMonumentsHelp(GenericInteractionCreateEvent event) {
+    private static void showMonumentsHelp(GenericInteractionCreateEvent event) {
         String path = ResourceHelper.getInstance().getHelpFile("Monuments.txt");
         try {
-            String message = new String(Files.readAllBytes(Paths.get(path)));
+            String message = Files.readString(Paths.get(path));
             MessageHelper.sendMessageToEventChannel(event, message);
         } catch (Exception e) {
             MessageHelper.sendMessageToEventChannel(event, "MONUMENTS HELP FILE IS BLANK");

@@ -52,19 +52,17 @@ public class ListSlashCommandsUsedService {
                 + ". The number of action cards Sabo'd is " + acsSabod
                 + ". The following is the recorded frequency of slash commands \n");
         Map<String, Integer> sortedMapAsc = SortHelper.sortByValue(slashCommands, false);
-        for (String command : sortedMapAsc.keySet()) {
-            longMsg.append(command)
-                    .append(": ")
-                    .append(sortedMapAsc.get(command))
-                    .append(" \n");
+        for (Map.Entry<String, Integer> entry : sortedMapAsc.entrySet()) {
+            longMsg.append(entry.getKey()).append(": ").append(entry.getValue()).append(" \n");
         }
         longMsg.append(
                 "\n The number of times an action card has been Sabo'd is also being tracked. The following is their recorded frequency \n");
         Map<String, Integer> sortedMapAscACs = SortHelper.sortByValue(actionCards, false);
-        for (String command : sortedMapAscACs.keySet()) {
+        for (Map.Entry<String, Integer> entry : sortedMapAscACs.entrySet()) {
+            String command = entry.getKey();
             longMsg.append(command)
                     .append(": ")
-                    .append(sortedMapAscACs.get(command))
+                    .append(entry.getValue())
                     .append(" out of ")
                     .append(actionCardsPlayed.get(command))
                     .append(" times played")

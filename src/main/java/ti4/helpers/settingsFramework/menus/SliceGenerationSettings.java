@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import lombok.Getter;
@@ -29,7 +30,7 @@ import ti4.service.milty.MiltyDraftSlice;
 
 // This is a sub-menu
 @Getter
-@JsonIgnoreProperties({"messageId"})
+@JsonIgnoreProperties("messageId")
 public class SliceGenerationSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
@@ -43,7 +44,7 @@ public class SliceGenerationSettings extends SettingsMenu {
     private final IntegerRangeSetting numLegends;
 
     // This is handled fully manually as there's a lot of validation to do
-    private String presetSlices = null;
+    private String presetSlices;
 
     @JsonIgnore
     private List<MiltyDraftSlice> parsedSlices;
@@ -211,7 +212,7 @@ public class SliceGenerationSettings extends SettingsMenu {
             game = ms.getGame();
             ms.getGameSettings().getMapTemplate().setChosenKey("2025scptFinals");
             List<String> factions = new ArrayList<>(List.of("sol", "xxcha", "jolnar", "keleresm", "ghost", "naalu"));
-            ms.getPlayerSettings().getBanFactions().setKeys(List.of());
+            ms.getPlayerSettings().getBanFactions().setKeys(Collections.emptyList());
             ms.getPlayerSettings().getPriFactions().setKeys(factions);
         }
         numSlices.setVal(6);
@@ -302,8 +303,8 @@ public class SliceGenerationSettings extends SettingsMenu {
             sources.addAll(mparent.getSourceSettings().getTileSources());
         }
 
-        this.parsedSlices = MiltyDraftHelper.parseSlicesFromString(sliceString, sources);
-        if (this.parsedSlices == null) {
+        parsedSlices = MiltyDraftHelper.parseSlicesFromString(sliceString, sources);
+        if (parsedSlices == null) {
             presetSlices = null;
             return "Invalid slice string";
         } else if (parsedSlices.size() < players) {

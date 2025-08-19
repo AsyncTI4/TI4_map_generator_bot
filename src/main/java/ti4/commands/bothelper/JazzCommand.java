@@ -12,8 +12,8 @@ import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.listeners.annotations.ButtonHandler;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.emoji.MiscEmojis;
 
 class JazzCommand extends Subcommand {
@@ -28,14 +28,14 @@ class JazzCommand extends Subcommand {
         sendJazzButton(event);
     }
 
-    public static void sendJazzButton(GenericInteractionCreateEvent event) {
+    private static void sendJazzButton(GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("jazzButton", "Jazz button", MiscEmojis.ScoutSpinner));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), Constants.jazzPing() + " button", buttons);
     }
 
-    public static boolean jazzCheck(GenericInteractionCreateEvent event) {
+    private static boolean jazzCheck(GenericInteractionCreateEvent event) {
         if (Constants.jazzId.equals(event.getUser().getId())) return true;
         if (Constants.honoraryJazz.contains(event.getUser().getId())) {
             MessageHelper.sendMessageToChannel(

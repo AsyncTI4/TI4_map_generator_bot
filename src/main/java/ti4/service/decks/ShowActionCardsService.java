@@ -62,7 +62,8 @@ public class ShowActionCardsService {
             List<String> ids = acEntryList.getValue().stream()
                     .map(i -> "`(" + i.getValue() + ")`")
                     .toList();
-            sb.append("\n").append(index++).append("\\. ");
+            sb.append("\n").append(index).append("\\. ");
+            index++;
             sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
             sb.append(" _").append(acEntryList.getKey()).append("_ ");
             sb.append(String.join(", ", ids)).append("\n> ");
@@ -72,7 +73,7 @@ public class ShowActionCardsService {
         return sb.toString();
     }
 
-    public static String discardListCondensed(List<Map.Entry<String, Integer>> discards, String title) {
+    private static String discardListCondensed(List<Map.Entry<String, Integer>> discards, String title) {
         // Set up the entry list
         List<Map.Entry<String, Integer>> aclist = new ArrayList<>(discards);
         Collections.reverse(aclist);
@@ -93,7 +94,8 @@ public class ShowActionCardsService {
             List<String> ids = acEntryList.getValue().stream()
                     .map(i -> "`(" + i.getValue() + ")`")
                     .toList();
-            sb.append("\n").append(index++).append("\\. ");
+            sb.append("\n").append(index).append("\\. ");
+            index++;
             sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
             sb.append(" _").append(acEntryList.getKey()).append("_");
             sb.append(String.join(", ", ids));

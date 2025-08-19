@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import ti4.cache.CacheManager;
 import ti4.cache.CacheStatsToStringConverter;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class LogCacheStatsCron {

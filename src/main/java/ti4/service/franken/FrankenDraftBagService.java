@@ -34,7 +34,7 @@ public class FrankenDraftBagService {
 
     public static final String ACTION_NAME = "frankenDraftAction;";
 
-    static final List<DraftItem.Category> componentCategories = List.of(
+    private static final List<DraftItem.Category> componentCategories = List.of(
             DraftItem.Category.ABILITY,
             DraftItem.Category.TECH,
             DraftItem.Category.AGENT,
@@ -103,7 +103,7 @@ public class FrankenDraftBagService {
         return sb.toString();
     }
 
-    public static List<Button> getSelectionButtons(List<DraftItem> draftables, Player player) {
+    private static List<Button> getSelectionButtons(List<DraftItem> draftables, Player player) {
         List<Button> buttons = new ArrayList<>();
         draftables.sort(Comparator.comparing(draftItem -> draftItem.ItemCategory));
         DraftItem.Category lastCategory = draftables.getFirst().ItemCategory;
@@ -210,7 +210,7 @@ public class FrankenDraftBagService {
         updateDraftStatusMessage(game);
     }
 
-    public static Set<String> getCurrentBagRepresentation(List<DraftItem> draftables, List<DraftItem> undraftables) {
+    private static Set<String> getCurrentBagRepresentation(List<DraftItem> draftables, List<DraftItem> undraftables) {
         Set<String> bagRepresentationLines = new LinkedHashSet<>();
         StringBuilder sb = new StringBuilder("# __Draftable:__\n");
 
@@ -270,11 +270,11 @@ public class FrankenDraftBagService {
         return sb.toString();
     }
 
-    public static String getCurrentHandRepresentation(Game game, Player player) {
+    private static String getCurrentHandRepresentation(Game game, Player player) {
         return game.getActiveBagDraft().getLongBagRepresentation(player.getDraftHand(), game);
     }
 
-    public static String getDraftQueueRepresentation(Player player) {
+    private static String getDraftQueueRepresentation(Player player) {
         StringBuilder sb = new StringBuilder();
         DraftBag currentBag = player.getDraftQueue();
         for (DraftItem item : currentBag.Contents) {

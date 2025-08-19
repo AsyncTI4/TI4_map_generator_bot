@@ -46,7 +46,7 @@ class ZelianHero extends GameStateSubcommand {
         secondHalfOfCelestialImpact(getPlayer(), event, tile, getGame());
     }
 
-    public static void secondHalfOfCelestialImpact(
+    private static void secondHalfOfCelestialImpact(
             Player player, GenericInteractionCreateEvent event, Tile tile, Game game) {
         String message1 = "Moments before disaster in game " + game.getName() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 1, message1);
@@ -83,7 +83,8 @@ class ZelianHero extends GameStateSubcommand {
         game.setTile(asteroidTile);
 
         // After shot to disaster channel
-        String message2 = tile.getRepresentation() + " has been celestially impacted by " + player.getRepresentation();
+        String message2 =
+                tile.getRepresentation() + " has been _Celestial Impact_'d by " + player.getRepresentation() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, asteroidTile, 1, message2);
 
         if (player.hasLeaderUnlocked("zelianhero")) {

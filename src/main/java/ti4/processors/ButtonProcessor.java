@@ -22,8 +22,9 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.context.ButtonContext;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.button.ReactionService;
 import ti4.service.game.GameNameService;
 
@@ -68,7 +69,7 @@ public class ButtonProcessor {
                 saveRuntime = System.currentTimeMillis() - beforeTime;
             }
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Something went wrong with button interaction", e);
+            BotLogger.error(new LogOrigin(event), "Something went wrong with button interaction", e);
         }
 
         runtimeWarningService.submitNewRuntime(
@@ -100,7 +101,7 @@ public class ButtonProcessor {
         return false;
     }
 
-    public static void resolveButtonInteractionEvent(ButtonContext context) {
+    private static void resolveButtonInteractionEvent(ButtonContext context) {
         // pull values from context for easier access
         ButtonInteractionEvent event = context.getEvent();
         Player player = context.getPlayer();

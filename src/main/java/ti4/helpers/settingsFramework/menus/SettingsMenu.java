@@ -25,8 +25,9 @@ import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.json.ObjectMapperFactory;
 import ti4.listeners.context.ListenerContext;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 
 /**
  * <h1>Jazzxhands Menu Framework</h1>
@@ -42,17 +43,17 @@ import ti4.message.MessageHelper;
 @Getter
 public abstract class SettingsMenu {
     // Prefix "Jazz Menu Framework"
-    protected static final @JsonIgnore String menuNav = "jmfN";
-    protected static final @JsonIgnore String menuAction = "jmfA";
+    private static final @JsonIgnore String menuNav = "jmfN";
+    static final @JsonIgnore String menuAction = "jmfA";
 
     protected final @JsonIgnore String menuName;
     protected final @JsonIgnore List<String> description = new ArrayList<>();
     protected final @JsonIgnore SettingsMenu parent;
 
     protected final String menuId;
-    protected String messageId = null;
+    private String messageId;
 
-    protected SettingsMenu(String menuId, String menuName, String description, SettingsMenu parent) {
+    SettingsMenu(String menuId, String menuName, String description, SettingsMenu parent) {
         this.menuId = menuId;
         this.menuName = menuName;
         this.description.add(description);
@@ -63,42 +64,42 @@ public abstract class SettingsMenu {
     // Overridable Methods:
     //  - Override these as needed
     // ---------------------------------------------------------------------------------------------------------------------------------
-    protected List<SettingInterface> settings() {
+    List<SettingInterface> settings() {
         return Collections.emptyList();
     }
 
-    protected List<SettingsMenu> categories() {
+    List<SettingsMenu> categories() {
         return Collections.emptyList();
     }
 
-    protected List<Button> specialButtons() {
+    List<Button> specialButtons() {
         return Collections.emptyList();
     }
 
     /** Action Handler. Returns "success" on a success, returns null if the action was not found */
-    protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
+    String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
         return null;
     }
 
     /** Action Handler. Returns null on a success */
-    protected String resetSettings() {
+    String resetSettings() {
         if (enabledSettings().isEmpty()) return "No settings to reset.";
         for (SettingInterface setting : enabledSettings()) setting.reset();
         return null;
     }
 
-    protected void updateTransientSettings() {}
+    void updateTransientSettings() {}
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // "Static" methods:
     //  - These methods should only rarely need to be overridden
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public List<SettingInterface> enabledSettings() {
+    List<SettingInterface> enabledSettings() {
         updateTransientSettings();
         return settings().stream().filter(x -> !x.isDisabled()).toList();
     }
 
-    public String menuSummaryString(String lastSettingTouched) {
+    String menuSummaryString(String lastSettingTouched) {
         StringBuilder sb = new StringBuilder("# **__").append(menuName).append(":__**");
         for (String line : description) sb.append("\n- *").append(line).append("*");
         sb.append("\n");
@@ -133,7 +134,7 @@ public abstract class SettingsMenu {
         return sb.toString();
     }
 
-    public String shortSummaryString(boolean shortDescrOnly) {
+    String shortSummaryString(boolean shortDescrOnly) {
         StringBuilder sb = new StringBuilder("**__" + menuName + ":__**");
         for (String line : description) {
             sb.append("\n- *").append(line).append("*");
@@ -172,7 +173,7 @@ public abstract class SettingsMenu {
 
     private void parseInput(GenericInteractionCreateEvent event, String originalId) {
         // This should only ever be run on the most top-level settings menu
-        if (getParent() != null) {
+        if (parent != null) {
             parent.parseInput(event, originalId);
             return;
         }
@@ -189,20 +190,19 @@ public abstract class SettingsMenu {
         }
     }
 
-    protected String navId() {
-        String base = getParent() != null ? getParent().navId() + "." : "";
+    String navId() {
+        String base = parent != null ? parent.navId() + "." : "";
         return base + menuId;
     }
 
-    protected void buttonFailed(GenericInteractionCreateEvent event, String userMsg) {
+    private void buttonFailed(GenericInteractionCreateEvent event, String userMsg) {
         buttonFailed(event, userMsg, true);
     }
 
-    protected void buttonFailed(GenericInteractionCreateEvent event, String userMsg, boolean pingJazz) {
+    private void buttonFailed(GenericInteractionCreateEvent event, String userMsg, boolean pingJazz) {
         if (pingJazz) {
             BotLogger.error(
-                    new BotLogger.LogMessageOrigin(event),
-                    userMsg + "\n" + Constants.jazzPing() + " Menu Framework button has failed.");
+                    new LogOrigin(event), userMsg + "\n" + Constants.jazzPing() + " Menu Framework button has failed.");
             userMsg += "\n> *Jazz has been pinged to take a look.*";
         }
         if (event instanceof ButtonInteractionEvent buttonEvent)
@@ -213,14 +213,14 @@ public abstract class SettingsMenu {
             stringEvent.getHook().sendMessage(userMsg).setEphemeral(true).queue();
     }
 
-    public String getMessageId() {
-        if (this.parent != null) {
-            return this.parent.getMessageId();
+    private String getMessageId() {
+        if (parent != null) {
+            return parent.getMessageId();
         }
-        return this.messageId;
+        return messageId;
     }
 
-    public void setMessageId(String messageId) {
+    void setMessageId(String messageId) {
         if (Objects.equals(this.messageId, messageId)) return;
         this.messageId = messageId;
         for (SettingsMenu cat : categories()) {
@@ -246,7 +246,7 @@ public abstract class SettingsMenu {
                 remainingPath.removeFirst();
                 if (!remainingPath.isEmpty()) {
                     for (SettingsMenu child : categories()) {
-                        if (remainingPath.getFirst().equals(child.getMenuId())) {
+                        if (remainingPath.getFirst().equals(child.menuId)) {
                             // found the path
                             return child.handleButtonPress(event, buttonType, action, remainingPath);
                         }
@@ -297,7 +297,7 @@ public abstract class SettingsMenu {
             }
         }
 
-        if (action.equals("reset")) {
+        if ("reset".equals(action)) {
             err = resetSettings();
             found = true;
         }
@@ -305,7 +305,7 @@ public abstract class SettingsMenu {
         // Check the special buttons
         String special = handleSpecialButtonAction(event, action);
         if (special != null) {
-            if (special.equals("success")) {
+            if ("success".equals(special)) {
                 found = true;
             } else {
                 err = special;
@@ -365,8 +365,8 @@ public abstract class SettingsMenu {
 
     private List<Button> navButtons() {
         List<Button> buttons = new ArrayList<>();
-        if (getParent() != null) {
-            buttons.add(getParent().getNavButton(true));
+        if (parent != null) {
+            buttons.add(parent.getNavButton(true));
         }
         for (SettingsMenu child : categories()) {
             if (child != null) buttons.add(child.getNavButton(false));

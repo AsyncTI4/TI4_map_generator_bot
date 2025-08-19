@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import ti4.draft.DraftItem;
+import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.DraftErrataModel;
@@ -14,6 +15,7 @@ import ti4.model.LeaderModel;
 import ti4.service.emoji.TI4Emoji;
 
 public class HeroDraftItem extends DraftItem {
+
     public HeroDraftItem(String itemId) {
         super(Category.HERO, itemId);
     }
@@ -68,7 +70,7 @@ public class HeroDraftItem extends DraftItem {
             leaders.removeIf(
                     (String leader) -> !"hero".equals(allLeaders.get(leader).getType()));
             for (String leader : leaders) {
-                allItems.add(DraftItem.generate(Category.HERO, leader));
+                allItems.add(generate(Category.HERO, leader));
             }
         }
         return allItems;
@@ -80,10 +82,10 @@ public class HeroDraftItem extends DraftItem {
         return allItems;
     }
 
-    public static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
+    private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
         Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
-        String[] results = game.getStoredValue("bannedLeaders").split("finSep");
+        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedLeaders"));
         for (FactionModel faction : factions) {
             List<String> leaders = faction.getLeaders();
             leaders.removeIf(
@@ -92,7 +94,7 @@ public class HeroDraftItem extends DraftItem {
                 if (Arrays.asList(results).contains(leader)) {
                     continue;
                 }
-                allItems.add(DraftItem.generate(Category.HERO, leader));
+                allItems.add(generate(Category.HERO, leader));
             }
         }
         return allItems;

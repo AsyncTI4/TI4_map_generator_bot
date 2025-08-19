@@ -19,10 +19,10 @@ public class HowToPlayTI4 extends Subcommand {
         howToPlayTI4(event);
     }
 
-    public static void howToPlayTI4(GenericInteractionCreateEvent event) {
+    private static void howToPlayTI4(GenericInteractionCreateEvent event) {
         String path = ResourceHelper.getInstance().getHelpFile("HowToPlayTI4.txt");
         try {
-            String message = new String(Files.readAllBytes(Paths.get(path)));
+            String message = Files.readString(Paths.get(path));
             MessageHelper.sendMessageToEventChannel(event, message);
         } catch (Exception e) {
             MessageHelper.sendMessageToEventChannel(event, "TI4 HELP FILE IS BLANK");

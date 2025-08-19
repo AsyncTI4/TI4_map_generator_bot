@@ -24,6 +24,7 @@ import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.PatternHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
@@ -31,13 +32,15 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.metadata.TechSummariesMetadataManager;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -46,6 +49,7 @@ import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -397,10 +401,11 @@ public class PlayerTechService {
             case "sr", "absol_sar" -> { // Sling Relay or Absol Self Assembley Routines
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();
-                List<Tile> tiles = new ArrayList<>(ButtonHelper.getTilesOfPlayersSpecificUnits(
+                List<Tile> tiles = new ArrayList<>(CheckUnitContainmentService.getTilesContainingPlayersUnits(
                         game, player, Units.UnitType.Spacedock, Units.UnitType.PlenaryOrbital));
                 if (player.hasUnit("ghoti_flagship")) {
-                    tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship));
+                    tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                            game, player, Units.UnitType.Flagship));
                 }
                 List<String> pos2 = new ArrayList<>();
                 for (Tile tile : tiles) {
@@ -465,7 +470,7 @@ public class PlayerTechService {
         boolean isStrat = !buttonID.contains("__comp");
         boolean paymentRequired = !buttonID.contains("__noPay");
 
-        List<String> buttonIDComponents = Arrays.asList(buttonID.split("__"));
+        List<String> buttonIDComponents = Arrays.asList(PatternHelper.DOUBLE_UNDERSCORE_PATTERN.split(buttonID));
         buttonID = buttonIDComponents.getFirst();
         String paymentType = buttonIDComponents.size() > 1 ? buttonIDComponents.get(1) : "res";
 
@@ -478,8 +483,7 @@ public class PlayerTechService {
         techID = AliasHandler.resolveTech(techID);
         if (!Mapper.isValidTech(techID)) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(event),
-                    "`ButtonHelper.getTech` Invalid TechID in 'getTech_' Button: " + techID);
+                    new LogOrigin(event), "`ButtonHelper.getTech` Invalid TechID in 'getTech_' Button: " + techID);
             return;
         }
         TechnologyModel techM = Mapper.getTech(techID);
@@ -522,9 +526,11 @@ public class PlayerTechService {
                 List<Button> buttons;
                 Tile tile = game.getTile(AliasHandler.resolveTile(player.getFaction()));
                 if (player.hasAbility("mobile_command")
-                        && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship)
+                        && !CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                        game, player, Units.UnitType.Flagship)
                                 .isEmpty()) {
-                    tile = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship)
+                    tile = CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                    game, player, Units.UnitType.Flagship)
                             .getFirst();
                 }
                 if (tile == null) {
@@ -543,7 +549,7 @@ public class PlayerTechService {
                             + ". You also have the That Which Molds Flesh, the Vuil'raith commander,"
                             + " which allows you to produce 2 fighters/infantry that don't count towards the PRODUCTION limit";
                 }
-                if (val > 0 && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
+                if (val > 0 && IsPlayerElectedService.isPlayerElected(game, player, "prophecy")) {
                     message2 +=
                             ". And reminder that you have _Prophecy of Ixth_ and should produce 2 fighters if you wish to keep it. Its removal is not automated.";
                 }
@@ -610,7 +616,7 @@ public class PlayerTechService {
                 }
             }
             String buttonText = "Use buttons to do your turn. ";
-            if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
+            if ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName())) {
                 buttonText += "Your strategy card initiative number is "
                         + player.getSCs().toArray()[0] + ".";
             }
@@ -653,12 +659,12 @@ public class PlayerTechService {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void payForTech(
-            Game game, Player player, ButtonInteractionEvent event, String tech, final String payWith) {
+    private static void payForTech(
+            Game game, Player player, ButtonInteractionEvent event, String tech, String payWith) {
         String trueIdentity = player.getRepresentationUnfogged();
         String message2 = trueIdentity + ", please choose the planets you wish to exhaust. ";
         String payType = payWith != null ? payWith : "res";
-        if (!payType.equals("res") && !payType.equals("inf") && !payType.equals("tgsonly")) {
+        if (!"res".equals(payType) && !"inf".equals(payType) && !"tgsonly".equals(payType)) {
             payType = "res";
         }
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, payType + "tech");
@@ -669,7 +675,7 @@ public class PlayerTechService {
         }
         if (techM.isUnitUpgrade() && player.hasTechReady("absol_aida")) {
             String inf = "";
-            if (payType.equalsIgnoreCase("inf")) {
+            if ("inf".equalsIgnoreCase(payType)) {
                 inf = "_inf";
             }
             Button aiDEVButton = Buttons.red("exhaustTech_absol_aida" + inf, "Exhaust AI Development Algorithm");

@@ -38,8 +38,8 @@ public class IntegerRangeSetting extends SettingInterface {
             int delta) {
         super(id, name);
 
-        this.defaultHigh = this.valHigh = valHigh;
-        this.defaultLow = this.valLow = valLow;
+        defaultHigh = this.valHigh = valHigh;
+        defaultLow = this.valLow = valLow;
         this.minHigh = minHigh;
         this.maxHigh = maxHigh;
         this.minLow = minLow;
@@ -97,27 +97,27 @@ public class IntegerRangeSetting extends SettingInterface {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Helper Methods
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public String incrementHigh() {
+    private String incrementHigh() {
         if (valHigh + delta > maxHigh) return String.format("[max %s cannot go above %u]", name, maxHigh);
         valHigh += delta;
         return null;
     }
 
-    public String decrementHigh() {
+    private String decrementHigh() {
         if (valHigh - delta < minHigh) return String.format("[max %s cannot go below %u]", name, minHigh);
         if (valHigh - delta < valLow) return String.format("[max %s cannot go below min %s]", name, name);
         valHigh -= delta;
         return null;
     }
 
-    public String incrementLow() {
+    private String incrementLow() {
         if (valLow + delta > maxLow) return String.format("[min %s cannot go above %u]", name, maxLow);
         if (valHigh - delta < valLow) return String.format("[min %s cannot go above max %s]", name, name);
         valLow += delta;
         return null;
     }
 
-    public String decrementLow() {
+    private String decrementLow() {
         if (valLow - delta < minLow) return String.format("[min %s cannot go below %u]", name, minLow);
         valLow -= delta;
         return null;

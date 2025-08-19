@@ -1,6 +1,9 @@
 package ti4.buttons.handlers.agenda.resolver;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.map.Game;
@@ -16,17 +19,31 @@ public class ArmsReductionAgendaResolver implements ForAgainstAgendaResolver {
     @Override
     public void handleFor(Game game, ButtonInteractionEvent event, int agendaNumericId) {
         for (Player player : game.getRealPlayers()) {
-            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser", false) > 4) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(),
-                        player.getRepresentation() + " remove excess cruisers",
-                        ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "cruiser"));
+            List<Button> removeButtons = new ArrayList<>();
+            String message = "";
+
+            int excessCruisers = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser", false) - 4;
+            if (excessCruisers > 0) {
+                removeButtons.addAll(ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "cruiser"));
+                message = player.getRepresentation() + ", please remove " + excessCruisers + " excess cruiser"
+                        + (excessCruisers == 1 ? "" : "s");
             }
-            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false) > 2) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(),
-                        player.getRepresentation() + " remove excess dreadnoughts",
-                        ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "dreadnought"));
+
+            int excessDreadnoughts = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false) - 2;
+            if (excessDreadnoughts > 0) {
+                removeButtons.addAll(ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "cruiser"));
+                if (message.isEmpty()) {
+                    message = player.getRepresentation() + ", please remove " + excessDreadnoughts
+                            + " excess dreadnought" + (excessDreadnoughts == 1 ? "" : "s");
+                } else {
+                    message += player.getRepresentation() + " and " + excessDreadnoughts + " excess dreadnought"
+                            + (excessDreadnoughts == 1 ? "" : "s");
+                }
+            }
+
+            if (!removeButtons.isEmpty()) {
+                message += ".";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, removeButtons);
             }
         }
         MessageHelper.sendMessageToChannel(
@@ -38,6 +55,6 @@ public class ArmsReductionAgendaResolver implements ForAgainstAgendaResolver {
         game.setStoredValue("agendaArmsReduction", "true");
         MessageHelper.sendMessageToChannel(
                 game.getMainGameChannel(),
-                "# Will exhaust all planets with a technology specialty  at the start of next Strategy Phase.");
+                "# Will exhaust all planets with a technology specialty at the start of next Strategy Phase.");
     }
 }

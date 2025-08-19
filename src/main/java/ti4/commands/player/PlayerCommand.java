@@ -26,7 +26,6 @@ public class PlayerCommand implements ParentCommand {
                     new SendDebt(),
                     new ClearDebt(),
                     new ChangeColor(),
-                    new CorrectFaction(),
                     new ChangeUnitDecal(),
                     new UnitInfo(),
                     new AddAllianceMember(),

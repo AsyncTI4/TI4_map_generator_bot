@@ -36,7 +36,7 @@ public class ReserveGame extends Subcommand {
         // ^^ These can never really be invalid
 
         String gameName = category.toLowerCase() + number;
-        if (removeStr.equalsIgnoreCase("remove")) {
+        if ("remove".equalsIgnoreCase(removeStr)) {
             MessageHelper.sendMessageToEventChannel(event, "Released `" + gameName + "`");
             ReserveGameNumberService.removeReservedGame(gameName);
         } else {

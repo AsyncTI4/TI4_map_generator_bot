@@ -26,7 +26,7 @@ import ti4.service.emoji.SourceEmojis;
 
 // This is a sub-menu
 @Getter
-@JsonIgnoreProperties({"messageId"})
+@JsonIgnoreProperties("messageId")
 public class PlayerFactionSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
@@ -122,7 +122,7 @@ public class PlayerFactionSettings extends SettingsMenu {
             Map<String, FactionModel> allFactions = Mapper.getFactionsValues().stream()
                     .filter(model -> sources.contains(model.getSource()))
                     .filter(model -> !model.getAlias().contains("keleres")
-                            || model.getAlias().equals("keleresm")) // Limit the pool to only 1 keleres flavor
+                            || "keleresm".equals(model.getAlias())) // Limit the pool to only 1 keleres flavor
                     .collect(Collectors.toMap(FactionModel::getAlias, f -> f));
             banFactions.setAllValues(allFactions);
             priFactions.setAllValues(allFactions);

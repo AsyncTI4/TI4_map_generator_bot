@@ -27,22 +27,22 @@ public abstract class ListenerContext {
     protected final Game game;
     protected Player player;
     protected MessageChannel privateChannel, mainGameChannel, actionsChannel;
-    protected final GenericInteractionCreateEvent event;
+    final GenericInteractionCreateEvent event;
 
     @Setter
     protected boolean shouldSave = true;
 
     public abstract GenericInteractionCreateEvent getEvent();
 
-    public abstract String getContextType();
+    protected abstract String getContextType();
 
     public boolean isValid() {
         return contextIsValid;
     }
 
-    public ListenerContext(GenericInteractionCreateEvent event, String compID) {
+    ListenerContext(GenericInteractionCreateEvent event, String compID) {
         this.event = event;
-        this.componentID = this.origComponentID = compID;
+        componentID = origComponentID = compID;
 
         String gameName = GameNameService.getGameNameFromChannel(event);
         game = GameManager.isValid(gameName)
@@ -64,7 +64,7 @@ public abstract class ListenerContext {
                 return;
             }
 
-            if (getContextType().equals("button")) {
+            if ("button".equals(getContextType())) {
                 componentID = componentID.replace("delete_buttons_", "resolveAgendaVote_");
                 game.increaseButtonPressCount();
             }
@@ -111,7 +111,7 @@ public abstract class ListenerContext {
         }
     }
 
-    public boolean checkFinsFactionChecker() {
+    private boolean checkFinsFactionChecker() {
         GenericInteractionCreateEvent event = getEvent();
         if (factionChecked || componentID == null || !componentID.startsWith("FFCC_")) {
             return true;

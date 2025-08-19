@@ -21,7 +21,8 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.settings.GlobalSettings;
 import ti4.website.model.WebCardPool;
 import ti4.website.model.WebLaw;
@@ -68,14 +69,14 @@ public class AsyncTi4WebsiteHelper {
                         .sendAsync(request, HttpResponse.BodyHandlers.ofString())
                         .exceptionally(e -> {
                             BotLogger.error(
-                                    new BotLogger.LogMessageOrigin(game),
+                                    new LogOrigin(game),
                                     "An exception occurred while performing an async send of game data to: " + url,
                                     e);
                             return null;
                         });
             }
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
+            BotLogger.error(new LogOrigin(game), "Could not put data to web server", e);
         }
     }
 
@@ -141,7 +142,7 @@ public class AsyncTi4WebsiteHelper {
                     "no-cache, no-store, must-revalidate",
                     bucket);
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
+            BotLogger.error(new LogOrigin(game), "Could not put data to web server", e);
         }
     }
 
@@ -217,7 +218,7 @@ public class AsyncTi4WebsiteHelper {
         long fileSize = Files.size(tempFile);
         String msg = String.format(
                 "# Uploading statistics to S3 (%.2f MB)... \nOut of %d eligible games, %d games are being uploaded.",
-                fileSize / (1024d * 1024d), eligible, uploaded);
+                fileSize / (1024.0d * 1024.0d), eligible, uploaded);
         if (eligible != uploaded) {
             msg += "\nBad games (first 10):\n- "
                     + String.join("\n- ", badGames.subList(0, Math.min(10, badGames.size())));
@@ -276,7 +277,7 @@ public class AsyncTi4WebsiteHelper {
                     bucket);
         } catch (Exception e) {
             BotLogger.error(
-                    new BotLogger.LogMessageOrigin(player),
+                    new LogOrigin(player),
                     "Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.",
                     e);
         }

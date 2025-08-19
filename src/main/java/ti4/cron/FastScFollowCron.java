@@ -11,8 +11,9 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.StrategyCardModel;
 import ti4.service.button.ReactionService;
 
@@ -47,8 +48,7 @@ public class FastScFollowCron {
             GameManager.save(
                     game, "FastScFollowCron"); // TODO: This should be a property outside game, as it can be UNDO'd
         } catch (Exception e) {
-            BotLogger.error(
-                    new BotLogger.LogMessageOrigin(game), "FastScFollowCron failed for game: " + game.getName(), e);
+            BotLogger.error(new LogOrigin(game), "FastScFollowCron failed for game: " + game.getName(), e);
         }
     }
 
@@ -66,14 +66,14 @@ public class FastScFollowCron {
                     twenty4 = Integer.parseInt(game.getStoredValue("fastSCFollow"));
                     half = twenty4 / 2;
                 }
-                long twelveHoursInMilliseconds = (long) half * ONE_HOUR_IN_MILLISECONDS;
-                long twentyFourHoursInMilliseconds = (long) twenty4 * ONE_HOUR_IN_MILLISECONDS;
+                long twelveHoursInMilliseconds = half * ONE_HOUR_IN_MILLISECONDS;
+                long twentyFourHoursInMilliseconds = twenty4 * ONE_HOUR_IN_MILLISECONDS;
                 long scPlayTime = Long.parseLong(scTime);
                 long timeDifference = System.currentTimeMillis() - scPlayTime;
                 String timesPinged = game.getStoredValue("scPlayPingCount" + sc + player.getFaction());
                 if (timeDifference > twelveHoursInMilliseconds
                         && timeDifference < twentyFourHoursInMilliseconds
-                        && !timesPinged.equalsIgnoreCase("1")) {
+                        && !"1".equalsIgnoreCase(timesPinged)) {
                     StringBuilder sb = new StringBuilder()
                             .append(player.getRepresentationUnfogged())
                             .append(" You are getting this ping because ")
@@ -84,7 +84,7 @@ public class FastScFollowCron {
                     appendScMessages(game, player, sc, sb);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "1");
                 }
-                if (timeDifference > twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("2")) {
+                if (timeDifference > twentyFourHoursInMilliseconds && !"2".equalsIgnoreCase(timesPinged)) {
                     String message = player.getRepresentationUnfogged() + Helper.getSCName(sc, game)
                             + " has been played and now it has been the allotted time and they haven't reacted, so they have"
                             + " been marked as not following.\n";

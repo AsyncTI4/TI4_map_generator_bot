@@ -28,7 +28,7 @@ public class ListTurnOrderService {
             return;
         }
 
-        HashMap<Integer, String> order = new HashMap<>();
+        Map<Integer, String> order = new HashMap<>();
         for (Player player : game.getRealPlayers()) {
             order.put(player.getInitiative(), buildPlayerScText(game, player, pingPeople));
         }
@@ -73,7 +73,7 @@ public class ListTurnOrderService {
         if (pingPeople || game.isFowMode()) {
             textBuilder.append(player.getRepresentation());
         } else {
-            textBuilder.append(player.getFactionEmoji() + " " + player.getUserName());
+            textBuilder.append(player.getFactionEmoji()).append(" ").append(player.getUserName());
         }
 
         if (passed) {

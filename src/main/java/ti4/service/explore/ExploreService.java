@@ -49,6 +49,7 @@ import ti4.model.ExploreModel;
 import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
 import ti4.service.PlanetService;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -83,7 +84,7 @@ public class ExploreService {
                 player.getFaction() + "planetsExplored",
                 game.getStoredValue(player.getFaction() + "planetsExplored") + planetName + "*");
 
-        if (planetName.equalsIgnoreCase("garbozia")) {
+        if ("garbozia".equalsIgnoreCase(planetName)) {
             if (player.hasAbility("distant_suns")) {
                 String reportMessage =
                         """
@@ -281,7 +282,7 @@ public class ExploreService {
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
             return;
         }
-        ExploreService.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
+        resolveExplore(event, cardID, tile, planetName, messageText, player, game);
         if (player.hasTech("pfa")) { // Pre-Fab Arcologies
             PlanetService.refreshPlanet(player, planetName);
             MessageHelper.sendMessageToChannel(
@@ -388,7 +389,7 @@ public class ExploreService {
         MessageEmbed exploreEmbed = exploreModel.getRepresentationEmbed(false, true);
         MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), messageText, exploreEmbed);
 
-        String message = null;
+        String message;
         message = "found a " + exploreModel.getName();
         if (planetID != null) {
             message += " on " + Helper.getPlanetRepresentation(planetID, game) + ".";
@@ -498,6 +499,21 @@ public class ExploreService {
                         Helper.addTokenPlanetToTile(game, tile, Constants.MIRAGE);
                         game.clearPlanetsCache();
                         message = "Mirage added to map, added to your play area, readied, and explored!";
+                        if (!game.isFowMode() && FoWHelper.playerHasShipsInSystem(player, tile)) {
+                            if (game.getRevealedPublicObjectives().containsKey("deep_space")
+                                    && !game.didPlayerScoreThisAlready(player.getUserID(), "deep_space")) {
+                                DisasterWatchHelper.sendMessageInDisasterWatch(
+                                        game,
+                                        player.getRepresentation() + " is attempting to _Expore Deep Space_ in "
+                                                + game.getName() + ". Alas, alack, they have discovered Mirage!");
+                            } else if (game.getRevealedPublicObjectives().containsKey("vast_territories")
+                                    && !game.didPlayerScoreThisAlready(player.getUserID(), "vast_territories")) {
+                                DisasterWatchHelper.sendMessageInDisasterWatch(
+                                        game,
+                                        player.getRepresentation() + " is attempting to _Patrol Vast Territories_ in "
+                                                + game.getName() + ". Alas, alack, they have discovered Mirage!");
+                            }
+                        }
                     }
                     game.purgeExplore(ogID);
                 }
@@ -648,7 +664,7 @@ public class ExploreService {
                             saarButton);
                 }
 
-                if (ButtonHelper.isPlayerElected(game, player, "minister_exploration")) {
+                if (IsPlayerElectedService.isPlayerElected(game, player, "minister_exploration")) {
                     String fac = player.getFactionEmoji();
                     message = fac + " gained 1 trade good from _Minister of Exploration_ " + player.gainTG(1)
                             + ". You do have this trade good prior to exploring.";
@@ -689,7 +705,7 @@ public class ExploreService {
                     message = "Resolve _Abandoned Warehouses_:\n-# You currently have "
                             + player.getCommoditiesRepresentation()
                             + " commodit" + (commod == 1 ? "y" : "ies") + ".";
-                    commod = commod > 2 ? 2 : commod;
+                    commod = Math.min(commod, 2);
                     Button convert = Buttons.green(
                             "convert_2_comms",
                             "Convert " + commod + " Commodit" + (commod == 1 ? "y" : "ies") + " Into "
@@ -960,7 +976,7 @@ public class ExploreService {
             }
             case "ancientshipyard" -> {
                 List<String> colors = tile == null
-                        ? List.of()
+                        ? Collections.emptyList()
                         : tile.getUnitHolders().get("space").getUnitColorsOnHolder();
                 if (colors.isEmpty() || colors.contains(player.getColorID())) {
                     AddUnitService.addUnits(event, tile, game, player.getColor(), "cruiser");
@@ -1047,7 +1063,7 @@ public class ExploreService {
             cardID = cardID == null ? game.drawExplore(Constants.FRONTIER) : cardID;
             String messageText = player.getRepresentation() + (force ? " force" : "") + " explored the "
                     + ExploreEmojis.Frontier + "frontier token in tile " + tile.getPosition() + ":";
-            ExploreService.resolveExplore(event, cardID, tile, null, messageText, player, game);
+            resolveExplore(event, cardID, tile, null, messageText, player, game);
 
             if (player.hasTech("dslaner")) {
                 player.setAtsCount(player.getAtsCount() + 1);
@@ -1168,7 +1184,7 @@ public class ExploreService {
                     entry.getValue().stream().map(ExploreModel::getId).toList();
 
             if (showFullText) {
-                sb.append(index++)
+                sb.append(index)
                         .append("\\. ")
                         .append(emoji)
                         .append(" _")
@@ -1176,6 +1192,7 @@ public class ExploreService {
                         .append("_ (`")
                         .append(String.join("`, `", ids))
                         .append("`)");
+                index++;
                 if (showPercents && ids.size() > 1) {
                     sb.append(" - ").append(formatPercent.format(deckDrawChance * ids.size()));
                 }
@@ -1188,13 +1205,13 @@ public class ExploreService {
                         .append("_ (`")
                         .append(String.join("`, `", ids))
                         .append("`)");
-                if (!entry.getValue()
-                        .getFirst()
-                        .getAttachmentId()
-                        .orElse("nothin")
-                        .equalsIgnoreCase("nothin")) {
-                    if (!entry.getValue().getFirst().getAlias().equalsIgnoreCase("gw")
-                            && !entry.getValue().getFirst().getType().equalsIgnoreCase("frontier")) {
+                if (!"nothin"
+                        .equalsIgnoreCase(
+                                entry.getValue().getFirst().getAttachmentId().orElse("nothin"))) {
+                    if (!"gw".equalsIgnoreCase(entry.getValue().getFirst().getAlias())
+                            && !"frontier"
+                                    .equalsIgnoreCase(
+                                            entry.getValue().getFirst().getType())) {
                         sb.append(" [ATTACHMENT]");
                     }
                 }

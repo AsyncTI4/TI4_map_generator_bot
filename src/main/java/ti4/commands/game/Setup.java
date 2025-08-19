@@ -96,7 +96,7 @@ class Setup extends GameStateSubcommand {
         if (pingHours != null) {
             if (pingHours == 0) {
                 game.setAutoPing(false);
-                game.setAutoPingSpacer(pingHours);
+                game.setAutoPingSpacer(0);
             } else {
                 game.setAutoPing(true);
                 if (pingHours < 1) {
@@ -118,7 +118,7 @@ class Setup extends GameStateSubcommand {
         }
     }
 
-    public static boolean setGameMode(SlashCommandInteractionEvent event, Game game) {
+    private static boolean setGameMode(SlashCommandInteractionEvent event, Game game) {
         if (event.getOption(Constants.TIGL_GAME) == null
                 && event.getOption(Constants.ABSOL_MODE) == null
                 && event.getOption(Constants.DISCORDANT_STARS_MODE) == null
