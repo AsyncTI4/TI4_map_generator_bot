@@ -26,8 +26,8 @@ import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.ExploreModel;
 import ti4.service.PlanetService;
 import ti4.service.button.ReactionService;
@@ -348,7 +348,7 @@ class ExploreButtonHandler {
     static void commForAC(ButtonInteractionEvent event, Game game, Player player) {
         boolean hasSchemingAbility = player.hasAbility("scheming");
         int count2 = hasSchemingAbility ? 2 : 1;
-        String commOrTg = "";
+        String commOrTg;
         if (player.getCommodities() > 0) {
             commOrTg = "commodity";
             player.setCommodities(player.getCommodities() - 1);

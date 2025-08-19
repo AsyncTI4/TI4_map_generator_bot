@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
-public class TechnologyModelTest extends BaseTi4Test {
+class TechnologyModelTest extends BaseTi4Test {
     @Test
-    public void testTechnologies() {
+    void testTechnologies() {
         for (TechnologyModel techModel : Mapper.getTechs().values()) {
             assertTrue(techModel.isValid(), techModel.getAlias() + ": invalid");
             assertTrue(validateFaction(techModel), techModel.getAlias() + ": invalid FactionID");

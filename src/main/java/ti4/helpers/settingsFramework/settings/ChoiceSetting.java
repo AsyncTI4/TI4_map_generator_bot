@@ -21,7 +21,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @Getter
 @Setter
@@ -38,9 +38,9 @@ public class ChoiceSetting<T> extends SettingInterface {
     public ChoiceSetting(String id, String name, String defaultKey) {
         super(id, name);
 
-        this.chosenKey = defaultKey;
+        chosenKey = defaultKey;
         this.defaultKey = defaultKey;
-        this.allValues = new HashMap<>();
+        allValues = new HashMap<>();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -69,8 +69,8 @@ public class ChoiceSetting<T> extends SettingInterface {
 
     protected List<Button> buttons(String idPrefix) {
         List<Button> ls = new ArrayList<>();
-        Button choose = Buttons.gray(idPrefix + "change" + id, lang + " " + this.name);
-        if (this.emoji != null) choose = choose.withEmoji(Emoji.fromFormatted(this.emoji));
+        Button choose = Buttons.gray(idPrefix + "change" + id, lang + " " + name);
+        if (emoji != null) choose = choose.withEmoji(Emoji.fromFormatted(emoji));
         ls.add(choose);
         return ls;
     }
@@ -124,7 +124,7 @@ public class ChoiceSetting<T> extends SettingInterface {
 
             if (allValues.containsKey(itemToChoose)) {
                 chosenKey = itemToChoose;
-                if (getGetExtraInfo() != null) setExtraInfo(getGetExtraInfo().apply(getValue()));
+                if (getExtraInfo != null) setExtraInfo(getExtraInfo.apply(getValue()));
                 return null;
             }
             return itemToChoose + " is not an allowed value";

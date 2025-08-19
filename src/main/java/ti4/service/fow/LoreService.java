@@ -1,6 +1,6 @@
 package ti4.service.fow;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,10 +29,10 @@ import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.PlanetModel;
-import ti4.model.TileModel.TileBack;
 
 public class LoreService {
 
@@ -57,9 +57,13 @@ public class LoreService {
         List<ActionRow> buttons = Buttons.paginateButtons(getLoreButtons(game), LORE_BUTTONS, pageNum, "gmLore");
 
         if (StringUtils.isBlank(page)) {
-            String msg = "### Lore Management"
-                    + "\n-# System Lore is shown to the first player to conclude an action with units in the system."
-                    + "\n-# Planet Lore is shown to the first player to gain control of the planet.";
+            String msg =
+                    """
+                ### Lore Management\
+
+                -# System Lore is shown to the first player to conclude an action with units in the system.\
+
+                -# Planet Lore is shown to the first player to gain control of the planet.""";
             event.getChannel().sendMessage(msg).setComponents(buttons).queue();
         } else {
             event.getHook().editOriginalComponents(buttons).queue();
@@ -69,8 +73,8 @@ public class LoreService {
     private static List<Button> getLoreButtons(Game game) {
         List<Button> loreButtons = new ArrayList<>();
         for (String target : getSavedLore(game).keySet()) {
-            String buttonLabel = "";
-            String emoji = null;
+            String buttonLabel;
+            String emoji;
             boolean isValidLore = true;
 
             if (PositionMapper.isTilePositionValid(target)) {
@@ -109,7 +113,7 @@ public class LoreService {
                     savedLoreMap.put(
                             splitLore[0], new String[] {splitLore[1], splitLore.length == 3 ? splitLore[2] : ""});
                 } else {
-                    BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Invalid lore string: " + savedLore);
+                    BotLogger.warning(new LogOrigin(game), "Invalid lore string: " + savedLore);
                 }
             }
         }
@@ -156,7 +160,7 @@ public class LoreService {
         String target = event.getValue(Constants.POSITION).getAsString();
         String loreText = event.getValue(Constants.MESSAGE).getAsString();
         String footerText = event.getValue("footer").getAsString();
-        boolean systemLore = event.getModalId().replace("gmLoreSave", "").equals("System");
+        boolean systemLore = "System".equals(event.getModalId().replace("gmLoreSave", ""));
         PlanetModel planet = null;
 
         if (systemLore) {
@@ -213,9 +217,9 @@ public class LoreService {
         Color embedColor = Color.black;
         if (tile != null && tile.getTileModel() != null) {
             switch (tile.getTileModel().getTileBack()) {
-                case TileBack.RED -> embedColor = Color.red;
-                case TileBack.BLUE -> embedColor = Color.blue;
-                case TileBack.GREEN -> embedColor = Color.green;
+                case RED -> embedColor = Color.red;
+                case BLUE -> embedColor = Color.blue;
+                case GREEN -> embedColor = Color.green;
                 default -> embedColor = Color.black;
             }
         }

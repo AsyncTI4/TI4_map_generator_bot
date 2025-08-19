@@ -117,7 +117,7 @@ public class GMService {
         if (!game.isFowMode()) return;
 
         String timestamp = "`[" + LocalDateTime.now().format(formatter) + "]` ";
-        final String log = timestamp + eventLog + (ping ? " - " + gmPing(game) : "");
+        String log = timestamp + eventLog + (ping ? " - " + gmPing(game) : "");
         ThreadGetter.getThreadInChannel(
                 getGMChannel(game), game.getName() + ACTIVITY_LOG_THREAD, true, false, threadChannel -> {
                     if (jumpUrl != null) {
@@ -125,9 +125,10 @@ public class GMService {
                     } else if (player == null) {
                         MessageHelper.sendMessageToChannel(threadChannel, log);
                     } else {
-                        jumpToLatestMessage(player, latestJumpUrl -> {
-                            MessageHelper.sendMessageToChannel(threadChannel, log + " - " + latestJumpUrl);
-                        });
+                        jumpToLatestMessage(
+                                player,
+                                latestJumpUrl ->
+                                        MessageHelper.sendMessageToChannel(threadChannel, log + " - " + latestJumpUrl));
                     }
                 });
     }
@@ -139,12 +140,8 @@ public class GMService {
                     .getHistory()
                     .retrievePast(1)
                     .queue(
-                            messages -> {
-                                callback.accept(messages.get(0).getJumpUrl());
-                            },
-                            throwable -> {
-                                callback.accept("No latest message.");
-                            });
+                            messages -> callback.accept(messages.getFirst().getJumpUrl()),
+                            throwable -> callback.accept("No latest message."));
         } else {
             callback.accept("No private channel.");
         }
@@ -181,9 +178,7 @@ public class GMService {
     public static void checkPlayerHands(ButtonInteractionEvent event, String buttonID, Game game) {
         String option = buttonID.replace("gmCheckPlayerHands_", "");
         switch (option) {
-            case "sabotage" -> {
-                checkWhoHas("sabo", game, event);
-            }
+            case "sabotage" -> checkWhoHas("sabo", game, event);
             case "deadly" -> {
                 checkWhoHas("deadly_plot", game, event);
                 checkWhoHas("bribery", game, event);
@@ -228,10 +223,9 @@ public class GMService {
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), sos.toString());
             }
-            default -> {
+            default ->
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getChannel(), "Please choose what to look for:", HAND_CHECK_BUTTONS);
-            }
         }
     }
 

@@ -9,7 +9,7 @@ import ti4.map.Game;
 
 public class GamesPage {
 
-    public static final int PAGE_SIZE = 100;
+    private static final int PAGE_SIZE = 100;
 
     private GamesPage() {}
 
@@ -18,7 +18,7 @@ public class GamesPage {
 
     private boolean hasNextPage;
 
-    public boolean hasNextPage() {
+    private boolean hasNextPage() {
         return hasNextPage;
     }
 
@@ -32,8 +32,9 @@ public class GamesPage {
         int currentPage = 0;
         GamesPage pagedGames;
         do {
-            pagedGames = GamesPage.getPage(currentPage++);
-            pagedGames.getGames().stream().filter(filter).forEach(consumer);
+            pagedGames = getPage(currentPage);
+            currentPage++;
+            pagedGames.games.stream().filter(filter).forEach(consumer);
         } while (pagedGames.hasNextPage());
     }
 
@@ -41,9 +42,7 @@ public class GamesPage {
     private static GamesPage getPage(int page) {
         var gameNames = GameManager.getGameNames();
         var pagedGames = new GamesPage();
-        for (int i = PAGE_SIZE * page;
-                i < gameNames.size() && pagedGames.getGames().size() < PAGE_SIZE;
-                i++) {
+        for (int i = PAGE_SIZE * page; i < gameNames.size() && pagedGames.games.size() < PAGE_SIZE; i++) {
             var game = GameManager.getManagedGame(gameNames.get(i)).getGame();
             pagedGames.games.add(game);
         }

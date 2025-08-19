@@ -40,7 +40,7 @@ public class TravelBanAgendaResolver implements AgendaResolver {
                 }
             }
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Removed all PDS in or adjacent to a wormhole");
+                    game.getMainGameChannel(), "Removed all PDS in or adjacent to wormholes.");
         }
     }
 }

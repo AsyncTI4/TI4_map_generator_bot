@@ -17,10 +17,10 @@ import ti4.helpers.AgendaHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.fow.GMService;
 
 @UtilityClass
@@ -209,7 +209,7 @@ public class ReactionService {
         GameMessageManager.remove(game.getName(), message.getId());
     }
 
-    public static boolean checkForSpecificPlayerReact(Player player, GameMessageManager.GameMessage gameMessage) {
+    private static boolean checkForSpecificPlayerReact(Player player, GameMessageManager.GameMessage gameMessage) {
         return gameMessage.factionsThatReacted().contains(player.getFaction());
     }
 

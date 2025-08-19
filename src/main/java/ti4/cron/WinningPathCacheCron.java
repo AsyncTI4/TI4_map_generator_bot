@@ -2,7 +2,7 @@ package ti4.cron;
 
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.service.statistics.game.WinningPathCacheService;
 
 @UtilityClass

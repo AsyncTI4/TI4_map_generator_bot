@@ -58,11 +58,11 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         return name;
     }
 
-    public String getCategory() {
+    private String getCategory() {
         return Optional.ofNullable(category).orElse("");
     }
 
-    public String getCategoryDescription() {
+    private String getCategoryDescription() {
         return Optional.ofNullable(categoryDescription).orElse("");
     }
 
@@ -116,7 +116,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
             sb.append("(").append(uniqueID).append(") - ");
         }
         sb.append(name).append("__** ");
-        sb.append(getSource().emoji());
+        sb.append(source.emoji());
         sb.append("\n");
 
         sb.append("> **").append(type).append(":** *").append(target).append("*\n");
@@ -143,8 +143,8 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
 
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
-        String name = getName() == null ? "" : getName();
-        eb.setTitle(CardEmojis.Agenda + "__" + name + "__" + getSource().emoji(), null);
+        String name = this.name == null ? "" : this.name;
+        eb.setTitle(CardEmojis.Agenda + "__" + name + "__" + source.emoji(), null);
         eb.setColor(Color.blue);
 
         // DESCRIPTION
@@ -159,7 +159,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         }
         eb.setDescription(text.toString());
 
-        if (includeID) eb.setFooter("ID: " + getAlias() + "  Source: " + getSource());
+        if (includeID) eb.setFooter("ID: " + alias + "  Source: " + source);
         return eb.build();
     }
 
@@ -175,12 +175,12 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString)
-                || getName().toLowerCase().contains(searchString)
-                || getSearchTags().contains(searchString);
+        return alias.toLowerCase().contains(searchString)
+                || name.toLowerCase().contains(searchString)
+                || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return getName() + " [" + getSource() + "]";
+        return name + " [" + source + "]";
     }
 }

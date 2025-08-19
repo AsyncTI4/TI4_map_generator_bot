@@ -458,7 +458,7 @@
         "alias": "techs_pok",
         "name": "[Outdated] PoK Techs",
         "type": "technology",
-        "description": "All techs available in PoK + Codexes. This is the old default deck with both x89s.",
+        "description": "All techs available in Prophecy of Kings + Codices. This is the old default deck with both X-89s and Magen Defense Grids.",
         "cardIDs": [
             "amd",
             "gd",
@@ -471,6 +471,7 @@
             "x89c4",
             "ps",
             "md",
+            "md_c1",
             "da",
             "asc",
             "st",

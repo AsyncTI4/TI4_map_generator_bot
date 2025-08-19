@@ -70,7 +70,7 @@ public class WhisperService {
             }
             String key = player.getFaction() + "whisperHistoryTo" + player_.getFaction();
             String whisperHistory = game.getStoredValue(key);
-            if (!game.getName().equalsIgnoreCase("pbd1000")) {
+            if (!"pbd1000".equalsIgnoreCase(game.getName())) {
                 if (whisperHistory.isEmpty()) {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),

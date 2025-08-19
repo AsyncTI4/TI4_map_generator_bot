@@ -58,7 +58,7 @@ public class CombatModifierModel implements ModelInterface {
                 isInScope = unit.getIsShip();
             }
             if ("_ship_no_ff".equals(scope)) {
-                isInScope = unit.getIsShip() && !unit.getBaseType().equalsIgnoreCase("fighter");
+                isInScope = unit.getIsShip() && !"fighter".equalsIgnoreCase(unit.getBaseType());
             }
             if ("_groundforce_".equals(scope)) {
                 isInScope = unit.getIsGroundForce();

@@ -11,7 +11,7 @@ import ti4.executors.ExecutionLockManager;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class EndOldGamesCron {

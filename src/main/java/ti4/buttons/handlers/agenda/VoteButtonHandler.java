@@ -65,7 +65,7 @@ public class VoteButtonHandler {
     }
 
     @ButtonHandler("vote")
-    public static void firstStepOfVoting(Game game, ButtonInteractionEvent event, Player player) {
+    private static void firstStepOfVoting(Game game, ButtonInteractionEvent event, Player player) {
         String pfaction2 = null;
         if (player != null) {
             pfaction2 = player.getFaction();
@@ -278,7 +278,7 @@ public class VoteButtonHandler {
         return strategyButtons;
     }
 
-    public static List<Button> getPlanetOutcomeButtons(Player player, Game game, String prefix, String rider) {
+    private static List<Button> getPlanetOutcomeButtons(Player player, Game game, String prefix, String rider) {
         List<Button> planetOutcomeButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
         for (String planet : planets) {

@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 
-public class ButtonHelperRelics {
+class ButtonHelperRelics {
 
     @ButtonHandler("jrResolution_")
     public static void jrResolution(Player player, String buttonID, Game game, ButtonInteractionEvent event) {

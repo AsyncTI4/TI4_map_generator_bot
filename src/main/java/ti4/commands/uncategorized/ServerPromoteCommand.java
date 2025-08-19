@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 
 public class ServerPromoteCommand implements ParentCommand {
 
-    public static final String DEV_CHANNEL = "947520255826198549";
+    private static final String DEV_CHANNEL = "947520255826198549";
     public static final Map<String, String> Servers = new HashMap<>() {
         {
             put(Constants.ASYNCTI4_HUB_SERVER_ID, "Async Hub");
@@ -90,23 +90,23 @@ public class ServerPromoteCommand implements ParentCommand {
             }
             Member member = event.getMember();
             boolean allowed = false;
-            if (Ranks.get(rankOpt.getAsString()).equalsIgnoreCase("admin")) {
+            if ("admin".equalsIgnoreCase(Ranks.get(rankOpt.getAsString()))) {
                 for (Role r : member.getRoles()) {
-                    if (r.getId().equals("943596173896323072")) {
+                    if ("943596173896323072".equals(r.getId())) {
                         allowed = true;
                     }
                 }
-            } else if (Ranks.get(rankOpt.getAsString()).equalsIgnoreCase("developer")) {
+            } else if ("developer".equalsIgnoreCase(Ranks.get(rankOpt.getAsString()))) {
                 for (Role r : member.getRoles()) {
-                    if (r.getId().equals("943596173896323072") || r.getId().equals("947648366056185897")) {
+                    if ("943596173896323072".equals(r.getId()) || "947648366056185897".equals(r.getId())) {
                         allowed = true;
                     }
                 }
-            } else if (Ranks.get(rankOpt.getAsString()).equalsIgnoreCase("bothelper")) {
+            } else if ("bothelper".equalsIgnoreCase(Ranks.get(rankOpt.getAsString()))) {
                 for (Role r : member.getRoles()) {
-                    if (r.getId().equals("943596173896323072")
-                            || r.getId().equals("947648366056185897")
-                            || r.getId().equals("1166011604488425482")) {
+                    if ("943596173896323072".equals(r.getId())
+                            || "947648366056185897".equals(r.getId())
+                            || "1166011604488425482".equals(r.getId())) {
                         allowed = true;
                     }
                 }
@@ -139,7 +139,7 @@ public class ServerPromoteCommand implements ParentCommand {
         if (target.startsWith("Emoji Farm")) {
             Guild guild = event.getJDA().getGuildById(Long.parseLong(target));
             guild.getRoles().forEach(r -> {
-                if (r.getName().equalsIgnoreCase("admin")) {
+                if ("admin".equalsIgnoreCase(r.getName())) {
                     if (demote) {
                         guild.removeRoleFromMember(user, r);
                     } else {

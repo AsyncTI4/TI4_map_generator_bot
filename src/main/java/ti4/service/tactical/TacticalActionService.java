@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -58,7 +61,7 @@ public class TacticalActionService {
         reverseTileUnitMovement(event, game, player, tile, moveOrRemove, false);
     }
 
-    public void reverseTileUnitMovement(
+    private void reverseTileUnitMovement(
             ButtonInteractionEvent event,
             Game game,
             Player player,
@@ -131,7 +134,7 @@ public class TacticalActionService {
         return false;
     }
 
-    public boolean moveUnitsIntoActiveSystem(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
+    private boolean moveUnitsIntoActiveSystem(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
         // Flip mallice
         if (TacticalActionDisplacementService.hasPendingDisplacement(game)) {
             tile = FlipTileService.flipTileIfNeeded(event, tile, game);
@@ -243,7 +246,8 @@ public class TacticalActionService {
 
     public List<Button> getLandingTroopsButtons(Game game, Player player, Tile tile) {
         List<Button> buttons = getLandingUnitsButtons(game, player, tile);
-        if (game.isNaaluAgent() || player == game.getActivePlayer()) {
+        if ((game.isNaaluAgent() || player == game.getActivePlayer())
+                && tile.getPosition().equalsIgnoreCase(game.getActiveSystem())) {
             buttons.add(Buttons.red(player.finChecker() + "doneLanding_" + tile.getPosition(), "Done Landing Troops"));
         } else {
             buttons.add(Buttons.red(player.finChecker() + "deleteButtons", "Done Resolving"));

@@ -29,8 +29,8 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
@@ -63,7 +63,7 @@ public class MiltyDraftHelper {
         int spanW = (int) Math.ceil(Math.sqrt(sliceCount));
         int spanH = (sliceCount + spanW - 1) / spanW;
 
-        float scale = 1f;
+        float scale = 1.0f;
         int scaled = (int) (mapTemplate.squareSliceImageSize() * scale);
         int width = scaled * spanW;
         int height = scaled * spanH;
@@ -311,9 +311,9 @@ public class MiltyDraftHelper {
         MiltyDraftTile draftTile = new MiltyDraftTile();
         if (wormholes != null) {
             for (WormholeModel.Wormhole wormhole : wormholes) {
-                if (WormholeModel.Wormhole.ALPHA == wormhole) {
+                if (wormhole == WormholeModel.Wormhole.ALPHA) {
                     draftTile.setHasAlphaWH(true);
-                } else if (WormholeModel.Wormhole.BETA == wormhole) {
+                } else if (wormhole == WormholeModel.Wormhole.BETA) {
                     draftTile.setHasBetaWH(true);
                 } else {
                     draftTile.setHasOtherWH(true);
@@ -357,7 +357,7 @@ public class MiltyDraftHelper {
 
     private static boolean isInvalid(TileModel tileModel) {
         TileModel.TileBack back = tileModel.getTileBack();
-        if (!TileModel.TileBack.RED.equals(back) && !TileModel.TileBack.BLUE.equals(back)) {
+        if (back != TileBack.RED && back != TileBack.BLUE) {
             return true;
         }
 

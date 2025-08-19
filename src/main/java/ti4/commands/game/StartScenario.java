@@ -47,7 +47,7 @@ public class StartScenario extends GameStateSubcommand {
         MessageHelper.replyToMessage(event, "Successfully started the scenario.");
     }
 
-    public static void startOrdinianCodex1(Game game, GenericInteractionCreateEvent event) {
+    private static void startOrdinianCodex1(Game game, GenericInteractionCreateEvent event) {
         game.setOrdinianC1Mode(true);
         var factions = List.of("arborec", "ghost", "muaat", "letnev", "nekro", "l1z1x");
         if (game.getRealPlayers().isEmpty()) {
@@ -66,7 +66,7 @@ public class StartScenario extends GameStateSubcommand {
             if (game.getPlayerFromColorOrFaction(faction) == null) {
                 int face = ThreadLocalRandom.current().nextInt(0, players.size());
                 Tile tile = game.getTileFromPositionOrAlias(faction);
-                if (faction.equalsIgnoreCase("ghost")) {
+                if ("ghost".equalsIgnoreCase(faction)) {
                     tile = game.getTileFromPositionOrAlias("creussgate");
                 }
                 boolean speakerAlreadyExist = game.getSpeaker() != null;
@@ -105,7 +105,7 @@ public class StartScenario extends GameStateSubcommand {
         CommanderUnlockCheckService.checkPlayer(nekro, "nekro");
     }
 
-    public static void startLiberationCodex4(Game game, GenericInteractionCreateEvent event) {
+    private static void startLiberationCodex4(Game game, GenericInteractionCreateEvent event) {
         game.setLiberationC4Mode(true);
         var factions = List.of("ghost", "xxcha", "sol", "naaz", "nekro", "nomad");
         if (game.getRealPlayers().isEmpty()) {
@@ -129,10 +129,10 @@ public class StartScenario extends GameStateSubcommand {
             if (game.getPlayerFromColorOrFaction(faction) == null) {
                 int face = ThreadLocalRandom.current().nextInt(0, players.size());
                 Tile tile = game.getTileFromPositionOrAlias(faction);
-                if (faction.equalsIgnoreCase("ghost")) {
+                if ("ghost".equalsIgnoreCase(faction)) {
                     tile = game.getTileFromPositionOrAlias("creussgate");
                 }
-                boolean speaker = faction.equalsIgnoreCase("nekro");
+                boolean speaker = "nekro".equalsIgnoreCase(faction);
                 String color = players.get(face).getNextAvailableColour();
                 color = switch (faction.toLowerCase()) {
                     case "ghost" -> RandomHelper.isOneInX(2) ? "ruby" : "bloodred";

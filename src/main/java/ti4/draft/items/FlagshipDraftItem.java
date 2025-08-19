@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import ti4.draft.DraftItem;
+import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.DraftErrataModel;
@@ -15,6 +16,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 
 public class FlagshipDraftItem extends DraftItem {
+
     public FlagshipDraftItem(String itemId) {
         super(Category.FLAGSHIP, itemId);
     }
@@ -88,7 +90,7 @@ public class FlagshipDraftItem extends DraftItem {
             var units = faction.getUnits();
             units.removeIf(
                     (String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(DraftItem.generate(Category.FLAGSHIP, units.getFirst()));
+            allItems.add(generate(Category.FLAGSHIP, units.getFirst()));
         }
         return allItems;
     }
@@ -99,10 +101,10 @@ public class FlagshipDraftItem extends DraftItem {
         return allItems;
     }
 
-    public static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
+    private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
         Map<String, UnitModel> allUnits = Mapper.getUnits();
-        String[] results = game.getStoredValue("bannedFSs").split("finSep");
+        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedFSs"));
         for (FactionModel faction : factions) {
             if (Arrays.asList(results).contains(faction.getAlias())) {
                 continue;
@@ -110,7 +112,7 @@ public class FlagshipDraftItem extends DraftItem {
             var units = faction.getUnits();
             units.removeIf(
                     (String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(DraftItem.generate(Category.FLAGSHIP, units.getFirst()));
+            allItems.add(generate(Category.FLAGSHIP, units.getFirst()));
         }
         return allItems;
     }

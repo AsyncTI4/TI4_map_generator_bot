@@ -15,7 +15,7 @@ import ti4.executors.ExecutionHistoryManager;
 import ti4.helpers.DisplayType;
 import ti4.helpers.TimedRunnable;
 import ti4.map.Game;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.settings.GlobalSettings;
 
 public class MapRenderPipeline {
@@ -80,7 +80,7 @@ public class MapRenderPipeline {
         queue(game, event, displayType, callback, true, true);
     }
 
-    public static void queue(
+    private static void queue(
             Game game,
             @Nullable GenericInteractionCreateEvent event,
             @Nullable DisplayType displayType,
@@ -104,7 +104,7 @@ public class MapRenderPipeline {
         }
     }
 
-    public record RenderEvent(
+    record RenderEvent(
             Game game,
             GenericInteractionCreateEvent event,
             DisplayType displayType,

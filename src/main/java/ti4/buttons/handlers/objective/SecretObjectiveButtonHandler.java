@@ -10,8 +10,9 @@ import ti4.helpers.ButtonHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.objectives.DiscardSecretService;
@@ -35,7 +36,7 @@ class SecretObjectiveButtonHandler {
         try {
             int soIndex = Integer.parseInt(soID);
 
-            String msg = player.getRepresentation() + " discarded a secret objective.";
+            String msg = player.getRepresentation() + " discarded a secret objective";
             if (game.getRound() == 1 && !game.isFowMode()) {
                 int amountLeftToDiscard = -1;
                 for (Player p2 : game.getRealPlayers()) {
@@ -43,9 +44,10 @@ class SecretObjectiveButtonHandler {
                         amountLeftToDiscard++;
                     }
                 }
-                msg += " (" + amountLeftToDiscard + " players still to discard)";
+                msg += " (" + amountLeftToDiscard + " player" + (amountLeftToDiscard == 1 ? "" : "s")
+                        + " still to discard)";
             }
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg + ".");
             DiscardSecretService.discardSO(player, soIndex, game);
 
             if (drawReplacement) {
@@ -63,7 +65,7 @@ class SecretObjectiveButtonHandler {
                 }
             }
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Could not parse SO ID: " + soID, e);
+            BotLogger.error(new LogOrigin(event, player), "Could not parse SO ID: " + soID, e);
             event.getChannel()
                     .sendMessage("Could not parse secret objective ID: " + soID + ". Please discard manually.")
                     .queue();
@@ -97,7 +99,7 @@ class SecretObjectiveButtonHandler {
                 && game.getPlayerFromColorOrFaction("keleres") == null) {
             Player keleres = null;
             for (String playerID : manager.getPlayers())
-                if (manager.getPlayerDraft(playerID).getFaction().equals("keleresm"))
+                if ("keleresm".equals(manager.getPlayerDraft(playerID).getFaction()))
                     keleres = game.getPlayer(playerID);
             if (keleres != null) {
                 MessageHelper.sendMessageToChannel(

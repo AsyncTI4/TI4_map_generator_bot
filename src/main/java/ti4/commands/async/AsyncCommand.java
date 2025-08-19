@@ -8,9 +8,7 @@ import ti4.commands.Subcommand;
 
 public class AsyncCommand implements ParentCommand {
 
-    private final Map<String, Subcommand> subcommands = Stream.of(
-                    new ShowHeroes(), new ShowTourneyWinners() //
-                    )
+    private final Map<String, Subcommand> subcommands = Stream.of(new ShowHeroes(), new ShowTourneyWinners())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

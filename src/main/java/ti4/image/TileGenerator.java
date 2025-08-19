@@ -1,13 +1,6 @@
 package ti4.image;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.time.ZoneOffset;
@@ -31,14 +24,25 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
-import ti4.helpers.*;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
+import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
+import ti4.helpers.PatternHelper;
+import ti4.helpers.PdsCoverage;
+import ti4.helpers.PdsCoverageHelper;
+import ti4.helpers.RandomHelper;
+import ti4.helpers.Storage;
+import ti4.helpers.Units;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.ShipPositionModel.ShipPosition;
@@ -99,7 +103,7 @@ public class TileGenerator {
         this.displayType = displayType;
         this.context = context;
         this.focusTile = focusTile;
-        this.isFoWPrivate = isFowModeActive();
+        isFoWPrivate = isFowModeActive();
         this.fowPlayer = fowPlayer != null
                 ? fowPlayer
                 : (event != null
@@ -293,7 +297,7 @@ public class TileGenerator {
                 // ADD HEX BORDERS FOR CONTROL
                 // display type = unlocked forces border style = solid
                 Player controllingPlayer = game.getPlayerThatControlsTile(tile);
-                if ((!game.getHexBorderStyle().equals("off") || displayType == DisplayType.unlocked)
+                if ((!"off".equals(game.getHexBorderStyle()) || displayType == DisplayType.unlocked)
                         && controllingPlayer != null
                         && !isSpiral) {
                     int sideNum = 0;
@@ -304,7 +308,7 @@ public class TileGenerator {
                         }
                         sideNum++;
                     }
-                    if (isFoWPrivate && this.fowPlayer == null) openSides.clear();
+                    if (isFoWPrivate && fowPlayer == null) openSides.clear();
                     String hexBorderStyle = displayType == DisplayType.unlocked ? "solid" : game.getHexBorderStyle();
                     BufferedImage border = DrawingUtil.hexBorder(
                             hexBorderStyle, Mapper.getColor(controllingPlayer.getColor()), openSides);
@@ -353,9 +357,12 @@ public class TileGenerator {
                 // Draft Stuff
                 if (TileHelper.isDraftTile(tile.getTileModel())) {
                     String tileID = tile.getTileID();
-                    String draftNum = tileID.replaceAll("[a-z]", "");
-                    String draftColor = tileID.replaceAll("[0-9]", "")
-                            .replaceAll("blank", "")
+                    String draftNum = PatternHelper.LOWERCASE_LETTER_PATTERN
+                            .matcher(tileID)
+                            .replaceAll("");
+                    String draftColor = PatternHelper.BLANK_WORD_PATTERN
+                            .matcher(tileID.replaceAll("[0-9]", ""))
+                            .replaceAll("")
                             .toUpperCase();
                     Point draftNumPosition = new Point(85, 140);
 
@@ -419,7 +426,7 @@ public class TileGenerator {
                     drawOnWormhole(tile, tileGraphics, doubleWormholeImage, 0, "b");
                 }
                 if ((ButtonHelper.isLawInPlay(game, "nexus") || ButtonHelper.isLawInPlay(game, "absol_nexus"))
-                        && (tile.getTileID().equals("82b"))
+                        && ("82b".equals(tile.getTileID()))
                         && !(ButtonHelper.isLawInPlay(game, "travel_ban")
                                 || ButtonHelper.isLawInPlay(game, "absol_travelban")) //
                 ) {
@@ -898,7 +905,7 @@ public class TileGenerator {
                 int x = TILE_PADDING;
                 int y = TILE_PADDING;
 
-                HashMap<String, List<Integer>> pdsDice = new HashMap<>();
+                Map<String, List<Integer>> pdsDice = new HashMap<>();
                 Map<String, PdsCoverage> pdsCoverageByFaction = new HashMap<>();
                 if (pdsCoverageMap != null) {
                     for (Player player : game.getRealPlayers()) {
@@ -945,15 +952,14 @@ public class TileGenerator {
 
                     x += (int) ((345 - 73 * scale) / 2);
                     y += (int) ((300 - pdsDice.size() * 48 * scale) / 2);
-                    for (String playerID : pdsDice.keySet()) {
-                        Player player = game.getPlayer(playerID);
+                    for (Map.Entry<String, List<Integer>> entry : pdsDice.entrySet()) {
+                        Player player = game.getPlayer(entry.getKey());
                         ti4.helpers.PdsCoverage coverage = pdsCoverageByFaction.get(player.getFaction());
 
                         int numberOfDice = coverage.getCount();
                         boolean rerolls = coverage.isHasRerolls();
                         float expectedHits = coverage.getExpected();
-                        if (DrawingUtil.getBlackWhiteFileSuffix(player.getColorID())
-                                .equals("_wht.png")) {
+                        if ("_wht.png".equals(DrawingUtil.getBlackWhiteFileSuffix(player.getColorID()))) {
                             tileGraphics.setColor(Color.WHITE);
                         } else {
                             tileGraphics.setColor(Color.BLACK);
@@ -982,7 +988,7 @@ public class TileGenerator {
                         if (numberOfDice >= 5) {
                             DrawingUtil.drawCenteredString(
                                     tileGraphics,
-                                    pdsDice.get(playerID).subList(0, numberOfDice / 3).stream()
+                                    entry.getValue().subList(0, numberOfDice / 3).stream()
                                                     .map(Object::toString)
                                                     .collect(Collectors.joining(","))
                                             + ",",
@@ -994,7 +1000,7 @@ public class TileGenerator {
                                     smallFont);
                             DrawingUtil.drawCenteredString(
                                     tileGraphics,
-                                    pdsDice.get(playerID).subList(numberOfDice / 3, 2 * numberOfDice / 3).stream()
+                                    entry.getValue().subList(numberOfDice / 3, 2 * numberOfDice / 3).stream()
                                                     .map(Object::toString)
                                                     .collect(Collectors.joining(","))
                                             + ",",
@@ -1006,7 +1012,7 @@ public class TileGenerator {
                                     smallFont);
                             DrawingUtil.drawCenteredString(
                                     tileGraphics,
-                                    pdsDice.get(playerID).subList(2 * numberOfDice / 3, numberOfDice).stream()
+                                    entry.getValue().subList(2 * numberOfDice / 3, numberOfDice).stream()
                                             .map(Object::toString)
                                             .collect(Collectors.joining(",")),
                                     new Rectangle(
@@ -1018,7 +1024,7 @@ public class TileGenerator {
                         } else if (numberOfDice >= 3) {
                             DrawingUtil.drawCenteredString(
                                     tileGraphics,
-                                    pdsDice.get(playerID).subList(0, numberOfDice / 2).stream()
+                                    entry.getValue().subList(0, numberOfDice / 2).stream()
                                                     .map(Object::toString)
                                                     .collect(Collectors.joining(","))
                                             + ",",
@@ -1030,7 +1036,7 @@ public class TileGenerator {
                                     smallFont);
                             DrawingUtil.drawCenteredString(
                                     tileGraphics,
-                                    pdsDice.get(playerID).subList(numberOfDice / 2, numberOfDice).stream()
+                                    entry.getValue().subList(numberOfDice / 2, numberOfDice).stream()
                                             .map(Object::toString)
                                             .collect(Collectors.joining(",")),
                                     new Rectangle(
@@ -1042,7 +1048,7 @@ public class TileGenerator {
                         } else {
                             DrawingUtil.drawCenteredString(
                                     tileGraphics,
-                                    pdsDice.get(playerID).stream()
+                                    entry.getValue().stream()
                                             .map(Object::toString)
                                             .collect(Collectors.joining(",")),
                                     new Rectangle(
@@ -1094,7 +1100,7 @@ public class TileGenerator {
                         t += traits.contains("cultural") ? "C" : "";
                         t += traits.contains("hazardous") ? "H" : "";
                         t += traits.contains("industrial") ? "I" : "";
-                        if (t.equals("CHI")) {
+                        if ("CHI".equals(t)) {
                             traitFile =
                                     ResourceHelper.getInstance().getPlanetResource("pc_attribute_combo_CHI_big.png");
                         } else {
@@ -1417,7 +1423,7 @@ public class TileGenerator {
             arrow.setColor(Color.BLACK);
 
             if (direction >= 2 && direction <= 4) { // all the south directions
-                arrow.rotate(Math.toRadians(180), imageCenterX, imageCenterY);
+                arrow.rotate(3.141592653589793, imageCenterX, imageCenterY);
                 textOffsetY = 25;
             }
             arrow.drawString(secondaryTile, textOffsetX, textOffsetY);
@@ -1575,8 +1581,7 @@ public class TileGenerator {
                     && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
                 scale = 1.65f;
             }
-            if (unitHolder.getName().equalsIgnoreCase("elysium")
-                    || unitHolder.getName().equalsIgnoreCase("magna")) {
+            if ("elysium".equalsIgnoreCase(unitHolder.getName()) || "magna".equalsIgnoreCase(unitHolder.getName())) {
                 scale = 1.65f;
             }
             if (Constants.MECATOLS.contains(unitHolder.getName())) {
@@ -1592,8 +1597,7 @@ public class TileGenerator {
             if (isValid.apply(tokenID)) {
                 String tokenPath = tile.getTokenPath(tokenID);
                 if (tokenPath == null) {
-                    BotLogger.warning(
-                            new BotLogger.LogMessageOrigin(game), "Could not find token file for: " + tokenID);
+                    BotLogger.warning(new LogOrigin(game), "Could not find token file for: " + tokenID);
                     continue;
                 }
                 float scale = 0.85f;
@@ -1605,7 +1609,7 @@ public class TileGenerator {
                             && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
                         scale = 0.53f;
                     }
-                    if (unitHolder.getName().equalsIgnoreCase("elysium")) {
+                    if ("elysium".equalsIgnoreCase(unitHolder.getName())) {
                         scale = 0.50f;
                     }
                     if (Constants.MECATOLS.contains(unitHolder.getName())) {
@@ -1685,7 +1689,7 @@ public class TileGenerator {
                             && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
                         scale = 0.53f;
                     }
-                    if (unitHolder.getName().equalsIgnoreCase("elysium")) {
+                    if ("elysium".equalsIgnoreCase(unitHolder.getName())) {
                         scale = 0.50f;
                     }
                     if (Constants.MECATOLS.contains(unitHolder.getName())) {
@@ -1763,7 +1767,7 @@ public class TileGenerator {
                     continue;
                 }
                 if (unitModel.getPlanetaryShield()) {
-                    return !unitModel.getBaseType().equalsIgnoreCase("mech")
+                    return !"mech".equalsIgnoreCase(unitModel.getBaseType())
                             || !ButtonHelper.isLawInPlay(game, "articles_war");
                 }
             }
@@ -1815,7 +1819,7 @@ public class TileGenerator {
 
     private static void drawTokensOnTile(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Game game) {
         List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
-        Collections.sort(tokenList, sortTokensForDisplay());
+        tokenList.sort(sortTokensForDisplay());
 
         Point centerPosition = unitHolder.getHolderCenterPosition(tile);
         int x = 0;
@@ -1844,7 +1848,7 @@ public class TileGenerator {
             String tokenName = Mapper.getTokenKey(tokenID);
 
             if (tokenPath == null) {
-                BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Could not parse token file for: " + tokenID);
+                BotLogger.warning(new LogOrigin(game), "Could not parse token file for: " + tokenID);
                 continue;
             }
             if (game.isCptiExploreMode() && tokenPath.toLowerCase().contains("token_frontier")) {
@@ -1915,7 +1919,7 @@ public class TileGenerator {
                     tileGraphics.drawImage(doubleWormholeImage, drawX + offsetX, drawY + offsetY, null);
                 }
                 if ((ButtonHelper.isLawInPlay(game, "nexus") || ButtonHelper.isLawInPlay(game, "absol_nexus"))
-                        && (tile.getTileID().equals("82b"))
+                        && ("82b".equals(tile.getTileID()))
                         && !(ButtonHelper.isLawInPlay(game, "travel_ban")
                                 || ButtonHelper.isLawInPlay(game, "absol_travelban"))
                         && (tokenPath.toLowerCase().contains("alpha")

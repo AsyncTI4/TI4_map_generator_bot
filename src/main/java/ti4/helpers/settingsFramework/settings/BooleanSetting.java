@@ -22,16 +22,16 @@ public class BooleanSetting extends SettingInterface {
     public BooleanSetting(String id, String name, boolean val) {
         super(id, name);
 
-        this.defaultValue = val;
+        defaultValue = val;
         this.val = val;
-        this.whenFalse = "Enable";
-        this.whenTrue = "Disable";
+        whenFalse = "Enable";
+        whenTrue = "Disable";
     }
 
     public BooleanSetting(String id, String name, boolean val, String whenFalse, String whenTrue) {
         super(id, name);
 
-        this.defaultValue = val;
+        defaultValue = val;
         this.val = val;
         this.whenFalse = whenFalse;
         this.whenTrue = whenTrue;
@@ -75,7 +75,7 @@ public class BooleanSetting extends SettingInterface {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Helper Methods
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public String toggle() {
+    private String toggle() {
         val = !val;
         return null;
     }

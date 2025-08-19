@@ -6,8 +6,8 @@ import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.cron.CronManager;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 
 public class CircuitBreaker {
 
@@ -22,7 +22,7 @@ public class CircuitBreaker {
 
     private static LocalDateTime closeDateTime;
 
-    public static synchronized boolean incrementThresholdCount() {
+    static synchronized boolean incrementThresholdCount() {
         if (open) {
             return false;
         }
@@ -46,6 +46,14 @@ public class CircuitBreaker {
         return true;
     }
 
+    public static synchronized void openForSeconds(long seconds) {
+        open = true;
+        thresholdCount = 0;
+        closeDateTime = LocalDateTime.now().plusSeconds(seconds);
+        CronManager.scheduleOnce(CircuitBreaker.class, CircuitBreaker::reset, seconds, TimeUnit.SECONDS);
+        BotLogger.info("Circuit breaker manually opened for " + seconds + " seconds.");
+    }
+
     private static synchronized void reset() {
         thresholdCount = 0;
         open = false;
@@ -57,7 +65,7 @@ public class CircuitBreaker {
 
     public static boolean checkIsOpenAndPostWarningIfTrue(MessageChannel messageChannel) {
         if (open) {
-            Duration durationUntilCircuitCloses = CircuitBreaker.getDurationUtilClose();
+            Duration durationUntilCircuitCloses = getDurationUtilClose();
             MessageHelper.sendMessageToChannel(
                     messageChannel,
                     "The bot is taking a breather. Try again in " + durationUntilCircuitCloses.toMinutes()

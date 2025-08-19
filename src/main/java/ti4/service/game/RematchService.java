@@ -20,8 +20,8 @@ import ti4.helpers.TIGLHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class RematchService {
@@ -47,8 +47,10 @@ public class RematchService {
 
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         TextChannel actionsChannel = game.getMainGameChannel();
-        if (tableTalkChannel.getParentCategory().getName().equals("The in-limbo PBD Archive")
-                || actionsChannel.getParentCategory().getName().equals("The in-limbo PBD Archive")) {
+        if ("The in-limbo PBD Archive"
+                        .equals(tableTalkChannel.getParentCategory().getName())
+                || "The in-limbo PBD Archive"
+                        .equals(actionsChannel.getParentCategory().getName())) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "These game channels are in the archive, so they cannot have a rematch created. Please create new game channels in the \"Making New Games\" forum channel in the HUB server");
@@ -96,8 +98,8 @@ public class RematchService {
         // ADD PLAYERS
         for (Player player : game.getPlayers().values()) {
             if (player.getFaction() != null
-                    && !player.getFaction().equals("neutral")
-                    && !player.getFaction().equalsIgnoreCase("null"))
+                    && !"neutral".equals(player.getFaction())
+                    && !"null".equalsIgnoreCase(player.getFaction()))
                 newGame.addPlayer(player.getUserID(), player.getUserName());
         }
         newGame.setPlayerCountForMap(newGame.getPlayers().size());

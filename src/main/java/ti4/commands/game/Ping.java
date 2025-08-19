@@ -20,7 +20,7 @@ class Ping extends GameStateSubcommand {
         pingGame(event, game);
     }
 
-    public void pingGame(GenericInteractionCreateEvent event, Game game) {
+    private void pingGame(GenericInteractionCreateEvent event, Game game) {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Ping Game: " + game.getPing());
     }
 }

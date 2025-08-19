@@ -11,7 +11,7 @@ import lombok.Getter;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import ti4.ResourceHelper;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 public class EgressClientManager {
 

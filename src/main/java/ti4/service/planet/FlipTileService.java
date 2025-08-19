@@ -1,14 +1,17 @@
 package ti4.service.planet;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.CommandCounterHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.map.Game;
+import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
@@ -22,6 +25,12 @@ public class FlipTileService {
     }
 
     public static Tile flipTileIfNeeded(ButtonInteractionEvent event, Tile tile, Game game) {
+        List<Player> players = new ArrayList<>();
+        for (Player player : game.getRealPlayers()) {
+            if (CommandCounterHelper.hasCC(player, tile)) {
+                players.add(player);
+            }
+        }
         if ("82a".equals(tile.getTileID())) {
             String position = tile.getPosition();
             game.removeTile(position);
@@ -60,7 +69,7 @@ public class FlipTileService {
             }
             tile = new Tile(planetTileName, position);
             game.setTile(tile);
-        } else if (game.getMapTemplateID().equals("2025scptFinals")
+        } else if ("2025scptFinals".equals(game.getMapTemplateID())
                 && List.of("528", "529", "530", "501", "502", "503", "504").contains(tile.getPosition())) {
             boolean anything = false;
             for (String pos : List.of("528", "529", "530", "501", "502", "503", "504")) {
@@ -85,6 +94,9 @@ public class FlipTileService {
                     right.addToken("token_whbeta.png", "space");
                 }
             }
+        }
+        for (Player player : players) {
+            CommandCounterHelper.addCC(event, player, tile);
         }
         return tile;
     }

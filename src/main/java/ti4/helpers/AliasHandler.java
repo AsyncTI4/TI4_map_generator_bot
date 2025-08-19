@@ -16,7 +16,7 @@ import lombok.Getter;
 import ti4.ResourceHelper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.model.ColorModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
@@ -164,19 +164,19 @@ public class AliasHandler {
         }
     }
 
-    public static void initAliases() {
+    private static void initAliases() {
         TileHelper.getAllTileModels().forEach(AliasHandler::addNewTileAliases);
         TileHelper.getAllPlanetModels().forEach(AliasHandler::addNewPlanetAliases);
     }
 
-    public static void addNewPlanetAliases(PlanetModel planetModel) {
+    private static void addNewPlanetAliases(PlanetModel planetModel) {
         Optional.ofNullable(planetModel.getAliases())
                 .orElse(new ArrayList<>())
                 .forEach(alias -> allPlanetAliases.put(alias.toLowerCase(), planetModel.getId()));
         allPlanetAliases.put(planetModel.getId(), planetModel.getId()); // add the planet itself to aliashandler
     }
 
-    public static void addNewTileAliases(TileModel tileModel) {
+    private static void addNewTileAliases(TileModel tileModel) {
         Optional.ofNullable(tileModel.getAliases())
                 .orElse(new ArrayList<>())
                 .forEach(alias -> allTileAliases.put(alias.toLowerCase(), tileModel.getId()));

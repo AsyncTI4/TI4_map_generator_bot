@@ -15,16 +15,16 @@ import ti4.service.emoji.TI4Emoji;
 @Getter
 @Setter
 public abstract class SettingInterface {
-    protected static final Emoji emojiUp = Emoji.fromUnicode("📈"); // Other up options: [⬆️,⏫,☝️,🔺]
-    protected static final Emoji emojiDown = Emoji.fromUnicode("📉"); // Other down options: []
-    protected static final Emoji emojiToggle = Emoji.fromUnicode("🔁");
+    static final Emoji emojiUp = Emoji.fromUnicode("📈"); // Other up options: [⬆️,⏫,☝️,🔺]
+    static final Emoji emojiDown = Emoji.fromUnicode("📉"); // Other down options: []
+    static final Emoji emojiToggle = Emoji.fromUnicode("🔁");
 
     protected String id;
     protected String name;
-    protected String emoji = null;
+    protected String emoji;
     protected boolean editable = true;
-    protected boolean disabled = false;
-    protected String extraInfo = null;
+    protected boolean disabled;
+    protected String extraInfo;
 
     SettingInterface(String id, String name) {
         this.id = id;
@@ -82,7 +82,7 @@ public abstract class SettingInterface {
         if (emoji == null) {
             this.emoji = null;
         } else {
-            setEmoji(emoji.toString());
+            this.emoji = emoji.toString();
         }
     }
 }

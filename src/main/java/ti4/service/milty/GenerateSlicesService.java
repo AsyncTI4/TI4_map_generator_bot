@@ -14,13 +14,14 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
 import ti4.image.PositionMapper;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.MapTemplateModel;
 import ti4.service.milty.MiltyService.DraftSpec;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass
-public class GenerateSlicesService {
+class GenerateSlicesService {
 
     public static boolean generateSlices(
             GenericInteractionCreateEvent event, MiltyDraftManager draftManager, DraftSpec specs) {
@@ -47,14 +48,12 @@ public class GenerateSlicesService {
         if (specs.playerIDs.size() == 2) extraWHs = 3; // lessen the behavior if there's 2 players
         if (!specs.extraWHs) extraWHs = 0;
 
-        List<List<MiltyDraftTile>> partitionedTiles = new ArrayList<>();
-
         // Partition blue tiles to split them up into "tiers" so that slices get 1 good tile, 1 medium tile, and 1 meh
         // tile
         List<MiltyDraftTile> blue = draftManager.getBlue();
         blue.sort(Comparator.comparingDouble(MiltyDraftTile::abstractValue));
         int bluePerPartition = Math.ceilDiv(blue.size(), bluePerPlayer);
-        partitionedTiles.addAll(ListUtils.partition(blue, bluePerPartition));
+        List<List<MiltyDraftTile>> partitionedTiles = new ArrayList<>(ListUtils.partition(blue, bluePerPartition));
 
         // Partition RED tiles into "tiers" so that slices don't get dumb stuff like 2 supernovae, 2 rifts, etc
         List<MiltyDraftTile> red = draftManager.getRed();
@@ -141,7 +140,7 @@ public class GenerateSlicesService {
                         .append(reason.getValue())
                         .append("\n");
             }
-            BotLogger.warning(new BotLogger.LogMessageOrigin(event), sb.toString());
+            BotLogger.warning(new LogOrigin(event), sb.toString());
         }
         return slicesCreated;
     }

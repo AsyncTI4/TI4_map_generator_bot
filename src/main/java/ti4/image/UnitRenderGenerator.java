@@ -1,11 +1,6 @@
 package ti4.image;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,11 +24,11 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.UnitModel;
 
-public class UnitRenderGenerator {
+class UnitRenderGenerator {
 
     private final ResourceHelper resourceHelper = ResourceHelper.getInstance();
 
@@ -69,7 +64,7 @@ public class UnitRenderGenerator {
     private final Tile tile;
     private final DisplayType displayType;
     private static final Point numberPositionPoint = new Point(40, 27);
-    private final int TILE_PADDING = 100;
+    private static final int TILE_PADDING = 100;
     private final Graphics tileGraphics;
     private final List<Rectangle> rectangles;
     private final int degree;
@@ -78,7 +73,7 @@ public class UnitRenderGenerator {
     private final int radius;
     private final Player frogPlayer;
 
-    SystemContext ctx;
+    private SystemContext ctx;
 
     public UnitRenderGenerator(
             Game game,
@@ -294,7 +289,7 @@ public class UnitRenderGenerator {
     }
 
     private void drawUnitTags(UnitKey unitKey, Player player, ImagePosition imagePos, int iteration) {
-        if (iteration != 0 || UnitType.Infantry.equals(unitKey.getUnitType()) || !game.isShowUnitTags()) {
+        if (iteration != 0 || unitKey.getUnitType() == UnitType.Infantry || !game.isShowUnitTags()) {
             return;
         }
 

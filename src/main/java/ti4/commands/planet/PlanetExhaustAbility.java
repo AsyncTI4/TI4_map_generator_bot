@@ -36,7 +36,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         doAction(player, planet, game, exhaust);
     }
 
-    public static void doAction(Player player, String planet, Game game, boolean exhaust) {
+    private static void doAction(Player player, String planet, Game game, boolean exhaust) {
         if (player == null) return;
         if (exhaust) {
             player.exhaustPlanetAbility(planet);
@@ -44,7 +44,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         resolveAbility(player, planet, game);
     }
 
-    public static void resolveAbility(Player player, String planet, Game game) {
+    private static void resolveAbility(Player player, String planet, Game game) {
         planet = AliasHandler.resolvePlanet(planet);
         PlanetModel model = Mapper.getPlanet(planet);
         MessageChannel channel = player.getCorrectChannel();
@@ -163,7 +163,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         }
     }
 
-    public static List<Button> getNewPrismLoseTechOptions(Player player) {
+    private static List<Button> getNewPrismLoseTechOptions(Player player) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {

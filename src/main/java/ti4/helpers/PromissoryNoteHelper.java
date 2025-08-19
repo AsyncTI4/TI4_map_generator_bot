@@ -15,9 +15,9 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.BotLogger;
-import ti4.message.BotLogger.LogMessageOrigin;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.emoji.CardEmojis;
@@ -62,12 +62,13 @@ public class PromissoryNoteHelper {
             for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn.getKey());
-                    sb.append(index++)
+                    sb.append(index)
                             .append("\\. ")
                             .append(CardEmojis.PN)
                             .append("  _")
                             .append(pnModel.getName())
                             .append("_ ");
+                    index++;
                     Player pnOwner = game.getPNOwner(pn.getKey());
                     if (pnOwner == null) {
                         MessageHelper.sendMessageToChannel(
@@ -98,12 +99,13 @@ public class PromissoryNoteHelper {
                         if (promissoryNotesInPlayArea.contains(pn.getKey())) {
                             PromissoryNoteModel pnModel =
                                     Mapper.getPromissoryNotes().get(pn.getKey());
-                            sb.append(index++)
+                            sb.append(index)
                                     .append("\\. ")
                                     .append(CardEmojis.PN)
                                     .append("  _")
                                     .append(pnModel.getName())
                                     .append("_ ");
+                            index++;
                             Player pnOwner = game.getPNOwner(pn.getKey());
                             if (pnOwner == null) {
                                 MessageHelper.sendMessageToChannel(
@@ -157,7 +159,7 @@ public class PromissoryNoteHelper {
         }
     }
 
-    public static List<Button> getPNButtons(Game game, Player player) {
+    private static List<Button> getPNButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String pnShortHand : player.getPromissoryNotes().keySet()) {
             if (player.getPromissoryNotesInPlayArea().contains(pnShortHand)) {
@@ -169,8 +171,7 @@ public class PromissoryNoteHelper {
                 continue;
             }
             if (owner == null) {
-                BotLogger.warning(
-                        new LogMessageOrigin(player), pnShortHand + " has no owner in game " + game.getName() + ".");
+                BotLogger.warning(new LogOrigin(player), pnShortHand + " has no owner in game " + game.getName() + ".");
                 continue;
             }
 
@@ -342,7 +343,7 @@ public class PromissoryNoteHelper {
             String message = player.getRepresentationUnfogged() + " Use buttons to drop 2 infantry on a planet";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
-        if (!"agendas_absol".equals(game.getAgendaDeckID()) && id.endsWith("_ps")) {
+        if (!"agendas_absol".equals(game.getAgendaDeckID()) && id.endsWith("_ps") && !id.contains("absol")) {
             if (game.playerHasLeaderUnlockedOrAlliance(owner, "xxchacommander")) {
                 MessageHelper.sendMessageToChannel(
                         owner.getCorrectChannel(),
@@ -433,7 +434,7 @@ public class PromissoryNoteHelper {
                 AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(), "_Political Favor_ has been played to discard the current agenda.");
-            } else if (owner.getFaction().equalsIgnoreCase("xxcha")) {
+            } else if ("xxcha".equalsIgnoreCase(owner.getFaction())) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "The Xxcha player does not have any command tokens in their strategy pool."

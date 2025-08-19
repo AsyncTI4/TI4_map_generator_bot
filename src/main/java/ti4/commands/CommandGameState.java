@@ -12,22 +12,22 @@ class CommandGameState {
 
     private final boolean saveGame;
     private final boolean isPlayerCommand;
-    private final ThreadLocal<Game> game = new ThreadLocal<>();
-    private final ThreadLocal<Player> player = new ThreadLocal<>();
+    private static final ThreadLocal<Game> game = new ThreadLocal<>();
+    private static final ThreadLocal<Player> player = new ThreadLocal<>();
 
-    public CommandGameState(boolean saveGame, boolean isPlayerCommand) {
+    CommandGameState(boolean saveGame, boolean isPlayerCommand) {
         this.saveGame = saveGame;
         this.isPlayerCommand = isPlayerCommand;
     }
 
-    public void preExecute(SlashCommandInteractionEvent event) {
+    void preExecute(SlashCommandInteractionEvent event) {
         String gameName = GameNameService.getGameName(event);
         if (!GameManager.isValid(gameName)) {
             throw new IllegalArgumentException("Invalid game name: " + gameName + " while attempting to run event "
                     + event.getName() + " in channel " + event.getChannel().getName());
         }
         Game game = GameManager.getManagedGame(gameName).getGame();
-        this.game.set(game);
+        CommandGameState.game.set(game);
         game.incrementSpecificSlashCommandCount(
                 event.getFullCommandName()); // TODO: This only works for commands that save...
 
@@ -39,12 +39,12 @@ class CommandGameState {
             throw new IllegalArgumentException("Unable to determine player while attempting to run event "
                     + event.getName() + " in channel " + event.getChannel().getName() + " for game " + gameName);
         }
-        this.player.set(player);
+        CommandGameState.player.set(player);
     }
 
-    public void postExecute(SlashCommandInteractionEvent event) {
+    void postExecute(SlashCommandInteractionEvent event) {
         if (saveGame) {
-            Game game = this.game.get();
+            Game game = CommandGameState.game.get();
             GameManager.save(game, EventAuditService.getReason(event, game.isFowMode()));
         }
         game.remove();

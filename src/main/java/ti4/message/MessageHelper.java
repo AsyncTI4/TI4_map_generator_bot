@@ -51,6 +51,8 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.ApplicationEmojiService;
@@ -75,6 +77,10 @@ public class MessageHelper {
         splitAndSent(messageText, channel);
     }
 
+    public static void sendMessageToChannel(MessageChannel channel, String messageText, List<Button> buttons) {
+        sendMessageToChannelWithButtons(channel, messageText, buttons);
+    }
+
     public static void sendMessageToEventChannel(GenericInteractionCreateEvent event, String messageText) {
         sendMessageToChannel(event.getMessageChannel(), messageText);
     }
@@ -85,7 +91,27 @@ public class MessageHelper {
     }
 
     public static void sendMessageToEventServerBotLogChannel(GenericInteractionCreateEvent event, String messageText) {
-        splitAndSent(messageText, BotLogger.getBotLogChannel(event));
+        splitAndSent(messageText, getBotLogChannel(event));
+    }
+
+    private static TextChannel getBotLogChannel(GenericInteractionCreateEvent event) {
+        TextChannel botLogChannel = null;
+        if (event != null) {
+            botLogChannel = getBotLogChannel(event.getGuild().getTextChannels());
+        }
+        if (botLogChannel == null) {
+            botLogChannel = getBotLogChannel(AsyncTI4DiscordBot.guildPrimary.getTextChannels());
+        }
+        return botLogChannel;
+    }
+
+    private static TextChannel getBotLogChannel(List<TextChannel> textChannels) {
+        for (TextChannel textChannel : textChannels) {
+            if ("bot-log".equals(textChannel.getName())) {
+                return textChannel;
+            }
+        }
+        return null;
     }
 
     public static void sendMessageToChannelWithEmbed(MessageChannel channel, String messageText, MessageEmbed embed) {
@@ -108,7 +134,7 @@ public class MessageHelper {
 
     public static void sendMessageToEventChannelWithEphemeralButtons(
             ButtonInteractionEvent event, String message, List<Button> buttons) {
-        List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(message, buttons);
+        List<MessageCreateData> messageList = getMessageCreateDataObjects(message, buttons);
         for (MessageCreateData messageD : messageList) {
             event.getHook().setEphemeral(true).sendMessage(messageD).queue();
         }
@@ -186,7 +212,7 @@ public class MessageHelper {
         sendMessageToChannelWithFactionReact(channel, messageText, game, player, buttons, false);
     }
 
-    public static void sendMessageToChannelWithFactionReact(
+    private static void sendMessageToChannelWithFactionReact(
             MessageChannel channel,
             String messageText,
             Game game,
@@ -282,9 +308,7 @@ public class MessageHelper {
                             yield new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
                         }
                         default -> {
-                            BotLogger.warning(
-                                    new BotLogger.LogMessageOrigin(game),
-                                    "Unable to handle message type: " + messageType);
+                            BotLogger.warning(new LogOrigin(game), "Unable to handle message type: " + messageType);
                             yield null;
                         }
                     };
@@ -323,7 +347,7 @@ public class MessageHelper {
     public static void sendEphemeralFileInResponseToButtonPress(
             FileUpload fileUpload, GenericInteractionCreateEvent event) {
         if (fileUpload == null) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), "FileUpload null");
+            BotLogger.error(new LogOrigin(event), "FileUpload null");
             return;
         }
         if (event instanceof ButtonInteractionEvent button)
@@ -346,7 +370,7 @@ public class MessageHelper {
             BotLogger.error("FileUpload null");
             return;
         }
-        final List<Button> realButtons = new ArrayList<>();
+        List<Button> realButtons = new ArrayList<>();
         channel.sendFiles(fileUpload)
                 .queue(
                         msg -> {
@@ -385,7 +409,7 @@ public class MessageHelper {
         editMessageWithButtonsAndFiles(event, message, buttons, Collections.emptyList());
     }
 
-    public static void editMessageWithButtonsAndFiles(
+    private static void editMessageWithButtonsAndFiles(
             ButtonInteractionEvent event, String message, List<Button> buttons, List<FileUpload> files) {
         editMessageWithActionRowsAndFiles(event, message, ActionRow.partitionOf(buttons), files);
     }
@@ -402,7 +426,7 @@ public class MessageHelper {
                 .queue();
     }
 
-    public static void replyToMessage(
+    private static void replyToMessage(
             GenericInteractionCreateEvent event,
             FileUpload fileUpload,
             boolean forceShowMap,
@@ -423,7 +447,16 @@ public class MessageHelper {
 
     public static void sendMessageWithFile(
             MessageChannel channel, FileUpload fileUpload, String messageText, boolean pinMessage) {
-        if (channel.getName().contains("-actions")) {
+        sendMessageWithFile(channel, fileUpload, messageText, pinMessage, true);
+    }
+
+    public static void sendMessageWithFile(
+            MessageChannel channel,
+            FileUpload fileUpload,
+            String messageText,
+            boolean pinMessage,
+            boolean overrideActionChannel) {
+        if (overrideActionChannel && channel.getName().contains("-actions")) {
             String threadName = channel.getName().replace("-actions", "") + "-bot-map-updates";
             List<ThreadChannel> threadChannels = ((IThreadContainer) channel).getThreadChannels();
             for (ThreadChannel threadChannel_ : threadChannels) {
@@ -438,6 +471,37 @@ public class MessageHelper {
             message.addContent(messageText);
         }
         MessageCreateData messageObject = message.addFiles(fileUpload).build();
+        channel.sendMessage(messageObject).queue(msg -> {
+            if (pinMessage) msg.pin().queue();
+        });
+    }
+
+    public static void sendMessageWithFiles(
+            MessageChannel channel, List<FileUpload> filesUpload, String messageText, boolean pinMessage) {
+        sendMessageWithFiles(channel, filesUpload, messageText, pinMessage, true);
+    }
+
+    public static void sendMessageWithFiles(
+            MessageChannel channel,
+            List<FileUpload> filesUpload,
+            String messageText,
+            boolean pinMessage,
+            boolean overrideActionChannel) {
+        if (overrideActionChannel && channel.getName().contains("-actions")) {
+            String threadName = channel.getName().replace("-actions", "") + "-bot-map-updates";
+            List<ThreadChannel> threadChannels = ((IThreadContainer) channel).getThreadChannels();
+            for (ThreadChannel threadChannel_ : threadChannels) {
+                if (threadChannel_.getName().equals(threadName)) {
+                    channel = threadChannel_;
+                }
+            }
+        }
+
+        MessageCreateBuilder message = new MessageCreateBuilder();
+        if (messageText != null) {
+            message.addContent(messageText);
+        }
+        MessageCreateData messageObject = message.setFiles(filesUpload).build();
         channel.sendMessage(messageObject).queue(msg -> {
             if (pinMessage) msg.pin().queue();
         });
@@ -515,7 +579,7 @@ public class MessageHelper {
             }
         }
 
-        final String finalMessageText = messageText;
+        String finalMessageText = messageText;
         List<MessageCreateData> objects = getMessageCreateDataObjects(finalMessageText, sanitizedEmbeds, buttons);
         Iterator<MessageCreateData> iterator = objects.iterator();
         while (iterator.hasNext()) {
@@ -686,7 +750,7 @@ public class MessageHelper {
         return privatelyPingPlayerList(players, game, null, message, null, null);
     }
 
-    public static boolean privatelyPingPlayerList(
+    private static boolean privatelyPingPlayerList(
             List<Player> players,
             Game game,
             MessageChannel feedbackChannel,
@@ -711,11 +775,11 @@ public class MessageHelper {
         sendMessageToUser(messageText, user, null);
     }
 
-    public static void sendMessageToUser(String messageText, User user, @Nullable MessageChannel failureChannel) {
+    private static void sendMessageToUser(String messageText, User user, @Nullable MessageChannel failureChannel) {
         sendMessageToUser(messageText, user, failureChannel, null);
     }
 
-    public static void sendMessageToUser(
+    private static void sendMessageToUser(
             String messageText, User user, @Nullable MessageChannel failureChannel, @Nullable String failText) {
         if (user == null) {
             return;
@@ -758,7 +822,7 @@ public class MessageHelper {
         int index = 0;
         while (index < messageLength) {
             String nextChars = messageText.substring(index, Math.min(index + maxLength, messageLength));
-            int lastNewLineIndex = nextChars.lastIndexOf("\n") + 1; // number of chars until right after the last \n
+            int lastNewLineIndex = nextChars.lastIndexOf('\n') + 1; // number of chars until right after the last \n
             String textToAdd;
             if (lastNewLineIndex > 0) {
                 textToAdd = nextChars.substring(0, lastNewLineIndex);
@@ -792,7 +856,7 @@ public class MessageHelper {
      * }
      * </pre>
      */
-    public static List<MessageCreateData> getMessageCreateDataObjects(
+    private static List<MessageCreateData> getMessageCreateDataObjects(
             String message, List<MessageEmbed> embeds, List<Button> buttons) {
         List<MessageCreateData> messageCreateDataList = new ArrayList<>();
 
@@ -865,7 +929,7 @@ public class MessageHelper {
                 continue;
             }
             StringBuilder error = new StringBuilder("MessageCreateData is invalid for arguments: \n");
-            int cutoff = message.indexOf("\n");
+            int cutoff = message.indexOf('\n');
             error.append("> Message: ")
                     .append(cutoff == -1 ? message : message.substring(0, cutoff))
                     .append("...\n");
@@ -883,7 +947,7 @@ public class MessageHelper {
         return getMessageCreateDataObjects(message, null, buttons);
     }
 
-    public static List<List<ActionRow>> getPartitionedButtonLists(List<Button> buttons) {
+    private static List<List<ActionRow>> getPartitionedButtonLists(List<Button> buttons) {
         List<List<ActionRow>> partitionedButtonRows = new ArrayList<>();
         try {
             buttons.removeIf(Objects::isNull);
@@ -1082,8 +1146,8 @@ public class MessageHelper {
             StringBuilder edited = new StringBuilder(message);
             StringBuilder copy = new StringBuilder(message.toLowerCase());
             for (String keyWord : AliasHandler.getInjectedRules()) {
-                if (keyWord.equals("bombardment") && message.contains("Tactical Bombardment")) continue;
-                if (keyWord.equals("production") && message.contains("Monopolize Production")) continue;
+                if ("bombardment".equals(keyWord) && message.contains("Tactical Bombardment")) continue;
+                if ("production".equals(keyWord) && message.contains("Monopolize Production")) continue;
                 if (copy.indexOf(keyWord) > -1) {
                     String replace = "](https://www.tirules.com/" + AliasHandler.getInjectedRule(keyWord) + ")";
                     int firstIndex = copy.indexOf(keyWord);

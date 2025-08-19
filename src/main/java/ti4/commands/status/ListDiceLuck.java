@@ -49,7 +49,7 @@ class ListDiceLuck extends GameStateSubcommand {
         MessageHelper.replyToMessage(event, message.toString());
     }
 
-    private static void playerAverageDiceLuck(Player player, HashMap<String, Double> record) {
+    private static void playerAverageDiceLuck(Player player, Map<String, Double> record) {
         double expectedHits = player.getExpectedHitsTimes10() / 10.0;
         int actualHits = player.getActualHits();
         if (expectedHits == 0) {

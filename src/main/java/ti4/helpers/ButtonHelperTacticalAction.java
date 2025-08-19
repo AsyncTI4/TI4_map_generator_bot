@@ -20,6 +20,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -29,6 +30,7 @@ import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.settings.users.UserSettingsManager;
 
 public class ButtonHelperTacticalAction {
@@ -87,7 +89,7 @@ public class ButtonHelperTacticalAction {
         if (game.isNaaluAgent()) {
             player = game.getPlayer(game.getActivePlayerID());
         }
-        ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
+        resetStoredValuesForTacticalAction(game);
         game.removeStoredValue("producedUnitCostFor" + player.getFaction());
         String message = player.getRepresentationUnfogged() + ", use buttons to end turn, or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
@@ -117,7 +119,7 @@ public class ButtonHelperTacticalAction {
                     + UnitEmojis.fighter + "/" + UnitEmojis.infantry + " that don't count towards PRODUCTION limit.\n";
         }
         if (Helper.getProductionValue(player, game, game.getTileByPosition(pos), false) > 0
-                && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
+                && IsPlayerElectedService.isPlayerElected(game, player, "prophecy")) {
             message3 +=
                     "Reminder that you have _Prophecy of Ixth_ and should produce at least 2 fighters if you wish to keep it. Its removal is not automated.\n";
         }
@@ -264,6 +266,9 @@ public class ButtonHelperTacticalAction {
         game.removeStoredValue("violatedSystems");
         game.removeStoredValue("vaylerianHeroActive");
         game.removeStoredValue("tnelisCommanderTracker");
+        for (Player player : game.getRealPlayers()) {
+            game.removeStoredValue("ASN" + player.getFaction());
+        }
         game.removeStoredValue("planetsTakenThisRound");
         game.removeStoredValue("fortuneSeekers");
         game.removeStoredValue("hiredGunsInPlay");
@@ -276,7 +281,7 @@ public class ButtonHelperTacticalAction {
         game.getTacticalActionDisplacement().clear();
     }
 
-    public static void beginTacticalAction(Game game, Player player) {
+    private static void beginTacticalAction(Game game, Player player) {
         boolean prefersDistanceBasedTacticalActions =
                 UserSettingsManager.get(player.getUserID()).isPrefersDistanceBasedTacticalActions();
         if (!game.isFowMode() && game.getRingCount() < 5 && prefersDistanceBasedTacticalActions) {
@@ -293,7 +298,7 @@ public class ButtonHelperTacticalAction {
         }
     }
 
-    public static void alternateWayOfOfferingTiles(Player player, Game game) {
+    private static void alternateWayOfOfferingTiles(Player player, Game game) {
         Map<String, Integer> distances =
                 CheckDistanceHelper.getTileDistancesRelativeToAllYourUnlockedTiles(game, player);
         List<String> initialOffering =
@@ -402,7 +407,7 @@ public class ButtonHelperTacticalAction {
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Activated "
                         + tile.getRepresentationForButtons(game, player) + ".");
         if (game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")
-                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
                         .contains(tile)) {
             List<Button> buttons = new ArrayList<>();
             Button getCommButton = Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm);
@@ -464,19 +469,12 @@ public class ButtonHelperTacticalAction {
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", Please resolve _Scanlink Drone Network_.",
                     button2);
-            if (player.hasAbility("awaken")
-                    || player.hasUnit("titans_flagship")
-                    || player.hasUnit("sigma_ul_flagship_1")
-                    || player.hasUnit("sigma_ul_flagship_2")) {
-                ButtonHelper.resolveTitanShenanigansOnActivation(player, game, tile, event);
-            }
-        } else {
-            if (player.hasAbility("awaken")
-                    || player.hasUnit("titans_flagship")
-                    || player.hasUnit("sigma_ul_flagship_1")
-                    || player.hasUnit("sigma_ul_flagship_2")) {
-                ButtonHelper.resolveTitanShenanigansOnActivation(player, game, tile, event);
-            }
+        }
+        if (player.hasAbility("awaken")
+                || player.hasUnit("titans_flagship")
+                || player.hasUnit("sigma_ul_flagship_1")
+                || player.hasUnit("sigma_ul_flagship_2")) {
+            ButtonHelper.resolveTitanShenanigansOnActivation(player, game, tile, event);
         }
         if (player.hasAbility("plague_reservoir") && player.hasTech("dxa")) {
             for (Planet planetUH : tile.getPlanetUnitHolders()) {
@@ -546,7 +544,7 @@ public class ButtonHelperTacticalAction {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         List<UnitType> movableFromPlanets = new ArrayList<>(List.of(UnitType.Infantry, UnitType.Mech));
-        boolean remove = moveOrRemove.equalsIgnoreCase("remove");
+        boolean remove = "remove".equalsIgnoreCase(moveOrRemove);
 
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         for (Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
@@ -614,13 +612,13 @@ public class ButtonHelperTacticalAction {
             if (!displacedUnits.containsKey(uhKey)) continue;
 
             Map<UnitKey, List<Integer>> unitsMovedFromUnitHolder = displacedUnits.get(uhKey);
-            for (UnitKey unitKey : unitsMovedFromUnitHolder.keySet()) {
-                List<Integer> states = unitsMovedFromUnitHolder.get(unitKey);
+            for (Entry<UnitKey, List<Integer>> entry : unitsMovedFromUnitHolder.entrySet()) {
+                List<Integer> states = entry.getValue();
                 for (UnitState state : UnitState.values()) {
                     int amt = states.get(state.ordinal());
                     for (int x = 1; x <= Math.min(2, amt); x++) {
-                        Button reverse =
-                                ButtonHelper.buildMoveUnitButton(player, tile, uh, state, unitKey, x, true, false);
+                        Button reverse = ButtonHelper.buildMoveUnitButton(
+                                player, tile, uh, state, entry.getKey(), x, true, false);
                         buttons.add(reverse);
                     }
                 }

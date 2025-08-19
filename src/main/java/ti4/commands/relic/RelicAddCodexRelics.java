@@ -1,6 +1,7 @@
 package ti4.commands.relic;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -9,7 +10,9 @@ import ti4.message.MessageHelper;
 
 class RelicAddCodexRelics extends GameStateSubcommand {
 
-    public RelicAddCodexRelics() {
+    private static final Pattern AND_PATTERN = Pattern.compile(" and ");
+
+    RelicAddCodexRelics() {
         super(Constants.ADD_CODEX_RELICS, "Add the three codex 4 relics into the deck and shuffle", true, false);
     }
 
@@ -39,7 +42,9 @@ class RelicAddCodexRelics extends GameStateSubcommand {
         } else {
             MessageHelper.sendMessageToEventChannel(
                     event,
-                    (relicCount == 2 ? newRelics : newRelics.replaceFirst(" and ", ", "))
+                    (relicCount == 2
+                                    ? newRelics
+                                    : AND_PATTERN.matcher(newRelics).replaceFirst(", "))
                             + (relicCount == 1 ? "has" : "have") + " been shuffled into the relic deck.");
         }
     }

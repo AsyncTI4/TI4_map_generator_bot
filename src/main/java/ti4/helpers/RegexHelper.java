@@ -19,7 +19,7 @@ import ti4.service.fow.FOWPlusService;
 @UtilityClass
 public class RegexHelper {
 
-    public static String regexBuilder(String groupname, Collection<String> options) {
+    private static String regexBuilder(String groupname, Collection<String> options) {
         return "(?<" + groupname + ">(" + String.join("|", options) + "))";
     }
 
@@ -86,7 +86,7 @@ public class RegexHelper {
      * @param game if provided, only match factions present in this game
      * @return group "faction" matching any faction in the bot
      */
-    public static String factionRegex(Game game, String group) {
+    private static String factionRegex(Game game, String group) {
         Set<String> factionAliases = legalFactions(game);
         return regexBuilder(group, factionAliases);
     }
@@ -102,7 +102,7 @@ public class RegexHelper {
     }
 
     /** @return group "unittype" */
-    public static String unitTypeRegex(String group) {
+    private static String unitTypeRegex(String group) {
         Set<String> types = new HashSet<>();
         Arrays.asList(UnitType.values()).forEach(x -> {
             types.add(x.getValue());
@@ -123,7 +123,7 @@ public class RegexHelper {
     }
 
     /** @return group "state" */
-    public static String unitStateRegex(String group) {
+    private static String unitStateRegex(String group) {
         Set<String> states = new HashSet<>();
         Arrays.asList(UnitState.values()).forEach(x -> states.add(x.name()));
         return regexBuilder("state", states);
@@ -170,7 +170,7 @@ public class RegexHelper {
         return ringRegex("ring");
     }
 
-    public static String ringRegex(String group) {
+    private static String ringRegex(String group) {
         return "ring" + regexBuilder(group, List.of("[\\+\\-]?[0-9]+", "corners"));
     }
 
@@ -179,14 +179,14 @@ public class RegexHelper {
         return tileIDRegex("tileID");
     }
 
-    public static String tileIDRegex(String group) {
+    private static String tileIDRegex(String group) {
         return regexBuilder(group, TileHelper.getAllTileIds());
     }
 
     /** @return group matching any planet name in the game */
     public static String planetNameRegex(Game game, String group) {
         Set<String> planets = new HashSet<>(game.getPlanets());
-        game.getPlanetsInfo().values().stream().forEach(p -> planets.add(p.getName()));
+        game.getPlanetsInfo().values().forEach(p -> planets.add(p.getName()));
         return regexBuilder(group, planets);
     }
 
@@ -225,7 +225,7 @@ public class RegexHelper {
         Set<String> agents = new HashSet<>();
         for (Player p : game.getRealPlayers()) {
             for (Leader l : p.getLeaders()) {
-                if (l.getType().equals("agent")) {
+                if ("agent".equals(l.getType())) {
                     agents.add(l.getId());
                 }
             }
@@ -276,7 +276,7 @@ public class RegexHelper {
     }
 
     /** @return group "pn" */
-    public static String pnRegex(Game game) {
+    private static String pnRegex(Game game) {
         Set<String> allPNs = new HashSet<>();
         if (game != null) {
             for (Player p : game.getRealPlayers()) allPNs.addAll(p.getPromissoryNotesOwned());
@@ -288,10 +288,10 @@ public class RegexHelper {
 
     /** @return group "pn" */
     public static String pnRegex(Game game, Player player) {
-        Set<String> allPNs = new HashSet<>();
+        Set<String> allPNs;
         if (player != null) {
-            allPNs.addAll(player.getPromissoryNotes().keySet());
-            allPNs.removeAll(player.getPromissoryNotesInPlayArea());
+            allPNs = new HashSet<>(player.getPromissoryNotes().keySet());
+            player.getPromissoryNotesInPlayArea().forEach(allPNs::remove);
         } else {
             return pnRegex(game);
         }
@@ -300,7 +300,7 @@ public class RegexHelper {
 
     /** @return group "page" matching an integer */
     public static String pageRegex() {
-        return "page" + RegexHelper.intRegex("page") + "$";
+        return "page" + intRegex("page") + "$";
     }
 
     /** @return group "token" */

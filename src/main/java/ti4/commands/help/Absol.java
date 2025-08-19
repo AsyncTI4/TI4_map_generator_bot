@@ -19,10 +19,10 @@ class Absol extends Subcommand {
         showAbsolStuff(event);
     }
 
-    public static void showAbsolStuff(GenericInteractionCreateEvent event) {
+    private static void showAbsolStuff(GenericInteractionCreateEvent event) {
         String path = ResourceHelper.getInstance().getHelpFile("Absol.txt");
         try {
-            String message = new String(Files.readAllBytes(Paths.get(path)));
+            String message = Files.readString(Paths.get(path));
             MessageHelper.sendMessageToEventChannel(event, message);
         } catch (Exception e) {
             MessageHelper.sendMessageToEventChannel(event, "ABSOL HELP FILE IS BLANK");

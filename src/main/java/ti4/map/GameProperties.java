@@ -85,7 +85,7 @@ public class GameProperties {
     private boolean showUnitTags;
     private boolean stratPings = true;
     private boolean testBetaFeaturesMode;
-    private boolean showOwnedPNsInPlayerArea = false;
+    private boolean showOwnedPNsInPlayerArea;
     private String hexBorderStyle = "off"; // values are off/dash/solid
     private String textSize = "medium";
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
@@ -140,7 +140,6 @@ public class GameProperties {
     private @ExportableField String tableTalkChannelID;
     private @ExportableField String mainChannelID;
     private String savedChannelID;
-    private @ExportableField List<String> fogOfWarGMIDs = new ArrayList<>(1); // Game Masters
 
     // More complex objects below
     private @ExportableField String mapString;
@@ -165,6 +164,6 @@ public class GameProperties {
 
     // Misc Helpers
     public String getID() {
-        return getName();
+        return name;
     }
 }

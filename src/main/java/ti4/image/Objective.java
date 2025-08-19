@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.model.PublicObjectiveModel;
 
 public record Objective(
@@ -55,7 +55,7 @@ public record Objective(
         return objectives;
     }
 
-    public Integer getWorth(Game game) {
+    private Integer getWorth(Game game) {
         return switch (type) {
             case Stage1 -> 1;
             case Stage2 -> 2;
@@ -66,7 +66,7 @@ public record Objective(
         };
     }
 
-    public String getName() {
+    private String getName() {
         if (type == Type.Custom) {
             return key;
         }
@@ -79,8 +79,8 @@ public record Objective(
     }
 
     public String getDisplayText(Game game) {
-        String name = this.getName();
-        Integer worth = this.getWorth(game);
+        String name = getName();
+        Integer worth = getWorth(game);
         if (revealed) {
             return String.format(
                     "(%d) %s - %d VP", game.getRevealedPublicObjectives().get(key), name, worth);

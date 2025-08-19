@@ -5,11 +5,12 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 
-public class ObjectiveBox {
-    public static final int objectiveBoxHeight = 38;
-    public static final int spacingBetweenBoxes = 5;
+class ObjectiveBox {
+    private static final int objectiveBoxHeight = 38;
+    private static final int spacingBetweenBoxes = 5;
     private static final int bufferBetweenTextAndTokens = 15;
     private static final int textVerticalOffset = 23;
     private static final int horizontalBoxOffset = 4;
@@ -33,7 +34,7 @@ public class ObjectiveBox {
         this.boxWidth = boxWidth;
         this.maxTextWidth = maxTextWidth;
         this.scoreTokenSpacing = scoreTokenSpacing;
-        this.spaceForTokens = boxWidth - (maxTextWidth + bufferBetweenTextAndTokens * 2);
+        spaceForTokens = boxWidth - (maxTextWidth + bufferBetweenTextAndTokens * 2);
     }
 
     public void display(Game game, Graphics graphics, MapGenerator generator, Objective objective) {
@@ -63,7 +64,7 @@ public class ObjectiveBox {
         return maxTextWidth;
     }
 
-    public static Integer getMinimumBoxWidth(Game game) {
+    private static Integer getMinimumBoxWidth(Game game) {
         return game.isRedTapeMode() ? 800 : 400;
     }
 
@@ -131,7 +132,7 @@ public class ObjectiveBox {
                 }
             }
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Error drawing score control token markers", e);
+            BotLogger.error(new LogOrigin(game), "Error drawing score control token markers", e);
         }
     }
 

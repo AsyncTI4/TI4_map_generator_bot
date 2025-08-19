@@ -8,14 +8,14 @@ import lombok.experimental.UtilityClass;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.map.Game;
 import ti4.map.persistence.GamesPage;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class WinningPathCacheService {
 
     private static final Cache<CacheKey, Map<String, Integer>> WINNING_PATH_CACHE =
             Caffeine.newBuilder().build();
-    private static boolean hasBeenComputed = false;
+    private static boolean hasBeenComputed;
 
     public static synchronized void recomputeCache() {
         BotLogger.info("**Recomputing win path cache**");
@@ -35,7 +35,7 @@ public class WinningPathCacheService {
         });
     }
 
-    public static synchronized Map<String, Integer> getWinningPathCounts(int playerCount, int victoryPoints) {
+    static synchronized Map<String, Integer> getWinningPathCounts(int playerCount, int victoryPoints) {
         if (!hasBeenComputed) recomputeCache();
         Map<String, Integer> map = WINNING_PATH_CACHE.getIfPresent(new CacheKey(playerCount, victoryPoints));
         return map == null ? Map.of() : Map.copyOf(map);

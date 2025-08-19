@@ -24,8 +24,8 @@ public class WebsiteOverlay {
     }
 
     public WebsiteOverlay(ModelInterface model, List<Integer> boxXYWH) {
-        this.dataModel = model.getClass().getSimpleName();
-        this.dataModelID = model.getAlias();
+        dataModel = model.getClass().getSimpleName();
+        dataModelID = model.getAlias();
         this.boxXYWH = boxXYWH;
     }
 }

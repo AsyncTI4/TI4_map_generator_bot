@@ -9,8 +9,9 @@ import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.migration.DataMigrationManager;
 
 class RunManualDataMigration extends Subcommand {
@@ -56,7 +57,7 @@ class RunManualDataMigration extends Subcommand {
                 | InvocationTargetException
                 | NoSuchMethodException
                 | SecurityException e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), "failed to run data migration", e);
+            BotLogger.error(new LogOrigin(event), "failed to run data migration", e);
         }
     }
 }

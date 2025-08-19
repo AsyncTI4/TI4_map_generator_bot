@@ -6,7 +6,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 public class RepositoryDispatchEvent {
 
@@ -23,7 +23,7 @@ public class RepositoryDispatchEvent {
      */
     public RepositoryDispatchEvent(String eventType, Map<String, String> payloadMap) {
         this.eventType = eventType;
-        this.payload = new RespositoryDispatchClientPayload(payloadMap);
+        payload = new RespositoryDispatchClientPayload(payloadMap);
     }
 
     public void sendEvent() {

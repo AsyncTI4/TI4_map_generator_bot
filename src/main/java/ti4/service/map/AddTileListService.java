@@ -23,8 +23,9 @@ import ti4.image.TileHelper;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
 import ti4.map.Tile;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.ShowGameService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -49,7 +50,7 @@ public class AddTileListService {
         try {
             badTiles = addTileMapToGame(game, mappedTilesToPosition);
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event, game), e.getMessage(), e);
+            BotLogger.error(new LogOrigin(event, game), e.getMessage(), e);
             MessageHelper.replyToMessage(event, e.getMessage());
         }
 
@@ -104,7 +105,7 @@ public class AddTileListService {
                 game.setTile(tile);
             }
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event, game), "Could not add setup and Mallice tiles", e);
+            BotLogger.error(new LogOrigin(event, game), "Could not add setup and Mallice tiles", e);
         }
 
         MessageChannel channel = event != null ? event.getMessageChannel() : game.getMainGameChannel();
@@ -132,11 +133,7 @@ public class AddTileListService {
         TextInput tags = TextInput.create(fieldId, "Enter Map String", TextInputStyle.PARAGRAPH)
                 .setPlaceholder("Paste the map string here.")
                 .setValue(game.getMapString()
-                        .substring(
-                                0,
-                                game.getMapString().length() > 4000
-                                        ? 4000
-                                        : game.getMapString().length()))
+                        .substring(0, Math.min(game.getMapString().length(), 4000)))
                 .setRequired(true)
                 .build();
         return Modal.create(modalId, "Add Map String for " + game.getName())

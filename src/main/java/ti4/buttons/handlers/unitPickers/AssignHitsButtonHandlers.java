@@ -17,8 +17,9 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.regex.RegexService;
@@ -28,14 +29,14 @@ import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
-public class AssignHitsButtonHandlers {
+class AssignHitsButtonHandlers {
 
     @ButtonHandler("assignHits_")
     // assignHits_101_2_dd
     public static void assignHits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String assignHitsType = getAssignHitsType(game, player);
         boolean combat = assignHitsType.contains("combat");
-        boolean remove = assignHitsType.equals("remove");
+        boolean remove = "remove".equals(assignHitsType);
 
         // Assign hits to single unit
         String regexSingleUnit = UnitPickerHandlerHelper.singleUnitRegex(game, "assignHits");
@@ -167,7 +168,8 @@ public class AssignHitsButtonHandlers {
                     List<Button> repairButtons =
                             ButtonHelper.getButtonsForRepairingUnitsInASystem(player, game, activeSystem);
                     MessageHelper.editMessageButtons(event, repairButtons);
-                    BotLogger.error("Error matching regex for sustaining hits: " + buttonID, game, event);
+                    BotLogger.error(
+                            new LogOrigin(event, game), "Error matching regex for sustaining hits: " + buttonID);
                     MessageHelper.sendEphemeralMessageToEventChannel(
                             event, "Encountered error. The buttons have been refreshed, please try again.");
                 });
@@ -218,7 +220,8 @@ public class AssignHitsButtonHandlers {
                     List<Button> systemButtons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(
                             player, game, activeSystem, assignHitsType);
                     MessageHelper.editMessageButtons(event, systemButtons);
-                    BotLogger.error("Error matching regex for sustaining hits: " + buttonID, game, event);
+                    BotLogger.error(
+                            new LogOrigin(event, game), "Error matching regex for sustaining hits: " + buttonID);
                     MessageHelper.sendEphemeralMessageToEventChannel(
                             event, "Encountered error. The buttons have been refreshed, please try again.");
                 });

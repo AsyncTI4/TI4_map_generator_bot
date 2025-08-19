@@ -7,7 +7,7 @@ import ti4.helpers.Constants;
 
 abstract class SearchComponentModelSubcommand extends Subcommand {
 
-    public SearchComponentModelSubcommand(String name, String description) {
+    SearchComponentModelSubcommand(String name, String description) {
         super(name, description);
         addOptions(new OptionData(
                         OptionType.STRING,

@@ -20,8 +20,8 @@ import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
 import ti4.map.persistence.ManagedPlayer;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.emoji.MiscEmojis;
 import ti4.settings.users.UserSettingsManager;
 
@@ -82,7 +82,7 @@ public class UserLeaveServerListener extends ListenerAdapter {
         // and then checks that require loading the game
         Game game = mGame.getGame();
         Player player = game.getPlayer(mPlayer.getId());
-        if (player.isEliminated() || player.isDummy()) return null;
+        if (player.isEliminated() || player.isDummy() || player.isNpc()) return null;
         if (game.isHasHadAStatusPhase() && !player.isRealPlayer()) return null;
         return game;
     }
@@ -102,7 +102,9 @@ public class UserLeaveServerListener extends ListenerAdapter {
                 if (voluntary) gameMessage += " has left the server.\n> If this was not a mistake, you may make ";
                 if (!voluntary) gameMessage += " was removed from the server.\n> Make ";
                 gameMessage +=
-                        "a post in https://discord.com/channels/943410040369479690/1176191865188536500 to get a replacement player";
+                        "a post in https://discord.com/channels/943410040369479690/1176191865188536500 to get a replacement player."
+                                + " You may also use `/player stats` to set them to an NPC"
+                                + " (the bot will choose the lowest possible strategy card, play it, and then pass for them every round).";
                 MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), gameMessage);
             }
             reportUserLeftServer(guild, player, gamesQuit);
@@ -200,7 +202,7 @@ public class UserLeaveServerListener extends ListenerAdapter {
         try {
             String msg = generateBothelperReport(guild, player, games);
             StringBuilder gs = new StringBuilder();
-            if (!msg.equalsIgnoreCase("dud")) {
+            if (!"dud".equalsIgnoreCase(msg)) {
                 var userSettings = UserSettingsManager.get(player.getId());
                 String prevRecord = userSettings.getTrackRecord();
                 for (Game game : games) {
@@ -216,7 +218,7 @@ public class UserLeaveServerListener extends ListenerAdapter {
                 for (Game game : games) {
                     gs.append(game.getActionsChannel().getJumpUrl()).append("\n");
                 }
-                final String gss = gs.toString();
+                String gss = gs.toString();
                 MessageHelper.sendMessageToChannel(
                         moderationLogChannel,
                         player.getName()

@@ -25,8 +25,7 @@ import ti4.listeners.context.ModalContext;
 import ti4.listeners.context.SelectionMenuContext;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
-import ti4.message.BotLogger.LogMessageOrigin;
+import ti4.message.logging.BotLogger;
 
 public class AnnotationHandler {
 
@@ -165,10 +164,10 @@ public class AnnotationHandler {
                 context.setShouldSave(save);
                 method.invoke(null, args.toArray());
             } catch (InvocationTargetException e) {
-                LogMessageOrigin origin = null;
+                GenericInteractionCreateEvent origin = null;
                 for (Object arg : args) {
                     if (arg instanceof ButtonInteractionEvent buttonInteractionEvent) {
-                        origin = new LogMessageOrigin((GenericInteractionCreateEvent) arg);
+                        origin = buttonInteractionEvent;
                         buttonInteractionEvent
                                 .getInteraction()
                                 .getMessage()
@@ -176,7 +175,7 @@ public class AnnotationHandler {
                                 .queue();
                     }
                     if (arg instanceof StringSelectInteractionEvent selectInteractionEvent) {
-                        origin = new LogMessageOrigin((GenericInteractionCreateEvent) arg);
+                        origin = selectInteractionEvent;
                         selectInteractionEvent
                                 .getInteraction()
                                 .getMessage()
@@ -262,7 +261,7 @@ public class AnnotationHandler {
 
                     for (H handler : handlers) {
                         String val = null;
-                        Boolean save = true;
+                        boolean save = true;
                         if (handler instanceof ButtonHandler bh) {
                             val = bh.value();
                             save = bh.save();

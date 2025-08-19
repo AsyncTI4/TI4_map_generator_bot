@@ -10,7 +10,8 @@ import ti4.draft.items.RedTileDraftItem;
 import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.FactionModel;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
@@ -39,7 +40,7 @@ public class StandardBagDraft extends BagDraft {
         "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral"
     };
 
-    public static List<FactionModel> getDraftableFactionsForGame(Game game) {
+    private static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllLegalFactions();
         if (!game.isDiscordantStarsMode()) {
             factionSet.removeIf(factionModel ->
@@ -48,7 +49,7 @@ public class StandardBagDraft extends BagDraft {
         return factionSet;
     }
 
-    public static List<FactionModel> getAllLegalFactions() {
+    private static List<FactionModel> getAllLegalFactions() {
         List<FactionModel> factionSet = Mapper.getFactionsValues();
         factionSet.removeIf((FactionModel model) -> {
             if (model.getSource().isPok() || model.getSource().isDs()) {
@@ -93,7 +94,7 @@ public class StandardBagDraft extends BagDraft {
                         bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
                         BotLogger.warning(
-                                new BotLogger.LogMessageOrigin(game),
+                                new LogOrigin(game),
                                 "Game: `" + game.getName() + "` error - empty franken draftableCollection: "
                                         + category.name());
                     }

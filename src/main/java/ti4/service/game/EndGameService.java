@@ -30,9 +30,10 @@ import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.statistics.game.WinningPathCacheService;
@@ -218,7 +219,7 @@ public class EndGameService {
                 if (publish) {
                     if (summaryChannel == null) {
                         BotLogger.warning(
-                                new BotLogger.LogMessageOrigin(event),
+                                new LogOrigin(event),
                                 "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
                         return;
                     }
@@ -259,8 +260,7 @@ public class EndGameService {
         } else if (publish) { // FOW SUMMARY
             if (summaryChannel == null) {
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(event),
-                        "`#fow-war-stories` channel not found - `/game end` cannot post summary");
+                        new LogOrigin(event), "`#fow-war-stories` channel not found - `/game end` cannot post summary");
                 return;
             }
             MessageHelper.sendMessageToChannel(summaryChannel, gameEndText);
@@ -329,7 +329,7 @@ public class EndGameService {
         }
     }
 
-    public static String getGameEndText(Game game, GenericInteractionCreateEvent event) {
+    private static String getGameEndText(Game game, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
         sb.append("**Game: __").append(game.getName()).append("__**");
         if (!game.getCustomName().isEmpty()) {
@@ -397,7 +397,7 @@ public class EndGameService {
         return sb.toString();
     }
 
-    public static String getTIGLFormattedGameEndText(Game game, GenericInteractionCreateEvent event) {
+    private static String getTIGLFormattedGameEndText(Game game, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
         sb.append("# ").append(MiscEmojis.TIGL).append("TIGL\n\n");
         sb.append("This was a TIGL game! 👑")
@@ -458,12 +458,11 @@ public class EndGameService {
         return report;
     }
 
-    public static void cleanUpInLimboCategory(Guild guild, int channelCountToDelete) {
+    private static void cleanUpInLimboCategory(Guild guild, int channelCountToDelete) {
         Category inLimboCategory =
                 guild.getCategoriesByName("The in-limbo PBD Archive", true).getFirst();
         if (inLimboCategory == null) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(guild),
                     "`GameEnd.cleanUpInLimboCategory`\nA clean up of in-limbo was attempted but could not find the **The in-limbo PBD Archive** category on server: "
                             + guild.getName());
             return;

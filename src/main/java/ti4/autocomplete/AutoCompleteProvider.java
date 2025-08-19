@@ -34,7 +34,8 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.AbilityModel;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.ColorableModelInterface;
@@ -72,7 +73,7 @@ public class AutoCompleteProvider {
         try {
             resolveAutoCompleteEvent(event);
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Error in handleAutoCompleteEvent", e);
+            BotLogger.error(new LogOrigin(event), "Error in handleAutoCompleteEvent", e);
         }
     }
 
@@ -519,10 +520,9 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.AUTO_ARCHIVE_DURATION -> {
+            case Constants.AUTO_ARCHIVE_DURATION ->
                 event.replyChoiceStrings("1_HOUR", "24_HOURS", "3_DAYS", "1_WEEK")
                         .queue();
-            }
             case Constants.PLANET_TYPE -> {
                 List<String> allPlanetTypes = Arrays.stream(PlanetTypeModel.PlanetType.values())
                         .map(PlanetTypeModel.PlanetType::toString)
@@ -667,8 +667,7 @@ public class AutoCompleteProvider {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 String latestCommand;
-                if (game.isFowMode()) { // !event.getUser().getID().equals(activeMap.getGMID()); //TODO: Validate that
-                    // the user running the command is the FoW GM, if so, display command.
+                if (game.isFowMode() && !FoWHelper.isGameMaster(event.getUser().getId(), game)) {
                     latestCommand = "Game is Fog of War mode - last command is hidden.";
                 } else {
                     latestCommand = StringUtils.left(game.getLatestCommand(), 100);
@@ -678,8 +677,7 @@ public class AutoCompleteProvider {
             case Constants.UNDO_TO_COMMAND -> {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
-                if (game.isFowMode()
-                        && !game.getFogOfWarGMIDs().contains(event.getUser().getId())) {
+                if (game.isFowMode() && !FoWHelper.isGameMaster(event.getUser().getId(), game)) {
                     event.replyChoiceStrings("Game is Fog of War mode - you can't see what you are undoing.")
                             .queue();
                     return;
@@ -856,7 +854,7 @@ public class AutoCompleteProvider {
                         abilities = Mapper.getAbilities();
                     }
                 } catch (Exception e) {
-                    BotLogger.error(new BotLogger.LogMessageOrigin(event), "Ability Autocomplete Setup Error", e);
+                    BotLogger.error(new LogOrigin(event), "Ability Autocomplete Setup Error", e);
                     abilities = Mapper.getAbilities();
                 }
 
@@ -869,7 +867,7 @@ public class AutoCompleteProvider {
             }
             case Constants.RANDOM_TYPE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Arrays.asList(RandomOption.values()).stream()
+                List<Command.Choice> options = Arrays.stream(RandomOption.values())
                         .filter(value -> value.search(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getAutoCompleteName(), value.toString()))
@@ -878,7 +876,7 @@ public class AutoCompleteProvider {
             }
             case Constants.PRIORITY_TRACK -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Arrays.asList(PriorityTrackMode.values()).stream()
+                List<Command.Choice> options = Arrays.stream(PriorityTrackMode.values())
                         .filter(value -> value.search(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getAutoCompleteName(), value.toString()))
