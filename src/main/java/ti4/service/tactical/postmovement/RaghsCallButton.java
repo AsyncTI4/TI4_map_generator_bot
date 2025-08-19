@@ -15,5 +15,3 @@ public final class RaghsCallButton implements PostMovementAbilityButton {
         return ButtonHelperFactionSpecific.getRaghsCallButtons(ctx.player, ctx.game, ctx.tile);
     }
 }
-
-

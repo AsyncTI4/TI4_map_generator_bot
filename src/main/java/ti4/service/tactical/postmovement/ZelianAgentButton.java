@@ -21,5 +21,3 @@ public final class ZelianAgentButton implements PostMovementAbilityButton {
                 FactionEmojis.zelian));
     }
 }
-
-

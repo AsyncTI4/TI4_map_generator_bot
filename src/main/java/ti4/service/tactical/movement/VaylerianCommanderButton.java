@@ -1,7 +1,7 @@
 package ti4.service.tactical.movement;
 
 import java.util.List;
-import net.dv8tion.jda.api.interactions/components/buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.tactical.MoveAbilityButton;
@@ -13,8 +13,7 @@ public final class VaylerianCommanderButton implements MoveAbilityButton {
     }
 
     public List<Button> build(MoveContext ctx) {
-        return List.of(Buttons.gray("declareUse_Vaylerian Commander", "Use Vaylerian Commander", FactionEmojis.vaylerian));
+        return List.of(
+                Buttons.gray("declareUse_Vaylerian Commander", "Use Vaylerian Commander", FactionEmojis.vaylerian));
     }
 }
-
-

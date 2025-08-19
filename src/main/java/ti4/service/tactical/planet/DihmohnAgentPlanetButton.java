@@ -21,5 +21,3 @@ public final class DihmohnAgentPlanetButton implements PlanetAbilityButton {
         return List.of(Buttons.green(id, label, FactionEmojis.dihmohn));
     }
 }
-
-

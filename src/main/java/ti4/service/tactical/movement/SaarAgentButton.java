@@ -16,5 +16,3 @@ public final class SaarAgentButton implements MoveAbilityButton {
         return List.of(Buttons.gray("exhaustAgent_saaragent", "Use Saar Agent", FactionEmojis.Saar));
     }
 }
-
-

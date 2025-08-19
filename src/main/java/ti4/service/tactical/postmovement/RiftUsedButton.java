@@ -19,5 +19,3 @@ public final class RiftUsedButton implements PostMovementAbilityButton {
                 MiscEmojis.GravityRift));
     }
 }
-
-

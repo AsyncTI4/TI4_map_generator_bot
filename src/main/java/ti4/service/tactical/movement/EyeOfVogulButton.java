@@ -16,5 +16,3 @@ public final class EyeOfVogulButton implements MoveAbilityButton {
         return List.of(Buttons.gray("eyeOfVogul", "Purge Eye of Vogul", ExploreEmojis.Relic));
     }
 }
-
-

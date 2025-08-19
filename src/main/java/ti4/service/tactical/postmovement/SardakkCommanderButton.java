@@ -15,5 +15,3 @@ public final class SardakkCommanderButton implements PostMovementAbilityButton {
         return ButtonHelperCommanders.getSardakkCommanderButtons(ctx.game, ctx.player, null);
     }
 }
-
-

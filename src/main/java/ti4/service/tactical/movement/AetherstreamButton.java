@@ -10,13 +10,10 @@ import ti4.service.tactical.MoveContext;
 
 public final class AetherstreamButton implements MoveAbilityButton {
     public boolean enabled(MoveContext ctx) {
-        return ctx.player.hasTech("as")
-                && FoWHelper.isTileAdjacentToAnAnomaly(ctx.game, ctx.activeSystem, ctx.player);
+        return ctx.player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(ctx.game, ctx.activeSystem, ctx.player);
     }
 
     public List<Button> build(MoveContext ctx) {
         return List.of(Buttons.gray("declareUse_Aetherstream", "Declare Aetherstream", FactionEmojis.Empyrean));
     }
 }
-
-

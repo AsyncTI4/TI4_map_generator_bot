@@ -20,5 +20,3 @@ public final class QhetAgentButton implements MoveAbilityButton {
         return List.of(Buttons.gray("exhaustAgent_qhetagent", "Use Qhet Agent", FactionEmojis.qhet));
     }
 }
-
-

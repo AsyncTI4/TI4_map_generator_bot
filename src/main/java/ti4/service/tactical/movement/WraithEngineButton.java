@@ -16,5 +16,3 @@ public final class WraithEngineButton implements MoveAbilityButton {
         return List.of(Buttons.gray("exhaustTech_dslihb", "Exhaust Wraith Engine", FactionEmojis.lizho));
     }
 }
-
-

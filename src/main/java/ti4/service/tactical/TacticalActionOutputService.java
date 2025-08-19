@@ -33,7 +33,11 @@ public class TacticalActionOutputService {
     public void refreshButtonsAndMessageForChoosingTile(ButtonInteractionEvent event, Game game, Player player) {
         String message = buildMessageForTacticalAction(game, player);
         List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
-        MessageHelper.editMessageWithButtons(event, message, systemButtons);
+        if (event == null) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, systemButtons);
+        } else {
+            MessageHelper.editMessageWithButtons(event, message, systemButtons);
+        }
     }
 
     public void refreshButtonsAndMessageForTile(
@@ -41,7 +45,11 @@ public class TacticalActionOutputService {
         String message = TacticalActionOutputService.buildMessageForSingleSystem(game, player, tile);
         List<Button> systemButtons =
                 ButtonHelperTacticalAction.getButtonsForAllUnitsInSystem(player, game, tile, moveOrRemove);
-        MessageHelper.editMessageWithButtons(event, message, systemButtons);
+        if (event == null) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, systemButtons);
+        } else {
+            MessageHelper.editMessageWithButtons(event, message, systemButtons);
+        }
     }
 
     private Set<String> positionsMovedFrom(Game game) {

@@ -19,5 +19,3 @@ public final class GhostCommanderButton implements PostMovementAbilityButton {
                 FactionEmojis.Ghost));
     }
 }
-
-

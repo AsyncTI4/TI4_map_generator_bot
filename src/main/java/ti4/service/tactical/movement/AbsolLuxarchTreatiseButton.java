@@ -13,9 +13,7 @@ public final class AbsolLuxarchTreatiseButton implements MoveAbilityButton {
     }
 
     public List<Button> build(MoveContext ctx) {
-        return List.of(Buttons.gray(
-                "exhaustRelic_absol_luxarchtreatise", "Exhaust Luxarch Treatise", ExploreEmojis.Relic));
+        return List.of(
+                Buttons.gray("exhaustRelic_absol_luxarchtreatise", "Exhaust Luxarch Treatise", ExploreEmojis.Relic));
     }
 }
-
-

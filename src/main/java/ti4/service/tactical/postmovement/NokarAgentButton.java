@@ -10,8 +10,7 @@ import ti4.service.tactical.PostMovementButtonContext;
 
 public final class NokarAgentButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.player.hasUnexhaustedLeader("nokaragent")
-                && FoWHelper.playerHasShipsInSystem(ctx.player, ctx.tile);
+        return ctx.player.hasUnexhaustedLeader("nokaragent") && FoWHelper.playerHasShipsInSystem(ctx.player, ctx.tile);
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
@@ -21,5 +20,3 @@ public final class NokarAgentButton implements PostMovementAbilityButton {
                 FactionEmojis.nokar));
     }
 }
-
-

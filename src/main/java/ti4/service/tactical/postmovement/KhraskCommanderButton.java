@@ -20,5 +20,3 @@ public final class KhraskCommanderButton implements PostMovementAbilityButton {
                 FactionEmojis.khrask));
     }
 }
-
-

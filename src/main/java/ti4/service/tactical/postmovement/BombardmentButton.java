@@ -10,7 +10,8 @@ import ti4.service.tactical.PostMovementButtonContext;
 public final class BombardmentButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
         return ctx.tile.getUnitHolders().size() > 1
-                && ti4.helpers.ButtonHelper.getTilesOfUnitsWithBombard(ctx.player, ctx.game).contains(ctx.tile);
+                && ti4.helpers.ButtonHelper.getTilesOfUnitsWithBombard(ctx.player, ctx.game)
+                        .contains(ctx.tile);
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
@@ -25,5 +26,3 @@ public final class BombardmentButton implements PostMovementAbilityButton {
         }
     }
 }
-
-

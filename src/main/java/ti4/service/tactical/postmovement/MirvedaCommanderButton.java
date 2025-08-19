@@ -17,5 +17,3 @@ public final class MirvedaCommanderButton implements PostMovementAbilityButton {
                 ctx.player.finChecker() + "offerMirvedaCommander", "Use Mirveda Commander", FactionEmojis.mirveda));
     }
 }
-
-
