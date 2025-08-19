@@ -16,8 +16,9 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.regex.RegexService;
 import ti4.service.tactical.TacticalActionOutputService;
@@ -92,7 +93,7 @@ class TacticalActionButtonHandlers {
         Tile t = game.getTileByPosition(pos);
         String moveRemove = buttonID.split("_")[0].replace("unitTactical", "");
         TacticalActionOutputService.refreshButtonsAndMessageForTile(event, game, player, t, moveRemove);
-        BotLogger.error("Error matching regex for tactical action: " + buttonID, game, event);
+        BotLogger.error(new LogOrigin(event, game), "Error matching regex for tactical action: " + buttonID);
         MessageHelper.sendEphemeralMessageToEventChannel(event, "Encountered error, refreshed buttons.");
     }
 

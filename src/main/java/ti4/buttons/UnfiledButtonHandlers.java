@@ -65,9 +65,10 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
@@ -1225,7 +1226,7 @@ public class UnfiledButtonHandlers {
             List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, pos, p1, p2, groundOrSpace);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
         } catch (IOException e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Failed to close FileUpload", e);
+            BotLogger.error(new LogOrigin(event), "Failed to close FileUpload", e);
         }
     }
 
@@ -1573,7 +1574,7 @@ public class UnfiledButtonHandlers {
                     event.getMessage().editMessage(msg).queue();
                 }
             } catch (Exception e) {
-                BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Could not parse PO ID: " + poID, e);
+                BotLogger.error(new LogOrigin(event, player), "Could not parse PO ID: " + poID, e);
                 event.getChannel()
                         .sendMessage("Could not parse public objective ID: " + poID + ". Please score manually.")
                         .queue();
@@ -1615,7 +1616,7 @@ public class UnfiledButtonHandlers {
                     }
                     game.setStoredValue(player.getFaction() + "queuedPOScore", "" + poIndex);
                 } catch (Exception e) {
-                    BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Could not parse PO ID: " + poID, e);
+                    BotLogger.error(new LogOrigin(event, player), "Could not parse PO ID: " + poID, e);
                     event.getChannel()
                             .sendMessage("Could not parse public objective ID: " + poID + ". Please score manually.")
                             .queue();
@@ -1798,7 +1799,7 @@ public class UnfiledButtonHandlers {
                     int soIndex = Integer.parseInt(soID);
                     SecretObjectiveHelper.scoreSO(event, game, player, soIndex, channel);
                 } catch (Exception e) {
-                    BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Could not parse SO ID: " + soID, e);
+                    BotLogger.error(new LogOrigin(event, player), "Could not parse SO ID: " + soID, e);
                     event.getChannel()
                             .sendMessage("Could not parse secret objective ID: " + soID + ". Please score manually.")
                             .queue();

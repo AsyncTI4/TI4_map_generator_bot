@@ -69,8 +69,9 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedPlayer;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.ColorModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
@@ -597,7 +598,7 @@ public class ButtonHelper {
             }
             Planet p = game.getPlanetsInfo().get(planet);
             if (p == null) {
-                BotLogger.warning(new BotLogger.LogMessageOrigin(player), "Null unitholder for planet " + planet);
+                BotLogger.warning(new LogOrigin(player), "Null unitholder for planet " + planet);
                 continue;
             }
             Set<String> tokenList = p.getTokenList();
@@ -673,7 +674,7 @@ public class ButtonHelper {
                     player.removePromissoryNote(pnID);
                     if (p2 == null) {
                         BotLogger.warning(
-                                new BotLogger.LogMessageOrigin(event),
+                                new LogOrigin(event),
                                 "Could not find player when removing eliminated player's PN: " + pn.getOwner());
                     } else {
                         p2.setPromissoryNote(pnID);
@@ -1672,15 +1673,13 @@ public class ButtonHelper {
             List<String> fakePlanets = new ArrayList<>(List.of("custodiavigilia", "ghoti"));
             if (!fakePlanets.contains(planetName))
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(game),
-                        "Couldn't find tile for " + planetName + " in game " + game.getName());
+                        new LogOrigin(game), "Couldn't find tile for " + planetName + " in game " + game.getName());
             return "none";
         }
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
         if (unitHolder == null) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(game),
-                    "Couldn't find unitholder for " + planetName + " in game " + game.getName());
+                    new LogOrigin(game), "Couldn't find unitholder for " + planetName + " in game " + game.getName());
             return "none";
         }
         Set<String> tokenList = unitHolder.getTokenList();
@@ -2432,8 +2431,7 @@ public class ButtonHelper {
         Tile hs = player.getHomeSystemTile();
         if (hs == null) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(player),
-                    "not finding a HS for " + player.getFaction() + " in " + game.getName());
+                    new LogOrigin(player), "not finding a HS for " + player.getFaction() + " in " + game.getName());
             return 0;
         }
         String hsPos = hs.getPosition();
@@ -4648,8 +4646,7 @@ public class ButtonHelper {
         }
         if (tradeHolder == null) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(event, player),
-                    "`ButtonHelper.sendTradeHolderSomething` tradeHolder was **null**");
+                    new LogOrigin(event, player), "`ButtonHelper.sendTradeHolderSomething` tradeHolder was **null**");
             return;
         }
         if ("tg".equalsIgnoreCase(tgOrDebt)) {
@@ -5929,9 +5926,7 @@ public class ButtonHelper {
                         player.getCardsInfoThread(), player.getRepresentation() + message, buttons);
             } catch (Exception e) {
                 BotLogger.error(
-                        new BotLogger.LogMessageOrigin(game),
-                        "Failing to set up player #cards-info thread in " + game.getName(),
-                        e);
+                        new LogOrigin(game), "Failing to set up player #cards-info thread in " + game.getName(), e);
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
@@ -6412,7 +6407,7 @@ public class ButtonHelper {
             Tile adjTile = game.getTileByPosition(adjTilePos);
             if (adjTile == null) {
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(player),
+                        new LogOrigin(player),
                         "`ButtonHelper.tileHasPDS2Cover` Game: " + game.getName() + " Tile: " + tilePos
                                 + " has a null adjacent tile: `" + adjTilePos + "` within: `" + adjTiles + "`");
                 continue;
@@ -6481,7 +6476,7 @@ public class ButtonHelper {
             Tile adjTile = game.getTileByPosition(adjTilePos);
             if (adjTile == null) {
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(player),
+                        new LogOrigin(player),
                         "`ButtonHelper.tileHasPDS2Cover` Game: " + game.getName() + " Tile: " + tilePos
                                 + " has a null adjacent tile: `" + adjTilePos + "` within: `" + adjTiles + "`");
                 continue;
@@ -6551,8 +6546,7 @@ public class ButtonHelper {
 
             game.setPhaseOfGame("action");
         } else {
-            BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(event, player), "`ButtonHelper.startMyTurn` player is null");
+            BotLogger.warning(new LogOrigin(event, player), "`ButtonHelper.startMyTurn` player is null");
             return;
         }
 

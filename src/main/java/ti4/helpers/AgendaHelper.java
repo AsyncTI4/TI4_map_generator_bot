@@ -51,10 +51,11 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
@@ -1714,16 +1715,13 @@ public class AgendaHelper {
         int firstIndex = buttonID.indexOf('_');
         int lastIndex = buttonID.lastIndexOf('_');
         if (firstIndex == -1 || lastIndex <= firstIndex) {
-            BotLogger.error(
-                    new BotLogger.LogMessageOrigin(event, game),
-                    "Could not parse rider info from button id: " + buttonID);
+            BotLogger.error(new LogOrigin(event, game), "Could not parse rider info from button id: " + buttonID);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not parse rider choice.");
             return;
         }
         String[] choiceParams = buttonID.substring(firstIndex + 1, lastIndex).split(";");
         if (choiceParams.length < 2) {
-            BotLogger.error(
-                    new BotLogger.LogMessageOrigin(event, game), "Invalid rider parameters in button id: " + buttonID);
+            BotLogger.error(new LogOrigin(event, game), "Invalid rider parameters in button id: " + buttonID);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not parse rider choice.");
             return;
         }
@@ -1917,10 +1915,10 @@ public class AgendaHelper {
             try {
                 nextInLine = getNextInLine(null, getVotingOrder(game), game);
             } catch (Exception e) {
-                BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not find next in line", e);
+                BotLogger.error(new LogOrigin(game), "Could not find next in line", e);
             }
             if (nextInLine == null) {
-                BotLogger.warning(new BotLogger.LogMessageOrigin(game), "`startTheVoting` is **null**");
+                BotLogger.warning(new LogOrigin(game), "`startTheVoting` is **null**");
                 return;
             }
             String realIdentity = nextInLine.getRepresentationUnfogged();
@@ -1989,7 +1987,7 @@ public class AgendaHelper {
                 game.updateActivePlayer(nextInLine);
                 game.setStoredValue("preVoting" + nextInLine.getFaction(), "");
             } catch (Exception e) {
-                BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not update active player", e);
+                BotLogger.error(new LogOrigin(game), "Could not update active player", e);
             }
             List<Button> buttons = List.of(Vote, Abstain, ForcedAbstain);
             if (game.isFowMode()) {
@@ -2652,8 +2650,7 @@ public class AgendaHelper {
                     Player player = votingOrder.get(x);
                     if (player == null) {
                         BotLogger.warning(
-                                new BotLogger.LogMessageOrigin(game),
-                                "`getNextInLine` Hit a null player in game " + game.getName());
+                                new LogOrigin(game), "`getNextInLine` Hit a null player in game " + game.getName());
                         return null;
                     }
 
@@ -2661,7 +2658,7 @@ public class AgendaHelper {
                         return player;
                     } else {
                         BotLogger.warning(
-                                new BotLogger.LogMessageOrigin(game),
+                                new LogOrigin(game),
                                 "`getNextInLine` Hit a notRealPlayer player in game " + game.getName() + " on player "
                                         + player.getUserName());
                     }
@@ -2870,7 +2867,7 @@ public class AgendaHelper {
                 planetNameProper = planetModel.getName();
             } else {
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(event),
+                        new LogOrigin(event),
                         "TEMP BOTLOG: A bad PlanetModel was found for planet: " + planet
                                 + " - using the planet id instead of the model name");
             }
@@ -4417,7 +4414,7 @@ public class AgendaHelper {
         try {
             startTheVoting(game);
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event, game), "Could not start the voting", e);
+            BotLogger.error(new LogOrigin(event, game), "Could not start the voting", e);
         }
     }
 

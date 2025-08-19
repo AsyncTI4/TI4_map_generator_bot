@@ -18,7 +18,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector;
 import org.springframework.stereotype.Component;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.website.EgressClientManager;
 
 @Component

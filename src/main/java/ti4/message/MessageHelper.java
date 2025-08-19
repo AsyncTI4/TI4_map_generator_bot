@@ -51,6 +51,8 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.ApplicationEmojiService;
@@ -89,7 +91,27 @@ public class MessageHelper {
     }
 
     public static void sendMessageToEventServerBotLogChannel(GenericInteractionCreateEvent event, String messageText) {
-        splitAndSent(messageText, BotLogger.getBotLogChannel(event));
+        splitAndSent(messageText, getBotLogChannel(event));
+    }
+
+    private static TextChannel getBotLogChannel(GenericInteractionCreateEvent event) {
+        TextChannel botLogChannel = null;
+        if (event != null) {
+            botLogChannel = getBotLogChannel(event.getGuild().getTextChannels());
+        }
+        if (botLogChannel == null) {
+            botLogChannel = getBotLogChannel(AsyncTI4DiscordBot.guildPrimary.getTextChannels());
+        }
+        return botLogChannel;
+    }
+
+    private static TextChannel getBotLogChannel(List<TextChannel> textChannels) {
+        for (TextChannel textChannel : textChannels) {
+            if ("bot-log".equals(textChannel.getName())) {
+                return textChannel;
+            }
+        }
+        return null;
     }
 
     public static void sendMessageToChannelWithEmbed(MessageChannel channel, String messageText, MessageEmbed embed) {
@@ -284,9 +306,7 @@ public class MessageHelper {
                             yield new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
                         }
                         default -> {
-                            BotLogger.warning(
-                                    new BotLogger.LogMessageOrigin(game),
-                                    "Unable to handle message type: " + messageType);
+                            BotLogger.warning(new LogOrigin(game), "Unable to handle message type: " + messageType);
                             yield null;
                         }
                     };
@@ -325,7 +345,7 @@ public class MessageHelper {
     public static void sendEphemeralFileInResponseToButtonPress(
             FileUpload fileUpload, GenericInteractionCreateEvent event) {
         if (fileUpload == null) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), "FileUpload null");
+            BotLogger.error(new LogOrigin(event), "FileUpload null");
             return;
         }
         if (event instanceof ButtonInteractionEvent button)
