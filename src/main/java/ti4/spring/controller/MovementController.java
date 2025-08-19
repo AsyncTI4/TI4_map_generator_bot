@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.spring.auth.RequestContext;
 import ti4.spring.model.MovementDisplacementRequest;
 import ti4.spring.service.MovementService;
 import ti4.spring.service.auth.RequestContext;
