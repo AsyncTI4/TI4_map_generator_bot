@@ -301,7 +301,7 @@ public class CryypterHelper {
 
     public static void addVotCAfterButtons(Game game, List<Button> afterButtons) {
         if (!game.isVotcMode()) {
-           return;
+            return;
         }
         for (Player player : game.getPlayers().values()) {
             votcRiderButtons(player, afterButtons, true);
