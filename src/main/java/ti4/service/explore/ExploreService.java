@@ -400,7 +400,7 @@ public class ExploreService {
             indefiniteArticle = "the ";
         } else if ("ls".equalsIgnoreCase(cardID)) {
             indefiniteArticle = "some ";
-        } else if ("aeiou".contains(Character.toLowerCase(exploreName.charAt(0)))) {
+        } else if ("aeiou".indexOf(exploreName.toLowerCase().charAt(0)) >= 0) {
             indefiniteArticle = "an ";
         } else {
             indefiniteArticle = "a ";
