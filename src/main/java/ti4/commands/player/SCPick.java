@@ -2,12 +2,9 @@ package ti4.commands.player;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
-import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -28,14 +25,11 @@ class SCPick extends GameStateSubcommand {
 
     public SCPick() {
         super(Constants.SC_PICK, "Pick a strategy card", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number").setRequired(true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC2, "2nd choice"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC3, "3rd choice"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC4, "4th choice"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC5, "5th choice"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC6, "6th choice"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
-
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number")
+                .setRequired(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -54,7 +48,10 @@ class SCPick extends GameStateSubcommand {
         Player player = getPlayer();
         int playerSCCount = player.getSCs().size();
         if (playerSCCount >= maxSCsPerPlayer) {
-            MessageHelper.sendMessageToEventChannel(event, "Player may not pick another strategy card. Max strategy cards per player for this game is " + maxSCsPerPlayer + ".");
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "Player may not pick another strategy card. Max strategy cards per player for this game is "
+                            + maxSCsPerPlayer + ".");
             return;
         }
 
@@ -64,22 +61,10 @@ class SCPick extends GameStateSubcommand {
         boolean pickSuccessful = PlayerStatsService.pickSC(event, game, player, option);
         Set<Integer> playerSCs = player.getSCs();
         if (!pickSuccessful) {
-            if (game.isFowMode()) {
-                String[] scs = { Constants.SC2, Constants.SC3, Constants.SC4, Constants.SC5, Constants.SC6 };
-                int c = 0;
-                while (playerSCs.isEmpty() && c < 5 && !pickSuccessful) {
-                    if (event.getOption(scs[c]) != null) {
-                        pickSuccessful = PlayerStatsService.pickSC(event, game, player, event.getOption(scs[c]));
-                    }
-                    playerSCs = player.getSCs();
-                    c++;
-                }
-            }
-            if (!pickSuccessful) {
-                return;
-            }
+            MessageHelper.sendMessageToEventChannel(event, "No strategy card picked.");
+            return;
         }
-        //ONLY DEAL WITH EXTRA PICKS IF IN FoW
+        // ONLY DEAL WITH EXTRA PICKS IF IN FoW
         if (playerSCs.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(event, "No strategy card picked.");
             return;
@@ -87,7 +72,8 @@ class SCPick extends GameStateSubcommand {
         secondHalfOfSCPick(event, player, game, scPicked);
     }
 
-    public static void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game game, int scPicked) {
+    private static void secondHalfOfSCPick(
+            GenericInteractionCreateEvent event, Player player, Game game, int scPicked) {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
 
         String msgExtra = "";
@@ -107,28 +93,29 @@ class SCPick extends GameStateSubcommand {
 
         boolean nextCorrectPing = false;
         Queue<Player> players = new ArrayDeque<>(activePlayers);
-        while (players.iterator().hasNext()) {
-            Player player_ = players.poll();
-            if (player_ == null || !player_.isRealPlayer()) {
+        while (players.iterator().hasNext() && player.isRealPlayer()) {
+            Player currentPlayer = players.poll();
+            if (currentPlayer == player) {
+                nextCorrectPing = true;
+            }
+            if (currentPlayer == null || !currentPlayer.isRealPlayer()) {
                 continue;
             }
-            int player_SCCount = player_.getSCs().size();
-            if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
-                msgExtra += player_.getRepresentationUnfogged() + " is up to pick their strategy card.";
+            int playerScCount = currentPlayer.getSCs().size();
+            if (nextCorrectPing && playerScCount < maxSCsPerPlayer && currentPlayer.getFaction() != null) {
+                msgExtra += currentPlayer.getRepresentationUnfogged() + " is up to pick their strategy card.";
                 game.setPhaseOfGame("strategy");
-                privatePlayer = player_;
+                privatePlayer = currentPlayer;
                 allPicked = false;
                 break;
             }
-            if (player_ == player) {
-                nextCorrectPing = true;
-            }
-            if (player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
-                players.add(player_);
+
+            if (playerScCount < maxSCsPerPlayer && currentPlayer.getFaction() != null) {
+                players.add(currentPlayer);
             }
         }
 
-        //SEND EXTRA MESSAGE
+        // SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
@@ -136,7 +123,10 @@ class SCPick extends GameStateSubcommand {
             game.updateActivePlayer(privatePlayer);
             if (!allPicked) {
                 game.setPhaseOfGame("strategy");
-                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use buttons to pick your strategy card.", Helper.getRemainingSCButtons(game, privatePlayer));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        privatePlayer.getPrivateChannel(),
+                        "Use buttons to pick your strategy card.",
+                        Helper.getRemainingSCButtons(game, privatePlayer));
             }
         } else {
             if (!allPicked) {

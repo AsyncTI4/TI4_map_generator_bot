@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -31,27 +30,31 @@ class SampleDecals extends Subcommand {
 
     public SampleDecals() {
         super(Constants.SAMPLE_DECALS, "Show a sample image of dreadnoughts with various decals.");
-        addOptions(new OptionData(OptionType.STRING, Constants.DECAL_HUE, "Category of decals to show (default: all)").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Which color to use as the background (default: blue)").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.DECAL_HUE, "Category of decals to show (default: all)")
+                .setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.STRING, Constants.COLOR, "Which color to use as the background (default: blue)")
+                .setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         List<String> decals = Mapper.getDecals().stream()
-            .filter(decalID -> UnitDecalService.userMayUseDecal(event.getUser().getId(), decalID))
-            .collect(Collectors.toList());
+                .filter(decalID ->
+                        UnitDecalService.userMayUseDecal(event.getUser().getId(), decalID))
+                .collect(Collectors.toList());
 
         OptionMapping input = event.getOption(Constants.DECAL_HUE);
-        if (input != null && !input.getAsString().equals(Constants.ALL) && !input.getAsString().isEmpty()) {
-            if (input.getAsString().equals("Other")) {
+        if (input != null
+                && !input.getAsString().equals(Constants.ALL)
+                && !input.getAsString().isEmpty()) {
+            if ("Other".equals(input.getAsString())) {
                 List<String> others = List.of("cb_10", "cb_11", "cb_52", "cb_81");
-                decals = decals.stream()
-                    .filter(others::contains)
-                    .collect(Collectors.toList());
+                decals = decals.stream().filter(others::contains).collect(Collectors.toList());
             } else {
                 decals = decals.stream()
-                    .filter(decalID -> Mapper.getDecalName(decalID).contains(input.getAsString()))
-                    .collect(Collectors.toList());
+                        .filter(decalID -> Mapper.getDecalName(decalID).contains(input.getAsString()))
+                        .collect(Collectors.toList());
             }
         }
 
@@ -77,7 +80,8 @@ class SampleDecals extends Subcommand {
         int PERROW = Math.min(PAGEWIDTH / DREADWIDTH, (int) Math.ceil(Math.sqrt(decals.size())));
 
         int left = ThreadLocalRandom.current().nextInt(PAGEWIDTH - PERROW * DREADWIDTH);
-        int top = ThreadLocalRandom.current().nextInt(PAGEHIGHT - ((decals.size() + PERROW - 1) / PERROW) * DREADTEXHIGHT);
+        int top = ThreadLocalRandom.current()
+                .nextInt(PAGEHIGHT - ((decals.size() + PERROW - 1) / PERROW) * DREADTEXHIGHT);
         int right = left + PERROW * DREADWIDTH;
         int bottom = top + ((decals.size() + PERROW - 1) / PERROW) * DREADTEXHIGHT;
         int x = left;
@@ -85,7 +89,8 @@ class SampleDecals extends Subcommand {
         int n = 0;
 
         BufferedImage coloursImage = new BufferedImage(PAGEWIDTH, PAGEHIGHT, BufferedImage.TYPE_INT_ARGB);
-        BufferedImage backgroundImage = ImageHelper.read(ResourceHelper.getInstance().getExtraFile("starfield.png"));
+        BufferedImage backgroundImage =
+                ImageHelper.read(ResourceHelper.getInstance().getExtraFile("starfield.png"));
         Graphics2D graphic = coloursImage.createGraphics();
         graphic.drawImage(backgroundImage, 0, 0, null);
         BasicStroke stroke = new BasicStroke(3.0f);
@@ -100,12 +105,16 @@ class SampleDecals extends Subcommand {
 
             String label = Mapper.getDecalName(d);
             int mid = -1;
-            int i = label.indexOf(" ");
+            int i = label.indexOf(' ');
             while (i >= 0) {
-                if (Math.abs(label.length() / 2.0 - 0.5 - mid) + (n % 2) > Math.abs(label.length() / 2.0 - 0.5 - i)) { // the (n%2) means that tie breaks will alternate each decal, hopefully reducing collisions
+                if (Math.abs(label.length() / 2.0 - 0.5 - mid) + (n % 2)
+                        > Math.abs(label.length() / 2.0
+                                - 0.5
+                                - i)) { // the (n%2) means that tie breaks will alternate each decal, hopefully reducing
+                    // collisions
                     mid = i;
                 }
-                i = label.indexOf(" ", i + 1);
+                i = label.indexOf(' ', i + 1);
             }
 
             graphic.setFont(bigFont);
@@ -113,10 +122,37 @@ class SampleDecals extends Subcommand {
             String row2 = (mid == -1 ? "" : label.substring(mid + 1));
             int drawX = x + DREADWIDTH / 2;
             int drawY = y + DREADSUBHIGHT + SPACING;
-            DrawingUtil.superDrawString(graphic, row1, drawX, drawY, Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top, stroke, Color.BLACK);
-            DrawingUtil.superDrawString(graphic, row2, drawX, drawY + LINEHEIGHT, Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top, stroke, Color.BLACK);
+            DrawingUtil.superDrawString(
+                    graphic,
+                    row1,
+                    drawX,
+                    drawY,
+                    Color.WHITE,
+                    MapGenerator.HorizontalAlign.Center,
+                    MapGenerator.VerticalAlign.Top,
+                    stroke,
+                    Color.BLACK);
+            DrawingUtil.superDrawString(
+                    graphic,
+                    row2,
+                    drawX,
+                    drawY + LINEHEIGHT,
+                    Color.WHITE,
+                    MapGenerator.HorizontalAlign.Center,
+                    MapGenerator.VerticalAlign.Top,
+                    stroke,
+                    Color.BLACK);
             graphic.setFont(smallFont);
-            DrawingUtil.superDrawString(graphic, d, drawX, drawY + 2 * LINEHEIGHT, Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top, stroke, Color.BLACK);
+            DrawingUtil.superDrawString(
+                    graphic,
+                    d,
+                    drawX,
+                    drawY + 2 * LINEHEIGHT,
+                    Color.WHITE,
+                    MapGenerator.HorizontalAlign.Center,
+                    MapGenerator.VerticalAlign.Top,
+                    stroke,
+                    Color.BLACK);
 
             n += 1;
             if (n >= PERROW) {

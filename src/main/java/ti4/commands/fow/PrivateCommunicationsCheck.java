@@ -12,7 +12,11 @@ import ti4.service.fow.FowCommunicationThreadService;
 class PrivateCommunicationsCheck extends GameStateSubcommand {
 
     public PrivateCommunicationsCheck() {
-        super(Constants.CHECK_PRIVATE_COMMUNICATIONS, "Check the status of private communication threads and offer a button to suggest new ones.", false, true);
+        super(
+                Constants.CHECK_PRIVATE_COMMUNICATIONS,
+                "Check the status of private communication threads and offer a button to suggest new ones.",
+                false,
+                true);
         addOption(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which check as", false, true);
     }
 
@@ -22,7 +26,8 @@ class PrivateCommunicationsCheck extends GameStateSubcommand {
         Game game = getGame();
 
         if (!FowCommunicationThreadService.isActive(game)) {
-            MessageHelper.replyToMessage(event, "Bot managed communication threads are not enabled.\nEnable them with `/fow fow_options`");
+            MessageHelper.replyToMessage(
+                    event, "Bot managed communication threads are not enabled.\nEnable them with `/fow fow_options`");
             return;
         }
 

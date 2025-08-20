@@ -1,9 +1,8 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.map.Game;
 import ti4.model.DraftErrataModel;
@@ -48,7 +47,7 @@ public class SpeakerOrderDraftItem extends DraftItem {
     public static List<DraftItem> buildAllDraftableItems(Game game) {
         List<DraftItem> allItems = new ArrayList<>();
         for (int i = 0; i < game.getRealPlayers().size(); i++) {
-            allItems.add(DraftItem.generate(DraftItem.Category.DRAFTORDER, Integer.toString(i + 1)));
+            allItems.add(generate(DraftItem.Category.DRAFTORDER, Integer.toString(i + 1)));
         }
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.DRAFTORDER);
         return allItems;

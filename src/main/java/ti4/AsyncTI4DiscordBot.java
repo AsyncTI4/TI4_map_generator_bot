@@ -1,5 +1,7 @@
 package ti4;
 
+import static org.reflections.scanners.Scanners.SubTypes;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,7 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -24,6 +25,8 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import ti4.commands.CommandManager;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CloseLaunchThreadsCron;
@@ -38,7 +41,8 @@ import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
 import ti4.cron.UploadStatsCron;
-import ti4.executors.ExecutorManager;
+import ti4.cron.WinningPathCacheCron;
+import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -57,8 +61,9 @@ import ti4.listeners.SelectionMenuListener;
 import ti4.listeners.SlashCommandListener;
 import ti4.listeners.UserJoinServerListener;
 import ti4.listeners.UserLeaveServerListener;
-import ti4.map.manage.GameManager;
-import ti4.message.BotLogger;
+import ti4.map.persistence.GameManager;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogBufferManager;
 import ti4.migration.DataMigrationManager;
 import ti4.selections.SelectionManager;
 import ti4.service.emoji.ApplicationEmojiService;
@@ -66,30 +71,28 @@ import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
 
-import static org.reflections.scanners.Scanners.SubTypes;
-
+@SpringBootApplication
 public class AsyncTI4DiscordBot {
 
     public static final long START_TIME_MILLISECONDS = System.currentTimeMillis();
-    public static final List<Role> adminRoles = new ArrayList<>();
-    public static final List<Role> developerRoles = new ArrayList<>();
-    public static final List<Role> bothelperRoles = new ArrayList<>();
+    public static final Set<Role> adminRoles = new HashSet<>();
+    public static final Set<Role> developerRoles = new HashSet<>();
+    public static final Set<Role> bothelperRoles = new HashSet<>();
 
     public static JDA jda;
-    public static String userID;
     public static String guildPrimaryID;
-    public static boolean testingMode = false;
+    public static boolean testingMode;
     public static Guild guildPrimary;
-    public static Guild guildSecondary;
-    public static Guild guildTertiary;
-    public static Guild guildQuaternary;
-    public static Guild guildQuinary;
-    public static Guild guildSenary;
-    public static Guild guildSeptenary;
-    public static Guild guildOctonary;
+    private static Guild guildSecondary;
+    private static Guild guildTertiary;
+    private static Guild guildQuaternary;
+    private static Guild guildQuinary;
+    private static Guild guildSenary;
+    private static Guild guildSeptenary;
+    private static Guild guildOctonary;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
-    public static Guild guildMegagame;
+    private static Guild guildMegagame;
     public static final Set<Guild> guilds = new HashSet<>();
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new LinkedList<>();
@@ -97,41 +100,44 @@ public class AsyncTI4DiscordBot {
     private static final List<Class<?>> classes = new ArrayList<>();
 
     public static void main(String[] args) {
+        SpringApplication.run(AsyncTI4DiscordBot.class, args);
+
         // guildPrimaryID must be set before initializing listeners that use webhook logging
-        userID = args[1];
         guildPrimaryID = args[2];
 
         GlobalSettings.loadSettings();
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
         jda = JDABuilder.createDefault(args[0])
-            // This is a privileged gateway intent that is used to update user information and join/leaves (including kicks).
-            // This is required to cache all members of a guild (including chunking)
-            .enableIntents(GatewayIntent.GUILD_MEMBERS)
-            // This is a privileged gateway intent this is only used to enable access to the user content in messages
-            // (also including embeds/attachments/components).
-            .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-            // not 100 sure this is needed? It may be for the Emoji cache... but do we actually need that?
-            .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
-            // It *appears* we need to pull all members or else the bot has trouble pinging players
-            // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
-            // and avoid loading every user at startup
-            .setMemberCachePolicy(MemberCachePolicy.ALL)
-            .setChunkingFilter(ChunkingFilter.ALL)
-            // This allows us to use our own ShutdownHook, created below
-            .setEnableShutdownHook(false)
-            .build();
+                // This is a privileged gateway intent that is used to update user information and join/leaves
+                // (including kicks).
+                // This is required to cache all members of a guild (including chunking)
+                .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                // This is a privileged gateway intent this is only used to enable access to the user content in
+                // messages
+                // (also including embeds/attachments/components).
+                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+                // not 100 sure this is needed? It may be for the Emoji cache... but do we actually need that?
+                .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
+                // It *appears* we need to pull all members or else the bot has trouble pinging players
+                // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
+                // and avoid loading every user at startup
+                .setMemberCachePolicy(MemberCachePolicy.ALL)
+                .setChunkingFilter(ChunkingFilter.ALL)
+                // This allows us to use our own ShutdownHook, created below
+                .setEnableShutdownHook(false)
+                .build();
 
         jda.addEventListener(
-            new MessageListener(),
-            new DeletionListener(),
-            new ChannelCreationListener(),
-            new SlashCommandListener(),
-            ButtonListener.getInstance(),
-            ModalListener.getInstance(),
-            new SelectionMenuListener(),
-            new UserJoinServerListener(),
-            new UserLeaveServerListener(),
-            new AutoCompleteListener());
+                new MessageListener(),
+                new DeletionListener(),
+                new ChannelCreationListener(),
+                new SlashCommandListener(),
+                ButtonListener.getInstance(),
+                ModalListener.getInstance(),
+                new SelectionMenuListener(),
+                new UserJoinServerListener(),
+                new UserLeaveServerListener(),
+                new AutoCompleteListener());
 
         try {
             jda.awaitReady();
@@ -139,7 +145,8 @@ public class AsyncTI4DiscordBot {
             BotLogger.error("Error waiting for bot to get ready", e);
         }
 
-        jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
+        jda.getPresence()
+                .setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
 
         BotLogger.info("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
 
@@ -217,11 +224,11 @@ public class AsyncTI4DiscordBot {
         }
 
         // Async: FOW Chapter Secondary
-        //if (args.length >= 13) {
+        // if (args.length >= 13) {
         //    guildFogOfWarSecondary = jda.getGuildById(args[12]);
         //    startBot(guildFogOfWarSecondary);
         //    fowServers.add(guildFogOfWarSecondary);
-        //}
+        // }
 
         if (!success) {
             BotLogger.info("Failed to start the bot on one or more servers. Aborting.");
@@ -242,7 +249,8 @@ public class AsyncTI4DiscordBot {
         ApplicationEmojiService.uploadNewEmojis();
         TileHelper.init(); // load all /resources/planets/ and /resources/systems/ .json files, into 3 HashMaps (not 2)
         PositionMapper.init(); // load all /resources/positions/ .properties files, each into 1 Properties
-        Mapper.init(); // load all /resources/data/ .json and .properties files, except logging.properties, each into 1 HashMap or Properties
+        Mapper.init(); // load all /resources/data/ .json and .properties files, except logging.properties, each into
+        // 1 HashMap or Properties
         AliasHandler.init(); // load all /resources/alias/ .properties files, except position_alias_old.properties, into
         Storage.init(); // create directories for games files
         SelectionManager.init();
@@ -264,20 +272,21 @@ public class AsyncTI4DiscordBot {
         AutoPingCron.register();
         ReuploadStaleEmojisCron.register();
         LogCacheStatsCron.register();
+        WinningPathCacheCron.register();
         UploadStatsCron.register();
         OldUndoFileCleanupCron.register();
         EndOldGamesCron.register();
         LogButtonRuntimeStatisticsCron.register();
         TechSummaryCron.register();
         SabotageAutoReactCron.register();
-        //AgendaPhaseAutoReactCron.register();  Disabled due to new afters/whens handling
         FastScFollowCron.register();
         CloseLaunchThreadsCron.register();
+        LogBufferManager.initialize();
         InteractionLogCron.register();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
-        AsyncTI4DiscordBot.jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
+        jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
         updatePresence();
         BotLogger.info("FINISHED LOADING GAMES");
 
@@ -285,11 +294,12 @@ public class AsyncTI4DiscordBot {
         Thread mainThread = Thread.currentThread();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
+                jda.getPresence()
+                        .setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
                 BotLogger.info("SHUTDOWN PROCESS STARTED");
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
                 BotLogger.info("NO LONGER ACCEPTING COMMANDS");
-                if (ExecutorManager.shutdown()) { // will wait for up to an additional 20 seconds
+                if (ExecutorServiceManager.shutdown()) { // will wait for up to an additional 20 seconds
                     BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");
                 } else {
                     BotLogger.info("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
@@ -305,6 +315,7 @@ public class AsyncTI4DiscordBot {
                     BotLogger.info("DID NOT FINISH PROCESSING STATISTICS");
                 }
                 CronManager.shutdown(); // will wait for up to an additional 20 seconds
+                LogBufferManager.sendBufferedLogsToDiscord(); // will drain the log buffer and doesn't have a timeout
                 BotLogger.info("SHUTDOWN PROCESS COMPLETE");
                 TimeUnit.SECONDS.sleep(1); // wait for BotLogger
                 jda.shutdown();
@@ -324,16 +335,17 @@ public class AsyncTI4DiscordBot {
             CommandListUpdateAction commands = guild.updateCommands();
             CommandManager.getCommands().forEach(command -> command.register(commands));
             commands.queue();
-            BotLogger.info(new BotLogger.LogMessageOrigin(guild), "BOT STARTED UP: " + guild.getName());
+            BotLogger.info("BOT STARTED UP: " + guild.getName());
             guilds.add(guild);
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(guild), "\n# FAILED TO START BOT ", e);
+            BotLogger.error("\n# FAILED TO START BOT ", e);
         }
         return true;
     }
 
     private static boolean startBotSearchOnly(Guild guild) {
-        // Do not set up search commands for test bots, and definitely never for the hub server, which several test bots are still in
+        // Do not set up search commands for test bots, and definitely never for the hub server, which several test bots
+        // are still in
         if (guild == null) return false;
         if (System.getenv("TESTING") != null) return false;
         if (guild.getId().equals(Constants.ASYNCTI4_HUB_SERVER_ID)) return false;
@@ -345,17 +357,17 @@ public class AsyncTI4DiscordBot {
             CommandListUpdateAction commands = guild.updateCommands();
             CommandManager.getCommands().forEach(command -> command.registerSearchCommands(commands));
             commands.queue();
-            BotLogger.info(new BotLogger.LogMessageOrigin(guild), "SEARCH-ONLY BOT STARTED UP: " + guild.getName());
+            BotLogger.info("SEARCH-ONLY BOT STARTED UP: " + guild.getName());
             guilds.add(guild);
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(guild), "\n# SEARCH-ONLY BOT FAILED TO START: " + guild.getName(), e);
+            BotLogger.error("\n# SEARCH-ONLY BOT FAILED TO START: " + guild.getName(), e);
         }
         return true;
     }
 
     public static void updatePresence() {
         long activeGames = GameManager.getActiveGameCount();
-        AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(activeGames + " games of Async TI4"));
+        jda.getPresence().setActivity(Activity.playing(activeGames + " games of Async TI4"));
     }
 
     /**
@@ -369,7 +381,7 @@ public class AsyncTI4DiscordBot {
      * Add your test server's role ID to enable access to these commands on your server
      */
     private static void initializeWhitelistedRoles() {
-        //ADMIN ROLES
+        // ADMIN ROLES
 
         adminRoles.add(jda.getRoleById("943596173896323072")); // Async Primary (Hub)
         adminRoles.add(jda.getRoleById("1090914497352446042")); // Async Secondary (Stroter's Paradise)
@@ -389,7 +401,6 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("1126610851034583050")); // Fin's Server
         adminRoles.add(jda.getRoleById("824111008863092757")); // Fireseal's Server
         adminRoles.add(jda.getRoleById("336194595501244417")); // tedw4rd's Server
-        adminRoles.add(jda.getRoleById("1149705227625316352")); // who dis
         adminRoles.add(jda.getRoleById("1178659621225889875")); // Jepp2078's Server
         adminRoles.add(jda.getRoleById("1215451631622164610")); // Sigma's Server
         adminRoles.add(jda.getRoleById("1225597324206800996")); // ForlornGeas's Server
@@ -399,11 +410,12 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("1311111853912358922")); // TSI's Server
         adminRoles.add(jda.getRoleById("1368344911103000728")); // gozer's server (marshmallow manosphere)
         adminRoles.add(jda.getRoleById("1378475691531567185")); // Hadouken's Server
+        adminRoles.add(jda.getRoleById("1149705227625316352")); // Will's server
         adminRoles.removeIf(Objects::isNull);
 
-        //DEVELOPER ROLES
+        // DEVELOPER ROLES
 
-        developerRoles.addAll(adminRoles); //admins may also execute developer commands
+        developerRoles.addAll(adminRoles); // admins may also execute developer commands
         developerRoles.add(jda.getRoleById("947648366056185897")); // Async Primary (Hub)
         developerRoles.add(jda.getRoleById("1090958278479052820")); // Async Secondary (Stroter's Paradise)
         developerRoles.add(jda.getRoleById("1146529125184581733")); // Async Tertiary (Dreadn't)
@@ -422,11 +434,13 @@ public class AsyncTI4DiscordBot {
         developerRoles.add(jda.getRoleById("1311111944832553090")); // TSI's Server
         developerRoles.add(jda.getRoleById("1368344979579338762")); // gozer's server (marshmallow manosphere)
         developerRoles.add(jda.getRoleById("1378475796301217792")); // Hadouken's Server
+        developerRoles.add(jda.getRoleById("1406188584163213332")); // Will's server
         developerRoles.removeIf(Objects::isNull);
 
-        //BOTHELPER ROLES
+        // BOTHELPER ROLES
 
-        bothelperRoles.addAll(adminRoles); //admins can also execute bothelper commands
+        bothelperRoles.addAll(developerRoles); // developers may also execute bothelper commands
+        bothelperRoles.addAll(adminRoles); // admins can also execute bothelper commands
         bothelperRoles.add(jda.getRoleById("1166011604488425482")); // Async Primary (Hub)
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary (Stroter's Paradise)
         bothelperRoles.add(jda.getRoleById("1146539257725464666")); // Async Tertiary (Dreadn't)
@@ -443,11 +457,12 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1131925041219653714")); // Jonjo's Server
         bothelperRoles.add(jda.getRoleById("1215450829096624129")); // Sigma's Server
         bothelperRoles.add(jda.getRoleById("1226068245010710558")); // Rintsi's Server
-        bothelperRoles.add(jda.getRoleById("1226805674046914560")); // Solax's Server 
+        bothelperRoles.add(jda.getRoleById("1226805674046914560")); // Solax's Server
         bothelperRoles.add(jda.getRoleById("1313965956338417784")); // ppups's Server
         bothelperRoles.add(jda.getRoleById("1311112004089548860")); // TSI's Server
         bothelperRoles.add(jda.getRoleById("1368345023745097898")); // gozer's server (marshmallow manosphere)
         bothelperRoles.add(jda.getRoleById("1378475822528204901")); // Hadouken's Server
+        bothelperRoles.add(jda.getRoleById("1150031360610799676")); // Will's server
         bothelperRoles.removeIf(Objects::isNull);
     }
 
@@ -456,29 +471,30 @@ public class AsyncTI4DiscordBot {
     }
 
     public static boolean isReadyToReceiveCommands() {
-        return GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, false);
+        return GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, false);
     }
 
     public static List<Category> getAvailablePBDCategories() {
         return guilds.stream()
-            .flatMap(guild -> guild.getCategories().stream())
-            .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
-            .toList();
+                .flatMap(guild -> guild.getCategories().stream())
+                .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
+                .toList();
     }
 
     public static List<Class<?>> getAllClasses() {
         if (classes.isEmpty()) {
             Reflections reflections = new Reflections(new ConfigurationBuilder()
-                .setUrls(ClasspathHelper.forJavaClassPath())
-                .setScanners(new SubTypesScanner(false)));
+                    .setUrls(ClasspathHelper.forJavaClassPath())
+                    .setScanners(new SubTypesScanner(false)));
             reflections.get(SubTypes.of(Object.class).asClass()).stream()
-                .filter(c -> c.getPackageName().startsWith("ti4"))
-                .forEach(classes::add);
+                    .filter(c -> c.getPackageName().startsWith("ti4"))
+                    .forEach(classes::add);
         }
         return classes;
     }
 
     public static boolean isValidGuild(String guildId) {
-        return AsyncTI4DiscordBot.guilds.stream().anyMatch(g -> g.getId().equals(guildId));
+        return guilds.stream().anyMatch(g -> g.getId().equals(guildId));
     }
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -29,16 +28,18 @@ import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
-import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.WhisperService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -46,6 +47,8 @@ public class StartTurnService {
 
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
         player.setInRoundTurnCount(player.getInRoundTurnCount() + 1);
+        game.removeStoredValue("currentActionSummary" + player.getFaction());
+
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         Map<String, String> maps = new HashMap<>(game.getMessagesThatICheckedForAllReacts());
         for (String id : maps.keySet()) {
@@ -62,33 +65,70 @@ public class StartTurnService {
         CardsInfoService.sendVariousAdditionalButtons(game, player);
         boolean goingToPass = false;
         if (game.getStoredValue("Pre Pass " + player.getFaction()) != null
-            && game.getStoredValue("Pre Pass " + player.getFaction())
-                .contains(player.getFaction())) {
+                && game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
             if (game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())
-                && !player.isPassed()) {
+                    && !player.isPassed()) {
                 game.setStoredValue("Pre Pass " + player.getFaction(), "");
                 goingToPass = true;
             }
         }
+
+        if (player.isNpc()) {
+            boolean hadAnyUnplayedSCs = false;
+            for (Integer SC : player.getSCs()) {
+                if (!game.getPlayedSCs().contains(SC)) {
+                    hadAnyUnplayedSCs = true;
+                }
+            }
+            if (!hadAnyUnplayedSCs) {
+                goingToPass = true;
+            }
+        }
+
         String text = player.getRepresentationUnfogged() + ", it is now your turn (your "
-            + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
+                + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
         Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
         if (nextPlayer != null && !game.isFowMode()) {
             if (nextPlayer == player) {
-                text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the Action Phase.";
+                text +=
+                        "\n-# All other players are passed; you will take consecutive turns until you pass, ending the Action Phase.";
+                if (player.getSecretsUnscored().containsKey("pe")
+                        && "".equals(game.getStoredValue("autoProveEndurance_" + player.getFaction()))) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green(
+                            "autoProveEndurance_yes", "Queue Prove Endurance", CardEmojis.SecretObjectiveAlt));
+                    buttons.add(Buttons.red("autoProveEndurance_no", "Decline Prove Endurance", "🙅"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(),
+                            "All other players have passed. As such, when you pass, you could score _Prove Endurance_."
+                                    + " You may use these buttons to queue scoring this when you pass (or not).",
+                            buttons);
+                }
             } else {
-                String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn() ? nextPlayer.getRepresentationUnfogged() : nextPlayer.getRepresentationNoPing();
-                text += "\n-# " + ping + " will start their turn once you've ended yours.";
+                String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn()
+                        ? nextPlayer.getRepresentationUnfogged()
+                        : nextPlayer.getRepresentationNoPing();
+                int numUnpassed = -2;
+                for (Player p2 : game.getPlayers().values()) {
+                    numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
+                }
+                text += "\n-# " + ping + " will start their turn once you've ended yours. ";
+                if (numUnpassed == 0) {
+                    text += "No other players are unpassed.";
+                } else {
+                    text += numUnpassed + " other player" + (numUnpassed == 1 ? " is" : "s are") + " still unpassed.";
+                }
             }
         }
 
         String buttonText = "Use buttons to do your turn. ";
-        if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
-            buttonText += "Your strategy card initiative number is " + player.getSCs().toArray()[0] + ".";
+        if ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName())) {
+            buttonText +=
+                    "Your strategy card initiative number is " + player.getSCs().toArray()[0] + ".";
         }
         List<Button> buttons = getStartOfTurnButtons(player, game, false, event);
-        MessageChannel gameChannel = game.getMainGameChannel() == null ? event.getMessageChannel()
-            : game.getMainGameChannel();
+        MessageChannel gameChannel =
+                game.getMainGameChannel() == null ? event.getMessageChannel() : game.getMainGameChannel();
 
         game.updateActivePlayer(player);
         game.setPhaseOfGame("action");
@@ -111,9 +151,8 @@ public class StartTurnService {
                 FowCommunicationThreadService.checkNewNeighbors(game, player);
             }
             if (getMissedSCFollowsText(game, player) != null
-                && !"".equalsIgnoreCase(getMissedSCFollowsText(game, player))) {
-                MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
-                    getMissedSCFollowsText(game, player));
+                    && !"".equalsIgnoreCase(getMissedSCFollowsText(game, player))) {
+                MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(game, player));
             }
             reviveInfantryII(player);
             ButtonHelperFactionSpecific.resolveKolleccAbilities(player, game);
@@ -124,7 +163,7 @@ public class StartTurnService {
         } else {
             MessageHelper.sendMessageToChannel(gameChannel, text);
             if (getMissedSCFollowsText(game, player) != null
-                && !"".equalsIgnoreCase(getMissedSCFollowsText(game, player))) {
+                    && !"".equalsIgnoreCase(getMissedSCFollowsText(game, player))) {
                 MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(game, player));
             }
             reviveInfantryII(player);
@@ -133,44 +172,62 @@ public class StartTurnService {
             }
             ButtonHelperFactionSpecific.resolveMykoMechCheck(player, game);
             ButtonHelperFactionSpecific.resolveKolleccAbilities(player, game);
-
         }
         if (!game.getStoredValue("futureMessageFor" + player.getFaction()).isEmpty()) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + " you left yourself the following message: \n"
-                    + game.getStoredValue("futureMessageFor" + player.getFaction()));
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + " you left yourself the following message: \n"
+                            + game.getStoredValue("futureMessageFor" + player.getFaction()));
             game.setStoredValue("futureMessageFor" + player.getFaction(), "");
         }
         for (Player p2 : game.getRealPlayers()) {
-            if (!game
-                .getStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction())
-                .isEmpty()) {
-                String msg2 = "This is a message sent from the past:\n" + game
-                    .getStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction());
-                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
-                    p2.getRepresentationUnfogged() + " your future message got delivered");
+            if (!game.getStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction())
+                    .isEmpty()) {
+                String msg2 = "This is a message sent from the past:\n"
+                        + game.getStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction());
+                MessageHelper.sendMessageToChannel(
+                        p2.getCardsInfoThread(), p2.getRepresentationUnfogged() + " your future message got delivered");
                 WhisperService.sendWhisper(game, p2, player, msg2, "n", p2.getCardsInfoThread(), event.getGuild());
                 game.setStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction(), "");
             }
         }
-        
+
         if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander") && player.getCommodities() > 0) {
             for (Player p2 : game.getRealPlayers()) {
-                if (!p2.equals(player) && game.playerHasLeaderUnlockedOrAlliance(p2, "redcreusscommander") && p2.getCommodities() > 0 
-                        && player.getNeighbouringPlayers(true).contains(p2))
-                {
+                if (!p2.equals(player)
+                        && game.playerHasLeaderUnlockedOrAlliance(p2, "redcreusscommander")
+                        && p2.getCommodities() > 0
+                        && player.getNeighbouringPlayers(true).contains(p2)) {
                     List<Button> buttonsRedCreuss = new ArrayList<>();
-                    buttonsRedCreuss.add(Buttons.green("redCreussWash_" + p2.getUserID(), "Wash", MiscEmojis.Wash));
+                    buttonsRedCreuss.add(
+                            Buttons.green("redCreussWashFull_" + p2.getUserID(), "Full Wash", MiscEmojis.Wash));
+                    buttonsRedCreuss.add(
+                            Buttons.blue("redCreussWashPartial_" + p2.getUserID(), "Partial Wash", MiscEmojis.Wash));
                     buttonsRedCreuss.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), 
-                        player.getRepresentationUnfogged() + ", both you and " + p2.getRepresentationNoPing() + " have commodities."
-                            + " You may use these buttons to wash them, should you both agree.", buttonsRedCreuss);
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged() + ", both you and " + p2.getRepresentationNoPing()
+                                    + " have commodities."
+                                    + " You may use these buttons to wash them, should you both agree."
+                                    + "\n-# \"Partial Wash\" will only swap commodities for an equal number of commodities. \"Full Wash\" will also swap trade goods, to wash as many commodities as possible."
+                                    + " If both player have the same number of commodities, the buttons are identical.",
+                            buttonsRedCreuss);
                 }
             }
         }
 
         if (goingToPass) {
             PassService.passPlayerForRound(event, game, player, true);
+        } else {
+            if (player.isNpc()) {
+
+                for (Integer SC : player.getSCs()) {
+                    if (!game.getPlayedSCs().contains(SC)) {
+                        PlayStrategyCardService.playSC(event, SC, game, game.getMainGameChannel(), player);
+                        return;
+                    }
+                }
+            }
         }
     }
 
@@ -179,7 +236,8 @@ public class StartTurnService {
         if (player.getStasisInfantry() > 0 && !player.hasTech("dsqhetinf")) {
             if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
                 List<Button> buttons = ButtonHelper.getPlaceStatusInfButtons(game, player);
-                String msg = "Use buttons to revive infantry. You have " + player.getStasisInfantry() + " infantry left to revive.";
+                String msg = "Use buttons to revive infantry. You have " + player.getStasisInfantry()
+                        + " infantry left to revive.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             } else {
                 String msg = player.getRepresentation() + ", you had infantry II to be revived, but";
@@ -190,7 +248,8 @@ public class StartTurnService {
             }
         }
         if (!game.getStoredValue("pathOf" + player.getFaction()).isEmpty()) {
-            String msg1 = player.getRepresentation() + "The Starlit path points you towards a " + game.getStoredValue("pathOf" + player.getFaction()) + ".";
+            String msg1 = player.getRepresentation() + "The Starlit path points you towards a "
+                    + game.getStoredValue("pathOf" + player.getFaction()) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg1);
             String msg = player.getRepresentation() + " use buttons to either accept or refuse the path";
             List<Button> buttons = new ArrayList<>();
@@ -202,15 +261,16 @@ public class StartTurnService {
     }
 
     public static String getMissedSCFollowsText(Game game, Player player) {
-        if (!game.isStratPings())
-            return null;
+        if (!game.isStratPings()) return null;
         boolean sendReminder = false;
+
+        if (!player.isRealPlayer()) return "";
 
         StringBuilder sb = new StringBuilder();
         sb.append(player.getRepresentationUnfogged());
         sb.append(" Please resolve these before doing anything else:\n");
         for (int sc : game.getPlayedSCsInOrder(player)) {
-            if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
+            if ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName())) {
                 String num = sc + "";
                 num = num.substring(num.length() - 1);
                 for (Integer sc2 : player.getSCs()) {
@@ -230,16 +290,25 @@ public class StartTurnService {
                 sendReminder = true;
             }
         }
-        sb.append("You currently have ").append(player.getStrategicCC()).append(" command token")
-            .append(player.getStrategicCC() == 1 ? "" : "s").append(" in your strategy pool.");
+        sb.append("You currently have ")
+                .append(player.getStrategicCC())
+                .append(" command token")
+                .append(player.getStrategicCC() == 1 ? "" : "s")
+                .append(" in your strategy pool.");
         return sendReminder ? sb.toString() : null;
     }
 
-    public static List<Button> getStartOfTurnButtons(Player player, Game game, boolean doneActionThisTurn, GenericInteractionCreateEvent event) {
+    public static List<Button> getStartOfTurnButtons(
+            Player player, Game game, boolean doneActionThisTurn, GenericInteractionCreateEvent event) {
         return getStartOfTurnButtons(player, game, doneActionThisTurn, event, false);
     }
 
-    public static List<Button> getStartOfTurnButtons(Player player, Game game, boolean doneActionThisTurn, GenericInteractionCreateEvent event, boolean confirmed2ndAction) {
+    public static List<Button> getStartOfTurnButtons(
+            Player player,
+            Game game,
+            boolean doneActionThisTurn,
+            GenericInteractionCreateEvent event,
+            boolean confirmed2ndAction) {
         if (!doneActionThisTurn) {
             for (Player p2 : game.getRealPlayers()) {
                 if (!game.getStoredValue(p2.getFaction() + "graviton").isEmpty()) {
@@ -252,14 +321,18 @@ public class StartTurnService {
         List<Button> startButtons = new ArrayList<>();
         boolean hadAnyUnplayedSCs = false;
         if (!doneActionThisTurn || confirmed2ndAction) {
-            Button tacticalAction = Buttons.green(finChecker + "tacticalAction",
-                "Tactical Action (" + player.getTacticalCC() + ")");
+            Button tacticalAction =
+                    Buttons.green(finChecker + "tacticalAction", "Tactical Action (" + player.getTacticalCC() + ")");
             List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(player);
-            int numOfComponentActions = ComponentActionHelper.getAllPossibleCompButtons(game, player, event).size() - 2 - acButtons.size();
+            int numOfComponentActions = ComponentActionHelper.getAllPossibleCompButtons(game, player, event)
+                            .size()
+                    - 2
+                    - acButtons.size();
             if (game.isFowMode()) {
                 numOfComponentActions += acButtons.size();
             }
-            Button componentAction = Buttons.green(finChecker + "componentAction", "Component Action (" + numOfComponentActions + ")");
+            Button componentAction =
+                    Buttons.green(finChecker + "componentAction", "Component Action (" + numOfComponentActions + ")");
 
             startButtons.add(tacticalAction);
             startButtons.add(componentAction);
@@ -268,10 +341,11 @@ public class StartTurnService {
                 if (!game.getPlayedSCs().contains(SC)) {
                     hadAnyUnplayedSCs = true;
                     String name = Helper.getSCName(SC, game);
-                    if (game.getName().equalsIgnoreCase("pbd1000")) {
+                    if ("pbd1000".equalsIgnoreCase(game.getName())) {
                         name += "(" + SC + ")";
                     }
-                    Button strategicAction = Buttons.green(finChecker + "strategicAction_" + SC, "Play " + name, CardEmojis.getSCFrontFromInteger(SC));
+                    Button strategicAction = Buttons.green(
+                            finChecker + "strategicAction_" + SC, "Play " + name, CardEmojis.getSCFrontFromInteger(SC));
                     startButtons.add(strategicAction);
                 }
             }
@@ -290,18 +364,25 @@ public class StartTurnService {
                         if (leaderName.contains("Ssruu")) {
                             String led = "naaluagent";
                             if (player.hasExternalAccessToLeader(led)) {
-                                Button lButton = Buttons.gray(finChecker + prefix + "leader_" + led, "Use " + leaderName + " as Naalu Agent", leaderEmoji);
+                                Button lButton = Buttons.gray(
+                                        finChecker + prefix + "leader_" + led,
+                                        "Use " + leaderName + " as Naalu Agent",
+                                        leaderEmoji);
                                 startButtons.add(lButton);
                             }
                         } else {
-                            if (leaderID.equalsIgnoreCase("naaluagent")) {
-                                Button lButton = Buttons.gray(finChecker + prefix + "leader_" + leaderID, "Use " + leaderName, leaderEmoji);
+                            if ("naaluagent".equalsIgnoreCase(leaderID)) {
+                                Button lButton = Buttons.gray(
+                                        finChecker + prefix + "leader_" + leaderID, "Use " + leaderName, leaderEmoji);
                                 startButtons.add(lButton);
                             }
                         }
-                    } else if ("mahactcommander".equalsIgnoreCase(leaderID) && player.getTacticalCC() > 0
-                        && !ButtonHelper.getTilesWithYourCC(player, game, event).isEmpty()) {
-                        Button lButton = Buttons.gray(finChecker + "mahactCommander", "Use Mahact Commander", leaderEmoji);
+                    } else if ("mahactcommander".equalsIgnoreCase(leaderID)
+                            && player.getTacticalCC() > 0
+                            && !ButtonHelper.getTilesWithYourCC(player, game, event)
+                                    .isEmpty()) {
+                        Button lButton =
+                                Buttons.gray(finChecker + "mahactCommander", "Use Mahact Commander", leaderEmoji);
                         startButtons.add(lButton);
                     }
                 }
@@ -313,7 +394,8 @@ public class StartTurnService {
 
             int numEndOfTurn = ButtonHelper.getEndOfTurnAbilities(player, game).size() - 1;
             if (numEndOfTurn > 0) {
-                startButtons.add(Buttons.blue(finChecker + "endOfTurnAbilities", "Do End Of Turn Ability (" + numEndOfTurn + ")"));
+                startButtons.add(Buttons.blue(
+                        finChecker + "endOfTurnAbilities", "Do End Of Turn Ability (" + numEndOfTurn + ")"));
             }
 
             startButtons.add(pass);
@@ -322,8 +404,10 @@ public class StartTurnService {
                     for (int sc : player.getSCs()) {
                         StringBuilder sb = new StringBuilder();
                         sb.append(p2.getRepresentationUnfogged());
-                        sb.append(" You are getting this ping because **").append(Helper.getSCName(sc, game))
-                            .append("** has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone");
+                        sb.append(" You are getting this ping because **")
+                                .append(Helper.getSCName(sc, game))
+                                .append(
+                                        "** has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone");
                         appendScMessages(game, p2, sc, sb);
                     }
                 }
@@ -338,11 +422,15 @@ public class StartTurnService {
         if (doneActionThisTurn) {
             ButtonHelperFactionSpecific.checkBlockadeStatusOfEverything(player, game, event);
             if (ButtonHelper.getEndOfTurnAbilities(player, game).size() > 1) {
-                startButtons.add(Buttons.blue("endOfTurnAbilities", "Do End Of Turn Ability ("
-                    + (ButtonHelper.getEndOfTurnAbilities(player, game).size() - 1) + ")"));
+                startButtons.add(Buttons.blue(
+                        "endOfTurnAbilities",
+                        "Do End Of Turn Ability ("
+                                + (ButtonHelper.getEndOfTurnAbilities(player, game)
+                                                .size()
+                                        - 1) + ")"));
             }
             startButtons.add(Buttons.red(finChecker + "turnEnd", "End Turn"));
-            if (ButtonHelper.isPlayerElected(game, player, "minister_war")) {
+            if (IsPlayerElectedService.isPlayerElected(game, player, "minister_war")) {
                 startButtons.add(Buttons.gray(finChecker + "ministerOfWar", "Use Minister of War"));
             }
             if (!game.isJustPlayedComponentAC()) {
@@ -351,36 +439,60 @@ public class StartTurnService {
         } else {
             game.setJustPlayedComponentAC(false);
             if (player.getTechs().contains("cm")) {
-                startButtons.add(Buttons.gray(finChecker + "startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));
+                startButtons.add(
+                        Buttons.gray(finChecker + "startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));
             }
-            if (game.isOrdinianC1Mode() && !ButtonHelper.isCoatlHealed(game) && player == ButtonHelper.getPlayerWhoControlsCoatl(game)) {
-                startButtons.add(Buttons.gray(finChecker + "healCoatl", "Heal Coatl (Costs 6r)", FactionEmojis.Argent));
+            if (game.isOrdinianC1Mode()
+                    && !ButtonHelper.isCoatlHealed(game)
+                    && player == ButtonHelper.getPlayerWhoControlsCoatl(game)) {
+                startButtons.add(
+                        Buttons.gray(finChecker + "healCoatl", "Heal Coatl (Costs 6 Resources)", FactionEmojis.Argent));
             }
-            if (player.getTechs().contains("dspharinf") && !ButtonHelperFactionSpecific.getPharadnInf2ReleaseButtons(player, game).isEmpty()) {
-                startButtons.add(Buttons.gray(finChecker + "startPharadnInfRevive", "Release 1 Infantry", FactionEmojis.pharadn));
+            if (player.getTechs().contains("dspharinf")
+                    && !ButtonHelperFactionSpecific.getPharadnInf2ReleaseButtons(player, game)
+                            .isEmpty()) {
+                startButtons.add(Buttons.gray(
+                        finChecker + "startPharadnInfRevive", "Release 1 Infantry", FactionEmojis.pharadn));
             }
-            if (player.getTechs().contains("dscymiy") && !player.getExhaustedTechs().contains("dscymiy")) {
-                startButtons.add(Buttons.gray(finChecker + "exhaustTech_dscymiy", "Exhaust Recursive Worm", FactionEmojis.cymiae));
+            if (player.getTechs().contains("dscymiy")
+                    && !player.getExhaustedTechs().contains("dscymiy")) {
+                startButtons.add(Buttons.gray(
+                        finChecker + "exhaustTech_dscymiy", "Exhaust Recursive Worm", FactionEmojis.cymiae));
             }
-            if (player.hasUnexhaustedLeader("florzenagent") && !ButtonHelperAgents.getAttachments(game, player).isEmpty()) {
-                startButtons.add(Buttons.green(finChecker + "exhaustAgent_florzenagent_" + player.getFaction(), "Use Florzen Agent", FactionEmojis.florzen));
+            if (player.hasUnexhaustedLeader("florzenagent")
+                    && !ButtonHelperAgents.getAttachments(game, player).isEmpty()) {
+                startButtons.add(Buttons.green(
+                        finChecker + "exhaustAgent_florzenagent_" + player.getFaction(),
+                        "Use Florzen Agent",
+                        FactionEmojis.florzen));
             }
             if (player.hasUnexhaustedLeader("vadenagent")) {
-                startButtons.add(Buttons.gray(finChecker + "exhaustAgent_vadenagent_" + player.getFaction(), "Use Vaden Agent", FactionEmojis.vaden));
+                startButtons.add(Buttons.gray(
+                        finChecker + "exhaustAgent_vadenagent_" + player.getFaction(),
+                        "Use Vaden Agent",
+                        FactionEmojis.vaden));
             }
             if (player.hasAbility("laws_order") && !game.getLaws().isEmpty()) {
-                startButtons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "useLawsOrder", "Pay To Ignore Laws", FactionEmojis.Keleres));
+                startButtons.add(Buttons.gray(
+                        player.getFinsFactionCheckerPrefix() + "useLawsOrder",
+                        "Pay To Ignore Laws",
+                        FactionEmojis.Keleres));
             }
-            if ((player.hasTech("td") && !player.getExhaustedTechs().contains("td")) ||
-                (player.hasTech("absol_td") && !player.getExhaustedTechs().contains("absol_td"))) {
-                startButtons.add(Buttons.gray(finChecker + "exhaustTech_td", "Exhaust Transit Diodes", TechEmojis.CyberneticTech));
+            if ((player.hasTech("td") && !player.getExhaustedTechs().contains("td"))
+                    || (player.hasTech("absol_td")
+                            && !player.getExhaustedTechs().contains("absol_td"))) {
+                startButtons.add(Buttons.gray(
+                        finChecker + "exhaustTech_td", "Exhaust Transit Diodes", TechEmojis.CyberneticTech));
             }
             if (player.hasUnexhaustedLeader("kolleccagent")) {
-                startButtons.add(Buttons.gray(finChecker + "exhaustAgent_kolleccagent", "Use Kollecc Agent", FactionEmojis.kollecc));
+                startButtons.add(Buttons.gray(
+                        finChecker + "exhaustAgent_kolleccagent", "Use Kollecc Agent", FactionEmojis.kollecc));
             }
         }
-        if (player.hasTech("pa") && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
-            startButtons.add(Buttons.green(finChecker + "getPsychoButtons", "Use Psychoarcheology", TechEmojis.BioticTech));
+        if (player.hasTech("pa")
+                && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
+            startButtons.add(
+                    Buttons.green(finChecker + "getPsychoButtons", "Use Psychoarcheology", TechEmojis.BioticTech));
         }
 
         Button transaction = Buttons.blue("transaction", "Transaction");
@@ -388,21 +500,25 @@ public class StartTurnService {
         Button modify = Buttons.gray("getModifyTiles", "Modify Units");
         startButtons.add(modify);
         if (player.hasUnexhaustedLeader("hacanagent")) {
-            startButtons.add(Buttons.gray(finChecker + "exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
+            startButtons.add(
+                    Buttons.gray(finChecker + "exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
         }
         if (player.hasUnexhaustedLeader("pharadnagent")) {
-            startButtons.add(Buttons.gray(finChecker + "exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));
+            startButtons.add(
+                    Buttons.gray(finChecker + "exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));
         }
         if (player.hasRelicReady("e6-g0_network")) {
-            startButtons.add(Buttons.green(finChecker + "exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw 1 Acton Card"));
+            startButtons.add(Buttons.green(
+                    finChecker + "exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw 1 Acton Card"));
         }
         if (player.hasUnexhaustedLeader("nekroagent") && player.getAc() > 0) {
-            startButtons.add(Buttons.gray(finChecker + "exhaustAgent_nekroagent", "Use Nekro Agent", FactionEmojis.Nekro));
+            startButtons.add(
+                    Buttons.gray(finChecker + "exhaustAgent_nekroagent", "Use Nekro Agent", FactionEmojis.Nekro));
         }
 
-        GameMessageManager
-            .remove(game.getName(), GameMessageType.TURN)
-            .ifPresent(messageId -> game.getMainGameChannel().deleteMessageById(messageId).queue());
+        GameMessageManager.remove(game.getName(), GameMessageType.TURN)
+                .ifPresent(messageId ->
+                        game.getMainGameChannel().deleteMessageById(messageId).queue());
         if (game.isFowMode()) {
             startButtons.add(Buttons.gray("showGameAgain", "Refresh Map"));
         } else {
@@ -411,6 +527,7 @@ public class StartTurnService {
         }
 
         if (!confirmed2ndAction && doneActionThisTurn) {
+
             startButtons.add(Buttons.red(finChecker + "confirmSecondAction", "Use Ability To Do Another Action"));
         }
         return startButtons;
@@ -418,13 +535,17 @@ public class StartTurnService {
 
     private static void appendScMessages(Game game, Player player, int sc, StringBuilder sb) {
         if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-            sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
+            sb.append("Message link is: ")
+                    .append(game.getStoredValue("scPlay" + sc))
+                    .append("\n");
         }
-        sb.append("You currently have ").append(player.getStrategicCC()).append(" command token")
-            .append(player.getStrategicCC() == 1 ? "" : "s").append(" in your strategy pool.");
+        sb.append("You currently have ")
+                .append(player.getStrategicCC())
+                .append(" command token")
+                .append(player.getStrategicCC() == 1 ? "" : "s")
+                .append(" in your strategy pool.");
         if (!player.hasFollowedSC(sc)) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                sb.toString());
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
         }
     }
 }

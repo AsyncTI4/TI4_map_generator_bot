@@ -2,21 +2,19 @@ package ti4.service.async;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.jetbrains.annotations.NotNull;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
+import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.json.PersistenceManager;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 public class TourneyWinnersService {
 
     private static final String fileName = "tourneyWinners.json";
-    private static List<TournamentWinner> winnerCache = null;
+    private static List<TournamentWinner> winnerCache;
 
     public static void addTourneyWinner(User user, String tourneyName) {
         List<TournamentWinner> winners = readWinnerList();
@@ -27,7 +25,8 @@ public class TourneyWinnersService {
     public static void removeTourneyWinner(User user, String tourneyName) {
         List<TournamentWinner> winners = readWinnerList();
         if (isPlayerWinner(user.getId())) {
-            winners.removeIf(w -> w.getId().equals(user.getId()) && w.getTourneyName().equals(tourneyName));
+            winners.removeIf(
+                    w -> w.getId().equals(user.getId()) && w.getTourneyName().equals(tourneyName));
             saveWinnerList(winners);
         }
     }
@@ -36,7 +35,7 @@ public class TourneyWinnersService {
         return winnerIDs().contains(userID);
     }
 
-    public static List<String> winnerIDs() {
+    private static List<String> winnerIDs() {
         return readWinnerList().stream().map(TournamentWinner::getId).toList();
     }
 
@@ -53,7 +52,8 @@ public class TourneyWinnersService {
     private static List<TournamentWinner> readWinnerList() {
         if (winnerCache == null) {
             try {
-                List<TournamentWinner> reserved = PersistenceManager.readListFromJsonFile(fileName, TournamentWinner.class);
+                List<TournamentWinner> reserved =
+                        PersistenceManager.readListFromJsonFile(fileName, TournamentWinner.class);
                 winnerCache = reserved;
             } catch (Exception e) {
                 BotLogger.error("Failed to read json data for Reserved Game Cache.", e);
@@ -77,12 +77,12 @@ public class TourneyWinnersService {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class TournamentWinner {
+    static class TournamentWinner {
         private String name;
         private String id;
         private String tourneyName;
 
-        public TournamentWinner(@NotNull User user, String tournament) {
+        TournamentWinner(@NotNull User user, String tournament) {
             name = user.getEffectiveName();
             id = user.getId();
             tourneyName = tournament;

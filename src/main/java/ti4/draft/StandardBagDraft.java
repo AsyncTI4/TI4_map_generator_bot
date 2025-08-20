@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import ti4.draft.items.BlueTileDraftItem;
 import ti4.draft.items.HomeSystemDraftItem;
 import ti4.draft.items.RedTileDraftItem;
 import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.FactionModel;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
@@ -36,17 +36,20 @@ public class StandardBagDraft extends BagDraft {
         return "standard_bag_draft";
     }
 
-    private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral" };
+    private static final String[] excludedFactions = {
+        "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral"
+    };
 
-    public static List<FactionModel> getDraftableFactionsForGame(Game game) {
+    private static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllLegalFactions();
         if (!game.isDiscordantStarsMode()) {
-            factionSet.removeIf(factionModel -> factionModel.getSource().isDs() && !factionModel.getSource().isPok());
+            factionSet.removeIf(factionModel ->
+                    factionModel.getSource().isDs() && !factionModel.getSource().isPok());
         }
         return factionSet;
     }
 
-    public static List<FactionModel> getAllLegalFactions() {
+    private static List<FactionModel> getAllLegalFactions() {
         List<FactionModel> factionSet = Mapper.getFactionsValues();
         factionSet.removeIf((FactionModel model) -> {
             if (model.getSource().isPok() || model.getSource().isDs()) {
@@ -66,7 +69,8 @@ public class StandardBagDraft extends BagDraft {
     public List<DraftBag> generateBags(Game game) {
         Map<DraftItem.Category, List<DraftItem>> allDraftableItems = new HashMap<>();
         List<FactionModel> allDraftableFactions = getDraftableFactionsForGame(game);
-        allDraftableItems.put(DraftItem.Category.HOMESYSTEM, HomeSystemDraftItem.buildAllDraftableItems(allDraftableFactions));
+        allDraftableItems.put(
+                DraftItem.Category.HOMESYSTEM, HomeSystemDraftItem.buildAllDraftableItems(allDraftableFactions));
         allDraftableItems.put(DraftItem.Category.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(game));
 
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
@@ -89,7 +93,10 @@ public class StandardBagDraft extends BagDraft {
                     if (!draftableCollection.getValue().isEmpty()) {
                         bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
-                        BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Game: `" + game.getName() + "` error - empty franken draftableCollection: " + category.name());
+                        BotLogger.warning(
+                                new LogOrigin(game),
+                                "Game: `" + game.getName() + "` error - empty franken draftableCollection: "
+                                        + category.name());
                     }
                 }
             }

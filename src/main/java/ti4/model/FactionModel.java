@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -41,33 +40,35 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     private String factionSheetBackImageURL;
     private String factionReferenceImageURL;
     private String wikiURL;
+    private List<String> preferredColours;
 
     public boolean isValid() {
         return alias != null
-            && factionName != null
-            && homeSystem != null
-            && startingFleet != null
-            && factionTech != null
-            && (startingTech != null || (startingTechOptions != null && startingTechAmount != null))
-            && homePlanets != null
-            && abilities != null
-            && leaders != null
-            && promissoryNotes != null
-            && units != null
-            && source != null;
+                && factionName != null
+                && homeSystem != null
+                && startingFleet != null
+                && factionTech != null
+                && (startingTech != null || (startingTechOptions != null && startingTechAmount != null))
+                && homePlanets != null
+                && abilities != null
+                && leaders != null
+                && promissoryNotes != null
+                && units != null
+                && source != null;
     }
 
     public String getFactionEmoji() {
-        if (homebrewReplacesID != null) return FactionEmojis.getFactionIcon(homebrewReplacesID).toString();
-        return FactionEmojis.getFactionIcon(getAlias()).toString();
+        if (homebrewReplacesID != null)
+            return FactionEmojis.getFactionIcon(homebrewReplacesID).toString();
+        return FactionEmojis.getFactionIcon(alias).toString();
     }
 
     public String getShortName() {
-        return Optional.ofNullable(shortName).orElse(getFactionName().replace("The ", ""));
+        return Optional.ofNullable(shortName).orElse(factionName.replace("The ", ""));
     }
 
     public String getShortTag() {
-        return StringUtils.left(Optional.ofNullable(shortTag).orElse(getAlias()), 3).toUpperCase();
+        return StringUtils.left(Optional.ofNullable(shortTag).orElse(alias), 3).toUpperCase();
     }
 
     public List<String> getFactionTech() {
@@ -82,8 +83,8 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     public int finalStartingTechAmount() {
         int amount = 0;
         if (getStartingTech() != null) amount += getStartingTech().size();
-        if (getStartingTechAmount() != null) amount += getStartingTechAmount();
-        if (getAlias().startsWith("keleres")) amount += 2;
+        if (startingTechAmount != null) amount += startingTechAmount;
+        if (alias.startsWith("keleres")) amount += 2;
         return amount;
     }
 
@@ -115,37 +116,53 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(complexity).orElse("Not added to bot yet");
     }
 
-    public Optional<String> getFactionSheetFrontImageURL() {
+    private Optional<String> getFactionSheetFrontImageURL() {
         return Optional.ofNullable(factionSheetFrontImageURL);
     }
 
-    public Optional<String> getFactionSheetBackImageURL() {
+    private Optional<String> getFactionSheetBackImageURL() {
         return Optional.ofNullable(factionSheetBackImageURL);
     }
 
-    public Optional<String> getFactionReferenceImageURL() {
+    private Optional<String> getFactionReferenceImageURL() {
         return Optional.ofNullable(factionReferenceImageURL);
     }
 
-    public Optional<String> getWikiURL() {
+    private Optional<String> getWikiURL() {
         return Optional.ofNullable(wikiURL);
+    }
+
+    public List<String> getPreferredColours() {
+        return Optional.ofNullable(preferredColours)
+                .orElse(
+                        homebrewReplacesID != null
+                                ? Mapper.getFaction(homebrewReplacesID).getPreferredColours()
+                                : new ArrayList<>());
     }
 
     public String getLinksText() {
         StringBuilder sb = new StringBuilder();
-        getFactionSheetFrontImageURL().ifPresent(url -> sb.append("[Faction Sheet Front](").append(url).append(")\n"));
-        getFactionSheetBackImageURL().ifPresent(url -> sb.append("[Faction Sheet Back](").append(url).append(")\n"));
-        getFactionReferenceImageURL().ifPresent(url -> sb.append("[Quick Reference Card](").append(url).append(")\n"));
+        getFactionSheetFrontImageURL()
+                .ifPresent(
+                        url -> sb.append("[Faction Sheet Front](").append(url).append(")\n"));
+        getFactionSheetBackImageURL()
+                .ifPresent(url -> sb.append("[Faction Sheet Back](").append(url).append(")\n"));
+        getFactionReferenceImageURL()
+                .ifPresent(
+                        url -> sb.append("[Quick Reference Card](").append(url).append(")\n"));
         getWikiURL().ifPresent(url -> sb.append("[Wiki Link](").append(url).append(")\n"));
         return sb.toString();
     }
 
     public String getFactionSheetMessage() {
-        if (getFactionSheetFrontImageURL().isEmpty() && getFactionSheetBackImageURL().isEmpty()) return null;
+        if (getFactionSheetFrontImageURL().isEmpty()
+                && getFactionSheetBackImageURL().isEmpty()) return null;
 
         StringBuilder sb = new StringBuilder("## Faction Sheet: ");
-        getFactionSheetFrontImageURL().ifPresent(url -> sb.append("[Front](").append(url).append(") "));
-        getFactionSheetBackImageURL().ifPresent(url -> sb.append("[Back](").append(url).append(") "));
+        getFactionSheetFrontImageURL()
+                .ifPresent(url -> sb.append("[Front](").append(url).append(") "));
+        getFactionSheetBackImageURL()
+                .ifPresent(url -> sb.append("[Back](").append(url).append(") "));
         getWikiURL().ifPresent(url -> sb.append("[Wiki Link](").append(url).append(")"));
         return sb.toString();
     }
@@ -166,8 +183,9 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
-        if (includeAliases) footer.append("\nAliases: ").append(AliasHandler.getFactionAliasEntryList(getAlias()));
+        if (includeID)
+            footer.append("ID: ").append(alias).append("    Source: ").append(source);
+        if (includeAliases) footer.append("\nAliases: ").append(AliasHandler.getFactionAliasEntryList(alias));
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.black);
@@ -181,7 +199,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(getFactionEmoji() + " " + getFactionNameWithSourceEmoji());
 
         // DESCRIPTION - <Commodity><Commodity><Commodity>
-        eb.setDescription("\n" + MiscEmojis.comm(getCommodities()));
+        eb.setDescription("\n" + MiscEmojis.comm(commodities));
 
         // FIELDS
         // Abilities
@@ -217,7 +235,8 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             UnitModel model = Mapper.getUnit(id);
             if (model.getFaction().isEmpty()) continue;
             sb.append(model.getUnitEmoji()).append(" ").append(model.getName());
-            if (model.getAbility().isPresent()) sb.append("\n> ").append(model.getAbility().get());
+            if (model.getAbility().isPresent())
+                sb.append("\n> ").append(model.getAbility().get());
             sb.append("\n");
         }
         eb.addField("__Units__", sb.toString(), false);
@@ -234,12 +253,15 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         sb = new StringBuilder();
         for (String id : getLeaders()) {
             LeaderModel model = Mapper.getLeader(id);
-            sb.append(model.getLeaderEmoji()).append(" ").append(model.getName()).append("\n");
+            sb.append(model.getLeaderEmoji())
+                    .append(" ")
+                    .append(model.getName())
+                    .append("\n");
         }
         eb.addField("__Leaders__", sb.toString(), false);
 
         sb = new StringBuilder();
-        sb.append(Helper.getUnitListEmojis(getStartingFleet())).append("\n");
+        sb.append(Helper.getUnitListEmojis(startingFleet)).append("\n");
         eb.addField("__Starting Fleet__", sb.toString(), false);
 
         sb = new StringBuilder();
@@ -247,19 +269,19 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             for (String id : getStartingTech()) {
                 TechnologyModel model = Mapper.getTech(id);
                 sb.append(model.getCondensedReqsEmojis(false)).append(" ").append(model.getName());
-                //sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
+                // sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
             }
         } else {
-            if (getStartingTechOptions() != null && getStartingTechAmount() != 0 && !getStartingTechOptions().isEmpty()) {
-                sb.append("\nPick ").append(getStartingTechAmount()).append(" of the following:\n");
-                for (String id : getStartingTechOptions()) {
+            if (startingTechOptions != null && startingTechAmount != 0 && !startingTechOptions.isEmpty()) {
+                sb.append("\nPick ").append(startingTechAmount).append(" of the following:\n");
+                for (String id : startingTechOptions) {
                     TechnologyModel model = Mapper.getTech(id);
                     sb.append(model.getCondensedReqsEmojis(false)).append(" ").append(model.getName());
-                    //sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
+                    // sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
                 }
             }
         }
-        if (getFactionName().toLowerCase().contains("keleres")) {
+        if (factionName.toLowerCase().contains("keleres")) {
             sb = new StringBuilder();
             sb.append("Choose 2 non-faction technologies owned by other players.");
         }
@@ -271,23 +293,23 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         searchString = searchString.toLowerCase();
-        return getFactionName().contains(searchString)
-            || getAlias().contains(searchString)
-            || getShortTag().contains(searchString)
-            || getSource().toString().contains(searchString)
-            || getAlias().equals(AliasHandler.resolveFaction(searchString));
+        return factionName.contains(searchString)
+                || alias.contains(searchString)
+                || getShortTag().contains(searchString)
+                || source.toString().contains(searchString)
+                || alias.equals(AliasHandler.resolveFaction(searchString));
     }
 
     @Override
     public String getAutoCompleteName() {
-        return getFactionName() + " [" + source + "]";
+        return factionName + " [" + source + "]";
     }
 
     public String getFactionNameWithSourceEmoji() {
-        return getFactionName() + getSource().emoji();
+        return factionName + source.emoji();
     }
 
     public String getFactionTitle() {
-        return getFactionEmoji() + " __**" + getFactionName() + "**__" + getSource().emoji();
+        return getFactionEmoji() + " __**" + factionName + "**__" + source.emoji();
     }
 }

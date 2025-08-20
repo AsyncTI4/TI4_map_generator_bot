@@ -2,7 +2,6 @@ package ti4.buttons.handlers.milty;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -20,7 +19,7 @@ import ti4.service.milty.MiltyService;
 import ti4.service.regex.RegexService;
 
 @UtilityClass
-public class MiltyDraftButtonHandlers {
+class MiltyDraftButtonHandlers {
 
     @ButtonHandler("showMiltyDraft")
     private void postDraftInfo(ButtonInteractionEvent event, Game game) {
@@ -43,15 +42,16 @@ public class MiltyDraftButtonHandlers {
         switch (whichOnes) {
             case "all" -> displayFactions.addAll(game.getMiltyDraftManager().allFactions());
             case "picked" -> displayFactions.addAll(game.getMiltyDraftManager().pickedFactions());
-            case "remaining" -> displayFactions.addAll(game.getMiltyDraftManager().remainingFactions());
+            case "remaining" ->
+                displayFactions.addAll(game.getMiltyDraftManager().remainingFactions());
         }
 
         boolean first = true;
-        List<MessageEmbed> embeds = displayFactions.stream().map(FactionModel::fancyEmbed).toList();
+        List<MessageEmbed> embeds =
+                displayFactions.stream().map(FactionModel::fancyEmbed).toList();
         for (MessageEmbed e : embeds) {
             String message = "";
-            if (first)
-                message = player.getRepresentationUnfogged() + " Here's an overview of the factions:";
+            if (first) message = player.getRepresentationUnfogged() + " Here's an overview of the factions:";
             MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
             first = false;
         }
@@ -64,7 +64,8 @@ public class MiltyDraftButtonHandlers {
             game.setStoredValue("keleresFlavorPreset", flavor);
             String preset = game.getStoredValue("keleresFlavorPreset");
             if (preset != null) {
-                String keleresName = Mapper.getFaction("keleres" + preset.charAt(0)).getFactionTitle();
+                String keleresName =
+                        Mapper.getFaction("keleres" + preset.charAt(0)).getFactionTitle();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Successfully preset " + keleresName);
                 MiltyService.offerKeleresSetupButtons(game.getMiltyDraftManager(), player);
                 ButtonHelper.deleteMessage(event);

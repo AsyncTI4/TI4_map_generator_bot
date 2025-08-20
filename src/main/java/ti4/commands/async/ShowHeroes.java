@@ -1,7 +1,6 @@
 package ti4.commands.async;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -27,7 +26,7 @@ class ShowHeroes extends Subcommand {
         showTIGLHeroes(event);
     }
 
-    public static void showTIGLHeroes(GenericInteractionCreateEvent event) {
+    private static void showTIGLHeroes(GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder("__**TIGL Heroes**__\n");
         List<TIGLRank> heroRanks = TIGLHelper.getAllHeroTIGLRanks();
 
@@ -49,5 +48,4 @@ class ShowHeroes extends Subcommand {
 
         MessageHelper.sendMessageToThread(event.getMessageChannel(), "Async Rank - Reigning Heroes", sb.toString());
     }
-
 }

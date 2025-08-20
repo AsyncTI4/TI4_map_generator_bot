@@ -1,7 +1,6 @@
 package ti4.commands.uncategorized;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -36,8 +35,10 @@ public class ShowDistancesCommand extends GameStateCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true),
-            new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check"));
+                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                        .setRequired(true)
+                        .setAutoComplete(true),
+                new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check"));
     }
 
     @Override
@@ -52,14 +53,19 @@ public class ShowDistancesCommand extends GameStateCommand {
         String tileID = tileOption.getAsString().toLowerCase();
         Tile tile = TileHelper.getTile(event, tileID, game);
         if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
 
         int maxDistance = event.getOption(Constants.MAX_DISTANCE, 10, OptionMapping::getAsInt);
-        game.setTileDistances(CheckDistanceHelper.getTileDistances(game, player, tile.getPosition(), maxDistance, true));
+        game.setTileDistances(
+                CheckDistanceHelper.getTileDistances(game, player, tile.getPosition(), maxDistance, true));
 
-        MapRenderPipeline.queue(game, event, DisplayType.map,
-            fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
+        MapRenderPipeline.queue(
+                game,
+                event,
+                DisplayType.map,
+                fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
     }
 }

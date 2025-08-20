@@ -14,7 +14,9 @@ public class PlanetRefreshAll extends GameStateSubcommand {
     public PlanetRefreshAll() {
         super(Constants.PLANET_REFRESH_ALL, "Ready All Planets", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     @Override

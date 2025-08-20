@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
-
 import ti4.json.PersistenceManager;
-import ti4.map.manage.GameManager;
-import ti4.message.BotLogger;
+import ti4.map.persistence.GameManager;
+import ti4.message.logging.BotLogger;
 
 public class ReserveGameNumberService {
 
     private static final String fileName = "reservedGameNumbers.json";
-    private static List<String> reservedGameCache = null;
+    private static List<String> reservedGameCache;
 
     public static void addReservedGame(String gameNum) {
         List<String> reserved = readReservedList();
@@ -43,9 +42,9 @@ public class ReserveGameNumberService {
     private static List<String> filterOutRealGames(List<String> reserved) {
         if (reserved == null) return new ArrayList<>();
         List<String> reservedAndNotTaken = reserved.stream()
-            .filter(Objects::nonNull)
-            .filter(Predicate.not(GameManager::isValid))
-            .toList();
+                .filter(Objects::nonNull)
+                .filter(Predicate.not(GameManager::isValid))
+                .toList();
         return new ArrayList<>(reservedAndNotTaken);
     }
 

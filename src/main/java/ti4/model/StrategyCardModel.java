@@ -1,11 +1,9 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.Color;
 import java.util.List;
 import java.util.Optional;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -22,7 +20,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     private String name;
     private List<String> primaryTexts;
     private List<String> secondaryTexts;
-    private String botSCAutomationID; //ID of another SCModel to use the automation/button suite of
+    private String botSCAutomationID; // ID of another SCModel to use the automation/button suite of
     private String imageFileName;
     private String flavourText;
     private String colourHexCode;
@@ -32,11 +30,11 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean isValid() {
         return id != null
-            && name != null
-            && initiative >= 0
-            && primaryTexts != null
-            && secondaryTexts != null
-            && source != null;
+                && name != null
+                && initiative >= 0
+                && primaryTexts != null
+                && secondaryTexts != null
+                && source != null;
     }
 
     @Override
@@ -49,7 +47,12 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         StringBuilder sb = new StringBuilder();
 
         // TITLE
-        sb.append("**").append(initiative).append("** __").append(name).append("__").append(getSource().emoji());
+        sb.append("**")
+                .append(initiative)
+                .append("** __")
+                .append(name)
+                .append("__")
+                .append(source.emoji());
         eb.setTitle(sb.toString());
 
         // PRIMARY
@@ -70,7 +73,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         if (includeID) {
             sb = new StringBuilder();
             sb.append("ID: ").append(id).append("  source: ").append(source.toString());
-            if (!getId().equals(getBotSCAutomationID())) {
+            if (!id.equals(getBotSCAutomationID())) {
                 sb.append("\nUses automation of SCID: ").append(getBotSCAutomationID());
             }
             eb.setFooter(sb.toString());
@@ -99,8 +102,8 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         return id.contains(searchString)
-            || name.contains(searchString)
-            || source.toString().contains(searchString);
+                || name.contains(searchString)
+                || source.toString().contains(searchString);
     }
 
     @Override
@@ -117,7 +120,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(group);
     }
 
-    public Optional<String> getFlavourText() {
+    private Optional<String> getFlavourText() {
         return Optional.ofNullable(flavourText);
     }
 
@@ -125,11 +128,12 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         return Color.decode(getColourHexCode());
     }
 
-    public String getColourHexCode() {
-        if (colourHexCode == null && getId().equals(getBotSCAutomationID())) {
+    private String getColourHexCode() {
+        if (colourHexCode == null && id.equals(getBotSCAutomationID())) {
             return "#ffffff";
         } else if (colourHexCode == null) {
-            if(Mapper.getStrategyCard(getBotSCAutomationID()) == null || Mapper.getStrategyCard(getBotSCAutomationID()).getColourHexCode() == null){
+            if (Mapper.getStrategyCard(getBotSCAutomationID()) == null
+                    || Mapper.getStrategyCard(getBotSCAutomationID()).getColourHexCode() == null) {
                 return "#ffffff";
             }
             return Mapper.getStrategyCard(getBotSCAutomationID()).getColourHexCode();
@@ -144,7 +148,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
      * Then set botSCAutomationID = "pok1leadership".
      */
     public String getBotSCAutomationID() {
-        return Optional.ofNullable(botSCAutomationID).orElse(getId());
+        return Optional.ofNullable(botSCAutomationID).orElse(id);
     }
 
     public boolean usesAutomationForSCID(String scID) {
@@ -152,10 +156,11 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean hasImageFile() {
-        return imageFileName != null && ResourceHelper.getResourceFromFolder("strat_cards/", imageFileName + ".png") != null;
+        return imageFileName != null
+                && ResourceHelper.getResourceFromFolder("strat_cards/", imageFileName + ".png") != null;
     }
 
     public String getImageFilePath() {
-        return ResourceHelper.getResourceFromFolder("strat_cards/", getImageFileName() + ".png");
+        return ResourceHelper.getResourceFromFolder("strat_cards/", imageFileName + ".png");
     }
 }

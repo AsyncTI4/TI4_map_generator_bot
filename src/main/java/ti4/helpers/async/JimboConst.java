@@ -13,7 +13,6 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
 import org.apache.commons.lang3.StringUtils;
 import ti4.image.TileHelper;
 import ti4.model.Source.ComponentSource;
@@ -21,7 +20,7 @@ import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 
 // Jazz's Interactive Map Builder
-public class JimboConst {
+class JimboConst {
     // Main Page
     public static final String mainPage = "jimbo_mainPage";
     public static final String exit = "jimbo_exit";
@@ -48,24 +47,109 @@ public class JimboConst {
     public static final String metaAction = "jimbo_metaAction";
     public static final String metaSymmetryAdd = "jimbo_metaSymmetryAdd";
     public static final String metaSymmetryRemove = "jimbo_metaSymmetryRemove";
+    private static final Pattern PATTERN = Pattern.compile("(blank|\\d+)$");
 
     // Tile separation
-    public static List<TileModel> blueTiles = null;
-    public static List<TileModel> redTiles = null;
-    public static List<TileModel> greenTiles = null;
-    public static List<TileModel> hyperlaneTiles = null;
-    public static Map<Integer, List<TileModel>> hyperlanesByRotation = null;
-    public static List<TileModel> draftTiles = null;
-    public static Map<Integer, List<TileModel>> draftTilesByNumber = null;
-    public static List<TileModel> otherTiles = null;
+    public static List<TileModel> blueTiles;
+    public static List<TileModel> redTiles;
+    public static List<TileModel> greenTiles;
+    private static List<TileModel> hyperlaneTiles;
+    public static Map<Integer, List<TileModel>> hyperlanesByRotation;
+    private static List<TileModel> draftTiles;
+    public static Map<Integer, List<TileModel>> draftTilesByNumber;
+    public static List<TileModel> otherTiles;
 
     public static String o() {
         List<String> candidates = new ArrayList<>();
-        candidates.addAll(List.of("oasis", "ocean", "octagon", "office", "object", "octopus", "ogre", "omelette", "ode", "operator", "operators", "opinions", "opportunity", "option", "oath", "oven", "origin", "ope"));
-        candidates.addAll(List.of("obsession", "observer", "observatory", "oddity", "odyssey", "onion", "ood", "offer", "offshoot", "ohana", "old-timer", "ohm", "omg", "omnipotence", "ordinian", "olradin", "obelisk"));
-        candidates.addAll(List.of("onomatopoeia", "onyx", "oodles", "opener", "opening", "opera", "optimizer", "opus", "oracle", "orange", "occulus", "oration", "orchestra", "orchid", "order", "obsidian", "olergodt"));
-        candidates.addAll(List.of("organism", "organization", "organizer", "orientation", "origami", "ornament", "ornithologist", "orthodontist", "osmosis", "ostrich", "outback", "outfit", "Okke", "orchard", "ospha"));
-        candidates.addAll(List.of("output", "outside", "oval", "ovation", "overgrowth", "overhaul", "override", "overseer", "overture", "owl", "oxymoron", "oxytocin", "oyster", "ozone", "omega", "Ogdun", "Oy-Oy-Oy"));
+        candidates.addAll(List.of(
+                "oasis",
+                "ocean",
+                "octagon",
+                "office",
+                "object",
+                "octopus",
+                "ogre",
+                "omelette",
+                "ode",
+                "operator",
+                "operators",
+                "opinions",
+                "opportunity",
+                "option",
+                "oath",
+                "oven",
+                "origin",
+                "ope"));
+        candidates.addAll(List.of(
+                "obsession",
+                "observer",
+                "observatory",
+                "oddity",
+                "odyssey",
+                "onion",
+                "ood",
+                "offer",
+                "offshoot",
+                "ohana",
+                "old-timer",
+                "ohm",
+                "omg",
+                "omnipotence",
+                "ordinian",
+                "olradin",
+                "obelisk"));
+        candidates.addAll(List.of(
+                "onomatopoeia",
+                "onyx",
+                "oodles",
+                "opener",
+                "opening",
+                "opera",
+                "optimizer",
+                "opus",
+                "oracle",
+                "orange",
+                "occulus",
+                "oration",
+                "orchestra",
+                "orchid",
+                "order",
+                "obsidian",
+                "olergodt"));
+        candidates.addAll(List.of(
+                "organism",
+                "organization",
+                "organizer",
+                "orientation",
+                "origami",
+                "ornament",
+                "ornithologist",
+                "orthodontist",
+                "osmosis",
+                "ostrich",
+                "outback",
+                "outfit",
+                "Okke",
+                "orchard",
+                "ospha"));
+        candidates.addAll(List.of(
+                "output",
+                "outside",
+                "oval",
+                "ovation",
+                "overgrowth",
+                "overhaul",
+                "override",
+                "overseer",
+                "overture",
+                "owl",
+                "oxymoron",
+                "oxytocin",
+                "oyster",
+                "ozone",
+                "omega",
+                "Ogdun",
+                "Oy-Oy-Oy"));
         candidates.addAll(List.of("o-word", "o-backronym"));
         Collections.shuffle(candidates);
         return StringUtils.capitalize(candidates.getFirst());
@@ -77,32 +161,44 @@ public class JimboConst {
         Function<TileModel, Integer> sourceOrder = t -> t.getSource().ordinal();
         Comparator<TileModel> comp = Comparator.comparing(sourceOrder).thenComparing(TileModel::getAlias);
         // sort by source, then by alias
-        List<TileModel> allTilesSorted = TileHelper.getAllTileModels().stream().sorted(comp).toList();
+        List<TileModel> allTilesSorted =
+                TileHelper.getAllTileModels().stream().sorted(comp).toList();
 
-        blueTiles = allTilesSorted.stream().filter(t -> "0b".equals(t.getAlias()) || TileBack.BLUE.equals(t.getTileBack())).toList();
-        redTiles = allTilesSorted.stream().filter(t -> "0r".equals(t.getAlias()) || TileBack.RED.equals(t.getTileBack())).toList();
-        greenTiles = allTilesSorted.stream().filter(t -> "0g".equals(t.getAlias()) || TileBack.GREEN.equals(t.getTileBack())).toList();
-        hyperlaneTiles = allTilesSorted.stream().filter(t -> t.getName() != null && t.getName().equalsIgnoreCase("hyperlane")).toList();
+        blueTiles = allTilesSorted.stream()
+                .filter(t -> "0b".equals(t.getAlias()) || t.getTileBack() == TileBack.BLUE)
+                .toList();
+        redTiles = allTilesSorted.stream()
+                .filter(t -> "0r".equals(t.getAlias()) || t.getTileBack() == TileBack.RED)
+                .toList();
+        greenTiles = allTilesSorted.stream()
+                .filter(t -> "0g".equals(t.getAlias()) || t.getTileBack() == TileBack.GREEN)
+                .toList();
+        hyperlaneTiles = allTilesSorted.stream()
+                .filter(t -> t.getName() != null && "hyperlane".equalsIgnoreCase(t.getName()))
+                .toList();
         draftTiles = allTilesSorted.stream().filter(TileHelper::isDraftTile).toList();
         otherTiles = new ArrayList<>();
-        List<TileModel> ignore = Stream.of(blueTiles, redTiles, greenTiles, hyperlaneTiles, draftTiles).flatMap(Collection::stream).toList();
-        allTilesSorted.stream().filter(t -> !ignore.contains(t))
-            .filter(t -> t.getSource() != ComponentSource.fow)
-            .forEach(otherTiles::add);
+        List<TileModel> ignore = Stream.of(blueTiles, redTiles, greenTiles, hyperlaneTiles, draftTiles)
+                .flatMap(Collection::stream)
+                .toList();
+        allTilesSorted.stream()
+                .filter(t -> !ignore.contains(t))
+                .filter(t -> t.getSource() != ComponentSource.fow)
+                .forEach(otherTiles::add);
 
         setupHyperlanes();
         setupDraftTiles();
     }
 
-    // Hyperlane Data is formatted such that each index has all the same hyperlanes in order and also later rotations get filled in, e.g.
+    // Hyperlane Data is formatted such that each index has all the same hyperlanes in order and also later rotations
+    // get filled in, e.g.
     // 0: 83a   , 83b   , 84a   , 84b   , ..., hl_spaghet_0, hl_roundabout3_0
     // 1: 83a60 , 83b60 , 84a60 , 84b60 , ..., hl_spaghet_0, hl_roundabout3_1
     // 2: 83a120, 83b120, 84a120, 84b120, ..., hl_spaghet_0, hl_roundabout3_0
     private static void setupHyperlanes() {
         Set<String> baseStringOrder = new LinkedHashSet<>();
         Map<Integer, Map<String, TileModel>> tilesByRotation = new HashMap<>();
-        for (int i = 0; i < 6; i++)
-            tilesByRotation.put(i, new HashMap<>());
+        for (int i = 0; i < 6; i++) tilesByRotation.put(i, new HashMap<>());
 
         for (TileModel hl : hyperlaneTiles) {
             String baseTile = hl.getId();
@@ -110,14 +206,15 @@ public class JimboConst {
             if (matcher.find()) baseTile = matcher.replaceFirst("");
 
             String rotationStr = hl.getId().replace(baseTile, "");
-            int rotation = switch (rotationStr) {
-                case "1", "60" -> 1;
-                case "2", "120" -> 2;
-                case "3", "180" -> 3;
-                case "4", "240" -> 4;
-                case "5", "300" -> 5;
-                default -> 0;
-            };
+            int rotation =
+                    switch (rotationStr) {
+                        case "1", "60" -> 1;
+                        case "2", "120" -> 2;
+                        case "3", "180" -> 3;
+                        case "4", "240" -> 4;
+                        case "5", "300" -> 5;
+                        default -> 0;
+                    };
             baseStringOrder.add(baseTile);
             tilesByRotation.get(rotation).put(baseTile, hl);
         }
@@ -126,8 +223,7 @@ public class JimboConst {
         for (String base : baseStringOrder) {
             int dupeOffset = 0;
             for (int i = 0; i < 6; i++) {
-                if (tilesByRotation.get(i).containsKey(base))
-                    dupeOffset = i + 1;
+                if (tilesByRotation.get(i).containsKey(base)) dupeOffset = i + 1;
             }
             for (int i = 0; i < 6; i++) {
                 for (int j = i + dupeOffset; j < 6; j += dupeOffset) {
@@ -154,7 +250,7 @@ public class JimboConst {
         Set<String> baseStringOrder = new LinkedHashSet<>();
         Map<Integer, Map<String, TileModel>> tilesByNum = new HashMap<>();
         for (TileModel tile : draftTiles) {
-            String color = tile.getId().replaceAll("(blank|\\d+)$", "");
+            String color = PATTERN.matcher(tile.getId()).replaceAll("");
             String indexStr = tile.getId().replace(color, "");
             int index;
             switch (indexStr) {
@@ -175,10 +271,11 @@ public class JimboConst {
 
         // Store the data for convenient use later
         draftTilesByNumber = new HashMap<>();
-        for (Integer x : tilesByNum.keySet()) {
+        for (Map.Entry<Integer, Map<String, TileModel>> entry : tilesByNum.entrySet()) {
+            Integer x = entry.getKey();
             draftTilesByNumber.put(x, new ArrayList<>());
             for (String base : baseStringOrder) {
-                draftTilesByNumber.get(x).add(tilesByNum.get(x).get(base));
+                draftTilesByNumber.get(x).add(entry.getValue().get(base));
             }
         }
     }

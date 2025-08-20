@@ -1,9 +1,8 @@
 package ti4.service.user;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Helper;
 import ti4.settings.users.UserSettingsManager;
 

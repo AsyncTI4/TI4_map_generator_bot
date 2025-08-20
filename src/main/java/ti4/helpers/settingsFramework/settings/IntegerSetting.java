@@ -1,10 +1,9 @@
 package ti4.helpers.settingsFramework.settings;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -13,7 +12,7 @@ import ti4.buttons.Buttons;
 
 @Getter
 @Setter
-@JsonIncludeProperties({ "id", "val" })
+@JsonIncludeProperties({"id", "val"})
 public class IntegerSetting extends SettingInterface {
     private int val;
     private int defaultValue;
@@ -24,7 +23,7 @@ public class IntegerSetting extends SettingInterface {
     public IntegerSetting(String id, String name, int val, int min, int max, int delta) {
         super(id, name);
 
-        this.defaultValue = this.val = val;
+        defaultValue = this.val = val;
         this.min = min;
         this.max = max;
         this.delta = delta;
@@ -67,13 +66,13 @@ public class IntegerSetting extends SettingInterface {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Helper Methods
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public String increment() {
+    private String increment() {
         if (val + delta > max) return "[" + name + " cannot go above " + max + "]";
         val += delta;
         return null;
     }
 
-    public String decrement() {
+    private String decrement() {
         if (val - delta < min) return "[" + name + " cannot go below " + min + "]";
         val -= delta;
         return null;

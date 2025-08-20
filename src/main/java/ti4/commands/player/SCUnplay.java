@@ -2,7 +2,6 @@ package ti4.commands.player;
 
 import java.util.Collections;
 import java.util.Set;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -19,7 +18,9 @@ class SCUnplay extends GameStateSubcommand {
     public SCUnplay() {
         super(Constants.SC_UNPLAY, "Unplay a Strategy Card", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -31,16 +32,19 @@ class SCUnplay extends GameStateSubcommand {
             return;
         }
 
-        if (playersSCs.size() != 1 && event.getOption(Constants.STRATEGY_CARD) == null) { //Only one SC selected
-            MessageHelper.sendMessageToEventChannel(event, "Player has more than one strategy card. Please try again, using the `strategy_card` option.");
+        if (playersSCs.size() != 1 && event.getOption(Constants.STRATEGY_CARD) == null) { // Only one SC selected
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "Player has more than one strategy card. Please try again, using the `strategy_card` option.");
             return;
         }
 
-        Integer scToUnplay = event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()), OptionMapping::getAsInt);
+        Integer scToUnplay =
+                event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()), OptionMapping::getAsInt);
         Game game = getGame();
         game.setSCPlayed(scToUnplay, false);
 
-        //fix sc reminders for all players
+        // fix sc reminders for all players
         for (Player player_ : game.getPlayers().values()) {
             if (!player_.isRealPlayer()) {
                 continue;
@@ -50,7 +54,9 @@ class SCUnplay extends GameStateSubcommand {
             player_.addFollowedSC(scToUnplay);
         }
 
-        MessageHelper.sendMessageToEventChannel(event, "Strategy card has been flipped: " + CardEmojis.getSCBackFromInteger(scToUnplay) + " to " + CardEmojis.getSCFrontFromInteger(scToUnplay) + " (unplayed).");
+        MessageHelper.sendMessageToEventChannel(
+                event,
+                "Strategy card has been flipped: " + CardEmojis.getSCBackFromInteger(scToUnplay) + " to "
+                        + CardEmojis.getSCFrontFromInteger(scToUnplay) + " (unplayed).");
     }
-
 }

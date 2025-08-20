@@ -1,42 +1,43 @@
 package ti4.helpers;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.awt.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Class used to execute Discord Webhooks with low effort
  * <a href="https://gist.github.com/k3kdude/fba6f6b37594eae3d6f9475330733bdb">...</a>
  * <p>
  * EXAMPLE USAGE:
- DiscordWebhook webhook = new DiscordWebho<a href="ok("https://discordapp.com/api/webho">...</a>oks/...");
- webhook.setContent("Any message!");
- webhook.setAvatarU<a href="rl("https://your.awesome/image">...</a>.png");
- webhook.setUsername("Custom Usernames!");
- webhook.setTts(true);
- webhook.addEmbed(new DiscordWebhook.EmbedObject()
- .setTitle("Title")
- .setDescription("This is a description")
- .setColor(Color.RED)
- .addField("1st Field", "Inline", true)
- .addField("2nd Field", "Inline", true)
- .addField("3rd Field", "No-Inline", false)
- .setThumbna<a href="il("https://kryptongta.com/images/kryptonlogo">...</a>.png")
- .setFooter("Footer text<a href="",">"https://kryptongta.com/images/kryptonlogodark</a>.png")
- .setIma<a href="ge("https://kryptongta.com/images/kryptontitle2">...</a>.png")
- .setAuthor("Author Name<a href="",">"https://kryp<a href="tongta</a>.com",">"https://kryptongta.com/images/k</a>ryptonlogowide.png")
- .setU<a href="rl("https://kryptongta">...</a>.com"));
- webhook.addEmbed(new DiscordWebhook.EmbedObject()
- .setDescription("Just another added embed object!"));
- webhook.execute(); //Handle exception
+ * DiscordWebhook webhook = new DiscordWebho<a href="ok("https://discordapp.com/api/webho">...</a>oks/...");
+ * webhook.setContent("Any message!");
+ * webhook.setAvatarU<a href="rl("https://your.awesome/image">...</a>.png");
+ * webhook.setUsername("Custom Usernames!");
+ * webhook.setTts(true);
+ * webhook.addEmbed(new DiscordWebhook.EmbedObject()
+ * .setTitle("Title")
+ * .setDescription("This is a description")
+ * .setColor(Color.RED)
+ * .addField("1st Field", "Inline", true)
+ * .addField("2nd Field", "Inline", true)
+ * .addField("3rd Field", "No-Inline", false)
+ * .setThumbna<a href="il("https://kryptongta.com/images/kryptonlogo">...</a>.png")
+ * .setFooter("Footer text<a href="",">"https://kryptongta.com/images/kryptonlogodark</a>.png")
+ * .setIma<a href="ge("https://kryptongta.com/images/kryptontitle2">...</a>.png")
+ * .setAuthor("Author Name<a href="",">"https://kryp<a href="tongta</a>.com",">"https://kryptongta.com/images/k</a>ryptonlogowide.png")
+ * .setU<a href="rl("https://kryptongta">...</a>.com"));
+ * webhook.addEmbed(new DiscordWebhook.EmbedObject()
+ * .setDescription("Just another added embed object!"));
+ * webhook.execute(); //Handle exception
  */
 public class DiscordWebhook {
 
@@ -170,11 +171,11 @@ public class DiscordWebhook {
         connection.setRequestMethod("POST");
 
         OutputStream stream = connection.getOutputStream();
-        stream.write(json.toString().getBytes());
+        stream.write(json.toString().getBytes(StandardCharsets.UTF_8));
         stream.flush();
         stream.close();
 
-        connection.getInputStream().close(); //I'm not sure why but it doesn't work without getting the InputStream
+        connection.getInputStream().close(); // I'm not sure why but it doesn't work without getting the InputStream
         connection.disconnect();
     }
 
@@ -190,39 +191,39 @@ public class DiscordWebhook {
         private Author author;
         private final List<Field> fields = new ArrayList<>();
 
-        public String getTitle() {
+        String getTitle() {
             return title;
         }
 
-        public String getDescription() {
+        String getDescription() {
             return description;
         }
 
-        public String getUrl() {
+        String getUrl() {
             return url;
         }
 
-        public Color getColor() {
+        Color getColor() {
             return color;
         }
 
-        public Footer getFooter() {
+        Footer getFooter() {
             return footer;
         }
 
-        public Thumbnail getThumbnail() {
+        Thumbnail getThumbnail() {
             return thumbnail;
         }
 
-        public Image getImage() {
+        Image getImage() {
             return image;
         }
 
-        public Author getAuthor() {
+        Author getAuthor() {
             return author;
         }
 
-        public List<Field> getFields() {
+        List<Field> getFields() {
             return fields;
         }
 
@@ -320,7 +321,8 @@ public class DiscordWebhook {
                     builder.append("]");
                 }
 
-                builder.append(++i == entrySet.size() ? "}" : ",");
+                ++i;
+                builder.append(i == entrySet.size() ? "}" : ",");
             }
 
             return builder.toString().replace("\n", "\\n");
@@ -330,5 +332,4 @@ public class DiscordWebhook {
             return "\"" + string + "\"";
         }
     }
-
 }

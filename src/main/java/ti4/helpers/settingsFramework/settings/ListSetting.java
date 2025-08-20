@@ -1,5 +1,7 @@
 package ti4.helpers.settingsFramework.settings;
 
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -9,9 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
-
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -26,11 +25,11 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @Getter
 @Setter
-@JsonIncludeProperties({ "id", "keys" })
+@JsonIncludeProperties({"id", "keys"})
 public class ListSetting<T> extends SettingInterface {
     private Set<String> keys = new HashSet<>();
     private Set<String> defaultKeys = new HashSet<>();
@@ -40,17 +39,23 @@ public class ListSetting<T> extends SettingInterface {
     private String includeLang;
     private String removeLang;
 
-    public ListSetting(String id, String name, String include, String remove, Set<Entry<String, T>> allVals, Set<String> values, Set<String> defaults) {
+    public ListSetting(
+            String id,
+            String name,
+            String include,
+            String remove,
+            Set<Entry<String, T>> allVals,
+            Set<String> values,
+            Set<String> defaults) {
         super(id, name);
 
-        this.includeLang = include;
-        this.removeLang = remove;
+        includeLang = include;
+        removeLang = remove;
         if (allVals != null) {
-            for (Map.Entry<String, T> entry : allVals)
-                allValues.put(entry.getKey(), entry.getValue());
+            for (Map.Entry<String, T> entry : allVals) allValues.put(entry.getKey(), entry.getValue());
         }
         if (defaults != null) defaultKeys.addAll(defaults);
-        if (values != null) this.keys.addAll(values);
+        if (values != null) keys.addAll(values);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -60,8 +65,7 @@ public class ListSetting<T> extends SettingInterface {
         if (json.has("keys") && json.get("keys").isArray()) {
             keys.clear();
             json.get("keys").forEach(j -> {
-                if (j.isTextual() && allValues.containsKey(j.asText()))
-                    keys.add(j.asText());
+                if (j.isTextual() && allValues.containsKey(j.asText())) keys.add(j.asText());
             });
         }
     }
@@ -77,14 +81,14 @@ public class ListSetting<T> extends SettingInterface {
     }
 
     protected String shortValue() {
-        List<String> values = keys.stream().sorted()
-            .map(k -> show.apply(allValues.get(k))).toList();
+        List<String> values =
+                keys.stream().sorted().map(k -> show.apply(allValues.get(k))).toList();
         return "[" + String.join(",", values) + "]";
     }
 
     protected String longValue() {
-        List<String> values = keys.stream().sorted()
-            .map(k -> show.apply(allValues.get(k))).toList();
+        List<String> values =
+                keys.stream().sorted().map(k -> show.apply(allValues.get(k))).toList();
         return "[" + String.join(",", values) + "]";
     }
 
@@ -93,7 +97,7 @@ public class ListSetting<T> extends SettingInterface {
         Button remove = Buttons.red(idPrefix + "remove" + id, removeLang).withEmoji(emojiDown);
         List<Button> ls = new ArrayList<>();
         if (!keys.isEmpty()) ls.add(remove);
-        if (!(keys.size() == allValues.size())) ls.add(include);
+        if (keys.size() != allValues.size()) ls.add(include);
         return ls;
     }
 
@@ -105,7 +109,8 @@ public class ListSetting<T> extends SettingInterface {
         allValues.putAll(values);
         // remove keys that no longer exist
         keys = new HashSet<>(keys.stream().filter(k -> allValues.containsKey(k)).toList());
-        defaultKeys = new HashSet<>(defaultKeys.stream().filter(k -> allValues.containsKey(k)).toList());
+        defaultKeys = new HashSet<>(
+                defaultKeys.stream().filter(k -> allValues.containsKey(k)).toList());
     }
 
     public void setKeys(List<String> keys) {
@@ -115,7 +120,8 @@ public class ListSetting<T> extends SettingInterface {
             return;
         }
         // otherwise don't include keys that have no value
-        this.keys = new HashSet<>(keys.stream().filter(k -> allValues.containsKey(k)).toList());
+        this.keys = new HashSet<>(
+                keys.stream().filter(k -> allValues.containsKey(k)).toList());
     }
 
     public void setDefaultKeys(List<String> defaultKeys) {
@@ -125,12 +131,15 @@ public class ListSetting<T> extends SettingInterface {
             return;
         }
         // otherwise don't include keys that have no value
-        this.defaultKeys = new HashSet<>(defaultKeys.stream().filter(k -> allValues.containsKey(k)).toList());
+        this.defaultKeys = new HashSet<>(
+                defaultKeys.stream().filter(k -> allValues.containsKey(k)).toList());
     }
 
     private String includeValue(GenericInteractionCreateEvent event, String action) {
         String suffix = action.replace("include" + id, "");
-        List<Map.Entry<String, T>> items = new ArrayList<>(allValues.entrySet().stream().filter(e -> !keys.contains(e.getKey())).toList());
+        List<Map.Entry<String, T>> items = new ArrayList<>(allValues.entrySet().stream()
+                .filter(e -> !keys.contains(e.getKey()))
+                .toList());
         if (StringUtils.isBlank(suffix)) {
             if (event instanceof ButtonInteractionEvent buttonEvent) {
                 sendSelectionBoxes(buttonEvent, items, " include in ");
@@ -153,7 +162,9 @@ public class ListSetting<T> extends SettingInterface {
 
     private String removeValue(GenericInteractionCreateEvent event, String action) {
         String suffix = action.replace("remove" + id, "");
-        List<Map.Entry<String, T>> items = new ArrayList<>(allValues.entrySet().stream().filter(e -> keys.contains(e.getKey())).toList());
+        List<Map.Entry<String, T>> items = new ArrayList<>(allValues.entrySet().stream()
+                .filter(e -> keys.contains(e.getKey()))
+                .toList());
         if (StringUtils.isBlank(suffix)) {
             if (event instanceof ButtonInteractionEvent buttonEvent) {
                 sendSelectionBoxes(buttonEvent, items, " remove from ");
@@ -174,29 +185,32 @@ public class ListSetting<T> extends SettingInterface {
         }
     }
 
-    private void sendSelectionBoxes(ButtonInteractionEvent buttonEvent, List<Map.Entry<String, T>> entries, String lang) {
+    private void sendSelectionBoxes(
+            ButtonInteractionEvent buttonEvent, List<Map.Entry<String, T>> entries, String lang) {
         String prefixID = buttonEvent.getButton().getId();
         List<ActionRow> rows = new ArrayList<>();
         int x = 0;
         entries.sort(Comparator.comparing(e -> show.apply(e.getValue())));
         for (List<Map.Entry<String, T>> menu : ListUtils.partition(entries, 25)) {
             List<SelectOption> options = menu.stream()
-                .map(entry -> SelectOption.of(show.apply(entry.getValue()), entry.getKey()))
-                .toList();
+                    .map(entry -> SelectOption.of(show.apply(entry.getValue()), entry.getKey()))
+                    .toList();
             char start = options.getFirst().getLabel().charAt(0);
             char end = options.getLast().getLabel().charAt(0);
             String placeholder = String.format("Select [%s-%s]", start, end);
             StringSelectMenu selectionMenu = StringSelectMenu.create(prefixID + "_" + x)
-                .addOptions(options)
-                .setPlaceholder(placeholder)
-                .setRequiredRange(0, menu.size())
-                .build();
+                    .addOptions(options)
+                    .setPlaceholder(placeholder)
+                    .setRequiredRange(0, menu.size())
+                    .build();
             rows.add(ActionRow.of(selectionMenu));
             x++;
         }
-        buttonEvent.getHook().sendMessage("Choose an item to" + lang + name)
-            .addComponents(rows)
-            .setEphemeral(true)
-            .queue(Consumers.nop(), BotLogger::catchRestError);
+        buttonEvent
+                .getHook()
+                .sendMessage("Choose an item to" + lang + name)
+                .addComponents(rows)
+                .setEphemeral(true)
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

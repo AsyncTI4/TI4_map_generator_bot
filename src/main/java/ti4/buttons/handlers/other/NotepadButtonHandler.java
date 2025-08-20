@@ -11,7 +11,7 @@ import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class NotepadButtonHandler {
+class NotepadButtonHandler {
 
     private static String getNotes(Player player) {
         return StringHelper.unescape(player.getNotes());
@@ -32,11 +32,14 @@ public class NotepadButtonHandler {
         String modalID = "notepadModal";
         String fieldID = "notes";
         String notes = getNotes(player);
-        TextInput.Builder textInputBuilder = TextInput.create(fieldID, "Edit summary", TextInputStyle.PARAGRAPH).setPlaceholder("Start typing your notes...");
+        TextInput.Builder textInputBuilder = TextInput.create(fieldID, "Edit summary", TextInputStyle.PARAGRAPH)
+                .setPlaceholder("Start typing your notes...");
         if (!notes.isBlank()) {
             textInputBuilder.setValue(notes);
         }
-        Modal modal = Modal.create(modalID, player.getFlexibleDisplayName() + "'s Notepad").addActionRow(textInputBuilder.build()).build();
+        Modal modal = Modal.create(modalID, player.getFlexibleDisplayName() + "'s Notepad")
+                .addActionRow(textInputBuilder.build())
+                .build();
         event.replyModal(modal).queue();
     }
 

@@ -6,14 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.UtilityClass;
 import ti4.json.PersistenceManager;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class TechSummariesMetadataManager {
@@ -30,21 +29,25 @@ public class TechSummariesMetadataManager {
             return;
         }
 
-        RoundTechSummaries roundTechSummaries = techSummaries.gameNameToTechSummary
-            .computeIfAbsent(game.getName(), k -> new RoundTechSummaries(game.getRound(), new ArrayList<>()));
+        RoundTechSummaries roundTechSummaries = techSummaries.gameNameToTechSummary.computeIfAbsent(
+                game.getName(), k -> new RoundTechSummaries(game.getRound(), new ArrayList<>()));
         if (roundTechSummaries.round != game.getRound()) {
             roundTechSummaries = new RoundTechSummaries(game.getRound(), new ArrayList<>());
             techSummaries.gameNameToTechSummary.put(game.getName(), roundTechSummaries);
         }
 
         FactionTechSummary factionTechSummary = roundTechSummaries.techSummaries.stream()
-            .filter(summary -> summary.faction.equals(player.getFaction()))
-            .findFirst()
-            .orElseGet(() -> {
-                var newFactionTechSummary = new FactionTechSummary(player.getFaction());
-                techSummaries.gameNameToTechSummary.get(game.getName()).techSummaries.add(newFactionTechSummary);
-                return newFactionTechSummary;
-            });
+                .filter(summary -> summary.faction.equals(player.getFaction()))
+                .findFirst()
+                .orElseGet(() -> {
+                    var newFactionTechSummary = new FactionTechSummary(player.getFaction());
+                    techSummaries
+                            .gameNameToTechSummary
+                            .get(game.getName())
+                            .techSummaries
+                            .add(newFactionTechSummary);
+                    return newFactionTechSummary;
+                });
 
         if (isResearchAgreement) {
             factionTechSummary.addResearchAgreementTech(techId);
@@ -91,18 +94,18 @@ public class TechSummariesMetadataManager {
         private List<String> tech;
         private List<String> researchAgreementTech;
 
-        public FactionTechSummary(String faction) {
+        FactionTechSummary(String faction) {
             this.faction = faction;
         }
 
-        public void addTech(String techId) {
+        void addTech(String techId) {
             if (tech == null) {
                 tech = new ArrayList<>();
             }
             tech.add(techId);
         }
 
-        public void addResearchAgreementTech(String techId) {
+        void addResearchAgreementTech(String techId) {
             if (researchAgreementTech == null) {
                 researchAgreementTech = new ArrayList<>();
             }

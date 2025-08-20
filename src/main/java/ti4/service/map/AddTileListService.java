@@ -3,9 +3,7 @@ package ti4.service.map;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Nullable;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -24,10 +22,10 @@ import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
-import ti4.map.MapStringMapper;
 import ti4.map.Tile;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.ShowGameService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -52,7 +50,7 @@ public class AddTileListService {
         try {
             badTiles = addTileMapToGame(game, mappedTilesToPosition);
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event, game), e.getMessage(), e);
+            BotLogger.error(new LogOrigin(event, game), e.getMessage(), e);
             MessageHelper.replyToMessage(event, e.getMessage());
         }
 
@@ -60,7 +58,9 @@ public class AddTileListService {
         ShowGameService.simpleShowGame(game, event, DisplayType.map);
 
         if (!badTiles.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There were some bad tiles that were replaced with gray tiles: " + badTiles + "\n");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "There were some bad tiles that were replaced with gray tiles: " + badTiles + "\n");
         }
 
         finishSetup(game, event);
@@ -105,20 +105,24 @@ public class AddTileListService {
                 game.setTile(tile);
             }
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event, game), "Could not add setup and Mallice tiles", e);
+            BotLogger.error(new LogOrigin(event, game), "Could not add setup and Mallice tiles", e);
         }
 
         MessageChannel channel = event != null ? event.getMessageChannel() : game.getMainGameChannel();
         if (!game.isBaseGameMode()) {
             AddFrontierTokensService.addFrontierTokens(event, game);
-            MessageHelper.sendMessageToChannel(channel, ExploreEmojis.Frontier + " frontier tokens have been added to empty spaces.");
+            MessageHelper.sendMessageToChannel(
+                    channel, ExploreEmojis.Frontier + " frontier tokens have been added to empty spaces.");
         }
         if (!game.isOrdinianC1Mode() && !game.isLiberationC4Mode()) {
             MessageHelper.sendMessageToChannelWithButtons(
-                game.getMainGameChannel(), "Press this button after every player is setup.",
-                List.of(Buttons.green("deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt)));
+                    game.getMainGameChannel(),
+                    "Press this button after every player is setup.",
+                    List.of(Buttons.green(
+                            "deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt)));
 
-            if (!game.isFowMode() && game.getRealPlayers().size() < game.getPlayers().size()) {
+            if (!game.isFowMode()
+                    && game.getRealPlayers().size() < game.getPlayers().size()) {
                 ButtonHelper.offerPlayerSetupButtons(channel, game);
             }
         }
@@ -127,11 +131,14 @@ public class AddTileListService {
     public static Modal buildMapStringModal(Game game, String modalId) {
         String fieldId = "mapString";
         TextInput tags = TextInput.create(fieldId, "Enter Map String", TextInputStyle.PARAGRAPH)
-            .setPlaceholder("Paste the map string here.")
-            .setValue(game.getMapString().substring(0, game.getMapString().length() > 4000 ? 4000 : game.getMapString().length()))
-            .setRequired(true)
-            .build();
-        return Modal.create(modalId, "Add Map String for " + game.getName()).addActionRow(tags).build();
+                .setPlaceholder("Paste the map string here.")
+                .setValue(game.getMapString()
+                        .substring(0, Math.min(game.getMapString().length(), 4000)))
+                .setRequired(true)
+                .build();
+        return Modal.create(modalId, "Add Map String for " + game.getName())
+                .addActionRow(tags)
+                .build();
     }
 
     @ModalHandler("addMapString")

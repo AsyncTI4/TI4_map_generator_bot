@@ -7,15 +7,18 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 
 class Undo extends GameStateSubcommand {
 
     public Undo() {
         super(Constants.UNDO, "Undo the last action", false, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.UNDO_TO_COMMAND, "Command to undo back to").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.UNDO_TO_COMMAND, "Command to undo back to")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES")
+                .setRequired(true));
     }
 
     @Override

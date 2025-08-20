@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -13,7 +12,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.SortHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.GamesPage;
+import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 
@@ -35,27 +34,58 @@ public class ListSlashCommandsUsedService {
         Map<String, Integer> actionCards = new HashMap<>();
         Map<String, Integer> actionCardsPlayed = new HashMap<>();
 
-        GamesPage.consumeAllGames(game -> listSlashCommandsUsed(game, useOnlyLastMonth, slashCommands, actionCards, actionCardsPlayed, largestGame,
-            largestAmountOfButtonsIn1Game, buttonsPressed, slashCommandsUsed, acsSabod));
+        GamesPage.consumeAllGames(game -> listSlashCommandsUsed(
+                game,
+                useOnlyLastMonth,
+                slashCommands,
+                actionCards,
+                actionCardsPlayed,
+                largestGame,
+                largestAmountOfButtonsIn1Game,
+                buttonsPressed,
+                slashCommandsUsed,
+                acsSabod));
 
-        StringBuilder longMsg = new StringBuilder("The number of button pressed so far recorded is " + buttonsPressed + ". The largest number of buttons pressed in a single game is " + largestAmountOfButtonsIn1Game + " in game " + largestGame + ". The number of slash commands used is " + slashCommandsUsed
-            + ". The number of action cards Sabo'd is " + acsSabod + ". The following is the recorded frequency of slash commands \n");
+        StringBuilder longMsg = new StringBuilder("The number of button pressed so far recorded is " + buttonsPressed
+                + ". The largest number of buttons pressed in a single game is " + largestAmountOfButtonsIn1Game
+                + " in game " + largestGame + ". The number of slash commands used is " + slashCommandsUsed
+                + ". The number of action cards Sabo'd is " + acsSabod
+                + ". The following is the recorded frequency of slash commands \n");
         Map<String, Integer> sortedMapAsc = SortHelper.sortByValue(slashCommands, false);
-        for (String command : sortedMapAsc.keySet()) {
-            longMsg.append(command).append(": ").append(sortedMapAsc.get(command)).append(" \n");
+        for (Map.Entry<String, Integer> entry : sortedMapAsc.entrySet()) {
+            longMsg.append(entry.getKey()).append(": ").append(entry.getValue()).append(" \n");
         }
-        longMsg.append("\n The number of times an action card has been Sabo'd is also being tracked. The following is their recorded frequency \n");
+        longMsg.append(
+                "\n The number of times an action card has been Sabo'd is also being tracked. The following is their recorded frequency \n");
         Map<String, Integer> sortedMapAscACs = SortHelper.sortByValue(actionCards, false);
-        for (String command : sortedMapAscACs.keySet()) {
-            longMsg.append(command).append(": ").append(sortedMapAscACs.get(command)).append(" out of ").append(actionCardsPlayed.get(command)).append(" times played").append(" \n");
+        for (Map.Entry<String, Integer> entry : sortedMapAscACs.entrySet()) {
+            String command = entry.getKey();
+            longMsg.append(command)
+                    .append(": ")
+                    .append(entry.getValue())
+                    .append(" out of ")
+                    .append(actionCardsPlayed.get(command))
+                    .append(" times played")
+                    .append(" \n");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());
     }
 
-    private static void listSlashCommandsUsed(Game game, boolean useOnlyLastMonth, Map<String, Integer> slashCommands, Map<String, Integer> actionCards,
-        Map<String, Integer> actionCardsPlayed, AtomicReference<String> largestGame, AtomicInteger largestAmountOfButtonsIn1Game,
-        AtomicInteger buttonsPressed, AtomicInteger slashCommandsUsed, AtomicInteger acsSabod) {
-        if (useOnlyLastMonth && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) > 30) {
+    private static void listSlashCommandsUsed(
+            Game game,
+            boolean useOnlyLastMonth,
+            Map<String, Integer> slashCommands,
+            Map<String, Integer> actionCards,
+            Map<String, Integer> actionCardsPlayed,
+            AtomicReference<String> largestGame,
+            AtomicInteger largestAmountOfButtonsIn1Game,
+            AtomicInteger buttonsPressed,
+            AtomicInteger slashCommandsUsed,
+            AtomicInteger acsSabod) {
+        if (useOnlyLastMonth
+                && Helper.getDateDifference(
+                                game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis()))
+                        > 30) {
             return;
         }
         if (game.getButtonPressCount() > largestAmountOfButtonsIn1Game.get()) {

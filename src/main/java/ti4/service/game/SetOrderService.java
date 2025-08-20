@@ -3,7 +3,6 @@ package ti4.service.game;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -40,7 +39,7 @@ public class SetOrderService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
-    public static void setPlayerOrder(Map<String, Player> newPlayerOrder, Map<String, Player> players, User user) {
+    private static void setPlayerOrder(Map<String, Player> newPlayerOrder, Map<String, Player> players, User user) {
         if (user == null) {
             return;
         }

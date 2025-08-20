@@ -1,20 +1,19 @@
 package ti4.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.testUtils.BaseTi4Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-public class AbilityModelTest extends BaseTi4Test {
+class AbilityModelTest extends BaseTi4Test {
     @Test
-    public void testAbilities() {
+    void testAbilities() {
         for (AbilityModel model : Mapper.getAbilities().values()) {
             assertTrue(model.isValid(), model.getAlias() + ": invalid");
             assertTrue(validateFaction(model), model.getAlias() + ": invalid FactionID");
@@ -23,12 +22,13 @@ public class AbilityModelTest extends BaseTi4Test {
 
     private boolean validateFaction(AbilityModel model) {
         if (Mapper.isValidFaction(model.getFaction()) || "keleres".equals(model.getFaction())) return true;
-        System.out.println("Ability **" + model.getAlias() + "** failed validation due to invalid FactionID: `" + model.getFaction() + "`");
+        System.out.println("Ability **" + model.getAlias() + "** failed validation due to invalid FactionID: `"
+                + model.getFaction() + "`");
         return false;
     }
 
     @Test
-    public void testFaction() {
+    void testFaction() {
         AbilityModel abilityModel = Mapper.getAbility("mitosis");
         String arborec = "arborec";
         assertEquals(arborec, abilityModel.getFaction());
@@ -38,28 +38,28 @@ public class AbilityModelTest extends BaseTi4Test {
     }
 
     @Test
-    public void testPermanentEffect() {
+    void testPermanentEffect() {
         AbilityModel abilityModel = Mapper.getAbility("mitosis");
         String permanentEffect = "Your space docks cannot produce infantry";
         assertEquals(Optional.of(permanentEffect), abilityModel.getPermanentEffect());
     }
 
     @Test
-    public void testWindow() {
+    void testWindow() {
         AbilityModel abilityModel = Mapper.getAbility("mitosis");
         String window = "At the start of the status phase";
         assertEquals(Optional.of(window), abilityModel.getWindow());
     }
 
     @Test
-    public void testWindowEffect() {
+    void testWindowEffect() {
         AbilityModel abilityModel = Mapper.getAbility("mitosis");
         String windowEffect = "Place 1 infantry from your reinforcements on any planet you control.";
         assertEquals(Optional.of(windowEffect), abilityModel.getWindowEffect());
     }
 
     @Test
-    public void testSource() {
+    void testSource() {
         AbilityModel abilityModel = Mapper.getAbility("mitosis");
         ComponentSource source = ComponentSource.base;
         abilityModel.setSource(source);
@@ -67,7 +67,7 @@ public class AbilityModelTest extends BaseTi4Test {
     }
 
     @Test
-    public void testSearchTags() {
+    void testSearchTags() {
         AbilityModel abilityModel = Mapper.getAbility("mitosis");
         List<String> searchTags = new ArrayList<>();
         searchTags.add("testTag1");
@@ -77,7 +77,7 @@ public class AbilityModelTest extends BaseTi4Test {
     }
 
     @Test
-    public void testIsValid() {
+    void testIsValid() {
         AbilityModel abilityModel = Mapper.getAbility("mitosis");
         abilityModel.setId("testId");
         abilityModel.setName("testName");
@@ -87,11 +87,10 @@ public class AbilityModelTest extends BaseTi4Test {
     }
 
     @Test
-    public void testGetAlias() {
+    void testGetAlias() {
         AbilityModel abilityModel = Mapper.getAbility("mitosis");
         String id = "testId";
         abilityModel.setId(id);
         assertEquals(id, abilityModel.getAlias());
     }
-
 }

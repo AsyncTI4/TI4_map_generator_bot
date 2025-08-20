@@ -2,13 +2,11 @@ package ti4.commands.franken;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
@@ -24,9 +22,12 @@ class Ban extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_1, "Ability Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER_1, "Leader Name").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.UNIT_ID, "Unit Name, only mechs or FS").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.UNIT_ID_1, "Unit Name, only mechs or FS").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID")
+                .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.UNIT_ID, "Unit Name, only mechs or FS")
+                .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.UNIT_ID_1, "Unit Name, only mechs or FS")
+                .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Technology Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "Technology Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name").setAutoComplete(true));
@@ -34,14 +35,17 @@ class Ban extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.BAN_FLEET, "Starting Fleet").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.BAN_COMMODITIES, "Commodities").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.BAN_HS, "Home System").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.BAN_STARTING_TECH, "Starting Technology").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.BAN_STARTING_TECH, "Starting Technology")
+                .setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
         List<String> abilityIDs = new ArrayList<>();
 
-        //GET ALL ABILITY OPTIONS AS STRING
-        for (OptionMapping option : event.getOptions().stream().filter(o -> o != null && o.getName().contains(Constants.ABILITY)).toList()) {
+        // GET ALL ABILITY OPTIONS AS STRING
+        for (OptionMapping option : event.getOptions().stream()
+                .filter(o -> o != null && o.getName().contains(Constants.ABILITY))
+                .toList()) {
             abilityIDs.add(option.getAsString());
         }
 
@@ -51,13 +55,17 @@ class Ban extends GameStateSubcommand {
         Game game = getGame();
         for (String ability : abilityIDs) {
             game.setStoredValue("bannedAbilities", game.getStoredValue("bannedAbilities") + "finSep" + ability);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getAbility(ability).getName());
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Successfully banned " + Mapper.getAbility(ability).getName());
         }
 
         List<String> leaderIDs = new ArrayList<>();
 
-        //GET ALL Leader OPTIONS AS STRING
-        for (OptionMapping option : event.getOptions().stream().filter(o -> o != null && o.getName().contains(Constants.LEADER)).toList()) {
+        // GET ALL Leader OPTIONS AS STRING
+        for (OptionMapping option : event.getOptions().stream()
+                .filter(o -> o != null && o.getName().contains(Constants.LEADER))
+                .toList()) {
             leaderIDs.add(option.getAsString());
         }
 
@@ -66,15 +74,19 @@ class Ban extends GameStateSubcommand {
 
         for (String leader : leaderIDs) {
             if (Mapper.getLeader(leader) != null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getLeader(leader).getName());
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        "Successfully banned " + Mapper.getLeader(leader).getName() + ".");
                 game.setStoredValue("bannedLeaders", game.getStoredValue("bannedLeaders") + "finSep" + leader);
             }
         }
 
         List<String> pnIDs = new ArrayList<>();
 
-        //GET ALL PN OPTIONS AS STRING
-        for (OptionMapping option : event.getOptions().stream().filter(o -> o != null && o.getName().contains(Constants.PROMISSORY_NOTE_ID)).toList()) {
+        // GET ALL PN OPTIONS AS STRING
+        for (OptionMapping option : event.getOptions().stream()
+                .filter(o -> o != null && o.getName().contains(Constants.PROMISSORY_NOTE_ID))
+                .toList()) {
             pnIDs.add(option.getAsString());
         }
 
@@ -84,14 +96,18 @@ class Ban extends GameStateSubcommand {
         for (String pn : pnIDs) {
             if (Mapper.getPromissoryNote(pn) != null) {
                 game.setStoredValue("bannedPNs", game.getStoredValue("bannedPNs") + "finSep" + pn);
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getPromissoryNote(pn).getName());
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        "Successfully banned " + Mapper.getPromissoryNote(pn).getName() + ".");
             }
         }
 
         List<String> unitIDs = new ArrayList<>();
 
-        //GET ALL UNIT OPTIONS AS STRING
-        for (OptionMapping option : event.getOptions().stream().filter(o -> o != null && o.getName().contains(Constants.UNIT_ID)).toList()) {
+        // GET ALL UNIT OPTIONS AS STRING
+        for (OptionMapping option : event.getOptions().stream()
+                .filter(o -> o != null && o.getName().contains(Constants.UNIT_ID))
+                .toList()) {
             unitIDs.add(option.getAsString());
         }
 
@@ -101,20 +117,24 @@ class Ban extends GameStateSubcommand {
         for (String unit : unitIDs) {
             String faction = unit.split("_")[0];
             String type = unit.split("_")[1];
-            if (type.equalsIgnoreCase("mech")) {
+            if ("mech".equalsIgnoreCase(type)) {
                 game.setStoredValue("bannedMechs", game.getStoredValue("bannedMechs") + "finSep" + faction);
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + faction + " " + type);
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), "Successfully banned " + faction + " " + type + ".");
             }
-            if (type.equalsIgnoreCase("flagship")) {
+            if ("flagship".equalsIgnoreCase(type)) {
                 game.setStoredValue("bannedFSs", game.getStoredValue("bannedFSs") + "finSep" + faction);
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + faction + " " + type);
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), "Successfully banned " + faction + " " + type + ".");
             }
         }
 
         List<String> techIDs = new ArrayList<>();
 
-        //GET ALL TECH OPTIONS AS STRING
-        for (OptionMapping option : event.getOptions().stream().filter(o -> o != null && o.getName().contains(Constants.TECH)).toList()) {
+        // GET ALL TECH OPTIONS AS STRING
+        for (OptionMapping option : event.getOptions().stream()
+                .filter(o -> o != null && o.getName().contains(Constants.TECH))
+                .toList()) {
             techIDs.add(option.getAsString());
         }
 
@@ -123,13 +143,16 @@ class Ban extends GameStateSubcommand {
 
         for (String tech : techIDs) {
             game.setStoredValue("bannedTechs", game.getStoredValue("bannedTechs") + "finSep" + tech);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getTech(tech).getName());
-
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Successfully banned " + Mapper.getTech(tech).getName() + ".");
         }
 
         List<String> tileIDs = new ArrayList<>();
 
-        for (OptionMapping option : event.getOptions().stream().filter(o -> o != null && o.getName().contains(Constants.TILE_NAME)).toList()) {
+        for (OptionMapping option : event.getOptions().stream()
+                .filter(o -> o != null && o.getName().contains(Constants.TILE_NAME))
+                .toList()) {
             tileIDs.add(option.getAsString());
         }
 
@@ -138,12 +161,16 @@ class Ban extends GameStateSubcommand {
             Tile tile = new Tile(tileID, "000");
             if (tile.getTileModel() != null) {
                 game.setStoredValue("bannedTiles", game.getStoredValue("bannedTiles") + "finSep" + tile.getTileID());
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + tile.getTileModel().getName());
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        "Successfully banned " + tile.getTileModel().getName() + ".");
             }
         }
 
         List<String> commodityIDs = new ArrayList<>();
-        for (OptionMapping option : event.getOptions().stream().filter(o -> o != null && o.getName().contains(Constants.BAN_COMMODITIES)).toList()) {
+        for (OptionMapping option : event.getOptions().stream()
+                .filter(o -> o != null && o.getName().contains(Constants.BAN_COMMODITIES))
+                .toList()) {
             commodityIDs.add(option.getAsString());
         }
 
@@ -152,11 +179,15 @@ class Ban extends GameStateSubcommand {
 
         for (String commodity : commodityIDs) {
             game.setStoredValue("bannedComms", game.getStoredValue("bannedComms") + "finSep" + commodity);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getFaction(commodity).getFactionName() + " commodities");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Successfully banned " + Mapper.getFaction(commodity).getFactionName() + " commodities.");
         }
 
         List<String> fleetIDs = new ArrayList<>();
-        for (OptionMapping option : event.getOptions().stream().filter(o -> o != null && o.getName().contains(Constants.BAN_FLEET)).toList()) {
+        for (OptionMapping option : event.getOptions().stream()
+                .filter(o -> o != null && o.getName().contains(Constants.BAN_FLEET))
+                .toList()) {
             fleetIDs.add(option.getAsString());
         }
 
@@ -165,11 +196,15 @@ class Ban extends GameStateSubcommand {
 
         for (String fleet : fleetIDs) {
             game.setStoredValue("bannedFleets", game.getStoredValue("bannedFleets") + "finSep" + fleet);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getFaction(fleet).getFactionName() + " starting fleet");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Successfully banned " + Mapper.getFaction(fleet).getFactionName() + " starting fleet.");
         }
 
         List<String> hsIDs = new ArrayList<>();
-        for (OptionMapping option : event.getOptions().stream().filter(o -> o != null && o.getName().contains(Constants.BAN_HS)).toList()) {
+        for (OptionMapping option : event.getOptions().stream()
+                .filter(o -> o != null && o.getName().contains(Constants.BAN_HS))
+                .toList()) {
             hsIDs.add(option.getAsString());
         }
 
@@ -178,11 +213,15 @@ class Ban extends GameStateSubcommand {
 
         for (String hs : hsIDs) {
             game.setStoredValue("bannedHSs", game.getStoredValue("bannedHSs") + "finSep" + hs);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getFaction(hs).getFactionName() + " home system");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Successfully banned " + Mapper.getFaction(hs).getFactionName() + " home system.");
         }
 
         List<String> startingTech = new ArrayList<>();
-        for (OptionMapping option : event.getOptions().stream().filter(o -> o != null && o.getName().contains(Constants.BAN_STARTING_TECH)).toList()) {
+        for (OptionMapping option : event.getOptions().stream()
+                .filter(o -> o != null && o.getName().contains(Constants.BAN_STARTING_TECH))
+                .toList()) {
             startingTech.add(option.getAsString());
         }
 
@@ -191,8 +230,9 @@ class Ban extends GameStateSubcommand {
 
         for (String fleet : startingTech) {
             game.setStoredValue("bannedStartingTechs", game.getStoredValue("bannedStartingTechs") + "finSep" + fleet);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getFaction(fleet).getFactionName() + " starting technology");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Successfully banned " + Mapper.getFaction(fleet).getFactionName() + " starting technology.");
         }
     }
-
 }

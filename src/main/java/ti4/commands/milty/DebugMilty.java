@@ -13,7 +13,7 @@ import ti4.service.milty.MiltyDraftManager;
 class DebugMilty extends GameStateSubcommand {
 
     public DebugMilty() {
-        super( "debug", "Debug Milty Draft", false, false);
+        super("debug", "Debug Milty Draft", false, false);
     }
 
     @Override
@@ -24,13 +24,15 @@ class DebugMilty extends GameStateSubcommand {
         if (channel instanceof ThreadChannel thread) {
             postInfoInThread(game, thread);
         } else if (channel instanceof TextChannel textChannel) {
-            textChannel.createThreadChannel(game.getName() + "-milty-debug-info").queue(t -> postInfoInThread(game, t));
+            textChannel
+                    .createThreadChannel(game.getName() + "-milty-debug-info")
+                    .queue(t -> postInfoInThread(game, t));
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not send debug info");
         }
     }
 
-    public static void postInfoInThread(Game game, ThreadChannel thread) {
+    private static void postInfoInThread(Game game, ThreadChannel thread) {
         MiltySettings menu = game.getMiltySettingsUnsafe();
         MiltyDraftManager manager = game.getMiltyDraftManager();
 

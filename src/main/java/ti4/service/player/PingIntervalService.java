@@ -9,13 +9,13 @@ import ti4.settings.users.UserSettingsManager;
 @UtilityClass
 public class PingIntervalService {
 
-    public static void set(GenericInteractionCreateEvent event, UserSettings settings, int pingInterval) {
+    private static void set(GenericInteractionCreateEvent event, UserSettings settings, int pingInterval) {
         if (pingInterval < 0) {
             pingInterval = 0;
         }
         settings.setPersonalPingInterval(pingInterval);
         UserSettingsManager.save(settings);
-        
+
         if (event == null) {
             return;
         }

@@ -3,7 +3,6 @@ package ti4.commands.status;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -32,18 +31,17 @@ class SCTradeGoods extends GameStateSubcommand {
             if (scOption == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify a strategy card.");
                 return;
-
             }
             if (tgOption == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify trade good count.");
                 return;
-
             }
             int sc = scOption.getAsInt();
             int tg = tgOption.getAsInt();
-            Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
-            if (!scTradeGoods.containsKey(sc)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy card must be from possible ones in game.");
+            Map<Integer, Integer> strategyCardToTradeGoodCount = game.getScTradeGoods();
+            if (!strategyCardToTradeGoodCount.containsKey(sc)) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), "Strategy card must be from possible ones in game.");
                 return;
             }
             Set<Integer> scPicked = new HashSet<>();
@@ -51,21 +49,23 @@ class SCTradeGoods extends GameStateSubcommand {
                 scPicked.addAll(player_.getSCs());
             }
             if (scPicked.contains(sc)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy card is already picked, can't add trade goods.");
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), "Strategy card is already picked, can't add trade goods.");
                 return;
             }
             game.setScTradeGood(sc, tg);
             return;
         }
 
-        Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
+        Map<Integer, Integer> strategyCardToTradeGoodCount = game.getScTradeGoods();
         Set<Integer> scPicked = new HashSet<>();
         for (Player player_ : game.getPlayers().values()) {
             scPicked.addAll(player_.getSCs());
         }
-        for (Integer scNumber : scTradeGoods.keySet()) {
+        for (Map.Entry<Integer, Integer> entry : strategyCardToTradeGoodCount.entrySet()) {
+            Integer scNumber = entry.getKey();
             if (!scPicked.contains(scNumber)) {
-                Integer tgCount = scTradeGoods.get(scNumber);
+                Integer tgCount = entry.getValue();
                 tgCount = tgCount == null ? 1 : tgCount + 1;
                 game.setScTradeGood(scNumber, tgCount);
             }

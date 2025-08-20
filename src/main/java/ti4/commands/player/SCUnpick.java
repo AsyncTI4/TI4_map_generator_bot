@@ -2,7 +2,6 @@ package ti4.commands.player;
 
 import java.util.Collection;
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -20,8 +19,11 @@ class SCUnpick extends GameStateSubcommand {
 
     public SCUnpick() {
         super(Constants.SC_UNPICK, "Unpick a Strategy Card", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color returning strategy card").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number")
+                .setRequired(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color returning strategy card")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -30,8 +32,10 @@ class SCUnpick extends GameStateSubcommand {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
 
         Collection<Player> activePlayers = game.getPlayers().values().stream()
-            .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !"null".equals(player_.getColor()))
-            .toList();
+                .filter(player_ -> player_.getFaction() != null
+                        && !player_.getFaction().isEmpty()
+                        && !"null".equals(player_.getColor()))
+                .toList();
         int maxSCsPerPlayer = game.getSCList().size() / activePlayers.size();
 
         OptionMapping option = event.getOption(Constants.STRATEGY_CARD);
@@ -42,11 +46,7 @@ class SCUnpick extends GameStateSubcommand {
         List<Button> scButtons = Helper.getRemainingSCButtons(game, player);
         game.updateActivePlayer(player);
         game.setPhaseOfGame("strategy");
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation()+" pick an SC please", scButtons);
-        
-
-        
-
-       
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(), player.getRepresentation() + " pick an SC please", scButtons);
     }
 }

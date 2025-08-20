@@ -14,7 +14,8 @@ class PutEventBottom extends GameStateSubcommand {
 
     public PutEventBottom() {
         super(Constants.PUT_BOTTOM, "Put event on the bottom of the deck", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.EVENT_ID, "Event ID, which is found between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.EVENT_ID, "Event ID, which is found between ()")
+                .setRequired(true));
     }
 
     @Override
@@ -25,7 +26,7 @@ class PutEventBottom extends GameStateSubcommand {
         putBottom(numericalID, game, player);
     }
 
-    public void putBottom(int eventID, Game game, Player player) {
+    private void putBottom(int eventID, Game game, Player player) {
         boolean success = game.putEventBottom(eventID, player);
         if (success) {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Event put on bottom of deck.");

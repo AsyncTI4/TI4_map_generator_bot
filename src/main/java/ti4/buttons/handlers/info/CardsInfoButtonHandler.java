@@ -13,9 +13,14 @@ class CardsInfoButtonHandler {
 
     @ButtonHandler(value = "cardsInfo", save = false)
     public static void sendCardsInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        ThreadChannel channel = player.getCardsInfoThread();
-        if (channel != null && !game.isFowMode()) {
-            channel.getManager().setArchived(true).complete(); // archiving it to combat a common bug that is solved via archiving
+        if (player == null) {
+            return;
+        }
+        if (!game.isFowMode()) {
+            ThreadChannel channel = player.getCardsInfoThread();
+            channel.getManager()
+                    .setArchived(true)
+                    .queue(); // archiving it to combat a common bug that is solved via archiving
         }
         CardsInfoService.sendCardsInfo(game, player, event);
     }

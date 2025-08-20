@@ -1,12 +1,11 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
@@ -88,11 +87,11 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
 
     public boolean isValid() {
         return alias != null
-            && name != null
-            && type != null
-            && description != null
-            && cardIDs != null
-            && source != null;
+                && name != null
+                && type != null
+                && description != null
+                && cardIDs != null
+                && source != null;
     }
 
     public String getAlias() {
@@ -133,13 +132,12 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed() {
         EmbedBuilder eb = new EmbedBuilder();
 
-        //TITLE
-        String title = getTypeEmoji() +
-            "__**" + getName() + "**__";
+        // TITLE
+        String title = getTypeEmoji() + "__**" + name + "**__";
         eb.setTitle(title);
 
-        //DESCRIPTION
-        eb.setDescription(getDescription());
+        // DESCRIPTION
+        eb.setDescription(description);
 
         // // FIELDS
         // String cardList = getNewDeck().stream().collect(Collectors.joining("\n"));
@@ -158,8 +156,8 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
         //     }
         // }
 
-        //FOOTER
-        eb.setFooter("ID: " + getAlias());
+        // FOOTER
+        eb.setFooter("ID: " + alias);
 
         eb.setColor(Color.BLACK);
         return eb.build();
@@ -167,12 +165,16 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public boolean search(String searchString) {
-        return getAlias().contains(searchString) || getName().contains(searchString) || getType().toString().contains(searchString) || getDescription().contains(searchString);
+        return alias.contains(searchString)
+                || name.contains(searchString)
+                || type.toString().contains(searchString)
+                || description.contains(searchString);
     }
 
     @Override
     public String getAutoCompleteName() {
-        return StringUtils.left(StringUtils.substringBefore("[" + getType() + "] " + getName() + " --> " + getDescription(), "\n"), 100);
+        return StringUtils.left(
+                StringUtils.substringBefore("[" + type + "] " + name + " --> " + description, "\n"), 100);
     }
 
     public ComponentSource getSource() {
@@ -180,7 +182,7 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
     }
 
     private String getTypeEmoji() {
-        return switch (getType()) {
+        return switch (type) {
             case TECHNOLOGY -> TechEmojis.NonUnitTechSkip.toString();
             case AGENDA -> CardEmojis.Agenda.toString();
             case ACTION_CARD -> CardEmojis.ActionCard.toString();
@@ -188,7 +190,11 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
             case PUBLIC_STAGE_2_OBJECTIVE -> CardEmojis.Public2.toString();
             case SECRET_OBJECTIVE -> CardEmojis.SecretObjective.toString();
             case RELIC -> CardEmojis.RelicCard.toString();
-            case EXPLORE -> CardEmojis.FrontierCard.toString() + CardEmojis.CulturalCard + CardEmojis.IndustrialCard + CardEmojis.HazardousCard;
+            case EXPLORE ->
+                CardEmojis.FrontierCard.toString()
+                        + CardEmojis.CulturalCard
+                        + CardEmojis.IndustrialCard
+                        + CardEmojis.HazardousCard;
             default -> "";
         };
     }

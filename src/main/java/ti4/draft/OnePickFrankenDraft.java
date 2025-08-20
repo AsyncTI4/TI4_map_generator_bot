@@ -10,12 +10,12 @@ public class OnePickFrankenDraft extends FrankenDraft {
 
     @Override
     public int getPicksFromFirstBag() {
-      return 1;
+        return 1;
     }
 
     @Override
     public int getPicksFromNextBags() {
-      return 1;
+        return 1;
     }
 
     @Override

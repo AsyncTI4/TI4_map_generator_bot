@@ -14,9 +14,16 @@ class ClearDebt extends GameStateSubcommand {
 
     public ClearDebt() {
         super(Constants.CLEAR_DEBT, "Clear debt tokens (control token) for player/faction", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of tokens to clear").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color having their debt cleared ").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color clearing the debt").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of tokens to clear")
+                .setRequired(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.TARGET_FACTION_OR_COLOR,
+                        "Faction or Color having their debt cleared ")
+                .setAutoComplete(true)
+                .setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color clearing the debt")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -41,6 +48,9 @@ class ClearDebt extends GameStateSubcommand {
         }
 
         clearingPlayer.clearDebt(clearedPlayer, debtCountToClear);
-        MessageHelper.sendMessageToEventChannel(event, clearingPlayer.getRepresentation() + " cleared " + debtCountToClear + " debt tokens owned by " + clearedPlayer.getRepresentation());
+        MessageHelper.sendMessageToEventChannel(
+                event,
+                clearingPlayer.getRepresentation() + " cleared " + debtCountToClear + " debt tokens owned by "
+                        + clearedPlayer.getRepresentation());
     }
 }

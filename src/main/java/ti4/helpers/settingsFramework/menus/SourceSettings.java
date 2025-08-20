@@ -1,12 +1,11 @@
 package ti4.helpers.settingsFramework.menus;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -19,8 +18,9 @@ import ti4.service.emoji.SourceEmojis;
 
 // This is a sub-menu
 @Getter
-@JsonIgnoreProperties({ "messageId" })
+@JsonIgnoreProperties("messageId")
 public class SourceSettings extends SettingsMenu {
+    private static final Pattern TOG = Pattern.compile("tog");
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -39,7 +39,11 @@ public class SourceSettings extends SettingsMenu {
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
     public SourceSettings(Game game, JsonNode json, SettingsMenu parent) {
-        super("source", "Expansions and Homebrew", "Adjust various settings related to expansions and homebrew that you wish to use", parent);
+        super(
+                "source",
+                "Expansions and Homebrew",
+                "Adjust various settings related to expansions and homebrew that you wish to use",
+                parent);
 
         // Initialize Settings to default values
         base = new BooleanSetting("BaseGame", "Base Game", true);
@@ -48,7 +52,10 @@ public class SourceSettings extends SettingsMenu {
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
         absol = new BooleanSetting("Absol", "Absol Mod", game.isAbsolMode());
-        ignis = new BooleanSetting("Ignis", "Ignis Aurora Mod", game.getTechnologyDeckID().toLowerCase().contains("baldrick"));
+        ignis = new BooleanSetting(
+                "Ignis",
+                "Ignis Aurora Mod",
+                game.getTechnologyDeckID().toLowerCase().contains("baldrick"));
         // miltymod = new BooleanSetting("MiltyMod", "Milty Mod", game.isMiltyModMode());
         eronous = new BooleanSetting("Eronous", "Eronous Tiles", false);
         // cryypter = new BooleanSetting("Cryypter", "Voices of the Council", false);
@@ -64,7 +71,8 @@ public class SourceSettings extends SettingsMenu {
         eronous.setEmoji(SourceEmojis.Eronous);
 
         // Other Initialization
-        // miltymod.setExtraInfo("NOTE: this is NOT \"milty draft\", this is a homebrew mod that replaces components in the game");
+        // miltymod.setExtraInfo("NOTE: this is NOT \"milty draft\", this is a homebrew mod that replaces components in
+        // the game");
 
         // Get the correct JSON node for initialization if applicable.
         // Add additional names here to support new generated JSON as needed.
@@ -72,7 +80,9 @@ public class SourceSettings extends SettingsMenu {
 
         // Verify this is the correct JSON node and continue initialization
         List<String> historicIDs = new ArrayList<>(List.of("source"));
-        if (json != null && json.has("menuId") && historicIDs.contains(json.get("menuId").asText(""))) {
+        if (json != null
+                && json.has("menuId")
+                && historicIDs.contains(json.get("menuId").asText(""))) {
             base.initialize(json.get("base"));
             pok.initialize(json.get("pok"));
             codexes.initialize(json.get("codexes"));
@@ -100,7 +110,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(unchartedSpace);
         ls.add(absol);
         ls.add(ignis);
-        //ls.add(miltymod);
+        // ls.add(miltymod);
         ls.add(eronous);
         // ls.add(cryypter);
         return ls;
@@ -109,7 +119,7 @@ public class SourceSettings extends SettingsMenu {
     @Override
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
         if (action.startsWith("tog") && event instanceof ButtonInteractionEvent bEvent) {
-            String setting = action.replaceFirst("tog", "");
+            String setting = TOG.matcher(action).replaceFirst("");
             afterChangeSources(bEvent, setting);
         }
         return null;
@@ -123,12 +133,14 @@ public class SourceSettings extends SettingsMenu {
         List<ComponentSource> sources = new ArrayList<>();
         if (base.isVal()) sources.add(ComponentSource.base);
         if (pok.isVal()) sources.add(ComponentSource.pok);
-        if (codexes.isVal()) sources.addAll(List.of(ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
+        if (codexes.isVal())
+            sources.addAll(List.of(
+                    ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
         if (unchartedSpace.isVal() || discoStars.isVal()) sources.add(ComponentSource.uncharted_space);
         if (absol.isVal()) sources.add(ComponentSource.absol);
-        //if (miltymod.isVal()) sources.add(ComponentSource.miltymod);
+        // if (miltymod.isVal()) sources.add(ComponentSource.miltymod);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
-        //if (cryypter.isVal()) sources.add(ComponentSource.cryypter);
+        // if (cryypter.isVal()) sources.add(ComponentSource.cryypter);
         return sources;
     }
 
@@ -137,13 +149,15 @@ public class SourceSettings extends SettingsMenu {
         List<ComponentSource> sources = new ArrayList<>();
         if (base.isVal()) sources.add(ComponentSource.base);
         if (pok.isVal()) sources.add(ComponentSource.pok);
-        if (codexes.isVal()) sources.addAll(List.of(ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
+        if (codexes.isVal())
+            sources.addAll(List.of(
+                    ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
         if (discoStars.isVal()) sources.add(ComponentSource.ds);
         if (absol.isVal()) sources.add(ComponentSource.absol);
-        //if (miltymod.isVal()) sources.add(ComponentSource.miltymod);
+        // if (miltymod.isVal()) sources.add(ComponentSource.miltymod);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
         if (ignis.isVal()) sources.add(ComponentSource.ignis_aurora);
-        //if (cryypter.isVal()) sources.add(ComponentSource.cryypter);
+        // if (cryypter.isVal()) sources.add(ComponentSource.cryypter);
         return sources;
     }
 
@@ -160,17 +174,24 @@ public class SourceSettings extends SettingsMenu {
             case "PoK" -> {
                 game.setBaseGameMode(!pok.isVal());
                 event.getHook()
-                    .sendMessage("This setting doesn't fully change the decks, please resolve manually after starting the draft if you actually want to play base game mode. You can ping Bothelper for assistance.")
-                    .setEphemeral(true).queue();
+                        .sendMessage(
+                                "This setting doesn't fully change the decks, please resolve manually after starting the draft if you actually want to play base game mode. You can ping Bothelper for assistance.")
+                        .setEphemeral(true)
+                        .queue();
             }
-            case "Codexes" -> event.getHook()
-                .sendMessage("This setting doesn't really do much. It only disables Keleres.")
-                .setEphemeral(true).queue();
-            case "DiscoStars" -> event.getHook()
-                .sendMessage("This setting only controls factions. If you want technologies, relics, explores, etc, you need to also enable **__Uncharted Space__**.")
-                .setEphemeral(true).queue();
+            case "Codexes" ->
+                event.getHook()
+                        .sendMessage("This setting doesn't really do much. It only disables Keleres.")
+                        .setEphemeral(true)
+                        .queue();
+            case "DiscoStars" ->
+                event.getHook()
+                        .sendMessage(
+                                "This setting only controls factions. If you want technologies, relics, explores, etc, you need to also enable **__Uncharted Space__**.")
+                        .setEphemeral(true)
+                        .queue();
             case "Ignis" -> {
-                boolean ignis = getIgnis().isVal();
+                boolean ignis = this.ignis.isVal();
 
                 // Decks with both
                 String relic = ignis ? "relics_baldrick" : "relics_pok";
@@ -190,11 +211,14 @@ public class SourceSettings extends SettingsMenu {
 
                 String absolDS = "Reset your decks to include all of the Ignis cards.";
                 String pokStr = "Reset your decks to include only PoK cards.";
-                event.getHook().sendMessage((ignis) ? absolDS : pokStr).setEphemeral(true).queue();
+                event.getHook()
+                        .sendMessage((ignis) ? absolDS : pokStr)
+                        .setEphemeral(true)
+                        .queue();
             }
             case "UnchartSpace", "Absol" -> {
-                boolean abs = getAbsol().isVal();
-                boolean ds = getUnchartedSpace().isVal();
+                boolean abs = absol.isVal();
+                boolean ds = unchartedSpace.isVal();
                 boolean both = abs && ds;
 
                 // Decks with both
@@ -215,12 +239,15 @@ public class SourceSettings extends SettingsMenu {
                 decks.getExplores().setChosenKey(explore);
                 decks.getActionCards().setChosenKey(acs);
 
-                String absolDS = "Reset your decks to include all of the " + (abs ? "Absol Mod" : "") + (both ? " and " : "") + (ds ? "Uncharted Space" : "") + " cards.";
+                String absolDS = "Reset your decks to include all of the " + (abs ? "Absol Mod" : "")
+                        + (both ? " and " : "") + (ds ? "Uncharted Space" : "") + " cards.";
                 String pokStr = "Reset your decks to include only PoK cards.";
-                event.getHook().sendMessage((abs || ds) ? absolDS : pokStr).setEphemeral(true).queue();
+                event.getHook()
+                        .sendMessage((abs || ds) ? absolDS : pokStr)
+                        .setEphemeral(true)
+                        .queue();
             }
-            case "Eronous" -> {
-            }
+            case "Eronous" -> {}
         }
     }
 }

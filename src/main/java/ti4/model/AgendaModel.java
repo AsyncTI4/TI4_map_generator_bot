@@ -5,12 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.jetbrains.annotations.Nullable;
-
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
@@ -34,12 +32,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
-        return alias != null
-            && name != null
-            && validateCategory()
-            && type != null
-            && text1 != null
-            && source != null;
+        return alias != null && name != null && validateCategory() && type != null && text1 != null && source != null;
     }
 
     private boolean validateCategory() {
@@ -48,7 +41,8 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
                 return Mapper.isValidFaction(getCategoryDescription());
             }
             case "event" -> {
-                return Stream.of("immediate", "permanent", "temporary").anyMatch(s -> s.equalsIgnoreCase(getCategoryDescription()));
+                return Stream.of("immediate", "permanent", "temporary")
+                        .anyMatch(s -> s.equalsIgnoreCase(getCategoryDescription()));
             }
             default -> {
                 return true;
@@ -64,11 +58,11 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         return name;
     }
 
-    public String getCategory() {
+    private String getCategory() {
         return Optional.ofNullable(category).orElse("");
     }
 
-    public String getCategoryDescription() {
+    private String getCategoryDescription() {
         return Optional.ofNullable(categoryDescription).orElse("");
     }
 
@@ -102,10 +96,14 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
 
     public String footnote() {
         return switch (alias) {
-            case "mutiny" -> "Use this command to add the objective: `/status po_add_custom public_name:Mutiny public_vp_worth:1`\n";
-            case "seed_empire" -> "Use this command to add the objective: `/status po_add_custom public_name:Seed of an Empire public_vp_worth:1`\n";
-            case "censure" -> "Use this command to add the objective: `/status po_add_custom public_name:Political Censure public_vp_worth:1`\n";
-            case Constants.VOICE_OF_THE_COUNCIL_ID -> "Use this command to change the electee: `/omegaphase elect_voice_of_the_council`\n";
+            case "mutiny" ->
+                "Use this command to add the objective: `/status po_add_custom public_name:Mutiny public_vp_worth:1`\n";
+            case "seed_empire" ->
+                "Use this command to add the objective: `/status po_add_custom public_name:Seed of an Empire public_vp_worth:1`\n";
+            case "censure" ->
+                "Use this command to add the objective: `/status po_add_custom public_name:Political Censure public_vp_worth:1`\n";
+            case Constants.VOICE_OF_THE_COUNCIL_ID ->
+                "Use this command to change the electee: `/omegaphase elect_voice_of_the_council`\n";
             default -> null;
         };
     }
@@ -118,7 +116,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
             sb.append("(").append(uniqueID).append(") - ");
         }
         sb.append(name).append("__** ");
-        sb.append(getSource().emoji());
+        sb.append(source.emoji());
         sb.append("\n");
 
         sb.append("> **").append(type).append(":** *").append(target).append("*\n");
@@ -145,8 +143,8 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
 
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
-        String name = getName() == null ? "" : getName();
-        eb.setTitle(CardEmojis.Agenda + "__" + name + "__" + getSource().emoji(), null);
+        String name = this.name == null ? "" : this.name;
+        eb.setTitle(CardEmojis.Agenda + "__" + name + "__" + source.emoji(), null);
         eb.setColor(Color.blue);
 
         // DESCRIPTION
@@ -161,7 +159,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         }
         eb.setDescription(text.toString());
 
-        if (includeID) eb.setFooter("ID: " + getAlias() + "  Source: " + getSource());
+        if (includeID) eb.setFooter("ID: " + alias + "  Source: " + source);
         return eb.build();
     }
 
@@ -177,10 +175,12 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+        return alias.toLowerCase().contains(searchString)
+                || name.toLowerCase().contains(searchString)
+                || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return getName() + " [" + getSource() + "]";
+        return name + " [" + source + "]";
     }
 }

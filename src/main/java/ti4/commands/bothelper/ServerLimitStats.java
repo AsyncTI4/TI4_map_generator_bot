@@ -2,7 +2,6 @@ package ti4.commands.bothelper;
 
 import java.text.NumberFormat;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -27,33 +26,49 @@ class ServerLimitStats extends Subcommand {
         int roomForGames;
         int memberMax = guild.getMaxMembers();
         int boostCount = guild.getBoostCount();
-        int roleCount = guild.getRoles().size(); //250
+        int roleCount = guild.getRoles().size(); // 250
         roomForGames = 250 - roleCount;
 
-        //CHANNELS
+        // CHANNELS
         List<GuildChannel> channels = guild.getChannels();
-        int channelCount = channels.size(); //500
+        int channelCount = channels.size(); // 500
         roomForGames = Math.min(roomForGames, (500 - channelCount) / (!isFoWGuild ? 2 : 10));
-        long pbdChannelCount = channels.stream().filter(c -> c.getName().startsWith(!isFoWGuild ? "pbd" : "fow")).count();
-        long categoryChannelCount = channels.stream().filter(c -> c.getType() == ChannelType.CATEGORY).count();
+        long pbdChannelCount = channels.stream()
+                .filter(c -> c.getName().startsWith(!isFoWGuild ? "pbd" : "fow"))
+                .count();
+        long categoryChannelCount = channels.stream()
+                .filter(c -> c.getType() == ChannelType.CATEGORY)
+                .count();
 
-        //THREADS
-        List<ThreadChannel> threadChannels = guild.getThreadChannels().stream().filter(c -> !c.isArchived()).toList();
-        int threadCount = threadChannels.size(); //1000
-        List<ThreadChannel> threadChannelsArchived = guild.getThreadChannels().stream().filter(ThreadChannel::isArchived).toList();
+        // THREADS
+        List<ThreadChannel> threadChannels =
+                guild.getThreadChannels().stream().filter(c -> !c.isArchived()).toList();
+        int threadCount = threadChannels.size(); // 1000
+        List<ThreadChannel> threadChannelsArchived = guild.getThreadChannels().stream()
+                .filter(ThreadChannel::isArchived)
+                .toList();
         int threadArchivedCount = threadChannelsArchived.size();
-        long cardsInfoThreadCount = threadChannels.stream().filter(t -> !isFoWGuild 
-            ? t.getName().startsWith(Constants.CARDS_INFO_THREAD_PREFIX) 
-            : t.getName().contains("-cards-info")).count();
-        long botThreadCount = threadChannels.stream().filter(t -> t.getName().contains("-bot-map-updates")).count();
-        long roundThreadCount = threadChannels.stream().filter(t -> t.getName().contains("-round-")).count();
-        long privateThreadCount = threadChannels.stream().filter(t -> !t.isPublic()).count();
-        long publicThreadCount = threadChannels.stream().filter(ThreadChannel::isPublic).count();
+        long cardsInfoThreadCount = threadChannels.stream()
+                .filter(t -> !isFoWGuild
+                        ? t.getName().startsWith(Constants.CARDS_INFO_THREAD_PREFIX)
+                        : t.getName().contains("-cards-info"))
+                .count();
+        long botThreadCount = threadChannels.stream()
+                .filter(t -> t.getName().contains("-bot-map-updates"))
+                .count();
+        long roundThreadCount = threadChannels.stream()
+                .filter(t -> t.getName().contains("-round-"))
+                .count();
+        long privateThreadCount =
+                threadChannels.stream().filter(t -> !t.isPublic()).count();
+        long publicThreadCount =
+                threadChannels.stream().filter(ThreadChannel::isPublic).count();
 
         int emojiCount = guild.getEmojis().size();
         int emojiMax = guild.getMaxEmojis();
 
-        String sb = """
+        String sb =
+                """
             ## Server Limit Statistics:
             ### Server: %s
             - %d / %d%s - members
@@ -73,23 +88,39 @@ class ServerLimitStats extends Subcommand {
             - %d   %s  public threads
               - %d   %s  '-bot-map-updates' threads
               - %d   %s  '-round-' threads (/sc play and combat)
-            """.formatted(
-            guild.getName(),
-            memberCount, memberMax, getPercentage(memberCount, memberMax),
-            boostCount,
-            emojiCount, emojiMax, getPercentage(emojiCount, emojiMax),
-            roleCount, getPercentage(roleCount, 250),
-            roomForGames,
-            channelCount, getPercentage(channelCount, 500),
-            categoryChannelCount, getPercentage(categoryChannelCount, channelCount),
-            pbdChannelCount, getPercentage(pbdChannelCount, channelCount), (!isFoWGuild ? "pdb" : "fow"),
-            threadCount, getPercentage(threadCount, 1000),
-            threadArchivedCount,
-            privateThreadCount, getPercentage(privateThreadCount, threadCount),
-            cardsInfoThreadCount, getPercentage(cardsInfoThreadCount, threadCount),
-            publicThreadCount, getPercentage(publicThreadCount, threadCount),
-            botThreadCount, getPercentage(botThreadCount, threadCount),
-            roundThreadCount, getPercentage(roundThreadCount, threadCount));
+            """
+                        .formatted(
+                                guild.getName(),
+                                memberCount,
+                                memberMax,
+                                getPercentage(memberCount, memberMax),
+                                boostCount,
+                                emojiCount,
+                                emojiMax,
+                                getPercentage(emojiCount, emojiMax),
+                                roleCount,
+                                getPercentage(roleCount, 250),
+                                roomForGames,
+                                channelCount,
+                                getPercentage(channelCount, 500),
+                                categoryChannelCount,
+                                getPercentage(categoryChannelCount, channelCount),
+                                pbdChannelCount,
+                                getPercentage(pbdChannelCount, channelCount),
+                                (!isFoWGuild ? "pdb" : "fow"),
+                                threadCount,
+                                getPercentage(threadCount, 1000),
+                                threadArchivedCount,
+                                privateThreadCount,
+                                getPercentage(privateThreadCount, threadCount),
+                                cardsInfoThreadCount,
+                                getPercentage(cardsInfoThreadCount, threadCount),
+                                publicThreadCount,
+                                getPercentage(publicThreadCount, threadCount),
+                                botThreadCount,
+                                getPercentage(botThreadCount, threadCount),
+                                roundThreadCount,
+                                getPercentage(roundThreadCount, threadCount));
         MessageHelper.sendMessageToEventChannel(event, sb);
     }
 

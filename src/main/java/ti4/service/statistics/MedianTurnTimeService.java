@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -15,9 +14,9 @@ import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.GamesPage;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
+import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -35,12 +34,13 @@ public class MedianTurnTimeService {
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
         GamesPage.consumeAllGames(
-            endedGamesFilter,
-            game -> getMedianTurnTimeForGame(game, playerTurnCount, playerAverageTurnTimes));
+                endedGamesFilter, game -> getMedianTurnTimeForGame(game, playerTurnCount, playerAverageTurnTimes));
 
         Map<String, Long> playerMedianTurnTimes = playerAverageTurnTimes.entrySet().stream()
-            .map(e -> Map.entry(e.getKey(), Helper.median(e.getValue().stream().sorted().toList())))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldEntry, newEntry) -> oldEntry, HashMap::new));
+                .map(e -> Map.entry(
+                        e.getKey(), Helper.median(e.getValue().stream().sorted().toList())))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey, Map.Entry::getValue, (oldEntry, newEntry) -> oldEntry, HashMap::new));
 
         StringBuilder sb = new StringBuilder("## __**Median Turn Time:**__\n");
 
@@ -49,10 +49,10 @@ public class MedianTurnTimeService {
 
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
         List<Map.Entry<String, Long>> medianTurnTimes = playerMedianTurnTimes.entrySet().stream()
-            .filter(o -> o.getValue() != 0 && playerTurnCount.get(o.getKey()) >= minimumTurnsToShow)
-            .sorted(Map.Entry.comparingByValue())
-            .limit(topLimit)
-            .toList();
+                .filter(o -> o.getValue() != 0 && playerTurnCount.get(o.getKey()) >= minimumTurnsToShow)
+                .sorted(Map.Entry.comparingByValue())
+                .limit(topLimit)
+                .toList();
 
         for (var userMedianTurnTime : medianTurnTimes) {
             var user = GameManager.getManagedPlayer(userMedianTurnTime.getKey());
@@ -73,9 +73,7 @@ public class MedianTurnTimeService {
     }
 
     private static void getMedianTurnTimeForGame(
-        Game game, Map<String, Integer> playerTurnCount,
-        Map<String, Set<Long>> playerAverageTurnTimes
-    ) {
+            Game game, Map<String, Integer> playerTurnCount, Map<String, Set<Long>> playerAverageTurnTimes) {
         for (Player player : game.getRealPlayers()) {
             int totalTurns = player.getNumberOfTurns();
             long totalTurnTime = player.getTotalTurnTime();

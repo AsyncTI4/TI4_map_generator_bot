@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -30,29 +29,28 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public boolean isValid() {
-        return id != null
-            && name != null
-            && faction != null
-            && source != null;
+        return id != null && name != null && faction != null && source != null;
     }
 
     @Override
     public String getAlias() {
-        return getId();
+        return id;
     }
 
     public String getShortName() {
         if (getHomebrewReplacesID().isEmpty()) {
-            return Optional.ofNullable(shortName).orElse(getName());
+            return Optional.ofNullable(shortName).orElse(name);
         }
-        return Optional.ofNullable(shortName).orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShortName());
+        return Optional.ofNullable(shortName)
+                .orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShortName());
     }
 
     public boolean getShrinkName() {
         if (getHomebrewReplacesID().isEmpty()) {
             return Optional.ofNullable(shrinkName).orElse(false);
         }
-        return Optional.ofNullable(shrinkName).orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShrinkName());
+        return Optional.ofNullable(shrinkName)
+                .orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShrinkName());
     }
 
     public Optional<String> getPermanentEffect() {
@@ -78,19 +76,21 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        //TITLE
-        String title = getFactionEmoji() + " __**" + getName() + "**__" + getSource().emoji();
+        // TITLE
+        String title = getFactionEmoji() + " __**" + name + "**__" + source.emoji();
         eb.setTitle(title);
 
-        //DESCRIPTION
-        if (getPermanentEffect().isPresent()) eb.setDescription(getPermanentEffect().get());
+        // DESCRIPTION
+        if (getPermanentEffect().isPresent())
+            eb.setDescription(getPermanentEffect().get());
 
-        //FIELDS
-        if (getWindow().isPresent()) eb.addField(getWindow().get(), getWindowEffect().orElse(""), false);
+        // FIELDS
+        if (getWindow().isPresent())
+            eb.addField(getWindow().get(), getWindowEffect().orElse(""), false);
 
-        //FOOTER
+        // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
+        if (includeID) footer.append("ID: ").append(id).append("    Source: ").append(source);
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.black);
@@ -98,41 +98,43 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        return getFactionEmoji() + " " + getName() + " " + getSource().emoji();
+        return getFactionEmoji() + " " + name + " " + source.emoji();
     }
 
     public String getRepresentation() {
-        String abilityName = getName();
-        String abilitySourceFaction = getFaction();
+        String abilityName = name;
+        String abilitySourceFaction = faction;
         String abilityRawModifier = getPermanentEffect().orElse("");
         String abilityWindow = getWindow().orElse("");
         String abilityText = getWindowEffect().orElse("");
 
         StringBuilder sb = new StringBuilder();
-        sb.append(FactionEmojis.getFactionIcon(abilitySourceFaction)).append("__**").append(abilityName).append("**__");
+        sb.append(FactionEmojis.getFactionIcon(abilitySourceFaction))
+                .append("__**")
+                .append(abilityName)
+                .append("**__");
         if (!abilityRawModifier.isBlank()) sb.append(": ").append(abilityRawModifier);
-        if (!abilityWindow.isBlank() || !abilityText.isBlank()) sb.append("\n> *").append(abilityWindow).append("*:\n> ").append(abilityText);
+        if (!abilityWindow.isBlank() || !abilityText.isBlank())
+            sb.append("\n> *").append(abilityWindow).append("*:\n> ").append(abilityText);
 
         return sb.toString();
     }
 
     @Override
     public boolean search(String searchString) {
-        return getId().contains(searchString)
-            || getName().toLowerCase().contains(searchString)
-            || getFaction().toLowerCase().contains(searchString)
-            || getSource().toString().toLowerCase().contains(searchString)
-            || getSearchTags().contains(searchString);
+        return id.contains(searchString)
+                || name.toLowerCase().contains(searchString)
+                || faction.toLowerCase().contains(searchString)
+                || source.toString().toLowerCase().contains(searchString)
+                || searchTags.contains(searchString);
     }
 
     @Override
     public String getAutoCompleteName() {
-        return getName() +
-            " (" + getFaction() + ")" +
-            " [" + getSource() + "]";
+        return name + " (" + faction + ")" + " [" + source + "]";
     }
 
     public TI4Emoji getFactionEmoji() {
-        return FactionEmojis.getFactionIcon(getFaction());
+        return FactionEmojis.getFactionIcon(faction);
     }
 }

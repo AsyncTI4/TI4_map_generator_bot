@@ -12,7 +12,6 @@ class ATS extends GameStateSubcommand {
     public ATS() {
         super(Constants.LANEFIR_ATS_COUNT, "Set commodity count on the ATS Armaments technology", true, true);
         addOptions(new OptionData(OptionType.INTEGER, "count", "Count").setRequired(true));
-
     }
 
     @Override
@@ -21,6 +20,7 @@ class ATS extends GameStateSubcommand {
         if (count > 0) {
             getPlayer().setAtsCount(count);
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Set commodities count to " + count + " on _ATS Armaments_.");
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(), "Set commodities count to " + count + " on _ATS Armaments_.");
     }
 }

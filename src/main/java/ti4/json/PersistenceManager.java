@@ -1,21 +1,20 @@
 package ti4.json;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Storage;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class PersistenceManager {
 
-    public static final String PERSISTENCE_MANAGER_JSON_PATH = Storage.getStoragePath() + "/pm_json/";
+    private static final String PERSISTENCE_MANAGER_JSON_PATH = Storage.getStoragePath() + "/pm_json/";
     private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     public static void writeObjectToJsonFile(String fileName, Object object) throws IOException {
@@ -42,7 +41,8 @@ public class PersistenceManager {
         return readListFromJsonFile(PERSISTENCE_MANAGER_JSON_PATH, fileName, clazz);
     }
 
-    public static <T> List<T> readListFromJsonFile(String directory, String fileName, Class<T> clazz) throws IOException {
+    private static <T> List<T> readListFromJsonFile(String directory, String fileName, Class<T> clazz)
+            throws IOException {
         JavaType ref = objectMapper.getTypeFactory().constructParametricType(List.class, clazz);
         return readObjectFromJsonFile(directory, fileName, ref);
     }
@@ -84,5 +84,4 @@ public class PersistenceManager {
             BotLogger.error("Failed to delete file: " + file.getAbsolutePath());
         }
     }
-
 }

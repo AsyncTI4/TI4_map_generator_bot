@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -39,35 +38,38 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
     @Override
     public SecretObjectiveModel duplicateAndSetColor(ColorModel newColor) {
         SecretObjectiveModel so = new SecretObjectiveModel();
-        so.setAlias(this.alias.replace("<color>", newColor.getName()));
-        so.setName(this.name.replace("<color>", newColor.getDisplayName()));
-        so.setPhase(this.phase);
-        so.setText(this.text.replace("<color>", newColor.getName()));
-        so.setPoints(this.points);
-        so.setHomebrewReplacesID(this.homebrewReplacesID);
-        so.setImageURL(this.getImageURL());
-        so.setSource(this.source);
+        so.setAlias(alias.replace("<color>", newColor.getName()));
+        so.setName(name.replace("<color>", newColor.getDisplayName()));
+        so.setPhase(phase);
+        so.setText(text.replace("<color>", newColor.getName()));
+        so.setPoints(points);
+        so.setHomebrewReplacesID(homebrewReplacesID);
+        so.setImageURL(imageURL);
+        so.setSource(source);
         so.setSearchTags(new ArrayList<>(searchTags));
         so.setSourceModel(this);
         return so;
     }
 
     public boolean isValid() {
-        return alias != null
-            && name != null
-            && phase != null
-            && text != null
-            && points != 0
-            && source != null;
+        return alias != null && name != null && phase != null && text != null && points != 0 && source != null;
     }
 
     public static final Comparator<SecretObjectiveModel> sortByPointsAndName = (po1, po2) -> {
-        if (po1.getPoints() == po2.getPoints()) {
-            return po1.getName().compareTo(po2.getName());
+        if (po1.points == po2.points) {
+            return po1.name.compareTo(po2.name);
         } else {
-            return po1.getPoints() < po2.getPoints() ? -1 : 1;
+            return po1.points < po2.points ? -1 : 1;
         }
     };
+
+    public String getRepresentation() {
+        return getRepresentation(true);
+    }
+
+    public String getRepresentation(boolean vps) {
+        return CardEmojis.SecretObjective + "_" + name + "_ - " + text + (vps ? " (" + points + " VP)" : "");
+    }
 
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false);
@@ -76,35 +78,38 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        //TITLE
-        String title = CardEmojis.SecretObjective + "__**" + getName() + "**__" + getSource().emoji();
+        // TITLE
+        String title = CardEmojis.SecretObjective + "__**" + name + "**__" + source.emoji();
         eb.setTitle(title);
 
-        //DESCRIPTION
-        eb.setDescription(getText());
+        // DESCRIPTION
+        eb.setDescription(text);
 
-        //FOOTER
+        // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
+        if (includeID)
+            footer.append("ID: ").append(alias).append("    Source: ").append(source);
         eb.setFooter(footer.toString());
 
         eb.setColor(getEmbedColor());
         return eb.build();
     }
 
-    public Color getEmbedColor() {
-        return switch (getPoints()) {
+    private Color getEmbedColor() {
+        return switch (points) {
             case 2 -> Color.BLACK;
             default -> Color.RED;
         };
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+        return alias.toLowerCase().contains(searchString)
+                || name.toLowerCase().contains(searchString)
+                || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return getName() + " (" + getSource() + ")";
+        return name + " (" + source + ")";
     }
 
     public Optional<String> getHomebrewReplacesID() {

@@ -8,24 +8,26 @@ import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Storage;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class OldUndoFileCleanupCron {
 
     public static void register() {
-        CronManager.schedulePeriodicallyAtTime(OldUndoFileCleanupCron.class, OldUndoFileCleanupCron::cleanup, 3, 0, ZoneId.of("America/New_York"));
+        CronManager.schedulePeriodicallyAtTime(
+                OldUndoFileCleanupCron.class, OldUndoFileCleanupCron::cleanup, 3, 0, ZoneId.of("America/New_York"));
     }
 
     private static void cleanup() {
+        BotLogger.info("Running OldUndoFileCleanupCron");
         try {
             cleanupOldUndoFiles();
         } catch (Exception e) {
             BotLogger.error("**OldUndoFileCleanupCron failed.**", e);
         }
+        BotLogger.info("Finished OldUndoFileCleanupCron");
     }
 
     private static void cleanupOldUndoFiles() {
@@ -34,7 +36,8 @@ public class OldUndoFileCleanupCron {
         int count = 0;
 
         Path baseGameUndoDirectory = Storage.getBaseGameUndoDirectory();
-        try (DirectoryStream<Path> subdirectories = Files.newDirectoryStream(baseGameUndoDirectory, Files::isDirectory)) {
+        try (DirectoryStream<Path> subdirectories =
+                Files.newDirectoryStream(baseGameUndoDirectory, Files::isDirectory)) {
             for (Path subdirectory : subdirectories) {
                 count += deleteOldFilesInDirectory(subdirectory, cutoff);
             }
@@ -42,7 +45,9 @@ public class OldUndoFileCleanupCron {
             BotLogger.error("Error accessing directory: " + baseGameUndoDirectory, e);
         }
 
-        BotLogger.info(String.format("OldUndoFileCleanupCron: Cleaned up `%d` undo files that were over `%d` days old (%s)", count, daysOld, cutoff));
+        BotLogger.info(String.format(
+                "OldUndoFileCleanupCron: Cleaned up `%d` undo files that were over `%d` days old (%s)",
+                count, daysOld, cutoff));
     }
 
     private int deleteOldFilesInDirectory(Path directory, Instant cutoff) {

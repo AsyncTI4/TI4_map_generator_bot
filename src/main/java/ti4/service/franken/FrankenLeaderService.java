@@ -1,16 +1,19 @@
 package ti4.service.franken;
 
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.LeaderModel;
+import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.HeroUnlockCheckService;
 
 @UtilityClass
 public class FrankenLeaderService {
@@ -24,6 +27,12 @@ public class FrankenLeaderService {
         for (String leaderID : leaderIDs) {
             sb.append(getAddLeaderText(player, leaderID));
             player.addLeader(leaderID);
+            LeaderModel leaderModel = Mapper.getLeader(leaderID);
+            if ("commander".equals(leaderModel.getType())) {
+                CommanderUnlockCheckService.checkConditionsAndUnlock(player, leaderModel.getFaction());
+            } else if ("hero".equals(leaderModel.getType())) {
+                HeroUnlockCheckService.checkIfHeroUnlocked(player.getGame(), player);
+            }
             if (fakeCommanders != null && fakeCommanders) {
                 player.getGame().addFakeCommander(leaderID);
             }

@@ -1,10 +1,10 @@
 package ti4.service.milty;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
@@ -23,9 +23,9 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.message.MessageHelper.MessageFunction;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class DraftDisplayService {
@@ -34,7 +34,8 @@ public class DraftDisplayService {
     private static final String POSITION = "**__Speaker Order:__**";
     private static final String SUMMARY_START = "# **__Draft Picks So Far__**:";
 
-    public void updateDraftInformation(GenericInteractionCreateEvent event, MiltyDraftManager manager, Game game, String category) {
+    public void updateDraftInformation(
+            GenericInteractionCreateEvent event, MiltyDraftManager manager, Game game, String category) {
         MessageChannel channel = game.getMainGameChannel();
         if (channel == null) return;
 
@@ -54,7 +55,8 @@ public class DraftDisplayService {
         pingCurrentDraftPlayer(event, manager, game, true);
     }
 
-    public void pingCurrentDraftPlayer(GenericInteractionCreateEvent event, MiltyDraftManager manager, Game game, boolean clearOldButtons) {
+    public void pingCurrentDraftPlayer(
+            GenericInteractionCreateEvent event, MiltyDraftManager manager, Game game, boolean clearOldButtons) {
         String msg = "Nobody is up to draft...";
         Player p = manager.getCurrentDraftPlayer(game);
         if (p != null) msg = "### " + p.getPing() + " is up to draft!";
@@ -76,7 +78,8 @@ public class DraftDisplayService {
     // Private Helper Functions
     // -----------------------------------------------------------------------------------
 
-    private static MessageRetrieveAction getMessageHistory(GenericInteractionCreateEvent event, MessageChannel channel) {
+    private static MessageRetrieveAction getMessageHistory(
+            GenericInteractionCreateEvent event, MessageChannel channel) {
         if (event != null && event.getMessageChannel() == channel && event instanceof ButtonInteractionEvent bEvent) {
             return channel.getHistoryAround(bEvent.getMessage(), 10);
         }
@@ -90,12 +93,13 @@ public class DraftDisplayService {
             case "order" -> txt.equals(POSITION);
             default -> false;
         };
-        List<Button> categoryButtons = switch (category) {
-            case "slice" -> manager.getSliceButtons();
-            case "faction" -> manager.getFactionButtons();
-            case "order" -> manager.getPositionButtons();
-            default -> List.of();
-        };
+        List<Button> categoryButtons =
+                switch (category) {
+                    case "slice" -> manager.getSliceButtons();
+                    case "faction" -> manager.getFactionButtons();
+                    case "order" -> manager.getPositionButtons();
+                    default -> Collections.emptyList();
+                };
         String newSummary = manager.getOverallSummaryString(game);
         return hist -> {
             boolean summaryDone = false, categoryDone = false, sliceImgDone = false;
@@ -132,8 +136,7 @@ public class DraftDisplayService {
 
         if (newMessage != null && newButtons != null)
             msg.editMessage(newMessage).setComponents(newComponents).queue(Consumers.nop(), BotLogger::catchRestError);
-        else if (newMessage != null)
-            msg.editMessage(newMessage).queue(Consumers.nop(), BotLogger::catchRestError);
+        else if (newMessage != null) msg.editMessage(newMessage).queue(Consumers.nop(), BotLogger::catchRestError);
         else if (newButtons != null)
             msg.editMessageComponents(newComponents).queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -188,7 +191,8 @@ public class DraftDisplayService {
     }
 
     private MessageFunction clearOldPingsAndButtonsFunc(boolean clearFirstPing, boolean clearOldDraftInfo) {
-        return msg -> msg.getChannel().getHistoryBefore(msg, 100).queue(hist -> clearHistMessages(hist, clearFirstPing, clearOldDraftInfo), BotLogger::catchRestError);
+        return msg -> msg.getChannel()
+                .getHistoryBefore(msg, 100)
+                .queue(hist -> clearHistMessages(hist, clearFirstPing, clearOldDraftInfo), BotLogger::catchRestError);
     }
-
 }

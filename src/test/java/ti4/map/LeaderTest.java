@@ -1,52 +1,46 @@
 package ti4.map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import ti4.testUtils.BaseTi4Test;
 import ti4.testUtils.JsonValidator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class LeaderTest extends BaseTi4Test {
-    private final String expectedId = "testId";
-    private final String expectedType = "testType";
-    private final int expectedTgCount = 1;
-    private final boolean expectedExhausted = false;
-    private final boolean expectedLocked = true;
-    private final boolean expectedActive = false;
+class LeaderTest extends BaseTi4Test {
+    private static final String expectedId = "testId";
+    private static final String expectedType = "testType";
+    private static final int expectedTgCount = 1;
+    private static final boolean expectedExhausted = false;
+    private static final boolean expectedLocked = true;
+    private static final boolean expectedActive = false;
 
     private Leader buildLeader() {
         return new Leader(expectedId, expectedType, expectedTgCount, expectedExhausted, expectedLocked, expectedActive);
     }
 
     @Test
-    public void testLeaderHasNoUnexpectedProperties() throws Exception {
-        // Given        
+    void testLeaderHasNoUnexpectedProperties() throws Exception {
+        // Given
         Leader leader = buildLeader();
-        Set<String> knownJsonAttributes = new HashSet<>(Arrays.asList(
-            "id",
-            "type",
-            "tgCount",
-            "exhausted",
-            "locked",
-            "active"));
+        Set<String> knownJsonAttributes =
+                new HashSet<>(Arrays.asList("id", "type", "tgCount", "exhausted", "locked", "active"));
 
         // When
         JsonValidator.assertAvailableJsonAttributes(leader, knownJsonAttributes);
     }
 
     @Test
-    public void testLeaderIsJacksonSerializable() {
+    void testLeaderIsJacksonSerializable() {
         JsonValidator.assertIsJacksonSerializable(Leader.class);
     }
 
     @Test
-    public void testLeaderJsonSaveAndRestore() throws JsonProcessingException {
-        // Given        
+    void testLeaderJsonSaveAndRestore() throws JsonProcessingException {
+        // Given
         Leader leader = buildLeader();
 
         // When

@@ -1,10 +1,8 @@
 package ti4.commands.map;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
@@ -17,8 +15,18 @@ class RemoveBorderAnomaly extends GameStateSubcommand {
 
     public RemoveBorderAnomaly() {
         super(Constants.REMOVE_BORDER_ANOMALY, "Remove border anomalies", true, false);
-        addOption(OptionType.STRING, Constants.PRIMARY_TILE, "Tile the border is linked to or ALL to remove all border anomalies from the map", true, true);
-        addOption(OptionType.STRING, Constants.PRIMARY_TILE_DIRECTION, "Side of the system the anomaly is on", false, true);
+        addOption(
+                OptionType.STRING,
+                Constants.PRIMARY_TILE,
+                "Tile the border is linked to or ALL to remove all border anomalies from the map",
+                true,
+                true);
+        addOption(
+                OptionType.STRING,
+                Constants.PRIMARY_TILE_DIRECTION,
+                "Side of the system the anomaly is on",
+                false,
+                true);
     }
 
     @Override
@@ -26,7 +34,7 @@ class RemoveBorderAnomaly extends GameStateSubcommand {
         Game game = getGame();
 
         String tilesString = event.getOption(Constants.PRIMARY_TILE).getAsString();
-        Set<String> tiles = new HashSet<>();
+        Set<String> tiles;
         if (Constants.ALL.equals(tilesString)) {
             tiles = game.getTileMap().values().stream().map(Tile::getTileID).collect(Collectors.toSet());
         } else {
@@ -36,7 +44,7 @@ class RemoveBorderAnomaly extends GameStateSubcommand {
         Set<Integer> directions = AddBorderAnomaly.resolveDirections(event);
 
         if (Constants.ALL.equals(tilesString) && directions.isEmpty()) {
-            //No need to loop, just set as empty
+            // No need to loop, just set as empty
             int amountOfBorderAnomalies = game.getBorderAnomalies().size();
             game.setBorderAnomalies(new ArrayList<>());
             MessageHelper.replyToMessage(event, "All " + amountOfBorderAnomalies + " border anomalies removed.");

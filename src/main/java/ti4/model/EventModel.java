@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -29,12 +28,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
     private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
-        return alias != null
-            && name != null
-            && validateCategory()
-            && type != null
-            && text != null
-            && source != null;
+        return alias != null && name != null && validateCategory() && type != null && text != null && source != null;
     }
 
     private boolean validateCategory() {
@@ -43,7 +37,8 @@ public class EventModel implements ModelInterface, EmbeddableModel {
                 return Mapper.isValidFaction(getCategoryDescription());
             }
             case "event" -> {
-                return Stream.of("immediate", "permanent", "temporary").anyMatch(s -> s.equalsIgnoreCase(getCategoryDescription()));
+                return Stream.of("immediate", "permanent", "temporary")
+                        .anyMatch(s -> s.equalsIgnoreCase(getCategoryDescription()));
             }
             default -> {
                 return true;
@@ -52,7 +47,8 @@ public class EventModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean staysInPlay() {
-        return getCategoryDescription().equalsIgnoreCase("permanent") || getCategoryDescription().equalsIgnoreCase("temporary");
+        return "permanent".equalsIgnoreCase(getCategoryDescription())
+                || "temporary".equalsIgnoreCase(getCategoryDescription());
     }
 
     public String getAlias() {
@@ -63,15 +59,15 @@ public class EventModel implements ModelInterface, EmbeddableModel {
         return name;
     }
 
-    public String getCategory() {
+    private String getCategory() {
         return Optional.ofNullable(category).orElse("");
     }
 
-    public String getCategoryDescription() {
+    private String getCategoryDescription() {
         return Optional.ofNullable(categoryDescription).orElse("");
     }
 
-    public String getType() {
+    private String getType() {
         return Optional.ofNullable(type).orElse("");
     }
 
@@ -79,7 +75,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(target).orElse("");
     }
 
-    public String getText() {
+    private String getText() {
         return Optional.ofNullable(text).orElse("");
     }
 
@@ -99,7 +95,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
             sb.append("(").append(uniqueID).append(") - ");
         }
         sb.append(name).append("__** ");
-        sb.append(getSource().emoji());
+        sb.append(source.emoji());
         sb.append("\n");
 
         sb.append("> **").append(type).append(":** *").append(target).append("*\n");
@@ -124,20 +120,22 @@ public class EventModel implements ModelInterface, EmbeddableModel {
 
         StringBuilder sb = new StringBuilder();
         if (numericalID != null) sb.append("(").append(numericalID).append(") ");
-        sb.append("__**").append(getName()).append("**__").append(getSource().emoji());
+        sb.append("__**").append(name).append("**__").append(source.emoji());
         eb.setTitle(sb.toString());
 
         eb.setColor(Color.black);
         eb.addField(StringUtils.capitalize(getCategoryDescription()) + " " + getType(), getText(), false);
-        if (includeID) eb.setFooter("ID: " + getAlias() + "  Source: " + getSource());
+        if (includeID) eb.setFooter("ID: " + alias + "  Source: " + source);
         return eb.build();
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+        return alias.toLowerCase().contains(searchString)
+                || name.toLowerCase().contains(searchString)
+                || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return getName() + " [" + getSource() + "]";
+        return name + " [" + source + "]";
     }
 }

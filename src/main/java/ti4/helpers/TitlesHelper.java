@@ -8,13 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
+import ti4.map.persistence.GameManager;
+import ti4.map.persistence.ManagedGame;
 import ti4.service.game.ManagedGameService;
 
 @UtilityClass
@@ -26,9 +25,9 @@ public class TitlesHelper {
 
         Predicate<ManagedGame> thisPlayerIsInGame = game -> game.getPlayer(userId) != null;
         List<ManagedGame> games = GameManager.getManagedGames().stream()
-            .filter(thisPlayerIsInGame.and(ManagedGame::isHasEnded))
-            .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
-            .toList();
+                .filter(thisPlayerIsInGame.and(ManagedGame::isHasEnded))
+                .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
+                .toList();
 
         for (var managedGame : games) {
             var game = managedGame.getGame();
@@ -36,29 +35,30 @@ public class TitlesHelper {
             if (titlesForPlayer.isEmpty()) {
                 continue;
             }
-            Arrays.stream(titlesForPlayer.split("_"))
-                .forEach(title -> {
-                    if (!title.isEmpty() && !title.equalsIgnoreCase("**")) {
-                        titles.merge(title, 1, Integer::sum);
-                        gameHistory.merge(title, game.getName(), (existing, newName) -> existing + ", " + newName);
-                    }
-                });
+            Arrays.stream(titlesForPlayer.split("_")).forEach(title -> {
+                if (!title.isEmpty() && !"**".equalsIgnoreCase(title)) {
+                    titles.merge(title, 1, Integer::sum);
+                    gameHistory.merge(title, game.getName(), (existing, newName) -> existing + ", " + newName);
+                }
+            });
         }
 
         int index = 1;
         StringBuilder sb = new StringBuilder("**__").append(userName).append("'s Titles__**\n");
 
         Map<String, Integer> titles2 = titles.entrySet().stream()
-            .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-            .collect(Collectors.toMap(
-                Map.Entry::getKey,
-                Map.Entry::getValue,
-                (e1, e2) -> e1,
-                LinkedHashMap::new));
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         for (String title : titles2.keySet()) {
             sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
             if (gamesIncluded) {
-                sb.append("**").append(title).append("** x").append(titles.get(title)).append(" (").append(gameHistory.get(title)).append(")");
+                sb.append("**")
+                        .append(title)
+                        .append("** x")
+                        .append(titles.get(title))
+                        .append(" (")
+                        .append(gameHistory.get(title))
+                        .append(")");
             } else {
                 sb.append("**").append(title).append("** x").append(titles.get(title));
             }

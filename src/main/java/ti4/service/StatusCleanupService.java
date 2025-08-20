@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CommandCounterHelper;
@@ -41,9 +39,11 @@ public class StatusCleanupService {
                             continue;
                         }
                         if (CommandCounterHelper.hasCC(player, tile)) {
-                            String msg = player.getRepresentation() + ", in order to remove your command token from tile " + tile.getRepresentationForButtons()
-                                + " you need to first spend 1 command token from your command sheet, due to the ability of the Errant, the Toldar flagship."
-                                + " If you don't wish to spend this command token, then your token will stay in the system. Use buttons to decide.";
+                            String msg =
+                                    player.getRepresentation() + ", in order to remove your command token from tile "
+                                            + tile.getRepresentationForButtons()
+                                            + " you need to first spend 1 command token from your command sheet, due to the ability of the Errant, the Toldar flagship."
+                                            + " If you don't wish to spend this command token, then your token will stay in the system. Use buttons to decide.";
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Buttons.gray("placeCCBack_" + tile.getPosition(), "Don't Spend"));
                             buttons.add(Buttons.red("lose1CC", "Spend 1 Command Token"));
@@ -58,7 +58,6 @@ public class StatusCleanupService {
                 unitHolder.removeAllCC();
                 unitHolder.removeAllUnitDamage();
             }
-
         }
         game.removeStoredValue("galacticThreatUsed");
         game.removeStoredValue("conspiratorsUsed");
@@ -86,9 +85,11 @@ public class StatusCleanupService {
             game.removeStoredValue("passOnAllWhensNAfters" + player.getFaction());
             game.removeStoredValue(player.getFaction() + "scpickqueue");
 
-            if (player.isRealPlayer() && game.getStoredValue("Pre Pass " + player.getFaction()) != null
-                && game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
-                if (game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction()) && !player.isPassed()) {
+            if (player.isRealPlayer()
+                    && game.getStoredValue("Pre Pass " + player.getFaction()) != null
+                    && game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
+                if (game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())
+                        && !player.isPassed()) {
                     game.setStoredValue("Pre Pass " + player.getFaction(), "");
                 }
             }
@@ -102,8 +103,8 @@ public class StatusCleanupService {
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, nonActivePlayer, false);
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get("sigma_cyber");
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                    "_" + pnModel.getName() + "_ has been returned.");
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(), "_" + pnModel.getName() + "_ has been returned.");
             }
         }
         for (int x = 0; x < 13; x++) {
@@ -132,30 +133,34 @@ public class StatusCleanupService {
             }
         }
         if (!game.isFowMode() && game.getTableTalkChannel() != null && !game.isOmegaPhaseMode()) {
-            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
+            MessageHelper.sendMessageToChannel(
+                    game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
             ListPlayerInfoService.displayerScoringProgression(game, true, game.getTableTalkChannel(), "both");
         }
         game.clearAllEmptyStoredValues();
     }
 
-    public void returnEndStatusPNs(Game game) {
+    private void returnEndStatusPNs(Game game) {
         Map<String, Player> players = game.getPlayers();
         for (Player player : players.values()) {
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
             for (String pn : pns) {
-                //MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Checking a new pn");
+                // MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Checking a new pn");
                 Player pnOwner = game.getPNOwner(pn);
                 if (pnOwner == null || !pnOwner.isRealPlayer()) {
                     continue;
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
-                if (pnModel.getText().contains("eturn this card") && pnModel.getText().contains("end of the status phase")) {
+                if (pnModel.getText().contains("eturn this card")
+                        && pnModel.getText().contains("end of the status phase")) {
                     player.removePromissoryNote(pn);
                     pnOwner.setPromissoryNote(pn);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, pnOwner, false);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                        "_" + pnModel.getName() + "_ has been returned to " + pnOwner.getRepresentationNoPing() + ".");
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            "_" + pnModel.getName() + "_ has been returned to " + pnOwner.getRepresentationNoPing()
+                                    + ".");
                 }
             }
         }
@@ -170,6 +175,7 @@ public class StatusCleanupService {
                     thread.getManager().setArchived(true).queueAfter(10, TimeUnit.SECONDS);
                 }
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
     }
 }

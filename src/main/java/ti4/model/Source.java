@@ -11,28 +11,77 @@ public class Source {
         //   please also add and complete the corresponding entry in the \resources\data\sources\sources.json file
         // IF YOU CHANGE THE ENUM VALUE FOR A SOURCE
         //   then you must change that value for all occurrences in .json files (including sources.json)
-        //   any oversight of an occurrence will make the bot unable to complete Mapper.loadData() at start up, and thus a bunch of Mapper Map objects will be empty
+        //   any oversight of an occurrence will make the bot unable to complete Mapper.loadData() at start up, and thus
+        // a bunch of Mapper Map objects will be empty
         // IF YOU ARE LOOKING FOR ALL OCCURRENCES OF A SOURCE ACROSS THE .json FILES
-        //   then you can run the '/search sources' which also look for occurrences (for now it counts occurrences by folder)
+        //   then you can run the '/search sources' which also look for occurrences (for now it counts occurrences by
+        // folder)
         //   (or you can use the search functionality of your IDE ofc)
 
         // official
-        base, pok, codex1, codex2, codex3, codex4,
+        base,
+        pok,
+        codex1,
+        codex2,
+        codex3,
+        codex4,
 
-        //big homebrew
-        ds, absol, franken, uncharted_space, monuments, blue_reverie,
+        // big homebrew
+        ds,
+        absol,
+        franken,
+        uncharted_space,
+        monuments,
+        blue_reverie,
 
         // lil homebrew
-        lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi, neutral, lost_star_charts_of_ixth, flagshipping, promises_promises,
+        lazax,
+        action_deck_2,
+        action_deck_2_old,
+        keleresplus,
+        little_omega,
+        project_pi,
+        neutral,
+        lost_star_charts_of_ixth,
+        flagshipping,
+        promises_promises,
 
         // async homebrew
-        draft, admins, pbd100, pbd500, pbd1000, testsource, pbd2000, fow, dane_leaks,
+        draft,
+        admins,
+        pbd100,
+        pbd500,
+        pbd1000,
+        testsource,
+        pbd2000,
+        fow,
+        dane_leaks,
 
         // personal projs
-        somno, ignis_aurora, asteroid, cryypter, voices_of_the_council, cpti, oath_of_kings, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma, byz_agendas, memephilosopher, omega_phase, fowplus,
+        somno,
+        ignis_aurora,
+        asteroid,
+        cryypter,
+        voices_of_the_council,
+        cpti,
+        oath_of_kings,
+        miltymod,
+        luminous,
+        holytispoon,
+        salliance,
+        nomadfalcon,
+        unfulvio,
+        andcat,
+        sigma,
+        byz_agendas,
+        memephilosopher,
+        omega_phase,
+        fowplus,
 
         // eronous' stuff
-        eronous, riftset, ascendant_sun,
+        eronous,
+        riftset,
+        ascendant_sun,
 
         // catchall
         other;
@@ -43,7 +92,7 @@ public class Source {
 
         /**
          * Converts a string identifier to the corresponding ComponentSource enum value.
-         * 
+         *
          * @param id the string identifier
          * @return the ComponentSource enum value, or null if not found
          */
@@ -78,24 +127,25 @@ public class Source {
         }
 
         public String emoji() {
-            TI4Emoji emoji = switch (this) {
-                case absol -> SourceEmojis.Absol;
-                case ds -> SourceEmojis.DiscordantStars;
-                case uncharted_space -> SourceEmojis.UnchartedSpace;
-                case eronous, riftset -> SourceEmojis.Eronous;
-                case admins -> FactionEmojis.AdminsFaction;
-                case ignis_aurora, pbd2000 -> SourceEmojis.IgnisAurora;
-                case keleresplus -> SourceEmojis.KeleresPlus;
-                case project_pi -> SourceEmojis.ProjectPi;
-                case flagshipping -> SourceEmojis.Flagshipping;
-                case promises_promises -> SourceEmojis.PromisesPromises;
-                case miltymod -> SourceEmojis.MiltyMod;
-                case lazax -> FactionEmojis.Lazax;
-                case neutral -> FactionEmojis.Neutral;
-                case salliance -> SourceEmojis.StrategicAlliance;
-                case monuments -> SourceEmojis.Monuments;
-                default -> null;
-            };
+            TI4Emoji emoji =
+                    switch (this) {
+                        case absol -> SourceEmojis.Absol;
+                        case ds -> SourceEmojis.DiscordantStars;
+                        case uncharted_space -> SourceEmojis.UnchartedSpace;
+                        case eronous, riftset -> SourceEmojis.Eronous;
+                        case admins -> FactionEmojis.AdminsFaction;
+                        case ignis_aurora, pbd2000 -> SourceEmojis.IgnisAurora;
+                        case keleresplus -> SourceEmojis.KeleresPlus;
+                        case project_pi -> SourceEmojis.ProjectPi;
+                        case flagshipping -> SourceEmojis.Flagshipping;
+                        case promises_promises -> SourceEmojis.PromisesPromises;
+                        case miltymod -> SourceEmojis.MiltyMod;
+                        case lazax -> FactionEmojis.Lazax;
+                        case neutral -> FactionEmojis.Neutral;
+                        case salliance -> SourceEmojis.StrategicAlliance;
+                        case monuments -> SourceEmojis.Monuments;
+                        default -> null;
+                    };
             return emoji == null ? "" : emoji.toString();
         }
 
@@ -123,5 +173,4 @@ public class Source {
             };
         }
     }
-
 }

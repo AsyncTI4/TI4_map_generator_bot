@@ -31,7 +31,7 @@
         "name": "Armistice",
         "phase": "Action",
         "window": "When another player activates a system that contains your units",
-        "text": "Return that player's command token from that system to their tactic pool and end their turn.",
+        "text": "Return that player's command token from that system to their strategy pool and end their turn.",
         "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more.",
         "source": "action_deck_2"
     },
@@ -99,8 +99,8 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "breakthrough",
-        "name": "Breakthrough",
+        "alias": "innovation",
+        "name": "Innovation",
         "phase": "Any",
         "window": "When or after you research a technology",
         "text": "Ready up to 2 of your planets that have a technology specialty.",
@@ -253,7 +253,7 @@
         "name": "Derelict Station",
         "phase": "Action",
         "window": "After your ships move out of, into, or through a system that does not contain planets",
-        "text": "Explore a frontier token that is in that system or gain 2 commodities.",
+        "text": "Explore a frontier token in that system or gain 2 commodities.",
         "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, bespoke what they once were.",
         "source": "action_deck_2"
     },
@@ -432,7 +432,7 @@
         "name": "Heist",
         "phase": "Action",
         "window": "After you gain control of a planet that was controlled by another player",
-        "text": "Either take up to 2 of that player's relic fragments or gain 2 trade goods.",
+        "text": "Take up to 2 of that player's relic fragments, trade goods, or commodities. [Note: This is any combination of, e.g. 1 trade good and 1 fragment.]",
         "flavorText": "Mot awoke in a pool of his own blood. S'ula had the courtesy to let him live—just barely—but he was too weak to stand. So, he lay in front of the empty vault and wept.",
         "source": "action_deck_2"
     },
@@ -515,6 +515,15 @@
         "window": "After you activate a system",
         "text": "Choose 1 unit in that system. That unit loses its printed abilities during this tactical action.",
         "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "mass_transference",
+        "name": "Mass Transference",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "Remove up to 4 of your units from that system and place them on any planets you control or in any space areas that contain your ships.",
+        "flavorText": "The Mentak crew handed out brochures, recruiting with promises of a grand new life on a distant world. In truth, we traded our quiet colony for a desperate land-grab on the front lines.",
         "source": "action_deck_2"
     },
     {
@@ -613,7 +622,7 @@
         "name": "Outmaneuver",
         "phase": "Action",
         "window": "Before a hit is assigned to 1 of your units",
-        "text": "Cancel 1 hit.",
+        "text": "Cancel that hit.",
         "flavorText": "T'esla reflexively flinched away from the danger she sensed. \"All ships commence evasive maneuvers. Zere's flak comin'.\"",
         "source": "action_deck_2"
     },
@@ -622,7 +631,7 @@
         "name": "Outmaneuver",
         "phase": "Action",
         "window": "Before a hit is assigned to 1 of your units",
-        "text": "Cancel 1 hit.",
+        "text": "Cancel that hit.",
         "flavorText": "Fortunately, T'esla's warning gave the cruiser's helmsman just enough time to roll the ship to port. \"Zat would've cut us in half,\" he muttered.",
         "source": "action_deck_2"
     },
@@ -631,7 +640,7 @@
         "name": "Outmaneuver",
         "phase": "Action",
         "window": "Before a hit is assigned to 1 of your units",
-        "text": "Cancel 1 hit.",
+        "text": "Cancel that hit.",
         "flavorText": "T'esla checked her wingman, relieved to see that he had managed to dodge the flak as well. \"Close in and open fire!\"",
         "source": "action_deck_2"
     },
@@ -640,7 +649,7 @@
         "name": "Outmaneuver",
         "phase": "Action",
         "window": "Before a hit is assigned to 1 of your units",
-        "text": "Cancel 1 hit.",
+        "text": "Cancel that hit.",
         "flavorText": "The capital ship's massive cannons were unable to track the brigades of fighters swarming it like insects.",
         "source": "action_deck_2"
     },
@@ -714,6 +723,15 @@
         "window": "Action",
         "text": "Ready 1 of your planets that has a trait. Then, reveal the top 3 cards of an exploration deck that matches that planet; attach each attachment that you reveal to that planet and discard the rest.",
         "flavorText": "Tungstantus collapsed mid-step as their energy depleted. The world was far from its former glory, and they would not rest until it was a paradise once more.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "recusal",
+        "name": "Recusal",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "During this agenda, you are treated as the speaker.",
+        "flavorText": "Elder Junn had seen many ruling parties come and go during his long years. This one, he knew, would be gone in the blink of an eye. He'd make sure of it.",
         "source": "action_deck_2"
     },
     {
@@ -840,15 +858,6 @@
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda and choose 1 non-faction technology owned by another player. If your prediction is correct, gain that technology.",
         "flavorText": "R7-82's optic servo motors malfunctioned momentarily as the council discussed 'feeding' the Virus to satiate its hunger.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "sensor_jam",
-        "name": "Sensor Jam",
-        "phase": "Action",
-        "window": "After a player activates a system",
-        "text": "Your cruisers and destroyers gain SUSTAIN DAMAGE during this tactical action.",
-        "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and with that, it displayed the enemy's signature in a thirteenth different location.",
         "source": "action_deck_2"
     },
     {
@@ -1046,15 +1055,6 @@
         "window": "After a player activates a system that contains your units",
         "text": "Choose 1 other system. That system is adjacent to the active system during this tactical action.",
         "flavorText": "The conduit was tearing itself apart as the space within it melted away to reveal the location of the beacon. Their panic quickly culled their jubilation.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "virulent_payload",
-        "name": "Virulent Payload",
-        "phase": "Agenda",
-        "window": "After you produce a hit against units on a planet",
-        "text": "Produce 1 additional hit. Then, roll 1 die; on a result of 6 or greater, resolve this ability again.",
-        "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—as Dart ran.",
         "source": "action_deck_2"
     },
     {

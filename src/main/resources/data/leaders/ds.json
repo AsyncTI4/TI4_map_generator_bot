@@ -637,7 +637,7 @@
         "name": "Silas Deriga",
         "title": "Necrosage",
         "abilityWindow": "When you cast votes:",
-        "abilityText": "When you cast votes: Remove any number of your infantry from the game board to cast 1 additional vote for each infantry removed.",
+        "abilityText": "When you cast votes: You may remove up to 4 of your infantry from the game board to cast 1 additional vote for each unit removed.",
         "unlockCondition": "Have 6 infantry and 6 fighters on the game board.",
         "source": "ds"
     },
@@ -868,8 +868,8 @@
         "type": "commander",
         "name": " Ciphus Gault",
         "title": "Mercenary Demon",
-        "abilityWindow": "During each round of space combat:",
-        "abilityText": "Each of your units may use ANTI-FIGHTER BARRAGE instead of making a combat roll during that round of combat. [Note: not applicable to first round of combat, where both occur. Also note that the bot will not know to not roll for certain units. Just ignore any hits they produce if you chose to use AFB instead.]",
+        "abilityWindow": "When one of your units would make a combat roll:",
+        "abilityText": "You may use that unit’s ANTI-FIGHTER BARRAGE instead. You cannot use this ability during the first round of space combat.",
         "unlockCondition": "Have 1 superweapon in your play area.",
         "source": "ds"
     },
@@ -928,7 +928,7 @@
         "title": "Polemarch",
         "abilityName": "Contingency Plan - Biomass Event",
         "abilityWindow": "ACTION:",
-        "abilityText": "Gather units from your reinforcements equal to your starting units, (or as many as are available. You can also gather less units if you want). Place these units, in any combination, in the space area of any systems that contain 1 of your structures and no other players' ships, or on planets you control. Then, purge this card.",
+        "abilityText": "Gather units from your reinforcements up to equal to your starting units. Place these units, in any combination, in the space area of any systems that contain 1 of your structures and no other players' ships, or on planets you control. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     },

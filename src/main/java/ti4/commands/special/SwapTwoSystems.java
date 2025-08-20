@@ -3,8 +3,6 @@ package ti4.commands.special;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -15,15 +13,18 @@ import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.fow.FowCommunicationThreadService;
-import ti4.service.fow.RiftSetModeService;
 import ti4.service.map.CustomHyperlaneService;
 
 class SwapTwoSystems extends GameStateSubcommand {
 
     public SwapTwoSystems() {
         super(Constants.SWAP_SYSTEMS, "Swap two systems", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to swap from or RND").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to swap to or RND").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to swap from or RND")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to swap to or RND")
+                .setRequired(true)
+                .setAutoComplete(true));
     }
 
     @Override
@@ -59,7 +60,6 @@ class SwapTwoSystems extends GameStateSubcommand {
         game.rebuildTilePositionAutoCompleteList();
         FowCommunicationThreadService.checkAllCommThreads(game);
         MessageHelper.replyToMessage(event, "Swapped " + tileTo.getPosition() + " and " + tileFrom.getPosition());
-        RiftSetModeService.swappedSystems(game);
     }
 
     private Tile getRandomTile() {
@@ -67,10 +67,10 @@ class SwapTwoSystems extends GameStateSubcommand {
         List<Tile> availableTiles = getGame().getTileMap().values().stream()
                 .filter(tile -> !EXCLUDED_POSITIONS.contains(tile.getPosition()))
                 .filter(tile -> !tile.getTileModel().isHyperlane())
-                .collect(Collectors.toList());
+                .toList();
 
         if (availableTiles.isEmpty()) {
-            return null; 
+            return null;
         }
 
         return availableTiles.get(new Random().nextInt(availableTiles.size()));

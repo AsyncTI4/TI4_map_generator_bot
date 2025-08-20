@@ -1,18 +1,17 @@
 package ti4.listeners.annotations;
 
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.map.Game;
 import ti4.map.Player;
-
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * <p>ButtonHandler(string) where buttonID.startsWith(string)</p>
@@ -32,8 +31,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Retention(RUNTIME)
 @Repeatable(ManyButtonHandlers.class)
-@Target({ ElementType.METHOD })
+@Target(ElementType.METHOD)
 public @interface ButtonHandler {
     String value();
+
     boolean save() default true;
 }

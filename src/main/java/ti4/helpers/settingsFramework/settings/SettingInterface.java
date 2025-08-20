@@ -1,10 +1,9 @@
 package ti4.helpers.settingsFramework.settings;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -16,16 +15,16 @@ import ti4.service.emoji.TI4Emoji;
 @Getter
 @Setter
 public abstract class SettingInterface {
-    protected static final Emoji emojiUp = Emoji.fromUnicode("📈"); // Other up options: [⬆️,⏫,☝️,🔺]
-    protected static final Emoji emojiDown = Emoji.fromUnicode("📉"); // Other down options: []
-    protected static final Emoji emojiToggle = Emoji.fromUnicode("🔁");
+    static final Emoji emojiUp = Emoji.fromUnicode("📈"); // Other up options: [⬆️,⏫,☝️,🔺]
+    static final Emoji emojiDown = Emoji.fromUnicode("📉"); // Other down options: []
+    static final Emoji emojiToggle = Emoji.fromUnicode("🔁");
 
     protected String id;
     protected String name;
-    protected String emoji = null;
+    protected String emoji;
     protected boolean editable = true;
-    protected boolean disabled = false;
-    protected String extraInfo = null;
+    protected boolean disabled;
+    protected String extraInfo;
 
     SettingInterface(String id, String name) {
         this.id = id;
@@ -52,13 +51,11 @@ public abstract class SettingInterface {
     // ---------------------------------------------------------------------------------------------------------------------------------
     public void initialize(JsonNode json) {
         if (json == null) return;
-        if (json.get("id").asText(id).equals(id))
-            init(json);
+        if (json.get("id").asText(id).equals(id)) init(json);
     }
 
     public List<Button> getButtons(String idPrefix) {
-        if (!editable)
-            return new ArrayList<>();
+        if (!editable) return new ArrayList<>();
         return buttons(idPrefix);
     }
 
@@ -72,10 +69,8 @@ public abstract class SettingInterface {
     public String longSummary(int pad, String extraInfoId) {
         String emote = emoji == null ? "" : emoji;
         String val;
-        if (Objects.equals(id, extraInfoId))
-            val = longValue() + (extraInfo != null ? " *" + extraInfo + "*" : "");
-        else
-            val = shortValue();
+        if (Objects.equals(id, extraInfoId)) val = longValue() + (extraInfo != null ? " *" + extraInfo + "*" : "");
+        else val = shortValue();
         return String.format("`%s`%s: %s", Helper.leftpad(name, pad), emote, val);
     }
 
@@ -87,7 +82,7 @@ public abstract class SettingInterface {
         if (emoji == null) {
             this.emoji = null;
         } else {
-            setEmoji(emoji.toString());
+            this.emoji = emoji.toString();
         }
     }
 }

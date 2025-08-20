@@ -1,7 +1,6 @@
 package ti4.commands.cardsac;
 
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -16,7 +15,9 @@ class ShowACToAll extends GameStateSubcommand {
 
     public ShowACToAll() {
         super(Constants.SHOW_TO_ALL, "Show an action card to all players", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID, which is found between ()").setRequired(true));
+        addOptions(new OptionData(
+                        OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID, which is found between ()")
+                .setRequired(true));
     }
 
     @Override
@@ -38,10 +39,10 @@ class ShowACToAll extends GameStateSubcommand {
         }
 
         Game game = getGame();
-        String sb = "Game: " + game.getName() + "\n" +
-            "Player: " + player.getUserName() + "\n" +
-            "Shown Action Card:" + "\n" +
-            Mapper.getActionCard(acID).getRepresentation() + "\n";
+        String sb = "Game: " + game.getName() + "\n" + "Player: "
+                + player.getUserName() + "\n" + "Shown Action Card:"
+                + "\n" + Mapper.getActionCard(acID).getRepresentation()
+                + "\n";
         player.setActionCard(acID);
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
     }

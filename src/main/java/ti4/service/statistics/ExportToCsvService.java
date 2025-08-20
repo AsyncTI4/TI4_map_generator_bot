@@ -2,16 +2,16 @@ package ti4.service.statistics;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.map.Game;
-import ti4.map.GamesPage;
 import ti4.map.Player;
+import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -26,9 +26,8 @@ public class ExportToCsvService {
         StringBuilder output = new StringBuilder(header(playerCount));
 
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getGamesFilter(event),
-            game -> output.append(System.lineSeparator()).append(gameToCsv(game))
-        );
+                GameStatisticsFilterer.getGamesFilter(event),
+                game -> output.append(System.lineSeparator()).append(gameToCsv(game)));
 
         if (output.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No games found matching filter.");
@@ -36,7 +35,7 @@ public class ExportToCsvService {
         }
 
         File outputCSV = new File("output.csv");
-        try (PrintWriter pw = new PrintWriter(outputCSV)) {
+        try (PrintWriter pw = new PrintWriter(outputCSV, StandardCharsets.UTF_8)) {
             pw.print(output);
             pw.close();
             MessageHelper.sendFileToChannel(event.getChannel(), outputCSV);
@@ -45,7 +44,7 @@ public class ExportToCsvService {
         }
     }
 
-    public static String header(int players) {
+    private static String header(int players) {
         List<String> fields = new ArrayList<>();
         fields.add("game name");
         fields.add("playerCount");
@@ -66,7 +65,7 @@ public class ExportToCsvService {
         return String.join(",", fields);
     }
 
-    public static String gameToCsv(Game game) {
+    private static String gameToCsv(Game game) {
         List<String> fields = new ArrayList<>();
         fields.add(game.getName());
         fields.add(Integer.toString(game.getRealAndEliminatedAndDummyPlayers().size()));
@@ -80,13 +79,15 @@ public class ExportToCsvService {
             fields.add(Integer.toString(p.getTotalVictoryPoints()));
             fields.add(Integer.toString(p.getSecretVictoryPoints()));
             fields.add(Integer.toString(p.getPublicVictoryPoints(false)));
-            fields.add(Integer.toString(p.getTotalVictoryPoints() - p.getSecretVictoryPoints() - p.getPublicVictoryPoints(false)));
+            fields.add(Integer.toString(
+                    p.getTotalVictoryPoints() - p.getSecretVictoryPoints() - p.getPublicVictoryPoints(false)));
             fields.add(String.join("|", p.getTechs()));
             fields.add(String.join("|", p.getRelics()));
             fields.add(Boolean.toString(p.getLeaderByType("hero").isEmpty()));
         }
 
-        List<String> outputFields = fields.stream().map(f -> f.contains(",") ? "\"" + f + "\"" : f).toList();
+        List<String> outputFields =
+                fields.stream().map(f -> f.contains(",") ? "\"" + f + "\"" : f).toList();
         return String.join(",", outputFields);
     }
 }

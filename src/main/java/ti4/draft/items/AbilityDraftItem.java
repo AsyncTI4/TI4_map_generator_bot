@@ -1,11 +1,11 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
+import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.AbilityModel;
@@ -14,6 +14,7 @@ import ti4.model.FactionModel;
 import ti4.service.emoji.TI4Emoji;
 
 public class AbilityDraftItem extends DraftItem {
+
     public AbilityDraftItem(String itemId) {
         super(Category.ABILITY, itemId);
     }
@@ -32,8 +33,12 @@ public class AbilityDraftItem extends DraftItem {
         if (abilityModel.getPermanentEffect().isPresent()) {
             sb.append(abilityModel.getPermanentEffect().get()).append("\n");
         }
-        if (abilityModel.getWindow().isPresent() && abilityModel.getWindowEffect().isPresent()) {
-            sb.append("*").append(abilityModel.getWindow().get()).append(":* ").append(abilityModel.getWindowEffect().get());
+        if (abilityModel.getWindow().isPresent()
+                && abilityModel.getWindowEffect().isPresent()) {
+            sb.append("*")
+                    .append(abilityModel.getWindow().get())
+                    .append(":* ")
+                    .append(abilityModel.getWindowEffect().get());
         }
         return sb.toString();
     }
@@ -61,15 +66,15 @@ public class AbilityDraftItem extends DraftItem {
         return allItems;
     }
 
-    public static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
+    private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            String[] results = game.getStoredValue("bannedAbilities").split("finSep");
+            String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedAbilities"));
             for (String ability : faction.getAbilities()) {
                 if (Arrays.asList(results).contains(ability)) {
                     continue;
                 }
-                allItems.add(DraftItem.generate(DraftItem.Category.ABILITY, ability));
+                allItems.add(generate(DraftItem.Category.ABILITY, ability));
             }
         }
         return allItems;
@@ -79,7 +84,7 @@ public class AbilityDraftItem extends DraftItem {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
             for (String ability : faction.getAbilities()) {
-                allItems.add(DraftItem.generate(DraftItem.Category.ABILITY, ability));
+                allItems.add(generate(DraftItem.Category.ABILITY, ability));
             }
         }
         return allItems;

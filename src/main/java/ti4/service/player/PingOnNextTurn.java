@@ -9,10 +9,10 @@ import ti4.settings.users.UserSettingsManager;
 @UtilityClass
 public class PingOnNextTurn {
 
-    public static void set(GenericInteractionCreateEvent event, UserSettings settings, boolean ping) {
+    private static void set(GenericInteractionCreateEvent event, UserSettings settings, boolean ping) {
         settings.setPingOnNextTurn(ping);
         UserSettingsManager.save(settings);
-        
+
         if (event == null) {
             return;
         }

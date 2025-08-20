@@ -20,12 +20,13 @@ public class RefreshLeaderService {
             String leaderName = playerLeader.getId();
             if ("nomadagentartuno".equals(leaderName)) {
                 leaderName = "Artuno the Betrayer, a Nomad agent,";
-            } else if ("nomadagentartuno".equals(leaderName)) {
-                leaderName = "Clever Clever Artuno the Betrayer, a Nomad/Yssaril agent,";
             }
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " you gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
-                    + " (" + (tg - tgCount) + "->" + tg + ") from " + leaderName + " being readied.");
+
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + " you gained " + tgCount + " trade good"
+                            + (tgCount == 1 ? "" : "s") + " (" + (tg - tgCount) + "->" + tg + ") from " + leaderName
+                            + " being readied.");
             ButtonHelperAbilities.pillageCheck(player, game);
             playerLeader.setTgCount(0);
         }

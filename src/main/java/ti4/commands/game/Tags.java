@@ -15,6 +15,7 @@ class Tags extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Button button = Buttons.green("editTags~MDL", "Edit Tags");
-        MessageHelper.sendMessageToChannelWithButton(event.getChannel(), "Press the below button to edit the game's tags:", button);
+        MessageHelper.sendMessageToChannelWithButton(
+                event.getChannel(), "Press the below button to edit the game's tags:", button);
     }
 }

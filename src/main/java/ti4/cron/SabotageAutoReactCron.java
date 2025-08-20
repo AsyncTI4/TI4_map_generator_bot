@@ -1,21 +1,21 @@
 package ti4.cron;
 
+import static java.util.function.Predicate.not;
+
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
-import ti4.message.BotLogger;
+import ti4.map.persistence.GameManager;
+import ti4.map.persistence.ManagedGame;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
-
-import static java.util.function.Predicate.not;
 
 @UtilityClass
 public class SabotageAutoReactCron {
@@ -24,26 +24,36 @@ public class SabotageAutoReactCron {
     private static final int RUNS_PER_HOUR = 60 / SCHEDULED_PERIOD_MINUTES;
 
     public static void register() {
-        CronManager.schedulePeriodically(SabotageAutoReactCron.class, SabotageAutoReactCron::autoReact, 5, SCHEDULED_PERIOD_MINUTES, TimeUnit.MINUTES);
+        CronManager.schedulePeriodically(
+                SabotageAutoReactCron.class,
+                SabotageAutoReactCron::autoReact,
+                5,
+                SCHEDULED_PERIOD_MINUTES,
+                TimeUnit.MINUTES);
     }
 
     private static void autoReact() {
+        BotLogger.info("Running SabotageAutoReactCron.");
+
         GameManager.getManagedGames().stream()
-            .filter(not(ManagedGame::isHasEnded))
-            .map(ManagedGame::getGame)
-            .forEach(SabotageAutoReactCron::autoReact);
+                .filter(not(ManagedGame::isHasEnded))
+                .map(ManagedGame::getGame)
+                .forEach(SabotageAutoReactCron::autoReact);
+
+        BotLogger.info("Finished SabotageAutoReactCron.");
     }
 
     private static void autoReact(Game game) {
         try {
             automaticallyReactToSabotageWindows(game);
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(game), "SabotageAutoReactCron failed for game: " + game.getName(), e);
+            BotLogger.error(new LogOrigin(game), "SabotageAutoReactCron failed for game: " + game.getName(), e);
         }
     }
 
     private static void automaticallyReactToSabotageWindows(Game game) {
-        List<GameMessageManager.GameMessage> acMessages = GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD);
+        List<GameMessageManager.GameMessage> acMessages =
+                GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD);
         if (acMessages.isEmpty()) {
             return;
         }

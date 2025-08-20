@@ -1,19 +1,26 @@
 package ti4.helpers;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import ti4.image.PositionMapper;
 import ti4.map.Game;
 import ti4.map.Player;
 
-import java.awt.*;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
-
 public class PlayerStatsHelper {
-    public static List<String> findThreeNearbyStatTiles(Game game, Player player, Set<String> taken,
-                                                  boolean isFoWPrivate, Player fowPlayer) {
+    private static final Pattern DIGIT_PATTERN = Pattern.compile("\\d");
+
+    public static List<String> findThreeNearbyStatTiles(
+            Game game, Player player, Set<String> taken, boolean isFoWPrivate, Player fowPlayer) {
         boolean fow = isFoWPrivate;
         boolean randomizeLocation = false;
         if (fow && player != fowPlayer) {
@@ -50,7 +57,7 @@ public class PlayerStatsHelper {
         boolean rand = randomizeLocation;
         PriorityQueue<String> pq = new PriorityQueue<>(Comparator.comparingDouble(pos -> {
             Point positionPoint = PositionMapper.getTilePosition(pos);
-            if (positionPoint == null) return 100000000f;
+            if (positionPoint == null) return 100000000.0f;
             int ring = tileRing(pos);
             Point realPosition = PositionMapper.getScaledTilePosition(game, pos, positionPoint.x, positionPoint.y);
             double distance = realPosition.distance(anchorPt);
@@ -89,8 +96,7 @@ public class PlayerStatsHelper {
     }
 
     private static int tileRing(String pos) {
-        if (pos.replaceAll("\\d", "").isEmpty())
-            return Integer.parseInt(pos) / 100;
+        if (DIGIT_PATTERN.matcher(pos).replaceAll("").isEmpty()) return Integer.parseInt(pos) / 100;
         return 100;
     }
 }

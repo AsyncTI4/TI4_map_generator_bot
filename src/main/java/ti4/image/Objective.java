@@ -6,29 +6,28 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.model.PublicObjectiveModel;
 
 public record Objective(
-    String key,
-    ti4.image.Objective.Type type,
-    Integer index, Boolean revealed,
-    List<String> scoredPlayerIDs,
-    List<String> peekPlayerIDs
-) {
+        String key,
+        ti4.image.Objective.Type type,
+        Integer index,
+        Boolean revealed,
+        List<String> scoredPlayerIDs,
+        List<String> peekPlayerIDs) {
 
     public enum Type {
-        Stage1, Stage2, Custom
+        Stage1,
+        Stage2,
+        Custom
     }
 
     public static List<Objective> retrieve(Game game) {
-        List<Objective> objectives = new ArrayList<>();
+        List<Objective> objectives = retrievePublic1(game);
 
-        appendRevealedObjectives(game, objectives, Type.Stage1);
-        appendUnrevealedObjectives(game, objectives, Type.Stage1);
         appendRevealedObjectives(game, objectives, Type.Stage2);
         appendUnrevealedObjectives(game, objectives, Type.Stage2);
         appendRevealedObjectives(game, objectives, Type.Custom);
@@ -56,15 +55,18 @@ public record Objective(
         return objectives;
     }
 
-    public Integer getWorth(Game game) {
+    private Integer getWorth(Game game) {
         return switch (type) {
             case Stage1 -> 1;
             case Stage2 -> 2;
-            case Custom -> game.getCustomPublicVP().get(key) != null ? game.getCustomPublicVP().get(key) : 1;
+            case Custom ->
+                game.getCustomPublicVP().get(key) != null
+                        ? game.getCustomPublicVP().get(key)
+                        : 1;
         };
     }
 
-    public String getName() {
+    private String getName() {
         if (type == Type.Custom) {
             return key;
         }
@@ -77,10 +79,11 @@ public record Objective(
     }
 
     public String getDisplayText(Game game) {
-        String name = this.getName();
-        Integer worth = this.getWorth(game);
+        String name = getName();
+        Integer worth = getWorth(game);
         if (revealed) {
-            return String.format("(%d) %s - %d VP", game.getRevealedPublicObjectives().get(key), name, worth);
+            return String.format(
+                    "(%d) %s - %d VP", game.getRevealedPublicObjectives().get(key), name, worth);
         } else if (game.isRedTapeMode()) {
             return String.format("(%d) <Unrevealed> %s - %d VP", index, name, worth);
         }
@@ -93,18 +96,29 @@ public record Objective(
 
     private static Map<String, String> getCustomObjectives(Game game) {
         return game.getCustomPublicVP().keySet().stream()
-            .collect(Collectors.toMap(key -> key, name -> {
-                name = name.replace("extra1", "");
-                name = name.replace("extra2", "");
-                String nameOfPO = Mapper.getSecretObjectivesJustNames().get(name);
-                return nameOfPO != null ? nameOfPO : name;
-            }, (key1, key2) -> key1, LinkedHashMap::new));
+                .collect(Collectors.toMap(
+                        key -> key,
+                        name -> {
+                            name = name.replace("extra1", "");
+                            name = name.replace("extra2", "");
+                            String nameOfPO =
+                                    Mapper.getSecretObjectivesJustNames().get(name);
+                            return nameOfPO != null ? nameOfPO : name;
+                        },
+                        (key1, key2) -> key1,
+                        LinkedHashMap::new));
     }
 
     private static List<String> getObjectiveList(Game game, Type type) {
         return switch (type) {
-            case Stage1 -> game.getRevealedPublicObjectives().keySet().stream().filter(Mapper.getPublicObjectivesStage1().keySet()::contains).collect(Collectors.toList());
-            case Stage2 -> game.getRevealedPublicObjectives().keySet().stream().filter(Mapper.getPublicObjectivesStage2().keySet()::contains).collect(Collectors.toList());
+            case Stage1 ->
+                game.getRevealedPublicObjectives().keySet().stream()
+                        .filter(Mapper.getPublicObjectivesStage1().keySet()::contains)
+                        .collect(Collectors.toList());
+            case Stage2 ->
+                game.getRevealedPublicObjectives().keySet().stream()
+                        .filter(Mapper.getPublicObjectivesStage2().keySet()::contains)
+                        .collect(Collectors.toList());
             case Custom -> getCustomObjectives(game).keySet().stream().toList();
         };
     }
@@ -112,7 +126,8 @@ public record Objective(
     private static void appendRevealedObjectives(Game game, List<Objective> objectives, Type type) {
         Integer index = 1;
         for (String key : getObjectiveList(game, type)) {
-            objectives.add(new Objective(key, type, index, Boolean.TRUE, getScoredPlayerIDs(game, key), getPeekPlayerIDs(game, key)));
+            objectives.add(new Objective(
+                    key, type, index, Boolean.TRUE, getScoredPlayerIDs(game, key), getPeekPlayerIDs(game, key)));
             index++;
         }
     }
@@ -128,7 +143,8 @@ public record Objective(
         }
 
         for (String key : inputList) {
-            objectives.add(new Objective(key, type, index, Boolean.FALSE, getScoredPlayerIDs(game, key), getPeekPlayerIDs(game, key)));
+            objectives.add(new Objective(
+                    key, type, index, Boolean.FALSE, getScoredPlayerIDs(game, key), getPeekPlayerIDs(game, key)));
             index++;
         }
     }

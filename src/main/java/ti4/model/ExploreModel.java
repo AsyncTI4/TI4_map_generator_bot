@@ -4,10 +4,10 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import ti4.helpers.PatternHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.ExploreEmojis;
 
@@ -27,24 +27,24 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean isValid() {
         return id != null
-            && name != null
-            && type != null
-            && resolution != null
-            && List.of("Fragment", "Attach", "Instant", "Token", "Leader").contains(resolution)
-            && text != null
-            && source != null;
+                && name != null
+                && type != null
+                && resolution != null
+                && List.of("Fragment", "Attach", "Instant", "Token", "Leader").contains(resolution)
+                && text != null
+                && source != null;
     }
 
     @Override
     public String getAlias() {
-        return getId();
+        return id;
     }
 
     public Optional<String> getAttachmentId() {
         return Optional.ofNullable(attachmentId);
     }
 
-    public Optional<String> getFlavorText() {
+    private Optional<String> getFlavorText() {
         return Optional.ofNullable(flavorText);
     }
 
@@ -53,28 +53,36 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
      */
     @Deprecated
     public String getRepresentation() {
-        return String.format("%s;%s;%s;%s;%s;%s;%s", getName(), getType().toLowerCase(), -1, getResolution(), getText(), getAttachmentId().orElse(""), getSource());
+        return String.format(
+                "%s;%s;%s;%s;%s;%s;%s",
+                name,
+                type.toLowerCase(),
+                -1,
+                resolution,
+                text,
+                getAttachmentId().orElse(""),
+                source);
     }
 
     public String textRepresentation() {
         StringBuilder sb = new StringBuilder(getTypeEmoji()).append(" ");
         if (source != null) sb.append(source.emoji()).append(" ");
-        sb.append("_").append(getName()).append("_\n> ");
-        sb.append(getText().replaceAll("\n(> )?", "\n> "));
+        sb.append("_").append(name).append("_\n> ");
+        sb.append(PatternHelper.NEWLINE_OPTIONAL_GT_PATTERN.matcher(text).replaceAll("\n> "));
         return sb.toString();
     }
 
     public boolean search(String searchString) {
         searchString = searchString.toLowerCase();
-        return getName().toLowerCase().contains(searchString) ||
-            getText().toLowerCase().contains(searchString) ||
-            getId().toLowerCase().contains(searchString) ||
-            getType().toLowerCase().contains(searchString) ||
-            getSearchTags().contains(searchString);
+        return name.toLowerCase().contains(searchString)
+                || text.toLowerCase().contains(searchString)
+                || id.toLowerCase().contains(searchString)
+                || type.toLowerCase().contains(searchString)
+                || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return getName() + " (" + getType() + ") [" + getSource() + "]";
+        return name + " (" + type + ") [" + source + "]";
     }
 
     public MessageEmbed getRepresentationEmbed() {
@@ -83,14 +91,15 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
 
     public MessageEmbed getRepresentationEmbed(boolean includeID, boolean showFlavorText) {
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(getTypeEmoji() + "__" + getName() + "__" + getSource().emoji(), null);
+        eb.setTitle(getTypeEmoji() + "__" + name + "__" + source.emoji(), null);
         eb.setColor(getEmbedColor());
-        eb.setDescription(getText());
+        eb.setDescription(text);
 
         if (includeID) {
             StringBuilder sb = new StringBuilder();
-            if (getAttachmentId().isPresent()) sb.append("Attachment: ").append(getAttachmentId().get()).append("\n");
-            sb.append("ID: ").append(getId()).append("  Source: ").append(getSource());
+            if (getAttachmentId().isPresent())
+                sb.append("Attachment: ").append(getAttachmentId().get()).append("\n");
+            sb.append("ID: ").append(id).append("  Source: ").append(source);
             eb.setFooter(sb.toString());
         }
 
@@ -102,7 +111,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     }
 
     private Color getEmbedColor() {
-        return switch (getType().toLowerCase()) {
+        return switch (type.toLowerCase()) {
             case "cultural" -> Color.blue;
             case "hazardous" -> Color.red;
             case "industrial" -> Color.green;
@@ -112,7 +121,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     }
 
     private String getTypeEmoji() {
-        return switch (getType().toLowerCase()) {
+        return switch (type.toLowerCase()) {
             case "cultural" -> ExploreEmojis.Cultural.toString();
             case "hazardous" -> ExploreEmojis.Hazardous.toString();
             case "industrial" -> ExploreEmojis.Industrial.toString();

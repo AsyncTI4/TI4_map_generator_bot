@@ -10,7 +10,11 @@ class SetPersonalPingInterval extends Subcommand {
 
     public SetPersonalPingInterval() {
         super("set_personal_ping_interval", "Set your personal ping interval");
-        addOption(OptionType.INTEGER, "hours", "The number of hours between turn reminder pings. Set to 0 to disable your personal preference", true);
+        addOption(
+                OptionType.INTEGER,
+                "hours",
+                "The number of hours between turn reminder pings. Set to 0 to disable your personal preference",
+                true);
     }
 
     @Override

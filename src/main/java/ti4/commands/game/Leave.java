@@ -20,9 +20,13 @@ public class Leave extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         User user = event.getUser();
-        if (game.getPlayer(user.getId()).isRealPlayer()) {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "You are a real player, and thus should not do `/game leave`."
-                + " You should do `/game eliminate`, or `/game replace`, depending on what you are looking for.");
+        var player = game.getPlayer(user.getId());
+        if (player != null && player.isRealPlayer()) {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    "You are a real player, and thus should not do `/game leave`."
+                            + " You should do `/game eliminate`, or `/game replace`, depending on what you are looking for."
+                            + " You may also use `/player stats` to set yourself as an NPC.");
             return;
         }
         game.removePlayer(user.getId());
@@ -31,7 +35,8 @@ public class Leave extends GameStateSubcommand {
     }
 
     private String getResponseMessage(Game game, User user) {
-        if (game.getPlayer(user.getId()) != null && game.getPlayer(user.getId()).isRealPlayer()) {
+        var player = game.getPlayer(user.getId());
+        if (player != null && player.isRealPlayer()) {
             return "Did not leave game: " + game.getName() + ". Try a different method or set status to dummy. ";
         }
         return "Left map: " + game.getName() + " successful";

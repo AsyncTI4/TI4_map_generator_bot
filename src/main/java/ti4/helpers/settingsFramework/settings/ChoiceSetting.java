@@ -1,13 +1,12 @@
 package ti4.helpers.settingsFramework.settings;
 
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -22,11 +21,11 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @Getter
 @Setter
-@JsonIncludeProperties({ "id", "chosenKey" })
+@JsonIncludeProperties({"id", "chosenKey"})
 public class ChoiceSetting<T> extends SettingInterface {
     private String chosenKey;
     private String defaultKey;
@@ -39,9 +38,9 @@ public class ChoiceSetting<T> extends SettingInterface {
     public ChoiceSetting(String id, String name, String defaultKey) {
         super(id, name);
 
-        this.chosenKey = defaultKey;
+        chosenKey = defaultKey;
         this.defaultKey = defaultKey;
-        this.allValues = new HashMap<>();
+        allValues = new HashMap<>();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -70,8 +69,8 @@ public class ChoiceSetting<T> extends SettingInterface {
 
     protected List<Button> buttons(String idPrefix) {
         List<Button> ls = new ArrayList<>();
-        Button choose = Buttons.gray(idPrefix + "change" + id, lang + " " + this.name);
-        if (this.emoji != null) choose = choose.withEmoji(Emoji.fromFormatted(this.emoji));
+        Button choose = Buttons.gray(idPrefix + "change" + id, lang + " " + name);
+        if (emoji != null) choose = choose.withEmoji(Emoji.fromFormatted(emoji));
         ls.add(choose);
         return ls;
     }
@@ -125,7 +124,7 @@ public class ChoiceSetting<T> extends SettingInterface {
 
             if (allValues.containsKey(itemToChoose)) {
                 chosenKey = itemToChoose;
-                if (getGetExtraInfo() != null) setExtraInfo(getGetExtraInfo().apply(getValue()));
+                if (getExtraInfo != null) setExtraInfo(getExtraInfo.apply(getValue()));
                 return null;
             }
             return itemToChoose + " is not an allowed value";
@@ -140,19 +139,21 @@ public class ChoiceSetting<T> extends SettingInterface {
         int x = 0;
         for (List<Map.Entry<String, T>> menu : ListUtils.partition(entries, 25)) {
             List<SelectOption> options = menu.stream()
-                .map(entry -> SelectOption.of(show.apply(entry.getValue()), entry.getKey()))
-                .toList();
+                    .map(entry -> SelectOption.of(show.apply(entry.getValue()), entry.getKey()))
+                    .toList();
             StringSelectMenu selectionMenu = StringSelectMenu.create(prefixID + "_" + x)
-                .addOptions(options)
-                .setPlaceholder("Select an option")
-                .setRequiredRange(1, 1)
-                .build();
+                    .addOptions(options)
+                    .setPlaceholder("Select an option")
+                    .setRequiredRange(1, 1)
+                    .build();
             rows.add(ActionRow.of(selectionMenu));
             x++;
         }
-        buttonEvent.getHook().sendMessage("Select a new setting for " + name)
-            .addComponents(rows)
-            .setEphemeral(true)
-            .queue(Consumers.nop(), BotLogger::catchRestError);
+        buttonEvent
+                .getHook()
+                .sendMessage("Select a new setting for " + name)
+                .addComponents(rows)
+                .setEphemeral(true)
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

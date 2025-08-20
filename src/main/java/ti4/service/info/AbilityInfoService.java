@@ -3,7 +3,6 @@ package ti4.service.info;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -24,12 +23,15 @@ public class AbilityInfoService {
     }
 
     public static void sendAbilityInfo(Game game, Player player) {
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "_ _\n__**Abilities:**__", getAbilityMessageEmbeds(player));
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "__Abilities:__", getAbilityMessageEmbeds(player));
     }
 
     private static List<MessageEmbed> getAbilityMessageEmbeds(Player player) {
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
-        for (AbilityModel model : player.getAbilities().stream().map(Mapper::getAbility).sorted(Comparator.comparing(AbilityModel::getAlias)).toList()) {
+        for (AbilityModel model : player.getAbilities().stream()
+                .map(Mapper::getAbility)
+                .sorted(Comparator.comparing(AbilityModel::getAlias))
+                .toList()) {
             MessageEmbed representationEmbed = model.getRepresentationEmbed();
             messageEmbeds.add(representationEmbed);
         }

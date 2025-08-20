@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
-
-import org.apache.commons.lang3.math.NumberUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.apache.commons.lang3.math.NumberUtils;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
@@ -32,7 +30,8 @@ public class ParseUnitService {
         return new ParsedUnit(Units.getUnitKey(type, player.getColorID()), amt, holder.getName());
     }
 
-    public List<ParsedUnit> getParsedUnits(GenericInteractionCreateEvent event, String color, Tile tile, String unitList) {
+    public List<ParsedUnit> getParsedUnits(
+            GenericInteractionCreateEvent event, String color, Tile tile, String unitList) {
         if (!Mapper.isValidColor(color)) {
             MessageHelper.replyToMessage(event, "The unit color is invalid: " + color);
             return Collections.emptyList();
@@ -78,7 +77,8 @@ public class ParseUnitService {
         String planetName = parsePlanetName(unitInfoTokenizer, tile);
 
         var parsedUnit = new ParsedUnit(unitKey, count, planetName);
-        if (event instanceof SlashCommandInteractionEvent && !validateParsedUnit(parsedUnit, tile, unitListToken, event)) {
+        if (event instanceof SlashCommandInteractionEvent
+                && !validateParsedUnit(parsedUnit, tile, unitListToken, event)) {
             return null;
         }
         return parsedUnit;
@@ -95,9 +95,11 @@ public class ParseUnitService {
         return PlanetService.getPlanet(tile, resolvedPlanet);
     }
 
-    private boolean validateParsedUnit(ParsedUnit parsedUnit, Tile tile, String unitListToken, GenericInteractionCreateEvent event) {
+    private boolean validateParsedUnit(
+            ParsedUnit parsedUnit, Tile tile, String unitListToken, GenericInteractionCreateEvent event) {
         boolean isValidUnit = parsedUnit.getUnitKey() != null;
-        boolean isValidUnitHolder = parsedUnit.getLocation().equals(Constants.SPACE) || tile.isSpaceHolderValid(parsedUnit.getLocation());
+        boolean isValidUnitHolder =
+                parsedUnit.getLocation().equals(Constants.SPACE) || tile.isSpaceHolderValid(parsedUnit.getLocation());
 
         if (isValidUnit && isValidUnitHolder) {
             return true;
@@ -108,16 +110,29 @@ public class ParseUnitService {
     }
 
     private void sendValidationError(
-        GenericInteractionCreateEvent event, String token, ParsedUnit parsedUnit, boolean isValidUnit,
-        boolean isValidUnitHolder, Tile tile
-    ) {
+            GenericInteractionCreateEvent event,
+            String token,
+            ParsedUnit parsedUnit,
+            boolean isValidUnit,
+            boolean isValidUnitHolder,
+            Tile tile) {
         String message = "Could not parse this section of the command: `" + token + "`\n"
-            + formatValidationMessage("Unit", isValidUnit, parsedUnit.getUnitKey(), "UnitID or Alias not found. Try: `inf, mech, dn, etc.`")
-            + formatValidationMessage("Planet", isValidUnitHolder, parsedUnit.getLocation(), "Planets in this system are: " + String.join(", ", tile.getUnitHolders().keySet()));
+                + formatValidationMessage(
+                        "Unit",
+                        isValidUnit,
+                        parsedUnit.getUnitKey(),
+                        "UnitID or Alias not found. Try: `inf, mech, dn, etc.`")
+                + formatValidationMessage(
+                        "Planet",
+                        isValidUnitHolder,
+                        parsedUnit.getLocation(),
+                        "Planets in this system are: "
+                                + String.join(", ", tile.getUnitHolders().keySet()));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
     }
 
     private String formatValidationMessage(String type, boolean isValid, Object value, String errorMessage) {
-        return (isValid ? "✅" : "❌") + " " + type + " = `" + value + "`" + (isValid ? "" : " -> " + errorMessage) + "\n";
+        return (isValid ? "✅" : "❌") + " " + type + " = `" + value + "`" + (isValid ? "" : " -> " + errorMessage)
+                + "\n";
     }
 }

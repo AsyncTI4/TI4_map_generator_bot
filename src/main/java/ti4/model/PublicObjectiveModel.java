@@ -1,14 +1,12 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -29,15 +27,11 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
-        return alias != null
-            && name != null
-            && phase != null
-            && text != null
-            && source != null;
+        return alias != null && name != null && phase != null && text != null && source != null;
     }
 
     @JsonIgnore
-    public TI4Emoji getObjectiveEmoji() {
+    private TI4Emoji getObjectiveEmoji() {
         return CardEmojis.getObjectiveEmoji(Integer.toString(points));
     }
 
@@ -52,10 +46,10 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     }
 
     public static final Comparator<PublicObjectiveModel> sortByPointsAndName = (po1, po2) -> {
-        if (Objects.equals(po1.getPoints(), po2.getPoints())) {
-            return po1.getName().compareTo(po2.getName());
+        if (Objects.equals(po1.points, po2.points)) {
+            return po1.name.compareTo(po2.name);
         } else {
-            return po1.getPoints() < po2.getPoints() ? -1 : 1;
+            return po1.points < po2.points ? -1 : 1;
         }
     };
 
@@ -66,24 +60,25 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        //TITLE
-        String title = getObjectiveEmoji() + "__**" + getName() + "**__" + getSource().emoji();
+        // TITLE
+        String title = getObjectiveEmoji() + "__**" + name + "**__" + source.emoji();
         eb.setTitle(title);
 
-        //DESCRIPTION
-        eb.setDescription(getText());
+        // DESCRIPTION
+        eb.setDescription(text);
 
-        //FOOTER
+        // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
+        if (includeID)
+            footer.append("ID: ").append(alias).append("    Source: ").append(source);
         eb.setFooter(footer.toString());
 
         eb.setColor(getEmbedColor());
         return eb.build();
     }
 
-    public Color getEmbedColor() {
-        return switch (getPoints()) {
+    private Color getEmbedColor() {
+        return switch (points) {
             case 1 -> Color.ORANGE;
             case 2 -> Color.BLUE;
             default -> Color.WHITE;
@@ -91,11 +86,13 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+        return alias.toLowerCase().contains(searchString)
+                || name.toLowerCase().contains(searchString)
+                || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return getName() + " (" + getSource() + ")";
+        return name + " (" + source + ")";
     }
 
     public Optional<String> getHomebrewReplacesID() {

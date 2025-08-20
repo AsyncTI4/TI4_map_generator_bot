@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import org.junit.jupiter.api.Assertions;
-
 import ti4.helpers.DisplayType;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
@@ -25,9 +24,10 @@ import ti4.map.UnitHolder;
 @UtilityClass
 public class TileImageTestHelper {
 
-    private static final String staticDir = String.join(File.separator, List.of(".", "src", "test", "java", "ti4", "image", "static", "tileLayout"));
+    private static final String staticDir =
+            String.join(File.separator, List.of(".", "src", "test", "java", "ti4", "image", "static", "tileLayout"));
 
-    public static BufferedImage generateTestImage(Tile tile) {
+    private static BufferedImage generateTestImage(Tile tile) {
         TileGenerator gen = new TileGenerator(TileImageTest.testGame, null, DisplayType.all, 0, tile.getPosition());
         return gen.createMainImage();
     }
@@ -57,8 +57,7 @@ public class TileImageTestHelper {
     public void addTokensToHolder(Tile t, String holderName, String... tokens) {
         UnitHolder uh = t.getUnitHolders().get(holderName);
         if (uh == null) return;
-        for (String token : tokens)
-            uh.addToken(token);
+        for (String token : tokens) uh.addToken(token);
     }
 
     private void compareBufferedImages(BufferedImage a, BufferedImage reference) {
@@ -75,7 +74,7 @@ public class TileImageTestHelper {
         Assertions.assertTrue(totalDist < 10);
     }
 
-    public void compareToStatic(Tile tile, String fileName) {
+    private void compareToStatic(Tile tile, String fileName) {
         String referenceImagePath = staticDir + File.separator + fileName;
         BufferedImage ref = ImageHelper.read(referenceImagePath);
         BufferedImage test = generateTestImage(tile);

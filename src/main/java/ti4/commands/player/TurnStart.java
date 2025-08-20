@@ -14,8 +14,8 @@ class TurnStart extends GameStateSubcommand {
     public TurnStart() {
         super(Constants.TURN_START, "Start Turn", true, true);
         addOptions(
-            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                .setAutoComplete(true));
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     @Override

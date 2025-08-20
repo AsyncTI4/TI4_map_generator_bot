@@ -1,10 +1,9 @@
 package ti4.helpers.settingsFramework.settings;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -13,7 +12,7 @@ import ti4.buttons.Buttons;
 
 @Getter
 @Setter
-@JsonIncludeProperties({ "id", "valLow", "valHigh" })
+@JsonIncludeProperties({"id", "valLow", "valHigh"})
 public class IntegerRangeSetting extends SettingInterface {
     private int valHigh;
     private int defaultHigh;
@@ -27,11 +26,20 @@ public class IntegerRangeSetting extends SettingInterface {
 
     private int delta;
 
-    public IntegerRangeSetting(String id, String name, int valLow, int minLow, int maxLow, int valHigh, int minHigh, int maxHigh, int delta) {
+    public IntegerRangeSetting(
+            String id,
+            String name,
+            int valLow,
+            int minLow,
+            int maxLow,
+            int valHigh,
+            int minHigh,
+            int maxHigh,
+            int delta) {
         super(id, name);
 
-        this.defaultHigh = this.valHigh = valHigh;
-        this.defaultLow = this.valLow = valLow;
+        defaultHigh = this.valHigh = valHigh;
+        defaultLow = this.valLow = valLow;
         this.minHigh = minHigh;
         this.maxHigh = maxHigh;
         this.minLow = minLow;
@@ -70,46 +78,46 @@ public class IntegerRangeSetting extends SettingInterface {
     }
 
     protected List<Button> buttons(String idPrefix) {
-        Button incLow = Buttons.green(idPrefix + "incLow" + id, "Increase Min " + name).withEmoji(emojiUp);
-        Button decLow = Buttons.red(idPrefix + "decLow" + id, "Decrease Min " + name).withEmoji(emojiDown);
-        Button incHigh = Buttons.green(idPrefix + "incHigh" + id, "Increase Max " + name).withEmoji(emojiUp);
-        Button decHigh = Buttons.red(idPrefix + "decHigh" + id, "Decrease Max " + name).withEmoji(emojiDown);
+        Button incLow =
+                Buttons.green(idPrefix + "incLow" + id, "Increase Min " + name).withEmoji(emojiUp);
+        Button decLow =
+                Buttons.red(idPrefix + "decLow" + id, "Decrease Min " + name).withEmoji(emojiDown);
+        Button incHigh =
+                Buttons.green(idPrefix + "incHigh" + id, "Increase Max " + name).withEmoji(emojiUp);
+        Button decHigh =
+                Buttons.red(idPrefix + "decHigh" + id, "Decrease Max " + name).withEmoji(emojiDown);
         List<Button> ls = new ArrayList<>();
-        if (valLow < maxLow && valLow < valHigh)
-            ls.add(incLow);
-        if (valLow > minLow)
-            ls.add(decLow);
-        if (valHigh < maxHigh)
-            ls.add(incHigh);
-        if (valHigh > minHigh && valHigh > valLow)
-            ls.add(decHigh);
+        if (valLow < maxLow && valLow < valHigh) ls.add(incLow);
+        if (valLow > minLow) ls.add(decLow);
+        if (valHigh < maxHigh) ls.add(incHigh);
+        if (valHigh > minHigh && valHigh > valLow) ls.add(decHigh);
         return ls;
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Helper Methods
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public String incrementHigh() {
+    private String incrementHigh() {
         if (valHigh + delta > maxHigh) return String.format("[max %s cannot go above %u]", name, maxHigh);
         valHigh += delta;
         return null;
     }
 
-    public String decrementHigh() {
+    private String decrementHigh() {
         if (valHigh - delta < minHigh) return String.format("[max %s cannot go below %u]", name, minHigh);
         if (valHigh - delta < valLow) return String.format("[max %s cannot go below min %s]", name, name);
         valHigh -= delta;
         return null;
     }
 
-    public String incrementLow() {
+    private String incrementLow() {
         if (valLow + delta > maxLow) return String.format("[min %s cannot go above %u]", name, maxLow);
         if (valHigh - delta < valLow) return String.format("[min %s cannot go above max %s]", name, name);
         valLow += delta;
         return null;
     }
 
-    public String decrementLow() {
+    private String decrementLow() {
         if (valLow - delta < minLow) return String.format("[min %s cannot go below %u]", name, minLow);
         valLow -= delta;
         return null;

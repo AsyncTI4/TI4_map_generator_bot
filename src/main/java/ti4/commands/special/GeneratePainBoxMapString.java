@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -20,10 +20,12 @@ import ti4.service.map.AddTileService.RandomOption;
 
 class GeneratePainBoxMapString extends GameStateSubcommand {
 
-  /*
-    Generates a map string for Eronous PainBox type map where no tiles are adjacent to each other.
-  */  
-  public GeneratePainBoxMapString() {
+    private static final Pattern COMMA_OR_WHITESPACE_PATTERN = Pattern.compile("[,\\s]+");
+
+    /*
+      Generates a map string for Eronous PainBox type map where no tiles are adjacent to each other.
+    */
+    GeneratePainBoxMapString() {
         super(Constants.GENERATE_PAINBOX_MAP, "Generate random map string for Eronous Pain Box", false, false);
         addOption(OptionType.INTEGER, Constants.BLUE_TILES, "How many random Blue tiles", true);
         addOption(OptionType.INTEGER, Constants.RED_TILES, "How many random Red tiles", true);
@@ -41,19 +43,25 @@ class GeneratePainBoxMapString extends GameStateSubcommand {
         int hsTiles = event.getOption(Constants.HOME_SYSTEMS, 6, OptionMapping::getAsInt);
         int supernovas = event.getOption(Constants.SUPERNOVAS, 0, OptionMapping::getAsInt);
         String fixedTiles = event.getOption(Constants.TILE_LIST, "", OptionMapping::getAsString);
-        List<String> fixedTilesList = fixedTiles.isEmpty() ? new ArrayList<>() : Arrays.asList(fixedTiles.split("[,\\s]+")).stream().map(String::trim).toList();
+        List<String> fixedTilesList = fixedTiles.isEmpty()
+                ? new ArrayList<>()
+                : Arrays.stream(COMMA_OR_WHITESPACE_PATTERN.split(fixedTiles))
+                        .map(String::trim)
+                        .toList();
 
         List<String> tileList = new ArrayList<>();
         tileList.add("18");
         tileList.addAll(Collections.nCopies(blueTiles, RandomOption.B.toString()));
         tileList.addAll(Collections.nCopies(redTiles, RandomOption.R.toString()));
-        tileList.addAll(Collections.nCopies(hsTiles, "0")); //Green tile back
+        tileList.addAll(Collections.nCopies(hsTiles, "0")); // Green tile back
         tileList.addAll(fixedTilesList);
 
         if (supernovas > 0) {
-            List<TileModel> allSupernovas = 
-                AddTileService.availableTiles(AddTileService.getSources(game, true), RandomOption.R, new HashSet<>(), new ArrayList<>())
-                    .stream().filter(TileModel::isSupernova).collect(Collectors.toList());
+            List<TileModel> allSupernovas = AddTileService.availableTiles(
+                            AddTileService.getSources(game, true), RandomOption.R, new HashSet<>(), new ArrayList<>())
+                    .stream()
+                    .filter(TileModel::isSupernova)
+                    .collect(Collectors.toList());
             for (int i = 0; i < supernovas; i++) {
                 Collections.shuffle(allSupernovas);
                 TileModel sn = allSupernovas.getFirst();
@@ -62,11 +70,11 @@ class GeneratePainBoxMapString extends GameStateSubcommand {
             }
         }
 
-        //Populate the map
+        // Populate the map
         int totalNumberOfTiles = tileList.size();
         Collections.shuffle(tileList);
         List<String> map = new ArrayList<>();
-        map.add(tileList.removeFirst()); //000
+        map.add(tileList.removeFirst()); // 000
         int rings = 0;
         while (!tileList.isEmpty()) {
             rings++;
@@ -92,7 +100,8 @@ class GeneratePainBoxMapString extends GameStateSubcommand {
         sb.append(redTiles).append(" reds");
         if (hsTiles > 0) sb.append(" + ").append(hsTiles).append(" hs placeholders");
         if (supernovas > 0) sb.append(" + ").append(supernovas).append(" supernovas");
-        if (!fixedTilesList.isEmpty()) sb.append(" + ").append(fixedTilesList.size()).append(" fixed tiles");
+        if (!fixedTilesList.isEmpty())
+            sb.append(" + ").append(fixedTilesList.size()).append(" fixed tiles");
         sb.append(") into ").append(rings).append(" rings.\nUse `/map add_tile_list_random` to insert the map string:");
 
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());

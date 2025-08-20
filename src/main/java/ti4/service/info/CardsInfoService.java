@@ -2,7 +2,6 @@ package ti4.service.info;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -14,19 +13,18 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
-import ti4.service.fow.RiftSetModeService;
 
 @UtilityClass
 public class CardsInfoService {
 
     public static void sendCardsInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        if (player == null)
-            return;
+        if (player == null) return;
         String headerText = player.getRepresentation() + " Somebody" + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendCardsInfo(game, player);
@@ -37,14 +35,14 @@ public class CardsInfoService {
         ActionCardHelper.sendActionCardInfo(game, player);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         sendVariousAdditionalButtons(game, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player,
-            """
+        MessageHelper.sendMessageToPlayerCardsInfoThread(
+                player,
+                """
                 You may whisper to people from here by starting a message with `to[color]` or `to[faction]`.\
 
                 You may schedule a message to yourself (delivered at start of your next turn) by starting a message with `tofutureme`.\
 
                 You may schedule a message to others (delivered at start of their next turn) by starting a message with `tofuture[color]` or `tofuture[faction]`.""");
-
     }
 
     public static void sendVariousAdditionalButtons(Game game, Player player) {
@@ -59,11 +57,13 @@ public class CardsInfoService {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "uydaicommander")) {
             buttons.add(Buttons.gray("uydaiCommander", "Pay 1 Trade Good to Use Uydai Commander", FactionEmojis.uydai));
         }
-        if (player.hasAbility("oracle_ai") || player.getPromissoryNotesInPlayArea().contains("dspnauge")) {
+        if (player.hasAbility("oracle_ai")
+                || player.getPromissoryNotesInPlayArea().contains("dspnauge")) {
             buttons.add(Buttons.gray("initialPeak", "Peek At Next Objective", FactionEmojis.augers));
         }
         if (player.hasUnexhaustedLeader("mykomentoriagent")) {
-            buttons.add(Buttons.gray("exhaustAgent_mykomentoriagent", "Use Myko-Mentori Agent", FactionEmojis.mykomentori));
+            buttons.add(
+                    Buttons.gray("exhaustAgent_mykomentoriagent", "Use Myko-Mentori Agent", FactionEmojis.mykomentori));
         }
         if (player.hasUnexhaustedLeader("hacanagent")) {
             buttons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
@@ -71,7 +71,7 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("pharadnagent")) {
             buttons.add(Buttons.gray("exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));
         }
-        if (ButtonHelper.isPlayerElected(game, player, "minister_peace")) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "minister_peace")) {
             buttons.add(Buttons.gray("ministerOfPeace", "Use Minister of Peace", CardEmojis.Agenda));
         }
         if (player.hasUnexhaustedLeader("vadenagent")) {
@@ -90,7 +90,8 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("getAgentSelection_cheiranagent", "Use Cheiran Agent", FactionEmojis.cheiran));
         }
         if (player.hasUnexhaustedLeader("freesystemsagent")) {
-            buttons.add(Buttons.gray("getAgentSelection_freesystemsagent", "Use Free Systems Agent", FactionEmojis.freesystems));
+            buttons.add(Buttons.gray(
+                    "getAgentSelection_freesystemsagent", "Use Free Systems Agent", FactionEmojis.freesystems));
         }
         if (player.hasUnexhaustedLeader("florzenagent")) {
             buttons.add(Buttons.gray("getAgentSelection_florzenagent", "Use Florzen Agent", FactionEmojis.florzen));
@@ -125,8 +126,14 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("saaragent")) {
             buttons.add(Buttons.gray("getAgentSelection_saaragent", "Use Saar Agent", FactionEmojis.Saar));
         }
+        if (player.hasAbility("laws_order") && !game.getLaws().isEmpty()) {
+            buttons.add(Buttons.gray(
+                    player.getFinsFactionCheckerPrefix() + "useLawsOrder",
+                    "Pay To Ignore Laws",
+                    FactionEmojis.Keleres));
+        }
         if (player.hasAbility("military_industrial_complex")) {
-            buttons.add(Buttons.gray("getAxisOrderReturns", "Un-buy Axis Order (Fix Mistake)", FactionEmojis.axis));
+            buttons.add(Buttons.gray("getAxisOrderReturns", "Un-Buy Axis Order (Fix Mistake)", FactionEmojis.axis));
         }
         if (player.hasUnexhaustedLeader("belkoseaagent")) {
             buttons.add(Buttons.gray("getAgentSelection_belkoseaagent", "Use Belkosea Agent", FactionEmojis.belkosea));
@@ -141,7 +148,8 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("getAgentSelection_ghostagent", "Use Ghost Agent", FactionEmojis.Ghost));
         }
         if (player.getPathTokenCounter() > 0) {
-            buttons.add(Buttons.gray("redistributePath", "Redistribute 1 Command Token With Path", FactionEmojis.uydai));
+            buttons.add(
+                    Buttons.gray("redistributePath", "Redistribute 1 Command Token With Path", FactionEmojis.uydai));
         }
         if (player.hasAbility("prescience")) {
             buttons.add(Buttons.gray("listPath", "List How Many Path Tokens You Have", FactionEmojis.uydai));
@@ -171,32 +179,36 @@ public class CardsInfoService {
         if (player.hasRelicReady("e6-g0_network")) {
             buttons.add(Buttons.green("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw Action Card"));
         }
-        if (player.hasTech("pa") && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
+        if (player.hasTech("pa")
+                && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
             buttons.add(Buttons.green("getPsychoButtons", "Use Psychoarcheology", TechEmojis.BioticTech));
         }
         if (player.hasUnexhaustedLeader("nekroagent")) {
             buttons.add(Buttons.gray("exhaustAgent_nekroagent", "Use Nekro Agent", FactionEmojis.Nekro));
         }
         if (player.hasRelicReady("superweapongrom")) {
-            buttons.add(Buttons.gray("exhaustSuperweapon_grom", "Use Grom To Fire AFB Against Every Fighter", FactionEmojis.belkosea));
+            buttons.add(Buttons.gray(
+                    "exhaustSuperweapon_grom", "Use Grom To Fire AFB Against Every Fighter", FactionEmojis.belkosea));
         }
         if (player.hasRelicReady("superweaponmors")) {
-            buttons.add(Buttons.gray("exhaustSuperweapon_mors", "Use Mors to Damage Every Unit In System", FactionEmojis.belkosea));
+            buttons.add(Buttons.gray(
+                    "exhaustSuperweapon_mors", "Use Mors to Damage Every Unit In System", FactionEmojis.belkosea));
         }
         if (player.hasRelicReady("superweaponglatison")) {
-            buttons.add(Buttons.gray("exhaustSuperweapon_glatison", "Use Glatison To Repair Every Unit", FactionEmojis.belkosea));
+            buttons.add(Buttons.gray(
+                    "exhaustSuperweapon_glatison", "Use Glatison To Repair Every Unit", FactionEmojis.belkosea));
         }
         if (player.hasUnexhaustedLeader("vaylerianagent")) {
             buttons.add(Buttons.gray("exhaustAgent_vaylerianagent", "Use Vaylerian Agent", FactionEmojis.vaylerian));
         }
         if (player.ownsUnit("ghost_mech")
-            && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0
-            && !ButtonHelper.isLawInPlay(game, "articles_war")) {
+                && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0
+                && !ButtonHelper.isLawInPlay(game, "articles_war")) {
             buttons.add(Buttons.gray("creussMechStep1_", "Use Creuss Mech", FactionEmojis.Ghost));
         }
         if (player.ownsUnit("nivyn_mech2")
-            && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0
-            && !game.getLaws().containsKey("articles_war")) {
+                && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0
+                && !game.getLaws().containsKey("articles_war")) {
             buttons.add(Buttons.gray("nivynMechStep1_", "Use Nivyn Mech", FactionEmojis.nivyn));
         }
         if (player.hasUnexhaustedLeader("kolleccagent")) {
@@ -214,7 +226,8 @@ public class CardsInfoService {
             buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On Whens"));
         }
 
-        if (player.hasAbility("divination") && !ButtonHelperAbilities.getAllOmenDie(game).isEmpty()) {
+        if (player.hasAbility("divination")
+                && !ButtonHelperAbilities.getAllOmenDie(game).isEmpty()) {
             StringBuilder omenDice = new StringBuilder();
             for (int omenDie : ButtonHelperAbilities.getAllOmenDie(game)) {
                 omenDice.append(" ").append(omenDie);
@@ -242,8 +255,7 @@ public class CardsInfoService {
         List<String> phasesBeforeAction = List.of("miltydraft", "action", "strategy", "playerSetup");
         boolean hasSummary = false;
         for (int x = 1; x <= game.getRound(); ++x) {
-            if (!game.getStoredValue("endofround" + x + player.getFaction()).isEmpty())
-                hasSummary = true;
+            if (!game.getStoredValue("endofround" + x + player.getFaction()).isEmpty()) hasSummary = true;
         }
         if (game.getRound() > 1 || !phasesBeforeAction.contains(game.getPhaseOfGame()) || hasSummary) {
             // after the Action Phase round 1, show the edit summary button by default
@@ -252,16 +264,19 @@ public class CardsInfoService {
         buttons.add(Buttons.POST_NOTEPAD);
         buttons.add(Buttons.EDIT_NOTEPAD);
         buttons.add(Buttons.green("cardsInfo", "Cards Info Refresh"));
-        RiftSetModeService.addCapturedUnitsButton(buttons, game);
 
         String message = "You may use these buttons to do various things:";
 
         // Refresh the various buttons if they're the last message in the thread
-        player.getCardsInfoThread().retrieveMessageById(player.getCardsInfoThread().getLatestMessageId()).queue(msg -> {
-            if (msg != null && message.equals(msg.getContentRaw())) {
-                msg.delete().queue();
-            }
-        }, BotLogger::catchRestError);
+        player.getCardsInfoThread()
+                .retrieveMessageById(player.getCardsInfoThread().getLatestMessageId())
+                .queue(
+                        msg -> {
+                            if (msg != null && message.equals(msg.getContentRaw())) {
+                                msg.delete().queue();
+                            }
+                        },
+                        BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
 }

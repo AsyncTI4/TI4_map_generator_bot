@@ -1,7 +1,6 @@
 package ti4.buttons.handlers.unitPickers;
 
 import java.util.regex.Matcher;
-
 import lombok.experimental.UtilityClass;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
@@ -12,7 +11,7 @@ import ti4.map.Player;
 import ti4.service.unit.ParsedUnit;
 
 @UtilityClass
-public class UnitPickerHandlerHelper {
+class UnitPickerHandlerHelper {
 
     public String singleUnitRegex(Game game, String action) {
         String regexSingleUnit = action;
@@ -26,7 +25,7 @@ public class UnitPickerHandlerHelper {
     }
 
     // TODO: Jazz make this useful
-    public ParsedUnit parsedUnitFromMatcher(Game game, Player player, Matcher matcher) {
+    public ParsedUnit parsedUnitFromMatcher(Player player, Matcher matcher) {
         int amt = Integer.parseInt(matcher.group("amt"));
         UnitType type = Units.findUnitType(matcher.group("unittype"));
         // TODO: Jazz add this functionality by default to parsed unit
@@ -38,5 +37,4 @@ public class UnitPickerHandlerHelper {
         UnitKey key = Units.getUnitKey(type, player.getColorID());
         return new ParsedUnit(key, amt, location);
     }
-
 }

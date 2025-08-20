@@ -15,8 +15,11 @@ class TurnEnd extends GameStateSubcommand {
 
     public TurnEnd() {
         super(Constants.TURN_END, "End Turn", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "In FoW, confirm with YES if you are not the active player"));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
+        addOptions(new OptionData(
+                OptionType.STRING, Constants.CONFIRM, "In FoW, confirm with YES if you are not the active player"));
     }
 
     @Override
@@ -27,7 +30,8 @@ class TurnEnd extends GameStateSubcommand {
         if (game.isFowMode() && !player.equals(game.getActivePlayer())) {
             OptionMapping confirm = event.getOption(Constants.CONFIRM);
             if (confirm == null || !"YES".equals(confirm.getAsString())) {
-                MessageHelper.sendMessageToEventChannel(event, "You are not the active player. Confirm End Turn with YES.");
+                MessageHelper.sendMessageToEventChannel(
+                        event, "You are not the active player. Confirm End Turn with YES.");
                 return;
             }
         }

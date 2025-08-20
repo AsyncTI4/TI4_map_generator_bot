@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -34,33 +33,43 @@ public class TacticalActionOutputService {
     public void refreshButtonsAndMessageForChoosingTile(ButtonInteractionEvent event, Game game, Player player) {
         String message = buildMessageForTacticalAction(game, player);
         List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
-        MessageHelper.editMessageWithButtons(event, message, systemButtons);
+        if (event == null) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, systemButtons);
+        } else {
+            MessageHelper.editMessageWithButtons(event, message, systemButtons);
+        }
     }
 
-    public void refreshButtonsAndMessageForTile(ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove) {
-        String message = TacticalActionOutputService.buildMessageForSingleSystem(game, player, tile);
-        List<Button> systemButtons = ButtonHelperTacticalAction.getButtonsForAllUnitsInSystem(player, game, tile, moveOrRemove);
-        MessageHelper.editMessageWithButtons(event, message, systemButtons);
+    public void refreshButtonsAndMessageForTile(
+            ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove) {
+        String message = buildMessageForSingleSystem(game, player, tile);
+        List<Button> systemButtons =
+                ButtonHelperTacticalAction.getButtonsForAllUnitsInSystem(player, game, tile, moveOrRemove);
+        if (event == null) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, systemButtons);
+        } else {
+            MessageHelper.editMessageWithButtons(event, message, systemButtons);
+        }
     }
 
     private Set<String> positionsMovedFrom(Game game) {
         return game.getTacticalActionDisplacement().keySet().stream()
-            .map(uhKey -> uhKey.split("-")[0])
-            .filter(pos -> game.getTileByPosition(pos) != null)
-            .collect(Collectors.toSet());
+                .map(uhKey -> uhKey.split("-")[0])
+                .filter(pos -> game.getTileByPosition(pos) != null)
+                .collect(Collectors.toSet());
     }
 
     private List<String> summariesPerSystem(Game game, Player player, Set<String> positions, boolean condensed) {
         List<String> summaries = new ArrayList<>(positions.stream()
-            .map(game::getTileByPosition)
-            .map(tile -> buildMessageForSingleSystem(game, player, tile, condensed, false))
-            .toList());
+                .map(game::getTileByPosition)
+                .map(tile -> buildMessageForSingleSystem(game, player, tile, condensed, false))
+                .toList());
         String remainder = buildShortSummary(game, positions);
         if (remainder != null) summaries.add(remainder);
         return summaries;
     }
 
-    public String buildMessageForTacticalAction(Game game, Player player) {
+    private String buildMessageForTacticalAction(Game game, Player player) {
         StringBuilder sb = new StringBuilder("## Tactical Action in system ");
         Tile activeSystem = getActiveSystem(game);
         sb.append(activeSystem.getRepresentationForButtons(game, player)).append(":\n\n");
@@ -68,12 +77,11 @@ public class TacticalActionOutputService {
         Set<String> positions = positionsMovedFrom(game);
         List<String> summaries = summariesPerSystem(game, player, positions, false);
         sb.append(String.join("\n\n", summaries));
-        if (sb.length() > 1950)
-            return buildCondensedMessageForTacticalAction(game, player);
+        if (sb.length() > 1950) return buildCondensedMessageForTacticalAction(game, player);
         return sb.toString();
     }
 
-    public String buildCondensedMessageForTacticalAction(Game game, Player player) {
+    private String buildCondensedMessageForTacticalAction(Game game, Player player) {
         StringBuilder sb = new StringBuilder("## Tactical Action in system ");
         Tile activeSystem = getActiveSystem(game);
         sb.append(activeSystem.getRepresentationForButtons(game, player)).append(":\n\n");
@@ -88,25 +96,33 @@ public class TacticalActionOutputService {
         return buildMessageForSingleSystem(game, player, tile, false, true);
     }
 
-    private String buildMessageForSingleSystem(Game game, Player player, Tile tile, boolean condensed, boolean inclSummary) {
+    private String buildMessageForSingleSystem(
+            Game game, Player player, Tile tile, boolean condensed, boolean inclSummary) {
         String linePrefix = "> " + player.getFactionEmoji();
-        int distance = CheckDistanceHelper.getDistanceBetweenTwoTiles(game, player, tile.getPosition(), game.getActiveSystem(), true);
-        int riftDistance = CheckDistanceHelper.getDistanceBetweenTwoTiles(game, player, tile.getPosition(), game.getActiveSystem(), false);
+        int distance = CheckDistanceHelper.getDistanceBetweenTwoTiles(
+                game, player, tile.getPosition(), game.getActiveSystem(), true);
+        int riftDistance = CheckDistanceHelper.getDistanceBetweenTwoTiles(
+                game, player, tile.getPosition(), game.getActiveSystem(), false);
 
         var displaced = game.getTacticalActionDisplacement();
         Set<UnitKey> movingUnitsFromTile = displaced.entrySet().stream()
-            .filter(entry -> entry.getKey().startsWith(tile.getPosition() + "-"))
-            .map(Entry::getValue)
-            .filter(Objects::nonNull)
-            .flatMap(f -> f.entrySet().stream())
-            .filter(e -> e.getValue() != null && !e.getValue().isEmpty())
-            .map(Entry::getKey)
-            .collect(Collectors.toSet());
+                .filter(entry -> entry.getKey().startsWith(tile.getPosition() + "-"))
+                .map(Entry::getValue)
+                .filter(Objects::nonNull)
+                .flatMap(f -> f.entrySet().stream())
+                .filter(e -> e.getValue() != null && !e.getValue().isEmpty())
+                .map(Entry::getKey)
+                .collect(Collectors.toSet());
 
         String header = (condensed ? "-# From system " : "From system ");
         StringBuilder summary = new StringBuilder(header).append(tile.getRepresentationForButtons(game, player));
         if (!condensed) {
-            summary.append(" (").append(distance).append(" tile").append(distance == 1 ? "" : "s").append(" away)").append("\n");
+            summary.append(" (")
+                    .append(distance)
+                    .append(" tile")
+                    .append(distance == 1 ? "" : "s")
+                    .append(" away)")
+                    .append("\n");
         } else {
             summary.append(" (").append(distance).append(" away)").append("\n");
         }
@@ -134,7 +150,7 @@ public class TacticalActionOutputService {
 
                 List<Integer> states = unitMap.get(key);
                 if (condensed) {
-                    int amt = states.stream().collect(Collectors.summingInt(i -> i));
+                    int amt = states.stream().mapToInt(i -> i).sum();
                     String unitStr = key.unitEmoji().emojiString().repeat(amt);
                     if (amt > 2) unitStr = amt + "x " + key.unitEmoji();
                     lines.add(unitStr);
@@ -151,10 +167,11 @@ public class TacticalActionOutputService {
                     String stateStr = (state == UnitState.none) ? "" : " " + state.humanDescr();
                     String unitMoveStr = linePrefix + " moved " + amt + color + stateStr + " " + key.unitEmoji();
 
-                    String unitHolderStr = (uh instanceof Planet p) ? " from the planet " + p.getRepresentation(game) : "";
+                    String unitHolderStr =
+                            (uh instanceof Planet p) ? " from the planet " + p.getRepresentation(game) : "";
                     unitMoveStr += unitHolderStr;
 
-                    String distanceStr = validateMoveValue(game, player, tile, key, movingUnitsFromTile, distance, riftDistance);
+                    String distanceStr = validateMoveValue(game, player, tile, key, distance, riftDistance);
                     unitMoveStr += distanceStr;
                     lines.add(unitMoveStr);
                 }
@@ -177,14 +194,15 @@ public class TacticalActionOutputService {
             String pos = entry.getKey().split("-")[0];
             if (excludeTiles.contains(pos)) continue;
             for (var unitEntry : entry.getValue().entrySet()) {
-                int amt = unitEntry.getValue().stream().collect(Collectors.summingInt(a -> a));
+                int amt = unitEntry.getValue().stream().mapToInt(a -> a).sum();
                 UnitKey key = unitEntry.getKey();
                 quantities.put(key, quantities.getOrDefault(key, 0) + amt);
             }
         }
         List<String> units = new ArrayList<>();
-        for (UnitKey key : quantities.keySet()) {
-            int amt = quantities.get(key);
+        for (Entry<UnitKey, Integer> entry : quantities.entrySet()) {
+            UnitKey key = entry.getKey();
+            int amt = entry.getValue();
             String unitStr = key.unitEmoji().emojiString().repeat(amt);
             if (amt > 2) unitStr = amt + "x " + key.unitEmoji();
             units.add(unitStr);
@@ -194,7 +212,8 @@ public class TacticalActionOutputService {
         return sb.toString();
     }
 
-    public String validateMoveValue(Game game, Player player, Tile tile, UnitKey unit, Set<UnitKey> allMovingUnits, int distance, int riftDistance) {
+    private String validateMoveValue(
+            Game game, Player player, Tile tile, UnitKey unit, int distance, int riftDistance) {
         int moveValue = getUnitMoveValue(game, player, tile, unit, false);
         if (moveValue == 0) return "";
 
@@ -230,8 +249,11 @@ public class TacticalActionOutputService {
         return output;
     }
 
-    public int getUnitMoveValue(Game game, Player player, Tile tile, UnitKey unit, boolean skipBonus) {
+    private int getUnitMoveValue(Game game, Player player, Tile tile, UnitKey unit, boolean skipBonus) {
         UnitModel model = player.getUnitFromUnitKey(unit);
+        if (model == null) {
+            return 0;
+        }
 
         boolean movingFromHome = tile == player.getHomeSystemTile();
         boolean tileHasWormhole = FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition());
@@ -239,7 +261,11 @@ public class TacticalActionOutputService {
         // Calculate base move value (pretty easy)
         int baseMoveValue = model.getMoveValue();
         if (baseMoveValue == 0) return 0;
-        if (tile.isNebula() && !player.hasAbility("voidborn") && !player.hasAbility("celestial_being") && !player.hasTech("absol_amd") && !player.getRelics().contains("circletofthevoid")) {
+        if (tile.isNebula()
+                && !player.hasAbility("voidborn")
+                && !player.hasAbility("celestial_being")
+                && !player.hasTech("absol_amd")
+                && !player.getRelics().contains("circletofthevoid")) {
             baseMoveValue = 1;
         }
         if (skipBonus) return baseMoveValue;
@@ -280,7 +306,7 @@ public class TacticalActionOutputService {
 
     private Tile getActiveSystem(Game game) {
         return FOWPlusService.isVoid(game, game.getActiveSystem())
-            ? FOWPlusService.voidTile(game.getActiveSystem())
-            : game.getTileByPosition(game.getActiveSystem());
+                ? FOWPlusService.voidTile(game.getActiveSystem())
+                : game.getTileByPosition(game.getActiveSystem());
     }
 }

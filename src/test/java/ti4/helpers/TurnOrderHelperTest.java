@@ -3,16 +3,14 @@ package ti4.helpers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Set;
-
 import org.junit.jupiter.api.Test;
-
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.testUtils.BaseTi4Test;
 
-public class TurnOrderHelperTest extends BaseTi4Test {
+class TurnOrderHelperTest extends BaseTi4Test {
     @Test
     void GetNonInitiativeOrderFromPlayer_IncompletePriorityTrack_OmegaPhase() {
         var game = createTestGame(PriorityTrackMode.FULL);
@@ -244,7 +242,14 @@ public class TurnOrderHelperTest extends BaseTi4Test {
         return game;
     }
 
-    private Player createPlayer(String userId, String faction, String color, Set<Integer> stratCards, int priority, Game game, boolean speaker) {
+    private Player createPlayer(
+            String userId,
+            String faction,
+            String color,
+            Set<Integer> stratCards,
+            int priority,
+            Game game,
+            boolean speaker) {
         var player = game.addPlayer(userId, color);
         player.setFaction(faction);
         player.setColor(color);

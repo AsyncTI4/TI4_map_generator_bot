@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -23,16 +22,11 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     private String imageURL;
     private String automationID;
     private ComponentSource source;
-    private ComponentSource actual_source;
+    private ComponentSource actualSource;
     private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
-        return alias != null
-            && name != null
-            && phase != null
-            && window != null
-            && text != null
-            && source != null;
+        return alias != null && name != null && phase != null && window != null && text != null && source != null;
     }
 
     public String getNameRepresentation() {
@@ -43,12 +37,12 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
         return getRepresentationJustName() + " - " + window + ": " + text + "\n";
     }
 
-    public String getRepresentationJustName() {
+    private String getRepresentationJustName() {
         return CardEmojis.ActionCard + "_" + name + "_";
     }
 
     public String getRepresentationJustText() {
-        return getWindow() + ": " + getText();
+        return window + ": " + text;
     }
 
     public MessageEmbed getRepresentationEmbed() {
@@ -56,27 +50,28 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getAutomationID() {
-        if (automationID == null)
-            return alias;
+        if (automationID == null) return alias;
         return automationID;
     }
 
     public MessageEmbed getRepresentationEmbed(boolean includeID, boolean includeFlavourText) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        //TITLE
-        String title = CardEmojis.ActionCard + "__**" + getName() + "**__" + getSource().emoji();
+        // TITLE
+        String title = CardEmojis.ActionCard + "__**" + name + "**__" + source.emoji();
         eb.setTitle(title);
 
-        //DESCRIPTION
-        eb.setDescription(getPhase() + " Phase\n***" + getWindow() + ":***\n" + getText());
+        // DESCRIPTION
+        eb.setDescription(phase + " Phase\n***" + window + ":***\n" + text);
 
-        //FLAVOUR TEXT
-        if (includeFlavourText && getFlavorText().isPresent()) eb.addField("", "*" + getFlavorText().get() + "*", true);
+        // FLAVOUR TEXT
+        if (includeFlavourText && getFlavorText().isPresent())
+            eb.addField("", "*" + getFlavorText().get() + "*", true);
 
-        //FOOTER
+        // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
+        if (includeID)
+            footer.append("ID: ").append(alias).append("    Source: ").append(source);
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.orange);
@@ -84,13 +79,13 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString)
-            || getName().toLowerCase().contains(searchString)
-            || getSearchTags().contains(searchString);
+        return alias.toLowerCase().contains(searchString)
+                || name.toLowerCase().contains(searchString)
+                || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return getName() + " (" + getSource() + ")";
+        return name + " (" + source + ")";
     }
 
     public Optional<String> getFlavorText() {

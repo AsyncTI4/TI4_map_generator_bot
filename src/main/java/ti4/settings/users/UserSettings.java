@@ -1,15 +1,13 @@
 package ti4.settings.users;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import lombok.Data;
 
 @Data
@@ -25,6 +23,20 @@ public class UserSettings {
     private LocalDateTime lockedFromCreatingGamesUntil;
     private boolean pingOnNextTurn;
     private boolean showTransactables;
+
+    private boolean hasAnsweredSurvey;
+    private boolean prefersSarweenMsg = true;
+    private boolean prefersPillageMsg = true;
+    private boolean prefersPassOnWhensAfters;
+    private boolean prefersPrePassOnSC = true;
+    private int autoNoSaboInterval;
+    private String whisperPref = "No Preference";
+    private String supportPref = "No Preference";
+    private String sandbagPref = "No Preference";
+    private String winmakingPref = "No Preference";
+    private String takebackPref = "No Preference";
+    private String metaPref = "No Preference";
+    private String trackRecord = "";
 
     UserSettings() {} // needed for ObjectMapper
 

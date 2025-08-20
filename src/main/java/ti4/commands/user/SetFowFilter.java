@@ -13,7 +13,9 @@ class SetFowFilter extends GameStateSubcommand {
 
     public SetFowFilter() {
         super(Constants.SET_FOG_FILTER, "Set the color of the fow tiles for your view of the map.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.FOG_FILTER, "Color of the filter").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FOG_FILTER, "Color of the filter")
+                .setAutoComplete(true)
+                .setRequired(true));
     }
 
     @Override
@@ -24,17 +26,17 @@ class SetFowFilter extends GameStateSubcommand {
             return;
         }
 
-        String color_suffix = null;
+        String colorSuffix = null;
         switch (fogColorMapping.getAsString()) {
-            case Constants.FOW_FILTER_DARK_GREY, "default", "darkgrey", "grey", "gray" -> color_suffix = "default";
-            case Constants.FOW_FILTER_SEPIA, "sepia" -> color_suffix = "sepia";
-            case Constants.FOW_FILTER_WHITE, "white" -> color_suffix = "white";
-            case Constants.FOW_FILTER_PINK, "pink" -> color_suffix = "pink";
-            case Constants.FOW_FILTER_PURPLE, "purple" -> color_suffix = "purple";
-            case Constants.FOW_FILTER_FROG, "frog" -> color_suffix = "frog";
+            case Constants.FOW_FILTER_DARK_GREY, "default", "darkgrey", "grey", "gray" -> colorSuffix = "default";
+            case Constants.FOW_FILTER_SEPIA, "sepia" -> colorSuffix = "sepia";
+            case Constants.FOW_FILTER_WHITE, "white" -> colorSuffix = "white";
+            case Constants.FOW_FILTER_PINK, "pink" -> colorSuffix = "pink";
+            case Constants.FOW_FILTER_PURPLE, "purple" -> colorSuffix = "purple";
+            case Constants.FOW_FILTER_FROG, "frog" -> colorSuffix = "frog";
         }
 
         Player player = getPlayer();
-        player.setFogFilter(color_suffix);
+        player.setFogFilter(colorSuffix);
     }
 }

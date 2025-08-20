@@ -1,7 +1,6 @@
 package ti4.commands.cardspn;
 
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -22,15 +21,24 @@ class SendPN extends GameStateSubcommand {
 
     public SendPN() {
         super(Constants.SEND_PN, "Send a promissory note to a player", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory note ID, which is found between (), or name/part of name").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.PROMISSORY_NOTE_ID,
+                        "Promissory note ID, which is found between (), or name/part of name")
+                .setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)")
+                        .setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
-        String value = event.getOption(Constants.PROMISSORY_NOTE_ID).getAsString().toLowerCase();
+        String value =
+                event.getOption(Constants.PROMISSORY_NOTE_ID).getAsString().toLowerCase();
         String id = null;
         int pnIndex;
         try {
@@ -49,7 +57,8 @@ class SendPN extends GameStateSubcommand {
                     pnName = pnName.toLowerCase();
                     if (pnName.contains(value) || pn.getKey().contains(value)) {
                         if (foundSimilarName && !cardName.equals(pnName)) {
-                            MessageHelper.sendMessageToEventChannel(event, "Multiple cards with similar name founds, please use ID.");
+                            MessageHelper.sendMessageToEventChannel(
+                                    event, "Multiple cards with similar name founds, please use ID.");
                             return;
                         }
                         id = pn.getKey();
@@ -80,7 +89,8 @@ class SendPN extends GameStateSubcommand {
         Player pnOwner = game.getPNOwner(id);
         if (player.getPromissoryNotesInPlayArea().contains(id)) {
             if (!targetPlayer.equals(pnOwner)) {
-                MessageHelper.sendMessageToEventChannel(event, "Promissory notes in play area may only be sent to the owner of the promissory note.");
+                MessageHelper.sendMessageToEventChannel(
+                        event, "Promissory notes in play area may only be sent to the owner of the promissory note.");
                 return;
             }
         }
@@ -94,7 +104,9 @@ class SendPN extends GameStateSubcommand {
         }
 
         boolean placeDirectlyInPlayArea = pnModel.isPlayedDirectlyToPlayArea();
-        if (placeDirectlyInPlayArea && !targetPlayer.equals(pnOwner) && !targetPlayer.isPlayerMemberOfAlliance(pnOwner)) {
+        if (placeDirectlyInPlayArea
+                && !targetPlayer.equals(pnOwner)
+                && !targetPlayer.isPlayerMemberOfAlliance(pnOwner)) {
             targetPlayer.addPromissoryNoteToPlayArea(id);
         }
 
@@ -103,7 +115,8 @@ class SendPN extends GameStateSubcommand {
 
         String conditionalPNName = placeDirectlyInPlayArea ? "_" + pnModel.getName() + "_" : "a promissory note";
         String preposition = placeDirectlyInPlayArea ? " directly to the play area of " : " to the hand of ";
-        String message = player.getRepresentation() + " sent " + CardEmojis.PN + conditionalPNName + preposition + targetPlayer.getRepresentation() + ".";
+        String message = player.getRepresentation() + " sent " + CardEmojis.PN + conditionalPNName + preposition
+                + targetPlayer.getRepresentation() + ".";
         if (game.isFowMode()) {
             String fail = "User for faction not found. Report to ADMIN.";
             String success = message + "\nThe other player has been notified.";
@@ -117,7 +130,8 @@ class SendPN extends GameStateSubcommand {
         if (game.isFowMode()) {
             String extra = null;
             if (id.endsWith("_sftt")) extra = "Scores changed.";
-            FoWHelper.pingPlayersTransaction(game, event, player, targetPlayer, CardEmojis.PN + conditionalPNName + " promissory note", extra);
+            FoWHelper.pingPlayersTransaction(
+                    game, event, player, targetPlayer, CardEmojis.PN + conditionalPNName + " promissory note", extra);
         }
     }
 }

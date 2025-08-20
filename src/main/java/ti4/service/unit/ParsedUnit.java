@@ -14,14 +14,15 @@ public class ParsedUnit {
 
     public ParsedUnit(Units.UnitKey unitKey) {
         this.unitKey = unitKey;
-        this.count = 1;
-        this.location = Constants.SPACE;
+        count = 1;
+        location = Constants.SPACE;
     }
 
     public ParsedUnit(Units.UnitKey unitKey, int count, String location) {
         this.unitKey = unitKey;
         this.count = count;
-        this.location = Constants.SPACE.equalsIgnoreCase(location) ? Constants.SPACE :
-            AliasHandler.resolvePlanet(location.toLowerCase());
+        this.location = Constants.SPACE.equalsIgnoreCase(location)
+                ? Constants.SPACE
+                : AliasHandler.resolvePlanet(location.toLowerCase());
     }
 }

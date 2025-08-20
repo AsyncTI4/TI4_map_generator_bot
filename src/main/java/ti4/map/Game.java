@@ -3,6 +3,13 @@ package ti4.map;
 import static java.util.function.Predicate.*;
 import static org.apache.commons.collections4.CollectionUtils.*;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.awt.Point;
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
@@ -24,19 +31,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
@@ -49,6 +43,9 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
@@ -56,8 +53,6 @@ import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
@@ -77,9 +72,15 @@ import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.json.ObjectMapperFactory;
-import ti4.map.manage.GameManager;
-import ti4.message.BotLogger;
+import ti4.map.manager.BorderAnomalyManager;
+import ti4.map.manager.StrategyCardManager;
+import ti4.map.persistence.GameManager;
+import ti4.map.pojo.ExportableField;
+import ti4.map.pojo.MapPairKeyDeserializer;
+import ti4.map.pojo.MapPairKeySerializer;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.ColorModel;
@@ -93,6 +94,7 @@ import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -118,17 +120,21 @@ public class Game extends GameProperties {
     private Map<String, Integer> slashCommandsUsed = new HashMap<>();
     private Map<String, Integer> actionCardsSabotaged = new HashMap<>();
     private Map<String, String> currentAgendaVotes = new HashMap<>();
+
     @Setter
     @Getter
     private Map<String, Map<UnitKey, List<Integer>>> tacticalActionDisplacement = new HashMap<>();
+
     private @Deprecated Map<String, Integer> displacedUnitsFrom1System = new HashMap<>();
     private @Deprecated Map<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<>();
 
     @Setter
     @Getter
     private DisplayType displayTypeForced;
-    private @Getter @Setter List<BorderAnomalyHolder> borderAnomalies = new ArrayList<>();
+
+    private final BorderAnomalyManager borderAnomalyManager = new BorderAnomalyManager();
     private Date lastActivePlayerChange = new Date(0);
+
     @JsonProperty("autoPingStatus")
     private boolean autoPingEnabled;
 
@@ -138,7 +144,8 @@ public class Game extends GameProperties {
     @Getter
     @Setter
     private Map<String, Integer> eventsInEffect = new LinkedHashMap<>();
-    private Map<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
+
+    private final StrategyCardManager strategyCardManager = new StrategyCardManager(this);
     private Map<String, Integer> discardAgendas = new LinkedHashMap<>();
     private Map<String, Integer> sentAgendas = new LinkedHashMap<>();
     private Map<String, Integer> laws = new LinkedHashMap<>();
@@ -147,46 +154,62 @@ public class Game extends GameProperties {
     private Map<String, Integer> customPublicVP = new LinkedHashMap<>();
     private Map<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
     private Map<String, List<String>> customAdjacentTiles = new LinkedHashMap<>();
+
     @Getter
     @Setter
     private Map<String, String> customHyperlaneData = new LinkedHashMap<>();
+
     @JsonProperty("adjacentTileOverrides")
     @JsonDeserialize(keyUsing = MapPairKeyDeserializer.class)
     private LinkedHashMap<Pair<String, Integer>, String> adjacencyOverrides = new LinkedHashMap<>();
+
     private List<String> publicObjectives1;
     private List<String> publicObjectives2;
     private List<String> publicObjectives1Peakable = new ArrayList<>();
     private List<String> publicObjectives2Peakable = new ArrayList<>();
+
     @Getter
     @Setter
     private Map<String, List<String>> publicObjectives1Peeked = new LinkedHashMap<>();
+
     @Getter
     @Setter
     private Map<String, List<String>> publicObjectives2Peeked = new LinkedHashMap<>();
+
     private List<String> savedButtons = new ArrayList<>();
     private List<String> soToPoList = new ArrayList<>();
+
     @JsonIgnore
     private List<String> purgedPN = new ArrayList<>();
+
     private List<String> explore;
     private List<String> discardExplore = new ArrayList<>();
     private List<String> relics;
+
     @JsonIgnore
     private List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache;
+
     private final Set<String> runDataMigrations = new HashSet<>();
     private BagDraft activeDraft;
+
     @JsonIgnore
     @Getter
     @Setter
     private Map<String, Integer> tileDistances = new HashMap<>();
+
     private MiltyDraftManager miltyDraftManager;
+
     @Setter
     @Getter
     private String miltyDraftString;
+
     @Setter
     private MiltySettings miltySettings;
+
     @Getter
     @Setter
     private String miltyJson;
+
     @Getter
     @Setter
     private TIGLRank minimumTIGLRankAtGameStart;
@@ -198,12 +221,12 @@ public class Game extends GameProperties {
 
     public void newGameSetup() {
         // Normal Decks
-        setPublicObjectives1(Mapper.getShuffledDeck("public_stage_1_objectives_pok"));
-        setPublicObjectives2(Mapper.getShuffledDeck("public_stage_2_objectives_pok"));
+        publicObjectives1 = Mapper.getShuffledDeck("public_stage_1_objectives_pok");
+        publicObjectives2 = Mapper.getShuffledDeck("public_stage_2_objectives_pok");
         setSecretObjectives(Mapper.getShuffledDeck("secret_objectives_pok"));
         setActionCards(Mapper.getShuffledDeck("action_cards_pok"));
         setAgendas(Mapper.getShuffledDeck("agendas_pok"));
-        setExploreDeck(Mapper.getShuffledDeck("explores_pok"));
+        explore = Mapper.getShuffledDeck("explores_pok");
         setRelics(Mapper.getShuffledDeck("relics_pok"));
         setStrategyCardSet("pok");
 
@@ -215,13 +238,15 @@ public class Game extends GameProperties {
     }
 
     public void fixScrewedSOs() {
-        MessageHelper.sendMessageToChannel(getActionsChannel(),
-            "The number of secret objectives in the deck before this operation is " + getNumberOfSOsInTheDeck()
-                + ". The number in players hands is " + getNumberOfSOsInPlayersHands() + ".");
+        MessageHelper.sendMessageToChannel(
+                getActionsChannel(),
+                "The number of secret objectives in the deck before this operation is " + getNumberOfSOsInTheDeck()
+                        + ". The number in players hands is " + getNumberOfSOsInPlayersHands() + ".");
 
-        List<String> defaultSecrets = Mapper.getDecks().get("secret_objectives_pok").getNewShuffledDeck();
+        List<String> defaultSecrets =
+                Mapper.getDecks().get("secret_objectives_pok").getNewShuffledDeck();
         List<String> currentSecrets = new ArrayList<>(getSecretObjectives());
-        for (Player player : getPlayers().values()) {
+        for (Player player : players.values()) {
             if (player == null) {
                 continue;
             }
@@ -239,9 +264,11 @@ public class Game extends GameProperties {
                 getSecretObjectives().add(defaultSO);
             }
         }
-        MessageHelper.sendMessageToChannel(getActionsChannel(),
-            "Fixed the secret objectives. The total amount of secret objectives in deck is " + getNumberOfSOsInTheDeck()
-                + ". The number in players hands is " + getNumberOfSOsInPlayersHands());
+        MessageHelper.sendMessageToChannel(
+                getActionsChannel(),
+                "Fixed the secret objectives. The total amount of secret objectives in deck is "
+                        + getNumberOfSOsInTheDeck() + ". The number in players hands is "
+                        + getNumberOfSOsInPlayersHands());
     }
 
     @JsonIgnore
@@ -251,7 +278,7 @@ public class Game extends GameProperties {
             ColorChangeHelper.changePlayerColor(this, neutral, neutral.getColor(), color);
             return players.get(Constants.dicecordId);
         }
-        addPlayer(Constants.dicecordId, "Dicecord"); //Dicecord
+        addPlayer(Constants.dicecordId, "Dicecord"); // Dicecord
         neutral = getPlayer(Constants.dicecordId);
         neutral.setColor(color);
         neutral.setFaction("neutral");
@@ -263,7 +290,7 @@ public class Game extends GameProperties {
         return neutral;
     }
 
-    public int getNumberOfSOsInTheDeck() {
+    private int getNumberOfSOsInTheDeck() {
         return getSecretObjectives().size();
     }
 
@@ -272,32 +299,34 @@ public class Game extends GameProperties {
     }
 
     public boolean hasBorderAnomalyOn(String tile, Integer direction) {
-        List<BorderAnomalyHolder> anomaliesOnBorder = borderAnomalies.stream()
-            .filter(anomaly -> anomaly.getType() != BorderAnomalyModel.BorderAnomalyType.ARROW)
-            .filter(anomaly -> anomaly.getTile().equals(tile))
-            .filter(anomaly -> anomaly.getDirection() == direction)
-            .collect(Collectors.toList());
-        return isNotEmpty(anomaliesOnBorder);
+        return borderAnomalyManager.has(tile, direction);
     }
 
     public void addBorderAnomaly(String tile, Integer direction, BorderAnomalyModel.BorderAnomalyType anomalyType) {
-        borderAnomalies.add(new BorderAnomalyHolder(tile, direction, anomalyType));
+        borderAnomalyManager.add(tile, direction, anomalyType);
     }
 
     public void removeBorderAnomaly(String tile, Integer direction) {
-        borderAnomalies.removeIf(anom -> anom.getTile().equals(tile) && anom.getDirection() == direction);
+        borderAnomalyManager.remove(tile, direction);
     }
 
-    public int getNumberOfSOsInPlayersHands() {
+    public List<BorderAnomalyHolder> getBorderAnomalies() {
+        return borderAnomalyManager.get();
+    }
+
+    public void setBorderAnomalies(List<BorderAnomalyHolder> anomalies) {
+        borderAnomalyManager.set(anomalies);
+    }
+
+    private int getNumberOfSOsInPlayersHands() {
         int soNum = 0;
-        for (Player player : getPlayers().values()) {
+        for (Player player : players.values()) {
             if (player == null) {
                 continue;
             }
 
             soNum += player.getSo();
             soNum += player.getSoScored();
-
         }
         return soNum;
     }
@@ -305,7 +334,7 @@ public class Game extends GameProperties {
     public Map<String, Object> getExportableFieldMap() {
         Class<GameProperties> aClass = GameProperties.class;
         Field[] fields = aClass.getDeclaredFields();
-        HashMap<String, Object> returnValue = new HashMap<>();
+        Map<String, Object> returnValue = new HashMap<>();
 
         for (Field field : fields) {
             field.setAccessible(true);
@@ -314,7 +343,7 @@ public class Game extends GameProperties {
                     returnValue.put(field.getName(), field.get(this));
                 } catch (IllegalAccessException e) {
                     // This shouldn't really happen since we can even see private fields.
-                    BotLogger.error(new BotLogger.LogMessageOrigin(this), "Unknown error exporting fields from Game.", e);
+                    BotLogger.error(new LogOrigin(this), "Unknown error exporting fields from Game.", e);
                 }
             }
         }
@@ -359,8 +388,12 @@ public class Game extends GameProperties {
                     JsonNode json = ObjectMapperFactory.build().readTree(miltyJson);
                     miltySettings = new MiltySettings(this, json);
                 } catch (Exception e) {
-                    BotLogger.error(new BotLogger.LogMessageOrigin(this), "Failed loading milty draft settings for `" + getName() + "` " + Constants.jazzPing(), e);
-                    MessageHelper.sendMessageToChannel(getActionsChannel(), "Milty draft settings failed to load. Resetting to default.");
+                    BotLogger.error(
+                            new LogOrigin(this),
+                            "Failed loading milty draft settings for `" + getName() + "` " + Constants.jazzPing(),
+                            e);
+                    MessageHelper.sendMessageToChannel(
+                            getActionsChannel(), "Milty draft settings failed to load. Resetting to default.");
                     miltySettings = new MiltySettings(this, null);
                 }
             } else {
@@ -385,7 +418,7 @@ public class Game extends GameProperties {
     public int getFrankenBagSize() {
         int size = 0;
         boolean overRodeNormal = false;
-        ArrayList<DraftItem.Category> categories = new ArrayList<>(EnumSet.allOf(DraftItem.Category.class));
+        Iterable<DraftItem.Category> categories = new ArrayList<>(EnumSet.allOf(DraftItem.Category.class));
         for (DraftItem.Category category : categories) {
             if (!getStoredValue("frankenLimit" + category.toString()).isEmpty()) {
                 overRodeNormal = true;
@@ -397,7 +430,6 @@ public class Game extends GameProperties {
         } else {
             return activeDraft.getBagSize();
         }
-
     }
 
     public void setBagDraft(BagDraft draft) {
@@ -407,11 +439,6 @@ public class Game extends GameProperties {
     public void addActionCardDuplicates(List<String> acIDs) {
         getActionCards().addAll(acIDs);
         Collections.shuffle(getActionCards());
-    }
-
-    public void addSecretDuplicates(List<String> soIDs) {
-        getSecretObjectives().addAll(soIDs);
-        Collections.shuffle(getSecretObjectives());
     }
 
     public void setPurgedPNs(List<String> purgedPN) {
@@ -431,72 +458,112 @@ public class Game extends GameProperties {
     public Optional<Player> getWinner() {
         Player winner = null;
         for (Player player : getRealPlayersNDummies()) {
-            if (player.getTotalVictoryPoints() >= getVp()) {
-                if (isLiberationC4Mode()) {
-                    if (!player.getAllianceMembers().isEmpty()) {
-                        Player ally = null;
-                        for (Player p2 : getRealPlayersNDummies()) {
-                            if (p2 != player && p2.getAllianceMembers().contains(player.getFaction())) {
-                                ally = p2;
-                            }
-                        }
-                        boolean allyGood = false;
-                        if (ally != null && ally.getTotalVictoryPoints() >= getVp() && (player.getTotalVictoryPoints() > 11 || ally.getTotalVictoryPoints() > 11)) {
-                            allyGood = true;
-                        }
-                        if (!allyGood) {
-                            continue;
-                        }
-                    }
-                }
-                if (winner == null) {
-                    winner = player;
-                } else if (hasFullPriorityTrackMode()) {
-                    if (player.hasPriorityPosition() && !winner.hasPriorityPosition()) {
-                        winner = player;
-                    } else if (player.hasPriorityPosition() && winner.hasPriorityPosition()) {
-                        winner = player.getPriorityPosition() < winner.getPriorityPosition() ? player : winner;
-                    }
-                } else if (isNotEmpty(player.getSCs()) && isNotEmpty(winner.getSCs())) {
-                    winner = getLowestInitiativePlayer(player, winner);
-                } else {
-                    return Optional.empty();
-                }
+            if (!meetsVictoryRequirement(player)) {
+                continue;
             }
-        }
-        if (winner == null && isOmegaPhaseMode() && revealedPublicObjectives.containsKey(Constants.IMPERIUM_REX_ID)) {
-            // If no winner was found, but Imperium Rex is revealed, the player with the most VP wins (Priority Track is tie-breaker)
-            for (Player player : getRealPlayersNDummies()) {
-                if (player == null || !player.hasPriorityPosition())
-                    continue;
+            if (winner == null) {
+                winner = player;
+                continue;
+            }
 
-                if (winner == null) {
-                    winner = player;
-                } else if (player.getTotalVictoryPoints() > winner.getTotalVictoryPoints()) {
-                    winner = player;
-                } else if (player.getTotalVictoryPoints() == winner.getTotalVictoryPoints()) {
-                    winner = player.getPriorityPosition() < winner.getPriorityPosition() ? player : winner;
-                }
+            Player candidate = compareWinners(player, winner);
+            if (candidate == null) {
+                return Optional.empty();
             }
+            winner = candidate;
+        }
+
+        if (winner == null && isOmegaPhaseMode() && revealedPublicObjectives.containsKey(Constants.IMPERIUM_REX_ID)) {
+            winner = getOmegaPhaseWinner().orElse(null);
         }
         return Optional.ofNullable(winner);
     }
 
     @JsonIgnore
     public List<Player> getWinners() {
+        Optional<Player> winnerOptional = getWinner();
+        if (winnerOptional.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Player winner = winnerOptional.get();
         List<Player> winners = new ArrayList<>();
-        Player winner = getWinner().orElse(null);
-        if (winner != null) {
-            winners.add(winner);
-            if (winner.getAllianceMembers() != null) {
-                for (Player player : getRealPlayers()) {
-                    if (player.getAllianceMembers() != null && player.getAllianceMembers().contains(winner.getFaction())) {
-                        winners.add(player);
-                    }
+        winners.add(winner);
+
+        if (winner.getAllianceMembers() != null) {
+            String faction = winner.getFaction();
+            getRealPlayers().stream()
+                    .filter(p -> p.getAllianceMembers() != null
+                            && p.getAllianceMembers().contains(faction))
+                    .forEach(winners::add);
+        }
+
+        return winners;
+    }
+
+    private boolean meetsVictoryRequirement(Player player) {
+        if (player.getTotalVictoryPoints() < getVp()) {
+            return false;
+        }
+
+        if (!isLiberationC4Mode()) {
+            return true;
+        }
+
+        if (player.getAllianceMembers().isEmpty()) {
+            return true;
+        }
+
+        Player ally = getRealPlayersNDummies().stream()
+                .filter(p -> p != player && p.getAllianceMembers().contains(player.getFaction()))
+                .findFirst()
+                .orElse(null);
+
+        return ally != null
+                && ally.getTotalVictoryPoints() >= getVp()
+                && (player.getTotalVictoryPoints() >= 12 || ally.getTotalVictoryPoints() >= 12);
+    }
+
+    private Player compareWinners(Player contender, Player current) {
+
+        if (isCivilizedSocietyMode()) {
+            if (contender.getTotalVictoryPoints() > current.getTotalVictoryPoints()) {
+                return contender;
+            }
+            if (contender.getTotalVictoryPoints() == current.getTotalVictoryPoints()) {
+                if (Helper.getPlayerInfluenceTotal(current, this) + current.getTg()
+                        < Helper.getPlayerInfluenceTotal(contender, this) + contender.getTg()) {
+                    return contender;
+                } else {
+                    return current;
                 }
             }
+            return current;
         }
-        return winners;
+        if (hasFullPriorityTrackMode()) {
+            if (contender.hasPriorityPosition() && !current.hasPriorityPosition()) {
+                return contender;
+            }
+            if (contender.hasPriorityPosition() && current.hasPriorityPosition()) {
+                return contender.getPriorityPosition() < current.getPriorityPosition() ? contender : current;
+            }
+            return current;
+        }
+        if (isNotEmpty(contender.getSCs()) && isNotEmpty(current.getSCs())) {
+            return getLowestInitiativePlayer(contender, current);
+        }
+        return null; // not enough info to break tie
+    }
+
+    private Optional<Player> getOmegaPhaseWinner() {
+        return getRealPlayersNDummies().stream()
+                .filter(Player::hasPriorityPosition)
+                .reduce((p1, p2) -> {
+                    if (p1.getTotalVictoryPoints() != p2.getTotalVictoryPoints()) {
+                        return p1.getTotalVictoryPoints() > p2.getTotalVictoryPoints() ? p1 : p2;
+                    }
+                    return p1.getPriorityPosition() < p2.getPriorityPosition() ? p1 : p2;
+                });
     }
 
     private static Player getLowestInitiativePlayer(Player player1, Player player2) {
@@ -511,14 +578,14 @@ public class Game extends GameProperties {
     }
 
     public int getSlashCommandsRunCount() {
-        return getAllSlashCommandsUsed().values().stream().mapToInt(Integer::intValue).sum();
+        return slashCommandsUsed.values().stream().mapToInt(Integer::intValue).sum();
     }
 
     public boolean isACInDiscard(String name) {
         return discardActionCards.keySet().stream()
-            .map(Mapper::getActionCard)
-            .anyMatch(ac -> ac.getName() != null &&
-                ac.getName().toLowerCase().contains(name.toLowerCase()));
+                .map(Mapper::getActionCard)
+                .anyMatch(
+                        ac -> ac.getName() != null && ac.getName().toLowerCase().contains(name.toLowerCase()));
     }
 
     public List<String> getListOfTilesPinged() {
@@ -544,16 +611,24 @@ public class Game extends GameProperties {
 
     @Override
     public void setCompetitiveTIGLGame(boolean competitiveTIGLGame) {
-        if (isAbsolMode() || isMiltyModMode() || isDiscordantStarsMode() || isHomebrewSCMode() || isFowMode() || isAllianceMode() || isCommunityMode())
-            competitiveTIGLGame = false;
+        if (isAbsolMode()
+                || isMiltyModMode()
+                || isDiscordantStarsMode()
+                || isHomebrewSCMode()
+                || isFowMode()
+                || isAllianceMode()
+                || isCommunityMode()) competitiveTIGLGame = false;
         super.setCompetitiveTIGLGame(competitiveTIGLGame);
     }
 
     @Override
     public boolean isAllianceMode() {
         for (Player player : getRealPlayers()) {
-            if (player.getAllianceMembers() != null && !player.getAllianceMembers().replace(player.getFaction(), "").isEmpty()) {
-                super.setAllianceMode(true);
+            if (player.getAllianceMembers() != null
+                    && !player.getAllianceMembers()
+                            .replace(player.getFaction(), "")
+                            .isEmpty()) {
+                setAllianceMode(true);
             }
         }
         return super.isAllianceMode();
@@ -604,6 +679,16 @@ public class Game extends GameProperties {
         gameModes.put("Community", isCommunityMode());
         gameModes.put("Minor Factions", isMinorFactionsMode());
         gameModes.put("Age of Exploration", isAgeOfExplorationMode());
+        gameModes.put("Hidden Agenda", isHiddenAgendaMode());
+        gameModes.put("Total War", isTotalWarMode());
+        gameModes.put("Dangerous Wilds", isDangerousWildsMode());
+        gameModes.put("Stellar Atomics", isStellarAtomicsMode());
+        gameModes.put("Civilized Society", isCivilizedSocietyMode());
+        gameModes.put("Age Of Fighters", isAgeOfFightersMode());
+        gameModes.put("No Support Swaps", isNoSwapMode());
+        gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
+        gameModes.put("Liberation", isLiberationC4Mode());
+        gameModes.put("Ordinian", isOrdinianC1Mode());
         gameModes.put("Alliance", isAllianceMode());
         gameModes.put("FoW", isFowMode());
         gameModes.put("Franken", isFrankenGame());
@@ -615,22 +700,31 @@ public class Game extends GameProperties {
         gameModes.put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
         gameModes.put("Omega Phase", isOmegaPhaseMode());
         gameModes.put("Priority Track", hasAnyPriorityTrackMode());
-        gameModes.put("Homebrew", !isNormalGame);
+        gameModes.put("Homebrew", isHomebrew());
 
         for (String tag : getTags()) {
             gameModes.put(tag, true);
         }
-        return gameModes.entrySet().stream().filter(Entry::getValue).map(Entry::getKey)
-            .collect(Collectors.joining(", "));
+        return gameModes.entrySet().stream()
+                .filter(Entry::getValue)
+                .map(Entry::getKey)
+                .collect(Collectors.joining(", "));
     }
 
     @JsonIgnore
     public boolean isNormalGame() {
-        return !hasHomebrew();
+        return !hasHomebrew()
+                && !isAgeOfExplorationMode()
+                && !isTotalWarMode()
+                && !isAgeOfCommerceMode()
+                && !isMinorFactionsMode()
+                && !isLiberationC4Mode()
+                && !isOrdinianC1Mode();
     }
 
     public boolean isFrankenGame() {
-        return getRealPlayers().stream().anyMatch(p -> p.getFaction().toLowerCase().contains("franken"));
+        return getRealPlayers().stream()
+                .anyMatch(p -> p.getFaction().toLowerCase().contains("franken"));
     }
 
     public String gameJumpLinks() {
@@ -638,15 +732,14 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
-    public String getTabletalkJumpLink() {
+    private String getTabletalkJumpLink() {
         TextChannel tt = getTableTalkChannel();
         if (tt == null) return "[no tt]";
         return String.format("[__[Tabletalk](%s)__]", tt.getJumpUrl());
-
     }
 
     @JsonIgnore
-    public String getActionsJumpLink() {
+    private String getActionsJumpLink() {
         TextChannel act = getActionsChannel();
         if (act == null) return "[no actions]";
         return String.format("[__[Actions](%s)__]", act.getJumpUrl());
@@ -660,15 +753,14 @@ public class Game extends GameProperties {
         } catch (Exception e) {
             TextChannel tableTalkChannel;
             List<TextChannel> gameChannels = AsyncTI4DiscordBot.jda.getTextChannels().stream()
-                .filter(c -> c.getName().startsWith(getName()))
-                .filter(not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
-                .toList();
+                    .filter(c -> c.getName().startsWith(getName()))
+                    .filter(not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
+                    .toList();
             if (gameChannels.size() == 1) {
                 tableTalkChannel = gameChannels.getFirst();
                 setTableTalkChannelID(tableTalkChannel.getId());
                 return tableTalkChannel;
             }
-            // BotLogger.log("Could not retrieve TableTalkChannel for " + getName(), e);
         }
         return null;
     }
@@ -678,8 +770,8 @@ public class Game extends GameProperties {
         try {
             return AsyncTI4DiscordBot.jda.getTextChannelById(getMainChannelID());
         } catch (Exception e) {
-            List<TextChannel> gameChannels = AsyncTI4DiscordBot.jda
-                .getTextChannelsByName(getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
+            List<TextChannel> gameChannels =
+                    AsyncTI4DiscordBot.jda.getTextChannelsByName(getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
             if (gameChannels.size() == 1) {
                 TextChannel mainGameChannel = gameChannels.getFirst();
                 setMainChannelID(mainGameChannel.getId());
@@ -719,11 +811,17 @@ public class Game extends GameProperties {
         }
 
         // FIND BY NAME
-        List<ThreadChannel> botChannels = AsyncTI4DiscordBot.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
+        List<ThreadChannel> botChannels =
+                AsyncTI4DiscordBot.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
         if (botChannels.size() == 1) {
             return botChannels.getFirst();
         } else if (botChannels.size() > 1) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(this), getName() + " appears to have more than one bot-map-updates channel:\n" + botChannels.stream().map(ThreadChannel::getJumpUrl).collect(Collectors.joining("\n")));
+            BotLogger.warning(
+                    new LogOrigin(this),
+                    getName() + " appears to have more than one bot-map-updates channel:\n"
+                            + botChannels.stream()
+                                    .map(ThreadChannel::getJumpUrl)
+                                    .collect(Collectors.joining("\n")));
             return botChannels.getFirst();
         }
 
@@ -732,7 +830,8 @@ public class Game extends GameProperties {
             return null;
         }
         for (ThreadChannel archivedChannel : getActionsChannel().retrieveArchivedPublicThreadChannels()) {
-            if (archivedChannel.getId().equals(getBotMapUpdatesThreadID()) || archivedChannel.getName().equals(getName() + Constants.BOT_CHANNEL_SUFFIX)) {
+            if (archivedChannel.getId().equals(getBotMapUpdatesThreadID())
+                    || archivedChannel.getName().equals(getName() + Constants.BOT_CHANNEL_SUFFIX)) {
                 setBotMapUpdatesThreadID(archivedChannel.getId());
                 return archivedChannel;
             }
@@ -757,16 +856,6 @@ public class Game extends GameProperties {
         return getActionsChannel() == null ? null : getActionsChannel().getGuild();
     }
 
-    @Nullable
-    @JsonIgnore
-    public String getGuildId() {
-        if (getGuild() == null) {
-            return null;
-        }
-        setGuildID(getGuild().getId());
-        return getGuild().getId();
-    }
-
     public Map<Integer, Boolean> getScPlayed() {
         return scPlayed;
     }
@@ -787,7 +876,7 @@ public class Game extends GameProperties {
         return checkingForAllReacts;
     }
 
-    public String getFactionsThatReactedToThis(String messageID) {
+    private String getFactionsThatReactedToThis(String messageID) {
         if (checkingForAllReacts.get(messageID) != null) {
             return checkingForAllReacts.get(messageID);
         }
@@ -796,7 +885,9 @@ public class Game extends GameProperties {
 
     public void clearAllEmptyStoredValues() {
         // Remove the entry if the value is empty
-        checkingForAllReacts.entrySet().removeIf(entry -> entry.getValue() == null || entry.getValue().isEmpty());
+        checkingForAllReacts
+                .entrySet()
+                .removeIf(entry -> entry.getValue() == null || entry.getValue().isEmpty());
     }
 
     public void setStoredValue(String key, String value) {
@@ -834,8 +925,10 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public Set<Integer> getPlayedSCs() {
-        return getScPlayed().entrySet().stream().filter(Entry::getValue).map(Entry::getKey)
-            .collect(Collectors.toSet());
+        return scPlayed.entrySet().stream()
+                .filter(Entry::getValue)
+                .map(Entry::getKey)
+                .collect(Collectors.toSet());
     }
 
     public List<Integer> getPlayedSCsInOrder(Player player) {
@@ -885,7 +978,7 @@ public class Game extends GameProperties {
         return orderedSCs;
     }
 
-    public Player getPlayerFromSC(int sc) {
+    private Player getPlayerFromSC(int sc) {
         for (Player player : getRealPlayersNDummies()) {
             if (player.getSCs().contains(sc)) {
                 return player;
@@ -896,26 +989,26 @@ public class Game extends GameProperties {
 
     public int getActionPhaseTurnOrder(String userId) {
         return getActionPhaseTurnOrder().stream()
-            .map(Player::getUserID)
-            .toList()
-            .indexOf(userId);
+                .map(Player::getUserID)
+                .toList()
+                .indexOf(userId);
     }
 
     public List<Player> getActionPhaseTurnOrder() {
         return new ArrayList<>(players.values().stream()
-            .filter(player -> !player.getSCs().isEmpty())
-            .sorted(Player.comparingInitiative())
-            .toList());
+                .filter(player -> !player.getSCs().isEmpty())
+                .sorted(Player.comparingInitiative())
+                .toList());
     }
 
     public int getRingCount() {
-        if (getTileMap().isEmpty()) {
+        if (tileMap.isEmpty()) {
             return 0;
         }
-        String highestPosition = getTileMap().keySet().stream()
-            .filter(Helper::isInteger)
-            .max(Comparator.comparingInt(Integer::parseInt))
-            .orElse(null);
+        String highestPosition = tileMap.keySet().stream()
+                .filter(Helper::isInteger)
+                .max(Comparator.comparingInt(Integer::parseInt))
+                .orElse(null);
         if (highestPosition == null) {
             return 0;
         }
@@ -1071,7 +1164,8 @@ public class Game extends GameProperties {
         Date newTime = new Date();
         String factionsInCombat = getStoredValue("factionsInCombat");
         Player prevPlayer = getActivePlayer();
-        String prevFaction = (prevPlayer != null && prevPlayer.getFaction() != null) ? prevPlayer.getFaction() : "jazzwuzhere&p1too";
+        String prevFaction =
+                (prevPlayer != null && prevPlayer.getFaction() != null) ? prevPlayer.getFaction() : "jazzwuzhere&p1too";
         long elapsedTime = newTime.getTime() - lastActivePlayerChange.getTime();
         if (prevPlayer != null && !factionsInCombat.contains(prevFaction) && !isTemporaryPingDisable()) {
             prevPlayer.updateTurnStats(elapsedTime);
@@ -1084,7 +1178,7 @@ public class Game extends GameProperties {
         setTemporaryPingDisable(false);
         // reset timers for ping and stats
         setActivePlayerID(player == null ? null : player.getUserID());
-        setLastActivePlayerChange(newTime);
+        lastActivePlayerChange = newTime;
         AutoPingMetadataManager.setupAutoPing(getName());
     }
 
@@ -1104,7 +1198,7 @@ public class Game extends GameProperties {
         lastActivePlayerChange = time;
     }
 
-    public void setSentAgenda(String id) {
+    private void setSentAgenda(String id) {
         Collection<Integer> values = sentAgendas.values();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
@@ -1113,7 +1207,7 @@ public class Game extends GameProperties {
         sentAgendas.put(id, identifier);
     }
 
-    public int addDiscardAgenda(String id) {
+    private int addDiscardAgenda(String id) {
         Collection<Integer> values = discardAgendas.values();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
@@ -1133,7 +1227,7 @@ public class Game extends GameProperties {
         return identifier;
     }
 
-    public void addRevealedPublicObjective(String id) {
+    private void addRevealedPublicObjective(String id) {
         Collection<Integer> values = revealedPublicObjectives.values();
         int identifier = 0;
         while (values.contains(identifier)) {
@@ -1149,76 +1243,32 @@ public class Game extends GameProperties {
      * @return Map of (scInitiativeNum, tradeGoodCount)
      */
     public Map<Integer, Integer> getScTradeGoods() {
-        return scTradeGoods;
+        return strategyCardManager.getTradeGoodCounts();
     }
 
-    public void setScTradeGoods(Map<Integer, Integer> scTradeGoods) {
-        this.scTradeGoods = scTradeGoods;
+    public void setScTradeGoods(Map<Integer, Integer> strategyCardToTradeGoodCount) {
+        strategyCardManager.setTradeGoodCounts(strategyCardToTradeGoodCount);
     }
 
     public void setScTradeGood(Integer sc, Integer tradeGoodCount) {
-        if (Objects.isNull(tradeGoodCount))
-            tradeGoodCount = 0;
-        if (tradeGoodCount > 0 && sc == ButtonHelper.getKyroHeroSC(this)) {
-            Player player = getPlayerFromColorOrFaction(getStoredValue("kyroHeroPlayer"));
-            if (player != null) {
-                player.setTg(player.getTg() + tradeGoodCount);
-                ButtonHelperAbilities.pillageCheck(player, this);
-                ButtonHelperAgents.resolveArtunoCheck(player, tradeGoodCount);
-                tradeGoodCount = 0;
-                MessageHelper.sendMessageToChannel(getActionsChannel(), "The " + tradeGoodCount + " trade good" + (tradeGoodCount == 1 ? "" : "s")
-                    + " that would be placed on **" + Helper.getSCName(sc, this) + "** have instead been given to the Kyro "
-                    + (isFrankenGame() ? "hero " : "") + "player, as per the text on Speygh, the Kyro Hero.");
-            }
-        }
-        scTradeGoods.put(sc, tradeGoodCount);
+        strategyCardManager.setTradeGoodCount(sc, tradeGoodCount);
     }
 
     public void incrementScTradeGoods() {
-        Set<Integer> scPickedList = new HashSet<>();
-        for (Player player_ : getRealPlayers()) {
-            scPickedList.addAll(player_.getSCs());
-            if (!player_.getSCs().isEmpty()) {
-                StringBuilder scs = new StringBuilder();
-                for (int SC : player_.getSCs()) {
-                    scs.append(SC).append("_");
-                }
-                scs = new StringBuilder(scs.substring(0, scs.length() - 1));
-                setStoredValue("Round" + getRound() + "SCPickFor" + player_.getFaction(), scs.toString());
-            }
-        }
-
-        //ADD A TG TO UNPICKED SC
-        if (!islandMode()) {
-            for (Integer scNumber : scTradeGoods.keySet()) {
-                if (!scPickedList.contains(scNumber) && scNumber != 0) {
-                    Integer tgCount = scTradeGoods.get(scNumber);
-                    tgCount = tgCount == null ? 1 : tgCount + 1;
-                    setScTradeGood(scNumber, tgCount);
-                }
-            }
-        }
+        strategyCardManager.incrementTradeGoods();
     }
 
     public boolean addSC(Integer sc) {
-        if (!scTradeGoods.containsKey(sc)) {
-            setScTradeGood(sc, 0);
-            return true;
-        }
-        return false;
+        return strategyCardManager.add(sc);
     }
 
     public boolean removeSC(Integer sc) {
-        if (scTradeGoods.containsKey(sc)) {
-            scTradeGoods.remove(sc);
-            return true;
-        } else
-            return false;
+        return strategyCardManager.remove(sc);
     }
 
     @JsonIgnore
     public List<Integer> getSCList() {
-        return (new ArrayList<>(getScTradeGoods().keySet()));
+        return strategyCardManager.list();
     }
 
     public Map<String, Integer> getRevealedPublicObjectives() {
@@ -1290,13 +1340,13 @@ public class Game extends GameProperties {
     public Map.Entry<String, Integer> revealSOAsPO() {
 
         return revealSecretObjective();
-
     }
 
     public void shuffleInBottomObjective(String cardIdToShuffle, int sizeOfBottom, int type) {
         List<String> objectiveList = type == 1 ? publicObjectives1Peakable : publicObjectives2Peakable;
         if (objectiveList.size() + 1 < sizeOfBottom) {
-            throw new IllegalArgumentException("Cannot shuffle in bottom objective, size of bottom exceeds new size of deck.");
+            throw new IllegalArgumentException(
+                    "Cannot shuffle in bottom objective, size of bottom exceeds new size of deck.");
         }
         if (sizeOfBottom < 1) {
             throw new IllegalArgumentException("Size of bottom must be greater than 0.");
@@ -1366,7 +1416,8 @@ public class Game extends GameProperties {
     public String peekAtStage1(int place, Player player) {
         String objective = peekAtObjective(publicObjectives1Peakable, place);
 
-        if (publicObjectives1Peeked.containsKey(objective) && !publicObjectives1Peeked.get(objective).contains(player.getUserID())) {
+        if (publicObjectives1Peeked.containsKey(objective)
+                && !publicObjectives1Peeked.get(objective).contains(player.getUserID())) {
             publicObjectives1Peeked.get(objective).add(player.getUserID());
         } else {
             List<String> list = new ArrayList<>();
@@ -1380,7 +1431,8 @@ public class Game extends GameProperties {
     public String peekAtStage2(int place, Player player) {
         String objective = peekAtObjective(publicObjectives2Peakable, place);
 
-        if (publicObjectives2Peeked.containsKey(objective) && !publicObjectives2Peeked.get(objective).contains(player.getUserID())) {
+        if (publicObjectives2Peeked.containsKey(objective)
+                && !publicObjectives2Peeked.get(objective).contains(player.getUserID())) {
             publicObjectives2Peeked.get(objective).add(player.getUserID());
         } else {
             List<String> list = new ArrayList<>();
@@ -1407,7 +1459,7 @@ public class Game extends GameProperties {
         swapObjective(publicObjectives2Peakable, place1, place2);
     }
 
-    public void swapObjective(List<String> objectiveList, int place1, int place2) {
+    private void swapObjective(List<String> objectiveList, int place1, int place2) {
         if (!objectiveList.isEmpty()) {
             place1 -= 1;
             place2 -= 1;
@@ -1430,7 +1482,7 @@ public class Game extends GameProperties {
         }
     }
 
-    public String peekAtObjective(List<String> objectiveList, int place) {
+    private String peekAtObjective(List<String> objectiveList, int place) {
         if (!objectiveList.isEmpty()) {
             place -= 1;
             return objectiveList.get(place);
@@ -1450,7 +1502,7 @@ public class Game extends GameProperties {
         }
     }
 
-    public void addObjectiveToDeck(String id) {
+    private void addObjectiveToDeck(String id) {
         PublicObjectiveModel obj = Mapper.getPublicObjective(id);
         if (obj != null) {
             if (obj.getPoints() == 1) {
@@ -1463,7 +1515,7 @@ public class Game extends GameProperties {
         }
     }
 
-    public Entry<String, Integer> revealObjective(List<String> objectiveList) {
+    private Entry<String, Integer> revealObjective(List<String> objectiveList) {
         if (!objectiveList.isEmpty()) {
             String id = objectiveList.getFirst();
             objectiveList.remove(id);
@@ -1488,7 +1540,7 @@ public class Game extends GameProperties {
         String id = getSecretObjectives().getFirst();
         removeSOFromGame(id);
         addToSoToPoList(id);
-        //addRevealedPublicObjective(id);
+        // addRevealedPublicObjective(id);
         Integer so = addCustomPO(Mapper.getSecretObjectivesJustNames().get(id), 1);
         for (Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
             if (entry.getKey().equals(Mapper.getSecretObjectivesJustNames().get(id))) {
@@ -1499,7 +1551,7 @@ public class Game extends GameProperties {
         return null;
     }
 
-    public Entry<String, Integer> revealSpecificObjective(List<String> objectiveList, String id) {
+    private Entry<String, Integer> revealSpecificObjective(List<String> objectiveList, String id) {
         if (objectiveList.contains(id)) {
             objectiveList.remove(id);
             addRevealedPublicObjective(id);
@@ -1520,7 +1572,7 @@ public class Game extends GameProperties {
         return addSpecificObjective(publicObjectives2, objective);
     }
 
-    public Entry<String, Integer> addSpecificObjective(List<String> objectiveList, String objective) {
+    private Entry<String, Integer> addSpecificObjective(List<String> objectiveList, String objective) {
         if (!objectiveList.isEmpty()) {
             objectiveList.remove(objective);
             addRevealedPublicObjective(objective);
@@ -1635,7 +1687,9 @@ public class Game extends GameProperties {
         }
         if (!id.isEmpty()) {
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
-            if (!Constants.CUSTODIAN.equals(id) && !Constants.IMPERIAL_RIDER.equals(id) && scoredPlayerList.contains(userID)) {
+            if (!Constants.CUSTODIAN.equals(id)
+                    && !Constants.IMPERIAL_RIDER.equals(id)
+                    && scoredPlayerList.contains(userID)) {
                 return false;
             }
             scoredPlayerList.add(userID);
@@ -1737,10 +1791,8 @@ public class Game extends GameProperties {
     }
 
     public boolean removePOFromGame(String id) {
-        if (publicObjectives1.remove(id))
-            return true;
-        if (publicObjectives2.remove(id))
-            return true;
+        if (publicObjectives1.remove(id)) return true;
+        if (publicObjectives2.remove(id)) return true;
         return revealedPublicObjectives.remove(id) != null;
     }
 
@@ -1916,14 +1968,13 @@ public class Game extends GameProperties {
 
     public void resetAgendas() {
         setAgendas(Mapper.getShuffledDeck(getAgendaDeckID()));
-        setDiscardAgendas(new LinkedHashMap<>());
+        discardAgendas = new LinkedHashMap<>();
     }
 
     public void resetEvents() {
-        if (Mapper.getDeck(getEventDeckID()) == null)
-            return;
+        if (Mapper.getDeck(getEventDeckID()) == null) return;
         setEvents(Mapper.getShuffledDeck(getEventDeckID()));
-        setDiscardedEvents(new LinkedHashMap<>());
+        discardedEvents = new LinkedHashMap<>();
     }
 
     public void resetDrawStateAgendas() {
@@ -2016,11 +2067,13 @@ public class Game extends GameProperties {
             if (optionalText != null) {
                 lawsInfo.put(id, optionalText);
             }
-            if (getLaws().size() > 2) {
+            if (laws.size() > 2) {
                 for (Player p : getRealPlayers()) {
                     if (p.getSecretsUnscored().containsKey("dp")) {
-                        MessageHelper.sendMessageToChannel(p.getCardsInfoThread(), p.getRepresentationUnfogged()
-                            + ", a reminder that you have _Dictate Policy_, and a 3rd law just got put into play.");
+                        MessageHelper.sendMessageToChannel(
+                                p.getCardsInfoThread(),
+                                p.getRepresentationUnfogged()
+                                        + ", a reminder that you have _Dictate Policy_, and a 3rd law just got put into play.");
                     }
                 }
             }
@@ -2040,7 +2093,7 @@ public class Game extends GameProperties {
         if (!id.isEmpty()) {
             if ("warrant".equalsIgnoreCase(id)) {
                 for (Player p2 : getRealPlayers()) {
-                    if (ButtonHelper.isPlayerElected(this, p2, id)) {
+                    if (IsPlayerElectedService.isPlayerElected(this, p2, id)) {
                         p2.setSearchWarrant(false);
                     }
                 }
@@ -2188,16 +2241,16 @@ public class Game extends GameProperties {
         }
         if ("warrant".equalsIgnoreCase(id)) {
             for (Player p2 : getRealPlayers()) {
-                if (ButtonHelper.isPlayerElected(this, p2, id)) {
+                if (IsPlayerElectedService.isPlayerElected(this, p2, id)) {
                     p2.setSearchWarrant(false);
                 }
             }
         }
         if ("censure".equalsIgnoreCase(id)) {
-            Map<String, Integer> customPOs = new HashMap<>(getRevealedPublicObjectives());
-            for (String customPO : customPOs.keySet()) {
-                if (customPO.toLowerCase().contains("political censure")) {
-                    removeCustomPO(customPOs.get(customPO));
+            Map<String, Integer> customPOs = new HashMap<>(revealedPublicObjectives);
+            for (Entry<String, Integer> entry : customPOs.entrySet()) {
+                if (entry.getKey().toLowerCase().contains("political censure")) {
+                    removeCustomPO(entry.getValue());
                 }
             }
         }
@@ -2216,17 +2269,17 @@ public class Game extends GameProperties {
             }
             if ("warrant".equalsIgnoreCase(id)) {
                 for (Player p2 : getRealPlayers()) {
-                    if (ButtonHelper.isPlayerElected(this, p2, id)) {
+                    if (IsPlayerElectedService.isPlayerElected(this, p2, id)) {
                         p2.setSearchWarrant(false);
                     }
                 }
             }
             if ("censure".equalsIgnoreCase(id)) {
-                if (getCustomPublicVP().get("Political Censure") != null) {
-                    Map<String, Integer> customPOs = new HashMap<>(getRevealedPublicObjectives());
-                    for (String customPO : customPOs.keySet()) {
-                        if (customPO.toLowerCase().contains("political censure")) {
-                            removeCustomPO(customPOs.get(customPO));
+                if (customPublicVP.get("Political Censure") != null) {
+                    Map<String, Integer> customPOs = new HashMap<>(revealedPublicObjectives);
+                    for (Entry<String, Integer> entry : customPOs.entrySet()) {
+                        if (entry.getKey().toLowerCase().contains("political censure")) {
+                            removeCustomPO(entry.getValue());
                         }
                     }
                 }
@@ -2482,8 +2535,9 @@ public class Game extends GameProperties {
         List<String> acsToShuffle = discardActionCards.keySet().stream().toList();
         getActionCards().addAll(acsToShuffle);
         Collections.shuffle(getActionCards());
-        acsToShuffle.forEach(ac -> discardActionCards.remove(ac)); //clear out the shuffled back cards
-        String msg = "# " + getPing() + ", the action card deck has run out of cards, and so the discard pile has been shuffled to form a new action card deck.";
+        acsToShuffle.forEach(ac -> discardActionCards.remove(ac)); // clear out the shuffled back cards
+        String msg = "# " + getPing()
+                + ", the action card deck has run out of cards, and so the discard pile has been shuffled to form a new action card deck.";
         MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
     }
 
@@ -2496,11 +2550,9 @@ public class Game extends GameProperties {
                 ButtonHelperFactionSpecific.resolveDeceive(player, this);
                 return null;
             }
-            if (player != null) {
-                getActionCards().remove(id);
-                player.setActionCard(id);
-                return player.getActionCards();
-            }
+            getActionCards().remove(id);
+            player.setActionCard(id);
+            return player.getActionCards();
         } else if (!discardActionCards.isEmpty()) {
             reshuffleActionCardDiscard();
             return drawActionCard(userID);
@@ -2557,46 +2609,46 @@ public class Game extends GameProperties {
     @JsonIgnore
     public List<TechnologyModel> getPropulsionTechDeck() {
         return getTechnologyDeck().stream()
-            .map(Mapper::getTech)
-            .filter(TechnologyModel::isPropulsionTech)
-            .sorted(TechnologyModel.sortByTechRequirements)
-            .toList();
+                .map(Mapper::getTech)
+                .filter(TechnologyModel::isPropulsionTech)
+                .sorted(TechnologyModel.sortByTechRequirements)
+                .toList();
     }
 
     @JsonIgnore
     public List<TechnologyModel> getWarfareTechDeck() {
         return getTechnologyDeck().stream()
-            .map(Mapper::getTech)
-            .filter(TechnologyModel::isWarfareTech)
-            .sorted(TechnologyModel.sortByTechRequirements)
-            .toList();
+                .map(Mapper::getTech)
+                .filter(TechnologyModel::isWarfareTech)
+                .sorted(TechnologyModel.sortByTechRequirements)
+                .toList();
     }
 
     @JsonIgnore
     public List<TechnologyModel> getCyberneticTechDeck() {
         return getTechnologyDeck().stream()
-            .map(Mapper::getTech)
-            .filter(TechnologyModel::isCyberneticTech)
-            .sorted(TechnologyModel.sortByTechRequirements)
-            .toList();
+                .map(Mapper::getTech)
+                .filter(TechnologyModel::isCyberneticTech)
+                .sorted(TechnologyModel.sortByTechRequirements)
+                .toList();
     }
 
     @JsonIgnore
     public List<TechnologyModel> getBioticTechDeck() {
         return getTechnologyDeck().stream()
-            .map(Mapper::getTech)
-            .filter(TechnologyModel::isBioticTech)
-            .sorted(TechnologyModel.sortByTechRequirements)
-            .toList();
+                .map(Mapper::getTech)
+                .filter(TechnologyModel::isBioticTech)
+                .sorted(TechnologyModel.sortByTechRequirements)
+                .toList();
     }
 
     @JsonIgnore
     public List<TechnologyModel> getUnitUpgradeTechDeck() {
         return getTechnologyDeck().stream()
-            .map(Mapper::getTech)
-            .filter(TechnologyModel::isUnitUpgrade)
-            .sorted(TechnologyModel.sortByTechRequirements)
-            .toList();
+                .map(Mapper::getTech)
+                .filter(TechnologyModel::isUnitUpgrade)
+                .sorted(TechnologyModel.sortByTechRequirements)
+                .toList();
     }
 
     public String drawExplore(String reqType) {
@@ -2608,8 +2660,10 @@ public class Game extends GameProperties {
         if (deck.isEmpty()) {
             shuffleDiscardsIntoExploreDeck(reqType);
             deck = getExplores(reqType, explore);
-            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "Map: `" + getName() + "` MIGRATION CODE TRIGGERED: Explore " + reqType
-                + " deck was empty, shuffling discards into deck.");
+            BotLogger.warning(
+                    new LogOrigin(this),
+                    "Map: `" + getName() + "` MIGRATION CODE TRIGGERED: Explore " + reqType
+                            + " deck was empty, shuffling discards into deck.");
         } // end of migration code
 
         if (!deck.isEmpty()) {
@@ -2620,7 +2674,7 @@ public class Game extends GameProperties {
 
         // If deck is empty after draw, auto refresh deck from discard
         if (getExplores(reqType, explore).isEmpty()) {
-            if (getName().equalsIgnoreCase("pbd1000")) {
+            if ("pbd1000".equalsIgnoreCase(getName())) {
                 resetExploresOfCertainType(reqType);
             } else {
                 shuffleDiscardsIntoExploreDeck(reqType);
@@ -2629,7 +2683,7 @@ public class Game extends GameProperties {
         return result;
     }
 
-    public void shuffleDiscardsIntoExploreDeck(String reqType) {
+    private void shuffleDiscardsIntoExploreDeck(String reqType) {
         List<String> discardsOfType = getExplores(reqType, discardExplore);
         List<String> anotherList = new ArrayList<>(discardsOfType);
         for (String explore : anotherList) {
@@ -2690,7 +2744,8 @@ public class Game extends GameProperties {
             }
         }
         deck = new ArrayList<>(Mapper.getDecks().get(getExplorationDeckID()).getNewShuffledDeck());
-        List<String> deck2 = new ArrayList<>(Mapper.getDecks().get(getExplorationDeckID()).getNewShuffledDeck());
+        List<String> deck2 =
+                new ArrayList<>(Mapper.getDecks().get(getExplorationDeckID()).getNewShuffledDeck());
         for (String id : deck2) {
             ExploreModel card = Mapper.getExplore(id);
             if (card != null) {
@@ -2702,7 +2757,6 @@ public class Game extends GameProperties {
         }
         Collections.shuffle(deck);
         explore.addAll(deck);
-
     }
 
     public void triplicateExplores() {
@@ -2729,11 +2783,11 @@ public class Game extends GameProperties {
     }
 
     private List<String> multiplyDeck(int totalCopies, String... deckIDs) {
-        List<String> newDeck = Arrays.stream(deckIDs).flatMap(deckID -> Mapper.getDecks().get(deckID).getNewDeck().stream()).toList();
+        List<String> newDeck = Arrays.stream(deckIDs)
+                .flatMap(deckID -> Mapper.getDecks().get(deckID).getNewDeck().stream())
+                .toList();
         List<String> newDeck2 = new ArrayList<>(newDeck);
-        for (String card : newDeck)
-            for (int i = 1; i < totalCopies; i++)
-                newDeck2.add(card + "extra" + i);
+        for (String card : newDeck) for (int i = 1; i < totalCopies; i++) newDeck2.add(card + "extra" + i);
         Collections.shuffle(newDeck2);
         return newDeck2;
     }
@@ -2778,17 +2832,16 @@ public class Game extends GameProperties {
     public void checkSOLimit(Player player) {
         if (player.getSecretsScored().size() + player.getSecretsUnscored().size() > player.getMaxSOCount()) {
             String msg = player.getRepresentationUnfogged() + " you have more secret objectives than the limit ("
-                + player.getMaxSOCount()
-                + ") and should discard one. If your game is playing with a higher secret objective limit, you may change that in `/game setup`.";
+                    + player.getMaxSOCount()
+                    + ") and should discard one. If your game is playing with a higher secret objective limit, you may change that in `/game setup`.";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
             String secretScoreMsg = "Click a button below to discard your secret objective.";
             List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
             if (!soButtons.isEmpty()) {
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), secretScoreMsg,
-                    soButtons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), secretScoreMsg, soButtons);
             } else {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    "Something went wrong. Please report to Fin.");
+                MessageHelper.sendMessageToChannel(
+                        player.getCardsInfoThread(), "Something went wrong. Please report to Fin.");
             }
         }
     }
@@ -2845,7 +2898,7 @@ public class Game extends GameProperties {
         }
     }
 
-    public void setDiscardActionCard(String id) {
+    private void setDiscardActionCard(String id) {
         Collection<Integer> values = discardActionCards.values();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
@@ -2854,7 +2907,7 @@ public class Game extends GameProperties {
         discardActionCards.put(id, identifier);
     }
 
-    public void setDiscardActionCard(String id, int oldNum) {
+    private void setDiscardActionCard(String id, int oldNum) {
         Collection<Integer> values = discardActionCards.values();
         int identifier = oldNum;
         while (values.contains(identifier)) {
@@ -2863,7 +2916,7 @@ public class Game extends GameProperties {
         discardActionCards.put(id, identifier);
     }
 
-    public void setPurgedActionCard(String id) {
+    private void setPurgedActionCard(String id) {
         Collection<Integer> values = purgedActionCards.values();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
@@ -3109,9 +3162,10 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public boolean islandMode() {
-        boolean otherThings = getName().contains("island") || (getMapTemplateID() != null && getMapTemplateID().equals("1pIsland"));
+        boolean otherThings =
+                getName().contains("island") || (getMapTemplateID() != null && "1pIsland".equals(getMapTemplateID()));
         if (otherThings) setStoredValue("IslandMode", "true");
-        return getStoredValue("IslandMode").equals("true");
+        return "true".equals(getStoredValue("IslandMode"));
     }
 
     public boolean loadGameSettingsFromSettings(GenericInteractionCreateEvent event, MiltySettings miltySettings) {
@@ -3126,22 +3180,27 @@ public class Game extends GameProperties {
         }
         setAllianceMode(settings.getAlliance().isVal());
 
-        if (settings.getMapTemplate().getValue().getAlias().equals("1pIsland")) {
+        if ("1pIsland".equals(settings.getMapTemplate().getValue().getAlias())) {
             setStoredValue("IslandMode", "true");
         }
 
         return validateAndSetAllDecks(event, miltySettings);
     }
 
-    public boolean validateAndSetAllDecks(GenericInteractionCreateEvent event, MiltySettings miltySettings) {
+    private boolean validateAndSetAllDecks(GenericInteractionCreateEvent event, MiltySettings miltySettings) {
         DeckSettings deckSettings = miltySettings.getGameSettings().getDecks();
 
         boolean success = true;
-        // &= is the "and operator". It will assign true to success iff success is true and the result is true. Otherwise it will propagate a false value to the end
-        success &= validateAndSetPublicObjectivesStage1Deck(event, deckSettings.getStage1().getValue());
-        success &= validateAndSetPublicObjectivesStage2Deck(event, deckSettings.getStage2().getValue());
-        success &= validateAndSetSecretObjectiveDeck(event, deckSettings.getSecrets().getValue());
-        success &= validateAndSetActionCardDeck(event, deckSettings.getActionCards().getValue());
+        // &= is the "and operator". It will assign true to success iff success is true and the result is true.
+        // Otherwise it will propagate a false value to the end
+        success &= validateAndSetPublicObjectivesStage1Deck(
+                event, deckSettings.getStage1().getValue());
+        success &= validateAndSetPublicObjectivesStage2Deck(
+                event, deckSettings.getStage2().getValue());
+        success &= validateAndSetSecretObjectiveDeck(
+                event, deckSettings.getSecrets().getValue());
+        success &= validateAndSetActionCardDeck(
+                event, deckSettings.getActionCards().getValue());
         success &= validateAndSetExploreDeck(event, deckSettings.getExplores().getValue());
         success &= validateAndSetTechnologyDeck(event, deckSettings.getTechs().getValue());
         setStrategyCardSet(deckSettings.getStratCards().getChosenKey());
@@ -3151,14 +3210,18 @@ public class Game extends GameProperties {
         setUpPeakableObjectives(miltySettings.getGameSettings().getStage2s().getVal(), 2);
 
         if (isAbsolMode() && !deckSettings.getAgendas().getChosenKey().contains("absol")) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using Absol mode, so the agenda deck you chose will be overridden.");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "This game seems to be using Absol mode, so the agenda deck you chose will be overridden.");
             success &= validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"));
         } else {
             success &= validateAndSetAgendaDeck(event, deckSettings.getAgendas().getValue());
         }
 
         if (isAbsolMode() && !deckSettings.getRelics().getChosenKey().contains("absol")) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using Absol mode, so the relic deck you chose will be overridden.");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "This game seems to be using Absol mode, so the relic deck you chose will be overridden.");
             success &= validateAndSetRelicDeck(Mapper.getDeck("relics_absol"));
         } else {
             success &= validateAndSetRelicDeck(deckSettings.getRelics().getValue());
@@ -3170,15 +3233,18 @@ public class Game extends GameProperties {
     public boolean validateAndSetPublicObjectivesStage1Deck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getStage1PublicDeckID().equals(deck.getAlias())) return true;
 
-        int peekableStageOneCount = getPublicObjectives1Peakable().size();
+        int peekableStageOneCount = publicObjectives1Peakable.size();
         setUpPeakableObjectives(0, 1);
-        if (getRevealedPublicObjectives().size() > 1) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change public objective deck to **" + deck.getName() + "** while there are revealed public objectives.");
+        if (revealedPublicObjectives.size() > 1) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Cannot change public objective deck to **" + deck.getName()
+                            + "** while there are revealed public objectives.");
             return false;
         }
 
         setStage1PublicDeckID(deck.getAlias());
-        setPublicObjectives1(deck.getNewShuffledDeck());
+        publicObjectives1 = deck.getNewShuffledDeck();
         setUpPeakableObjectives(peekableStageOneCount, 1);
         return true;
     }
@@ -3186,23 +3252,26 @@ public class Game extends GameProperties {
     public boolean validateAndSetPublicObjectivesStage2Deck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getStage2PublicDeckID().equals(deck.getAlias())) return true;
 
-        int peekableStageTwoCount = getPublicObjectives2Peakable().size();
+        int peekableStageTwoCount = publicObjectives2Peakable.size();
         setUpPeakableObjectives(0, 2);
-        if (getRevealedPublicObjectives().size() > 1) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change public objective deck to **" + deck.getName() + "** while there are revealed public objectives.");
+        if (revealedPublicObjectives.size() > 1) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Cannot change public objective deck to **" + deck.getName()
+                            + "** while there are revealed public objectives.");
             return false;
         }
 
         setStage2PublicDeckID(deck.getAlias());
-        setPublicObjectives2(deck.getNewShuffledDeck());
+        publicObjectives2 = deck.getNewShuffledDeck();
         setUpPeakableObjectives(peekableStageTwoCount, 2);
         return true;
     }
 
     public void resetActionCardDeck(DeckModel deck) {
         setActionCards(deck.getNewShuffledDeck());
-        getDiscardActionCards().clear();
-        for (Player player : getPlayers().values()) {
+        discardActionCards.clear();
+        for (Player player : players.values()) {
             player.getActionCards().clear();
         }
     }
@@ -3217,13 +3286,17 @@ public class Game extends GameProperties {
         for (String ac : oldDeck) {
             newDeck.remove(ac);
         }
-        if (!getDiscardActionCards().isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Since there were action cards in the discard pile, will just shuffle any new action cards into the existing deck.");
+        if (!discardActionCards.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Since there were action cards in the discard pile, will just shuffle any new action cards into the existing deck.");
             shuffledExtrasIn = true;
         } else {
-            for (Player player : getPlayers().values()) {
+            for (Player player : players.values()) {
                 if (!player.getActionCards().isEmpty()) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Since there were action cards in players hands, will just shuffle any new action cards into the existing deck.");
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(),
+                            "Since there were action cards in players hands, will just shuffle any new action cards into the existing deck.");
                     shuffledExtrasIn = true;
                     break;
                 }
@@ -3258,9 +3331,12 @@ public class Game extends GameProperties {
     public boolean validateAndSetSecretObjectiveDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getSoDeckID().equals(deck.getAlias())) return true;
 
-        for (Player player : getPlayers().values()) {
+        for (Player player : players.values()) {
             if (!player.getSecrets().isEmpty()) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change secret objective deck to **" + deck.getName() + "** while there are secret objectives in player hands.");
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "Cannot change secret objective deck to **" + deck.getName()
+                                + "** while there are secret objectives in player hands.");
                 return false;
             }
         }
@@ -3272,28 +3348,102 @@ public class Game extends GameProperties {
     public boolean validateAndSetExploreDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getExplorationDeckID().equals(deck.getAlias())) return true;
 
-        if (!getAllExploreDiscard().isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change exploration deck to **" + deck.getName() + "** while there are exploration cards in the discard piles.");
+        if (!discardExplore.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Cannot change exploration deck to **" + deck.getName()
+                            + "** while there are exploration cards in the discard piles.");
             return false;
         }
         setExplorationDeckID(deck.getAlias());
-        setExploreDeck(deck.getNewShuffledDeck());
+        explore = deck.getNewShuffledDeck();
         return true;
     }
 
     public boolean validateAndSetAgendaDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getAgendaDeckID().equals(deck.getAlias())) return true;
 
-        if (!getDiscardAgendas().isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change agenda deck to **" + deck.getName() + "** while there are agendas in the discard pile.");
+        if (!discardAgendas.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Cannot change agenda deck to **" + deck.getName()
+                            + "** while there are agendas in the discard pile.");
             return false;
         }
         setAgendaDeckID(deck.getAlias());
         setAgendas(deck.getNewShuffledDeck());
+        if ("agendas_br".equalsIgnoreCase(deck.getAlias())) {
+            List<String> list = new ArrayList<>(Arrays.asList(
+                    "prophecy",
+                    "minister_antiquities",
+                    "minister_commrece",
+                    "minister_exploration",
+                    "minister_industry",
+                    "minister_peace",
+                    "minister_policy",
+                    "minister_sciences",
+                    "minister_war",
+                    "censure",
+                    "arbiter",
+                    "abolishment",
+                    "classified",
+                    "crisis",
+                    "execution",
+                    "grant_reallocation",
+                    "redistribution",
+                    "secret",
+                    "standardization",
+                    "warrant",
+                    "prophecy",
+                    "minister_antiquities",
+                    "minister_commrece",
+                    "minister_exploration",
+                    "minister_industry",
+                    "minister_peace",
+                    "minister_policy",
+                    "minister_sciences",
+                    "minister_war",
+                    "censure",
+                    "arbiter",
+                    "abolishment",
+                    "classified",
+                    "crisis",
+                    "execution",
+                    "grant_reallocation",
+                    "redistribution",
+                    "secret",
+                    "standardization",
+                    "warrant",
+                    "prophecy",
+                    "minister_antiquities",
+                    "minister_commrece",
+                    "minister_exploration",
+                    "minister_industry",
+                    "minister_peace",
+                    "minister_policy",
+                    "minister_sciences",
+                    "minister_war",
+                    "censure",
+                    "arbiter",
+                    "abolishment",
+                    "classified",
+                    "crisis",
+                    "execution",
+                    "grant_reallocation",
+                    "redistribution",
+                    "secret",
+                    "standardization",
+                    "warrant",
+                    "strategic_coordination",
+                    "minister_of_justice",
+                    "invalidated_patent"));
+            Collections.shuffle(list);
+            setMandates(list);
+        }
         return true;
     }
 
-    public boolean validateAndSetTechnologyDeck(GenericInteractionCreateEvent event, DeckModel deck) {
+    private boolean validateAndSetTechnologyDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getTechnologyDeckID().equals(deck.getAlias())) return true;
 
         swapOutVariantTechs();
@@ -3305,8 +3455,11 @@ public class Game extends GameProperties {
     public boolean validateAndSetEventDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getEventDeckID().equals(deck.getAlias())) return true;
 
-        if (!getDiscardedEvents().isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change event deck to **" + deck.getName() + "** while there are events in the discard pile.");
+        if (!discardedEvents.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Cannot change event deck to **" + deck.getName()
+                            + "** while there are events in the discard pile.");
             return false;
         }
         setEventDeckID(deck.getAlias());
@@ -3345,14 +3498,13 @@ public class Game extends GameProperties {
         StringBuilder sb = new StringBuilder(getName()).append(" ");
         for (String playerID : getPlayerIDs()) {
             User user = AsyncTI4DiscordBot.jda.getUserById(playerID);
-            if (user != null)
-                sb.append(user.getAsMention()).append(" ");
+            if (user != null) sb.append(user.getAsMention()).append(" ");
         }
         return sb.toString();
     }
 
     @JsonIgnore
-    public Role getGameRole() {
+    private Role getGameRole() {
         if (getGuild() != null) {
             for (Role role : getGuild().getRoles()) {
                 if (getName().equals(role.getName().toLowerCase())) {
@@ -3368,8 +3520,7 @@ public class Game extends GameProperties {
     }
 
     public Tile getTileFromPositionOrAlias(String positionOrAlias) {
-        if (getTileByPosition(positionOrAlias) != null)
-            return getTileByPosition(positionOrAlias);
+        if (getTileByPosition(positionOrAlias) != null) return getTileByPosition(positionOrAlias);
         return getTile(AliasHandler.resolveTile(positionOrAlias));
     }
 
@@ -3383,9 +3534,9 @@ public class Game extends GameProperties {
         }
 
         return tileMap.values().stream()
-            .filter(tile -> tile.getTileID().equals(tileID))
-            .findFirst()
-            .orElse(null);
+                .filter(tile -> tile.getTileID().equals(tileID))
+                .findFirst()
+                .orElse(null);
     }
 
     public Tile getTileByPosition(String position) {
@@ -3395,8 +3546,9 @@ public class Game extends GameProperties {
 
     public boolean isTileDuplicated(String tileID) {
         return tileMap.values().stream()
-            .filter(tile -> tile.getTileID().equals(tileID))
-            .count() > 1;
+                        .filter(tile -> tile.getTileID().equals(tileID))
+                        .count()
+                > 1;
     }
 
     public Player getPlayerThatControlsTile(String tileId) {
@@ -3427,43 +3579,46 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public List<Player> getRealPlayers() {
-        return getPlayers().values().stream().filter(Player::isRealPlayer).collect(Collectors.toList());
+        return players.values().stream().filter(Player::isRealPlayer).toList();
     }
 
     @JsonIgnore
     public List<Player> getRealPlayersNNeutral() {
-        return getPlayers().values().stream()
-            .filter(p -> p.isRealPlayer() || (p.getFaction() != null && p.getFaction().equals("neutral")))
-            .collect(Collectors.toList());
+        return players.values().stream()
+                .filter(p -> p.isRealPlayer() || (p.getFaction() != null && "neutral".equals(p.getFaction())))
+                .toList();
     }
 
     @JsonIgnore
     public List<Player> getRealPlayersNDummies() {
-        return getPlayers().values().stream().filter(player -> player.isRealPlayer() || player.isDummy() && player.getColor() != null && !"null".equals(player.getColor()))
-            .collect(Collectors.toList());
+        return players.values().stream()
+                .filter(player -> player.isRealPlayer()
+                        || player.isDummy() && player.getColor() != null && !"null".equals(player.getColor()))
+                .collect(Collectors.toList());
     }
 
     @JsonIgnore
     public List<Player> getRealAndEliminatedPlayers() {
-        return getPlayers().values().stream().filter(player -> (player.isRealPlayer() || player.isEliminated()))
-            .collect(Collectors.toList());
+        return players.values().stream()
+                .filter(player -> (player.isRealPlayer() || player.isEliminated()))
+                .toList();
     }
 
     @JsonIgnore
     public List<Player> getRealAndEliminatedAndDummyPlayers() {
-        return getPlayers().values().stream()
-            .filter(player -> (player.isRealPlayer() || player.isEliminated() || player.isDummy()))
-            .collect(Collectors.toList());
+        return players.values().stream()
+                .filter(player -> (player.isRealPlayer() || player.isEliminated() || player.isDummy()))
+                .toList();
     }
 
     @JsonIgnore
     public List<Player> getDummies() {
-        return getPlayers().values().stream().filter(Player::isDummy).collect(Collectors.toList());
+        return players.values().stream().filter(Player::isDummy).toList();
     }
 
     @JsonIgnore
     public List<Player> getNotRealPlayers() {
-        return getPlayers().values().stream().filter(not(Player::isRealPlayer)).collect(Collectors.toList());
+        return players.values().stream().filter(not(Player::isRealPlayer)).toList();
     }
 
     @JsonIgnore
@@ -3471,13 +3626,12 @@ public class Game extends GameProperties {
         if (getGuild() == null) return Collections.emptyList();
         List<Role> roles = getGuild().getRolesByName(getName() + " GM", true);
         Role gmRole = roles.isEmpty() ? null : roles.getFirst();
-        List<Player> gmPlayers = getPlayers().values().stream()
-            .filter(player -> {
-                Member user = getGuild().getMemberById(player.getUserID());
-                return user != null && user.getRoles().contains(gmRole);
-            }).toList();
-        setFogOfWarGMIDs(gmPlayers.stream().map(Player::getUserID).toList()); // For @ExportableField (Website)
-        return gmPlayers;
+        return players.values().stream()
+                .filter(player -> {
+                    Member user = getGuild().getMemberById(player.getUserID());
+                    return user != null && user.getRoles().contains(gmRole);
+                })
+                .toList();
     }
 
     @JsonIgnore
@@ -3493,7 +3647,9 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public Set<String> getFactions() {
-        return getRealAndEliminatedAndDummyPlayers().stream().map(Player::getFaction).collect(Collectors.toSet());
+        return getRealAndEliminatedAndDummyPlayers().stream()
+                .map(Player::getFaction)
+                .collect(Collectors.toSet());
     }
 
     public void setPlayers(Map<String, Player> players) {
@@ -3529,8 +3685,7 @@ public class Game extends GameProperties {
 
     @Override
     public void setOwnerID(String ownerID) {
-        if (ownerID.length() > 18)
-            ownerID = ownerID.substring(0, 18);
+        if (ownerID.length() > 18) ownerID = ownerID.substring(0, 18);
         super.setOwnerID(ownerID);
     }
 
@@ -3588,7 +3743,8 @@ public class Game extends GameProperties {
     public Set<String> getPlanets() {
         if (planets.isEmpty()) {
             for (Tile tile : tileMap.values()) {
-                for (Entry<String, UnitHolder> unitHolderEntry : tile.getUnitHolders().entrySet()) {
+                for (Entry<String, UnitHolder> unitHolderEntry :
+                        tile.getUnitHolders().entrySet()) {
                     if (unitHolderEntry.getValue() instanceof Planet p) {
                         planets.put(unitHolderEntry.getKey(), p);
                     }
@@ -3609,10 +3765,10 @@ public class Game extends GameProperties {
     }
 
     public void rebuildTilePositionAutoCompleteList() {
-        setTileNameAutocompleteOptionsCache(getTileMap().values().stream()
-            .map(tile -> new SimpleEntry<>(tile.getAutoCompleteName(), tile.getPosition()))
-            .filter(e -> !e.getKey().toLowerCase().contains("hyperlane"))
-            .toList());
+        tileNameAutocompleteOptionsCache = tileMap.values().stream()
+                .map(tile -> new SimpleEntry<>(tile.getAutoCompleteName(), tile.getPosition()))
+                .filter(e -> !e.getKey().toLowerCase().contains("hyperlane"))
+                .toList();
     }
 
     @JsonIgnore
@@ -3624,12 +3780,13 @@ public class Game extends GameProperties {
         return tileNameAutocompleteOptionsCache;
     }
 
-    public void setTileNameAutocompleteOptionsCache(List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache) {
+    public void setTileNameAutocompleteOptionsCache(
+            List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache) {
         this.tileNameAutocompleteOptionsCache = tileNameAutocompleteOptionsCache;
     }
 
     public Player getPNOwner(String pnID) {
-        for (Player player : getPlayers().values()) {
+        for (Player player : players.values()) {
             if (player.ownsPromissoryNote(pnID)) {
                 return player;
             }
@@ -3642,7 +3799,7 @@ public class Game extends GameProperties {
         List<String> allPlayerHandPromissoryNotes = new ArrayList<>();
         Set<String> allOwnedPromissoryNotes = new HashSet<>();
 
-        for (Player player : getPlayers().values()) {
+        for (Player player : players.values()) {
             allPromissoryNotes.addAll(player.getPromissoryNotes().keySet());
             allPlayerHandPromissoryNotes.addAll(player.getPromissoryNotes().keySet());
             allPromissoryNotes.addAll(player.getPromissoryNotesInPlayArea());
@@ -3651,29 +3808,33 @@ public class Game extends GameProperties {
 
         // Find duplicate PNs - PNs that are in multiple players' hands or play areas
         if (!Helper.findDuplicateInList(allPlayerHandPromissoryNotes).isEmpty()) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "`" + getName() + "`: there are duplicate promissory notes in the game:\n> `"
-                + Helper.findDuplicateInList(allPlayerHandPromissoryNotes) + "`");
+            BotLogger.warning(
+                    new LogOrigin(this),
+                    "`" + getName() + "`: there are duplicate promissory notes in the game:\n> `"
+                            + Helper.findDuplicateInList(allPlayerHandPromissoryNotes) + "`");
         }
 
-        allPromissoryNotes.addAll(getPurgedPN());
+        allPromissoryNotes.addAll(purgedPN);
 
         // Find PNs that are extra - players have them but nobody "owns" them
         List<String> unOwnedPromissoryNotes = new ArrayList<>(allPromissoryNotes);
         unOwnedPromissoryNotes.removeAll(allOwnedPromissoryNotes);
         if (!unOwnedPromissoryNotes.isEmpty()) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "`" + getName() + "`: there are promissory notes in the game that no player owns:\n> `"
-                + unOwnedPromissoryNotes + "`");
-            getPurgedPN().removeAll(unOwnedPromissoryNotes);
+            BotLogger.warning(
+                    new LogOrigin(this),
+                    "`" + getName() + "`: there are promissory notes in the game that no player owns:\n> `"
+                            + unOwnedPromissoryNotes + "`");
+            purgedPN.removeAll(unOwnedPromissoryNotes);
         }
 
         // Remove unowned PNs from all players hands
-        for (Player player : getPlayers().values()) {
+        for (Player player : players.values()) {
             List<String> pns = new ArrayList<>(player.getPromissoryNotes().keySet());
             for (String pnID : pns) {
                 if (unOwnedPromissoryNotes.contains(pnID)) {
                     player.removePromissoryNote(pnID);
                     BotLogger.info("`" + getName() + "`: removed promissory note `" + pnID + "` from player `"
-                        + player.getUserName() + "` because nobody 'owned' it");
+                            + player.getUserName() + "` because nobody 'owned' it");
                 }
             }
         }
@@ -3682,16 +3843,20 @@ public class Game extends GameProperties {
         List<String> missingPromissoryNotes = new ArrayList<>(allOwnedPromissoryNotes);
         missingPromissoryNotes.removeAll(allPromissoryNotes);
         if (!missingPromissoryNotes.isEmpty()) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `" + missingPromissoryNotes + "`");
-            for (Player player : getPlayers().values()) {
+            BotLogger.warning(
+                    new LogOrigin(this),
+                    "`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `"
+                            + missingPromissoryNotes + "`");
+            for (Player player : players.values()) {
                 PromissoryNoteHelper.checkAndAddPNs(this, player);
             }
             GameManager.save(this, "Added missing promissory notes to players' hands: " + missingPromissoryNotes);
         }
     }
 
-    public boolean leaderIsFake(String leaderID) {
-        return (getStoredValue("fakeCommanders").contains(leaderID) || getStoredValue("minorFactionCommanders").contains(leaderID));
+    private boolean leaderIsFake(String leaderID) {
+        return (getStoredValue("fakeCommanders").contains(leaderID)
+                || getStoredValue("minorFactionCommanders").contains(leaderID));
     }
 
     public void addFakeCommander(String leaderID) {
@@ -3708,10 +3873,8 @@ public class Game extends GameProperties {
     }
 
     public boolean playerHasLeaderUnlockedOrAlliance(Player player, String leaderID) {
-        if (player.hasLeaderUnlocked(leaderID))
-            return true;
-        if (!leaderID.contains("commander"))
-            return false;
+        if (player.hasLeaderUnlocked(leaderID)) return true;
+        if (!leaderID.contains("commander")) return false;
 
         if (leaderIsFake(leaderID)) {
             return false;
@@ -3720,7 +3883,9 @@ public class Game extends GameProperties {
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
-                if (pnOwner != null && !pnOwner.getFaction().equalsIgnoreCase(player.getFaction()) && pnOwner.hasLeaderUnlocked(leaderID)) {
+                if (pnOwner != null
+                        && !pnOwner.getFaction().equalsIgnoreCase(player.getFaction())
+                        && pnOwner.hasLeaderUnlocked(leaderID)) {
                     return true;
                 }
             }
@@ -3730,8 +3895,7 @@ public class Game extends GameProperties {
         // that have the leader unlocked
         if (player.hasAbility("imperia")) {
             for (Player player_ : getRealPlayersNDummies()) {
-                if (player_.getFaction().equalsIgnoreCase(player.getFaction()))
-                    continue;
+                if (player_.getFaction().equalsIgnoreCase(player.getFaction())) continue;
                 if (player.getMahactCC().contains(player_.getColor()) && player_.hasLeaderUnlocked(leaderID)) {
                     return true;
                 }
@@ -3766,8 +3930,7 @@ public class Game extends GameProperties {
         // that have the leader unlocked
         if (player.hasAbility("imperia")) {
             for (Player otherPlayer : getRealPlayers()) {
-                if (otherPlayer.equals(player))
-                    continue;
+                if (otherPlayer.equals(player)) continue;
                 if (player.getMahactCC().contains(otherPlayer.getColor())) {
                     for (Leader playerLeader : otherPlayer.getLeaders()) {
                         if (leaderIsFake(playerLeader.getId())) {
@@ -3776,17 +3939,19 @@ public class Game extends GameProperties {
                         if (!playerLeader.getId().contains("commander")) {
                             continue;
                         }
-                        if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())
-                            && !playerLeader.getId().contains(otherPlayer.getFaction())) {
+                        if (isAllianceMode()
+                                && "mahact".equalsIgnoreCase(player.getFaction())
+                                && !playerLeader.getId().contains(otherPlayer.getFaction())) {
                             continue;
                         }
                         leaders.add(playerLeader);
                     }
-
                 }
             }
         }
-        leaders = leaders.stream().filter(leader -> leader != null && !leader.isLocked()).collect(Collectors.toList());
+        leaders = leaders.stream()
+                .filter(leader -> leader != null && !leader.isLocked())
+                .collect(Collectors.toList());
         return leaders;
     }
 
@@ -3827,7 +3992,7 @@ public class Game extends GameProperties {
      */
     public boolean usesStrategyCardAutomation(String scID) {
         return getStrategyCardSet().getStrategyCardModels().stream()
-            .anyMatch(sc -> scID.equals(sc.getBotSCAutomationID()));
+                .anyMatch(sc -> scID.equals(sc.getBotSCAutomationID()));
     }
 
     @JsonIgnore
@@ -3838,8 +4003,7 @@ public class Game extends GameProperties {
     @JsonIgnore
     public int getActionCardFullDeckSize() {
         DeckModel acDeckModel = Mapper.getDeck(getAcDeckID());
-        if (acDeckModel != null)
-            return acDeckModel.getCardCount();
+        if (acDeckModel != null) return acDeckModel.getCardCount();
         return -1;
     }
 
@@ -3851,8 +4015,7 @@ public class Game extends GameProperties {
     @JsonIgnore
     public int getAgendaFullDeckSize() {
         DeckModel agendaDeckModel = Mapper.getDeck(getAgendaDeckID());
-        if (agendaDeckModel != null)
-            return agendaDeckModel.getCardCount();
+        if (agendaDeckModel != null) return agendaDeckModel.getCardCount();
         return -1;
     }
 
@@ -3864,47 +4027,43 @@ public class Game extends GameProperties {
     @JsonIgnore
     public int getEventFullDeckSize() {
         DeckModel eventDeckModel = Mapper.getDeck(getEventDeckID());
-        if (eventDeckModel != null)
-            return eventDeckModel.getCardCount();
+        if (eventDeckModel != null) return eventDeckModel.getCardCount();
         return -1;
     }
 
     @JsonIgnore
     public int getPublicObjectives1DeckSize() {
-        return getPublicObjectives1().size();
+        return publicObjectives1.size();
     }
 
     @JsonIgnore
     public int getPublicObjectives1FullDeckSize() {
         DeckModel po1DeckModel = Mapper.getDeck(getStage1PublicDeckID());
-        if (po1DeckModel != null)
-            return po1DeckModel.getCardCount();
+        if (po1DeckModel != null) return po1DeckModel.getCardCount();
         return -1;
     }
 
     @JsonIgnore
     public int getPublicObjectives2DeckSize() {
-        return getPublicObjectives2().size();
+        return publicObjectives2.size();
     }
 
     @JsonIgnore
     public int getPublicObjectives2FullDeckSize() {
         DeckModel po2DeckModel = Mapper.getDeck(getStage2PublicDeckID());
-        if (po2DeckModel != null)
-            return po2DeckModel.getCardCount();
+        if (po2DeckModel != null) return po2DeckModel.getCardCount();
         return -1;
     }
 
     @JsonIgnore
     public int getRelicDeckSize() {
-        return getAllRelics().size();
+        return relics.size();
     }
 
     @JsonIgnore
     public int getRelicFullDeckSize() {
         DeckModel relicDeckModel = Mapper.getDeck(getRelicDeckID());
-        if (relicDeckModel != null)
-            return relicDeckModel.getCardCount();
+        if (relicDeckModel != null) return relicDeckModel.getCardCount();
         return -1;
     }
 
@@ -3916,8 +4075,7 @@ public class Game extends GameProperties {
     @JsonIgnore
     public int getSecretObjectiveFullDeckSize() {
         DeckModel soDeckModel = Mapper.getDeck(getSoDeckID());
-        if (soDeckModel != null)
-            return soDeckModel.getCardCount();
+        if (soDeckModel != null) return soDeckModel.getCardCount();
         return -1;
     }
 
@@ -3927,8 +4085,7 @@ public class Game extends GameProperties {
 
     private int getExploreDeckFullSize(String exploreDeckID) {
         DeckModel exploreDeckModel = Mapper.getDeck(getExplorationDeckID());
-        if (exploreDeckModel == null)
-            return -1;
+        if (exploreDeckModel == null) return -1;
 
         int count = 0;
         for (String exploreCardID : exploreDeckModel.getNewDeck()) {
@@ -4003,7 +4160,7 @@ public class Game extends GameProperties {
     @JsonIgnore
     public List<String> getAllPlanetsWithSleeperTokens() {
         List<String> planetsWithSleepers = new ArrayList<>();
-        for (Tile tile : getTileMap().values()) {
+        for (Tile tile : tileMap.values()) {
             planetsWithSleepers.addAll(tile.getPlanetsWithSleeperTokens());
         }
         return planetsWithSleepers;
@@ -4020,27 +4177,25 @@ public class Game extends GameProperties {
 
     public Optional<Player> getPlayerByUnitKey(UnitKey unit) {
         return getRealPlayersNDummies().stream()
-            .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(unit.getColorID()))
-            .findFirst();
+                .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(unit.getColorID()))
+                .findFirst();
     }
 
     public Optional<Player> getPlayerByColorID(String color) {
         return getRealPlayersNDummies().stream()
-            .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(color))
-            .findFirst();
+                .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(color))
+                .findFirst();
     }
 
     public boolean isLeaderInGame(String leaderID) {
         for (Player player : getRealPlayers()) {
-            if (player.getLeaderIDs().contains(leaderID))
-                return true;
+            if (player.getLeaderIDs().contains(leaderID)) return true;
         }
         return false;
     }
 
     @JsonIgnore
     public Tile getMecatolTile() {
-
         if (isOrdinianC1Mode()) {
             return ButtonHelper.getTileWithCoatl(this);
         }
@@ -4049,17 +4204,18 @@ public class Game extends GameProperties {
         }
         for (String mr : Constants.MECATOL_SYSTEMS) {
             Tile tile = getTile(mr);
-            if (tile != null)
-                return tile;
+            if (tile != null) return tile;
         }
         return null;
     }
 
     @Nullable
     public Tile getTileFromPlanet(String planetName) {
-        for (Tile tile_ : getTileMap().values()) {
-            for (Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
-                if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
+        for (Tile tile_ : tileMap.values()) {
+            for (Entry<String, UnitHolder> unitHolderEntry :
+                    tile_.getUnitHolders().entrySet()) {
+                if (unitHolderEntry.getValue() instanceof Planet
+                        && unitHolderEntry.getKey().equals(planetName)) {
                     return tile_;
                 }
             }
@@ -4084,7 +4240,7 @@ public class Game extends GameProperties {
         String factionColor = AliasHandler.resolveColor(factionOrColor.toLowerCase());
         factionColor = StringUtils.substringBefore(factionColor, " "); // TO HANDLE UNRESOLVED AUTOCOMPLETE
         factionColor = AliasHandler.resolveFaction(factionColor);
-        for (Player player : getPlayers().values()) {
+        for (Player player : players.values()) {
             if ("keleres".equalsIgnoreCase(factionColor)) {
                 if (Objects.equals(factionColor + "a", player.getFaction())) {
                     return player;
@@ -4096,9 +4252,9 @@ public class Game extends GameProperties {
                     return player;
                 }
             }
-            if (Objects.equals(factionColor, player.getFaction()) ||
-                Objects.equals(factionColor, player.getColor()) ||
-                Objects.equals(factionColor, player.getColorID())) {
+            if (Objects.equals(factionColor, player.getFaction())
+                    || Objects.equals(factionColor, player.getColor())
+                    || Objects.equals(factionColor, player.getColorID())) {
                 return player;
             }
         }
@@ -4109,7 +4265,7 @@ public class Game extends GameProperties {
     public Player getPlayerFromLeader(String leader) {
         Player player = null;
         if (leader != null) {
-            for (Player player_ : getPlayers().values()) {
+            for (Player player_ : players.values()) {
                 if (player_.getLeaderIDs().contains(leader)) {
                     player = player_;
                     break;
@@ -4121,21 +4277,24 @@ public class Game extends GameProperties {
 
     public UnitModel getUnitFromUnitKey(UnitKey unitKey) {
         Player player = getPlayerFromColorOrFaction(unitKey.getColorID());
-        if (player == null)
-            return null;
+        if (player == null) return null;
         return player.getUnitFromUnitKey(unitKey);
     }
 
     public void swapInVariantUnits(String source) {
         List<UnitModel> variantUnits = Mapper.getUnits().values().stream()
-            .filter(unit -> source.equals(unit.getSource().toString())).toList();
-        for (Player player : getPlayers().values()) {
+                .filter(unit -> source.equals(unit.getSource().toString()))
+                .toList();
+        for (Player player : players.values()) {
             List<UnitModel> playersUnits = player.getUnitModels().stream()
-                .filter(unit -> !source.equals(unit.getSource().toString())).toList();
+                    .filter(unit -> !source.equals(unit.getSource().toString()))
+                    .toList();
             for (UnitModel playerUnit : playersUnits) {
                 for (UnitModel variantUnit : variantUnits) {
-                    boolean variantReplacesPok = variantUnit.getHomebrewReplacesID().orElse("-").equals(playerUnit.getId());
-                    boolean pokReplacesVariant = playerUnit.getHomebrewReplacesID().orElse("-").equals(variantUnit.getId());
+                    boolean variantReplacesPok =
+                            variantUnit.getHomebrewReplacesID().orElse("-").equals(playerUnit.getId());
+                    boolean pokReplacesVariant =
+                            playerUnit.getHomebrewReplacesID().orElse("-").equals(variantUnit.getId());
                     if (variantReplacesPok || pokReplacesVariant) {
                         player.removeOwnedUnitByID(playerUnit.getId());
                         player.addOwnedUnitByID(variantUnit.getId());
@@ -4149,11 +4308,13 @@ public class Game extends GameProperties {
     @JsonIgnore
     public void swapInVariantTechs() {
         DeckModel deckModel = Mapper.getDeck(getTechnologyDeckID());
-        if (deckModel == null)
-            return;
-        List<TechnologyModel> techsToReplace = deckModel.getNewDeck().stream().map(Mapper::getTech)
-            .filter(Objects::nonNull).filter(t -> t.getHomebrewReplacesID().isPresent()).toList();
-        for (Player player : getPlayers().values()) {
+        if (deckModel == null) return;
+        List<TechnologyModel> techsToReplace = deckModel.getNewDeck().stream()
+                .map(Mapper::getTech)
+                .filter(Objects::nonNull)
+                .filter(t -> t.getHomebrewReplacesID().isPresent())
+                .toList();
+        for (Player player : players.values()) {
             List<String> newExhaustedTechs = new ArrayList<>(player.getExhaustedTechs());
 
             for (TechnologyModel tech : techsToReplace) {
@@ -4179,11 +4340,11 @@ public class Game extends GameProperties {
     @JsonIgnore
     public void swapOutVariantTechs() {
         DeckModel deckModel = Mapper.getDeck(getTechnologyDeckID());
-        if (deckModel == null)
-            return;
+        if (deckModel == null) return;
         List<TechnologyModel> techsToReplace = Mapper.getTechs().values().stream()
-            .filter(t -> t.getHomebrewReplacesID().isPresent()).toList();
-        for (Player player : getPlayers().values()) {
+                .filter(t -> t.getHomebrewReplacesID().isPresent())
+                .toList();
+        for (Player player : players.values()) {
             List<String> newExhaustedTechs = new ArrayList<>(player.getExhaustedTechs());
 
             for (TechnologyModel tech : techsToReplace) {
@@ -4208,14 +4369,15 @@ public class Game extends GameProperties {
 
     public String getSCNumberIfNaaluInPlay(Player player, String scText) {
         if (player.hasTheZeroToken()) // naalu 0 token ability
-            scText = "0/" + scText;
+        scText = "0/" + scText;
         return scText;
     }
 
     @JsonIgnore
     public boolean isLittleOmega() {
-        return getStage1PublicDeckID().contains("little_omega") || getStage2PublicDeckID().contains("little_omega")
-            || getAgendaDeckID().contains("little_omega");
+        return getStage1PublicDeckID().contains("little_omega")
+                || getStage2PublicDeckID().contains("little_omega")
+                || getAgendaDeckID().contains("little_omega");
     }
 
     // Currently unused
@@ -4227,65 +4389,110 @@ public class Game extends GameProperties {
         sources.add(ComponentSource.codex2);
         sources.add(ComponentSource.codex3);
         sources.add(ComponentSource.codex4);
-        if (!isBaseGameMode())
-            sources.add(ComponentSource.pok);
-        if (isAbsolMode())
-            sources.add(ComponentSource.absol);
-        if (isVotcMode())
-            sources.add(ComponentSource.cryypter);
-        if (isMiltyModMode())
-            sources.add(ComponentSource.miltymod);
-        if (isDiscordantStarsMode())
-            sources.add(ComponentSource.ds);
+        if (!isBaseGameMode()) sources.add(ComponentSource.pok);
+        if (isAbsolMode()) sources.add(ComponentSource.absol);
+        if (isVotcMode()) sources.add(ComponentSource.cryypter);
+        if (isMiltyModMode()) sources.add(ComponentSource.miltymod);
+        if (isDiscordantStarsMode()) sources.add(ComponentSource.ds);
         return sources;
     }
 
     @JsonIgnore
     public boolean hasHomebrew() {
         return isHomebrew()
-            || isExtraSecretMode()
-            || isFowMode()
-            || isAgeOfExplorationMode()
-            || isFacilitiesMode()
-            || isMinorFactionsMode()
-            || isLightFogMode()
-            || isRedTapeMode()
-            || isDiscordantStarsMode()
-            || isFrankenGame()
-            || isMiltyModMode()
-            || isAbsolMode()
-            || isVotcMode()
-            || isPromisesPromisesMode()
-            || isFlagshippingMode()
-            || isAllianceMode()
-            || getSpinMode() != null && !"OFF".equalsIgnoreCase(getSpinMode())
-            || isHomebrewSCMode()
-            || isCommunityMode()
-            || !checkAllDecksAreOfficial()
-            || !checkAllTilesAreOfficial()
-            || getFactions().stream()
-                .map(Mapper::getFaction)
+                || isExtraSecretMode()
+                || isFowMode()
+                || isFacilitiesMode()
+                || isLightFogMode()
+                || isRedTapeMode()
+                || isDiscordantStarsMode()
+                || isFrankenGame()
+                || isMiltyModMode()
+                || isAbsolMode()
+                || isVotcMode()
+                || isPromisesPromisesMode()
+                || isFlagshippingMode()
+                || isAllianceMode()
+                || getSpinMode() != null && !"OFF".equalsIgnoreCase(getSpinMode())
+                || isHomebrewSCMode()
+                || isCommunityMode()
+                || !checkAllDecksAreOfficial()
+                || !checkAllTilesAreOfficial()
+                || getFactions().stream()
+                        .map(Mapper::getFaction)
+                        .filter(Objects::nonNull)
+                        .anyMatch(faction -> !faction.getSource().isOfficial())
+                || getRealAndEliminatedAndDummyPlayers().stream()
+                        .map(Player::getLeaderIDs)
+                        .flatMap(Collection::stream)
+                        .map(Mapper::getLeader)
+                        .filter(Objects::nonNull)
+                        .anyMatch(leader -> !leader.getSource().isOfficial())
+                || getRealPlayers().stream()
+                        .anyMatch(player -> player.getSecretVictoryPoints() > 3
+                                && !player.getRelics().contains("obsidian"))
+                || getPlayerCountForMap() < 3
+                || getRealAndEliminatedPlayers().size() < 3
+                || getPlayerCountForMap() > 8
+                || getRealAndEliminatedPlayers().size() > 8
+                || hasUnofficialNumberOfRevealedObjectives();
+    }
+
+    private boolean hasUnofficialNumberOfRevealedObjectives() {
+        int revealedStage1Count = (int) revealedPublicObjectives.keySet().stream()
+                .map(Mapper::getPublicObjective)
                 .filter(Objects::nonNull)
-                .anyMatch(faction -> !faction.getSource().isOfficial())
-            || getRealAndEliminatedAndDummyPlayers().stream()
-                .map(Player::getLeaderIDs)
-                .flatMap(Collection::stream)
-                .map(Mapper::getLeader)
+                .filter(objective -> objective.getSource().isOfficial())
+                .filter(objective -> objective.getPoints() == 1)
+                .count();
+        if (revealedStage1Count < 2) {
+            return true;
+        }
+
+        int revealedStage2Count = (int) revealedPublicObjectives.keySet().stream()
+                .map(Mapper::getPublicObjective)
                 .filter(Objects::nonNull)
-                .anyMatch(leader -> !leader.getSource().isOfficial())
-            || (publicObjectives1 != null && publicObjectives1.size() < 5 && getRound() >= 4)
-            || (publicObjectives2 != null && publicObjectives2.size() < (getRound() - 4))
-            || getRealPlayers().stream()
-                .anyMatch(player -> player.getSecretVictoryPoints() > 3
-                    && !player.getRelics().contains("obsidian"))
-            || getPlayerCountForMap() < 3
-            || getRealAndEliminatedAndDummyPlayers().size() < 3
-            || getPlayerCountForMap() > 8
-            || getRealAndEliminatedAndDummyPlayers().size() > 8;
+                .filter(objective -> objective.getSource().isOfficial())
+                .filter(objective -> objective.getPoints() == 2)
+                .count();
+        int round = getRound();
+        String phaseOfGame = StringUtils.defaultString(getPhaseOfGame());
+        // if we're in action, we haven't revealed this round's public; can't filter on status because sometimes people
+        // reveal despite game end
+        int extraIfNotActionPhase = phaseOfGame.contains("action") ? 0 : 1;
+        // if neuraloop is in the deck, or we're not using Codex 4, we can make additional assumptions about number of
+        // publics
+        if (relics.contains("neuraloop") || !isCodex4()) {
+            // 5 revealed by round 5 and Incentive Program
+            if (revealedStage1Count > 6) return true;
+            if (round < 5) {
+                // We can't have less stage 1s than this
+                if (revealedStage1Count < round + 1) return true;
+                // Round + 1 revealed by this point, plus Incentive Program; 1 extra if we're not in action phase
+                if (revealedStage1Count > round + 2 + extraIfNotActionPhase) return true;
+                // At most 1 Stage 2 can be revealed, by Incentive Program; 1 extra if we're not in action phase and its
+                // round 4
+                int extraIfRound4AndNotActionPhase = round != 4 ? 0 : extraIfNotActionPhase;
+                if (revealedStage2Count > 1 + extraIfRound4AndNotActionPhase) return true;
+            }
+            if (round >= 5) {
+                // We can't have less stage 1s than this
+                if (revealedStage1Count < 5) return true;
+                if (revealedStage2Count < round - 4) return true;
+                // 1 revealed per round past round 4 and Incentive Program; 1 extra if we're not in action phase
+                if (revealedStage2Count > round - 3 + extraIfNotActionPhase) return true;
+            }
+        }
+
+        // Extra stage 1 on round 1, Incentive Program during agenda phase; 1 extra if we're not in action phase
+        return revealedStage1Count + revealedStage2Count > round + 2 + extraIfNotActionPhase;
+    }
+
+    private boolean isCodex4() {
+        return getTechnologyDeck().contains("x89c4");
     }
 
     public boolean checkAllDecksAreOfficial() {
-        // needs to check for homebrew tiles still
         // Decks
         List<String> deckIDs = new ArrayList<>();
         deckIDs.add(getAcDeckID());
@@ -4312,13 +4519,13 @@ public class Game extends GameProperties {
 
     public boolean checkAllTilesAreOfficial() {
         // Tiles
-        return getTileMap().values().stream().allMatch(tile -> {
+        return tileMap.values().stream().allMatch(tile -> {
             if (tile == null || tile.getTileModel() == null) {
                 return true;
             }
             ComponentSource tileSource = tile.getTileModel().getSource();
             if (tile.getTileModel().getImagePath().endsWith("_Hyperlane.png")) {
-                return true; //official hyperlane
+                return true; // official hyperlane
             }
             return tileSource != null && tileSource.isOfficial();
         });
@@ -4331,16 +4538,20 @@ public class Game extends GameProperties {
         Map<Integer, Integer> oldTGs = getScTradeGoods();
         setScTradeGoods(new LinkedHashMap<>());
         setScSetID(strategyCardModel.getAlias());
-        strategyCardModel.getStrategyCardModels().forEach(scModel -> setScTradeGood(scModel.getInitiative(), oldTGs.getOrDefault(scModel.getInitiative(), 0)));
+        strategyCardModel
+                .getStrategyCardModels()
+                .forEach(scModel ->
+                        setScTradeGood(scModel.getInitiative(), oldTGs.getOrDefault(scModel.getInitiative(), 0)));
     }
 
     @JsonIgnore
     public List<ColorModel> getUnusedColorsPreferringBase() {
         List<String> priorityColourIDs = List.of("red", "blue", "yellow", "purple", "green", "orange", "pink", "black");
         List<ColorModel> priorityColours = priorityColourIDs.stream()
-            .map(Mapper::getColor)
-            .filter(color -> getPlayers().values().stream().noneMatch(player -> player.getColor().equals(color.getName())))
-            .toList();
+                .map(Mapper::getColor)
+                .filter(color -> players.values().stream()
+                        .noneMatch(player -> player.getColor().equals(color.getName())))
+                .toList();
         if (!priorityColours.isEmpty()) {
             return priorityColours;
         }
@@ -4349,8 +4560,9 @@ public class Game extends GameProperties {
 
     public List<ColorModel> getUnusedColors() {
         return Mapper.getColors().stream()
-            .filter(color -> getPlayers().values().stream().noneMatch(player -> player.getColor().equals(color.getName())))
-            .toList();
+                .filter(color -> players.values().stream()
+                        .noneMatch(player -> player.getColor().equals(color.getName())))
+                .toList();
     }
 
     public boolean addTag(String tag) {
@@ -4387,15 +4599,16 @@ public class Game extends GameProperties {
         }
 
         List<String> sortedTilePositions = tilePositions.stream()
-            .sorted(Comparator.comparingInt(Integer::parseInt))
-            .toList();
-        Map<String, Tile> tileMap = new HashMap<>(getTileMap());
+                .sorted(Comparator.comparingInt(Integer::parseInt))
+                .toList();
+        Map<String, Tile> tileMap = new HashMap<>(this.tileMap);
         StringBuilder sb = new StringBuilder();
         for (String position : sortedTilePositions) {
             boolean missingTile = true;
             for (Tile tile : tileMap.values()) {
                 if (tile.getPosition().equals(position)) {
-                    String tileID = AliasHandler.resolveStandardTile(tile.getTileID()).toUpperCase();
+                    String tileID =
+                            AliasHandler.resolveStandardTile(tile.getTileID()).toUpperCase();
                     if ("000".equalsIgnoreCase(position) && "18".equalsIgnoreCase(tileID)) {
                         // Mecatol Rex in Centre Position
                         sb.append("{18}");
@@ -4424,15 +4637,13 @@ public class Game extends GameProperties {
         // 18+0+0*b;Bio,71+0+2Rct;Ro;Ri,36+1+1Kcf;Km*I;Ki,76+1-1;;;,72+0-2; ......
         // CSV of {tileID}{+x+yCoords}??{list;of;tokens} ??
         // See ConvertTTPGtoAsync.ConvertTTPGHexToAsyncTile() and reverse it!
-        return getTileMap().values().stream()
-            .map(Tile::getHexTileSummary)
-            .collect(Collectors.joining(","));
+        return tileMap.values().stream().map(Tile::getHexTileSummary).collect(Collectors.joining(","));
     }
 
     public boolean hasUser(User user) {
         if (user == null) return false;
         String id = user.getId();
-        for (Player player : getPlayers().values()) {
+        for (Player player : players.values()) {
             if (player.getUserID().equals(id)) {
                 return true;
             }
@@ -4443,20 +4654,15 @@ public class Game extends GameProperties {
         return false;
     }
 
-    public List<String> getAllTeamMateIDs() {
-        List<String> teamMateIDs = new ArrayList<>();
-        for (Player player : getPlayers().values()) {
-            teamMateIDs.addAll(player.getTeamMateIDs());
-            teamMateIDs.remove(player.getUserID());
-        }
-        return teamMateIDs;
-    }
-
     public List<String> peekAtSecrets(int count) {
         var peekedSecrets = new ArrayList<String>();
         for (int i = 0; i < count && i < getSecretObjectives().size(); i++) {
             peekedSecrets.add(getSecretObjectives().get(i));
         }
         return peekedSecrets;
+    }
+
+    public int addTradeGoodsToStrategyCard(int strategyCard, int tradeGoodCount) {
+        return strategyCardManager.addTradeGoods(strategyCard, tradeGoodCount);
     }
 }

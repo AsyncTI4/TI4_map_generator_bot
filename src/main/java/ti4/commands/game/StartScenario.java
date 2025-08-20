@@ -3,7 +3,6 @@ package ti4.commands.game;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -16,7 +15,6 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 import ti4.service.emoji.FactionEmojis;
@@ -29,8 +27,10 @@ import ti4.service.unit.AddUnitService;
 public class StartScenario extends GameStateSubcommand {
 
     public StartScenario() {
-        super(Constants.START_SCENARIO, "Start a codex scanerio", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.SCENARIO, "Scenario name").setAutoComplete(true).setRequired(true));
+        super(Constants.START_SCENARIO, "Start a codex scenario", true, false);
+        addOptions(new OptionData(OptionType.STRING, Constants.SCENARIO, "Scenario name")
+                .setAutoComplete(true)
+                .setRequired(true));
     }
 
     @Override
@@ -38,20 +38,23 @@ public class StartScenario extends GameStateSubcommand {
         Game game = getGame();
         String scenario = event.getOption(Constants.SCENARIO).getAsString();
 
-        if (scenario != null && scenario.contains("ordinian")) {
+        if (scenario.contains("ordinian")) {
             startOrdinianCodex1(game, event);
         }
-        if (scenario != null && scenario.contains("liberation")) {
+        if (scenario.contains("liberation")) {
             startLiberationCodex4(game, event);
         }
         MessageHelper.replyToMessage(event, "Successfully started the scenario.");
     }
 
-    public static void startOrdinianCodex1(Game game, GenericInteractionCreateEvent event) {
+    private static void startOrdinianCodex1(Game game, GenericInteractionCreateEvent event) {
         game.setOrdinianC1Mode(true);
         var factions = List.of("arborec", "ghost", "muaat", "letnev", "nekro", "l1z1x");
-        if (game.getRealPlayers().size() == 0) {
-            AddTileListService.addTileListToMap(game, "{42} 32 43 25 47 33 36 19 37 28 21 48 29 27 24 38 30 40 22 10 50 26 4 49 45 17 35 31 5 44 39 8 41 34 6 20 23", event);
+        if (game.getRealPlayers().isEmpty()) {
+            AddTileListService.addTileListToMap(
+                    game,
+                    "{42} 32 43 25 47 33 36 19 37 28 21 48 29 27 24 38 30 40 22 10 50 26 4 49 45 17 35 31 5 44 39 8 41 34 6 20 23",
+                    event);
         }
         List<Player> players = new ArrayList<>();
         for (Player player : game.getPlayers().values()) {
@@ -63,7 +66,7 @@ public class StartScenario extends GameStateSubcommand {
             if (game.getPlayerFromColorOrFaction(faction) == null) {
                 int face = ThreadLocalRandom.current().nextInt(0, players.size());
                 Tile tile = game.getTileFromPositionOrAlias(faction);
-                if (faction.equalsIgnoreCase("ghost")) {
+                if ("ghost".equalsIgnoreCase(faction)) {
                     tile = game.getTileFromPositionOrAlias("creussgate");
                 }
                 boolean speakerAlreadyExist = game.getSpeaker() != null;
@@ -73,7 +76,14 @@ public class StartScenario extends GameStateSubcommand {
                     speaker = chance == face;
                 }
                 if (tile != null) {
-                    MiltyService.secondHalfOfPlayerSetup(players.get(face), game, players.get(face).getNextAvailableColour(), faction, tile.getPosition(), event, speaker);
+                    MiltyService.secondHalfOfPlayerSetup(
+                            players.get(face),
+                            game,
+                            players.get(face).getNextAvailableColour(),
+                            faction,
+                            tile.getPosition(),
+                            event,
+                            speaker);
                     players.remove(face);
                 }
             }
@@ -93,14 +103,16 @@ public class StartScenario extends GameStateSubcommand {
         game.addCustomPO("Coatl HS", 1);
         center.addToken("token_custc1.png", "space");
         CommanderUnlockCheckService.checkPlayer(nekro, "nekro");
-
     }
 
-    public static void startLiberationCodex4(Game game, GenericInteractionCreateEvent event) {
+    private static void startLiberationCodex4(Game game, GenericInteractionCreateEvent event) {
         game.setLiberationC4Mode(true);
         var factions = List.of("ghost", "xxcha", "sol", "naaz", "nekro", "nomad");
-        if (game.getRealPlayers().size() == 0) {
-            AddTileListService.addTileListToMap(game, "{c41} 21 35 77 63 48 70 68 60 47 76 25 66 30 72 27 26 22 75 1 74 67 8 62 79 14 31 29 53 41 34 17 65 45 57 64 49", event);
+        if (game.getRealPlayers().isEmpty()) {
+            AddTileListService.addTileListToMap(
+                    game,
+                    "{c41} 21 35 77 63 48 70 68 60 47 76 25 66 30 72 27 26 22 75 1 74 67 8 62 79 14 31 29 53 41 34 17 65 45 57 64 49",
+                    event);
         }
         List<Player> players = new ArrayList<>();
         for (Player player : game.getPlayers().values()) {
@@ -109,45 +121,31 @@ public class StartScenario extends GameStateSubcommand {
             }
         }
         for (String faction : factions) {
-            if (players.size() == 0)
-            {
-                MessageHelper.sendMessageToEventChannel(event, "You don't have six players, but I'll try my best anyway.");
+            if (players.isEmpty()) {
+                MessageHelper.sendMessageToEventChannel(
+                        event, "You don't have six players, but I'll try my best anyway.");
                 break;
             }
             if (game.getPlayerFromColorOrFaction(faction) == null) {
                 int face = ThreadLocalRandom.current().nextInt(0, players.size());
                 Tile tile = game.getTileFromPositionOrAlias(faction);
-                if (faction.equalsIgnoreCase("ghost")) {
+                if ("ghost".equalsIgnoreCase(faction)) {
                     tile = game.getTileFromPositionOrAlias("creussgate");
                 }
-                boolean speaker = false;
-                if (faction.equalsIgnoreCase("nekro")) {
-                    speaker = true;
-                }
+                boolean speaker = "nekro".equalsIgnoreCase(faction);
                 String color = players.get(face).getNextAvailableColour();
-                switch (faction.toLowerCase())
-                {
-                    case "ghost":
-                        color = RandomHelper.isOneInX(2) ? "ruby" : "bloodred";
-                        break;
-                    case "xxcha":
-                        color = RandomHelper.isOneInX(2) ? "sunset" : "tropical";
-                        break;
-                    case "sol":
-                        color = RandomHelper.isOneInX(2) ? "dawn" : "wasp";
-                        break;
-                    case "naaz":
-                        color = RandomHelper.isOneInX(2) ? "lime" : "sherbet";
-                        break;
-                    case "nekro":
-                        color = RandomHelper.isOneInX(2) ? "black" : "poison";
-                        break;
-                    case "nomad":
-                        color = RandomHelper.isOneInX(2) ? "navy" : "glacier";
-                        break;
-                }
+                color = switch (faction.toLowerCase()) {
+                    case "ghost" -> RandomHelper.isOneInX(2) ? "ruby" : "bloodred";
+                    case "xxcha" -> RandomHelper.isOneInX(2) ? "sunset" : "tropical";
+                    case "sol" -> RandomHelper.isOneInX(2) ? "dawn" : "wasp";
+                    case "naaz" -> RandomHelper.isOneInX(2) ? "lime" : "sherbet";
+                    case "nekro" -> RandomHelper.isOneInX(2) ? "black" : "poison";
+                    case "nomad" -> RandomHelper.isOneInX(2) ? "navy" : "glacier";
+                    default -> color;
+                };
                 if (tile != null) {
-                    MiltyService.secondHalfOfPlayerSetup(players.get(face), game, color, faction, tile.getPosition(), event, speaker);
+                    MiltyService.secondHalfOfPlayerSetup(
+                            players.get(face), game, color, faction, tile.getPosition(), event, speaker);
                     players.remove(face);
                 }
             }
@@ -184,7 +182,8 @@ public class StartScenario extends GameStateSubcommand {
             nomad.addRelic(relicID);
             RelicModel relicModel = Mapper.getRelic(relicID);
             String message = nomad.getFactionEmoji() + " Drew Relic: " + relicModel.getName();
-            MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
         }
 
         Player naaz = game.getPlayerFromColorOrFaction("naaz");
@@ -194,7 +193,8 @@ public class StartScenario extends GameStateSubcommand {
             naaz.addRelic(relicID);
             RelicModel relicModel = Mapper.getRelic(relicID);
             String message = naaz.getFactionEmoji() + " Drew Relic: " + relicModel.getName();
-            MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
         }
 
         Player sol = game.getPlayerFromColorOrFaction("sol");
@@ -208,7 +208,5 @@ public class StartScenario extends GameStateSubcommand {
             DrawSecretService.dealSOToAll(event, 2, game);
         }
         CommanderUnlockCheckService.checkPlayer(nekro, "nekro");
-
     }
-
 }
