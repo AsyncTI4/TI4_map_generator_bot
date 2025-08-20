@@ -26,6 +26,11 @@ class CreateGameButton extends Subcommand {
 
     public CreateGameButton() {
         super(Constants.CREATE_GAME_BUTTON, "Create Game Creation Button");
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.GAME_FUN_NAME,
+                        "Fun name for the channel; a single underscore alone will generate a random name")
+                .setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3"));
@@ -34,7 +39,6 @@ class CreateGameButton extends Subcommand {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Player6"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8"));
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel"));
     }
 
     @Override
@@ -109,10 +113,8 @@ class CreateGameButton extends Subcommand {
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("createGameChannels", "Create Game"));
-        String gameFunName = event.getOption(Constants.GAME_FUN_NAME) == null
-                ? null
-                : event.getOption(Constants.GAME_FUN_NAME).getAsString();
-        if (gameFunName == null) {
+        String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString();
+        if ("_".equals(gameFunName)) {
             // spotless:off
             // if these words are changed, please replace them in place, to avoid disrupting the generation algorithm
             // i.e. avoid deleting a word and putting a new word at the end, instead put the new word where the old word was
@@ -157,8 +159,8 @@ class CreateGameButton extends Subcommand {
             int third = (gameNumber >> 16) & 0xFF;
             second ^= first;
             third ^= second;
-            gameFunName = words.get(3 * first & 0xFF) + "-" + words.get(5 * second & 0xFF) + "-"
-                    + words.get(7 * third & 0xFF);
+            gameFunName = words.get(37 * first & 0xFF) + "-" + words.get(53 * second & 0xFF) + "-"
+                    + words.get(83 * third & 0xFF);
         }
         if (!members.isEmpty()) {
             StringBuilder buttonMsg =
