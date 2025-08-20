@@ -12,6 +12,8 @@ import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.tactical.TacticalActionDisplacementService;
 import ti4.service.tactical.TacticalActionOutputService;
 import ti4.spring.model.MovementUnitCount;
@@ -25,45 +27,53 @@ public class MovementService {
      */
     public Tile commitMovement(
             Game game, Player player, String targetPosition, Map<String, List<MovementUnitCount>> displacement) {
-        // Transform web payload into internal displacement structure, normalizing unit-holder keys
-        Map<String, Map<UnitKey, List<Integer>>> internal = new HashMap<>();
-        if (displacement != null) {
-            for (Entry<String, List<MovementUnitCount>> entry : displacement.entrySet()) {
-                String normalizedKey = normalizeUnitHolderKey(game, entry.getKey());
-                List<MovementUnitCount> units = entry.getValue();
-                if (units == null) continue;
-                Map<UnitKey, List<Integer>> byKey = new HashMap<>();
-                for (MovementUnitCount muc : units) {
-                    if (muc == null) continue;
-                    UnitKey key = Units.getUnitKey(muc.unitType(), muc.colorID());
-                    if (key == null) continue;
-                    List<Integer> counts = muc.counts();
-                    byKey.put(key, counts == null ? List.of(0, 0) : counts);
+        try {
+            // Transform web payload into internal displacement structure, normalizing unit-holder keys
+            Map<String, Map<UnitKey, List<Integer>>> internal = new HashMap<>();
+            if (displacement != null) {
+                for (Entry<String, List<MovementUnitCount>> entry : displacement.entrySet()) {
+                    String normalizedKey = normalizeUnitHolderKey(game, entry.getKey());
+                    List<MovementUnitCount> units = entry.getValue();
+                    if (units == null) continue;
+                    Map<UnitKey, List<Integer>> byKey = new HashMap<>();
+                    for (MovementUnitCount muc : units) {
+                        if (muc == null) continue;
+                        UnitKey key = Units.getUnitKey(muc.unitType(), muc.colorID());
+                        if (key == null) continue;
+                        List<Integer> counts = muc.counts();
+                        byKey.put(key, counts == null ? List.of(0, 0) : counts);
+                    }
+                    internal.put(normalizedKey, byKey);
                 }
-                internal.put(normalizedKey, byKey);
             }
+
+            // Validate that active system is already set and matches targetPosition
+            String active = game.getActiveSystem();
+            if (active == null || active.isBlank()) {
+                throw new IllegalStateException("Active system is not set. Activate a system first.");
+            }
+            if (targetPosition != null && !targetPosition.equals(active)) {
+                throw new IllegalStateException(
+                        "Target position '" + targetPosition + "' does not match active system '" + active + "'.");
+            }
+
+            // Stage the full displacement and remove units from origins
+            TacticalActionDisplacementService.stageFullDisplacementAndRemoveFromOrigins(game, player, internal);
+
+            Tile tile = game.getTileByPosition(active);
+            if (tile == null) return null;
+
+            // Post the movement UI with a "Done moving" button (no commit yet)
+            TacticalActionOutputService.refreshButtonsAndMessageForChoosingTile(null, game, player);
+
+            return tile;
+        } catch (RuntimeException e) {
+            BotLogger.error(
+                    new LogOrigin(game),
+                    "MovementService.commitMovement failed for target '" + targetPosition + "'",
+                    e);
+            throw e;
         }
-
-        // Validate that active system is already set and matches targetPosition
-        String active = game.getActiveSystem();
-        if (active == null || active.isBlank()) {
-            throw new IllegalStateException("Active system is not set. Activate a system first.");
-        }
-        if (targetPosition != null && !targetPosition.equals(active)) {
-            throw new IllegalStateException(
-                    "Target position '" + targetPosition + "' does not match active system '" + active + "'.");
-        }
-
-        // Stage the full displacement and remove units from origins
-        TacticalActionDisplacementService.stageFullDisplacementAndRemoveFromOrigins(game, player, internal);
-
-        Tile tile = game.getTileByPosition(active);
-        if (tile == null) return null;
-
-        // Post the movement UI with a "Done moving" button (no commit yet)
-        TacticalActionOutputService.refreshButtonsAndMessageForChoosingTile(null, game, player);
-
-        return tile;
     }
 
     private String normalizeUnitHolderKey(Game game, String raw) {
