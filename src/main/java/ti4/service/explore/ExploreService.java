@@ -390,12 +390,28 @@ public class ExploreService {
         MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), messageText, exploreEmbed);
 
         String message;
-        message = "found a " + exploreModel.getName();
-        if (planetID != null) {
-            message += " on " + Helper.getPlanetRepresentation(planetID, game) + ".";
+        String indefiniteArticle;
+        String exploreName = exploreModel.getName();
+        if ("Freelancers".equalsIgnoreCase(exploreName)
+                || "Local Fabricators".equalsIgnoreCase(exploreName)
+                || "mirage".equalsIgnoreCase(cardID)) {
+            indefiniteArticle = "";
+        } else if ("dmz".equalsIgnoreCase(cardID) || "toe".equalsIgnoreCase(cardID)) {
+            indefiniteArticle = "the ";
+        } else if ("ls".equalsIgnoreCase(cardID)) {
+            indefiniteArticle = "some ";
+        } else if ("aeiou".indexOf(exploreName.toLowerCase().charAt(0)) >= 0) {
+            indefiniteArticle = "an ";
+        } else {
+            indefiniteArticle = "a ";
         }
+        message = player.getFactionEmoji() + " found " + indefiniteArticle + "_" + exploreName + "_";
+        if (planetID != null) {
+            message += " on " + Helper.getPlanetRepresentation(planetID, game);
+        }
+        message += ".";
         if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
-            MessageHelper.sendMessageToChannel(game.getActionsChannel(), player.getFactionEmoji() + " " + message);
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
         }
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),

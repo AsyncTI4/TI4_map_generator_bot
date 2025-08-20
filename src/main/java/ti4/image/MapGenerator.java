@@ -1091,11 +1091,10 @@ public class MapGenerator implements AutoCloseable {
             graphics.setFont(Storage.getFont32());
             point = PositionMapper.getPlayerStats("newfaction");
             point.translate(statTileMid.x, statTileMid.y);
-            String factionText = player.getFaction();
+            String factionText = player.getFactionModel().getShortName();
             if (player.getDisplayName() != null && !"null".equals(player.getDisplayName())) {
                 factionText = player.getDisplayName();
             }
-            factionText = StringUtils.capitalize(factionText);
             DrawingUtil.superDrawString(
                     graphics, factionText, point.x, point.y, Color.WHITE, center, null, stroke5, Color.BLACK);
         }
