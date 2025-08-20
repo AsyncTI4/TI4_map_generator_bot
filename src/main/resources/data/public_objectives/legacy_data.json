@@ -1,18 +1,3 @@
 [
-  {
-    "alias": "raise_fleets_little_omega",
-    "name": "Raise Fleets ω",
-    "phase": "Status",
-    "text": "Have 3 non-fighter ships in each of 3 systems.",
-    "points": 1,
-    "source": "little_omega"
-  },
-  {
-    "alias": "parade_marvels_little_omega",
-    "name": "Parade Marvels ω",
-    "phase": "Status",
-    "text": "Have your flagship or a war sun on the game board that is not in or adjacent to your home system.",
-    "points": 1,
-    "source": "little_omega"
-  }
+
 ]

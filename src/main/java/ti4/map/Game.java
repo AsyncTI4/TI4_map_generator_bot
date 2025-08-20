@@ -1,16 +1,6 @@
 package ti4.map;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
-
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.awt.Point;
+import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -31,6 +21,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
@@ -100,6 +98,9 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
+
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 public class Game extends GameProperties {
 
@@ -696,7 +697,6 @@ public class Game extends GameProperties {
         gameModes.put("VotC", isVotcMode());
         gameModes.put(SourceEmojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
         gameModes.put("HomebrewSC", isHomebrewSCMode());
-        gameModes.put("Little Omega", isLittleOmega());
         gameModes.put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
         gameModes.put("Omega Phase", isOmegaPhaseMode());
         gameModes.put("Priority Track", hasAnyPriorityTrackMode());
@@ -1291,10 +1291,6 @@ public class Game extends GameProperties {
         savedButtons = savedButtonsPassed;
     }
 
-    /**
-     *
-     * @return unrevealed Stage 1 Objectives
-     */
     public List<String> getPublicObjectives1Peakable() {
         return publicObjectives1Peakable;
     }
@@ -1303,10 +1299,6 @@ public class Game extends GameProperties {
         return publicObjectives2;
     }
 
-    /**
-     *
-     * @return unrevealed Stage 2 Objectives
-     */
     public List<String> getPublicObjectives2Peakable() {
         return publicObjectives2Peakable;
     }
@@ -1335,11 +1327,6 @@ public class Game extends GameProperties {
     public Map.Entry<String, Integer> revealStage1Random() {
         Collections.shuffle(publicObjectives1);
         return revealObjective(publicObjectives1);
-    }
-
-    public Map.Entry<String, Integer> revealSOAsPO() {
-
-        return revealSecretObjective();
     }
 
     public void shuffleInBottomObjective(String cardIdToShuffle, int sizeOfBottom, int type) {
@@ -1385,25 +1372,6 @@ public class Game extends GameProperties {
                     publicObjectives2.add(id);
                     Collections.shuffle(publicObjectives2);
                 } else {
-                    Collections.shuffle(publicObjectives2);
-                    String id = publicObjectives2.getFirst();
-                    publicObjectives2.remove(id);
-                    publicObjectives2Peakable.add(id);
-                }
-            }
-        }
-    }
-
-    public void setUpPeakableObjectives(int num) {
-        if (publicObjectives1Peakable != null && publicObjectives1Peakable.size() < num - 1) {
-            for (int x = 0; x < num; x++) {
-                if (!publicObjectives1.isEmpty()) {
-                    Collections.shuffle(publicObjectives1);
-                    String id = publicObjectives1.getFirst();
-                    publicObjectives1.remove(id);
-                    publicObjectives1Peakable.add(id);
-                }
-                if (!publicObjectives2.isEmpty()) {
                     Collections.shuffle(publicObjectives2);
                     String id = publicObjectives2.getFirst();
                     publicObjectives2.remove(id);
@@ -1540,8 +1508,7 @@ public class Game extends GameProperties {
         String id = getSecretObjectives().getFirst();
         removeSOFromGame(id);
         addToSoToPoList(id);
-        // addRevealedPublicObjective(id);
-        Integer so = addCustomPO(Mapper.getSecretObjectivesJustNames().get(id), 1);
+        addCustomPO(Mapper.getSecretObjectivesJustNames().get(id), 1);
         for (Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
             if (entry.getKey().equals(Mapper.getSecretObjectivesJustNames().get(id))) {
                 return entry;
@@ -4368,16 +4335,10 @@ public class Game extends GameProperties {
     }
 
     public String getSCNumberIfNaaluInPlay(Player player, String scText) {
-        if (player.hasTheZeroToken()) // naalu 0 token ability
-        scText = "0/" + scText;
+        if (player.hasTheZeroToken()) {
+            return "0/" + scText;
+        }
         return scText;
-    }
-
-    @JsonIgnore
-    public boolean isLittleOmega() {
-        return getStage1PublicDeckID().contains("little_omega")
-                || getStage2PublicDeckID().contains("little_omega")
-                || getAgendaDeckID().contains("little_omega");
     }
 
     // Currently unused

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -82,7 +83,6 @@ class AgendaResolveButtonHandler {
         AGENDA_HANDLERS.put("absol_censure", new PoliticalCensureAgendaResolver("absol_censure"));
         AGENDA_HANDLERS.put("absol_abolishment", new AbsolAbolishmentAgendaResolver());
         AGENDA_HANDLERS.put("absol_miscount", new MiscountMessageAgendaResolver("absol_miscount"));
-        AGENDA_HANDLERS.put("little_omega_artifact", new ArtifactAgendaResolver("little_omega_artifact"));
         AGENDA_HANDLERS.put("voice_of_the_council", new VoiceOfTheCouncilLawAgendaResolver());
 
         AGENDA_HANDLERS.put("abolishment", new AbolishmentAgendaResolver());

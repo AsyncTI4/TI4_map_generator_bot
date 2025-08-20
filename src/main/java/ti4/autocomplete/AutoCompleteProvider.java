@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -402,7 +403,6 @@ public class AutoCompleteProvider {
                         "absol",
                         "ds",
                         "action_deck_2",
-                        "little_omega",
                         "franken",
                         "milty_mod",
                         "red_tape",

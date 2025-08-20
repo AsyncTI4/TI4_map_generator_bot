@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
@@ -44,13 +45,7 @@ public class DataMigrationManager {
 
     static {
         migrations = new HashMap<>();
-        migrations.put("cleanupFactionEmojis_110525", MigrationHelper::cleanupFactionEmojis);
-        migrations.put(
-                "removeWekkersAbsolsPoliticalSecret_220125", MigrationHelper::removeWekkersAbsolsPoliticalSecrets);
-        migrations.put(
-                "removeWekkersAbsolsPoliticalSecretAgain_220125",
-                MigrationHelper::removeWekkersAbsolsPoliticalSecretsAgain);
-        migrations.put("warnGamesWithOldDisplaceMap_270525", MigrationHelper::warnGamesWithOldDisplaceMap);
+        migrations.put("removeOldHomebrew_081925", DataMigrationManager::removeOldHomebrew_081925);
         // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
@@ -132,5 +127,9 @@ public class DataMigrationManager {
             }
         }
         return migrationsApplied;
+    }
+
+    private static boolean removeOldHomebrew_081925(Game game) {
+
     }
 }
