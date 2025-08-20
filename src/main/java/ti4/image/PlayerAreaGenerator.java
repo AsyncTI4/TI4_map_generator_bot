@@ -146,7 +146,7 @@ class PlayerAreaGenerator {
         // Faction/Colour/DisplayName
         // String factionText = player.getFactionModel() != null ? player.getFactionModel().getShortName() :
         // player.getFaction(); //TODO use this but make it look better
-        String factionText = StringUtils.capitalize(player.getFaction());
+        String factionText = player.getFactionModel().getShortName();
         if (player.getDisplayName() != null && !"null".equalsIgnoreCase(player.getDisplayName())) {
             factionText = player.getDisplayName(); // overwrites faction
         }
