@@ -317,6 +317,21 @@ class PlayerAreaGenerator {
             int drawX = x + 9;
             int drawY = y + 125;
             Set<Player> neighbors = player.getNeighbouringPlayers(true);
+            Set<Player> guildShips = new HashSet<>();
+            for (Player p2 : game.getRealPlayers()) {
+                if (player == p2 || neighbors.contains(p2)) {
+                    continue;
+                }
+                if (game.isAgeOfCommerceMode()
+                        || player.hasAbility("guild_ships")
+                        || player.getPromissoryNotesInPlayArea().contains("convoys")
+                        || p2.getPromissoryNotesInPlayArea().contains("convoys")
+                        || p2.hasAbility("guild_ships")
+                        || player.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")
+                        || p2.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")) {
+                    guildShips.add(p2);
+                }
+            }
             if (neighbors.isEmpty()) {
                 DrawingUtil.superDrawString(
                         g2, "No Neighbors", drawX + xSpacer, drawY, Color.red, null, null, stroke2, Color.black);
@@ -332,6 +347,22 @@ class PlayerAreaGenerator {
                         xSpacer += 27;
                     }
                 }
+            }
+            if (!guildShips.isEmpty()) {
+                xSpacer += 27;
+                DrawingUtil.superDrawString(
+                        g2, "(", drawX + xSpacer, drawY, Color.red, null, null, stroke2, Color.black);
+                xSpacer += 20;
+                for (Player p2 : guildShips) {
+                    String faction2 = p2.getFaction();
+                    if (faction2 != null) {
+                        DrawingUtil.drawPlayerFactionIconImage(graphics, p2, x + xSpacer, y + 125 - 20, 26, 26);
+                        xSpacer += 27;
+                    }
+                }
+                DrawingUtil.superDrawString(
+                        g2, ")", drawX + xSpacer - 8, drawY, Color.red, null, null, stroke2, Color.black);
+                xSpacer += 4;
             }
         }
 
