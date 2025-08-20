@@ -349,9 +349,10 @@ class PlayerAreaGenerator {
                 }
             }
             if (!guildShips.isEmpty()) {
+                graphics.setFont(Storage.getFont30());
                 xSpacer += 27;
                 DrawingUtil.superDrawString(
-                        g2, "(", drawX + xSpacer, drawY, Color.red, null, null, stroke2, Color.black);
+                        g2, "(", drawX + xSpacer, drawY + 2, Color.red, null, null, stroke2, Color.black);
                 xSpacer += 20;
                 for (Player p2 : guildShips) {
                     String faction2 = p2.getFaction();
@@ -361,7 +362,7 @@ class PlayerAreaGenerator {
                     }
                 }
                 DrawingUtil.superDrawString(
-                        g2, ")", drawX + xSpacer - 8, drawY, Color.red, null, null, stroke2, Color.black);
+                        g2, ")", drawX + xSpacer - 8, drawY + 2, Color.red, null, null, stroke2, Color.black);
                 xSpacer += 4;
             }
         }

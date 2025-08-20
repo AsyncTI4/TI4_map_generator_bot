@@ -4669,6 +4669,7 @@ public class ButtonHelper {
         String msg =
                 player.getRepresentation() + " sent 1 " + tgOrDebt + " to " + tradeHolder.getRepresentation() + ".";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        CommanderUnlockCheckService.checkPlayer(tradeHolder, "hacan");
     }
 
     public static boolean doesPlanetHaveAttachmentTechSkip(Tile tile, String planet) {
