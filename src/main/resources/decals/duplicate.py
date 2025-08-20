@@ -2,7 +2,7 @@ from os import listdir
 from shutil import copyfile
 
 old = 45
-new = 100
+new = 101
 
 ##for i in listdir():
 ##    if f"cb_{old}_" in i and "blk.png" in i:

@@ -1504,10 +1504,13 @@ public class TransactionHelper {
                     Button button;
                     if (!game.isFowMode()) {
                         String label = player.getUserName();
-                        if (!canTheseTwoTransact(game, p, player)) {
-                            label = player.getUserName() + "(Not Neighbors)";
+                        if (p.isNeighboursWith(player)) {
+                            button = Buttons.green(finChecker + "transactWith_" + faction, label);
+                        } else if (canTheseTwoTransact(game, p, player)) {
+                            button = Buttons.blue(finChecker + "transactWith_" + faction, label);
+                        } else {
+                            button = Buttons.gray(finChecker + "transactWith_" + faction, label);
                         }
-                        button = Buttons.gray(finChecker + "transactWith_" + faction, label);
 
                         String factionEmojiString = player.getFactionEmoji();
                         button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));

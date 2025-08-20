@@ -417,14 +417,20 @@ public class CreateGameService {
         return missingMembers;
     }
 
-    public static String getNextGameName() {
+    public static Integer getNextGameNumber() {
         List<Integer> existingNums = getAllExistingPBDNumbers();
         if (existingNums.isEmpty()) {
-            return "pbd1";
+            return 1;
         }
-        int nextPBDNumber = Collections.max(getAllExistingPBDNumbers()) + 1;
-        while (ReserveGameNumberService.isGameNumReserved("pbd" + nextPBDNumber)) nextPBDNumber++;
-        return "pbd" + nextPBDNumber;
+        int nextPBDNumber = Collections.max(existingNums) + 1;
+        while (ReserveGameNumberService.isGameNumReserved("pbd" + nextPBDNumber)) {
+            nextPBDNumber++;
+        }
+        return nextPBDNumber;
+    }
+
+    public static String getNextGameName() {
+        return "pbd" + getNextGameNumber();
     }
 
     public static String getLastGameName() {
@@ -432,7 +438,7 @@ public class CreateGameService {
         if (existingNums.isEmpty()) {
             return "pbd1";
         }
-        int nextPBDNumber = Collections.max(getAllExistingPBDNumbers());
+        int nextPBDNumber = Collections.max(existingNums);
         return "pbd" + nextPBDNumber;
     }
 
