@@ -892,8 +892,20 @@ public class StartPhaseService {
                 if (!userSettings.isHasAnsweredSurvey()) {
                     continue;
                 }
-                question1.append("* ").append(userSettings.getWhisperPref()).append("\n");
-                question2.append("* ").append(userSettings.getSupportPref()).append("\n");
+                question1
+                        .append("* ")
+                        .append(userSettings
+                                .getWhisperPref()
+                                .replace("No Preference", "No Stated Preference")
+                                .replace("No Preference", "No Stated Preference"))
+                        .append("\n");
+                question2
+                        .append("* ")
+                        .append(userSettings
+                                .getSupportPref()
+                                .replace("No Preference", "No Stated Preference")
+                                .replace("No Preference", "No Stated Preference"))
+                        .append("\n");
                 if (userSettings.getSupportPref().contains("Purge")) {
                     anyoneWantsToBan = true;
                 }
@@ -903,9 +915,27 @@ public class StartPhaseService {
                 if (userSettings.getWhisperPref().contains("Limited")) {
                     anyoneWantsLimitedWhispers = true;
                 }
-                question4.append("* ").append(userSettings.getWinmakingPref()).append("\n");
-                question3.append("* ").append(userSettings.getTakebackPref()).append("\n");
-                question5.append("* ").append(userSettings.getMetaPref()).append("\n");
+                question4
+                        .append("* ")
+                        .append(userSettings
+                                .getWinmakingPref()
+                                .replace("No Preference", "No Stated Preference")
+                                .replace("No Preference", "No Stated Preference"))
+                        .append("\n");
+                question3
+                        .append("* ")
+                        .append(userSettings
+                                .getTakebackPref()
+                                .replace("No Preference", "No Stated Preference")
+                                .replace("No Preference", "No Stated Preference"))
+                        .append("\n");
+                question5
+                        .append("* ")
+                        .append(userSettings
+                                .getMetaPref()
+                                .replace("No Preference", "No Stated Preference")
+                                .replace("No Preference", "No Stated Preference"))
+                        .append("\n");
             }
             MessageHelper.sendMessageToChannelAndPin(
                     game.getTableTalkChannel(),
