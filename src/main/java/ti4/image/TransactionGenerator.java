@@ -1,6 +1,10 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.function.Function;
@@ -149,7 +153,8 @@ public class TransactionGenerator {
                 sendingNothing = false;
 
                 String thingToTransact = item.split("_")[2];
-                String furtherDetail = item.split("_")[3];
+                String furtherDetail = item.replace(
+                        item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
                 int amountToTransact = 1;
                 if ("frags".equalsIgnoreCase(thingToTransact)
                         || (("PNs".equalsIgnoreCase(thingToTransact) || "ACs".equalsIgnoreCase(thingToTransact))

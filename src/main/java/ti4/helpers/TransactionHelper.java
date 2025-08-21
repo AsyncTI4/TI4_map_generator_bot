@@ -70,7 +70,8 @@ public class TransactionHelper {
                 if (item.contains("sending" + sender.getFaction())
                         && item.contains("receiving" + receiver.getFaction())) {
                     String thingToTransact = item.split("_")[2];
-                    String furtherDetail = item.split("_")[3];
+                    String furtherDetail = item.replace(
+                            item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
                     int amountToTransact = 1;
                     if ((("ACs".equalsIgnoreCase(thingToTransact) || "PNs".equalsIgnoreCase(thingToTransact))
                             && furtherDetail.contains("generic"))) {
@@ -174,7 +175,8 @@ public class TransactionHelper {
                 trans.append("> - ");
                 sendingNothing = false;
                 String thingToTransact = item.split("_")[2];
-                String furtherDetail = item.split("_")[3];
+                String furtherDetail = item.replace(
+                        item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
                 int amountToTransact = 1;
                 if ("frags".equalsIgnoreCase(thingToTransact)
                         || (("PNs".equalsIgnoreCase(thingToTransact) || "ACs".equalsIgnoreCase(thingToTransact))
@@ -843,7 +845,8 @@ public class TransactionHelper {
         String item = buttonID.split("_")[1];
         String sender = buttonID.split("_")[2];
         String receiver = buttonID.split("_")[3];
-        String extraDetail = buttonID.split("_")[4];
+        String extraDetail =
+                buttonID.replace(buttonID.split("_")[0] + "_" + item + "_" + sender + "_" + receiver + "_", "");
         Player p1 = game.getPlayerFromColorOrFaction(sender);
         Player p2 = game.getPlayerFromColorOrFaction(receiver);
         if (p1 == null || p2 == null) return;
