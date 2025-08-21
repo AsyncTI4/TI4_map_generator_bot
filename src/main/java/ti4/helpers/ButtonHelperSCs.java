@@ -1078,13 +1078,15 @@ public class ButtonHelperSCs {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     "You have " + (limit - ccCount) + " command token" + (limit - ccCount == 1 ? "" : "s")
-                            + " in your reinforcements that you could gain, and " + player.getTg() + " tgs to spend.");
+                            + " in your reinforcements that you could gain, and " + player.getTg() + " trade good"
+                            + (player.getTg() == 1 ? "" : "s") + " to spend.");
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getPrivateChannel(),
                     "You have " + (limit - ccCount) + " command token" + (limit - ccCount == 1 ? "" : "s")
-                            + " in your reinforcements that you could gain, and " + player.getTg() + " tgs to spend.");
+                            + " in your reinforcements that you could gain, and " + player.getTg() + " trade good"
+                            + (player.getTg() == 1 ? "" : "s") + " to spend.");
             MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
         }
         // MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);

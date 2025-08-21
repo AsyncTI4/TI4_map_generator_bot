@@ -20,8 +20,8 @@ import ti4.helpers.PatternHelper;
 import ti4.helpers.Storage;
 import ti4.map.Game;
 import ti4.map.Tile;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 

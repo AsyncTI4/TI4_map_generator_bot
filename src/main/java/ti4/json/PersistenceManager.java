@@ -9,7 +9,7 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Storage;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class PersistenceManager {

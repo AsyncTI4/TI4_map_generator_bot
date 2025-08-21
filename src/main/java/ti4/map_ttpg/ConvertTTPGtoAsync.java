@@ -32,7 +32,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.map.persistence.GameManager;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @Deprecated // old and probably broken
 public class ConvertTTPGtoAsync {

@@ -28,8 +28,9 @@ import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.StrategyCardModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.emoji.CardEmojis;
@@ -67,7 +68,7 @@ public class PlayStrategyCardService {
                 game.getStrategyCardModelByInitiative(scToPlay).orElse(null);
         if (scModel == null) { // Temporary Error Reporting
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(player),
+                    new LogOrigin(player),
                     "`PlayStrategyCardService.playSC` - Game: `" + game.getName() + "` - SC Model not found for SC `"
                             + scToPlay + "` from set `" + game.getScSetID() + "`");
         }

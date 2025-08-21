@@ -47,8 +47,9 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.AbilityModel;
 import ti4.model.ColorModel;
 import ti4.model.ExploreModel;
@@ -117,7 +118,7 @@ class PlayerAreaGenerator {
 
             Point tl = new Point(x, y);
             Rectangle rect = drawPlayerAreaOLD(player, tl);
-            if (rect != null && rect.height > 0) y += rect.height + 15;
+            if (rect.height > 0) y += rect.height + 15;
         }
     }
 
@@ -316,6 +317,21 @@ class PlayerAreaGenerator {
             int drawX = x + 9;
             int drawY = y + 125;
             Set<Player> neighbors = player.getNeighbouringPlayers(true);
+            Set<Player> guildShips = new HashSet<>();
+            for (Player p2 : game.getRealPlayers()) {
+                if (player == p2 || neighbors.contains(p2)) {
+                    continue;
+                }
+                if (game.isAgeOfCommerceMode()
+                        || player.hasAbility("guild_ships")
+                        || player.getPromissoryNotesInPlayArea().contains("convoys")
+                        || p2.getPromissoryNotesInPlayArea().contains("convoys")
+                        || p2.hasAbility("guild_ships")
+                        || player.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")
+                        || p2.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")) {
+                    guildShips.add(p2);
+                }
+            }
             if (neighbors.isEmpty()) {
                 DrawingUtil.superDrawString(
                         g2, "No Neighbors", drawX + xSpacer, drawY, Color.red, null, null, stroke2, Color.black);
@@ -331,6 +347,23 @@ class PlayerAreaGenerator {
                         xSpacer += 27;
                     }
                 }
+            }
+            if (!guildShips.isEmpty()) {
+                graphics.setFont(Storage.getFont30());
+                xSpacer += 27;
+                DrawingUtil.superDrawString(
+                        g2, "(", drawX + xSpacer, drawY + 2, Color.red, null, null, stroke2, Color.black);
+                xSpacer += 20;
+                for (Player p2 : guildShips) {
+                    String faction2 = p2.getFaction();
+                    if (faction2 != null) {
+                        DrawingUtil.drawPlayerFactionIconImage(graphics, p2, x + xSpacer, y + 125 - 20, 26, 26);
+                        xSpacer += 27;
+                    }
+                }
+                DrawingUtil.superDrawString(
+                        g2, ")", drawX + xSpacer - 8, drawY + 2, Color.red, null, null, stroke2, Color.black);
+                xSpacer += 4;
             }
         }
 
@@ -790,7 +823,7 @@ class PlayerAreaGenerator {
                 String error = game.getName() + " " + player.getUserName()
                         + "  `GenerateMap.pnInfo` is trying to display a Promissory Note without an owner - possibly an eliminated player: "
                         + pn;
-                BotLogger.warning(new BotLogger.LogMessageOrigin(player), error);
+                BotLogger.warning(new LogOrigin(player), error);
                 continue;
             }
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pn);
@@ -991,7 +1024,7 @@ class PlayerAreaGenerator {
                     graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
                 }
             } catch (Exception e) {
-                BotLogger.error(new BotLogger.LogMessageOrigin(player), "Bad file: " + relicFileName, e);
+                BotLogger.error(new LogOrigin(player), "Bad file: " + relicFileName, e);
             }
 
             deltaX += 48;
@@ -1441,10 +1474,7 @@ class PlayerAreaGenerator {
                         Point position = reinforcementsPosition.getPosition(CC_TAG);
                         DrawingUtil.drawCCOfPlayer(graphics, ccID, x + position.x, y + position.y, 1, player, false);
                     } catch (Exception e) {
-                        BotLogger.error(
-                                new BotLogger.LogMessageOrigin(player),
-                                "Could not parse file for CC: " + playerColor,
-                                e);
+                        BotLogger.error(new LogOrigin(player), "Could not parse file for CC: " + playerColor, e);
                     }
                 }
             }
@@ -1620,7 +1650,7 @@ class PlayerAreaGenerator {
                     image = ImageHelper.read(unitPath);
                 } catch (Exception e) {
                     BotLogger.error(
-                            new BotLogger.LogMessageOrigin(player),
+                            new LogOrigin(player),
                             "Could not parse unit file for: " + unitKey + " in game " + game.getName(),
                             e);
                 }
@@ -1628,8 +1658,7 @@ class PlayerAreaGenerator {
                     unitCount = 1;
                 }
                 if (image == null) {
-                    BotLogger.error(
-                            new BotLogger.LogMessageOrigin(player), "Could not find unit image for: " + unitKey);
+                    BotLogger.error(new LogOrigin(player), "Could not find unit image for: " + unitKey);
                     continue;
                 }
 
@@ -1940,7 +1969,7 @@ class PlayerAreaGenerator {
             if (planet == null) {
                 player.removePlanet(planetName);
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(player),
+                        new LogOrigin(player),
                         "Planet " + planetName + " not found in game " + game.getName()
                                 + ". Removing planet from player.");
                 return deltaX;
@@ -2110,10 +2139,7 @@ class PlayerAreaGenerator {
 
             return deltaX + 56;
         } catch (Exception e) {
-            BotLogger.error(
-                    new BotLogger.LogMessageOrigin(player),
-                    "could not print out planet: " + planetName.toLowerCase(),
-                    e);
+            BotLogger.error(new LogOrigin(player), "could not print out planet: " + planetName.toLowerCase(), e);
         }
         return deltaX;
     }
@@ -2521,7 +2547,7 @@ class PlayerAreaGenerator {
                 UnitModel unit = Mapper.getUnitModelByTechUpgrade(techInformation.getAlias());
                 if (unit == null) {
                     BotLogger.warning(
-                            new BotLogger.LogMessageOrigin(player),
+                            new LogOrigin(player),
                             game.getName() + " " + player.getUserName() + " Could not load unit associated with tech: "
                                     + techInformation.getAlias());
                     continue;
@@ -2539,8 +2565,7 @@ class PlayerAreaGenerator {
                         graphics.drawImage(img, deltaX + x + unitOffset.x, y + unitOffset.y, null);
                     } catch (Exception e) {
                         // Do Nothing
-                        BotLogger.error(
-                                new BotLogger.LogMessageOrigin(player), "Could not display active zealot tech", e);
+                        BotLogger.error(new LogOrigin(player), "Could not display active zealot tech", e);
                     }
                 }
             }
@@ -2574,7 +2599,7 @@ class PlayerAreaGenerator {
                 UnitModel unit = Mapper.getUnitModelByTechUpgrade(techInformation.getAlias());
                 if (unit == null) {
                     BotLogger.warning(
-                            new BotLogger.LogMessageOrigin(player),
+                            new LogOrigin(player),
                             game.getName() + " " + player.getUserName() + " Could not load unit associated with tech: "
                                     + techInformation.getAlias());
                     continue;
@@ -2588,7 +2613,7 @@ class PlayerAreaGenerator {
                     graphics.drawImage(img, deltaX + x + unitOffset.x, y + unitOffset.y, null);
                 } catch (Exception e) {
                     // Do Nothing
-                    BotLogger.error(new BotLogger.LogMessageOrigin(player), "Could not display purged zealot tech", e);
+                    BotLogger.error(new LogOrigin(player), "Could not display purged zealot tech", e);
                 }
             }
         }

@@ -6,8 +6,8 @@ import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.cron.CronManager;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 
 public class CircuitBreaker {
 

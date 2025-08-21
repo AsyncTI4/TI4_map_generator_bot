@@ -18,8 +18,9 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 
 @UtilityClass
@@ -223,7 +224,7 @@ public class RemoveUnitService {
     private static void handleEmptyUnitHolders(GenericInteractionCreateEvent event, Tile tile, ParsedUnit parsedUnit) {
         if (event instanceof ButtonInteractionEvent) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(event),
+                    new LogOrigin(event),
                     event.getId() + " found a null UnitHolder with the following info: " + tile.getRepresentation()
                             + " " + parsedUnit.getLocation());
         } else if (event != null) {

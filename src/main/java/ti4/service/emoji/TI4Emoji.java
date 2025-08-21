@@ -11,7 +11,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Constants;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
 
 public interface TI4Emoji {

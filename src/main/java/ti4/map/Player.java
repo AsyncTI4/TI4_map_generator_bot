@@ -54,8 +54,9 @@ import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.map.pojo.PlayerProperties;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.AbilityModel;
 import ti4.model.ColorModel;
 import ti4.model.FactionModel;
@@ -413,7 +414,7 @@ public class Player extends PlayerProperties {
         }
         if (actionsChannel == null) {
             BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(this),
+                    new LogOrigin(this),
                     "`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: "
                             + game.getName());
             return null;
@@ -460,7 +461,7 @@ public class Player extends PlayerProperties {
             }
         } catch (Exception e) {
             BotLogger.error(
-                    new BotLogger.LogMessageOrigin(this),
+                    new LogOrigin(this),
                     "`Player.getCardsInfoThread`: Could not find existing #cards-info thread using ID: "
                             + getCardsInfoThreadID() + " for potential thread name: " + threadName,
                     e);
@@ -495,7 +496,7 @@ public class Player extends PlayerProperties {
             }
         } catch (Exception e) {
             BotLogger.error(
-                    new BotLogger.LogMessageOrigin(this),
+                    new LogOrigin(this),
                     "`Player.getCardsInfoThread`: Could not find existing #cards-info thread using name: " + threadName,
                     e);
         }
@@ -698,7 +699,7 @@ public class Player extends PlayerProperties {
                         + "`\n> Units Owned: `"
                         + getUnitsOwned() + "`";
                 if (!game.isFrankenGame()) {
-                    BotLogger.warning(new BotLogger.LogMessageOrigin(this), message);
+                    BotLogger.warning(new LogOrigin(this), message);
                 }
                 return message;
             }
@@ -1369,8 +1370,7 @@ public class Player extends PlayerProperties {
         if (getFaction() == null || "null".equals(getFaction()) || "keleres".equals(getFaction())) return null;
         FactionModel factionSetupInfo = Mapper.getFaction(getFaction());
         if (factionSetupInfo == null) {
-            BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(this), "Could not get faction setup info for: " + getFaction());
+            BotLogger.warning(new LogOrigin(this), "Could not get faction setup info for: " + getFaction());
             return null;
         }
         return factionSetupInfo;
