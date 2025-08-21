@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.ListUtils;
@@ -400,7 +399,7 @@ public class MapGenerator implements AutoCloseable {
                 AsyncTi4WebsiteHelper.putPlayerData(game.getID(), game);
             } else if (isFoWPrivate) {
                 Player player = CommandHelper.getPlayerFromGame(
-                    game, event.getMember(), event.getUser().getId());
+                        game, event.getMember(), event.getUser().getId());
                 AsyncTi4WebsiteHelper.putMap(game.getName(), mainImageBytes, true, player);
             }
         } catch (Exception e) {
