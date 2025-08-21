@@ -3396,7 +3396,9 @@ public class UnfiledButtonHandlers {
     public static void mahactCommander(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "mahactCommander");
         MessageHelper.sendMessageToChannelWithButtons(
-                "Please choose which system you wish to remove your command token from.", buttons);
+                event.getMessageChannel(),
+                "Please choose which system you wish to remove your command token from.",
+                buttons);
         ButtonHelper.deleteMessage(event);
     }
 
