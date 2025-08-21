@@ -3403,7 +3403,8 @@ public class UnfiledButtonHandlers {
     public static void primaryOfWarfare(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "warfare");
         MessageChannel channel = player.getCorrectChannel();
-        MessageHelper.sendMessageToChannelWithButtons(channel, "Please choose which system you wish to remove your command token from.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                channel, "Please choose which system you wish to remove your command token from.", buttons);
     }
 
     @ButtonHandler("drawAgenda_2")

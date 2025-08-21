@@ -288,7 +288,8 @@ public class PromissoryNoteHelper {
         if ("dspnkort".equalsIgnoreCase(id)) {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "kortalipn");
             MessageChannel channel = player.getCorrectChannel();
-            MessageHelper.sendMessageToChannelWithButtons(channel, "Please choose which system you wish to remove your command token from.", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    channel, "Please choose which system you wish to remove your command token from.", buttons);
         }
         if ("ragh".equalsIgnoreCase(id)) {
             String message = player.getRepresentationUnfogged() + ", please choose a planet to _Ragh's Call_ on.";
