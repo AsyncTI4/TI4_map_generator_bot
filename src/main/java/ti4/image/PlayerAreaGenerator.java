@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -146,7 +147,7 @@ class PlayerAreaGenerator {
         // Faction/Colour/DisplayName
         // String factionText = player.getFactionModel() != null ? player.getFactionModel().getShortName() :
         // player.getFaction(); //TODO use this but make it look better
-        String factionText = player.getFactionModel().getShortName();
+        String factionText = StringUtils.capitalize(player.getFaction());
         if (player.getDisplayName() != null && !"null".equalsIgnoreCase(player.getDisplayName())) {
             factionText = player.getDisplayName(); // overwrites faction
         }
