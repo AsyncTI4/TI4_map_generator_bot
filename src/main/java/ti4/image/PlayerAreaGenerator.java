@@ -118,7 +118,7 @@ class PlayerAreaGenerator {
 
             Point tl = new Point(x, y);
             Rectangle rect = drawPlayerAreaOLD(player, tl);
-            if (rect != null && rect.height > 0) y += rect.height + 15;
+            if (rect.height > 0) y += rect.height + 15;
         }
     }
 
