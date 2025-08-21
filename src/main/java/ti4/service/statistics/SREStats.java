@@ -26,11 +26,11 @@ public class SREStats {
 
     private static final String REQUESTS_TOTAL_NAME = "ti4.bot.requests.total";
     private static final String ERRORS_TOTAL_NAME = "ti4.bot.errors.total";
-    // Renamed from "upstream" to "webserver" to reflect actual meaning
     private static final String WEBSERVER_REQUEST_ERROR_TOTAL_NAME = "ti4.bot.webserver.http.errors.total";
     private static final String WEBSERVER_REQUESTS_TOTAL_NAME = "ti4.bot.webserver.http.requests.total";
 
-    private static final List<Tag> COMMON_TAGS = List.of(Tag.of("component", "bot"));
+    private static final List<Tag> BOT_TAGS = List.of(Tag.of("component", "bot"));
+    private static final List<Tag> HTTP_TAGS = List.of(Tag.of("component", "http"));
 
     private static volatile Counter REQUESTS_TOTAL;
     private static volatile Counter ERRORS_TOTAL;
@@ -44,21 +44,21 @@ public class SREStats {
     public static void init(MeterRegistry meterRegistry) {
         RegistryHolder.registry = meterRegistry;
         REQUESTS_TOTAL = Counter.builder(REQUESTS_TOTAL_NAME)
-                .tags(COMMON_TAGS)
-                .description("Total incoming bot interaction requests")
-                .register(meterRegistry);
+            .tags(BOT_TAGS)
+            .description("Total incoming bot interaction requests")
+            .register(meterRegistry);
         ERRORS_TOTAL = Counter.builder(ERRORS_TOTAL_NAME)
-                .tags(COMMON_TAGS)
-                .description("Total error-severity events observed by the bot")
-                .register(meterRegistry);
+            .tags(BOT_TAGS)
+            .description("Total error-severity events observed by the bot")
+            .register(meterRegistry);
         WEBSERVER_REQUEST_ERROR_TOTAL = Counter.builder(WEBSERVER_REQUEST_ERROR_TOTAL_NAME)
-                .tags(COMMON_TAGS)
-                .description("Total webserver HTTP request errors")
-                .register(meterRegistry);
+            .tags(HTTP_TAGS)
+            .description("Total webserver HTTP request errors")
+            .register(meterRegistry);
         WEBSERVER_REQUESTS_TOTAL = Counter.builder(WEBSERVER_REQUESTS_TOTAL_NAME)
-                .tags(COMMON_TAGS)
-                .description("Total webserver HTTP requests handled/initiated by the bot's internal Spring server")
-                .register(meterRegistry);
+            .tags(HTTP_TAGS)
+            .description("Total webserver HTTP requests handled/initiated by the bot's internal Spring server")
+            .register(meterRegistry);
     }
 
     private static MeterRegistry registry() {
@@ -82,9 +82,9 @@ public class SREStats {
         synchronized (SREStats.class) {
             if (REQUESTS_TOTAL == null) {
                 REQUESTS_TOTAL = Counter.builder(REQUESTS_TOTAL_NAME)
-                        .tags(COMMON_TAGS)
-                        .description("Total incoming bot interaction requests")
-                        .register(registry());
+                    .tags(BOT_TAGS)
+                    .description("Total incoming bot interaction requests")
+                    .register(registry());
             }
             return REQUESTS_TOTAL;
         }
@@ -98,9 +98,9 @@ public class SREStats {
         synchronized (SREStats.class) {
             if (ERRORS_TOTAL == null) {
                 ERRORS_TOTAL = Counter.builder(ERRORS_TOTAL_NAME)
-                        .tags(COMMON_TAGS)
-                        .description("Total error-severity events observed by the bot")
-                        .register(registry());
+                    .tags(BOT_TAGS)
+                    .description("Total error-severity events observed by the bot")
+                    .register(registry());
             }
             return ERRORS_TOTAL;
         }
@@ -114,9 +114,9 @@ public class SREStats {
         synchronized (SREStats.class) {
             if (WEBSERVER_REQUEST_ERROR_TOTAL == null) {
                 WEBSERVER_REQUEST_ERROR_TOTAL = Counter.builder(WEBSERVER_REQUEST_ERROR_TOTAL_NAME)
-                        .tags(COMMON_TAGS)
-                        .description("Total webserver HTTP request errors")
-                        .register(registry());
+                    .tags(HTTP_TAGS)
+                    .description("Total webserver HTTP request errors")
+                    .register(registry());
             }
             return WEBSERVER_REQUEST_ERROR_TOTAL;
         }
@@ -130,10 +130,10 @@ public class SREStats {
         synchronized (SREStats.class) {
             if (WEBSERVER_REQUESTS_TOTAL == null) {
                 WEBSERVER_REQUESTS_TOTAL = Counter.builder(WEBSERVER_REQUESTS_TOTAL_NAME)
-                        .tags(COMMON_TAGS)
-                        .description(
-                                "Total webserver HTTP requests handled/initiated by the bot's internal Spring server")
-                        .register(registry());
+                    .tags(HTTP_TAGS)
+                    .description(
+                        "Total webserver HTTP requests handled/initiated by the bot's internal Spring server")
+                    .register(registry());
             }
             return WEBSERVER_REQUESTS_TOTAL;
         }
