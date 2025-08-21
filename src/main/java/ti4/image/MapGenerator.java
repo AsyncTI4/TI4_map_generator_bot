@@ -390,16 +390,20 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private void sendToWebsite() {
-        String testing = System.getenv("TESTING");
-        if (testing == null && displayTypeBasic == DisplayType.all && !isFoWPrivate) {
-            AsyncTi4WebsiteHelper.putMap(game.getName(), mainImageBytes, false, null);
-            AsyncTi4WebsiteHelper.putData(game.getName(), game);
-            AsyncTi4WebsiteHelper.putOverlays(game.getID(), websiteOverlays);
-            AsyncTi4WebsiteHelper.putPlayerData(game.getID(), game);
-        } else if (isFoWPrivate) {
-            Player player = CommandHelper.getPlayerFromGame(
-                    game, event.getMember(), event.getUser().getId());
-            AsyncTi4WebsiteHelper.putMap(game.getName(), mainImageBytes, true, player);
+        try {
+            String testing = System.getenv("TESTING");
+            if (testing == null && displayTypeBasic == DisplayType.all && !isFoWPrivate) {
+                AsyncTi4WebsiteHelper.putMap(game.getName(), mainImageBytes, false, null);
+                AsyncTi4WebsiteHelper.putData(game.getName(), game);
+                AsyncTi4WebsiteHelper.putOverlays(game.getID(), websiteOverlays);
+                AsyncTi4WebsiteHelper.putPlayerData(game.getID(), game);
+            } else if (isFoWPrivate) {
+                Player player = CommandHelper.getPlayerFromGame(
+                        game, event.getMember(), event.getUser().getId());
+                AsyncTi4WebsiteHelper.putMap(game.getName(), mainImageBytes, true, player);
+            }
+        } catch (Exception e) {
+            BotLogger.error("Failed to send to game info to website", e);
         }
     }
 
