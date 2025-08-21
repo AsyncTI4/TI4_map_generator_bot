@@ -3301,7 +3301,7 @@ public class AgendaHelper {
         }
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "ministerOfWar");
         MessageChannel channel = player.getCorrectChannel();
-        MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to remove token.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(channel, "Please choose which system you wish to remove your command token from.", buttons);
     }
 
     private static String getPlayerVoteText(Game game, Player player) {

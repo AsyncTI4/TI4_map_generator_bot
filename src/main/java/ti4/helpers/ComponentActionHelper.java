@@ -656,7 +656,7 @@ public class ComponentActionHelper {
                 }
                 List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(p1, game, event, "absol");
                 MessageChannel channel = p1.getCorrectChannel();
-                MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to remove token.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(channel, "Please choose which system you wish to remove your command token from.", buttons);
                 game.setStoredValue("absolMOW", p1.getFaction());
             }
             case "actionCards" -> {
