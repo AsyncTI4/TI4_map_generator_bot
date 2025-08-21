@@ -47,6 +47,8 @@ public final class ExecutionHistoryManager {
             executionStartTimes.put(id, new Execution(timedRunnable.getName(), Instant.now()));
             try {
                 timedRunnable.run();
+            } catch (Throwable t) {
+                BotLogger.error("Unhandled exception in task: " + timedRunnable.getName(), t);
             } finally {
                 executionStartTimes.remove(id);
             }
