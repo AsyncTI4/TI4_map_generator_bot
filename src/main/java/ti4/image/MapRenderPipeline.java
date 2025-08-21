@@ -48,8 +48,7 @@ public class MapRenderPipeline {
                             mapGenerator.uploadToWebsite();
                         }
                     } catch (Exception e) {
-                        BotLogger.error(
-                                new LogOrigin(renderEvent.event, renderEvent.game), "Failed to render event.", e);
+                        BotLogger.error(new LogOrigin(renderEvent.game), "Failed to render event.", e);
                     }
                 });
 
