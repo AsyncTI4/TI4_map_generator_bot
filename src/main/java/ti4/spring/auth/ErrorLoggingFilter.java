@@ -27,6 +27,7 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         var cachingResponse = new ContentCachingResponseWrapper(response);
         SREStats.incrementWebserverRequestCount();
+        SREStats.incrementRequestCount();
 
         try {
             filterChain.doFilter(request, cachingResponse);
