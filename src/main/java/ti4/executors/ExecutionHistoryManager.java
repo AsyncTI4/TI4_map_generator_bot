@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import ti4.cron.CronManager;
 import ti4.helpers.TimedRunnable;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 public final class ExecutionHistoryManager {
 
@@ -47,6 +47,8 @@ public final class ExecutionHistoryManager {
             executionStartTimes.put(id, new Execution(timedRunnable.getName(), Instant.now()));
             try {
                 timedRunnable.run();
+            } catch (Throwable t) {
+                BotLogger.error("Unhandled exception in task: " + timedRunnable.getName(), t);
             } finally {
                 executionStartTimes.remove(id);
             }

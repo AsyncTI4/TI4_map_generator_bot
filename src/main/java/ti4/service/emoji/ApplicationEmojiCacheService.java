@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import net.dv8tion.jda.api.entities.emoji.ApplicationEmoji;
 import org.jetbrains.annotations.NotNull;
 import ti4.json.PersistenceManager;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 public class ApplicationEmojiCacheService {
 

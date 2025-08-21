@@ -12,7 +12,7 @@ import lombok.experimental.UtilityClass;
 import ti4.json.PersistenceManager;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class TechSummariesMetadataManager {

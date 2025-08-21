@@ -29,8 +29,9 @@ import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.PlanetModel;
 
 public class LoreService {
@@ -112,7 +113,7 @@ public class LoreService {
                     savedLoreMap.put(
                             splitLore[0], new String[] {splitLore[1], splitLore.length == 3 ? splitLore[2] : ""});
                 } else {
-                    BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Invalid lore string: " + savedLore);
+                    BotLogger.warning(new LogOrigin(game), "Invalid lore string: " + savedLore);
                 }
             }
         }

@@ -33,6 +33,7 @@
     {
         "alias": "ghost",
         "factionName": "The Ghosts of Creuss",
+        "shortName": "Creuss",
         "shortTag": "CRE",
         "homeSystem": "17",
         "startingFleet": "cv,2 dd,2 ff,4 inf c,sd c",
@@ -96,6 +97,7 @@
     {
         "alias": "jolnar",
         "factionName": "The Universities of Jol-Nar",
+        "shortName": "Jol-Nar",
         "shortTag": "J-N",
         "homeSystem": "12",
         "startingFleet": "dn,2 cv,ff,2 inf j,sd n,pds j,pds n",
@@ -128,6 +130,7 @@
     {
         "alias": "l1z1x",
         "factionName": "The L1Z1X Mindnet",
+        "shortName": "L1Z1X",
         "shortTag": "LZX",
         "homeSystem": "06",
         "startingFleet": "dn, cv, 3 ff, 5 inf 0,sd 0,pds 0",
@@ -353,6 +356,7 @@
     {
         "alias": "sardakk",
         "factionName": "Sardakk Norr",
+        "shortName": "N'orr",
         "shortTag": "BUG",
         "homeSystem": "13",
         "startingFleet": "2 cv,cr,3 inf q,2 inf t,sd q,pds t",

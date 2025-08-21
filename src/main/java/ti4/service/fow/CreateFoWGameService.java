@@ -27,8 +27,9 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.async.ReserveGameNumberService;
 import ti4.service.game.CreateGameService;
 import ti4.service.game.HomebrewService;
@@ -36,6 +37,9 @@ import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
 public class CreateFoWGameService {
+
+    private static final int MAX_CHANNELS_MINUS_5 = 495;
+    private static final int MAX_ROLE_COUNT = 250;
 
     @ButtonHandler("createFoWGameChannels")
     public static void createFoWGameChannels(ButtonInteractionEvent event) {
@@ -66,7 +70,7 @@ public class CreateFoWGameService {
         if (!"fow1".equalsIgnoreCase(lastGame)) {
             if (!GameManager.isValid(lastGame)) {
                 BotLogger.warning(
-                        new BotLogger.LogMessageOrigin(event),
+                        new LogOrigin(event),
                         "**Unable to create new games because the last game cannot be found. Was it deleted but the roles still exist?**");
                 return;
             }
@@ -333,11 +337,9 @@ public class CreateFoWGameService {
 
     private static boolean serverHasRoomForNewRole(Guild guild) {
         int roleCount = guild.getRoles().size();
-        if (roleCount >= 250) {
-            BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(guild),
-                    "`CreateFoWGameService.serverHasRoomForNewRole` Cannot create a new role. Server **"
-                            + guild.getName() + "** currently has **" + roleCount + "** roles.");
+        if (roleCount >= MAX_ROLE_COUNT) {
+            BotLogger.warning("`CreateFoWGameService.serverHasRoomForNewRole` Cannot create a new role. Server **"
+                    + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return false;
         }
         return true;
@@ -345,13 +347,10 @@ public class CreateFoWGameService {
 
     private static boolean serverHasRoomForNewChannels(Guild guild, int playerCount) {
         int channelCount = guild.getChannels().size();
-        int channelMax = 495; // to keep 5 channels free always
         int channelsCountRequiredForNewGame = playerCount + 2;
-        if (channelCount > (channelMax - channelsCountRequiredForNewGame)) {
-            BotLogger.warning(
-                    new BotLogger.LogMessageOrigin(guild),
-                    "`CreateFoWGameService.serverHasRoomForNewChannels` Cannot create new channels. Server **"
-                            + guild.getName() + "** currently has " + channelCount + " channels.");
+        if (channelCount > (MAX_CHANNELS_MINUS_5 - channelsCountRequiredForNewGame)) {
+            BotLogger.warning("`CreateFoWGameService.serverHasRoomForNewChannels` Cannot create new channels. Server **"
+                    + guild.getName() + "** currently has " + channelCount + " channels.");
             return false;
         }
         return true;

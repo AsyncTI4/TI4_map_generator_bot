@@ -75,28 +75,31 @@ public class DrawSecretService {
                             player.getRepresentation()
                                     + " due to **Plausible Deniability**, you were dealt an extra secret objective. Thus, you must also discard an extra secret objective.");
                 }
-                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event, game.getRound() == 1, false);
             }
         }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 count + " " + CardEmojis.SecretObjective + " dealt to all players. Check your `#cards-info` threads.");
         if (game.getRound() == 1) {
-            String message = "Here are the quick reference cards for the factions in this game.";
-            List<FileUpload> files = new ArrayList<>();
-            for (Player player : game.getRealPlayers()) {
-                String path = ResourceHelper.getResourceFromFolder(
-                        "quick_reference/", player.getFaction().toLowerCase() + ".png");
-                if (path == null) {
-                    message += "\n- Could not get quick reference for " + player.getFaction() + ".";
-                } else {
-                    files.add(FileUploadService.createFileUpload(ImageHelper.read(path), player.getFaction() + "_ref"));
+            if (!game.isFowMode()) {
+                String message = "Here are the quick reference cards for the factions in this game.";
+                List<FileUpload> files = new ArrayList<>();
+                for (Player player : game.getRealPlayers()) {
+                    String path = ResourceHelper.getResourceFromFolder(
+                            "quick_reference/", player.getFaction().toLowerCase() + ".png");
+                    if (path == null) {
+                        message += "\n- Could not get quick reference for " + player.getFaction() + ".";
+                    } else {
+                        files.add(FileUploadService.createFileUpload(
+                                ImageHelper.read(path), player.getFaction() + "_ref"));
+                    }
                 }
-            }
-            if (!files.isEmpty() && files.size() <= 10 && !game.isFowMode()) {
-                message +=
-                        "\n-# A reminder that these reference cards are general overviews, and not specific mechanical text.";
-                MessageHelper.sendMessageWithFiles(game.getActionsChannel(), files, message, true, false);
+                if (!files.isEmpty() && files.size() <= 10) {
+                    message +=
+                            "\n-# A reminder that these reference cards are general overviews, and not specific mechanical text.";
+                    MessageHelper.sendMessageWithFiles(game.getActionsChannel(), files, message, true, false);
+                }
             }
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("startOfGameObjReveal", "Reveal Objectives and Start Strategy Phase"));

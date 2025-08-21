@@ -207,6 +207,7 @@
             <removeUnusedImports/>
             <formatAnnotations/>
             <palantirJavaFormat/>
+            <toggleOffOn/>
           </java>
           <pom>
             <sortPom>

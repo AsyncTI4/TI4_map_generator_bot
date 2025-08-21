@@ -67,7 +67,7 @@
         "source": "absol",
         "flavourText": "*Trilossa slipped the core into the hololattice's main terminal.  The lattice was ancient - as old as the Flight itself - and tampering with it was tantamount to sin.  Hopefully the rest of the Flight would would see the necessity of the upgrade.*",
         "shortName": "Quantum\n-core",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/QuantumCore.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/QuantumCore.jpg?raw=true"
     },
     {
         "alias": "absol_emelpar",

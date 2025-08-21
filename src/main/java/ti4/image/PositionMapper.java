@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.model.PlanetModel;
 import ti4.model.ShipPositionModel;
 import ti4.model.ShipPositionModel.ShipPosition;

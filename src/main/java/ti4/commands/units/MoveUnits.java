@@ -16,8 +16,9 @@ import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.combat.StartCombatService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.unit.AddUnitService;
@@ -75,7 +76,7 @@ public class MoveUnits extends GameStateCommand {
 
         Tile tileFrom = CommandHelper.getTile(event, game);
         if (tileFrom == null) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(event), "Could not find the system you're moving from.");
+            BotLogger.warning(new LogOrigin(event), "Could not find the system you're moving from.");
             return;
         }
 

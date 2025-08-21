@@ -34,6 +34,7 @@
     {
         "alias": "cabal",
         "factionName": "The Vuil'raith Cabal",
+        "shortName": "Vuil'raith",
         "shortTag": "VRC",
         "homeSystem": "54",
         "startingFleet": "dn,cv,cr,3 ff,3 inf a,sd a",
@@ -167,6 +168,7 @@
     {
         "alias": "naaz",
         "factionName": "The Naaz-Rokha Alliance",
+        "shortName": "Naaz-Rokha",
         "shortTag": "NRA",
         "homeSystem": "57",
         "startingFleet": "2 cv,dd,2 ff,3 inf n,mech r,sd n",
@@ -200,6 +202,7 @@
     {
         "alias": "titans",
         "factionName": "The Titans of Ul",
+        "shortName": "Ul",
         "shortTag": "UL",
         "homeSystem": "55",
         "startingFleet": "dn,2 cr,2 ff,3 inf elysium,sd elysium",

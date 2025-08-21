@@ -8,7 +8,7 @@ import lombok.experimental.UtilityClass;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.map.Game;
 import ti4.map.persistence.GamesPage;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class WinningPathCacheService {
