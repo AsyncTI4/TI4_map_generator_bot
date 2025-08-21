@@ -701,8 +701,8 @@ public class ButtonHelperSCs {
     public static void resolveUnexpectedAction(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "unexpected");
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(), 
-                player.getRepresentation() + ", please choose which system you wish to remove your command token from.", 
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", please choose which system you wish to remove your command token from.",
                 buttons);
     }
 

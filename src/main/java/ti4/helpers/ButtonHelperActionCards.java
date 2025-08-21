@@ -848,8 +848,8 @@ public class ButtonHelperActionCards {
     public static void resolveUnexpectedAction(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "unexpected");
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), 
-                "Please choose which system you wish to remove your command token from.", 
+                event.getMessageChannel(),
+                "Please choose which system you wish to remove your command token from.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
