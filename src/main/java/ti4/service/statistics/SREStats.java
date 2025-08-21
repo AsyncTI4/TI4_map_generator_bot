@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 
 /*
@@ -31,6 +32,8 @@ public class SREStats {
 
     private static final List<Tag> BOT_TAGS = List.of(Tag.of("component", "bot"));
     private static final List<Tag> HTTP_TAGS = List.of(Tag.of("component", "http"));
+    private static final List<Tag> REQUEST_TAGS = List.of(Tag.of("status", "request"));
+    private static final List<Tag> ERROR_TAGS = List.of(Tag.of("status", "error"));
 
     private static volatile Counter REQUESTS_TOTAL;
     private static volatile Counter ERRORS_TOTAL;
@@ -44,20 +47,20 @@ public class SREStats {
     public static void init(MeterRegistry meterRegistry) {
         RegistryHolder.registry = meterRegistry;
         REQUESTS_TOTAL = Counter.builder(REQUESTS_TOTAL_NAME)
-                .tags(BOT_TAGS)
+                .tags(Stream.concat(BOT_TAGS.stream(), REQUEST_TAGS.stream()).toList())
                 .description("Total incoming bot interaction requests")
                 .register(meterRegistry);
         ERRORS_TOTAL = Counter.builder(ERRORS_TOTAL_NAME)
-                .tags(BOT_TAGS)
+                .tags(Stream.concat(BOT_TAGS.stream(), ERROR_TAGS.stream()).toList())
                 .description("Total error-severity events observed by the bot")
                 .register(meterRegistry);
-        WEBSERVER_REQUEST_ERROR_TOTAL = Counter.builder(WEBSERVER_REQUEST_ERROR_TOTAL_NAME)
-                .tags(HTTP_TAGS)
-                .description("Total webserver HTTP request errors")
-                .register(meterRegistry);
         WEBSERVER_REQUESTS_TOTAL = Counter.builder(WEBSERVER_REQUESTS_TOTAL_NAME)
-                .tags(HTTP_TAGS)
+                .tags(Stream.concat(HTTP_TAGS.stream(), REQUEST_TAGS.stream()).toList())
                 .description("Total webserver HTTP requests handled/initiated by the bot's internal Spring server")
+                .register(meterRegistry);
+        WEBSERVER_REQUEST_ERROR_TOTAL = Counter.builder(WEBSERVER_REQUEST_ERROR_TOTAL_NAME)
+                .tags(Stream.concat(HTTP_TAGS.stream(), ERROR_TAGS.stream()).toList())
+                .description("Total webserver HTTP request errors")
                 .register(meterRegistry);
     }
 
@@ -82,7 +85,8 @@ public class SREStats {
         synchronized (SREStats.class) {
             if (REQUESTS_TOTAL == null) {
                 REQUESTS_TOTAL = Counter.builder(REQUESTS_TOTAL_NAME)
-                        .tags(BOT_TAGS)
+                        .tags(Stream.concat(BOT_TAGS.stream(), REQUEST_TAGS.stream())
+                                .toList())
                         .description("Total incoming bot interaction requests")
                         .register(registry());
             }
@@ -98,7 +102,8 @@ public class SREStats {
         synchronized (SREStats.class) {
             if (ERRORS_TOTAL == null) {
                 ERRORS_TOTAL = Counter.builder(ERRORS_TOTAL_NAME)
-                        .tags(BOT_TAGS)
+                        .tags(Stream.concat(BOT_TAGS.stream(), ERROR_TAGS.stream())
+                                .toList())
                         .description("Total error-severity events observed by the bot")
                         .register(registry());
             }
@@ -114,7 +119,8 @@ public class SREStats {
         synchronized (SREStats.class) {
             if (WEBSERVER_REQUEST_ERROR_TOTAL == null) {
                 WEBSERVER_REQUEST_ERROR_TOTAL = Counter.builder(WEBSERVER_REQUEST_ERROR_TOTAL_NAME)
-                        .tags(HTTP_TAGS)
+                        .tags(Stream.concat(HTTP_TAGS.stream(), ERROR_TAGS.stream())
+                                .toList())
                         .description("Total webserver HTTP request errors")
                         .register(registry());
             }
@@ -130,7 +136,8 @@ public class SREStats {
         synchronized (SREStats.class) {
             if (WEBSERVER_REQUESTS_TOTAL == null) {
                 WEBSERVER_REQUESTS_TOTAL = Counter.builder(WEBSERVER_REQUESTS_TOTAL_NAME)
-                        .tags(HTTP_TAGS)
+                        .tags(Stream.concat(HTTP_TAGS.stream(), REQUEST_TAGS.stream())
+                                .toList())
                         .description(
                                 "Total webserver HTTP requests handled/initiated by the bot's internal Spring server")
                         .register(registry());
