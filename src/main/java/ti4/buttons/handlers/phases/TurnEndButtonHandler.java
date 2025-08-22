@@ -34,7 +34,8 @@ class TurnEndButtonHandler {
                     "You are not the active player. If you need to, you can force end the current player's turn with `/player turn_end`.");
             return;
         }
-        CommanderUnlockCheckService.checkPlayer(player, "hacan");
+        CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost");
+        CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus", "hacan");
         EndTurnService.endTurnAndUpdateMap(event, game, player);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
