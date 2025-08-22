@@ -52,7 +52,6 @@ import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
 import ti4.listeners.AutoCompleteListener;
-import ti4.listeners.BotRuntimeStatsListener;
 import ti4.listeners.ButtonListener;
 import ti4.listeners.ChannelCreationListener;
 import ti4.listeners.DeletionListener;
@@ -129,7 +128,6 @@ public class AsyncTI4DiscordBot {
                 .build();
 
         jda.addEventListener(
-                new BotRuntimeStatsListener(),
                 new MessageListener(),
                 new DeletionListener(),
                 new ChannelCreationListener(),
