@@ -1,2 +1,20 @@
+# Application configuration:
+# - What: Configures server port and Spring Boot Actuator Prometheus exposure.
+# - How: 'server.port' sets the HTTP port; 'management.*' configures actuator endpoints and metrics export.
+
 server:
   port: 8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    enabled: true
+    export:
+      prometheus:
+        enabled: true
