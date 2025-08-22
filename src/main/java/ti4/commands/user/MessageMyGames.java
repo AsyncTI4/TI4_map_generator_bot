@@ -5,14 +5,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.GameStateSubcommand;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.SearchGameHelper;
 
-class MessageMyGames extends GameStateSubcommand {
+class MessageMyGames extends Subcommand {
 
     public MessageMyGames() {
-        super(Constants.MESSAGE_MY_GAMES, "Take the 5 question survey about preferences", false, false);
+        super(Constants.MESSAGE_MY_GAMES, "Message all your active games");
         addOptions(new OptionData(OptionType.STRING, Constants.MESSAGE, "Message").setRequired(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.PING_GAME, "Ping the game role (default false)"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "User who is sending the message"));

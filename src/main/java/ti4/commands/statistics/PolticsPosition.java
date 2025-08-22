@@ -50,7 +50,7 @@ class PoliticsPosition extends Subcommand {
             }
 
             for (Player player : game.getRealPlayers()) {
-                if (game.getStoredValue("Round1CCPickFor" + player.getFaction()).equalsIgnoreCase("3")
+                if (game.getStoredValue("Round1SCPickFor" + player.getFaction()).equalsIgnoreCase("3")
                         && player.getAllianceMembers().isEmpty()) {
                     games++;
                     if (game.getStoredValue("Round" + game.getRound() + "SCPickFor" + player.getFaction())
