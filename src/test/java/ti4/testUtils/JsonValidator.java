@@ -15,7 +15,7 @@ import ti4.json.ObjectMapperFactory;
  * Utility test class that allows us to validate our source files are correctly configured
  * for JSON save/restore.
  */
-public final class JsonValidator<T> {
+public final class JsonValidator {
     private static final ObjectMapper objectMapper = ObjectMapperFactory.build();
 
     private JsonValidator() {}

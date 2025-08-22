@@ -1,7 +1,7 @@
 package ti4.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.awt.*;
+import java.awt.Color;
 import java.util.List;
 import lombok.Data;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -35,29 +35,21 @@ public class ColorModel implements ModelInterface {
     }
 
     public Color getPrimaryColor() {
-        return primaryColor();
+        if (primaryColor != null)
+            return new Color(primaryColor.getRed(), primaryColor.getGreen(), primaryColor.getBlue());
+        if (primaryColorRef != null) return Mapper.getColor(primaryColorRef).getPrimaryColor();
+        return new Color(255, 255, 255);
     }
 
     public Color getSecondaryColor() {
-        return secondaryColor();
+        if (secondaryColor != null)
+            return new Color(secondaryColor.getRed(), secondaryColor.getGreen(), secondaryColor.getBlue());
+        if (secondaryColorRef != null) return Mapper.getColor(secondaryColorRef).getPrimaryColor();
+        return getPrimaryColor();
     }
 
     public String getHue() {
         return (hue == null ? "null" : hue);
-    }
-
-    public Color primaryColor() {
-        if (primaryColor != null)
-            return new Color(primaryColor.getRed(), primaryColor.getGreen(), primaryColor.getBlue());
-        if (primaryColorRef != null) return Mapper.getColor(primaryColorRef).primaryColor();
-        return new Color(255, 255, 255);
-    }
-
-    public Color secondaryColor() {
-        if (secondaryColor != null)
-            return new Color(secondaryColor.getRed(), secondaryColor.getGreen(), secondaryColor.getBlue());
-        if (secondaryColorRef != null) return Mapper.getColor(secondaryColorRef).primaryColor();
-        return primaryColor();
     }
 
     @JsonIgnore
@@ -83,11 +75,11 @@ public class ColorModel implements ModelInterface {
     }
 
     private double primaryLuminance() {
-        return relativeLuminance(primaryColor());
+        return relativeLuminance(getPrimaryColor());
     }
 
     private double secondaryLuminance() {
-        return relativeLuminance(secondaryColor());
+        return relativeLuminance(getSecondaryColor());
     }
 
     // For the sRGB colorspace, the relative luminance of a color is defined as
@@ -110,5 +102,20 @@ public class ColorModel implements ModelInterface {
     private static double contrastRatio(double color1, double color2) {
         if (color1 < color2) return contrastRatio(color2, color1);
         return (color1 + 0.05) / (color2 + 0.05);
+    }
+
+    @Override
+    public String toString() {
+        return "ColorModel{" + "alias='"
+                + alias + '\'' + ", name='"
+                + name + '\'' + ", displayName='"
+                + displayName + '\'' + ", aliases="
+                + aliases + ", textColor='"
+                + textColor + '\'' + ", hue='"
+                + hue + '\'' + ", primaryColor="
+                + primaryColor + ", secondaryColor="
+                + secondaryColor + ", primaryColorRef='"
+                + primaryColorRef + '\'' + ", secondaryColorRef='"
+                + secondaryColorRef + '\'' + '}';
     }
 }
