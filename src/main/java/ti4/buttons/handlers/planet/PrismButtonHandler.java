@@ -24,7 +24,7 @@ class PrismButtonHandler {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation(false, false) + " purged the technology _" + techM1.getNameRepresentation()
-                        + "_.");
+                        + "_.\n\n## Please note purged means that you can never research or gain this technology again.");
         MessageHelper.sendMessageToChannelWithButton(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", use the button to get a technology that also has "

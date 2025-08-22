@@ -137,8 +137,9 @@ public class AgendaHelper {
             game.removeStoredValue("queuedWhensFor" + player.getFaction());
             game.removeStoredValue("queuedAftersFor" + player.getFaction());
             game.removeStoredValue("queuedAftersLockedFor" + player.getFaction());
-            if (!game.getStoredValue("passOnAllWhensNAfters" + player.getFaction())
-                            .isEmpty()
+            if ((!game.getStoredValue("passOnAllWhensNAfters" + player.getFaction())
+                                    .isEmpty()
+                            || player.isNpc())
                     && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
                 game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens") + player.getFaction() + "_");
                 List<Button> buttons = new ArrayList<>();

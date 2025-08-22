@@ -34,6 +34,7 @@ class SearchMyGames extends Subcommand {
                 OptionType.BOOLEAN,
                 "ignore_aborted",
                 "Do not show games that have ended without a winner (default = true)"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player to cross reference with"));
     }
 
     @Override
@@ -48,6 +49,7 @@ class SearchMyGames extends Subcommand {
         boolean ignoreAborted = event.getOption("ignore_aborted", true, OptionMapping::getAsBoolean);
 
         User user = event.getOption(Constants.PLAYER, event.getUser(), OptionMapping::getAsUser);
+        User user2 = event.getOption(Constants.PLAYER2, null, OptionMapping::getAsUser);
         SearchGameHelper.searchGames(
                 user,
                 event,
@@ -58,6 +60,7 @@ class SearchMyGames extends Subcommand {
                 showGameModes,
                 ignoreSpectate,
                 ignoreAborted,
-                false);
+                false,
+                user2);
     }
 }

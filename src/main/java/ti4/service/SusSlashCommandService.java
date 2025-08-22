@@ -29,6 +29,7 @@ public class SusSlashCommandService {
             Constants.CARDS_INFO,
             Constants.MILTY,
             Constants.BUTTON,
+            Constants.SHOW_DISTANCES,
             "tigl",
             "map",
             "all_info");
@@ -86,7 +87,9 @@ public class SusSlashCommandService {
                 && !event.getMessageChannel().getName().contains("bot-map-updates");
 
         if ((event.getInteraction().getSubcommandName() != null
-                        && "replace".equalsIgnoreCase(event.getInteraction().getSubcommandName()))
+                        && ("replace".equalsIgnoreCase(event.getInteraction().getSubcommandName())
+                                || "leave"
+                                        .equalsIgnoreCase(event.getInteraction().getSubcommandName())))
                 || (!managedGame.isFowMode() && (isPrivateThread || isNotGameChannel) && !isPublicThread)) {
             reportSusSlashCommand(event, jumpUrl);
         }
