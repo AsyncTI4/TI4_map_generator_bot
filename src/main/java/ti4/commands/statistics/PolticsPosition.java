@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
@@ -30,7 +31,7 @@ class PoliticsPosition extends Subcommand {
         Predicate<ManagedGame> endedGamesFilter = game -> game.isHasEnded()
                 && game.getRound() == 5
                 && game.getRealPlayers().size() == 6
-                && !game.isFowMode();
+                && !game.isFowMode() && game.isHasWinner();
 
         var filteredManagedGames = GameManager.getManagedGames().stream()
                 .filter(endedGamesFilter)
@@ -77,7 +78,7 @@ class PoliticsPosition extends Subcommand {
                         }
                     }
 
-                    if (game.getWinner().get() == player) {
+                    if (game.getWinner() != null && game.getWinner().get() == player) {
                         gamesWon++;
                     }
                 }
