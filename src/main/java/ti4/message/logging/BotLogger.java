@@ -20,7 +20,6 @@ import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.message.MessageHelper;
-import ti4.service.statistics.SREStats;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass
@@ -161,11 +160,6 @@ public class BotLogger {
             @Nonnull String message,
             @Nullable Throwable err,
             @Nonnull LogSeverity severity) {
-        // Count Error-severity logs once per entry
-        if (severity == LogSeverity.Error) {
-            SREStats.incrementErrorCount();
-        }
-
         TextChannel channel;
         StringBuilder msg = new StringBuilder();
 
