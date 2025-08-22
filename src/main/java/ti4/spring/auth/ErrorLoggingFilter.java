@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 import ti4.message.logging.BotLogger;
-import ti4.service.statistics.SREStats;
 
 @Order(3)
 @Component
@@ -26,14 +25,10 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
             @NotNull FilterChain filterChain)
             throws ServletException, IOException {
         var cachingResponse = new ContentCachingResponseWrapper(response);
-        SREStats.incrementWebserverRequestCount();
-        SREStats.incrementRequestCount();
-
         try {
             filterChain.doFilter(request, cachingResponse);
         } catch (Exception e) {
             BotLogger.error("Exception during request to " + request.getRequestURI(), e);
-            SREStats.incrementWebserverRequestErrorCount();
             throw e;
         }
 
@@ -43,7 +38,6 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
                     "Request to %s returned status %s with body: %s",
                     request.getRequestURI(), cachingResponse.getStatus(), body);
             BotLogger.error(error);
-            SREStats.incrementWebserverRequestErrorCount();
         }
 
         cachingResponse.copyBodyToResponse();
