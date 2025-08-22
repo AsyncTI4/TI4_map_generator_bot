@@ -1004,5 +1004,23 @@
         "text": "Produce 1 additional hit. Then, roll 1 die; on a result of 6 or greater, resolve this ability again.",
         "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—as Dart ran.",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "lazax_cache",
+        "name": "Cache",
+        "phase": "Action",
+        "window": "At the end of your turn",
+        "text": "Exhaust 1 non-home planet you control other than Mecatol Rex. Then, gain trade goods equal to that planet's combined resource and influence values.",
+        "flavorText": "The hoard of Lazax artifacts dated back to the dawn of the empire. The thought of selling these prized possessions cut him deeply, but Berekar knew they were the coin required to reclaim their home.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "mass_transference",
+        "name": "Mass Transference",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "Remove up to 4 of your units from that system and place them on any planets you control or in any space areas that contain your ships.",
+        "flavorText": "The Mentak crew handed out brochures, recruiting with promises of a grand new life on a distant world. In truth, we traded our quiet colony for a desperate land-grab on the front lines.",
+        "source": "action_deck_2_old"
     }
 ]
