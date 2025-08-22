@@ -1,14 +1,14 @@
 package ti4.commands.user;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.GameStateSubcommand;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.PlayerTitleHelper;
 
-class Survey extends GameStateSubcommand {
+class Survey extends Subcommand {
 
     public Survey() {
-        super(Constants.SURVEY, "Take the 5 question survey about preferences", false, false);
+        super(Constants.SURVEY, "Take the 5 question survey about preferences");
     }
 
     @Override
