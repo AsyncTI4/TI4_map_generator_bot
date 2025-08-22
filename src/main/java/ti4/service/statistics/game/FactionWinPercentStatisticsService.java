@@ -49,36 +49,36 @@ class FactionWinPercentStatisticsService {
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
 
-        StringBuilder sb2 = new StringBuilder();
-        sb2.append("Winning Faction Relic Holding Percent:").append("\n");
+        // StringBuilder sb2 = new StringBuilder();
+        // sb2.append("Winning Faction Relic Holding Percent:").append("\n");
 
-        Mapper.getFactionsValues().stream()
-                .map(faction -> {
-                    double winCount = factionWinsWithRelics.getOrDefault(faction.getAlias(), 0);
-                    double gameCount = factionWinCount.getOrDefault(faction.getAlias(), 0);
-                    return Map.entry(faction, gameCount == 0 ? 0 : Math.round(100 * winCount / gameCount));
-                })
-                .filter(entry -> factionGameCount.containsKey(entry.getKey().getAlias()))
-                .sorted(Map.Entry.<FactionModel, Long>comparingByValue().reversed())
-                .forEach(entry -> sb2.append("`")
-                        .append(StringUtils.leftPad(entry.getValue().toString(), 4))
-                        .append("%` (")
-                        .append(factionWinCount.getOrDefault(entry.getKey().getAlias(), 0))
-                        .append(" games) ")
-                        .append(entry.getKey().getFactionEmoji())
-                        .append(" ")
-                        .append(entry.getKey().getFactionNameWithSourceEmoji())
-                        .append("\n"));
+        // Mapper.getFactionsValues().stream()
+        //         .map(faction -> {
+        //             double winCount = factionWinsWithRelics.getOrDefault(faction.getAlias(), 0);
+        //             double gameCount = factionWinCount.getOrDefault(faction.getAlias(), 0);
+        //             return Map.entry(faction, gameCount == 0 ? 0 : Math.round(100 * winCount / gameCount));
+        //         })
+        //         .filter(entry -> factionGameCount.containsKey(entry.getKey().getAlias()))
+        //         .sorted(Map.Entry.<FactionModel, Long>comparingByValue().reversed())
+        //         .forEach(entry -> sb2.append("`")
+        //                 .append(StringUtils.leftPad(entry.getValue().toString(), 4))
+        //                 .append("%` (")
+        //                 .append(factionWinCount.getOrDefault(entry.getKey().getAlias(), 0))
+        //                 .append(" games) ")
+        //                 .append(entry.getKey().getFactionEmoji())
+        //                 .append(" ")
+        //                 .append(entry.getKey().getFactionNameWithSourceEmoji())
+        //                 .append("\n"));
 
-        sb2.append("All winners: ")
-                .append(factionWinsWithRelics.getOrDefault("allWinners", 0))
-                .append(" wins with relics out of ")
-                .append(factionWinCount.getOrDefault("allWinners", 0))
-                .append(" total wins");
-        MessageHelper.sendMessageToThread(
-                (MessageChannelUnion) event.getMessageChannel(),
-                "Winning Faction Relic Holding Percent",
-                sb2.toString());
+        // sb2.append("All winners: ")
+        //         .append(factionWinsWithRelics.getOrDefault("allWinners", 0))
+        //         .append(" wins with relics out of ")
+        //         .append(factionWinCount.getOrDefault("allWinners", 0))
+        //         .append(" total wins");
+        // MessageHelper.sendMessageToThread(
+        //         (MessageChannelUnion) event.getMessageChannel(),
+        //         "Winning Faction Relic Holding Percent",
+        //         sb2.toString());
     }
 
     private static void getFactionWinPercent(

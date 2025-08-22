@@ -746,7 +746,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray(
                 player.getFinsFactionCheckerPrefix() + "removePlayerPermissions_" + player.getFaction(),
-                "Remove View Permissions " + player.getDisplayName()));
+                "Remove View Permissions For " + player.getUserName()));
         buttons.add(Buttons.red("deleteButtons", "Stay in channels"));
         String msg = player.getRepresentation()
                 + " do you want to remove yourself from the game channels? If so, press this button.";
@@ -3033,7 +3033,7 @@ public class ButtonHelper {
             List<Button> newActionRow = new ArrayList<>();
             for (ItemComponent item : row.getComponents()) {
                 if (!(item instanceof Button b)) continue;
-                if (b.getId().equals(buttonID)) continue;
+                if (b.getId() == null || b.getId().equals(buttonID)) continue;
 
                 remainingButtons.add(b);
                 newActionRow.add(b);

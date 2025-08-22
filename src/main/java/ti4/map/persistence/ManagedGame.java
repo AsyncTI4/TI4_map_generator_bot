@@ -1,6 +1,6 @@
 package ti4.map.persistence;
 
-import static java.util.stream.Collectors.toUnmodifiableSet;
+import static java.util.stream.Collectors.*;
 
 import java.util.List;
 import java.util.Map;

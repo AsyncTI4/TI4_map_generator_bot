@@ -166,7 +166,7 @@ public class TacticalActionService {
 
         // Post-core triggers
         CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost");
-        CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus");
+        CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus", "hacan");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
 
         if (!game.isL1Hero() && !ctx.playersWithPds2.isEmpty()) {

@@ -147,7 +147,7 @@
         "name": "AI Augury",
         "phase": "Action",
         "window": "When you pass:",
-        "text": "Return up to 1 of your unscored secret objectives to the secret objective deck, shuffle that deck, and draw 1 secret objective.",
+        "text": "Return 1 of your unscored secret objectives to the secret objective deck, shuffle that deck, and draw 1 secret objective.",
         "flavorText": "The predictive algorithms of the Ilyxum are magnificent, but at times infuriatingly cryptic.",
         "source": "ds",
         "actualSource": "uncharted_space"
