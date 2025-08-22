@@ -99,21 +99,21 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "innovation",
-        "name": "Innovation",
-        "phase": "Any",
-        "window": "When or after you research a technology",
-        "text": "Ready up to 2 of your planets that have a technology specialty.",
-        "flavorText": "The conference erupted in cheers as Doctor Sucaban announced his findings. Despite the countless sacrifices to reach these results, the wide range of applications made it difficult to feel regret.",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "brutal_occupation",
         "name": "Brutal Occupation",
         "phase": "Any",
         "window": "After you gain control of a planet",
         "text": "Ready and explore that planet.",
         "flavorText": "The harvest of Ordinian was so complete that even the planet's core was depleted. The Nekro left nothing usable. Only its lifeless shell remained.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "cache",
+        "name": "Cache",
+        "phase": "Action",
+        "window": "At the end of your turn",
+        "text": "Exhaust 1 non-home planet you control other than Mecatol Rex. Then, gain trade goods equal to that planet's combined resource and influence values.",
+        "flavorText": "The hoard of Lazax artifacts dated back to the dawn of the empire. The thought of selling these prized possessions cut him deeply, but Berekar knew they were the coin required to reclaim their home.",
         "source": "action_deck_2"
     },
     {
@@ -337,9 +337,9 @@
         "alias": "final_mission",
         "name": "Final Mission",
         "phase": "Action",
-        "window": "After 1 of your units is destroyed during combat, if you are the attacker",
-        "text": "Choose and destroy 1 of your opponent's participating units that has a cost equal to or lower than than your destroyed unit's cost.",
-        "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
+        "window": "After 1 of your non-fighter ships is destroyed",
+        "text": "Choose 1 planet in that unit's system. Destroy 1 of another player's ground forces or PDS on that planet.",
+        "flavorText": "The Exotrireme became a guide missile in its death-throes, transforming the Sol base into a burning crater of steel and death.",
         "source": "action_deck_2"
     },
     {
@@ -464,6 +464,15 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "innovation",
+        "name": "Innovation",
+        "phase": "Any",
+        "window": "When or after you research a technology",
+        "text": "Ready up to 2 of your planets that have a technology specialty.",
+        "flavorText": "The conference erupted in cheers as Doctor Sucaban announced his findings. Despite the countless sacrifices to reach these results, the wide range of applications made it difficult to feel regret.",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "intrigue",
         "name": "Intrigue",
         "phase": "Agenda",
@@ -491,15 +500,6 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "lazax_cache",
-        "name": "Lazax Cache",
-        "phase": "Action",
-        "window": "At the end of your turn",
-        "text": "Exhaust 1 non-home planet you control other than Mecatol Rex. Then, gain trade goods equal to that planet's combined resource and influence values.",
-        "flavorText": "The hoard of Lazax artifacts dated back to the dawn of the empire. The thought of selling these prized possessions cut him deeply, but Berekar knew they were the coin required to reclaim their home.",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "lost_treatise",
         "name": "Lost Treatise",
         "phase": "Action",
@@ -515,15 +515,6 @@
         "window": "After you activate a system",
         "text": "Choose 1 unit in that system. That unit loses its printed abilities during this tactical action.",
         "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "mass_transference",
-        "name": "Mass Transference",
-        "phase": "Action",
-        "window": "After you activate a system",
-        "text": "Remove up to 4 of your units from that system and place them on any planets you control or in any space areas that contain your ships.",
-        "flavorText": "The Mentak crew handed out brochures, recruiting with promises of a grand new life on a distant world. In truth, we traded our quiet colony for a desperate land-grab on the front lines.",
         "source": "action_deck_2"
     },
     {
@@ -714,6 +705,15 @@
         "window": "After an agenda is revealed",
         "text": "Choose 1 outcome of this agenda. Each player that casts votes for that outcome casts 3 additional votes and draws 1 action card.",
         "flavorText": "Elder Junn had seen many ruling parties come and go during his long years. This one would support his policies, or it would be gone in the blink of an eye. He'd make sure of it.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "ramming_speed",
+        "name": "Ramming Speed",
+        "phase": "Action",
+        "window": "After 1 of your units is destroyed during combat, if you are the attacker",
+        "text": "Choose and destroy 1 of your opponent's participating units that has a cost equal to or lower than than your destroyed unit's cost.",
+        "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
         "source": "action_deck_2"
     },
     {
