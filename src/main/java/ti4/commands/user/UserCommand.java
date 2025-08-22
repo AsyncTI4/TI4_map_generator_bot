@@ -16,6 +16,7 @@ public class UserCommand implements ParentCommand {
                     new SetPingOnNextTurn(),
                     new OfferAFKTimeOptions(),
                     new Survey(),
+                    new MessageMyGames(),
                     new SetPreferredSettings(),
                     new WipeTurnTime(),
                     new SetFowFilter())

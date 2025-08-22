@@ -183,7 +183,7 @@ public class AddPlanetService {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                         if (player_.getPlanetsAllianceMode().isEmpty()
                                 && CheckUnitContainmentService.getTilesContainingPlayersUnits(
-                                                game, player, UnitType.Infantry, UnitType.Mech, UnitType.Spacedock)
+                                                game, player_, UnitType.Infantry, UnitType.Mech, UnitType.Spacedock)
                                         .isEmpty()) {
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Buttons.red(
