@@ -23,11 +23,12 @@ class PrismButtonHandler {
         TechnologyModel techM1 = Mapper.getTech(techOut);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation(false, false) + " purged the technology _" + techM1.getNameRepresentation()
-                        + "_.\n\n## Please note purged means that you can never research or gain this technology again.");
+                player.getRepresentation(false, false) + " has purged their _" + techM1.getNameRepresentation()
+                        + "_ technology.\n-# \"Purged\" means that it is completely gone from the game. "
+                        + player.getRepresentation(false, false) + " will not be able to gain it again at a later point.");
         MessageHelper.sendMessageToChannelWithButton(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", use the button to get a technology that also has "
+                player.getRepresentation() + ", please choose a technology to gain that also has "
                         + techM1.getRequirements().orElse("").length() + " prerequisites.",
                 Buttons.GET_A_FREE_TECH);
         event.getMessage().delete().queue();
