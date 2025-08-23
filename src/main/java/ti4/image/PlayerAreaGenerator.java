@@ -1,6 +1,13 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -132,7 +139,9 @@ class PlayerAreaGenerator {
         Graphics2D g2 = (Graphics2D) graphics;
 
         boolean convertToGeneric = isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, frogPlayer);
-        if (convertToGeneric || ("neutral".equals(player.getFaction()) && player.isDummy())) {
+        if ((player.isDummy() && player.isNpc())
+                || convertToGeneric
+                || ("neutral".equals(player.getFaction()) && player.isDummy())) {
             return new Rectangle(topLeft);
         }
 

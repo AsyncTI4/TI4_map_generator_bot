@@ -948,7 +948,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Hits produced by the SPACE CANNON abilities of your units in this system cannot be canceled.",
+        "ability": "Hits produced by the SPACE CANNON abilities of your units in this system cannot be canceled.[Note: this means you cannot use sustain damage on them]",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/ds/flagships/halberd.png?raw=true"
     },
     {
@@ -2054,7 +2054,7 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability":"After this unit is destroyed or removed, capture this unit."
+        "ability": "After this unit is destroyed or removed, capture this unit."
     },
     {
         "id": "pharadn_infantry2",
@@ -2085,7 +2085,7 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability":"Units cannot use SPACE CANNON against this unit."
+        "ability": "Units cannot use SPACE CANNON against this unit."
     },
     {
         "id": "qhet_infantry2",
@@ -2221,7 +2221,7 @@
         "moveValue": 2,
         "capacityValue": 0,
         "capacityUsed": 1,
-        "productionValue":0,
+        "productionValue": 0,
         "cost": 2,
         "combatHitsOn": 7,
         "combatDieCount": 1,
@@ -2240,7 +2240,7 @@
         "moveValue": 3,
         "capacityValue": 1,
         "capacityUsed": 1,
-        "productionValue":1,
+        "productionValue": 1,
         "cost": 2,
         "combatHitsOn": 6,
         "combatDieCount": 1,

@@ -27,6 +27,8 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.PromissoryNoteModel;
@@ -58,7 +60,10 @@ public class AddPlanetService {
         }
         Tile tile = game.getTileFromPlanet(planet);
         Planet unitHolder = game.getPlanetsInfo().get(planet);
-
+        if (unitHolder == null) {
+            BotLogger.error(new LogOrigin(event), "Unitholder found null in addPlanet for planet " + planet);
+            unitHolder = game.getUnitHolderFromPlanet(planet);
+        }
         if (unitHolder.getTokenList().contains("token_freepeople.png")) {
             unitHolder.removeToken("token_freepeople.png");
         }

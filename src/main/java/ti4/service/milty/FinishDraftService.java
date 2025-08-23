@@ -100,8 +100,8 @@ class FinishDraftService {
             if (keleresExists) {
                 MessageHelper.sendMessageToChannel(
                         game.getActionsChannel(),
-                        game.getPing()
-                                + " be sure to wait for Keleres to choose their flavour and starting tech before dealing out secret objectives.");
+                        "## " + game.getPing()
+                                + " be sure to wait for Keleres to setup before dealing out secret objectives.");
             }
             game.getMiltyDraftManager().setFinished(true);
         } catch (Exception e) {
