@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,26 +29,22 @@ public class ActuatorApiKeyFilter extends OncePerRequestFilter {
     private static final String API_KEY_HEADER = "X-API-KEY";
 
     private final String expectedKey;
-    private final boolean keyConfigured;
 
     ActuatorApiKeyFilter(String expectedKey) {
         this.expectedKey = expectedKey;
-        keyConfigured = StringUtils.hasText(expectedKey);
     }
 
     @Override
-    protected boolean shouldNotFilter(@NotNull HttpServletRequest request) {
-        if (!keyConfigured) {
-            return true;
-        }
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        // Only run for /actuator/**, and only if a key is configured (non-blank)
         String path = request.getRequestURI();
         boolean isActuator = path != null && ("/actuator".equals(path) || path.startsWith(ACTUATOR_PATH));
-        return !isActuator;
+        boolean keyConfigured = StringUtils.hasText(expectedKey);
+        return !(isActuator && keyConfigured);
     }
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String apiKey = request.getHeader(API_KEY_HEADER);
         if (apiKey == null) {
