@@ -38,7 +38,8 @@ class Replace extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.PLAYER_FACTION, "Player being replaced")
                 .setAutoComplete(true)
                 .setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Replacement player @playerName"));
+        addOptions(
+                new OptionData(OptionType.USER, Constants.PLAYER, "Replacement player @playerName").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setAutoComplete(true));
     }
 
