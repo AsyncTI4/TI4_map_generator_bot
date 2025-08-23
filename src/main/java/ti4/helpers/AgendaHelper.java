@@ -3242,9 +3242,17 @@ public class AgendaHelper {
                     }
 
                     if (!game.isFowMode() && game.getCurrentAgendaInfo().contains("Elect Player")) {
+                        String emoji = FactionEmojis.getFactionIcon(outcome.toLowerCase())
+                                .toString();
+                        if (outcome.toLowerCase().contains("franken")) {
+                            Player outcomerP = game.getPlayerFromColorOrFaction(outcome.toLowerCase());
+                            if (outcomerP != null) {
+                                emoji = outcomerP.getFactionEmoji();
+                            }
+                        }
                         summaryBuilder
                                 .append("- ")
-                                .append(FactionEmojis.getFactionIcon(outcome.toLowerCase()))
+                                .append(emoji)
                                 .append(" ")
                                 .append(outcome)
                                 .append(": ")

@@ -31,6 +31,7 @@ public class FlipTileService {
                 players.add(player);
             }
         }
+        boolean flipped = false;
         if ("82a".equals(tile.getTileID())) {
             String position = tile.getPosition();
             game.removeTile(position);
@@ -50,6 +51,7 @@ public class FlipTileService {
             }
             tile = new Tile(planetTileName, position);
             game.setTile(tile);
+            flipped = true;
         } else if ("82ah".equals(tile.getTileID())) {
             String position = tile.getPosition();
             game.removeTile(position);
@@ -69,6 +71,7 @@ public class FlipTileService {
             }
             tile = new Tile(planetTileName, position);
             game.setTile(tile);
+            flipped = true;
         } else if ("2025scptFinals".equals(game.getMapTemplateID())
                 && List.of("528", "529", "530", "501", "502", "503", "504").contains(tile.getPosition())) {
             boolean anything = false;
@@ -95,8 +98,12 @@ public class FlipTileService {
                 }
             }
         }
-        for (Player player : players) {
-            CommandCounterHelper.addCC(event, player, tile);
+        if (flipped) {
+            for (Player player : players) {
+                if (!CommandCounterHelper.hasCC(player, tile)) {
+                    CommandCounterHelper.addCC(event, player, tile);
+                }
+            }
         }
         return tile;
     }

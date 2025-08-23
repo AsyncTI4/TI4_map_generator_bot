@@ -1,6 +1,13 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
@@ -200,6 +207,9 @@ public class MapGenerator implements AutoCloseable {
         int unrealPlayers = game.getNotRealPlayers().size();
         playersY += unrealPlayers * unrealPlayerHeight;
         for (Player player : game.getPlayers().values()) {
+            if (player.getFaction().equalsIgnoreCase("neutral") || (player.isNpc() && player.isDummy())) {
+                playersY -= 350;
+            }
             if (player.isEliminated()) {
                 playersY -= 190;
             } else if (player.getSecretsScored().size() >= 4) {

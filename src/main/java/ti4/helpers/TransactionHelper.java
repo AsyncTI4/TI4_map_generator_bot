@@ -1110,6 +1110,9 @@ public class TransactionHelper {
                     }
                     PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
                     Player owner = game.getPNOwner(pnShortHand);
+                    if (owner == null) {
+                        continue;
+                    }
                     Button transact;
                     if (game.isFowMode()) {
                         transact = Buttons.green(
