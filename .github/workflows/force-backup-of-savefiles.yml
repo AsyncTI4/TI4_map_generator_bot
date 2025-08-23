@@ -14,15 +14,13 @@ jobs:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
         env:
-          AWS_KEY: ${{ secrets.IMG_AWS_KEY }}
-          AWS_SECRET: ${{ secrets.IMG_AWS_SECRET }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         with:
           host: ${{ secrets.HOSTINGER_SSH_HOST }}
           username: ${{ secrets.HOSTINGER_SSH_USER }}
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
-          envs: AWS_KEY, AWS_SECRET, DISCORD_WEBHOOK_URL
+          envs: DISCORD_WEBHOOK_URL
           script: |
             cd ${{ vars.HOST_TI4_SAVES_DIR }}
             echo "FORCING BACKUP OF SAVE FILES"

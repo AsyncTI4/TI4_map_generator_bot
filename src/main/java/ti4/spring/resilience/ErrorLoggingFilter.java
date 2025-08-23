@@ -1,4 +1,4 @@
-package ti4.spring.security;
+package ti4.spring.resilience;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
