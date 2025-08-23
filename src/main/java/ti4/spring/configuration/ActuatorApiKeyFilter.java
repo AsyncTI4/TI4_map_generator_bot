@@ -30,7 +30,7 @@ public class ActuatorApiKeyFilter extends OncePerRequestFilter {
 
     private final String expectedKey;
 
-    public ActuatorApiKeyFilter(String expectedKey) {
+    ActuatorApiKeyFilter(String expectedKey) {
         this.expectedKey = expectedKey;
     }
 
@@ -38,7 +38,7 @@ public class ActuatorApiKeyFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         // Only run for /actuator/**, and only if a key is configured (non-blank)
         String path = request.getRequestURI();
-        boolean isActuator = path != null && (path.equals("/actuator") || path.startsWith(ACTUATOR_PATH));
+        boolean isActuator = path != null && ("/actuator".equals(path) || path.startsWith(ACTUATOR_PATH));
         boolean keyConfigured = StringUtils.hasText(expectedKey);
         return !(isActuator && keyConfigured);
     }

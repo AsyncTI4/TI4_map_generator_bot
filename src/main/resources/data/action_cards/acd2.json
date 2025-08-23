@@ -405,7 +405,7 @@
         "name": "Freedom Fighters",
         "phase": "Action",
         "window": "After you commit units to land on a planet you do not control in the active system",
-        "text": "Place up to 1 infantry from your reinforcements on each planet in that system.[Note: These infantry cannot be targeted by PDS.]",
+        "text": "Place up to 1 infantry from your reinforcements on each planet in that system. [Note: These infantry cannot be targeted by PDS.]",
         "flavorText": "Harrugh had brought them supplies and hope. On the promised day, they would repay him with their determination for liberation.",
         "source": "action_deck_2"
     },
