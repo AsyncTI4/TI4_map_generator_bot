@@ -1283,7 +1283,7 @@ public class UnfiledButtonHandlers {
         boolean useSingular = newTradeGoodCount == 1;
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                "Added 1 trade good to " + Helper.getSCName(scNum, game) + ". There " + (useSingular ? "is" : "are")
+                "Added 1 trade good to **" + Helper.getSCName(scNum, game) + "**. There " + (useSingular ? "is" : "are")
                         + " now " + newTradeGoodCount + " trade good" + (useSingular ? "" : "s") + " on it.");
     }
 
