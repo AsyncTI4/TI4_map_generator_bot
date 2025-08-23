@@ -725,14 +725,14 @@ public class ButtonHelperAbilities {
     }
 
     @ButtonHandler("getOmenDice2")
-    public static void offerOmenDiceButtons2(Game game, Player player, String agent) {
+    public static void offerOmenDiceButtons2(Game game, Player player, String componentID) {
         String msg = player.getRepresentationUnfogged()
                 + " you may play an Omen die with the following buttons. Duplicate dice are not shown.";
         List<Button> buttons = new ArrayList<>();
         List<Integer> dice = new ArrayList<>();
         for (int die : getAllOmenDie(game)) {
             if (!dice.contains(die)) {
-                buttons.add(Buttons.green("useOmenDie_" + die + "_" + agent, "Use Result: " + die));
+                buttons.add(Buttons.green("useOmenDie_" + die + "_" + componentID, "Use Result: " + die));
                 dice.add(die);
             }
         }

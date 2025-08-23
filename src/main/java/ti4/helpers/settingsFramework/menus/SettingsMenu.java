@@ -213,13 +213,6 @@ public abstract class SettingsMenu {
             stringEvent.getHook().sendMessage(userMsg).setEphemeral(true).queue();
     }
 
-    private String getMessageId() {
-        if (parent != null) {
-            return parent.getMessageId();
-        }
-        return messageId;
-    }
-
     void setMessageId(String messageId) {
         if (Objects.equals(this.messageId, messageId)) return;
         this.messageId = messageId;
@@ -345,9 +338,12 @@ public abstract class SettingsMenu {
                         .queue();
             }
         } else if (event instanceof StringSelectInteractionEvent selectEvent) {
+            if (messageId == null) {
+                return;
+            }
             selectEvent
                     .getGuildChannel()
-                    .editMessageById(getMessageId(), newSummary)
+                    .editMessageById(messageId, newSummary)
                     .setComponents(actionRows)
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         }
