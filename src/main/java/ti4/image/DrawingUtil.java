@@ -5,7 +5,21 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 
-import java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Point;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -432,8 +446,8 @@ public class DrawingUtil {
         Stroke outlineSparse =
                 new BasicStroke(outlineSize, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, sparse, 0.0f);
 
-        Color primary = color.primaryColor();
-        Color secondary = color.secondaryColor();
+        Color primary = color.getPrimaryColor();
+        Color secondary = color.getSecondaryColor();
         if (secondary == null) secondary = primary;
         if ("black".equals(color.getName())) primary = secondary = Color.darkGray;
 

@@ -52,6 +52,7 @@ import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
 import ti4.listeners.AutoCompleteListener;
+import ti4.listeners.BotRuntimeStatsListener;
 import ti4.listeners.ButtonListener;
 import ti4.listeners.ChannelCreationListener;
 import ti4.listeners.DeletionListener;
@@ -128,6 +129,7 @@ public class AsyncTI4DiscordBot {
                 .build();
 
         jda.addEventListener(
+                new BotRuntimeStatsListener(),
                 new MessageListener(),
                 new DeletionListener(),
                 new ChannelCreationListener(),
@@ -247,12 +249,17 @@ public class AsyncTI4DiscordBot {
         BotLogger.info("LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
         ApplicationEmojiService.uploadNewEmojis();
-        TileHelper.init(); // load all /resources/planets/ and /resources/systems/ .json files, into 3 HashMaps (not 2)
-        PositionMapper.init(); // load all /resources/positions/ .properties files, each into 1 Properties
-        Mapper.init(); // load all /resources/data/ .json and .properties files, except logging.properties, each into
-        // 1 HashMap or Properties
-        AliasHandler.init(); // load all /resources/alias/ .properties files, except position_alias_old.properties, into
-        Storage.init(); // create directories for games files
+        // load all /resources/planets/ and /resources/systems/ .json files, into 3 HashMaps (not 2)
+        TileHelper.init();
+        // load all /resources/positions/ .properties files, each into 1 Properties
+        PositionMapper.init();
+        // load all /resources/data/ .json and .properties files, except logging.properties, each into 1 HashMap or
+        // Properties
+        Mapper.init();
+        // load all /resources/alias/ .properties files, except position_alias_old.properties, into
+        AliasHandler.init();
+        // create directories for games files
+        Storage.init();
         SelectionManager.init();
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
