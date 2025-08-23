@@ -1,5 +1,8 @@
 package ti4.image;
 
+import static ti4.image.TileGenerator.TILE_HEIGHT;
+import static ti4.image.TileGenerator.TILE_WIDTH;
+
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -22,9 +25,6 @@ import ti4.ResourceHelper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.service.map.CustomHyperlaneService;
-
-import static ti4.image.TileGenerator.TILE_HEIGHT;
-import static ti4.image.TileGenerator.TILE_WIDTH;
 
 class HyperlaneTileGenerator {
 
