@@ -22,6 +22,5 @@ COPY --from=build /opt/app/src/main/resources /opt/resources
 
 ENV DB_PATH=/opt/STORAGE
 ENV RESOURCE_PATH=/opt/resources
-ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=90.0 -XX:InitialRAMPercentage=30.0 -XX:+UseStringDeduplication"
 
-ENTRYPOINT ["java", "-jar", "tibot.jar"]
+ENTRYPOINT ["java", "-jar", "-XX:MaxRAMPercentage=90.0", "-XX:InitialRAMPercentage=30.0", "-XX:+UseStringDeduplication", "tibot.jar"]
