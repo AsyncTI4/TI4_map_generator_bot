@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import java.awt.*;
+import java.awt.Point;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -54,16 +54,8 @@ public abstract class UnitHolder {
 
     public abstract String getRepresentation(Game game);
 
-    public void inheritEverythingFrom(UnitHolder other) {
-        unitsByState.putAll(other.unitsByState);
-
-        ccList.addAll(other.ccList);
-        controlList.addAll(other.controlList);
-        tokenList.addAll(other.tokenList);
-    }
-
     public void addUnit(UnitKey unit, Integer count) {
-        if (count == null || count <= 0) {
+        if (unit == null || count == null || count <= 0) {
             return;
         }
 
@@ -75,7 +67,7 @@ public abstract class UnitHolder {
     }
 
     public void addUnitsWithStates(UnitKey unit, List<Integer> counts) {
-        if (getTotalUnitCount(counts) <= 0) {
+        if (unit == null || getTotalUnitCount(counts) <= 0) {
             return;
         }
 
@@ -138,7 +130,7 @@ public abstract class UnitHolder {
     }
 
     public List<Integer> removeUnit(UnitKey unit, int count, UnitState preferredState) {
-        if (count <= 0) return UnitState.emptyList();
+        if (unit == null || count <= 0) return UnitState.emptyList();
 
         List<Integer> counts = unitsByState.get(unit);
         int totalCount = getTotalUnitCount(counts);
@@ -159,7 +151,6 @@ public abstract class UnitHolder {
             if (amt >= count) {
                 unitsRemoved.set(index, count);
                 counts.set(index, amt - count);
-                count = 0;
                 break;
             } else {
                 unitsRemoved.set(index, amt);
@@ -188,7 +179,7 @@ public abstract class UnitHolder {
 
     // magic
     private int flipUnitStates(UnitKey unit, int count, int bit, boolean isSet) {
-        if (count <= 0) return 0;
+        if (unit == null || count <= 0) return 0;
 
         List<Integer> counts = unitsByState.get(unit);
         if (getTotalUnitCount(counts) <= 0) return 0;
@@ -210,14 +201,12 @@ public abstract class UnitHolder {
                 counts.set(origIndex, origAmt - count);
                 counts.set(newIndex, newAmt + count);
                 amtFlipped += count;
-                count = 0;
                 break;
-            } else {
-                counts.set(origIndex, 0);
-                counts.set(newIndex, newAmt + origAmt);
-                amtFlipped += origAmt;
-                count -= origAmt;
             }
+            counts.set(origIndex, 0);
+            counts.set(newIndex, newAmt + origAmt);
+            amtFlipped += origAmt;
+            count -= origAmt;
         }
         return amtFlipped;
     }
@@ -315,13 +304,6 @@ public abstract class UnitHolder {
     public boolean hasUnits() {
         for (List<Integer> counts : unitsByState.values()) if (getTotalUnitCount(counts) > 0) return true;
         return false;
-    }
-
-    @JsonIgnore
-    public int getTotalDamagedCount() {
-        return unitsByState.values().stream()
-                .mapToInt(UnitHolder::getDamagedUnitStateCount)
-                .sum();
     }
 
     public int getDamagedUnitCount(UnitKey unitKey) {
