@@ -57,9 +57,7 @@ public class SourceSettings extends SettingsMenu {
                 game.getTechnologyDeckID().toLowerCase().contains("baldrick"));
         eronous = new BooleanSetting("Eronous", "Eronous Tiles", false);
         actionCardDeck2 = new BooleanSetting(
-            "ActionCardDeck2",
-            "Action Card Deck 2",
-            "action_deck_2".equalsIgnoreCase(game.getAcDeckID()));
+                "ActionCardDeck2", "Action Card Deck 2", "action_deck_2".equalsIgnoreCase(game.getAcDeckID()));
         // Emojis
         base.setEmoji(SourceEmojis.TI4BaseGame);
         pok.setEmoji(SourceEmojis.TI4PoK);
@@ -239,8 +237,8 @@ public class SourceSettings extends SettingsMenu {
                 if (ds) inclusions.add("Uncharted Space");
                 if (acd2) inclusions.add("Action Deck 2");
                 String message = inclusions.isEmpty()
-                    ? "Reset your decks to include only PoK cards."
-                    : "Reset your decks to include all of the " + String.join(" and ", inclusions) + " cards.";
+                        ? "Reset your decks to include only PoK cards."
+                        : "Reset your decks to include all of the " + String.join(" and ", inclusions) + " cards.";
                 event.getHook().sendMessage(message).setEphemeral(true).queue();
             }
             case "Eronous" -> {}
