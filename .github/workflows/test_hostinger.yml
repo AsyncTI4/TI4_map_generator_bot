@@ -9,11 +9,15 @@ jobs:
     steps:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
+        env:
+          AWS_KEY: ${{ secrets.IMG_AWS_KEY }}
+          AWS_SECRET: ${{ secrets.IMG_AWS_SECRET }}
         with:
           host: ${{ secrets.HOSTINGER_SSH_HOST }}
           username: ${{ secrets.HOSTINGER_SSH_USER }}
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
+          envs: AWS_KEY, AWS_SECRET
           script: |
             whoami
             hostname
