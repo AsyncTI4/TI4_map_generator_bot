@@ -30,6 +30,7 @@ jobs:
             port: ${{ secrets.HOSTINGER_SSH_PORT }}
             envs: AWS_KEY, AWS_SECRET, DISCORD_BOT_TOKEN, DISCORD_BOT_USERID, REPO_DISPATCH_TOKEN, TI4_ULTIMATE_STATISTICS_API_KEY, MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY
             script: |
+              set -Eeuo pipefail
               echo "Pulling changes from GitHub..."
               cd ${{ vars.HOST_TI4_REPO_DIR }}
               git pull

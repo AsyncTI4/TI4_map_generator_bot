@@ -266,13 +266,13 @@ public class AsyncTI4DiscordBot {
 
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
 
-        // LOAD GAMES NAMES
         BotLogger.info("LOADING GAMES");
-        GameManager.initialize(); // load games, into 2 ConcurrentHashMaps: 1 for games and 1 for players
+        GameManager.initialize();
+        BotLogger.info("FINISHED LOADING GAMES");
 
-        // RUN DATA MIGRATIONS
+        BotLogger.info("RUNNING MIGRATIONS");
         if (DataMigrationManager.runMigrations()) {
-            BotLogger.info("RAN MIGRATIONS");
+            BotLogger.info("FINISHED RUNNING MIGRATIONS");
         }
 
         // START CRONS
@@ -295,7 +295,7 @@ public class AsyncTI4DiscordBot {
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
         jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
         updatePresence();
-        BotLogger.info("FINISHED LOADING GAMES");
+        BotLogger.info("BOT IS READY TO RECEIVE COMMANDS");
 
         // Register Shutdown Hook to run when SIGTERM is received from docker stop
         Thread mainThread = Thread.currentThread();
