@@ -27,7 +27,8 @@ import ti4.model.TileModel;
 
 public class TileHelper {
 
-    public static final Pattern TILE_WITH_NAME_PATTERN = Pattern.compile("^\\s*\\d{3} \\(\\w+\\)\\s*$");
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final Pattern TILE_WITH_NAME_PATTERN = Pattern.compile("^\\s*\\d{3} \\(\\w+\\)\\s*$");
     private static final Map<String, TileModel> tileIdsToTileModels = new HashMap<>();
     private static final Map<String, PlanetModel> planetIdsToPlanetModels = new HashMap<>();
     private static final Map<String, List<PlanetModel>> tileIdsToPlanetModels = new HashMap<>();
@@ -64,7 +65,6 @@ public class TileHelper {
     }
 
     private static void initPlanetsFromJson() {
-        ObjectMapper objectMapper = new ObjectMapper();
         String resourcePath = Storage.getResourcePath() + File.separator + "planets" + File.separator;
         String storagePath = Storage.getStoragePath() + File.separator + "planets" + File.separator;
         List<File> files = new ArrayList<>();
@@ -99,7 +99,6 @@ public class TileHelper {
     }
 
     private static void initTilesFromJson() {
-        ObjectMapper objectMapper = new ObjectMapper();
         String resourcePath = Storage.getResourcePath() + File.separator + "systems" + File.separator;
         String storagePath = Storage.getStoragePath() + File.separator + "systems" + File.separator;
         List<File> files = new ArrayList<>();
