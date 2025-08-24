@@ -1,11 +1,11 @@
 package ti4.json;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Storage;
@@ -37,16 +37,6 @@ public class PersistenceManager {
         objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, object);
     }
 
-    public static <T> List<T> readListFromJsonFile(String fileName, Class<T> clazz) throws IOException {
-        return readListFromJsonFile(PERSISTENCE_MANAGER_JSON_PATH, fileName, clazz);
-    }
-
-    private static <T> List<T> readListFromJsonFile(String directory, String fileName, Class<T> clazz)
-            throws IOException {
-        JavaType ref = objectMapper.getTypeFactory().constructParametricType(List.class, clazz);
-        return readObjectFromJsonFile(directory, fileName, ref);
-    }
-
     public static <T> T readObjectFromJsonFile(String fileName, Class<T> clazz) throws IOException {
         return readObjectFromJsonFile(PERSISTENCE_MANAGER_JSON_PATH, fileName, clazz);
     }
@@ -70,6 +60,16 @@ public class PersistenceManager {
         }
 
         return objectMapper.readValue(file, clazz);
+    }
+
+    public static <T> T readObjectFromJsonFile(String directory, String fileName, TypeReference<T> typeReference)
+            throws IOException {
+        JavaType ref = objectMapper.getTypeFactory().constructType(typeReference);
+        return readObjectFromJsonFile(directory, fileName, ref);
+    }
+
+    public static <T> T readObjectFromJsonFile(String fileName, TypeReference<T> typeReference) throws IOException {
+        return readObjectFromJsonFile(PERSISTENCE_MANAGER_JSON_PATH, fileName, typeReference);
     }
 
     @NotNull
