@@ -25,7 +25,6 @@ public class CronManager {
     }
 
     public static void scheduleOnce(Class<?> clazz, Runnable runnable, long initialDelay, TimeUnit unit) {
-        CRONS.put(clazz.getSimpleName(), runnable);
         TimedRunnable timedRunnable = new TimedRunnable(clazz.getSimpleName(), runnable);
         SCHEDULER.schedule(timedRunnable, initialDelay, unit);
     }
