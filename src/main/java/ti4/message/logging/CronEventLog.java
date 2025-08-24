@@ -8,7 +8,7 @@ final class CronEventLog extends AbstractEventLog {
 
     @Override
     public String getChannelName() {
-        return "bot-cron-log";
+        return "bot-log";
     }
 
     @Override
