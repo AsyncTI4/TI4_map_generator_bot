@@ -19,7 +19,7 @@ class ShowUserSettings extends Subcommand {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    public ShowUserSettings() {
+    ShowUserSettings() {
         super("show_settings", "Show your User Settings");
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
