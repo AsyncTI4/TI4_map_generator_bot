@@ -23,4 +23,3 @@ public class WinningPathCron {
         BotLogger.info("Finished WinningPathCron.");
     }
 }
-
