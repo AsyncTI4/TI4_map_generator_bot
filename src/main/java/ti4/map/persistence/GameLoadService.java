@@ -237,7 +237,7 @@ class GameLoadService {
                         String data = tmpData != null ? tmpData : gameFileLines.next();
                         tmpData = null;
                         if (UNITS.equals(data)) {
-                            unitHolderName = gameFileLines.next().toLowerCase();
+                            unitHolderName = gameFileLines.next().toLowerCase().replace("blaheo", "biaheo");
                             if (tile != null) {
                                 boolean found = false;
                                 for (String tp : Constants.TOKEN_PLANETS) {
@@ -976,11 +976,8 @@ class GameLoadService {
                 case Constants.UNITS_OWNED ->
                     player.setUnitsOwned(new HashSet<>(Helper.getSetFromCSV(tokenizer.nextToken())));
                 case Constants.PLANETS ->
-                    player.setPlanets(getCardList(tokenizer
-                            .nextToken()
-                            .replace("exhausted", "")
-                            .replace("refreshed", "")
-                            .replace("blaheo", "biaheo")));
+                    player.setPlanets(getCardList(
+                            tokenizer.nextToken().replace("exhausted", "").replace("refreshed", "")));
                 case Constants.PLANETS_EXHAUSTED -> player.setExhaustedPlanets(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS_ABILITY_EXHAUSTED ->
                     player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
