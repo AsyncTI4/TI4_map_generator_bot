@@ -20,8 +20,8 @@ class RunCron extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String cronName = event.getOption(Constants.CRON_NAME).getAsString();
-        boolean found = CronManager.runCron(cronName);
-        if (found) {
+        boolean runningCron = CronManager.runCron(cronName);
+        if (runningCron) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Running cron " + cronName + ".");
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown cron: " + cronName + ".");

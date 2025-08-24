@@ -19,23 +19,20 @@ public class CronManager {
 
     public static void schedulePeriodically(
             Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
-        if (clazz.getPackageName().equals("ti4.cron")) {
-            CRONS.put(clazz.getSimpleName(), runnable);
-        }
+        CRONS.put(clazz.getSimpleName(), runnable);
         TimedRunnable timedRunnable = new TimedRunnable(clazz.getSimpleName(), runnable);
         SCHEDULER.scheduleAtFixedRate(timedRunnable, initialDelay, period, unit);
     }
 
     public static void scheduleOnce(Class<?> clazz, Runnable runnable, long initialDelay, TimeUnit unit) {
-        if (clazz.getPackageName().equals("ti4.cron")) {
-            CRONS.put(clazz.getSimpleName(), runnable);
-        }
+        CRONS.put(clazz.getSimpleName(), runnable);
         TimedRunnable timedRunnable = new TimedRunnable(clazz.getSimpleName(), runnable);
         SCHEDULER.schedule(timedRunnable, initialDelay, unit);
     }
 
     public static void schedulePeriodicallyAtTime(
             Class<?> clazz, Runnable runnable, int hour, int minute, ZoneId zoneId) {
+        CRONS.put(clazz.getSimpleName(), runnable);
         long initialDelaySeconds = calculateInitialDelaySeconds(hour, minute, zoneId);
         long periodSeconds = TimeUnit.DAYS.toSeconds(1);
         schedulePeriodically(clazz, runnable, initialDelaySeconds, periodSeconds, TimeUnit.SECONDS);
@@ -56,7 +53,7 @@ public class CronManager {
         if (runnable == null) {
             return false;
         }
-        TimedRunnable timedRunnable = new TimedRunnable(cronName, runnable);
+        var timedRunnable = new TimedRunnable(cronName, runnable);
         SCHEDULER.execute(timedRunnable);
         return true;
     }
