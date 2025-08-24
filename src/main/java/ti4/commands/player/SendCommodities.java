@@ -81,7 +81,7 @@ class SendCommodities extends GameStateSubcommand {
             targetPlayer.clearDebt(player, sendCommodities);
             MessageHelper.sendMessageToEventChannel(
                     event,
-                    targetPlayer.getRepresentation() + " cleared " + sendCommodities + " debt tokens owned by "
+                    targetPlayer.getRepresentation() + " cleared " + sendCommodities + " debt token" + (sendCommodities == 1 ? "" : "s") + " owned by "
                             + player.getRepresentation() + ".");
         }
 
