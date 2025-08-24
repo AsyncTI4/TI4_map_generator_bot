@@ -24,7 +24,7 @@ public class EndOldGamesCron {
     }
 
     private static void endOldGames() {
-        BotLogger.info("Running EndOldGamesCron.");
+        BotLogger.logCron("Running EndOldGamesCron.");
         try {
             GameManager.getManagedGames().stream()
                     .filter(not(ManagedGame::isHasEnded))
@@ -35,7 +35,7 @@ public class EndOldGamesCron {
         } catch (Exception e) {
             BotLogger.error("**Error ending inactive games!**", e);
         }
-        BotLogger.info("Finished EndOldGamesCron.");
+        BotLogger.logCron("Finished EndOldGamesCron.");
     }
 
     private void endIfOld(String gameName) {
