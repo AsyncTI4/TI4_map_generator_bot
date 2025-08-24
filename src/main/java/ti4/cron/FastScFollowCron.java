@@ -28,7 +28,7 @@ public class FastScFollowCron {
     }
 
     private static void handleFastScFollow() {
-        BotLogger.info("Running FastScFollowCron");
+        BotLogger.logCron("Running FastScFollowCron");
 
         GameManager.getManagedGames().stream()
                 .filter(not(ManagedGame::isHasEnded))
@@ -38,7 +38,7 @@ public class FastScFollowCron {
                                 gameName, ExecutionLockManager.LockType.WRITE, () -> handleFastScFollow(gameName))
                         .run());
 
-        BotLogger.info("Finished FastScFollowCron");
+        BotLogger.logCron("Finished FastScFollowCron");
     }
 
     private static void handleFastScFollow(String gameName) {
