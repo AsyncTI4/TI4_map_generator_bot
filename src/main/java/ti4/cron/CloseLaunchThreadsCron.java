@@ -16,11 +16,11 @@ public class CloseLaunchThreadsCron {
     }
 
     private static void closeLaunchThreads() {
-        BotLogger.info("Running CloneLaunchThreadsCron.");
+        BotLogger.logCron("Running CloneLaunchThreadsCron.");
         for (ManagedGame game : GameManager.getManagedGames()) {
             if (game.getLaunchPostThread() == null) continue;
             GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game.getGame(), false);
         }
-        BotLogger.info("Finished CloneLaunchThreadsCron.");
+        BotLogger.logCron("Finished CloneLaunchThreadsCron.");
     }
 }
