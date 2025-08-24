@@ -30,6 +30,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
+import ti4.cron.CronManager;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
@@ -913,16 +914,24 @@ public class AutoCompleteProvider {
             @NotNull CommandAutoCompleteInteractionEvent event,
             @NotNull String subCommandName,
             @NotNull String optionName) {
-        if (!subCommandName.equals(Constants.SET_SETTING)) return;
-        switch (optionName) {
-            case Constants.SETTING_TYPE ->
-                event.replyChoiceStrings("string", "number", "bool").queue();
-            case Constants.SETTING_NAME -> {
-                var settings = Arrays.stream(GlobalSettings.ImplementedSettings.values())
-                        .map(GlobalSettings.ImplementedSettings::toString)
-                        .toList();
-                replyWith25ChoicesThatContainValue(event, settings);
+        switch (subCommandName) {
+            case Constants.SET_SETTING -> {
+                switch (optionName) {
+                    case Constants.SETTING_TYPE ->
+                        event.replyChoiceStrings("string", "number", "bool").queue();
+                    case Constants.SETTING_NAME -> {
+                        var settings = Arrays.stream(GlobalSettings.ImplementedSettings.values())
+                                .map(GlobalSettings.ImplementedSettings::toString)
+                                .toList();
+                        replyWith25ChoicesThatContainValue(event, settings);
+                    }
+                }
             }
+            case Constants.RUN_CRON -> {
+                if (!optionName.equals(Constants.CRON_NAME)) return;
+                replyWith25ChoicesThatContainValue(event, CronManager.getCronNames());
+            }
+            default -> {}
         }
     }
 

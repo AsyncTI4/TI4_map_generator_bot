@@ -2,6 +2,9 @@ package ti4.cron;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -12,14 +15,21 @@ import ti4.helpers.TimedRunnable;
 public class CronManager {
 
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
+    private static final Map<String, Runnable> CRONS = new ConcurrentHashMap<>();
 
     public static void schedulePeriodically(
             Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
+        if (clazz.getPackageName().equals("ti4.cron")) {
+            CRONS.put(clazz.getSimpleName(), runnable);
+        }
         TimedRunnable timedRunnable = new TimedRunnable(clazz.getSimpleName(), runnable);
         SCHEDULER.scheduleAtFixedRate(timedRunnable, initialDelay, period, unit);
     }
 
     public static void scheduleOnce(Class<?> clazz, Runnable runnable, long initialDelay, TimeUnit unit) {
+        if (clazz.getPackageName().equals("ti4.cron")) {
+            CRONS.put(clazz.getSimpleName(), runnable);
+        }
         TimedRunnable timedRunnable = new TimedRunnable(clazz.getSimpleName(), runnable);
         SCHEDULER.schedule(timedRunnable, initialDelay, unit);
     }
@@ -39,6 +49,20 @@ public class CronManager {
             nextRun = nextRun.plusDays(1);
         }
         return nextRun.toEpochSecond() - now.toEpochSecond();
+    }
+
+    public static boolean runCron(String cronName) {
+        Runnable runnable = CRONS.get(cronName);
+        if (runnable == null) {
+            return false;
+        }
+        TimedRunnable timedRunnable = new TimedRunnable(cronName, runnable);
+        SCHEDULER.execute(timedRunnable);
+        return true;
+    }
+
+    public static Set<String> getCronNames() {
+        return CRONS.keySet();
     }
 
     public static void shutdown() {
