@@ -17,6 +17,9 @@ RUN --mount=type=cache,target=/root/.m2 \
 FROM amazoncorretto:21-alpine
 WORKDIR /app
 
+# needed to handle fonts
+RUN apk add --no-cache fontconfig ttf-dejavu
+
 COPY --from=build /opt/app/target/TI4_map_generator_discord_bot-1.0-SNAPSHOT.jar tibot.jar
 COPY --from=build /opt/app/src/main/resources /opt/resources
 
