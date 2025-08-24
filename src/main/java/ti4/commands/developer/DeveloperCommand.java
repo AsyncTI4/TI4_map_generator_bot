@@ -18,7 +18,8 @@ public class DeveloperCommand implements ParentCommand {
                     new GiveTheBotABreather(),
                     new ButtonProcessingStatistics(),
                     new CacheStatistics(),
-                    new RestoreGame())
+                    new RestoreGame(),
+                    new RunCron())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
