@@ -9,18 +9,22 @@ jobs:
     steps:
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@master
+      env:
+        AWS_KEY: ${{ secrets.IMG_AWS_KEY }}
+        AWS_SECRET: ${{ secrets.IMG_AWS_SECRET }}
       with:
         host: ${{ secrets.HOSTINGER_SSH_HOST }}
         username: ${{ secrets.HOSTINGER_SSH_USER }}
         password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
         port: ${{ secrets.HOSTINGER_SSH_PORT }}
+        envs: AWS_KEY, AWS_SECRET
         script: |
           cd /app
           ./scheduled_upload.sh
           cd ${{ vars.HOST_TI4_REPO_DIR }}
           echo "Building docker image..."
           docker version
-          docker build -t tibot .
+          docker build --build-arg BOT_KEY=$DISCORD_BOT_KEY --build-arg USER=$DISCORD_USER --build-arg SERVER=$DISCORD_SERVER --build-arg SERVER2=$DISCORD_SERVER2 --build-arg AWS_SECRET=$AWS_SECRET --build-arg AWS_KEY=$AWS_KEY -t tibot .
           echo "Shutting Down TIBot... giving 600 seconds to shutdown"
           docker stop $(docker ps -q) --time 600
           cd /app

@@ -69,7 +69,7 @@ public class CreateFoWGameService {
         Game game;
         if (!"fow1".equalsIgnoreCase(lastGame)) {
             if (!GameManager.isValid(lastGame)) {
-                BotLogger.error(
+                BotLogger.warning(
                         new LogOrigin(event),
                         "**Unable to create new games because the last game cannot be found. Was it deleted but the roles still exist?**");
                 return;
