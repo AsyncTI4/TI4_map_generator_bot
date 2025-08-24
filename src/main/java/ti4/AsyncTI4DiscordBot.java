@@ -270,7 +270,6 @@ public class AsyncTI4DiscordBot {
         GameManager.initialize();
         BotLogger.info("FINISHED LOADING GAMES");
 
-        BotLogger.info("RUNNING MIGRATIONS");
         if (DataMigrationManager.runMigrations()) {
             BotLogger.info("FINISHED RUNNING MIGRATIONS");
         }
