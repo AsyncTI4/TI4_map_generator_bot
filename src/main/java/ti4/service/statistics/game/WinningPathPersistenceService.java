@@ -1,5 +1,6 @@
 package ti4.service.statistics.game;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,11 +49,10 @@ public class WinningPathPersistenceService {
         return map == null ? Collections.emptyMap() : map;
     }
 
-    @SuppressWarnings("unchecked")
     private static Map<String, Map<String, Integer>> readData() {
         try {
-            Map<String, Map<String, Integer>> data = (Map<String, Map<String, Integer>>)
-                    PersistenceManager.readObjectFromJsonFile(WINNING_PATHS_FILE, Map.class);
+            Map<String, Map<String, Integer>> data =
+                    PersistenceManager.readObjectFromJsonFile(WINNING_PATHS_FILE, new TypeReference<>() {});
             return data == null ? new HashMap<>() : data;
         } catch (IOException e) {
             BotLogger.error("Failed to read winning paths file", e);

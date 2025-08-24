@@ -1,5 +1,6 @@
 package ti4.service.emoji;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.temporal.ChronoField;
 import java.util.Collections;
 import java.util.List;
@@ -7,17 +8,19 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.ApplicationEmoji;
 import org.jetbrains.annotations.NotNull;
 import ti4.json.PersistenceManager;
 import ti4.message.logging.BotLogger;
 
+@UtilityClass
 public class ApplicationEmojiCacheService {
 
     public static List<CachedEmoji> readCachedEmojis() {
         List<CachedEmoji> cache = null;
         try {
-            cache = PersistenceManager.readListFromJsonFile("emojis.json", CachedEmoji.class);
+            cache = PersistenceManager.readObjectFromJsonFile("emojis.json", new TypeReference<>() {});
         } catch (Exception e) {
             BotLogger.error("Failed to read json data for EmojiCache.", e);
         }

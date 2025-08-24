@@ -1,5 +1,6 @@
 package ti4.service.async;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -51,7 +52,7 @@ public class ReserveGameNumberService {
     private static List<String> readReservedList() {
         if (reservedGameCache == null) {
             try {
-                List<String> reserved = PersistenceManager.readListFromJsonFile(fileName, String.class);
+                List<String> reserved = PersistenceManager.readObjectFromJsonFile(fileName, new TypeReference<>() {});
                 reservedGameCache = filterOutRealGames(reserved);
             } catch (Exception e) {
                 BotLogger.error("Failed to read json data for Reserved Game Cache.", e);
