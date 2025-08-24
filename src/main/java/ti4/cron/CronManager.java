@@ -12,6 +12,7 @@ import ti4.helpers.TimedRunnable;
 public class CronManager {
 
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
+    private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
 
     public static void schedulePeriodically(
             Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
@@ -44,7 +45,7 @@ public class CronManager {
     public static void shutdown() {
         SCHEDULER.shutdown();
         try {
-            if (!SCHEDULER.awaitTermination(20, TimeUnit.SECONDS)) {
+            if (!SCHEDULER.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
                 SCHEDULER.shutdownNow();
             }
         } catch (InterruptedException e) {

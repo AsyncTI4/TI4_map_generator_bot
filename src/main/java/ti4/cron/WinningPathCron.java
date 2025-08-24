@@ -14,12 +14,12 @@ public class WinningPathCron {
     }
 
     private static void recompute() {
-        BotLogger.info("Running WinningPathCron.");
+        BotLogger.logCron("Running WinningPathCron.");
         try {
             WinningPathPersistenceService.recomputeFile();
         } catch (Exception e) {
             BotLogger.error("**WinningPathCron failed.**", e);
         }
-        BotLogger.info("Finished WinningPathCron.");
+        BotLogger.logCron("Finished WinningPathCron.");
     }
 }

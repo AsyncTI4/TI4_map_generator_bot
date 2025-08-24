@@ -1,6 +1,7 @@
 package ti4.service.statistics.game;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
@@ -24,23 +25,6 @@ public class WinningPathPersistenceService {
         BotLogger.info("**Finished recomputing win paths file**");
     }
 
-    public static synchronized void addGame(Game game) {
-        game.getWinner().ifPresent(winner -> {
-            Map<String, Map<String, Integer>> data = readData();
-            String key = key(game.getRealAndEliminatedPlayers().size(), game.getVp());
-            Map<String, Integer> map = data.computeIfAbsent(key, k -> new HashMap<>());
-            String path = WinningPathHelper.buildWinningPath(game, winner);
-            map.put(path, map.getOrDefault(path, 0) + 1);
-            writeData(data);
-        });
-    }
-
-    static synchronized Map<String, Integer> getWinningPathCounts(int playerCount, int victoryPoints) {
-        Map<String, Map<String, Integer>> data = readData();
-        Map<String, Integer> map = data.get(key(playerCount, victoryPoints));
-        return map == null ? Map.of() : Map.copyOf(map);
-    }
-
     private static void addGameToMap(Game game, Map<String, Map<String, Integer>> data) {
         game.getWinner().ifPresent(winner -> {
             String key = key(game.getRealAndEliminatedPlayers().size(), game.getVp());
@@ -48,6 +32,20 @@ public class WinningPathPersistenceService {
             String path = WinningPathHelper.buildWinningPath(game, winner);
             map.put(path, map.getOrDefault(path, 0) + 1);
         });
+    }
+
+    public static synchronized void addGame(Game game) {
+        game.getWinner().ifPresent(winner -> {
+            Map<String, Map<String, Integer>> data = readData();
+            addGameToMap(game, data);
+            writeData(data);
+        });
+    }
+
+    static synchronized Map<String, Integer> getWinningPathCounts(int playerCount, int victoryPoints) {
+        Map<String, Map<String, Integer>> data = readData();
+        Map<String, Integer> map = data.get(key(playerCount, victoryPoints));
+        return map == null ? Collections.emptyMap() : map;
     }
 
     @SuppressWarnings("unchecked")
