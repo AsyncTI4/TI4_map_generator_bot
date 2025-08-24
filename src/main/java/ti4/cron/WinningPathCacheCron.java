@@ -14,12 +14,12 @@ public class WinningPathCacheCron {
     }
 
     private static void precompute() {
-        BotLogger.info("Running WinningPathCacheCron.");
+        BotLogger.logCron("Running WinningPathCacheCron.");
         try {
             WinningPathCacheService.recomputeCache();
         } catch (Exception e) {
             BotLogger.error("**WinningPathCacheCron failed.**", e);
         }
-        BotLogger.info("Finished WinningPathCacheCron.");
+        BotLogger.logCron("Finished WinningPathCacheCron.");
     }
 }
