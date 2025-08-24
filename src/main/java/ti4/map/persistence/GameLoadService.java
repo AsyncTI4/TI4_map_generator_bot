@@ -237,7 +237,7 @@ class GameLoadService {
                         String data = tmpData != null ? tmpData : gameFileLines.next();
                         tmpData = null;
                         if (UNITS.equals(data)) {
-                            unitHolderName = gameFileLines.next().toLowerCase().replace("blaheo", "biaheo");
+                            unitHolderName = gameFileLines.next().toLowerCase();
                             if (tile != null) {
                                 boolean found = false;
                                 for (String tp : Constants.TOKEN_PLANETS) {
