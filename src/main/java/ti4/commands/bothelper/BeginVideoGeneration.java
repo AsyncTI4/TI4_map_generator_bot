@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 
 class BeginVideoGeneration extends Subcommand {
 
-    public BeginVideoGeneration() {
+    BeginVideoGeneration() {
         super(Constants.BEGIN_VIDEO_GEN, "Kickoff Video Process in AWS");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Name of the Game to video-ize.")
                 .setRequired(true)
