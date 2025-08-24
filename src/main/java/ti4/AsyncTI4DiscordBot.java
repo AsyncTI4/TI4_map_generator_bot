@@ -36,6 +36,7 @@ import ti4.cron.FastScFollowCron;
 import ti4.cron.InteractionLogCron;
 import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
+import ti4.cron.LongExecutionHistoryCron;
 import ti4.cron.OldUndoFileCleanupCron;
 import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
@@ -289,6 +290,7 @@ public class AsyncTI4DiscordBot {
         CloseLaunchThreadsCron.register();
         LogBufferManager.initialize();
         InteractionLogCron.register();
+        LongExecutionHistoryCron.register();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
