@@ -73,8 +73,6 @@ public class StartPhaseService {
             case "strategy" -> startStrategyPhase(event, game);
             case "voting", "agendaVoting" -> AgendaHelper.startTheVoting(game);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
-            // case "P1Special" -> MigrationHelper.fixBlaheo(); // manual migration code to convert blaheo to biaheo -
-            // comment after 2025-03
             case "shuffleDecks" -> game.shuffleDecks();
             case "agenda" -> {
                 game.setPhaseOfGame("agenda");
