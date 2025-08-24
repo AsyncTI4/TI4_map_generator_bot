@@ -36,9 +36,9 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.MiscEmojis;
-import ti4.service.statistics.game.WinningPathCacheService;
 import ti4.service.statistics.game.WinningPathComparisonService;
 import ti4.service.statistics.game.WinningPathHelper;
+import ti4.service.statistics.game.WinningPathPersistenceService;
 import ti4.service.tigl.TiglGameReport;
 import ti4.service.tigl.TiglPlayerResult;
 import ti4.website.UltimateStatisticsWebsiteHelper;
@@ -205,7 +205,7 @@ public class EndGameService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
 
         writeChronicle(game, event, publish);
-        WinningPathCacheService.addGame(game);
+        WinningPathPersistenceService.addGame(game);
     }
 
     private static void writeChronicle(Game game, GenericInteractionCreateEvent event, boolean publish) {
