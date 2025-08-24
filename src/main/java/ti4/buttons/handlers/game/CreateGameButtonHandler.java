@@ -102,7 +102,7 @@ class CreateGameButtonHandler {
         }
 
         Game lastGame = GameManager.getManagedGame(lastGameName).getGame();
-        boolean lastGameHasSameSillyName = lastGame.getCustomName().equalsIgnoreCase(gameSillyName);
+        boolean lastGameHasSameSillyName = gameSillyName.equalsIgnoreCase(lastGame.getCustomName());
         if (!lastGameHasSameSillyName) {
             return false;
         }
