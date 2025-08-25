@@ -1,8 +1,6 @@
 package ti4.commands.statistics;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
 import ti4.service.statistics.ExportToCsvService;
 
