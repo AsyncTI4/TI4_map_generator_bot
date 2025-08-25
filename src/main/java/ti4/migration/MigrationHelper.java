@@ -220,4 +220,19 @@ class MigrationHelper {
         }
         return true;
     }
+
+    public static boolean setPiFactionsHomebrew(Game game) {
+        boolean changed = false;
+        for (Player player : game.getPlayers().values()) {
+            String faction = player.getFaction();
+            if (faction != null && faction.startsWith("pi_")) {
+                player.setFaction(faction.substring(3));
+                changed = true;
+            }
+        }
+        if (changed) {
+            game.setHomebrew(true);
+        }
+        return changed;
+    }
 }

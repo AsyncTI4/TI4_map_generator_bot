@@ -51,6 +51,7 @@ public class DataMigrationManager {
                 "removeWekkersAbsolsPoliticalSecretAgain_220125",
                 MigrationHelper::removeWekkersAbsolsPoliticalSecretsAgain);
         migrations.put("warnGamesWithOldDisplaceMap_270525", MigrationHelper::warnGamesWithOldDisplaceMap);
+        migrations.put("piFactionsHomebrew_010625", MigrationHelper::setPiFactionsHomebrew);
         // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
