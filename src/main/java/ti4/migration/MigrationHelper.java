@@ -1,23 +1,17 @@
 package ti4.migration;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
-import ti4.helpers.Units;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
-import ti4.service.fow.GMService;
 
 @UtilityClass
 class MigrationHelper {
@@ -119,105 +113,19 @@ class MigrationHelper {
         bag.Contents.add(index, newItem);
     }
 
-    public static boolean cleanupFactionEmojis(Game game) {
-        if (game.isFrankenGame()) return false;
-
-        boolean anyChanged = false;
-        for (Player p : game.getPlayers().values()) {
-            String rawEmoji = p.getFactionEmojiRaw();
-            if (rawEmoji == null || "null".equals(rawEmoji)) continue;
-
-            Emoji e = Emoji.fromFormatted(rawEmoji);
-            if (e.getName().equalsIgnoreCase(p.getFaction())) {
-                p.setFactionEmoji(null);
-                anyChanged = true;
-            }
-        }
-        return anyChanged;
-    }
-
-    public static boolean removeWekkersAbsolsPoliticalSecrets(Game game) {
-        if ("g14".equals(game.getName())) {
-            return false;
-        }
-        boolean removed = false;
+    public static boolean setPiFactionsHomebrew(Game game) {
+        boolean changed = false;
         for (Player player : game.getPlayers().values()) {
-            for (String ownedPN : new ArrayList<>(player.getPromissoryNotesOwned())) {
-                if (ownedPN.startsWith("wekkerabsol_")) {
-                    player.removeOwnedPromissoryNoteByID(ownedPN);
-                    removed = true;
-                }
+            String faction = player.getFaction();
+            if (faction != null && faction.startsWith("pi_")) {
+                player.setFaction(faction.substring(3));
+                changed = true;
             }
         }
-        return removed;
-    }
-
-    public static boolean removeWekkersAbsolsPoliticalSecretsAgain(Game game) {
-        if ("g14".equals(game.getName())) {
-            return false;
+        if (changed) {
+            game.setHomebrew(true);
+            BotLogger.info("Changed factions from 'pi_' in game: " + game.getName());
         }
-        boolean removed = false;
-        for (Player player : game.getPlayers().values()) {
-            for (String pn : new ArrayList<>(player.getPromissoryNotes().keySet())) {
-                if (pn.startsWith("wekkerabsol_")) {
-                    player.removePromissoryNote(pn);
-                    removed = true;
-                }
-            }
-        }
-        return removed;
-    }
-
-    public static boolean warnGamesWithOldDisplaceMap(Game game) {
-        if (game.getMovedUnitsFromCurrentActivation().isEmpty()) return false;
-        Player player = game.getActivePlayer();
-        if (player == null) return false;
-
-        Map<String, Integer> moved = game.getMovedUnitsFromCurrentActivation();
-        for (String unit : moved.keySet()) {
-            Integer amt = moved.get(unit);
-
-            // Get the state
-            Units.UnitState st = Units.UnitState.none;
-            if (unit.contains("damaged")) {
-                unit = unit.replace("damaged", "");
-                st = Units.UnitState.dmg;
-            }
-
-            Units.UnitKey key = Units.getUnitKey(unit, player.getColorID());
-            if (key != null) {
-                // Add the unit to "unk"
-                if (!game.getTacticalActionDisplacement().containsKey("unk"))
-                    game.getTacticalActionDisplacement().put("unk", new HashMap<>());
-                Map<Units.UnitKey, List<Integer>> uh =
-                        game.getTacticalActionDisplacement().get("unk");
-                if (!uh.containsKey(key)) uh.put(key, Units.UnitState.emptyList());
-                int mv = uh.get(key).get(st.ordinal());
-                uh.get(key).set(st.ordinal(), mv + amt);
-            }
-        }
-        game.resetCurrentMovedUnitsFrom1System();
-        game.resetCurrentMovedUnitsFrom1TacticalAction();
-
-        String msg =
-                "Hey %s, I redid a lot of the tactical action buttons, and because of this a little bit of information has been lost. ";
-        msg +=
-                "**__All your units are still accounted for__**, but any units that you moved won't be able to be put back unless you use `undo`. ";
-        msg +=
-                "Apologies for the inconvenience. Let me know if anything breaks during this tactical action and you need help fixing it.\n\n";
-        msg +=
-                "Good news though, future tactical actions you'll be able to freely edit your unit movement from each system as much as you like!\n";
-        msg += "\\- Jazzxhands";
-        String playerMsg = String.format(msg, player.getRepresentationUnfogged());
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), playerMsg);
-
-            String gmMsg =
-                    String.format(msg, "GM (on behalf of " + player.getRepresentationUnfoggedNoPing() + ")") + "\n";
-            GMService.logActivity(game, gmMsg, true);
-        } else if (game.getTableTalkChannel() != null) {
-            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), playerMsg);
-        }
-        return true;
+        return changed;
     }
 }
