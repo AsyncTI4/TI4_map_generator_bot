@@ -44,7 +44,13 @@ public class DataMigrationManager {
 
     static {
         migrations = new HashMap<>();
-        migrations.put("renameBlaheoUnitHolder_250825", MigrationHelper::renameBlaheoUnitHolder);
+        migrations.put("cleanupFactionEmojis_110525", MigrationHelper::cleanupFactionEmojis);
+        migrations.put(
+                "removeWekkersAbsolsPoliticalSecret_220125", MigrationHelper::removeWekkersAbsolsPoliticalSecrets);
+        migrations.put(
+                "removeWekkersAbsolsPoliticalSecretAgain_220125",
+                MigrationHelper::removeWekkersAbsolsPoliticalSecretsAgain);
+        migrations.put("warnGamesWithOldDisplaceMap_270525", MigrationHelper::warnGamesWithOldDisplaceMap);
         // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
