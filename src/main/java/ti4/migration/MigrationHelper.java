@@ -112,6 +112,7 @@ class MigrationHelper {
         bag.Contents.remove(index);
         bag.Contents.add(index, newItem);
     }
+
     public static boolean setPiFactionsHomebrew(Game game) {
         boolean changed = false;
         for (Player player : game.getPlayers().values()) {
