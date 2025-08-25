@@ -1058,7 +1058,7 @@ class GameSaveService {
         }
     }
 
-    public static boolean delete(String gameName) {
+    static boolean delete(String gameName) {
         return GameFileLockManager.wrapWithWriteLock(gameName, () -> {
             File mapStorage = Storage.getGameFile(gameName + Constants.TXT);
             if (!mapStorage.exists()) {
