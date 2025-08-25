@@ -51,6 +51,7 @@ public class DataMigrationManager {
                 "removeWekkersAbsolsPoliticalSecretAgain_220125",
                 MigrationHelper::removeWekkersAbsolsPoliticalSecretsAgain);
         migrations.put("warnGamesWithOldDisplaceMap_270525", MigrationHelper::warnGamesWithOldDisplaceMap);
+        migrations.put("renameBlaheoUnitHolder_250825", MigrationHelper::renameBlaheoUnitHolder);
         // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 

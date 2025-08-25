@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.lang.reflect.Field;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import ti4.draft.DraftBag;
@@ -117,6 +118,26 @@ class MigrationHelper {
                 "Draft Bag replacing %s with %s", bag.Contents.get(index).getAlias(), newItem.getAlias()));
         bag.Contents.remove(index);
         bag.Contents.add(index, newItem);
+    }
+
+    public static boolean renameBlaheoUnitHolder(Game game) {
+        boolean changed = false;
+        for (Tile tile : game.getTileMap().values()) {
+            if (!"d17".equalsIgnoreCase(tile.getTileID())) continue;
+            Map<String, UnitHolder> holders = tile.getUnitHolders();
+            if (!holders.containsKey("blaheo")) continue;
+            UnitHolder holder = holders.remove("blaheo");
+            try {
+                Field nameField = UnitHolder.class.getDeclaredField("name");
+                nameField.setAccessible(true);
+                nameField.set(holder, "biaheo");
+            } catch (Exception e) {
+                BotLogger.error("Failed to rename blaheo unit holder", e);
+            }
+            holders.put("biaheo", holder);
+            changed = true;
+        }
+        return changed;
     }
 
     public static boolean cleanupFactionEmojis(Game game) {
