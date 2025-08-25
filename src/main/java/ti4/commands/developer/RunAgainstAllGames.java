@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
+import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -17,13 +18,14 @@ class RunAgainstAllGames extends Subcommand {
 
     RunAgainstAllGames() {
         super("run_against_all_games", "Runs this custom code against all games.");
+        addOptions(GameStatisticsFilterer.gameStatsFilters());
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Running custom command against all games.");
 
-        GamesPage.consumeAllGames(game -> {
+        GamesPage.consumeAllGames(GameStatisticsFilterer.getGamesFilter(event), game -> {
             boolean changed = setPiFactionsHomebrew(game);
             changed |= renameBlaheoUnitHolder(game);
             if (changed) {
