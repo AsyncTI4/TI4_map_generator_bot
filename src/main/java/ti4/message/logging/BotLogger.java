@@ -279,6 +279,10 @@ public class BotLogger {
         LogBufferManager.addLogMessage(new SlashCommandEventLog(new LogOrigin(event), commandResponseMessage));
     }
 
+    public static void logCron(String message) {
+        LogBufferManager.addLogMessage(new CronEventLog(message));
+    }
+
     public static void catchRestError(Throwable e) {
         // This has become too annoying, so we are limiting to testing mode/debug mode
         boolean debugMode =

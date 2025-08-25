@@ -46,24 +46,10 @@ class CreateGameButtonHandler {
         String buttonMsg = event.getMessage().getContentRaw();
         String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
         String gameName = CreateGameService.getNextGameName();
-        String lastGame = CreateGameService.getLastGameName();
-        Game game;
-        if (!"pbd1".equalsIgnoreCase(lastGame)) {
-            if (!GameManager.isValid(lastGame)) {
-                BotLogger.warning(
-                        new LogOrigin(event),
-                        "**Unable to create new games because the last game cannot be found. Was it deleted but the roles still exist?**");
-                return;
-            }
-            game = GameManager.getManagedGame(lastGame).getGame();
-            if (game != null && game.getCustomName().equalsIgnoreCase(gameSillyName)) {
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        "The custom name of the last game is the same as the one for this game, so the bot suspects a double press "
-                                + "occurred and is cancelling the creation of another game.");
-                return;
-            }
-        }
+        String lastGameName = CreateGameService.getLastGameName();
+
+        if (isLikelyDoublePressedButton(gameName, gameSillyName, lastGameName, event)) return;
+
         List<Member> members = new ArrayList<>();
         Member gameOwner = null;
         for (int i = 3; i <= 10; i++) {
@@ -96,11 +82,35 @@ class CreateGameButtonHandler {
             return;
         }
         event.getMessage().delete().queue();
-        game = CreateGameService.createGameChannels(
+        Game game = CreateGameService.createGameChannels(
                 members, event, gameSillyName, gameName, gameOwner, categoryChannel);
         if (game != null) {
             GameManager.save(
                     game, "Created game channels"); // TODO: We should be locking since we're saving? Maybe not here
         }
+    }
+
+    private static boolean isLikelyDoublePressedButton(
+            String gameName, String gameSillyName, String lastGameName, ButtonInteractionEvent event) {
+        if ("pbd1".equalsIgnoreCase(gameName)) return false;
+
+        if (!GameManager.isValid(lastGameName)) {
+            BotLogger.error(
+                    new LogOrigin(event),
+                    "**Unable to create new games because the last game cannot be found. Was it deleted but the roles still exist?**");
+            return true;
+        }
+
+        Game lastGame = GameManager.getManagedGame(lastGameName).getGame();
+        boolean lastGameHasSameSillyName = gameSillyName.equalsIgnoreCase(lastGame.getCustomName());
+        if (!lastGameHasSameSillyName) {
+            return false;
+        }
+
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                "The custom name of the last game is the same as the one for this game, so the bot suspects a double press "
+                        + "occurred and is cancelling the creation of another game.");
+        return true;
     }
 }

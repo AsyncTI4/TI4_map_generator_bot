@@ -1192,6 +1192,8 @@ public class Constants {
 
     public static final String MIGRATION_NAME = "migration_name";
     public static final String RUN_MANUAL_DATA_MIGRATION = "run_manual_data_migration";
+    public static final String CRON_NAME = "cron_name";
+    public static final String RUN_CRON = "run_cron";
 
     public static final String AC_DECK_ID = "ac_deck_id";
     public static final String SO_DECK_ID = "so_deck_id";
