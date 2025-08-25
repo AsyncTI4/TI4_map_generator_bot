@@ -17,7 +17,7 @@ public class ReuploadStaleEmojisCron {
     }
 
     private static void reuploadEmojisAndDeleteHanging() {
-        BotLogger.info("Running ReuploadStaleEmojisCron.");
+        BotLogger.logCron("Running ReuploadStaleEmojisCron.");
         try {
             ApplicationEmojiService.reuploadStaleEmojis();
             ApplicationEmojiService.deleteHangingEmojis();
@@ -25,6 +25,6 @@ public class ReuploadStaleEmojisCron {
         } catch (Exception e) {
             BotLogger.error("**ReuploadStaleEmojisCron failed.**", e);
         }
-        BotLogger.info("Finished ReuploadStaleEmojisCron.");
+        BotLogger.logCron("Finished ReuploadStaleEmojisCron.");
     }
 }

@@ -12,7 +12,7 @@ public class WinningPathComparisonService {
     public static String compareWinningPathToAllOthers(String winningPath, int playerCount, int victoryPointTotal) {
         StringBuilder sb = new StringBuilder();
         Map<String, Integer> winningPathCounts =
-                WinningPathCacheService.getWinningPathCounts(playerCount, victoryPointTotal);
+                WinningPathPersistenceService.getWinningPathCounts(playerCount, victoryPointTotal);
         int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
         if (gamesWithWinnerCount >= 100) {
             int winningPathCount = winningPathCounts.getOrDefault(winningPath, 1);

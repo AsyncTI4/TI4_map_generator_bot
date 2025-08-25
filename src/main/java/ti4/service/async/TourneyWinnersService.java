@@ -1,5 +1,6 @@
 package ti4.service.async;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -52,9 +53,7 @@ public class TourneyWinnersService {
     private static List<TournamentWinner> readWinnerList() {
         if (winnerCache == null) {
             try {
-                List<TournamentWinner> reserved =
-                        PersistenceManager.readListFromJsonFile(fileName, TournamentWinner.class);
-                winnerCache = reserved;
+                winnerCache = PersistenceManager.readObjectFromJsonFile(fileName, new TypeReference<>() {});
             } catch (Exception e) {
                 BotLogger.error("Failed to read json data for Reserved Game Cache.", e);
                 winnerCache = new ArrayList<>();

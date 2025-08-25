@@ -1,7 +1,6 @@
 package ti4.website.model.stats;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,22 +25,22 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.website.EgressClientManager;
 
 public class PlayerStatsDashboardPayload {
 
     private final Player player;
     private final Game game;
 
-    public PlayerStatsDashboardPayload(Player player) {
+    PlayerStatsDashboardPayload(Player player) {
         this.player = player;
         game = player.getGame();
     }
 
     @JsonIgnore
     public String getJson() {
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.writeValueAsString(this);
+            return EgressClientManager.getObjectMapper().writeValueAsString(this);
         } catch (Exception e) {
             BotLogger.error(
                     "Could not get PlayerStatsDashboardPayload JSON for Game: "

@@ -2,7 +2,6 @@ package ti4.website.model.stats;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -27,6 +26,7 @@ import ti4.message.logging.BotLogger;
 import ti4.model.AgendaModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
+import ti4.website.EgressClientManager;
 
 public class GameStatsDashboardPayload {
 
@@ -38,9 +38,8 @@ public class GameStatsDashboardPayload {
 
     @JsonIgnore
     public String getJson() {
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.writeValueAsString(this);
+            return EgressClientManager.getObjectMapper().writeValueAsString(this);
         } catch (Exception e) {
             BotLogger.error("Could not get GameStatsDashboardPayload JSON for Game ", e);
             return null;

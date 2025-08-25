@@ -27,6 +27,11 @@ public class LogOrigin {
 
     private final String originTime = DateTimeHelper.getCurrentTimestamp();
 
+    public LogOrigin() {
+        eventString = null;
+        gameInfo = null;
+    }
+
     public LogOrigin(@Nonnull GenericInteractionCreateEvent event) {
         eventString = buildEventString(event);
         gameInfo = null;

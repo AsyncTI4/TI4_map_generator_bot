@@ -3,7 +3,12 @@ package ti4.image;
 import static ti4.image.TileGenerator.TILE_HEIGHT;
 import static ti4.image.TileGenerator.TILE_WIDTH;
 
-import java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -21,7 +26,7 @@ import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.service.map.CustomHyperlaneService;
 
-public class HyperlaneTileGenerator {
+class HyperlaneTileGenerator {
 
     private static final float CENTER_X = TILE_WIDTH / 2.0f;
     private static final float CENTER_Y = TILE_HEIGHT / 2.0f;
@@ -133,7 +138,7 @@ public class HyperlaneTileGenerator {
      * Connection matrix format: 0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0
      * Generates the hyperlane as roundabout if any connections connect to itself
      */
-    public static BufferedImage generateHyperlaneTile(Tile tile, Game game) {
+    static BufferedImage generateHyperlaneTile(Tile tile, Game game) {
         String matrix = game.getCustomHyperlaneData().get(tile.getPosition());
         boolean asRoundabout = CustomHyperlaneService.hasSelfConnection(matrix);
 

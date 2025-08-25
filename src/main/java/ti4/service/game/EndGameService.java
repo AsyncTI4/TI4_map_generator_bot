@@ -36,9 +36,9 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.MiscEmojis;
-import ti4.service.statistics.game.WinningPathCacheService;
 import ti4.service.statistics.game.WinningPathComparisonService;
 import ti4.service.statistics.game.WinningPathHelper;
+import ti4.service.statistics.game.WinningPathPersistenceService;
 import ti4.service.tigl.TiglGameReport;
 import ti4.service.tigl.TiglPlayerResult;
 import ti4.website.UltimateStatisticsWebsiteHelper;
@@ -104,10 +104,9 @@ public class EndGameService {
                 tableTalkChannel.getManager().setParent(inLimboCategory).queueAfter(15, TimeUnit.SECONDS);
                 MessageHelper.sendMessageToChannel(tableTalkChannel, moveMessage);
             }
-            if (actionsChannel != null) { // MOVE ACTIONS CHANNEL
-                actionsChannel.getManager().setParent(inLimboCategory).queueAfter(15, TimeUnit.SECONDS);
-                MessageHelper.sendMessageToChannel(actionsChannel, moveMessage);
-            }
+            // MOVE ACTIONS CHANNEL
+            actionsChannel.getManager().setParent(inLimboCategory).queueAfter(15, TimeUnit.SECONDS);
+            MessageHelper.sendMessageToChannel(actionsChannel, moveMessage);
             if (og != null && og.getTextChannels().size() < 3) {
                 og.delete().queueAfter(20, TimeUnit.SECONDS);
             }
@@ -148,11 +147,9 @@ public class EndGameService {
                 threadChannel.getManager().setArchived(true).queue();
             }
         }
-        if (actionsChannel != null) {
-            for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
-                if (!threadChannel.getName().contains("Cards Info")) {
-                    threadChannel.getManager().setArchived(true).queue();
-                }
+        for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
+            if (!threadChannel.getName().contains("Cards Info")) {
+                threadChannel.getManager().setArchived(true).queue();
             }
         }
         gameEndStuff(game, event, publish);
@@ -179,16 +176,14 @@ public class EndGameService {
             new RepositoryDispatchEvent("archive_game_channel", Map.of("channel", tableTalkChannel.getId()))
                     .sendEvent();
         }
-        if (actionsChannel != null) {
-            new RepositoryDispatchEvent("archive_game_channel", Map.of("channel", actionsChannel.getId())).sendEvent();
-        }
+        new RepositoryDispatchEvent("archive_game_channel", Map.of("channel", actionsChannel.getId())).sendEvent();
 
         if (rematch) {
             RematchService.secondHalfOfRematch(event, game);
         }
     }
 
-    public static void gameEndStuff(Game game, GenericInteractionCreateEvent event, boolean publish) {
+    static void gameEndStuff(Game game, GenericInteractionCreateEvent event, boolean publish) {
         String gameName = game.getName();
 
         game.setHasEnded(true);
@@ -205,7 +200,7 @@ public class EndGameService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
 
         writeChronicle(game, event, publish);
-        WinningPathCacheService.addGame(game);
+        WinningPathPersistenceService.addGame(game);
     }
 
     private static void writeChronicle(Game game, GenericInteractionCreateEvent event, boolean publish) {
