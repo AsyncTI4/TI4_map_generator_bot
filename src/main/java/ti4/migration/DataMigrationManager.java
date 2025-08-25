@@ -44,7 +44,6 @@ public class DataMigrationManager {
 
     static {
         migrations = new HashMap<>();
-        migrations.put("piFactionsHomebrew_010625", MigrationHelper::setPiFactionsHomebrew);
         // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 

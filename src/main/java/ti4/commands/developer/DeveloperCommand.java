@@ -19,7 +19,8 @@ public class DeveloperCommand implements ParentCommand {
                     new ButtonProcessingStatistics(),
                     new CacheStatistics(),
                     new RestoreGame(),
-                    new RunCron())
+                    new RunCron(),
+                    new RunAgainstAllGames())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

@@ -8,7 +8,7 @@ import ti4.service.statistics.ExportToCsvService;
 
 class ExportToCSV extends Subcommand {
 
-    public ExportToCSV() {
+    ExportToCSV() {
         super("export_games_to_csv", "Export game data to a CSV file");
         addOptions(GameStatisticsFilterer.gameStatsFilters());
         addOptions(new OptionData(

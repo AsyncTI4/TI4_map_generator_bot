@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 @UtilityClass
 class GameCountStatisticsService {
 
-    public static void getGameCount(SlashCommandInteractionEvent event) {
+    static void getGameCount(SlashCommandInteractionEvent event) {
         AtomicInteger count = new AtomicInteger();
 
         GamesPage.consumeAllGames(GameStatisticsFilterer.getGamesFilter(event), game -> count.getAndIncrement());
