@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
@@ -44,7 +45,6 @@ public class DataMigrationManager {
 
     static {
         migrations = new HashMap<>();
-        migrations.put("renameBlaheoUnitHolder_250825", MigrationHelper::renameBlaheoUnitHolder);
         // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 

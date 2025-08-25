@@ -39,8 +39,6 @@ public class Source {
         action_deck_2,
         action_deck_2_old,
         keleresplus,
-        little_omega,
-        project_pi,
         neutral,
         lost_star_charts_of_ixth,
         flagshipping,
@@ -136,7 +134,6 @@ public class Source {
                         case admins -> FactionEmojis.AdminsFaction;
                         case ignis_aurora, pbd2000 -> SourceEmojis.IgnisAurora;
                         case keleresplus -> SourceEmojis.KeleresPlus;
-                        case project_pi -> SourceEmojis.ProjectPi;
                         case flagshipping -> SourceEmojis.Flagshipping;
                         case promises_promises -> SourceEmojis.PromisesPromises;
                         case miltymod -> SourceEmojis.MiltyMod;

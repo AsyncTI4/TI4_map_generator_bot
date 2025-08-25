@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -138,7 +139,6 @@ public class GameStatisticsFilterer {
             case "ds" -> isDiscordantStarsGame(game);
             case "pok" -> !game.isBaseGameMode();
             case "action_deck_2" -> "action_deck_2".equals(game.getAcDeckID());
-            case "little_omega" -> game.isLittleOmega();
             case "franken" -> game.isFrankenGame();
             case "milty_mod" -> isMiltyModGame(game);
             case "red_tape" -> game.isRedTapeMode();
