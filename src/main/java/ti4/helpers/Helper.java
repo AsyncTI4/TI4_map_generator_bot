@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.*;
+import java.awt.Point;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -419,7 +419,7 @@ public class Helper {
                 if (game.getStoredValue(key3).contains(player.getFaction() + "*")
                         && game.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentationUnfogged()
-                            + " is the one the game is currently waiting on before advancing to the next player, with regards to queued public objective scoring.";
+                            + " is the one the game is currently waiting on before advancing to the next player, with regards to queued scoring.";
                     if (game.isFowMode()) {
                         message = "Waiting on someone else before proceeding with scoring.";
                     }
@@ -429,7 +429,7 @@ public class Helper {
                 if (game.getStoredValue(key3b).contains(player.getFaction() + "*")
                         && game.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentationUnfogged()
-                            + " is the one the game is currently waiting on before advancing to the next player, with regards to queued secret objective scoring.";
+                            + " is the one the game is currently waiting on before advancing to the next player, with regards to queued scoring.";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     break;
                 }

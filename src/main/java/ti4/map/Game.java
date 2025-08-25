@@ -1670,7 +1670,7 @@ public class Game extends GameProperties {
             }
         }
 
-        for (Player p : getRealPlayers()) {
+        for (Player p : getRealPlayersNDummies()) {
             if (p.controlsMecatol(false)) {
                 return true;
             }

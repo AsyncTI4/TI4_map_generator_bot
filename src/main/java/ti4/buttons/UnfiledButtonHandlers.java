@@ -1604,7 +1604,8 @@ public class UnfiledButtonHandlers {
                 }
                 break;
             }
-            if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
+            if (game.getStoredValue(key3).contains(player2.getFaction() + "*")
+                    || game.getStoredValue(key3b).contains(player2.getFaction() + "*")) {
                 message = " has been queued to score a public objective. ";
                 if (!game.isFowMode()) {
                     message += player2.getRepresentationUnfogged() + " is the one the game is currently waiting on.";
@@ -1779,7 +1780,8 @@ public class UnfiledButtonHandlers {
 
                         break;
                     }
-                    if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
+                    if (game.getStoredValue(key3).contains(player2.getFaction() + "*")
+                            || game.getStoredValue(key3b).contains(player2.getFaction() + "*")) {
                         message = player.getRepresentation() + " has been queued to score a secret objective. ";
                         if (!game.isFowMode()) {
                             message += player2.getRepresentationUnfogged()
