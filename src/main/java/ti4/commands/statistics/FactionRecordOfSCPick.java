@@ -17,11 +17,6 @@ class FactionRecordOfSCPick extends Subcommand {
                 .setRequired(true)
                 .setAutoComplete(true));
         addOptions(GameStatisticsFilterer.gameStatsFilters());
-        addOptions(new OptionData(
-                        OptionType.STRING,
-                        GameStatisticsFilterer.WINNING_FACTION_FILTER,
-                        "Filter games by if the game was won by said faction")
-                .setAutoComplete(true));
     }
 
     @Override

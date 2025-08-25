@@ -52,6 +52,11 @@ public class GameStatisticsFilterer {
                 new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Filter games by if the game has any homebrew"));
         filters.add(new OptionData(OptionType.BOOLEAN, HAS_WINNER_FILTER, "Filter games by if the game has a winner"));
         filters.add(new OptionData(
+                        OptionType.STRING,
+                        WINNING_FACTION_FILTER,
+                        "Filter games by if the game was won by said faction")
+                .setAutoComplete(true));
+        filters.add(new OptionData(
                 OptionType.BOOLEAN, HAS_GALACTIC_EVENT_FILTER, "Filter games by if the game has a galactic event"));
         filters.add(
                 new OptionData(OptionType.BOOLEAN, HAS_SCENARIO_FILTER, "Filter games by if the game has a scenario"));
