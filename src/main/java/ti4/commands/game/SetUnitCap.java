@@ -20,6 +20,7 @@ class SetUnitCap extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAME, "Unit that you're setting the cap for")
                 .setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.UNIT_CAP, "Unit Cap").setRequired(true));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.EVERYONE, "Apply Cap to everyone?").setRequired(true));
     }
 
     @Override
@@ -30,9 +31,21 @@ class SetUnitCap extends GameStateSubcommand {
         }
         String unit = event.getOption(Constants.UNIT_NAME).getAsString();
         String unitID = AliasHandler.resolveUnit(unit);
-        Player player = getPlayer();
-        player.setUnitCap(unitID, unitCap);
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(), "Set " + unit + " max to " + unitCap + " for " + player.getRepresentation());
+
+        boolean everyone = event.getOption(Constants.EVERYONE).getAsBoolean();
+        if (everyone) {
+            String msg = "";
+            for (Player player : getGame().getRealPlayersNDummies()) {
+                player.setUnitCap(unitID, unitCap);
+                msg += "Set " + unit + " max to " + unitCap + " for " + player.getRepresentation() + "\n";
+            }
+            MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+        } else {
+
+            Player player = getPlayer();
+            player.setUnitCap(unitID, unitCap);
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Set " + unit + " max to " + unitCap + " for " + player.getRepresentation());
+        }
     }
 }

@@ -266,6 +266,7 @@ public class Constants {
 
     public static final String UNIT = "unit";
     public static final String UNIT_CAP = "unit_cap";
+    public static final String EVERYONE = "everyone";
     public static final String TOKEN = "token";
     public static final String TILE_LIST = "tile_list";
     public static final String UNIT_NAMES = "unit_names";
