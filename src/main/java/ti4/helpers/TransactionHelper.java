@@ -1613,6 +1613,10 @@ public class TransactionHelper {
         }
 
         if (player == p1) {
+            if (getReturnPNsInPlayAreaButtons(game, p1, p2).size() > 0) {
+                stuffToTransButtons.add(
+                        Buttons.gray("startReturnPNInPlayArea_" + p2.getFaction(), "Return a PN in Play Area"));
+            }
             stuffToTransButtons.add(Buttons.gray("resetOffer_" + p2.getFaction(), "Reset Offer"));
             stuffToTransButtons.add(
                     Buttons.red("getNewTransaction_" + p2.getFaction() + "_" + p1.getFaction(), "Ask for Stuff"));
@@ -1630,6 +1634,48 @@ public class TransactionHelper {
     @ButtonHandler("send_")
     public static void send(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         resolveSpecificTransButtonPress(game, player, buttonID, event, true);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static List<Button> getReturnPNsInPlayAreaButtons(Game game, Player p1, Player p2) {
+        List<Button> buttons = new ArrayList<>();
+        for (String pn : p1.getPromissoryNotesInPlayArea()) {
+            if (p2 == game.getPNOwner(pn) && Mapper.getPromissoryNote(pn) != null) {
+                buttons.add(Buttons.gray(
+                        "returnPNInPlayArea_" + pn,
+                        "Return " + Mapper.getPromissoryNote(pn).getName()));
+            }
+        }
+
+        return buttons;
+    }
+
+    @ButtonHandler("startReturnPNInPlayArea_")
+    public static void startReturnPNInPlayArea(ButtonInteractionEvent event, Player p1, String buttonID, Game game) {
+        String message = "## Warning, this is only to be done if a bug or mistake occurred. You cannot normally return"
+                + " promissories via this method";
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = getReturnPNsInPlayAreaButtons(game, p1, p2);
+        MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("returnPNInPlayArea_")
+    public static void returnPNInPlayArea(ButtonInteractionEvent event, Player p1, String buttonID, Game game) {
+        String id = buttonID.replace("returnPNInPlayArea_", "");
+
+        Player p2 = game.getPNOwner(id);
+        if (p2 != null) {
+            p1.removePromissoryNote(id);
+            p2.setPromissoryNote(id);
+            PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
+            PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
+            String message2 = p1.getRepresentation() + " returned a promissory note to " + p2.getRepresentation();
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2);
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message2);
+            }
+        }
         ButtonHelper.deleteMessage(event);
     }
 

@@ -78,7 +78,7 @@ class PoliticsPosition extends Subcommand {
                         }
                     }
 
-                    if (game.getWinner() != null && game.getWinner().get() == player) {
+                    if (game.getWinner().isPresent() && game.getWinner().get() == player) {
                         gamesWon++;
                     }
                 }
