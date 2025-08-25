@@ -45,7 +45,6 @@ public class DataMigrationManager {
 
     static {
         migrations = new HashMap<>();
-        migrations.put("removeOldHomebrew_081925", DataMigrationManager::removeOldHomebrew_081925);
         // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
@@ -127,9 +126,5 @@ public class DataMigrationManager {
             }
         }
         return migrationsApplied;
-    }
-
-    private static boolean removeOldHomebrew_081925(Game game) {
-
     }
 }
