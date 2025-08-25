@@ -232,6 +232,7 @@ class MigrationHelper {
         }
         if (changed) {
             game.setHomebrew(true);
+            BotLogger.info("Changed factions from 'pi_' in game: " + game.getName());
         }
         return changed;
     }
