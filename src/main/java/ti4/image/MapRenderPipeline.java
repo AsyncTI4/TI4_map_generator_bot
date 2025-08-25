@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import javax.imageio.ImageIO;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -16,8 +17,10 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.TimedRunnable;
 import ti4.map.Game;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.settings.GlobalSettings;
 
+@UtilityClass
 public class MapRenderPipeline {
 
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
@@ -44,6 +47,8 @@ public class MapRenderPipeline {
                         if (renderEvent.uploadToWebsite) {
                             mapGenerator.uploadToWebsite();
                         }
+                    } catch (Exception e) {
+                        BotLogger.error(new LogOrigin(renderEvent.game), "Failed to render event.", e);
                     }
                 });
 

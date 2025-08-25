@@ -412,6 +412,16 @@ public class PlayStrategyCardService {
                     if (reactionEmoji2 != null) {
                         message.addReaction(reactionEmoji2).queue();
                         p2.addFollowedSC(scToPlay, event);
+                        if (scToPlay == 8) {
+                            String key3 = "potentialBlockers";
+                            if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
+                                game.setStoredValue(
+                                        key3, game.getStoredValue(key3).replace(p2.getFaction() + "*", ""));
+                            }
+
+                            String key = "factionsThatAreNotDiscardingSOs";
+                            game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
+                        }
                     }
                     continue;
                 }

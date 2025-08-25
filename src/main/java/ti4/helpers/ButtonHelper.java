@@ -746,7 +746,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray(
                 player.getFinsFactionCheckerPrefix() + "removePlayerPermissions_" + player.getFaction(),
-                "Remove View Permissions " + player.getDisplayName()));
+                "Remove View Permissions For " + player.getUserName()));
         buttons.add(Buttons.red("deleteButtons", "Stay in channels"));
         String msg = player.getRepresentation()
                 + " do you want to remove yourself from the game channels? If so, press this button.";
@@ -3033,7 +3033,7 @@ public class ButtonHelper {
             List<Button> newActionRow = new ArrayList<>();
             for (ItemComponent item : row.getComponents()) {
                 if (!(item instanceof Button b)) continue;
-                if (b.getId().equals(buttonID)) continue;
+                if (b.getId() == null || b.getId().equals(buttonID)) continue;
 
                 remainingButtons.add(b);
                 newActionRow.add(b);
@@ -3274,6 +3274,9 @@ public class ButtonHelper {
         }
         int armadaValue = 0;
         if (player == null) {
+            return values;
+        }
+        if (player.isNpc() && player.isDummy()) {
             return values;
         }
         if ("neutral".equals(player.getFaction()) && player.getUserID().equals(Constants.dicecordId)) {
@@ -3798,81 +3801,6 @@ public class ButtonHelper {
                 buttons);
     }
 
-    public static void detTileAdditionStep1(Player player, String newTileID) {
-        List<Button> buttons = new ArrayList<>();
-        TileModel tile = TileHelper.getTileById(newTileID);
-        buttons.add(Buttons.green("detTileAdditionStep2_" + newTileID, "Next to Only 1 Tile"));
-        buttons.add(Buttons.green(
-                player.getFinsFactionCheckerPrefix() + "starChartsStep1_" + newTileID, "Next to 2 Tiles"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentation() + ", you are placing " + tile.getName()
-                        + ". Will this tile be adjacent to 1 other tile or 2?",
-                buttons);
-    }
-
-    @ButtonHandler("detTileAdditionStep2_")
-    public static void detTileAdditionStep2(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
-        List<Button> buttons = new ArrayList<>();
-        deleteMessage(event);
-        String newTileID = buttonID.split("_")[1];
-        for (Tile tile : game.getTileMap().values()) {
-            if (tile.isEdgeOfBoard(game)
-                    && tile.getPosition().length() > 2
-                    && FoWHelper.playerHasShipsInSystem(player, tile)) {
-                buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "detTileAdditionStep3_" + newTileID + "_"
-                                + tile.getPosition(),
-                        tile.getRepresentationForButtons(game, player)));
-            }
-        }
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentation() + ", please choose an edge tile that the new tile will be adjacent to.",
-                buttons);
-    }
-
-    @ButtonHandler("detTileAdditionStep3_")
-    public static void detTileAdditionStep3(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
-        deleteMessage(event);
-        String newTileID = buttonID.split("_")[1];
-        List<Button> buttons = new ArrayList<>();
-        String pos = buttonID.split("_")[2];
-        List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(pos);
-        List<String> adjacentToSomethingElse = new ArrayList<>();
-        for (String pos3 : directlyAdjacentTiles) {
-            if (game.getTileByPosition(pos3) != null) {
-                adjacentToSomethingElse.addAll(PositionMapper.getAdjacentTilePositions(pos3));
-            }
-        }
-        for (String pos3 : directlyAdjacentTiles) {
-            if (game.getTileByPosition(pos3) == null && !adjacentToSomethingElse.contains(pos3)) {
-                buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "detTileAdditionStep4_" + newTileID + "_" + pos3, pos3));
-            }
-        }
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentation() + ", please choose where the new system should go.",
-                buttons);
-    }
-
-    @ButtonHandler("detTileAdditionStep4_")
-    public static void detTileAdditionStep4(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
-        deleteMessage(event);
-        String newTileID = buttonID.split("_")[1];
-        String pos = buttonID.split("_")[2];
-        Tile tile = new Tile(newTileID, pos);
-        game.setTile(tile);
-        if (tile.getPlanetUnitHolders().isEmpty()) {
-            AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
-        }
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentation() + " added the system " + tile.getRepresentationForButtons(game, player)
-                        + ".");
-    }
-
     public static void starChartStep1(Game game, Player player, String newTileID) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
@@ -3910,58 +3838,7 @@ public class ButtonHelper {
         String pos = buttonID.split("_")[2];
         List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(pos);
         List<String> usedPos = new ArrayList<>();
-        for (String pos2 : directlyAdjacentTiles) {
-            Tile tile = game.getTileByPosition(pos2);
-            if (tile != null && tile.isEdgeOfBoard(game) && !pos2.equalsIgnoreCase(pos) && !usedPos.contains(pos2)) {
-                if (game.isAgeOfExplorationMode() && tile.isHomeSystem(game)) {
-                    continue;
-                }
-                usedPos.add(pos2);
-                buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "starChartsStep3_" + newTileID + "_" + tile.getPosition()
-                                + "_" + pos,
-                        tile.getRepresentationForButtons(game, player)));
-            }
 
-            if (tile == null) {
-                for (String pos3 : PositionMapper.getAdjacentTilePositions(pos2)) {
-                    Tile tile2 = game.getTileByPosition(pos3);
-                    if (tile2 != null
-                            && tile2.isEdgeOfBoard(game)
-                            && !pos3.equalsIgnoreCase(pos)
-                            && !usedPos.contains(pos3)) {
-                        if (game.isAgeOfExplorationMode() && tile2.isHomeSystem(game)) {
-                            continue;
-                        }
-                        usedPos.add(pos3);
-                        buttons.add(Buttons.green(
-                                player.getFinsFactionCheckerPrefix() + "starChartsStep3_" + newTileID + "_"
-                                        + tile2.getPosition() + "_" + pos,
-                                tile2.getRepresentationForButtons(game, player)));
-                    }
-                }
-            }
-        }
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentation() + ", please choose another tile that the new tile will be adjacent to.",
-                buttons);
-    }
-
-    @ButtonHandler("starChartsStep3_")
-    public static void starChartStep3(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
-        deleteMessage(event);
-        String newTileID = buttonID.split("_")[1];
-        String pos = buttonID.split("_")[2];
-        String pos2 = buttonID.split("_")[3];
-        List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(pos);
-        List<String> directlyAdjacentTiles2 = PositionMapper.getAdjacentTilePositions(pos2);
-        String inBoth = "";
-        for (String pos3 : directlyAdjacentTiles) {
-            if (directlyAdjacentTiles2.contains(pos3) && game.getTileByPosition(pos3) == null) {
-                inBoth = pos3;
-            }
-        }
         List<String> redTilesToPullFrom = new ArrayList<>(List.of(
                 // Source:  https://discord.com/channels/943410040369479690/1009507056606249020/1140518249088434217
                 //
@@ -4072,6 +3949,60 @@ public class ButtonHelper {
                 newTileID = ids.getFirst();
             }
         }
+
+        for (String pos2 : directlyAdjacentTiles) {
+            Tile tile = game.getTileByPosition(pos2);
+            if (tile != null && tile.isEdgeOfBoard(game) && !pos2.equalsIgnoreCase(pos) && !usedPos.contains(pos2)) {
+                if (game.isAgeOfExplorationMode() && tile.isHomeSystem(game)) {
+                    continue;
+                }
+                usedPos.add(pos2);
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "starChartsStep3_" + newTileID + "_" + tile.getPosition()
+                                + "_" + pos,
+                        tile.getRepresentationForButtons(game, player)));
+            }
+
+            if (tile == null) {
+                for (String pos3 : PositionMapper.getAdjacentTilePositions(pos2)) {
+                    Tile tile2 = game.getTileByPosition(pos3);
+                    if (tile2 != null
+                            && tile2.isEdgeOfBoard(game)
+                            && !pos3.equalsIgnoreCase(pos)
+                            && !usedPos.contains(pos3)) {
+                        if (game.isAgeOfExplorationMode() && tile2.isHomeSystem(game)) {
+                            continue;
+                        }
+                        usedPos.add(pos3);
+                        buttons.add(Buttons.green(
+                                player.getFinsFactionCheckerPrefix() + "starChartsStep3_" + newTileID + "_"
+                                        + tile2.getPosition() + "_" + pos,
+                                tile2.getRepresentationForButtons(game, player)));
+                    }
+                }
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", please choose another tile that the new tile will be adjacent to.",
+                buttons);
+    }
+
+    @ButtonHandler("starChartsStep3_")
+    public static void starChartStep3(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        deleteMessage(event);
+        String newTileID = buttonID.split("_")[1];
+        String pos = buttonID.split("_")[2];
+        String pos2 = buttonID.split("_")[3];
+        List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(pos);
+        List<String> directlyAdjacentTiles2 = PositionMapper.getAdjacentTilePositions(pos2);
+        String inBoth = "";
+        for (String pos3 : directlyAdjacentTiles) {
+            if (directlyAdjacentTiles2.contains(pos3) && game.getTileByPosition(pos3) == null) {
+                inBoth = pos3;
+            }
+        }
+
         if (inBoth.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -4105,7 +4036,7 @@ public class ButtonHelper {
                     event,
                     "## " + player.getRepresentation()
                             + " if you are not a new player, you can ignore this, but know that on your turn you can only do one action normally."
-                            + " Doing a second action button is reserved for homebrew/master planet/other abilities. If you don't have one of those, please don't do another turn. ");
+                            + " Doing a second action button is reserved for homebrew/master plan/other abilities. If you don't have one of those, please don't do another turn. ");
         }
         GMService.logPlayerActivity(game, player, msg);
     }
@@ -4669,6 +4600,7 @@ public class ButtonHelper {
         String msg =
                 player.getRepresentation() + " sent 1 " + tgOrDebt + " to " + tradeHolder.getRepresentation() + ".";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        CommanderUnlockCheckService.checkPlayer(tradeHolder, "hacan");
     }
 
     public static boolean doesPlanetHaveAttachmentTechSkip(Tile tile, String planet) {

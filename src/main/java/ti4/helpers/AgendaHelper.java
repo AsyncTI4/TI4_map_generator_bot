@@ -137,8 +137,9 @@ public class AgendaHelper {
             game.removeStoredValue("queuedWhensFor" + player.getFaction());
             game.removeStoredValue("queuedAftersFor" + player.getFaction());
             game.removeStoredValue("queuedAftersLockedFor" + player.getFaction());
-            if (!game.getStoredValue("passOnAllWhensNAfters" + player.getFaction())
-                            .isEmpty()
+            if ((!game.getStoredValue("passOnAllWhensNAfters" + player.getFaction())
+                                    .isEmpty()
+                            || player.isNpc())
                     && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
                 game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens") + player.getFaction() + "_");
                 List<Button> buttons = new ArrayList<>();
@@ -3241,8 +3242,17 @@ public class AgendaHelper {
                     }
 
                     if (!game.isFowMode() && game.getCurrentAgendaInfo().contains("Elect Player")) {
+                        String emoji = FactionEmojis.getFactionIcon(outcome.toLowerCase())
+                                .toString();
+                        if (outcome.toLowerCase().contains("franken")) {
+                            Player outcomerP = game.getPlayerFromColorOrFaction(outcome.toLowerCase());
+                            if (outcomerP != null) {
+                                emoji = outcomerP.getFactionEmoji();
+                            }
+                        }
                         summaryBuilder
-                                .append(FactionEmojis.getFactionIcon(outcome.toLowerCase()))
+                                .append("- ")
+                                .append(emoji)
                                 .append(" ")
                                 .append(outcome)
                                 .append(": ")
@@ -3254,6 +3264,7 @@ public class AgendaHelper {
                     } else if (!game.isHomebrewSCMode()
                             && game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
                         summaryBuilder
+                                .append("- ")
                                 .append(CardEmojis.getSCFrontFromInteger(Integer.parseInt(outcome)))
                                 .append(" **")
                                 .append(Helper.getSCName(Integer.parseInt(outcome), game))
@@ -3264,6 +3275,7 @@ public class AgendaHelper {
                                 .append(")\n");
                     } else {
                         summaryBuilder
+                                .append("- ")
                                 .append(outcome)
                                 .append(": ")
                                 .append(totalVotes)
@@ -3273,6 +3285,7 @@ public class AgendaHelper {
                     }
                 } else {
                     summaryBuilder
+                            .append("- ")
                             .append(outcome)
                             .append(": Total votes ")
                             .append(totalVotes)

@@ -312,8 +312,13 @@ public class CryypterHelper {
     private static void votcRiderButtons(Player player, List<Button> buttons, boolean play) {
         for (Leader leader : player.getLeaders()) {
             LeaderModel leaderModel = leader.getLeaderModel().orElse(null);
-            if (!leader.isLocked() && "After an agenda is revealed:".equals(leaderModel.getAbilityWindow())) {
+            if (leaderModel != null
+                    && !leader.isLocked()
+                    && "After an agenda is revealed:".equals(leaderModel.getAbilityWindow())) {
                 FactionModel factionModel = Mapper.getFaction(leaderModel.getFaction());
+                if (factionModel == null) {
+                    continue;
+                }
                 String buttonID;
                 if ("hero".equals(leaderModel.getType())) {
                     buttonID = "Keleres Xxcha Hero";

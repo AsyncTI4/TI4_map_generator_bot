@@ -25,6 +25,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands.CommandHelper;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.commands.uncategorized.ServerPromoteCommand;
+import ti4.cron.CronManager;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -913,16 +914,24 @@ public class AutoCompleteProvider {
             @NotNull CommandAutoCompleteInteractionEvent event,
             @NotNull String subCommandName,
             @NotNull String optionName) {
-        if (!subCommandName.equals(Constants.SET_SETTING)) return;
-        switch (optionName) {
-            case Constants.SETTING_TYPE ->
-                event.replyChoiceStrings("string", "number", "bool").queue();
-            case Constants.SETTING_NAME -> {
-                var settings = Arrays.stream(GlobalSettings.ImplementedSettings.values())
-                        .map(GlobalSettings.ImplementedSettings::toString)
-                        .toList();
-                replyWith25ChoicesThatContainValue(event, settings);
+        switch (subCommandName) {
+            case Constants.SET_SETTING -> {
+                switch (optionName) {
+                    case Constants.SETTING_TYPE ->
+                        event.replyChoiceStrings("string", "number", "bool").queue();
+                    case Constants.SETTING_NAME -> {
+                        var settings = Arrays.stream(GlobalSettings.ImplementedSettings.values())
+                                .map(GlobalSettings.ImplementedSettings::toString)
+                                .toList();
+                        replyWith25ChoicesThatContainValue(event, settings);
+                    }
+                }
             }
+            case Constants.RUN_CRON -> {
+                if (!optionName.equals(Constants.CRON_NAME)) return;
+                replyWith25ChoicesThatContainValue(event, CronManager.getCronNames());
+            }
+            default -> {}
         }
     }
 

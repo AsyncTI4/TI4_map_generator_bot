@@ -171,7 +171,9 @@ public class MessageHelper {
 
     public static List<Button> addUndoButtonToList(List<Button> buttons, String gameName) {
         for (Button button : buttons) {
-            if (button.getId().contains("ultimateUndo") || button.getId().contains("answerSurvey")) {
+            if (button.getId() != null
+                    && (button.getId().contains("ultimateUndo")
+                            || button.getId().contains("answerSurvey"))) {
                 return buttons;
             }
         }

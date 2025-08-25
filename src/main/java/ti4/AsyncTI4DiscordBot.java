@@ -35,12 +35,13 @@ import ti4.cron.FastScFollowCron;
 import ti4.cron.InteractionLogCron;
 import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
+import ti4.cron.LongExecutionHistoryCron;
 import ti4.cron.OldUndoFileCleanupCron;
 import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
 import ti4.cron.UploadStatsCron;
-import ti4.cron.WinningPathCacheCron;
+import ti4.cron.WinningPathCron;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -51,6 +52,7 @@ import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
 import ti4.listeners.AutoCompleteListener;
+import ti4.listeners.BotRuntimeStatsListener;
 import ti4.listeners.ButtonListener;
 import ti4.listeners.ChannelCreationListener;
 import ti4.listeners.DeletionListener;
@@ -129,6 +131,7 @@ public class AsyncTI4DiscordBot {
                 .build();
 
         jda.addEventListener(
+                new BotRuntimeStatsListener(),
                 new MessageListener(),
                 new DeletionListener(),
                 new ChannelCreationListener(),
@@ -248,32 +251,36 @@ public class AsyncTI4DiscordBot {
         BotLogger.info("LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
         ApplicationEmojiService.uploadNewEmojis();
-        TileHelper.init(); // load all /resources/planets/ and /resources/systems/ .json files, into 3 HashMaps (not 2)
-        PositionMapper.init(); // load all /resources/positions/ .properties files, each into 1 Properties
-        Mapper.init(); // load all /resources/data/ .json and .properties files, except logging.properties, each into
-        // 1 HashMap or Properties
-        AliasHandler.init(); // load all /resources/alias/ .properties files, except position_alias_old.properties, into
-        Storage.init(); // create directories for games files
+        // load all /resources/planets/ and /resources/systems/ .json files, into 3 HashMaps (not 2)
+        TileHelper.init();
+        // load all /resources/positions/ .properties files, each into 1 Properties
+        PositionMapper.init();
+        // load all /resources/data/ .json and .properties files, except logging.properties, each into 1 HashMap or
+        // Properties
+        Mapper.init();
+        // load all /resources/alias/ .properties files, except position_alias_old.properties, into
+        AliasHandler.init();
+        // create directories for games files
+        Storage.init();
         SelectionManager.init();
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
 
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
 
-        // LOAD GAMES NAMES
         BotLogger.info("LOADING GAMES");
-        GameManager.initialize(); // load games, into 2 ConcurrentHashMaps: 1 for games and 1 for players
+        GameManager.initialize();
+        BotLogger.info("FINISHED LOADING GAMES");
 
-        // RUN DATA MIGRATIONS
         if (DataMigrationManager.runMigrations()) {
-            BotLogger.info("RAN MIGRATIONS");
+            BotLogger.info("FINISHED RUNNING MIGRATIONS");
         }
 
         // START CRONS
         AutoPingCron.register();
         ReuploadStaleEmojisCron.register();
         LogCacheStatsCron.register();
-        WinningPathCacheCron.register();
+        WinningPathCron.register();
         UploadStatsCron.register();
         OldUndoFileCleanupCron.register();
         EndOldGamesCron.register();
@@ -283,12 +290,13 @@ public class AsyncTI4DiscordBot {
         FastScFollowCron.register();
         CloseLaunchThreadsCron.register();
         InteractionLogCron.register();
+        LongExecutionHistoryCron.register();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
         jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
         updatePresence();
-        BotLogger.info("FINISHED LOADING GAMES");
+        BotLogger.info("BOT IS READY TO RECEIVE COMMANDS");
 
         // Register Shutdown Hook to run when SIGTERM is received from docker stop
         Thread mainThread = Thread.currentThread();

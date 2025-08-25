@@ -74,6 +74,7 @@ import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.service.PlanetService;
 import ti4.service.StatusCleanupService;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -1603,7 +1604,8 @@ public class UnfiledButtonHandlers {
                 }
                 break;
             }
-            if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
+            if (game.getStoredValue(key3).contains(player2.getFaction() + "*")
+                    || game.getStoredValue(key3b).contains(player2.getFaction() + "*")) {
                 message = " has been queued to score a public objective. ";
                 if (!game.isFowMode()) {
                     message += player2.getRepresentationUnfogged() + " is the one the game is currently waiting on.";
@@ -1778,7 +1780,8 @@ public class UnfiledButtonHandlers {
 
                         break;
                     }
-                    if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
+                    if (game.getStoredValue(key3).contains(player2.getFaction() + "*")
+                            || game.getStoredValue(key3b).contains(player2.getFaction() + "*")) {
                         message = player.getRepresentation() + " has been queued to score a secret objective. ";
                         if (!game.isFowMode()) {
                             message += player2.getRepresentationUnfogged()
@@ -2445,6 +2448,10 @@ public class UnfiledButtonHandlers {
     @ButtonHandler("componentAction")
     public static void componentAction(ButtonInteractionEvent event, Player player, Game game) {
         String message = "Please choose what kind of component action you wish to do.";
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
+            message += "\n-# You have been _Political Censure_'d, and thus cannot play action cards.";
+        }
         List<Button> systemButtons = ComponentActionHelper.getAllPossibleCompButtons(game, player, event);
         MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, systemButtons);
     }

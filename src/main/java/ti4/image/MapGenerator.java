@@ -1,6 +1,13 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
@@ -200,6 +207,9 @@ public class MapGenerator implements AutoCloseable {
         int unrealPlayers = game.getNotRealPlayers().size();
         playersY += unrealPlayers * unrealPlayerHeight;
         for (Player player : game.getPlayers().values()) {
+            if (player.getFaction().equalsIgnoreCase("neutral") || (player.isNpc() && player.isDummy())) {
+                playersY -= 350;
+            }
             if (player.isEliminated()) {
                 playersY -= 190;
             } else if (player.getSecretsScored().size() >= 4) {
@@ -390,16 +400,20 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private void sendToWebsite() {
-        String testing = System.getenv("TESTING");
-        if (testing == null && displayTypeBasic == DisplayType.all && !isFoWPrivate) {
-            AsyncTi4WebsiteHelper.putMap(game.getName(), mainImageBytes, false, null);
-            AsyncTi4WebsiteHelper.putData(game.getName(), game);
-            AsyncTi4WebsiteHelper.putOverlays(game.getID(), websiteOverlays);
-            AsyncTi4WebsiteHelper.putPlayerData(game.getID(), game);
-        } else if (isFoWPrivate) {
-            Player player = CommandHelper.getPlayerFromGame(
-                    game, event.getMember(), event.getUser().getId());
-            AsyncTi4WebsiteHelper.putMap(game.getName(), mainImageBytes, true, player);
+        try {
+            String testing = System.getenv("TESTING");
+            if (testing == null && displayTypeBasic == DisplayType.all && !isFoWPrivate) {
+                AsyncTi4WebsiteHelper.putMap(game.getName(), mainImageBytes, false, null);
+                AsyncTi4WebsiteHelper.putData(game.getName(), game);
+                AsyncTi4WebsiteHelper.putOverlays(game.getID(), websiteOverlays);
+                AsyncTi4WebsiteHelper.putPlayerData(game.getID(), game);
+            } else if (isFoWPrivate) {
+                Player player = CommandHelper.getPlayerFromGame(
+                        game, event.getMember(), event.getUser().getId());
+                AsyncTi4WebsiteHelper.putMap(game.getName(), mainImageBytes, true, player);
+            }
+        } catch (Exception e) {
+            BotLogger.error("Failed to send to game info to website", e);
         }
     }
 
@@ -1091,11 +1105,10 @@ public class MapGenerator implements AutoCloseable {
             graphics.setFont(Storage.getFont32());
             point = PositionMapper.getPlayerStats("newfaction");
             point.translate(statTileMid.x, statTileMid.y);
-            String factionText = player.getFaction();
+            String factionText = player.getFactionModel().getShortName();
             if (player.getDisplayName() != null && !"null".equals(player.getDisplayName())) {
                 factionText = player.getDisplayName();
             }
-            factionText = StringUtils.capitalize(factionText);
             DrawingUtil.superDrawString(
                     graphics, factionText, point.x, point.y, Color.WHITE, center, null, stroke5, Color.BLACK);
         }

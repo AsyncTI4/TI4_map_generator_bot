@@ -1,6 +1,13 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -118,7 +125,7 @@ class PlayerAreaGenerator {
 
             Point tl = new Point(x, y);
             Rectangle rect = drawPlayerAreaOLD(player, tl);
-            if (rect != null && rect.height > 0) y += rect.height + 15;
+            if (rect.height > 0) y += rect.height + 15;
         }
     }
 
@@ -132,7 +139,9 @@ class PlayerAreaGenerator {
         Graphics2D g2 = (Graphics2D) graphics;
 
         boolean convertToGeneric = isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, frogPlayer);
-        if (convertToGeneric || ("neutral".equals(player.getFaction()) && player.isDummy())) {
+        if ((player.isDummy() && player.isNpc())
+                || convertToGeneric
+                || ("neutral".equals(player.getFaction()) && player.isDummy())) {
             return new Rectangle(topLeft);
         }
 
@@ -317,6 +326,21 @@ class PlayerAreaGenerator {
             int drawX = x + 9;
             int drawY = y + 125;
             Set<Player> neighbors = player.getNeighbouringPlayers(true);
+            Set<Player> guildShips = new HashSet<>();
+            for (Player p2 : game.getRealPlayers()) {
+                if (player == p2 || neighbors.contains(p2)) {
+                    continue;
+                }
+                if (game.isAgeOfCommerceMode()
+                        || player.hasAbility("guild_ships")
+                        || player.getPromissoryNotesInPlayArea().contains("convoys")
+                        || p2.getPromissoryNotesInPlayArea().contains("convoys")
+                        || p2.hasAbility("guild_ships")
+                        || player.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")
+                        || p2.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")) {
+                    guildShips.add(p2);
+                }
+            }
             if (neighbors.isEmpty()) {
                 DrawingUtil.superDrawString(
                         g2, "No Neighbors", drawX + xSpacer, drawY, Color.red, null, null, stroke2, Color.black);
@@ -332,6 +356,23 @@ class PlayerAreaGenerator {
                         xSpacer += 27;
                     }
                 }
+            }
+            if (!guildShips.isEmpty()) {
+                graphics.setFont(Storage.getFont30());
+                xSpacer += 27;
+                DrawingUtil.superDrawString(
+                        g2, "(", drawX + xSpacer, drawY + 2, Color.red, null, null, stroke2, Color.black);
+                xSpacer += 20;
+                for (Player p2 : guildShips) {
+                    String faction2 = p2.getFaction();
+                    if (faction2 != null) {
+                        DrawingUtil.drawPlayerFactionIconImage(graphics, p2, x + xSpacer, y + 125 - 20, 26, 26);
+                        xSpacer += 27;
+                    }
+                }
+                DrawingUtil.superDrawString(
+                        g2, ")", drawX + xSpacer - 8, drawY + 2, Color.red, null, null, stroke2, Color.black);
+                xSpacer += 4;
             }
         }
 

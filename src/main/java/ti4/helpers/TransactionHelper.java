@@ -70,7 +70,8 @@ public class TransactionHelper {
                 if (item.contains("sending" + sender.getFaction())
                         && item.contains("receiving" + receiver.getFaction())) {
                     String thingToTransact = item.split("_")[2];
-                    String furtherDetail = item.split("_")[3];
+                    String furtherDetail = item.replace(
+                            item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
                     int amountToTransact = 1;
                     if ((("ACs".equalsIgnoreCase(thingToTransact) || "PNs".equalsIgnoreCase(thingToTransact))
                             && furtherDetail.contains("generic"))) {
@@ -174,7 +175,8 @@ public class TransactionHelper {
                 trans.append("> - ");
                 sendingNothing = false;
                 String thingToTransact = item.split("_")[2];
-                String furtherDetail = item.split("_")[3];
+                String furtherDetail = item.replace(
+                        item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
                 int amountToTransact = 1;
                 if ("frags".equalsIgnoreCase(thingToTransact)
                         || (("PNs".equalsIgnoreCase(thingToTransact) || "ACs".equalsIgnoreCase(thingToTransact))
@@ -843,7 +845,8 @@ public class TransactionHelper {
         String item = buttonID.split("_")[1];
         String sender = buttonID.split("_")[2];
         String receiver = buttonID.split("_")[3];
-        String extraDetail = buttonID.split("_")[4];
+        String extraDetail =
+                buttonID.replace(buttonID.split("_")[0] + "_" + item + "_" + sender + "_" + receiver + "_", "");
         Player p1 = game.getPlayerFromColorOrFaction(sender);
         Player p2 = game.getPlayerFromColorOrFaction(receiver);
         if (p1 == null || p2 == null) return;
@@ -1107,6 +1110,9 @@ public class TransactionHelper {
                     }
                     PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
                     Player owner = game.getPNOwner(pnShortHand);
+                    if (owner == null) {
+                        continue;
+                    }
                     Button transact;
                     if (game.isFowMode()) {
                         transact = Buttons.green(
@@ -1504,10 +1510,13 @@ public class TransactionHelper {
                     Button button;
                     if (!game.isFowMode()) {
                         String label = player.getUserName();
-                        if (!canTheseTwoTransact(game, p, player)) {
-                            label = player.getUserName() + "(Not Neighbors)";
+                        if (p.isNeighboursWith(player)) {
+                            button = Buttons.green(finChecker + "transactWith_" + faction, label);
+                        } else if (canTheseTwoTransact(game, p, player)) {
+                            button = Buttons.blue(finChecker + "transactWith_" + faction, label);
+                        } else {
+                            button = Buttons.gray(finChecker + "transactWith_" + faction, label);
                         }
-                        button = Buttons.gray(finChecker + "transactWith_" + faction, label);
 
                         String factionEmojiString = player.getFactionEmoji();
                         button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
@@ -1604,6 +1613,10 @@ public class TransactionHelper {
         }
 
         if (player == p1) {
+            if (getReturnPNsInPlayAreaButtons(game, p1, p2).size() > 0) {
+                stuffToTransButtons.add(
+                        Buttons.gray("startReturnPNInPlayArea_" + p2.getFaction(), "Return a PN in Play Area"));
+            }
             stuffToTransButtons.add(Buttons.gray("resetOffer_" + p2.getFaction(), "Reset Offer"));
             stuffToTransButtons.add(
                     Buttons.red("getNewTransaction_" + p2.getFaction() + "_" + p1.getFaction(), "Ask for Stuff"));
@@ -1621,6 +1634,48 @@ public class TransactionHelper {
     @ButtonHandler("send_")
     public static void send(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         resolveSpecificTransButtonPress(game, player, buttonID, event, true);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static List<Button> getReturnPNsInPlayAreaButtons(Game game, Player p1, Player p2) {
+        List<Button> buttons = new ArrayList<>();
+        for (String pn : p1.getPromissoryNotesInPlayArea()) {
+            if (p2 == game.getPNOwner(pn) && Mapper.getPromissoryNote(pn) != null) {
+                buttons.add(Buttons.gray(
+                        "returnPNInPlayArea_" + pn,
+                        "Return " + Mapper.getPromissoryNote(pn).getName()));
+            }
+        }
+
+        return buttons;
+    }
+
+    @ButtonHandler("startReturnPNInPlayArea_")
+    public static void startReturnPNInPlayArea(ButtonInteractionEvent event, Player p1, String buttonID, Game game) {
+        String message = "## Warning, this is only to be done if a bug or mistake occurred. You cannot normally return"
+                + " promissories via this method";
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = getReturnPNsInPlayAreaButtons(game, p1, p2);
+        MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("returnPNInPlayArea_")
+    public static void returnPNInPlayArea(ButtonInteractionEvent event, Player p1, String buttonID, Game game) {
+        String id = buttonID.replace("returnPNInPlayArea_", "");
+
+        Player p2 = game.getPNOwner(id);
+        if (p2 != null) {
+            p1.removePromissoryNote(id);
+            p2.setPromissoryNote(id);
+            PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
+            PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
+            String message2 = p1.getRepresentation() + " returned a promissory note to " + p2.getRepresentation();
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2);
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message2);
+            }
+        }
         ButtonHelper.deleteMessage(event);
     }
 

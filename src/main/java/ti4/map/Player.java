@@ -2598,7 +2598,7 @@ public class Player extends PlayerProperties {
     private void applyEmbedDefaults(EmbedBuilder eb) {
         eb.setAuthor(getUserName(), null, getUser().getEffectiveAvatarUrl());
         eb.setFooter("");
-        eb.setColor(Mapper.getColor(getColor()).primaryColor());
+        eb.setColor(Mapper.getColor(getColor()).getPrimaryColor());
     }
 
     @JsonIgnore

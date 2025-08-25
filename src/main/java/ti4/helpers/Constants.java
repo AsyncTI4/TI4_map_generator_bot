@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -54,6 +54,8 @@ public class Constants {
     public static final String OFFER_AUTOPASS_OPTIONS = "offer_autopass_options";
     public static final String OFFER_AFKTIME_OPTIONS = "offer_afktime_options";
     public static final String SURVEY = "survey";
+    public static final String MESSAGE_MY_GAMES = "message_my_games";
+    public static final String PING_GAME = "ping_game";
     public static final String WIPE_TURN_TIME = "wipe_turn_time";
     public static final String ALLIANCE_MEMBERS = "alliance_members";
     public static final String AFK_HOURS = "afk_hours";
@@ -230,6 +232,7 @@ public class Constants {
     public static final String SEARCH_GAMES = "games";
     public static final String SEARCH_MY_GAMES = "my_games";
     public static final String STATISTICS_FACTION_GAMES = "faction_games";
+    public static final String STATISTICS_POLITICS_POSITION = "politics_position";
     public static final String SEARCH_FOR_GAME = "for_game";
     public static final String SEARCH_MY_TITLES = "my_titles";
     public static final String SEARCH_WINNING_PATH = "winning_path_games";
@@ -263,6 +266,7 @@ public class Constants {
 
     public static final String UNIT = "unit";
     public static final String UNIT_CAP = "unit_cap";
+    public static final String EVERYONE = "everyone";
     public static final String TOKEN = "token";
     public static final String TILE_LIST = "tile_list";
     public static final String UNIT_NAMES = "unit_names";
@@ -1188,6 +1192,8 @@ public class Constants {
 
     public static final String MIGRATION_NAME = "migration_name";
     public static final String RUN_MANUAL_DATA_MIGRATION = "run_manual_data_migration";
+    public static final String CRON_NAME = "cron_name";
+    public static final String RUN_CRON = "run_cron";
 
     public static final String AC_DECK_ID = "ac_deck_id";
     public static final String SO_DECK_ID = "so_deck_id";

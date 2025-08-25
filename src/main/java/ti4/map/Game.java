@@ -288,6 +288,7 @@ public class Game extends GameProperties {
         Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
         neutral.setUnitsOwned(playerOwnedUnits);
         neutral.addTech("ff2");
+        neutral.addTech("dd2");
         return neutral;
     }
 
@@ -1636,7 +1637,7 @@ public class Game extends GameProperties {
             }
         }
 
-        for (Player p : getRealPlayers()) {
+        for (Player p : getRealPlayersNDummies()) {
             if (p.controlsMecatol(false)) {
                 return true;
             }

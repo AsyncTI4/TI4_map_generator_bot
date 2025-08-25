@@ -1,10 +1,16 @@
 package ti4.image;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -68,6 +74,7 @@ import ti4.model.WormholeModel;
 import ti4.service.emoji.CardEmojis;
 
 public class Mapper {
+
     // private static final Properties colors = new Properties();
     private static final Properties decals = new Properties();
     private static final Properties general = new Properties();
@@ -104,7 +111,10 @@ public class Mapper {
     private static final Cache<String, ColorModel> colorToColorModelCache =
             Caffeine.newBuilder().maximumSize(1000).build();
 
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
     public static void init() {
+        objectMapper.registerModule(new SimpleModule().addDeserializer(Color.class, new ColorDeserializer()));
         try {
             loadData();
         } catch (Exception e) {
@@ -112,7 +122,7 @@ public class Mapper {
         }
     }
 
-    public static void loadData() throws Exception {
+    static void loadData() throws Exception {
         // must be first for validating later models
         importJsonObjectsFromFolder("factions", factions, FactionModel.class);
 
@@ -171,24 +181,22 @@ public class Mapper {
         File folder = new File(folderPath);
         File[] listOfFiles = folder.listFiles();
         for (File file : listOfFiles) {
-            if (file.isFile() && file.getName().endsWith(".json")) {
-                try {
-                    importJsonObjects(jsonFolderName + File.separator + file.getName(), objectMap, target);
-                } catch (InvalidFormatException e) {
-                    BotLogger.error(
-                            "JSON File may be formatted incorrectly: " + jsonFolderName + "/" + file.getName(), e);
-                    throw e;
-                } catch (Exception e) {
-                    BotLogger.error(
-                            "Could not import JSON Objects from File: " + jsonFolderName + "/" + file.getName(), e);
-                }
+            if (!file.isFile() || !file.getName().endsWith(".json")) {
+                continue;
+            }
+            try {
+                importJsonObjects(jsonFolderName + File.separator + file.getName(), objectMap, target);
+            } catch (InvalidFormatException e) {
+                BotLogger.error("JSON File may be formatted incorrectly: " + jsonFolderName + "/" + file.getName(), e);
+                throw e;
+            } catch (Exception e) {
+                BotLogger.error("Could not import JSON Objects from File: " + jsonFolderName + "/" + file.getName(), e);
             }
         }
     }
 
     private static <T extends ModelInterface> void importJsonObjects(
             String jsonFileName, Map<String, T> objectMap, Class<T> target) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
         List<T> allObjects = new ArrayList<>();
         String filePath = ResourceHelper.getInstance().getDataFile(jsonFileName);
         JavaType type = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, target);
@@ -516,11 +524,6 @@ public class Mapper {
     }
 
     // no source field in colors data, missing 'private List<String> getColorsSources(ComponentSource CompSource)'
-
-    public static List<String> getColorIDs() {
-        return new ArrayList<>(
-                colors.values().stream().map(ColorModel::getAlias).toList());
-    }
 
     public static List<String> getColorNames() {
         return new ArrayList<>(colors.values().stream().map(ColorModel::getName).toList());
@@ -1341,5 +1344,25 @@ public class Mapper {
                         && tileModel.getWormholes().contains(wormhole))
                 .map(TileModel::getId)
                 .collect(Collectors.toSet());
+    }
+
+    private static class ColorDeserializer extends JsonDeserializer<Color> {
+        @Override
+        public Color deserialize(JsonParser p, DeserializationContext c) throws IOException {
+            JsonNode n = p.getCodec().readTree(p);
+            // "#RRGGBB" or "0xRRGGBB"
+            if (n.isTextual()) return Color.decode(n.asText());
+            // ARGB
+            if (n.isInt()) return new Color(n.asInt(), true);
+            // { "red" : ###, "green": ###, "blue": ###, "alpha": ### } where alpha is optional
+            if (n.has("red")) {
+                int r = n.get("red").asInt(),
+                        g = n.get("green").asInt(),
+                        b = n.get("blue").asInt();
+                int a = n.has("alpha") ? n.get("alpha").asInt() : 255;
+                return new Color(r, g, b, a);
+            }
+            throw c.weirdStringException(n.toString(), Color.class, "Unsupported color format");
+        }
     }
 }

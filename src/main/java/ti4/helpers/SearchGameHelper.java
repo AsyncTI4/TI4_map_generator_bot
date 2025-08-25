@@ -36,6 +36,32 @@ public class SearchGameHelper {
             boolean ignoreSpectate,
             boolean ignoreAborted,
             boolean wantNum) {
+        return searchGames(
+                user,
+                event,
+                onlyMyTurn,
+                includeEndedGames,
+                showAverageTurnTime,
+                showSecondaries,
+                showGameModes,
+                ignoreSpectate,
+                ignoreAborted,
+                wantNum,
+                null);
+    }
+
+    public static int searchGames(
+            User user,
+            GenericInteractionCreateEvent event,
+            boolean onlyMyTurn,
+            boolean includeEndedGames,
+            boolean showAverageTurnTime,
+            boolean showSecondaries,
+            boolean showGameModes,
+            boolean ignoreSpectate,
+            boolean ignoreAborted,
+            boolean wantNum,
+            User user2) {
         String userID = user.getId();
 
         Predicate<ManagedGame> ignoreSpectateFilter = ignoreSpectate
@@ -43,6 +69,15 @@ public class SearchGameHelper {
                         .anyMatch(player -> player.getId().equals(user.getId()))
                 : game -> game.getPlayers().stream()
                         .anyMatch(player -> player.getId().equals(user.getId()));
+
+        if (user2 != null) {
+            Predicate<ManagedGame> ignoreSpectateFilter2 = ignoreSpectate
+                    ? game -> game.getRealPlayers().stream()
+                            .anyMatch(player -> player.getId().equals(user2.getId()))
+                    : game -> game.getPlayers().stream()
+                            .anyMatch(player -> player.getId().equals(user2.getId()));
+            ignoreSpectateFilter = ignoreSpectateFilter.and(ignoreSpectateFilter2);
+        }
         Predicate<ManagedGame> onlyMyTurnFilter =
                 onlyMyTurn ? game -> Objects.equals(game.getActivePlayerId(), user.getId()) : game -> true;
         Predicate<ManagedGame> endedGamesFilter =
@@ -145,6 +180,53 @@ public class SearchGameHelper {
         Collections.sort(days);
 
         return days;
+    }
+
+    public static void msgGames(
+            User user,
+            GenericInteractionCreateEvent event,
+            boolean onlyMyTurn,
+            boolean includeEndedGames,
+            boolean showAverageTurnTime,
+            boolean showSecondaries,
+            boolean showGameModes,
+            boolean ignoreSpectate,
+            boolean ignoreAborted,
+            boolean pingGame,
+            String msg) {
+
+        Predicate<ManagedGame> ignoreSpectateFilter = ignoreSpectate
+                ? game -> game.getRealPlayers().stream()
+                        .anyMatch(player -> player.getId().equals(user.getId()))
+                : game -> game.getPlayers().stream()
+                        .anyMatch(player -> player.getId().equals(user.getId()));
+        Predicate<ManagedGame> onlyMyTurnFilter =
+                onlyMyTurn ? game -> Objects.equals(game.getActivePlayerId(), user.getId()) : game -> true;
+        Predicate<ManagedGame> endedGamesFilter =
+                includeEndedGames ? game -> true : game -> !game.isHasEnded() && !game.isFowMode();
+        Predicate<ManagedGame> onlyEndedFoWGames = game -> !game.isFowMode() || game.isHasEnded();
+        Predicate<ManagedGame> ignoreAbortedFilter =
+                ignoreAborted ? game -> !game.isHasEnded() || game.isHasWinner() : game -> true;
+        Predicate<ManagedGame> allFilterPredicates = ignoreSpectateFilter
+                .and(onlyMyTurnFilter)
+                .and(endedGamesFilter)
+                .and(onlyEndedFoWGames)
+                .and(ignoreAbortedFilter);
+
+        var filteredManagedGames = GameManager.getManagedGames().stream()
+                .filter(allFilterPredicates)
+                .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
+                .toList();
+
+        for (var managedGame : filteredManagedGames) {
+            if (managedGame.getTableTalkChannel() != null) {
+                String msg2 = "The player " + user.getName() + " sends the following msg:\n" + msg;
+                if (pingGame) {
+                    msg2 = managedGame.getGame().getPing() + " " + msg2;
+                }
+                MessageHelper.sendMessageToChannel(managedGame.getTableTalkChannel(), msg2);
+            }
+        }
     }
 
     private static double getWinPercentage(
