@@ -137,6 +137,9 @@ class MigrationHelper {
             holders.put("biaheo", holder);
             changed = true;
         }
+        if (changed) {
+            BotLogger.info("Renamed Blaheo as Biaheo in game " + game.getName());
+        }
         return changed;
     }
 
