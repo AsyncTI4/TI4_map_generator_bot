@@ -284,6 +284,7 @@ public class PlayerStatsService {
             changeDescription = "Increased";
         } else if (changeNumber < 0) {
             changeDescription = "Decreased";
+            changeNumber *= -1;
         }
         if (explanation == null || "".equalsIgnoreCase(explanation)) {
             return changeDescription + " __" + optionName + "__ by " + changeNumber + " (was " + existingNumber
