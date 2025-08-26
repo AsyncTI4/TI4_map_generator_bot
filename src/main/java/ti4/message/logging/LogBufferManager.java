@@ -1,19 +1,18 @@
 package ti4.message.logging;
 
-import javax.annotation.Nonnull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import javax.annotation.Nonnull;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import ti4.AsyncTI4DiscordBot;
 import ti4.message.MessageHelper;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @UtilityClass
 public class LogBufferManager {
@@ -77,7 +76,8 @@ public class LogBufferManager {
                 AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName(target.channelName(), false);
 
         if (logCandidates.isEmpty()) {
-            BotLogger.error("Cannot log buffered logs because target channel not found in primary guild: " + target.channelName());
+            BotLogger.error("Cannot log buffered logs because target channel not found in primary guild: "
+                    + target.channelName());
             return;
         }
 
@@ -90,8 +90,7 @@ public class LogBufferManager {
                 MessageHelper.sendMessageToChannel(channel, message.toString());
             }
         } catch (Exception e) {
-            BotLogger.error(
-                    "Failed to send LogBufferManager message", e);
+            BotLogger.error("Failed to send LogBufferManager message", e);
         }
     }
 

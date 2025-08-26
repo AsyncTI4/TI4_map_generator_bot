@@ -1,5 +1,7 @@
 package ti4;
 
+import static org.reflections.scanners.Scanners.SubTypes;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,7 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -71,8 +72,6 @@ import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
-
-import static org.reflections.scanners.Scanners.SubTypes;
 
 @SpringBootApplication
 public class AsyncTI4DiscordBot {
