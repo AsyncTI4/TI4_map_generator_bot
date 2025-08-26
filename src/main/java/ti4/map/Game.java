@@ -190,6 +190,19 @@ public class Game extends GameProperties {
     private List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache;
 
     private final Set<String> runDataMigrations = new HashSet<>();
+    // Comma-delimited list of component source selections in the format
+    // componentSource:componentType;componentSource:componentType;...
+    // Example: "base:agenda,pok:agenda,codex1:technology,ds:explore"
+    private String componentSources; // persisted via GameSave/Load using Constants.COMPONENT_SOURCES
+
+    public String getComponentSourcesCsv() {
+        return componentSources;
+    }
+
+    public void setComponentSourcesCsv(String componentSources) {
+        this.componentSources = componentSources;
+    }
+
     private BagDraft activeDraft;
 
     @JsonIgnore
@@ -235,6 +248,31 @@ public class Game extends GameProperties {
         addCustomPO(Constants.CUSTODIAN, 1);
         setUpPeakableObjectives(5, 1);
         setUpPeakableObjectives(5, 2);
+        // Default component sources: official (base, pok, codex1-4) across core component types
+        setComponentSourcesCsv(String.join(
+                ",",
+                List.of(
+                        "base:action_card",
+                        "pok:action_card",
+                        "codex1:action_card",
+                        "codex2:action_card",
+                        "codex3:action_card",
+                        "codex4:action_card",
+                        "base:agenda",
+                        "pok:agenda",
+                        "codex1:agenda",
+                        "codex2:agenda",
+                        "codex3:agenda",
+                        "codex4:agenda",
+                        "pok:technology",
+                        "codex1:technology",
+                        "codex2:technology",
+                        "codex3:technology",
+                        "codex4:technology",
+                        "pok:relic",
+                        "codex2:relic",
+                        "codex4:relic",
+                        "pok:explore")));
     }
 
     public void fixScrewedSOs() {
@@ -1967,7 +2005,11 @@ public class Game extends GameProperties {
     }
 
     public void resetAgendas() {
-        setAgendas(Mapper.getShuffledDeck(getAgendaDeckID()));
+        if (getComponentSourcesCsv() != null && !getComponentSourcesCsv().isBlank()) {
+            setAgendas(ti4.service.decks.DynamicDeckService.buildAgendaDeckShuffled(this));
+        } else {
+            setAgendas(Mapper.getShuffledDeck(getAgendaDeckID()));
+        }
         discardAgendas = new LinkedHashMap<>();
     }
 
@@ -2603,6 +2645,10 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public List<String> getTechnologyDeck() {
+        // Use dynamic sources if configured; otherwise fall back to static deck id
+        if (getComponentSourcesCsv() != null && !getComponentSourcesCsv().isBlank()) {
+            return ti4.service.decks.DynamicDeckService.buildTechnologyDeck(this);
+        }
         return Mapper.getDecks().get(getTechnologyDeckID()).getNewDeck();
     }
 
@@ -2716,10 +2762,13 @@ public class Game extends GameProperties {
     }
 
     public void resetExplore() {
-        explore.clear();
+        if (getComponentSourcesCsv() != null && !getComponentSourcesCsv().isBlank()) {
+            explore = ti4.service.decks.DynamicDeckService.buildExploreDeckShuffled(this);
+        } else {
+            explore = new ArrayList<>(
+                    Mapper.getDecks().get(getExplorationDeckID()).getNewShuffledDeck());
+        }
         discardExplore.clear();
-        List<String> exp = Mapper.getDecks().get(getExplorationDeckID()).getNewShuffledDeck();
-        explore.addAll(exp);
     }
 
     public void resetExploresOfCertainType(String reqType) {
@@ -3157,7 +3206,11 @@ public class Game extends GameProperties {
     }
 
     public void resetRelics() {
-        relics = Mapper.getDecks().get(getRelicDeckID()).getNewShuffledDeck();
+        if (getComponentSourcesCsv() != null && !getComponentSourcesCsv().isBlank()) {
+            relics = ti4.service.decks.DynamicDeckService.buildRelicDeckShuffled(this);
+        } else {
+            relics = Mapper.getDecks().get(getRelicDeckID()).getNewShuffledDeck();
+        }
     }
 
     @JsonIgnore

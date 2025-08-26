@@ -671,6 +671,7 @@ class GameLoadService {
                 case Constants.RED_TAPE_MODE -> game.setRedTapeMode(loadBooleanOrDefault(info, false));
                 case Constants.OMEGA_PHASE_MODE -> game.setOmegaPhaseMode(loadBooleanOrDefault(info, false));
                 case Constants.HOMEBREW_SC_MODE -> game.setHomebrewSCMode(loadBooleanOrDefault(info, false));
+                case Constants.COMPONENT_SOURCES -> game.setComponentSourcesCsv(info);
                 case Constants.INJECT_RULES_LINKS -> game.setInjectRulesLinks(loadBooleanOrDefault(info, false));
                 case Constants.SPIN_MODE -> {
                     try {

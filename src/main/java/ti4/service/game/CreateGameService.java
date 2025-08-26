@@ -220,6 +220,12 @@ public class CreateGameService {
 
         presentSetupToPlayers(newGame);
 
+        // Build initial dynamic decks from default component sources
+        try {
+            ti4.service.decks.DynamicDeckService.applyToGame(newGame);
+        } catch (Exception ignored) {
+        }
+
         // AUTOCLOSE LAUNCH THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread
                 && "making-new-games".equals(thread.getParentChannel().getName())) {
@@ -675,17 +681,18 @@ public class CreateGameService {
     }
 
     public static boolean isLockedFromCreatingGames(GenericInteractionCreateEvent event) {
-        if (CommandHelper.hasRole(event, AsyncTI4DiscordBot.bothelperRoles)) {
-            return false;
-        }
-
-        var userSettings = UserSettingsManager.get(event.getUser().getId());
-        if (userSettings.isLockedFromCreatingGames()) {
-            return true;
-        }
-        userSettings.setLockedFromCreatingGamesUntil(LocalDateTime.now().plusMinutes(10));
-        UserSettingsManager.save(userSettings);
         return false;
+//        if (CommandHelper.hasRole(event, AsyncTI4DiscordBot.bothelperRoles)) {
+//            return false;
+//        }
+//
+//        var userSettings = UserSettingsManager.get(event.getUser().getId());
+//        if (userSettings.isLockedFromCreatingGames()) {
+//            return true;
+//        }
+//        userSettings.setLockedFromCreatingGamesUntil(LocalDateTime.now().plusMinutes(10));
+//        UserSettingsManager.save(userSettings);
+//        return false;
     }
 
     public static boolean isGameCreationAllowed() {

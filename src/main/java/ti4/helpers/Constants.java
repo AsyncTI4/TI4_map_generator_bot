@@ -216,6 +216,7 @@ public class Constants {
     public static final String SEARCH_RELICS = "relics";
     public static final String SEARCH_SECRET_OBJECTIVES = "secret_objectives";
     public static final String SEARCH_SOURCES = "sources";
+    public static final String COMPONENT_SOURCES = "component_sources";
     // no /search strategy_card_sets yet
     public static final String SEARCH_STRATEGY_CARDS = "strategy_cards";
     public static final String SEARCH_TECHS = "techs";

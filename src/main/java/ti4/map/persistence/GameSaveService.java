@@ -594,6 +594,12 @@ class GameSaveService {
         writer.write(Constants.STRATEGY_CARD_SET + " " + game.getScSetID());
         writer.write(System.lineSeparator());
 
+        // Component sources (dynamic decks)
+        String componentSources = game.getComponentSourcesCsv();
+        if (componentSources == null) componentSources = "";
+        writer.write(Constants.COMPONENT_SOURCES + " " + componentSources);
+        writer.write(System.lineSeparator());
+
         String anomaliesJson = mapper.writeValueAsString(game.getBorderAnomalies()); // much easier than manually
         // (de)serialising
         writer.write(Constants.BORDER_ANOMALIES + " " + anomaliesJson);
