@@ -132,8 +132,7 @@ public class Buttons {
         List<Button> buttonsWeb = new ArrayList<>();
         if (game != null && !game.isFowMode()) {
             if (AsyncTi4WebsiteHelper.uploadsEnabled()) {
-                String baseUrl = "https://asyncti4.com/game/" + game.getName();
-                String url = isStandardPoKOrOnly444(game) ? baseUrl + "/newui" : baseUrl;
+                String url = "https://asyncti4.com/game/" + game.getName() + "/newui";
                 buttonsWeb.add(Button.link(url, "Website View"));
             }
             buttonsWeb.add(PLAYER_INFO);
