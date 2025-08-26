@@ -3397,7 +3397,9 @@ public class UnfiledButtonHandlers {
     public static void mahactCommander(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "mahactCommander");
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), "Use buttons to remove token.", buttons);
+                event.getMessageChannel(),
+                "Please choose which system you wish to remove your command token from.",
+                buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -3405,7 +3407,8 @@ public class UnfiledButtonHandlers {
     public static void primaryOfWarfare(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "warfare");
         MessageChannel channel = player.getCorrectChannel();
-        MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to remove token.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                channel, "Please choose which system you wish to remove your command token from.", buttons);
     }
 
     @ButtonHandler("drawAgenda_2")
