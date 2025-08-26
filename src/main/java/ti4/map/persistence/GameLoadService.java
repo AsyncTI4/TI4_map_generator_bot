@@ -101,7 +101,7 @@ class GameLoadService {
     private static ManagedGame loadManagedGame(Path path) {
         File file = path.toFile();
         try {
-            Game game = readGame(file, false);
+            Game game = readGame(file);
 
             if (game == null || game.getName() == null) {
                 BotLogger.warning("Could not load game. Game or game name is null: " + file.getName());
@@ -121,12 +121,12 @@ class GameLoadService {
             if (!gameFile.exists()) {
                 return null;
             }
-            return readGame(gameFile, true);
+            return readGame(gameFile);
         });
     }
 
     @Nullable
-    private static Game readGame(@NotNull File gameFile, boolean loadTileMap) {
+    private static Game readGame(@NotNull File gameFile) {
         if (!gameFile.exists()) {
             BotLogger.error("Could not load map, map file does not exist: " + gameFile.getAbsolutePath());
             return null;
@@ -187,15 +187,13 @@ class GameLoadService {
                     }
                 }
             }
-            if (loadTileMap) {
-                Map<String, Tile> tileMap = getTileMap(gameFileLines, game, gameFile);
-                if (tileMap == null) {
-                    BotLogger.error("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
-                    return null;
-                }
-                game.setTileMap(tileMap);
-                TransientGameInfoUpdater.update(game);
+            Map<String, Tile> tileMap = getTileMap(gameFileLines, game, gameFile);
+            if (tileMap == null) {
+                BotLogger.error("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
+                return null;
             }
+            game.setTileMap(tileMap);
+            TransientGameInfoUpdater.update(game);
             game.setStoredValue("loadedGame", "yes");
             return game;
         } catch (Exception e) {
