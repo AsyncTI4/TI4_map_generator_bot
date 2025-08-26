@@ -19,11 +19,6 @@ class PlayerStatistics extends Subcommand {
                 .setAutoComplete(true));
         addOptions(GameStatisticsFilterer.gameStatsFilters());
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        GameStatisticsFilterer.WINNING_FACTION_FILTER,
-                        "Filter games by if the game was won by said faction")
-                .setAutoComplete(true));
-        addOptions(new OptionData(
                 OptionType.INTEGER,
                 MINIMUM_GAME_COUNT_FILTER,
                 "Filter by the minimum number of games player has played, default 10"));
