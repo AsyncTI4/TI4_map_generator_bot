@@ -34,9 +34,7 @@ class GameWinsWithOtherFactions extends Subcommand {
         addOptions(new OptionData(
                 OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter by victory point goal, e.g. 10-14"));
         addOptions(new OptionData(
-                OptionType.STRING,
-                GAME_TYPE_FILTER,
-                "Filter by game type, e.g. base, pok, absol, ds, action_deck_2, little_omega"));
+                OptionType.STRING, GAME_TYPE_FILTER, "Filter by game type, e.g. base, pok, absol, ds, action_deck_2"));
         addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if the game is a fog game"));
         addOptions(new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Filter by if the game has any homebrew"));
     }

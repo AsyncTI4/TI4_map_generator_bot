@@ -82,7 +82,6 @@ class AgendaResolveButtonHandler {
         AGENDA_HANDLERS.put("absol_censure", new PoliticalCensureAgendaResolver("absol_censure"));
         AGENDA_HANDLERS.put("absol_abolishment", new AbsolAbolishmentAgendaResolver());
         AGENDA_HANDLERS.put("absol_miscount", new MiscountMessageAgendaResolver("absol_miscount"));
-        AGENDA_HANDLERS.put("little_omega_artifact", new ArtifactAgendaResolver("little_omega_artifact"));
         AGENDA_HANDLERS.put("voice_of_the_council", new VoiceOfTheCouncilLawAgendaResolver());
 
         AGENDA_HANDLERS.put("abolishment", new AbolishmentAgendaResolver());

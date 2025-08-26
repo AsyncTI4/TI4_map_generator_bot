@@ -308,22 +308,6 @@
         "source": "other"
     },
     {
-        "name": "Pi Strategy Cards",
-        "alias": "pi",
-        "scIDs": [
-            "pok1leadership",
-            "pok2diplomacy",
-            "pok3politics",
-            "project_pi_4",
-            "pok5trade",
-            "pok6warfare",
-            "pok7technology",
-            "pok8imperial"
-        ],
-        "description": "The Project_Pi set of strategy cards",
-        "source": "project_pi"
-    },
-    {
         "name": "Strategic Alliance Variant",
         "alias": "salliance",
         "scIDs": [

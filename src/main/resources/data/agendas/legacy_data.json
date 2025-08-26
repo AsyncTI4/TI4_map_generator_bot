@@ -1,0 +1,447 @@
+[
+  {
+    "alias": "little_omega_revolution",
+    "name": "Anti-Intellectual Revolution ω",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "For: Technologies with prerequisites require 1 additional prerequisite, matching any they already have. When a player would research a technology, they may gain 3 command tokens instead.",
+    "text2": "Against: Players return 1 of their non-unit upgrade, non-faction technologies that has the most prerequisites to their technology deck.",
+    "mapText": "Technologies require 1 additional prerequisite, matching any they already have.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_arms_reduction",
+    "name": "Arms Reduction ω",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "For: Each player destroys 1 of their dreadnoughts, cruisers, or destroyers in each system and gains trade goods equal to the combined cost of those ships.",
+    "text2": "Against: The player who cast the most votes \"Against\" may research a unit upgrade technology; the speaker breaks ties. At the start of the next strategy phase, exhaust each planet that has a technology specialty.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_classified",
+    "name": "Classified Document Leaks ω",
+    "type": "Law",
+    "target": "Elect Scored Secret Objective (When this agenda is revealed, if there are 1 or fewer scored secret objectives, discard this card and reveal another agenda from the top of the deck.)",
+    "text1": "The elected secret objective becomes a public objective; place it near the other public objectives in the common play area.",
+    "text2": "",
+    "mapText": "The elected secret objective becomes a public objective; place it near the other public objectives in the common play area.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_redistribution",
+    "name": "Colonial Redistribution ω",
+    "type": "Directive",
+    "target": "Elect Non-Home Planet",
+    "text1": "Remove each unit on the elected planet. The player who controls that planet places those units on 1 or more planets they control, if able; otherwise, they return that unit to their reinforcements. Then, that player chooses another player with the fewest victory points; the chosen player gains control of the elected planet and places 3 infantry from their reinforcements on it. [Note: You always choose another player, even if you are the only one with the fewest victory points.]",
+    "text2": "",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_committee",
+    "name": "Committee Formation ω",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card. Before players vote on an agenda, the owner of this card may discard this card to choose an outcome to be resolved, as if each player had cast 1 vote for that outcome.",
+    "text2": "",
+    "mapText": "Before players vote, you may discard this card to choose an outcome to be resolved, as if each player had cast 1 vote for that outcome.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_conventions",
+    "name": "Conventions of War ω",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "For: At the start of an invasion, players must discard 1 random action card from their hand to use BOMBARDMENT during that invasion.",
+    "text2": "Against: Each player who voted \"Against\" or abstained discards 1 random action card from their hand.",
+    "mapText": "Players cannot use BOMBARDMENT against units that are on planets that have a trait.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_covert_legislation",
+    "name": "Covert Legislation ω",
+    "type": "Directive",
+    "target": "When this agenda is revealed, the speaker looks at the top card of the agenda deck and reads the eligible outcomes aloud (for, against, elect player, etc.), but not the effects; treat those outcomes as if they were outcomes of this agenda and discard that agenda when this agenda is discarded. The speaker votes first on this agenda and, if able, must cast at least 1 vote.",
+    "text1": "",
+    "text2": "",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_economic_equality",
+    "name": "Economic Equality ω",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "For: Each player returns all of their trade goods to the supply. Then, each player gains 4 trade goods.",
+    "text2": "Against: Each player who cast votes \"Against\" gains 1 trade good. Then, the player who cast the most votes \"Against\" gains 4 trade goods; the speaker breaks ties.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_travel_ban",
+    "name": "Enforced Travel Ban ω",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "For: Alpha and beta wormholes have no effect during movement.",
+    "text2": "Against: Each player destroys 1 of their PDS that is in or adjacent to a system that contains an alpha or beta wormhole.",
+    "mapText": "Alpha and beta wormholes have no effect during movement.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_sanctions",
+    "name": "Executive Sanctions ω",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "For: Each player can have a maximum of 5 action cards in their hand.",
+    "text2": "Against: Each player with the fewest victory points draws 2 action cards. Each other player discards 1 random action card.",
+    "mapText": "Each player can have a maximum of 5 action cards in their hand.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_regulations",
+    "name": "Fleet Regulations ω",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "For: Each player cannot have more than 4 tokens in their fleet pool.",
+    "text2": "Against: The player that cast the most votes \"Against\" places 2 command tokens from their reinforcements in their fleet pool; the speaker breaks ties.",
+    "mapText": "Each player cannot have more than 4 tokens in their fleet pool.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_defense_act",
+    "name": "Homeland Defense Act ω",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "For: For each planet they control in their home system, each player may place 1 PDS from their reinforcements on that planet.",
+    "text2": "Against: Each player may place 1 command token from their reinforcements in their strategy pool; they may place 1 additional token if they cast 5 or more votes \"Against\".",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_artifact",
+    "name": "Ixthian Artifact ω",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "For: The speaker rolls 1 die. If the result is 6-10, each player may research 2 technologies. If the result is 1-5, destroy all units on Mecatol Rex; then, each player with units in systems adjacent to Mecatol Rex destroys 3 of their units in each of those systems.",
+    "text2": "Against: Each player draws 1 secret objective.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_abolishment",
+    "name": "Judicial Abolishment ω",
+    "type": "Directive",
+    "target": "Elect Law (When this agenda is revealed, if there are 1 or fewer laws in play, discard this card and reveal another agenda from the top of the deck.)",
+    "text1": "Discard the elected law from play. The player who cast the most votes for the elected law gains the speaker token; the speaker breaks ties.",
+    "text2": "",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_minister_commerce",
+    "name": "Minister of Commerce ω",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Trade\" strategy card, they gain 4 trade goods. When the owner of this card ends their turn, they may discard this card to replenish their commodities or to convert their commodities to trade goods.",
+    "text2": "",
+    "mapText": "After you resolve Trade, gain 4 trade goods. When you end your turn, you may discard this card to replenish or convert your commodities.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_minister_exploration",
+    "name": "Minister of Exploration ω",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "After the owner of this card gains command tokens while resolving the primary or secondary ability of the \"Leadership\" strategy card, they explore 1 of their planets. When the owner of this card explores, they may discard this card to draw 3 additional cards; they choose 1 to resolve and discard the rest.",
+    "text2": "",
+    "mapText": "After gaining command tokens from Leadership, explore a planet. Before you draw from exploration, you may discard this to draw 3 additional cards and resolve 1.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_minister_industry",
+    "name": "Minister of Industry ω",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Construction\" strategy card, they may place 1 structure on a planet they control. When the owner of this card ends their turn, they may discard this card to choose 1 system; they use the PRODUCTION abilities of each of their units in that system.",
+    "text2": "",
+    "mapText": "After resolving Construction, place 1 structure. At the end of your turn, you may discard this to resolve PRODUCTION in 1 system.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_minister_peace",
+    "name": "Minister of Peace ω",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Diplomacy\" strategy card, they ready 1 planet they control. After a player activates a system that contains a different player's units, the owner of this card may discard this card to end the active player's turn.",
+    "text2": "",
+    "mapText": "After resolving Diplomacy, ready 1 planet you control. After a player activates another player's units, discard this card to end their turn.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_minister_policy",
+    "name": "Minister of Policy ω",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card. When the owner of this card resolves the primary or secondary ability of the \"Politics\" strategy card, they draw 2 additional action cards. When another player plays an action card, the owner of this card may discard this card to cancel that action card.",
+    "text2": "",
+    "mapText": "After you resolve Politics, draw 2 additional action cards. Discard this card to cancel an action card.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_minister_sciences",
+    "name": "Minister of Sciences ω",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card. When the owner of this card resolves the primary or secondary ability of the \"Technology\" strategy card, they do not need to spend resources to research technology. When the owner of this card ends their turn, they may discard this card to research 1 technology.",
+    "text2": "",
+    "mapText": "After you resolve Technology, you do not need to spend resources. When you end your turn, you may discard this card to research 1 technology.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_minister_war",
+    "name": "Minister of War ω",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Warfare\" strategy card, they gain 1 command token. The owner of this card may discard this card after they perform an action to remove 1 of their command tokens from the game board and perform a tactical action.",
+    "text2": "",
+    "mapText": "After you resolve Warfare, gain 1 command token. You may discard this card after performing an action to remove 1 command token from the game board and perform a tactical action.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_miscount",
+    "name": "Miscount Disclosed ω",
+    "type": "Directive",
+    "target": "Elect Law (When this agenda is revealed, if the speaker chooses to, or if there are no laws in play, discard this card and reveal another agenda from the top of the deck.)\n",
+    "text1": "The speaker chooses 1 law in play or in the discard pile. Then, players vote on that law as if it were just revealed from the top of the deck.",
+    "text2": "",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_constitution",
+    "name": "New Constitution ω",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "For: The player who cast the most votes \"For\" gains the speaker token; the speaker breaks ties. Then, discard all laws from play.",
+    "text2": "Against: During the next strategy phase, players cannot choose the \"Politics\" strategy card, if they have another choice.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_prophecy",
+    "name": "Prophecy of Ixth ω",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card. The owner of this card applies +1 to the result of their fighters' combat rolls and may produce 1 additional fighter for their cost; these additional units do not count against their PRODUCTION limit.",
+    "text2": "",
+    "mapText": "+1 to fighter combat rolls. Produce 1 additional fighter for their cost that doesn't count against PRODUCTION limits.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_execution",
+    "name": "Public Execution ω",
+    "type": "Directive",
+    "target": "Elect Player",
+    "text1": "The elected player discards 1 random action card from their hand for each other player that voted for them. If they have the speaker token, they give it to another player who cast the most votes for them. During this agenda phase, they cannot vote, play action cards, or use faction abilities.",
+    "text2": "",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_schematics",
+    "name": "Publicize Weapon Schematics ω",
+    "type": "Directive",
+    "target": "Elect Non-Flagship, Non-Mech Unit",
+    "text1": "Each player who owns a unit upgrade technology of the same type as the elected unit places 2 command tokens from their reinforcements in their strategy pool. Then, each other player gains a unit upgrade technology of the same type as the elected unit.",
+    "text2": "",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_conscription",
+    "name": "Regulated Conscription ω",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "For: When a player produces units, they produce only 1 fighter and infantry for its cost instead of 2.",
+    "text2": "Against: At the start of the next strategy phase, each player exhausts 1 planet in each system that contains a combined total of 4 or more of their fighters and infantry.",
+    "mapText": "When a player produces units, they produce only 1 fighter and infantry for its cost instead of 2.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_shared_research",
+    "name": "Shared Research ω",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "For: When a player's ships move, they may ignore the effect of any anomaly that does not contain a frontier token.",
+    "text2": "Against: Each player who has ships in a non-home anomaly may research 1 technology. Then, destroy all ships that do not have SUSTAIN DAMAGE in each non-home anomaly.",
+    "mapText": "Players may ignore the effects of anomalies that do not contain a frontier token during movement.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_unconventional",
+    "name": "Unconventional Measures ω",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "For: Each player draws 2 action cards; they draw 1 additional action card if they cast 5 or more votes \"For\".",
+    "text2": "Against: Each player may discard 2 action cards to gain 1 command token; they may repeat this effect any number of times.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_wormhole_recon",
+    "name": "Wormhole Reconstruction ω",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "For: All systems that contain a non-delta wormhole are adjacent to each other.",
+    "text2": "Against: Each player places 1 command token from their reinforcements in each system that contains a non-delta wormhole and their units. Then, each player may place 1 structure on 1 planet they control in each of those systems.",
+    "mapText": "All systems that contain a non-delta wormhole are adjacent to each other.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_wormhole_research",
+    "name": "Wormhole Research ω",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "For: Each player who has ships in a system that contains a non-delta wormhole may research 1 technology. Then, destroy all ships that do not have SUSTAIN DAMAGE in each system that contains a non-delta wormhole.",
+    "text2": "Against: Each player may spend 1 strategy token to research 1 technology that has no prerequisites.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_articles_war",
+    "name": "Articles of War ω",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "For: All mechs lose their printed abilities except for SUSTAIN DAMAGE.",
+    "text2": "Against: Each player removes 4 of their infantry from the game board.",
+    "mapText": "All mechs lose their printed abilities except for SUSTAIN DAMAGE.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_checks",
+    "name": "Checks and Balances ω",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "For: Players choose strategy cards during the strategy phase in order from the player with the fewest victory points to the player with the most; on a tie, the order for those players starts with the speaker and proceeds clockwise.",
+    "text2": "Against: During the next strategy phase, when a player chooses a strategy card, they give that strategy card to another player who does not have one, if able.",
+    "mapText": "Players choose strategy cards in order of fewest to most victory points; on a tie, start with the speaker and proceed clockwise.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_cladenstine",
+    "name": "Clandestine Operations ω",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "For: The player who cast the most votes \"For\" gains the speaker token; the speaker breaks ties. Then, each other player returns 1 command token from their command sheet to their reinforcements.",
+    "text2": "Against: Each player destroys 1 of their space docks in a non-home system, if able; otherwise, that player destroys 2 of their non-fighter ships.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_minister_antiquities",
+    "name": "Minister of Antiquities ω",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Imperial\" strategy card, they look at the top 3 cards of the relic deck and place each card on top of the deck in any order. When the owner of this card ends their turn, they may discard this card to gain 1 relic.",
+    "text2": "",
+    "mapText": "After you resolve Imperial, look at the top 3 of the relic deck and place each on top in any order. When you end your turn, you may discard this card to gain 1 relic.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_nexus",
+    "name": "Nexus Sovereignty ω",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "For: Alpha and beta wormholes in the wormhole nexus have no effect during movement. The player who controls Mallice may allow a player to ignore this law.",
+    "text2": "Against: Place a gamma wormhole token in the Mecatol Rex system.",
+    "mapText": "Alpha and beta wormholes in the wormhole nexus have no effect during movement. The player who controls Mallice may allow a player to ignore this law.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_rearmament",
+    "name": "Rearmament Agreement ω",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "For: Each player with the fewest victory points places 1 infantry from their reinforcements on each planet they control.",
+    "text2": "Against: Each player who cast votes \"Against\" or abstained gives 1 promissory note from their hand to another player with the fewest victory.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_rep_govt",
+    "name": "Representative Government ω",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "For: Players cannot exhaust planets to cast votes during the agenda phase; each player may cast 1 vote on each agenda instead. Players cannot cast additional votes.",
+    "text2": "Against: At the start of the next strategy phase, each player that voted \"Against\" or abstained exhausts all of their cultural planets.",
+    "mapText": "Players cannot exhaust planets to cast votes during the agenda phase. each player may cast 1 vote on each agenda instead. Players cannot cast additional votes.",
+    "source": "little_omega"
+  },
+  {
+    "alias": "little_omega_grant_reallocation",
+    "name": "Research Grant Reallocation ω",
+    "type": "Directive",
+    "target": "Elect Player",
+    "text1": "The elected player researches 1 technology; they may ignore 1 prerequisite for each command token from their strategy pool they return to their reinforcements.",
+    "text2": "",
+    "source": "little_omega"
+  },
+  {
+    "alias": "pi_enforced_travel_ban",
+    "name": "Enforced Travel Ban",
+    "category": "agenda",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "For: Non-delta wormholes have no effect during movement",
+    "text2": "Against: Each player destroys 1 PDS on a planet they control in or adjacent to a system that contains a wormhole",
+    "mapText": "Non-delta wormholes have no effect during movement",
+    "source": "project_pi"
+  },
+  {
+    "alias": "pi_ixthian_artifact",
+    "name": "Ixthian Artifact",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "For: The speaker rolls 1 die. If the result is 6-10, each player may research 2 technologies. If the result is 1-5, destroy all units in Mecatol Rex's system, and each player with units in systems adjacent to Mecatol Rex's system destroys 3 of their own units in each of those systems.",
+    "text2": "Against: Place this agenda on the top of the agenda deck and shuffle the agenda deck.",
+    "source": "project_pi"
+  },
+  {
+    "alias": "pi_minister_policy",
+    "name": "Minister of Policy",
+    "category": "agenda",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "Elect Player: The elected player gains this card. When you would draw 1 or more action cards, draw 1 additional action card.",
+    "mapText": "When you would draw 1 or more action cards, draw 1 additional action card.",
+    "source": "project_pi"
+  },
+  {
+    "alias": "pi_new_constitution",
+    "name": "New Constitution",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "For: Discard all laws from play. At the start of the next strategy phase, each player exhausts each planet in their home system. ",
+    "text2": "Reveal another agenda from the top of the deck and vote on it",
+    "source": "project_pi"
+  },
+  {
+    "alias": "pi_public_execution",
+    "name": "Public Execution",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "Elect Player",
+    "text1": "Elect Player: The elected player discards all of their action cards. If they have the speaker token, they give it to the player on their right. The elected player cannot vote on any agendas in this agenda phase.",
+    "source": "project_pi"
+  },
+  {
+    "alias": "pi_regulated_conscription",
+    "name": "Regulated Conscription",
+    "category": "agenda",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "For: When a player produces units, they produce only 1 fighter for its cost instead of 2.",
+    "text2": "Against: Each player removes 1 infantry and 1 fighter from every system where they have units (if able).",
+    "mapText": "When a player produces units, they produce only 1 fighter for its cost instead of 2.",
+    "source": "project_pi"
+  },
+  {
+    "alias": "pi_wormhole_research",
+    "name": "Wormhole Research",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "For: Each player who has 1 or more ships in a system that contains a wormhole may research a technology. Then, each player with ships in a system with a non-delta wormhole destroys 3 of their ships in each of those systems.",
+    "text2": "Against: Each player that voted \"Against\" removes 1 command token from his command sheet and returns it to his reinforcements.",
+    "source": "project_pi"
+  }
+]

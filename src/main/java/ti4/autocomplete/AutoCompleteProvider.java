@@ -403,7 +403,6 @@ public class AutoCompleteProvider {
                         "absol",
                         "ds",
                         "action_deck_2",
-                        "little_omega",
                         "franken",
                         "milty_mod",
                         "red_tape",

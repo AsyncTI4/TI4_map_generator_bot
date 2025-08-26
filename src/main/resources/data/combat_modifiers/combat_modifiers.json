@@ -757,20 +757,6 @@
         "forCombatAbility": "combatround"
     },
     {
-        "alias": "plus1_always_fighter_lomega",
-        "type": "mods",
-        "value": "+1",
-        "scope": "ff",
-        "persistenceType": "ALWAYS",
-        "related": [
-            {
-                "type": "agenda",
-                "alias": "little_omega_prophecy"
-            }
-        ],
-        "forCombatAbility": "combatround"
-    },
-    {
         "alias": "plus_x_frag_always_flagship",
         "type": "mods",
         "value": "+1",
