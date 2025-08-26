@@ -140,9 +140,8 @@ public class UserLeaveServerListener extends ListenerAdapter {
         String header = String.format("> %s %s %s %s %s", websiteLink, faction, tabletalkLink, actionsLink, round);
 
         // Last player turn start
-        game.getLastActivePlayerChange().getTime();
         String lastTurnStart =
-                "> -- Last turn started <t:" + (game.getLastActivePlayerChange().getTime() / 1000) + ":R>";
+                "> -- Last turn started <t:" + game.getLastActivePlayerChange().getEpochSecond() + ":R>";
 
         // Some other player stats to show...
         float value = player.getTotalResourceValueOfUnits("space") + player.getTotalResourceValueOfUnits("ground");
@@ -166,13 +165,13 @@ public class UserLeaveServerListener extends ListenerAdapter {
         boolean foundOne = false;
         for (Game g : games) {
             Player p = g.getPlayer(player.getId());
-            if (p != null && g.getLastActivePlayerChange().toString() != null) {
+            if (p != null && g.getLastActivePlayerChange() != null) {
                 float value = p.getTotalResourceValueOfUnits("space") + p.getTotalResourceValueOfUnits("ground");
                 if (!foundOne
                         && value > 0
                         && Helper.getDateDifference(
                                         Helper.getDateRepresentation(
-                                                g.getLastActivePlayerChange().getTime()),
+                                                g.getLastActivePlayerChange().toEpochMilli()),
                                         Helper.getDateRepresentation(System.currentTimeMillis()))
                                 < 15) {
                     foundOne = true;

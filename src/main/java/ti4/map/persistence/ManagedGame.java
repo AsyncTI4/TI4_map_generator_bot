@@ -62,7 +62,7 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         activePlayerId = sanitizeToNull(game.getActivePlayerID());
         lastActivePlayerChange = game.getLastActivePlayerChange() == null
                 ? 0
-                : game.getLastActivePlayerChange().getTime();
+                : game.getLastActivePlayerChange().toEpochMilli();
         endedDate = game.getEndedDate();
         round = game.getRound();
         guild = game.getGuild();

@@ -190,7 +190,7 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         writer.write(Constants.LAST_ACTIVE_PLAYER_CHANGE + " "
-                + game.getLastActivePlayerChange().getTime());
+                + game.getLastActivePlayerChange().toEpochMilli());
         writer.write(System.lineSeparator());
 
         Map<Integer, Boolean> scPlayed = game.getScPlayed();

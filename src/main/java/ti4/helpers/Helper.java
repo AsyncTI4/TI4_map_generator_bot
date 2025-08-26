@@ -1,12 +1,10 @@
 package ti4.helpers;
 
 import java.awt.Point;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -19,6 +17,9 @@ import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -586,15 +587,13 @@ public class Helper {
     }
 
     public static String getDateRepresentation(long dateInfo) {
-        Date date = new Date(dateInfo);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd");
-        return simpleDateFormat.format(date);
+        Instant instant = Instant.ofEpochMilli(dateInfo);
+        return DateTimeFormatter.ofPattern("yyyy.MM.dd").withZone(ZoneId.systemDefault()).format(instant);
     }
 
     public static String getDateRepresentationTIGL(long dateInfo) {
-        Date date = new Date(dateInfo);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM.dd.yyyy");
-        return simpleDateFormat.format(date);
+        Instant instant = Instant.ofEpochMilli(dateInfo);
+        return DateTimeFormatter.ofPattern("MM.dd.yyyy").withZone(ZoneId.systemDefault()).format(instant);
     }
 
     public static int getDateDifference(String date1, String date2) {

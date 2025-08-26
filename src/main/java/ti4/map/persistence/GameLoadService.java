@@ -32,7 +32,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -47,6 +46,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import java.time.Instant;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -452,7 +452,7 @@ class GameLoadService {
                 case Constants.LAST_ACTIVE_PLAYER_CHANGE -> {
                     try {
                         long millis = Long.parseLong(info);
-                        Date lastChange = new Date(millis);
+                        Instant lastChange = Instant.ofEpochMilli(millis);
                         game.setLastActivePlayerChange(lastChange);
                     } catch (Exception e) {
                     }

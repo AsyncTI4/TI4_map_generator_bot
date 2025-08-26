@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +30,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+import java.time.Duration;
+import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
@@ -133,7 +134,7 @@ public class Game extends GameProperties {
     private DisplayType displayTypeForced;
 
     private final BorderAnomalyManager borderAnomalyManager = new BorderAnomalyManager();
-    private Date lastActivePlayerChange = new Date(0);
+    private Instant lastActivePlayerChange = Instant.EPOCH;
 
     @JsonProperty("autoPingStatus")
     private boolean autoPingEnabled;
@@ -1162,12 +1163,12 @@ public class Game extends GameProperties {
 
     public void updateActivePlayer(Player player) {
         /// update previous active player stats
-        Date newTime = new Date();
+        Instant newTime = Instant.now();
         String factionsInCombat = getStoredValue("factionsInCombat");
         Player prevPlayer = getActivePlayer();
         String prevFaction =
                 (prevPlayer != null && prevPlayer.getFaction() != null) ? prevPlayer.getFaction() : "jazzwuzhere&p1too";
-        long elapsedTime = newTime.getTime() - lastActivePlayerChange.getTime();
+        long elapsedTime = Duration.between(lastActivePlayerChange, newTime).toMillis();
         if (prevPlayer != null && !factionsInCombat.contains(prevFaction) && !isTemporaryPingDisable()) {
             prevPlayer.updateTurnStats(elapsedTime);
         } else {
@@ -1191,11 +1192,11 @@ public class Game extends GameProperties {
         return autoPingEnabled;
     }
 
-    public Date getLastActivePlayerChange() {
+    public Instant getLastActivePlayerChange() {
         return lastActivePlayerChange;
     }
 
-    public void setLastActivePlayerChange(Date time) {
+    public void setLastActivePlayerChange(Instant time) {
         lastActivePlayerChange = time;
     }
 
