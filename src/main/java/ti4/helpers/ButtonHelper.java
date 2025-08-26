@@ -4035,8 +4035,8 @@ public class ButtonHelper {
             MessageHelper.sendEphemeralMessageToEventChannel(
                     event,
                     "## " + player.getRepresentation()
-                            + " if you are not a new player, you can ignore this, but know that on your turn you can only do one action normally."
-                            + " Doing a second action button is reserved for homebrew/master plan/other abilities. If you don't have one of those, please don't do another turn. ");
+                            + ", if you are not a new player, you can ignore this, but know that on your turn you can only do one action normally."
+                            + " Doing a second action button is reserved for homebrew/_Master Plan_/other abilities. If you don't have one of those, please don't do another turn.");
         }
         GMService.logPlayerActivity(game, player, msg);
     }

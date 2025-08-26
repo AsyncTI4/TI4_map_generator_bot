@@ -28,7 +28,7 @@ class CombatButtonHandler {
         String confirmed = buttonID.split("_")[4];
         if (player != p1 && player != p2) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "This button is only for combat participants");
+                    event.getMessageChannel(), "This button is only for combat participants.");
             return;
         }
         Player opponent;

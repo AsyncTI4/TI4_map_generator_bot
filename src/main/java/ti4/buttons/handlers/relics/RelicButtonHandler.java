@@ -150,7 +150,6 @@ class RelicButtonHandler {
         String relicId = "eye_of_vogul";
         player.removeRelic(relicId);
         player.removeExhaustedRelic(relicId);
-        String relicName = Mapper.getRelic(relicId).getName();
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), player.getRepresentationNoPing() + " has purged the _Eye of Vogul_.");
         ButtonHelper.deleteTheOneButton(event);
