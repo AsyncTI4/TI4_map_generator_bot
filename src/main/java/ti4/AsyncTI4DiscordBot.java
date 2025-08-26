@@ -288,7 +288,6 @@ public class AsyncTI4DiscordBot {
         SabotageAutoReactCron.register();
         FastScFollowCron.register();
         CloseLaunchThreadsCron.register();
-        LogBufferManager.initialize();
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
 
