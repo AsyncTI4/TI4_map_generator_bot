@@ -36,12 +36,13 @@ import ti4.cron.FastScFollowCron;
 import ti4.cron.InteractionLogCron;
 import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
+import ti4.cron.LongExecutionHistoryCron;
 import ti4.cron.OldUndoFileCleanupCron;
 import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
 import ti4.cron.UploadStatsCron;
-import ti4.cron.WinningPathCacheCron;
+import ti4.cron.WinningPathCron;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -266,20 +267,19 @@ public class AsyncTI4DiscordBot {
 
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
 
-        // LOAD GAMES NAMES
         BotLogger.info("LOADING GAMES");
-        GameManager.initialize(); // load games, into 2 ConcurrentHashMaps: 1 for games and 1 for players
+        GameManager.initialize();
+        BotLogger.info("FINISHED LOADING GAMES");
 
-        // RUN DATA MIGRATIONS
         if (DataMigrationManager.runMigrations()) {
-            BotLogger.info("RAN MIGRATIONS");
+            BotLogger.info("FINISHED RUNNING MIGRATIONS");
         }
 
         // START CRONS
         AutoPingCron.register();
         ReuploadStaleEmojisCron.register();
         LogCacheStatsCron.register();
-        WinningPathCacheCron.register();
+        WinningPathCron.register();
         UploadStatsCron.register();
         OldUndoFileCleanupCron.register();
         EndOldGamesCron.register();
@@ -288,14 +288,14 @@ public class AsyncTI4DiscordBot {
         SabotageAutoReactCron.register();
         FastScFollowCron.register();
         CloseLaunchThreadsCron.register();
-        LogBufferManager.initialize();
         InteractionLogCron.register();
+        LongExecutionHistoryCron.register();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
         jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
         updatePresence();
-        BotLogger.info("FINISHED LOADING GAMES");
+        BotLogger.info("BOT IS READY TO RECEIVE COMMANDS");
 
         // Register Shutdown Hook to run when SIGTERM is received from docker stop
         Thread mainThread = Thread.currentThread();

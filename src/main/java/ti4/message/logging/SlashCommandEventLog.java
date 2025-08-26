@@ -10,7 +10,7 @@ final class SlashCommandEventLog extends AbstractEventLog {
 
     @Override
     public String getChannelName() {
-        return "bot-slash-command-log";
+        return "bot-log";
     }
 
     @Override

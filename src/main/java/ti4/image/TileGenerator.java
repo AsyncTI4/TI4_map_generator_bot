@@ -1,6 +1,13 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.time.ZoneOffset;
@@ -64,8 +71,8 @@ public class TileGenerator {
     private static final int EXTRA_X = 100;
     private static final int EXTRA_Y = 100;
 
-    public static final int TILE_WIDTH = 345;
-    public static final int TILE_HEIGHT = 300;
+    static final int TILE_WIDTH = 345;
+    static final int TILE_HEIGHT = 300;
 
     private final Game game;
     private final GenericInteractionCreateEvent event;
@@ -474,13 +481,13 @@ public class TileGenerator {
 
                 if (!game.getBorderAnomalies().isEmpty()) {
                     List<String> orderedAdjacentPositions = PositionMapper.getAdjacentTilePositions(tile.getPosition());
-                    Set<String> visiblePositions = FoWHelper.getTilePositionsToShow(game, fowPlayer);
                     game.getBorderAnomalies().forEach(borderAnomalyHolder -> {
                         if (borderAnomalyHolder.getTile().equals(tile.getPosition())
                                 && (!isFoWPrivate
                                         || !tile.hasFog(fowPlayer)
-                                        || visiblePositions.contains(
-                                                orderedAdjacentPositions.get(borderAnomalyHolder.getDirection())))) {
+                                        || FoWHelper.getTilePositionsToShow(game, fowPlayer)
+                                                .contains(orderedAdjacentPositions.get(
+                                                        borderAnomalyHolder.getDirection())))) {
                             addBorderDecoration(
                                     borderAnomalyHolder.getDirection(),
                                     null,

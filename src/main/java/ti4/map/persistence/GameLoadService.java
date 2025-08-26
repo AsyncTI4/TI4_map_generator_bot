@@ -84,32 +84,34 @@ class GameLoadService {
     private static final ObjectMapper mapper = ObjectMapperFactory.build();
     private static final Pattern PATTERN = Pattern.compile("—");
 
-    public static List<ManagedGame> loadManagedGames() {
+    static List<ManagedGame> loadManagedGames() {
         try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
             return pathStream
                     .parallel()
                     .filter(path -> path.toString().toLowerCase().endsWith(".txt"))
-                    .map(path -> {
-                        File file = path.toFile();
-                        try {
-                            Game game = readGame(file);
-
-                            if (game == null || game.getName() == null) {
-                                BotLogger.warning("Could not load game. Game or game name is null: " + file.getName());
-                                return null;
-                            }
-                            return new ManagedGame(game);
-                        } catch (Exception e) {
-                            BotLogger.error("Could not load game: " + file.getName(), e);
-                        }
-                        return null;
-                    })
+                    .map(GameLoadService::loadManagedGame)
                     .filter(Objects::nonNull)
                     .toList();
         } catch (IOException e) {
             BotLogger.error("Exception occurred while getting all game names.", e);
         }
         return Collections.emptyList();
+    }
+
+    private static ManagedGame loadManagedGame(Path path) {
+        File file = path.toFile();
+        try {
+            Game game = readGame(file);
+
+            if (game == null || game.getName() == null) {
+                BotLogger.warning("Could not load game. Game or game name is null: " + file.getName());
+                return null;
+            }
+            return new ManagedGame(game);
+        } catch (Exception e) {
+            BotLogger.error("Could not load game: " + file.getName(), e);
+        }
+        return null;
     }
 
     @Nullable
@@ -976,11 +978,8 @@ class GameLoadService {
                 case Constants.UNITS_OWNED ->
                     player.setUnitsOwned(new HashSet<>(Helper.getSetFromCSV(tokenizer.nextToken())));
                 case Constants.PLANETS ->
-                    player.setPlanets(getCardList(tokenizer
-                            .nextToken()
-                            .replace("exhausted", "")
-                            .replace("refreshed", "")
-                            .replace("blaheo", "biaheo")));
+                    player.setPlanets(getCardList(
+                            tokenizer.nextToken().replace("exhausted", "").replace("refreshed", "")));
                 case Constants.PLANETS_EXHAUSTED -> player.setExhaustedPlanets(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS_ABILITY_EXHAUSTED ->
                     player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));

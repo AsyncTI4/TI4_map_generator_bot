@@ -1,9 +1,9 @@
 package ti4.message.logging;
 
-final class ButtonInteractionEventLog extends AbstractEventLog {
+final class CronEventLog extends AbstractEventLog {
 
-    ButtonInteractionEventLog(LogOrigin source) {
-        super(source);
+    CronEventLog(String message) {
+        super(new LogOrigin(), message);
     }
 
     @Override
@@ -13,7 +13,7 @@ final class ButtonInteractionEventLog extends AbstractEventLog {
 
     @Override
     public String getThreadName() {
-        return "button-log";
+        return "cron-log";
     }
 
     @Override
