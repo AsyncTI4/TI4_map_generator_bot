@@ -70,8 +70,8 @@ class SendTG extends GameStateSubcommand {
             targetPlayer.clearDebt(player, sendTG);
             MessageHelper.sendMessageToEventChannel(
                     event,
-                    targetPlayer.getRepresentation() + " cleared " + sendTG + " debt token" + (sendTG == 1 ? "" : "s") + " owned by "
-                            + player.getRepresentation());
+                    targetPlayer.getRepresentation() + " cleared " + sendTG + " debt token" + (sendTG == 1 ? "" : "s")
+                            + " owned by " + player.getRepresentation());
         }
 
         if (game.isFowMode()) {

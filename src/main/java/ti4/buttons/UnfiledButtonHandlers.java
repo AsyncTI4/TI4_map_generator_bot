@@ -2862,7 +2862,6 @@ public class UnfiledButtonHandlers {
     public static void gain1TG(ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
         String message = "";
         String labelP = event.getButton().getLabel();
-        String planetName = labelP.substring(labelP.lastIndexOf(' ') + 1);
         boolean failed = false;
         if (labelP.contains("inf") && labelP.contains("mech")) {
             message += "Please resolve removing infantry manually, if applicable.";

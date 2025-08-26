@@ -37,14 +37,16 @@ class SetUnitCap extends GameStateSubcommand {
             for (Player player : getGame().getRealPlayersNDummies()) {
                 player.setUnitCap(unitID, unitCap);
             }
-            String msg = "Set " + unit + " max to " + unitCap + " for all players in " + getGame().getPing() + ".";
+            String msg = "Set " + unit + " max to " + unitCap + " for all players in "
+                    + getGame().getPing() + ".";
             MessageHelper.sendMessageToChannel(event.getChannel(), msg);
         } else {
 
             Player player = getPlayer();
             player.setUnitCap(unitID, unitCap);
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Set " + unit + " max to " + unitCap + " for " + player.getRepresentation() + ".");
+                    event.getChannel(),
+                    "Set " + unit + " max to " + unitCap + " for " + player.getRepresentation() + ".");
         }
     }
 }

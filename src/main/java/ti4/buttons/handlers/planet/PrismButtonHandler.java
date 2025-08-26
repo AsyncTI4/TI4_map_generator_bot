@@ -25,7 +25,8 @@ class PrismButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentation(false, false) + " has purged their _" + techM1.getNameRepresentation()
                         + "_ technology.\n-# \"Purged\" means that it is completely gone from the game. "
-                        + player.getRepresentation(false, false) + " will not be able to gain it again at a later point.");
+                        + player.getRepresentation(false, false)
+                        + " will not be able to gain it again at a later point.");
         MessageHelper.sendMessageToChannelWithButton(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", please choose a technology to gain that also has "

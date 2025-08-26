@@ -1614,8 +1614,8 @@ public class TransactionHelper {
 
         if (player == p1) {
             if (getReturnPNsInPlayAreaButtons(game, p1, p2).size() > 0) {
-                stuffToTransButtons.add(
-                        Buttons.gray("startReturnPNInPlayArea_" + p2.getFaction(), "Return a Play Area Promissory Note"));
+                stuffToTransButtons.add(Buttons.gray(
+                        "startReturnPNInPlayArea_" + p2.getFaction(), "Return a Play Area Promissory Note"));
             }
             stuffToTransButtons.add(Buttons.gray("resetOffer_" + p2.getFaction(), "Reset Offer"));
             stuffToTransButtons.add(
@@ -1670,7 +1670,9 @@ public class TransactionHelper {
             p2.setPromissoryNote(id);
             PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
             PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
-            String message2 = p1.getRepresentation() + " returned _" + Mapper.getPromissoryNote(id).getName() + "_ from their play area to " + p2.getRepresentation() + ".";
+            String message2 = p1.getRepresentation() + " returned _"
+                    + Mapper.getPromissoryNote(id).getName() + "_ from their play area to " + p2.getRepresentation()
+                    + ".";
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2);
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message2);
