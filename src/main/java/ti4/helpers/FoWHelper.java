@@ -792,7 +792,7 @@ public class FoWHelper {
             if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
                 continue;
             }
-            if (p2.hasTech("ahl") && ButtonHelperAgents.doesTileHaveAStructureInIt(p2, tile)) {
+            if (p2.hasTech("ah") && ButtonHelperAgents.doesTileHaveAStructureInIt(p2, tile)) {
                 return true;
             }
             if (p2.hasAbility("decree") && tile.isAnomaly(game)) {
