@@ -1,7 +1,5 @@
 package ti4.message.logging;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
@@ -12,6 +10,7 @@ import javax.annotation.Nonnull;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import ti4.AsyncTI4DiscordBot;
+import ti4.helpers.ThreadGetter;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -81,14 +80,13 @@ public class LogBufferManager {
             return;
         }
 
-        TextChannel channel = logCandidates.getFirst();
-        String threadName = target.threadName();
         try {
-            if (isNotBlank(threadName)) {
-                MessageHelper.sendMessageToThread(channel, target.threadName(), message.toString());
-            } else {
-                MessageHelper.sendMessageToChannel(channel, message.toString());
-            }
+            ThreadGetter.getThreadInChannel(
+                    logCandidates.getFirst(),
+                    target.threadName(),
+                    false,
+                    false,
+                    (threadChannel) -> MessageHelper.sendMessageToChannel(threadChannel, message.toString()));
         } catch (Exception e) {
             BotLogger.error("Failed to send LogBufferManager message", e);
         }
