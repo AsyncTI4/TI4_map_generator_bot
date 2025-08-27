@@ -845,7 +845,7 @@ public class ExploreService {
                 if (!message.isEmpty()) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 }
-                message += player.getRepresentationUnfogged() + ", your current command tokens are "
+                message = player.getRepresentationUnfogged() + ", your current command tokens are "
                         + player.getCCRepresentation()
                         + ". Use buttons to gain " + ccsToGain + " command token" + (ccsToGain > 1 ? "s" : "") + ".";
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
@@ -1073,7 +1073,7 @@ public class ExploreService {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         if (space.getTokenList().contains(frontierFilename) || force) {
-            if (space.getTokenList().contains(frontierFilename)) {
+            if (space.getTokenList().contains(frontierFilename) && !force) {
                 space.removeToken(frontierFilename);
             }
             cardID = cardID == null ? game.drawExplore(Constants.FRONTIER) : cardID;

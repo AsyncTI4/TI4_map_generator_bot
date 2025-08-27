@@ -48,6 +48,7 @@ import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
+import ti4.commands.special.SetupNeutralPlayer;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -2097,6 +2098,52 @@ public class ButtonHelper {
         return count;
     }
 
+    @ButtonHandler("addMinorFactionsInfantry")
+    public static void addMinorFactionsInfantry(Game game, ButtonInteractionEvent event) {
+
+        if (!game.isMinorFactionsMode()) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not minor factions mode");
+            return;
+        }
+        if (game.getRealPlayers().size() < 3) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Set up all real players before pressing this button");
+            return;
+        }
+        Player neutral = game.getPlayerFromColorOrFaction("neutral");
+        if (neutral == null) {
+            List<String> unusedColors =
+                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
+            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            game.setupNeutralPlayer(color);
+            neutral = game.getPlayerFromColorOrFaction("neutral");
+        }
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.isHomeSystem() && !tile.isHomeSystem(game)) {
+                int size = tile.getPlanetUnitHolders().size();
+
+                for (UnitHolder planet : tile.getPlanetUnitHolders()) {
+                    if (size == 3) {
+                        AddUnitService.addUnits(
+                                event, tile, game, neutral.getColor(), "1 infantry " + planet.getName());
+                    }
+                    if (size == 1) {
+                        AddUnitService.addUnits(
+                                event, tile, game, neutral.getColor(), "3 infantry " + planet.getName());
+                    }
+                    if (size == 2) {
+                        AddUnitService.addUnits(
+                                event, tile, game, neutral.getColor(), "2 infantry " + planet.getName());
+                        size = 3;
+                    }
+                }
+            }
+        }
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Added neutral infantry to home systems");
+
+        deleteMessage(event);
+    }
+
     public static int checkNumberNonFighterShips(Player player, Tile tile) {
         int count = 0;
         UnitHolder space = tile.getUnitHolders().get("space");
@@ -2109,7 +2156,9 @@ public class ButtonHelper {
             UnitModel removedUnit = unitModels.getFirst();
             if (removedUnit.getIsShip() && !removedUnit.getAsyncId().contains("ff")) {
                 count += space.getUnitCount(unit);
-            } else if ("mech".equalsIgnoreCase(removedUnit.getBaseType()) && player.hasUnit("naaz_mech_space")) {
+            } else if ("mech".equalsIgnoreCase(removedUnit.getBaseType())
+                    && player.hasUnit("naaz_mech_space")
+                    && player.getGame().getPhaseOfGame().equalsIgnoreCase("action")) {
                 count += space.getUnitCount(unit);
             }
         }
@@ -4016,6 +4065,28 @@ public class ButtonHelper {
                             + ".");
             if (tile.getPlanetUnitHolders().isEmpty()) {
                 AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
+            }
+            if (game.isDangerousWildsMode() && game.getPlayerFromColorOrFaction("neutral") != null) {
+                Player neutral = game.getPlayerFromColorOrFaction("neutral");
+                boolean added = false;
+                for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                    if (ButtonHelper.getTypeOfPlanet(game, uH.getName()).contains("hazardous")) {
+                        int neutralUnitsToAdd = Helper.getPlanetResources(uH.getName(), game);
+                        if (neutralUnitsToAdd > 0) {
+                            added = true;
+                            AddUnitService.addUnits(
+                                    event,
+                                    tile,
+                                    game,
+                                    neutral.getColor(),
+                                    neutralUnitsToAdd + " infantry " + uH.getName());
+                        }
+                    }
+                }
+                if (added) {
+                    MessageHelper.sendMessageToChannel(
+                            game.getMainGameChannel(), "Added neutral infantry to hazardous planets");
+                }
             }
         }
     }

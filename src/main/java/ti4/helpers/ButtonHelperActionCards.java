@@ -589,8 +589,8 @@ public class ButtonHelperActionCards {
                         continue;
                     }
                     if (FoWHelper.playerHasShipsInSystem(p2, game.getTileFromPositionOrAlias(game.getActiveSystem()))) {
-                        List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(
-                                p2, game, tile, "courageouscannoncombat");
+                        List<Button> buttons =
+                                ButtonHelper.getButtonsForRemovingAllUnitsInSystem(p2, game, tile, "courageouscombat");
                         MessageHelper.sendMessageToChannelWithButtons(
                                 p2.getCorrectChannel(),
                                 p2.getRepresentation() + ", you can use the buttons to destroy your ship(s).",

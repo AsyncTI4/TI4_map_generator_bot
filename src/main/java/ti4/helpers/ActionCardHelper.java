@@ -208,6 +208,10 @@ public class ActionCardHelper {
 
     public static List<Button> getActionPlayActionCardButtons(Player player) {
         List<Button> acButtons = new ArrayList<>();
+        if (IsPlayerElectedService.isPlayerElected(player.getGame(), player, "censure")
+                || IsPlayerElectedService.isPlayerElected(player.getGame(), player, "absol_censure")) {
+            return acButtons;
+        }
         Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {

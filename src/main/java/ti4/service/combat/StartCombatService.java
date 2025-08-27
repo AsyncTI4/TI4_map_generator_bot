@@ -724,9 +724,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         msg
-                                + ", a reminder that if you win the combat (or otherwise keep ships in the active system), and you lose "
-                                + (capitalShips == 3 ? "no" : "at most " + (capitalShips - 3)) + " non-fighter ship"
-                                + (capitalShips == 4 ? "" : "s") + ", you could score _Demonstrate Your Power_.");
+                                + ", a reminder that if you keep alive at least 3 non-fighter ships in the active system until the end of combat, you could score _Demonstrate Your Power_.");
             }
 
             if ((player.hasAbility("edict") || player.hasAbility("imperia"))

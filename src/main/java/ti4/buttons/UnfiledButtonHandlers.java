@@ -178,8 +178,13 @@ public class UnfiledButtonHandlers {
             if (enable) {
                 message +=
                         "You will need to decide how you wish to draft the minor factions. This site has a decent setup for it, "
-                                + "and you can important the map using buttons above: https://tidraft.com/draft/prechoice. Note that you need to set up a neutral player "
-                                + "after the draft finishes with `/special2 setup_neutral_player`, and you can add 3 infantry to the minor faction planets pretty easily with `/add_units`.";
+                                + "and you can important the map using buttons above: https://tidraft.com/draft/prechoice. Note that you can add 3 infantry to the minor faction planets with the provided button.";
+                List<Button> mfButtons = new ArrayList<>();
+                mfButtons.add(Buttons.blue("addMinorFactionsInfantry", "Add Minor Factions Infantry"));
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "After setting up the map, use this button to auto populate the neutral infantry",
+                        mfButtons);
             }
         }
         if ("ageOfExploration".equalsIgnoreCase(mode)) {

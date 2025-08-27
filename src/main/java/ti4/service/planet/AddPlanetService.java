@@ -186,7 +186,8 @@ public class AddPlanetService {
                                 + " lost the planet of "
                                 + Mapper.getPlanet(planet).getName() + " (and could perhaps play _Reparations_).";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-                        if (player_.getPlanetsAllianceMode().isEmpty()
+                        if (player_.isRealPlayer()
+                                && player_.getPlanetsAllianceMode().isEmpty()
                                 && CheckUnitContainmentService.getTilesContainingPlayersUnits(
                                                 game, player_, UnitType.Infantry, UnitType.Mech, UnitType.Spacedock)
                                         .isEmpty()) {
