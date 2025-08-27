@@ -1,13 +1,18 @@
 package ti4.commands.game;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 class GalacticEventsSetup extends GameStateSubcommand {
 
@@ -56,7 +61,17 @@ class GalacticEventsSetup extends GameStateSubcommand {
         if (explorationMode != null) game.setAgeOfExplorationMode(explorationMode);
 
         Boolean minorMode = event.getOption(Constants.MINOR_FACTIONS_MODE, null, OptionMapping::getAsBoolean);
-        if (minorMode != null) game.setMinorFactionsMode(minorMode);
+        if (minorMode != null) {
+            game.setMinorFactionsMode(minorMode);
+            if (minorMode) {
+                List<Button> mfButtons = new ArrayList<>();
+                mfButtons.add(Buttons.blue("addMinorFactionsInfantry", "Add Minor Factions Infantry"));
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "After setting up the map, use this button to auto populate the neutral infantry",
+                        mfButtons);
+            }
+        }
 
         Boolean agendaMode = event.getOption(Constants.HIDDEN_AGENDA_MODE, null, OptionMapping::getAsBoolean);
         if (agendaMode != null) game.setHiddenAgendaMode(agendaMode);

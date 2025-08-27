@@ -198,7 +198,7 @@ public class ButtonHelperModifyUnits {
             }
             int p1SardakkMechHits;
             int p2SardakkMechHits;
-            if (p1.getPlanets().contains(planet)) {
+            if (p1.getPlanets().contains(planet)) { // always make sure the attacker assigns first
                 p2SardakkMechHits = autoAssignGroundCombatHits(p2, game, planet, hitP1, event);
                 p1SardakkMechHits = autoAssignGroundCombatHits(p1, game, planet, hitP2, event);
             } else {
@@ -984,7 +984,11 @@ public class ButtonHelperModifyUnits {
         if (skilled) {
             skilledS = "_skilled";
         }
-        for (String pos2 : FoWHelper.getAdjacentTiles(game, pos1, player, false)) {
+        Set<String> positions = FoWHelper.getAdjacentTiles(game, pos1, player, false);
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander") && player.getHomeSystemTile() != null) {
+            positions.addAll(FoWHelper.getAdjacentTiles(game, player.getHomeSystemPosition(), player, false));
+        }
+        for (String pos2 : positions) {
             Tile tile = game.getTileByPosition(pos2);
             boolean skipNonFrontierEmptySystem = !Mapper.getFrontierTileIds().contains(tile.getTileID())
                     && tile.getPlanetUnitHolders().isEmpty()
