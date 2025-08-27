@@ -15,14 +15,15 @@ jobs:
         password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
         port: ${{ secrets.HOSTINGER_SSH_PORT }}
         script: |
-          cd /app
-          ./scheduled_upload.sh
+          set -eu
+          
           cd ${{ vars.HOST_TI4_REPO_DIR }}
+          
           echo "Building docker image..."
           docker version
           docker build -t tibot .
+          
           echo "Shutting Down TIBot... giving 600 seconds to shutdown"
           docker stop $(docker ps -q) --time 600
-          cd /app
-          ./scheduled_upload.sh
+
           echo "DONE!"
