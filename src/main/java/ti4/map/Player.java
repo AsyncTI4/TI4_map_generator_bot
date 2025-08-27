@@ -2473,7 +2473,11 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public MessageChannel getCorrectChannel() {
         if (game.isFowMode()) {
-            return getPrivateChannel();
+            if (getPrivateChannel() != null) {
+                return getPrivateChannel();
+            } else {
+                return game.getMainGameChannel();
+            }
         }
         return game.getMainGameChannel();
     }

@@ -1697,7 +1697,8 @@ public class Helper {
         if (player.hasTech("ah")
                 && planetUnitVal < 1
                 && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
-                        || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
+                        || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0
+                        || (uH.getUnitCount(UnitType.Mech, player.getColor()) > 0) && player.hasAbility("byssus"))) {
             productionValueTotal += 1;
             planetUnitVal = 1;
             if (player.hasRelic("boon_of_the_cerulean_god")) {
