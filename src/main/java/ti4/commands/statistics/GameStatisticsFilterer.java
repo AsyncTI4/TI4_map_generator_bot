@@ -110,13 +110,18 @@ public class GameStatisticsFilterer {
 
     public static Predicate<Game> getNormalFinishedGamesFilter(
             Integer playerCountFilter, Integer victoryPointGoalFilter) {
+        return getFinishedGamesFilter(playerCountFilter, victoryPointGoalFilter)
+                .and(game -> filterOnHasWinner(Boolean.TRUE, game));
+    }
+
+    public static Predicate<Game> getFinishedGamesFilter(
+        Integer playerCountFilter, Integer victoryPointGoalFilter) {
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(playerCountFilter, game);
         return playerCountPredicate
-                .and(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
-                .and(game -> filterOnIsNormal(Boolean.TRUE, game))
-                .and(game -> filterOnHasWinner(Boolean.TRUE, game))
-                .and(GameStatisticsFilterer::filterAbortedGames)
-                .and(GameStatisticsFilterer::filterEarlyRounds);
+            .and(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
+            .and(game -> filterOnHasWinner(Boolean.TRUE, game))
+            .and(GameStatisticsFilterer::filterAbortedGames)
+            .and(GameStatisticsFilterer::filterEarlyRounds);
     }
 
     private static boolean filterOnFogType(Boolean fogFilter, Game game) {
