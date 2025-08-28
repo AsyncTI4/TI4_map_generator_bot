@@ -2,7 +2,7 @@ on:
   workflow_dispatch:
   workflow_call:
   schedule:
-    - cron: '0 * * * *'
+    - cron: "0 * * * *"
 name: ForceSaveFileBackup
 concurrency:
   group: "Start Bot"
@@ -22,6 +22,7 @@ jobs:
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
           envs: DISCORD_WEBHOOK_URL
           script: |
+            set -eu
             cd ${{ vars.HOST_TI4_SAVES_DIR }}
             echo "FORCING BACKUP OF SAVE FILES"
             rm -f ${{ vars.HOST_TI4_SAVES_DIR }}/.git/index.lock
@@ -30,3 +31,12 @@ jobs:
             git push
             curl -X POST -H 'Content-Type: application/json' -d '{"content":"Backup Successful"}' $DISCORD_WEBHOOK_URL
             echo "DONE!"
+
+      - name: Notify Discord on failure
+        if: ${{ always() && (failure() || cancelled()) }}
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            -d "{\"content\":\"⚠️ ForceSaveFileBackup failed or was cancelled for ${{ github.repository }} on ref ${{ github.ref_name }}. See run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+            "$DISCORD_WEBHOOK_URL"
