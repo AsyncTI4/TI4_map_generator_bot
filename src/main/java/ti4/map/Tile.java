@@ -2,7 +2,7 @@ package ti4.map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.awt.*;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -464,6 +464,11 @@ public class Tile {
             }
         }
         return planetsWithSleepers;
+    }
+
+    @JsonIgnore
+    public boolean isValid() {
+        return getTileModel() != null;
     }
 
     @JsonIgnore
