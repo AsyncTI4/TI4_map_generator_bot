@@ -7,6 +7,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
+import ti4.service.statistics.SREStats;
 
 class ButtonRuntimeWarningService {
 
@@ -45,6 +46,10 @@ class ButtonRuntimeWarningService {
         long eventDelay = startTime - eventTime;
         averagePreprocessingTime = ((averagePreprocessingTime * (totalRuntimeSubmissionCount - 1)) + eventDelay)
                 / totalRuntimeSubmissionCount;
+
+        // Record metrics for histogram and percentiles
+        SREStats.recordButtonPreprocessingMillis(eventDelay);
+        SREStats.recordButtonProcessingMillis(processingTime);
 
         var now = LocalDateTime.now();
         if (now.minusMinutes(1).isAfter(lastWarningTime)) {
