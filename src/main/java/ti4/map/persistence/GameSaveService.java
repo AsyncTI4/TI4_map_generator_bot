@@ -81,6 +81,8 @@ class GameSaveService {
 
             saveGame(game, temporarySavePath);
 
+            PosixFileSystemUtility.setPermissionsIfPosix(temporarySavePath);
+
             Files.move(temporarySavePath, gameSavePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Could not save map: " + game.getName(), e);
