@@ -12,7 +12,7 @@ import ti4.service.turn.PassService;
 
 class Pass extends GameStateSubcommand {
 
-    public Pass() {
+    Pass() {
         super(Constants.PASS, "Pass", true, true);
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")

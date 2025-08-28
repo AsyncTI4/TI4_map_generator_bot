@@ -3,7 +3,9 @@ package ti4.service.statistics;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
@@ -30,15 +32,25 @@ public class SREStats {
     private static final String WEBSERVER_REQUEST_ERROR_TOTAL_NAME = "ti4.bot.webserver.http.errors.total";
     private static final String WEBSERVER_REQUESTS_TOTAL_NAME = "ti4.bot.webserver.http.requests.total";
 
+    // New: button runtime metric names
+    private static final String BUTTON_PROCESSING_TIMER_NAME = "ti4.bot.button.runtime.processing";
+    private static final String BUTTON_PREPROCESSING_TIMER_NAME = "ti4.bot.button.runtime.preprocess";
+
     private static final List<Tag> BOT_TAGS = List.of(Tag.of("component", "bot"));
     private static final List<Tag> HTTP_TAGS = List.of(Tag.of("component", "http"));
     private static final List<Tag> REQUEST_TAGS = List.of(Tag.of("status", "request"));
     private static final List<Tag> ERROR_TAGS = List.of(Tag.of("status", "error"));
+    // New: common tags for button interactions
+    private static final List<Tag> BUTTON_TAGS = List.of(Tag.of("component", "bot"), Tag.of("interaction", "button"));
 
     private static volatile Counter REQUESTS_TOTAL;
     private static volatile Counter ERRORS_TOTAL;
     private static volatile Counter WEBSERVER_REQUEST_ERROR_TOTAL;
     private static volatile Counter WEBSERVER_REQUESTS_TOTAL;
+
+    // New: timers (created lazily if init() not called)
+    private static volatile Timer BUTTON_PROCESSING_TIMER;
+    private static volatile Timer BUTTON_PREPROCESSING_TIMER;
 
     /**
      * Initialize the metrics registry used by this class. Call once during application startup.
@@ -46,21 +58,74 @@ public class SREStats {
      */
     public static void init(MeterRegistry meterRegistry) {
         RegistryHolder.registry = meterRegistry;
+
         REQUESTS_TOTAL = Counter.builder(REQUESTS_TOTAL_NAME)
                 .tags(Stream.concat(BOT_TAGS.stream(), REQUEST_TAGS.stream()).toList())
                 .description("Total incoming bot interaction requests")
                 .register(meterRegistry);
+
         ERRORS_TOTAL = Counter.builder(ERRORS_TOTAL_NAME)
                 .tags(Stream.concat(BOT_TAGS.stream(), ERROR_TAGS.stream()).toList())
                 .description("Total error-severity events observed by the bot")
                 .register(meterRegistry);
+
         WEBSERVER_REQUESTS_TOTAL = Counter.builder(WEBSERVER_REQUESTS_TOTAL_NAME)
                 .tags(Stream.concat(HTTP_TAGS.stream(), REQUEST_TAGS.stream()).toList())
                 .description("Total webserver HTTP requests handled/initiated by the bot's internal Spring server")
                 .register(meterRegistry);
+
         WEBSERVER_REQUEST_ERROR_TOTAL = Counter.builder(WEBSERVER_REQUEST_ERROR_TOTAL_NAME)
                 .tags(Stream.concat(HTTP_TAGS.stream(), ERROR_TAGS.stream()).toList())
                 .description("Total webserver HTTP request errors")
+                .register(meterRegistry);
+
+        // New: configure button runtime timers with percentiles and long-tail SLO buckets
+        BUTTON_PROCESSING_TIMER = Timer.builder(BUTTON_PROCESSING_TIMER_NAME)
+                .description("Processing time for button interactions (start -> end)")
+                .tags(BUTTON_TAGS)
+                .publishPercentiles(0.5, 0.9, 0.99)
+                .serviceLevelObjectives(
+                        Duration.ofMillis(50),
+                        Duration.ofMillis(100),
+                        Duration.ofMillis(200),
+                        Duration.ofMillis(500),
+                        Duration.ofMillis(1_000),
+                        Duration.ofMillis(1_500),
+                        Duration.ofMillis(2_000),
+                        Duration.ofMillis(3_000),
+                        Duration.ofMillis(5_000),
+                        Duration.ofMillis(7_500),
+                        Duration.ofMillis(10_000),
+                        Duration.ofMillis(15_000),
+                        Duration.ofMillis(20_000),
+                        Duration.ofMillis(30_000),
+                        Duration.ofMillis(60_000),
+                        Duration.ofMillis(120_000))
+                .publishPercentileHistogram(true)
+                .register(meterRegistry);
+
+        BUTTON_PREPROCESSING_TIMER = Timer.builder(BUTTON_PREPROCESSING_TIMER_NAME)
+                .description("Preprocessing delay for button interactions (Discord event -> start)")
+                .tags(BUTTON_TAGS)
+                .publishPercentiles(0.5, 0.9, 0.99)
+                .serviceLevelObjectives(
+                        Duration.ofMillis(50),
+                        Duration.ofMillis(100),
+                        Duration.ofMillis(200),
+                        Duration.ofMillis(500),
+                        Duration.ofMillis(1_000),
+                        Duration.ofMillis(1_500),
+                        Duration.ofMillis(2_000),
+                        Duration.ofMillis(3_000),
+                        Duration.ofMillis(5_000),
+                        Duration.ofMillis(7_500),
+                        Duration.ofMillis(10_000),
+                        Duration.ofMillis(15_000),
+                        Duration.ofMillis(20_000),
+                        Duration.ofMillis(30_000),
+                        Duration.ofMillis(60_000),
+                        Duration.ofMillis(120_000))
+                .publishPercentileHistogram(true)
                 .register(meterRegistry);
     }
 
@@ -144,6 +209,88 @@ public class SREStats {
             }
             return WEBSERVER_REQUESTS_TOTAL;
         }
+    }
+
+    // New: lazy builders for timers if init() wasn't called
+    private static Timer buttonProcessingTimer() {
+        Timer t = BUTTON_PROCESSING_TIMER;
+        if (t != null) {
+            return t;
+        }
+        synchronized (SREStats.class) {
+            if (BUTTON_PROCESSING_TIMER == null) {
+                BUTTON_PROCESSING_TIMER = Timer.builder(BUTTON_PROCESSING_TIMER_NAME)
+                        .description("Processing time for button interactions (start -> end)")
+                        .tags(BUTTON_TAGS)
+                        .publishPercentiles(0.5, 0.9, 0.99)
+                        .serviceLevelObjectives(
+                                Duration.ofMillis(50),
+                                Duration.ofMillis(100),
+                                Duration.ofMillis(200),
+                                Duration.ofMillis(500),
+                                Duration.ofMillis(1_000),
+                                Duration.ofMillis(1_500),
+                                Duration.ofMillis(2_000),
+                                Duration.ofMillis(3_000),
+                                Duration.ofMillis(5_000),
+                                Duration.ofMillis(7_500),
+                                Duration.ofMillis(10_000),
+                                Duration.ofMillis(15_000),
+                                Duration.ofMillis(20_000),
+                                Duration.ofMillis(30_000),
+                                Duration.ofMillis(60_000),
+                                Duration.ofMillis(120_000))
+                        .publishPercentileHistogram(true)
+                        .register(registry());
+            }
+            return BUTTON_PROCESSING_TIMER;
+        }
+    }
+
+    private static Timer buttonPreprocessingTimer() {
+        Timer t = BUTTON_PREPROCESSING_TIMER;
+        if (t != null) {
+            return t;
+        }
+        synchronized (SREStats.class) {
+            if (BUTTON_PREPROCESSING_TIMER == null) {
+                BUTTON_PREPROCESSING_TIMER = Timer.builder(BUTTON_PREPROCESSING_TIMER_NAME)
+                        .description("Preprocessing delay for button interactions (Discord event -> start)")
+                        .tags(BUTTON_TAGS)
+                        .publishPercentiles(0.5, 0.9, 0.99)
+                        .serviceLevelObjectives(
+                                Duration.ofMillis(50),
+                                Duration.ofMillis(100),
+                                Duration.ofMillis(200),
+                                Duration.ofMillis(500),
+                                Duration.ofMillis(1_000),
+                                Duration.ofMillis(1_500),
+                                Duration.ofMillis(2_000),
+                                Duration.ofMillis(3_000),
+                                Duration.ofMillis(5_000),
+                                Duration.ofMillis(7_500),
+                                Duration.ofMillis(10_000),
+                                Duration.ofMillis(15_000),
+                                Duration.ofMillis(20_000),
+                                Duration.ofMillis(30_000),
+                                Duration.ofMillis(60_000),
+                                Duration.ofMillis(120_000))
+                        .publishPercentileHistogram(true)
+                        .register(registry());
+            }
+            return BUTTON_PREPROCESSING_TIMER;
+        }
+    }
+
+    // New: public recorders (milliseconds)
+    public static void recordButtonProcessingMillis(long millis) {
+        if (millis < 0) return;
+        buttonProcessingTimer().record(Duration.ofMillis(millis));
+    }
+
+    public static void recordButtonPreprocessingMillis(long millis) {
+        if (millis < 0) return;
+        buttonPreprocessingTimer().record(Duration.ofMillis(millis));
     }
 
     // Request counters

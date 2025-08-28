@@ -762,6 +762,7 @@ public class TransactionHelper {
                 Modal modal = Modal.create(modalId, "Deal Details")
                         .addActionRow(summary)
                         .build();
+
                 event.replyModal(modal).queue();
                 return;
             }

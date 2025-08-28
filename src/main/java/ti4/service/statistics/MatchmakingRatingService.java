@@ -27,6 +27,7 @@ import ti4.message.MessageHelper;
 public class MatchmakingRatingService {
 
     private static final int MAX_LIST_SIZE = 50;
+    private static final double SIGMA_CALIBRATION_THRESHOLD = 1;
 
     public void queueReply(SlashCommandInteractionEvent event) {
         StatisticsPipeline.queue(event, () -> calculateRatings(event));
@@ -74,11 +75,9 @@ public class MatchmakingRatingService {
                     Rating rating = ratings.get(entry.getValue());
                     String username =
                             GameManager.getManagedPlayer(entry.getKey()).getName();
-                    double conservativeRating = rating.getConservativeRating();
-                    Confidence confidence = Confidence.calculate(rating);
-                    return new PlayerRating(username, conservativeRating, confidence);
+                    double calibrationPercent = SIGMA_CALIBRATION_THRESHOLD / rating.getStandardDeviation() * 100;
+                    return new PlayerRating(entry.getKey(), username, rating.getMean(), calibrationPercent);
                 })
-                .filter(rating -> rating.confidence.ordinal() >= Confidence.HIGH.ordinal())
                 .sorted(Comparator.comparing(PlayerRating::rating).reversed())
                 .toList();
     }
@@ -96,48 +95,45 @@ public class MatchmakingRatingService {
     }
 
     private static void sendMessage(SlashCommandInteractionEvent event, List<PlayerRating> playerRatings) {
+        int maxListSize = Math.min(MAX_LIST_SIZE, playerRatings.size());
         StringBuilder sb = new StringBuilder();
         sb.append("__**Player Matchmaking Ratings:**__\n");
-        for (int i = 0; i < playerRatings.size() && i < MAX_LIST_SIZE; i++) {
+        for (int i = 0, listSize = 0; i < playerRatings.size() && listSize < maxListSize; i++) {
             var playerRating = playerRatings.get(i);
-            sb.append(i + 1)
-                    .append(". `")
-                    .append(playerRating.username)
-                    .append("` ")
-                    .append("`Rating=")
-                    .append(Math.round(playerRating.rating))
-                    .append("`\n");
+            if (playerRating.calibrationPercent < 100) {
+                continue;
+            }
+            listSize++;
+            String formattedString =
+                    String.format("%d. `%s` `Rating=%.3f`\n", listSize, playerRating.username, playerRating.rating);
+            sb.append(formattedString);
         }
+
+        double averageRating = playerRatings.stream()
+                .mapToDouble(PlayerRating::rating)
+                .average()
+                .orElse(Double.NaN);
+        String formattedString = String.format(
+                """
+
+                This list only includes the top %d players with a high confidence in their rating.
+
+                The average rating of the player base is `%.3f`
+                """,
+                maxListSize, averageRating);
+        sb.append(formattedString);
+
+        playerRatings.stream()
+                .filter(playerRating ->
+                        playerRating.userId.equals(event.getUser().getId()))
+                .findFirst()
+                .ifPresent(playerRating -> sb.append(String.format(
+                        "\nWe are `%.1f%%` of the way to a high confidence in your rating.",
+                        Math.min(100, playerRating.calibrationPercent))));
+
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Player Matchmaking Ratings", sb.toString());
     }
 
-    private record PlayerRating(String username, double rating, Confidence confidence) {}
-
-    private enum Confidence {
-        VERY_LOW(1.4),
-        LOW(1.2),
-        MEDIUM(1.0),
-        HIGH(0.8),
-        VERY_HIGH(0.6);
-
-        final double confidenceThreshold;
-
-        Confidence(double confidenceThreshold) {
-            this.confidenceThreshold = confidenceThreshold;
-        }
-
-        static Confidence calculate(Rating rating) {
-            double standardDeviation = rating.getStandardDeviation();
-            if (isInRange(VERY_HIGH, standardDeviation)) return VERY_HIGH;
-            if (isInRange(HIGH, standardDeviation)) return HIGH;
-            if (isInRange(MEDIUM, standardDeviation)) return MEDIUM;
-            if (isInRange(LOW, standardDeviation)) return LOW;
-            return VERY_LOW;
-        }
-
-        private static boolean isInRange(Confidence confidence, double standardDeviation) {
-            return standardDeviation <= confidence.confidenceThreshold;
-        }
-    }
+    private record PlayerRating(String userId, String username, double rating, double calibrationPercent) {}
 }
