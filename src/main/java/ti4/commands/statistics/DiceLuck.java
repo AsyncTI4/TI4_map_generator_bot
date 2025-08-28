@@ -9,7 +9,7 @@ import ti4.service.statistics.DiceLuckService;
 
 class DiceLuck extends Subcommand {
 
-    public DiceLuck() {
+    DiceLuck() {
         super(Constants.DICE_LUCK, "Dice luck as recorded by the bot");
         addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)"));
         addOptions(new OptionData(
