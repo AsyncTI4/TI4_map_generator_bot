@@ -1,8 +1,6 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -512,9 +510,16 @@ public class CombatRollService {
             MessageHelper.sendMessageToChannel(channel, msg);
             List<Button> buttons = new ArrayList<>();
             String finChecker = "FFCC_" + opponent.getFaction() + "_";
-            buttons.add(Buttons.green(
-                    finChecker + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_" + h,
-                    "Auto-assign Hit" + (h == 1 ? "" : "s")));
+            if (opponent.isDummy()) {
+                buttons.add(Buttons.green(
+                        opponent.dummyPlayerSpoof() + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_"
+                                + h,
+                        "Auto-assign Hit" + (h == 1 ? "" : "s For Dummy")));
+            } else {
+                buttons.add(Buttons.green(
+                        finChecker + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_" + h,
+                        "Auto-assign Hit" + (h == 1 ? "" : "s")));
+            }
             buttons.add(Buttons.red(
                     "getDamageButtons_" + tile.getPosition() + "deleteThis_pds",
                     "Manually Assign Hit" + (h == 1 ? "" : "s")));

@@ -443,6 +443,10 @@ public class StatusHelper {
                         && !key.toLowerCase().contains("custodian")
                         && !key.toLowerCase().contains("imperial")
                         && !key.contains("Shard of the Throne")
+                        && !key.contains("Seed of an")
+                        && !key.contains("Mutiny")
+                        && !key.contains("Stellar Atomics")
+                        && !key.contains("Crown of Emphidia")
                         && !key.contains(Constants.VOICE_OF_THE_COUNCIL_PO)) {
                     poName = key;
                     poStatus = 2;
