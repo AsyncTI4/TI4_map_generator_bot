@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -438,14 +437,14 @@ public class ComponentActionHelper {
                             p1.getRepresentation() + ", please choose the planet you wish to put a Superweapon on.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("orbitalDrop".equalsIgnoreCase(buttonID)) {
-                     String successMessage = p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Sol
+                    String successMessage = p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Sol
                             + "**Orbital Drop** (" + (p1.getStrategicCC()) + "->" + (p1.getStrategicCC() - 1) + ")";
-                    if(!p1.hasRelicReady("emelpar")){
-                   
+                    if (!p1.hasRelicReady("emelpar")) {
+
                         p1.setStrategicCC(p1.getStrategicCC() - 1);
                         ButtonHelperCommanders.resolveMuaatCommanderCheck(
                                 p1, game, event, FactionEmojis.Sol + " **Orbital Drop**'d");
-                    }else{
+                    } else {
                         p1.addExhaustedRelic("emelpar");
                         successMessage = p1.getFactionEmoji() + " used Scepter of Emelpar to Orbital Drop";
                     }
