@@ -15,27 +15,21 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          SUDO_PASS: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
         with:
           host: ${{ secrets.HOSTINGER_SSH_HOST }}
           username: ${{ secrets.HOSTINGER_SSH_USER }}
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
-          envs: DISCORD_WEBHOOK_URL, SUDO_PASS
+          envs: DISCORD_WEBHOOK_URL
           script: |
             set -eu
             cd ${{ vars.HOST_TI4_SAVES_DIR }}
             echo "FORCING BACKUP OF SAVE FILES"
-
             rm -f .git/index.lock
-
-            echo "$SUDO_PASS" | sudo -S chmod -R u+rwX .
-
             git add -A
             git commit -m "save files"
             git push
             curl -X POST -H 'Content-Type: application/json' -d '{"content":"Backup Successful"}' $DISCORD_WEBHOOK_URL
-
             echo "DONE!"
 
       - name: Notify Discord on failure
