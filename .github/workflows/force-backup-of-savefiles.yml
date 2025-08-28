@@ -15,13 +15,12 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          SUDO_PASS: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
         with:
           host: ${{ secrets.HOSTINGER_SSH_HOST }}
           username: ${{ secrets.HOSTINGER_SSH_USER }}
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
-          envs: DISCORD_WEBHOOK_URL, SUDO_PASS
+          envs: DISCORD_WEBHOOK_URL
           script: |
             set -eu
             cd ${{ vars.HOST_TI4_SAVES_DIR }}
