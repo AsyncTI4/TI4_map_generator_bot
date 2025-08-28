@@ -27,7 +27,7 @@ class PlayerWinPercentStatisticsService {
                 game -> getPlayerWinPercent(game, playerWinCount, playerGameCount, playerUserIdToUsername));
 
         int maximumListedPlayers = event.getOption("max_list_size", 50, OptionMapping::getAsInt);
-        int minimumGameCountFilter = event.getOption("has_minimum_game_count", 10, OptionMapping::getAsInt);
+        int minimumGameCountFilter = event.getOption("min_game_count", 10, OptionMapping::getAsInt);
         List<Map.Entry<String, Long>> entries = playerUserIdToUsername.keySet().stream()
                 .filter(userId -> playerGameCount.get(userId) >= minimumGameCountFilter)
                 .map(userId -> {
