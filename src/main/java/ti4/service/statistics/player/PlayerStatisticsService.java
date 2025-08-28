@@ -25,7 +25,6 @@ public class PlayerStatisticsService {
         switch (statType) {
             case PLAYER_WIN_PERCENT -> PlayerWinPercentStatisticsService.showPlayerWinPercent(event);
             case PLAYER_GAME_COUNT -> PlayerGameCountStatisticsService.showPlayerGameCount(event);
-            case PLAYER_MATCHMAKING_RATING -> MatchmakingRatingService.calculateRatings(event);
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statType);
         }
     }

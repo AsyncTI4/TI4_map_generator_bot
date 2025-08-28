@@ -25,7 +25,7 @@ class PlayerGameCountStatisticsService {
                 game -> getPlayerGameCount(game, playerGameCount, playerUserIdToUsername));
 
         int maximumListedPlayers = event.getOption("max_list_size", 50, OptionMapping::getAsInt);
-        int minimumGameCountFilter = event.getOption("has_minimum_game_count", 10, OptionMapping::getAsInt);
+        int minimumGameCountFilter = event.getOption("min_game_count", 10, OptionMapping::getAsInt);
         List<Map.Entry<String, Integer>> entries = playerUserIdToUsername.keySet().stream()
                 .filter(userId -> playerGameCount.get(userId) >= minimumGameCountFilter)
                 .map(userId -> Map.entry(userId, playerGameCount.get(userId)))
