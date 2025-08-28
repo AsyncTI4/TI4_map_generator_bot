@@ -37,8 +37,8 @@ jobs:
       - name: Notify Discord on failure
         if: ${{ always() && (failure() || cancelled()) }}
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_ERROR_URL: ${{ secrets.DISCORD_WEBHOOK_ERROR_URL }}
         run: |
           curl -sS -X POST -H 'Content-Type: application/json' \
             -d "{\"content\":\"⚠️ ForceSaveFileBackup failed or was cancelled for ${{ github.repository }} on ref ${{ github.ref_name }}. See run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
-            "$DISCORD_WEBHOOK_URL"
+            "$DISCORD_WEBHOOK_ERROR_URL"
