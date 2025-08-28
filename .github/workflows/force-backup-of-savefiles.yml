@@ -2,7 +2,7 @@ on:
   workflow_dispatch:
   workflow_call:
   schedule:
-    - cron: '0 * * * *'
+    - cron: "0 * * * *"
 name: ForceSaveFileBackup
 concurrency:
   group: "Start Bot"
@@ -22,6 +22,7 @@ jobs:
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
           envs: DISCORD_WEBHOOK_URL
           script: |
+            set -eu
             cd ${{ vars.HOST_TI4_SAVES_DIR }}
             echo "FORCING BACKUP OF SAVE FILES"
             rm -f ${{ vars.HOST_TI4_SAVES_DIR }}/.git/index.lock
