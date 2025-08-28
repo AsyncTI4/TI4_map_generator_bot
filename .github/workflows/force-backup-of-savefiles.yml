@@ -27,7 +27,7 @@ jobs:
             echo "FORCING BACKUP OF SAVE FILES"
             rm -f ${{ vars.HOST_TI4_SAVES_DIR }}/.git/index.lock
             # ensure all save files are readable before committing
-            chmod -R u+rwX . || true
+            chmod -R u+rw . || true
             git add . -A
             git commit -m "save files"
             git push
