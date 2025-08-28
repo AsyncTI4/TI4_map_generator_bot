@@ -15,6 +15,13 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
@@ -27,11 +34,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
@@ -265,7 +267,7 @@ public class AgendaHelper {
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId) && pnId.endsWith("_ps") && !pnId.contains("absol")) {
-                names.add(Mapper.getPromissoryNote(pnId).getName());
+                names.add(StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor()+" ")+Mapper.getPromissoryNote(pnId).getName());
             }
         }
         return names;
@@ -286,7 +288,7 @@ public class AgendaHelper {
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId) && pnId.endsWith("_ps") && !pnId.contains("absol")) {
                 buttons.add(Buttons.red(
-                        "queueWhen_pn_" + pnId, Mapper.getPromissoryNote(pnId).getName()));
+                        "queueWhen_pn_" + pnId, StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor()+" ")+ Mapper.getPromissoryNote(pnId).getName()));
             }
         }
         return buttons;
