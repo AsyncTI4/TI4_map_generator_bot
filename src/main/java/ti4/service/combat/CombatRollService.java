@@ -339,7 +339,7 @@ public class CombatRollService {
                         buttons.add(Buttons.green(
                                 opponent.dummyPlayerSpoof() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_"
                                         + h,
-                                "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
+                                "Auto-Assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
                     } else {
                         if (round2 > round) {
                             buttons.add(Buttons.blue(
@@ -349,7 +349,7 @@ public class CombatRollService {
                         buttons.add(Buttons.green(
                                 opponent.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_"
                                         + combatOnHolder.getName() + "_" + h,
-                                "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                                "Auto-Assign Hit" + (h == 1 ? "" : "s")));
                         buttons.add(Buttons.red(
                                 "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
                                 "Manually Assign Hit" + (h == 1 ? "" : "s")));
@@ -362,12 +362,12 @@ public class CombatRollService {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                     if (opponent.hasTech("vpw")) {
                         msg = player.getRepresentationUnfogged()
-                                + " you got hit by _Valkyrie Particle Weave_. You may autoassign 1 hit.";
+                                + " you got hit by _Valkyrie Particle Weave_. You may auto-assign 1 hit.";
                         buttons = new ArrayList<>();
                         buttons.add(Buttons.green(
                                 player.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_"
                                         + combatOnHolder.getName() + "_1",
-                                "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                                "Auto-Assign Hit" + (h == 1 ? "" : "s")));
                         buttons.add(Buttons.red(
                                 "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
                                 "Manually Assign Hit" + (h == 1 ? "" : "s")));
@@ -428,12 +428,12 @@ public class CombatRollService {
                     if (opponent.isDummy() || opponent.isNpc()) {
                         buttons.add(Buttons.green(
                                 opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
-                                "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
+                                "Auto-Assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
 
                     } else {
                         buttons.add(Buttons.green(
                                 finChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
-                                "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                                "Auto-Assign Hit" + (h == 1 ? "" : "s")));
                         buttons.add(Buttons.red(
                                 "getDamageButtons_" + tile.getPosition() + "deleteThis_spacecombat",
                                 "Manually Assign Hit" + (h == 1 ? "" : "s")));
@@ -465,14 +465,14 @@ public class CombatRollService {
                         buttons.add(Buttons.green(
                                 opponent.dummyPlayerSpoof() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_"
                                         + h,
-                                "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
+                                "Auto-Assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
                         String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit"
                                 + (h == 1 ? "" : "s") + ".";
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                     } else {
                         buttons.add(Buttons.green(
                                 opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
-                                "Auto-assign Hits For Dummy"));
+                                "Auto-Assign Hits For Dummy"));
                         String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign "
                                 + (h == 1 ? "the hit" : "hits") + "."
                                 + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(
@@ -493,7 +493,7 @@ public class CombatRollService {
                 String finChecker = "FFCC_" + opponent.getFaction() + "_";
                 buttons.add(Buttons.green(
                         finChecker + "autoAssignAFBHits_" + tile.getPosition() + "_" + h,
-                        "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                        "Auto-Assign Hit" + (h == 1 ? "" : "s")));
                 buttons.add(Buttons.gray("cancelAFBHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
@@ -514,11 +514,11 @@ public class CombatRollService {
                 buttons.add(Buttons.green(
                         opponent.dummyPlayerSpoof() + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_"
                                 + h,
-                        "Auto-assign Hit" + (h == 1 ? "" : "s For Dummy")));
+                        "Auto-Assign Hit" + (h == 1 ? "" : "s For Dummy")));
             } else {
                 buttons.add(Buttons.green(
                         finChecker + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_" + h,
-                        "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                        "Auto-Assign Hit" + (h == 1 ? "" : "s")));
             }
             buttons.add(Buttons.red(
                     "getDamageButtons_" + tile.getPosition() + "deleteThis_pds",
