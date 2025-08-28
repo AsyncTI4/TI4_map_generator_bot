@@ -2102,12 +2102,12 @@ public class ButtonHelper {
     public static void addMinorFactionsInfantry(Game game, ButtonInteractionEvent event) {
 
         if (!game.isMinorFactionsMode()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not minor factions mode");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not Minor Factions mode.");
             return;
         }
         if (game.getRealPlayers().size() < 3) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Set up all real players before pressing this button");
+                    event.getChannel(), "Set up all real players before pressing this button.");
             return;
         }
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
@@ -2139,7 +2139,7 @@ public class ButtonHelper {
                 }
             }
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Added neutral infantry to home systems");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Added neutral infantry to minor home systems.");
 
         deleteMessage(event);
     }
@@ -4085,7 +4085,7 @@ public class ButtonHelper {
                 }
                 if (added) {
                     MessageHelper.sendMessageToChannel(
-                            game.getMainGameChannel(), "Added neutral infantry to hazardous planets");
+                            game.getMainGameChannel(), "Added neutral infantry to hazardous planets.");
                 }
             }
         }

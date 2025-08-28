@@ -3895,6 +3895,24 @@ public class AgendaHelper {
             BannerGenerator.drawPhaseBanner("agenda", game.getRound(), game.getActionsChannel());
         }
 
+        if (!action && aCount == 1) {
+            pingAboutDebt(game);
+            String politicsHolder = "round" + game.getRound() + "PoliticsHolder";
+            String key = "round" + game.getRound() + "AgendaPlacement";
+            if (!game.getStoredValue(key).isEmpty() && !game.isFowMode()) {
+                String message;
+                if (!game.getStoredValue(politicsHolder).isEmpty()) {
+                    message = "## " + game.getStoredValue(politicsHolder)
+                            + " had **Politics** and placed the agendas in this order: "
+                            + game.getStoredValue(key).replace("_", ", ") + ".";
+                } else {
+                    message = "## The **Politics** player placed the agendas in this order: "
+                            + game.getStoredValue(key).replace("_", ", ") + ".";
+                }
+                MessageHelper.sendMessageToChannel(channel, message);
+            }
+        }
+
         CryypterHelper.checkEnvoyUnlocks(game);
 
         game.setStoredValue("AssassinatedReps", "");
@@ -4024,12 +4042,12 @@ public class AgendaHelper {
         GameMessageManager.remove(game.getName(), GameMessageType.AGENDA_WHEN);
         GameMessageManager.remove(game.getName(), GameMessageType.AGENDA_AFTER);
 
-        MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
-        String revealMessage = game.getPing() + "\nAn agenda has been revealed";
-        MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
         if (!action) {
             BannerGenerator.drawAgendaBanner(aCount, game);
         }
+        MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
+        String revealMessage = game.getPing() + ", an agenda has been revealed.";
+        MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
         StringBuilder whensAftersMessage = new StringBuilder(
                 "Please indicate whether you abstain from playing \"when\"s and \"after\"s.\nIf you have an action card with those windows, you may simply play it.");
         if (action) {
@@ -4074,24 +4092,6 @@ public class AgendaHelper {
                     channel,
                     "# " + game.getPing() + " the agenda target is " + agendaTarget
                             + ". Sent the agenda to the speaker's `#cards-info` thread.");
-        }
-
-        if (!action && aCount == 1) {
-            pingAboutDebt(game);
-            String politicsHolder = "round" + game.getRound() + "PoliticsHolder";
-            String key = "round" + game.getRound() + "AgendaPlacement";
-            if (!game.getStoredValue(key).isEmpty() && !game.isFowMode()) {
-                String message;
-                if (!game.getStoredValue(politicsHolder).isEmpty()) {
-                    message = "## " + game.getStoredValue(politicsHolder)
-                            + " had **Politics** and placed the agendas in this order: "
-                            + game.getStoredValue(key).replace("_", ", ") + ".";
-                } else {
-                    message = "## The **Politics** player placed the agendas in this order: "
-                            + game.getStoredValue(key).replace("_", ", ") + ".";
-                }
-                MessageHelper.sendMessageToChannel(channel, message);
-            }
         }
         for (Player player : game.getRealPlayers()) {
             if (!action

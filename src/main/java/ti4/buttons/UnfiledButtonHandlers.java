@@ -183,7 +183,7 @@ public class UnfiledButtonHandlers {
                 mfButtons.add(Buttons.blue("addMinorFactionsInfantry", "Add Minor Factions Infantry"));
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        "After setting up the map, use this button to auto populate the neutral infantry",
+                        "After setting up the map, use this button to auto populate the neutral infantry.",
                         mfButtons);
             }
         }
