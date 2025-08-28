@@ -1,6 +1,6 @@
 package ti4.map.persistence;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toUnmodifiableSet;
 
 import java.util.List;
 import java.util.Map;
@@ -17,8 +17,8 @@ import ti4.map.Game;
 import ti4.map.Player;
 
 @Getter
-public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN EASILY BALLOON THE DATA ON THE HEAP BY
-    // MEGABYTES PER FIELD
+public class ManagedGame {
+    // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN EASILY BALLOON THE DATA ON THE HEAP BY MEGABYTES PER FIELD
 
     private final String name;
     private final boolean hasEnded;

@@ -1,5 +1,7 @@
 package ti4.service.statistics;
 
+import static java.util.function.Predicate.not;
+
 import de.gesundkrank.jskills.GameInfo;
 import de.gesundkrank.jskills.IPlayer;
 import de.gesundkrank.jskills.ITeam;
@@ -37,7 +39,10 @@ public class MatchmakingRatingService {
 
         List<Game> games = new ArrayList<>();
         GamesPage.consumeAllGames(GameStatisticsFilterer.getFinishedGamesFilter(6, null), games::add);
-        games.sort(Comparator.comparingLong(Game::getEndedDate));
+        games = games.stream()
+                .filter(not(Game::isAllianceMode))
+                .sorted(Comparator.comparingLong(Game::getEndedDate))
+                .toList();
 
         var calculator = new FactorGraphTrueSkillCalculator();
         for (Game game : games) {

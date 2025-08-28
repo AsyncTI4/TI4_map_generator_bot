@@ -111,7 +111,7 @@ public class GameStatisticsFilterer {
     public static Predicate<Game> getNormalFinishedGamesFilter(
             Integer playerCountFilter, Integer victoryPointGoalFilter) {
         return getFinishedGamesFilter(playerCountFilter, victoryPointGoalFilter)
-                .and(game -> filterOnHasWinner(Boolean.TRUE, game));
+                .and(game -> filterOnIsNormal(Boolean.TRUE, game));
     }
 
     public static Predicate<Game> getFinishedGamesFilter(Integer playerCountFilter, Integer victoryPointGoalFilter) {
