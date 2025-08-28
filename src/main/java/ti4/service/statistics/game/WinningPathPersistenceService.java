@@ -21,12 +21,12 @@ public class WinningPathPersistenceService {
         BotLogger.info("**Recomputing win paths file**");
         Map<String, Map<String, Integer>> data = new HashMap<>();
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getNormalFinishedGamesFilter(null, null), game -> addGameToMap(game, data));
+                GameStatisticsFilterer.getNormalFinishedGamesFilter(null, null), game -> computeWinPath(game, data));
         writeData(data);
         BotLogger.info("**Finished recomputing win paths file**");
     }
 
-    private static void addGameToMap(Game game, Map<String, Map<String, Integer>> data) {
+    private static void computeWinPath(Game game, Map<String, Map<String, Integer>> data) {
         game.getWinner().ifPresent(winner -> {
             String key = key(game.getRealAndEliminatedPlayers().size(), game.getVp());
             Map<String, Integer> map = data.computeIfAbsent(key, k -> new HashMap<>());
@@ -38,7 +38,7 @@ public class WinningPathPersistenceService {
     public static synchronized void addGame(Game game) {
         game.getWinner().ifPresent(winner -> {
             Map<String, Map<String, Integer>> data = readData();
-            addGameToMap(game, data);
+            computeWinPath(game, data);
             writeData(data);
         });
     }

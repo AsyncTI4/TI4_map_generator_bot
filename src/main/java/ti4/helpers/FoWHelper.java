@@ -132,6 +132,8 @@ public class FoWHelper {
             return;
         }
 
+        player.setFogInitialized(true);
+
         // Get all tiles with the player in it
         Set<String> tilesWithPlayerUnitsPlanets = new HashSet<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
@@ -156,7 +158,6 @@ public class FoWHelper {
         }
 
         updatePlayerFogTiles(game, player);
-        player.setFogInitialized(true);
     }
 
     public static Set<String> getTilePositionsToShow(Game game, @NotNull Player player) {
@@ -189,6 +190,7 @@ public class FoWHelper {
 
     private static void updatePlayerFogTiles(Game game, Player player) {
         for (Tile tileToUpdate : game.getTileMap().values()) {
+            if (!tileToUpdate.isValid()) continue;
             if (!tileToUpdate.hasFog(player)
                     || tileToUpdate.isSupernova() && game.getFowOption(FOWOption.BRIGHT_NOVAS)) {
                 player.updateFogTile(tileToUpdate, "Rnd " + game.getRound());
