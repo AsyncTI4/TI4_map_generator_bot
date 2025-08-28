@@ -27,6 +27,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.WormholeModel;
 import ti4.service.combat.StartCombatService;
@@ -190,7 +191,11 @@ public class FoWHelper {
 
     private static void updatePlayerFogTiles(Game game, Player player) {
         for (Tile tileToUpdate : game.getTileMap().values()) {
-            if (!tileToUpdate.isValid()) continue;
+            if (!tileToUpdate.isValid()) {
+                BotLogger.warning(
+                        String.format("Tile %s is not valid in game %s", tileToUpdate.getTileID(), game.getName()));
+                continue;
+            }
             if (!tileToUpdate.hasFog(player)
                     || tileToUpdate.isSupernova() && game.getFowOption(FOWOption.BRIGHT_NOVAS)) {
                 player.updateFogTile(tileToUpdate, "Rnd " + game.getRound());
