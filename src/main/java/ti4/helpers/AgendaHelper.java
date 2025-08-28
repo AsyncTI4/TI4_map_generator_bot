@@ -265,7 +265,8 @@ public class AgendaHelper {
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId) && pnId.endsWith("_ps") && !pnId.contains("absol")) {
-                names.add(Mapper.getPromissoryNote(pnId).getName());
+                names.add(StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor() + " ")
+                        + Mapper.getPromissoryNote(pnId).getName());
             }
         }
         return names;
@@ -286,7 +287,9 @@ public class AgendaHelper {
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId) && pnId.endsWith("_ps") && !pnId.contains("absol")) {
                 buttons.add(Buttons.red(
-                        "queueWhen_pn_" + pnId, Mapper.getPromissoryNote(pnId).getName()));
+                        "queueWhen_pn_" + pnId,
+                        StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor() + " ")
+                                + Mapper.getPromissoryNote(pnId).getName()));
             }
         }
         return buttons;
@@ -2518,7 +2521,7 @@ public class AgendaHelper {
                 most = p.getTotalVictoryPoints();
             }
         }
-        for (Player p : game.getRealPlayers()) {
+        for (Player p : Helper.getSpeakerOrFullPriorityOrder(game)) {
             if (p.getTotalVictoryPoints() == most) {
                 losers.add(p);
             }
@@ -3244,12 +3247,11 @@ public class AgendaHelper {
                     if (!game.isFowMode() && game.getCurrentAgendaInfo().contains("Elect Player")) {
                         String emoji = FactionEmojis.getFactionIcon(outcome.toLowerCase())
                                 .toString();
-                        if (outcome.toLowerCase().contains("franken")) {
-                            Player outcomerP = game.getPlayerFromColorOrFaction(outcome.toLowerCase());
-                            if (outcomerP != null) {
-                                emoji = outcomerP.getFactionEmoji();
-                            }
+                        Player outcomerP = game.getPlayerFromColorOrFaction(outcome.toLowerCase());
+                        if (outcomerP != null && outcomerP.getFactionEmoji() != null) {
+                            emoji = outcomerP.getFactionEmoji();
                         }
+
                         summaryBuilder
                                 .append("- ")
                                 .append(emoji)
