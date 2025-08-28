@@ -9,7 +9,7 @@ import ti4.service.statistics.player.PlayerStatisticsService;
 
 class PlayerStatistics extends Subcommand {
 
-    private static final String MINIMUM_GAME_COUNT_FILTER = "has_minimum_game_count";
+    private static final String MINIMUM_GAME_COUNT_FILTER = "min_game_count";
     private static final String MAX_LIST_SIZE = "max_list_size";
 
     public PlayerStatistics() {
