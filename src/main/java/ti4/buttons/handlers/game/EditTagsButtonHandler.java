@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -30,7 +31,7 @@ class EditTagsButtonHandler {
                 .setValue(currentTags)
                 .build();
         Modal modal = Modal.create(modalId, "Tags for Game " + game.getName())
-                .addActionRow(tags)
+            .addComponents(ActionRow.of(tags))
                 .build();
         event.replyModal(modal).queue();
     }

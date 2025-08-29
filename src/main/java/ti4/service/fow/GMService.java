@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
@@ -236,7 +237,7 @@ public class GMService {
                 .setRequiredRange(3, 4)
                 .build();
         Modal modal = Modal.create("gmWhoCanSeeResolve", "Who Can See Position")
-                .addActionRow(position)
+            .addComponents(ActionRow.of(position))
                 .build();
         event.replyModal(modal).queue();
     }

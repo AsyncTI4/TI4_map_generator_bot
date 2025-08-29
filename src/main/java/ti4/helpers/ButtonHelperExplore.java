@@ -3,6 +3,13 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.MessageTopLevelComponentUnion;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.tree.MessageComponentTree;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -20,9 +27,12 @@ class ButtonHelperExplore {
         String pos = buttonID.replace("exploreFront_", "");
         ButtonHelper.resolveFullFrontierExplore(game, player, game.getTileByPosition(pos), event);
         List<ActionRow> actionRow2 = new ArrayList<>();
-        String exhaustedMessage = event.getMessage().getContentRaw();
-        for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
+        Message message = event.getMessage();
+        String exhaustedMessage = message.getContentRaw();
+        MessageComponentTree components = message.getComponentTree();
+
+        for (MessageTopLevelComponentUnion row : components.getComponents()) {
+            List<ActionRowChildComponentUnion> buttonRow = row.asActionRow().getComponents();
             int buttonIndex = buttonRow.indexOf(event.getButton());
             if (buttonIndex > -1) {
                 buttonRow.remove(buttonIndex);
@@ -35,7 +45,7 @@ class ButtonHelperExplore {
             exhaustedMessage = "Explore";
         }
         if (!actionRow2.isEmpty()) {
-            event.getMessage()
+            message
                     .editMessage(exhaustedMessage)
                     .setComponents(actionRow2)
                     .queue();
@@ -67,9 +77,9 @@ class ButtonHelperExplore {
         int count = Integer.parseInt(typeNAmount.split("_")[1]);
         List<String> fragmentsToPurge = new ArrayList<>();
         List<String> playerFragments = player.getFragments();
-        for (String fragid : playerFragments) {
-            if (fragid.contains(type.toLowerCase())) {
-                fragmentsToPurge.add(fragid);
+        for (String fragId : playerFragments) {
+            if (fragId.contains(type.toLowerCase())) {
+                fragmentsToPurge.add(fragId);
             }
         }
         if (fragmentsToPurge.size() == count) {
@@ -81,10 +91,10 @@ class ButtonHelperExplore {
 
         StringBuilder message = new StringBuilder(player.getRepresentation() + " purged");
         if (fragmentsToPurge.size() == 1) {
-            String fragid = fragmentsToPurge.getFirst();
-            player.removeFragment(fragid);
+            String fragId = fragmentsToPurge.getFirst();
+            player.removeFragment(fragId);
             game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-            switch (fragid) {
+            switch (fragId) {
                 case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" ->
                     message.append(" a " + ExploreEmojis.CFrag + "cultural");
                 case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->
@@ -92,20 +102,20 @@ class ButtonHelperExplore {
                 case "irf1", "irf2", "irf3", "irf4", "irf5" ->
                     message.append(" an " + ExploreEmojis.IFrag + "industrial");
                 case "urf1", "urf2", "urf3" -> message.append(" an " + ExploreEmojis.UFrag + "unknown");
-                default -> message.append(" ").append(fragid);
+                default -> message.append(" ").append(fragId);
             }
             message.append(" relic fragment.");
         } else {
-            for (String fragid : fragmentsToPurge) {
-                player.removeFragment(fragid);
+            for (String fragId : fragmentsToPurge) {
+                player.removeFragment(fragId);
                 game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-                switch (fragid) {
+                switch (fragId) {
                     case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" ->
                         message.append(ExploreEmojis.CFrag);
                     case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> message.append(ExploreEmojis.HFrag);
                     case "irf1", "irf2", "irf3", "irf4", "irf5" -> message.append(ExploreEmojis.IFrag);
                     case "urf1", "urf2", "urf3" -> message.append(ExploreEmojis.UFrag);
-                    default -> message.append(" ").append(fragid);
+                    default -> message.append(" ").append(fragId);
                 }
             }
             message.append(" relic fragments.");

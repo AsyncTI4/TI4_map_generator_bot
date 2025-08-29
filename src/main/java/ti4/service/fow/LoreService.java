@@ -126,14 +126,14 @@ public class LoreService {
         boolean systemLore = "System".equals(target) || PositionMapper.isTilePositionValid(target);
         String addingTo = systemLore ? "System" : "Planet";
 
-        Builder position = TextInput.create(Constants.POSITION, addingTo, TextInputStyle.SHORT)
+        TextInput.Builder position = TextInput.create(Constants.POSITION, addingTo, TextInputStyle.SHORT)
                 .setRequired(true)
                 .setPlaceholder(systemLore ? "000" : "Sem-Lore");
-        Builder lore = TextInput.create(Constants.MESSAGE, "Lore (clear to delete)", TextInputStyle.PARAGRAPH)
+        TextInput.Builder lore = TextInput.create(Constants.MESSAGE, "Lore (clear to delete)", TextInputStyle.PARAGRAPH)
                 .setRequired(false)
                 .setPlaceholder("Once upon a time...")
                 .setMaxLength(1000);
-        Builder footer = TextInput.create("footer", "Other info", TextInputStyle.SHORT)
+        TextInput.Builder footer = TextInput.create("footer", "Other info", TextInputStyle.SHORT)
                 .setRequired(false)
                 .setPlaceholder("Please use `/add_token token:gravityrift` on this system.");
 
@@ -147,16 +147,13 @@ public class LoreService {
         }
 
         Modal editLoreModal = Modal.create("gmLoreSave" + addingTo, "Add Lore to " + addingTo)
-                .addActionRow(position.build())
-                .addActionRow(lore.build())
-                .addActionRow(footer.build())
+                .addComponents(ActionRow.of(position.build()), ActionRow.of(lore.build()), ActionRow.of(footer.build()))
                 .build();
-
         event.replyModal(editLoreModal).queue();
     }
 
     @ModalHandler("gmLoreSave")
-    public static void saveLore(ModalInteractionEvent event, Player player, Game game) {
+    public static void saveLore(ModalInteractionEvent event, Game game) {
         String target = event.getValue(Constants.POSITION).getAsString();
         String loreText = event.getValue(Constants.MESSAGE).getAsString();
         String footerText = event.getValue("footer").getAsString();
