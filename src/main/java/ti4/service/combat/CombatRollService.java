@@ -1,7 +1,6 @@
 package ti4.service.combat;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.util.ArrayList;
