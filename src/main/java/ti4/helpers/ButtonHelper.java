@@ -20,6 +20,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Data;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -34,11 +36,9 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
@@ -124,7 +124,7 @@ import ti4.website.AsyncTi4WebsiteHelper;
 public class ButtonHelper {
 
     public static String getButtonRepresentation(Button button) {
-        String id = button.getId();
+        String id = button.getCustomId();
         String label = button.getLabel();
         EmojiUnion emoji = button.getEmoji();
         return (emoji != null ? emoji.getFormatted() : "") + "__**" + (label.isEmpty() ? " " : label) + "**__  `[" + id
@@ -3002,7 +3002,7 @@ public class ButtonHelper {
     public static void deleteTheOneButton(GenericInteractionCreateEvent event) {
         if (event instanceof ButtonInteractionEvent bevent) {
             bevent.getMessage();
-            deleteTheOneButton(bevent, bevent.getButton().getId(), true);
+            deleteTheOneButton(bevent, bevent.getButton().getCustomId(), true);
         }
     }
 
@@ -3058,9 +3058,9 @@ public class ButtonHelper {
             List<Button> buttons = new ArrayList<>(bevent.getMessage().getButtons());
             List<Button> newButtons = new ArrayList<>();
             for (Button button : buttons) {
-                if (!button.getId().contains(partialID)) {
-                    if (!button.getId().contains("deleteButtons")
-                            && !button.getId().contains("ultimateUndo")) {
+                if (!button.getCustomId().contains(partialID)) {
+                    if (!button.getCustomId().contains("deleteButtons")
+                            && !button.getCustomId().contains("ultimateUndo")) {
                         containsRealButton = true;
                     }
                     newButtons.add(button);
@@ -3084,11 +3084,12 @@ public class ButtonHelper {
             List<Button> newActionRow = new ArrayList<>();
             for (ItemComponent item : row.getComponents()) {
                 if (!(item instanceof Button b)) continue;
-                if (b.getId() == null || b.getId().equals(buttonID)) continue;
+                if (b.getCustomId() == null || b.getCustomId().equals(buttonID)) continue;
 
                 remainingButtons.add(b);
                 newActionRow.add(b);
-                if (!b.getId().contains("deleteButtons") && !b.getId().contains("ultimateUndo")) {
+                if (!b.getCustomId().contains("deleteButtons")
+                        && !b.getCustomId().contains("ultimateUndo")) {
                     hasRealButton = true;
                 }
             }
@@ -3157,11 +3158,11 @@ public class ButtonHelper {
         }
 
         for (Button button : buttons) {
-            if (button.getId() == null || button.getId().contains("ultimateUndo")) {
+            if (button.getCustomId() == null || button.getCustomId().contains("ultimateUndo")) {
                 continue;
             }
-            String builder =
-                    player.getFaction() + ";" + button.getId() + ";" + button.getLabel() + ";" + button.getStyle();
+            String builder = player.getFaction() + ";" + button.getCustomId() + ";" + button.getLabel() + ";"
+                    + button.getStyle();
             if (button.getEmoji() != null
                     && !"".equalsIgnoreCase(button.getEmoji().toString())) {
                 builder += ";" + button.getEmoji().toString();
@@ -5204,7 +5205,7 @@ public class ButtonHelper {
                 list.add(ActionRow.of(buttonRow));
                 buttonRow = new ArrayList<>();
             }
-            if (buttons.size() < 26 || !button.getId().contains("_2")) {
+            if (buttons.size() < 26 || !button.getCustomId().contains("_2")) {
                 buttonRow.add(button);
             }
         }
@@ -6012,7 +6013,7 @@ public class ButtonHelper {
 
     public static List<Button> getGainAndLoseCCButtons(Player player) {
         List<Button> buttons = getGainCCButtons(player);
-        buttons.removeIf(b -> !b.getId().startsWith("increase_")); // remove the wiring buttons
+        buttons.removeIf(b -> !b.getCustomId().startsWith("increase_")); // remove the wiring buttons
         buttons.addAll(getLoseCCButtons(player)); // add the redistro buttons
         return buttons;
     }

@@ -22,7 +22,7 @@ public class SelectionMenuContext extends ListenerContext {
     }
 
     public SelectionMenuContext(StringSelectInteractionEvent event) {
-        super(event, event.getSelectMenu().getId());
+        super(event, event.getSelectMenu().getCustomId());
         if (!isValid()) return; // super failed
 
         // Proceed with additional context

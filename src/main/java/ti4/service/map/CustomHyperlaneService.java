@@ -9,14 +9,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInput.Builder;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
@@ -134,7 +135,7 @@ public class CustomHyperlaneService {
 
     @ButtonHandler("customHyperlaneImport~MDL")
     public static void importHyperlaneData(ButtonInteractionEvent event, Game game) {
-        TextInput.Builder data = TextInput.create(Constants.SETTING_VALUE, "Hyperlane Data", TextInputStyle.PARAGRAPH);
+        Builder data = TextInput.create(Constants.SETTING_VALUE, "Hyperlane Data", TextInputStyle.PARAGRAPH);
 
         Modal importDataModal = Modal.create("customHyperlaneImportSave", "Import Data (overwrites existing)")
                 .addActionRow(data.build())
@@ -183,7 +184,7 @@ public class CustomHyperlaneService {
     public static void editHyperlaneData(ButtonInteractionEvent event, String buttonID, Game game) {
         String position = StringUtils.substringBetween(buttonID, "customHyperlaneEdit_", "~MDL");
 
-        TextInput.Builder data = TextInput.create(
+        Builder data = TextInput.create(
                         Constants.SETTING_VALUE, "Hyperlane Matrix (clear to delete)", TextInputStyle.PARAGRAPH)
                 .setPlaceholder("0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0")
                 .setValue("0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0")
@@ -228,10 +229,10 @@ public class CustomHyperlaneService {
 
     @ButtonHandler("customHyperlaneTransform~MDL")
     public static void transformHyperlane(ButtonInteractionEvent event, Game game) {
-        TextInput.Builder data1 = TextInput.create("staticToCustom", "Static -> Custom", TextInputStyle.SHORT)
+        Builder data1 = TextInput.create("staticToCustom", "Static -> Custom", TextInputStyle.SHORT)
                 .setPlaceholder("Comma separated positions or ALL")
                 .setRequired(false);
-        TextInput.Builder data2 = TextInput.create("customToStatic", "Custom -> Static", TextInputStyle.SHORT)
+        Builder data2 = TextInput.create("customToStatic", "Custom -> Static", TextInputStyle.SHORT)
                 .setPlaceholder("Comma separated positions or ALL")
                 .setRequired(false);
 

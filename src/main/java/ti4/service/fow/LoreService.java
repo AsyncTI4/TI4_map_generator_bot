@@ -8,14 +8,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInput.Builder;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
@@ -126,14 +127,14 @@ public class LoreService {
         boolean systemLore = "System".equals(target) || PositionMapper.isTilePositionValid(target);
         String addingTo = systemLore ? "System" : "Planet";
 
-        TextInput.Builder position = TextInput.create(Constants.POSITION, addingTo, TextInputStyle.SHORT)
+        Builder position = TextInput.create(Constants.POSITION, addingTo, TextInputStyle.SHORT)
                 .setRequired(true)
                 .setPlaceholder(systemLore ? "000" : "Sem-Lore");
-        TextInput.Builder lore = TextInput.create(Constants.MESSAGE, "Lore (clear to delete)", TextInputStyle.PARAGRAPH)
+        Builder lore = TextInput.create(Constants.MESSAGE, "Lore (clear to delete)", TextInputStyle.PARAGRAPH)
                 .setRequired(false)
                 .setPlaceholder("Once upon a time...")
                 .setMaxLength(1000);
-        TextInput.Builder footer = TextInput.create("footer", "Other info", TextInputStyle.SHORT)
+        Builder footer = TextInput.create("footer", "Other info", TextInputStyle.SHORT)
                 .setRequired(false)
                 .setPlaceholder("Please use `/add_token token:gravityrift` on this system.");
 
