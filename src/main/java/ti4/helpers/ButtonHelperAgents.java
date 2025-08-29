@@ -23,6 +23,7 @@ import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
+import ti4.jda.JdaComponentHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -2535,7 +2536,7 @@ public class ButtonHelperAgents {
             exhaustedMessage = "Combat";
         }
         event.getMessage().editMessage(exhaustedMessage).queue();
-        ButtonHelper.removeButton(event);
+        JdaComponentHelper.removeComponentFromMessage(event);
     }
 
     private static List<Button> getJolNarAgentButtons(Player player, Game game) {

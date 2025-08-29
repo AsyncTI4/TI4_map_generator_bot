@@ -42,6 +42,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
+import ti4.jda.JdaComponentHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -1209,7 +1210,7 @@ public class AgendaHelper {
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
             }
             event.getMessage().editMessage(totalVotesSoFar).queue();
-            ButtonHelper.removeButton(event);
+            JdaComponentHelper.removeComponentFromMessage(event);
         } else {
             if ("Exhaust stuff".equalsIgnoreCase(totalVotesSoFar)) {
                 totalVotesSoFar =
@@ -1223,7 +1224,7 @@ public class AgendaHelper {
                         + totalVotesSoFar.substring(totalVotesSoFar.indexOf('\n'));
             }
             event.getMessage().editMessage(totalVotesSoFar).queue();
-            ButtonHelper.removeButton(event);
+            JdaComponentHelper.removeComponentFromMessage(event);
             String message;
             if (buttonID.contains("everything")) {
                 message = "Exhausted all planets for " + votes + " vote" + ("1".equals(votes) ? "" : "s");
