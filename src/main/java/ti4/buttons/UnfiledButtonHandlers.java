@@ -13,10 +13,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
@@ -29,6 +25,8 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
@@ -2453,7 +2451,7 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 11);
-        if(randomJokeChance == 10){
+        if (randomJokeChance == 10) {
             File audioFile = ResourceHelper.getFile("voices/yin/", "YinSpin.mp3");
             if (audioFile.exists()) {
                 MessageHelper.sendFileToChannel(player.getCorrectChannel(), audioFile);
