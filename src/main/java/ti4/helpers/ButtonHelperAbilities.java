@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -847,9 +846,9 @@ public class ButtonHelperAbilities {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), pillagerMessage + "\n" + pillagedMessage);
             }
             int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 6);
-            if(randomJokeChance == 5){
+            if (randomJokeChance == 5) {
                 randomJokeChance = ThreadLocalRandom.current().nextInt(1, 6);
-                File audioFile = ResourceHelper.getFile("voices/mentak/", "Pillage"+randomJokeChance+".mp3");
+                File audioFile = ResourceHelper.getFile("voices/mentak/", "Pillage" + randomJokeChance + ".mp3");
                 if (audioFile.exists()) {
                     MessageHelper.sendFileToChannel(player.getCorrectChannel(), audioFile);
                 }
