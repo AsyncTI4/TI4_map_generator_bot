@@ -85,8 +85,8 @@ public class PickStrategyCardService {
             if (!allPicked) {
                 game.updateActivePlayer(privatePlayer);
                 game.setPhaseOfGame("strategy");
-                boolean queuedPick = false;
-                if (event != null && event instanceof ButtonInteractionEvent bevent) {
+                boolean queuedPick;
+                if (event instanceof ButtonInteractionEvent bevent) {
                     queuedPick = checkForQueuedSCPick(bevent, privatePlayer, game, msgExtra);
                 } else {
                     queuedPick = checkForQueuedSCPick(null, privatePlayer, game, msgExtra);

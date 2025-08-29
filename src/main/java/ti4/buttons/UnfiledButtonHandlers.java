@@ -1167,9 +1167,7 @@ public class UnfiledButtonHandlers {
             }
         }
         String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, whatIsItFor);
-        event.getMessage()
-                .editMessage(exhaustedMessage)
-                .queue();
+        event.getMessage().editMessage(exhaustedMessage).queue();
         ButtonHelper.removeButton(event);
     }
 
@@ -1243,9 +1241,7 @@ public class UnfiledButtonHandlers {
             totalVotesSoFar = player.getFactionEmojiOrColor() + " Readied "
                     + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
         }
-        event.getMessage()
-            .editMessage(totalVotesSoFar)
-            .queue();
+        event.getMessage().editMessage(totalVotesSoFar).queue();
         ButtonHelper.removeButton(event);
     }
 

@@ -31,7 +31,7 @@ class EditTagsButtonHandler {
                 .setValue(currentTags)
                 .build();
         Modal modal = Modal.create(modalId, "Tags for Game " + game.getName())
-            .addComponents(ActionRow.of(tags))
+                .addComponents(ActionRow.of(tags))
                 .build();
         event.replyModal(modal).queue();
     }

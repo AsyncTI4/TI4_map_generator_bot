@@ -883,7 +883,8 @@ public class CombatRollService {
                 player.setExpectedHitsTimes10(
                         player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
                 int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
-                if (gloryHolder != null && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
+                if (gloryHolder != null
+                        && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
                     for (DiceHelper.Die die : resultRolls2) {
                         if (die.getResult() > 9) {
                             hitRolls2 += 1;
@@ -1144,7 +1145,7 @@ public class CombatRollService {
         }
         Map<UnitModel, Integer> unitsInCombat = getUnitsInCombat(player, unitsByAsyncId);
 
-        HashMap<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
+        Map<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
                 .filter(entry ->
                         entry.getKey() != null && entry.getKey().getBombardDieCount(player, player.getGame()) > 0)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));

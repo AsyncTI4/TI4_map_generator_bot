@@ -3241,7 +3241,7 @@ public class ButtonHelperFactionSpecific {
 
         Modal blindSelectionModal = Modal.create(
                         "blindIFFSelection_" + type + "_" + event.getMessageId(), "Select position")
-            .addComponents(ActionRow.of(position))
+                .addComponents(ActionRow.of(position))
                 .build();
         event.replyModal(blindSelectionModal).queue();
     }

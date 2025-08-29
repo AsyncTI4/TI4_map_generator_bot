@@ -34,8 +34,9 @@ class EditTrackRecord extends Subcommand {
                 .setPlaceholder("Edit the user's track record here.")
                 .setValue(prevRecord)
                 .build();
-        Modal modal =
-                Modal.create(modalId, "Track Record").addComponents(ActionRow.of(summary)).build();
+        Modal modal = Modal.create(modalId, "Track Record")
+                .addComponents(ActionRow.of(summary))
+                .build();
         event.replyModal(modal).queue();
     }
 }

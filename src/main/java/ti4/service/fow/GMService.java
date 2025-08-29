@@ -237,7 +237,7 @@ public class GMService {
                 .setRequiredRange(3, 4)
                 .build();
         Modal modal = Modal.create("gmWhoCanSeeResolve", "Who Can See Position")
-            .addComponents(ActionRow.of(position))
+                .addComponents(ActionRow.of(position))
                 .build();
         event.replyModal(modal).queue();
     }

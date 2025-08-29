@@ -42,7 +42,7 @@ class NotepadButtonHandler {
             textInputBuilder.setValue(notes);
         }
         Modal modal = Modal.create(modalID, player.getFlexibleDisplayName() + "'s Notepad")
-            .addComponents(ActionRow.of(textInputBuilder.build()))
+                .addComponents(ActionRow.of(textInputBuilder.build()))
                 .build();
         event.replyModal(modal).queue();
     }
