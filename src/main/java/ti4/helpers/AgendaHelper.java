@@ -16,6 +16,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.MessageTopLevelComponentUnion;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -1193,8 +1194,8 @@ public class AgendaHelper {
             }
         }
         List<ActionRow> actionRow2 = new ArrayList<>();
-        for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
+        for (MessageTopLevelComponentUnion row : event.getMessage().getComponents()) {
+            List<ActionRowChildComponentUnion> buttonRow = row.asActionRow().getComponents();
             int buttonIndex = buttonRow.indexOf(event.getButton());
             if (buttonIndex > -1) {
                 buttonRow.remove(buttonIndex);
