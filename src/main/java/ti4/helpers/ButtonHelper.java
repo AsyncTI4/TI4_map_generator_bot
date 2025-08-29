@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import static org.apache.commons.lang3.StringUtils.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,11 +13,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -41,9 +48,6 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -4404,6 +4408,14 @@ public class ButtonHelper {
                             player.getRepresentationUnfogged()
                                     + ", due to your **Reclamation** ability, 1 PDS and 1 space dock have been added to Mecatol Rex. This is optional though.");
                     CommanderUnlockCheckService.checkPlayer(player, "titans", "saar", "rohdhna", "cheiran", "celdauri");
+                    int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 6);
+                    if(randomJokeChance == 5){
+                        randomJokeChance = ThreadLocalRandom.current().nextInt(1, 3);
+                        File audioFile = ResourceHelper.getFile("voices/winnu/", "reclmation"+randomJokeChance+".mp3");
+                        if (audioFile.exists()) {
+                            MessageHelper.sendFileToChannel(player.getCorrectChannel(), audioFile);
+                        }
+                    }
                 }
             }
         }
