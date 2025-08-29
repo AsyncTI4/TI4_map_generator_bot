@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -49,7 +50,7 @@ class AddTileListRandom extends GameStateSubcommand {
                 .setRequired(false)
                 .build();
 
-        newModalBuilder.addActionRow(sourcesInput).build();
+        newModalBuilder.addComponents(ActionRow.of(sourcesInput)).build();
         modal = newModalBuilder.build();
 
         event.replyModal(modal).queue();
