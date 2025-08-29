@@ -3,12 +3,13 @@ package ti4.selections.selectmenus;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.selections.SelectOption;
+import net.dv8tion.jda.api.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.components.selections.StringSelectMenu.Builder;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
-import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.apache.commons.collections4.ListUtils;
 import ti4.helpers.ButtonHelper;
 import ti4.image.Mapper;
@@ -54,7 +55,7 @@ public class SelectFaction implements Selection {
         List<StringSelectMenu> menus = new ArrayList<>();
 
         for (List<FactionModel> factionPage : factionPages) {
-            StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(selectionID);
+            Builder menuBuilder = StringSelectMenu.create(selectionID);
             for (FactionModel faction : factionPage) {
                 Emoji emojiToUse =
                         FactionEmojis.getFactionIcon(faction.getAlias()).asEmoji();

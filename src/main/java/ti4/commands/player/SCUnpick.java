@@ -1,11 +1,11 @@
 package ti4.commands.player;
 
 import java.util.List;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;

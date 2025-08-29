@@ -1,7 +1,7 @@
 package ti4.service.tactical.planet;
 
 import java.util.List;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitType;
 import ti4.service.emoji.FactionEmojis;

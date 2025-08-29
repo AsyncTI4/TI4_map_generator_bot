@@ -14,6 +14,8 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
@@ -21,9 +23,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -645,7 +645,7 @@ public class UnfiledButtonHandlers {
             case "st" -> { // Sarween Tools
                 player.addSpentThing("sarween");
                 String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
-                ButtonHelper.deleteTheOneButton(event, event.getButton().getId(), false);
+                ButtonHelper.deleteTheOneButton(event, event.getButton().getCustomId(), false);
                 player.setSarweenCounter(player.getSarweenCounter() + 1);
                 String msg =
                         player.getFactionEmoji() + " has used _Sarween Tools_ to save " + player.getSarweenCounter()
@@ -695,7 +695,7 @@ public class UnfiledButtonHandlers {
             case "absol_st" -> { // Absol's Sarween Tools
                 player.addSpentThing("absol_sarween");
                 String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
-                ButtonHelper.deleteTheOneButton(event, event.getButton().getId(), false);
+                ButtonHelper.deleteTheOneButton(event, event.getButton().getCustomId(), false);
                 event.getMessage().editMessage(exhaustedMessage).queue();
             }
             case "absol_pa" -> { // Absol's Psychoarcheology
@@ -2184,7 +2184,7 @@ public class UnfiledButtonHandlers {
     }
 
     public static void checkForAllReactions(@NotNull ButtonInteractionEvent event, Game game) {
-        String buttonID = event.getButton().getId();
+        String buttonID = event.getButton().getCustomId();
 
         String messageId = event.getInteraction().getMessage().getId();
         var gameMessage = GameMessageManager.getOne(game.getName(), messageId);
@@ -2253,7 +2253,7 @@ public class UnfiledButtonHandlers {
     }
 
     private static void respondAllPlayersReacted(ButtonInteractionEvent event, Game game) {
-        String buttonID = event.getButton().getId();
+        String buttonID = event.getButton().getCustomId();
         if (game == null || buttonID == null) {
             return;
         }
@@ -2708,7 +2708,7 @@ public class UnfiledButtonHandlers {
             List<ItemComponent> buttonRow = row.getComponents();
             for (ItemComponent but : buttonRow) {
                 if (but instanceof Button butt) {
-                    if (!Helper.doesListContainButtonID(buttons, butt.getId())) {
+                    if (!Helper.doesListContainButtonID(buttons, butt.getCustomId())) {
                         buttons.add(butt);
                     }
                 }
