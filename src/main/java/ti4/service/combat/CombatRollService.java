@@ -290,7 +290,9 @@ public class CombatRollService {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
-        message = removeEnd(message, ";\n");
+        if (message != null && message.endsWith(";\n")) {
+            message = message.substring(0, message.length() - 2);
+        }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         if (game.isFowMode() && isFoWPrivateChannelRoll(player, event)) {
             if (rollType == CombatRollType.SpaceCannonOffence) {
