@@ -5,11 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
-import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import ti4.buttons.Buttons;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -113,7 +108,7 @@ public class RiftUnitsHelper {
             List<ActionRow> actionRow2 = new ArrayList<>();
             String exhaustedMessage = event.getMessage().getContentRaw();
             for (ActionRow row : event.getMessage().getActionRows()) {
-                List<ItemComponent> buttonRow = row.getComponents();
+                List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
                 int buttonIndex = buttonRow.indexOf(event.getButton());
                 if (buttonIndex > -1) {
                     buttonRow.remove(buttonIndex);

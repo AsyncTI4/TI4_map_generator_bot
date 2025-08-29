@@ -156,7 +156,7 @@ class AssignHitsButtonHandlers {
                                     : " in tile " + tile.getRepresentationForButtons(game, player))
                             + ".";
 
-                    List<Button> repairButtons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, game, tile);
+                    List<Button> repairButtons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, tile);
                     MessageHelper.editMessageButtons(event, repairButtons);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                     FOWCombatThreadMirroring.mirrorMessage(event, game, msg);
@@ -165,7 +165,7 @@ class AssignHitsButtonHandlers {
                     // Refresh buttons if there was an error
                     Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
                     List<Button> repairButtons =
-                            ButtonHelper.getButtonsForRepairingUnitsInASystem(player, game, activeSystem);
+                            ButtonHelper.getButtonsForRepairingUnitsInASystem(player, activeSystem);
                     MessageHelper.editMessageButtons(event, repairButtons);
                     BotLogger.error(
                             new LogOrigin(event, game), "Error matching regex for sustaining hits: " + buttonID);

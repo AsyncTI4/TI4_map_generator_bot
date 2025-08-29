@@ -1,6 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +23,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -358,7 +357,7 @@ public class UnfiledButtonHandlers {
     public static void genericModify(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.replace("genericModify_", "");
         Tile tile = game.getTileByPosition(pos);
-        ButtonHelper.offerBuildOrRemove(player, game, event, tile);
+        ButtonHelper.offerBuildOrRemove(player, game, tile);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1097,7 +1096,7 @@ public class UnfiledButtonHandlers {
         }
 
         if (acName.contains("Rider") || acName.contains("Sanction")) {
-            AgendaHelper.reverseRider("reverse_" + acName, event, game, player);
+            AgendaHelper.reverseRider("reverse_" + acName, game, player);
         }
         if (sendReact) {
             if (game.isFowMode()) {
@@ -1168,7 +1167,7 @@ public class UnfiledButtonHandlers {
         }
         List<ActionRow> actionRow2 = new ArrayList<>();
         for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ItemComponent> buttonRow = row.getComponents();
+            List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
             int buttonIndex = buttonRow.indexOf(event.getButton());
             if (buttonIndex > -1) {
                 buttonRow.remove(buttonIndex);
@@ -1216,8 +1215,7 @@ public class UnfiledButtonHandlers {
     @ButtonHandler("getRepairButtons_")
     public static void getRepairButtons(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.replace("getRepairButtons_", "");
-        List<Button> buttons =
-                ButtonHelper.getButtonsForRepairingUnitsInASystem(player, game, game.getTileByPosition(pos));
+        List<Button> buttons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, game.getTileByPosition(pos));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), player.getRepresentationUnfogged() + ", use buttons to resolve.", buttons);
     }
@@ -1250,7 +1248,7 @@ public class UnfiledButtonHandlers {
         PlanetService.refreshPlanet(p2, planetName);
         List<ActionRow> actionRow2 = new ArrayList<>();
         for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ItemComponent> buttonRow = row.getComponents();
+            List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
             int buttonIndex = buttonRow.indexOf(event.getButton());
             if (buttonIndex > -1) {
                 buttonRow.remove(buttonIndex);
@@ -2705,8 +2703,8 @@ public class UnfiledButtonHandlers {
 
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, whatIsItFor);
         for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ItemComponent> buttonRow = row.getComponents();
-            for (ItemComponent but : buttonRow) {
+            List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
+            for (ActionRowChildComponentUnion but : buttonRow) {
                 if (but instanceof Button butt) {
                     if (!Helper.doesListContainButtonID(buttons, butt.getCustomId())) {
                         buttons.add(butt);
@@ -2731,8 +2729,8 @@ public class UnfiledButtonHandlers {
         player.resetSpentThings();
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, whatIsItFor);
         for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ItemComponent> buttonRow = row.getComponents();
-            for (ItemComponent but : buttonRow) {
+            List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
+            for (ActionRowChildComponentUnion but : buttonRow) {
                 if (but instanceof Button butt) {
                     if (!buttons.contains(butt)) {
                         buttons.add(butt);

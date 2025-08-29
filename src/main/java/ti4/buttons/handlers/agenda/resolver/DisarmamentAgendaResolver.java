@@ -22,7 +22,7 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
     public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         for (Player player : game.getRealPlayers()) {
             if (player.getPlanets().contains(winner.toLowerCase())) {
-                String units = "";
+                StringBuilder units = new StringBuilder();
                 Tile tile = game.getTileFromPlanet(winner);
                 Planet uH = ButtonHelper.getUnitHolderFromPlanetName(winner, game);
                 int count = 0;
@@ -31,7 +31,7 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
                         int amt = uH.getUnitCount(uk);
                         count += amt;
                         DestroyUnitService.destroyUnit(event, tile, game, uk, amt, uH, false);
-                        units += uk.unitEmoji().emojiString().repeat(amt);
+                        units.append(uk.unitEmoji().emojiString().repeat(amt));
                     }
                 }
                 if (count > 0) {

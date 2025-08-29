@@ -22,9 +22,9 @@ import ti4.service.map.AddTileListService;
 import ti4.service.map.AddTileService;
 import ti4.service.map.AddTileService.RandomOption;
 
-public class AddTileListRandom extends GameStateSubcommand {
+class AddTileListRandom extends GameStateSubcommand {
 
-    public AddTileListRandom() {
+    AddTileListRandom() {
         super(
                 Constants.ADD_TILE_LIST_RANDOM,
                 "Show dialog for tile list to generate map (supports random options from /map add_tile_random)",
@@ -49,7 +49,7 @@ public class AddTileListRandom extends GameStateSubcommand {
                 .setRequired(false)
                 .build();
 
-        newModalBuilder.addActionRow(sourcesInput).build();
+        newModalBuilder.addComponents(ActionRow.of(sourcesInput)).build();
         modal = newModalBuilder.build();
 
         event.replyModal(modal).queue();

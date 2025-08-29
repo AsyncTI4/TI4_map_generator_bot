@@ -150,7 +150,7 @@ public class PlayerTechService {
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "dsbelky" -> {
-                ButtonHelper.sendAllAgentsAndAbilitiesToReady(game, event, player);
+                ButtonHelper.sendAllAgentsAndAbilitiesToReady(event, player);
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "gls" -> { // Graviton

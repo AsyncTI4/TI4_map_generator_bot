@@ -1626,7 +1626,7 @@ public class TransactionHelper {
         }
 
         if (player == p1) {
-            if (getReturnPNsInPlayAreaButtons(game, p1, p2).size() > 0) {
+            if (!getReturnPNsInPlayAreaButtons(game, p1, p2).isEmpty()) {
                 stuffToTransButtons.add(Buttons.gray(
                         "startReturnPNInPlayArea_" + p2.getFaction(), "Return a Play Area Promissory Note"));
             }

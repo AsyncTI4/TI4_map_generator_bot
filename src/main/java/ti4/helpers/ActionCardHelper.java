@@ -55,10 +55,10 @@ public class ActionCardHelper {
                     getPlayActionCardButtons(game, player));
         }
 
-        sendTrapCardInfo(game, player);
+        sendTrapCardInfo(player);
     }
 
-    private static void sendTrapCardInfo(Game game, Player player) {
+    private static void sendTrapCardInfo(Player player) {
         if (player.hasAbility("cunning") || player.hasAbility("subterfuge")) { // Lih-zo trap abilities
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, getTrapCardInfo(player));
         }
@@ -186,14 +186,14 @@ public class ActionCardHelper {
         if (actionCards != null
                 && !actionCards.isEmpty()
                 && !IsPlayerElectedService.isPlayerElected(game, player, "censure")
-                && hasPrePlayCards(game, player)) {
+                && hasPrePlayCards(player)) {
             acButtons.add(Buttons.gray("checkForAllACAssignments", "Pre-Assign Action Cards"));
         }
 
         return acButtons;
     }
 
-    private static boolean hasPrePlayCards(Game game, Player player) {
+    private static boolean hasPrePlayCards(Player player) {
         List<String> prePlayable = List.of(
                 "coup",
                 "disgrace",

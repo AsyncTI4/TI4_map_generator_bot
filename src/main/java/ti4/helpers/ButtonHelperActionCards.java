@@ -2632,7 +2632,7 @@ public class ButtonHelperActionCards {
                 }
             }
         }
-        if (message.length() == 0) {
+        if (message.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     player.getRepresentationUnfogged()
