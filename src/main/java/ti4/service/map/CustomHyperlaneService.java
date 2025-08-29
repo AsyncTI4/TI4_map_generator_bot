@@ -27,7 +27,6 @@ import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
-import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
@@ -116,7 +115,7 @@ public class CustomHyperlaneService {
     }
 
     @ButtonHandler("customHyperlaneMore")
-    public static void moreHyperlaneButtons(ButtonInteractionEvent event, Game game) {
+    public static void moreHyperlaneButtons(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", HYPERLANE_MORE_BUTTONS);
     }
 
@@ -133,18 +132,18 @@ public class CustomHyperlaneService {
     }
 
     @ButtonHandler("customHyperlaneImport~MDL")
-    public static void importHyperlaneData(ButtonInteractionEvent event, Game game) {
-        Builder data = TextInput.create(Constants.SETTING_VALUE, "Hyperlane Data", TextInputStyle.PARAGRAPH);
+    public static void importHyperlaneData(ButtonInteractionEvent event) {
+        TextInput.Builder data = TextInput.create(Constants.SETTING_VALUE, "Hyperlane Data", TextInputStyle.PARAGRAPH);
 
         Modal importDataModal = Modal.create("customHyperlaneImportSave", "Import Data (overwrites existing)")
-                .addActionRow(data.build())
+            .addComponents(ActionRow.of(data.build()))
                 .build();
 
         event.replyModal(importDataModal).queue();
     }
 
     @ModalHandler("customHyperlaneImportSave")
-    public static void saveImportedHyperlaneData(ModalInteractionEvent event, Player player, Game game) {
+    public static void saveImportedHyperlaneData(ModalInteractionEvent event, Game game) {
         String importData =
                 event.getValue(Constants.SETTING_VALUE).getAsString().replace("\n", " ");
 
@@ -183,7 +182,7 @@ public class CustomHyperlaneService {
     public static void editHyperlaneData(ButtonInteractionEvent event, String buttonID, Game game) {
         String position = StringUtils.substringBetween(buttonID, "customHyperlaneEdit_", "~MDL");
 
-        Builder data = TextInput.create(
+        TextInput.Builder data = TextInput.create(
                         Constants.SETTING_VALUE, "Hyperlane Matrix (clear to delete)", TextInputStyle.PARAGRAPH)
                 .setPlaceholder("0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0")
                 .setValue("0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0")
@@ -196,14 +195,14 @@ public class CustomHyperlaneService {
         }
 
         Modal customHyperlaneModal = Modal.create("customHyperlaneSave_" + position, position + " Hyperlane")
-                .addActionRow(data.build())
+            .addComponents(ActionRow.of(data.build()))
                 .build();
 
         event.replyModal(customHyperlaneModal).queue();
     }
 
     @ModalHandler("customHyperlaneSave_")
-    public static void saveHyperlaneData(ModalInteractionEvent event, Player player, Game game) {
+    public static void saveHyperlaneData(ModalInteractionEvent event, Game game) {
         String[] modalId = event.getModalId().split("_");
         String position = modalId[1];
         String hyperlaneData =
@@ -227,24 +226,23 @@ public class CustomHyperlaneService {
     }
 
     @ButtonHandler("customHyperlaneTransform~MDL")
-    public static void transformHyperlane(ButtonInteractionEvent event, Game game) {
-        Builder data1 = TextInput.create("staticToCustom", "Static -> Custom", TextInputStyle.SHORT)
+    public static void transformHyperlane(ButtonInteractionEvent event) {
+        TextInput.Builder data1 = TextInput.create("staticToCustom", "Static -> Custom", TextInputStyle.SHORT)
                 .setPlaceholder("Comma separated positions or ALL")
                 .setRequired(false);
-        Builder data2 = TextInput.create("customToStatic", "Custom -> Static", TextInputStyle.SHORT)
+        TextInput.Builder data2 = TextInput.create("customToStatic", "Custom -> Static", TextInputStyle.SHORT)
                 .setPlaceholder("Comma separated positions or ALL")
                 .setRequired(false);
 
         Modal modal = Modal.create("customHyperlaneTransformExecute", "Transform Hyperlanes")
-                .addActionRow(data1.build())
-                .addActionRow(data2.build())
+            .addComponents(ActionRow.of(data1.build()), ActionRow.of(data2.build()))
                 .build();
 
         event.replyModal(modal).queue();
     }
 
     @ModalHandler("customHyperlaneTransformExecute")
-    public static void transformHyperlaneExecute(ModalInteractionEvent event, Player player, Game game) {
+    public static void transformHyperlaneExecute(ModalInteractionEvent event, Game game) {
         String staticToCustom = event.getValue("staticToCustom").getAsString();
         String customToStatic = event.getValue("customToStatic").getAsString();
 

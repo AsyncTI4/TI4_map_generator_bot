@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import lombok.Getter;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
@@ -273,7 +274,7 @@ public class SliceGenerationSettings extends SettingsMenu {
                 .setRequired(true)
                 .build();
         Modal modal = Modal.create(modalId, "Enter some stuff")
-                .addActionRow(ttsString)
+            .addComponents(ActionRow.of(ttsString))
                 .build();
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             buttonEvent.replyModal(modal).queue();

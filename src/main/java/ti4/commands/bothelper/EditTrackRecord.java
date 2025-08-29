@@ -1,5 +1,6 @@
 package ti4.commands.bothelper;
 
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -34,7 +35,7 @@ class EditTrackRecord extends Subcommand {
                 .setValue(prevRecord)
                 .build();
         Modal modal =
-                Modal.create(modalId, "Track Record").addActionRow(summary).build();
+                Modal.create(modalId, "Track Record").addComponents(ActionRow.of(summary)).build();
         event.replyModal(modal).queue();
     }
 }

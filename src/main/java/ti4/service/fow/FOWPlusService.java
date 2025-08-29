@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
@@ -103,7 +104,7 @@ public class FOWPlusService {
                 .build();
 
         Modal blindActivationModal = Modal.create("blindActivation_" + event.getMessageId(), "Activate a blind tile")
-                .addActionRow(position)
+            .addComponents(ActionRow.of(position))
                 .build();
 
         event.replyModal(blindActivationModal).queue();

@@ -24,6 +24,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Data;
+import net.dv8tion.jda.api.components.MessageTopLevelComponent;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponent;
+import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -5070,10 +5074,6 @@ public class ButtonHelper {
                         "This is a reminder that _Conventions of War_ is in play, so using BOMBARDMENT on cultural planets is illegal.");
             }
         }
-        // if (buttonID.contains("bombard")) {
-        //     ButtonHelper.deleteTheOneButton(event);
-        // }
-
     }
 
     public static String putInfWithMechsForStarforge(

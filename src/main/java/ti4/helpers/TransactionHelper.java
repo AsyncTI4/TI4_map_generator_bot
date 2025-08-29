@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
@@ -760,19 +761,8 @@ public class TransactionHelper {
                         .setValue("The deal is that I ")
                         .build();
 
-                // String selectId = "dealOptions_" + other;
-                // StringSelectMenu selectMenu = StringSelectMenu.create(selectId)
-                //         .setPlaceholder("Choose a deal type")
-                //         .setMinValues(1)    // minimum selections allowed
-                //         .setMaxValues(1)    // maximum selections allowed for single select
-                //         .addOptions(
-                //             SelectOption.of("Fixed price", "fixed_price").withDescription("A fixed price deal"),
-                //             SelectOption.of("Hourly", "hourly").withDescription("Pay by hour"),
-                //             SelectOption.of("Commission", "commission").withDescription("Commission-based")
-                //         )
-                //         .build();
                 Modal modal = Modal.create(modalId, "Deal Details")
-                        .addActionRow(summary)
+                    .addComponents(ActionRow.of(summary))
                         .build();
 
                 event.replyModal(modal).queue();
@@ -791,7 +781,7 @@ public class TransactionHelper {
                         .setValue("The deal is that you ")
                         .build();
                 Modal modal = Modal.create(modalId, "Deal Details")
-                        .addActionRow(summary)
+                    .addComponents(ActionRow.of(summary))
                         .build();
                 event.replyModal(modal).queue();
                 return;

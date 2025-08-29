@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -59,7 +60,7 @@ class AddTileListRandom extends GameStateSubcommand {
     public static void addMapStringFromModal(ModalInteractionEvent event, Game game) {
         String mapStringRaw = event.getValue("mapString").getAsString().replace(",", " ");
         String eronousTiles = event.getValue(Constants.INCLUDE_ERONOUS_TILES).getAsString();
-        eronousTiles = eronousTiles != null ? eronousTiles.toLowerCase().trim() : "";
+        eronousTiles = eronousTiles.toLowerCase().trim();
 
         Set<ComponentSource> sources =
                 AddTileService.getSources(game, ("y".equals(eronousTiles) || "yes".equals(eronousTiles)));

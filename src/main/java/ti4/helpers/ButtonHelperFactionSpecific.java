@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
@@ -3240,7 +3241,7 @@ public class ButtonHelperFactionSpecific {
 
         Modal blindSelectionModal = Modal.create(
                         "blindIFFSelection_" + type + "_" + event.getMessageId(), "Select position")
-                .addActionRow(position)
+            .addComponents(ActionRow.of(position))
                 .build();
         event.replyModal(blindSelectionModal).queue();
     }

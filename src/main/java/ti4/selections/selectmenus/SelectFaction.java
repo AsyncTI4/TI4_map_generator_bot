@@ -54,7 +54,7 @@ public class SelectFaction implements Selection {
         List<StringSelectMenu> menus = new ArrayList<>();
 
         for (List<FactionModel> factionPage : factionPages) {
-            Builder menuBuilder = StringSelectMenu.create(selectionID);
+            StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(selectionID);
             for (FactionModel faction : factionPage) {
                 Emoji emojiToUse =
                         FactionEmojis.getFactionIcon(faction.getAlias()).asEmoji();
