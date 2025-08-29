@@ -1,18 +1,20 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.DiceHelper.Die;
@@ -843,6 +845,14 @@ public class ButtonHelperAbilities {
                 MessageHelper.sendMessageToChannel(pillaged.getCorrectChannel(), pillagedMessage);
             } else {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), pillagerMessage + "\n" + pillagedMessage);
+            }
+            int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 6);
+            if(randomJokeChance == 5){
+                randomJokeChance = ThreadLocalRandom.current().nextInt(1, 6);
+                File audioFile = ResourceHelper.getFile("voices/mentak/", "Pillage"+randomJokeChance+".mp3");
+                if (audioFile.exists()) {
+                    MessageHelper.sendFileToChannel(player.getCorrectChannel(), audioFile);
+                }
             }
             if (player.hasUnexhaustedLeader("mentakagent")) {
                 List<Button> buttons = new ArrayList<>();

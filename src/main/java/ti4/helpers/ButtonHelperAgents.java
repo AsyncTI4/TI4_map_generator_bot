@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,13 +8,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
+import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
@@ -587,6 +591,13 @@ public class ButtonHelperAgents {
                     player.getRepresentation() + " placed " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
                             + " on top of " + ssruuClever + "Artuno the Betrayer, a Nomad" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, messageText);
+            int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 11);
+            if(randomJokeChance == 10){
+                File audioFile = ResourceHelper.getFile("voices/nomad/", "Artuno.mp3");
+                if (audioFile.exists()) {
+                    MessageHelper.sendFileToChannel(player.getCorrectChannel(), audioFile);
+                }
+            }
         }
         if ("naazagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
@@ -1346,6 +1357,7 @@ public class ButtonHelperAgents {
             }
             if (!actionRow2.isEmpty()
                     && !exhaustedMessage.contains("choose the user of the agent")
+                    && !exhaustedMessage.contains("wanna ")
                     && !exhaustedMessage.contains("please choose the faction to give")
                     && !exhaustedMessage.contains("choose the target of the agent")) {
                 if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 1) {
