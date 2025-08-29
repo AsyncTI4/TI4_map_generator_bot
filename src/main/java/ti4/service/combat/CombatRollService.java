@@ -1,6 +1,8 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -881,9 +883,7 @@ public class CombatRollService {
                 player.setExpectedHitsTimes10(
                         player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
                 int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
-                if (CombatRollType.combatround == CombatRollType.combatround
-                        && gloryHolder != null
-                        && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
+                if (gloryHolder != null && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
                     for (DiceHelper.Die die : resultRolls2) {
                         if (die.getResult() > 9) {
                             hitRolls2 += 1;
@@ -1064,7 +1064,7 @@ public class CombatRollService {
                             .map(entry -> new ImmutablePair<>(
                                     player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder), entry.getValue()))
                             .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
-                    HashMap<UnitModel, Integer> output2;
+                    Map<UnitModel, Integer> output2;
                     output2 = new HashMap<>(unitsInCombat2.entrySet().stream()
                             .filter(entry -> entry.getKey() != null
                                     && (entry.getKey().getIsGroundForce()
@@ -1108,7 +1108,7 @@ public class CombatRollService {
 
         Map<UnitModel, Integer> unitsInCombat = getUnitsInCombat(player, unitsByAsyncId);
 
-        HashMap<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
+        Map<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
                 .filter(entry -> entry.getKey() != null && entry.getKey().getAfbDieCount(player, player.getGame()) > 0)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
         checkBadUnits(player, event, unitsByAsyncId, output);
@@ -1196,7 +1196,7 @@ public class CombatRollService {
             unitsOnPlanet.put(planetFakeUnit, 1);
         }
 
-        HashMap<UnitModel, Integer> output = new HashMap<>(unitsOnPlanet.entrySet().stream()
+        Map<UnitModel, Integer> output = new HashMap<>(unitsOnPlanet.entrySet().stream()
                 .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount() > 0)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 

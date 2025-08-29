@@ -3,11 +3,7 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.MessageTopLevelComponentUnion;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
-import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.components.tree.MessageComponentTree;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -26,31 +22,16 @@ class ButtonHelperExplore {
     public static void exploreFront(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("exploreFront_", "");
         ButtonHelper.resolveFullFrontierExplore(game, player, game.getTileByPosition(pos), event);
-        List<ActionRow> actionRow2 = new ArrayList<>();
         Message message = event.getMessage();
         String exhaustedMessage = message.getContentRaw();
-        MessageComponentTree components = message.getComponentTree();
-
-        for (MessageTopLevelComponentUnion row : components.getComponents()) {
-            List<ActionRowChildComponentUnion> buttonRow = row.asActionRow().getComponents();
-            int buttonIndex = buttonRow.indexOf(event.getButton());
-            if (buttonIndex > -1) {
-                buttonRow.remove(buttonIndex);
-            }
-            if (!buttonRow.isEmpty()) {
-                actionRow2.add(ActionRow.of(buttonRow));
-            }
-        }
         if ("".equalsIgnoreCase(exhaustedMessage)) {
             exhaustedMessage = "Explore";
         }
-        if (!actionRow2.isEmpty()) {
-            message
-                    .editMessage(exhaustedMessage)
-                    .setComponents(actionRow2)
-                    .queue();
-        } else {
-            ButtonHelper.deleteMessage(event);
+        boolean deletedMessage = ButtonHelper.removeButtonOrDeleteMessageIfOnly1Button(event);
+        if (!deletedMessage) {
+            event.getMessage()
+                .editMessage(exhaustedMessage)
+                .queue();
         }
     }
 

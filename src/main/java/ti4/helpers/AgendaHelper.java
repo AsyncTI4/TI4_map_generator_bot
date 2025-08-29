@@ -16,9 +16,6 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.components.MessageTopLevelComponentUnion;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
-import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
@@ -1193,17 +1190,6 @@ public class AgendaHelper {
                 player.exhaustPlanet(planet);
             }
         }
-        List<ActionRow> actionRow2 = new ArrayList<>();
-        for (MessageTopLevelComponentUnion row : event.getMessage().getComponents()) {
-            List<ActionRowChildComponentUnion> buttonRow = row.asActionRow().getComponents();
-            int buttonIndex = buttonRow.indexOf(event.getButton());
-            if (buttonIndex > -1) {
-                buttonRow.remove(buttonIndex);
-            }
-            if (!buttonRow.isEmpty()) {
-                actionRow2.add(ActionRow.of(buttonRow));
-            }
-        }
         String totalVotesSoFar = event.getMessage().getContentRaw();
         if (!buttonID.contains("argent")
                 && !buttonID.contains("blood")
@@ -1222,12 +1208,10 @@ public class AgendaHelper {
                         + totalVotesSoFar.substring(totalVotesSoFar.indexOf('\n'))
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
             }
-            if (!actionRow2.isEmpty()) {
-                event.getMessage()
-                        .editMessage(totalVotesSoFar)
-                        .setComponents(actionRow2)
-                        .queue();
-            }
+            event.getMessage()
+                .editMessage(totalVotesSoFar)
+                .queue();
+            ButtonHelper.removeButton(event);
         } else {
             if ("Exhaust stuff".equalsIgnoreCase(totalVotesSoFar)) {
                 totalVotesSoFar =

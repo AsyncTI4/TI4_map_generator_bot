@@ -1166,22 +1166,11 @@ public class UnfiledButtonHandlers {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             }
         }
-        List<ActionRow> actionRow2 = new ArrayList<>();
-        for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
-            int buttonIndex = buttonRow.indexOf(event.getButton());
-            if (buttonIndex > -1) {
-                buttonRow.remove(buttonIndex);
-            }
-            if (!buttonRow.isEmpty()) {
-                actionRow2.add(ActionRow.of(buttonRow));
-            }
-        }
         String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, whatIsItFor);
         event.getMessage()
                 .editMessage(exhaustedMessage)
-                .setComponents(actionRow2)
                 .queue();
+        ButtonHelper.removeButton(event);
     }
 
     @ButtonHandler("autoneticMemoryStep3")
@@ -1247,17 +1236,6 @@ public class UnfiledButtonHandlers {
         }
 
         PlanetService.refreshPlanet(p2, planetName);
-        List<ActionRow> actionRow2 = new ArrayList<>();
-        for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
-            int buttonIndex = buttonRow.indexOf(event.getButton());
-            if (buttonIndex > -1) {
-                buttonRow.remove(buttonIndex);
-            }
-            if (!buttonRow.isEmpty()) {
-                actionRow2.add(ActionRow.of(buttonRow));
-            }
-        }
         String totalVotesSoFar = event.getMessage().getContentRaw();
         if (totalVotesSoFar.contains("Readied")) {
             totalVotesSoFar += ", " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
@@ -1265,12 +1243,10 @@ public class UnfiledButtonHandlers {
             totalVotesSoFar = player.getFactionEmojiOrColor() + " Readied "
                     + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
         }
-        if (!actionRow2.isEmpty()) {
-            event.getMessage()
-                    .editMessage(totalVotesSoFar)
-                    .setComponents(actionRow2)
-                    .queue();
-        }
+        event.getMessage()
+            .editMessage(totalVotesSoFar)
+            .queue();
+        ButtonHelper.removeButton(event);
     }
 
     // @ButtonHandler("strategicAction_")
@@ -2703,7 +2679,7 @@ public class UnfiledButtonHandlers {
         }
 
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, whatIsItFor);
-        for (ActionRow row : event.getMessage().getActionRows()) {
+        for (ActionRow row : event.getMessage().getComponentTree().findAll(ActionRow.class)) {
             List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
             for (ActionRowChildComponentUnion but : buttonRow) {
                 if (but instanceof Button butt) {
@@ -2729,7 +2705,7 @@ public class UnfiledButtonHandlers {
         }
         player.resetSpentThings();
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, whatIsItFor);
-        for (ActionRow row : event.getMessage().getActionRows()) {
+        for (ActionRow row : event.getMessage().getComponentTree().findAll(ActionRow.class)) {
             List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
             for (ActionRowChildComponentUnion but : buttonRow) {
                 if (but instanceof Button butt) {

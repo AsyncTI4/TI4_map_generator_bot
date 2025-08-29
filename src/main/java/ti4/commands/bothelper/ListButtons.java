@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 
 class ListButtons extends Subcommand {
 
-    public ListButtons() {
+    ListButtons() {
         super("list_buttons", "list button IDs on a message");
         addOption(OptionType.STRING, "message_id", "Message ID of the message of which to list buttons", true);
         addOption(OptionType.STRING, "channel_id", "Channel where the message is located", false);
@@ -47,9 +47,8 @@ class ListButtons extends Subcommand {
                         return;
                     }
 
-                    msg.getButtons();
                     StringBuilder sb = new StringBuilder("Button details:\n>>> ");
-                    for (Button b : msg.getButtons()) {
+                    for (Button b : msg.getComponentTree().findAll(Button.class)) {
                         sb.append(ButtonHelper.getButtonRepresentation(b)).append("\n");
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());

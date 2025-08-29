@@ -3,8 +3,6 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
-import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -70,17 +68,6 @@ class ButtonHelperRelics {
         } else {
             String msg = " exhausted _The Prophet's Tears_.";
             String exhaustedMessage = event.getMessage().getContentRaw();
-            List<ActionRow> actionRow2 = new ArrayList<>();
-            for (ActionRow row : event.getMessage().getActionRows()) {
-                List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
-                int buttonIndex = buttonRow.indexOf(event.getButton());
-                if (buttonIndex > -1) {
-                    buttonRow.remove(buttonIndex);
-                }
-                if (!buttonRow.isEmpty()) {
-                    actionRow2.add(ActionRow.of(buttonRow));
-                }
-            }
             if (!exhaustedMessage.contains("Please choose the")) {
                 exhaustedMessage += ", " + msg;
             } else {
@@ -88,8 +75,8 @@ class ButtonHelperRelics {
             }
             event.getMessage()
                     .editMessage(exhaustedMessage)
-                    .setComponents(actionRow2)
                     .queue();
+            ButtonHelper.removeButton(event);
         }
     }
 
