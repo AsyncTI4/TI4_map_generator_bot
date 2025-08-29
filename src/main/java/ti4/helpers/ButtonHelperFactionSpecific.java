@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import static org.apache.commons.lang3.StringUtils.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,7 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -22,7 +27,7 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.jetbrains.annotations.NotNull;
+import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.DiceHelper.Die;
@@ -568,6 +573,13 @@ public class ButtonHelperFactionSpecific {
             unitHolder.addDamagedUnit(Mapper.getUnitKey("cavalry", player.getColorID()), 1);
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 6);
+        if(randomJokeChance == 5){
+            File audioFile = ResourceHelper.getFile("voices/nomad/", "Cavalry.mp3");
+            if (audioFile.exists()) {
+                MessageHelper.sendFileToChannel(player.getCorrectChannel(), audioFile);
+            }
+        }
     }
 
     public static void cleanCavUp(Game game, GenericInteractionCreateEvent event) {

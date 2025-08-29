@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -33,7 +34,7 @@ public class ShowActionCardsService {
 
         Button showFullTextButton = null;
         if (showFullText) {
-            sb.append(actionCardListFullText(discards, "Action card discard list"));
+            sb.append(actionCardListFullText(discards, "Action card discard list",game));
         } else {
             sb.append(discardListCondensed(discards, "Action card discard list"));
             showFullTextButton = Buttons.green("ACShowDiscardFullText", "Show Full Text");
@@ -41,15 +42,19 @@ public class ShowActionCardsService {
         MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), sb.toString(), showFullTextButton);
     }
 
-    private static String actionCardListFullText(List<Map.Entry<String, Integer>> discards, String title) {
+    private static String actionCardListFullText(List<Map.Entry<String, Integer>> discards, String title, Game game) {
         // Set up the entry list
         List<Map.Entry<String, Integer>> aclist = new ArrayList<>(discards);
         Collections.reverse(aclist);
         Map<String, List<Map.Entry<String, Integer>>> cardsByName = new LinkedHashMap<>();
         aclist.forEach(ac -> {
-            String name = Mapper.getActionCard(ac.getKey()).getName();
-            if (!cardsByName.containsKey(name)) cardsByName.put(name, new ArrayList<>());
-            cardsByName.get(name).addFirst(ac);
+            if(Mapper.getActionCard(ac.getKey()) != null){
+                String name = Mapper.getActionCard(ac.getKey()).getName();
+                if (!cardsByName.containsKey(name)) cardsByName.put(name, new ArrayList<>());
+                    cardsByName.get(name).addFirst(ac);
+            }else{
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(),"Null AC with id "+ac.getKey() +" "+ac.getValue());
+            }
         });
         List<Map.Entry<String, List<Map.Entry<String, Integer>>>> entries = new ArrayList<>(cardsByName.entrySet());
         Collections.reverse(entries);

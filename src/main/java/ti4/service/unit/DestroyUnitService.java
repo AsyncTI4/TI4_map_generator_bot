@@ -1,12 +1,17 @@
 package ti4.service.unit;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+
+import org.apache.commons.lang3.function.Consumers;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.function.Consumers;
+import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -198,6 +203,11 @@ public class DestroyUnitService {
                     UnitHolder uh = unit.tile().getSpaceUnitHolder();
                     for (Player player_ : game.getPlayers().values()) {
                         destroyAllPlayerNonStructureUnits(event, game, player_, unit.tile(), uh, combat);
+                    }
+                    int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 3);
+                    File audioFile = ResourceHelper.getFile("voices/yin/", "Bomb"+randomJokeChance+".mp3");
+                    if (audioFile.exists()) {
+                        MessageHelper.sendFileToChannel(event.getMessageChannel(), audioFile);
                     }
                     DisasterWatchHelper.postTileInDisasterWatch(
                             game, event, unit.tile(), 0, player.getRepresentation() + " has detonated the bomb.");
