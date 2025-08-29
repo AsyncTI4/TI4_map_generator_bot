@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
-import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -110,28 +108,15 @@ public class RiftUnitsHelper {
                     .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
                     .queue();
         } else {
-            List<ActionRow> actionRow2 = new ArrayList<>();
-            String exhaustedMessage = event.getMessage().getContentRaw();
-            for (ActionRow row : event.getMessage().getActionRows()) {
-                List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
-                int buttonIndex = buttonRow.indexOf(event.getButton());
-                if (buttonIndex > -1) {
-                    buttonRow.remove(buttonIndex);
+            boolean deletedMessage = ButtonHelper.removeButtonOrDeleteMessageIfOnly1Button(event);
+            if (!deletedMessage) {
+                String exhaustedMessage = event.getMessage().getContentRaw();
+                if ("".equalsIgnoreCase(exhaustedMessage)) {
+                    exhaustedMessage = "Rift";
                 }
-                if (!buttonRow.isEmpty()) {
-                    actionRow2.add(ActionRow.of(buttonRow));
-                }
-            }
-            if ("".equalsIgnoreCase(exhaustedMessage)) {
-                exhaustedMessage = "Rift";
-            }
-            if (!actionRow2.isEmpty()) {
                 event.getMessage()
-                        .editMessage(exhaustedMessage)
-                        .setComponents(actionRow2)
-                        .queue();
-            } else {
-                ButtonHelper.deleteMessage(event);
+                    .editMessage(exhaustedMessage)
+                    .queue();
             }
         }
     }

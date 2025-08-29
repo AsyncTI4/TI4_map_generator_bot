@@ -1342,7 +1342,7 @@ public class ButtonHelperAgents {
             int buttons = 0;
             List<ActionRow> actionRow2 = new ArrayList<>();
 
-            for (ActionRow row : buttonEvent.getMessage().getActionRows()) {
+            for (ActionRow row : buttonEvent.getMessage().getComponentTree().findAll(ActionRow.class)) {
                 List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
                 int buttonIndex = buttonRow.indexOf(buttonEvent.getButton());
                 if (buttonIndex > -1 && !"nomadagentmercer".equalsIgnoreCase(agent)) {
@@ -2534,21 +2534,10 @@ public class ButtonHelperAgents {
         if (exhaustedMessage.isEmpty()) {
             exhaustedMessage = "Combat";
         }
-        List<ActionRow> actionRow2 = new ArrayList<>();
-        for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
-            int buttonIndex = buttonRow.indexOf(event.getButton());
-            if (buttonIndex > -1) {
-                buttonRow.remove(buttonIndex);
-            }
-            if (!buttonRow.isEmpty()) {
-                actionRow2.add(ActionRow.of(buttonRow));
-            }
-        }
         event.getMessage()
                 .editMessage(exhaustedMessage)
-                .setComponents(actionRow2)
                 .queue();
+        ButtonHelper.removeButton(event);
     }
 
     private static List<Button> getJolNarAgentButtons(Player player, Game game) {
