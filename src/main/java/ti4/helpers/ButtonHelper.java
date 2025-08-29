@@ -5666,7 +5666,9 @@ public class ButtonHelper {
         int h = Integer.parseInt(hits);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
-        message = removeEnd(message, ";\n");
+        if (message != null && message.endsWith(";\n")) {
+            message = message.substring(0, message.length() - 2);
+        }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         if (!game.isFowMode() && combatOnHolder instanceof Planet && h > 0 && opponent != player) {
             String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit"
