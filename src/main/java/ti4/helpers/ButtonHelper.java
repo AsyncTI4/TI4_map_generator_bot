@@ -24,13 +24,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Data;
-import net.dv8tion.jda.api.components.Component;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.components.replacer.ComponentReplacer;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -7321,22 +7319,5 @@ public class ButtonHelper {
     @ButtonHandler("autoProveEndurance_")
     public static void autoProveEndurance(Player player, Game game, String buttonID) {
         game.setStoredValue("autoProveEndurance_" + player.getFaction(), buttonID.split("_")[1]);
-    }
-
-    public static void removeButton(ButtonInteractionEvent event) {
-        event.editComponents(event.getMessage()
-                        .getComponentTree()
-                        .replace(ComponentReplacer.byUniqueId(event.getUniqueId(), (Component) null)))
-                .queue();
-    }
-
-    public static boolean removeButtonOrDeleteMessageIfOnly1Button(ButtonInteractionEvent event) {
-        boolean isSingleButton = event.getMessage().getComponents().size() == 1;
-        if (isSingleButton) {
-            deleteMessage(event);
-            return true;
-        }
-        removeButton(event);
-        return false;
     }
 }

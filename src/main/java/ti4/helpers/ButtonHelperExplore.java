@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.jda.JdaComponentHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -27,7 +28,7 @@ class ButtonHelperExplore {
         if ("".equalsIgnoreCase(exhaustedMessage)) {
             exhaustedMessage = "Explore";
         }
-        boolean deletedMessage = ButtonHelper.removeButtonOrDeleteMessageIfOnly1Button(event);
+        boolean deletedMessage = JdaComponentHelper.removeComponentFromMessageAndDeleteIfEmpty(event);
         if (!deletedMessage) {
             event.getMessage().editMessage(exhaustedMessage).queue();
         }
