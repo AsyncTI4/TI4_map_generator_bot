@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.entities.MessageHistory.MessageRetrieveAction;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -42,7 +41,7 @@ public class DraftDisplayService {
         getMessageHistory(event, channel).queue(editDraftInfo(manager, game, category), BotLogger::catchRestError);
     }
 
-    public void repostDraftInformation(GenericInteractionCreateEvent event, MiltyDraftManager manager, Game game) {
+    public void repostDraftInformation(MiltyDraftManager manager, Game game) {
         MessageChannel channel = game.getMainGameChannel();
         if (channel == null) return;
 
@@ -52,11 +51,10 @@ public class DraftDisplayService {
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, SLICES, manager.getSliceButtons());
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, FACTIONS, manager.getFactionButtons());
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, POSITION, manager.getPositionButtons());
-        pingCurrentDraftPlayer(event, manager, game, true);
+        pingCurrentDraftPlayer(manager, game, true);
     }
 
-    public void pingCurrentDraftPlayer(
-            GenericInteractionCreateEvent event, MiltyDraftManager manager, Game game, boolean clearOldButtons) {
+    public void pingCurrentDraftPlayer(MiltyDraftManager manager, Game game, boolean clearOldButtons) {
         String msg = "Nobody is up to draft...";
         Player p = manager.getCurrentDraftPlayer(game);
         if (p != null) msg = "### " + p.getPing() + " is up to draft!";
@@ -109,12 +107,12 @@ public class DraftDisplayService {
 
                 if (!summaryDone && txt.startsWith(SUMMARY_START)) {
                     summaryDone = true;
-                    editMessage(game, msg, newSummary, null);
+                    editMessage(msg, newSummary, null);
                 }
 
                 if (!categoryDone && isCategory.test(txt)) {
                     categoryDone = true;
-                    editMessage(game, msg, null, categoryButtons);
+                    editMessage(msg, null, categoryButtons);
                 }
 
                 if (!sliceImgDone && messageIsSliceImg(msg)) {
@@ -126,8 +124,8 @@ public class DraftDisplayService {
         };
     }
 
-    private void editMessage(Game game, Message msg, String newMessage, List<Button> newButtons) {
-        List<LayoutComponent> newComponents = new ArrayList<>();
+    private void editMessage(Message msg, String newMessage, List<Button> newButtons) {
+        List<MessageTopLevelComponent> newComponents = new ArrayList<>();
         if (newButtons != null) {
             List<List<Button>> partitioned = new ArrayList<>(ListUtils.partition(newButtons, 5));
             List<ActionRow> newRows = partitioned.stream().map(ActionRow::of).toList();

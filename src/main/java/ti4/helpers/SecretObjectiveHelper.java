@@ -76,17 +76,17 @@ public class SecretObjectiveHelper {
                     List<String> playerFragments = player.getFragments();
                     List<String> fragmentsToPurge = new ArrayList<>(playerFragments);
                     StringBuilder message2 = new StringBuilder(player.getRepresentation() + " purged");
-                    for (String fragid : fragmentsToPurge) {
-                        player.removeFragment(fragid);
+                    for (String fragId : fragmentsToPurge) {
+                        player.removeFragment(fragId);
                         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-                        switch (fragid) {
+                        switch (fragId) {
                             case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" ->
                                 message2.append(" " + ExploreEmojis.CFrag);
                             case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->
                                 message2.append(" " + ExploreEmojis.HFrag);
                             case "irf1", "irf2", "irf3", "irf4", "irf5" -> message2.append(" " + ExploreEmojis.IFrag);
                             case "urf1", "urf2", "urf3" -> message2.append(" " + ExploreEmojis.UFrag);
-                            default -> message2.append(" ").append(fragid);
+                            default -> message2.append(" ").append(fragId);
                         }
                     }
                     CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");

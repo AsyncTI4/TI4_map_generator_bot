@@ -207,7 +207,7 @@ public class MapGenerator implements AutoCloseable {
         int unrealPlayers = game.getNotRealPlayers().size();
         playersY += unrealPlayers * unrealPlayerHeight;
         for (Player player : game.getPlayers().values()) {
-            if (player.getFaction().equalsIgnoreCase("neutral") || (player.isNpc() && player.isDummy())) {
+            if ("neutral".equalsIgnoreCase(player.getFaction()) || (player.isNpc() && player.isDummy())) {
                 playersY -= 350;
             }
             if (player.isEliminated()) {

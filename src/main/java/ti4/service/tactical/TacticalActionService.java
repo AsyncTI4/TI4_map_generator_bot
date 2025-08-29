@@ -131,7 +131,7 @@ public class TacticalActionService {
         return false;
     }
 
-    private boolean moveUnitsIntoActiveSystem(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
+    private boolean moveUnitsIntoActiveSystem(ButtonInteractionEvent event, Game game, Tile tile) {
         // Flip mallice
         if (TacticalActionDisplacementService.hasPendingDisplacement(game)) {
             tile = FlipTileService.flipTileIfNeeded(event, tile, game);
@@ -142,7 +142,7 @@ public class TacticalActionService {
             }
         }
 
-        return TacticalActionDisplacementService.applyDisplacementToActiveSystem(game, player, tile);
+        return TacticalActionDisplacementService.applyDisplacementToActiveSystem(game, tile);
     }
 
     public void finishMovement(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
@@ -195,7 +195,7 @@ public class TacticalActionService {
             ButtonInteractionEvent event, Game game, Player player, Tile tile) {
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
 
-        boolean unitsWereMoved = moveUnitsIntoActiveSystem(event, game, player, tile);
+        boolean unitsWereMoved = moveUnitsIntoActiveSystem(event, game, tile);
         Tile updatedTile = game.getTileByPosition(tile.getPosition());
         spendAndPlaceTokenIfNecessary(event, game, player, updatedTile);
 
@@ -282,10 +282,9 @@ public class TacticalActionService {
     }
 
     public static List<Button> getTilesToMoveFrom(Player player, Game game, GenericInteractionCreateEvent event) {
-        List<Button> buttons = new ArrayList<>();
 
         // Tile selection buttons
-        buttons.addAll(buildMoveFromTileSelectionButtons(player, game, event));
+        List<Button> buttons = new ArrayList<>(buildMoveFromTileSelectionButtons(player, game, event));
 
         // Ability contributions
         MoveContext pubCtx = new MoveContext(player, game, event);

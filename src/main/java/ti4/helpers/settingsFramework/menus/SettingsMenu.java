@@ -18,7 +18,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.Constants;
@@ -316,7 +315,7 @@ public abstract class SettingsMenu {
 
     private void refreshMessageAndButtons(GenericInteractionCreateEvent event, String settingTouched, int page) {
         String newSummary = menuSummaryString(settingTouched);
-        List<LayoutComponent> actionRows = new ArrayList<>();
+        List<MessageTopLevelComponent> actionRows = new ArrayList<>();
         for (List<Button> row : ListUtils.partition(getPaginatedButtons(page), 5)) {
             actionRows.add(ActionRow.of(row));
         }

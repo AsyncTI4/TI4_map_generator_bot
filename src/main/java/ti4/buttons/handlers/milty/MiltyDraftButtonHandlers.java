@@ -24,7 +24,7 @@ class MiltyDraftButtonHandlers {
     @ButtonHandler("showMiltyDraft")
     private void postDraftInfo(ButtonInteractionEvent event, Game game) {
         MiltyDraftManager manager = game.getMiltyDraftManager();
-        DraftDisplayService.repostDraftInformation(event, manager, game);
+        DraftDisplayService.repostDraftInformation(manager, game);
     }
 
     @ButtonHandler("milty_")
