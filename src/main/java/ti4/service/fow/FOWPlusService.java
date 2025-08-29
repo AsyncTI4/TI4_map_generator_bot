@@ -104,7 +104,7 @@ public class FOWPlusService {
                 .build();
 
         Modal blindActivationModal = Modal.create("blindActivation_" + event.getMessageId(), "Activate a blind tile")
-            .addComponents(ActionRow.of(position))
+                .addComponents(ActionRow.of(position))
                 .build();
 
         event.replyModal(blindActivationModal).queue();

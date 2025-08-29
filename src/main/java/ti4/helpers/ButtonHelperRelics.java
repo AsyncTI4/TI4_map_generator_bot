@@ -73,9 +73,7 @@ class ButtonHelperRelics {
             } else {
                 exhaustedMessage = player.getRepresentation() + msg;
             }
-            event.getMessage()
-                    .editMessage(exhaustedMessage)
-                    .queue();
+            event.getMessage().editMessage(exhaustedMessage).queue();
             ButtonHelper.removeButton(event);
         }
     }

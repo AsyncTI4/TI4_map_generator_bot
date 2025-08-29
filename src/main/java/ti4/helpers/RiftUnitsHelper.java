@@ -114,9 +114,7 @@ public class RiftUnitsHelper {
                 if ("".equalsIgnoreCase(exhaustedMessage)) {
                     exhaustedMessage = "Rift";
                 }
-                event.getMessage()
-                    .editMessage(exhaustedMessage)
-                    .queue();
+                event.getMessage().editMessage(exhaustedMessage).queue();
             }
         }
     }

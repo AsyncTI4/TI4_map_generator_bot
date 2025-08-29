@@ -29,9 +29,7 @@ class ButtonHelperExplore {
         }
         boolean deletedMessage = ButtonHelper.removeButtonOrDeleteMessageIfOnly1Button(event);
         if (!deletedMessage) {
-            event.getMessage()
-                .editMessage(exhaustedMessage)
-                .queue();
+            event.getMessage().editMessage(exhaustedMessage).queue();
         }
     }
 

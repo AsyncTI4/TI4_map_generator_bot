@@ -274,7 +274,7 @@ public class SliceGenerationSettings extends SettingsMenu {
                 .setRequired(true)
                 .build();
         Modal modal = Modal.create(modalId, "Enter some stuff")
-            .addComponents(ActionRow.of(ttsString))
+                .addComponents(ActionRow.of(ttsString))
                 .build();
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             buttonEvent.replyModal(modal).queue();

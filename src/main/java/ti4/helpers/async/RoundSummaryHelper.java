@@ -60,7 +60,7 @@ public class RoundSummaryHelper {
                 .setValue(currentSummary)
                 .build();
         Modal modal = Modal.create(modalId, "End of Round " + roundNum + " Summary")
-            .addComponents(ActionRow.of(summary))
+                .addComponents(ActionRow.of(summary))
                 .build();
         event.replyModal(modal).queue();
         // ButtonHelper.deleteMessage(event); Breaks submiting the summary for some reason

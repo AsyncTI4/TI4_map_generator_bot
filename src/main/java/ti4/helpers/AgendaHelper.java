@@ -1208,9 +1208,7 @@ public class AgendaHelper {
                         + totalVotesSoFar.substring(totalVotesSoFar.indexOf('\n'))
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
             }
-            event.getMessage()
-                .editMessage(totalVotesSoFar)
-                .queue();
+            event.getMessage().editMessage(totalVotesSoFar).queue();
             ButtonHelper.removeButton(event);
         } else {
             if ("Exhaust stuff".equalsIgnoreCase(totalVotesSoFar)) {
@@ -1224,12 +1222,8 @@ public class AgendaHelper {
                         + totalVotes
                         + totalVotesSoFar.substring(totalVotesSoFar.indexOf('\n'));
             }
-            if (!actionRow2.isEmpty()) {
-                event.getMessage()
-                        .editMessage(totalVotesSoFar)
-                        .setComponents(actionRow2)
-                        .queue();
-            }
+            event.getMessage().editMessage(totalVotesSoFar).queue();
+            ButtonHelper.removeButton(event);
             String message;
             if (buttonID.contains("everything")) {
                 message = "Exhausted all planets for " + votes + " vote" + ("1".equals(votes) ? "" : "s");
@@ -4006,11 +4000,6 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
         if (!action) {
             BannerGenerator.drawAgendaBanner(aCount, game);
-        }
-        StringBuilder whensAftersMessage = new StringBuilder(
-                "Please indicate whether you abstain from playing \"when\"s and \"after\"s.\nIf you have an action card with those windows, you may simply play it.");
-        if (action) {
-            whensAftersMessage.append("\nYou may play \"after\"s during this agenda.");
         }
 
         AutoPingMetadataManager.setupAutoPing(game.getName());

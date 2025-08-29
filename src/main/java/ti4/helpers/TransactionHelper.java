@@ -762,7 +762,7 @@ public class TransactionHelper {
                         .build();
 
                 Modal modal = Modal.create(modalId, "Deal Details")
-                    .addComponents(ActionRow.of(summary))
+                        .addComponents(ActionRow.of(summary))
                         .build();
 
                 event.replyModal(modal).queue();
@@ -781,7 +781,7 @@ public class TransactionHelper {
                         .setValue("The deal is that you ")
                         .build();
                 Modal modal = Modal.create(modalId, "Deal Details")
-                    .addComponents(ActionRow.of(summary))
+                        .addComponents(ActionRow.of(summary))
                         .build();
                 event.replyModal(modal).queue();
                 return;

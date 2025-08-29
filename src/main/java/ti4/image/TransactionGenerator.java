@@ -43,7 +43,7 @@ public class TransactionGenerator {
         // Add player 1's color
         String pn1 = "pa_pn_color_" + Mapper.getColorID(p1.getColor()) + ".png";
         BufferedImage color1 =
-                ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn1), pnHeight, pnWidth);
+                ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn1), pnWidth, pnHeight);
         g2.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
         g2.drawImage(color1, -1 * pnHeight, 0, null);
         g2.rotate(NINETY_DEGREES_RADIANS);
@@ -51,7 +51,7 @@ public class TransactionGenerator {
         // Add player 2's color
         String pn2 = "pa_pn_color_" + Mapper.getColorID(p2.getColor()) + ".png";
         BufferedImage color2 =
-                ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn2), pnHeight, pnWidth);
+                ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn2), pnWidth, pnHeight);
         g2.rotate(NINETY_DEGREES_RADIANS);
         g2.drawImage(color2, height - pnHeight, -1 * width, null);
         g2.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);

@@ -2534,9 +2534,7 @@ public class ButtonHelperAgents {
         if (exhaustedMessage.isEmpty()) {
             exhaustedMessage = "Combat";
         }
-        event.getMessage()
-                .editMessage(exhaustedMessage)
-                .queue();
+        event.getMessage().editMessage(exhaustedMessage).queue();
         ButtonHelper.removeButton(event);
     }
 

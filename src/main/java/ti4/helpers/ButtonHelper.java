@@ -2981,7 +2981,7 @@ public class ButtonHelper {
 
     @ButtonHandler("deleteMessage_") // deleteMessage_{Optional String to send to the event channel after}
     public static void deleteMessage(GenericInteractionCreateEvent event) {
-        if (event != null && event instanceof ButtonInteractionEvent bevent) {
+        if (event instanceof ButtonInteractionEvent bevent) {
             bevent.getMessage().delete().queue();
         }
     }
@@ -3063,7 +3063,8 @@ public class ButtonHelper {
     public static void deleteButtonsWithPartialID(GenericInteractionCreateEvent event, String partialID) {
         if (event instanceof ButtonInteractionEvent bevent) {
             boolean containsRealButton = false;
-            List<Button> buttons = new ArrayList<>(bevent.getMessage().getComponentTree().findAll(Button.class));
+            List<Button> buttons =
+                    new ArrayList<>(bevent.getMessage().getComponentTree().findAll(Button.class));
             List<Button> newButtons = new ArrayList<>();
             for (Button button : buttons) {
                 if (!button.getCustomId().contains(partialID)) {
@@ -7323,11 +7324,10 @@ public class ButtonHelper {
     }
 
     public static void removeButton(ButtonInteractionEvent event) {
-        event.editComponents(
-            event.getMessage()
-                .getComponentTree()
-                .replace(ComponentReplacer.byUniqueId(event.getUniqueId(), (Component) null))
-        ).queue();
+        event.editComponents(event.getMessage()
+                        .getComponentTree()
+                        .replace(ComponentReplacer.byUniqueId(event.getUniqueId(), (Component) null)))
+                .queue();
     }
 
     public static boolean removeButtonOrDeleteMessageIfOnly1Button(ButtonInteractionEvent event) {

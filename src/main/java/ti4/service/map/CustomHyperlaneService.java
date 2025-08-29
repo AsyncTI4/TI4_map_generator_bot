@@ -136,7 +136,7 @@ public class CustomHyperlaneService {
         TextInput.Builder data = TextInput.create(Constants.SETTING_VALUE, "Hyperlane Data", TextInputStyle.PARAGRAPH);
 
         Modal importDataModal = Modal.create("customHyperlaneImportSave", "Import Data (overwrites existing)")
-            .addComponents(ActionRow.of(data.build()))
+                .addComponents(ActionRow.of(data.build()))
                 .build();
 
         event.replyModal(importDataModal).queue();
@@ -195,7 +195,7 @@ public class CustomHyperlaneService {
         }
 
         Modal customHyperlaneModal = Modal.create("customHyperlaneSave_" + position, position + " Hyperlane")
-            .addComponents(ActionRow.of(data.build()))
+                .addComponents(ActionRow.of(data.build()))
                 .build();
 
         event.replyModal(customHyperlaneModal).queue();
@@ -235,7 +235,7 @@ public class CustomHyperlaneService {
                 .setRequired(false);
 
         Modal modal = Modal.create("customHyperlaneTransformExecute", "Transform Hyperlanes")
-            .addComponents(ActionRow.of(data1.build()), ActionRow.of(data2.build()))
+                .addComponents(ActionRow.of(data1.build()), ActionRow.of(data2.build()))
                 .build();
 
         event.replyModal(modal).queue();
