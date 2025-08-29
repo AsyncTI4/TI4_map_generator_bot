@@ -42,8 +42,8 @@ abstract class AddRemoveFactionCCToFromFleet extends GameStateSubcommand {
                 }
             }
         }
-        action(event, colors, game, getPlayer());
+        action(colors, game, getPlayer());
     }
 
-    abstract void action(SlashCommandInteractionEvent event, List<String> color, Game game, Player player);
+    abstract void action(List<String> color, Game game, Player player);
 }

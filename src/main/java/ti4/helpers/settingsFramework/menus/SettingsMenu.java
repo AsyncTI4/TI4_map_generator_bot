@@ -9,16 +9,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
+import net.dv8tion.jda.api.components.MessageTopLevelComponent;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.LayoutComponent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.Constants;
@@ -316,7 +316,7 @@ public abstract class SettingsMenu {
 
     private void refreshMessageAndButtons(GenericInteractionCreateEvent event, String settingTouched, int page) {
         String newSummary = menuSummaryString(settingTouched);
-        List<LayoutComponent> actionRows = new ArrayList<>();
+        List<MessageTopLevelComponent> actionRows = new ArrayList<>();
         for (List<Button> row : ListUtils.partition(getPaginatedButtons(page), 5)) {
             actionRows.add(ActionRow.of(row));
         }

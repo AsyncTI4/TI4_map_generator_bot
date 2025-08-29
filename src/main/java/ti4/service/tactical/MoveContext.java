@@ -16,7 +16,7 @@ public final class MoveContext {
         this.player = player;
         this.game = game;
         this.event = event;
-        this.activeSystem = game.getActiveSystem();
-        this.active = game.getTileByPosition(this.activeSystem);
+        activeSystem = game.getActiveSystem();
+        active = game.getTileByPosition(activeSystem);
     }
 }

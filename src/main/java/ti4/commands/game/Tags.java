@@ -1,7 +1,7 @@
 package ti4.commands.game;
 
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.GameStateSubcommand;
 import ti4.message.MessageHelper;

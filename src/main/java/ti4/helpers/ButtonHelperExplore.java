@@ -2,11 +2,12 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -15,6 +16,7 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 
+@UtilityClass
 class ButtonHelperExplore {
 
     @ButtonHandler("exploreFront_")
@@ -24,7 +26,7 @@ class ButtonHelperExplore {
         List<ActionRow> actionRow2 = new ArrayList<>();
         String exhaustedMessage = event.getMessage().getContentRaw();
         for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ItemComponent> buttonRow = row.getComponents();
+            List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
             int buttonIndex = buttonRow.indexOf(event.getButton());
             if (buttonIndex > -1) {
                 buttonRow.remove(buttonIndex);
