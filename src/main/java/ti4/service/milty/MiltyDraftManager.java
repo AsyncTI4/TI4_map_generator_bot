@@ -13,10 +13,10 @@ import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Data;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
@@ -398,7 +398,7 @@ public class MiltyDraftManager {
                 doMiltyPick(event, game, fauxPlayerPick, nextDrafter);
             } else {
                 DraftDisplayService.updateDraftInformation(event, this, game, category);
-                DraftDisplayService.pingCurrentDraftPlayer(event, this, game, false);
+                DraftDisplayService.pingCurrentDraftPlayer(this, game, false);
             }
         } else {
             MessageHelper.sendMessageToChannel(

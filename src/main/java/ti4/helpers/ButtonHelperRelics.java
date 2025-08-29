@@ -2,11 +2,12 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -16,10 +17,11 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 
+@UtilityClass
 class ButtonHelperRelics {
 
     @ButtonHandler("jrResolution_")
-    public static void jrResolution(Player player, String buttonID, Game game, ButtonInteractionEvent event) {
+    public static void jrResolution(String buttonID, Game game, ButtonInteractionEvent event) {
         String faction2 = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction2);
         if (p2 != null) {
@@ -70,7 +72,7 @@ class ButtonHelperRelics {
             String exhaustedMessage = event.getMessage().getContentRaw();
             List<ActionRow> actionRow2 = new ArrayList<>();
             for (ActionRow row : event.getMessage().getActionRows()) {
-                List<ItemComponent> buttonRow = row.getComponents();
+                List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
                 int buttonIndex = buttonRow.indexOf(event.getButton());
                 if (buttonIndex > -1) {
                     buttonRow.remove(buttonIndex);

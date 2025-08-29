@@ -210,7 +210,7 @@ class SetPolicy extends GameStateSubcommand {
         Game game = getGame();
         DiscordantStarsHelper.checkOlradinMech(game);
 
-        AbilityInfoService.sendAbilityInfo(game, player, event);
+        AbilityInfoService.sendAbilityInfo(player, event);
         MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "", List.of(unitModel.getRepresentationEmbed(false)));
     }
 

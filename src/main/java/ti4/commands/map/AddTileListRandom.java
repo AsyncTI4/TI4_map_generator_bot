@@ -6,11 +6,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.modals.Modal;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.listeners.annotations.ModalHandler;
@@ -22,9 +22,9 @@ import ti4.service.map.AddTileListService;
 import ti4.service.map.AddTileService;
 import ti4.service.map.AddTileService.RandomOption;
 
-public class AddTileListRandom extends GameStateSubcommand {
+class AddTileListRandom extends GameStateSubcommand {
 
-    public AddTileListRandom() {
+    AddTileListRandom() {
         super(
                 Constants.ADD_TILE_LIST_RANDOM,
                 "Show dialog for tile list to generate map (supports random options from /map add_tile_random)",

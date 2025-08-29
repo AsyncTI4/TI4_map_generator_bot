@@ -33,7 +33,7 @@ public class TacticalActionDisplacementService {
         Pattern rx = Pattern.compile(RegexHelper.posRegex(game) + "-" + RegexHelper.unitHolderRegex(game, "uh"));
         for (String uhKey : displacedKeys) {
             if (!displaced.containsKey(uhKey)) continue;
-            if (uhKey.equals("unk")) continue;
+            if ("unk".equals(uhKey)) continue;
 
             RegexService.runMatcher(rx, uhKey, matcher -> {
                 Tile tile = game.getTileByPosition(matcher.group("pos"));
@@ -161,7 +161,7 @@ public class TacticalActionDisplacementService {
         return game.getTacticalActionDisplacement();
     }
 
-    public boolean applyDisplacementToActiveSystem(Game game, Player player, Tile tile) {
+    public boolean applyDisplacementToActiveSystem(Game game, Tile tile) {
         boolean moved = false;
         UnitHolder activeSystemSpace = tile.getSpaceUnitHolder();
         for (Entry<String, Map<UnitKey, List<Integer>>> e :

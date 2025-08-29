@@ -8,12 +8,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
@@ -1343,7 +1343,7 @@ public class ButtonHelperAgents {
             List<ActionRow> actionRow2 = new ArrayList<>();
 
             for (ActionRow row : buttonEvent.getMessage().getActionRows()) {
-                List<ItemComponent> buttonRow = row.getComponents();
+                List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
                 int buttonIndex = buttonRow.indexOf(buttonEvent.getButton());
                 if (buttonIndex > -1 && !"nomadagentmercer".equalsIgnoreCase(agent)) {
                     buttonRow.remove(buttonIndex);
@@ -2536,7 +2536,7 @@ public class ButtonHelperAgents {
         }
         List<ActionRow> actionRow2 = new ArrayList<>();
         for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ItemComponent> buttonRow = row.getComponents();
+            List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
             int buttonIndex = buttonRow.indexOf(event.getButton());
             if (buttonIndex > -1) {
                 buttonRow.remove(buttonIndex);

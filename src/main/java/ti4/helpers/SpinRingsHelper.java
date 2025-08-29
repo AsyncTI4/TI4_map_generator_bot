@@ -184,7 +184,7 @@ public class SpinRingsHelper {
 
                 if (y == 2) {
                     if ((x - 2) < 1) {
-                        tile.setPosition(2 + "" + ((x - y) + (y * 6)));
+                        tile.setPosition(2 + "" + ((x - 2) + (2 * 6)));
                     } else {
                         if ((x - y) < 10) {
                             tile.setPosition(y + "0" + (x - y));
