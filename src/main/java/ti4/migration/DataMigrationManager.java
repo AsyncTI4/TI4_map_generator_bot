@@ -12,6 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
+import ti4.map.helper.GameHelper;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
 import ti4.message.logging.BotLogger;
@@ -19,7 +20,6 @@ import ti4.message.logging.BotLogger;
 @UtilityClass
 public class DataMigrationManager {
 
-    private static final DateTimeFormatter MAP_CREATED_ON_FORMAT = DateTimeFormatter.ofPattern("yyyy.MM.dd");
     private static final DateTimeFormatter MIGRATION_DATE_FORMATTER = DateTimeFormatter.ofPattern("ddMMyy");
 
     ///
@@ -105,7 +105,7 @@ public class DataMigrationManager {
 
             LocalDate mapCreatedOn = null;
             try {
-                mapCreatedOn = LocalDate.parse(managedGame.getCreationDate(), MAP_CREATED_ON_FORMAT);
+                mapCreatedOn = LocalDate.parse(managedGame.getCreationDate(), GameHelper.CREATION_DATE_FORMATTER);
             } catch (Exception ignored) {
             }
 

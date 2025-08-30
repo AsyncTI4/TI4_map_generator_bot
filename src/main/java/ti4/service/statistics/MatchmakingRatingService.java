@@ -42,7 +42,7 @@ public class MatchmakingRatingService {
         GamesPage.consumeAllGames(
                 GameStatisticsFilterer.getFinishedGamesFilter(6, null).and(not(Game::isAllianceMode)),
                 game -> games.add(MatchmakingGame.from(game)));
-        games.sort(Comparator.comparingLong(MatchmakingGame::endedDate));
+        games.sort(Comparator.comparingLong(MatchmakingGame::endedDate).thenComparing(MatchmakingGame::name));
 
         var calculator = new FactorGraphTrueSkillCalculator();
         for (MatchmakingGame game : games) {
@@ -124,18 +124,23 @@ public class MatchmakingRatingService {
 
     private record PlayerRating(String userId, String username, double rating, double calibrationPercent) {}
 
-    private record MatchmakingGame(long endedDate, List<MatchmakingPlayer> players) {
+    private record MatchmakingGame(String name, long endedDate, List<MatchmakingPlayer> players) {
 
         static MatchmakingGame from(Game game) {
-            List<MatchmakingPlayer> players = game.getRealAndEliminatedPlayers().stream()
+            return new MatchmakingGame(game.getName(), game.getEndedDate(), getPlayers(game));
+        }
+
+        private static List<MatchmakingPlayer> getPlayers(Game game) {
+            return game.getRealAndEliminatedPlayers().stream()
                     .map(player -> {
                         boolean isWinner = game.getWinners().stream()
                                 .anyMatch(gamePlayer -> gamePlayer.getUserID().equals(player.getUserID()));
                         int rank = isWinner ? 1 : game.getVp() - player.getTotalVictoryPoints() <= 3 ? 2 : 3;
                         return new MatchmakingPlayer(player.getUserID(), rank);
                     })
+                    // it is recommended to always pass in sorted data when ties can occur
+                    .sorted(Comparator.comparing(MatchmakingPlayer::userId))
                     .toList();
-            return new MatchmakingGame(game.getEndedDate(), players);
         }
     }
 
