@@ -44,9 +44,7 @@ public class MatchmakingRatingService {
         GamesPage.consumeAllGames(
                 GameStatisticsFilterer.getFinishedGamesFilter(6, null).and(not(Game::isAllianceMode)),
                 game -> games.add(MatchmakingGame.from(game)));
-        games = games.stream()
-                .sorted(Comparator.comparingLong(MatchmakingGame::endedDate))
-                .toList();
+        games.sort(Comparator.comparingLong(MatchmakingGame::endedDate));
 
         var calculator = new FactorGraphTrueSkillCalculator();
         for (MatchmakingGame game : games) {
@@ -140,6 +138,7 @@ public class MatchmakingRatingService {
 
     private record MatchmakingGame(
             long endedDate, int vp, List<MatchmakingPlayer> players, Set<String> winners) {
+
         static MatchmakingGame from(Game game) {
             List<MatchmakingPlayer> players = game.getRealAndEliminatedPlayers().stream()
                     .map(p -> new MatchmakingPlayer(p.getUserID(), p.getTotalVictoryPoints()))
