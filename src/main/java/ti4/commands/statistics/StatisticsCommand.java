@@ -19,7 +19,7 @@ public class StatisticsCommand implements ParentCommand {
                     new MedianTurnTime(),
                     new CompareAFKTimes(),
                     new DiceLuck(),
-                    //new MatchMakingRatingCommand(), TODO: Add this back once we safely compute it once per day.
+                    // new MatchMakingRatingCommand(), TODO: Add this back once we safely compute it once per day.
                     new LifetimeRecord(),
                     new FactionRecordOfTech(),
                     new FactionRecordOfSCPick(),
