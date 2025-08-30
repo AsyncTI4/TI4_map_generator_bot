@@ -59,7 +59,7 @@ public class MatchmakingRatingService {
                 var team = new Team();
                 team.addPlayer(tsPlayer, rating);
                 teams.add(team);
-                ranks[i] = getRank(game, gamePlayer);
+                ranks[i] = gamePlayer.rank();
             }
             Map<IPlayer, Rating> newRatings = calculator.calculateNewRatings(gameInfo, teams, ranks);
             ratings.putAll(newRatings);
@@ -81,16 +81,6 @@ public class MatchmakingRatingService {
                 })
                 .sorted(Comparator.comparing(PlayerRating::rating).reversed())
                 .toList();
-    }
-
-    private static int getRank(MatchmakingGame game, MatchmakingPlayer player) {
-        if (game.winners().contains(player.userId())) {
-            return 1;
-        }
-        if (game.vp() - player.totalVictoryPoints() <= 3) {
-            return 2;
-        }
-        return 3;
     }
 
     private static void sendMessage(SlashCommandInteractionEvent event, List<PlayerRating> playerRatings) {
@@ -139,14 +129,19 @@ public class MatchmakingRatingService {
     private record MatchmakingGame(long endedDate, int vp, List<MatchmakingPlayer> players, Set<String> winners) {
 
         static MatchmakingGame from(Game game) {
-            List<MatchmakingPlayer> players = game.getRealAndEliminatedPlayers().stream()
-                    .map(p -> new MatchmakingPlayer(p.getUserID(), p.getTotalVictoryPoints()))
-                    .toList();
             Set<String> winners =
                     game.getWinners().stream().map(ti4.map.Player::getUserID).collect(Collectors.toSet());
+            List<MatchmakingPlayer> players = game.getRealAndEliminatedPlayers().stream()
+                    .map(player -> {
+                        int rank = winners.contains(player.getUserID())
+                                ? 1
+                                : game.getVp() - player.getTotalVictoryPoints() <= 3 ? 2 : 3;
+                        return new MatchmakingPlayer(player.getUserID(), rank);
+                    })
+                    .toList();
             return new MatchmakingGame(game.getEndedDate(), game.getVp(), players, winners);
         }
     }
 
-    private record MatchmakingPlayer(String userId, int totalVictoryPoints) {}
+    private record MatchmakingPlayer(String userId, int rank) {}
 }
