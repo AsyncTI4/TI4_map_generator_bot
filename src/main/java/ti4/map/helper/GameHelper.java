@@ -20,7 +20,7 @@ public class GameHelper {
                 .toEpochMilli();
     }
 
-    public LocalDate getCreationDateAsLocalDate(Game game) {
+    public static LocalDate getCreationDateAsLocalDate(Game game) {
         return LocalDate.parse(game.getCreationDate(), CREATION_DATE_FORMATTER);
     }
 }
