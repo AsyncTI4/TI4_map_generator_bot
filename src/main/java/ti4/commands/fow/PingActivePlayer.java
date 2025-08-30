@@ -39,7 +39,7 @@ class PingActivePlayer extends GameStateSubcommand {
         if (autoPing != null) {
             latestPingMilliseconds = autoPing.lastPingTimeEpochMilliseconds();
         } else if (game.getLastActivePlayerChange() != null) {
-            latestPingMilliseconds = game.getLastActivePlayerChange().getTime();
+            latestPingMilliseconds = game.getLastActivePlayerChange().toEpochMilli();
         }
 
         long milliSinceLastPing = System.currentTimeMillis() - latestPingMilliseconds;
