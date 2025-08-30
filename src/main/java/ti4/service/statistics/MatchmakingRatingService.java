@@ -14,6 +14,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -38,21 +40,22 @@ public class MatchmakingRatingService {
         Map<IPlayer, Rating> ratings = new HashMap<>();
         Map<String, Player<String>> players = new HashMap<>();
 
-        List<Game> games = new ArrayList<>();
-        GamesPage.consumeAllGames(GameStatisticsFilterer.getFinishedGamesFilter(6, null), games::add);
+        List<MatchmakingGame> games = new ArrayList<>();
+        GamesPage.consumeAllGames(
+                GameStatisticsFilterer.getFinishedGamesFilter(6, null).and(not(Game::isAllianceMode)),
+                game -> games.add(MatchmakingGame.from(game)));
         games = games.stream()
-                .filter(not(Game::isAllianceMode))
-                .sorted(Comparator.comparingLong(Game::getEndedDate))
+                .sorted(Comparator.comparingLong(MatchmakingGame::endedDate))
                 .toList();
 
         var calculator = new FactorGraphTrueSkillCalculator();
-        for (Game game : games) {
-            List<ti4.map.Player> gamePlayers = game.getRealAndEliminatedPlayers();
+        for (MatchmakingGame game : games) {
+            List<MatchmakingPlayer> gamePlayers = game.players();
             var teams = new ArrayList<ITeam>();
             int[] ranks = new int[gamePlayers.size()];
             for (int i = 0; i < gamePlayers.size(); i++) {
-                ti4.map.Player gamePlayer = gamePlayers.get(i);
-                String userId = gamePlayer.getUserID();
+                MatchmakingPlayer gamePlayer = gamePlayers.get(i);
+                String userId = gamePlayer.userId();
                 var tsPlayer = players.computeIfAbsent(userId, Player::new);
                 Rating rating = ratings.computeIfAbsent(tsPlayer, id -> gameInfo.getDefaultRating());
                 var team = new Team();
@@ -82,13 +85,11 @@ public class MatchmakingRatingService {
                 .toList();
     }
 
-    private static int getRank(Game game, ti4.map.Player player) {
-        boolean isWinner =
-                game.getWinners().stream().anyMatch(w -> w.getUserID().equals(player.getUserID()));
-        if (isWinner) {
+    private static int getRank(MatchmakingGame game, MatchmakingPlayer player) {
+        if (game.winners().contains(player.userId())) {
             return 1;
         }
-        if (game.getVp() - player.getTotalVictoryPoints() <= 3) {
+        if (game.vp() - player.totalVictoryPoints() <= 3) {
             return 2;
         }
         return 3;
@@ -136,4 +137,19 @@ public class MatchmakingRatingService {
     }
 
     private record PlayerRating(String userId, String username, double rating, double calibrationPercent) {}
+
+    private record MatchmakingGame(
+            long endedDate, int vp, List<MatchmakingPlayer> players, Set<String> winners) {
+        static MatchmakingGame from(Game game) {
+            List<MatchmakingPlayer> players = game.getRealAndEliminatedPlayers().stream()
+                    .map(p -> new MatchmakingPlayer(p.getUserID(), p.getTotalVictoryPoints()))
+                    .toList();
+            Set<String> winners = game.getWinners().stream()
+                    .map(ti4.map.Player::getUserID)
+                    .collect(Collectors.toSet());
+            return new MatchmakingGame(game.getEndedDate(), game.getVp(), players, winners);
+        }
+    }
+
+    private record MatchmakingPlayer(String userId, int totalVictoryPoints) {}
 }
