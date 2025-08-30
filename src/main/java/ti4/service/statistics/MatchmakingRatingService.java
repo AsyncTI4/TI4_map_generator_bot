@@ -9,13 +9,15 @@ import de.gesundkrank.jskills.Player;
 import de.gesundkrank.jskills.Rating;
 import de.gesundkrank.jskills.Team;
 import de.gesundkrank.jskills.trueskill.FactorGraphTrueSkillCalculator;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.map.Game;
@@ -26,14 +28,21 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class MatchmakingRatingService {
 
+    public static final String MATCHMAKING_RATING_FILE = "matchmaking_ratings.json";
     private static final int MAX_LIST_SIZE = 50;
     private static final double SIGMA_CALIBRATION_THRESHOLD = 1;
+    private static final DateTimeFormatter TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm z").withZone(ZoneId.of("UTC"));
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(event, () -> calculateRatings(event));
+        StatisticsPipeline.queue(event, () -> {
+            MatchmakingRatingData data = calculateRatingsData();
+            String message = buildMessage(data, event.getUser().getId());
+            MessageHelper.sendMessageToThread(event.getChannel(), "Player Matchmaking Ratings", message);
+        });
     }
 
-    private static void calculateRatings(SlashCommandInteractionEvent event) {
+    public MatchmakingRatingData calculateRatingsData() {
         GameInfo gameInfo = GameInfo.getDefaultGameInfo();
         Map<IPlayer, Rating> ratings = new HashMap<>();
         Map<String, Player<String>> players = new HashMap<>();
@@ -65,24 +74,28 @@ public class MatchmakingRatingService {
         }
 
         List<PlayerRating> playerRatings = buildPlayerRatings(players, ratings);
-        sendMessage(event, playerRatings);
+        double averageRating = playerRatings.stream()
+                .mapToDouble(PlayerRating::rating)
+                .average()
+                .orElse(Double.NaN);
+        return new MatchmakingRatingData(playerRatings, averageRating, Instant.now());
     }
 
-    private static List<PlayerRating> buildPlayerRatings(
+    private List<PlayerRating> buildPlayerRatings(
             Map<String, Player<String>> players, Map<IPlayer, Rating> ratings) {
         return players.entrySet().stream()
                 .map(entry -> {
                     Rating rating = ratings.get(entry.getValue());
-                    String username =
-                            GameManager.getManagedPlayer(entry.getKey()).getName();
-                    double calibrationPercent = SIGMA_CALIBRATION_THRESHOLD / rating.getStandardDeviation() * 100;
+                    String username = GameManager.getManagedPlayer(entry.getKey()).getName();
+                    double calibrationPercent =
+                            SIGMA_CALIBRATION_THRESHOLD / rating.getStandardDeviation() * 100;
                     return new PlayerRating(entry.getKey(), username, rating.getMean(), calibrationPercent);
                 })
                 .sorted(Comparator.comparing(PlayerRating::rating).reversed())
                 .toList();
     }
 
-    private static int getRank(Game game, ti4.map.Player player) {
+    private int getRank(Game game, ti4.map.Player player) {
         boolean isWinner =
                 game.getWinners().stream().anyMatch(w -> w.getUserID().equals(player.getUserID()));
         if (isWinner) {
@@ -94,7 +107,8 @@ public class MatchmakingRatingService {
         return 3;
     }
 
-    private static void sendMessage(SlashCommandInteractionEvent event, List<PlayerRating> playerRatings) {
+    public String buildMessage(MatchmakingRatingData data, String userId) {
+        List<PlayerRating> playerRatings = data.playerRatings();
         int maxListSize = Math.min(MAX_LIST_SIZE, playerRatings.size());
         StringBuilder sb = new StringBuilder();
         sb.append("__**Player Matchmaking Ratings:**__\n");
@@ -104,36 +118,29 @@ public class MatchmakingRatingService {
                 continue;
             }
             listSize++;
-            String formattedString =
-                    String.format("%d. `%s` `Rating=%.3f`\n", listSize, playerRating.username, playerRating.rating);
-            sb.append(formattedString);
+            sb.append(String.format(
+                    "%d. `%s` `Rating=%.3f`\n", listSize, playerRating.username, playerRating.rating));
         }
-
-        double averageRating = playerRatings.stream()
-                .mapToDouble(PlayerRating::rating)
-                .average()
-                .orElse(Double.NaN);
-        String formattedString = String.format(
-                """
-
-                This list only includes the top %d players with a high confidence in their rating.
-
-                The average rating of the player base is `%.3f`
-                """,
-                maxListSize, averageRating);
-        sb.append(formattedString);
+        sb.append(String.format(
+                "\nThis list only includes the top %d players with a high confidence in their rating.\n"
+                        + "The average rating of the player base is `%.3f`\n",
+                maxListSize, data.averageRating()));
 
         playerRatings.stream()
-                .filter(playerRating ->
-                        playerRating.userId.equals(event.getUser().getId()))
+                .filter(pr -> pr.userId.equals(userId))
                 .findFirst()
-                .ifPresent(playerRating -> sb.append(String.format(
-                        "\nWe are `%.1f%%` of the way to a high confidence in your rating.",
-                        Math.min(100, playerRating.calibrationPercent))));
+                .ifPresent(pr -> sb.append(String.format(
+                        "We are `%.1f%%` of the way to a high confidence in your rating.\n",
+                        Math.min(100, pr.calibrationPercent))));
 
-        MessageHelper.sendMessageToThread(
-                (MessageChannelUnion) event.getMessageChannel(), "Player Matchmaking Ratings", sb.toString());
+        sb.append("Last calculated: ")
+                .append(TIME_FORMATTER.format(data.lastCalculated()));
+
+        return sb.toString();
     }
 
-    private record PlayerRating(String userId, String username, double rating, double calibrationPercent) {}
+    public static record PlayerRating(String userId, String username, double rating, double calibrationPercent) {}
+
+    public static record MatchmakingRatingData(
+            List<PlayerRating> playerRatings, double averageRating, Instant lastCalculated) {}
 }
