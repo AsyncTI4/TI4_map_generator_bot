@@ -97,7 +97,10 @@ public class ModalListener extends ListenerAdapter {
     public static String getModalDebugText(ModalInteractionEvent event) {
         StringBuilder output = new StringBuilder("INPUT:\n```\n" + "MenuID: " + event.getModalId());
         for (ModalMapping field : event.getValues()) {
-            output.append("\n> Field: ").append(field.getId()).append(" => ").append(field.getAsString());
+            output.append("\n> Field: ")
+                    .append(field.getCustomId())
+                    .append(" => ")
+                    .append(field.getAsString());
         }
         output.append("\n```");
         return output.toString();

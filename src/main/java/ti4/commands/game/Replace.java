@@ -199,7 +199,7 @@ class Replace extends GameStateSubcommand {
         if (game.getMiltyDraftManager().getDraftIndex()
                 < game.getMiltyDraftManager().getDraftOrder().size()) {
             MiltyDraftManager manager = game.getMiltyDraftManager();
-            DraftDisplayService.repostDraftInformation(event, manager, game);
+            DraftDisplayService.repostDraftInformation(manager, game);
         }
 
         game.setReplacementMade(true);

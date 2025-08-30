@@ -48,13 +48,13 @@ public class ButtonListener extends ListenerAdapter {
      * }`
      */
     private static boolean shouldShowBotIsThinking(ButtonInteractionEvent event) {
-        return buttonsToThinkAbout.contains(event.getButton().getId());
+        return buttonsToThinkAbout.contains(event.getButton().getCustomId());
     }
 
     /**
      * @return whether the button spawns a Modal - modals must be a raw undeferred reply
      */
     private static boolean isModalSpawner(ButtonInteractionEvent event) {
-        return event.getButton().getId().endsWith("~MDL");
+        return event.getButton().getCustomId().endsWith("~MDL");
     }
 }
