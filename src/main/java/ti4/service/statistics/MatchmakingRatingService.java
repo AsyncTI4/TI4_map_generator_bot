@@ -136,16 +136,14 @@ public class MatchmakingRatingService {
 
     private record PlayerRating(String userId, String username, double rating, double calibrationPercent) {}
 
-    private record MatchmakingGame(
-            long endedDate, int vp, List<MatchmakingPlayer> players, Set<String> winners) {
+    private record MatchmakingGame(long endedDate, int vp, List<MatchmakingPlayer> players, Set<String> winners) {
 
         static MatchmakingGame from(Game game) {
             List<MatchmakingPlayer> players = game.getRealAndEliminatedPlayers().stream()
                     .map(p -> new MatchmakingPlayer(p.getUserID(), p.getTotalVictoryPoints()))
                     .toList();
-            Set<String> winners = game.getWinners().stream()
-                    .map(ti4.map.Player::getUserID)
-                    .collect(Collectors.toSet());
+            Set<String> winners =
+                    game.getWinners().stream().map(ti4.map.Player::getUserID).collect(Collectors.toSet());
             return new MatchmakingGame(game.getEndedDate(), game.getVp(), players, winners);
         }
     }
