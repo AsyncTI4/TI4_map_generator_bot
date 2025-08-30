@@ -43,6 +43,7 @@ import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
 import ti4.cron.UploadStatsCron;
 import ti4.cron.WinningPathCron;
+import ti4.cron.MatchmakingRatingCron;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -290,6 +291,7 @@ public class AsyncTI4DiscordBot {
         CloseLaunchThreadsCron.register();
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
+        MatchmakingRatingCron.register();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
