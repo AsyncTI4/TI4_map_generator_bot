@@ -6,19 +6,19 @@ import ti4.json.PersistenceManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.service.statistics.MatchmakingRatingService;
-import ti4.service.statistics.MatchmakingRatingService.MatchmakingRatingData;
+import ti4.service.statistics.MatchmakingRatingService.MatchmakingData;
 
-class MatchMakingRatingCommand extends Subcommand {
+class MatchmakingRatingCommand extends Subcommand {
 
-    MatchMakingRatingCommand() {
+    MatchmakingRatingCommand() {
         super("matchmaking_rating", "Calculates the top 50 high confidence MMRs using the TrueSkill algorithm");
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         try {
-            MatchmakingRatingData data = PersistenceManager.readObjectFromJsonFile(
-                    MatchmakingRatingService.MATCHMAKING_RATING_FILE, MatchmakingRatingData.class);
+            MatchmakingData data = PersistenceManager.readObjectFromJsonFile(
+                    MatchmakingRatingService.MATCHMAKING_RATING_FILE, MatchmakingData.class);
             if (data == null) {
                 MessageHelper.sendMessageToThread(event.getChannel(), "Player Matchmaking Ratings",
                         "Matchmaking ratings have not been calculated yet.");

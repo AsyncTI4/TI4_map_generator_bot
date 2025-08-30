@@ -5,7 +5,7 @@ import lombok.experimental.UtilityClass;
 import ti4.json.PersistenceManager;
 import ti4.message.logging.BotLogger;
 import ti4.service.statistics.MatchmakingRatingService;
-import ti4.service.statistics.MatchmakingRatingService.MatchmakingRatingData;
+import ti4.service.statistics.MatchmakingRatingService.MatchmakingData;
 
 @UtilityClass
 public class MatchmakingRatingCron {
@@ -22,7 +22,7 @@ public class MatchmakingRatingCron {
     private static void calculateAndPersist() {
         BotLogger.logCron("Running MatchmakingRatingCron.");
         try {
-            MatchmakingRatingData data = MatchmakingRatingService.calculateRatingsData();
+            MatchmakingData data = MatchmakingRatingService.calculateRatingsData();
             PersistenceManager.writeObjectToJsonFile(MatchmakingRatingService.MATCHMAKING_RATING_FILE, data);
         } catch (Exception e) {
             BotLogger.error("**MatchmakingRatingCron failed.**", e);
