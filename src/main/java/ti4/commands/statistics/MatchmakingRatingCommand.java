@@ -4,9 +4,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.commands.Subcommand;
 import ti4.service.statistics.MatchmakingRatingService;
 
-class MatchMakingRatingCommand extends Subcommand {
+class MatchmakingRatingCommand extends Subcommand {
 
-    MatchMakingRatingCommand() {
+    MatchmakingRatingCommand() {
         super("matchmaking_rating", "Calculates the top 50 high confidence MMRs using the TrueSkill algorithm");
     }
 
