@@ -14,8 +14,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -126,20 +124,18 @@ public class MatchmakingRatingService {
 
     private record PlayerRating(String userId, String username, double rating, double calibrationPercent) {}
 
-    private record MatchmakingGame(long endedDate, int vp, List<MatchmakingPlayer> players, Set<String> winners) {
+    private record MatchmakingGame(long endedDate, List<MatchmakingPlayer> players) {
 
         static MatchmakingGame from(Game game) {
-            Set<String> winners =
-                    game.getWinners().stream().map(ti4.map.Player::getUserID).collect(Collectors.toSet());
             List<MatchmakingPlayer> players = game.getRealAndEliminatedPlayers().stream()
                     .map(player -> {
-                        int rank = winners.contains(player.getUserID())
-                                ? 1
-                                : game.getVp() - player.getTotalVictoryPoints() <= 3 ? 2 : 3;
+                        boolean isWinner = game.getWinners().stream()
+                                .anyMatch(gamePlayer -> gamePlayer.getUserID().equals(player.getUserID()));
+                        int rank = isWinner ? 1 : game.getVp() - player.getTotalVictoryPoints() <= 3 ? 2 : 3;
                         return new MatchmakingPlayer(player.getUserID(), rank);
                     })
                     .toList();
-            return new MatchmakingGame(game.getEndedDate(), game.getVp(), players, winners);
+            return new MatchmakingGame(game.getEndedDate(), players);
         }
     }
 
