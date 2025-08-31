@@ -26,7 +26,7 @@ public class MatchmakingRatingEventService {
 
     private static void calculateRatings(SlashCommandInteractionEvent event) {
         List<MatchmakingGame> games = new ArrayList<>();
-        boolean onlyTiglGames = event.getOption("TIGL_only", false, OptionMapping::getAsBoolean);
+        boolean onlyTiglGames = event.getOption("tigl_only", false, OptionMapping::getAsBoolean);
         Predicate<Game> filter =
                 GameStatisticsFilterer.getFinishedGamesFilter(6, null).and(not(Game::isAllianceMode));
         if (onlyTiglGames) {
