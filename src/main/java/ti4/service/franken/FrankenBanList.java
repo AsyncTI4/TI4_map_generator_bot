@@ -10,8 +10,8 @@ public enum FrankenBanList {
         "Removes Weak & Unbalanced Components for a more balanced draft",
         Map.ofEntries(
             Map.entry(Constants.ABILITY, List.of(
-                "Hired Guns (nokar) [ds]",
-                "Deep Mining",
+                "hired_guns",
+                "deep_mining",
                 "deep_mining",
                 "orbital_foundries",
                 "rule_of_two",
