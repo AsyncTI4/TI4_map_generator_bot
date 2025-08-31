@@ -759,6 +759,18 @@ public class TransactionHelper {
                         .setPlaceholder("Edit your deals details here.")
                         .setValue("The deal is that I ")
                         .build();
+
+                // String selectId = "dealOptions_" + other;
+                // StringSelectMenu selectMenu = StringSelectMenu.create(selectId)
+                //         .setPlaceholder("Choose a deal type")
+                //         .setMinValues(1)    // minimum selections allowed
+                //         .setMaxValues(1)    // maximum selections allowed for single select
+                //         .addOptions(
+                //             SelectOption.of("Fixed price", "fixed_price").withDescription("A fixed price deal"),
+                //             SelectOption.of("Hourly", "hourly").withDescription("Pay by hour"),
+                //             SelectOption.of("Commission", "commission").withDescription("Commission-based")
+                //         )
+                //         .build();
                 Modal modal = Modal.create(modalId, "Deal Details")
                         .addActionRow(summary)
                         .build();

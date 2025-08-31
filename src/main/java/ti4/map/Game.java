@@ -585,8 +585,9 @@ public class Game extends GameProperties {
     public boolean isACInDiscard(String name) {
         return discardActionCards.keySet().stream()
                 .map(Mapper::getActionCard)
-                .anyMatch(
-                        ac -> ac.getName() != null && ac.getName().toLowerCase().contains(name.toLowerCase()));
+                .anyMatch(ac -> ac != null
+                        && ac.getName() != null
+                        && ac.getName().toLowerCase().contains(name.toLowerCase()));
     }
 
     public List<String> getListOfTilesPinged() {

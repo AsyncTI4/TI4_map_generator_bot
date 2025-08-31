@@ -2,6 +2,7 @@ package ti4.buttons;
 
 import static org.apache.commons.lang3.StringUtils.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import ti4.ResourceHelper;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.helpers.ActionCardHelper;
@@ -2448,6 +2450,13 @@ public class UnfiledButtonHandlers {
         String message = "Use buttons to drop 2 infantry on a planet or with your ships.";
         ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 11);
+        if (randomJokeChance == 10) {
+            File audioFile = ResourceHelper.getFile("voices/yin/", "YinSpin.mp3");
+            if (audioFile.exists()) {
+                MessageHelper.sendFileToChannel(player.getCorrectChannel(), audioFile);
+            }
+        }
     }
 
     @ButtonHandler("componentAction")

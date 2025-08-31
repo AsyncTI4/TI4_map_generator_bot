@@ -2,16 +2,16 @@ package ti4.commands.statistics;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
-import ti4.service.statistics.MatchmakingRatingService;
+import ti4.service.statistics.matchmaking.MatchmakingRatingEventService;
 
-class MatchMakingRatingCommand extends Subcommand {
+class MatchmakingRatingCommand extends Subcommand {
 
-    MatchMakingRatingCommand() {
+    MatchmakingRatingCommand() {
         super("matchmaking_rating", "Calculates the top 50 high confidence MMRs using the TrueSkill algorithm");
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MatchmakingRatingService.queueReply(event);
+        MatchmakingRatingEventService.queueReply(event);
     }
 }

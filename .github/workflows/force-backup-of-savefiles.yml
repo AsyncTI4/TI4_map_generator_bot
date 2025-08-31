@@ -27,7 +27,11 @@ jobs:
             echo "FORCING BACKUP OF SAVE FILES"
             rm -f .git/index.lock
             git add -A
-            git commit -m "save files"
+            if git diff-index --quiet HEAD; then
+              echo "No changes to commit"
+            else
+              git commit -m "save files"
+            fi
             git push
             curl -X POST -H 'Content-Type: application/json' -d '{"content":"Backup Successful"}' $DISCORD_WEBHOOK_URL
             echo "DONE!"

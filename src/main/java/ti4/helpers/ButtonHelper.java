@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import static org.apache.commons.lang3.StringUtils.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -4404,6 +4406,15 @@ public class ButtonHelper {
                             player.getRepresentationUnfogged()
                                     + ", due to your **Reclamation** ability, 1 PDS and 1 space dock have been added to Mecatol Rex. This is optional though.");
                     CommanderUnlockCheckService.checkPlayer(player, "titans", "saar", "rohdhna", "cheiran", "celdauri");
+                    int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 6);
+                    if (randomJokeChance == 5) {
+                        randomJokeChance = ThreadLocalRandom.current().nextInt(1, 3);
+                        File audioFile =
+                                ResourceHelper.getFile("voices/winnu/", "reclmation" + randomJokeChance + ".mp3");
+                        if (audioFile.exists()) {
+                            MessageHelper.sendFileToChannel(player.getCorrectChannel(), audioFile);
+                        }
+                    }
                 }
             }
         }
@@ -5655,7 +5666,9 @@ public class ButtonHelper {
         int h = Integer.parseInt(hits);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
-        message = removeEnd(message, ";\n");
+        if (message != null && message.endsWith(";\n")) {
+            message = message.substring(0, message.length() - 2);
+        }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         if (!game.isFowMode() && combatOnHolder instanceof Planet && h > 0 && opponent != player) {
             String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit"
