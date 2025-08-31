@@ -110,18 +110,11 @@ public class BanService implements IBanService {
             String type = entry.getKey();
             List<String> values = entry.getValue();
             for (String value : values) {
-                String line = applyBanCommand(game, type, value);
+                String line = applyOption(game, type, value);
                 if (!isBlank(line)) out.append(line);
             }
         }
         return out.toString();
-    }
-
-    private String applyBanCommand(Game game, String type, String value) {
-        if (isBlank(type) || isBlank(value)) return "";
-        BiFunction<Game, String, String> applier = BAN_APPLIERS.get(type);
-        if (applier == null) return "Unknown ban type: `" + type + "`\n";
-        return applier.apply(game, value);
     }
 
     private static boolean isBlank(String s) {
