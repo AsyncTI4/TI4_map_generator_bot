@@ -473,7 +473,8 @@ public class TransactionHelper {
             "Artisanal, Hand-Crafted Nothing",
             "Reticulating Splines",
             "ADDITIONAL PYLONS",
-            "A State-of-the-Art Turbo Encabulator");
+            "A State-of-the-Art Turbo Encabulator",
+            "This Large Wooden Horse, Which I Assure You Is Not Full Of Soldiers");
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {

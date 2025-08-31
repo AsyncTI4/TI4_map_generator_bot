@@ -193,6 +193,27 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.CODEX_NUMBER -> {
+                String enteredValue = Objects.toString(event.getFocusedOption().getValue(), "")
+                        .toLowerCase();
+                Map<String, String> values = new HashMap<>() {
+                    {
+                        put("1", "Codex I");
+                        put("1ac", "Codex I Action Cards");
+                        put("1omega", "Codex I Technologies and Promissory Notes");
+                        put("2", "Codex II");
+                        put("3", "Codex III");
+                        put("4", "Codex IV");
+                        put(Constants.ALL, "ALL Codices");
+                    }
+                };
+                List<Command.Choice> options = values.entrySet().stream()
+                        .filter(entry -> entry.getValue().toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(entry -> new Command.Choice(entry.getValue(), entry.getKey()))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
             case Constants.CC_USE -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<String> values = Arrays.asList("t/tactic", "r/retreat/reinforcements", "no");

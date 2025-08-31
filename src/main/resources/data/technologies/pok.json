@@ -778,7 +778,7 @@
     },
     {
         "alias": "mr",
-        "name": "Magmus Reactor",
+        "name": "Magmus Reactor Ω",
         "types": [
             "WARFARE"
         ],
@@ -828,7 +828,7 @@
     },
     {
         "alias": "wg",
-        "name": "Wormhole Generator",
+        "name": "Wormhole Generator Ω",
         "types": [
             "PROPULSION"
         ],
@@ -1023,7 +1023,7 @@
     },
     {
         "alias": "yso",
-        "name": "Yin Spinner Omega",
+        "name": "Yin Spinner Ω",
         "types": [
             "BIOTIC"
         ],

@@ -53,7 +53,7 @@ public class ShowActionCardsService {
                 cardsByName.get(name).addFirst(ac);
             } else {
                 MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(), "Null AC with id " + ac.getKey() + " " + ac.getValue());
+                        game.getActionsChannel(), "Null action card with id `" + ac.getKey() + "` " + ac.getValue() + ".");
             }
         });
         List<Map.Entry<String, List<Map.Entry<String, Integer>>>> entries = new ArrayList<>(cardsByName.entrySet());

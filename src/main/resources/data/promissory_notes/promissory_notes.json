@@ -9,7 +9,7 @@
         "shrinkName": true
     },
     {
-        "alias": "war_funding",
+        "alias": "war_funding Ω",
         "name": "War Funding",
         "faction": "letnev",
         "playArea": false,
@@ -69,7 +69,7 @@
     },
     {
         "alias": "ce",
-        "name": "Cybernetic Enhancements",
+        "name": "Cybernetic Enhancements Ω",
         "faction": "l1z1x",
         "playArea": false,
         "source": "base",
@@ -166,7 +166,7 @@
     },
     {
         "alias": "acq",
-        "name": "Acquiescence",
+        "name": "Acquiescence Ω",
         "faction": "winnu",
         "playArea": false,
         "source": "base",
@@ -183,7 +183,7 @@
     },
     {
         "alias": "greyfire",
-        "name": "Greyfire Mutagen",
+        "name": "Greyfire Mutagen Ω",
         "faction": "yin",
         "playArea": false,
         "source": "base",
@@ -199,7 +199,7 @@
     },
     {
         "alias": "stymie",
-        "name": "Stymie",
+        "name": "Stymie Ω",
         "faction": "arborec",
         "playArea": false,
         "source": "base",
