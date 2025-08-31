@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.persistence.GameManager;
 
 record MatchmakingGame(String name, long endedDate, List<MatchmakingPlayer> players) {
 
@@ -14,9 +15,10 @@ record MatchmakingGame(String name, long endedDate, List<MatchmakingPlayer> play
     private static List<MatchmakingPlayer> getPlayers(Game game) {
         return game.getRealAndEliminatedPlayers().stream()
                 .map(player -> {
-                    boolean isWinner = isWinner(game, player);
-                    int rank = calculatePlayerRank(isWinner, game.getVp(), player.getTotalVictoryPoints());
-                    return new MatchmakingPlayer(player.getUserID(), rank);
+                    String userId = player.getUserID();
+                    String username = GameManager.getManagedPlayer(userId).getName();
+                    int rank = calculatePlayerRank(isWinner(game, player), game.getVp(), player.getTotalVictoryPoints());
+                    return new MatchmakingPlayer(userId, username, rank);
                 })
                 // it is recommended to always pass in sorted data when ties can occur
                 .sorted(Comparator.comparing(MatchmakingPlayer::userId))

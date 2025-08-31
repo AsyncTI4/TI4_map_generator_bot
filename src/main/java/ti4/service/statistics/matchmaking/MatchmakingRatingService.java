@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
-import ti4.map.persistence.GameManager;
 
 @UtilityClass
 class MatchmakingRatingService {
@@ -23,7 +22,7 @@ class MatchmakingRatingService {
     static List<MatchmakingRating> calculateRatings(List<MatchmakingGame> games) {
         GameInfo gameInfo = GameInfo.getDefaultGameInfo();
         Map<IPlayer, Rating> ratings = new HashMap<>();
-        Map<String, Player<String>> players = new HashMap<>();
+        Map<MatchmakingPlayer, Player<String>> players = new HashMap<>();
 
         games.sort(Comparator.comparingLong(MatchmakingGame::endedDate).thenComparing(MatchmakingGame::name));
 
@@ -34,8 +33,7 @@ class MatchmakingRatingService {
             int[] ranks = new int[gamePlayers.size()];
             for (int i = 0; i < gamePlayers.size(); i++) {
                 MatchmakingPlayer gamePlayer = gamePlayers.get(i);
-                String userId = gamePlayer.userId();
-                var tsPlayer = players.computeIfAbsent(userId, Player::new);
+                var tsPlayer = players.computeIfAbsent(gamePlayer, k -> new Player<>(gamePlayer.userId()));
                 Rating rating = ratings.computeIfAbsent(tsPlayer, id -> gameInfo.getDefaultRating());
                 var team = new Team();
                 team.addPlayer(tsPlayer, rating);
@@ -50,14 +48,13 @@ class MatchmakingRatingService {
     }
 
     private static List<MatchmakingRating> buildPlayerRatings(
-            Map<String, Player<String>> players, Map<IPlayer, Rating> ratings) {
+            Map<MatchmakingPlayer, Player<String>> players, Map<IPlayer, Rating> ratings) {
         return players.entrySet().stream()
                 .map(entry -> {
                     Rating rating = ratings.get(entry.getValue());
-                    String username =
-                            GameManager.getManagedPlayer(entry.getKey()).getName();
                     double calibrationPercent = SIGMA_CALIBRATION_THRESHOLD / rating.getStandardDeviation() * 100;
-                    return new MatchmakingRating(entry.getKey(), username, rating.getMean(), calibrationPercent);
+                    return new MatchmakingRating(entry.getKey().userId(), entry.getKey().username(), rating.getMean(),
+                        calibrationPercent);
                 })
                 .sorted(Comparator.comparing(MatchmakingRating::rating).reversed())
                 .toList();
