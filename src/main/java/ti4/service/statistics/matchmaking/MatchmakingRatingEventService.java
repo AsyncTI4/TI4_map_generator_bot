@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.commands.statistics.GameStatisticsFilterer;
-import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
@@ -27,8 +26,9 @@ public class MatchmakingRatingEventService {
 
     private static void calculateRatings(SlashCommandInteractionEvent event) {
         List<MatchmakingGame> games = new ArrayList<>();
-        boolean onlyTiglGames = event.getOption(Constants.TIGL_GAME, false, OptionMapping::getAsBoolean);
-        Predicate<Game> filter = GameStatisticsFilterer.getFinishedGamesFilter(6, null).and(not(Game::isAllianceMode));
+        boolean onlyTiglGames = event.getOption("TIGL_only", false, OptionMapping::getAsBoolean);
+        Predicate<Game> filter =
+                GameStatisticsFilterer.getFinishedGamesFilter(6, null).and(not(Game::isAllianceMode));
         if (onlyTiglGames) {
             filter = filter.and(Game::isCompetitiveTIGLGame);
         }
