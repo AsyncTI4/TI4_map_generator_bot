@@ -59,7 +59,7 @@ public class BanService implements IBanService {
             return "Successfully banned " + Mapper.getFaction(id).getFactionName() + " starting fleet.\n";
         });
 
-        BAN_APPLIERS.put(Constants.BAN_HS,(game, id) -> {
+        BAN_APPLIERS.put(Constants.BAN_HS, (game, id) -> {
             if (isBlank(id) || !Mapper.getFactionIDs().contains(id)) return "";
             appendStoredValue(game, "bannedHSs", id);
             return "Successfully banned " + Mapper.getFaction(id).getFactionName() + " home system.\n";
