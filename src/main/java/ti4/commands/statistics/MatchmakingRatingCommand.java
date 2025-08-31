@@ -2,7 +2,7 @@ package ti4.commands.statistics;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
-import ti4.service.statistics.MatchmakingRatingService;
+import ti4.service.statistics.matchmaking.MatchmakingRatingEventService;
 
 class MatchmakingRatingCommand extends Subcommand {
 
@@ -12,6 +12,6 @@ class MatchmakingRatingCommand extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MatchmakingRatingService.queueReply(event);
+        MatchmakingRatingEventService.queueReply(event);
     }
 }

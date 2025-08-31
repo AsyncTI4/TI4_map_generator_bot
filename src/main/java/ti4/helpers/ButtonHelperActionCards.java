@@ -2721,7 +2721,6 @@ public class ButtonHelperActionCards {
             Planet p = game.getPlanetsInfo().get(planet);
             if (p != null && p.getResources() > count) {
                 if (game.getTileFromPlanet(planet) == player.getHomeSystemTile()) {
-
                     count = p.getResources();
                     planetName = planet;
                 }
