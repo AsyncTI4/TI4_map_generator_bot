@@ -25,8 +25,7 @@ public class MatchmakingRatingEventService {
     private static void calculateRatings(SlashCommandInteractionEvent event) {
         List<MatchmakingGame> games = new ArrayList<>();
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getFinishedGamesFilter(6, null)
-                    .and(not(Game::isAllianceMode)),
+                GameStatisticsFilterer.getFinishedGamesFilter(6, null).and(not(Game::isAllianceMode)),
                 game -> games.add(MatchmakingGame.from(game)));
 
         List<MatchmakingRating> playerRatings = MatchmakingRatingService.calculateRatings(games);
