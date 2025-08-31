@@ -4,9 +4,11 @@ import static java.util.function.Predicate.not;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.map.Game;
 import ti4.map.persistence.GamesPage;
@@ -24,10 +26,13 @@ public class MatchmakingRatingEventService {
 
     private static void calculateRatings(SlashCommandInteractionEvent event) {
         List<MatchmakingGame> games = new ArrayList<>();
-        GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getFinishedGamesFilter(6, null)
-                    .and(not(Game::isAllianceMode)),
-                game -> games.add(MatchmakingGame.from(game)));
+        boolean onlyTiglGames = event.getOption("tigl_only", false, OptionMapping::getAsBoolean);
+        Predicate<Game> filter =
+                GameStatisticsFilterer.getFinishedGamesFilter(6, null).and(not(Game::isAllianceMode));
+        if (onlyTiglGames) {
+            filter = filter.and(Game::isCompetitiveTIGLGame);
+        }
+        GamesPage.consumeAllGames(filter, game -> games.add(MatchmakingGame.from(game)));
 
         List<MatchmakingRating> playerRatings = MatchmakingRatingService.calculateRatings(games);
         sendMessage(event, playerRatings);
