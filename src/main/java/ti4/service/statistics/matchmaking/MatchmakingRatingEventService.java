@@ -31,9 +31,7 @@ public class MatchmakingRatingEventService {
         Predicate<Game> filter =
                 GameStatisticsFilterer.getFinishedGamesFilter(6, null).and(not(Game::isAllianceMode));
         if (onlyTiglGames) {
-            filter = filter
-                .and(Game::isCompetitiveTIGLGame)
-                .and(Game::isNormalGame);
+            filter = filter.and(Game::isCompetitiveTIGLGame).and(Game::isNormalGame);
         }
         GamesPage.consumeAllGames(filter, game -> games.add(MatchmakingGame.from(game)));
 
