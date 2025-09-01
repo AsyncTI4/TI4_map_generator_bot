@@ -228,7 +228,6 @@ public class AddPlanetService {
                 && game.isMinorFactionsMode()
                 && player.isRealPlayer()
                 && tile != null
-                && unitHolder != null
                 && !tile.isHomeSystem(game)
                 && (unitHolder.getPlanetModel().getPlanetTypes().contains(PlanetType.FACTION))) {
             PlanetModel p = Mapper.getPlanet(unitHolder.getName());
@@ -240,7 +239,6 @@ public class AddPlanetService {
                 && game.isDangerousWildsMode()
                 && player.isRealPlayer()
                 && tile != null
-                && unitHolder != null
                 && ButtonHelper.getTypeOfPlanet(game, unitHolder.getName()).contains("hazardous")) {
             if (!player.hasAbility("propagation")) {
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -262,7 +260,6 @@ public class AddPlanetService {
 
         if (game.isMinorFactionsMode()
                 && tile != null
-                && unitHolder != null
                 && unitHolder.getTokenList().contains("attachment_threetraits.png")
                 && player.isRealPlayer()) {
             boolean ownsThemAll = true;
