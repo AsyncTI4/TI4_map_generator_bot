@@ -1,7 +1,6 @@
 package ti4.service.statistics.matchmaking;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -10,20 +9,20 @@ import org.assertj.core.util.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
-class MatchmakingRatingServiceTest {
+class OpenSkillMatchmakingRatingServiceTest {
 
     @Test
     void generatingRatingsTwiceGivesSameResult() {
         MatchmakingGame game = buildMatchmakingGame("game1", new int[] {1, 2, 2, 3, 3, 3});
 
-        List<MatchmakingRating> ratings = MatchmakingRatingService.calculateRatings(Lists.newArrayList(game));
+        List<MatchmakingRating> ratings = OpenSkillMatchmakingRatingService.calculateRatings(Lists.newArrayList(game));
         List<MatchmakingRating> sortedRatings = ratings.stream()
                 .sorted(Comparator.comparing(MatchmakingRating::rating)
                         .reversed()
                         .thenComparing(MatchmakingRating::userId))
                 .toList();
 
-        List<MatchmakingRating> ratings2 = MatchmakingRatingService.calculateRatings(Lists.newArrayList(game));
+        List<MatchmakingRating> ratings2 = OpenSkillMatchmakingRatingService.calculateRatings(Lists.newArrayList(game));
         List<MatchmakingRating> sortedRatings2 = ratings2.stream()
                 .sorted(Comparator.comparing(MatchmakingRating::rating)
                         .reversed()
@@ -37,7 +36,7 @@ class MatchmakingRatingServiceTest {
     void generatesSensibleRatings() {
         MatchmakingGame game = buildMatchmakingGame("game1", new int[] {1, 2, 2, 3, 3, 3});
 
-        List<MatchmakingRating> ratings = MatchmakingRatingService.calculateRatings(Lists.newArrayList(game));
+        List<MatchmakingRating> ratings = OpenSkillMatchmakingRatingService.calculateRatings(Lists.newArrayList(game));
 
         List<MatchmakingRating> sortedRatings = ratings.stream()
                 .sorted(Comparator.comparing(MatchmakingRating::rating)
@@ -52,7 +51,7 @@ class MatchmakingRatingServiceTest {
         assertThat(winnerRating).isGreaterThan(rank2Rating);
 
         double otherRank2Rating = sortedRatings.get(2).rating();
-        assertThat(otherRank2Rating).isCloseTo(rank2Rating, within(0.05));
+        assertThat(otherRank2Rating).isEqualTo(rank2Rating);
 
         double rank3Rating = sortedRatings.get(3).rating();
         assertThat(rank3Rating).isLessThan(rank2Rating);

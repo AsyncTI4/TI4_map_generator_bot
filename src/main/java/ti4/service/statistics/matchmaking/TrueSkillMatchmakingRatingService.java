@@ -15,47 +15,54 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-class MatchmakingRatingService {
+class TrueSkillMatchmakingRatingService {
 
     private static final double SIGMA_CALIBRATION_THRESHOLD = 1;
 
     static List<MatchmakingRating> calculateRatings(List<MatchmakingGame> games) {
-        GameInfo gameInfo = GameInfo.getDefaultGameInfo();
-        Map<IPlayer, Rating> ratings = new HashMap<>();
-        Map<MatchmakingPlayer, Player<String>> players = new HashMap<>();
-
         games.sort(Comparator.comparingLong(MatchmakingGame::endedDate).thenComparing(MatchmakingGame::name));
 
-        var calculator = new FactorGraphTrueSkillCalculator();
+        GameInfo gameInfo = GameInfo.getDefaultGameInfo();
+        Map<String, Player<String>> userIdToTrueSkillPlayer = new HashMap<>();
+        Map<IPlayer, Rating> trueSkillPlayerToRating = new HashMap<>();
+        Map<String, String> userIdToUsername = new HashMap<>();
+
         for (MatchmakingGame game : games) {
             List<MatchmakingPlayer> gamePlayers = game.players();
             var teams = new ArrayList<ITeam>();
             int[] ranks = new int[gamePlayers.size()];
             for (int i = 0; i < gamePlayers.size(); i++) {
                 MatchmakingPlayer gamePlayer = gamePlayers.get(i);
-                var tsPlayer = players.computeIfAbsent(gamePlayer, k -> new Player<>(gamePlayer.userId()));
-                Rating rating = ratings.computeIfAbsent(tsPlayer, id -> gameInfo.getDefaultRating());
+                var trueSkillPlayer = userIdToTrueSkillPlayer.computeIfAbsent(
+                        gamePlayer.userId(), k -> new Player<>(gamePlayer.userId()));
+                Rating rating =
+                        trueSkillPlayerToRating.computeIfAbsent(trueSkillPlayer, id -> gameInfo.getDefaultRating());
+                userIdToUsername.put(gamePlayer.userId(), gamePlayer.username());
+
                 var team = new Team();
-                team.addPlayer(tsPlayer, rating);
+                team.addPlayer(trueSkillPlayer, rating);
                 teams.add(team);
                 ranks[i] = gamePlayer.rank();
             }
-            Map<IPlayer, Rating> newRatings = calculator.calculateNewRatings(gameInfo, teams, ranks);
-            ratings.putAll(newRatings);
+
+            Map<IPlayer, Rating> newRatings =
+                    new FactorGraphTrueSkillCalculator().calculateNewRatings(gameInfo, teams, ranks);
+            trueSkillPlayerToRating.putAll(newRatings);
         }
 
-        return buildPlayerRatings(players, ratings);
+        return buildMatchmakingRatings(userIdToTrueSkillPlayer, trueSkillPlayerToRating, userIdToUsername);
     }
 
-    private static List<MatchmakingRating> buildPlayerRatings(
-            Map<MatchmakingPlayer, Player<String>> players, Map<IPlayer, Rating> ratings) {
+    private static List<MatchmakingRating> buildMatchmakingRatings(
+            Map<String, Player<String>> players, Map<IPlayer, Rating> ratings, Map<String, String> userIdToUsername) {
         return players.entrySet().stream()
                 .map(entry -> {
+                    String userId = entry.getKey();
+                    String username = userIdToUsername.get(userId);
                     Rating rating = ratings.get(entry.getValue());
                     double calibrationPercent =
                             Math.min(100, SIGMA_CALIBRATION_THRESHOLD / rating.getStandardDeviation() * 100);
-                    return new MatchmakingRating(
-                            entry.getKey().userId(), entry.getKey().username(), rating.getMean(), calibrationPercent);
+                    return new MatchmakingRating(userId, username, rating.getMean(), calibrationPercent);
                 })
                 .sorted(Comparator.comparing(MatchmakingRating::rating).reversed())
                 .toList();

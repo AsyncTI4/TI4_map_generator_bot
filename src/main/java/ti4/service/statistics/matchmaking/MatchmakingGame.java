@@ -32,7 +32,8 @@ record MatchmakingGame(String name, long endedDate, List<MatchmakingPlayer> play
         if (isWinner) {
             return 1;
         }
-        if (gameVictoryPoints - playerVictoryPoints <= 3) {
+        int pointsRemainingToWin = gameVictoryPoints - playerVictoryPoints;
+        if (pointsRemainingToWin <= 3) {
             return 2;
         }
         return 3;
