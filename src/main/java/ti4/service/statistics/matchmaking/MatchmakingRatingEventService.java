@@ -27,6 +27,7 @@ public class MatchmakingRatingEventService {
     private static void calculateRatings(SlashCommandInteractionEvent event) {
         List<MatchmakingGame> games = new ArrayList<>();
         boolean onlyTiglGames = event.getOption("tigl_only", false, OptionMapping::getAsBoolean);
+        boolean showRating = event.getOption("show_rating", false, OptionMapping::getAsBoolean);
         Predicate<Game> filter =
                 GameStatisticsFilterer.getFinishedGamesFilter(6, null).and(not(Game::isAllianceMode));
         if (onlyTiglGames) {
@@ -35,10 +36,11 @@ public class MatchmakingRatingEventService {
         GamesPage.consumeAllGames(filter, game -> games.add(MatchmakingGame.from(game)));
 
         List<MatchmakingRating> playerRatings = MatchmakingRatingService.calculateRatings(games);
-        sendMessage(event, playerRatings);
+        sendMessage(event, playerRatings, showRating);
     }
 
-    private static void sendMessage(SlashCommandInteractionEvent event, List<MatchmakingRating> playerRatings) {
+    private static void sendMessage(
+            SlashCommandInteractionEvent event, List<MatchmakingRating> playerRatings, boolean showRating) {
         int maxListSize = Math.min(MAX_LIST_SIZE, playerRatings.size());
         StringBuilder sb = new StringBuilder();
         sb.append("__**Player Matchmaking Ratings:**__\n");
@@ -71,9 +73,16 @@ public class MatchmakingRatingEventService {
                 .filter(playerRating ->
                         playerRating.userId().equals(event.getUser().getId()))
                 .findFirst()
-                .ifPresent(playerRating -> sb.append(String.format(
-                        "\nWe are `%.1f%%` of the way to a high confidence in your rating.",
-                        Math.min(100, playerRating.calibrationPercent()))));
+                .ifPresent(playerRating -> {
+                    if (showRating && playerRating.calibrationPercent() >= 100) {
+                        sb.append(String.format(
+                                "\nYour rating is `%.3f`.", playerRating.rating()));
+                    } else {
+                        sb.append(String.format(
+                                "\nWe are `%.1f%%` of the way to a high confidence in your rating.",
+                                Math.min(100, playerRating.calibrationPercent())));
+                    }
+                });
 
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Player Matchmaking Ratings", sb.toString());
