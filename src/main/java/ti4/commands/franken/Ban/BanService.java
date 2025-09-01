@@ -4,9 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
-
-import org.apache.tomcat.util.bcel.Const;
-
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -33,7 +30,8 @@ public class BanService implements IBanService {
         BAN_APPLIERS.put(Constants.PROMISSORY_NOTE_ID, (game, id) -> {
             if (isBlank(id) || Mapper.getPromissoryNote(id) == null) return "";
             appendStoredValue(game, "bannedPNs", id);
-            return "Successfully banned promissory note: " + Mapper.getPromissoryNote(id).getName() + ".\n";
+            return "Successfully banned promissory note: "
+                    + Mapper.getPromissoryNote(id).getName() + ".\n";
         });
 
         BAN_APPLIERS.put(Constants.TECH, (game, id) -> {
@@ -87,12 +85,15 @@ public class BanService implements IBanService {
         BAN_APPLIERS.put(Constants.UNIT_ID, (game, unitId) -> {
             if (isBlank(unitId) || Mapper.getUnit(unitId) == null) return "";
             String[] parts = unitId.split("_");
-            if (parts.length < 2 ) return "";
-            if (parts[1].equalsIgnoreCase(Constants.MECH_ID)) return BAN_APPLIERS.get(Constants.MECH_ID).apply(game, parts[0]);
-            if (parts[1].equalsIgnoreCase(Constants.FLAGSHIP_ID)) return BAN_APPLIERS.get(Constants.FLAGSHIP_ID).apply(game, parts[0]);
+            if (parts.length < 2) return "";
+            if (parts[1].equalsIgnoreCase(Constants.MECH_ID))
+                return BAN_APPLIERS.get(Constants.MECH_ID).apply(game, parts[0]);
+            if (parts[1].equalsIgnoreCase(Constants.FLAGSHIP_ID))
+                return BAN_APPLIERS.get(Constants.FLAGSHIP_ID).apply(game, parts[0]);
             return "";
         });
     }
+
     @Override
     public String applyOption(Game game, String optionName, String value) {
         if (isBlank(optionName) || isBlank(value)) return "";
