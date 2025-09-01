@@ -1,3 +1,3 @@
 package ti4.service.statistics.matchmaking;
 
-record MatchmakingPlayer(String userId, int rank) {}
+record MatchmakingPlayer(String userId, String username, int rank) {}
