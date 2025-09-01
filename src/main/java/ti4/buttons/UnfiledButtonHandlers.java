@@ -1,6 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +59,6 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
-import ti4.jda.JdaComponentHelper;
 import ti4.listeners.ButtonListener;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -1169,7 +1168,7 @@ public class UnfiledButtonHandlers {
         }
         String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, whatIsItFor);
         event.getMessage().editMessage(exhaustedMessage).queue();
-        JdaComponentHelper.removeComponentFromMessage(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("autoneticMemoryStep3")
@@ -1243,7 +1242,7 @@ public class UnfiledButtonHandlers {
                     + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
         }
         event.getMessage().editMessage(totalVotesSoFar).queue();
-        JdaComponentHelper.removeComponentFromMessage(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     // @ButtonHandler("strategicAction_")

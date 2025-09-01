@@ -512,7 +512,7 @@ public class StartCombatService {
                 && isGroundCombat
                 && game.getStoredValue("audioSent").isEmpty()) {
             for (Player p3 : game.getRealPlayers()) {
-                if (p3.getHomeSystemTile() == tile) {
+                if (p3.getHomeSystemTile() == tile && game.getActivePlayer() != null) {
                     File audioFile = ResourceHelper.getFile("voices/" + p3.getFaction() + "/", "homedefense.mp3");
                     if (audioFile.exists()) {
                         MessageHelper.sendFileToChannel(threadChannel, audioFile);

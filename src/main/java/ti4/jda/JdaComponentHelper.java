@@ -3,7 +3,9 @@ package ti4.jda;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.Component;
 import net.dv8tion.jda.api.components.replacer.ComponentReplacer;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
+import ti4.helpers.ButtonHelper;
 
 @UtilityClass
 public class JdaComponentHelper {
@@ -21,7 +23,7 @@ public class JdaComponentHelper {
             event.getMessage().delete().queue();
             return true;
         }
-        removeComponentFromMessage(event);
+        ButtonHelper.deleteTheOneButton((GenericInteractionCreateEvent) event);
         return false;
     }
 }
