@@ -14,7 +14,7 @@ class MatchmakingRatingCommand extends Subcommand {
                 new OptionData(OptionType.BOOLEAN, "tigl_only", "True to only include TIGL games"),
                 new OptionData(
                         OptionType.BOOLEAN,
-                        "show_rating",
+                        "show_my_rating",
                         "If true, shows your rating instead of calibration percent when fully calibrated"));
     }
 
