@@ -54,7 +54,8 @@ class MatchmakingRatingService {
                     Rating rating = ratings.get(entry.getValue());
                     double calibrationPercent =
                             Math.min(100, SIGMA_CALIBRATION_THRESHOLD / rating.getStandardDeviation() * 100);
-                    return new MatchmakingRating(entry.getKey(), entry.getKey().username(), rating.getMean(), calibrationPercent);
+                    return new MatchmakingRating(
+                            entry.getKey().userId(), entry.getKey().username(), rating.getMean(), calibrationPercent);
                 })
                 .sorted(Comparator.comparing(MatchmakingRating::rating).reversed())
                 .toList();
