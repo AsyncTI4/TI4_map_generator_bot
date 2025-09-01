@@ -10,7 +10,12 @@ class MatchmakingRatingCommand extends Subcommand {
 
     MatchmakingRatingCommand() {
         super("matchmaking_rating", "Calculates the top 50 high confidence MMRs using the TrueSkill algorithm");
-        addOptions(new OptionData(OptionType.BOOLEAN, "tigl_only", "True to only include TIGL games"));
+        addOptions(
+                new OptionData(OptionType.BOOLEAN, "tigl_only", "True to only include TIGL games"),
+                new OptionData(
+                        OptionType.BOOLEAN,
+                        "show_my_rating",
+                        "If true, shows your rating instead of calibration percent when fully calibrated"));
     }
 
     @Override

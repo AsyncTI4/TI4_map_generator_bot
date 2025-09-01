@@ -56,7 +56,8 @@ class MatchmakingRatingService {
                     Rating rating = ratings.get(entry.getValue());
                     String username =
                             GameManager.getManagedPlayer(entry.getKey()).getName();
-                    double calibrationPercent = SIGMA_CALIBRATION_THRESHOLD / rating.getStandardDeviation() * 100;
+                    double calibrationPercent =
+                            Math.min(100, SIGMA_CALIBRATION_THRESHOLD / rating.getStandardDeviation() * 100);
                     return new MatchmakingRating(entry.getKey(), username, rating.getMean(), calibrationPercent);
                 })
                 .sorted(Comparator.comparing(MatchmakingRating::rating).reversed())
