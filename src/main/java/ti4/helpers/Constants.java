@@ -168,6 +168,7 @@ public class Constants {
     public static final String PROMOTE_TARGET = "promote_target";
     public static final String PROMOTE_RANK = "promote_rank";
     public static final String PROMOTE_DEMOTE = "promote_demote";
+    public static final String FIN_SEPARATOR = "finSep";
 
     public static final String SET_SETTING = "setting";
     public static final String SET_UNIT_CAP = "set_unit_cap";
