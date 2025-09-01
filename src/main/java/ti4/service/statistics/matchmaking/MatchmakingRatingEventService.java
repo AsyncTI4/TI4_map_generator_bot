@@ -35,7 +35,7 @@ public class MatchmakingRatingEventService {
         }
         GamesPage.consumeAllGames(filter, game -> games.add(MatchmakingGame.from(game)));
 
-        List<MatchmakingRating> playerRatings = MatchmakingRatingService.calculateRatings(games);
+        List<MatchmakingRating> playerRatings = TrueSkillMatchmakingRatingService.calculateRatings(games);
         sendMessage(event, playerRatings, showRating);
     }
 
