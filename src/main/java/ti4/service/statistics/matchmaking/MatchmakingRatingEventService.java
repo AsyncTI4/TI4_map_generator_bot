@@ -74,12 +74,13 @@ public class MatchmakingRatingEventService {
                         playerRating.userId().equals(event.getUser().getId()))
                 .findFirst()
                 .ifPresent(playerRating -> {
-                    if (showRating && playerRating.calibrationPercent() >= 100) {
+                    double calibrationPercent = Math.min(100, playerRating.calibrationPercent());
+                    if (showRating && calibrationPercent == 100) {
                         sb.append(String.format("\nYour rating is `%.3f`.", playerRating.rating()));
                     } else {
                         sb.append(String.format(
                                 "\nWe are `%.1f%%` of the way to a high confidence in your rating.",
-                                Math.min(100, playerRating.calibrationPercent())));
+                                calibrationPercent));
                     }
                 });
 
