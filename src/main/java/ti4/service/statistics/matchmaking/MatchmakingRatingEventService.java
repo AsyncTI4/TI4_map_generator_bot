@@ -80,6 +80,9 @@ public class MatchmakingRatingEventService {
                         sb.append(String.format(
                                 "\nWe are `%.1f%%` of the way to a high confidence in your rating.",
                                 playerRating.calibrationPercent()));
+                        if (showRating) {
+                            sb.append(" We cannot show your rating until it reaches high confidence.");
+                        }
                     }
                 });
 
