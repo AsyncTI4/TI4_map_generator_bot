@@ -52,9 +52,9 @@ class MatchmakingRatingService {
         return players.entrySet().stream()
                 .map(entry -> {
                     Rating rating = ratings.get(entry.getValue());
-                    double calibrationPercent = SIGMA_CALIBRATION_THRESHOLD / rating.getStandardDeviation() * 100;
-                    return new MatchmakingRating(entry.getKey().userId(), entry.getKey().username(), rating.getMean(),
-                        calibrationPercent);
+                    double calibrationPercent =
+                            Math.min(100, SIGMA_CALIBRATION_THRESHOLD / rating.getStandardDeviation() * 100);
+                    return new MatchmakingRating(entry.getKey(), entry.getKey().username(), rating.getMean(), calibrationPercent);
                 })
                 .sorted(Comparator.comparing(MatchmakingRating::rating).reversed())
                 .toList();
