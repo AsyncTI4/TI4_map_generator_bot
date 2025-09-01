@@ -75,8 +75,7 @@ public class MatchmakingRatingEventService {
                 .findFirst()
                 .ifPresent(playerRating -> {
                     if (showRating && playerRating.calibrationPercent() >= 100) {
-                        sb.append(String.format(
-                                "\nYour rating is `%.3f`.", playerRating.rating()));
+                        sb.append(String.format("\nYour rating is `%.3f`.", playerRating.rating()));
                     } else {
                         sb.append(String.format(
                                 "\nWe are `%.1f%%` of the way to a high confidence in your rating.",
