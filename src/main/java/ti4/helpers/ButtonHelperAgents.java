@@ -23,7 +23,6 @@ import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.jda.JdaComponentHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -1345,10 +1344,6 @@ public class ButtonHelperAgents {
 
             for (ActionRow row : buttonEvent.getMessage().getComponentTree().findAll(ActionRow.class)) {
                 List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
-                int buttonIndex = buttonRow.indexOf(buttonEvent.getButton());
-                if (buttonIndex > -1 && !"nomadagentmercer".equalsIgnoreCase(agent)) {
-                    buttonRow.remove(buttonIndex);
-                }
                 if (!buttonRow.isEmpty()) {
                     buttons += buttonRow.size();
                     actionRow2.add(ActionRow.of(buttonRow));
@@ -1359,14 +1354,10 @@ public class ButtonHelperAgents {
                     && !exhaustedMessage.contains("wanna ")
                     && !exhaustedMessage.contains("please choose the faction to give")
                     && !exhaustedMessage.contains("choose the target of the agent")) {
-                if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 1) {
+                if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 2) {
                     buttonEvent.getMessage().delete().queue();
                 } else {
-                    buttonEvent
-                            .getMessage()
-                            .editMessage(exhaustedMessage)
-                            .setComponents(actionRow2)
-                            .queue();
+                    ButtonHelper.deleteTheOneButton(buttonEvent);
                 }
 
             } else {
@@ -2536,7 +2527,7 @@ public class ButtonHelperAgents {
             exhaustedMessage = "Combat";
         }
         event.getMessage().editMessage(exhaustedMessage).queue();
-        JdaComponentHelper.removeComponentFromMessage(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     private static List<Button> getJolNarAgentButtons(Player player, Game game) {
