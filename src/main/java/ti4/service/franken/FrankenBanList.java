@@ -182,8 +182,7 @@ public enum FrankenBanList {
     FrankenBanList(String id, String description, Map<String, List<String>> bansByType) {
         this.id = id;
         this.description = description;
-        this.bansByType = bansByType.entrySet().stream()
-            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, e -> List.copyOf(e.getValue())));
+        this.bansByType = bansByType;
     }
 
     public String getName() {

@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+
+import org.apache.tomcat.util.bcel.Const;
+
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -72,25 +75,21 @@ public class BanService implements IBanService {
         });
 
         BAN_APPLIERS.put(Constants.MECH_ID, (game, unitId) -> {
-            if (isBlank(unitId) || Mapper.getUnit(unitId) == null) return "";
-            String[] parts = unitId.split("_");
-            if (parts.length < 2 || !Constants.MECH_ID.equalsIgnoreCase(parts[1])) return "";
-            appendStoredValue(game, "bannedMechs", parts[0]);
-            return "Successfully banned " + parts[0] + " " + Constants.MECH_ID + ".\n";
+            appendStoredValue(game, "bannedMechs", unitId);
+            return "Successfully banned " + unitId + " " + Constants.MECH_ID + ".\n";
         });
 
         BAN_APPLIERS.put(Constants.FLAGSHIP_ID, (game, unitId) -> {
-            if (isBlank(unitId) || Mapper.getUnit(unitId) == null) return "";
-            String[] parts = unitId.split("_");
-            if (parts.length < 2 || !Constants.FLAGSHIP_ID.equalsIgnoreCase(parts[1])) return "";
-            appendStoredValue(game, "bannedFSs", parts[0]);
-            return "Successfully banned " + parts[0] + " " + Constants.FLAGSHIP_ID + ".\n";
+            appendStoredValue(game, "bannedFSs", unitId);
+            return "Successfully banned " + unitId + " " + Constants.FLAGSHIP_ID + ".\n";
         });
 
         BAN_APPLIERS.put(Constants.UNIT_ID, (game, unitId) -> {
             if (isBlank(unitId) || Mapper.getUnit(unitId) == null) return "";
-            if (unitId.endsWith("_mech")) return BAN_APPLIERS.get(Constants.MECH_ID).apply(game, unitId);
-            if (unitId.endsWith("_flagship")) return BAN_APPLIERS.get(Constants.FLAGSHIP_ID).apply(game, unitId);
+            String[] parts = unitId.split("_");
+            if (parts.length < 2 ) return "";
+            if (parts[1].equalsIgnoreCase(Constants.MECH_ID)) return BAN_APPLIERS.get(Constants.MECH_ID).apply(game, parts[0]);
+            if (parts[1].equalsIgnoreCase(Constants.FLAGSHIP_ID)) return BAN_APPLIERS.get(Constants.FLAGSHIP_ID).apply(game, parts[0]);
             return "";
         });
     }
@@ -122,6 +121,7 @@ public class BanService implements IBanService {
     }
 
     private static void appendStoredValue(Game game, String key, String value) {
+        String prev = game.getStoredValue(key);
         game.setStoredValue(key, prev.isEmpty() ? value : prev + Constants.FIN_SEPARATOR + value);
     }
 }
