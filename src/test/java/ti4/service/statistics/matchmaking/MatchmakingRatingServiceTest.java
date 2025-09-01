@@ -3,25 +3,18 @@ package ti4.service.statistics.matchmaking;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import org.assertj.core.util.Lists;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 class MatchmakingRatingServiceTest {
 
     @Test
     void generatingRatingsTwiceGivesSameResult() {
-        MatchmakingGame game = new MatchmakingGame(
-                "game1",
-                1L,
-                Lists.newArrayList(
-                        new MatchmakingPlayer("p1", "player1", 1),
-                        new MatchmakingPlayer("p2", "player2", 2),
-                        new MatchmakingPlayer("p3", "player3", 2),
-                        new MatchmakingPlayer("p4", "player4", 3),
-                        new MatchmakingPlayer("p5", "player5", 3),
-                        new MatchmakingPlayer("p6", "player6", 3)));
+        MatchmakingGame game = buildMatchmakingGame("game1", new int[] {1, 2, 2, 3, 3, 3});
 
         List<MatchmakingRating> ratings = MatchmakingRatingService.calculateRatings(Lists.newArrayList(game));
         List<MatchmakingRating> sortedRatings = ratings.stream()
@@ -42,16 +35,7 @@ class MatchmakingRatingServiceTest {
 
     @Test
     void generatesSensibleRatings() {
-        MatchmakingGame game = new MatchmakingGame(
-                "game1",
-                1L,
-                Lists.newArrayList(
-                        new MatchmakingPlayer("p1", "player1", 1),
-                        new MatchmakingPlayer("p2", "player2", 2),
-                        new MatchmakingPlayer("p3", "player3", 2),
-                        new MatchmakingPlayer("p4", "player4", 3),
-                        new MatchmakingPlayer("p5", "player5", 3),
-                        new MatchmakingPlayer("p6", "player6", 3)));
+        MatchmakingGame game = buildMatchmakingGame("game1", new int[] {1, 2, 2, 3, 3, 3});
 
         List<MatchmakingRating> ratings = MatchmakingRatingService.calculateRatings(Lists.newArrayList(game));
 
@@ -72,5 +56,14 @@ class MatchmakingRatingServiceTest {
 
         double rank3Rating = sortedRatings.get(3).rating();
         assertThat(rank3Rating).isLessThan(rank2Rating);
+    }
+
+    @NotNull
+    private static MatchmakingGame buildMatchmakingGame(String name, int[] ranks) {
+        var players = new ArrayList<MatchmakingPlayer>();
+        for (int i = 0; i < ranks.length; i++) {
+            players.add(new MatchmakingPlayer("p" + i, "player" + i, ranks[i]));
+        }
+        return new MatchmakingGame(name, System.currentTimeMillis(), players);
     }
 }
