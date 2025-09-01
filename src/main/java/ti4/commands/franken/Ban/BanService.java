@@ -124,6 +124,6 @@ public class BanService implements IBanService {
     private static void appendStoredValue(Game game, String key, String value) {
         String prev = game.getStoredValue(key);
         if (prev == null) prev = "";
-        game.setStoredValue(key, prev + "finSep" + value);
+        game.setStoredValue(key, prev + Constants.FIN_SEPARATOR + value);
     }
 }

@@ -11,6 +11,7 @@ public enum FrankenBanList {
         Map.ofEntries(
             Map.entry(Constants.ABILITY, List.of(
                 "hired_guns",
+                "deep_mining",
                 "orbital_foundries",
                 "rule_of_two",
                 "conspirators",
