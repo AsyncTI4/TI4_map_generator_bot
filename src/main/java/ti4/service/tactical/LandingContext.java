@@ -39,11 +39,11 @@ public final class LandingContext {
         this.tile = tile;
         this.space = space;
         this.planet = planet;
-        this.planetName = planet.getName();
-        this.planetRep = Helper.getPlanetRepresentation(planet.getName(), game);
+        planetName = planet.getName();
+        planetRep = Helper.getPlanetRepresentation(planet.getName(), game);
         this.landPrefix = landPrefix;
         this.unlandPrefix = unlandPrefix;
-        this.alliedPlayers = computeAllies(mainPlayer, game);
+        alliedPlayers = computeAllies(mainPlayer, game);
         this.committable = committable;
     }
 

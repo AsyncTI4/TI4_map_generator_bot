@@ -20,6 +20,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Data;
+import net.dv8tion.jda.api.components.MessageTopLevelComponent;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponent;
+import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -34,11 +39,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
-import net.dv8tion.jda.api.interactions.components.LayoutComponent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
@@ -124,7 +125,7 @@ import ti4.website.AsyncTi4WebsiteHelper;
 public class ButtonHelper {
 
     public static String getButtonRepresentation(Button button) {
-        String id = button.getId();
+        String id = button.getCustomId();
         String label = button.getLabel();
         EmojiUnion emoji = button.getEmoji();
         return (emoji != null ? emoji.getFormatted() : "") + "__**" + (label.isEmpty() ? " " : label) + "**__  `[" + id
@@ -962,7 +963,7 @@ public class ButtonHelper {
     }
 
     @ButtonHandler(value = "offerDeckButtons", save = false)
-    public static void offerDeckButtons(Game game, ButtonInteractionEvent event) {
+    public static void offerDeckButtons(ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("showDeck_frontier", "Frontier", ExploreEmojis.Frontier));
         buttons.add(Buttons.blue("showDeck_cultural", "Cultural", ExploreEmojis.Cultural));
@@ -1301,32 +1302,7 @@ public class ButtonHelper {
                             + " use buttons to resolve a build for the Duha Menaimon (the Arborec flagship).",
                     buttons);
         }
-        // All players get to use Magen
-        // this is mandatory, so should probably be refactored to happen automatically
-        for (Player magenPlayer : game.getPlayers().values()) {
-            boolean has = activeSystem.containsPlayersUnitsWithModelCondition(magenPlayer, UnitModel::getIsStructure);
-            if (magenPlayer.hasAbility("byssus")) {
-                for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
-                    if (planet.getUnitCount(UnitType.Mech, magenPlayer) > 0) {
-                        has = true;
-                    }
-                }
-            }
-            for (UnitHolder p : activeSystem.getPlanetUnitHolders()) {
-                for (String token : p.getTokenList()) {
-                    if (magenPlayer.getPlanets().contains(p.getName()) && token.contains("superweapon")) {
-                        has = true;
-                    }
-                }
-            }
-            if (!has || !magenPlayer.hasTech("md")) continue;
 
-            String id = magenPlayer.finChecker() + "useMagenDefense_" + activeSystem.getPosition();
-            Button useMagen = Buttons.red(id, "Use Magen Defense Grid", TechEmojis.WarfareTech);
-            String magenMsg = magenPlayer.getRepresentation()
-                    + " you can, and must, use _Magen Defense Grid_ to place an infantry with each of your structures in the active system.";
-            MessageHelper.sendMessageToChannelWithButton(magenPlayer.getCorrectChannel(), magenMsg, useMagen);
-        }
         if (player.hasAbility("void_tap")
                 && (activeSystem.getPlanetUnitHolders().isEmpty()
                         || doesPlayerHaveFSHere("eidolon_flagship", player, activeSystem))) {
@@ -1755,7 +1731,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
 
-    public static void sendAllAgentsAndAbilitiesToReady(Game game, GenericInteractionCreateEvent event, Player player) {
+    public static void sendAllAgentsAndAbilitiesToReady(GenericInteractionCreateEvent event, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String ability : player.getExhaustedPlanetsAbilities()) {
             buttons.add(Buttons.green("belkoseaYellowTechReady_planet_", "Ready " + ability + " abiility"));
@@ -1894,7 +1870,8 @@ public class ButtonHelper {
                     && game.getLawsInfo().get("absol_sanctions").equalsIgnoreCase(player.getFaction())) {
                 limit = 5;
             }
-            if (game.getStoredValue("controlTokensOnAgendaabsol_sanctions").contains(player.getColor())) {
+            if (game.getStoredValue("controlTokensOnAgenda" + game.getLaws().get("absol_sanctions"))
+                    .contains(player.getColor())) {
                 limit = 5;
             }
         }
@@ -2160,7 +2137,7 @@ public class ButtonHelper {
                 count += space.getUnitCount(unit);
             } else if ("mech".equalsIgnoreCase(removedUnit.getBaseType())
                     && player.hasUnit("naaz_mech_space")
-                    && player.getGame().getPhaseOfGame().equalsIgnoreCase("action")) {
+                    && "action".equalsIgnoreCase(player.getGame().getPhaseOfGame())) {
                 count += space.getUnitCount(unit);
             }
         }
@@ -2973,7 +2950,7 @@ public class ButtonHelper {
 
     @ButtonHandler("deleteMessage_") // deleteMessage_{Optional String to send to the event channel after}
     public static void deleteMessage(GenericInteractionCreateEvent event) {
-        if (event != null && event instanceof ButtonInteractionEvent bevent) {
+        if (event instanceof ButtonInteractionEvent bevent) {
             bevent.getMessage().delete().queue();
         }
     }
@@ -3002,7 +2979,7 @@ public class ButtonHelper {
     public static void deleteTheOneButton(GenericInteractionCreateEvent event) {
         if (event instanceof ButtonInteractionEvent bevent) {
             bevent.getMessage();
-            deleteTheOneButton(bevent, bevent.getButton().getId(), true);
+            deleteTheOneButton(bevent, bevent.getButton().getCustomId(), true);
         }
     }
 
@@ -3055,12 +3032,13 @@ public class ButtonHelper {
     public static void deleteButtonsWithPartialID(GenericInteractionCreateEvent event, String partialID) {
         if (event instanceof ButtonInteractionEvent bevent) {
             boolean containsRealButton = false;
-            List<Button> buttons = new ArrayList<>(bevent.getMessage().getButtons());
+            List<Button> buttons =
+                    new ArrayList<>(bevent.getMessage().getComponentTree().findAll(Button.class));
             List<Button> newButtons = new ArrayList<>();
             for (Button button : buttons) {
-                if (!button.getId().contains(partialID)) {
-                    if (!button.getId().contains("deleteButtons")
-                            && !button.getId().contains("ultimateUndo")) {
+                if (!button.getCustomId().contains(partialID)) {
+                    if (!button.getCustomId().contains("deleteButtons")
+                            && !button.getCustomId().contains("ultimateUndo")) {
                         containsRealButton = true;
                     }
                     newButtons.add(button);
@@ -3080,15 +3058,16 @@ public class ButtonHelper {
         boolean hasRealButton = false;
         List<Button> remainingButtons = new ArrayList<>();
         List<ActionRow> remainingRows = new ArrayList<>();
-        for (ActionRow row : event.getMessage().getActionRows()) {
+        for (ActionRow row : event.getMessage().getComponentTree().findAll(ActionRow.class)) {
             List<Button> newActionRow = new ArrayList<>();
-            for (ItemComponent item : row.getComponents()) {
+            for (ActionRowChildComponent item : row.getComponents()) {
                 if (!(item instanceof Button b)) continue;
-                if (b.getId() == null || b.getId().equals(buttonID)) continue;
+                if (b.getCustomId() == null || b.getCustomId().equals(buttonID)) continue;
 
                 remainingButtons.add(b);
                 newActionRow.add(b);
-                if (!b.getId().contains("deleteButtons") && !b.getId().contains("ultimateUndo")) {
+                if (!b.getCustomId().contains("deleteButtons")
+                        && !b.getCustomId().contains("ultimateUndo")) {
                     hasRealButton = true;
                 }
             }
@@ -3146,9 +3125,9 @@ public class ButtonHelper {
         game.setSavedChannelID(event.getMessageChannel().getId());
         game.setSavedMessage(exhaustedMessage);
         List<Button> buttons = new ArrayList<>();
-        for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ItemComponent> buttonRow = row.getComponents();
-            for (ItemComponent but : buttonRow) {
+        for (ActionRow row : event.getMessage().getComponentTree().findAll(ActionRow.class)) {
+            List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
+            for (ActionRowChildComponent but : buttonRow) {
                 Button button = (Button) but;
                 if (button != null) {
                     buttons.add(button);
@@ -3157,11 +3136,11 @@ public class ButtonHelper {
         }
 
         for (Button button : buttons) {
-            if (button.getId() == null || button.getId().contains("ultimateUndo")) {
+            if (button.getCustomId() == null || button.getCustomId().contains("ultimateUndo")) {
                 continue;
             }
-            String builder =
-                    player.getFaction() + ";" + button.getId() + ";" + button.getLabel() + ";" + button.getStyle();
+            String builder = player.getFaction() + ";" + button.getCustomId() + ";" + button.getLabel() + ";"
+                    + button.getStyle();
             if (button.getEmoji() != null
                     && !"".equalsIgnoreCase(button.getEmoji().toString())) {
                 builder += ";" + button.getEmoji().toString();
@@ -3423,6 +3402,7 @@ public class ButtonHelper {
         }
         // System.out.println(fightersIgnored);
         int ignoredFs = 0;
+
         UnitHolder spaceHolder = tile.getSpaceUnitHolder();
         List<String> unitTypesCounted = new ArrayList<>();
         Map<UnitModel, Integer> unitsByQuantity = getAllUnits(spaceHolder, player);
@@ -4072,7 +4052,7 @@ public class ButtonHelper {
                 Player neutral = game.getPlayerFromColorOrFaction("neutral");
                 boolean added = false;
                 for (UnitHolder uH : tile.getPlanetUnitHolders()) {
-                    if (ButtonHelper.getTypeOfPlanet(game, uH.getName()).contains("hazardous")) {
+                    if (getTypeOfPlanet(game, uH.getName()).contains("hazardous")) {
                         int neutralUnitsToAdd = Helper.getPlanetResources(uH.getName(), game);
                         if (neutralUnitsToAdd > 0) {
                             added = true;
@@ -4808,7 +4788,7 @@ public class ButtonHelper {
         return buttons;
     }
 
-    public static List<Button> lanefirFSResolution(Player player, Game game, ButtonInteractionEvent event) {
+    public static List<Button> lanefirFSResolution(Player player, Game game) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder planetUnit : tile.getUnitHolders().values()) {
@@ -4981,7 +4961,7 @@ public class ButtonHelper {
         return unitHolder.getPlanetTypes();
     }
 
-    public static void offerBuildOrRemove(Player player, Game game, GenericInteractionCreateEvent event, Tile tile) {
+    public static void offerBuildOrRemove(Player player, Game game, Tile tile) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         Button buildButton = Buttons.green(
@@ -5067,10 +5047,6 @@ public class ButtonHelper {
                         "This is a reminder that _Conventions of War_ is in play, so using BOMBARDMENT on cultural planets is illegal.");
             }
         }
-        // if (buttonID.contains("bombard")) {
-        //     ButtonHelper.deleteTheOneButton(event);
-        // }
-
     }
 
     public static String putInfWithMechsForStarforge(
@@ -5196,23 +5172,23 @@ public class ButtonHelper {
         return tile.getUnitHolderFromPlanet(planet);
     }
 
-    public static List<LayoutComponent> turnButtonListIntoActionRowList(List<Button> buttons) {
-        List<LayoutComponent> list = new ArrayList<>();
-        List<ItemComponent> buttonRow = new ArrayList<>();
+    public static List<MessageTopLevelComponent> turnButtonListIntoActionRowList(List<Button> buttons) {
+        List<MessageTopLevelComponent> actionRows = new ArrayList<>();
+        List<ActionRowChildComponent> buttonRow = new ArrayList<>();
         for (Button button : buttons) {
             if (buttonRow.size() == 5) {
-                list.add(ActionRow.of(buttonRow));
+                actionRows.add(ActionRow.of(buttonRow));
                 buttonRow = new ArrayList<>();
             }
-            if (buttons.size() < 26 || !button.getId().contains("_2")) {
+            if (buttons.size() < 26 || !button.getCustomId().contains("_2")) {
                 buttonRow.add(button);
             }
         }
         if (!buttonRow.isEmpty()) {
-            list.add(ActionRow.of(buttonRow));
+            actionRows.add(ActionRow.of(buttonRow));
         }
 
-        return list;
+        return actionRows;
     }
 
     @ButtonHandler("unflipMallice")
@@ -6014,7 +5990,7 @@ public class ButtonHelper {
 
     public static List<Button> getGainAndLoseCCButtons(Player player) {
         List<Button> buttons = getGainCCButtons(player);
-        buttons.removeIf(b -> !b.getId().startsWith("increase_")); // remove the wiring buttons
+        buttons.removeIf(b -> !b.getCustomId().startsWith("increase_")); // remove the wiring buttons
         buttons.addAll(getLoseCCButtons(player)); // add the redistro buttons
         return buttons;
     }
@@ -6378,7 +6354,7 @@ public class ButtonHelper {
                 .count();
     }
 
-    public static List<Button> getButtonsForRepairingUnitsInASystem(Player player, Game game, Tile tile) {
+    public static List<Button> getButtonsForRepairingUnitsInASystem(Player player, Tile tile) {
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             for (UnitKey unitKey : unitHolder.getUnitKeys()) {
@@ -6633,7 +6609,7 @@ public class ButtonHelper {
     }
 
     @ButtonHandler("declinePath")
-    public static void declinePath(ButtonInteractionEvent event, Game game, Player player) {
+    public static void declinePath(ButtonInteractionEvent event, Player player) {
         deleteMessage(event);
         player.setPathTokenCounter(Math.max(0, player.getPathTokenCounter() - 1));
         String msg1 =
@@ -6643,7 +6619,7 @@ public class ButtonHelper {
     }
 
     @ButtonHandler("acceptPath")
-    public static void acceptPath(ButtonInteractionEvent event, Game game, Player player) {
+    public static void acceptPath(ButtonInteractionEvent event, Player player) {
         deleteMessage(event);
 
         player.setPathTokenCounter(Math.min(8, player.getPathTokenCounter() + 1));
@@ -6688,7 +6664,7 @@ public class ButtonHelper {
     }
 
     @ButtonHandler("listPath")
-    public static void listPath(ButtonInteractionEvent event, Game game, Player player) {
+    public static void listPath(ButtonInteractionEvent event, Player player) {
         if (player.getPathTokenCounter() < 1) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not have any **Path** tokens.");
         } else {
@@ -6700,7 +6676,7 @@ public class ButtonHelper {
     }
 
     @ButtonHandler("redistributePath")
-    public static void redistributePath(ButtonInteractionEvent event, Game game, Player player) {
+    public static void redistributePath(ButtonInteractionEvent event, Player player) {
         if (player.getPathTokenCounter() < 1) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "You do not have the **Path** tokens to do this.");
@@ -7252,7 +7228,7 @@ public class ButtonHelper {
     }
 
     static void purge2StarCharters(Player player) {
-        var relics = new ArrayList<String>(player.getRelics());
+        var relics = new ArrayList<>(player.getRelics());
         int count = 0;
         for (String relic : relics) {
             if (relic.contains("starchart") && count < 2) {

@@ -2,10 +2,10 @@ package ti4.selections.selectmenus;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import ti4.listeners.context.SelectionMenuContext;
 import ti4.selections.Selection;
 

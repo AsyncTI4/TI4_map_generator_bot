@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.commands.CommandHelper;
 import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
@@ -16,13 +15,13 @@ import ti4.model.AbilityModel;
 @UtilityClass
 public class AbilityInfoService {
 
-    public static void sendAbilityInfo(Game game, Player player, GenericInteractionCreateEvent event) {
+    public static void sendAbilityInfo(Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + " Somebody" + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
-        sendAbilityInfo(game, player);
+        sendAbilityInfo(player);
     }
 
-    public static void sendAbilityInfo(Game game, Player player) {
+    public static void sendAbilityInfo(Player player) {
         MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "__Abilities:__", getAbilityMessageEmbeds(player));
     }
 

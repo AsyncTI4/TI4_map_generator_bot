@@ -14,6 +14,9 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
@@ -21,9 +24,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -358,7 +358,7 @@ public class UnfiledButtonHandlers {
     public static void genericModify(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.replace("genericModify_", "");
         Tile tile = game.getTileByPosition(pos);
-        ButtonHelper.offerBuildOrRemove(player, game, event, tile);
+        ButtonHelper.offerBuildOrRemove(player, game, tile);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -645,7 +645,7 @@ public class UnfiledButtonHandlers {
             case "st" -> { // Sarween Tools
                 player.addSpentThing("sarween");
                 String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
-                ButtonHelper.deleteTheOneButton(event, event.getButton().getId(), false);
+                ButtonHelper.deleteTheOneButton(event, event.getButton().getCustomId(), false);
                 player.setSarweenCounter(player.getSarweenCounter() + 1);
                 String msg =
                         player.getFactionEmoji() + " has used _Sarween Tools_ to save " + player.getSarweenCounter()
@@ -695,7 +695,7 @@ public class UnfiledButtonHandlers {
             case "absol_st" -> { // Absol's Sarween Tools
                 player.addSpentThing("absol_sarween");
                 String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
-                ButtonHelper.deleteTheOneButton(event, event.getButton().getId(), false);
+                ButtonHelper.deleteTheOneButton(event, event.getButton().getCustomId(), false);
                 event.getMessage().editMessage(exhaustedMessage).queue();
             }
             case "absol_pa" -> { // Absol's Psychoarcheology
@@ -1097,7 +1097,7 @@ public class UnfiledButtonHandlers {
         }
 
         if (acName.contains("Rider") || acName.contains("Sanction")) {
-            AgendaHelper.reverseRider("reverse_" + acName, event, game, player);
+            AgendaHelper.reverseRider("reverse_" + acName, game, player);
         }
         if (sendReact) {
             if (game.isFowMode()) {
@@ -1166,22 +1166,9 @@ public class UnfiledButtonHandlers {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             }
         }
-        List<ActionRow> actionRow2 = new ArrayList<>();
-        for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ItemComponent> buttonRow = row.getComponents();
-            int buttonIndex = buttonRow.indexOf(event.getButton());
-            if (buttonIndex > -1) {
-                buttonRow.remove(buttonIndex);
-            }
-            if (!buttonRow.isEmpty()) {
-                actionRow2.add(ActionRow.of(buttonRow));
-            }
-        }
         String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, whatIsItFor);
-        event.getMessage()
-                .editMessage(exhaustedMessage)
-                .setComponents(actionRow2)
-                .queue();
+        event.getMessage().editMessage(exhaustedMessage).queue();
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("autoneticMemoryStep3")
@@ -1216,8 +1203,7 @@ public class UnfiledButtonHandlers {
     @ButtonHandler("getRepairButtons_")
     public static void getRepairButtons(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.replace("getRepairButtons_", "");
-        List<Button> buttons =
-                ButtonHelper.getButtonsForRepairingUnitsInASystem(player, game, game.getTileByPosition(pos));
+        List<Button> buttons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, game.getTileByPosition(pos));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), player.getRepresentationUnfogged() + ", use buttons to resolve.", buttons);
     }
@@ -1248,17 +1234,6 @@ public class UnfiledButtonHandlers {
         }
 
         PlanetService.refreshPlanet(p2, planetName);
-        List<ActionRow> actionRow2 = new ArrayList<>();
-        for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ItemComponent> buttonRow = row.getComponents();
-            int buttonIndex = buttonRow.indexOf(event.getButton());
-            if (buttonIndex > -1) {
-                buttonRow.remove(buttonIndex);
-            }
-            if (!buttonRow.isEmpty()) {
-                actionRow2.add(ActionRow.of(buttonRow));
-            }
-        }
         String totalVotesSoFar = event.getMessage().getContentRaw();
         if (totalVotesSoFar.contains("Readied")) {
             totalVotesSoFar += ", " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
@@ -1266,12 +1241,8 @@ public class UnfiledButtonHandlers {
             totalVotesSoFar = player.getFactionEmojiOrColor() + " Readied "
                     + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
         }
-        if (!actionRow2.isEmpty()) {
-            event.getMessage()
-                    .editMessage(totalVotesSoFar)
-                    .setComponents(actionRow2)
-                    .queue();
-        }
+        event.getMessage().editMessage(totalVotesSoFar).queue();
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     // @ButtonHandler("strategicAction_")
@@ -2184,7 +2155,7 @@ public class UnfiledButtonHandlers {
     }
 
     public static void checkForAllReactions(@NotNull ButtonInteractionEvent event, Game game) {
-        String buttonID = event.getButton().getId();
+        String buttonID = event.getButton().getCustomId();
 
         String messageId = event.getInteraction().getMessage().getId();
         var gameMessage = GameMessageManager.getOne(game.getName(), messageId);
@@ -2253,7 +2224,7 @@ public class UnfiledButtonHandlers {
     }
 
     private static void respondAllPlayersReacted(ButtonInteractionEvent event, Game game) {
-        String buttonID = event.getButton().getId();
+        String buttonID = event.getButton().getCustomId();
         if (game == null || buttonID == null) {
             return;
         }
@@ -2704,11 +2675,11 @@ public class UnfiledButtonHandlers {
         }
 
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, whatIsItFor);
-        for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ItemComponent> buttonRow = row.getComponents();
-            for (ItemComponent but : buttonRow) {
+        for (ActionRow row : event.getMessage().getComponentTree().findAll(ActionRow.class)) {
+            List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
+            for (ActionRowChildComponentUnion but : buttonRow) {
                 if (but instanceof Button butt) {
-                    if (!Helper.doesListContainButtonID(buttons, butt.getId())) {
+                    if (!Helper.doesListContainButtonID(buttons, butt.getCustomId())) {
                         buttons.add(butt);
                     }
                 }
@@ -2730,9 +2701,9 @@ public class UnfiledButtonHandlers {
         }
         player.resetSpentThings();
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, whatIsItFor);
-        for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ItemComponent> buttonRow = row.getComponents();
-            for (ItemComponent but : buttonRow) {
+        for (ActionRow row : event.getMessage().getComponentTree().findAll(ActionRow.class)) {
+            List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
+            for (ActionRowChildComponentUnion but : buttonRow) {
                 if (but instanceof Button butt) {
                     if (!buttons.contains(butt)) {
                         buttons.add(butt);

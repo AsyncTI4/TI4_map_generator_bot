@@ -4,17 +4,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
+import ti4.jda.JdaComponentHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -110,28 +109,13 @@ public class RiftUnitsHelper {
                     .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
                     .queue();
         } else {
-            List<ActionRow> actionRow2 = new ArrayList<>();
-            String exhaustedMessage = event.getMessage().getContentRaw();
-            for (ActionRow row : event.getMessage().getActionRows()) {
-                List<ItemComponent> buttonRow = row.getComponents();
-                int buttonIndex = buttonRow.indexOf(event.getButton());
-                if (buttonIndex > -1) {
-                    buttonRow.remove(buttonIndex);
+            boolean deletedMessage = JdaComponentHelper.removeComponentFromMessageAndDeleteIfEmpty(event);
+            if (!deletedMessage) {
+                String exhaustedMessage = event.getMessage().getContentRaw();
+                if ("".equalsIgnoreCase(exhaustedMessage)) {
+                    exhaustedMessage = "Rift";
                 }
-                if (!buttonRow.isEmpty()) {
-                    actionRow2.add(ActionRow.of(buttonRow));
-                }
-            }
-            if ("".equalsIgnoreCase(exhaustedMessage)) {
-                exhaustedMessage = "Rift";
-            }
-            if (!actionRow2.isEmpty()) {
-                event.getMessage()
-                        .editMessage(exhaustedMessage)
-                        .setComponents(actionRow2)
-                        .queue();
-            } else {
-                ButtonHelper.deleteMessage(event);
+                event.getMessage().editMessage(exhaustedMessage).queue();
             }
         }
     }

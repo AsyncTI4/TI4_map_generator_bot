@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
@@ -1897,6 +1897,9 @@ public class ButtonHelperModifyUnits {
         String playerRep = player.getRepresentation();
 
         Tile tile = game.getTileFromPositionOrAlias(planetName);
+        if (ButtonHelper.isNumeric(planetName)) {
+            planetName += "space";
+        }
         if ("sd".equalsIgnoreCase(unitID)) {
             if (player.ownsUnit("saar_spacedock") || player.ownsUnit("saar_spacedock2")) {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitID);
@@ -1940,7 +1943,8 @@ public class ButtonHelperModifyUnits {
                     } else {
                         tile = game.getTileByPosition(planetName.replace("space", ""));
                         AddUnitService.addUnits(event, tile, game, player.getColor(), unitID);
-                        successMessage = producedOrPlaced + " a " + unitKey.unitEmoji() + " in space.";
+                        successMessage = producedOrPlaced + " a " + unitKey.unitEmoji() + " in the space area of "
+                                + tile.getRepresentationForButtons() + ".";
                     }
                 }
             } else {

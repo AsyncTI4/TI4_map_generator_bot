@@ -2,11 +2,11 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -23,7 +23,8 @@ public class PlayerTitleHelper {
             String msg = player.getRepresentation()
                     + ", you have the opportunity to anonymously bestow one title on someone else in this game."
                     + " Titles are just for fun, and have no real significance, but could a nice way to take something away from this game."
-                    + " Feel free to not. If you choose to, it's a 2 button process. First select the title, then the player you wish to bestow it upon.";
+                    + " Feel free to not. If you choose to, it's a 2 button process. First select the title, then the player you wish to bestow it upon.\n\n"
+                    + "Of you don't see buttons for titles, try exiting Discord and reopening it.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("bestowTitleStep1_Life Of The Table", "Life Of The Table"));
             buttons.add(Buttons.green("bestowTitleStep1_Fun To Be Around", "Fun To Be Around"));

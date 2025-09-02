@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
@@ -277,7 +277,7 @@ public class PlayHeroService {
                         player.getFactionEmoji() + " may resolve " + size
                                 + " agenda" + (size == 1 ? "" : "s") + " because that's how many Sigils they got."
                                 + " After putting the agendas on top in the order you wish (don't bottom any), please press the button to reveal an agenda.");
-                AgendaHelper.drawAgenda(event, size, game, player);
+                AgendaHelper.drawAgenda(size, game, player);
                 Button flipAgenda = Buttons.blue("flip_agenda", "Press This to Flip Agenda");
                 List<Button> buttons = List.of(flipAgenda);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Flip Agenda", buttons);
