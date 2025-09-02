@@ -120,10 +120,29 @@ class PlayerAreaGenerator {
         int x = topLeftOfAllPAs.x;
         int y = topLeftOfAllPAs.y;
 
-        for (Player player : game.getRealAndEliminatedPlayers()) {
-            Point tl = new Point(x, y);
-            Rectangle rect = drawPlayerAreaOLD(player, tl);
-            if (rect.height > 0) y += rect.height + 15;
+        List<Player> players = new ArrayList<>(game.getRealAndEliminatedPlayers());
+        if (players.size() <= 8) {
+            for (Player player : players) {
+                Point tl = new Point(x, y);
+                Rectangle rect = drawPlayerAreaOLD(player, tl, mapWidth);
+                if (rect.height > 0) y += rect.height + 15;
+            }
+        } else {
+            int spacing = 15;
+            int columnWidth = (mapWidth - x - spacing) / 2;
+            int leftMapWidth = x + columnWidth;
+            int rightX = x + columnWidth + spacing;
+            int rows = (players.size() + 1) / 2;
+            for (int i = 0; i < rows; i++) {
+                int yStart = y;
+                Rectangle leftRect = drawPlayerAreaOLD(players.get(i), new Point(x, yStart), leftMapWidth);
+                Rectangle rightRect = new Rectangle();
+                int rightIndex = i + rows;
+                if (rightIndex < players.size()) {
+                    rightRect = drawPlayerAreaOLD(players.get(rightIndex), new Point(rightX, yStart), mapWidth);
+                }
+                y += Math.max(leftRect.height, rightRect.height) + 15;
+            }
         }
 
         String spectatorNames = game.getPlayers().values().stream()
@@ -155,7 +174,7 @@ class PlayerAreaGenerator {
         }
     }
 
-    private Rectangle drawPlayerAreaOLD(Player player, Point topLeft) {
+    private Rectangle drawPlayerAreaOLD(Player player, Point topLeft, int mapWidth) {
         int x = topLeft.x;
         int y = topLeft.y;
         Graphics2D g2 = (Graphics2D) graphics;
