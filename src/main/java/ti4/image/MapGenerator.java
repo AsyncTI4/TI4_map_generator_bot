@@ -302,40 +302,41 @@ public class MapGenerator implements AutoCloseable {
         }
 
         tileMap.remove(null);
-        Set<String> tiles = tileMap.keySet();
+        List<String> sortedTiles = tileMap.keySet().stream().sorted().toList();
         Set<String> tilesWithExtra =
                 new HashSet<>(game.getAdjacentTileOverrides().values());
         tilesWithExtra.addAll(game.getBorderAnomalies().stream()
                 .map(BorderAnomalyHolder::getTile)
                 .collect(Collectors.toSet()));
 
-        tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Tile));
+        // Iterate over the sorted keys once per step instead of repeatedly sorting the stream
+        sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Tile));
         tilesWithExtra.forEach(key -> addTile(tileMap.get(key), TileStep.Extras));
-        tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Units));
+        sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Units));
         if (!game.getTileDistances().isEmpty()) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Distance));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Distance));
             game.setTileDistances(new HashMap<>()); // clear distances after consuming them
         }
         if (displayType == DisplayType.wormholes) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Wormholes));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Wormholes));
         } else if (displayType == DisplayType.anomalies) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Anomalies));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Anomalies));
         } else if (displayType == DisplayType.aetherstream) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Aetherstream));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Aetherstream));
         } else if (displayType == DisplayType.legendaries) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Legendaries));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Legendaries));
         } else if (displayType == DisplayType.empties) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Empties));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Empties));
         } else if (displayType == DisplayType.spacecannon) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.SpaceCannon));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.SpaceCannon));
         } else if (displayType == DisplayType.traits) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Traits));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Traits));
         } else if (displayType == DisplayType.techskips) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.TechSkips));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.TechSkips));
         } else if (displayType == DisplayType.attachments) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Attachments));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Attachments));
         }
-        tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.TileNumber));
+        sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.TileNumber));
     }
 
     private void setupFow(Map<String, Tile> tilesToDisplay) {
