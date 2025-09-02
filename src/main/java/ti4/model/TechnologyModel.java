@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -335,7 +335,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     public String getCondensedReqsEmojis(boolean single) {
         String reqs = getRequirements().orElse("");
         StringBuilder output = new StringBuilder();
-        Set<TechnologyType> types = EnumSet.allOf(TechnologyType.class);
+        Set<TechnologyType> types = new HashSet<>(this.types);
         for (TechnologyType type : types) {
             switch (type) {
                 case PROPULSION -> {
