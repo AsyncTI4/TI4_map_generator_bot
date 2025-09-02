@@ -1,6 +1,6 @@
 package ti4.service.fow;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -8,14 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
@@ -147,16 +147,13 @@ public class LoreService {
         }
 
         Modal editLoreModal = Modal.create("gmLoreSave" + addingTo, "Add Lore to " + addingTo)
-                .addActionRow(position.build())
-                .addActionRow(lore.build())
-                .addActionRow(footer.build())
+                .addComponents(ActionRow.of(position.build()), ActionRow.of(lore.build()), ActionRow.of(footer.build()))
                 .build();
-
         event.replyModal(editLoreModal).queue();
     }
 
     @ModalHandler("gmLoreSave")
-    public static void saveLore(ModalInteractionEvent event, Player player, Game game) {
+    public static void saveLore(ModalInteractionEvent event, Game game) {
         String target = event.getValue(Constants.POSITION).getAsString();
         String loreText = event.getValue(Constants.MESSAGE).getAsString();
         String footerText = event.getValue("footer").getAsString();

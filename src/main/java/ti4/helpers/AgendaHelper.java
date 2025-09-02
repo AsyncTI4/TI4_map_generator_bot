@@ -16,6 +16,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -24,9 +25,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -200,8 +198,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("passOnEverythingWhensNAfters")
-    public static void passOnEverythingWhensNAfters(
-            Game game, String buttonID, ButtonInteractionEvent event, Player player) {
+    public static void passOnEverythingWhensNAfters(Game game, ButtonInteractionEvent event, Player player) {
         event.getMessage().delete().queue();
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red("undoPassOnAllWhensNAfters", "Undo Pass"));
@@ -240,8 +237,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("undoPassOnAllWhensNAfters")
-    public static void undoPassOnEverythingWhensNAfters(
-            Game game, String buttonID, ButtonInteractionEvent event, Player player) {
+    public static void undoPassOnEverythingWhensNAfters(Game game, ButtonInteractionEvent event, Player player) {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
@@ -310,7 +306,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("explainQueue")
-    public static void explainQueue(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
+    public static void explainQueue(ButtonInteractionEvent event) {
         String msg =
                 """
             "When"s are any action card or ability that has a timing window of "when an agenda is revealed" and \
@@ -356,7 +352,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("lockAftersIn")
-    public static void lockAftersIn(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
+    public static void lockAftersIn(Game game, ButtonInteractionEvent event, Player player) {
         game.setStoredValue("queuedAftersLockedFor" + player.getFaction(), "Yes");
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(
@@ -758,7 +754,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("pingNonresponders")
-    public static void pingNonresponders(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
+    public static void pingNonresponders(Game game, Player player) {
         AutoPingCron.pingMissingAgendaPlayers(game);
         String alreadyResolved = game.getStoredValue("whensResolved");
         int num = 0;
@@ -795,7 +791,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("queueAWhen")
-    public static void queueAWhen(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
+    public static void queueAWhen(Game game, ButtonInteractionEvent event, Player player) {
         List<Button> buttons = getPossibleWhenButtons(player);
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -813,7 +809,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("declineToQueueAWhen")
-    public static void declineToQueueAWhen(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
+    public static void declineToQueueAWhen(Game game, ButtonInteractionEvent event, Player player) {
         game.setStoredValue("queuedWhens", game.getStoredValue("queuedWhens").replace(player.getFaction() + "_", ""));
         game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens") + player.getFaction() + "_");
         resolveWhenQueue(event, game);
@@ -847,7 +843,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("queueAnAfter")
-    public static void queueAnAfter(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
+    public static void queueAnAfter(Game game, ButtonInteractionEvent event, Player player) {
         List<Button> buttons = getPossibleAferButtons(player);
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -866,7 +862,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("unlockQueuedAfters")
-    public static void unlockQueuedAfters(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
+    public static void unlockQueuedAfters(Game game, ButtonInteractionEvent event, Player player) {
         game.setStoredValue("queuedAftersLockedFor" + player.getFaction(), "");
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(
@@ -875,7 +871,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("declineToQueueAnAfter")
-    public static void declineToQueueAnAfter(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
+    public static void declineToQueueAnAfter(Game game, ButtonInteractionEvent event, Player player) {
         game.setStoredValue("queuedAfters", game.getStoredValue("queuedAfters").replace(player.getFaction() + "_", ""));
         game.setStoredValue("declinedAfters", game.getStoredValue("declinedAfters") + player.getFaction() + "_");
         List<Button> buttons = new ArrayList<>();
@@ -1194,17 +1190,6 @@ public class AgendaHelper {
                 player.exhaustPlanet(planet);
             }
         }
-        List<ActionRow> actionRow2 = new ArrayList<>();
-        for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ItemComponent> buttonRow = row.getComponents();
-            int buttonIndex = buttonRow.indexOf(event.getButton());
-            if (buttonIndex > -1) {
-                buttonRow.remove(buttonIndex);
-            }
-            if (!buttonRow.isEmpty()) {
-                actionRow2.add(ActionRow.of(buttonRow));
-            }
-        }
         String totalVotesSoFar = event.getMessage().getContentRaw();
         if (!buttonID.contains("argent")
                 && !buttonID.contains("blood")
@@ -1223,12 +1208,8 @@ public class AgendaHelper {
                         + totalVotesSoFar.substring(totalVotesSoFar.indexOf('\n'))
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
             }
-            if (!actionRow2.isEmpty()) {
-                event.getMessage()
-                        .editMessage(totalVotesSoFar)
-                        .setComponents(actionRow2)
-                        .queue();
-            }
+            event.getMessage().editMessage(totalVotesSoFar).queue();
+            ButtonHelper.deleteTheOneButton(event);
         } else {
             if ("Exhaust stuff".equalsIgnoreCase(totalVotesSoFar)) {
                 totalVotesSoFar =
@@ -1241,12 +1222,8 @@ public class AgendaHelper {
                         + totalVotes
                         + totalVotesSoFar.substring(totalVotesSoFar.indexOf('\n'));
             }
-            if (!actionRow2.isEmpty()) {
-                event.getMessage()
-                        .editMessage(totalVotesSoFar)
-                        .setComponents(actionRow2)
-                        .queue();
-            }
+            event.getMessage().editMessage(totalVotesSoFar).queue();
+            ButtonHelper.deleteTheOneButton(event);
             String message;
             if (buttonID.contains("everything")) {
                 message = "Exhausted all planets for " + votes + " vote" + ("1".equals(votes) ? "" : "s");
@@ -1659,7 +1636,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("reverse_")
-    public static void reverseRider(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+    public static void reverseRider(String buttonID, Game game, Player player) {
         String choice = buttonID.substring(buttonID.indexOf('_') + 1);
         String voteMessage = player.getFactionEmojiOrColor() + " Chose to reverse the " + choice + ".";
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
@@ -2013,8 +1990,7 @@ public class AgendaHelper {
         }
     }
 
-    private static List<Button> getPlanetOutcomeButtons(
-            GenericInteractionCreateEvent event, Player player, Game game, String prefix, String rider) {
+    private static List<Button> getPlanetOutcomeButtons(Player player, Game game, String prefix, String rider) {
         List<Button> planetOutcomeButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
         for (String planet : planets) {
@@ -2710,8 +2686,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("presetCommitteeFormation")
-    public static void presetCommitteeFormation(
-            ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+    public static void presetCommitteeFormation(ButtonInteractionEvent event, Player player, Game game) {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
@@ -2963,7 +2938,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("refreshAgenda")
-    public static void refreshAgenda(Game game, ButtonInteractionEvent event) {
+    public static void refreshAgenda(Game game) {
         String agendaDetails = game.getCurrentAgendaInfo();
         String agendaID = "CL";
         if (StringUtils.countMatches(agendaDetails, "_") > 2) {
@@ -3579,8 +3554,7 @@ public class AgendaHelper {
         String voteMessage = "Chose to Rider for one of " + factionOrColor + "'s planets. Please choose which one.";
         List<Button> outcomeActionRow;
         buttonID = buttonID.replace(factionOrColor + "_", "");
-        outcomeActionRow =
-                getPlanetOutcomeButtons(event, planetOwner, game, player.getFinsFactionCheckerPrefix(), buttonID);
+        outcomeActionRow = getPlanetOutcomeButtons(planetOwner, game, player.getFinsFactionCheckerPrefix(), buttonID);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, outcomeActionRow);
         ButtonHelper.deleteMessage(event);
     }
@@ -3800,12 +3774,7 @@ public class AgendaHelper {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void drawAgenda(GenericInteractionCreateEvent event, int count, Game game, @NotNull Player player) {
-        drawAgenda(event, count, false, game, player);
-    }
-
-    public static void drawAgenda(
-            GenericInteractionCreateEvent event, int count, boolean fromBottom, Game game, @NotNull Player player) {
+    public static void drawAgenda(int count, boolean fromBottom, Game game, @NotNull Player player) {
         drawAgenda(count, fromBottom, game, player, false);
     }
 
@@ -4031,11 +4000,6 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
         if (!action) {
             BannerGenerator.drawAgendaBanner(aCount, game);
-        }
-        StringBuilder whensAftersMessage = new StringBuilder(
-                "Please indicate whether you abstain from playing \"when\"s and \"after\"s.\nIf you have an action card with those windows, you may simply play it.");
-        if (action) {
-            whensAftersMessage.append("\nYou may play \"after\"s during this agenda.");
         }
 
         AutoPingMetadataManager.setupAutoPing(game.getName());
@@ -4580,7 +4544,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("breakDocketTie_")
-    public static void breakDocketTie(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void breakDocketTie(ButtonInteractionEvent event, Game game, String buttonID) {
         String pos = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
         game.setStoredValue("docketSpace" + pos, faction);

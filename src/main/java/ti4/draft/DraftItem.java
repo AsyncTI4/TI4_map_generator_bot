@@ -3,7 +3,7 @@ package ti4.draft;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.draft.items.AbilityDraftItem;
 import ti4.draft.items.AgentDraftItem;

@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
+import net.dv8tion.jda.api.modals.Modal;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
@@ -137,7 +138,7 @@ public class AddTileListService {
                 .setRequired(true)
                 .build();
         return Modal.create(modalId, "Add Map String for " + game.getName())
-                .addActionRow(tags)
+                .addComponents(ActionRow.of(tags))
                 .build();
     }
 
