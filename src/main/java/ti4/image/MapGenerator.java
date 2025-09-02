@@ -82,6 +82,7 @@ public class MapGenerator implements AutoCloseable {
     private final Graphics graphics;
     private final BufferedImage mainImage;
     private byte[] mainImageBytes;
+    private String imageFormat = "webp";
     private final GenericInteractionCreateEvent event;
     private final int scoreTokenSpacing;
     private final Game game;
@@ -193,7 +194,7 @@ public class MapGenerator implements AutoCloseable {
         }
 
         // Create image
-        mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         graphics = mainImage.getGraphics();
     }
 
@@ -237,7 +238,7 @@ public class MapGenerator implements AutoCloseable {
     FileUpload createFileUpload() {
         if (debug) debugDiscordTime = StopWatch.createStarted();
         game.incrementMapImageGenerationCount();
-        FileUpload fileUpload = FileUploadService.createFileUpload(mainImageBytes, game.getName());
+        FileUpload fileUpload = FileUploadService.createFileUpload(mainImageBytes, game.getName(), imageFormat);
         if (debug) debugDiscordTime.stop();
         if (debug && !AsyncTi4WebsiteHelper.uploadsEnabled()) FileUploadService.saveLocalPng(mainImage, "MapDebug");
         return fileUpload;
@@ -427,7 +428,13 @@ public class MapGenerator implements AutoCloseable {
 
         if (debug) debugImageGraphicsTime = StopWatch.createStarted();
         drawImage();
-        mainImageBytes = ImageHelper.writeWebp(mainImage);
+        if (mainImage.getWidth() > 16383 || mainImage.getHeight() > 16383) {
+            mainImageBytes = ImageHelper.writeJpg(mainImage);
+            imageFormat = "jpg";
+        } else {
+            mainImageBytes = ImageHelper.writeWebp(mainImage);
+            imageFormat = "webp";
+        }
         if (debug) debugImageGraphicsTime.stop();
     }
 
