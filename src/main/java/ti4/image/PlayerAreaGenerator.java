@@ -115,11 +115,14 @@ class PlayerAreaGenerator {
     }
 
     public void drawAllPlayerAreas(Point topLeftOfAllPAs) {
+        drawAllPlayerAreas(topLeftOfAllPAs, new ArrayList<>(game.getPlayers().values()));
+    }
+
+    public void drawAllPlayerAreas(Point topLeftOfAllPAs, List<Player> players) {
         graphics.setFont(Storage.getFont32());
         int x = topLeftOfAllPAs.x;
         int y = topLeftOfAllPAs.y;
 
-        List<Player> players = new ArrayList<>(game.getPlayers().values());
         for (Player player : players) {
             if (player == null) continue;
 

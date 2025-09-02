@@ -209,10 +209,29 @@ public class MapGenerator implements AutoCloseable {
     private static int getHeightOfPlayerAreasSection(Game game, int playerCountForMap, int objectivesY) {
         final int typicalPlayerAreaHeight = 340;
         final int unrealPlayerHeight = 35;
-        int playersY = playerCountForMap * typicalPlayerAreaHeight;
-        int unrealPlayers = game.getNotRealPlayers().size();
+
+        List<Player> players = new ArrayList<>(game.getPlayers().values());
+        int playersY;
+        if (playerCountForMap > 8) {
+            int half = (players.size() + 1) / 2;
+            int leftHeight = getPlayersHeight(players.subList(0, half), typicalPlayerAreaHeight, unrealPlayerHeight);
+            int rightHeight = getPlayersHeight(players.subList(half, players.size()), typicalPlayerAreaHeight, unrealPlayerHeight);
+            playersY = Math.max(leftHeight, rightHeight);
+        } else {
+            playersY = getPlayersHeight(players, typicalPlayerAreaHeight, unrealPlayerHeight);
+        }
+        final int columnsOfLaws = 2;
+        final int lawHeight = 115;
+        int lawsY = (game.getLaws().size() / columnsOfLaws + 1) * lawHeight;
+        lawsY += (game.getEventsInEffect().size() / columnsOfLaws + 1) * lawHeight;
+        return playersY + lawsY + objectivesY + EXTRA_Y * 3;
+    }
+
+    private static int getPlayersHeight(List<Player> players, int typicalPlayerAreaHeight, int unrealPlayerHeight) {
+        int playersY = players.size() * typicalPlayerAreaHeight;
+        int unrealPlayers = (int) players.stream().filter(p -> !p.isRealPlayer()).count();
         playersY += unrealPlayers * unrealPlayerHeight;
-        for (Player player : game.getPlayers().values()) {
+        for (Player player : players) {
             if ("neutral".equalsIgnoreCase(player.getFaction()) || (player.isNpc() && player.isDummy())) {
                 playersY -= 350;
             }
@@ -223,11 +242,7 @@ public class MapGenerator implements AutoCloseable {
             }
             playersY += (player.getTeamMateIDs().size() - 1) * unrealPlayerHeight;
         }
-        final int columnsOfLaws = 2;
-        final int lawHeight = 115;
-        int lawsY = (game.getLaws().size() / columnsOfLaws + 1) * lawHeight;
-        lawsY += (game.getEventsInEffect().size() / columnsOfLaws + 1) * lawHeight;
-        return playersY + lawsY + objectivesY + EXTRA_Y * 3;
+        return playersY;
     }
 
     private DisplayType defaultIfNull(DisplayType displayType) {
@@ -538,9 +553,42 @@ public class MapGenerator implements AutoCloseable {
 
         if (displayTypeBasic == DisplayType.all || displayTypeBasic == DisplayType.stats) {
             Point topLeft = new Point(x, y);
-            new PlayerAreaGenerator(
-                            graphics, game, isFoWPrivate, fowPlayer, websiteOverlays, mapWidth, scoreTokenSpacing)
-                    .drawAllPlayerAreas(topLeft);
+            List<Player> allPlayers = new ArrayList<>(game.getPlayers().values());
+            if (allPlayers.size() > 8) {
+                int half = (allPlayers.size() + 1) / 2;
+                int availableWidth = mapWidth - topLeft.x;
+                int columnWidth = availableWidth / 2;
+                new PlayerAreaGenerator(
+                                graphics,
+                                game,
+                                isFoWPrivate,
+                                fowPlayer,
+                                websiteOverlays,
+                                topLeft.x + columnWidth,
+                                scoreTokenSpacing)
+                        .drawAllPlayerAreas(topLeft, allPlayers.subList(0, half));
+                new PlayerAreaGenerator(
+                                graphics,
+                                game,
+                                isFoWPrivate,
+                                fowPlayer,
+                                websiteOverlays,
+                                mapWidth,
+                                scoreTokenSpacing)
+                        .drawAllPlayerAreas(
+                                new Point(topLeft.x + columnWidth, topLeft.y),
+                                allPlayers.subList(half, allPlayers.size()));
+            } else {
+                new PlayerAreaGenerator(
+                                graphics,
+                                game,
+                                isFoWPrivate,
+                                fowPlayer,
+                                websiteOverlays,
+                                mapWidth,
+                                scoreTokenSpacing)
+                        .drawAllPlayerAreas(topLeft);
+            }
         }
     }
 
