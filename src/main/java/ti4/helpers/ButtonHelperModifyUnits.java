@@ -1897,7 +1897,7 @@ public class ButtonHelperModifyUnits {
         String playerRep = player.getRepresentation();
 
         Tile tile = game.getTileFromPositionOrAlias(planetName);
-        if (ButtonHelper.isNumeric(planetName)) {
+        if (ButtonHelper.isNumeric(planetName) && unitLong.contains("2gf")) {
             planetName += "space";
         }
         if ("sd".equalsIgnoreCase(unitID)) {
@@ -1933,7 +1933,8 @@ public class ButtonHelperModifyUnits {
                     } else {
                         tile = game.getTileByPosition(planetName.replace("space", ""));
                         AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " gf ");
-                        successMessage = producedOrPlaced + " " + amount + " " + UnitEmojis.infantry + " in space.";
+                        successMessage = producedOrPlaced + " " + amount + " " + UnitEmojis.infantry
+                                + " in the space area of " + tile.getRepresentationForButtons() + ".";
                     }
                 } else {
                     if (!planetName.contains("space")) {
