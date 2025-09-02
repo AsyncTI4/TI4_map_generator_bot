@@ -210,7 +210,7 @@ public class MapGenerator implements AutoCloseable {
         final int typicalPlayerAreaHeight = 340;
         int playersY = playerCountForMap * typicalPlayerAreaHeight;
         int unrealPlayers = game.getNotRealPlayers().size();
-        playersY += 35 + Math.round(unrealPlayers / 10.0f) * 15;
+        playersY += Math.round(unrealPlayers / 20.0f) * 15;
         for (Player player : game.getPlayers().values()) {
             if ("neutral".equalsIgnoreCase(player.getFaction()) || (player.isNpc() && player.isDummy())) {
                 playersY -= 350;
