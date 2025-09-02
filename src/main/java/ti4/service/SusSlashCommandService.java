@@ -108,7 +108,7 @@ public class SusSlashCommandService {
         }
     }
 
-    private static void reportSusSlashCommand(SlashCommandInteractionEvent event, String jumpUrl) {
+    public static void reportSusSlashCommand(SlashCommandInteractionEvent event, String jumpUrl) {
         TextChannel moderationLogChannel =
                 AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("moderation-log", true).stream()
                         .findFirst()

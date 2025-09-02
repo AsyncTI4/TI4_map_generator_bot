@@ -6,6 +6,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -31,11 +32,18 @@ public class MuaatHeroService {
 
         // Add the muaat supernova to the map and copy over the space unitholder
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
+        boolean frontier = false;
+        if (space.getTokenList().contains(frontierFilename)) {
+            frontier = true;
+        }
         Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
 
         game.removeTile(tile.getPosition());
         game.setTile(novaTile);
-
+        if (frontier) {
+            novaTile.getSpaceUnitHolder().addToken(frontierFilename);
+        }
         String message2 = tile.getRepresentation() + " has been _Nova Seed_'d by " + muaat.getRepresentation() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, novaTile, 1, message2);
 

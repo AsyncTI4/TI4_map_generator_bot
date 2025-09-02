@@ -1128,7 +1128,7 @@ public class ButtonHelperAbilities {
         return buttons;
     }
 
-    private static Tile getLocationOfSuperweapon(Game game, String name) {
+    public static Tile getLocationOfSuperweapon(Game game, String name) {
         Tile tile = null;
         for (Tile loc : game.getTileMap().values()) {
             for (UnitHolder uH : loc.getPlanetUnitHolders()) {

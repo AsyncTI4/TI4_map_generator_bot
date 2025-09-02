@@ -234,7 +234,8 @@ public class StatusHelper {
             } else if (player.getSo() == 0
                     || player.isNpc()
                     || userSettings.getSandbagPref().contains("bot")) {
-                String message = player.getRepresentation() + " has no secret objectives to score at this time.";
+                String message = player.getRepresentation()
+                        + " has opted not to score a secret objective at this point in time.";
                 game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "None");
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 key2 = "queueToScoreSOs";

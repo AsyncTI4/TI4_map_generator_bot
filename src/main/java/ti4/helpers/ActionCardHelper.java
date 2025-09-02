@@ -63,14 +63,24 @@ public class ActionCardHelper {
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, getTrapCardInfo(player));
         }
         if (player.hasAbility("classified_developments")) {
-            String sb = "Info on your superweapons are as follows:\n"
-                    + Mapper.getRelic("superweaponavailyn").getSimpleRepresentation()
-                    + "\n" + Mapper.getRelic("superweaponcaled").getSimpleRepresentation()
-                    + "\n" + Mapper.getRelic("superweaponglatison").getSimpleRepresentation()
-                    + "\n" + Mapper.getRelic("superweapongrom").getSimpleRepresentation()
-                    + "\n" + Mapper.getRelic("superweaponmors").getSimpleRepresentation()
-                    + "\n";
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
+            String[] superWeapons = {
+                "superweaponavailyn", "superweaponcaled", "superweaponglatison", "superweapongrom", "superweaponmors"
+            };
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("Info on your superweapons are as follows:\n");
+
+            for (String id : superWeapons) {
+                sb.append(Mapper.getRelic(id).getSimpleRepresentation());
+
+                var location = ButtonHelperAbilities.getLocationOfSuperweapon(player.getGame(), id);
+                if (location != null) {
+                    sb.append("\nLOCATION: ").append(location.getRepresentationForButtons());
+                }
+                sb.append("\n");
+            }
+
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
         }
     }
 
