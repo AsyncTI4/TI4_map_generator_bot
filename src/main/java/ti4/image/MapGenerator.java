@@ -215,7 +215,8 @@ public class MapGenerator implements AutoCloseable {
         if (playerCountForMap > 8) {
             int half = (players.size() + 1) / 2;
             int leftHeight = getPlayersHeight(players.subList(0, half), typicalPlayerAreaHeight, unrealPlayerHeight);
-            int rightHeight = getPlayersHeight(players.subList(half, players.size()), typicalPlayerAreaHeight, unrealPlayerHeight);
+            int rightHeight = getPlayersHeight(
+                    players.subList(half, players.size()), typicalPlayerAreaHeight, unrealPlayerHeight);
             playersY = Math.max(leftHeight, rightHeight);
         } else {
             playersY = getPlayersHeight(players, typicalPlayerAreaHeight, unrealPlayerHeight);
@@ -229,7 +230,8 @@ public class MapGenerator implements AutoCloseable {
 
     private static int getPlayersHeight(List<Player> players, int typicalPlayerAreaHeight, int unrealPlayerHeight) {
         int playersY = players.size() * typicalPlayerAreaHeight;
-        int unrealPlayers = (int) players.stream().filter(p -> !p.isRealPlayer()).count();
+        int unrealPlayers =
+                (int) players.stream().filter(p -> !p.isRealPlayer()).count();
         playersY += unrealPlayers * unrealPlayerHeight;
         for (Player player : players) {
             if ("neutral".equalsIgnoreCase(player.getFaction()) || (player.isNpc() && player.isDummy())) {
@@ -569,25 +571,13 @@ public class MapGenerator implements AutoCloseable {
                                 scoreTokenSpacing)
                         .drawAllPlayerAreas(topLeft, allPlayers.subList(0, half));
                 new PlayerAreaGenerator(
-                                graphics,
-                                game,
-                                isFoWPrivate,
-                                fowPlayer,
-                                websiteOverlays,
-                                mapWidth,
-                                scoreTokenSpacing)
+                                graphics, game, isFoWPrivate, fowPlayer, websiteOverlays, mapWidth, scoreTokenSpacing)
                         .drawAllPlayerAreas(
                                 new Point(topLeft.x + columnWidth, topLeft.y),
                                 allPlayers.subList(half, allPlayers.size()));
             } else {
                 new PlayerAreaGenerator(
-                                graphics,
-                                game,
-                                isFoWPrivate,
-                                fowPlayer,
-                                websiteOverlays,
-                                mapWidth,
-                                scoreTokenSpacing)
+                                graphics, game, isFoWPrivate, fowPlayer, websiteOverlays, mapWidth, scoreTokenSpacing)
                         .drawAllPlayerAreas(topLeft);
             }
         }
