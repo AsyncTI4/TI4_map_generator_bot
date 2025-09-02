@@ -72,6 +72,9 @@ public class TacticalActionDisplacementService {
     public Map<String, Map<UnitKey, List<Integer>>> moveAllFromTile(Game game, Player player, Tile tile) {
         Map<String, Map<UnitKey, List<Integer>>> displaced = game.getTacticalActionDisplacement();
         List<UnitType> movableFromPlanets = new ArrayList<>(List.of(UnitType.Infantry, UnitType.Mech));
+        if (player.hasTech("ffac2")) {
+            movableFromPlanets.add(UnitType.Spacedock);
+        }
         Set<Player> allowedAllies = resolveAllowedAllies(game, player, tile);
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             processUnitHolderMovement(game, player, allowedAllies, tile, unitHolder, displaced, movableFromPlanets);

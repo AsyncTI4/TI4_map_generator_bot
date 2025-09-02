@@ -1,6 +1,6 @@
 package ti4.map.persistence;
 
-import static java.util.stream.Collectors.toUnmodifiableSet;
+import static java.util.stream.Collectors.*;
 
 import java.util.List;
 import java.util.Map;
@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.map.Game;
-import ti4.map.Player;
 
 @Getter
 public class ManagedGame {
@@ -75,7 +74,8 @@ public class ManagedGame {
                 .map(p -> GameManager.addOrMergePlayer(this, p))
                 .collect(toUnmodifiableSet());
         playerToIsReal = game.getPlayers().values().stream()
-                .collect(Collectors.toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::isRealPlayer));
+                .collect(Collectors.toUnmodifiableMap(
+                        p -> getPlayer(p.getUserID()), p -> p.isRealPlayer() && !p.isNpc()));
 
         final long sixtyDays = 1000L * 60 * 60 * 24 * 60;
         stale = (System.currentTimeMillis() - game.getLastModifiedDate()) > sixtyDays;

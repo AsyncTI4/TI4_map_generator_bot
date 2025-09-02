@@ -90,7 +90,8 @@ class CreateGameButton extends Subcommand {
                                 member.getUser().getAsMention()
                                         + " is at their game limit (# of ongoing games must be equal or less than # of completed games + 3) and so cannot join more games at the moment."
                                         + " Their number of ongoing games is " + ongoingAmount
-                                        + " and their number of completed games is " + completedGames + ".");
+                                        + " and their number of completed games is " + completedGames + ".\n\n"
+                                        + "If you're playing a private game with friends, you can ping a bothelper for a 1-game exemption from the limit.");
                         return;
                     }
                     // Used for specific people we are limiting the amount of games of

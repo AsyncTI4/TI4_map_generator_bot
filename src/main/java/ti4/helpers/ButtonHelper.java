@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1305,33 +1302,7 @@ public class ButtonHelper {
                             + " use buttons to resolve a build for the Duha Menaimon (the Arborec flagship).",
                     buttons);
         }
-        // All players get to use Magen
-        // this is mandatory, so should probably be refactored to happen automatically
-        for (Player magenPlayer : game.getPlayers().values()) {
-            boolean has = activeSystem.containsPlayersUnitsWithModelCondition(magenPlayer, UnitModel::getIsStructure);
-            if (magenPlayer.hasAbility("byssus")) {
-                for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
-                    if (planet.getUnitCount(UnitType.Mech, magenPlayer) > 0) {
-                        has = true;
-                    }
-                }
-            }
-            for (UnitHolder p : activeSystem.getPlanetUnitHolders()) {
-                for (String token : p.getTokenList()) {
-                    if (magenPlayer.getPlanets().contains(p.getName()) && token.contains("superweapon")) {
-                        has = true;
-                        break;
-                    }
-                }
-            }
-            if (!has || !magenPlayer.hasTech("md")) continue;
 
-            String id = magenPlayer.finChecker() + "useMagenDefense_" + activeSystem.getPosition();
-            Button useMagen = Buttons.red(id, "Use Magen Defense Grid", TechEmojis.WarfareTech);
-            String magenMsg = magenPlayer.getRepresentation()
-                    + " you can, and must, use _Magen Defense Grid_ to place an infantry with each of your structures in the active system.";
-            MessageHelper.sendMessageToChannelWithButton(magenPlayer.getCorrectChannel(), magenMsg, useMagen);
-        }
         if (player.hasAbility("void_tap")
                 && (activeSystem.getPlanetUnitHolders().isEmpty()
                         || doesPlayerHaveFSHere("eidolon_flagship", player, activeSystem))) {
@@ -1899,7 +1870,8 @@ public class ButtonHelper {
                     && game.getLawsInfo().get("absol_sanctions").equalsIgnoreCase(player.getFaction())) {
                 limit = 5;
             }
-            if (game.getStoredValue("controlTokensOnAgendaabsol_sanctions").contains(player.getColor())) {
+            if (game.getStoredValue("controlTokensOnAgenda" + game.getLaws().get("absol_sanctions"))
+                    .contains(player.getColor())) {
                 limit = 5;
             }
         }
@@ -3430,6 +3402,7 @@ public class ButtonHelper {
         }
         // System.out.println(fightersIgnored);
         int ignoredFs = 0;
+
         UnitHolder spaceHolder = tile.getSpaceUnitHolder();
         List<String> unitTypesCounted = new ArrayList<>();
         Map<UnitModel, Integer> unitsByQuantity = getAllUnits(spaceHolder, player);
