@@ -7,11 +7,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
@@ -55,22 +55,32 @@ public class ActionCardHelper {
                     getPlayActionCardButtons(game, player));
         }
 
-        sendTrapCardInfo(game, player);
+        sendTrapCardInfo(player);
     }
 
-    private static void sendTrapCardInfo(Game game, Player player) {
+    private static void sendTrapCardInfo(Player player) {
         if (player.hasAbility("cunning") || player.hasAbility("subterfuge")) { // Lih-zo trap abilities
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, getTrapCardInfo(player));
         }
         if (player.hasAbility("classified_developments")) {
-            String sb = "Info on your superweapons are as follows:\n"
-                    + Mapper.getRelic("superweaponavailyn").getSimpleRepresentation()
-                    + "\n" + Mapper.getRelic("superweaponcaled").getSimpleRepresentation()
-                    + "\n" + Mapper.getRelic("superweaponglatison").getSimpleRepresentation()
-                    + "\n" + Mapper.getRelic("superweapongrom").getSimpleRepresentation()
-                    + "\n" + Mapper.getRelic("superweaponmors").getSimpleRepresentation()
-                    + "\n";
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
+            String[] superWeapons = {
+                "superweaponavailyn", "superweaponcaled", "superweaponglatison", "superweapongrom", "superweaponmors"
+            };
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("Info on your superweapons are as follows:\n");
+
+            for (String id : superWeapons) {
+                sb.append(Mapper.getRelic(id).getSimpleRepresentation());
+
+                var location = ButtonHelperAbilities.getLocationOfSuperweapon(player.getGame(), id);
+                if (location != null) {
+                    sb.append("\nLOCATION: ").append(location.getRepresentationForButtons());
+                }
+                sb.append("\n");
+            }
+
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
         }
     }
 
@@ -186,14 +196,14 @@ public class ActionCardHelper {
         if (actionCards != null
                 && !actionCards.isEmpty()
                 && !IsPlayerElectedService.isPlayerElected(game, player, "censure")
-                && hasPrePlayCards(game, player)) {
+                && hasPrePlayCards(player)) {
             acButtons.add(Buttons.gray("checkForAllACAssignments", "Pre-Assign Action Cards"));
         }
 
         return acButtons;
     }
 
-    private static boolean hasPrePlayCards(Game game, Player player) {
+    private static boolean hasPrePlayCards(Player player) {
         List<String> prePlayable = List.of(
                 "coup",
                 "disgrace",

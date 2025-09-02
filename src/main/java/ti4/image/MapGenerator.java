@@ -78,10 +78,14 @@ public class MapGenerator implements AutoCloseable {
     private static final BasicStroke stroke4 = new BasicStroke(4.0f);
     private static final BasicStroke stroke5 = new BasicStroke(5.0f);
     private static final BasicStroke stroke6 = new BasicStroke(6.0f);
+    private static final int WEBP_MAX_DIMENSION = 16383;
+    private static final ColorConvertOp GRAYSCALE_CONVERT_OP =
+            new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
 
     private final Graphics graphics;
     private final BufferedImage mainImage;
     private byte[] mainImageBytes;
+    private String imageFormat = "webp";
     private final GenericInteractionCreateEvent event;
     private final int scoreTokenSpacing;
     private final Game game;
@@ -126,16 +130,20 @@ public class MapGenerator implements AutoCloseable {
         else scoreTokenSpacing = 30;
 
         // Height of objectives section (=0 when there is 5 or less objectives in the column with most objectives)
-        int stage1PublicObjCount = (int) game.getRevealedPublicObjectives().keySet().stream()
-                .filter(Mapper.getPublicObjectivesStage1()::containsKey)
-                .count();
-        int stage2PublicObjCount = (int) game.getRevealedPublicObjectives().keySet().stream()
-                .filter(Mapper.getPublicObjectivesStage2()::containsKey)
-                .count();
-        int otherObjCount = game.getRevealedPublicObjectives().size() - stage1PublicObjCount - stage2PublicObjCount;
+        Set<String> revealedObjectives = game.getRevealedPublicObjectives().keySet();
+        int stage1PublicObjCount = 0;
+        int stage2PublicObjCount = 0;
+        for (String objective : revealedObjectives) {
+            if (Mapper.getPublicObjectivesStage1().containsKey(objective)) {
+                stage1PublicObjCount++;
+            } else if (Mapper.getPublicObjectivesStage2().containsKey(objective)) {
+                stage2PublicObjCount++;
+            }
+        }
+        int otherObjCount = revealedObjectives.size() - stage1PublicObjCount - stage2PublicObjCount;
         otherObjCount = Math.max(Objective.retrieveCustom(game).size(), otherObjCount);
-        stage1PublicObjCount = game.getPublicObjectives1Peakable().size() + stage1PublicObjCount;
-        stage2PublicObjCount = game.getPublicObjectives2Peakable().size() + stage2PublicObjCount;
+        stage1PublicObjCount += game.getPublicObjectives1Peakable().size();
+        stage2PublicObjCount += game.getPublicObjectives2Peakable().size();
         int mostObjectivesInAColumn = Math.max(Math.max(stage1PublicObjCount, stage2PublicObjCount), otherObjCount);
         int heightOfObjectivesSection = Math.max((mostObjectivesInAColumn - 5) * 43, 0);
 
@@ -193,7 +201,7 @@ public class MapGenerator implements AutoCloseable {
         }
 
         // Create image
-        mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         graphics = mainImage.getGraphics();
     }
 
@@ -207,7 +215,7 @@ public class MapGenerator implements AutoCloseable {
         int unrealPlayers = game.getNotRealPlayers().size();
         playersY += unrealPlayers * unrealPlayerHeight;
         for (Player player : game.getPlayers().values()) {
-            if (player.getFaction().equalsIgnoreCase("neutral") || (player.isNpc() && player.isDummy())) {
+            if ("neutral".equalsIgnoreCase(player.getFaction()) || (player.isNpc() && player.isDummy())) {
                 playersY -= 350;
             }
             if (player.isEliminated()) {
@@ -237,7 +245,7 @@ public class MapGenerator implements AutoCloseable {
     FileUpload createFileUpload() {
         if (debug) debugDiscordTime = StopWatch.createStarted();
         game.incrementMapImageGenerationCount();
-        FileUpload fileUpload = FileUploadService.createFileUpload(mainImageBytes, game.getName());
+        FileUpload fileUpload = FileUploadService.createFileUpload(mainImageBytes, game.getName(), imageFormat);
         if (debug) debugDiscordTime.stop();
         if (debug && !AsyncTi4WebsiteHelper.uploadsEnabled()) FileUploadService.saveLocalPng(mainImage, "MapDebug");
         return fileUpload;
@@ -296,40 +304,40 @@ public class MapGenerator implements AutoCloseable {
         }
 
         tileMap.remove(null);
-        Set<String> tiles = tileMap.keySet();
+        List<String> sortedTiles = tileMap.keySet().stream().sorted().toList();
         Set<String> tilesWithExtra =
                 new HashSet<>(game.getAdjacentTileOverrides().values());
         tilesWithExtra.addAll(game.getBorderAnomalies().stream()
                 .map(BorderAnomalyHolder::getTile)
                 .collect(Collectors.toSet()));
 
-        tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Tile));
         tilesWithExtra.forEach(key -> addTile(tileMap.get(key), TileStep.Extras));
-        tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Units));
+        sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Tile));
+        sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Units));
         if (!game.getTileDistances().isEmpty()) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Distance));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Distance));
             game.setTileDistances(new HashMap<>()); // clear distances after consuming them
         }
         if (displayType == DisplayType.wormholes) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Wormholes));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Wormholes));
         } else if (displayType == DisplayType.anomalies) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Anomalies));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Anomalies));
         } else if (displayType == DisplayType.aetherstream) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Aetherstream));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Aetherstream));
         } else if (displayType == DisplayType.legendaries) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Legendaries));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Legendaries));
         } else if (displayType == DisplayType.empties) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Empties));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Empties));
         } else if (displayType == DisplayType.spacecannon) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.SpaceCannon));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.SpaceCannon));
         } else if (displayType == DisplayType.traits) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Traits));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Traits));
         } else if (displayType == DisplayType.techskips) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.TechSkips));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.TechSkips));
         } else if (displayType == DisplayType.attachments) {
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Attachments));
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Attachments));
         }
-        tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.TileNumber));
+        sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.TileNumber));
     }
 
     private void setupFow(Map<String, Tile> tilesToDisplay) {
@@ -403,14 +411,14 @@ public class MapGenerator implements AutoCloseable {
         try {
             String testing = System.getenv("TESTING");
             if (testing == null && displayTypeBasic == DisplayType.all && !isFoWPrivate) {
-                AsyncTi4WebsiteHelper.putMap(game.getName(), mainImageBytes, false, null);
+                AsyncTi4WebsiteHelper.putMap(game.getName(), imageFormat, mainImageBytes, false, null);
                 AsyncTi4WebsiteHelper.putData(game.getName(), game);
                 AsyncTi4WebsiteHelper.putOverlays(game.getID(), websiteOverlays);
                 AsyncTi4WebsiteHelper.putPlayerData(game.getID(), game);
             } else if (isFoWPrivate) {
                 Player player = CommandHelper.getPlayerFromGame(
                         game, event.getMember(), event.getUser().getId());
-                AsyncTi4WebsiteHelper.putMap(game.getName(), mainImageBytes, true, player);
+                AsyncTi4WebsiteHelper.putMap(game.getName(), imageFormat, mainImageBytes, true, player);
             }
         } catch (Exception e) {
             BotLogger.error("Failed to send to game info to website", e);
@@ -427,7 +435,13 @@ public class MapGenerator implements AutoCloseable {
 
         if (debug) debugImageGraphicsTime = StopWatch.createStarted();
         drawImage();
-        mainImageBytes = ImageHelper.writeJpg(mainImage);
+        if (mainImage.getWidth() > WEBP_MAX_DIMENSION || mainImage.getHeight() > WEBP_MAX_DIMENSION) {
+            mainImageBytes = ImageHelper.writeJpg(mainImage);
+            imageFormat = "jpg";
+        } else {
+            mainImageBytes = ImageHelper.writeWebp(mainImage);
+            imageFormat = "webp";
+        }
         if (debug) debugImageGraphicsTime.stop();
     }
 
@@ -2358,9 +2372,7 @@ public class MapGenerator implements AutoCloseable {
     // The first parameter is the scale factor (contrast), the second is the offset
     // (brightness)
     private static BufferedImage makeGrayscale(BufferedImage image) {
-        ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-        ColorConvertOp op = new ColorConvertOp(cs, null);
-        return op.filter(image, null);
+        return GRAYSCALE_CONVERT_OP.filter(image, null);
     }
 
     private void addWebsiteOverlay(String overlayTitle, String overlayText, int x, int y, int width, int height) {

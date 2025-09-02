@@ -7,16 +7,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
+import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
@@ -760,19 +761,8 @@ public class TransactionHelper {
                         .setValue("The deal is that I ")
                         .build();
 
-                // String selectId = "dealOptions_" + other;
-                // StringSelectMenu selectMenu = StringSelectMenu.create(selectId)
-                //         .setPlaceholder("Choose a deal type")
-                //         .setMinValues(1)    // minimum selections allowed
-                //         .setMaxValues(1)    // maximum selections allowed for single select
-                //         .addOptions(
-                //             SelectOption.of("Fixed price", "fixed_price").withDescription("A fixed price deal"),
-                //             SelectOption.of("Hourly", "hourly").withDescription("Pay by hour"),
-                //             SelectOption.of("Commission", "commission").withDescription("Commission-based")
-                //         )
-                //         .build();
                 Modal modal = Modal.create(modalId, "Deal Details")
-                        .addActionRow(summary)
+                        .addComponents(ActionRow.of(summary))
                         .build();
 
                 event.replyModal(modal).queue();
@@ -791,7 +781,7 @@ public class TransactionHelper {
                         .setValue("The deal is that you ")
                         .build();
                 Modal modal = Modal.create(modalId, "Deal Details")
-                        .addActionRow(summary)
+                        .addComponents(ActionRow.of(summary))
                         .build();
                 event.replyModal(modal).queue();
                 return;
@@ -1626,7 +1616,7 @@ public class TransactionHelper {
         }
 
         if (player == p1) {
-            if (getReturnPNsInPlayAreaButtons(game, p1, p2).size() > 0) {
+            if (!getReturnPNsInPlayAreaButtons(game, p1, p2).isEmpty()) {
                 stuffToTransButtons.add(Buttons.gray(
                         "startReturnPNInPlayArea_" + p2.getFaction(), "Return a Play Area Promissory Note"));
             }

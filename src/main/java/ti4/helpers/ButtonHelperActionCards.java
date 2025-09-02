@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.DiceHelper.Die;
@@ -2632,7 +2632,7 @@ public class ButtonHelperActionCards {
                 }
             }
         }
-        if (message.length() == 0) {
+        if (message.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     player.getRepresentationUnfogged()

@@ -9,14 +9,14 @@ import java.util.Map;
 import java.util.function.Function;
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.selections.SelectOption;
+import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
-import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -134,7 +134,7 @@ public class ChoiceSetting<T> extends SettingInterface {
     }
 
     private void sendSelectionBoxes(ButtonInteractionEvent buttonEvent, List<Map.Entry<String, T>> entries) {
-        String prefixID = buttonEvent.getButton().getId();
+        String prefixID = buttonEvent.getButton().getCustomId();
         List<ActionRow> rows = new ArrayList<>();
         int x = 0;
         for (List<Map.Entry<String, T>> menu : ListUtils.partition(entries, 25)) {

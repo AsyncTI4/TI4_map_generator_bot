@@ -209,7 +209,7 @@ public class CommandHelper {
             return " used `" + ((CommandInteractionPayload) event).getCommandString() + "`";
         }
         if (event instanceof ButtonInteractionEvent) {
-            return " pressed `" + ((ButtonInteraction) event).getButton().getId() + "`";
+            return " pressed `" + ((ButtonInteraction) event).getButton().getCustomId() + "`";
         }
         return " used the force";
     }

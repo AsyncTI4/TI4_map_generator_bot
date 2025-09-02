@@ -74,19 +74,15 @@ public class RematchService {
         }
 
         // CLOSE THREADS IN CHANNELS
-        if (tableTalkChannel != null) {
-            for (ThreadChannel threadChannel : tableTalkChannel.getThreadChannels()) {
-                threadChannel.getManager().setArchived(true).queue();
-            }
-            String newTableName = tableTalkChannel.getName().replace(name, newName);
-            game.getTableTalkChannel().getManager().setName(newTableName).queue();
+        for (ThreadChannel threadChannel : tableTalkChannel.getThreadChannels()) {
+            threadChannel.getManager().setArchived(true).queue();
         }
-        if (actionsChannel != null) {
-            for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
-                threadChannel.getManager().setArchived(true).queue();
-            }
-            game.getActionsChannel().getManager().setName(newName + "-actions").queue();
+        String newTableName = tableTalkChannel.getName().replace(name, newName);
+        game.getTableTalkChannel().getManager().setName(newTableName).queue();
+        for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
+            threadChannel.getManager().setArchived(true).queue();
         }
+        game.getActionsChannel().getManager().setName(newName + "-actions").queue();
         Member gameOwner = guild.getMemberById(game.getOwnerID());
         if (gameOwner == null) {
             for (Player player : game.getPlayers().values()) {
@@ -118,14 +114,14 @@ public class RematchService {
             newGameName += " Rematch #1";
         }
         newGame.setCustomName(newGameName);
-        if (tableTalkChannel != null) newGame.setTableTalkChannelID(tableTalkChannel.getId());
+        newGame.setTableTalkChannelID(tableTalkChannel.getId());
 
         // CREATE ACTIONS CHANNEL AND CLEAR PINS
         String newBotThreadName = newName + Constants.BOT_CHANNEL_SUFFIX;
         newGame.setMainChannelID(actionsChannel.getId());
         actionsChannel
                 .retrievePinnedMessages()
-                .queue(msgs -> msgs.forEach(msg -> msg.unpin().queue()), BotLogger::catchRestError);
+                .queue(msgs -> msgs.forEach(msg -> msg.getMessage().unpin().queue()), BotLogger::catchRestError);
 
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread =
