@@ -78,6 +78,7 @@ public class MapGenerator implements AutoCloseable {
     private static final BasicStroke stroke4 = new BasicStroke(4.0f);
     private static final BasicStroke stroke5 = new BasicStroke(5.0f);
     private static final BasicStroke stroke6 = new BasicStroke(6.0f);
+    private static final int WEBP_MAX_DIMENSION = 16383;
 
     private final Graphics graphics;
     private final BufferedImage mainImage;
@@ -303,7 +304,7 @@ public class MapGenerator implements AutoCloseable {
         tilesWithExtra.addAll(game.getBorderAnomalies().stream()
                 .map(BorderAnomalyHolder::getTile)
                 .collect(Collectors.toSet()));
-
+        
         tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Tile));
         tilesWithExtra.forEach(key -> addTile(tileMap.get(key), TileStep.Extras));
         tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Units));
@@ -428,7 +429,7 @@ public class MapGenerator implements AutoCloseable {
 
         if (debug) debugImageGraphicsTime = StopWatch.createStarted();
         drawImage();
-        if (mainImage.getWidth() > 16383 || mainImage.getHeight() > 16383) {
+        if (mainImage.getWidth() > WEBP_MAX_DIMENSION || mainImage.getHeight() > WEBP_MAX_DIMENSION) {
             mainImageBytes = ImageHelper.writeJpg(mainImage);
             imageFormat = "jpg";
         } else {
