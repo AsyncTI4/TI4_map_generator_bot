@@ -8,8 +8,13 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
+import java.awt.font.LineBreakMeasurer;
+import java.awt.font.TextAttribute;
+import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.text.AttributedCharacterIterator;
+import java.text.AttributedString;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -93,7 +98,7 @@ class PlayerAreaGenerator {
     private static final Stroke stroke4 = new BasicStroke(4.0f);
     private static final Stroke stroke5 = new BasicStroke(5.0f);
 
-    public PlayerAreaGenerator(
+    PlayerAreaGenerator(
             Graphics graphics,
             Game game,
             boolean isFoWPrivate,
@@ -110,27 +115,54 @@ class PlayerAreaGenerator {
         this.scoreTokenSpacing = scoreTokenSpacing;
     }
 
-    public static int getTotalPlayerAreaHeight(Game game) {
-        return 550 * game.getPlayers().size();
-    }
-
-    public void drawAllPlayerAreas(Point topLeftOfAllPAs) {
+    void drawAllPlayerAreas(Point topLeftOfAllPAs) {
         graphics.setFont(Storage.getFont32());
         int x = topLeftOfAllPAs.x;
         int y = topLeftOfAllPAs.y;
 
-        List<Player> players = new ArrayList<>(game.getPlayers().values());
-        for (Player player : players) {
-            if (player == null) continue;
-
+        for (Player player : game.getRealAndEliminatedPlayers()) {
             Point tl = new Point(x, y);
             Rectangle rect = drawPlayerAreaOLD(player, tl);
             if (rect.height > 0) y += rect.height + 15;
         }
+
+        List<Player> spectators = game.getPlayers().values().stream()
+                .filter(p -> !p.isRealPlayer() && !p.isDummy() && !p.isNpc())
+                .toList();
+
+        if (!spectators.isEmpty()) {
+            var spectatorString = new StringBuilder();
+            for (int i = 0, newlineCount = 0; i < spectators.size() - 1; i++) {
+                spectatorString.append(spectators.get(i).getUserName()).append(", ");
+                // add a newline every ~100 characters
+                if (spectatorString.length() > (newlineCount + 1) * 100) {
+                    spectatorString.append("\n");
+                    newlineCount++;
+                }
+            }
+            spectatorString.append(spectators.getLast().getUserName());
+
+            graphics.setFont(Storage.getFont32());
+            graphics.setColor(Color.WHITE);
+            drawString((Graphics2D) graphics, "Spectators: " + spectatorString, x, y + 15, mapWidth);
+        }
     }
 
-    public Rectangle drawPlayerAreaNEW(Point topLeft) {
-        return new Rectangle(topLeft);
+    private void drawString(Graphics2D g2, String text, int x, int y, float maxWidth) {
+        var attributedString = new AttributedString(text);
+        attributedString.addAttribute(TextAttribute.FONT, g2.getFont());
+        AttributedCharacterIterator characterIterator = attributedString.getIterator();
+
+        var lineBreakMeasurer = new LineBreakMeasurer(characterIterator, g2.getFontRenderContext());
+
+        float drawPosY = y;
+
+        while (lineBreakMeasurer.getPosition() < characterIterator.getEndIndex()) {
+            TextLayout layout = lineBreakMeasurer.nextLayout(maxWidth);
+            drawPosY += layout.getAscent();
+            layout.draw(g2, x, drawPosY);
+            drawPosY += layout.getDescent() + layout.getLeading();
+        }
     }
 
     private Rectangle drawPlayerAreaOLD(Player player, Point topLeft) {
@@ -237,7 +269,7 @@ class PlayerAreaGenerator {
                             stroke2,
                             Color.BLACK);
                 } else { // can one-line it
-                    String fullText = userName + (factionText == null ? "" : " " + factionText);
+                    String fullText = userName + " " + factionText;
                     DrawingUtil.superDrawString(
                             graphics,
                             fullText,
@@ -277,12 +309,9 @@ class PlayerAreaGenerator {
 
         // PAINT FACTION ICON
         y += 2;
-        String faction = player.getFaction();
-        if (faction != null) {
-            DrawingUtil.drawPlayerFactionIconImage(graphics, player, x, y, 95, 95);
-            if (!player.hasCustomFactionEmoji()) {
-                addWebsiteOverlay(player.getFactionModel(), x + 10, y + 10, 75, 75);
-            }
+        DrawingUtil.drawPlayerFactionIconImage(graphics, player, x, y, 95, 95);
+        if (!player.hasCustomFactionEmoji()) {
+            addWebsiteOverlay(player.getFactionModel(), x + 10, y + 10, 75, 75);
         }
         y += 4;
 
@@ -2053,9 +2082,7 @@ class PlayerAreaGenerator {
             }
 
             if (planet.isLegendary()) {
-                if (planetModel != null) {
-                    addWebsiteOverlay(planetModel, x + deltaX + 26, y + 60, 20, 20);
-                }
+                addWebsiteOverlay(planetModel, x + deltaX + 26, y + 60, 20, 20);
                 String statusOfAbility = exhaustedPlanetsAbilities.contains(planetName) ? "_exh" : "_rdy";
                 String planetLegendaryCresent = "pc_legendary" + statusOfAbility + ".png";
                 drawPlanetCardDetail(x + deltaX + 26, y + 60, planetLegendaryCresent);
