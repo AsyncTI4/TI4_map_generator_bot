@@ -181,8 +181,8 @@ public class ImageHelper {
             writeParam.setCompressionType(CompressionType.Lossy);
             writeParam.setUseSharpYUV(false);
             writeParam.setAlphaCompressionAlgorithm(0);
-            //writeParam.setCompressionQuality(.5f);
-            //writeParam.setMethod(1); //0-6, lower is faster, higher is better quality
+            // writeParam.setCompressionQuality(.5f);
+            // writeParam.setMethod(1); //0-6, lower is faster, higher is better quality
 
             writer.setOutput(imageOutputStream);
 

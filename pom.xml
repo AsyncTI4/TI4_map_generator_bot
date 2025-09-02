@@ -84,11 +84,11 @@
       <artifactId>jskills</artifactId>
       <version>1.1</version>
     </dependency>
-      <dependency>
-          <groupId>com.github.usefulness</groupId>
-          <artifactId>webp-imageio</artifactId>
-          <version>0.10.2</version>
-      </dependency>
+    <dependency>
+      <groupId>com.github.usefulness</groupId>
+      <artifactId>webp-imageio</artifactId>
+      <version>0.10.2</version>
+    </dependency>
     <!-- TEST -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
