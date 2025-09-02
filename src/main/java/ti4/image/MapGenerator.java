@@ -427,7 +427,7 @@ public class MapGenerator implements AutoCloseable {
 
         if (debug) debugImageGraphicsTime = StopWatch.createStarted();
         drawImage();
-        mainImageBytes = ImageHelper.writeJpg(mainImage);
+        mainImageBytes = ImageHelper.writeWebp(mainImage);
         if (debug) debugImageGraphicsTime.stop();
     }
 

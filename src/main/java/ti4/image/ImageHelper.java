@@ -1,19 +1,26 @@
 package ti4.image;
 
-import java.awt.*;
+import com.luciad.imageio.webp.CompressionType;
+import com.luciad.imageio.webp.WebPWriteParam;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import javax.annotation.Nullable;
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.message.logging.BotLogger;
 import ti4.service.emoji.TI4Emoji;
 
@@ -158,6 +165,29 @@ public class ImageHelper {
     public static byte[] writePng(BufferedImage image) {
         try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
             ImageIO.write(image, "png", byteArrayOutputStream);
+            return byteArrayOutputStream.toByteArray();
+        }
+    }
+
+    @SneakyThrows
+    public static byte[] writeWebp(BufferedImage image) {
+        var imageWithoutAlpha = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
+        try (var byteArrayOutputStream = new ByteArrayOutputStream();
+                var imageOutputStream = ImageIO.createImageOutputStream(byteArrayOutputStream)) {
+            ImageWriter writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
+
+            WebPWriteParam writeParam = ((WebPWriteParam) writer.getDefaultWriteParam());
+            writeParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            writeParam.setCompressionType(CompressionType.Lossy);
+            writeParam.setUseSharpYUV(false);
+            writeParam.setAlphaCompressionAlgorithm(0);
+            //writeParam.setCompressionQuality(.5f);
+            //writeParam.setMethod(1); //0-6, lower is faster, higher is better quality
+
+            writer.setOutput(imageOutputStream);
+
+            // Encode
+            writer.write(null, new IIOImage(imageWithoutAlpha, null, null), writeParam);
             return byteArrayOutputStream.toByteArray();
         }
     }

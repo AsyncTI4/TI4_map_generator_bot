@@ -20,7 +20,7 @@ public class FileUploadService {
 
     private static FileUpload createFileUpload(
             BufferedImage bufferedImage, String filenamePrefix, boolean saveLocalCopy) {
-        byte[] imageBytes = ImageHelper.writeJpg(bufferedImage);
+        byte[] imageBytes = ImageHelper.writeWebp(bufferedImage);
         return createFileUpload(imageBytes, filenamePrefix, saveLocalCopy);
     }
 
@@ -31,9 +31,9 @@ public class FileUploadService {
     private static FileUpload createFileUpload(byte[] bytes, String filenamePrefix, boolean saveLocalCopy) {
         if (bytes == null || bytes.length == 0) return null;
 
-        if (saveLocalCopy) optionallySaveToLocal(bytes, filenamePrefix, "jpg");
+        if (saveLocalCopy) optionallySaveToLocal(bytes, filenamePrefix, "webp");
 
-        String fileName = filenamePrefix + "_" + DateTimeHelper.getFormattedTimestamp() + ".jpg";
+        String fileName = filenamePrefix + "_" + DateTimeHelper.getFormattedTimestamp() + ".webp";
         return FileUpload.fromData(bytes, fileName);
     }
 
