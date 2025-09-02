@@ -9,14 +9,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
@@ -27,7 +27,6 @@ import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
-import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
@@ -116,7 +115,7 @@ public class CustomHyperlaneService {
     }
 
     @ButtonHandler("customHyperlaneMore")
-    public static void moreHyperlaneButtons(ButtonInteractionEvent event, Game game) {
+    public static void moreHyperlaneButtons(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", HYPERLANE_MORE_BUTTONS);
     }
 
@@ -133,18 +132,18 @@ public class CustomHyperlaneService {
     }
 
     @ButtonHandler("customHyperlaneImport~MDL")
-    public static void importHyperlaneData(ButtonInteractionEvent event, Game game) {
+    public static void importHyperlaneData(ButtonInteractionEvent event) {
         TextInput.Builder data = TextInput.create(Constants.SETTING_VALUE, "Hyperlane Data", TextInputStyle.PARAGRAPH);
 
         Modal importDataModal = Modal.create("customHyperlaneImportSave", "Import Data (overwrites existing)")
-                .addActionRow(data.build())
+                .addComponents(ActionRow.of(data.build()))
                 .build();
 
         event.replyModal(importDataModal).queue();
     }
 
     @ModalHandler("customHyperlaneImportSave")
-    public static void saveImportedHyperlaneData(ModalInteractionEvent event, Player player, Game game) {
+    public static void saveImportedHyperlaneData(ModalInteractionEvent event, Game game) {
         String importData =
                 event.getValue(Constants.SETTING_VALUE).getAsString().replace("\n", " ");
 
@@ -196,14 +195,14 @@ public class CustomHyperlaneService {
         }
 
         Modal customHyperlaneModal = Modal.create("customHyperlaneSave_" + position, position + " Hyperlane")
-                .addActionRow(data.build())
+                .addComponents(ActionRow.of(data.build()))
                 .build();
 
         event.replyModal(customHyperlaneModal).queue();
     }
 
     @ModalHandler("customHyperlaneSave_")
-    public static void saveHyperlaneData(ModalInteractionEvent event, Player player, Game game) {
+    public static void saveHyperlaneData(ModalInteractionEvent event, Game game) {
         String[] modalId = event.getModalId().split("_");
         String position = modalId[1];
         String hyperlaneData =
@@ -227,7 +226,7 @@ public class CustomHyperlaneService {
     }
 
     @ButtonHandler("customHyperlaneTransform~MDL")
-    public static void transformHyperlane(ButtonInteractionEvent event, Game game) {
+    public static void transformHyperlane(ButtonInteractionEvent event) {
         TextInput.Builder data1 = TextInput.create("staticToCustom", "Static -> Custom", TextInputStyle.SHORT)
                 .setPlaceholder("Comma separated positions or ALL")
                 .setRequired(false);
@@ -236,15 +235,14 @@ public class CustomHyperlaneService {
                 .setRequired(false);
 
         Modal modal = Modal.create("customHyperlaneTransformExecute", "Transform Hyperlanes")
-                .addActionRow(data1.build())
-                .addActionRow(data2.build())
+                .addComponents(ActionRow.of(data1.build()), ActionRow.of(data2.build()))
                 .build();
 
         event.replyModal(modal).queue();
     }
 
     @ModalHandler("customHyperlaneTransformExecute")
-    public static void transformHyperlaneExecute(ModalInteractionEvent event, Player player, Game game) {
+    public static void transformHyperlaneExecute(ModalInteractionEvent event, Game game) {
         String staticToCustom = event.getValue("staticToCustom").getAsString();
         String customToStatic = event.getValue("customToStatic").getAsString();
 

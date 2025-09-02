@@ -31,14 +31,14 @@ public class BookOfLatviniaService {
         }
         for (TechnologyType type : TechnologyType.mainFour) {
             if (!skips.contains(type.toString())) {
-                stealSpeakerToken(event, game, player);
+                stealSpeakerToken(game, player);
                 return;
             }
         }
         scoreBookOfLatviniaPoint(event, game, player);
     }
 
-    private static void stealSpeakerToken(ButtonInteractionEvent event, Game game, Player player) {
+    private static void stealSpeakerToken(Game game, Player player) {
         Player prevSpeaker = game.getSpeaker();
         game.setSpeaker(player);
 

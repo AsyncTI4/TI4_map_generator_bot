@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
@@ -83,22 +83,26 @@ public class DrawSecretService {
                 count + " " + CardEmojis.SecretObjective + " dealt to all players. Check your `#cards-info` threads.");
         if (game.getRound() == 1) {
             if (!game.isFowMode()) {
-                String message = "Here are the quick reference cards for the factions in this game.";
+                StringBuilder message =
+                        new StringBuilder("Here are the quick reference cards for the factions in this game.");
                 List<FileUpload> files = new ArrayList<>();
                 for (Player player : game.getRealPlayers()) {
                     String path = ResourceHelper.getResourceFromFolder(
                             "quick_reference/", player.getFaction().toLowerCase() + ".png");
                     if (path == null) {
-                        message += "\n- Could not get quick reference for " + player.getFaction() + ".";
+                        message.append("\n- Could not get quick reference for ")
+                                .append(player.getFaction())
+                                .append(".");
                     } else {
                         files.add(FileUploadService.createFileUpload(
                                 ImageHelper.read(path), player.getFaction() + "_ref"));
                     }
                 }
                 if (!files.isEmpty() && files.size() <= 10) {
-                    message +=
-                            "\n-# A reminder that these reference cards are general overviews, and not specific mechanical text.";
-                    MessageHelper.sendMessageWithFiles(game.getActionsChannel(), files, message, true, false);
+                    message.append(
+                            "\n-# A reminder that these reference cards are general overviews, and not specific mechanical text.");
+                    MessageHelper.sendMessageWithFiles(
+                            game.getActionsChannel(), files, message.toString(), true, false);
                 }
             }
             List<Button> buttons = new ArrayList<>();
