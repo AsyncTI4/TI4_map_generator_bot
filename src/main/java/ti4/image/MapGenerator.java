@@ -312,6 +312,7 @@ public class MapGenerator implements AutoCloseable {
                 .collect(Collectors.toSet()));
 
         tilesWithExtra.forEach(key -> addTile(tileMap.get(key), TileStep.Extras));
+        sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Tile));
         sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Units));
         if (!game.getTileDistances().isEmpty()) {
             sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Distance));
