@@ -78,12 +78,14 @@ public class MapGenerator implements AutoCloseable {
     private static final BasicStroke stroke4 = new BasicStroke(4.0f);
     private static final BasicStroke stroke5 = new BasicStroke(5.0f);
     private static final BasicStroke stroke6 = new BasicStroke(6.0f);
+    private static final int WEBP_MAX_DIMENSION = 16383;
     private static final ColorConvertOp GRAYSCALE_CONVERT_OP =
             new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
 
     private final Graphics graphics;
     private final BufferedImage mainImage;
     private byte[] mainImageBytes;
+    private String imageFormat = "webp";
     private final GenericInteractionCreateEvent event;
     private final int scoreTokenSpacing;
     private final Game game;
@@ -199,7 +201,7 @@ public class MapGenerator implements AutoCloseable {
         }
 
         // Create image
-        mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         graphics = mainImage.getGraphics();
     }
 
@@ -242,7 +244,7 @@ public class MapGenerator implements AutoCloseable {
     FileUpload createFileUpload() {
         if (debug) debugDiscordTime = StopWatch.createStarted();
         game.incrementMapImageGenerationCount();
-        FileUpload fileUpload = FileUploadService.createFileUpload(mainImageBytes, game.getName());
+        FileUpload fileUpload = FileUploadService.createFileUpload(mainImageBytes, game.getName(), imageFormat);
         if (debug) debugDiscordTime.stop();
         if (debug && !AsyncTi4WebsiteHelper.uploadsEnabled()) FileUploadService.saveLocalPng(mainImage, "MapDebug");
         return fileUpload;
@@ -308,9 +310,8 @@ public class MapGenerator implements AutoCloseable {
                 .map(BorderAnomalyHolder::getTile)
                 .collect(Collectors.toSet()));
 
-        // Iterate over the sorted keys once per step instead of repeatedly sorting the stream
-        sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Tile));
         tilesWithExtra.forEach(key -> addTile(tileMap.get(key), TileStep.Extras));
+        sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Tile));
         sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Units));
         if (!game.getTileDistances().isEmpty()) {
             sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Distance));
@@ -409,14 +410,14 @@ public class MapGenerator implements AutoCloseable {
         try {
             String testing = System.getenv("TESTING");
             if (testing == null && displayTypeBasic == DisplayType.all && !isFoWPrivate) {
-                AsyncTi4WebsiteHelper.putMap(game.getName(), mainImageBytes, false, null);
+                AsyncTi4WebsiteHelper.putMap(game.getName(), imageFormat, mainImageBytes, false, null);
                 AsyncTi4WebsiteHelper.putData(game.getName(), game);
                 AsyncTi4WebsiteHelper.putOverlays(game.getID(), websiteOverlays);
                 AsyncTi4WebsiteHelper.putPlayerData(game.getID(), game);
             } else if (isFoWPrivate) {
                 Player player = CommandHelper.getPlayerFromGame(
                         game, event.getMember(), event.getUser().getId());
-                AsyncTi4WebsiteHelper.putMap(game.getName(), mainImageBytes, true, player);
+                AsyncTi4WebsiteHelper.putMap(game.getName(), imageFormat, mainImageBytes, true, player);
             }
         } catch (Exception e) {
             BotLogger.error("Failed to send to game info to website", e);
@@ -433,7 +434,13 @@ public class MapGenerator implements AutoCloseable {
 
         if (debug) debugImageGraphicsTime = StopWatch.createStarted();
         drawImage();
-        mainImageBytes = ImageHelper.writeJpg(mainImage);
+        if (mainImage.getWidth() > WEBP_MAX_DIMENSION || mainImage.getHeight() > WEBP_MAX_DIMENSION) {
+            mainImageBytes = ImageHelper.writeJpg(mainImage);
+            imageFormat = "jpg";
+        } else {
+            mainImageBytes = ImageHelper.writeWebp(mainImage);
+            imageFormat = "webp";
+        }
         if (debug) debugImageGraphicsTime.stop();
     }
 
