@@ -250,7 +250,7 @@ public class AsyncTi4WebsiteHelper {
                 });
     }
 
-    public static void putMap(String gameName, byte[] imageBytes, boolean frog, Player player) {
+    public static void putMap(String gameName, String fileFormat, byte[] imageBytes, boolean frog, Player player) {
         if (!uploadsEnabled()) return;
         String bucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
         if (bucket == null || bucket.isEmpty()) {
@@ -261,9 +261,9 @@ public class AsyncTi4WebsiteHelper {
         try {
             String mapPath;
             if (frog && player != null) {
-                mapPath = "fogmap/" + player.getUserID() + "/%s/%s.webp";
+                mapPath = "fogmap/" + player.getUserID() + "/%s/%s." + fileFormat;
             } else {
-                mapPath = "map/%s/%s.webp";
+                mapPath = "map/%s/%s." + fileFormat;
             }
 
             LocalDateTime date = LocalDateTime.now();
@@ -272,7 +272,7 @@ public class AsyncTi4WebsiteHelper {
             putObjectInBucket(
                     String.format(mapPath, gameName, dtstamp),
                     AsyncRequestBody.fromBytes(imageBytes),
-                    "image/webp",
+                    "image/" + fileFormat,
                     null);
         } catch (Exception e) {
             BotLogger.error(

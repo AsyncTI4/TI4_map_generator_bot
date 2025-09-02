@@ -404,14 +404,14 @@ public class MapGenerator implements AutoCloseable {
         try {
             String testing = System.getenv("TESTING");
             if (testing == null && displayTypeBasic == DisplayType.all && !isFoWPrivate) {
-                AsyncTi4WebsiteHelper.putMap(game.getName(), mainImageBytes, false, null);
+                AsyncTi4WebsiteHelper.putMap(game.getName(), imageFormat, mainImageBytes, false, null);
                 AsyncTi4WebsiteHelper.putData(game.getName(), game);
                 AsyncTi4WebsiteHelper.putOverlays(game.getID(), websiteOverlays);
                 AsyncTi4WebsiteHelper.putPlayerData(game.getID(), game);
             } else if (isFoWPrivate) {
                 Player player = CommandHelper.getPlayerFromGame(
                         game, event.getMember(), event.getUser().getId());
-                AsyncTi4WebsiteHelper.putMap(game.getName(), mainImageBytes, true, player);
+                AsyncTi4WebsiteHelper.putMap(game.getName(), imageFormat, mainImageBytes, true, player);
             }
         } catch (Exception e) {
             BotLogger.error("Failed to send to game info to website", e);
