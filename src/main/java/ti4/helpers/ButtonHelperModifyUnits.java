@@ -1897,6 +1897,9 @@ public class ButtonHelperModifyUnits {
         String playerRep = player.getRepresentation();
 
         Tile tile = game.getTileFromPositionOrAlias(planetName);
+        if (ButtonHelper.isNumeric(planetName)) {
+            planetName += "space";
+        }
         if ("sd".equalsIgnoreCase(unitID)) {
             if (player.ownsUnit("saar_spacedock") || player.ownsUnit("saar_spacedock2")) {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitID);
@@ -1940,7 +1943,8 @@ public class ButtonHelperModifyUnits {
                     } else {
                         tile = game.getTileByPosition(planetName.replace("space", ""));
                         AddUnitService.addUnits(event, tile, game, player.getColor(), unitID);
-                        successMessage = producedOrPlaced + " a " + unitKey.unitEmoji() + " in space.";
+                        successMessage = producedOrPlaced + " a " + unitKey.unitEmoji() + " in the space area of "
+                                + tile.getRepresentationForButtons() + ".";
                     }
                 }
             } else {
