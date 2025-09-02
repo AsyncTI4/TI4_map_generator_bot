@@ -78,6 +78,8 @@ public class MapGenerator implements AutoCloseable {
     private static final BasicStroke stroke4 = new BasicStroke(4.0f);
     private static final BasicStroke stroke5 = new BasicStroke(5.0f);
     private static final BasicStroke stroke6 = new BasicStroke(6.0f);
+    private static final ColorConvertOp GRAYSCALE_CONVERT_OP =
+            new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
 
     private final Graphics graphics;
     private final BufferedImage mainImage;
@@ -126,16 +128,20 @@ public class MapGenerator implements AutoCloseable {
         else scoreTokenSpacing = 30;
 
         // Height of objectives section (=0 when there is 5 or less objectives in the column with most objectives)
-        int stage1PublicObjCount = (int) game.getRevealedPublicObjectives().keySet().stream()
-                .filter(Mapper.getPublicObjectivesStage1()::containsKey)
-                .count();
-        int stage2PublicObjCount = (int) game.getRevealedPublicObjectives().keySet().stream()
-                .filter(Mapper.getPublicObjectivesStage2()::containsKey)
-                .count();
-        int otherObjCount = game.getRevealedPublicObjectives().size() - stage1PublicObjCount - stage2PublicObjCount;
+        Set<String> revealedObjectives = game.getRevealedPublicObjectives().keySet();
+        int stage1PublicObjCount = 0;
+        int stage2PublicObjCount = 0;
+        for (String objective : revealedObjectives) {
+            if (Mapper.getPublicObjectivesStage1().containsKey(objective)) {
+                stage1PublicObjCount++;
+            } else if (Mapper.getPublicObjectivesStage2().containsKey(objective)) {
+                stage2PublicObjCount++;
+            }
+        }
+        int otherObjCount = revealedObjectives.size() - stage1PublicObjCount - stage2PublicObjCount;
         otherObjCount = Math.max(Objective.retrieveCustom(game).size(), otherObjCount);
-        stage1PublicObjCount = game.getPublicObjectives1Peakable().size() + stage1PublicObjCount;
-        stage2PublicObjCount = game.getPublicObjectives2Peakable().size() + stage2PublicObjCount;
+        stage1PublicObjCount += game.getPublicObjectives1Peakable().size();
+        stage2PublicObjCount += game.getPublicObjectives2Peakable().size();
         int mostObjectivesInAColumn = Math.max(Math.max(stage1PublicObjCount, stage2PublicObjCount), otherObjCount);
         int heightOfObjectivesSection = Math.max((mostObjectivesInAColumn - 5) * 43, 0);
 
@@ -2358,9 +2364,7 @@ public class MapGenerator implements AutoCloseable {
     // The first parameter is the scale factor (contrast), the second is the offset
     // (brightness)
     private static BufferedImage makeGrayscale(BufferedImage image) {
-        ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-        ColorConvertOp op = new ColorConvertOp(cs, null);
-        return op.filter(image, null);
+        return GRAYSCALE_CONVERT_OP.filter(image, null);
     }
 
     private void addWebsiteOverlay(String overlayTitle, String overlayText, int x, int y, int width, int height) {
