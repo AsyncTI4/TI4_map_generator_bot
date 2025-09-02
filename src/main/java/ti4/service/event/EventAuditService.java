@@ -27,11 +27,11 @@ public class EventAuditService {
                 if (cardThread
                         || draftThread
                         || isFow
-                        || button.getButton().getId().contains("anonDeclare")
-                        || button.getButton().getId().contains("requestAllFollow")) {
+                        || button.getButton().getCustomId().contains("anonDeclare")
+                        || button.getButton().getCustomId().contains("requestAllFollow")) {
                     yield "someone pressed button: [CLASSIFIED]";
                 }
-                yield username + " pressed button: " + button.getButton().getId() + " -- "
+                yield username + " pressed button: " + button.getButton().getCustomId() + " -- "
                         + button.getButton().getLabel();
             }
             case StringSelectInteractionEvent selectMenu ->

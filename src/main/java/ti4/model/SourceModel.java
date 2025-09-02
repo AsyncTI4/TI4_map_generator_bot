@@ -1,7 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
-import java.util.HashMap;
+import java.awt.Color;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
@@ -34,7 +33,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
         return getRepresentationEmbed(null);
     }
 
-    public MessageEmbed getRepresentationEmbed(HashMap<String, Integer> occurrences) {
+    public MessageEmbed getRepresentationEmbed(Map<String, Integer> occurrences) {
         EmbedBuilder eb = new EmbedBuilder();
 
         eb.setTitle(source.emoji() + " " + name);

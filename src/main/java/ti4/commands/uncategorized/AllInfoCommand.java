@@ -39,7 +39,7 @@ public class AllInfoCommand extends GameStateCommand {
         Player player = getPlayer();
         String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event) + ".";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
-        AbilityInfoService.sendAbilityInfo(game, player);
+        AbilityInfoService.sendAbilityInfo(player);
         UnitInfoService.sendUnitInfo(player, false);
         LeaderInfoService.sendLeadersInfo(game, player);
         TechInfoService.sendTechInfo(player);

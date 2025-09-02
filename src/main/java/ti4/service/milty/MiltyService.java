@@ -9,8 +9,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import lombok.Data;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
@@ -189,7 +189,7 @@ public class MiltyService {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "### You are using preset slices!! Starting the draft right away!");
             specs.presetSlices.forEach(draftManager::addSlice);
-            DraftDisplayService.repostDraftInformation(event, draftManager, game);
+            DraftDisplayService.repostDraftInformation(draftManager, game);
         } else {
             event.getMessageChannel().sendMessage(startMsg).queue((ignore) -> {
                 boolean slicesCreated = GenerateSlicesService.generateSlices(event, draftManager, specs);
@@ -200,7 +200,7 @@ public class MiltyService {
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 } else {
-                    DraftDisplayService.repostDraftInformation(event, draftManager, game);
+                    DraftDisplayService.repostDraftInformation(draftManager, game);
                     game.setPhaseOfGame("miltydraft");
                     GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
                 }
@@ -471,7 +471,7 @@ public class MiltyService {
 
         // SEND STUFF
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, factionModel.getFactionSheetMessage());
-        AbilityInfoService.sendAbilityInfo(game, player, event);
+        AbilityInfoService.sendAbilityInfo(player, event);
         TechInfoService.sendTechInfo(game, player, event);
         LeaderInfoService.sendLeadersInfo(game, player, event);
         UnitInfoService.sendUnitInfo(game, player, event, false);

@@ -278,9 +278,9 @@ public class CreateFoWGameService {
         return Collections.max(getAllExistingFOWNumbers());
     }
 
-    private static ArrayList<Integer> getAllExistingFOWNumbers() {
+    private static List<Integer> getAllExistingFOWNumbers() {
         List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
-        ArrayList<Integer> fowNumbers = new ArrayList<>();
+        List<Integer> fowNumbers = new ArrayList<>();
 
         // GET ALL FOW ROLES FROM ALL GUILDS
         for (Guild guild : guilds) {

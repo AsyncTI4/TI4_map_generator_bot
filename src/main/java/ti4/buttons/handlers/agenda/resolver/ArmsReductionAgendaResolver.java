@@ -2,8 +2,8 @@ package ti4.buttons.handlers.agenda.resolver;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.map.Game;
