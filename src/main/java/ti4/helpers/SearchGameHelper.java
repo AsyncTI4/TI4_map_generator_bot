@@ -159,23 +159,15 @@ public class SearchGameHelper {
                 .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
                 .toList();
 
-        int index = 1;
-
         var days = new ArrayList<Integer>();
 
-        StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
         for (var managedGame : filteredManagedGames) {
-            sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
             var game = managedGame.getGame();
-            sb.append(
-                    getPlayerMapListRepresentation(game, userID, showAverageTurnTime, showSecondaries, showGameModes));
-            sb.append("\n");
             if (game.isHasEnded()) {
                 if (Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString()) > 0) {
                     days.add(Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString()));
                 }
             }
-            index++;
         }
         Collections.sort(days);
 

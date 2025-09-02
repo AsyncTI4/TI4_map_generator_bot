@@ -13,13 +13,13 @@ import java.util.Set;
 import java.util.function.Function;
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.selections.SelectOption;
+import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
-import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -187,7 +187,7 @@ public class ListSetting<T> extends SettingInterface {
 
     private void sendSelectionBoxes(
             ButtonInteractionEvent buttonEvent, List<Map.Entry<String, T>> entries, String lang) {
-        String prefixID = buttonEvent.getButton().getId();
+        String prefixID = buttonEvent.getButton().getCustomId();
         List<ActionRow> rows = new ArrayList<>();
         int x = 0;
         entries.sort(Comparator.comparing(e -> show.apply(e.getValue())));

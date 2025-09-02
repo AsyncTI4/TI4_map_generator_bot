@@ -25,7 +25,7 @@ public class ButtonContext extends ListenerContext {
     }
 
     public ButtonContext(ButtonInteractionEvent event) {
-        super(event, event.getButton().getId());
+        super(event, event.getButton().getCustomId());
         if (!isValid()) {
             return;
         }

@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
+import net.dv8tion.jda.api.modals.Modal;
 import ti4.buttons.Buttons;
 import ti4.helpers.RegexHelper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -59,7 +60,7 @@ public class RoundSummaryHelper {
                 .setValue(currentSummary)
                 .build();
         Modal modal = Modal.create(modalId, "End of Round " + roundNum + " Summary")
-                .addActionRow(summary)
+                .addComponents(ActionRow.of(summary))
                 .build();
         event.replyModal(modal).queue();
         // ButtonHelper.deleteMessage(event); Breaks submiting the summary for some reason

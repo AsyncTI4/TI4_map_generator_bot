@@ -12,6 +12,6 @@ class AbilityInfoButtonHandler {
 
     @ButtonHandler(value = "refreshAbilityInfo", save = false)
     public static void sendAbilityInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        AbilityInfoService.sendAbilityInfo(game, player, event);
+        AbilityInfoService.sendAbilityInfo(player, event);
     }
 }

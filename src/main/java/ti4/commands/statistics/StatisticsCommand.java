@@ -19,7 +19,7 @@ public class StatisticsCommand implements ParentCommand {
                     new MedianTurnTime(),
                     new CompareAFKTimes(),
                     new DiceLuck(),
-                    new MatchMakingRatingCommand(),
+                    new MatchmakingRatingCommand(),
                     new LifetimeRecord(),
                     new FactionRecordOfTech(),
                     new FactionRecordOfSCPick(),

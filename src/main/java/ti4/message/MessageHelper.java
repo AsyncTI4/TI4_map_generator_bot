@@ -12,6 +12,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -29,9 +32,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -171,9 +171,9 @@ public class MessageHelper {
 
     public static List<Button> addUndoButtonToList(List<Button> buttons, String gameName) {
         for (Button button : buttons) {
-            if (button.getId() != null
-                    && (button.getId().contains("ultimateUndo")
-                            || button.getId().contains("answerSurvey"))) {
+            if (button.getCustomId() != null
+                    && (button.getCustomId().contains("ultimateUndo")
+                            || button.getCustomId().contains("answerSurvey"))) {
                 return buttons;
             }
         }
@@ -935,7 +935,7 @@ public class MessageHelper {
                     .append("...\n");
             error.append("> Buttons:\n");
             for (Button b : buttons) {
-                error.append("> - id:`").append(b.getId()).append("`");
+                error.append("> - id:`").append(b.getCustomId()).append("`");
             }
             BotLogger.error(error.toString(), null);
             break;
@@ -1088,15 +1088,15 @@ public class MessageHelper {
         List<String> badButtonIDsAndReason = new ArrayList<>();
         for (Button button : buttons) {
             if (button == null) continue;
-            if (button.getId() == null && button.getStyle() != ButtonStyle.LINK) continue;
+            if (button.getCustomId() == null && button.getStyle() != ButtonStyle.LINK) continue;
 
             // REMOVE DUPLICATE IDs
-            if (goodButtonIDs.contains(button.getId())) {
-                badButtonIDsAndReason.add(
-                        "Button:  " + button.getId() + "\n Label:  " + button.getLabel() + "\n Error:  Duplicate ID");
+            if (goodButtonIDs.contains(button.getCustomId())) {
+                badButtonIDsAndReason.add("Button:  " + button.getCustomId() + "\n Label:  " + button.getLabel()
+                        + "\n Error:  Duplicate ID");
                 continue;
             }
-            goodButtonIDs.add(button.getId());
+            goodButtonIDs.add(button.getCustomId());
 
             // REMOVE EMOJIS IF BOT CAN'T SEE IT
             if (button.getEmoji() instanceof CustomEmoji emoji
@@ -1108,7 +1108,7 @@ public class MessageHelper {
                 }
                 badButtonIDsAndReason.add("Button:  " + ButtonHelper.getButtonRepresentation(button)
                         + "\n Error:  Emoji Not Found in Cache: " + emoji.getName() + " " + emoji.getId());
-                button = Button.of(button.getStyle(), button.getId(), label);
+                button = Button.of(button.getStyle(), button.getCustomId(), label);
             }
             if (button.getEmoji() instanceof UnicodeEmoji emoji
                     && StringUtils.countMatches(emoji.getAsCodepoints(), "+")
@@ -1119,7 +1119,7 @@ public class MessageHelper {
                 }
                 badButtonIDsAndReason.add("Button:  " + ButtonHelper.getButtonRepresentation(button)
                         + "\n Error:  Bad Unicode Emoji: " + emoji.getName());
-                button = Button.of(button.getStyle(), button.getId(), label);
+                button = Button.of(button.getStyle(), button.getCustomId(), label);
             }
             newButtons.add(button);
         }

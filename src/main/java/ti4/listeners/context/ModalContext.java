@@ -35,7 +35,7 @@ public class ModalContext extends ListenerContext {
         messageID = event.getId();
         values = new HashMap<>();
         for (ModalMapping mapping : event.getValues()) {
-            values.put(mapping.getId(), mapping.getAsString());
+            values.put(mapping.getCustomId(), mapping.getAsString());
         }
     }
 

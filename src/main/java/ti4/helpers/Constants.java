@@ -168,6 +168,7 @@ public class Constants {
     public static final String PROMOTE_TARGET = "promote_target";
     public static final String PROMOTE_RANK = "promote_rank";
     public static final String PROMOTE_DEMOTE = "promote_demote";
+    public static final String FIN_SEPARATOR = "finSep";
 
     public static final String SET_SETTING = "setting";
     public static final String SET_UNIT_CAP = "set_unit_cap";
@@ -1043,6 +1044,7 @@ public class Constants {
     public static final String HACK_ELECTION_STATUS = "hack_election_status";
     public static final String CC_N_PLASTIC_LIMIT = "cc_n_plastic_limit";
     public static final String DRAFT_MODE = "draft_mode";
+    public static final String BAN_LIST = "ban_list";
     public static final String BOT_FACTION_REACTS = "bot_faction_reacts";
     public static final String BOT_COLOR_REACTS = "bot_color_reacts";
     public static final String BOT_STRAT_REACTS = "bot_strat_reacts";
@@ -1166,7 +1168,8 @@ public class Constants {
     public static final String UNIT_ADD = "unit_add";
     public static final String UNIT_INFO = "unit_info";
     public static final String CLEAR_DEBT = "clear_debt";
-
+    public static final String MECH_ID = "mech";
+    public static final String FLAGSHIP_ID = "flagship";
     public static final String OBSERVER = "observer";
     public static final String REMOVE_TITLE = "remove_title";
     public static final String EDIT_TRACK_RECORD = "edit_track_record";

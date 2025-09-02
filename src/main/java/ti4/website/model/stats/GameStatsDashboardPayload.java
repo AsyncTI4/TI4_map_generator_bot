@@ -6,7 +6,6 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +21,7 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.helper.GameHelper;
 import ti4.message.logging.BotLogger;
 import ti4.model.AgendaModel;
 import ti4.model.PublicObjectiveModel;
@@ -220,7 +220,7 @@ public class GameStatsDashboardPayload {
     public long getSetupTimestamp() {
         LocalDate localDate;
         try {
-            localDate = LocalDate.parse(game.getCreationDate(), DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+            localDate = GameHelper.getCreationDateAsLocalDate(game);
         } catch (DateTimeParseException e) {
             localDate = LocalDate.now();
         }
