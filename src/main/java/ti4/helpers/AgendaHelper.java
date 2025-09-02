@@ -4265,6 +4265,7 @@ public class AgendaHelper {
 
     public static void sendTopAgendaToCardsInfoSkipCovert(Game game, Player player, int count) {
 
+        int covert = 0;
         for (int x = 0; x < count; x++) {
             StringBuilder sb = new StringBuilder();
             if (x == 0) {
@@ -4272,7 +4273,7 @@ public class AgendaHelper {
             } else {
                 sb.append("__**Agenda At Location ").append(x + 1).append(":**__");
             }
-            String agendaID = game.lookAtTopAgenda(x);
+            String agendaID = game.lookAtTopAgenda(x + covert);
             MessageEmbed embed = null;
             if (game.getSentAgendas().get(agendaID) != null) {
                 if (game.getCurrentAgendaInfo().contains("_CL_")
@@ -4281,6 +4282,7 @@ public class AgendaHelper {
                             "You are currently voting on _Covert Legislation_, and the top agenda is in the speaker's hand.");
                     sb.append(" Showing the next agenda per the rules.\n");
                     agendaID = game.lookAtTopAgenda(x + 1);
+                    covert = 1;
 
                     if (game.getSentAgendas().get(agendaID) != null) {
                         embed = AgendaModel.agendaIsInSomeonesHandEmbed();

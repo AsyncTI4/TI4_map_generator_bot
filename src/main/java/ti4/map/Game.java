@@ -2780,6 +2780,10 @@ public class Game extends GameProperties {
         setActionCards(multiplyDeck(3, "action_cards_pok"));
     }
 
+    public void duplicateACs() {
+        setActionCards(multiplyDeck(2, getAcDeckID()));
+    }
+
     public void triplicateSOs() {
         setSecretObjectives(multiplyDeck(3, "secret_objectives_pok"));
     }

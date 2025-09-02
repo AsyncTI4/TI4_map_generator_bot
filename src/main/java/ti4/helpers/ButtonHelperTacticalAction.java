@@ -20,10 +20,12 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.LoreService;
@@ -470,6 +472,36 @@ public class ButtonHelperTacticalAction {
                     player.getRepresentation() + ", Please resolve _Scanlink Drone Network_.",
                     button2);
         }
+        if (!game.isL1Hero()) {
+            // All players get to use Magen
+            Tile activeSystem = tile;
+            for (Player magenPlayer : game.getPlayers().values()) {
+                boolean has =
+                        activeSystem.containsPlayersUnitsWithModelCondition(magenPlayer, UnitModel::getIsStructure);
+                if (magenPlayer.hasAbility("byssus")) {
+                    for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
+                        if (planet.getUnitCount(UnitType.Mech, magenPlayer) > 0) {
+                            has = true;
+                        }
+                    }
+                }
+                for (UnitHolder p : activeSystem.getPlanetUnitHolders()) {
+                    for (String token : p.getTokenList()) {
+                        if (magenPlayer.getPlanets().contains(p.getName()) && token.contains("superweapon")) {
+                            has = true;
+                            break;
+                        }
+                    }
+                }
+                if (!has || !magenPlayer.hasTech("md")) continue;
+
+                String id = magenPlayer.finChecker() + "useMagenDefense_" + activeSystem.getPosition();
+                Button useMagen = Buttons.red(id, "Use Magen Defense Grid", TechEmojis.WarfareTech);
+                String magenMsg = magenPlayer.getRepresentation()
+                        + " you can, and must, use _Magen Defense Grid_ to place an infantry with each of your structures in the active system.";
+                MessageHelper.sendMessageToChannelWithButton(magenPlayer.getCorrectChannel(), magenMsg, useMagen);
+            }
+        }
         if (player.hasAbility("awaken")
                 || player.hasUnit("titans_flagship")
                 || player.hasUnit("sigma_ul_flagship_1")
@@ -544,6 +576,9 @@ public class ButtonHelperTacticalAction {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         List<UnitType> movableFromPlanets = new ArrayList<>(List.of(UnitType.Infantry, UnitType.Mech));
+        if (player.hasTech("ffac2")) {
+            movableFromPlanets.add(UnitType.Spacedock);
+        }
         boolean remove = "remove".equalsIgnoreCase(moveOrRemove);
 
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
