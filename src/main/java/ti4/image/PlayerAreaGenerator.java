@@ -126,25 +126,15 @@ class PlayerAreaGenerator {
             if (rect.height > 0) y += rect.height + 15;
         }
 
-        List<Player> spectators = game.getPlayers().values().stream()
+        String spectatorNames = game.getPlayers().values().stream()
                 .filter(p -> !p.isRealPlayer() && !p.isDummy() && !p.isNpc())
-                .toList();
+                .map(Player::getUserName)
+                .collect(Collectors.joining(", "));
 
-        if (!spectators.isEmpty()) {
-            var spectatorString = new StringBuilder();
-            for (int i = 0, newlineCount = 0; i < spectators.size() - 1; i++) {
-                spectatorString.append(spectators.get(i).getUserName()).append(", ");
-                // add a newline every ~100 characters
-                if (spectatorString.length() > (newlineCount + 1) * 100) {
-                    spectatorString.append("\n");
-                    newlineCount++;
-                }
-            }
-            spectatorString.append(spectators.getLast().getUserName());
-
+        if (!spectatorNames.isEmpty()) {
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
-            drawString((Graphics2D) graphics, "Spectators: " + spectatorString, x, y + 15, mapWidth);
+            drawString((Graphics2D) graphics, "Spectators: " + spectatorNames, x, y + 15, mapWidth);
         }
     }
 
