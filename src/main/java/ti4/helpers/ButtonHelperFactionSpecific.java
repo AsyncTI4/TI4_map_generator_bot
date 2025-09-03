@@ -548,7 +548,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + " is going to pay 2 influence to repair a ship that just used its sustain damage ability.");
+                        + " is paying 2 influence to repair a ship that just used its SUSTAIN DAMAGE ability.");
 
         List<Button> buttons = new ArrayList<>();
         UnitHolder space = tile.getSpaceUnitHolder();
@@ -573,7 +573,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + " please select the ship to repair (the bot did not check how recently they have been damaged).",
+                        + ", please choose the ship to repair (the bot did not check how recently they have been damaged).",
                 buttons);
     }
 
@@ -585,13 +585,17 @@ public class ButtonHelperFactionSpecific {
         Tile tile = game.getTileByPosition(pos);
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[2]);
         String name = "themselves.";
-        if (p2 != player) {
-            name = p2.getRepresentation() + ".";
+        if (p2 == player) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentation() + " repaired their own " + Mapper.getUnitBaseTypeFromAsyncID(unit)
+                            + ". The influence spent will be posted in the main channel when finished.");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentation() + " repaired a " + Mapper.getUnitBaseTypeFromAsyncID(unit) + " owned by "
+                            + p2.getRepresentation() + ". The influence spent will be posted in the main channel when finished.");
         }
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getRepresentation() + " repaired a " + Mapper.getUnitBaseTypeFromAsyncID(unit) + " owned by "
-                        + name + " The influence spent will be posted in the main channel when finished.");
         UnitHolder space = tile.getSpaceUnitHolder();
         space.removeDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), p2.getColorID()), 1);
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
@@ -599,7 +603,7 @@ public class ButtonHelperFactionSpecific {
         buttons.add(DoneExhausting);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation() + " please pay the 2 influence (each repair is a seperate spend).",
+                player.getRepresentation() + " please pay the 2 influence (each repair is a separate spend).",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
