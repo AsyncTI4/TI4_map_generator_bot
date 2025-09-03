@@ -6,8 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -99,12 +99,12 @@ public class FOWPlusService {
 
     @ButtonHandler("blindTileSelection~MDL")
     public static void offerBlindActivation(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        TextInput position = TextInput.create(Constants.POSITION, "Position to activate", TextInputStyle.SHORT)
+        TextInput position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
                 .setRequired(true)
                 .build();
 
         Modal blindActivationModal = Modal.create("blindActivation_" + event.getMessageId(), "Activate a blind tile")
-                .addComponents(ActionRow.of(position))
+                .addComponents(Label.of("Position to activate", position))
                 .build();
 
         event.replyModal(blindActivationModal).queue();
