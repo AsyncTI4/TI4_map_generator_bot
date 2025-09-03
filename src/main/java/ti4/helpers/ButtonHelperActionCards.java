@@ -346,7 +346,7 @@ public class ButtonHelperActionCards {
     public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event) {
         RemoveCommandCounterService.fromTile(player.getColor(), game.getTileByPosition(game.getActiveSystem()), game);
         String message = player.getFactionEmoji() + " removed their command token from tile " + game.getActiveSystem()
-                + " using _Counterstroke_, and gained it to their tactic pool.";
+                + " using _Counterstroke_ and gained it to their tactic pool.";
         player.setTacticalCC(player.getTacticalCC() + 1);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelper.deleteMessage(event);
@@ -356,7 +356,7 @@ public class ButtonHelperActionCards {
     public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         RemoveCommandCounterService.fromTile(player.getColor(), game.getTileByPosition(buttonID.split("_")[1]), game);
         String message = player.getFactionEmoji() + " removed their command token from tile " + buttonID.split("_")[1]
-                + " using _Counterstroke_ ,and gained it to their tactic pool.";
+                + " using _Counterstroke_ and gained it to their tactic pool.";
         player.setTacticalCC(player.getTacticalCC() + 1);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelper.deleteMessage(event);

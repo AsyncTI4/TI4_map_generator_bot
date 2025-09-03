@@ -766,7 +766,7 @@ public class ListPlayerInfoService {
             }
             case "mtm" -> {
                 int count = 0;
-                for (String planet : player.getPlanets()) {
+                for (String planet : player.getPlanetsAllianceMode()) {
                     UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                     if (uH != null && uH.getUnitCount(Units.UnitType.Mech, player) > 0) {
                         count++;

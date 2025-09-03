@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -126,14 +127,14 @@ public class LoreService {
         boolean systemLore = "System".equals(target) || PositionMapper.isTilePositionValid(target);
         String addingTo = systemLore ? "System" : "Planet";
 
-        TextInput.Builder position = TextInput.create(Constants.POSITION, addingTo, TextInputStyle.SHORT)
+        TextInput.Builder position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
                 .setRequired(true)
                 .setPlaceholder(systemLore ? "000" : "Sem-Lore");
-        TextInput.Builder lore = TextInput.create(Constants.MESSAGE, "Lore (clear to delete)", TextInputStyle.PARAGRAPH)
+        TextInput.Builder lore = TextInput.create(Constants.MESSAGE, TextInputStyle.PARAGRAPH)
                 .setRequired(false)
                 .setPlaceholder("Once upon a time...")
                 .setMaxLength(1000);
-        TextInput.Builder footer = TextInput.create("footer", "Other info", TextInputStyle.SHORT)
+        TextInput.Builder footer = TextInput.create("footer", TextInputStyle.SHORT)
                 .setRequired(false)
                 .setPlaceholder("Please use `/add_token token:gravityrift` on this system.");
 
@@ -147,7 +148,10 @@ public class LoreService {
         }
 
         Modal editLoreModal = Modal.create("gmLoreSave" + addingTo, "Add Lore to " + addingTo)
-                .addComponents(ActionRow.of(position.build()), ActionRow.of(lore.build()), ActionRow.of(footer.build()))
+                .addComponents(
+                        Label.of(addingTo, position.build()),
+                        Label.of("Lore (clear to delete)", lore.build()),
+                        Label.of("Other info", footer.build()))
                 .build();
         event.replyModal(editLoreModal).queue();
     }

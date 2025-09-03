@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -26,12 +26,12 @@ class EditTagsButtonHandler {
         if (currentTags.isBlank()) currentTags = null;
 
         String fieldID = "tags";
-        TextInput tags = TextInput.create(fieldID, "Edit Tags", TextInputStyle.SHORT)
+        TextInput tags = TextInput.create(fieldID, TextInputStyle.SHORT)
                 .setPlaceholder("Add tags here, separated by semicolons. Leave blank to delete all tags.")
                 .setValue(currentTags)
                 .build();
         Modal modal = Modal.create(modalId, "Tags for Game " + game.getName())
-                .addComponents(ActionRow.of(tags))
+                .addComponents(Label.of("Edit Tags", tags))
                 .build();
         event.replyModal(modal).queue();
     }

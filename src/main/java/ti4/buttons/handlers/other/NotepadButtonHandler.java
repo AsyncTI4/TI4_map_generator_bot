@@ -1,7 +1,7 @@
 package ti4.buttons.handlers.other;
 
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInput.Builder;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
@@ -36,13 +36,13 @@ class NotepadButtonHandler {
         String modalID = "notepadModal";
         String fieldID = "notes";
         String notes = getNotes(player);
-        Builder textInputBuilder = TextInput.create(fieldID, "Edit summary", TextInputStyle.PARAGRAPH)
-                .setPlaceholder("Start typing your notes...");
+        Builder textInputBuilder =
+                TextInput.create(fieldID, TextInputStyle.PARAGRAPH).setPlaceholder("Start typing your notes...");
         if (!notes.isBlank()) {
             textInputBuilder.setValue(notes);
         }
         Modal modal = Modal.create(modalID, player.getFlexibleDisplayName() + "'s Notepad")
-                .addComponents(ActionRow.of(textInputBuilder.build()))
+                .addComponents(Label.of("Edit summary", textInputBuilder.build()))
                 .build();
         event.replyModal(modal).queue();
     }
