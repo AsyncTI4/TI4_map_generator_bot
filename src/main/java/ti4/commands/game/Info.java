@@ -292,6 +292,11 @@ class Info extends GameStateSubcommand {
 
         sb.append("### Other Stats: ").append("\n");
         sb.append("Current Phase: ").append(game.getPhaseOfGame()).append("\n");
+        String activeP = "null";
+        if (game.getActivePlayer() != null) {
+            activeP = game.getActivePlayer().getRepresentationNoPing();
+        }
+        sb.append("Current Active Player: ").append(activeP).append("\n");
         sb.append("Game Player Count: ").append(game.getPlayerCountForMap()).append("\n");
         sb.append("Game Real Player Count: ")
                 .append(game.getRealPlayers().size())
