@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -131,14 +131,14 @@ public class AddTileListService {
 
     public static Modal buildMapStringModal(Game game, String modalId) {
         String fieldId = "mapString";
-        TextInput tags = TextInput.create(fieldId, "Enter Map String", TextInputStyle.PARAGRAPH)
+        TextInput tags = TextInput.create(fieldId, TextInputStyle.PARAGRAPH)
                 .setPlaceholder("Paste the map string here.")
                 .setValue(game.getMapString()
                         .substring(0, Math.min(game.getMapString().length(), 4000)))
                 .setRequired(true)
                 .build();
         return Modal.create(modalId, "Add Map String for " + game.getName())
-                .addComponents(ActionRow.of(tags))
+                .addComponents(Label.of("Enter Map String", tags))
                 .build();
     }
 

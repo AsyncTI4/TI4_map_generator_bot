@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -55,12 +55,12 @@ public class RoundSummaryHelper {
         if (currentSummary.isBlank()) currentSummary = null;
 
         String fieldID = "summary";
-        TextInput summary = TextInput.create(fieldID, "Edit summary", TextInputStyle.PARAGRAPH)
+        TextInput summary = TextInput.create(fieldID, TextInputStyle.PARAGRAPH)
                 .setPlaceholder("Edit your round summary here. Or, leave blank to delete it")
                 .setValue(currentSummary)
                 .build();
         Modal modal = Modal.create(modalId, "End of Round " + roundNum + " Summary")
-                .addComponents(ActionRow.of(summary))
+                .addComponents(Label.of("Edit summary", summary))
                 .build();
         event.replyModal(modal).queue();
         // ButtonHelper.deleteMessage(event); Breaks submiting the summary for some reason
