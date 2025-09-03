@@ -1,8 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,8 +13,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -27,6 +25,7 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
@@ -539,6 +538,70 @@ public class ButtonHelperFactionSpecific {
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+    }
+
+    @ButtonHandler("empyreanFlagshipAbilityStep1_")
+    public static void empyreanFlagshipAbilityStep1(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        Tile tile = game.getTileByPosition(pos);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentation()
+                        + " is going to pay 2 influence to repair a ship that just used its sustain damage ability.");
+
+        List<Button> buttons = new ArrayList<>();
+        UnitHolder space = tile.getSpaceUnitHolder();
+        List<UnitType> units = new ArrayList<UnitType>(List.of(
+                UnitType.Cavalry,
+                UnitType.Warsun,
+                UnitType.Dreadnought,
+                UnitType.Carrier,
+                UnitType.Flagship,
+                UnitType.Cruiser));
+        for (Player p2 : ButtonHelper.getPlayersWithShipsInTheSystem(game, tile)) {
+            for (UnitType unit : units) {
+                if (space.getDamagedUnitCount(unit, p2.getColorID()) > 0) {
+                    buttons.add(Buttons.gray(
+                            "empyreanFlagshipAbilityStep2_" + pos + "_" + p2.getFaction() + "_" + unit.getValue(),
+                            StringUtils.capitalize(p2.getColor()) + " "
+                                    + Mapper.getUnitBaseTypeFromAsyncID(unit.getValue()),
+                            p2.getFactionEmoji()));
+                }
+            }
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentation()
+                        + " please select the ship to repair (the bot did not check how recently they have been damaged).",
+                buttons);
+    }
+
+    @ButtonHandler("empyreanFlagshipAbilityStep2_")
+    public static void empyreanFlagshipAbilityStep2(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        String unit = buttonID.split("_")[3];
+        Tile tile = game.getTileByPosition(pos);
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[2]);
+        String name = "themselves.";
+        if (p2 != player) {
+            name = p2.getRepresentation() + ".";
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentation() + " repaired a " + Mapper.getUnitBaseTypeFromAsyncID(unit) + " owned by "
+                        + name + " The influence spent will be posted in the main channel when finished.");
+        UnitHolder space = tile.getSpaceUnitHolder();
+        space.removeDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), p2.getColorID()), 1);
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
+        Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+        buttons.add(DoneExhausting);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentation() + " please pay the 2 influence (each repair is a seperate spend).",
+                buttons);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("cavStep2_")
@@ -3235,13 +3298,13 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("blindIFFSelection_")
     public static void offerBlindIFFSelection(ButtonInteractionEvent event, String buttonID) {
         String type = substringBetween(buttonID, "blindIFFSelection_", "~MDL");
-        TextInput position = TextInput.create(Constants.POSITION, "Position for " + type, TextInputStyle.SHORT)
+        TextInput position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
                 .setRequired(true)
                 .build();
 
         Modal blindSelectionModal = Modal.create(
                         "blindIFFSelection_" + type + "_" + event.getMessageId(), "Select position")
-                .addComponents(ActionRow.of(position))
+                .addComponents(Label.of("Position for " + type, position))
                 .build();
         event.replyModal(blindSelectionModal).queue();
     }

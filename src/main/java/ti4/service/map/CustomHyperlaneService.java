@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -133,10 +134,10 @@ public class CustomHyperlaneService {
 
     @ButtonHandler("customHyperlaneImport~MDL")
     public static void importHyperlaneData(ButtonInteractionEvent event) {
-        TextInput.Builder data = TextInput.create(Constants.SETTING_VALUE, "Hyperlane Data", TextInputStyle.PARAGRAPH);
+        TextInput.Builder data = TextInput.create(Constants.SETTING_VALUE, TextInputStyle.PARAGRAPH);
 
         Modal importDataModal = Modal.create("customHyperlaneImportSave", "Import Data (overwrites existing)")
-                .addComponents(ActionRow.of(data.build()))
+                .addComponents(Label.of("Hyperlane Data", data.build()))
                 .build();
 
         event.replyModal(importDataModal).queue();
@@ -182,8 +183,7 @@ public class CustomHyperlaneService {
     public static void editHyperlaneData(ButtonInteractionEvent event, String buttonID, Game game) {
         String position = StringUtils.substringBetween(buttonID, "customHyperlaneEdit_", "~MDL");
 
-        TextInput.Builder data = TextInput.create(
-                        Constants.SETTING_VALUE, "Hyperlane Matrix (clear to delete)", TextInputStyle.PARAGRAPH)
+        TextInput.Builder data = TextInput.create(Constants.SETTING_VALUE, TextInputStyle.PARAGRAPH)
                 .setPlaceholder("0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0")
                 .setValue("0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0")
                 .setRequired(false)
@@ -195,7 +195,7 @@ public class CustomHyperlaneService {
         }
 
         Modal customHyperlaneModal = Modal.create("customHyperlaneSave_" + position, position + " Hyperlane")
-                .addComponents(ActionRow.of(data.build()))
+                .addComponents(Label.of("Hyperlane Matrix (clear to delete)", data.build()))
                 .build();
 
         event.replyModal(customHyperlaneModal).queue();
@@ -227,15 +227,15 @@ public class CustomHyperlaneService {
 
     @ButtonHandler("customHyperlaneTransform~MDL")
     public static void transformHyperlane(ButtonInteractionEvent event) {
-        TextInput.Builder data1 = TextInput.create("staticToCustom", "Static -> Custom", TextInputStyle.SHORT)
+        TextInput.Builder data1 = TextInput.create("staticToCustom", TextInputStyle.SHORT)
                 .setPlaceholder("Comma separated positions or ALL")
                 .setRequired(false);
-        TextInput.Builder data2 = TextInput.create("customToStatic", "Custom -> Static", TextInputStyle.SHORT)
+        TextInput.Builder data2 = TextInput.create("customToStatic", TextInputStyle.SHORT)
                 .setPlaceholder("Comma separated positions or ALL")
                 .setRequired(false);
 
         Modal modal = Modal.create("customHyperlaneTransformExecute", "Transform Hyperlanes")
-                .addComponents(ActionRow.of(data1.build()), ActionRow.of(data2.build()))
+                .addComponents(Label.of("Static -> Custom", data1.build()), Label.of("Custom -> Static", data2.build()))
                 .build();
 
         event.replyModal(modal).queue();
