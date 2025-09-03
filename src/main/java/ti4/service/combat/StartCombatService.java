@@ -720,7 +720,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
             int capitalShips = ButtonHelper.checkFleetAndCapacity(player, game, tile, true, true)[0];
-            if (player.getSecretsUnscored().containsKey("dyp") && capitalShips >= 3) {
+            if ("space".equalsIgnoreCase(type) && player.getSecretsUnscored().containsKey("dyp") && capitalShips >= 3) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         msg
@@ -1226,6 +1226,18 @@ public class StartCombatService {
                         "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                                 + "The Thundarian",
                         FactionEmojis.Nomad));
+            }
+            List<Tile> flagshipTile =
+                    CheckUnitContainmentService.getTilesContainingPlayersUnits(game, agentHolder, UnitType.Flagship);
+            if (isSpaceCombat
+                    && agentHolder.hasUnit("empyrean_flagship")
+                    && !flagshipTile.isEmpty()
+                    && FoWHelper.getAdjacentTiles(game, pos, agentHolder, false, true)
+                            .contains(flagshipTile.getFirst().getPosition())) {
+                buttons.add(Buttons.gray(
+                        finChecker + "empyreanFlagshipAbilityStep1_" + pos,
+                        "Use Empyrean Flagship Ability",
+                        FactionEmojis.Empyrean));
             }
 
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("yinagent")) {
