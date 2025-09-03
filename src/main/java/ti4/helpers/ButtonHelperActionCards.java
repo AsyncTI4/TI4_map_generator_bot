@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.DiceHelper.Die;
@@ -346,7 +346,7 @@ public class ButtonHelperActionCards {
     public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event) {
         RemoveCommandCounterService.fromTile(player.getColor(), game.getTileByPosition(game.getActiveSystem()), game);
         String message = player.getFactionEmoji() + " removed their command token from tile " + game.getActiveSystem()
-                + " using _Counterstroke_, and gained it to their tactic pool.";
+                + " using _Counterstroke_ and gained it to their tactic pool.";
         player.setTacticalCC(player.getTacticalCC() + 1);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelper.deleteMessage(event);
@@ -356,7 +356,7 @@ public class ButtonHelperActionCards {
     public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         RemoveCommandCounterService.fromTile(player.getColor(), game.getTileByPosition(buttonID.split("_")[1]), game);
         String message = player.getFactionEmoji() + " removed their command token from tile " + buttonID.split("_")[1]
-                + " using _Counterstroke_ ,and gained it to their tactic pool.";
+                + " using _Counterstroke_ and gained it to their tactic pool.";
         player.setTacticalCC(player.getTacticalCC() + 1);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelper.deleteMessage(event);
@@ -2632,7 +2632,7 @@ public class ButtonHelperActionCards {
                 }
             }
         }
-        if (message.length() == 0) {
+        if (message.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     player.getRepresentationUnfogged()

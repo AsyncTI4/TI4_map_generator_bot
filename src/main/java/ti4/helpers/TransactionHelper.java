@@ -7,16 +7,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
+import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
@@ -755,24 +757,13 @@ public class TransactionHelper {
                 event.getMessage().delete().queue();
                 String modalId = "finishDealDetails_" + other;
                 String fieldID = "details";
-                TextInput summary = TextInput.create(fieldID, "Edit deal details", TextInputStyle.PARAGRAPH)
+                TextInput summary = TextInput.create(fieldID, TextInputStyle.PARAGRAPH)
                         .setPlaceholder("Edit your deals details here.")
                         .setValue("The deal is that I ")
                         .build();
 
-                // String selectId = "dealOptions_" + other;
-                // StringSelectMenu selectMenu = StringSelectMenu.create(selectId)
-                //         .setPlaceholder("Choose a deal type")
-                //         .setMinValues(1)    // minimum selections allowed
-                //         .setMaxValues(1)    // maximum selections allowed for single select
-                //         .addOptions(
-                //             SelectOption.of("Fixed price", "fixed_price").withDescription("A fixed price deal"),
-                //             SelectOption.of("Hourly", "hourly").withDescription("Pay by hour"),
-                //             SelectOption.of("Commission", "commission").withDescription("Commission-based")
-                //         )
-                //         .build();
                 Modal modal = Modal.create(modalId, "Deal Details")
-                        .addActionRow(summary)
+                        .addComponents(Label.of("Edit deal details", summary))
                         .build();
 
                 event.replyModal(modal).queue();
@@ -786,12 +777,12 @@ public class TransactionHelper {
                 event.getMessage().delete().queue();
                 String modalId = "finishDealDetailsInvert_" + other;
                 String fieldID = "details";
-                TextInput summary = TextInput.create(fieldID, "Edit deal details", TextInputStyle.PARAGRAPH)
+                TextInput summary = TextInput.create(fieldID, TextInputStyle.PARAGRAPH)
                         .setPlaceholder("Edit your deals details here.")
                         .setValue("The deal is that you ")
                         .build();
                 Modal modal = Modal.create(modalId, "Deal Details")
-                        .addActionRow(summary)
+                        .addComponents(Label.of("Edit deal details", summary))
                         .build();
                 event.replyModal(modal).queue();
                 return;
@@ -799,6 +790,39 @@ public class TransactionHelper {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, stuffToTransButtons);
+    }
+
+    // Left for future reference.
+    private static Modal buildTransactionModel(Player p1, Player p2, Game game) {
+        Modal.Builder modal = Modal.create("transactionModelFinish_" + p1.getFaction(), "Traction");
+        List<Player> players = new ArrayList<>();
+        players.add(p1);
+        players.add(p2);
+
+        for (Player player : players) {
+            Player otherPlayer = p1;
+            if (player == otherPlayer) {
+                otherPlayer = p2;
+            }
+            if (player.getTg() > 0) {
+                StringSelectMenu.Builder tgs = StringSelectMenu.create("TGs" + player.getFaction());
+                for (int tg = 1; tg < player.getTg() + 1; tg++) {
+                    tgs.addOption("" + tg, "" + tg);
+                }
+                modal.addComponents(
+                        Label.of("Trade Goods From " + player.getFactionModel().getFactionName(), tgs.build()));
+            }
+            if (player.getCommodities() > 0) {
+                StringSelectMenu.Builder comms = StringSelectMenu.create("Comms" + player.getFaction());
+                for (int comm = 1; comm < player.getCommodities() + 1; comm++) {
+                    comms.addOption("" + comm, "" + comm);
+                }
+                modal.addComponents(
+                        Label.of("Commodities From " + player.getFactionModel().getFactionName(), comms.build()));
+            }
+        }
+
+        return modal.build();
     }
 
     private static boolean resolveAgeOfCommerceTechCheck(Player owner, Player receiver, String tech, Game game) {
@@ -1626,7 +1650,7 @@ public class TransactionHelper {
         }
 
         if (player == p1) {
-            if (getReturnPNsInPlayAreaButtons(game, p1, p2).size() > 0) {
+            if (!getReturnPNsInPlayAreaButtons(game, p1, p2).isEmpty()) {
                 stuffToTransButtons.add(Buttons.gray(
                         "startReturnPNInPlayArea_" + p2.getFaction(), "Return a Play Area Promissory Note"));
             }

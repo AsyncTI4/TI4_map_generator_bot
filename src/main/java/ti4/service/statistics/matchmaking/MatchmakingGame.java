@@ -32,10 +32,10 @@ record MatchmakingGame(String name, long endedDate, List<MatchmakingPlayer> play
         if (isWinner) {
             return 1;
         }
-        int pointsRemainingToWin = gameVictoryPoints - playerVictoryPoints;
-        if (pointsRemainingToWin <= 3) {
+        int pointsAwayFromVictory = gameVictoryPoints - playerVictoryPoints;
+        if (pointsAwayFromVictory <= 3) {
             return 2;
         }
-        return 3;
+        return 3 + pointsAwayFromVictory;
     }
 }

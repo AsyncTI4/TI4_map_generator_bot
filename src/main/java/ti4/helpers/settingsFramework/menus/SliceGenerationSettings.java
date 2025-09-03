@@ -8,13 +8,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import lombok.Getter;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.modals.Modal;
 import ti4.buttons.Buttons;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
@@ -267,13 +268,13 @@ public class SliceGenerationSettings extends SettingsMenu {
 
     private String getPresetSlicesFromUser(GenericInteractionCreateEvent event) {
         String modalId = menuAction + "_" + navId() + "_presetSlices";
-        TextInput ttsString = TextInput.create("sliceStrings", "TTS String", TextInputStyle.PARAGRAPH)
+        TextInput ttsString = TextInput.create("sliceStrings", TextInputStyle.PARAGRAPH)
                 .setPlaceholder("25,69,34,49,45;24,28,46,47,67;...")
                 .setMinLength(1)
                 .setRequired(true)
                 .build();
         Modal modal = Modal.create(modalId, "Enter some stuff")
-                .addActionRow(ttsString)
+                .addComponents(Label.of("TTS String", ttsString))
                 .build();
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             buttonEvent.replyModal(modal).queue();

@@ -8,12 +8,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
@@ -1342,12 +1342,8 @@ public class ButtonHelperAgents {
             int buttons = 0;
             List<ActionRow> actionRow2 = new ArrayList<>();
 
-            for (ActionRow row : buttonEvent.getMessage().getActionRows()) {
-                List<ItemComponent> buttonRow = row.getComponents();
-                int buttonIndex = buttonRow.indexOf(buttonEvent.getButton());
-                if (buttonIndex > -1 && !"nomadagentmercer".equalsIgnoreCase(agent)) {
-                    buttonRow.remove(buttonIndex);
-                }
+            for (ActionRow row : buttonEvent.getMessage().getComponentTree().findAll(ActionRow.class)) {
+                List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
                 if (!buttonRow.isEmpty()) {
                     buttons += buttonRow.size();
                     actionRow2.add(ActionRow.of(buttonRow));
@@ -1358,14 +1354,10 @@ public class ButtonHelperAgents {
                     && !exhaustedMessage.contains("wanna ")
                     && !exhaustedMessage.contains("please choose the faction to give")
                     && !exhaustedMessage.contains("choose the target of the agent")) {
-                if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 1) {
+                if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 2) {
                     buttonEvent.getMessage().delete().queue();
                 } else {
-                    buttonEvent
-                            .getMessage()
-                            .editMessage(exhaustedMessage)
-                            .setComponents(actionRow2)
-                            .queue();
+                    ButtonHelper.deleteTheOneButton(buttonEvent);
                 }
 
             } else {
@@ -2534,21 +2526,8 @@ public class ButtonHelperAgents {
         if (exhaustedMessage.isEmpty()) {
             exhaustedMessage = "Combat";
         }
-        List<ActionRow> actionRow2 = new ArrayList<>();
-        for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ItemComponent> buttonRow = row.getComponents();
-            int buttonIndex = buttonRow.indexOf(event.getButton());
-            if (buttonIndex > -1) {
-                buttonRow.remove(buttonIndex);
-            }
-            if (!buttonRow.isEmpty()) {
-                actionRow2.add(ActionRow.of(buttonRow));
-            }
-        }
-        event.getMessage()
-                .editMessage(exhaustedMessage)
-                .setComponents(actionRow2)
-                .queue();
+        event.getMessage().editMessage(exhaustedMessage).queue();
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     private static List<Button> getJolNarAgentButtons(Player player, Game game) {

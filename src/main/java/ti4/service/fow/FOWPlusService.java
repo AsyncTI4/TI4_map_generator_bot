@@ -6,13 +6,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
@@ -98,12 +99,12 @@ public class FOWPlusService {
 
     @ButtonHandler("blindTileSelection~MDL")
     public static void offerBlindActivation(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        TextInput position = TextInput.create(Constants.POSITION, "Position to activate", TextInputStyle.SHORT)
+        TextInput position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
                 .setRequired(true)
                 .build();
 
         Modal blindActivationModal = Modal.create("blindActivation_" + event.getMessageId(), "Activate a blind tile")
-                .addActionRow(position)
+                .addComponents(Label.of("Position to activate", position))
                 .build();
 
         event.replyModal(blindActivationModal).queue();
@@ -144,10 +145,10 @@ public class FOWPlusService {
                 || centerTile != null
                         && centerTile.getTileModel() != null
                         && centerTile.getTileModel().isHyperlane()) {
-            ringButtons.removeIf(b -> b.getId().contains("ringTile_000"));
+            ringButtons.removeIf(b -> b.getCustomId().contains("ringTile_000"));
         }
         if (Collections.disjoint(visiblePositions, Arrays.asList("tl", "tr", "bl", "br"))) {
-            ringButtons.removeIf(b -> b.getId().contains("ring_corners"));
+            ringButtons.removeIf(b -> b.getCustomId().contains("ring_corners"));
         }
         for (Button button : new ArrayList<>(ringButtons)) {
             if (button.getLabel().startsWith("Ring #")) {

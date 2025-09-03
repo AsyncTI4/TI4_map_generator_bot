@@ -5,9 +5,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.resolver.AbolishmentAgendaResolver;
@@ -153,8 +153,8 @@ class AgendaResolveButtonHandler {
         }
         List<Player> riders = AgendaHelper.getWinningRiders(winner, game, event);
         List<Player> voters = AgendaHelper.getWinningVoters(winner, game);
-        notifyIndoctrinationTeam(game, voters, event);
-        checkFlorzenUnlock(game, voters, riders);
+        notifyIndoctrinationTeam(game, voters);
+        checkFlorzenUnlock(voters, riders);
         processRiders(game, riders);
         String resMes = buildResolutionMessage(game, winner);
         int aCount = computeNextAgendaCount(game);
@@ -278,7 +278,7 @@ class AgendaResolveButtonHandler {
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, playerWithSO, event);
     }
 
-    private static void notifyIndoctrinationTeam(Game game, List<Player> voters, ButtonInteractionEvent event) {
+    private static void notifyIndoctrinationTeam(Game game, List<Player> voters) {
         for (Player voter : voters) {
             if (voter.hasTech("dskyrog")) {
                 MessageHelper.sendMessageToChannel(
@@ -292,7 +292,7 @@ class AgendaResolveButtonHandler {
         }
     }
 
-    private static void checkFlorzenUnlock(Game game, List<Player> voters, List<Player> riders) {
+    private static void checkFlorzenUnlock(List<Player> voters, List<Player> riders) {
         List<Player> everyone = new ArrayList<>(voters);
         everyone.addAll(riders);
         for (Player player : everyone) {

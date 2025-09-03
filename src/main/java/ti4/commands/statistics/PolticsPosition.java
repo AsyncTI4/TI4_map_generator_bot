@@ -51,13 +51,15 @@ class PoliticsPosition extends Subcommand {
             }
 
             for (Player player : game.getRealPlayers()) {
-                if (game.getStoredValue("Round1SCPickFor" + player.getFaction()).equalsIgnoreCase("3")
+                if ("3".equalsIgnoreCase(game.getStoredValue("Round1SCPickFor" + player.getFaction()))
                         && player.getAllianceMembers().isEmpty()) {
                     games++;
-                    if (game.getStoredValue("Round" + game.getRound() + "SCPickFor" + player.getFaction())
-                                    .equalsIgnoreCase("8")
-                            || game.getStoredValue("Round" + game.getRound() + "SCPickFor" + player.getFaction())
-                                    .equalsIgnoreCase("1")) {
+                    if ("8"
+                                    .equalsIgnoreCase(game.getStoredValue(
+                                            "Round" + game.getRound() + "SCPickFor" + player.getFaction()))
+                            || "1"
+                                    .equalsIgnoreCase(game.getStoredValue(
+                                            "Round" + game.getRound() + "SCPickFor" + player.getFaction()))) {
                         gamesWith8Or1++;
                     }
 
@@ -72,8 +74,8 @@ class PoliticsPosition extends Subcommand {
                     if (!idC.isEmpty()) {
                         List<String> scoredPlayerList =
                                 game.getScoredPublicObjectives().computeIfAbsent(idC, key -> new ArrayList<>());
-                        if (scoredPlayerList.size() > 0
-                                && scoredPlayerList.get(0).equalsIgnoreCase(player.getUserID())) {
+                        if (!scoredPlayerList.isEmpty()
+                                && scoredPlayerList.getFirst().equalsIgnoreCase(player.getUserID())) {
                             gamesWithCustodians++;
                         }
                     }

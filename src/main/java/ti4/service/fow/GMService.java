@@ -6,15 +6,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
@@ -231,12 +232,12 @@ public class GMService {
 
     @ButtonHandler("gmWhoCanSee~MDL")
     public static void whoCanSeePosition(ButtonInteractionEvent event) {
-        TextInput position = TextInput.create(Constants.POSITION, "Position", TextInputStyle.SHORT)
+        TextInput position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
                 .setPlaceholder("000")
                 .setRequiredRange(3, 4)
                 .build();
         Modal modal = Modal.create("gmWhoCanSeeResolve", "Who Can See Position")
-                .addActionRow(position)
+                .addComponents(Label.of("Position", position))
                 .build();
         event.replyModal(modal).queue();
     }

@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.5.4</version>
+    <version>3.5.5</version>
   </parent>
 
   <groupId>me.terterro</groupId>
@@ -40,7 +40,7 @@
     <dependency>
       <groupId>net.dv8tion</groupId>
       <artifactId>JDA</artifactId>
-      <version>5.6.1</version>
+      <version>6.0.0-rc.4</version>
       <exclusions>
         <exclusion>
           <groupId>club.minnced</groupId>
@@ -51,7 +51,7 @@
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-batch</artifactId>
-      <version>1.12.782</version>
+      <version>1.12.788</version>
     </dependency>
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
@@ -88,6 +88,11 @@
       <groupId>com.pocketcombats</groupId>
       <artifactId>openskill</artifactId>
       <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.usefulness</groupId>
+      <artifactId>webp-imageio</artifactId>
+      <version>0.10.2</version>
     </dependency>
     <!-- TEST -->
     <dependency>

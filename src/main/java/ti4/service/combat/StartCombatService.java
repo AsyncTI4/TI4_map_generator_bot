@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.Nullable;
@@ -512,7 +512,7 @@ public class StartCombatService {
                 && isGroundCombat
                 && game.getStoredValue("audioSent").isEmpty()) {
             for (Player p3 : game.getRealPlayers()) {
-                if (p3.getHomeSystemTile() == tile) {
+                if (p3.getHomeSystemTile() == tile && game.getActivePlayer() != null) {
                     File audioFile = ResourceHelper.getFile("voices/" + p3.getFaction() + "/", "homedefense.mp3");
                     if (audioFile.exists()) {
                         MessageHelper.sendFileToChannel(threadChannel, audioFile);
@@ -720,7 +720,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
             int capitalShips = ButtonHelper.checkFleetAndCapacity(player, game, tile, true, true)[0];
-            if (player.getSecretsUnscored().containsKey("dyp") && capitalShips >= 3) {
+            if ("space".equalsIgnoreCase(type) && player.getSecretsUnscored().containsKey("dyp") && capitalShips >= 3) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         msg
@@ -1226,6 +1226,18 @@ public class StartCombatService {
                         "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                                 + "The Thundarian",
                         FactionEmojis.Nomad));
+            }
+            List<Tile> flagshipTile =
+                    CheckUnitContainmentService.getTilesContainingPlayersUnits(game, agentHolder, UnitType.Flagship);
+            if (isSpaceCombat
+                    && agentHolder.hasUnit("empyrean_flagship")
+                    && !flagshipTile.isEmpty()
+                    && FoWHelper.getAdjacentTiles(game, pos, agentHolder, false, true)
+                            .contains(flagshipTile.getFirst().getPosition())) {
+                buttons.add(Buttons.gray(
+                        finChecker + "empyreanFlagshipAbilityStep1_" + pos,
+                        "Use Empyrean Flagship Ability",
+                        FactionEmojis.Empyrean));
             }
 
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("yinagent")) {

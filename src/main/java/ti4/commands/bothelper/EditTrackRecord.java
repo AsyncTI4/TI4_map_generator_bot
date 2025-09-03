@@ -1,11 +1,12 @@
 package ti4.commands.bothelper;
 
+import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.modals.Modal;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.settings.users.UserSettingsManager;
@@ -29,12 +30,13 @@ class EditTrackRecord extends Subcommand {
             prevRecord = "Nothing was previously here.";
         }
         String fieldID = "record";
-        TextInput summary = TextInput.create(fieldID, "Edit user's track record", TextInputStyle.PARAGRAPH)
+        TextInput summary = TextInput.create(fieldID, TextInputStyle.PARAGRAPH)
                 .setPlaceholder("Edit the user's track record here.")
                 .setValue(prevRecord)
                 .build();
-        Modal modal =
-                Modal.create(modalId, "Track Record").addActionRow(summary).build();
+        Modal modal = Modal.create(modalId, "Track Record")
+                .addComponents(Label.of("Edit user's track record", summary))
+                .build();
         event.replyModal(modal).queue();
     }
 }

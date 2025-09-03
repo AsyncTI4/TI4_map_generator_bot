@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
+import net.dv8tion.jda.api.modals.Modal;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
@@ -130,14 +131,14 @@ public class AddTileListService {
 
     public static Modal buildMapStringModal(Game game, String modalId) {
         String fieldId = "mapString";
-        TextInput tags = TextInput.create(fieldId, "Enter Map String", TextInputStyle.PARAGRAPH)
+        TextInput tags = TextInput.create(fieldId, TextInputStyle.PARAGRAPH)
                 .setPlaceholder("Paste the map string here.")
                 .setValue(game.getMapString()
                         .substring(0, Math.min(game.getMapString().length(), 4000)))
                 .setRequired(true)
                 .build();
         return Modal.create(modalId, "Add Map String for " + game.getName())
-                .addActionRow(tags)
+                .addComponents(Label.of("Enter Map String", tags))
                 .build();
     }
 

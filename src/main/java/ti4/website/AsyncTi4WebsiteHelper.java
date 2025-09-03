@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.experimental.UtilityClass;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import ti4.map.Game;
@@ -35,6 +36,7 @@ import ti4.website.model.WebTileUnitData;
 import ti4.website.model.WebsiteOverlay;
 import ti4.website.model.stats.GameStatsDashboardPayload;
 
+@UtilityClass
 public class AsyncTi4WebsiteHelper {
 
     private static final int STAT_BATCH_SIZE = 200;
@@ -139,8 +141,7 @@ public class AsyncTi4WebsiteHelper {
                     String.format("webdata/%s/%s.json", gameId, gameId),
                     AsyncRequestBody.fromString(json),
                     "application/json",
-                    "no-cache, no-store, must-revalidate",
-                    bucket);
+                    "no-cache, no-store, must-revalidate");
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Could not put data to web server", e);
         }
@@ -161,8 +162,7 @@ public class AsyncTi4WebsiteHelper {
                     String.format("overlays/%s/%s.json", gameId, gameId),
                     AsyncRequestBody.fromString(json),
                     "application/json",
-                    "no-cache, no-store, must-revalidate",
-                    bucket);
+                    "no-cache, no-store, must-revalidate");
         } catch (Exception e) {
             BotLogger.error("Could not put overlay to web server", e);
         }
@@ -250,7 +250,7 @@ public class AsyncTi4WebsiteHelper {
                 });
     }
 
-    public static void putMap(String gameName, byte[] imageBytes, boolean frog, Player player) {
+    public static void putMap(String gameName, String fileFormat, byte[] imageBytes, boolean frog, Player player) {
         if (!uploadsEnabled()) return;
         String bucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
         if (bucket == null || bucket.isEmpty()) {
@@ -261,9 +261,9 @@ public class AsyncTi4WebsiteHelper {
         try {
             String mapPath;
             if (frog && player != null) {
-                mapPath = "fogmap/" + player.getUserID() + "/%s/%s.jpg";
+                mapPath = "fogmap/" + player.getUserID() + "/%s/%s." + fileFormat;
             } else {
-                mapPath = "map/%s/%s.jpg";
+                mapPath = "map/%s/%s." + fileFormat;
             }
 
             LocalDateTime date = LocalDateTime.now();
@@ -272,9 +272,8 @@ public class AsyncTi4WebsiteHelper {
             putObjectInBucket(
                     String.format(mapPath, gameName, dtstamp),
                     AsyncRequestBody.fromBytes(imageBytes),
-                    "image/jpg",
-                    null,
-                    bucket);
+                    "image/" + fileFormat,
+                    null);
         } catch (Exception e) {
             BotLogger.error(
                     new LogOrigin(player),
@@ -300,8 +299,7 @@ public class AsyncTi4WebsiteHelper {
         return urls;
     }
 
-    private static void putObjectInBucket(
-            String key, AsyncRequestBody body, String contentType, String cacheControl, String bucket) {
+    private static void putObjectInBucket(String key, AsyncRequestBody body, String contentType, String cacheControl) {
         String websiteBucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
 
         PutObjectRequest.Builder requestBuilder =

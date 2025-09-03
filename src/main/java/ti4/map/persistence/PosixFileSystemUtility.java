@@ -19,10 +19,9 @@ class PosixFileSystemUtility {
             FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
 
     static void setPermissionsIfPosix(Path path) {
+        if (!isPosix) return;
         try {
-            if (isPosix) {
-                Files.setPosixFilePermissions(path, FILE_PERMISSIONS);
-            }
+            Files.setPosixFilePermissions(path, FILE_PERMISSIONS);
         } catch (IOException e) {
             BotLogger.error("Failed to set Posix permissions", e);
         }

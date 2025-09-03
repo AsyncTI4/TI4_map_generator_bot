@@ -6,11 +6,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.modals.Modal;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.listeners.annotations.ModalHandler;
@@ -22,9 +23,9 @@ import ti4.service.map.AddTileListService;
 import ti4.service.map.AddTileService;
 import ti4.service.map.AddTileService.RandomOption;
 
-public class AddTileListRandom extends GameStateSubcommand {
+class AddTileListRandom extends GameStateSubcommand {
 
-    public AddTileListRandom() {
+    AddTileListRandom() {
         super(
                 Constants.ADD_TILE_LIST_RANDOM,
                 "Show dialog for tile list to generate map (supports random options from /map add_tile_random)",
@@ -42,14 +43,15 @@ public class AddTileListRandom extends GameStateSubcommand {
         modal.getComponents().forEach(newModalBuilder::addComponents);
         boolean hasExistingErTiles = game.getTileMap().values().stream()
                 .anyMatch(t -> t.getTileID().toLowerCase().startsWith("er"));
-        TextInput sourcesInput = TextInput.create(
-                        Constants.INCLUDE_ERONOUS_TILES, "Include Eronous tiles", TextInputStyle.SHORT)
+        TextInput sourcesInput = TextInput.create(Constants.INCLUDE_ERONOUS_TILES, TextInputStyle.SHORT)
                 .setPlaceholder("(Y)es / (N)o")
                 .setValue(hasExistingErTiles ? "Yes" : "No")
                 .setRequired(false)
                 .build();
 
-        newModalBuilder.addActionRow(sourcesInput).build();
+        newModalBuilder
+                .addComponents(Label.of("Include Eronous tiles", sourcesInput))
+                .build();
         modal = newModalBuilder.build();
 
         event.replyModal(modal).queue();
@@ -59,7 +61,7 @@ public class AddTileListRandom extends GameStateSubcommand {
     public static void addMapStringFromModal(ModalInteractionEvent event, Game game) {
         String mapStringRaw = event.getValue("mapString").getAsString().replace(",", " ");
         String eronousTiles = event.getValue(Constants.INCLUDE_ERONOUS_TILES).getAsString();
-        eronousTiles = eronousTiles != null ? eronousTiles.toLowerCase().trim() : "";
+        eronousTiles = eronousTiles.toLowerCase().trim();
 
         Set<ComponentSource> sources =
                 AddTileService.getSources(game, ("y".equals(eronousTiles) || "yes".equals(eronousTiles)));

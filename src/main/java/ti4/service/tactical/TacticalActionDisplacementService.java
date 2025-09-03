@@ -33,7 +33,7 @@ public class TacticalActionDisplacementService {
         Pattern rx = Pattern.compile(RegexHelper.posRegex(game) + "-" + RegexHelper.unitHolderRegex(game, "uh"));
         for (String uhKey : displacedKeys) {
             if (!displaced.containsKey(uhKey)) continue;
-            if (uhKey.equals("unk")) continue;
+            if ("unk".equals(uhKey)) continue;
 
             RegexService.runMatcher(rx, uhKey, matcher -> {
                 Tile tile = game.getTileByPosition(matcher.group("pos"));
@@ -72,6 +72,9 @@ public class TacticalActionDisplacementService {
     public Map<String, Map<UnitKey, List<Integer>>> moveAllFromTile(Game game, Player player, Tile tile) {
         Map<String, Map<UnitKey, List<Integer>>> displaced = game.getTacticalActionDisplacement();
         List<UnitType> movableFromPlanets = new ArrayList<>(List.of(UnitType.Infantry, UnitType.Mech));
+        if (player.hasTech("ffac2")) {
+            movableFromPlanets.add(UnitType.Spacedock);
+        }
         Set<Player> allowedAllies = resolveAllowedAllies(game, player, tile);
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             processUnitHolderMovement(game, player, allowedAllies, tile, unitHolder, displaced, movableFromPlanets);
@@ -161,7 +164,7 @@ public class TacticalActionDisplacementService {
         return game.getTacticalActionDisplacement();
     }
 
-    public boolean applyDisplacementToActiveSystem(Game game, Player player, Tile tile) {
+    public boolean applyDisplacementToActiveSystem(Game game, Tile tile) {
         boolean moved = false;
         UnitHolder activeSystemSpace = tile.getSpaceUnitHolder();
         for (Entry<String, Map<UnitKey, List<Integer>>> e :
