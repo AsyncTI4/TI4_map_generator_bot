@@ -331,6 +331,10 @@ public class StartTurnService {
             if (game.isFowMode()) {
                 numOfComponentActions += acButtons.size();
             }
+            if (IsPlayerElectedService.isPlayerElected(player.getGame(), player, "censure")
+                    || IsPlayerElectedService.isPlayerElected(player.getGame(), player, "absol_censure")) {
+                numOfComponentActions += 1;
+            }
             Button componentAction =
                     Buttons.green(finChecker + "componentAction", "Component Action (" + numOfComponentActions + ")");
 
