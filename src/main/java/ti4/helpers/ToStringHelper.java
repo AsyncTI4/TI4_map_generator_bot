@@ -3,7 +3,7 @@ package ti4.helpers;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Arrays;
 import java.util.Objects;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 
 public final class ToStringHelper {
 
