@@ -43,8 +43,7 @@ public class StandardBagDraft extends BagDraft {
     private static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllLegalFactions();
         if (!game.isDiscordantStarsMode()) {
-            factionSet.removeIf(factionModel ->
-                    factionModel.getSource().isDs() && !factionModel.getSource().isPok());
+            factionSet.removeIf(factionModel -> factionModel.getSource().isDs() && !factionModel.getSource().isPok());
         }
         return factionSet;
     }
@@ -70,7 +69,7 @@ public class StandardBagDraft extends BagDraft {
         Map<DraftItem.Category, List<DraftItem>> allDraftableItems = new HashMap<>();
         List<FactionModel> allDraftableFactions = getDraftableFactionsForGame(game);
         allDraftableItems.put(
-                DraftItem.Category.HOMESYSTEM, HomeSystemDraftItem.buildAllDraftableItems(allDraftableFactions));
+            DraftItem.Category.HOMESYSTEM, HomeSystemDraftItem.buildAllDraftableItems(allDraftableFactions));
         allDraftableItems.put(DraftItem.Category.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(game));
 
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
@@ -94,9 +93,9 @@ public class StandardBagDraft extends BagDraft {
                         bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
                         BotLogger.warning(
-                                new LogOrigin(game),
-                                "Game: `" + game.getName() + "` error - empty franken draftableCollection: "
-                                        + category.name());
+                            new LogOrigin(game),
+                            "Game: `" + game.getName() + "` error - empty franken draftableCollection: "
+                                + category.name());
                     }
                 }
             }

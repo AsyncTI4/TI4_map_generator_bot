@@ -21,11 +21,11 @@ class StartMilty extends GameStateSubcommand {
         super(Constants.QUICKSTART, "Start Milty Draft with default settings", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.SLICE_COUNT, "Slice Count (default = players + 1)"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.FACTION_COUNT, "Faction Count (default = players + 1)")
-                .setRequiredRange(1, 25));
+            .setRequiredRange(1, 25));
         addOptions(
-                new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_FACTIONS, "Include Discordant Stars Factions"));
+            new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_FACTIONS, "Include Discordant Stars Factions"));
         addOptions(
-                new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_TILES, "Include Uncharted Space Tiles (ds)"));
+            new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_TILES, "Include Uncharted Space Tiles (ds)"));
     }
 
     @Override
@@ -84,7 +84,7 @@ class StartMilty extends GameStateSubcommand {
 
         if (validTemplates.isEmpty()) {
             String msg = "Milty draft in this bot does not know about any map layouts that support " + players
-                    + " player" + (players == 1 ? "" : "s") + " yet.";
+                + " player" + (players == 1 ? "" : "s") + " yet.";
             MessageHelper.sendMessageToChannel(event.getChannel(), msg);
             return null;
         }
@@ -106,8 +106,7 @@ class StartMilty extends GameStateSubcommand {
         }
 
         if (useTemplate == null) {
-            String msg =
-                    "There is not a default map layout defined for this player count. Specify map template in options.";
+            String msg = "There is not a default map layout defined for this player count. Specify map template in options.";
             MessageHelper.sendMessageToChannel(event.getChannel(), msg);
             return null;
         }

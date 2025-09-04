@@ -10,23 +10,23 @@ import ti4.helpers.Constants;
 public class SOCardsCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new DrawSO(),
-                    new ShuffleSecretDeck(),
-                    new DiscardSO(),
-                    new SOInfo(),
-                    new ShowSO(),
-                    new ShowSOToAll(),
-                    new ScoreSO(),
-                    new DealSO(),
-                    new UnscoreSO(),
-                    new ShowAllSO(),
-                    new ShowAllSOToAll(),
-                    new ShowRandomSO(),
-                    new DealSOToAll(),
-                    new DrawSpecificSO(),
-                    new ShowUnScoredSOs(),
-                    new ListAllScored())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new DrawSO(),
+        new ShuffleSecretDeck(),
+        new DiscardSO(),
+        new SOInfo(),
+        new ShowSO(),
+        new ShowSOToAll(),
+        new ScoreSO(),
+        new DealSO(),
+        new UnscoreSO(),
+        new ShowAllSO(),
+        new ShowAllSOToAll(),
+        new ShowRandomSO(),
+        new DealSOToAll(),
+        new DrawSpecificSO(),
+        new ShowUnScoredSOs(),
+        new ListAllScored())
+        .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

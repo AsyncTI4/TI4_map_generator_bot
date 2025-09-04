@@ -33,45 +33,44 @@ public class UnlockLeaderService {
 
         if (leaderModel != null) {
             MessageHelper.sendMessageToChannelWithEmbed(
-                    channel,
-                    player.getRepresentation() + " has unlocked their " + leaderModel.getType() + ".",
-                    leaderModel.getRepresentationEmbed(false, true, true, showFlavourText));
+                channel,
+                player.getRepresentation() + " has unlocked their " + leaderModel.getType() + ".",
+                leaderModel.getRepresentationEmbed(false, true, true, showFlavourText));
         } else {
             MessageHelper.sendMessageToChannel(
-                    channel, LeaderEmojis.getLeaderEmoji(playerLeader).toString());
-            String message =
-                    player.getRepresentation() + " unlocked " + Helper.getLeaderFullRepresentation(playerLeader) + ".";
+                channel, LeaderEmojis.getLeaderEmoji(playerLeader).toString());
+            String message = player.getRepresentation() + " unlocked " + Helper.getLeaderFullRepresentation(playerLeader) + ".";
             MessageHelper.sendMessageToChannel(channel, message);
         }
 
         if (leaderID.contains("bentorcommander")) {
             MessageHelper.sendMessageToChannel(
-                    channel,
-                    player.getFactionEmoji() + ", your commodity value has been set to " + player.getCommoditiesTotal()
-                            + ".");
+                channel,
+                player.getFactionEmoji() + ", your commodity value has been set to " + player.getCommoditiesTotal()
+                    + ".");
         }
 
         if (leaderID.contains("naalucommander")) {
             CardsInfoService.sendVariousAdditionalButtons(game, player);
             MessageHelper.sendMessageToChannel(
-                    channel,
-                    player.getRepresentationUnfogged()
-                            + ", you may use M'aban, the Naalu Commander, via button in your `#cards-info` thread.");
+                channel,
+                player.getRepresentationUnfogged()
+                    + ", you may use M'aban, the Naalu Commander, via button in your `#cards-info` thread.");
         }
 
         if ("xxchahero".equals(leaderID)) {
             if (game.getPhaseOfGame().contains("status")) {
                 MessageHelper.sendMessageToChannel(
-                        channel,
-                        "Reminder, " + player.getRepresentationUnfogged()
-                                + ", that officially Xxekir Grom remains locked until after both objectives have been scored;"
-                                + " you cannot use the ability to pay for any requirements of the unlocking objectives (if they're spendies).");
+                    channel,
+                    "Reminder, " + player.getRepresentationUnfogged()
+                        + ", that officially Xxekir Grom remains locked until after both objectives have been scored;"
+                        + " you cannot use the ability to pay for any requirements of the unlocking objectives (if they're spendies).");
             } else {
                 MessageHelper.sendMessageToChannel(
-                        channel,
-                        "Reminder, " + player.getRepresentationUnfogged()
-                                + ", that officially Xxekir Grom remains locked until after the objective has been scored;"
-                                + " you cannot use the ability to pay for any requirements of the unlocking objective (if it's a spendie).");
+                    channel,
+                    "Reminder, " + player.getRepresentationUnfogged()
+                        + ", that officially Xxekir Grom remains locked until after the objective has been scored;"
+                        + " you cannot use the ability to pay for any requirements of the unlocking objective (if it's a spendie).");
             }
         }
 

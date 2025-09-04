@@ -55,7 +55,7 @@ public class FOWCombatThreadMirroring {
         boolean messageMirrored = mirrorMessage((ThreadChannel) event.getChannel(), player, game, newMessageText);
         if (messageMirrored) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), player.getRepresentationNoPing() + "(You) said: " + messageText);
+                event.getChannel(), player.getRepresentationNoPing() + "(You) said: " + messageText);
             event.getMessage().delete().queue();
         }
     }
@@ -65,7 +65,7 @@ public class FOWCombatThreadMirroring {
         String hits = matchPattern(messageText, "Total hits (\\d+)");
 
         return player.getRepresentationNoPing() + " rolled for " + combat + ": "
-                + CombatMessageHelper.displayHitResults(Integer.parseInt(hits)).replace("\n", "");
+            + CombatMessageHelper.displayHitResults(Integer.parseInt(hits)).replace("\n", "");
     }
 
     private static boolean isFowCombatThread(Channel eventChannel) {
@@ -129,7 +129,7 @@ public class FOWCombatThreadMirroring {
         if (!isFowCombatThread(event.getChannel())) return false;
 
         return mirrorMessage(
-                (ThreadChannel) event.getChannel(), getCommunityModePlayer(event.getMember(), game), game, message);
+            (ThreadChannel) event.getChannel(), getCommunityModePlayer(event.getMember(), game), game, message);
     }
 
     private static boolean mirrorMessage(ThreadChannel channel, Player player, Game game, String message) {
@@ -145,9 +145,8 @@ public class FOWCombatThreadMirroring {
             TextChannel pChan = (TextChannel) pChannel;
             if (pChan != null) {
                 boolean combatParticipant = combatParticipants.contains(playerOther);
-                String newMessage =
-                        (combatParticipant ? playerOther.getRepresentation(true, combatParticipant) + " " : "")
-                                + message;
+                String newMessage = (combatParticipant ? playerOther.getRepresentation(true, combatParticipant) + " " : "")
+                    + message;
 
                 List<ThreadChannel> threadChannels = pChan.getThreadChannels();
                 for (ThreadChannel threadChannel_ : threadChannels) {

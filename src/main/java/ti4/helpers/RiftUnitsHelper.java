@@ -39,14 +39,14 @@ public class RiftUnitsHelper {
         String unit = rest;
         for (int x = 0; x < amount; x++) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), ident + " " + riftUnit(unit, tile, game, event, player, null));
+                player.getCorrectChannel(), ident + " " + riftUnit(unit, tile, game, event, player, null));
         }
         String message = event.getMessage().getContentRaw();
         List<Button> systemButtons = getButtonsForRiftingUnitsInSystem(player, game, tile);
         event.getMessage()
-                .editMessage(message)
-                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                .queue();
+            .editMessage(message)
+            .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
+            .queue();
     }
 
     @ButtonHandler("riftAllUnits_")
@@ -57,7 +57,8 @@ public class RiftUnitsHelper {
     }
 
     public static void riftAllUnitsInASystem(
-            String pos, ButtonInteractionEvent event, Game game, Player player, String ident, Player cabal) {
+        String pos, ButtonInteractionEvent event, Game game, Player player, String ident, Player cabal
+    ) {
         Tile tile = game.getTileByPosition(pos);
 
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
@@ -73,11 +74,11 @@ public class RiftUnitsHelper {
 
                 UnitKey key = unitEntry.getKey();
                 if (key.getUnitType() == UnitType.Infantry
-                        || key.getUnitType() == UnitType.Mech
-                        || (!player.hasFF2Tech() && key.getUnitType() == UnitType.Fighter)
-                        || (cabal != null
-                                && (key.getUnitType() == UnitType.Fighter
-                                        || key.getUnitType() == UnitType.Spacedock))) {
+                    || key.getUnitType() == UnitType.Mech
+                    || (!player.hasFF2Tech() && key.getUnitType() == UnitType.Fighter)
+                    || (cabal != null
+                        && (key.getUnitType() == UnitType.Fighter
+                            || key.getUnitType() == UnitType.Spacedock))) {
                     continue;
                 }
 
@@ -85,19 +86,19 @@ public class RiftUnitsHelper {
                 String unitAsyncID = unitModel.getAsyncId();
                 int damagedUnits = 0;
                 if (unitHolder.getUnitDamage() != null
-                        && unitHolder.getUnitDamage().get(key) != null) {
+                    && unitHolder.getUnitDamage().get(key) != null) {
                     damagedUnits = unitHolder.getUnitDamage().get(key);
                 }
                 for (int x = 0; x < damagedUnits; x++) {
                     MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            "A " + ident + riftUnit(unitAsyncID + "damaged", tile, game, event, player, cabal));
+                        player.getCorrectChannel(),
+                        "A " + ident + riftUnit(unitAsyncID + "damaged", tile, game, event, player, cabal));
                 }
                 totalUnits -= damagedUnits;
                 for (int x = 0; x < totalUnits; x++) {
                     MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            "A " + ident + riftUnit(unitAsyncID, tile, game, event, player, cabal));
+                        player.getCorrectChannel(),
+                        "A " + ident + riftUnit(unitAsyncID, tile, game, event, player, cabal));
                 }
             }
         }
@@ -105,9 +106,9 @@ public class RiftUnitsHelper {
             String message = event.getMessage().getContentRaw();
             List<Button> systemButtons = getButtonsForRiftingUnitsInSystem(player, game, tile);
             event.getMessage()
-                    .editMessage(message)
-                    .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                    .queue();
+                .editMessage(message)
+                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
+                .queue();
         } else {
             boolean deletedMessage = JdaComponentHelper.removeComponentFromMessageAndDeleteIfEmpty(event);
             if (!deletedMessage) {
@@ -121,7 +122,8 @@ public class RiftUnitsHelper {
     }
 
     public static String riftUnit(
-            String unit, Tile tile, Game game, GenericInteractionCreateEvent event, Player player, Player cabal) {
+        String unit, Tile tile, Game game, GenericInteractionCreateEvent event, Player player, Player cabal
+    ) {
         boolean damaged = false;
         if (unit.contains("damaged")) {
             unit = unit.replace("damaged", "");
@@ -130,7 +132,7 @@ public class RiftUnitsHelper {
         Die d1 = new Die(4);
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
         String msg = unitKey.unitEmoji() + " in tile " + tile.getPosition() + " rolled a "
-                + d1.getGreenDieIfSuccessOrRedDieIfFailure();
+            + d1.getGreenDieIfSuccessOrRedDieIfFailure();
         if (damaged) {
             msg = "damaged " + msg;
         }
@@ -141,8 +143,8 @@ public class RiftUnitsHelper {
             RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
             msg += " and failed. Condolences for your loss.";
             if (cabal != null
-                    && cabal != player
-                    && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, game, cabal)) {
+                && cabal != player
+                && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, game, cabal)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, 1, unit, event);
             }
         }
@@ -168,8 +170,8 @@ public class RiftUnitsHelper {
 
                     UnitType unitType = key.getUnitType();
                     if ((!game.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")
-                                    && (unitType == UnitType.Infantry || unitType == UnitType.Mech))
-                            || (!player.hasFF2Tech() && unitType == UnitType.Fighter)) {
+                        && (unitType == UnitType.Infantry || unitType == UnitType.Mech))
+                        || (!player.hasFF2Tech() && unitType == UnitType.Fighter)) {
                         continue;
                     }
 
@@ -179,22 +181,22 @@ public class RiftUnitsHelper {
 
                     int damagedUnits = 0;
                     if (unitHolder.getUnitDamage() != null
-                            && unitHolder.getUnitDamage().get(key) != null) {
+                        && unitHolder.getUnitDamage().get(key) != null) {
                         damagedUnits = unitHolder.getUnitDamage().get(key);
                     }
                     for (int x = 1; x < damagedUnits + 1 && x <= 2; x++) {
                         Button validTile2 = Buttons.red(
-                                finChecker + "riftUnit_" + tile.getPosition() + "_" + x + unitName + "damaged",
-                                "Rift " + x + " Damaged " + unitModel.getBaseType(),
-                                unitModel.getUnitEmoji());
+                            finChecker + "riftUnit_" + tile.getPosition() + "_" + x + unitName + "damaged",
+                            "Rift " + x + " Damaged " + unitModel.getBaseType(),
+                            unitModel.getUnitEmoji());
                         buttons.add(validTile2);
                     }
                     totalUnits -= damagedUnits;
                     for (int x = 1; x < totalUnits + 1 && x <= 2; x++) {
                         Button validTile2 = Buttons.red(
-                                finChecker + "riftUnit_" + tile.getPosition() + "_" + x + unitName,
-                                "Rift " + x + " " + unitModel.getBaseType(),
-                                unitModel.getUnitEmoji());
+                            finChecker + "riftUnit_" + tile.getPosition() + "_" + x + unitName,
+                            "Rift " + x + " " + unitModel.getBaseType(),
+                            unitModel.getUnitEmoji());
                         buttons.add(validTile2);
                     }
                 }
@@ -221,7 +223,7 @@ public class RiftUnitsHelper {
                 }
             }
             String msg = player.getRepresentation()
-                    + " if the wormhole nexus was improperly unlocked during this action, you can use the button below to unflip it.";
+                + " if the wormhole nexus was improperly unlocked during this action, you can use the button below to unflip it.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("unflipMallice", "Unflip Mallice"));
             buttons.add(Buttons.red("deleteButtons", "Leave It Alone"));
@@ -237,20 +239,20 @@ public class RiftUnitsHelper {
         String msg = player.getRepresentationNoPing() + " is rifting some units.";
         if (player.hasAbility("celestial_guides")) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationNoPing()
-                            + " is rifting some units. However, because of their **Celestial Guides** ability, they do not roll.");
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing()
+                    + " is rifting some units. However, because of their **Celestial Guides** ability, they do not roll.");
         } else if (player.hasRelic("circletofthevoid")) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationNoPing()
-                            + " is rifting some units. However, because of their _Circlet of the Void_ relic, they do not roll.");
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing()
+                    + " is rifting some units. However, because of their _Circlet of the Void_ relic, they do not roll.");
         } else {
             MessageHelper.sendMessageToChannelWithButtons(
-                    channel,
-                    player.getRepresentationNoPing()
-                            + " is rifting some units. Please use the the buttons to choose the units you wish to risk in the gravity rift.",
-                    getButtonsForRiftingUnitsInSystem(player, game, tile));
+                channel,
+                player.getRepresentationNoPing()
+                    + " is rifting some units. Please use the the buttons to choose the units you wish to risk in the gravity rift.",
+                getButtonsForRiftingUnitsInSystem(player, game, tile));
         }
     }
 }

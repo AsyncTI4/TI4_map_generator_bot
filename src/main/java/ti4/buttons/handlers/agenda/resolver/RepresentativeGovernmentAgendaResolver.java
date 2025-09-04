@@ -21,8 +21,8 @@ public class RepresentativeGovernmentAgendaResolver implements AgendaResolver {
                 game.setStoredValue("agendaRepGov", game.getStoredValue("agendaRepGov") + playerWL.getFaction());
             }
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(),
-                    "Will exhaust cultural planets of all players who voted \"Against\" at start of next Strategy Phase.");
+                game.getMainGameChannel(),
+                "Will exhaust cultural planets of all players who voted \"Against\" at start of next Strategy Phase.");
         }
     }
 }

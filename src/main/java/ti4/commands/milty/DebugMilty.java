@@ -25,8 +25,8 @@ class DebugMilty extends GameStateSubcommand {
             postInfoInThread(game, thread);
         } else if (channel instanceof TextChannel textChannel) {
             textChannel
-                    .createThreadChannel(game.getName() + "-milty-debug-info")
-                    .queue(t -> postInfoInThread(game, t));
+                .createThreadChannel(game.getName() + "-milty-debug-info")
+                .queue(t -> postInfoInThread(game, t));
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not send debug info");
         }

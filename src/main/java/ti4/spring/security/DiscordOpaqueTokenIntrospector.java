@@ -26,9 +26,9 @@ public class DiscordOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
 
     private static final String ME_ENDPOINT = "https://discord.com/api/v10/users/@me";
     private static final Cache<String, OAuth2AuthenticatedPrincipal> AUTH_CACHE = Caffeine.newBuilder()
-            .maximumSize(1000)
-            .expireAfterWrite(30, TimeUnit.MINUTES)
-            .build();
+        .maximumSize(1000)
+        .expireAfterWrite(30, TimeUnit.MINUTES)
+        .build();
 
     @Override
     public OAuth2AuthenticatedPrincipal introspect(String token) {
@@ -54,35 +54,35 @@ public class DiscordOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
             return handleSuccessfulAuthenticate(response, token);
         }
         if (response.statusCode() == HttpStatus.UNAUTHORIZED.value()
-                || response.statusCode() == HttpStatus.FORBIDDEN.value()) {
+            || response.statusCode() == HttpStatus.FORBIDDEN.value()) {
             throw newAuthenticationFailureException();
         }
         BotLogger.error(String.format(
-                "Received an unexpected status code from Discord during authentication: %s", response.body()));
+            "Received an unexpected status code from Discord during authentication: %s", response.body()));
         throw newAuthenticationFailureException();
     }
 
     private HttpResponse<String> authenticateWithDiscord(String token) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
-                .GET()
-                .uri(URI.create(ME_ENDPOINT))
-                .header("Accept", "application/json")
-                .header("Authorization", "Bearer " + token)
-                .build();
+            .GET()
+            .uri(URI.create(ME_ENDPOINT))
+            .header("Accept", "application/json")
+            .header("Authorization", "Bearer " + token)
+            .build();
 
         return EgressClientManager.getHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private OAuth2AuthenticatedPrincipal handleSuccessfulAuthenticate(HttpResponse<String> response, String token)
-            throws JsonProcessingException {
+        throws JsonProcessingException {
         JsonNode node = EgressClientManager.getObjectMapper().readTree(response.body());
 
         OAuth2AuthenticatedPrincipal principal = new DefaultOAuth2AuthenticatedPrincipal(
-                node.get("id").asText(),
-                Map.of(
-                        "id", node.get("id").asText(),
-                        "username", node.get("username").asText()),
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
+            node.get("id").asText(),
+            Map.of(
+                "id", node.get("id").asText(),
+                "username", node.get("username").asText()),
+            Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
 
         AUTH_CACHE.put(token, principal);
 

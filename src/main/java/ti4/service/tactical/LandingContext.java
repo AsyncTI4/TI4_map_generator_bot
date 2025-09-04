@@ -26,14 +26,15 @@ public final class LandingContext {
     public final List<UnitType> committable;
 
     private LandingContext(
-            Game game,
-            Player mainPlayer,
-            Tile tile,
-            UnitHolder space,
-            Planet planet,
-            String landPrefix,
-            String unlandPrefix,
-            List<UnitType> committable) {
+        Game game,
+        Player mainPlayer,
+        Tile tile,
+        UnitHolder space,
+        Planet planet,
+        String landPrefix,
+        String unlandPrefix,
+        List<UnitType> committable
+    ) {
         this.game = game;
         this.mainPlayer = mainPlayer;
         this.tile = tile;
@@ -48,14 +49,15 @@ public final class LandingContext {
     }
 
     public static LandingContext of(
-            Game game,
-            Player mainPlayer,
-            Tile tile,
-            UnitHolder space,
-            Planet planet,
-            String landPrefix,
-            String unlandPrefix,
-            List<UnitType> committable) {
+        Game game,
+        Player mainPlayer,
+        Tile tile,
+        UnitHolder space,
+        Planet planet,
+        String landPrefix,
+        String unlandPrefix,
+        List<UnitType> committable
+    ) {
         return new LandingContext(game, mainPlayer, tile, space, planet, landPrefix, unlandPrefix, committable);
     }
 
@@ -87,12 +89,12 @@ public final class LandingContext {
 
     public String buildLandLabel(int count, Player owner, UnitState state, UnitType unitType) {
         return "Land " + count + colorTextFor(owner) + stateDescriptor(state) + " " + unitType.humanReadableName()
-                + " on " + planetRep;
+            + " on " + planetRep;
     }
 
     public String buildUnlandLabel(int count, Player owner, UnitState state, UnitType unitType) {
         return "Un-land " + count + colorTextFor(owner) + stateDescriptor(state) + " " + unitType.humanReadableName()
-                + " from " + planetRep;
+            + " from " + planetRep;
     }
 
     public String colorTextFor(Player owner) {

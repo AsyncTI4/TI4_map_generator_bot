@@ -13,7 +13,7 @@ class CardsInfoForPlayer extends GameStateSubcommand {
     CardsInfoForPlayer() {
         super(Constants.INFO, "Resent all my cards in Private Message", false, true);
         addOptions(
-                new OptionData(OptionType.USER, Constants.PLAYER, "Player to resend cards info for").setRequired(true));
+            new OptionData(OptionType.USER, Constants.PLAYER, "Player to resend cards info for").setRequired(true));
     }
 
     @Override

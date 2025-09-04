@@ -8,7 +8,8 @@ import ti4.message.MessageHelper;
 class SearchHelper {
 
     public static void sendSearchEmbedsToEventChannel(
-            SlashCommandInteractionEvent event, List<MessageEmbed> messageEmbeds) {
+        SlashCommandInteractionEvent event, List<MessageEmbed> messageEmbeds
+    ) {
         if (messageEmbeds.size() > 3) {
             String threadName = event.getCommandString();
             MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, messageEmbeds);

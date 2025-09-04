@@ -47,22 +47,21 @@ class CreateFOWGameChannels extends Subcommand {
         // CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!CreateFoWGameService.serverCanHostNewGame(guild, members.size() + 1)) {
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+                event,
+                "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
             return;
         }
 
         // CHECK IF GUILD HAS ALL PLAYERS LISTED
-        List<String> guildMemberIDs =
-                guild.getMembers().stream().map(ISnowflake::getId).toList();
+        List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
         boolean sendInviteLink = false;
         int count = 0;
         for (Member member : members) {
             if (!guildMemberIDs.contains(member.getId())) {
                 MessageHelper.sendMessageToEventChannel(
-                        event,
-                        member.getAsMention() + " is not a member of the server **" + guild.getName()
-                                + "**. Please use the invite below to join the server and then try this command again.");
+                    event,
+                    member.getAsMention() + " is not a member of the server **" + guild.getName()
+                        + "**. Please use the invite below to join the server and then try this command again.");
                 sendInviteLink = true;
                 count++;
             }

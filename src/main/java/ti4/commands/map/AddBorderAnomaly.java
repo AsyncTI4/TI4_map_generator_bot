@@ -18,11 +18,11 @@ public class AddBorderAnomaly extends GameStateSubcommand {
         super(Constants.ADD_BORDER_ANOMALY, "Add a border anomaly to a tile", true, false);
         addOption(OptionType.STRING, Constants.PRIMARY_TILE, "Tile the border will be linked to", true, true);
         addOption(
-                OptionType.STRING,
-                Constants.PRIMARY_TILE_DIRECTION,
-                "Side of the system the anomaly will be on",
-                true,
-                true);
+            OptionType.STRING,
+            Constants.PRIMARY_TILE_DIRECTION,
+            "Side of the system the anomaly will be on",
+            true,
+            true);
         addOption(OptionType.STRING, Constants.BORDER_TYPE, "Type of anomaly", true, true);
     }
 
@@ -43,10 +43,10 @@ public class AddBorderAnomaly extends GameStateSubcommand {
             for (int d : directions) {
                 if (game.hasBorderAnomalyOn(tile, d)) {
                     sb.append("Tile ")
-                            .append(tile)
-                            .append(" already has an anomaly in position ")
-                            .append(d)
-                            .append(".\n");
+                        .append(tile)
+                        .append(" already has an anomaly in position ")
+                        .append(d)
+                        .append(".\n");
                 } else {
                     game.addBorderAnomaly(tile, d, anomalyType);
                     amountAdded++;

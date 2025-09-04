@@ -10,29 +10,29 @@ import ti4.helpers.Constants;
 public class ACCardsCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new ACInfo(),
-                    new DrawAC(),
-                    new DiscardAC(),
-                    new PurgeAC(),
-                    new DiscardACRandom(),
-                    new ShowAC(),
-                    new ShowACToAll(),
-                    new PlayAC(),
-                    new ShuffleACDeck(),
-                    new ShowAllAC(),
-                    new ShowACRemainingCardCount(),
-                    new ShowAllUnplayedACs(),
-                    new PickACFromDiscard(),
-                    new PickACFromPurged(),
-                    new ShowDiscardActionCards(),
-                    new ShowPurgedActionCards(),
-                    new ShuffleACBackIntoDeck(),
-                    new RevealAndPutACIntoDiscard(),
-                    new SendAC(),
-                    new SendACRandom(),
-                    new DrawSpecificAC(),
-                    new MakeCopiesOfACs())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new ACInfo(),
+        new DrawAC(),
+        new DiscardAC(),
+        new PurgeAC(),
+        new DiscardACRandom(),
+        new ShowAC(),
+        new ShowACToAll(),
+        new PlayAC(),
+        new ShuffleACDeck(),
+        new ShowAllAC(),
+        new ShowACRemainingCardCount(),
+        new ShowAllUnplayedACs(),
+        new PickACFromDiscard(),
+        new PickACFromPurged(),
+        new ShowDiscardActionCards(),
+        new ShowPurgedActionCards(),
+        new ShuffleACBackIntoDeck(),
+        new RevealAndPutACIntoDiscard(),
+        new SendAC(),
+        new SendACRandom(),
+        new DrawSpecificAC(),
+        new MakeCopiesOfACs())
+        .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

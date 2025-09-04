@@ -37,15 +37,15 @@ public class EconomicEqualityAgendaResolver implements AgendaResolver {
             }
         }
         MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(),
-                game.getPing() + ", all players' trade goods have been set to " + finalTG + ".");
+            game.getMainGameChannel(),
+            game.getPing() + ", all players' trade goods have been set to " + finalTG + ".");
         if (!comrades.isEmpty()) {
             for (Player playerB : comrades) {
                 DisasterWatchHelper.sendMessageInDisasterWatch(
-                        game,
-                        "The Galactic Council of " + game.getName() + " have generously volunteered "
-                                + playerB.getRepresentation() + " to donate " + maxLoss
-                                + " trade goods to the less economically fortunate citizens of the galaxy.");
+                    game,
+                    "The Galactic Council of " + game.getName() + " have generously volunteered "
+                        + playerB.getRepresentation() + " to donate " + maxLoss
+                        + " trade goods to the less economically fortunate citizens of the galaxy.");
             }
             DisasterWatchHelper.sendMessageInDisasterWatch(game, MiscEmojis.tg(maxLoss));
         }

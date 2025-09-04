@@ -44,17 +44,17 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
 
     public boolean isValid() {
         return alias != null
-                && factionName != null
-                && homeSystem != null
-                && startingFleet != null
-                && factionTech != null
-                && (startingTech != null || (startingTechOptions != null && startingTechAmount != null))
-                && homePlanets != null
-                && abilities != null
-                && leaders != null
-                && promissoryNotes != null
-                && units != null
-                && source != null;
+            && factionName != null
+            && homeSystem != null
+            && startingFleet != null
+            && factionTech != null
+            && (startingTech != null || (startingTechOptions != null && startingTechAmount != null))
+            && homePlanets != null
+            && abilities != null
+            && leaders != null
+            && promissoryNotes != null
+            && units != null
+            && source != null;
     }
 
     public String getFactionEmoji() {
@@ -134,35 +134,35 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
 
     public List<String> getPreferredColours() {
         return Optional.ofNullable(preferredColours)
-                .orElse(
-                        homebrewReplacesID != null
-                                ? Mapper.getFaction(homebrewReplacesID).getPreferredColours()
-                                : new ArrayList<>());
+            .orElse(
+                homebrewReplacesID != null
+                    ? Mapper.getFaction(homebrewReplacesID).getPreferredColours()
+                    : new ArrayList<>());
     }
 
     public String getLinksText() {
         StringBuilder sb = new StringBuilder();
         getFactionSheetFrontImageURL()
-                .ifPresent(
-                        url -> sb.append("[Faction Sheet Front](").append(url).append(")\n"));
+            .ifPresent(
+                url -> sb.append("[Faction Sheet Front](").append(url).append(")\n"));
         getFactionSheetBackImageURL()
-                .ifPresent(url -> sb.append("[Faction Sheet Back](").append(url).append(")\n"));
+            .ifPresent(url -> sb.append("[Faction Sheet Back](").append(url).append(")\n"));
         getFactionReferenceImageURL()
-                .ifPresent(
-                        url -> sb.append("[Quick Reference Card](").append(url).append(")\n"));
+            .ifPresent(
+                url -> sb.append("[Quick Reference Card](").append(url).append(")\n"));
         getWikiURL().ifPresent(url -> sb.append("[Wiki Link](").append(url).append(")\n"));
         return sb.toString();
     }
 
     public String getFactionSheetMessage() {
         if (getFactionSheetFrontImageURL().isEmpty()
-                && getFactionSheetBackImageURL().isEmpty()) return null;
+            && getFactionSheetBackImageURL().isEmpty()) return null;
 
         StringBuilder sb = new StringBuilder("## Faction Sheet: ");
         getFactionSheetFrontImageURL()
-                .ifPresent(url -> sb.append("[Front](").append(url).append(") "));
+            .ifPresent(url -> sb.append("[Front](").append(url).append(") "));
         getFactionSheetBackImageURL()
-                .ifPresent(url -> sb.append("[Back](").append(url).append(") "));
+            .ifPresent(url -> sb.append("[Back](").append(url).append(") "));
         getWikiURL().ifPresent(url -> sb.append("[Wiki Link](").append(url).append(")"));
         return sb.toString();
     }
@@ -254,9 +254,9 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         for (String id : getLeaders()) {
             LeaderModel model = Mapper.getLeader(id);
             sb.append(model.getLeaderEmoji())
-                    .append(" ")
-                    .append(model.getName())
-                    .append("\n");
+                .append(" ")
+                .append(model.getName())
+                .append("\n");
         }
         eb.addField("__Leaders__", sb.toString(), false);
 
@@ -294,10 +294,10 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     public boolean search(String searchString) {
         searchString = searchString.toLowerCase();
         return factionName.contains(searchString)
-                || alias.contains(searchString)
-                || getShortTag().contains(searchString)
-                || source.toString().contains(searchString)
-                || alias.equals(AliasHandler.resolveFaction(searchString));
+            || alias.contains(searchString)
+            || getShortTag().contains(searchString)
+            || source.toString().contains(searchString)
+            || alias.equals(AliasHandler.resolveFaction(searchString));
     }
 
     @Override

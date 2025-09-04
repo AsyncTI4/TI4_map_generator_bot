@@ -173,7 +173,7 @@ public class ImageHelper {
     public static byte[] writeWebp(BufferedImage image) {
         var imageWithoutAlpha = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
         try (var byteArrayOutputStream = new ByteArrayOutputStream();
-                var imageOutputStream = ImageIO.createImageOutputStream(byteArrayOutputStream)) {
+            var imageOutputStream = ImageIO.createImageOutputStream(byteArrayOutputStream)) {
             ImageWriter writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
 
             WebPWriteParam writeParam = ((WebPWriteParam) writer.getDefaultWriteParam());

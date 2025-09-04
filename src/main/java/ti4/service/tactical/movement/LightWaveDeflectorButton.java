@@ -14,6 +14,6 @@ public final class LightWaveDeflectorButton implements MoveAbilityButton {
 
     public List<Button> build(MoveContext ctx) {
         return List.of(
-                Buttons.gray("exhaustTech_baldrick_lwd", "Exhaust Light/Wave Deflector", SourceEmojis.IgnisAurora));
+            Buttons.gray("exhaustTech_baldrick_lwd", "Exhaust Light/Wave Deflector", SourceEmojis.IgnisAurora));
     }
 }

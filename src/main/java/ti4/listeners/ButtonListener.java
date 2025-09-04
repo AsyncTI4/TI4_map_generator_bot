@@ -21,9 +21,9 @@ public class ButtonListener extends ListenerAdapter {
     public void onButtonInteraction(@Nonnull ButtonInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
             event.reply("You pressed: " + ButtonHelper.getButtonRepresentation(event.getButton())
-                            + "\nPlease try again in a few minutes. The bot is rebooting.")
-                    .setEphemeral(true)
-                    .queue();
+                + "\nPlease try again in a few minutes. The bot is rebooting.")
+                .setEphemeral(true)
+                .queue();
             return;
         }
 

@@ -11,11 +11,11 @@ class FactionRecordOfSCPick extends Subcommand {
 
     public FactionRecordOfSCPick() {
         super(
-                Constants.FACTION_RECORD_OF_SCPICK,
-                "number of times a strategy card has been picked by a faction, by round");
+            Constants.FACTION_RECORD_OF_SCPICK,
+            "number of times a strategy card has been picked by a faction, by round");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction that you wish to get history of")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(GameStatisticsFilterer.gameStatsFilters());
     }
 

@@ -75,9 +75,9 @@ public class SliceGenerationSettings extends SettingsMenu {
 
         // Other Initialization
         minimumRes.setExtraInfo(
-                "(this value does not account for flexibly spent planets (you may be used to those appearing as +0.5))");
+            "(this value does not account for flexibly spent planets (you may be used to those appearing as +0.5))");
         minimumInf.setExtraInfo(
-                "(this value does not account for flexibly spent planets (you may be used to those appearing as +0.5))");
+            "(this value does not account for flexibly spent planets (you may be used to those appearing as +0.5))");
 
         // Get the correct JSON node for initialization if applicable.
         // Add additional names here to support new generated JSON as needed.
@@ -86,8 +86,8 @@ public class SliceGenerationSettings extends SettingsMenu {
         // Verify this is the correct JSON node and continue initialization
         List<String> historicIDs = new ArrayList<>(List.of("slice"));
         if (json != null
-                && json.has("menuId")
-                && historicIDs.contains(json.get("menuId").asText(""))) {
+            && json.has("menuId")
+            && historicIDs.contains(json.get("menuId").asText(""))) {
             numSlices.initialize(json.get("numSlices"));
             numFactions.initialize(json.get("numFactions"));
             minimumRes.initialize(json.get("minimumRes"));
@@ -136,15 +136,14 @@ public class SliceGenerationSettings extends SettingsMenu {
 
     @Override
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "scpt2025finals" -> scpt2025finals(event);
-                    case "richPreset" -> richGalaxy();
-                    case "poorPreset" -> poorGalaxy();
-                    case "presetSlices~MDL" -> getPresetSlicesFromUser(event);
-                    case "presetSlices" -> setPresetSlices(event);
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "scpt2025finals" -> scpt2025finals(event);
+            case "richPreset" -> richGalaxy();
+            case "poorPreset" -> poorGalaxy();
+            case "presetSlices~MDL" -> getPresetSlicesFromUser(event);
+            case "presetSlices" -> setPresetSlices(event);
+            default -> null;
+        };
 
         return (error == null ? "success" : error);
     }
@@ -152,13 +151,14 @@ public class SliceGenerationSettings extends SettingsMenu {
     @Override
     public String menuSummaryString(String lastSettingTouched) {
         StringBuilder sb = new StringBuilder("# **__").append(menuName).append(":__**");
-        for (String line : description) sb.append("\n- *").append(line).append("*");
+        for (String line : description)
+            sb.append("\n- *").append(line).append("*");
         sb.append("\n");
 
         int pad = enabledSettings().stream()
-                .map(x -> x.getName().length())
-                .max(Comparator.comparingInt(x -> x))
-                .orElse(15);
+            .map(x -> x.getName().length())
+            .max(Comparator.comparingInt(x -> x))
+            .orElse(15);
         for (SettingInterface setting : enabledSettings()) {
             sb.append("> ");
             sb.append(setting.longSummary(pad, lastSettingTouched));
@@ -219,19 +219,18 @@ public class SliceGenerationSettings extends SettingsMenu {
         numSlices.setVal(6);
         numFactions.setVal(6);
         List<String> slices = new ArrayList<>(List.of(
-                "64,22,45,75,70",
-                "74,68,40,60,21",
-                "62,39,67,72,38",
-                "42,27,34,26,50",
-                "41,30,29,80,63",
-                "31,25,79,76,78"));
+            "64,22,45,75,70",
+            "74,68,40,60,21",
+            "62,39,67,72,38",
+            "42,27,34,26,50",
+            "41,30,29,80,63",
+            "31,25,79,76,78"));
         String ttsString = String.join("|", slices);
         if (game != null) {
             String msg = "Howdy " + game.getPing()
-                    + ",\nThis map is WEIRD!!!\nPlease note that the map template was updated to `2025scptFinals`, ";
+                + ",\nThis map is WEIRD!!!\nPlease note that the map template was updated to `2025scptFinals`, ";
             msg += "and the faction list was set to a default of: Sol, Xxcha, Jol Nar, Keleres, Creuss, and Naalu.";
-            msg +=
-                    "\nIf you wish to play instead on a normal map, or with different factions, feel free to edit those settings accordingly.";
+            msg += "\nIf you wish to play instead on a normal map, or with different factions, feel free to edit those settings accordingly.";
             msg += "\nHave fun :)";
             MessageHelper.sendMessageToEventChannel(event, msg);
         }
@@ -269,13 +268,13 @@ public class SliceGenerationSettings extends SettingsMenu {
     private String getPresetSlicesFromUser(GenericInteractionCreateEvent event) {
         String modalId = menuAction + "_" + navId() + "_presetSlices";
         TextInput ttsString = TextInput.create("sliceStrings", TextInputStyle.PARAGRAPH)
-                .setPlaceholder("25,69,34,49,45;24,28,46,47,67;...")
-                .setMinLength(1)
-                .setRequired(true)
-                .build();
+            .setPlaceholder("25,69,34,49,45;24,28,46,47,67;...")
+            .setMinLength(1)
+            .setRequired(true)
+            .build();
         Modal modal = Modal.create(modalId, "Enter some stuff")
-                .addComponents(Label.of("TTS String", ttsString))
-                .build();
+            .addComponents(Label.of("TTS String", ttsString))
+            .build();
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             buttonEvent.replyModal(modal).queue();
             return null;

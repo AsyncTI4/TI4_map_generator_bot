@@ -10,12 +10,12 @@ import ti4.helpers.Constants;
 public class OmegaPhaseCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new AssignPlayerPriority(),
-                    new ClearPriorityTrack(),
-                    new PrintPriorityTrack(),
-                    new ElectVoiceOfTheCouncil(),
-                    new ResetVoiceOfTheCouncil())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new AssignPlayerPriority(),
+        new ClearPriorityTrack(),
+        new PrintPriorityTrack(),
+        new ElectVoiceOfTheCouncil(),
+        new ResetVoiceOfTheCouncil())
+        .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

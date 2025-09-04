@@ -11,7 +11,7 @@ import ti4.service.tactical.MoveContext;
 public final class GhostMechButton implements MoveAbilityButton {
     public boolean enabled(MoveContext ctx) {
         return ctx.player.ownsUnit("ghost_mech")
-                && ButtonHelper.getNumberOfUnitsOnTheBoard(ctx.game, ctx.player, "mech") > 0;
+            && ButtonHelper.getNumberOfUnitsOnTheBoard(ctx.game, ctx.player, "mech") > 0;
     }
 
     public List<Button> build(MoveContext ctx) {

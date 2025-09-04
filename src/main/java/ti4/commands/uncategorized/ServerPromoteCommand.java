@@ -105,8 +105,8 @@ public class ServerPromoteCommand implements ParentCommand {
             } else if ("bothelper".equalsIgnoreCase(Ranks.get(rankOpt.getAsString()))) {
                 for (Role r : member.getRoles()) {
                     if ("943596173896323072".equals(r.getId())
-                            || "947648366056185897".equals(r.getId())
-                            || "1166011604488425482".equals(r.getId())) {
+                        || "947648366056185897".equals(r.getId())
+                        || "1166011604488425482".equals(r.getId())) {
                         allowed = true;
                     }
                 }
@@ -133,8 +133,8 @@ public class ServerPromoteCommand implements ParentCommand {
         User user = event.getUser();
 
         MessageHelper.replyToMessage(
-                event,
-                (demote ? "Demoting" : "Promoting") + " " + user.getEffectiveName() + "; rank " + Ranks.get(rank));
+            event,
+            (demote ? "Demoting" : "Promoting") + " " + user.getEffectiveName() + "; rank " + Ranks.get(rank));
 
         if (target.startsWith("Emoji Farm")) {
             Guild guild = event.getJDA().getGuildById(Long.parseLong(target));
@@ -164,10 +164,10 @@ public class ServerPromoteCommand implements ParentCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-                new OptionData(OptionType.STRING, Constants.PROMOTE_TARGET, "Target Server")
-                        .setRequired(true)
-                        .setAutoComplete(true),
-                new OptionData(OptionType.STRING, Constants.PROMOTE_RANK, "Rank").setAutoComplete(true),
-                new OptionData(OptionType.BOOLEAN, Constants.PROMOTE_DEMOTE, "Demote").setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.PROMOTE_TARGET, "Target Server")
+                .setRequired(true)
+                .setAutoComplete(true),
+            new OptionData(OptionType.STRING, Constants.PROMOTE_RANK, "Rank").setAutoComplete(true),
+            new OptionData(OptionType.BOOLEAN, Constants.PROMOTE_DEMOTE, "Demote").setAutoComplete(true));
     }
 }

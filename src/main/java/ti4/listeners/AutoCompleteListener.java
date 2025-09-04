@@ -14,15 +14,15 @@ public class AutoCompleteListener extends ListenerAdapter {
     @Override
     public void onCommandAutoCompleteInteraction(@Nonnull CommandAutoCompleteInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()
-                && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
+            && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
             event.replyChoice("Please try again in a moment. The bot is not ready to serve AutoComplete.", 0)
-                    .queue();
+                .queue();
             return;
         }
 
         ExecutorServiceManager.runAsync(
-                "AutoCompleteListener task",
-                EXECUTION_TIME_WARNING_THRESHOLD_SECONDS,
-                () -> AutoCompleteProvider.handleAutoCompleteEvent(event));
+            "AutoCompleteListener task",
+            EXECUTION_TIME_WARNING_THRESHOLD_SECONDS,
+            () -> AutoCompleteProvider.handleAutoCompleteEvent(event));
     }
 }

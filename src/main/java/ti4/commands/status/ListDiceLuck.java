@@ -60,9 +60,9 @@ class ListDiceLuck extends GameStateSubcommand {
         double total = actualHits / expectedHits;
 
         record.put(
-                "> " + player.getUserName() + ": `" + String.format("%.2f", total)
-                        + "` ("
-                        + actualHits + "/" + String.format("%.1f", expectedHits) + " actual/expected)",
-                total);
+            "> " + player.getUserName() + ": `" + String.format("%.2f", total)
+                + "` ("
+                + actualHits + "/" + String.format("%.1f", expectedHits) + " actual/expected)",
+            total);
     }
 }

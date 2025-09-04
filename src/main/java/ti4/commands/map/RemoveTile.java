@@ -16,10 +16,10 @@ class RemoveTile extends GameStateSubcommand {
     public RemoveTile() {
         super(Constants.REMOVE_TILE, "Remove tile from map", true, false);
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.POSITION,
-                        "Tile position on map. Accepts comma separated list",
-                        true)
+            OptionType.STRING,
+            Constants.POSITION,
+            "Tile position on map. Accepts comma separated list",
+            true)
                 .setAutoComplete(true));
     }
 

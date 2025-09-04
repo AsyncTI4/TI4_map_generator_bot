@@ -14,7 +14,7 @@ class AddEvent extends GameStateSubcommand {
     public AddEvent() {
         super(Constants.ADD_EVENT, "Add event as if it were a law (permanent/temporary)", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.EVENT_ID, "Event ID, which is found between ()")
-                .setRequired(true));
+            .setRequired(true));
     }
 
     @Override

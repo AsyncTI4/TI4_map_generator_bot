@@ -15,8 +15,8 @@ public final class NokarAgentButton implements PostMovementAbilityButton {
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.gray(
-                "exhaustAgent_nokaragent_" + ctx.player.getFaction(),
-                "Use Nokar Agent to Place 1 Destroyer",
-                FactionEmojis.nokar));
+            "exhaustAgent_nokaragent_" + ctx.player.getFaction(),
+            "Use Nokar Agent to Place 1 Destroyer",
+            FactionEmojis.nokar));
     }
 }

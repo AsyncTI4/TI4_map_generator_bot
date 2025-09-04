@@ -40,18 +40,18 @@ class ButtonHelperRelics {
     public static void prophetsTears(Player player, String buttonID, Game game, ButtonInteractionEvent event) {
         player.addExhaustedRelic("prophetstears");
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(), player.getFactionEmoji() + " is exhausting _The Prophet's Tears_.");
+            player.getCorrectChannel(), player.getFactionEmoji() + " is exhausting _The Prophet's Tears_.");
         if (buttonID.contains("AC")) {
             String message;
             if (player.hasAbility("scheming")) {
                 game.drawActionCard(player.getUserID());
                 game.drawActionCard(player.getUserID());
                 message = player.getFactionEmoji()
-                        + " drew 2 action cards with **Scheming**. Please discard 1 action card with the blue buttons.";
+                    + " drew 2 action cards with **Scheming**. Please discard 1 action card with the blue buttons.";
                 MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged() + " use buttons to discard",
-                        ActionCardHelper.getDiscardActionCardButtons(player, false));
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + " use buttons to discard",
+                    ActionCardHelper.getDiscardActionCardButtons(player, false));
             } else if (player.hasAbility("autonetic_memory")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
                 message = player.getFactionEmoji() + " triggered **Autonetic Memory Option**.";
@@ -98,7 +98,7 @@ class ButtonHelperRelics {
         Planet planetReal = game.getPlanetsInfo().get(planet);
         planetReal.addToken("attachment_nanoforge.png");
         MessageHelper.sendMessageToChannel(
-                event.getChannel(), "Attached _Nano-Forge_ to " + Helper.getPlanetRepresentation(planet, game) + ".");
+            event.getChannel(), "Attached _Nano-Forge_ to " + Helper.getPlanetRepresentation(planet, game) + ".");
         ButtonHelper.deleteMessage(event);
     }
 }

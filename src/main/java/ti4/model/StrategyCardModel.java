@@ -30,11 +30,11 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean isValid() {
         return id != null
-                && name != null
-                && initiative >= 0
-                && primaryTexts != null
-                && secondaryTexts != null
-                && source != null;
+            && name != null
+            && initiative >= 0
+            && primaryTexts != null
+            && secondaryTexts != null
+            && source != null;
     }
 
     @Override
@@ -48,11 +48,11 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
 
         // TITLE
         sb.append("**")
-                .append(initiative)
-                .append("** __")
-                .append(name)
-                .append("__")
-                .append(source.emoji());
+            .append(initiative)
+            .append("** __")
+            .append(name)
+            .append("__")
+            .append(source.emoji());
         eb.setTitle(sb.toString());
 
         // PRIMARY
@@ -102,8 +102,8 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         return id.contains(searchString)
-                || name.contains(searchString)
-                || source.toString().contains(searchString);
+            || name.contains(searchString)
+            || source.toString().contains(searchString);
     }
 
     @Override
@@ -133,7 +133,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
             return "#ffffff";
         } else if (colourHexCode == null) {
             if (Mapper.getStrategyCard(getBotSCAutomationID()) == null
-                    || Mapper.getStrategyCard(getBotSCAutomationID()).getColourHexCode() == null) {
+                || Mapper.getStrategyCard(getBotSCAutomationID()).getColourHexCode() == null) {
                 return "#ffffff";
             }
             return Mapper.getStrategyCard(getBotSCAutomationID()).getColourHexCode();
@@ -157,7 +157,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
 
     public boolean hasImageFile() {
         return imageFileName != null
-                && ResourceHelper.getResourceFromFolder("strat_cards/", imageFileName + ".png") != null;
+            && ResourceHelper.getResourceFromFolder("strat_cards/", imageFileName + ".png") != null;
     }
 
     public String getImageFilePath() {

@@ -78,7 +78,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
             return Optional.ofNullable(shortName).orElse(name);
         }
         return Optional.ofNullable(shortName)
-                .orElse(Mapper.getPromissoryNote(getHomebrewReplacesID().get()).getShortName());
+            .orElse(Mapper.getPromissoryNote(getHomebrewReplacesID().get()).getShortName());
     }
 
     public boolean getShrinkName() {
@@ -86,7 +86,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
             return Optional.ofNullable(shrinkName).orElse(false);
         }
         return Optional.ofNullable(shrinkName)
-                .orElse(Mapper.getPromissoryNote(getHomebrewReplacesID().get()).getShrinkName());
+            .orElse(Mapper.getPromissoryNote(getHomebrewReplacesID().get()).getShrinkName());
     }
 
     public Optional<String> getFaction() {
@@ -179,10 +179,10 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         }
         if (includeID) {
             footer.append("ID: ")
-                    .append(alias)
-                    .append("    Source: ")
-                    .append(source)
-                    .append("\n");
+                .append(alias)
+                .append("    Source: ")
+                .append(source)
+                .append("\n");
         }
         eb.setFooter(footer.toString());
 
@@ -241,9 +241,9 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
 
     public boolean search(String searchString) {
         return alias.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || getFactionOrColor().toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
+            || name.toLowerCase().contains(searchString)
+            || getFactionOrColor().toLowerCase().contains(searchString)
+            || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {

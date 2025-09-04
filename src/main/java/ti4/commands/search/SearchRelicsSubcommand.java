@@ -19,21 +19,20 @@ class SearchRelicsSubcommand extends SearchComponentModelSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        ComponentSource source =
-                ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
+        ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
         if (Mapper.isValidRelic(searchString)) {
             event.getChannel()
-                    .sendMessageEmbeds(Mapper.getRelic(searchString).getRepresentationEmbed(true, true))
-                    .queue();
+                .sendMessageEmbeds(Mapper.getRelic(searchString).getRepresentationEmbed(true, true))
+                .queue();
             return;
         }
 
         List<MessageEmbed> messageEmbeds = Mapper.getRelics().values().stream()
-                .filter(model -> model.search(searchString, source))
-                .sorted(Comparator.comparing(RelicModel::getName))
-                .map(model -> model.getRepresentationEmbed(true, true))
-                .toList();
+            .filter(model -> model.search(searchString, source))
+            .sorted(Comparator.comparing(RelicModel::getName))
+            .map(model -> model.getRepresentationEmbed(true, true))
+            .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }
 }

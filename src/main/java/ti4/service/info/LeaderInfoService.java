@@ -32,7 +32,7 @@ public class LeaderInfoService {
         // LEADERS
         List<MessageEmbed> leaderEmbeds = getPlayersLeaderEmbeds(player);
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-                player.getCardsInfoThread(), "**Leaders Information:**", leaderEmbeds, getLeaderButtons());
+            player.getCardsInfoThread(), "**Leaders Information:**", leaderEmbeds, getLeaderButtons());
 
         // PROMISSORY NOTES
         List<MessageEmbed> allianceEmbeds = new ArrayList<>();
@@ -60,7 +60,7 @@ public class LeaderInfoService {
         }
         if (!allianceEmbeds.isEmpty()) {
             MessageHelper.sendMessageToChannelWithEmbeds(
-                    player.getCardsInfoThread(), "**Alliance Commanders:**", allianceEmbeds);
+                player.getCardsInfoThread(), "**Alliance Commanders:**", allianceEmbeds);
         }
 
         // ADD YSSARIL AGENT REFERENCE
@@ -78,9 +78,9 @@ public class LeaderInfoService {
         }
         if (!yssarilEmbeds.isEmpty()) {
             MessageHelper.sendMessageToChannelWithEmbeds(
-                    player.getCardsInfoThread(),
-                    LeaderEmojis.YssarilAgent + "**Clever, Clever Agents:**",
-                    yssarilEmbeds);
+                player.getCardsInfoThread(),
+                LeaderEmojis.YssarilAgent + "**Clever, Clever Agents:**",
+                yssarilEmbeds);
         }
 
         // ADD MAHACT IMPERIA REFERENCE
@@ -100,9 +100,9 @@ public class LeaderInfoService {
         }
         if (!imperiaEmbeds.isEmpty()) {
             MessageHelper.sendMessageToChannelWithEmbeds(
-                    player.getCardsInfoThread(),
-                    "**Commanders from " + FactionEmojis.Mahact + " Imperia:**",
-                    imperiaEmbeds);
+                player.getCardsInfoThread(),
+                "**Commanders from " + FactionEmojis.Mahact + " Imperia:**",
+                imperiaEmbeds);
         }
     }
 

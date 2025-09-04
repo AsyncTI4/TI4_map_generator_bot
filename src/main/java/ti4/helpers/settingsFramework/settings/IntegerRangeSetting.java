@@ -12,7 +12,7 @@ import ti4.buttons.Buttons;
 
 @Getter
 @Setter
-@JsonIncludeProperties({"id", "valLow", "valHigh"})
+@JsonIncludeProperties({ "id", "valLow", "valHigh" })
 public class IntegerRangeSetting extends SettingInterface {
     private int valHigh;
     private int defaultHigh;
@@ -27,15 +27,16 @@ public class IntegerRangeSetting extends SettingInterface {
     private int delta;
 
     public IntegerRangeSetting(
-            String id,
-            String name,
-            int valLow,
-            int minLow,
-            int maxLow,
-            int valHigh,
-            int minHigh,
-            int maxHigh,
-            int delta) {
+        String id,
+        String name,
+        int valLow,
+        int minLow,
+        int maxLow,
+        int valHigh,
+        int minHigh,
+        int maxHigh,
+        int delta
+    ) {
         super(id, name);
 
         defaultHigh = this.valHigh = valHigh;
@@ -78,14 +79,10 @@ public class IntegerRangeSetting extends SettingInterface {
     }
 
     protected List<Button> buttons(String idPrefix) {
-        Button incLow =
-                Buttons.green(idPrefix + "incLow" + id, "Increase Min " + name).withEmoji(emojiUp);
-        Button decLow =
-                Buttons.red(idPrefix + "decLow" + id, "Decrease Min " + name).withEmoji(emojiDown);
-        Button incHigh =
-                Buttons.green(idPrefix + "incHigh" + id, "Increase Max " + name).withEmoji(emojiUp);
-        Button decHigh =
-                Buttons.red(idPrefix + "decHigh" + id, "Decrease Max " + name).withEmoji(emojiDown);
+        Button incLow = Buttons.green(idPrefix + "incLow" + id, "Increase Min " + name).withEmoji(emojiUp);
+        Button decLow = Buttons.red(idPrefix + "decLow" + id, "Decrease Min " + name).withEmoji(emojiDown);
+        Button incHigh = Buttons.green(idPrefix + "incHigh" + id, "Increase Max " + name).withEmoji(emojiUp);
+        Button decHigh = Buttons.red(idPrefix + "decHigh" + id, "Decrease Max " + name).withEmoji(emojiDown);
         List<Button> ls = new ArrayList<>();
         if (valLow < maxLow && valLow < valHigh) ls.add(incLow);
         if (valLow > minLow) ls.add(decLow);

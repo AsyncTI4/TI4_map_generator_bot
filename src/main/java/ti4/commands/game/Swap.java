@@ -20,10 +20,10 @@ class Swap extends GameStateSubcommand {
     public Swap() {
         super(Constants.SWAP, "Swap factions with a player", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Swap with player in Faction/Color ")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.TARGET_PLAYER, "Replacement player @playerName")
-                .setRequired(true));
+            .setRequired(true));
     }
 
     @Override

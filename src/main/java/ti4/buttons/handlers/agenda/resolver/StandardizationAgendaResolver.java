@@ -21,8 +21,8 @@ public class StandardizationAgendaResolver implements AgendaResolver {
         int amount = Math.clamp(3 - player2.getMahactCC().size(), 0, 3);
         player2.setFleetCC(amount);
         MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                "Set " + player2.getFactionEmojiOrColor() + " command sheet to 3/" + player2.getFleetCC() + "/2.");
+            event.getChannel(),
+            "Set " + player2.getFactionEmojiOrColor() + " command sheet to 3/" + player2.getFleetCC() + "/2.");
         ButtonHelper.checkFleetInEveryTile(player2, game);
     }
 }

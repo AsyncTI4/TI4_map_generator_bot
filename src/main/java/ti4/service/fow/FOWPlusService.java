@@ -85,8 +85,8 @@ public class FOWPlusService {
     // Hide all 0b tiles from FoW map
     public static boolean hideFogTile(String tileID, String label, Game game) {
         return (isActive(game) || game.getFowOption(FOWOption.HIDE_MAP))
-                && "0b".equals(tileID)
-                && StringUtils.isEmpty(label);
+            && "0b".equals(tileID)
+            && StringUtils.isEmpty(label);
     }
 
     public static boolean isVoid(Game game, String position) {
@@ -100,12 +100,12 @@ public class FOWPlusService {
     @ButtonHandler("blindTileSelection~MDL")
     public static void offerBlindActivation(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         TextInput position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
-                .setRequired(true)
-                .build();
+            .setRequired(true)
+            .build();
 
         Modal blindActivationModal = Modal.create("blindActivation_" + event.getMessageId(), "Activate a blind tile")
-                .addComponents(Label.of("Position to activate", position))
-                .build();
+            .addComponents(Label.of("Position to activate", position))
+            .build();
 
         event.replyModal(blindActivationModal).queue();
     }
@@ -129,10 +129,10 @@ public class FOWPlusService {
 
         List<Button> chooseTileButtons = new ArrayList<>();
         chooseTileButtons.add(Buttons.green(
-                finChecker + "ringTile_" + targetPosition, tile.getRepresentationForButtons(game, player)));
+            finChecker + "ringTile_" + targetPosition, tile.getRepresentationForButtons(game, player)));
         chooseTileButtons.add(Buttons.red("ChooseDifferentDestination", "Get a Different Ring"));
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), "Please choose the system that you wish to activate.", chooseTileButtons);
+            event.getMessageChannel(), "Please choose the system that you wish to activate.", chooseTileButtons);
 
         event.getMessageChannel().deleteMessageById(origMessageId).queue();
     }
@@ -142,9 +142,9 @@ public class FOWPlusService {
         Set<String> visiblePositions = FoWHelper.getTilePositionsToShow(game, player);
         Tile centerTile = game.getTileByPosition("000");
         if (!visiblePositions.contains("000")
-                || centerTile != null
-                        && centerTile.getTileModel() != null
-                        && centerTile.getTileModel().isHyperlane()) {
+            || centerTile != null
+                && centerTile.getTileModel() != null
+                && centerTile.getTileModel().isHyperlane()) {
             ringButtons.removeIf(b -> b.getCustomId().contains("ringTile_000"));
         }
         if (Collections.disjoint(visiblePositions, Arrays.asList("tl", "tr", "bl", "br"))) {
@@ -154,10 +154,10 @@ public class FOWPlusService {
             if (button.getLabel().startsWith("Ring #")) {
                 String ring = button.getLabel().replace("Ring #", "");
                 int availableTiles = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_left")
-                                .size()
-                        + ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_right")
-                                .size()
-                        - 2;
+                    .size()
+                    + ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_right")
+                        .size()
+                    - 2;
                 if (availableTiles == 0) {
                     ringButtons.remove(button);
                 }
@@ -167,9 +167,9 @@ public class FOWPlusService {
 
     public static void resolveVoidActivation(Player player, Game game) {
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                "## Your ships continued their journey into The Void " + MiscEmojis.GravityRift
-                        + " never to be seen again...");
+            player.getCorrectChannel(),
+            "## Your ships continued their journey into The Void " + MiscEmojis.GravityRift
+                + " never to be seen again...");
 
         Map<String, Map<UnitKey, List<Integer>>> unitsGoingToVoid = game.getTacticalActionDisplacement();
         float valueOfUnitsLost = 0.0f;
@@ -223,7 +223,7 @@ public class FOWPlusService {
     // Hide explore and relic decks
     public static boolean deckInfoAvailable(Player player, Game game) {
         if (!isActive(game) && !game.getFowOption(FOWOption.HIDE_EXPLORES)
-                || game.getPlayersWithGMRole().contains(player)) return true;
+            || game.getPlayersWithGMRole().contains(player)) return true;
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Deck info not available in FoW+ mode.");
         return false;
@@ -231,12 +231,13 @@ public class FOWPlusService {
 
     // FOWPlus specific explores
     public static void resolveExplore(
-            GenericInteractionCreateEvent event,
-            String exploreCardId,
-            Tile tile,
-            String planetID,
-            Player player,
-            Game game) {
+        GenericInteractionCreateEvent event,
+        String exploreCardId,
+        Tile tile,
+        String planetID,
+        Player player,
+        Game game
+    ) {
         if (!isActive(game)) return;
 
         switch (exploreCardId) {
@@ -245,17 +246,17 @@ public class FOWPlusService {
                 for (String adjacentPos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, false)) {
                     Tile adjacentTile = game.getTileByPosition(adjacentPos);
                     if (!adjacentTile.getTileModel().isHyperlane()
-                            && !FoWHelper.otherPlayersHaveShipsInSystem(player, adjacentTile, game)) {
+                        && !FoWHelper.otherPlayersHaveShipsInSystem(player, adjacentTile, game)) {
                         waveButtons.add(Buttons.green(
-                                "fowplus_wave_" + adjacentPos + "_" + tile.getPosition(),
-                                adjacentTile.getRepresentationForButtons(game, player)));
+                            "fowplus_wave_" + adjacentPos + "_" + tile.getPosition(),
+                            adjacentTile.getRepresentationForButtons(game, player)));
                     }
                 }
                 MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(),
-                        player.getRepresentationUnfogged()
-                                + ", please choose a system to eject your non-infantry units.",
-                        waveButtons);
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                        + ", please choose a system to eject your non-infantry units.",
+                    waveButtons);
                 break;
 
             case FOWPLUS_EXPLORE_VORTEX:
@@ -264,62 +265,63 @@ public class FOWPlusService {
                 int nonCarriedFF = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false)[4];
                 if (nonCarriedFF > 0) {
                     RemoveUnitService.removeUnit(
-                            event, tile, game, player, tile.getSpaceUnitHolder(), UnitType.Fighter, nonCarriedFF);
+                        event, tile, game, player, tile.getSpaceUnitHolder(), UnitType.Fighter, nonCarriedFF);
                     MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentationUnfogged() + " You lost " + nonCarriedFF + " " + UnitEmojis.fighter
-                                    + " Fighters to the Vortex.");
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged() + " You lost " + nonCarriedFF + " " + UnitEmojis.fighter
+                            + " Fighters to the Vortex.");
                 }
                 break;
 
             case FOWPLUS_EXPLORE_CLARITY:
                 RemoveCommandCounterService.fromTile(event, player, tile);
                 MessageHelper.sendMessageToChannelWithButton(
-                        player.getCorrectChannel(),
-                        player.getRepresentationUnfogged() + ", use the button to gain one command token.",
-                        Buttons.green(
-                                player.finChecker() + "redistributeCCButtons_deleteThisMessage", "Gain Command Token"));
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + ", use the button to gain one command token.",
+                    Buttons.green(
+                        player.finChecker() + "redistributeCCButtons_deleteThisMessage", "Gain Command Token"));
                 break;
 
             case FOWPLUS_EXPLORE_FRACTURE:
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        "Use `/move_units tile_name:"
-                                + tile.getPosition() + " unit_names:cv tile_name_to:"
-                                + tile.getPosition()
-                                + " unit_names_to:2 cr` to fracture a Carrier into 2 Cruisers for example.");
+                    player.getCorrectChannel(),
+                    "Use `/move_units tile_name:"
+                        + tile.getPosition() + " unit_names:cv tile_name_to:"
+                        + tile.getPosition()
+                        + " unit_names_to:2 cr` to fracture a Carrier into 2 Cruisers for example.");
                 break;
 
             case FOWPLUS_EXPLORE_SPOOR:
                 List<Button> buttons = ButtonHelperActionCards.getPlagiarizeButtons(game, player);
                 MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(),
-                        !buttons.isEmpty()
-                                ? "Please choose the technology you wish to gain."
-                                : "No valid technologies to gain.",
-                        buttons);
+                    player.getCorrectChannel(),
+                    !buttons.isEmpty()
+                        ? "Please choose the technology you wish to gain."
+                        : "No valid technologies to gain.",
+                    buttons);
                 break;
 
             case FOWPLUS_EXPLORE_SACRIFICE:
                 MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(),
-                        player.getRepresentationUnfogged() + " Use buttons to resolve Founder's Sacrifice",
-                        Arrays.asList(
-                                Buttons.green(
-                                        "winnuStructure_sd_" + planetID,
-                                        "Place 1 space dock on " + Helper.getPlanetRepresentation(planetID, game),
-                                        UnitEmojis.spacedock),
-                                Buttons.gray(
-                                        "fowplus_sacrifice_" + planetID,
-                                        "Destroy ground forces on " + Helper.getPlanetRepresentation(planetID, game)),
-                                Buttons.red("deleteButtons", "Done Resolving")));
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + " Use buttons to resolve Founder's Sacrifice",
+                    Arrays.asList(
+                        Buttons.green(
+                            "winnuStructure_sd_" + planetID,
+                            "Place 1 space dock on " + Helper.getPlanetRepresentation(planetID, game),
+                            UnitEmojis.spacedock),
+                        Buttons.gray(
+                            "fowplus_sacrifice_" + planetID,
+                            "Destroy ground forces on " + Helper.getPlanetRepresentation(planetID, game)),
+                        Buttons.red("deleteButtons", "Done Resolving")));
                 break;
         }
     }
 
     @ButtonHandler("fowplus_sacrifice_")
     public static void resolveSacrificeExplore(
-            ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        ButtonInteractionEvent event, Player player, String buttonID, Game game
+    ) {
         String planetID = buttonID.replace("fowplus_sacrifice_", "");
         Tile tile = game.getTileFromPlanet(planetID);
         UnitHolder unitHolder = game.getUnitHolderFromPlanet(planetID);
@@ -330,10 +332,10 @@ public class FOWPlusService {
         if (infs > 0) RemoveUnitService.removeUnit(event, tile, game, player, unitHolder, UnitType.Infantry, infs);
 
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                "Destroyed all ground forces " + StringUtils.repeat(UnitEmojis.infantry.toString(), infs)
-                        + StringUtils.repeat(UnitEmojis.mech.toString(), mechs) + " on "
-                        + Helper.getPlanetRepresentation(planetID, game));
+            player.getCorrectChannel(),
+            "Destroyed all ground forces " + StringUtils.repeat(UnitEmojis.infantry.toString(), infs)
+                + StringUtils.repeat(UnitEmojis.mech.toString(), mechs) + " on "
+                + Helper.getPlanetRepresentation(planetID, game));
     }
 
     @ButtonHandler("fowplus_wave_")
@@ -349,19 +351,18 @@ public class FOWPlusService {
         if (infs > 0) RemoveUnitService.removeUnit(event, currentTile, game, player, space, UnitType.Infantry, infs);
 
         String unitList = space.getPlayersUnitListOnHolder(player);
-        List<RemovedUnit> removed =
-                RemoveUnitService.removeUnits(event, currentTile, game, player.getColor(), unitList, false);
+        List<RemovedUnit> removed = RemoveUnitService.removeUnits(event, currentTile, game, player.getColor(), unitList, false);
         AddUnitService.addUnits(event, targetTile, game, player.getColor(), unitList, removed);
         StartCombatService.combatCheck(game, event, targetTile);
 
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentation()
-                        + " Units ejected to " + targetPos + " due to Gravity Wave."
-                        + (infs > 0
-                                ? " " + infs + " " + StringUtils.repeat(UnitEmojis.infantry.toString(), infs)
-                                        + " was left behind."
-                                : ""));
+            player.getCorrectChannel(),
+            player.getRepresentation()
+                + " Units ejected to " + targetPos + " due to Gravity Wave."
+                + (infs > 0
+                    ? " " + infs + " " + StringUtils.repeat(UnitEmojis.infantry.toString(), infs)
+                        + " was left behind."
+                    : ""));
 
         if (!currentTile.isGravityRift()) {
             AddTokenCommand.addToken(event, currentTile, "gravityrift", game);

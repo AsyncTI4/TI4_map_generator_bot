@@ -20,7 +20,8 @@ public class PlayerStatsHelper {
     private static final Pattern DIGIT_PATTERN = Pattern.compile("\\d");
 
     public static List<String> findThreeNearbyStatTiles(
-            Game game, Player player, Set<String> taken, boolean isFoWPrivate, Player fowPlayer) {
+        Game game, Player player, Set<String> taken, boolean isFoWPrivate, Player fowPlayer
+    ) {
         boolean fow = isFoWPrivate;
         boolean randomizeLocation = false;
         if (fow && player != fowPlayer) {
@@ -39,10 +40,10 @@ public class PlayerStatsHelper {
         if (randomizeLocation) anchor = "000"; // just stick them on 000
 
         Set<String> validPositions = PositionMapper.getTilePositions().stream()
-                .filter(pos -> tileRing(pos) <= (game.getRingCount() + 1))
-                .filter(pos -> game.getTileByPosition(pos) == null)
-                .filter(pos -> taken == null || !taken.contains(pos))
-                .collect(Collectors.toSet());
+            .filter(pos -> tileRing(pos) <= (game.getRingCount() + 1))
+            .filter(pos -> game.getTileByPosition(pos) == null)
+            .filter(pos -> taken == null || !taken.contains(pos))
+            .collect(Collectors.toSet());
 
         Point anchorRaw = PositionMapper.getTilePosition(anchor);
         if (anchorRaw == null) return null;

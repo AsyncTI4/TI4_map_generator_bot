@@ -18,17 +18,17 @@ class ChangeColor extends GameStateSubcommand {
     public ChangeColor() {
         super(Constants.CHANGE_COLOR, "Player Color Change", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                .setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String newColor = AliasHandler.resolveColor(
-                event.getOption(Constants.COLOR).getAsString().toLowerCase());
+            event.getOption(Constants.COLOR).getAsString().toLowerCase());
         if (!Mapper.isValidColor(newColor)) {
             MessageHelper.sendMessageToEventChannel(event, "Color not valid");
             return;
@@ -41,7 +41,7 @@ class ChangeColor extends GameStateSubcommand {
             if (playerInfo != player) {
                 if (newColor.equals(playerInfo.getColor())) {
                     MessageHelper.sendMessageToEventChannel(
-                            event, "Player:" + playerInfo.getUserName() + " already uses color:" + newColor);
+                        event, "Player:" + playerInfo.getUserName() + " already uses color:" + newColor);
                     return;
                 }
             }
@@ -56,6 +56,6 @@ class ChangeColor extends GameStateSubcommand {
         String oldRepresentation = player.getRepresentationNoPing();
         ColorChangeHelper.changePlayerColor(game, player, oldColor, newColor);
         MessageHelper.sendMessageToEventChannel(
-                event, oldRepresentation + " changed color to " + player.getRepresentationNoPing() + ".");
+            event, oldRepresentation + " changed color to " + player.getRepresentationNoPing() + ".");
     }
 }

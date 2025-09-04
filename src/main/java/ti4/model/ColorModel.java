@@ -107,15 +107,15 @@ public class ColorModel implements ModelInterface {
     @Override
     public String toString() {
         return "ColorModel{" + "alias='"
-                + alias + '\'' + ", name='"
-                + name + '\'' + ", displayName='"
-                + displayName + '\'' + ", aliases="
-                + aliases + ", textColor='"
-                + textColor + '\'' + ", hue='"
-                + hue + '\'' + ", primaryColor="
-                + primaryColor + ", secondaryColor="
-                + secondaryColor + ", primaryColorRef='"
-                + primaryColorRef + '\'' + ", secondaryColorRef='"
-                + secondaryColorRef + '\'' + '}';
+            + alias + '\'' + ", name='"
+            + name + '\'' + ", displayName='"
+            + displayName + '\'' + ", aliases="
+            + aliases + ", textColor='"
+            + textColor + '\'' + ", hue='"
+            + hue + '\'' + ", primaryColor="
+            + primaryColor + ", secondaryColor="
+            + secondaryColor + ", primaryColorRef='"
+            + primaryColorRef + '\'' + ", secondaryColorRef='"
+            + secondaryColorRef + '\'' + '}';
     }
 }

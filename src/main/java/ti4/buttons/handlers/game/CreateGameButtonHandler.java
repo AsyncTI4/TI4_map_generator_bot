@@ -25,21 +25,21 @@ class CreateGameButtonHandler {
 
     private static void createGameChannels(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToEventChannel(
-                event, event.getUser().getEffectiveName() + " pressed the [Create Game] button");
+            event, event.getUser().getEffectiveName() + " pressed the [Create Game] button");
 
         if (!CreateGameService.isGameCreationAllowed()) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "Admins have temporarily turned off game creation, "
-                            + "most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
+                event.getMessageChannel(),
+                "Admins have temporarily turned off game creation, "
+                    + "most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
             return;
         }
 
         if (CreateGameService.isLockedFromCreatingGames(event)) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "You created a game within the last 10 minutes and thus are being stopped from creating more until some time "
-                            + "has passed. You can have someone else in the game press the button instead.");
+                event.getMessageChannel(),
+                "You created a game within the last 10 minutes and thus are being stopped from creating more until some time "
+                    + "has passed. You can have someone else in the game press the button instead.");
             return;
         }
 
@@ -76,28 +76,29 @@ class CreateGameButtonHandler {
         if (categoryChannel == null) categoryChannel = CreateGameService.createNewCategory(categoryChannelName);
         if (categoryChannel == null) {
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    "Could not automatically find a category that begins with **" + categoryChannelName
-                            + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
+                event,
+                "Could not automatically find a category that begins with **" + categoryChannelName
+                    + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
             return;
         }
         event.getMessage().delete().queue();
         Game game = CreateGameService.createGameChannels(
-                members, event, gameSillyName, gameName, gameOwner, categoryChannel);
+            members, event, gameSillyName, gameName, gameOwner, categoryChannel);
         if (game != null) {
             GameManager.save(
-                    game, "Created game channels"); // TODO: We should be locking since we're saving? Maybe not here
+                game, "Created game channels"); // TODO: We should be locking since we're saving? Maybe not here
         }
     }
 
     private static boolean isLikelyDoublePressedButton(
-            String gameName, String gameSillyName, String lastGameName, ButtonInteractionEvent event) {
+        String gameName, String gameSillyName, String lastGameName, ButtonInteractionEvent event
+    ) {
         if ("pbd1".equalsIgnoreCase(gameName)) return false;
 
         if (!GameManager.isValid(lastGameName)) {
             BotLogger.error(
-                    new LogOrigin(event),
-                    "**Unable to create new games because the last game cannot be found. Was it deleted but the roles still exist?**");
+                new LogOrigin(event),
+                "**Unable to create new games because the last game cannot be found. Was it deleted but the roles still exist?**");
             return true;
         }
 
@@ -108,9 +109,9 @@ class CreateGameButtonHandler {
         }
 
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                "The custom name of the last game is the same as the one for this game, so the bot suspects a double press "
-                        + "occurred and is cancelling the creation of another game.");
+            event.getMessageChannel(),
+            "The custom name of the last game is the same as the one for this game, so the bot suspects a double press "
+                + "occurred and is cancelling the creation of another game.");
         return true;
     }
 }

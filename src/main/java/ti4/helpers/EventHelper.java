@@ -27,7 +27,7 @@ public class EventHelper {
             channel.sendMessageEmbeds(eventModel.getRepresentationEmbed()).queue();
         } else {
             MessageHelper.sendMessageToEventChannel(
-                    event, "Something went wrong revealing an event; eventID: " + eventID);
+                event, "Something went wrong revealing an event; eventID: " + eventID);
         }
     }
 
@@ -41,33 +41,33 @@ public class EventHelper {
         sb.append("__Tiles Not Constituting the Map__:");
 
         List<Tile> unusedBlueTiles = new ArrayList<>(Helper.getUnusedTiles(game).stream()
-                .filter(tile -> tile.getTierList().isBlue())
-                .map(MiltyDraftTile::getTile)
-                .toList());
+            .filter(tile -> tile.getTierList().isBlue())
+            .map(MiltyDraftTile::getTile)
+            .toList());
 
         List<Tile> unusedRedTiles = new ArrayList<>(Helper.getUnusedTiles(game).stream()
-                .filter(tile -> !tile.getTierList().isBlue())
-                .map(MiltyDraftTile::getTile)
-                .toList());
+            .filter(tile -> !tile.getTierList().isBlue())
+            .map(MiltyDraftTile::getTile)
+            .toList());
 
         for (Tile tile : unusedBlueTiles) {
             sb.append("\n")
-                    .append(TileEmojis.TileBlueBack)
-                    .append(" ")
-                    .append(tile.getRepresentation())
-                    .append(" (`")
-                    .append(tile.getTileID())
-                    .append("`)");
+                .append(TileEmojis.TileBlueBack)
+                .append(" ")
+                .append(tile.getRepresentation())
+                .append(" (`")
+                .append(tile.getTileID())
+                .append("`)");
         }
 
         for (Tile tile : unusedRedTiles) {
             sb.append("\n")
-                    .append(TileEmojis.TileRedBack)
-                    .append(" ")
-                    .append(tile.getRepresentation())
-                    .append(" (`")
-                    .append(tile.getTileID())
-                    .append("`)");
+                .append(TileEmojis.TileRedBack)
+                .append(" ")
+                .append(tile.getRepresentation())
+                .append(" (`")
+                .append(tile.getTileID())
+                .append("`)");
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());

@@ -30,10 +30,11 @@ public class RoundSummaryHelper {
     @ButtonHandler("editEndOfRoundSummaries")
     public static void serveEditSummaryButtons(Game game, Player player, MessageChannel eventChannel) {
         List<Button> buttons = new ArrayList<>();
-        for (int x = 1; x <= game.getRound(); x++) buttons.add(editSummaryButton(game, player, x));
+        for (int x = 1; x <= game.getRound(); x++)
+            buttons.add(editSummaryButton(game, player, x));
         MessageChannel playerChannel = player.isRealPlayer() ? player.getCardsInfoThread() : eventChannel;
         MessageHelper.sendMessageToChannelWithButtons(
-                playerChannel, "Choose a round summary to view/edit/create:", buttons);
+            playerChannel, "Choose a round summary to view/edit/create:", buttons);
     }
 
     public static Button editSummaryButton(Game game, Player player, int round) {
@@ -56,12 +57,12 @@ public class RoundSummaryHelper {
 
         String fieldID = "summary";
         TextInput summary = TextInput.create(fieldID, TextInputStyle.PARAGRAPH)
-                .setPlaceholder("Edit your round summary here. Or, leave blank to delete it")
-                .setValue(currentSummary)
-                .build();
+            .setPlaceholder("Edit your round summary here. Or, leave blank to delete it")
+            .setValue(currentSummary)
+            .build();
         Modal modal = Modal.create(modalId, "End of Round " + roundNum + " Summary")
-                .addComponents(Label.of("Edit summary", summary))
-                .build();
+            .addComponents(Label.of("Edit summary", summary))
+            .build();
         event.replyModal(modal).queue();
         // ButtonHelper.deleteMessage(event); Breaks submiting the summary for some reason
     }
@@ -78,23 +79,23 @@ public class RoundSummaryHelper {
     }
 
     public static void storeEndOfRoundSummary(
-            Game game, Player player, String roundNum, String thoughts, boolean append, MessageChannel eventChannel) {
+        Game game, Player player, String roundNum, String thoughts, boolean append, MessageChannel eventChannel
+    ) {
         roundNum = NON_DIGIT.matcher(roundNum).replaceAll(""); // I only want the digits
         String roundKey = resolveRoundSummaryKey(player, roundNum);
         String previousThoughts = "";
         if (append && !game.getStoredValue(roundKey).isEmpty()) {
             previousThoughts = game.getStoredValue(roundKey);
-            previousThoughts =
-                    OPTIONAL_TRAILING_PERIOD_AND_SPACE.matcher(previousThoughts).replaceFirst("") + "\n";
+            previousThoughts = OPTIONAL_TRAILING_PERIOD_AND_SPACE.matcher(previousThoughts).replaceFirst("") + "\n";
         }
         game.setStoredValue(roundKey, previousThoughts + thoughts);
 
         MessageChannel playerChannel = player.isRealPlayer() ? player.getCardsInfoThread() : eventChannel;
         MessageHelper.sendMessageToChannelWithButton(
-                playerChannel, resolvePlayerEmoji(player) + " stored a round summary.", Buttons.EDIT_SUMMARIES);
+            playerChannel, resolvePlayerEmoji(player) + " stored a round summary.", Buttons.EDIT_SUMMARIES);
         MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(),
-                (game.getPlayersWithGMRole().contains(player) ? "GM" : "A player") + " has stored a round summary.");
+            game.getMainGameChannel(),
+            (game.getPlayersWithGMRole().contains(player) ? "GM" : "A player") + " has stored a round summary.");
     }
 
     public static String resolveRoundSummaryKey(Player player, String roundNum) {
@@ -104,7 +105,7 @@ public class RoundSummaryHelper {
 
     public static String resolvePlayerEmoji(Player player) {
         return player.isRealPlayer() || player.isEliminated()
-                ? player.getFactionEmoji()
-                : TI4Emoji.getRandomGoodDog(player.getUserID()).toString();
+            ? player.getFactionEmoji()
+            : TI4Emoji.getRandomGoodDog(player.getUserID()).toString();
     }
 }

@@ -42,7 +42,7 @@ class DraftLimits extends GameStateSubcommand {
         if (limit != null && limit > 0) {
             game.setStoredValue("frankenLimit" + StringUtils.upperCase(limitName.replace("_limit", "")), "" + limit);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
+                event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
         }
 
         limitName = Constants.TECH_LIMIT;
@@ -50,7 +50,7 @@ class DraftLimits extends GameStateSubcommand {
         if (limit != null && limit > 0) {
             game.setStoredValue("frankenLimit" + StringUtils.upperCase(limitName.replace("_limit", "")), "" + limit);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
+                event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
         }
 
         limitName = Constants.AGENT_LIMIT;
@@ -58,7 +58,7 @@ class DraftLimits extends GameStateSubcommand {
         if (limit != null && limit > 0) {
             game.setStoredValue("frankenLimit" + StringUtils.upperCase(limitName.replace("_limit", "")), "" + limit);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
+                event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
         }
 
         limitName = Constants.COMMANDER_LIMIT;
@@ -66,7 +66,7 @@ class DraftLimits extends GameStateSubcommand {
         if (limit != null && limit > 0) {
             game.setStoredValue("frankenLimit" + StringUtils.upperCase(limitName.replace("_limit", "")), "" + limit);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
+                event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
         }
 
         limitName = Constants.HERO_LIMIT;
@@ -74,7 +74,7 @@ class DraftLimits extends GameStateSubcommand {
         if (limit != null && limit > 0) {
             game.setStoredValue("frankenLimit" + StringUtils.upperCase(limitName.replace("_limit", "")), "" + limit);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
+                event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
         }
 
         limitName = Constants.MECH_LIMIT;
@@ -82,7 +82,7 @@ class DraftLimits extends GameStateSubcommand {
         if (limit != null && limit > 0) {
             game.setStoredValue("frankenLimit" + StringUtils.upperCase(limitName.replace("_limit", "")), "" + limit);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
+                event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
         }
 
         limitName = Constants.FLAGSHIP_LIMIT;
@@ -90,7 +90,7 @@ class DraftLimits extends GameStateSubcommand {
         if (limit != null && limit > 0) {
             game.setStoredValue("frankenLimit" + StringUtils.upperCase(limitName.replace("_limit", "")), "" + limit);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
+                event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
         }
 
         limitName = Constants.FIRSTPICK_LIMIT;
@@ -98,7 +98,7 @@ class DraftLimits extends GameStateSubcommand {
         if (limit != null && limit > 0) {
             game.setStoredValue("frankenLimit" + StringUtils.upperCase(limitName.replace("_limit", "")), "" + limit);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
+                event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
         }
 
         limitName = Constants.LATERPICK_LIMIT;
@@ -106,7 +106,7 @@ class DraftLimits extends GameStateSubcommand {
         if (limit != null && limit > 0) {
             game.setStoredValue("frankenLimit" + StringUtils.upperCase(limitName.replace("_limit", "")), "" + limit);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
+                event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
         }
 
         limitName = Constants.PN_LIMIT;
@@ -114,7 +114,7 @@ class DraftLimits extends GameStateSubcommand {
         if (limit != null && limit > 0) {
             game.setStoredValue("frankenLimit" + StringUtils.upperCase(limitName.replace("_limit", "")), "" + limit);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
+                event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
         }
 
         limitName = Constants.STARTINGFLEET_LIMIT;
@@ -122,7 +122,7 @@ class DraftLimits extends GameStateSubcommand {
         if (limit != null && limit > 0) {
             game.setStoredValue("frankenLimit" + StringUtils.upperCase(limitName.replace("_limit", "")), "" + limit);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
+                event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
         }
 
         limitName = Constants.STARTINGTECH_LIMIT;
@@ -130,7 +130,7 @@ class DraftLimits extends GameStateSubcommand {
         if (limit != null && limit > 0) {
             game.setStoredValue("frankenLimit" + StringUtils.upperCase(limitName.replace("_limit", "")), "" + limit);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
+                event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
         }
 
         limitName = Constants.REDTILE_LIMIT;
@@ -138,7 +138,7 @@ class DraftLimits extends GameStateSubcommand {
         if (limit != null && limit > 0) {
             game.setStoredValue("frankenLimit" + StringUtils.upperCase(limitName.replace("_limit", "")), "" + limit);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
+                event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
         }
 
         limitName = Constants.BLUETILE_LIMIT;
@@ -146,7 +146,7 @@ class DraftLimits extends GameStateSubcommand {
         if (limit != null && limit > 0) {
             game.setStoredValue("frankenLimit" + StringUtils.upperCase(limitName.replace("_limit", "")), "" + limit);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
+                event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
         }
 
         limitName = Constants.COMMODITIES_LIMIT;
@@ -154,7 +154,7 @@ class DraftLimits extends GameStateSubcommand {
         if (limit != null && limit > 0) {
             game.setStoredValue("frankenLimit" + StringUtils.upperCase(limitName.replace("_limit", "")), "" + limit);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
+                event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
         }
 
         limitName = Constants.HOMESYSTEM_LIMIT;
@@ -162,7 +162,7 @@ class DraftLimits extends GameStateSubcommand {
         if (limit != null && limit > 0) {
             game.setStoredValue("frankenLimit" + StringUtils.upperCase(limitName.replace("_limit", "")), "" + limit);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
+                event.getMessageChannel(), "Successfully set a " + limitName + " of " + limit + ".");
         }
     }
 }

@@ -35,57 +35,57 @@ public class ListSlashCommandsUsedService {
         Map<String, Integer> actionCardsPlayed = new HashMap<>();
 
         GamesPage.consumeAllGames(game -> listSlashCommandsUsed(
-                game,
-                useOnlyLastMonth,
-                slashCommands,
-                actionCards,
-                actionCardsPlayed,
-                largestGame,
-                largestAmountOfButtonsIn1Game,
-                buttonsPressed,
-                slashCommandsUsed,
-                acsSabod));
+            game,
+            useOnlyLastMonth,
+            slashCommands,
+            actionCards,
+            actionCardsPlayed,
+            largestGame,
+            largestAmountOfButtonsIn1Game,
+            buttonsPressed,
+            slashCommandsUsed,
+            acsSabod));
 
         StringBuilder longMsg = new StringBuilder("The number of button pressed so far recorded is " + buttonsPressed
-                + ". The largest number of buttons pressed in a single game is " + largestAmountOfButtonsIn1Game
-                + " in game " + largestGame + ". The number of slash commands used is " + slashCommandsUsed
-                + ". The number of action cards Sabo'd is " + acsSabod
-                + ". The following is the recorded frequency of slash commands \n");
+            + ". The largest number of buttons pressed in a single game is " + largestAmountOfButtonsIn1Game
+            + " in game " + largestGame + ". The number of slash commands used is " + slashCommandsUsed
+            + ". The number of action cards Sabo'd is " + acsSabod
+            + ". The following is the recorded frequency of slash commands \n");
         Map<String, Integer> sortedMapAsc = SortHelper.sortByValue(slashCommands, false);
         for (Map.Entry<String, Integer> entry : sortedMapAsc.entrySet()) {
             longMsg.append(entry.getKey()).append(": ").append(entry.getValue()).append(" \n");
         }
         longMsg.append(
-                "\n The number of times an action card has been Sabo'd is also being tracked. The following is their recorded frequency \n");
+            "\n The number of times an action card has been Sabo'd is also being tracked. The following is their recorded frequency \n");
         Map<String, Integer> sortedMapAscACs = SortHelper.sortByValue(actionCards, false);
         for (Map.Entry<String, Integer> entry : sortedMapAscACs.entrySet()) {
             String command = entry.getKey();
             longMsg.append(command)
-                    .append(": ")
-                    .append(entry.getValue())
-                    .append(" out of ")
-                    .append(actionCardsPlayed.get(command))
-                    .append(" times played")
-                    .append(" \n");
+                .append(": ")
+                .append(entry.getValue())
+                .append(" out of ")
+                .append(actionCardsPlayed.get(command))
+                .append(" times played")
+                .append(" \n");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());
     }
 
     private static void listSlashCommandsUsed(
-            Game game,
-            boolean useOnlyLastMonth,
-            Map<String, Integer> slashCommands,
-            Map<String, Integer> actionCards,
-            Map<String, Integer> actionCardsPlayed,
-            AtomicReference<String> largestGame,
-            AtomicInteger largestAmountOfButtonsIn1Game,
-            AtomicInteger buttonsPressed,
-            AtomicInteger slashCommandsUsed,
-            AtomicInteger acsSabod) {
+        Game game,
+        boolean useOnlyLastMonth,
+        Map<String, Integer> slashCommands,
+        Map<String, Integer> actionCards,
+        Map<String, Integer> actionCardsPlayed,
+        AtomicReference<String> largestGame,
+        AtomicInteger largestAmountOfButtonsIn1Game,
+        AtomicInteger buttonsPressed,
+        AtomicInteger slashCommandsUsed,
+        AtomicInteger acsSabod
+    ) {
         if (useOnlyLastMonth
-                && Helper.getDateDifference(
-                                game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis()))
-                        > 30) {
+            && Helper.getDateDifference(
+                game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) > 30) {
             return;
         }
         if (game.getButtonPressCount() > largestAmountOfButtonsIn1Game.get()) {

@@ -39,19 +39,19 @@ class ListButtons extends Subcommand {
         }
 
         Objects.requireNonNullElse(channel, threadChannel)
-                .getHistoryAround(messageId, 1)
-                .queue(messageHistory -> {
-                    Message msg = messageHistory.getMessageById(messageId);
-                    if (msg == null) {
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find message");
-                        return;
-                    }
+            .getHistoryAround(messageId, 1)
+            .queue(messageHistory -> {
+                Message msg = messageHistory.getMessageById(messageId);
+                if (msg == null) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find message");
+                    return;
+                }
 
-                    StringBuilder sb = new StringBuilder("Button details:\n>>> ");
-                    for (Button b : msg.getComponentTree().findAll(Button.class)) {
-                        sb.append(ButtonHelper.getButtonRepresentation(b)).append("\n");
-                    }
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
-                });
+                StringBuilder sb = new StringBuilder("Button details:\n>>> ");
+                for (Button b : msg.getComponentTree().findAll(Button.class)) {
+                    sb.append(ButtonHelper.getButtonRepresentation(b)).append("\n");
+                }
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+            });
     }
 }

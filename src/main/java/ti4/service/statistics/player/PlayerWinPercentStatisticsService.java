@@ -23,20 +23,20 @@ class PlayerWinPercentStatisticsService {
         Map<String, String> playerUserIdToUsername = new HashMap<>();
 
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilterForWonGame(event),
-                game -> getPlayerWinPercent(game, playerWinCount, playerGameCount, playerUserIdToUsername));
+            GameStatisticsFilterer.getGamesFilterForWonGame(event),
+            game -> getPlayerWinPercent(game, playerWinCount, playerGameCount, playerUserIdToUsername));
 
         int maximumListedPlayers = event.getOption("max_list_size", 50, OptionMapping::getAsInt);
         int minimumGameCountFilter = event.getOption("min_game_count", 10, OptionMapping::getAsInt);
         List<Map.Entry<String, Long>> entries = playerUserIdToUsername.keySet().stream()
-                .filter(userId -> playerGameCount.get(userId) >= minimumGameCountFilter)
-                .map(userId -> {
-                    double winCount = playerWinCount.getOrDefault(userId, 0);
-                    double gameCount = playerGameCount.get(userId);
-                    return Map.entry(userId, Math.round(100 * winCount / gameCount));
-                })
-                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                .toList();
+            .filter(userId -> playerGameCount.get(userId) >= minimumGameCountFilter)
+            .map(userId -> {
+                double winCount = playerWinCount.getOrDefault(userId, 0);
+                double gameCount = playerGameCount.get(userId);
+                return Map.entry(userId, Math.round(100 * winCount / gameCount));
+            })
+            .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+            .toList();
 
         StringBuilder sb = new StringBuilder();
         sb.append("__**Player Win Percent:**__").append("\n");
@@ -46,25 +46,26 @@ class PlayerWinPercentStatisticsService {
         for (int i = 0; i < entries.size() && i < maximumListedPlayers; i++) {
             Map.Entry<String, Long> entry = entries.get(i);
             sb.append(i + 1)
-                    .append(". `")
-                    .append(StringUtils.leftPad(playerUserIdToUsername.get(entry.getKey()), 4))
-                    .append("` ")
-                    .append(entry.getValue())
-                    .append("% (")
-                    .append(playerGameCount.get(entry.getKey()))
-                    .append(" games) ")
-                    .append("\n");
+                .append(". `")
+                .append(StringUtils.leftPad(playerUserIdToUsername.get(entry.getKey()), 4))
+                .append("` ")
+                .append(entry.getValue())
+                .append("% (")
+                .append(playerGameCount.get(entry.getKey()))
+                .append(" games) ")
+                .append("\n");
         }
 
         MessageHelper.sendMessageToThread(
-                (MessageChannelUnion) event.getMessageChannel(), "Player Win Percent", sb.toString());
+            (MessageChannelUnion) event.getMessageChannel(), "Player Win Percent", sb.toString());
     }
 
     private static void getPlayerWinPercent(
-            Game game,
-            Map<String, Integer> playerWinCount,
-            Map<String, Integer> playerGameCount,
-            Map<String, String> playerUserIdToUsername) {
+        Game game,
+        Map<String, Integer> playerWinCount,
+        Map<String, Integer> playerGameCount,
+        Map<String, String> playerUserIdToUsername
+    ) {
         if (game.getWinners().isEmpty()) {
             return;
         }

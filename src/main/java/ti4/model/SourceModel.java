@@ -67,7 +67,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         return name.toLowerCase().contains(searchString)
-                || source.toString().toLowerCase().contains(searchString);
+            || source.toString().toLowerCase().contains(searchString);
     }
 
     /**
@@ -110,10 +110,10 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
             if (entry.getValue() != 0) {
                 if (!implementation.toString().isEmpty()) implementation.append(", ");
                 implementation
-                        .append(entry.getKey())
-                        .append(" (")
-                        .append(entry.getValue())
-                        .append(")");
+                    .append(entry.getKey())
+                    .append(" (")
+                    .append(entry.getValue())
+                    .append(")");
             }
         }
         return implementation.toString();

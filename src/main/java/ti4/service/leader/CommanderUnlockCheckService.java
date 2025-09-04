@@ -26,9 +26,9 @@ public class CommanderUnlockCheckService {
     public static void checkPlayer(Player player, String... factionsToCheck) {
         for (String factionToCheck : factionsToCheck) {
             if (player != null
-                    && player.isRealPlayer()
-                    && player.hasLeader(factionToCheck + "commander")
-                    && !player.hasLeaderUnlocked(factionToCheck + "commander")) {
+                && player.isRealPlayer()
+                && player.hasLeader(factionToCheck + "commander")
+                && !player.hasLeaderUnlocked(factionToCheck + "commander")) {
                 checkConditionsAndUnlock(player, factionToCheck);
             }
         }
@@ -69,8 +69,7 @@ public class CommanderUnlockCheckService {
                 }
             }
             case "vaden" -> {
-                if (ButtonHelper.howManyDifferentDebtPlayerHas(player)
-                        > (game.getRealPlayers().size() / 2) - 1) {
+                if (ButtonHelper.howManyDifferentDebtPlayerHas(player) > (game.getRealPlayers().size() / 2) - 1) {
                     shouldBeUnlocked = true;
                 }
             }
@@ -81,15 +80,15 @@ public class CommanderUnlockCheckService {
             }
             case "olradin" -> {
                 if (ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial", true) > 0
-                        && ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", true) > 0
-                        && ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", true) > 0) {
+                    && ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", true) > 0
+                    && ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", true) > 0) {
                     shouldBeUnlocked = true;
                 }
             }
             case "vaylerian" -> {
                 if (ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial", true) > 2
-                        || ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", true) > 2
-                        || ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", true) > 2) {
+                    || ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", true) > 2
+                    || ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", true) > 2) {
                     shouldBeUnlocked = true;
                 }
             }
@@ -110,8 +109,8 @@ public class CommanderUnlockCheckService {
             }
             case "yssaril" -> {
                 if (player.getActionCards().size() > 7
-                        || (player.getExhaustedTechs().contains("mi")
-                                && player.getActionCards().size() > 6)) {
+                    || (player.getExhaustedTechs().contains("mi")
+                        && player.getActionCards().size() > 6)) {
                     shouldBeUnlocked = true;
                 }
             }
@@ -131,8 +130,7 @@ public class CommanderUnlockCheckService {
             case "redcreuss" -> shouldBeUnlocked = true;
             case "veldyr" -> {
                 if (ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player)
-                                .size()
-                        > 1) {
+                    .size() > 1) {
                     shouldBeUnlocked = true;
                 }
             }
@@ -166,8 +164,7 @@ public class CommanderUnlockCheckService {
                     shouldBeUnlocked = true;
                 }
             }
-            case "zealots", "keleres", "winnu", "muaat", "augers", "kortali", "letnev", "florzen", "yin" ->
-                shouldBeUnlocked = true;
+            case "zealots", "keleres", "winnu", "muaat", "augers", "kortali", "letnev", "florzen", "yin" -> shouldBeUnlocked = true;
             case "hacan" -> {
                 if (player.getTg() > 9) {
                     shouldBeUnlocked = true;
@@ -220,8 +217,7 @@ public class CommanderUnlockCheckService {
             }
             case "ghemina" -> {
                 if ((ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", false)
-                                + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "lady", false))
-                        > 1) {
+                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "lady", false)) > 1) {
                     shouldBeUnlocked = true;
                 }
             }
@@ -237,7 +233,7 @@ public class CommanderUnlockCheckService {
             }
             case "kyro" -> {
                 if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "infantry", false) > 5
-                        && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "fighter", false) > 5) {
+                    && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "fighter", false) > 5) {
                     shouldBeUnlocked = true;
                 }
             }
@@ -248,16 +244,16 @@ public class CommanderUnlockCheckService {
             }
             case "argent" -> {
                 int num = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false)
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false)
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false)
+                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false)
+                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
                 if (num > 5) {
                     shouldBeUnlocked = true;
                 }
             }
             case "titans" -> {
                 int num = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds")
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "spacedock");
+                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "spacedock");
                 if (num > 4) {
                     shouldBeUnlocked = true;
                 }
@@ -292,8 +288,7 @@ public class CommanderUnlockCheckService {
             }
             case "naaz" -> {
                 if (CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Mech)
-                                .size()
-                        > 2) {
+                    .size() > 2) {
                     shouldBeUnlocked = true;
                 }
             }
@@ -319,7 +314,7 @@ public class CommanderUnlockCheckService {
                         Tile tile = game.getTileByPosition(tilePos);
                         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                             if (unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0
-                                    || unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
+                                || unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
                                 shouldBeUnlocked = true;
                             }
                         }
@@ -338,7 +333,7 @@ public class CommanderUnlockCheckService {
                     shouldBeUnlocked = true;
                 }
             }
-                // missing: yin, ghost, naalu, letnev
+            // missing: yin, ghost, naalu, letnev
         }
         if (shouldBeUnlocked) {
             UnlockLeaderService.unlockLeader(faction + "commander", game, player);

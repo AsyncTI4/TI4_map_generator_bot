@@ -19,21 +19,20 @@ public class SearchAttachmentsSubcommand extends SearchComponentModelSubcommand 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        ComponentSource source =
-                ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
+        ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
         if (Mapper.isValidAttachment(searchString)) {
             event.getChannel()
-                    .sendMessageEmbeds(Mapper.getAttachmentInfo(searchString).getRepresentationEmbed())
-                    .queue();
+                .sendMessageEmbeds(Mapper.getAttachmentInfo(searchString).getRepresentationEmbed())
+                .queue();
             return;
         }
 
         List<MessageEmbed> messageEmbeds = Mapper.getAttachments().values().stream()
-                .filter(model -> model.search(searchString, source))
-                .sorted(Comparator.comparing(AttachmentModel::getSource))
-                .map(AttachmentModel::getRepresentationEmbed)
-                .toList();
+            .filter(model -> model.search(searchString, source))
+            .sorted(Comparator.comparing(AttachmentModel::getSource))
+            .map(AttachmentModel::getRepresentationEmbed)
+            .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }
 }

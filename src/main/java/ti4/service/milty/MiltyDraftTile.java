@@ -48,9 +48,12 @@ public class MiltyDraftTile {
         resources += r;
         influence += i;
 
-        if (r > i) miltyRes += r;
-        else if (i > r) miltyInf += i;
-        else miltyFlex += r;
+        if (r > i)
+            miltyRes += r;
+        else if (i > r)
+            miltyInf += i;
+        else
+            miltyFlex += r;
 
         if (planet.isLegendary()) isLegendary = true;
     }

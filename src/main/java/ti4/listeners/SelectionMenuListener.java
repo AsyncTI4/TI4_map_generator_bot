@@ -12,8 +12,8 @@ public class SelectionMenuListener extends ListenerAdapter {
     public void onStringSelectInteraction(@Nonnull StringSelectInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
             event.reply("Please try again in a moment. The bot is not ready to receive selections.")
-                    .setEphemeral(true)
-                    .queue();
+                .setEphemeral(true)
+                .queue();
             return;
         }
 

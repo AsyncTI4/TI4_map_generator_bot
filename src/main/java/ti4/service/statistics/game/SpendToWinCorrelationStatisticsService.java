@@ -19,19 +19,20 @@ class SpendToWinCorrelationStatisticsService {
         AtomicInteger gamesWhereHighestWon = new AtomicInteger();
 
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilterForWonGame(event),
-                game -> calculate(game, num, gamesWhereHighestWon, names));
+            GameStatisticsFilterer.getGamesFilterForWonGame(event),
+            game -> calculate(game, num, gamesWhereHighestWon, names));
 
         names.append("Total games where highest spender won was ")
-                .append(gamesWhereHighestWon)
-                .append(" out of ")
-                .append(num);
+            .append(gamesWhereHighestWon)
+            .append(" out of ")
+            .append(num);
         MessageHelper.sendMessageToThread(
-                (MessageChannelUnion) event.getMessageChannel(), "Game Expenses", names.toString());
+            (MessageChannelUnion) event.getMessageChannel(), "Game Expenses", names.toString());
     }
 
     private static void calculate(
-            Game game, AtomicInteger num, AtomicInteger gamesWhereHighestWon, StringBuilder names) {
+        Game game, AtomicInteger num, AtomicInteger gamesWhereHighestWon, StringBuilder names
+    ) {
         if (game.getWinner().isEmpty()) {
             return;
         }
@@ -53,13 +54,13 @@ class SpendToWinCorrelationStatisticsService {
             num.incrementAndGet();
             names.append(num).append(". ").append(game.getName());
             names.append(" - Winner was ")
-                    .append(winner.getFactionEmoji())
-                    .append(" (")
-                    .append("Highest was ")
-                    .append(highestP.getFactionEmoji())
-                    .append(" at ")
-                    .append(highestP.getTotalExpenses())
-                    .append(")");
+                .append(winner.getFactionEmoji())
+                .append(" (")
+                .append("Highest was ")
+                .append(highestP.getFactionEmoji())
+                .append(" at ")
+                .append(highestP.getTotalExpenses())
+                .append(")");
             names.append("\n");
             if (highestP == winner) {
                 gamesWhereHighestWon.incrementAndGet();

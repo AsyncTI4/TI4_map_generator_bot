@@ -12,9 +12,9 @@ public class JdaComponentHelper {
 
     public static void removeComponentFromMessage(ComponentInteraction event) {
         event.editComponents(event.getMessage()
-                        .getComponentTree()
-                        .replace(ComponentReplacer.byUniqueId(event.getUniqueId(), (Component) null)))
-                .queue();
+            .getComponentTree()
+            .replace(ComponentReplacer.byUniqueId(event.getUniqueId(), (Component) null)))
+            .queue();
     }
 
     public static boolean removeComponentFromMessageAndDeleteIfEmpty(ComponentInteraction event) {

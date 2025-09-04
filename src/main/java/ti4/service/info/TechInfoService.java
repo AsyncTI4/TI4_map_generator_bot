@@ -25,9 +25,9 @@ public class TechInfoService {
 
     public static void sendTechInfo(Player player) {
         MessageHelper.sendMessageEmbedsToCardsInfoThread(
-                player, "__Technologies Researched:__", getTechMessageEmbeds(player));
+            player, "__Technologies Researched:__", getTechMessageEmbeds(player));
         MessageHelper.sendMessageEmbedsToCardsInfoThread(
-                player, "__Faction Technologies (Not Yet Researched)__", getFactionTechMessageEmbeds(player));
+            player, "__Faction Technologies (Not Yet Researched)__", getFactionTechMessageEmbeds(player));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), null, getTechButtons());
     }
 
@@ -40,9 +40,9 @@ public class TechInfoService {
     private static List<MessageEmbed> getTechMessageEmbeds(Player player) {
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
         for (TechnologyModel techModel : player.getTechs().stream()
-                .map(Mapper::getTech)
-                .sorted(TechnologyModel.sortByTechRequirements)
-                .toList()) {
+            .map(Mapper::getTech)
+            .sorted(TechnologyModel.sortByTechRequirements)
+            .toList()) {
             MessageEmbed representationEmbed = techModel.getRepresentationEmbed();
             messageEmbeds.add(representationEmbed);
         }
@@ -53,9 +53,9 @@ public class TechInfoService {
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
         List<String> notResearchedFactionTechs = player.getNotResearchedFactionTechs();
         for (TechnologyModel techModel : notResearchedFactionTechs.stream()
-                .map(Mapper::getTech)
-                .sorted(TechnologyModel.sortByTechRequirements)
-                .toList()) {
+            .map(Mapper::getTech)
+            .sorted(TechnologyModel.sortByTechRequirements)
+            .toList()) {
             MessageEmbed representationEmbed = techModel.getRepresentationEmbed(false, true);
             messageEmbeds.add(representationEmbed);
         }

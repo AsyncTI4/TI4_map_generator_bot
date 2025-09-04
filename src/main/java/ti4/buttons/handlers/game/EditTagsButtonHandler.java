@@ -27,12 +27,12 @@ class EditTagsButtonHandler {
 
         String fieldID = "tags";
         TextInput tags = TextInput.create(fieldID, TextInputStyle.SHORT)
-                .setPlaceholder("Add tags here, separated by semicolons. Leave blank to delete all tags.")
-                .setValue(currentTags)
-                .build();
+            .setPlaceholder("Add tags here, separated by semicolons. Leave blank to delete all tags.")
+            .setValue(currentTags)
+            .build();
         Modal modal = Modal.create(modalId, "Tags for Game " + game.getName())
-                .addComponents(Label.of("Edit Tags", tags))
-                .build();
+            .addComponents(Label.of("Edit Tags", tags))
+            .build();
         event.replyModal(modal).queue();
     }
 
@@ -48,6 +48,6 @@ class EditTagsButtonHandler {
             game.setTags(tags);
         }
         MessageHelper.sendMessageToEventChannel(
-                event, "Changed tags from `" + currentTags + "` to `" + game.getTags() + "`");
+            event, "Changed tags from `" + currentTags + "` to `" + game.getTags() + "`");
     }
 }

@@ -20,10 +20,11 @@ public class CircuitBreakerFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-            @NotNull HttpServletRequest request,
-            @NotNull HttpServletResponse response,
-            @NotNull FilterChain filterChain)
-            throws ServletException, IOException {
+        @NotNull HttpServletRequest request,
+        @NotNull HttpServletResponse response,
+        @NotNull FilterChain filterChain
+    )
+        throws ServletException, IOException {
         if (CircuitBreaker.isOpen() || !AsyncTI4DiscordBot.isReadyToReceiveCommands())
             throw new ServiceUnavailableException();
 

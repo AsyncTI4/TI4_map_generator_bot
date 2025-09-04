@@ -19,25 +19,25 @@ public class AbsolSeedsAgendaResolver implements ForAgainstAgendaResolver {
     public void handleFor(Game game, ButtonInteractionEvent event, int agendaNumericId) {
         var winOrLose = AgendaHelper.getPlayersWithMostPoints(game);
         MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(), "Custom public objective _Seed of an Empire_ has been added.");
+            game.getMainGameChannel(), "Custom public objective _Seed of an Empire_ has been added.");
         if (winOrLose.size() == 1) {
             Player playerWL = winOrLose.getFirst();
             Integer poIndex = game.addCustomPO("Seed of an Empire", 1);
             game.scorePublicObjective(playerWL.getUserID(), poIndex);
             MessageHelper.sendMessageToChannel(
-                    playerWL.getCorrectChannel(), playerWL.getRepresentation() + " scored _Seed of an Empire_.");
+                playerWL.getCorrectChannel(), playerWL.getRepresentation() + " scored _Seed of an Empire_.");
             Helper.checkEndGame(game, playerWL);
             game.setSpeakerUserID(playerWL.getUserID());
             MessageHelper.sendMessageToChannel(
-                    playerWL.getCorrectChannel(),
-                    playerWL.getRepresentation()
-                            + " was made speaker and so must give each other player that voted \"for\" a promissory note.");
+                playerWL.getCorrectChannel(),
+                playerWL.getRepresentation()
+                    + " was made speaker and so must give each other player that voted \"for\" a promissory note.");
             for (Player p2 : AgendaHelper.getWinningVoters("for", game)) {
                 if (p2 != playerWL) {
                     MessageHelper.sendMessageToChannelWithButtons(
-                            playerWL.getCardsInfoThread(),
-                            "You owe " + p2.getRepresentation() + "a promissory note.",
-                            ButtonHelper.getForcedPNSendButtons(game, p2, playerWL));
+                        playerWL.getCardsInfoThread(),
+                        "You owe " + p2.getRepresentation() + "a promissory note.",
+                        ButtonHelper.getForcedPNSendButtons(game, p2, playerWL));
                 }
             }
         }
@@ -47,22 +47,22 @@ public class AbsolSeedsAgendaResolver implements ForAgainstAgendaResolver {
     public void handleAgainst(Game game, ButtonInteractionEvent event, int agendaNumericId) {
         var winOrLose = AgendaHelper.getPlayersWithLeastPoints(game);
         MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(), "Custom public objective _Seed of an Empire_ has been added.");
+            game.getMainGameChannel(), "Custom public objective _Seed of an Empire_ has been added.");
         if (winOrLose.size() == 1) {
             Player playerWL = winOrLose.getFirst();
             Integer poIndex = game.addCustomPO("Seed of an Empire", 1);
             game.scorePublicObjective(playerWL.getUserID(), poIndex);
             MessageHelper.sendMessageToChannel(
-                    playerWL.getCorrectChannel(), playerWL.getRepresentation() + " scored _Seed of an Empire_.");
+                playerWL.getCorrectChannel(), playerWL.getRepresentation() + " scored _Seed of an Empire_.");
             Helper.checkEndGame(game, playerWL);
             ActionCardHelper.drawActionCards(game, playerWL, agendaNumericId, true);
             playerWL.setFleetCC(playerWL.getFleetCC() + 1);
             playerWL.setTacticalCC(playerWL.getTacticalCC() + 1);
             playerWL.setStrategicCC(playerWL.getStrategicCC() + 1);
             MessageHelper.sendMessageToChannel(
-                    playerWL.getCorrectChannel(),
-                    playerWL.getRepresentation()
-                            + " drew some action cards and has had a command token placed in each command pool.");
+                playerWL.getCorrectChannel(),
+                playerWL.getRepresentation()
+                    + " drew some action cards and has had a command token placed in each command pool.");
         }
     }
 }

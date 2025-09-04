@@ -22,16 +22,16 @@ class MoveCreussWormhole extends GameStateSubcommand {
 
     public MoveCreussWormhole() {
         super(
-                Constants.MOVE_CREUSS_WORMHOLE,
-                "Adds or moves a Creuss wormhole token to the target system.",
-                true,
-                true);
+            Constants.MOVE_CREUSS_WORMHOLE,
+            "Adds or moves a Creuss wormhole token to the target system.",
+            true,
+            true);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Target System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CREUSS_TOKEN_NAME, "Token Name")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
     }
 
     @Override
@@ -40,11 +40,11 @@ class MoveCreussWormhole extends GameStateSubcommand {
         Player player = getPlayer();
 
         String tileName = StringUtils.substringBefore(
-                event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
+            event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
         Tile tile = TileHelper.getTile(event, tileName, game);
         if (tile == null) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "Could not resolve tileID:  `" + tileName + "`. Tile not found");
+                event, "Could not resolve tileID:  `" + tileName + "`. Tile not found");
             return;
         }
 
@@ -55,16 +55,16 @@ class MoveCreussWormhole extends GameStateSubcommand {
         }
         if (!isValidCreussWormhole(tokenName)) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "Token Name: " + tokenName + " is not a valid Creuss Wormhole Token.");
+                event, "Token Name: " + tokenName + " is not a valid Creuss Wormhole Token.");
             return;
         }
 
         StringBuilder sb = new StringBuilder(player.getRepresentation());
         tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
         sb.append(" moved ")
-                .append(MiscEmojis.getCreussWormhole(tokenName))
-                .append(" to ")
-                .append(tile.getRepresentation());
+            .append(MiscEmojis.getCreussWormhole(tokenName))
+            .append(" to ")
+            .append(tile.getRepresentation());
         for (Tile tile_ : game.getTileMap().values()) {
             if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
                 sb.append(" (from ").append(tile_.getRepresentation()).append(")");

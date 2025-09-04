@@ -68,7 +68,7 @@ public class AgentDraftItem extends DraftItem {
         for (FactionModel faction : factions) {
             List<String> agents = faction.getLeaders();
             agents.removeIf(
-                    (String leader) -> !"agent".equals(allLeaders.get(leader).getType()));
+                (String leader) -> !"agent".equals(allLeaders.get(leader).getType()));
             for (String agent : agents) {
                 allItems.add(generate(Category.AGENT, agent));
             }
@@ -89,7 +89,7 @@ public class AgentDraftItem extends DraftItem {
         for (FactionModel faction : factions) {
             List<String> agents = faction.getLeaders();
             agents.removeIf(
-                    (String leader) -> !"agent".equals(allLeaders.get(leader).getType()));
+                (String leader) -> !"agent".equals(allLeaders.get(leader).getType()));
             for (String agent : agents) {
                 if (Arrays.asList(results).contains(agent)) {
                     continue;

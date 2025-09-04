@@ -16,8 +16,8 @@ class SetThreadName extends Subcommand {
     public SetThreadName() {
         super(Constants.SET_THREAD_NAME, "Set the name of the thread");
         addOptions(new OptionData(OptionType.STRING, Constants.THREAD_NAME, "New Thread Name")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
     }
 
     @Override

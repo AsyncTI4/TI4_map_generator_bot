@@ -29,8 +29,8 @@ public class StartScenario extends GameStateSubcommand {
     public StartScenario() {
         super(Constants.START_SCENARIO, "Start a codex scenario", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.SCENARIO, "Scenario name")
-                .setAutoComplete(true)
-                .setRequired(true));
+            .setAutoComplete(true)
+            .setRequired(true));
     }
 
     @Override
@@ -52,9 +52,9 @@ public class StartScenario extends GameStateSubcommand {
         var factions = List.of("arborec", "ghost", "muaat", "letnev", "nekro", "l1z1x");
         if (game.getRealPlayers().isEmpty()) {
             AddTileListService.addTileListToMap(
-                    game,
-                    "{42} 32 43 25 47 33 36 19 37 28 21 48 29 27 24 38 30 40 22 10 50 26 4 49 45 17 35 31 5 44 39 8 41 34 6 20 23",
-                    event);
+                game,
+                "{42} 32 43 25 47 33 36 19 37 28 21 48 29 27 24 38 30 40 22 10 50 26 4 49 45 17 35 31 5 44 39 8 41 34 6 20 23",
+                event);
         }
         List<Player> players = new ArrayList<>();
         for (Player player : game.getPlayers().values()) {
@@ -77,13 +77,13 @@ public class StartScenario extends GameStateSubcommand {
                 }
                 if (tile != null) {
                     MiltyService.secondHalfOfPlayerSetup(
-                            players.get(face),
-                            game,
-                            players.get(face).getNextAvailableColour(),
-                            faction,
-                            tile.getPosition(),
-                            event,
-                            speaker);
+                        players.get(face),
+                        game,
+                        players.get(face).getNextAvailableColour(),
+                        faction,
+                        tile.getPosition(),
+                        event,
+                        speaker);
                     players.remove(face);
                 }
             }
@@ -110,9 +110,9 @@ public class StartScenario extends GameStateSubcommand {
         var factions = List.of("ghost", "xxcha", "sol", "naaz", "nekro", "nomad");
         if (game.getRealPlayers().isEmpty()) {
             AddTileListService.addTileListToMap(
-                    game,
-                    "{c41} 21 35 77 63 48 70 68 60 47 76 25 66 30 72 27 26 22 75 1 74 67 8 62 79 14 31 29 53 41 34 17 65 45 57 64 49",
-                    event);
+                game,
+                "{c41} 21 35 77 63 48 70 68 60 47 76 25 66 30 72 27 26 22 75 1 74 67 8 62 79 14 31 29 53 41 34 17 65 45 57 64 49",
+                event);
         }
         List<Player> players = new ArrayList<>();
         for (Player player : game.getPlayers().values()) {
@@ -123,7 +123,7 @@ public class StartScenario extends GameStateSubcommand {
         for (String faction : factions) {
             if (players.isEmpty()) {
                 MessageHelper.sendMessageToEventChannel(
-                        event, "You don't have six players, but I'll try my best anyway.");
+                    event, "You don't have six players, but I'll try my best anyway.");
                 break;
             }
             if (game.getPlayerFromColorOrFaction(faction) == null) {
@@ -145,7 +145,7 @@ public class StartScenario extends GameStateSubcommand {
                 };
                 if (tile != null) {
                     MiltyService.secondHalfOfPlayerSetup(
-                            players.get(face), game, color, faction, tile.getPosition(), event, speaker);
+                        players.get(face), game, color, faction, tile.getPosition(), event, speaker);
                     players.remove(face);
                 }
             }
@@ -183,7 +183,7 @@ public class StartScenario extends GameStateSubcommand {
             RelicModel relicModel = Mapper.getRelic(relicID);
             String message = nomad.getFactionEmoji() + " Drew Relic: " + relicModel.getName();
             MessageHelper.sendMessageToChannelWithEmbed(
-                    event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
+                event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
         }
 
         Player naaz = game.getPlayerFromColorOrFaction("naaz");
@@ -194,7 +194,7 @@ public class StartScenario extends GameStateSubcommand {
             RelicModel relicModel = Mapper.getRelic(relicID);
             String message = naaz.getFactionEmoji() + " Drew Relic: " + relicModel.getName();
             MessageHelper.sendMessageToChannelWithEmbed(
-                    event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
+                event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
         }
 
         Player sol = game.getPlayerFromColorOrFaction("sol");

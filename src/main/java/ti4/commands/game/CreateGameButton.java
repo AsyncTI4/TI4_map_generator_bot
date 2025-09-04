@@ -27,9 +27,9 @@ class CreateGameButton extends Subcommand {
     public CreateGameButton() {
         super(Constants.CREATE_GAME_BUTTON, "Create Game Creation Button");
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.GAME_FUN_NAME,
-                        "Fun name for the channel; a single underscore alone will generate a random name")
+            OptionType.STRING,
+            Constants.GAME_FUN_NAME,
+            "Fun name for the channel; a single underscore alone will generate a random name")
                 .setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));
@@ -59,9 +59,9 @@ class CreateGameButton extends Subcommand {
         if (categoryChannel == null) categoryChannel = CreateGameService.createNewCategory(categoryChannelName);
         if (categoryChannel == null) {
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    "Could not automatically find a category that begins with **" + categoryChannelName
-                            + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
+                event,
+                "Could not automatically find a category that begins with **" + categoryChannelName
+                    + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
             return;
         }
         // SET GUILD BASED ON CATEGORY SELECTED
@@ -73,25 +73,26 @@ class CreateGameButton extends Subcommand {
         for (int i = 1; i <= 8; i++) {
             if (Objects.nonNull(event.getOption("player" + i))) {
                 Member member = event.getOption("player" + i).getAsMember();
-                if (member != null) members.add(member);
+                if (member != null)
+                    members.add(member);
                 else {
                     continue;
                 }
 
                 if (!member.getUser().isBot() && !CommandHelper.hasRole(event, AsyncTI4DiscordBot.developerRoles)) {
                     int ongoingAmount = SearchGameHelper.searchGames(
-                            member.getUser(), event, false, false, false, true, false, true, true, true);
+                        member.getUser(), event, false, false, false, true, false, true, true, true);
                     int completedAndOngoingAmount = SearchGameHelper.searchGames(
-                            member.getUser(), event, false, true, false, true, false, true, true, true);
+                        member.getUser(), event, false, true, false, true, false, true, true, true);
                     int completedGames = completedAndOngoingAmount - ongoingAmount;
                     if (ongoingAmount > completedGames + 2) {
                         MessageHelper.sendMessageToChannel(
-                                event.getChannel(),
-                                member.getUser().getAsMention()
-                                        + " is at their game limit (# of ongoing games must be equal or less than # of completed games + 3) and so cannot join more games at the moment."
-                                        + " Their number of ongoing games is " + ongoingAmount
-                                        + " and their number of completed games is " + completedGames + ".\n\n"
-                                        + "If you're playing a private game with friends, you can ping a bothelper for a 1-game exemption from the limit.");
+                            event.getChannel(),
+                            member.getUser().getAsMention()
+                                + " is at their game limit (# of ongoing games must be equal or less than # of completed games + 3) and so cannot join more games at the moment."
+                                + " Their number of ongoing games is " + ongoingAmount
+                                + " and their number of completed games is " + completedGames + ".\n\n"
+                                + "If you're playing a private game with friends, you can ping a bothelper for a 1-game exemption from the limit.");
                         return;
                     }
                     // Used for specific people we are limiting the amount of games of
@@ -127,7 +128,7 @@ class CreateGameButton extends Subcommand {
                 "Labyrinth", "Zenith", "Acidic", "Oxygen", "Primordial", "Havoc", "Homoeostasis", "Vorpal",
                 "Solstice", "Qubit", "Cephalopod", "Vertebrate", "Lattice", "Obelisk", "Yggdrasil", "Jargon",
                 "Compass", "Machination", "Incorporeal", "Electron", "Maglev", "Radiant", "Cosmology", "Tensor",
-                "Cryosleep", "Incandescent", "Vector", "Atomizer", "Retina", "Dragonfly", "Nanotube",  "Gloom",
+                "Cryosleep", "Incandescent", "Vector", "Atomizer", "Retina", "Dragonfly", "Nanotube", "Gloom",
                 "Saturn", "Convex", "Nulldrive", "Distortion", "Equilibrium", "Abyss", "Hydra", "Friction",
                 "Equatorial", "Incursion", "Solenoid", "Illusion", "Inhibitor", "Sundial", "Microchip", "Krypton",
                 "Gravitational", "Entropy", "Taurus", "Hyperion", "Deuterium", "Voltage", "Viscosity", "Logarithm",
@@ -161,25 +162,24 @@ class CreateGameButton extends Subcommand {
             second ^= first;
             third ^= second;
             gameFunName = words.get(37 * first & 0xFF) + "-" + words.get(53 * second & 0xFF) + "-"
-                    + words.get(83 * third & 0xFF);
+                + words.get(83 * third & 0xFF);
         }
         if (!members.isEmpty()) {
-            StringBuilder buttonMsg =
-                    new StringBuilder("Game Fun Name: " + gameFunName.replace(":", "") + "\nPlayers:\n");
+            StringBuilder buttonMsg = new StringBuilder("Game Fun Name: " + gameFunName.replace(":", "") + "\nPlayers:\n");
             int counter = 1;
             for (Member member : members) {
                 buttonMsg
-                        .append(counter)
-                        .append(":")
-                        .append(member.getId())
-                        .append(".(")
-                        .append(member.getEffectiveName().replace(":", ""))
-                        .append(")\n");
+                    .append(counter)
+                    .append(":")
+                    .append(member.getId())
+                    .append(".(")
+                    .append(member.getEffectiveName().replace(":", ""))
+                    .append(")\n");
                 counter++;
             }
             buttonMsg
-                    .append("\n\n")
-                    .append(" Please hit this button after confirming that the members are the correct ones.");
+                .append("\n\n")
+                .append(" Please hit this button after confirming that the members are the correct ones.");
             MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(buttonMsg.toString());
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), buttonMsg.toString(), buttons);
             ActionRow actionRow = ActionRow.of(buttons);

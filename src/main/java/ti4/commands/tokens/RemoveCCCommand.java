@@ -18,10 +18,10 @@ public class RemoveCCCommand extends AddRemoveTokenCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                        .setRequired(true)
-                        .setAutoComplete(true),
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                .setRequired(true)
+                .setAutoComplete(true),
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
@@ -31,12 +31,12 @@ public class RemoveCCCommand extends AddRemoveTokenCommand {
             String ccPath = tile.getCCPath(ccID);
             if (ccPath == null) {
                 MessageHelper.sendMessageToChannel(
-                        game.getMainGameChannel(), "Command token: " + color + " is not valid and not supported.");
+                    game.getMainGameChannel(), "Command token: " + color + " is not valid and not supported.");
             }
             if (game.isFowMode()) {
                 String colorMention = ColorEmojis.getColorEmojiWithName(color);
                 FoWHelper.pingSystem(
-                        game, tile.getPosition(), colorMention + " has removed a command token in the system.");
+                    game, tile.getPosition(), colorMention + " has removed a command token in the system.");
             }
 
             tile.removeCC(ccID);

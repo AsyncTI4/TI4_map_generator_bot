@@ -36,9 +36,9 @@ class ActionCardHandButtonHandler {
         List<Button> buttons = ButtonHelperFactionSpecific.getButtonsToTakeSomeonesAC(player, victim);
         ActionCardHelper.showAll(victim, player, game);
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + ", please choose which action card you wish to steal.",
-                buttons);
+            player.getCardsInfoThread(),
+            player.getRepresentationUnfogged() + ", please choose which action card you wish to steal.",
+            buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -56,7 +56,8 @@ class ActionCardHandButtonHandler {
     // TODO: bake this into /ac discard
     @ButtonHandler("ac_discard_from_hand_")
     static void acDiscardFromHand(
-            ButtonInteractionEvent event, String buttonID, Game game, Player player, MessageChannel actionsChannel) {
+        ButtonInteractionEvent event, String buttonID, Game game, Player player, MessageChannel actionsChannel
+    ) {
         String acIndex = buttonID.replace("ac_discard_from_hand_", "");
         boolean stalling = false;
         boolean drawReplacement = false;
@@ -78,8 +79,8 @@ class ActionCardHandButtonHandler {
 
         if (channel == null) {
             event.getChannel()
-                    .sendMessage("Could not find channel to play card. Please ping Bothelper.")
-                    .queue();
+                .sendMessage("Could not find channel to play card. Please ping Bothelper.")
+                .queue();
             return;
         }
 
@@ -97,19 +98,19 @@ class ActionCardHandButtonHandler {
                 return;
             }
             String sb = player.getRepresentation() + " discarded the action card _"
-                    + Mapper.getActionCard(acID).getName() + "_.\n"
-                    + Mapper.getActionCard(acID).getRepresentation();
+                + Mapper.getActionCard(acID).getName() + "_.\n"
+                + Mapper.getActionCard(acID).getRepresentation();
             MessageChannel channel2 = game.isFowMode() ? player.getPrivateChannel() : game.getMainGameChannel();
             MessageHelper.sendMessageToChannel(channel2, sb);
             ActionCardHelper.sendActionCardInfo(game, player);
             String message = "Use buttons to end turn or do another action.";
             if (stalling) {
                 if (player.hasUnit("yssaril_mech")
-                        && !ButtonHelper.isLawInPlay(game, "articles_war")
-                        && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
+                    && !ButtonHelper.isLawInPlay(game, "articles_war")
+                    && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
                     String message3 = "Use buttons to drop 1 mech on a planet or decline";
                     List<Button> buttons = new ArrayList<>(
-                            Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
+                        Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
                     buttons.add(Buttons.red("deleteButtons", "Decline to Drop Mech"));
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message3, buttons);
                 }
@@ -128,17 +129,17 @@ class ActionCardHandButtonHandler {
             if (player.hasUnexhaustedLeader("cymiaeagent")) {
                 List<Button> buttons2 = new ArrayList<>();
                 Button hacanButton = Buttons.gray(
-                        "exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent", FactionEmojis.cymiae);
+                    "exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent", FactionEmojis.cymiae);
                 buttons2.add(hacanButton);
                 MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(),
-                        player.getRepresentationUnfogged()
-                                + " you may use "
-                                + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                + "Skhot Unit X-12, the Cymiae"
-                                + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                                + " agent, to make yourself draw 1 action card.",
-                        buttons2);
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                        + " you may use "
+                        + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                        + "Skhot Unit X-12, the Cymiae"
+                        + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
+                        + " agent, to make yourself draw 1 action card.",
+                    buttons2);
             }
             ActionCardHelper.serveReverseEngineerButtons(game, player, List.of(acID));
         } catch (Exception e) {
@@ -153,9 +154,9 @@ class ActionCardHandButtonHandler {
         MessageChannel channel = game.getMainGameChannel();
         if (acID.contains("sabo")) {
             MessageHelper.sendMessageToChannel(
-                    player.getCardsInfoThread(),
-                    player.getRepresentation()
-                            + ", please play _Sabotage_ by clicking the Sabo button on the action card you wish to Sabo.");
+                player.getCardsInfoThread(),
+                player.getRepresentation()
+                    + ", please play _Sabotage_ by clicking the Sabo button on the action card you wish to Sabo.");
             return;
         }
 
@@ -164,12 +165,12 @@ class ActionCardHandButtonHandler {
             acID = acID.split("_")[0];
             List<Button> scButtons = new ArrayList<>();
             scButtons.add(Buttons.green(
-                    "resolveReverse_" + actionCardTitle, "Pick Up " + actionCardTitle + " From The Discard"));
+                "resolveReverse_" + actionCardTitle, "Pick Up " + actionCardTitle + " From The Discard"));
             MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + ", after checking for Sabos, use buttons to resolve _Reverse Engineer_.",
-                    scButtons);
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                    + ", after checking for Sabos, use buttons to resolve _Reverse Engineer_.",
+                scButtons);
         }
         if (acID.contains("counterstroke_")) {
             String tilePos = acID.split("_")[2];
@@ -177,14 +178,14 @@ class ActionCardHandButtonHandler {
             List<Button> scButtons = new ArrayList<>();
             scButtons.add(Buttons.green("resolveCounterStroke_" + tilePos, "Counterstroke in " + tilePos));
             MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + ", after checking for Sabos, use buttons to resolve _Counterstroke_.",
-                    scButtons);
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", after checking for Sabos, use buttons to resolve _Counterstroke_.",
+                scButtons);
         }
         if (channel == null) {
             event.getChannel()
-                    .sendMessage("Could not find channel to play card. Please ping Bothelper.")
-                    .queue();
+                .sendMessage("Could not find channel to play card. Please ping Bothelper.")
+                .queue();
             return;
         }
 
@@ -196,9 +197,9 @@ class ActionCardHandButtonHandler {
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(event, player), "Could not parse AC ID: " + acID, e);
             event.getChannel()
-                    .asThreadChannel()
-                    .sendMessage("Could not parse action card ID: " + acID + ". Please play manually.")
-                    .queue();
+                .asThreadChannel()
+                .sendMessage("Could not parse action card ID: " + acID + ". Please play manually.")
+                .queue();
         }
     }
 
@@ -250,9 +251,9 @@ class ActionCardHandButtonHandler {
         }
         ReactionService.addReaction(event, game, player, true, false, message);
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + ", use buttons to discard an action card.",
-                ActionCardHelper.getDiscardActionCardButtons(player, false));
+            player.getCardsInfoThread(),
+            player.getRepresentationUnfogged() + ", use buttons to discard an action card.",
+            ActionCardHelper.getDiscardActionCardButtons(player, false));
 
         ButtonHelper.deleteMessage(event);
         ButtonHelper.checkACLimit(game, player);
@@ -262,8 +263,8 @@ class ActionCardHandButtonHandler {
     static void draw2AC(ButtonInteractionEvent event, Player player, Game game) {
         boolean hasSchemingAbility = player.hasAbility("scheming");
         String message = hasSchemingAbility
-                ? "drew 3 Action Cards (**Scheming**) - please discard 1 action card from your hand"
-                : "drew 2 Action cards";
+            ? "drew 3 Action Cards (**Scheming**) - please discard 1 action card from your hand"
+            : "drew 2 Action cards";
         int count = hasSchemingAbility ? 3 : 2;
         if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
@@ -278,9 +279,9 @@ class ActionCardHandButtonHandler {
         ReactionService.addReaction(event, game, player, message);
         if (hasSchemingAbility) {
             MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + ", please discard an action card due to **Scheming**.",
-                    ActionCardHelper.getDiscardActionCardButtons(player, false));
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + ", please discard an action card due to **Scheming**.",
+                ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
         ButtonHelper.deleteTheOneButton(event);
@@ -292,7 +293,6 @@ class ActionCardHandButtonHandler {
             int count = Integer.parseInt(buttonID.replace("drawActionCards_", ""));
             ActionCardHelper.drawActionCards(game, player, count, true);
             ButtonHelper.deleteTheOneButton(event);
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
     }
 }

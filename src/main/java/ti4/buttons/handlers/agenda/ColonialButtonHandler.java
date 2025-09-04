@@ -23,7 +23,7 @@ class ColonialButtonHandler {
             AddUnitService.addUnits(event, tile, game, p2.getColor(), "1 inf " + planet);
         }
         MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(), "1 " + p2.getColor() + " infantry was added to " + planet);
+            game.getMainGameChannel(), "1 " + p2.getColor() + " infantry was added to " + planet);
         ButtonHelper.deleteMessage(event);
     }
 }

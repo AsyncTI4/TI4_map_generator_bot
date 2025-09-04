@@ -10,7 +10,7 @@ public class LongExecutionHistoryCron {
 
     public static void register() {
         CronManager.schedulePeriodically(
-                ExecutionHistoryManager.class, LongExecutionHistoryCron::logCacheStats, 0, 1, TimeUnit.MINUTES);
+            ExecutionHistoryManager.class, LongExecutionHistoryCron::logCacheStats, 0, 1, TimeUnit.MINUTES);
     }
 
     private static void logCacheStats() {

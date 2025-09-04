@@ -34,10 +34,9 @@ public class RedistributionAgendaResolver implements AgendaResolver {
 
                 boolean containsDMZ = uH.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
                 if (containsDMZ) {
-                    String dmzString =
-                            "Because " + Helper.getPlanetRepresentation(winner, game) + " is the _Demilitarized Zone_"
-                                    + ", there is no point in choosing a player to place an infantry."
-                                    + " Feel free to curry favour with another player by claiming you would have chosen them.";
+                    String dmzString = "Because " + Helper.getPlanetRepresentation(winner, game) + " is the _Demilitarized Zone_"
+                        + ", there is no point in choosing a player to place an infantry."
+                        + " Feel free to curry favour with another player by claiming you would have chosen them.";
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), dmzString);
                     continue;
                 }
@@ -47,8 +46,8 @@ public class RedistributionAgendaResolver implements AgendaResolver {
                         AddUnitService.addUnits(event, tile, game, p2.getColor(), "1 inf " + winner);
                     }
                     String resolveStr = p2.getRepresentation()
-                            + " outright has the fewest victory points, and so 1 of their infantry infantry was added to "
-                            + Helper.getPlanetRepresentation(winner, game) + " automatically.";
+                        + " outright has the fewest victory points, and so 1 of their infantry infantry was added to "
+                        + Helper.getPlanetRepresentation(winner, game) + " automatically.";
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), resolveStr);
                     continue;
                 }
@@ -56,21 +55,20 @@ public class RedistributionAgendaResolver implements AgendaResolver {
                 for (Player player2 : AgendaHelper.getPlayersWithLeastPoints(game)) {
                     if (game.isFowMode()) {
                         buttons.add(Buttons.green(
-                                "colonialRedTarget_" + player2.getFaction() + "_" + winner, player2.getColor()));
+                            "colonialRedTarget_" + player2.getFaction() + "_" + winner, player2.getColor()));
                     } else {
                         buttons.add(Buttons.green(
-                                "colonialRedTarget_" + player2.getFaction() + "_" + winner, player2.getFaction()));
+                            "colonialRedTarget_" + player2.getFaction() + "_" + winner, player2.getFaction()));
                     }
                 }
 
-                String msg =
-                        player.getRepresentationUnfogged() + ", please choose who you wish to place an infantry on";
+                String msg = player.getRepresentationUnfogged() + ", please choose who you wish to place an infantry on";
                 msg += ", and thus gain control of " + Helper.getPlanetRepresentation(winner, game) + ".";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                 if (game.isFowMode()) {
                     MessageHelper.sendMessageToChannel(
-                            game.getMainGameChannel(),
-                            "Removed all units and gave player who owns the planet the option of who to give it to.");
+                        game.getMainGameChannel(),
+                        "Removed all units and gave player who owns the planet the option of who to give it to.");
                 }
             }
         }

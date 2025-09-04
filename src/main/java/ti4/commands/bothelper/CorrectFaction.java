@@ -24,18 +24,18 @@ class CorrectFaction extends GameStateSubcommand {
     CorrectFaction() {
         super(Constants.CORRECT_FACTION, "Change faction.", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "New faction")
+            .setRequired(true)
+            .setAutoComplete(true));
+        addOptions(
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
                 .setRequired(true)
                 .setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setRequired(true)
-                        .setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String newFaction = AliasHandler.resolveColor(
-                event.getOption(Constants.FACTION).getAsString().toLowerCase());
+            event.getOption(Constants.FACTION).getAsString().toLowerCase());
         newFaction = AliasHandler.resolveFaction(newFaction);
         if (!Mapper.isValidFaction(newFaction)) {
             MessageHelper.sendMessageToEventChannel(event, "Faction not valid");
@@ -48,13 +48,14 @@ class CorrectFaction extends GameStateSubcommand {
     }
 
     private void changeFactionSheetAndComponents(
-            GenericInteractionCreateEvent event, Game game, Player player, String newFaction) {
+        GenericInteractionCreateEvent event, Game game, Player player, String newFaction
+    ) {
         Map<String, Player> players = game.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (newFaction.equals(playerInfo.getFaction())) {
                     MessageHelper.sendMessageToEventChannel(
-                            event, "Player:" + playerInfo.getUserName() + " already uses faction:" + newFaction);
+                        event, "Player:" + playerInfo.getUserName() + " already uses faction:" + newFaction);
                     return;
                 }
             }

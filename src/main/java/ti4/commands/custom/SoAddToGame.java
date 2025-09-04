@@ -14,8 +14,8 @@ class SoAddToGame extends GameStateSubcommand {
     public SoAddToGame() {
         super(Constants.ADD_SO_TO_GAME, "Add a secret objective to the game", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
     }
 
     @Override
@@ -32,7 +32,7 @@ class SoAddToGame extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Secret objective added to game deck.");
         } else {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Secret objective was not added for an unknown reason.");
+                event.getChannel(), "Secret objective was not added for an unknown reason.");
         }
     }
 }

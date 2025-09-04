@@ -16,17 +16,17 @@ class UpdateThreadArchiveTime extends Subcommand {
 
     public UpdateThreadArchiveTime() {
         super(
-                Constants.UPDATE_THREAD_ARCHIVE_TIME,
-                "Update the AutoArchiveDuration for all currently open threads that contain the search string");
+            Constants.UPDATE_THREAD_ARCHIVE_TIME,
+            "Update the AutoArchiveDuration for all currently open threads that contain the search string");
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.THREAD_SEARCH_STRING,
-                        "Any thread containing this string will be updated.")
+            OptionType.STRING,
+            Constants.THREAD_SEARCH_STRING,
+            "Any thread containing this string will be updated.")
                 .setRequired(true));
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.AUTO_ARCHIVE_DURATION,
-                        "The autoarchive duration to set. Must be picked from the list.")
+            OptionType.STRING,
+            Constants.AUTO_ARCHIVE_DURATION,
+            "The autoarchive duration to set. Must be picked from the list.")
                 .setRequired(true)
                 .setAutoComplete(true));
     }
@@ -34,14 +34,13 @@ class UpdateThreadArchiveTime extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.THREAD_SEARCH_STRING, null, OptionMapping::getAsString)
-                .toLowerCase();
+            .toLowerCase();
         if (searchString.isBlank()) {
             MessageHelper.sendMessageToEventChannel(event, "Please do better with the search string.");
             return;
         }
 
-        String autoArchiveDurationString =
-                event.getOption(Constants.AUTO_ARCHIVE_DURATION, null, OptionMapping::getAsString);
+        String autoArchiveDurationString = event.getOption(Constants.AUTO_ARCHIVE_DURATION, null, OptionMapping::getAsString);
 
         AutoArchiveDuration autoArchiveDuration = null;
 
@@ -65,16 +64,16 @@ class UpdateThreadArchiveTime extends Subcommand {
 
         AutoArchiveDuration autoArchiveDuration_ = autoArchiveDuration;
         List<ThreadChannel> threadChannels = guild.getThreadChannels().stream()
-                .filter(tc -> tc.getName().toLowerCase().contains(searchString)
-                        && tc.getAutoArchiveDuration() != autoArchiveDuration_)
-                .toList();
+            .filter(tc -> tc.getName().toLowerCase().contains(searchString)
+                && tc.getAutoArchiveDuration() != autoArchiveDuration_)
+            .toList();
 
         StringBuilder sb = new StringBuilder("**__Threads Updated__**\n");
         for (ThreadChannel threadChannel : threadChannels) {
             threadChannel
-                    .getManager()
-                    .setAutoArchiveDuration(autoArchiveDuration)
-                    .queue();
+                .getManager()
+                .setAutoArchiveDuration(autoArchiveDuration)
+                .queue();
             sb.append("> ").append(threadChannel.getAsMention()).append("\n");
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

@@ -20,9 +20,9 @@ class PlayEvent extends GameStateSubcommand {
     public PlayEvent() {
         super(Constants.EVENT_PLAY, "Play an event from your hand", true, true);
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.EVENT_ID,
-                        "Event Card ID, which is found between (), or name/part of name")
+            OptionType.STRING,
+            Constants.EVENT_ID,
+            "Event Card ID, which is found between (), or name/part of name")
                 .setRequired(true)
                 .setAutoComplete(true));
     }
@@ -30,9 +30,9 @@ class PlayEvent extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String eventIDOption = StringUtils.substringBefore(
-                event.getOption(Constants.EVENT_ID, "", OptionMapping::getAsString)
-                        .toLowerCase(),
-                " ");
+            event.getOption(Constants.EVENT_ID, "", OptionMapping::getAsString)
+                .toLowerCase(),
+            " ");
         int eventNumericalID;
         try {
             eventNumericalID = Integer.parseInt(eventIDOption);
@@ -44,16 +44,16 @@ class PlayEvent extends GameStateSubcommand {
         Player player = getPlayer();
         if (!player.getEvents().containsValue(eventNumericalID)) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "Player does not have event `" + eventNumericalID + "` in hand.");
+                event, "Player does not have event `" + eventNumericalID + "` in hand.");
             return;
         }
 
         int numericID = eventNumericalID;
         String eventID = player.getEvents().entrySet().stream()
-                .filter(e -> numericID == e.getValue())
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElse(null);
+            .filter(e -> numericID == e.getValue())
+            .map(Map.Entry::getKey)
+            .findFirst()
+            .orElse(null);
         EventModel eventModel = Mapper.getEvent(eventID);
         if (eventModel == null) {
             MessageHelper.sendMessageToEventChannel(event, "Event ID `" + eventID + "` could not be found.");
@@ -64,20 +64,21 @@ class PlayEvent extends GameStateSubcommand {
     }
 
     private static void playEventFromHand(
-            GenericInteractionCreateEvent event, Game game, Player player, EventModel eventModel) {
+        GenericInteractionCreateEvent event, Game game, Player player, EventModel eventModel
+    ) {
         game.discardEvent(eventModel.getAlias());
         player.removeEvent(eventModel.getAlias());
 
         game.getActionsChannel()
-                .sendMessageEmbeds(eventModel.getRepresentationEmbed())
-                .queue();
+            .sendMessageEmbeds(eventModel.getRepresentationEmbed())
+            .queue();
 
         Integer discardedEventNumericalID = game.getDiscardedEvents().get(eventModel.getAlias());
 
         if (eventModel.staysInPlay()) {
             game.addEventInEffect(discardedEventNumericalID);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Event `" + eventModel.getAlias() + "` is now in effect.");
+                event.getMessageChannel(), "Event `" + eventModel.getAlias() + "` is now in effect.");
         }
     }
 }

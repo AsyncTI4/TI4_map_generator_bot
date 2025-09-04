@@ -12,7 +12,7 @@ import ti4.buttons.Buttons;
 
 @Getter
 @Setter
-@JsonIncludeProperties({"id", "val"})
+@JsonIncludeProperties({ "id", "val" })
 public class IntegerSetting extends SettingInterface {
     private int val;
     private int defaultValue;

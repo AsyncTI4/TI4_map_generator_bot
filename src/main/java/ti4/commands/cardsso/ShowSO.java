@@ -19,20 +19,20 @@ class ShowSO extends GameStateSubcommand {
     public ShowSO() {
         super(Constants.SHOW_SO, "Show a Secret Objective to a player", true, true);
         addOptions(new OptionData(
-                        OptionType.INTEGER,
-                        Constants.SECRET_OBJECTIVE_ID,
-                        "Secret objective ID, which is found between ()")
+            OptionType.INTEGER,
+            Constants.SECRET_OBJECTIVE_ID,
+            "Secret objective ID, which is found between ()")
                 .setRequired(true)
                 .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Target faction or color")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color (defaults to you)")
-                .setAutoComplete(true));
+            .setAutoComplete(true));
         addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.ONLY_PHASE,
-                "Show only the phase of the secret objective (action/agenda/status). Default false"));
+            OptionType.BOOLEAN,
+            Constants.ONLY_PHASE,
+            "Show only the phase of the secret objective (action/agenda/status). Default false"));
     }
 
     @Override
@@ -58,9 +58,9 @@ class ShowSO extends GameStateSubcommand {
         }
         Game game = getGame();
         String sb = "Game: " + game.getName() + "\n" + "Player: "
-                + player.getUserName() + "\n" + "Showed Secret Objectives:"
-                + "\n" + info
-                + "\n";
+            + player.getUserName() + "\n" + "Showed Secret Objectives:"
+            + "\n" + info
+            + "\n";
 
         player.setSecret(soID);
 

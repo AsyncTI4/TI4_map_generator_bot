@@ -54,7 +54,7 @@ class SaveMapPojo {
     }
 
     private <T> void setFieldToValue(T object, Class<T> clazz, String fieldName, String stringValue)
-            throws NoSuchFieldException {
+        throws NoSuchFieldException {
         try {
             Field field = clazz.getDeclaredField(fieldName);
             field.setAccessible(true);
@@ -64,10 +64,9 @@ class SaveMapPojo {
         } catch (NoSuchFieldException e) {
             System.out.println("Failed to find field `" + fieldName + "` for class `" + clazz.getName() + "`");
             System.out.println(String.join(
-                    ", ", Arrays.stream(clazz.getFields()).map(Field::getName).toList()));
+                ", ", Arrays.stream(clazz.getFields()).map(Field::getName).toList()));
             throw e;
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
     }
 
     private <T> String getSaveStringForField(Field field, T props) {

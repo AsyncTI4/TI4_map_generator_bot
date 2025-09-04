@@ -25,13 +25,13 @@ public class RemoveTokenCommand extends AddRemoveTokenCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-                new OptionData(OptionType.STRING, Constants.TOKEN, "Token name")
-                        .setRequired(true)
-                        .setAutoComplete(true),
-                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                        .setRequired(true)
-                        .setAutoComplete(true),
-                new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.TOKEN, "Token name")
+                .setRequired(true)
+                .setAutoComplete(true),
+            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                .setRequired(true)
+                .setAutoComplete(true),
+            new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true));
     }
 
     @Override
@@ -59,10 +59,10 @@ public class RemoveTokenCommand extends AddRemoveTokenCommand {
                     removeToken(event, tile, tokenID, false);
                 }
                 removeToken(
-                        event,
-                        tile,
-                        tokenID,
-                        Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName));
+                    event,
+                    tile,
+                    tokenID,
+                    Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName));
                 TokenPlanetService.removeTokenPlanetFromTile(game, Mapper.getTokenKey(tokenID));
                 game.clearPlanetsCache();
             }
@@ -100,7 +100,7 @@ public class RemoveTokenCommand extends AddRemoveTokenCommand {
             planet = PlanetService.getPlanet(tile, AliasHandler.resolvePlanet(planet));
             if (!tile.isSpaceHolderValid(planet)) {
                 MessageHelper.sendMessageToChannel(
-                        event.getChannel(), "Planet: " + planet + " is not valid and not supported.");
+                    event.getChannel(), "Planet: " + planet + " is not valid and not supported.");
                 continue;
             }
             tile.removeToken(tokenID, planet);

@@ -41,19 +41,19 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
                 }
                 if (game.isFowMode()) {
                     MessageHelper.sendMessageToChannel(
-                            player.getPrivateChannel(),
-                            "Destroyed all ground forces (" + units + ") on " + winner + ", and gave "
-                                    + player.getRepresentation() + " " + count + " trade good" + (count == 1 ? "" : "s")
-                                    + ".");
+                        player.getPrivateChannel(),
+                        "Destroyed all ground forces (" + units + ") on " + winner + ", and gave "
+                            + player.getRepresentation() + " " + count + " trade good" + (count == 1 ? "" : "s")
+                            + ".");
                     MessageHelper.sendMessageToChannel(
-                            game.getMainGameChannel(),
-                            "Destroyed all ground forces on the elected planet. The owner of said units has been justly compensated.");
+                        game.getMainGameChannel(),
+                        "Destroyed all ground forces on the elected planet. The owner of said units has been justly compensated.");
                 } else {
                     MessageHelper.sendMessageToChannel(
-                            game.getMainGameChannel(),
-                            "Destroyed all ground forces (" + units + ") on " + winner + ", and gave "
-                                    + player.getRepresentation() + " " + count + " trade good" + (count == 1 ? "" : "s")
-                                    + " in compensation.");
+                        game.getMainGameChannel(),
+                        "Destroyed all ground forces (" + units + ") on " + winner + ", and gave "
+                            + player.getRepresentation() + " " + count + " trade good" + (count == 1 ? "" : "s")
+                            + " in compensation.");
                 }
             }
         }

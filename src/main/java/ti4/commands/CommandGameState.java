@@ -24,12 +24,12 @@ class CommandGameState {
         String gameName = GameNameService.getGameName(event);
         if (!GameManager.isValid(gameName)) {
             throw new IllegalArgumentException("Invalid game name: " + gameName + " while attempting to run event "
-                    + event.getName() + " in channel " + event.getChannel().getName());
+                + event.getName() + " in channel " + event.getChannel().getName());
         }
         Game game = GameManager.getManagedGame(gameName).getGame();
         CommandGameState.game.set(game);
         game.incrementSpecificSlashCommandCount(
-                event.getFullCommandName()); // TODO: This only works for commands that save...
+            event.getFullCommandName()); // TODO: This only works for commands that save...
 
         if (!isPlayerCommand) {
             return;
@@ -37,7 +37,7 @@ class CommandGameState {
         var player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             throw new IllegalArgumentException("Unable to determine player while attempting to run event "
-                    + event.getName() + " in channel " + event.getChannel().getName() + " for game " + gameName);
+                + event.getName() + " in channel " + event.getChannel().getName() + " for game " + gameName);
         }
         CommandGameState.player.set(player);
     }
@@ -60,7 +60,7 @@ class CommandGameState {
     public Player getPlayer() {
         if (!isPlayerCommand) {
             throw new IllegalStateException(
-                    "CommandGameStateHelper cannot get player state because command was not set to be a player command. This is a bug.");
+                "CommandGameStateHelper cannot get player state because command was not set to be a player command. This is a bug.");
         }
         return player.get();
     }

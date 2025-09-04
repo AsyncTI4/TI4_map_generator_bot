@@ -25,13 +25,13 @@ class ListCategoryChannelCounts extends Subcommand {
         for (Category category : categories) {
             int channelCount = category.getChannels().size();
             sb.append("> **")
-                    .append(category.getName())
-                    .append("**: ")
-                    .append(channelCount)
-                    .append("/")
-                    .append(maxChannels)
-                    .append(getPercentage(channelCount, maxChannels))
-                    .append("\n");
+                .append(category.getName())
+                .append("**: ")
+                .append(channelCount)
+                .append("/")
+                .append(maxChannels)
+                .append(getPercentage(channelCount, maxChannels))
+                .append("\n");
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }

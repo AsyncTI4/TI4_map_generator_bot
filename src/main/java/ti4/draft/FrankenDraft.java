@@ -39,18 +39,7 @@ public class FrankenDraft extends BagDraft {
         int limit = 0;
         switch (category) {
             case ABILITY, BLUETILE -> limit = 3;
-            case TECH,
-                    REDTILE,
-                    STARTINGFLEET,
-                    STARTINGTECH,
-                    HOMESYSTEM,
-                    PN,
-                    COMMODITIES,
-                    FLAGSHIP,
-                    MECH,
-                    HERO,
-                    COMMANDER,
-                    AGENT -> limit = 2;
+            case TECH, REDTILE, STARTINGFLEET, STARTINGTECH, HOMESYSTEM, PN, COMMODITIES, FLAGSHIP, MECH, HERO, COMMANDER, AGENT -> limit = 2;
             case DRAFTORDER -> limit = 1;
         }
         return limit;
@@ -64,7 +53,7 @@ public class FrankenDraft extends BagDraft {
                     limit = Integer.parseInt(game.getStoredValue("frankenLimit" + category));
                 } else {
                     if (game.getActiveBagDraft() instanceof PoweredFrankenDraft
-                            || game.getActiveBagDraft() instanceof PoweredOnePickFrankenDraft) {
+                        || game.getActiveBagDraft() instanceof PoweredOnePickFrankenDraft) {
                         if (category == DraftItem.Category.ABILITY) {
                             limit = 4;
                         } else {
@@ -75,23 +64,12 @@ public class FrankenDraft extends BagDraft {
                     }
                 }
             }
-            case TECH,
-                    REDTILE,
-                    STARTINGFLEET,
-                    STARTINGTECH,
-                    HOMESYSTEM,
-                    PN,
-                    COMMODITIES,
-                    FLAGSHIP,
-                    MECH,
-                    HERO,
-                    COMMANDER,
-                    AGENT -> {
+            case TECH, REDTILE, STARTINGFLEET, STARTINGTECH, HOMESYSTEM, PN, COMMODITIES, FLAGSHIP, MECH, HERO, COMMANDER, AGENT -> {
                 if (!game.getStoredValue("frankenLimit" + category).isEmpty()) {
                     limit = Integer.parseInt(game.getStoredValue("frankenLimit" + category));
                 } else {
                     if (game.getActiveBagDraft() instanceof PoweredFrankenDraft
-                            || game.getActiveBagDraft() instanceof PoweredOnePickFrankenDraft) {
+                        || game.getActiveBagDraft() instanceof PoweredOnePickFrankenDraft) {
                         if (category == DraftItem.Category.TECH) {
                             limit = 3;
                         } else {
@@ -120,8 +98,7 @@ public class FrankenDraft extends BagDraft {
         List<FactionModel> factionSet = getAllFrankenLegalFactions();
         String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedFactions"));
         if (!game.isDiscordantStarsMode()) {
-            factionSet.removeIf(factionModel ->
-                    factionModel.getSource().isDs() && !factionModel.getSource().isPok());
+            factionSet.removeIf(factionModel -> factionModel.getSource().isDs() && !factionModel.getSource().isPok());
         }
         factionSet.removeIf(factionModel -> contains(results, factionModel.getAlias()));
 
@@ -159,31 +136,31 @@ public class FrankenDraft extends BagDraft {
         List<FactionModel> allDraftableFactions = getDraftableFactionsForGame(game);
 
         allDraftableItems.put(
-                DraftItem.Category.ABILITY, AbilityDraftItem.buildAllDraftableItems(allDraftableFactions, game));
+            DraftItem.Category.ABILITY, AbilityDraftItem.buildAllDraftableItems(allDraftableFactions, game));
         allDraftableItems.put(
-                DraftItem.Category.TECH, TechDraftItem.buildAllDraftableItems(allDraftableFactions, game));
+            DraftItem.Category.TECH, TechDraftItem.buildAllDraftableItems(allDraftableFactions, game));
         allDraftableItems.put(
-                DraftItem.Category.AGENT, AgentDraftItem.buildAllDraftableItems(allDraftableFactions, game));
+            DraftItem.Category.AGENT, AgentDraftItem.buildAllDraftableItems(allDraftableFactions, game));
         allDraftableItems.put(
-                DraftItem.Category.COMMANDER, CommanderDraftItem.buildAllDraftableItems(allDraftableFactions, game));
+            DraftItem.Category.COMMANDER, CommanderDraftItem.buildAllDraftableItems(allDraftableFactions, game));
         allDraftableItems.put(
-                DraftItem.Category.HERO, HeroDraftItem.buildAllDraftableItems(allDraftableFactions, game));
+            DraftItem.Category.HERO, HeroDraftItem.buildAllDraftableItems(allDraftableFactions, game));
         allDraftableItems.put(
-                DraftItem.Category.COMMODITIES,
-                CommoditiesDraftItem.buildAllDraftableItems(allDraftableFactions, game));
+            DraftItem.Category.COMMODITIES,
+            CommoditiesDraftItem.buildAllDraftableItems(allDraftableFactions, game));
         allDraftableItems.put(
-                DraftItem.Category.FLAGSHIP, FlagshipDraftItem.buildAllDraftableItems(allDraftableFactions, game));
+            DraftItem.Category.FLAGSHIP, FlagshipDraftItem.buildAllDraftableItems(allDraftableFactions, game));
         allDraftableItems.put(
-                DraftItem.Category.MECH, MechDraftItem.buildAllDraftableItems(allDraftableFactions, game));
+            DraftItem.Category.MECH, MechDraftItem.buildAllDraftableItems(allDraftableFactions, game));
         allDraftableItems.put(
-                DraftItem.Category.HOMESYSTEM, HomeSystemDraftItem.buildAllDraftableItems(allDraftableFactions, game));
+            DraftItem.Category.HOMESYSTEM, HomeSystemDraftItem.buildAllDraftableItems(allDraftableFactions, game));
         allDraftableItems.put(DraftItem.Category.PN, PNDraftItem.buildAllDraftableItems(allDraftableFactions, game));
         allDraftableItems.put(
-                DraftItem.Category.STARTINGFLEET,
-                StartingFleetDraftItem.buildAllDraftableItems(allDraftableFactions, game));
+            DraftItem.Category.STARTINGFLEET,
+            StartingFleetDraftItem.buildAllDraftableItems(allDraftableFactions, game));
         allDraftableItems.put(
-                DraftItem.Category.STARTINGTECH,
-                StartingTechDraftItem.buildAllDraftableItems(allDraftableFactions, game));
+            DraftItem.Category.STARTINGTECH,
+            StartingTechDraftItem.buildAllDraftableItems(allDraftableFactions, game));
 
         allDraftableItems.put(DraftItem.Category.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(game));
 
@@ -192,7 +169,7 @@ public class FrankenDraft extends BagDraft {
         MiltyDraftHelper.initDraftTiles(draftManager, game);
         allDraftableItems.put(DraftItem.Category.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftManager, game));
         allDraftableItems.put(
-                DraftItem.Category.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager, game));
+            DraftItem.Category.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager, game));
 
         List<DraftBag> bags = new ArrayList<>();
 
@@ -210,9 +187,9 @@ public class FrankenDraft extends BagDraft {
                         bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
                         BotLogger.warning(
-                                new LogOrigin(game),
-                                "Game: `" + game.getName() + "` error - empty franken draftableCollection: "
-                                        + category.name());
+                            new LogOrigin(game),
+                            "Game: `" + game.getName() + "` error - empty franken draftableCollection: "
+                                + category.name());
                     }
                 }
             }

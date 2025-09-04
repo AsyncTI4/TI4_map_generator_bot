@@ -27,8 +27,7 @@ public class WebStatTilePositions {
                 continue;
             }
 
-            List<String> myStatTiles =
-                    PlayerStatsHelper.findThreeNearbyStatTiles(game, player, statTilesInUse, false, null);
+            List<String> myStatTiles = PlayerStatsHelper.findThreeNearbyStatTiles(game, player, statTilesInUse, false, null);
             if (myStatTiles != null) {
                 statTilesInUse.addAll(myStatTiles);
                 factionToStatTiles.put(player.getFaction(), myStatTiles);

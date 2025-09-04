@@ -17,14 +17,14 @@ class PoSetDeck extends GameStateSubcommand {
 
     public PoSetDeck() {
         super(
-                Constants.SET_PO_DECK,
-                "Create fixed order public objective deck from specific public objectives",
-                true,
-                true);
+            Constants.SET_PO_DECK,
+            "Create fixed order public objective deck from specific public objectives",
+            true,
+            true);
         addOptions(new OptionData(OptionType.STRING, Constants.SET_PO_DECK_STAGE1_LIST, "ID list separated by comma"));
         addOptions(new OptionData(OptionType.STRING, Constants.SET_PO_DECK_STAGE2_LIST, "ID list separated by comma"));
         addOptions(new OptionData(
-                OptionType.BOOLEAN, Constants.SET_PO_DECK_SHUFFLE, "Shuffle the deck after creation (default: false)"));
+            OptionType.BOOLEAN, Constants.SET_PO_DECK_SHUFFLE, "Shuffle the deck after creation (default: false)"));
     }
 
     @Override
@@ -58,16 +58,16 @@ class PoSetDeck extends GameStateSubcommand {
 
         if (stage1IdList.isEmpty() && stage2IdList.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "Public objective stage 1 deck: " + getGame().getPublicObjectives1() + "\n"
-                            + "Public objective stage 2 deck: " + getGame().getPublicObjectives2());
+                event.getChannel(),
+                "Public objective stage 1 deck: " + getGame().getPublicObjectives1() + "\n"
+                    + "Public objective stage 2 deck: " + getGame().getPublicObjectives2());
         }
     }
 
     private List<String> parseIds(String idList) {
         return idList == null
-                ? Collections.emptyList()
-                : Arrays.stream(idList.split(",")).map(String::trim).collect(Collectors.toList());
+            ? Collections.emptyList()
+            : Arrays.stream(idList.split(",")).map(String::trim).collect(Collectors.toList());
     }
 
     private boolean validateIds(List<String> ids, SlashCommandInteractionEvent event) {

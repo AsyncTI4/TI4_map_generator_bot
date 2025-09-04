@@ -41,13 +41,13 @@ public class ModalContext extends ListenerContext {
 
     public void save(ButtonInteractionEvent event) {
         boolean skippableButton = componentID.contains("ultimateUndo")
-                || "showGameAgain".equalsIgnoreCase(componentID)
-                || "cardsInfo".equalsIgnoreCase(componentID)
-                || componentID.contains("showDeck")
-                || componentID.contains("FactionInfo")
-                || componentID.contains("searchMyGames")
-                || componentID.contains("decline_explore")
-                || componentID.contains("offerDeckButtons");
+            || "showGameAgain".equalsIgnoreCase(componentID)
+            || "cardsInfo".equalsIgnoreCase(componentID)
+            || componentID.contains("showDeck")
+            || componentID.contains("FactionInfo")
+            || componentID.contains("searchMyGames")
+            || componentID.contains("decline_explore")
+            || componentID.contains("offerDeckButtons");
         if (game != null && !skippableButton) {
             ButtonHelper.saveButtons(event, game, player);
             GameManager.save(game, EventAuditService.getReason(event, game.isFowMode()));

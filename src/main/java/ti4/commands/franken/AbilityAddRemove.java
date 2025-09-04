@@ -17,16 +17,16 @@ abstract class AbilityAddRemove extends GameStateSubcommand {
     AbilityAddRemove(String name, String description) {
         super(name, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.ABILITY, "Ability Name")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_1, "Ability Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_2, "Ability Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_3, "Ability Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_4, "Ability Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_5, "Ability Name").setAutoComplete(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                .setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -34,8 +34,8 @@ abstract class AbilityAddRemove extends GameStateSubcommand {
 
         // GET ALL ABILITY OPTIONS AS STRING
         for (OptionMapping option : event.getOptions().stream()
-                .filter(o -> o != null && o.getName().contains(Constants.ABILITY))
-                .toList()) {
+            .filter(o -> o != null && o.getName().contains(Constants.ABILITY))
+            .toList()) {
             abilityIDs.add(option.getAsString());
         }
 

@@ -18,16 +18,16 @@ abstract class UnitAddRemove extends GameStateSubcommand {
     UnitAddRemove(String name, String description) {
         super(name, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_ID, "Unit Name")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_ID_1, "Unit Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_ID_2, "Unit Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_ID_3, "Unit Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_ID_4, "Unit Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_ID_5, "Unit Name").setAutoComplete(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                .setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -35,8 +35,8 @@ abstract class UnitAddRemove extends GameStateSubcommand {
 
         // GET ALL UNIT OPTIONS AS STRING
         for (OptionMapping option : event.getOptions().stream()
-                .filter(o -> o != null && o.getName().contains(Constants.UNIT_ID))
-                .toList()) {
+            .filter(o -> o != null && o.getName().contains(Constants.UNIT_ID))
+            .toList()) {
             unitIDs.add(option.getAsString());
         }
 

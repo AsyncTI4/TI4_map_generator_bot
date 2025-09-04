@@ -60,9 +60,9 @@ public interface TI4Emoji {
         if (!clazz.isEnum()) return null;
         List<T> consts = Arrays.asList(clazz.getEnumConstants());
         return consts.stream()
-                .filter(c -> c.name().equalsIgnoreCase(name))
-                .findFirst()
-                .orElse(null);
+            .filter(c -> c.name().equalsIgnoreCase(name))
+            .findFirst()
+            .orElse(null);
     }
 
     static TI4Emoji findEmoji(String category, String name) {
@@ -110,53 +110,53 @@ public interface TI4Emoji {
     // LIST OF SYMBOLS FOR FOG STUFF
     static List<TI4Emoji> symbols() {
         return new ArrayList<>(Arrays.asList(
-                // Unit emojis
-                UnitEmojis.warsun,
-                UnitEmojis.spacedock,
-                UnitEmojis.pds,
-                UnitEmojis.mech,
-                UnitEmojis.infantry,
-                UnitEmojis.flagship,
-                UnitEmojis.fighter,
-                UnitEmojis.dreadnought,
-                UnitEmojis.destroyer,
-                UnitEmojis.carrier,
-                UnitEmojis.cruiser,
-                // Explores
-                ExploreEmojis.HFrag,
-                ExploreEmojis.CFrag,
-                ExploreEmojis.IFrag,
-                ExploreEmojis.UFrag,
-                ExploreEmojis.Relic,
-                ExploreEmojis.Cultural,
-                ExploreEmojis.Industrial,
-                ExploreEmojis.Hazardous,
-                ExploreEmojis.Frontier,
-                // Planet
-                PlanetEmojis.SemLord,
-                // Cards
-                CardEmojis.ActionCard,
-                CardEmojis.Agenda,
-                CardEmojis.PN,
-                CardEmojis.SecretObjective,
-                CardEmojis.Public1,
-                CardEmojis.Public2,
-                // Tech
-                TechEmojis.CyberneticTech,
-                TechEmojis.PropulsionTech,
-                TechEmojis.BioticTech,
-                TechEmojis.WarfareTech,
-                // Other
-                MiscEmojis.tg,
-                MiscEmojis.comm,
-                MiscEmojis.Sleeper,
-                MiscEmojis.influence,
-                MiscEmojis.resources,
-                MiscEmojis.WHalpha,
-                MiscEmojis.WHbeta,
-                MiscEmojis.WHgamma,
-                MiscEmojis.LegendaryPlanet,
-                MiscEmojis.SpeakerToken,
-                MiscEmojis.BortWindow));
+            // Unit emojis
+            UnitEmojis.warsun,
+            UnitEmojis.spacedock,
+            UnitEmojis.pds,
+            UnitEmojis.mech,
+            UnitEmojis.infantry,
+            UnitEmojis.flagship,
+            UnitEmojis.fighter,
+            UnitEmojis.dreadnought,
+            UnitEmojis.destroyer,
+            UnitEmojis.carrier,
+            UnitEmojis.cruiser,
+            // Explores
+            ExploreEmojis.HFrag,
+            ExploreEmojis.CFrag,
+            ExploreEmojis.IFrag,
+            ExploreEmojis.UFrag,
+            ExploreEmojis.Relic,
+            ExploreEmojis.Cultural,
+            ExploreEmojis.Industrial,
+            ExploreEmojis.Hazardous,
+            ExploreEmojis.Frontier,
+            // Planet
+            PlanetEmojis.SemLord,
+            // Cards
+            CardEmojis.ActionCard,
+            CardEmojis.Agenda,
+            CardEmojis.PN,
+            CardEmojis.SecretObjective,
+            CardEmojis.Public1,
+            CardEmojis.Public2,
+            // Tech
+            TechEmojis.CyberneticTech,
+            TechEmojis.PropulsionTech,
+            TechEmojis.BioticTech,
+            TechEmojis.WarfareTech,
+            // Other
+            MiscEmojis.tg,
+            MiscEmojis.comm,
+            MiscEmojis.Sleeper,
+            MiscEmojis.influence,
+            MiscEmojis.resources,
+            MiscEmojis.WHalpha,
+            MiscEmojis.WHbeta,
+            MiscEmojis.WHgamma,
+            MiscEmojis.LegendaryPlanet,
+            MiscEmojis.SpeakerToken,
+            MiscEmojis.BortWindow));
     }
 }

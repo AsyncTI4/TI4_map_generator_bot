@@ -42,7 +42,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
             return Optional.ofNullable(shortName).orElse(name);
         }
         return Optional.ofNullable(shortName)
-                .orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShortName());
+            .orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShortName());
     }
 
     public boolean getShrinkName() {
@@ -50,7 +50,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
             return Optional.ofNullable(shrinkName).orElse(false);
         }
         return Optional.ofNullable(shrinkName)
-                .orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShrinkName());
+            .orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShrinkName());
     }
 
     public Optional<String> getPermanentEffect() {
@@ -110,9 +110,9 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
 
         StringBuilder sb = new StringBuilder();
         sb.append(FactionEmojis.getFactionIcon(abilitySourceFaction))
-                .append("__**")
-                .append(abilityName)
-                .append("**__");
+            .append("__**")
+            .append(abilityName)
+            .append("**__");
         if (!abilityRawModifier.isBlank()) sb.append(": ").append(abilityRawModifier);
         if (!abilityWindow.isBlank() || !abilityText.isBlank())
             sb.append("\n> *").append(abilityWindow).append("*:\n> ").append(abilityText);
@@ -123,10 +123,10 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         return id.contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || faction.toLowerCase().contains(searchString)
-                || source.toString().toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
+            || name.toLowerCase().contains(searchString)
+            || faction.toLowerCase().contains(searchString)
+            || source.toString().toLowerCase().contains(searchString)
+            || searchTags.contains(searchString);
     }
 
     @Override

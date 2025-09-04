@@ -25,7 +25,7 @@ public class ReserveGame extends Subcommand {
         addOptions(new OptionData(OptionType.STRING, CATEGORY, "'pbd' or 'fow'", true).addChoices(categories));
         addOptions(new OptionData(OptionType.INTEGER, NUMBER, "Game number to reserve", true).setMinValue(1));
         addOptions(new OptionData(OptionType.STRING, REMOVE, "Remove from the list instead", false)
-                .addChoices(removeOpts));
+            .addChoices(removeOpts));
     }
 
     @Override

@@ -23,10 +23,10 @@ public class RefreshLeaderService {
             }
 
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " you gained " + tgCount + " trade good"
-                            + (tgCount == 1 ? "" : "s") + " (" + (tg - tgCount) + "->" + tg + ") from " + leaderName
-                            + " being readied.");
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " you gained " + tgCount + " trade good"
+                    + (tgCount == 1 ? "" : "s") + " (" + (tg - tgCount) + "->" + tg + ") from " + leaderName
+                    + " being readied.");
             ButtonHelperAbilities.pillageCheck(player, game);
             playerLeader.setTgCount(0);
         }

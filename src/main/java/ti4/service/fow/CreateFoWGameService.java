@@ -45,21 +45,21 @@ public class CreateFoWGameService {
     @ButtonHandler("createFoWGameChannels")
     public static void createFoWGameChannels(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToEventChannel(
-                event, event.getUser().getEffectiveName() + " pressed the [Create FoW Game] button.");
+            event, event.getUser().getEffectiveName() + " pressed the [Create FoW Game] button.");
 
         if (!CreateGameService.isGameCreationAllowed()) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "Admins have temporarily turned off game creation, "
-                            + "most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
+                event.getMessageChannel(),
+                "Admins have temporarily turned off game creation, "
+                    + "most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
             return;
         }
 
         if (CreateGameService.isLockedFromCreatingGames(event)) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "You created a game within the last 10 minutes and thus are being stopped from creating more until some time "
-                            + "has passed. You can have someone else in the game press the button instead.");
+                event.getMessageChannel(),
+                "You created a game within the last 10 minutes and thus are being stopped from creating more until some time "
+                    + "has passed. You can have someone else in the game press the button instead.");
             return;
         }
 
@@ -71,16 +71,16 @@ public class CreateFoWGameService {
         if (!"fow1".equalsIgnoreCase(lastGame)) {
             if (!GameManager.isValid(lastGame)) {
                 BotLogger.error(
-                        new LogOrigin(event),
-                        "**Unable to create new games because the last game cannot be found. Was it deleted but the roles still exist?**");
+                    new LogOrigin(event),
+                    "**Unable to create new games because the last game cannot be found. Was it deleted but the roles still exist?**");
                 return;
             }
             game = GameManager.getManagedGame(lastGame).getGame();
             if (game != null && game.getCustomName().equalsIgnoreCase(gameSillyName)) {
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        "The custom name of the last game is the same as the one for this game, so the bot suspects a double press "
-                                + "occurred and is cancelling the creation of another game.");
+                    event.getMessageChannel(),
+                    "The custom name of the last game is the same as the one for this game, so the bot suspects a double press "
+                        + "occurred and is cancelling the creation of another game.");
                 return;
             }
         }
@@ -121,7 +121,7 @@ public class CreateFoWGameService {
         Guild guild = findFoWGuildWithSpace(event.getGuild(), members.size() + 1);
         if (guild == null) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "All FoW Servers are full. Can not host a new game - please contact @Bothelper.");
+                event, "All FoW Servers are full. Can not host a new game - please contact @Bothelper.");
             return;
         }
 
@@ -130,23 +130,24 @@ public class CreateFoWGameService {
     }
 
     public static void executeCreateFoWGame(
-            Guild guild,
-            String gameName,
-            String gameFunName,
-            Member gameOwner,
-            List<Member> members,
-            MessageChannel eventChannel) {
+        Guild guild,
+        String gameName,
+        String gameFunName,
+        Member gameOwner,
+        List<Member> members,
+        MessageChannel eventChannel
+    ) {
         // CREATE ROLES
         Role role = guild.createRole()
-                .setName(gameName)
-                .setMentionable(true)
-                .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
+            .setName(gameName)
+            .setMentionable(true)
+            .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
         // game
 
         Role roleGM = guild.createRole()
-                .setName(gameName + " GM")
-                .setMentionable(true)
-                .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
+            .setName(gameName + " GM")
+            .setMentionable(true)
+            .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
         // game
 
         guild.addRoleToMember(gameOwner, roleGM).queue();
@@ -171,13 +172,13 @@ public class CreateFoWGameService {
         // CREATE CATEGORY
         Role everyone = guild.getRolesByName("@everyone", true).getFirst();
         long permission2 = Permission.MESSAGE_MANAGE.getRawValue()
-                | Permission.VIEW_CHANNEL.getRawValue()
-                | Permission.MANAGE_PERMISSIONS.getRawValue()
-                | Permission.MANAGE_THREADS.getRawValue();
+            | Permission.VIEW_CHANNEL.getRawValue()
+            | Permission.MANAGE_PERMISSIONS.getRawValue()
+            | Permission.MANAGE_THREADS.getRawValue();
         Category category = guild.createCategory(gameName)
-                .addRolePermissionOverride(everyone.getIdLong(), 0, permission2)
-                .addRolePermissionOverride(roleGM.getIdLong(), permission2, 0)
-                .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
+            .addRolePermissionOverride(everyone.getIdLong(), 0, permission2)
+            .addRolePermissionOverride(roleGM.getIdLong(), permission2, 0)
+            .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
         // game
 
         // CREATE CHANNELS
@@ -189,16 +190,16 @@ public class CreateFoWGameService {
 
         // CREATE GM CHANNEL
         TextChannel gmChannel = guild.createTextChannel(newGMChannelName, category)
-                .syncPermissionOverrides()
-                .addRolePermissionOverride(gameRoleGMID, permission, 0)
-                .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleGMID, permission, 0)
+            .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
         // game
 
         // CREATE Anon Announcements CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
-                .syncPermissionOverrides()
-                .addRolePermissionOverride(gameRoleID, permission, 0)
-                .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleID, permission, 0)
+            .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
         // game
         StringBuilder sb = new StringBuilder(role.getAsMention() + " - announcements channel\n");
         sb.append(getInfoTextFromFile("FoWMainChannelIntro.txt"));
@@ -210,10 +211,10 @@ public class CreateFoWGameService {
         MessageHelper.sendMessageToChannel(gmChannel, sb.toString());
         HomebrewService.offerGameHomebrewButtons(gmChannel);
         GMService.logActivity(
-                newGame,
-                "This thread will log player slash commands and other activities.\n"
-                        + " If you don't care to follow this, just remove yourself from the thread.",
-                true);
+            newGame,
+            "This thread will log player slash commands and other activities.\n"
+                + " If you don't care to follow this, just remove yourself from the thread.",
+            true);
 
         // Individual player channels
         String privateChannelIntro = getInfoTextFromFile("FoWPrivateChannelIntro.txt");
@@ -223,9 +224,9 @@ public class CreateFoWGameService {
                 name = member.getEffectiveName();
             }
             TextChannel memberChannel = guild.createTextChannel(gameName + "-" + name + "-private", category)
-                    .syncPermissionOverrides()
-                    .addMemberPermissionOverride(member.getIdLong(), permission, 0)
-                    .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
+                .syncPermissionOverrides()
+                .addMemberPermissionOverride(member.getIdLong(), permission, 0)
+                .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
             // game
             Player player_ = newGame.getPlayer(member.getId());
             player_.setPrivateChannelID(memberChannel.getId());
@@ -235,19 +236,19 @@ public class CreateFoWGameService {
         }
 
         String message = "Channels have been set up:\n" + "> "
-                + gameName + " " + gameFunName + "\n" + "> "
-                + gmChannel.getAsMention() + "\n" + "> "
-                + actionsChannel.getAsMention() + "\n";
+            + gameName + " " + gameFunName + "\n" + "> "
+            + gmChannel.getAsMention() + "\n" + "> "
+            + actionsChannel.getAsMention() + "\n";
         MessageHelper.sendMessageToChannel(eventChannel, message);
 
         GameManager.save(newGame, "Create FOW Game Channels");
 
         if (eventChannel instanceof ThreadChannel thread
-                && "making-fow-games".equals(thread.getParentChannel().getName())) {
+            && "making-fow-games".equals(thread.getParentChannel().getName())) {
             newGame.setLaunchPostThreadID(thread.getId());
             ThreadChannelManager manager = thread.getManager()
-                    .setName(StringUtils.left(newGame.getName().toUpperCase() + "-LAUNCHED - " + thread.getName(), 100))
-                    .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
+                .setName(StringUtils.left(newGame.getName().toUpperCase() + "-LAUNCHED - " + thread.getName(), 100))
+                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             manager.queue();
         }
     }
@@ -267,7 +268,8 @@ public class CreateFoWGameService {
 
     public static String getNextFOWGameName() {
         int nextFowNum = getLastFOWGameNumber() + 1;
-        while (ReserveGameNumberService.isGameNumReserved("fow" + nextFowNum)) nextFowNum++;
+        while (ReserveGameNumberService.isGameNumReserved("fow" + nextFowNum))
+            nextFowNum++;
         return "fow" + (getLastFOWGameNumber() + 1);
     }
 
@@ -287,8 +289,8 @@ public class CreateFoWGameService {
         for (Guild guild : guilds) {
             System.out.println(guild.getName());
             List<Role> fowRoles = guild.getRoles().stream()
-                    .filter(r -> r.getName().startsWith("fow"))
-                    .toList();
+                .filter(r -> r.getName().startsWith("fow"))
+                .toList();
 
             // EXISTING ROLE NAMES
             for (Role role : fowRoles) {
@@ -301,8 +303,8 @@ public class CreateFoWGameService {
 
         // GET ALL EXISTING FOW MAP NAMES
         List<String> gameNames = GameManager.getGameNames().stream()
-                .filter(gameName -> gameName.startsWith("fow"))
-                .toList();
+            .filter(gameName -> gameName.startsWith("fow"))
+            .toList();
         for (String gameName : gameNames) {
             String fowNum = gameName.replace("fow", "");
             if (Helper.isInteger(fowNum)) {
@@ -340,7 +342,7 @@ public class CreateFoWGameService {
         int roleCount = guild.getRoles().size();
         if (roleCount >= MAX_ROLE_COUNT) {
             BotLogger.warning("`CreateFoWGameService.serverHasRoomForNewRole` Cannot create a new role. Server **"
-                    + guild.getName() + "** currently has **" + roleCount + "** roles.");
+                + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return false;
         }
         return true;
@@ -351,7 +353,7 @@ public class CreateFoWGameService {
         int channelsCountRequiredForNewGame = playerCount + 2;
         if (channelCount > (MAX_CHANNELS_MINUS_5 - channelsCountRequiredForNewGame)) {
             BotLogger.warning("`CreateFoWGameService.serverHasRoomForNewChannels` Cannot create new channels. Server **"
-                    + guild.getName() + "** currently has " + channelCount + " channels.");
+                + guild.getName() + "** currently has " + channelCount + " channels.");
             return false;
         }
         return true;

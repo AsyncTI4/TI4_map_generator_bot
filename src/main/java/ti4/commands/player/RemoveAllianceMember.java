@@ -16,13 +16,13 @@ class RemoveAllianceMember extends GameStateSubcommand {
     public RemoveAllianceMember() {
         super(Constants.REMOVE_ALLIANCE_MEMBER, "Remove an alliance member", true, true);
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.TARGET_FACTION_OR_COLOR,
-                        "Faction or Color with which you wish to remove from your alliance")
+            OptionType.STRING,
+            Constants.TARGET_FACTION_OR_COLOR,
+            "Faction or Color with which you wish to remove from your alliance")
                 .setAutoComplete(true)
                 .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color (defaults you))")
-                .setAutoComplete(true));
+            .setAutoComplete(true));
     }
 
     @Override
@@ -42,16 +42,16 @@ class RemoveAllianceMember extends GameStateSubcommand {
         }
 
         player.getCardsInfoThread()
-                .removeThreadMember(AsyncTI4DiscordBot.jda.getUserById(targetPlayer.getUserID()))
-                .queue();
+            .removeThreadMember(AsyncTI4DiscordBot.jda.getUserById(targetPlayer.getUserID()))
+            .queue();
         targetPlayer
-                .getCardsInfoThread()
-                .removeThreadMember(AsyncTI4DiscordBot.jda.getUserById(player.getUserID()))
-                .queue();
+            .getCardsInfoThread()
+            .removeThreadMember(AsyncTI4DiscordBot.jda.getUserById(player.getUserID()))
+            .queue();
 
         MessageHelper.sendMessageToEventChannel(
-                event,
-                "Removed " + targetPlayer.getFaction() + " as part of " + player.getFaction()
-                        + "'s alliance. This worked both ways. You will have to /franken leader_remove to remove the commanders");
+            event,
+            "Removed " + targetPlayer.getFaction() + " as part of " + player.getFaction()
+                + "'s alliance. This worked both ways. You will have to /franken leader_remove to remove the commanders");
     }
 }

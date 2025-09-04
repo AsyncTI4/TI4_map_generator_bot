@@ -16,10 +16,10 @@ class PNReset extends GameStateSubcommand {
 
     public PNReset() {
         super(
-                Constants.PN_RESET,
-                "Reset your promissory notes and send details to your #cards-info thread",
-                true,
-                true);
+            Constants.PN_RESET,
+            "Reset your promissory notes and send details to your #cards-info thread",
+            true,
+            true);
     }
 
     @Override

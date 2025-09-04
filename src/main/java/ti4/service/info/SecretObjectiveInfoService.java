@@ -28,13 +28,14 @@ public class SecretObjectiveInfoService {
     }
 
     public static void sendSecretObjectiveInfo(
-            Game game,
-            Player player,
-            ButtonInteractionEvent event,
-            boolean autoDiscardButtons,
-            boolean autoScoreButtons) {
+        Game game,
+        Player player,
+        ButtonInteractionEvent event,
+        boolean autoDiscardButtons,
+        boolean autoScoreButtons
+    ) {
         String headerText = player.getRepresentationUnfogged() + " pressed button: "
-                + event.getButton().getLabel();
+            + event.getButton().getLabel();
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendSecretObjectiveInfo(game, player, autoDiscardButtons, autoScoreButtons);
     }
@@ -44,11 +45,12 @@ public class SecretObjectiveInfoService {
     }
 
     public static void sendSecretObjectiveInfo(
-            Game game,
-            Player player,
-            SlashCommandInteractionEvent event,
-            boolean autoDiscardButtons,
-            boolean autoScoreButtons) {
+        Game game,
+        Player player,
+        SlashCommandInteractionEvent event,
+        boolean autoDiscardButtons,
+        boolean autoScoreButtons
+    ) {
         String headerText = player.getRepresentationUnfogged() + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendSecretObjectiveInfo(game, player, autoDiscardButtons, autoScoreButtons);
@@ -59,11 +61,12 @@ public class SecretObjectiveInfoService {
     }
 
     public static void sendSecretObjectiveInfo(
-            Game game,
-            Player player,
-            GenericInteractionCreateEvent event,
-            boolean autoDiscardButtons,
-            boolean autoScoreButtons) {
+        Game game,
+        Player player,
+        GenericInteractionCreateEvent event,
+        boolean autoDiscardButtons,
+        boolean autoScoreButtons
+    ) {
         String headerText = player.getRepresentationUnfogged() + " used something";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendSecretObjectiveInfo(game, player, autoDiscardButtons, autoScoreButtons);
@@ -74,7 +77,8 @@ public class SecretObjectiveInfoService {
     }
 
     public static void sendSecretObjectiveInfo(
-            Game game, Player player, boolean autoDiscardButtons, boolean autoScoreButtons) {
+        Game game, Player player, boolean autoDiscardButtons, boolean autoScoreButtons
+    ) {
         // SO INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, getSecretObjectiveCardInfo(game, player));
 
@@ -115,24 +119,24 @@ public class SecretObjectiveInfoService {
 
         // SCORED SECRET OBJECTIVES
         sb.append("__Scored Secret Objectives__ (")
-                .append(player.getSoScored())
-                .append("/")
-                .append(player.getMaxSOCount())
-                .append("):")
-                .append("\n");
+            .append(player.getSoScored())
+            .append("/")
+            .append(player.getMaxSOCount())
+            .append("):")
+            .append("\n");
         if (scoredSecretObjective.isEmpty()) {
             sb.append("> None");
         } else {
             for (Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
                 SecretObjectiveModel soModel = Mapper.getSecretObjective(so.getKey());
                 sb.append(index)
-                        .append("\\. ")
-                        .append(CardEmojis.SecretObjectiveAlt)
-                        .append(" _")
-                        .append(soModel.getName())
-                        .append("_ `(")
-                        .append(so.getValue())
-                        .append(")`\n");
+                    .append("\\. ")
+                    .append(CardEmojis.SecretObjectiveAlt)
+                    .append(" _")
+                    .append(soModel.getName())
+                    .append("_ `(")
+                    .append(so.getValue())
+                    .append(")`\n");
                 index++;
             }
         }
@@ -147,25 +151,25 @@ public class SecretObjectiveInfoService {
                 for (Map.Entry<String, Integer> so : secretObjective.entrySet()) {
                     SecretObjectiveModel soModel = Mapper.getSecretObjective(so.getKey());
                     sb.append(index)
-                            .append("\\. ")
-                            .append(CardEmojis.SecretObjectiveAlt)
-                            .append(" _")
-                            .append(soModel.getName())
-                            .append("_ - ")
-                            .append(soModel.getPhase())
-                            .append(" Phase `(")
-                            .append(Helper.leftpad("" + so.getValue(), 3))
-                            .append(")`\n> ")
-                            .append(soModel.getText());
+                        .append("\\. ")
+                        .append(CardEmojis.SecretObjectiveAlt)
+                        .append(" _")
+                        .append(soModel.getName())
+                        .append("_ - ")
+                        .append(soModel.getPhase())
+                        .append(" Phase `(")
+                        .append(Helper.leftpad("" + so.getValue(), 3))
+                        .append(")`\n> ")
+                        .append(soModel.getText());
                     index++;
 
                     int threshold = ListPlayerInfoService.getObjectiveThreshold(so.getKey(), game);
                     if (threshold > 0) {
                         sb.append(" (")
-                                .append(ListPlayerInfoService.getPlayerProgressOnObjective(so.getKey(), game, player))
-                                .append("/")
-                                .append(threshold)
-                                .append(")");
+                            .append(ListPlayerInfoService.getPlayerProgressOnObjective(so.getKey(), game, player))
+                            .append("/")
+                            .append(threshold)
+                            .append(")");
                     }
                     sb.append("\n");
                 }
@@ -179,10 +183,10 @@ public class SecretObjectiveInfoService {
         SecretObjectiveModel so = Mapper.getSecretObjective(soID);
         String soName = so.getName();
         sb.append(CardEmojis.SecretObjectiveAlt)
-                .append("_")
-                .append(soName)
-                .append("_")
-                .append("\n");
+            .append("_")
+            .append(soName)
+            .append("_")
+            .append("\n");
         return sb.toString();
     }
 
@@ -201,13 +205,13 @@ public class SecretObjectiveInfoService {
         String soPhase = so.getPhase();
         String soDescription = so.getText();
         sb.append(CardEmojis.SecretObjectiveAlt)
-                .append("_")
-                .append(soName)
-                .append("_")
-                .append(" (")
-                .append(soPhase)
-                .append(" Phase): ")
-                .append(soDescription);
+            .append("_")
+            .append(soName)
+            .append("_")
+            .append(" (")
+            .append(soPhase)
+            .append(" Phase): ")
+            .append(soDescription);
         if (newLine) {
             sb.append("\n");
         }

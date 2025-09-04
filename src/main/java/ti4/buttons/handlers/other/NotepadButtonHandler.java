@@ -36,14 +36,13 @@ class NotepadButtonHandler {
         String modalID = "notepadModal";
         String fieldID = "notes";
         String notes = getNotes(player);
-        Builder textInputBuilder =
-                TextInput.create(fieldID, TextInputStyle.PARAGRAPH).setPlaceholder("Start typing your notes...");
+        Builder textInputBuilder = TextInput.create(fieldID, TextInputStyle.PARAGRAPH).setPlaceholder("Start typing your notes...");
         if (!notes.isBlank()) {
             textInputBuilder.setValue(notes);
         }
         Modal modal = Modal.create(modalID, player.getFlexibleDisplayName() + "'s Notepad")
-                .addComponents(Label.of("Edit summary", textInputBuilder.build()))
-                .build();
+            .addComponents(Label.of("Edit summary", textInputBuilder.build()))
+            .build();
         event.replyModal(modal).queue();
     }
 

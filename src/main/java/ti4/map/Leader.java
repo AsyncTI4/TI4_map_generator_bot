@@ -23,12 +23,13 @@ public class Leader {
 
     @JsonCreator
     public Leader(
-            @JsonProperty("id") String id,
-            @JsonProperty("type") String type,
-            @JsonProperty("tgCount") int tgCount,
-            @JsonProperty("exhausted") boolean exhausted,
-            @JsonProperty("locked") boolean locked,
-            @JsonProperty("active") boolean active) {
+        @JsonProperty("id") String id,
+        @JsonProperty("type") String type,
+        @JsonProperty("tgCount") int tgCount,
+        @JsonProperty("exhausted") boolean exhausted,
+        @JsonProperty("locked") boolean locked,
+        @JsonProperty("active") boolean active
+    ) {
         this.id = id;
         this.type = type;
         this.tgCount = tgCount;

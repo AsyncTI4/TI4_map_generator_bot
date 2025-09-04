@@ -33,9 +33,8 @@ class UndoButtonHandler {
             if (p != null && player != p && !"null".equals(colorOrFaction)) {
                 // if the last button was pressed by a non-faction player, allow anyone to undo
                 // it
-                String msg =
-                        "You were not the player who pressed the latest button. Use `/game undo` if you truly wish to undo "
-                                + game.getLatestCommand() + ".";
+                String msg = "You were not the player who pressed the latest button. Use `/game undo` if you truly wish to undo "
+                    + game.getLatestCommand() + ".";
                 MessageHelper.sendMessageToChannel(event.getChannel(), msg);
                 return;
             }
@@ -50,9 +49,9 @@ class UndoButtonHandler {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(gameUndoDirectory, gameNameForUndoStart + "*")) {
             for (Path filePath : stream) {
                 String fileName = filePath.getFileName()
-                        .toString()
-                        .replace(gameNameForUndoStart, "")
-                        .replace(Constants.TXT, "");
+                    .toString()
+                    .replace(gameNameForUndoStart, "")
+                    .replace(Constants.TXT, "");
                 numbers.add(Integer.parseInt(fileName));
             }
         } catch (IOException e) {
@@ -60,11 +59,11 @@ class UndoButtonHandler {
         }
 
         int maxNumber = numbers.isEmpty()
-                ? 0
-                : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
+            ? 0
+            : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
 
         if (highestNumBefore.equalsIgnoreCase(String.valueOf(maxNumber - 1))
-                || highestNumBefore.equalsIgnoreCase(String.valueOf(maxNumber + 1))) {
+            || highestNumBefore.equalsIgnoreCase(String.valueOf(maxNumber + 1))) {
             ButtonHelper.deleteMessage(event);
         }
 
@@ -74,8 +73,7 @@ class UndoButtonHandler {
             return;
         }
 
-        StringBuilder msg =
-                new StringBuilder("You undid something, the details of which can be found in the `#undo-log` thread");
+        StringBuilder msg = new StringBuilder("You undid something, the details of which can be found in the `#undo-log` thread");
         List<ThreadChannel> threadChannels = game.getMainGameChannel().getThreadChannels();
         for (ThreadChannel threadChannel_ : threadChannels) {
             if (threadChannel_.getName().equals(game.getName() + "-undo-log")) {

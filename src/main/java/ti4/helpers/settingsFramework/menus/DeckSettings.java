@@ -37,8 +37,8 @@ public class DeckSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     private ChoiceSetting<DeckModel> deckChoice(String id, String defaultDeck, DeckModel.DeckType deckType) {
         List<DeckModel> decks = Mapper.getDecks().values().stream()
-                .filter(deck -> deck.getType() == deckType)
-                .toList();
+            .filter(deck -> deck.getType() == deckType)
+            .toList();
 
         ChoiceSetting<DeckModel> choice = new ChoiceSetting<>(id, deckType.typeName(), defaultDeck);
         choice.setEmoji(deckType.deckEmoji());
@@ -49,10 +49,10 @@ public class DeckSettings extends SettingsMenu {
 
     DeckSettings(JsonNode json, SettingsMenu parent, Optional<Game> game) {
         super(
-                "decks",
-                "Card Decks",
-                "Manually adjust which decks your game will use. This should be automatic, for the most part",
-                parent);
+            "decks",
+            "Card Decks",
+            "Manually adjust which decks your game will use. This should be automatic, for the most part",
+            parent);
 
         // Get default deck IDs for this game
         String defaultStage1 = game.map(Game::getStage1PublicDeckID).orElse("public_stage_1_objectives_pok");
@@ -88,8 +88,8 @@ public class DeckSettings extends SettingsMenu {
         // Verify this is the correct JSON node and continue initialization
         List<String> historicIDs = new ArrayList<>(List.of("decks"));
         if (json != null
-                && json.has("menuId")
-                && historicIDs.contains(json.get("menuId").asText(""))) {
+            && json.has("menuId")
+            && historicIDs.contains(json.get("menuId").asText(""))) {
             stage1.initialize(json.get("stage1"));
             stage2.initialize(json.get("stage2"));
             secrets.initialize(json.get("secrets"));

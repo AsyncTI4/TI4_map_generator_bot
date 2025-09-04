@@ -10,7 +10,7 @@ public class MapPairKeySerializer extends JsonSerializer<Pair<String, Integer>> 
 
     @Override
     public void serialize(Pair<String, Integer> value, JsonGenerator gen, SerializerProvider serializers)
-            throws IOException {
+        throws IOException {
         String serializedPair = value.getLeft() + ";" + value.getRight();
         gen.writeFieldName(serializedPair);
     }

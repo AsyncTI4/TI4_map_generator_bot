@@ -17,7 +17,8 @@ import ti4.map.Tile;
 public class AddPlanetToPlayAreaService {
 
     public static void addPlanetToPlayArea(
-            GenericInteractionCreateEvent event, Tile tile, String planetName, Game game) {
+        GenericInteractionCreateEvent event, Tile tile, String planetName, Game game
+    ) {
         if (Constants.SPACE.equals(planetName)) {
             return;
         }

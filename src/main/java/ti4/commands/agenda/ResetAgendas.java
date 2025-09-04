@@ -14,7 +14,7 @@ class ResetAgendas extends GameStateSubcommand {
     public ResetAgendas() {
         super(Constants.RESET_AGENDAS, "Reset agenda deck", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES")
-                .setRequired(true));
+            .setRequired(true));
     }
 
     @Override
@@ -28,7 +28,7 @@ class ResetAgendas extends GameStateSubcommand {
         Game game = getGame();
         game.resetAgendas();
         MessageHelper.replyToMessage(
-                event,
-                "Agenda deck reset to deck: `" + game.getAgendaDeckID() + "`. Discards removed. All shuffled as new");
+            event,
+            "Agenda deck reset to deck: `" + game.getAgendaDeckID() + "`. Discards removed. All shuffled as new");
     }
 }

@@ -17,10 +17,10 @@ public class MoveTile extends GameStateSubcommand {
     public MoveTile() {
         super(Constants.MOVE_TILE, "Move a tile to another location", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to move")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Position to move to (must have no tile)")
-                .setRequired(true));
+            .setRequired(true));
     }
 
     @Override
@@ -38,7 +38,7 @@ public class MoveTile extends GameStateSubcommand {
 
         if (game.getTileMap().containsKey(tileToPosition)) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Oops, a tile already exists here: " + tileToPosition);
+                event.getChannel(), "Oops, a tile already exists here: " + tileToPosition);
             return;
         }
         if (!PositionMapper.isTilePositionValid(tileToPosition)) {
@@ -52,8 +52,8 @@ public class MoveTile extends GameStateSubcommand {
         CustomHyperlaneService.moveCustomHyperlaneData(tileFromPosition, tileToPosition, game);
 
         MessageHelper.sendMessageToEventChannel(
-                event,
-                "Moved tile " + movingTile.getRepresentation() + " from " + tileFromPosition + " to " + tileToPosition);
+            event,
+            "Moved tile " + movingTile.getRepresentation() + " from " + tileFromPosition + " to " + tileToPosition);
 
         game.rebuildTilePositionAutoCompleteList();
     }

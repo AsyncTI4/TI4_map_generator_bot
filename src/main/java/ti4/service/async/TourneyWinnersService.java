@@ -27,7 +27,7 @@ public class TourneyWinnersService {
         List<TournamentWinner> winners = readWinnerList();
         if (isPlayerWinner(user.getId())) {
             winners.removeIf(
-                    w -> w.getId().equals(user.getId()) && w.getTourneyName().equals(tourneyName));
+                w -> w.getId().equals(user.getId()) && w.getTourneyName().equals(tourneyName));
             saveWinnerList(winners);
         }
     }
@@ -53,7 +53,8 @@ public class TourneyWinnersService {
     private static List<TournamentWinner> readWinnerList() {
         if (winnerCache == null) {
             try {
-                winnerCache = PersistenceManager.readObjectFromJsonFile(fileName, new TypeReference<>() {});
+                winnerCache = PersistenceManager.readObjectFromJsonFile(fileName, new TypeReference<>() {
+                });
             } catch (Exception e) {
                 BotLogger.error("Failed to read json data for Reserved Game Cache.", e);
                 winnerCache = new ArrayList<>();

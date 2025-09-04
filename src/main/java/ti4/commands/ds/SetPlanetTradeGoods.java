@@ -12,13 +12,13 @@ class SetPlanetTradeGoods extends GameStateSubcommand {
 
     public SetPlanetTradeGoods() {
         super(
-                Constants.SET_PLANET_COMMS,
-                "Set commodity count (or trade goods) on a planet per Harvest or Facility powers",
-                true,
-                true);
+            Constants.SET_PLANET_COMMS,
+            "Set commodity count (or trade goods) on a planet per Harvest or Facility powers",
+            true,
+            true);
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, "count", "Count").setRequired(true));
     }
 
@@ -40,8 +40,8 @@ class SetPlanetTradeGoods extends GameStateSubcommand {
             }
         }
         MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                "Set commodities on " + Helper.getPlanetRepresentation(planet, getGame()) + " to " + count
-                        + " (used to be " + old + ").");
+            event.getChannel(),
+            "Set commodities on " + Helper.getPlanetRepresentation(planet, getGame()) + " to " + count
+                + " (used to be " + old + ").");
     }
 }

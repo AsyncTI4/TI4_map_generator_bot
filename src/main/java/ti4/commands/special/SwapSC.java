@@ -16,15 +16,15 @@ class SwapSC extends GameStateSubcommand {
     public SwapSC() {
         super(Constants.SWAP_SC, "Swap two players' strategy cards", true, true);
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.TARGET_FACTION_OR_COLOR,
-                        "Faction or Color to swap strategy card with")
+            OptionType.STRING,
+            Constants.TARGET_FACTION_OR_COLOR,
+            "Faction or Color to swap strategy card with")
                 .setRequired(true)
                 .setAutoComplete(true));
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.FACTION_COLOR,
-                        "Faction or Color to swap strategy card with (default: you)")
+            OptionType.STRING,
+            Constants.FACTION_COLOR,
+            "Faction or Color to swap strategy card with (default: you)")
                 .setAutoComplete(true));
     }
 
@@ -44,8 +44,8 @@ class SwapSC extends GameStateSubcommand {
 
         if (player1.getSCs().size() > 1 || player2.getSCs().size() > 1) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "Cannot swap strategy cards because a player has multiple strategy cards. Command not yet implemented for this scenario.");
+                event.getChannel(),
+                "Cannot swap strategy cards because a player has multiple strategy cards. Command not yet implemented for this scenario.");
             return;
         }
 
@@ -54,7 +54,7 @@ class SwapSC extends GameStateSubcommand {
 
         if (player1SC == 0 || player2SC == 0) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Cannot swap strategy cards because a player has zero strategy cards.");
+                event.getChannel(), "Cannot swap strategy cards because a player has zero strategy cards.");
             return;
         }
 
@@ -65,11 +65,11 @@ class SwapSC extends GameStateSubcommand {
         player2.removeSC(player2SC);
 
         String sb = player1.getRepresentation() + " swapped strategy cards with " + player2.getRepresentation() + "\n"
-                + "> "
-                + player2.getRepresentation() + CardEmojis.getSCFrontFromInteger(player2SC) + " " + ":arrow_right:"
-                + " " + CardEmojis.getSCFrontFromInteger(player1SC) + "\n" + "> "
-                + player1.getRepresentation() + CardEmojis.getSCFrontFromInteger(player1SC) + " " + ":arrow_right:"
-                + " " + CardEmojis.getSCFrontFromInteger(player2SC) + "\n";
+            + "> "
+            + player2.getRepresentation() + CardEmojis.getSCFrontFromInteger(player2SC) + " " + ":arrow_right:"
+            + " " + CardEmojis.getSCFrontFromInteger(player1SC) + "\n" + "> "
+            + player1.getRepresentation() + CardEmojis.getSCFrontFromInteger(player1SC) + " " + ":arrow_right:"
+            + " " + CardEmojis.getSCFrontFromInteger(player2SC) + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
     }
 }

@@ -15,14 +15,14 @@ class ChangeUnitDecal extends GameStateSubcommand {
     public ChangeUnitDecal() {
         super(Constants.CHANGE_UNIT_DECAL, "Player Change Unit Decals", true, true);
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.DECAL_SET,
-                        "Decals for units. Enter 'none' to remove current decals.")
+            OptionType.STRING,
+            Constants.DECAL_SET,
+            "Decals for units. Enter 'none' to remove current decals.")
                 .setRequired(true)
                 .setAutoComplete(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -47,6 +47,6 @@ class ChangeUnitDecal extends GameStateSubcommand {
 
         player.setDecalSet(newDecalSet);
         MessageHelper.sendMessageToEventChannel(
-                event, player.getFactionEmojiOrColor() + " changed their decal set to " + newDecalSet);
+            event, player.getFactionEmojiOrColor() + " changed their decal set to " + newDecalSet);
     }
 }

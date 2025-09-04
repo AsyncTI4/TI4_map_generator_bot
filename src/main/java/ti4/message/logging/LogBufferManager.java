@@ -63,30 +63,29 @@ public class LogBufferManager {
         try {
             LogTarget target = new LogTarget(eventLog.getChannelName(), eventLog.getThreadName());
             messageBuilders
-                    .computeIfAbsent(target, k -> new StringBuilder(INITIAL_STRING_BUFFER_SIZE))
-                    .append(eventLog.getLogString());
+                .computeIfAbsent(target, k -> new StringBuilder(INITIAL_STRING_BUFFER_SIZE))
+                .append(eventLog.getLogString());
         } catch (Exception e) {
             BotLogger.error("Error draining message buffer for single event log.", e);
         }
     }
 
     private static void sendByChannelOrThread(LogTarget target, StringBuilder message) {
-        List<TextChannel> logCandidates =
-                AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName(target.channelName(), false);
+        List<TextChannel> logCandidates = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName(target.channelName(), false);
 
         if (logCandidates.isEmpty()) {
             BotLogger.error("Cannot log buffered logs because target channel not found in primary guild: "
-                    + target.channelName());
+                + target.channelName());
             return;
         }
 
         try {
             ThreadGetter.getThreadInChannel(
-                    logCandidates.getFirst(),
-                    target.threadName(),
-                    false,
-                    false,
-                    (threadChannel) -> MessageHelper.sendMessageToChannel(threadChannel, message.toString()));
+                logCandidates.getFirst(),
+                target.threadName(),
+                false,
+                false,
+                (threadChannel) -> MessageHelper.sendMessageToChannel(threadChannel, message.toString()));
         } catch (Exception e) {
             BotLogger.error("Failed to send LogBufferManager message", e);
         }

@@ -63,7 +63,7 @@ public class PersistenceManager {
     }
 
     public static <T> T readObjectFromJsonFile(String directory, String fileName, TypeReference<T> typeReference)
-            throws IOException {
+        throws IOException {
         JavaType ref = objectMapper.getTypeFactory().constructType(typeReference);
         return readObjectFromJsonFile(directory, fileName, ref);
     }

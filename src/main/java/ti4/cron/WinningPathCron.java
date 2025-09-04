@@ -10,7 +10,7 @@ public class WinningPathCron {
 
     public static void register() {
         CronManager.schedulePeriodicallyAtTime(
-                WinningPathCron.class, WinningPathCron::recompute, 4, 0, ZoneId.of("America/New_York"));
+            WinningPathCron.class, WinningPathCron::recompute, 4, 0, ZoneId.of("America/New_York"));
     }
 
     private static void recompute() {

@@ -27,10 +27,10 @@ class ShowPurgedActionCards extends GameStateSubcommand {
         int index = 1;
         for (Map.Entry<String, Integer> ac : game.getPurgedActionCards().entrySet()) {
             sb.append("`")
-                    .append(index)
-                    .append(".")
-                    .append(Helper.leftpad("(" + ac.getValue(), 4))
-                    .append(")` - ");
+                .append(index)
+                .append(".")
+                .append(Helper.leftpad("(" + ac.getValue(), 4))
+                .append(")` - ");
             if (Mapper.getActionCard(ac.getKey()) != null) {
                 sb.append(Mapper.getActionCard(ac.getKey()).getRepresentation());
             }

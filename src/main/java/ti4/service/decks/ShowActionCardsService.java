@@ -28,8 +28,7 @@ public class ShowActionCardsService {
 
     public static void showDiscard(Game game, GenericInteractionCreateEvent event, boolean showFullText) {
         StringBuilder sb = new StringBuilder();
-        List<Map.Entry<String, Integer>> discards =
-                game.getDiscardActionCards().entrySet().stream().toList();
+        List<Map.Entry<String, Integer>> discards = game.getDiscardActionCards().entrySet().stream().toList();
 
         Button showFullTextButton = null;
         if (showFullText) {
@@ -53,7 +52,7 @@ public class ShowActionCardsService {
                 cardsByName.get(name).addFirst(ac);
             } else {
                 MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(), "Null AC with id " + ac.getKey() + " " + ac.getValue());
+                    game.getActionsChannel(), "Null AC with id " + ac.getKey() + " " + ac.getValue());
             }
         });
         List<Map.Entry<String, List<Map.Entry<String, Integer>>>> entries = new ArrayList<>(cardsByName.entrySet());
@@ -65,15 +64,15 @@ public class ShowActionCardsService {
 
         for (Map.Entry<String, List<Map.Entry<String, Integer>>> acEntryList : entries) {
             List<String> ids = acEntryList.getValue().stream()
-                    .map(i -> "`(" + i.getValue() + ")`")
-                    .toList();
+                .map(i -> "`(" + i.getValue() + ")`")
+                .toList();
             sb.append("\n").append(index).append("\\. ");
             index++;
             sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
             sb.append(" _").append(acEntryList.getKey()).append("_ ");
             sb.append(String.join(", ", ids)).append("\n> ");
             sb.append(Mapper.getActionCard(acEntryList.getValue().getFirst().getKey())
-                    .getRepresentationJustText());
+                .getRepresentationJustText());
         }
         return sb.toString();
     }
@@ -97,8 +96,8 @@ public class ShowActionCardsService {
         int pad = cardsByName.size() > 99 ? 4 : (cardsByName.size() > 9 ? 3 : 2);
         for (Map.Entry<String, List<Map.Entry<String, Integer>>> acEntryList : entries) {
             List<String> ids = acEntryList.getValue().stream()
-                    .map(i -> "`(" + i.getValue() + ")`")
-                    .toList();
+                .map(i -> "`(" + i.getValue() + ")`")
+                .toList();
             sb.append("\n").append(index).append("\\. ");
             index++;
             sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));

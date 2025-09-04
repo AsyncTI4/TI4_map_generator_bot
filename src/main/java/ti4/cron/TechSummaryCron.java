@@ -16,7 +16,7 @@ public class TechSummaryCron {
 
     public static void register() {
         CronManager.schedulePeriodically(
-                TechSummaryCron.class, TechSummaryCron::postTechSummaries, 5, 10, TimeUnit.MINUTES);
+            TechSummaryCron.class, TechSummaryCron::postTechSummaries, 5, 10, TimeUnit.MINUTES);
     }
 
     private static void postTechSummaries() {
@@ -34,13 +34,14 @@ public class TechSummaryCron {
     }
 
     private static boolean tryToPostTechSummary(
-            String gameName, TechSummariesMetadataManager.RoundTechSummaries roundTechSummaries) {
+        String gameName, TechSummariesMetadataManager.RoundTechSummaries roundTechSummaries
+    ) {
         try {
             var managedGame = GameManager.getManagedGame(gameName);
             if (managedGame == null
-                    || managedGame.isHasEnded()
-                    || managedGame.getTableTalkChannel() == null
-                    || managedGame.getRound() != roundTechSummaries.round()) {
+                || managedGame.isHasEnded()
+                || managedGame.getTableTalkChannel() == null
+                || managedGame.getRound() != roundTechSummaries.round()) {
                 return true;
             }
             var techSummaries = roundTechSummaries.techSummaries();
@@ -56,7 +57,8 @@ public class TechSummaryCron {
     }
 
     private static void postTechSummary(
-            Game game, List<TechSummariesMetadataManager.FactionTechSummary> techSummaries) {
+        Game game, List<TechSummariesMetadataManager.FactionTechSummary> techSummaries
+    ) {
         StringBuilder msg = new StringBuilder("**__Tech Summary For Round " + game.getRound() + "__**\n");
         for (var techSummary : techSummaries) {
             Player player = game.getPlayerFromColorOrFaction(techSummary.getFaction());

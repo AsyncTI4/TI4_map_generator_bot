@@ -172,7 +172,7 @@ class AgendaResolveButtonHandler {
         String key = "agendaRes" + game.getRound() + game.getDiscardAgendas().size();
         if (game.getStoredValue(key).equalsIgnoreCase(winner + agendaId)) {
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Double press suspected, stopping resolution here.");
+                game.getMainGameChannel(), "Double press suspected, stopping resolution here.");
             return true;
         }
         game.setStoredValue(key, winner + agendaId);
@@ -186,10 +186,10 @@ class AgendaResolveButtonHandler {
             AgendaModel agendaDetails = Mapper.getAgenda(id2);
             String agendaName = agendaDetails.getName();
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(),
-                    "# The hidden agenda was " + agendaName + "! You can find it added as a law or in the discard.");
+                game.getMainGameChannel(),
+                "# The hidden agenda was " + agendaName + "! You can find it added as a law or in the discard.");
             MessageHelper.sendMessageToChannelWithEmbed(
-                    game.getMainGameChannel(), "Hidden Agenda", agendaDetails.getRepresentationEmbed());
+                game.getMainGameChannel(), "Hidden Agenda", agendaDetails.getRepresentationEmbed());
             return discardAgendas.get(id2);
         } else {
             return Integer.parseInt(agendaid);
@@ -214,9 +214,9 @@ class AgendaResolveButtonHandler {
             if (game.getStoredValue("riskedPredictive").contains(playerWL.getFaction()) && playerWL.hasTech("pi")) {
                 playerWL.exhaustTech("pi");
                 MessageHelper.sendMessageToChannel(
-                        playerWL.getCorrectChannel(),
-                        playerWL.getRepresentation()
-                                + " _Predictive Intelligence_ was exhausted since you voted for a losing outcome while using it.");
+                    playerWL.getCorrectChannel(),
+                    playerWL.getRepresentation()
+                        + " _Predictive Intelligence_ was exhausted since you voted for a losing outcome while using it.");
             }
         }
         game.setStoredValue("riskedPredictive", "");
@@ -261,7 +261,7 @@ class AgendaResolveButtonHandler {
         }
         if (winner.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Can make only scored secret objective to public objective.");
+                event.getChannel(), "Can make only scored secret objective to public objective.");
             return;
         }
         game.addToSoToPoList(winner);
@@ -269,10 +269,10 @@ class AgendaResolveButtonHandler {
         Integer poIndex = game.addCustomPO(Mapper.getSecretObjectivesJustNames().get(winner), 1);
         game.scorePublicObjective(playerWithSO.getUserID(), poIndex);
         String sb = "_" + Mapper.getSecretObjectivesJustNames().get(winner)
-                + "_ has been made in to a public objective (" + poIndex + ").";
+            + "_ has been made in to a public objective (" + poIndex + ").";
         if (!game.isFowMode()) {
             sb += "\n-# " + playerWithSO.getRepresentationUnfogged()
-                    + " has been marked as having scored this, and it no longer counts towards their secret objective limit.";
+                + " has been marked as having scored this, and it no longer counts towards their secret objective limit.";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, playerWithSO, event);
@@ -282,12 +282,12 @@ class AgendaResolveButtonHandler {
         for (Player voter : voters) {
             if (voter.hasTech("dskyrog")) {
                 MessageHelper.sendMessageToChannel(
-                        voter.getCorrectChannel(),
-                        voter.getFactionEmoji() + " gets to drop 2 infantry on a planet due to _Indoctrination Team_.");
+                    voter.getCorrectChannel(),
+                    voter.getFactionEmoji() + " gets to drop 2 infantry on a planet due to _Indoctrination Team_.");
                 List<Button> buttons = new ArrayList<>(
-                        Helper.getPlanetPlaceUnitButtons(voter, game, "2gf", "placeOneNDone_skipbuild"));
+                    Helper.getPlanetPlaceUnitButtons(voter, game, "2gf", "placeOneNDone_skipbuild"));
                 MessageHelper.sendMessageToChannelWithButtons(
-                        voter.getCorrectChannel(), "Please use buttons to drop 2 infantry on a planet.", buttons);
+                    voter.getCorrectChannel(), "Please use buttons to drop 2 infantry on a planet.", buttons);
             }
         }
     }
@@ -308,8 +308,8 @@ class AgendaResolveButtonHandler {
             String message;
             if (rid.hasAbility("future_sight")) {
                 message = rep
-                        + " you have a Rider to resolve or you voted for the correct outcome. Either way a trade good has been added to your total due to your **Future Sight** ability "
-                        + rid.gainTG(1, true) + ".";
+                    + " you have a Rider to resolve or you voted for the correct outcome. Either way a trade good has been added to your total due to your **Future Sight** ability "
+                    + rid.gainTG(1, true) + ".";
                 ButtonHelperAgents.resolveArtunoCheck(rid, 1);
                 for (Player player2 : game.getRealPlayers()) {
                     if (player2.getPromissoryNotesInPlayArea().contains("sigma_machinations")) {
@@ -321,33 +321,33 @@ class AgendaResolveButtonHandler {
             }
             if (rid.hasTech("dsatokcr") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, rid, "cruiser", true) < 8) {
                 MessageHelper.sendMessageToChannel(
-                        rid.getCorrectChannel(),
-                        rid.getFactionEmoji() + " may DEPLOY 1 cruiser to a system that contains their ships.");
+                    rid.getCorrectChannel(),
+                    rid.getFactionEmoji() + " may DEPLOY 1 cruiser to a system that contains their ships.");
                 List<Button> buttons = new ArrayList<>(
-                        Helper.getTileWithShipsPlaceUnitButtons(rid, game, "cruiser", "placeOneNDone_skipbuild"));
+                    Helper.getTileWithShipsPlaceUnitButtons(rid, game, "cruiser", "placeOneNDone_skipbuild"));
                 MessageHelper.sendMessageToChannelWithButtons(
-                        rid.getCorrectChannel(),
-                        "Use buttons to DEPLOY 1 cruiser to a system that contains your ships.",
-                        buttons);
+                    rid.getCorrectChannel(),
+                    "Use buttons to DEPLOY 1 cruiser to a system that contains your ships.",
+                    buttons);
             }
             if (game.isFowMode()) {
                 MessageHelper.sendPrivateMessageToPlayer(rid, game, message);
                 if (machinations != null) {
                     MessageHelper.sendPrivateMessageToPlayer(
-                            machinations,
-                            game,
-                            machinations.getRepresentationUnfogged()
-                                    + ", you've gained a trade good from _Machinations_ " + machinations.gainTG(1, true)
-                                    + ".");
+                        machinations,
+                        game,
+                        machinations.getRepresentationUnfogged()
+                            + ", you've gained a trade good from _Machinations_ " + machinations.gainTG(1, true)
+                            + ".");
                 }
             } else {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
                 if (machinations != null) {
                     MessageHelper.sendMessageToChannel(
-                            game.getMainGameChannel(),
-                            machinations.getRepresentationUnfogged()
-                                    + ", you've also gained a trade good from _Machinations_ "
-                                    + machinations.gainTG(1, true) + ".");
+                        game.getMainGameChannel(),
+                        machinations.getRepresentationUnfogged()
+                            + ", you've also gained a trade good from _Machinations_ "
+                            + machinations.gainTG(1, true) + ".");
                 }
             }
         }
@@ -380,7 +380,7 @@ class AgendaResolveButtonHandler {
 
         if (!game.isOmegaPhaseMode()) {
             buttons.add(Buttons.green(
-                    "proceed_to_strategy", "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)"));
+                "proceed_to_strategy", "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)"));
         } else {
             Button proceedToScoring;
             Button electVoiceOfTheCouncil;
@@ -405,8 +405,8 @@ class AgendaResolveButtonHandler {
                     if (speaker != null) {
                         MessageChannel speakerCardsInfoThread = speaker.getCardsInfoThread();
                         MessageHelper.sendMessageToChannel(
-                                speakerCardsInfoThread,
-                                "These are the current votes available for the _Voice of the Council_ vote.");
+                            speakerCardsInfoThread,
+                            "These are the current votes available for the _Voice of the Council_ vote.");
                         AgendaHelper.listVoteCount(game, speakerCardsInfoThread);
                     }
                     proceedToScoring = Buttons.green("proceed_to_scoring", "Proceed to Scoring Objectives");
@@ -423,23 +423,22 @@ class AgendaResolveButtonHandler {
         if (game.isOmegaPhaseMode() && aCount == 3) {
             String previousElectee = game.getLawsInfo().get(Constants.VOICE_OF_THE_COUNCIL_ID);
             voteMessage += " The bot believes this is the third agenda, which in Omega Phase means you"
-                    + (previousElectee == null ? "'ll" : " might") + " vote on the _Voice of the Council_.";
+                + (previousElectee == null ? "'ll" : " might") + " vote on the _Voice of the Council_.";
             if (previousElectee == null) {
-                voteMessage +=
-                        " Since no player currently has the _Voice of the Council_, it must be voted on once before proceeding to scoring.";
+                voteMessage += " Since no player currently has the _Voice of the Council_, it must be voted on once before proceeding to scoring.";
             } else {
                 Player previousPlayer = game.getPlayerFromColorOrFaction(previousElectee);
                 voteMessage += " Since somebody (specifically, " + previousPlayer.getRepresentationNoPing()
-                        + ") currently has the _Voice of the Council_, the Speaker chooses whether to vote on it this round or not.";
+                    + ") currently has the _Voice of the Council_, the Speaker chooses whether to vote on it this round or not.";
             }
-            voteMessage +=
-                    " If this is not actually the third agenda yet, please remember this when that agenda is reached.";
+            voteMessage += " If this is not actually the third agenda yet, please remember this when that agenda is reached.";
         }
         return voteMessage;
     }
 
     private static void sendNextStepUi(
-            Game game, ButtonInteractionEvent event, String resMes, String voteMessage, List<Button> buttons) {
+        Game game, ButtonInteractionEvent event, String resMes, String voteMessage, List<Button> buttons
+    ) {
         MessageHelper.sendMessageToChannel(event.getChannel(), resMes);
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, buttons);

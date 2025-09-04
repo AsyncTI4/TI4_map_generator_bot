@@ -17,8 +17,8 @@ class RestoreGame extends Subcommand {
     RestoreGame() {
         super(Constants.RESTORE_GAME, "Restore a game by uploading a save file");
         addOptions(
-                new OptionData(OptionType.ATTACHMENT, Constants.SAVE_FILE, "Save file to reload").setRequired(true),
-                new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name to load to").setRequired(true));
+            new OptionData(OptionType.ATTACHMENT, Constants.SAVE_FILE, "Save file to reload").setRequired(true),
+            new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name to load to").setRequired(true));
     }
 
     @Override

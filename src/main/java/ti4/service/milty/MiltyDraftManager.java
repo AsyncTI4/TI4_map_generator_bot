@@ -70,8 +70,8 @@ public class MiltyDraftManager {
 
         private String factionEmoji(String doggy) {
             return faction == null
-                    ? doggy
-                    : FactionEmojis.getFactionIcon(faction).toString();
+                ? doggy
+                : FactionEmojis.getFactionIcon(faction).toString();
         }
 
         private String sliceEmoji() {
@@ -192,7 +192,8 @@ public class MiltyDraftManager {
                 if (!isSliceTaken(slice.getName())) remaining.add("Slice " + slice.getName());
         }
         if (active.getFaction() == null) {
-            for (String faction : factionDraft) if (!isFactionTaken(faction)) remaining.add(faction);
+            for (String faction : factionDraft)
+                if (!isFactionTaken(faction)) remaining.add(faction);
         }
         if (active.getPosition() == null) {
             for (int i = 1; i <= players.size(); i++)
@@ -311,9 +312,9 @@ public class MiltyDraftManager {
         if (getCurrentDraftPlayer() == null || !userId.equals(getCurrentDraftPlayer())) {
             if (event instanceof ButtonInteractionEvent bevent) {
                 bevent.getHook()
-                        .sendMessage("You are not up to draft")
-                        .setEphemeral(true)
-                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                    .sendMessage("You are not up to draft")
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             } else {
                 event.getMessageChannel().sendMessage("Something went wrong").queue();
             }
@@ -322,26 +323,24 @@ public class MiltyDraftManager {
 
         boolean auto = buttonID.startsWith("miltyAuto_");
         boolean force = buttonID.startsWith("miltyForce_");
-        String draftPick =
-                buttonID.replace("milty_", "").replace("miltyAuto_", "").replace("miltyForce_", "");
+        String draftPick = buttonID.replace("milty_", "").replace("miltyAuto_", "").replace("miltyForce_", "");
         String category = draftPick.substring(0, draftPick.indexOf('_'));
         String item = draftPick.substring(draftPick.indexOf('_') + 1);
 
-        String errorMessage =
-                switch (category) {
-                    case "slice" -> draftSlice(userId, item);
-                    case "faction" -> draftFaction(userId, item);
-                    case "order" -> draftSpeakerOrder(userId, item);
-                    default -> "Error parsing milty button press: " + buttonID;
-                };
+        String errorMessage = switch (category) {
+            case "slice" -> draftSlice(userId, item);
+            case "faction" -> draftFaction(userId, item);
+            case "order" -> draftSpeakerOrder(userId, item);
+            default -> "Error parsing milty button press: " + buttonID;
+        };
 
         // Oopsiedoops
         if (errorMessage != null) {
             if (event instanceof ButtonInteractionEvent bevent) {
                 bevent.getHook()
-                        .sendMessage(errorMessage)
-                        .setEphemeral(true)
-                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                    .sendMessage(errorMessage)
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             } else {
                 event.getMessageChannel().sendMessage(errorMessage).queue();
             }
@@ -354,13 +353,12 @@ public class MiltyDraftManager {
         if (force) middle = " was forced to take ";
         try {
             String drafted = player.getPing() + middle
-                    + switch (category) {
-                        case "slice" -> "Slice " + item;
-                        case "faction" ->
-                            Mapper.getFaction(item).getFactionTitle().replace("Keleres - Mentak", "Keleres");
-                        case "order" -> StringHelper.ordinal(Integer.parseInt(item)) + " pick";
-                        default -> "Error parsing milty button press: " + buttonID;
-                    } + "!";
+                + switch (category) {
+                    case "slice" -> "Slice " + item;
+                    case "faction" -> Mapper.getFaction(item).getFactionTitle().replace("Keleres - Mentak", "Keleres");
+                    case "order" -> StringHelper.ordinal(Integer.parseInt(item)) + " pick";
+                    default -> "Error parsing milty button press: " + buttonID;
+                } + "!";
             MessageHelper.sendMessageToChannel(mainGameChannel, drafted);
         } catch (Exception e) {
             // Shouldn't get errors here, but fallback to a boring message
@@ -402,8 +400,8 @@ public class MiltyDraftManager {
             }
         } else {
             MessageHelper.sendMessageToChannel(
-                    mainGameChannel,
-                    game.getPing() + " the draft is finished! Ping jazz if there are any issues with the map.");
+                mainGameChannel,
+                game.getPing() + " the draft is finished! Ping jazz if there are any issues with the map.");
             FinishDraftService.finishDraft(event, this, game);
             game.updateActivePlayer(null);
         }
@@ -460,7 +458,7 @@ public class MiltyDraftManager {
         for (MiltyDraftSlice slice : slices) {
             if (isSliceTaken(slice.getName())) continue;
             sliceButtons.add(Buttons.green(
-                    "milty_slice_" + slice.getName(), " ", MiltyDraftEmojis.getMiltyDraftEmoji(slice.getName())));
+                "milty_slice_" + slice.getName(), " ", MiltyDraftEmojis.getMiltyDraftEmoji(slice.getName())));
         }
         return sliceButtons;
     }
@@ -483,7 +481,7 @@ public class MiltyDraftManager {
         for (int speakerOrder = 1; speakerOrder <= players.size(); speakerOrder++) {
             if (isOrderTaken(speakerOrder)) continue;
             orderButtons.add(Buttons.green(
-                    "milty_order_" + speakerOrder, " ", MiltyDraftEmojis.getSpeakerPickEmoji(speakerOrder)));
+                "milty_order_" + speakerOrder, " ", MiltyDraftEmojis.getSpeakerPickEmoji(speakerOrder)));
         }
         return orderButtons;
     }
@@ -518,15 +516,14 @@ public class MiltyDraftManager {
     public String superSaveMessage() {
         try {
             String sliceStr = String.join(
-                    ";", slices.stream().map(MiltyDraftSlice::ttsString).toList());
+                ";", slices.stream().map(MiltyDraftSlice::ttsString).toList());
             String factionStr = String.join(",", factionDraft);
             String playerStr = String.join(",", players);
             String picksStr = String.join(
-                    ";", players.stream().map(p -> getPlayerDraft(p).save()).toList());
+                ";", players.stream().map(p -> getPlayerDraft(p).save()).toList());
             String templateStr = mapTemplate;
 
-            List<String> lesserSaves =
-                    Arrays.asList(sliceStr, factionStr, playerStr, picksStr, /* messagesStr, */ templateStr);
+            List<String> lesserSaves = Arrays.asList(sliceStr, factionStr, playerStr, picksStr, /* messagesStr, */ templateStr);
             return String.join("|", lesserSaves);
         } catch (Exception e) {
             return "error";
@@ -598,9 +595,9 @@ public class MiltyDraftManager {
     private void loadSliceFromString(String str, int index) {
         List<String> tiles = Arrays.asList(str.split(","));
         List<MiltyDraftTile> draftTiles = tiles.stream()
-                .map(AliasHandler::resolveTile)
-                .map(this::findTile)
-                .toList();
+            .map(AliasHandler::resolveTile)
+            .map(this::findTile)
+            .toList();
         MiltyDraftSlice slice = new MiltyDraftSlice();
         slice.setTiles(draftTiles);
         slice.setName(Character.toString(index - 1 + 'A'));
@@ -609,23 +606,23 @@ public class MiltyDraftManager {
 
     private MiltyDraftTile findTile(String tileId) {
         MiltyDraftTile result = all.stream()
-                .filter(t -> t.getTile().getTileID().equals(tileId))
-                .findFirst()
-                .orElse(null);
+            .filter(t -> t.getTile().getTileID().equals(tileId))
+            .findFirst()
+            .orElse(null);
         if (result == null) {
             TileModel tileRequested = TileHelper.getTileById(tileId);
             Set<ComponentSource> currentsources = all.stream()
-                    .map(t -> t.getTile().getTileModel().getSource())
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toSet());
+                .map(t -> t.getTile().getTileModel().getSource())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
             if (tileRequested.getSource() != null) currentsources.add(tileRequested.getSource());
             if (REGEX.matcher(tileId).matches()) currentsources.add(ComponentSource.uncharted_space);
             if (PATTERN.matcher(tileId).matches()) currentsources.add(ComponentSource.eronous);
             MiltyDraftHelper.initDraftTiles(this, new ArrayList<>(currentsources));
             result = all.stream()
-                    .filter(t -> t.getTile().getTileID().equals(tileId))
-                    .findFirst()
-                    .orElseThrow();
+                .filter(t -> t.getTile().getTileID().equals(tileId))
+                .findFirst()
+                .orElseThrow();
         }
         return result;
     }

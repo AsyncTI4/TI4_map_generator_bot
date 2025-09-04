@@ -29,7 +29,7 @@ class PlayerPromissoryButtonHandler {
             TechnologyModel techModel = Mapper.getTech(tech);
             pnID = pnID.replace("_" + tech, "");
             String message = player.getRepresentationNoPing() + " acquired the technology "
-                    + techModel.getRepresentation(false) + " via _Research Agreement_.";
+                + techModel.getRepresentation(false) + " via _Research Agreement_.";
             player.addTech(tech);
             TechSummariesMetadataManager.addTech(game, player, tech, true);
             ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
@@ -42,12 +42,12 @@ class PlayerPromissoryButtonHandler {
         }
 
         var possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(
-                Constants.PROMISSORY_NOTES, pnID, player.getNumberOfTurns());
+            Constants.PROMISSORY_NOTES, pnID, player.getNumberOfTurns());
         if (possibleCombatMod != null) {
             player.addNewTempCombatMod(possibleCombatMod);
             MessageHelper.sendMessageToChannel(
-                    player.getCardsInfoThread(),
-                    "Combat modifier will be applied next time you push the \"Combat Roll\" button.");
+                player.getCardsInfoThread(),
+                "Combat modifier will be applied next time you push the \"Combat Roll\" button.");
         }
     }
 }

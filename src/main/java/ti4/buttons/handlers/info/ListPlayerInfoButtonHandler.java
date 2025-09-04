@@ -39,8 +39,7 @@ class ListPlayerInfoButtonHandler {
         buttons.add(Buttons.green("offerInfoButtonStep2_tech", "Researched Technologies"));
         buttons.add(Buttons.green("offerInfoButtonStep2_ftech", "Faction Technologies"));
         buttons.add(Buttons.REFRESH_INFO);
-        String msg =
-                "Select the category you'd like more info on. You will then be able to select either a specific faction's info, or every faction's.";
+        String msg = "Select the category you'd like more info on. You will then be able to select either a specific faction's info, or every faction's.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
 
@@ -67,7 +66,8 @@ class ListPlayerInfoButtonHandler {
 
     @ButtonHandler(value = "offerInfoButtonStep3_", save = false)
     public static void resolveOfferInfoButtonStep3(
-            ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+        ButtonInteractionEvent event, String buttonID, Game game, Player player
+    ) {
         String category = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
@@ -98,7 +98,7 @@ class ListPlayerInfoButtonHandler {
                     }
                     for (String planet : p2.getPlanets()) {
                         sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game))
-                                .append("\n");
+                            .append("\n");
                     }
                     for (String tech : p2.getTechs()) {
                         messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
@@ -133,7 +133,7 @@ class ListPlayerInfoButtonHandler {
                 case "planet" -> {
                     for (String planet : p2.getPlanets()) {
                         sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game))
-                                .append("\n");
+                            .append("\n");
                     }
                 }
                 case "pn" -> {
@@ -147,7 +147,7 @@ class ListPlayerInfoButtonHandler {
                     for (Leader lead : p2.getLeaders()) {
                         if (lead.getId().contains(category)) {
                             messageEmbeds.add(
-                                    lead.getLeaderModel().get().getRepresentationEmbed(true, true, true, true));
+                                lead.getLeaderModel().get().getRepresentationEmbed(true, true, true, true));
                         }
                     }
                 }

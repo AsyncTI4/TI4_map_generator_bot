@@ -20,6 +20,6 @@ class UnitAdd extends UnitAddRemove {
     @Override
     public void doAction(Player player, List<String> unitIDs, SlashCommandInteractionEvent event) {
         FrankenUnitService.addUnits(
-                event, player, unitIDs, event.getOption(ALLOW_DUPLICATES, false, OptionMapping::getAsBoolean));
+            event, player, unitIDs, event.getOption(ALLOW_DUPLICATES, false, OptionMapping::getAsBoolean));
     }
 }

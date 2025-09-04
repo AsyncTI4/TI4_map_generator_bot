@@ -24,7 +24,7 @@ public class ExhaustLeaderService {
         String message = player.getRepresentation() + " exhausted: ";
         if (leaderModel != null) {
             MessageHelper.sendMessageToChannelWithEmbed(
-                    player.getCorrectChannel(), message, leaderModel.getRepresentationEmbed());
+                player.getCorrectChannel(), message, leaderModel.getRepresentationEmbed());
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message + leader.getId());
         }
@@ -38,27 +38,27 @@ public class ExhaustLeaderService {
             }
 
             sb.append(tgCount)
-                    .append(" trade good")
-                    .append(tgCount == 1 ? "" : "s")
-                    .append(" were placed on top of ")
-                    .append(leaderName)
-                    .append(".");
+                .append(" trade good")
+                .append(tgCount == 1 ? "" : "s")
+                .append(" were placed on top of ")
+                .append(leaderName)
+                .append(".");
             if (leader.getTgCount() != tgCount) {
                 sb.append(" *(")
-                        .append(tgCount)
-                        .append(MiscEmojis.getTGorNomadCoinEmoji(game))
-                        .append(" total)*\n");
+                    .append(tgCount)
+                    .append(MiscEmojis.getTGorNomadCoinEmoji(game))
+                    .append(" total)*\n");
             }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         }
 
         TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(
-                Constants.LEADER, leader.getId(), player.getNumberOfTurns());
+            Constants.LEADER, leader.getId(), player.getNumberOfTurns());
         if (possibleCombatMod != null) {
             player.addNewTempCombatMod(possibleCombatMod);
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    "Combat modifier will be applied next time you push the combat roll button.");
+                player.getCorrectChannel(),
+                "Combat modifier will be applied next time you push the combat roll button.");
         }
     }
 }

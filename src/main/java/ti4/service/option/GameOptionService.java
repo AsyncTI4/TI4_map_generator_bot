@@ -19,9 +19,9 @@ public class GameOptionService {
         factionReactButtons.add(Buttons.red("disableAidReacts", "No Faction Reactions"));
         factionReactButtons.add(Buttons.gray("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
-                channel,
-                "Enable to have the bot react to player messages with their faction emoji.",
-                factionReactButtons);
+            channel,
+            "Enable to have the bot react to player messages with their faction emoji.",
+            factionReactButtons);
 
         List<Button> hexBorderButtons = new ArrayList<>();
         hexBorderButtons.add(Buttons.green("showHexBorders_dash", "Dashed line"));
@@ -29,12 +29,12 @@ public class GameOptionService {
         hexBorderButtons.add(Buttons.red("showHexBorders_off", "Off (default)"));
         hexBorderButtons.add(Buttons.gray("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
-                channel, "Show borders around systems with player's ships.", hexBorderButtons);
+            channel, "Show borders around systems with player's ships.", hexBorderButtons);
 
         // sendShowOwnedPNsInPlayerAreaButton(game, channel);
         List<Button> daneLinkButtons = getDaneLeakModeButtons(game);
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
-                channel, "Enable or Disable Galactic Events.", daneLinkButtons);
+            channel, "Enable or Disable Galactic Events.", daneLinkButtons);
         StartPhaseService.postSurveyResults(game);
     }
 
@@ -104,6 +104,6 @@ public class GameOptionService {
         }
         buttons.add(Buttons.gray("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
-                channel, "Show Owned Promissory Notes in Player Area?", buttons);
+            channel, "Show Owned Promissory Notes in Player Area?", buttons);
     }
 }

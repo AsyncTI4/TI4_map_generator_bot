@@ -15,12 +15,12 @@ class ExploreShuffleBackIntoDeck extends GameStateSubcommand {
 
     ExploreShuffleBackIntoDeck() {
         super(
-                Constants.SHUFFLE_BACK_INTO_DECK,
-                "Shuffle an exploration card back into the deck, including purged cards",
-                true,
-                true);
+            Constants.SHUFFLE_BACK_INTO_DECK,
+            "Shuffle an exploration card back into the deck, including purged cards",
+            true,
+            true);
         addOptions(new OptionData(
-                        OptionType.STRING, Constants.EXPLORE_CARD_ID, "Exploration card ID, which is found between ()")
+            OptionType.STRING, Constants.EXPLORE_CARD_ID, "Exploration card ID, which is found between ()")
                 .setRequired(true));
     }
 
@@ -28,8 +28,8 @@ class ExploreShuffleBackIntoDeck extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         String ids = PatternHelper.SPACE_PATTERN
-                .matcher(event.getOption(Constants.EXPLORE_CARD_ID).getAsString())
-                .replaceAll("");
+            .matcher(event.getOption(Constants.EXPLORE_CARD_ID).getAsString())
+            .replaceAll("");
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {
@@ -37,13 +37,13 @@ class ExploreShuffleBackIntoDeck extends GameStateSubcommand {
             if (explore != null) {
                 game.addExplore(id);
                 sb.append("Card shuffled into exploration deck: ")
-                        .append(explore.textRepresentation())
-                        .append(System.lineSeparator());
+                    .append(explore.textRepresentation())
+                    .append(System.lineSeparator());
             } else {
                 sb.append("Card ID ")
-                        .append(id)
-                        .append(" not found, please retry")
-                        .append(System.lineSeparator());
+                    .append(id)
+                    .append(" not found, please retry")
+                    .append(System.lineSeparator());
             }
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

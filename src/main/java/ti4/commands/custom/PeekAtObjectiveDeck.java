@@ -32,15 +32,15 @@ class PeekAtObjectiveDeck extends GameStateSubcommand {
         }
         Player player = getPlayer();
         StringBuilder sb = new StringBuilder()
-                .append(player.getRepresentationUnfogged())
-                .append(" **Stage ")
-                .append(stage)
-                .append(" Public Objectives**")
-                .append("\n");
+            .append(player.getRepresentationUnfogged())
+            .append(" **Stage ")
+            .append(stage)
+            .append(" Public Objectives**")
+            .append("\n");
         peakedObjectives.stream()
-                .map(peakedObjectiveId -> "(" + peakedObjectiveId + "): "
-                        + Mapper.getPublicObjective(peakedObjectiveId).getRepresentation())
-                .forEach(sb::append);
+            .map(peakedObjectiveId -> "(" + peakedObjectiveId + "): "
+                + Mapper.getPublicObjective(peakedObjectiveId).getRepresentation())
+            .forEach(sb::append);
         sb.append("\n");
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
     }

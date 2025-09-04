@@ -25,13 +25,13 @@ class VictoryPointsScoredStatisticsService {
         Map<String, Integer> relics = new HashMap<>();
 
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilter(event),
-                game -> listScoredVictoryPoints(game, secrets, publics, relics));
+            GameStatisticsFilterer.getGamesFilter(event),
+            game -> listScoredVictoryPoints(game, secrets, publics, relics));
 
         Map<String, Integer> topThousand = secrets.entrySet().stream()
-                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                .limit(3000)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+            .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+            .limit(3000)
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         int index = 1;
         StringBuilder sb = new StringBuilder("List of times a particular secret objective has been scored.\n");
         for (Map.Entry<String, Integer> entry : topThousand.entrySet()) {
@@ -44,9 +44,9 @@ class VictoryPointsScoredStatisticsService {
         MessageHelper.sendMessageToThread(event.getChannel(), "Secret Objective Score Counts", sb.toString());
 
         topThousand = publics.entrySet().stream()
-                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                .limit(3000)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+            .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+            .limit(3000)
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         index = 1;
         sb = new StringBuilder("List of times a particular public objective has been revealed \n");
         for (Map.Entry<String, Integer> entry : topThousand.entrySet()) {
@@ -59,9 +59,9 @@ class VictoryPointsScoredStatisticsService {
         MessageHelper.sendMessageToThread(event.getChannel(), "Public Objectives Revealed", sb.toString());
 
         topThousand = relics.entrySet().stream()
-                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                .limit(3000)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+            .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+            .limit(3000)
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         index = 1;
         sb = new StringBuilder("List of times a particular relic has been drawn \n");
         for (Map.Entry<String, Integer> entry : topThousand.entrySet()) {
@@ -75,7 +75,8 @@ class VictoryPointsScoredStatisticsService {
     }
 
     private static void listScoredVictoryPoints(
-            Game game, Map<String, Integer> secrets, Map<String, Integer> publics, Map<String, Integer> relics) {
+        Game game, Map<String, Integer> secrets, Map<String, Integer> publics, Map<String, Integer> relics
+    ) {
         for (Player player : game.getRealPlayers()) {
             for (String so : player.getSecretsScored().keySet()) {
                 if (Mapper.getSecretObjective(so) != null) {

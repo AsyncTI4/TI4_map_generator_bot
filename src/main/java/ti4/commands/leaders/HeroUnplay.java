@@ -15,11 +15,11 @@ class HeroUnplay extends GameStateSubcommand {
     public HeroUnplay() {
         super(Constants.INACTIVE_LEADER, "Set leader as inactive", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                .setAutoComplete(true));
     }
 
     @Override

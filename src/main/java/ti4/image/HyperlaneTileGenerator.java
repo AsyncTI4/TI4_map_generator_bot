@@ -32,29 +32,26 @@ class HyperlaneTileGenerator {
     private static final float CENTER_Y = TILE_HEIGHT / 2.0f;
 
     private static final List<String> RANDOM_BACKGROUNDS = List.of(
-            "hl_bg/hl_empty_0.png",
-            "hl_bg/hl_empty_1.png",
-            "hl_bg/hl_empty_2.png",
-            "hl_bg/hl_empty_3.png",
-            "hl_bg/hl_empty_4.png",
-            "hl_bg/hl_empty_5.png",
-            "hl_bg/hl_empty_6.png",
-            "hl_bg/hl_empty_7.png",
-            "hl_bg/hl_empty_8.png",
-            "hl_bg/hl_empty_9.png",
-            "hl_bg/hl_empty_10.png",
-            "hl_bg/hl_empty_11.png",
-            "hl_bg/hl_empty_12.png",
-            "hl_bg/hl_empty_13.png",
-            "hl_bg/hl_empty_14.png",
-            "hl_bg/hl_empty_15.png",
-            "hl_bg/hl_empty_16.png");
+        "hl_bg/hl_empty_0.png",
+        "hl_bg/hl_empty_1.png",
+        "hl_bg/hl_empty_2.png",
+        "hl_bg/hl_empty_3.png",
+        "hl_bg/hl_empty_4.png",
+        "hl_bg/hl_empty_5.png",
+        "hl_bg/hl_empty_6.png",
+        "hl_bg/hl_empty_7.png",
+        "hl_bg/hl_empty_8.png",
+        "hl_bg/hl_empty_9.png",
+        "hl_bg/hl_empty_10.png",
+        "hl_bg/hl_empty_11.png",
+        "hl_bg/hl_empty_12.png",
+        "hl_bg/hl_empty_13.png",
+        "hl_bg/hl_empty_14.png",
+        "hl_bg/hl_empty_15.png",
+        "hl_bg/hl_empty_16.png");
 
     public enum HLColor {
-        BLUE(new Color(0, 180, 255), new Color(180, 200, 240)),
-        GREEN(new Color(0, 220, 120), new Color(170, 220, 180)),
-        RED(new Color(255, 80, 80), new Color(240, 170, 170)),
-        YELLOW(new Color(255, 200, 40), new Color(240, 220, 170));
+        BLUE(new Color(0, 180, 255), new Color(180, 200, 240)), GREEN(new Color(0, 220, 120), new Color(170, 220, 180)), RED(new Color(255, 80, 80), new Color(240, 170, 170)), YELLOW(new Color(255, 200, 40), new Color(240, 220, 170));
 
         final Color glow;
         final Color core;
@@ -67,9 +64,7 @@ class HyperlaneTileGenerator {
 
     // Line format
     private enum HLStroke {
-        GLOW(20, AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f)),
-        GAP(10, AlphaComposite.getInstance(AlphaComposite.CLEAR, 0.0f)),
-        CORE(4, AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));
+        GLOW(20, AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f)), GAP(10, AlphaComposite.getInstance(AlphaComposite.CLEAR, 0.0f)), CORE(4, AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));
 
         final float width;
         final AlphaComposite composite;
@@ -82,33 +77,33 @@ class HyperlaneTileGenerator {
 
     // Connection mappings
     private static final Map<List<Integer>, Integer> STRAIGHT_CONNECTIONS = Map.of(
-            List.of(0, 3), 0,
-            List.of(1, 4), 60,
-            List.of(2, 5), 120);
+        List.of(0, 3), 0,
+        List.of(1, 4), 60,
+        List.of(2, 5), 120);
 
     private static final Map<List<Integer>, Integer> SMALL_CURVE_CONNECTIONS = Map.of(
-            List.of(0, 1), 0,
-            List.of(1, 2), 60,
-            List.of(2, 3), 120,
-            List.of(3, 4), 180,
-            List.of(4, 5), 240,
-            List.of(0, 5), 300);
+        List.of(0, 1), 0,
+        List.of(1, 2), 60,
+        List.of(2, 3), 120,
+        List.of(3, 4), 180,
+        List.of(4, 5), 240,
+        List.of(0, 5), 300);
 
     private static final Map<List<Integer>, Integer> LARGE_CURVE_CONNECTIONS = Map.of(
-            List.of(0, 2), 0,
-            List.of(1, 3), 60,
-            List.of(2, 4), 120,
-            List.of(3, 5), 180,
-            List.of(0, 4), 240,
-            List.of(1, 5), 300);
+        List.of(0, 2), 0,
+        List.of(1, 3), 60,
+        List.of(2, 4), 120,
+        List.of(3, 5), 180,
+        List.of(0, 4), 240,
+        List.of(1, 5), 300);
 
     private static final Map<List<Integer>, Integer> ROUNDABOUT_CONNECTIONS = Map.of(
-            List.of(0, 0), 0,
-            List.of(1, 1), 60,
-            List.of(2, 2), 120,
-            List.of(3, 3), 180,
-            List.of(4, 4), 240,
-            List.of(5, 5), 300);
+        List.of(0, 0), 0,
+        List.of(1, 1), 60,
+        List.of(2, 2), 120,
+        List.of(3, 3), 180,
+        List.of(4, 4), 240,
+        List.of(5, 5), 300);
 
     // Shape templates
     private static final Shape STRAIGHT_LINE_TEMPLATE = new Line2D.Float(CENTER_X, 0, CENTER_X, TILE_HEIGHT);
@@ -120,15 +115,15 @@ class HyperlaneTileGenerator {
     private static final Shape ROUNDABOUT = new Ellipse2D.Float(112.5f, 90, 120, 120);
 
     private static final Shape ROUNDABOUT_CONNECTOR_TEMPLATE = new Line2D.Float(
-            CENTER_X, 0,
-            CENTER_X, 90);
+        CENTER_X, 0,
+        CENTER_X, 90);
 
     // Map connections to templates
     private static final List<ConnectionRule> CONNECTION_RULES = List.of(
-            new ConnectionRule(STRAIGHT_CONNECTIONS, STRAIGHT_LINE_TEMPLATE),
-            new ConnectionRule(SMALL_CURVE_CONNECTIONS, SMALL_CURVE_TEMPLATE),
-            new ConnectionRule(LARGE_CURVE_CONNECTIONS, LARGE_CURVE_TEMPLATE),
-            new ConnectionRule(ROUNDABOUT_CONNECTIONS, ROUNDABOUT_CONNECTOR_TEMPLATE));
+        new ConnectionRule(STRAIGHT_CONNECTIONS, STRAIGHT_LINE_TEMPLATE),
+        new ConnectionRule(SMALL_CURVE_CONNECTIONS, SMALL_CURVE_TEMPLATE),
+        new ConnectionRule(LARGE_CURVE_CONNECTIONS, LARGE_CURVE_TEMPLATE),
+        new ConnectionRule(ROUNDABOUT_CONNECTIONS, ROUNDABOUT_CONNECTOR_TEMPLATE));
 
     // Cache for overlays to avoid re-generating the same overlay multiple times
     // Key as canonical matrix to save only once for each unique matrix and rotate as needed
@@ -198,7 +193,8 @@ class HyperlaneTileGenerator {
         g.setComposite(hlStroke.composite);
         g.setStroke(new BasicStroke(hlStroke.width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
         g.setColor(color);
-        for (Shape shape : shapes) g.draw(shape);
+        for (Shape shape : shapes)
+            g.draw(shape);
     }
 
     // If looking for selfConnections, return only those
@@ -239,33 +235,30 @@ class HyperlaneTileGenerator {
         Graphics2D g = transformed.createGraphics();
 
         switch (transform) {
-            case 1 ->
-                g.drawImage(
-                        original,
-                        0,
-                        0,
-                        TILE_WIDTH,
-                        TILE_HEIGHT,
-                        TILE_WIDTH,
-                        0,
-                        0,
-                        TILE_HEIGHT,
-                        null); // Horizontal flip
-            case 2 ->
-                g.drawImage(
-                        original, 0, 0, TILE_WIDTH, TILE_HEIGHT, 0, TILE_HEIGHT, TILE_WIDTH, 0, null); // Vertical flip
-            case 3 ->
-                g.drawImage(
-                        original,
-                        0,
-                        0,
-                        TILE_WIDTH,
-                        TILE_HEIGHT,
-                        TILE_WIDTH,
-                        TILE_HEIGHT,
-                        0,
-                        0,
-                        null); // Both flips (180° rotate)
+            case 1 -> g.drawImage(
+                original,
+                0,
+                0,
+                TILE_WIDTH,
+                TILE_HEIGHT,
+                TILE_WIDTH,
+                0,
+                0,
+                TILE_HEIGHT,
+                null); // Horizontal flip
+            case 2 -> g.drawImage(
+                original, 0, 0, TILE_WIDTH, TILE_HEIGHT, 0, TILE_HEIGHT, TILE_WIDTH, 0, null); // Vertical flip
+            case 3 -> g.drawImage(
+                original,
+                0,
+                0,
+                TILE_WIDTH,
+                TILE_HEIGHT,
+                TILE_WIDTH,
+                TILE_HEIGHT,
+                0,
+                0,
+                null); // Both flips (180° rotate)
             default -> g.drawImage(original, 0, 0, null); // No transformation
         }
 

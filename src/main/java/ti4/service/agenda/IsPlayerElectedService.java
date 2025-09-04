@@ -17,10 +17,9 @@ public class IsPlayerElectedService {
             return false;
         }
         return game.getLaws().keySet().stream()
-                .filter(currentLawId -> currentLawId.equalsIgnoreCase(lawId))
-                .map(currentLawId -> game.getLawsInfo().get(currentLawId))
-                .filter(Objects::nonNull)
-                .anyMatch(lawInfo ->
-                        lawInfo.equalsIgnoreCase(player.getFaction()) || lawInfo.equalsIgnoreCase(player.getColor()));
+            .filter(currentLawId -> currentLawId.equalsIgnoreCase(lawId))
+            .map(currentLawId -> game.getLawsInfo().get(currentLawId))
+            .filter(Objects::nonNull)
+            .anyMatch(lawInfo -> lawInfo.equalsIgnoreCase(player.getFaction()) || lawInfo.equalsIgnoreCase(player.getColor()));
     }
 }

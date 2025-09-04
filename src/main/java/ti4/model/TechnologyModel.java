@@ -39,12 +39,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private String initials;
 
     public enum TechnologyType {
-        PROPULSION,
-        BIOTIC,
-        CYBERNETIC,
-        WARFARE,
-        UNITUPGRADE,
-        NONE;
+        PROPULSION, BIOTIC, CYBERNETIC, WARFARE, UNITUPGRADE, NONE;
 
         public String toString() {
             return super.toString().toLowerCase();
@@ -73,20 +68,19 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         }
 
         public static final List<TechnologyType> mainFour = List.of(PROPULSION, BIOTIC, CYBERNETIC, WARFARE);
-        public static final List<TechnologyType> mainFive =
-                List.of(PROPULSION, BIOTIC, CYBERNETIC, WARFARE, UNITUPGRADE);
+        public static final List<TechnologyType> mainFive = List.of(PROPULSION, BIOTIC, CYBERNETIC, WARFARE, UNITUPGRADE);
     }
 
     public boolean isValid() {
         return alias != null
-                && name != null
-                && types != null
-                && !types.isEmpty()
-                // && getRequirements() != null
-                // && getFaction() != null
-                // && getBaseUpgrade() != null
-                && source != null
-                && text != null;
+            && name != null
+            && types != null
+            && !types.isEmpty()
+            // && getRequirements() != null
+            // && getFaction() != null
+            // && getBaseUpgrade() != null
+            && source != null
+            && text != null;
     }
 
     /**
@@ -232,7 +226,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
             return Optional.ofNullable(shortName).orElse(name);
         }
         return Optional.ofNullable(shortName)
-                .orElse(Mapper.getTech(getHomebrewReplacesID().get()).getShortName());
+            .orElse(Mapper.getTech(getHomebrewReplacesID().get()).getShortName());
     }
 
     public boolean getShrinkName() {
@@ -240,7 +234,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
             return Optional.ofNullable(shrinkName).orElse(false);
         }
         return Optional.ofNullable(shrinkName)
-                .orElse(Mapper.getTech(getHomebrewReplacesID().get()).getShrinkName());
+            .orElse(Mapper.getTech(getHomebrewReplacesID().get()).getShrinkName());
     }
 
     public String getInitials() {
@@ -248,7 +242,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
             return Optional.ofNullable(initials).orElse(name.substring(0, 1));
         }
         return Optional.ofNullable(initials)
-                .orElse(Mapper.getTech(getHomebrewReplacesID().get()).getInitials());
+            .orElse(Mapper.getTech(getHomebrewReplacesID().get()).getInitials());
     }
 
     public String getRepresentation(boolean includeCardText) {
@@ -309,11 +303,11 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
             factionEmoji = FactionEmojis.getFactionIcon(techFaction).toString();
         String techEmoji = getType().emoji();
         title.append(factionEmoji)
-                .append(techEmoji)
-                .append(" ")
-                .append(name)
-                .append(" ")
-                .append(source.emoji());
+            .append(techEmoji)
+            .append(" ")
+            .append(name)
+            .append(" ")
+            .append(source.emoji());
         return title.toString();
     }
 
@@ -376,8 +370,8 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                 }
                 case UNITUPGRADE -> {
                     String unitType = getBaseUpgrade().isEmpty()
-                            ? alias
-                            : getBaseUpgrade().get();
+                        ? alias
+                        : getBaseUpgrade().get();
                     switch (unitType) {
                         case "inf2" -> output.append(UnitEmojis.infantry);
                         case "ff2" -> output.append(UnitEmojis.fighter);
@@ -391,7 +385,8 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                         default -> output.append(UnitEmojis.flagship);
                     }
                 }
-                default -> {}
+                default -> {
+                }
             }
             if (single) return output.toString();
         }
@@ -412,9 +407,9 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public boolean search(String searchString) {
         return alias.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || getFaction().orElse("").contains(searchString)
-                || searchTags.contains(searchString);
+            || name.toLowerCase().contains(searchString)
+            || getFaction().orElse("").contains(searchString)
+            || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {

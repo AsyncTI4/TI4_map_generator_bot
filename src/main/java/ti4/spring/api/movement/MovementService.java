@@ -25,7 +25,8 @@ public class MovementService {
      * Apply the provided displacement to the given target position, handle token placement, and return the updated tile.
      */
     public Tile commitMovement(
-            Game game, Player player, String targetPosition, Map<String, List<MovementUnitCount>> displacement) {
+        Game game, Player player, String targetPosition, Map<String, List<MovementUnitCount>> displacement
+    ) {
         try {
             // Transform web payload into internal displacement structure, normalizing unit-holder keys
             Map<String, Map<UnitKey, List<Integer>>> internal = new HashMap<>();
@@ -53,7 +54,7 @@ public class MovementService {
             }
             if (targetPosition != null && !targetPosition.equals(active)) {
                 throw new IllegalStateException(
-                        "Target position '" + targetPosition + "' does not match active system '" + active + "'.");
+                    "Target position '" + targetPosition + "' does not match active system '" + active + "'.");
             }
 
             // Stage the full displacement and remove units from origins
@@ -68,9 +69,9 @@ public class MovementService {
             return tile;
         } catch (RuntimeException e) {
             BotLogger.error(
-                    new LogOrigin(game),
-                    "MovementService.commitMovement failed for target '" + targetPosition + "'",
-                    e);
+                new LogOrigin(game),
+                "MovementService.commitMovement failed for target '" + targetPosition + "'",
+                e);
             throw e;
         }
     }

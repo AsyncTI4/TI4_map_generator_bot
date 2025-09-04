@@ -39,20 +39,20 @@ class ShowAllSOToAll extends GameStateSubcommand {
         int index = 1;
         for (String so : secretObjectives) {
             sb.append(index)
-                    .append(" - ")
-                    .append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(so))
-                    .append("\n");
+                .append(" - ")
+                .append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(so))
+                .append("\n");
             player.setSecret(so);
             index++;
         }
         sb.append("\n").append("**Scored Secret Objectives:**").append("\n");
         for (Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
             sb.append(index)
-                    .append(". (")
-                    .append(so.getValue())
-                    .append(") - ")
-                    .append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(so.getKey()))
-                    .append("\n");
+                .append(". (")
+                .append(so.getValue())
+                .append(") - ")
+                .append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(so.getKey()))
+                .append("\n");
             index++;
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

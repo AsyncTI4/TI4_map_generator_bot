@@ -17,7 +17,7 @@ class ChangeToBaseGame extends GameStateSubcommand {
     public ChangeToBaseGame() {
         super(Constants.CHANGE_TO_BASE_GAME, "Remove Prophecy of Kings components from the game", true, true);
         addOptions(
-                new OptionData(OptionType.STRING, Constants.REMOVE_CODEX_AC, "Remove Codex action cards too? (y/n)"));
+            new OptionData(OptionType.STRING, Constants.REMOVE_CODEX_AC, "Remove Codex action cards too? (y/n)"));
     }
 
     @Override

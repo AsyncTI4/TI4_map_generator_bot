@@ -36,10 +36,10 @@ class Replace extends GameStateSubcommand {
     Replace() {
         super(Constants.REPLACE, "Replace player in game", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.PLAYER_FACTION, "Player being replaced")
-                .setAutoComplete(true)
-                .setRequired(true));
+            .setAutoComplete(true)
+            .setRequired(true));
         addOptions(
-                new OptionData(OptionType.USER, Constants.PLAYER, "Replacement player @playerName").setRequired(true));
+            new OptionData(OptionType.USER, Constants.PLAYER, "Replacement player @playerName").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setAutoComplete(true));
     }
 
@@ -49,15 +49,15 @@ class Replace extends GameStateSubcommand {
         Game game = getGame();
         if (game.getPlayer(event.getUser().getId()) == null && !isBotHelper) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Only game players or BotHelpers can replace a player.");
+                event.getChannel(), "Only game players or BotHelpers can replace a player.");
             return;
         }
 
         Player replacedPlayer = CommandHelper.getPlayerFromReplaceEvent(game, event);
         if (replacedPlayer == null) {
             MessageHelper.replyToMessage(
-                    event,
-                    "Could not find the player to replace. Please try again, and if the problem persists contact `@Bothelper`.");
+                event,
+                "Could not find the player to replace. Please try again, and if the problem persists contact `@Bothelper`.");
             return;
         }
 
@@ -70,8 +70,8 @@ class Replace extends GameStateSubcommand {
         User replacementUser = replacementPlayerOption.getAsUser();
         Player possibleSpectatorToRemove = game.getPlayer(replacementUser.getId());
         if (possibleSpectatorToRemove != null
-                && possibleSpectatorToRemove.getFaction() != null
-                && !"null".equalsIgnoreCase(possibleSpectatorToRemove.getFaction())) {
+            && possibleSpectatorToRemove.getFaction() != null
+            && !"null".equalsIgnoreCase(possibleSpectatorToRemove.getFaction())) {
             MessageHelper.replyToMessage(event, "Specify player that is **__not__** in the game to be the replacement");
             return;
         } else if (possibleSpectatorToRemove != null) {
@@ -142,28 +142,27 @@ class Replace extends GameStateSubcommand {
             TextChannel privateChannel = (TextChannel) replacedPlayer.getPrivateChannel();
 
             privateChannel.getMemberPermissionOverrides().stream()
-                    .filter(override -> Objects.equals(override.getMember(), oldMember))
-                    .findFirst()
-                    .ifPresent(oldOverride -> oldOverride.delete().queue());
+                .filter(override -> Objects.equals(override.getMember(), oldMember))
+                .findFirst()
+                .ifPresent(oldOverride -> oldOverride.delete().queue());
 
             // Update private channel
             if (oldMember != null) {
-                String newPrivateChannelName =
-                        privateChannel.getName().replace(getNormalizedName(oldMember), getNormalizedName(newMember));
+                String newPrivateChannelName = privateChannel.getName().replace(getNormalizedName(oldMember), getNormalizedName(newMember));
                 privateChannel.getManager().setName(newPrivateChannelName).queue();
             }
             privateChannel
-                    .getManager()
-                    .putMemberPermissionOverride(newMember.getIdLong(), permission, 0)
-                    .queue(success -> accessMessage(privateChannel, newMember));
+                .getManager()
+                .putMemberPermissionOverride(newMember.getIdLong(), permission, 0)
+                .queue(success -> accessMessage(privateChannel, newMember));
 
             // Update Cards Info
             ThreadChannel cardsInfo = replacedPlayer.getCardsInfoThread();
             String newCardsInfoName = cardsInfo
-                    .getName()
-                    .replace(
-                            oldPlayerUserName.replace("/", ""),
-                            replacedPlayer.getUserName().replace("/", ""));
+                .getName()
+                .replace(
+                    oldPlayerUserName.replace("/", ""),
+                    replacedPlayer.getUserName().replace("/", ""));
             cardsInfo.getManager().setName(newCardsInfoName).queue();
             if (oldMember != null) {
                 cardsInfo.removeThreadMember(oldMember).queue();
@@ -173,13 +172,12 @@ class Replace extends GameStateSubcommand {
             // Update private threads
             if (oldMember != null) {
                 game.getMainGameChannel()
-                        .getThreadChannels()
-                        .forEach(thread -> updateThread(thread, oldMember, newMember));
+                    .getThreadChannels()
+                    .forEach(thread -> updateThread(thread, oldMember, newMember));
 
                 game.getMainGameChannel()
-                        .retrieveArchivedPrivateThreadChannels()
-                        .queue(archivedThreads ->
-                                archivedThreads.forEach(thread -> updateThread(thread, oldMember, newMember)));
+                    .retrieveArchivedPrivateThreadChannels()
+                    .queue(archivedThreads -> archivedThreads.forEach(thread -> updateThread(thread, oldMember, newMember)));
             }
         }
 
@@ -187,17 +185,16 @@ class Replace extends GameStateSubcommand {
         ThreadChannel mapThread = game.getBotMapUpdatesThread();
         if (mapThread != null && !mapThread.isLocked()) {
             mapThread
-                    .getManager()
-                    .setArchived(false)
-                    .queue(
-                            success -> mapThread.addThreadMember(newMember).queueAfter(5, TimeUnit.SECONDS),
-                            BotLogger::catchRestError);
+                .getManager()
+                .setArchived(false)
+                .queue(
+                    success -> mapThread.addThreadMember(newMember).queueAfter(5, TimeUnit.SECONDS),
+                    BotLogger::catchRestError);
         }
 
         game.getMiltyDraftManager().replacePlayer(oldPlayerUserId, replacedPlayer.getUserID());
 
-        if (game.getMiltyDraftManager().getDraftIndex()
-                < game.getMiltyDraftManager().getDraftOrder().size()) {
+        if (game.getMiltyDraftManager().getDraftIndex() < game.getMiltyDraftManager().getDraftOrder().size()) {
             MiltyDraftManager manager = game.getMiltyDraftManager();
             DraftDisplayService.repostDraftInformation(manager, game);
         }
@@ -205,7 +202,7 @@ class Replace extends GameStateSubcommand {
         game.setReplacementMade(true);
 
         String message = "Game: " + game.getName() + "  Player: " + oldPlayerUserId + " replaced by player: "
-                + replacementUser.getName();
+            + replacementUser.getName();
         if (FoWHelper.isPrivateGame(game)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {
@@ -215,20 +212,20 @@ class Replace extends GameStateSubcommand {
 
     private void updateThread(ThreadChannel thread, Member oldMember, Member newMember) {
         thread.retrieveThreadMemberById(oldMember.getId())
-                .queue(
-                        oldThreadMember -> thread.getManager()
-                                .setArchived(false)
-                                .queue(success -> thread.removeThreadMember(oldMember)
-                                        .queue(success2 -> thread.addThreadMember(newMember)
-                                                .queue(success3 -> accessMessage(thread, newMember)))),
-                        failure -> {
-                            /* Old member is not in the thread -> Do nothing */
-                        });
+            .queue(
+                oldThreadMember -> thread.getManager()
+                    .setArchived(false)
+                    .queue(success -> thread.removeThreadMember(oldMember)
+                        .queue(success2 -> thread.addThreadMember(newMember)
+                            .queue(success3 -> accessMessage(thread, newMember)))),
+                failure -> {
+                    /* Old member is not in the thread -> Do nothing */
+                });
     }
 
     private void accessMessage(MessageChannel channel, Member member) {
         MessageHelper.sendMessageToChannel(
-                channel, "Access to " + channel.getName() + " granted for " + member.getAsMention());
+            channel, "Access to " + channel.getName() + " granted for " + member.getAsMention());
     }
 
     private String getNormalizedName(Member member) {
@@ -237,10 +234,10 @@ class Replace extends GameStateSubcommand {
             name = member.getEffectiveName();
         }
         name = name.toLowerCase()
-                .replaceAll("[\\s]+", "-")
-                .replaceAll("[^a-z0-9-]", "")
-                .replaceAll("-{2,}", "-")
-                .replaceAll("^-|-$", "");
+            .replaceAll("[\\s]+", "-")
+            .replaceAll("[^a-z0-9-]", "")
+            .replaceAll("-{2,}", "-")
+            .replaceAll("^-|-$", "");
         return name;
     }
 }

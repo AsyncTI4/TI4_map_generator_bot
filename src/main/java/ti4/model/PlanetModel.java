@@ -85,7 +85,8 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @Deprecated
     public Point getPositionInTile() {
-        if (positionInTile != null) return positionInTile;
+        if (positionInTile != null)
+            return positionInTile;
         else if (planetLayout != null && planetLayout.getCenterPosition() != null) {
             return planetLayout.getCenterPosition();
         }
@@ -254,9 +255,9 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
             cachedStickerUrl = getEmojiURL();
         } else {
             cachedStickerUrl = AsyncTI4DiscordBot.jda
-                    .retrieveSticker(Sticker.fromId(ident))
-                    .complete()
-                    .getIconUrl();
+                .retrieveSticker(Sticker.fromId(ident))
+                .complete()
+                .getIconUrl();
         }
 
         return cachedStickerUrl;
@@ -264,9 +265,9 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     public boolean search(String searchString) {
         return name.toLowerCase().contains(searchString)
-                || id.toLowerCase().contains(searchString)
-                || source.toString().contains(searchString)
-                || searchTags.contains(searchString);
+            || id.toLowerCase().contains(searchString)
+            || source.toString().contains(searchString)
+            || searchTags.contains(searchString);
     }
 
     @JsonIgnore

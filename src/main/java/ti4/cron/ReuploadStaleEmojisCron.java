@@ -10,10 +10,10 @@ public class ReuploadStaleEmojisCron {
 
     public static void register() {
         CronManager.scheduleOnce(
-                ReuploadStaleEmojisCron.class,
-                ReuploadStaleEmojisCron::reuploadEmojisAndDeleteHanging,
-                2,
-                TimeUnit.MINUTES);
+            ReuploadStaleEmojisCron.class,
+            ReuploadStaleEmojisCron::reuploadEmojisAndDeleteHanging,
+            2,
+            TimeUnit.MINUTES);
     }
 
     private static void reuploadEmojisAndDeleteHanging() {

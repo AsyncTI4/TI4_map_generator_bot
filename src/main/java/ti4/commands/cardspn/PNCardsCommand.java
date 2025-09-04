@@ -10,16 +10,16 @@ import ti4.helpers.Constants;
 public class PNCardsCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new ShowPN(),
-                    new ShowAllPN(),
-                    new ShowPNToAll(),
-                    new PlayPN(),
-                    new SendPN(),
-                    new PurgePN(),
-                    new PNInfo(),
-                    new SendRandomPN(),
-                    new PNReset())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new ShowPN(),
+        new ShowAllPN(),
+        new ShowPNToAll(),
+        new PlayPN(),
+        new SendPN(),
+        new PurgePN(),
+        new PNInfo(),
+        new SendRandomPN(),
+        new PNReset())
+        .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

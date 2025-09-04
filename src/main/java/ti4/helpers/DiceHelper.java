@@ -34,8 +34,10 @@ public class DiceHelper {
         }
 
         public String getRedDieIfSuccessOrGrayDieIfFailure() {
-            if (isSuccess()) return DiceEmojis.getRedDieEmoji(result);
-            else return DiceEmojis.getGrayDieEmoji(result);
+            if (isSuccess())
+                return DiceEmojis.getRedDieEmoji(result);
+            else
+                return DiceEmojis.getGrayDieEmoji(result);
         }
 
         String printResult() {
@@ -85,8 +87,7 @@ public class DiceHelper {
             mapByThreshold.put(d.getThreshold(), l);
         }
 
-        List<Integer> smallestToLargest =
-                mapByThreshold.keySet().stream().sorted().toList();
+        List<Integer> smallestToLargest = mapByThreshold.keySet().stream().sorted().toList();
         StringBuilder sb = new StringBuilder();
         for (Integer threshold : smallestToLargest) {
             List<Die> results = mapByThreshold.get(threshold);

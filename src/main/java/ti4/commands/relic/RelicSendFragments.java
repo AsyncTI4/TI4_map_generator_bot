@@ -19,11 +19,11 @@ class RelicSendFragments extends GameStateSubcommand {
 
         addOption(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.", true, true);
         addOption(
-                OptionType.STRING,
-                Constants.TARGET_FACTION_OR_COLOR,
-                "Faction or Color you are sending to.",
-                true,
-                true);
+            OptionType.STRING,
+            Constants.TARGET_FACTION_OR_COLOR,
+            "Faction or Color you are sending to.",
+            true,
+            true);
         addOption(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color (defaults to you)", false, true);
         addOption(OptionType.INTEGER, Constants.COUNT, "Number of fragments (default 1)");
     }

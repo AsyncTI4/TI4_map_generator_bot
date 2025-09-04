@@ -41,11 +41,11 @@ class RelicAddCodexRelics extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, "No new relics have been added.");
         } else {
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    (relicCount == 2
-                                    ? newRelics
-                                    : AND_PATTERN.matcher(newRelics).replaceFirst(", "))
-                            + (relicCount == 1 ? "has" : "have") + " been shuffled into the relic deck.");
+                event,
+                (relicCount == 2
+                    ? newRelics
+                    : AND_PATTERN.matcher(newRelics).replaceFirst(", "))
+                    + (relicCount == 1 ? "has" : "have") + " been shuffled into the relic deck.");
         }
     }
 }

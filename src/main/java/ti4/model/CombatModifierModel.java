@@ -33,12 +33,13 @@ public class CombatModifierModel implements ModelInterface {
 
     public boolean isRelevantTo(String relatedType, String relatedAlias) {
         return related.stream()
-                .anyMatch(related -> related.getAlias().equals(relatedAlias)
-                        && related.getType().equals(relatedType));
+            .anyMatch(related -> related.getAlias().equals(relatedAlias)
+                && related.getType().equals(relatedType));
     }
 
     public Boolean isInScopeForUnit(
-            UnitModel unit, List<UnitModel> allUnits, CombatRollType rollType, Game game, Player player) {
+        UnitModel unit, List<UnitModel> allUnits, CombatRollType rollType, Game game, Player player
+    ) {
         boolean isInScope = false;
         if (scopeExcept != null) {
             if (!scopeExcept.equals(unit.getAsyncId())) {
@@ -51,7 +52,7 @@ public class CombatModifierModel implements ModelInterface {
             if ("_best_".equals(scope)) {
                 List<UnitModel> sortedAllUnits = new ArrayList<>(allUnits);
                 sortedAllUnits.sort(
-                        Comparator.comparingInt(a -> a.getCombatDieHitsOnForAbility(rollType, player, game)));
+                    Comparator.comparingInt(a -> a.getCombatDieHitsOnForAbility(rollType, player, game)));
                 isInScope = Objects.equals(sortedAllUnits.getFirst().getAsyncId(), unit.getAsyncId());
             }
             if ("_ship_".equals(scope)) {

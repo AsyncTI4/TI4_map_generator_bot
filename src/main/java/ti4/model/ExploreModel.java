@@ -27,12 +27,12 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean isValid() {
         return id != null
-                && name != null
-                && type != null
-                && resolution != null
-                && List.of("Fragment", "Attach", "Instant", "Token", "Leader").contains(resolution)
-                && text != null
-                && source != null;
+            && name != null
+            && type != null
+            && resolution != null
+            && List.of("Fragment", "Attach", "Instant", "Token", "Leader").contains(resolution)
+            && text != null
+            && source != null;
     }
 
     @Override
@@ -54,14 +54,14 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     @Deprecated
     public String getRepresentation() {
         return String.format(
-                "%s;%s;%s;%s;%s;%s;%s",
-                name,
-                type.toLowerCase(),
-                -1,
-                resolution,
-                text,
-                getAttachmentId().orElse(""),
-                source);
+            "%s;%s;%s;%s;%s;%s;%s",
+            name,
+            type.toLowerCase(),
+            -1,
+            resolution,
+            text,
+            getAttachmentId().orElse(""),
+            source);
     }
 
     public String textRepresentation() {
@@ -75,10 +75,10 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     public boolean search(String searchString) {
         searchString = searchString.toLowerCase();
         return name.toLowerCase().contains(searchString)
-                || text.toLowerCase().contains(searchString)
-                || id.toLowerCase().contains(searchString)
-                || type.toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
+            || text.toLowerCase().contains(searchString)
+            || id.toLowerCase().contains(searchString)
+            || type.toLowerCase().contains(searchString)
+            || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {

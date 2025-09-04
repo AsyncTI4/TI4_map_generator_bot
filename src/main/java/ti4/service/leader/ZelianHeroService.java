@@ -21,7 +21,8 @@ import ti4.message.MessageHelper;
 public class ZelianHeroService {
 
     public static void secondHalfOfCelestialImpact(
-            Player player, GenericInteractionCreateEvent event, Tile tile, Game game) {
+        Player player, GenericInteractionCreateEvent event, Tile tile, Game game
+    ) {
         String message1 = "Moments before disaster in game " + game.getName() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 1, message1);
 
@@ -43,8 +44,8 @@ public class ZelianHeroService {
             resourcesSum += p.getResources();
         }
         String tgGainMsg = player.getFactionEmoji() + " gained " + resourcesSum + " trade good"
-                + (resourcesSum == 1 ? "" : "s") + " from _Celestial Impact_ (" + player.getTg()
-                + "->" + (player.getTg() + resourcesSum) + ").";
+            + (resourcesSum == 1 ? "" : "s") + " from _Celestial Impact_ (" + player.getTg()
+            + "->" + (player.getTg() + resourcesSum) + ").";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), tgGainMsg);
         player.gainTG(resourcesSum);
         ButtonHelperAbilities.pillageCheck(player, game);
@@ -57,22 +58,21 @@ public class ZelianHeroService {
         game.setTile(asteroidTile);
 
         // After shot to disaster channel
-        String message2 =
-                tile.getRepresentation() + " has been _Celestial Impact_'d by " + player.getRepresentation() + ".";
+        String message2 = tile.getRepresentation() + " has been _Celestial Impact_'d by " + player.getRepresentation() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, asteroidTile, 1, message2);
 
         if (player.hasLeaderUnlocked("zelianhero")) {
             Leader playerLeader = player.getLeader("zelianhero").orElse(null);
             StringBuilder message = new StringBuilder(player.getRepresentation())
-                    .append(" played ")
-                    .append(Helper.getLeaderFullRepresentation(playerLeader));
+                .append(" played ")
+                .append(Helper.getLeaderFullRepresentation(playerLeader));
             boolean purged = player.removeLeader(playerLeader);
             if (purged) {
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), message + " - Zelian R, the Zelian heRo, has been purged.");
+                    event.getMessageChannel(), message + " - Zelian R, the Zelian heRo, has been purged.");
             } else {
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), "Zelian R, the Zelian heRo, was not purged - something went wrong.");
+                    event.getMessageChannel(), "Zelian R, the Zelian heRo, was not purged - something went wrong.");
             }
         }
     }

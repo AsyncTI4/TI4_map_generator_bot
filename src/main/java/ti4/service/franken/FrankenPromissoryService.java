@@ -15,13 +15,14 @@ import ti4.model.PromissoryNoteModel;
 public class FrankenPromissoryService {
 
     public static void addPromissoryNotes(
-            GenericInteractionCreateEvent event, Game game, Player player, List<String> pnIDs) {
+        GenericInteractionCreateEvent event, Game game, Player player, List<String> pnIDs
+    ) {
         StringBuilder sb = new StringBuilder(player.getRepresentation())
-                .append(" added ")
-                .append(pnIDs.size() == 1 ? "a " : "")
-                .append("promissory note")
-                .append(pnIDs.size() == 1 ? "" : "s")
-                .append(":\n");
+            .append(" added ")
+            .append(pnIDs.size() == 1 ? "a " : "")
+            .append("promissory note")
+            .append(pnIDs.size() == 1 ? "" : "s")
+            .append(":\n");
         List<MessageEmbed> embeds = new ArrayList<>();
         for (String pnID : pnIDs) {
             Player pnOwner = game.getPNOwner(pnID);

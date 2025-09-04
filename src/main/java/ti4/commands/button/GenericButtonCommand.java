@@ -17,12 +17,12 @@ public class GenericButtonCommand implements ParentCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-                new OptionData(
-                                OptionType.STRING,
-                                Constants.BUTTON_TEXT,
-                                "The text/prompt that will appear on the button itself. Max 80 characters.")
-                        .setRequired(true),
-                new OptionData(OptionType.STRING, "spoof_id", "Spoof the buttonID, mainly for debugging purposes"));
+            new OptionData(
+                OptionType.STRING,
+                Constants.BUTTON_TEXT,
+                "The text/prompt that will appear on the button itself. Max 80 characters.")
+                    .setRequired(true),
+            new OptionData(OptionType.STRING, "spoof_id", "Spoof the buttonID, mainly for debugging purposes"));
     }
 
     @Override
@@ -50,9 +50,9 @@ public class GenericButtonCommand implements ParentCommand {
         }
 
         String id = event.getOption(
-                "spoof_id", Constants.GENERIC_BUTTON_ID_PREFIX + event.getId(), OptionMapping::getAsString);
+            "spoof_id", Constants.GENERIC_BUTTON_ID_PREFIX + event.getId(), OptionMapping::getAsString);
         Button button = Buttons.gray(id, buttonText);
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), message, Collections.singletonList(button));
+            event.getMessageChannel(), message, Collections.singletonList(button));
     }
 }

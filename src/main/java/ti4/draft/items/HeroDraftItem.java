@@ -41,7 +41,7 @@ public class HeroDraftItem extends DraftItem {
         LeaderModel leader = getLeader();
         if (leader != null) {
             return "**" + leader.getAbilityName().orElse("").replace("\n", "") + "** - " + "*"
-                    + leader.getAbilityWindow() + "* " + leader.getAbilityText();
+                + leader.getAbilityWindow() + "* " + leader.getAbilityText();
         }
         return "";
     }
@@ -68,7 +68,7 @@ public class HeroDraftItem extends DraftItem {
         for (FactionModel faction : factions) {
             List<String> leaders = faction.getLeaders();
             leaders.removeIf(
-                    (String leader) -> !"hero".equals(allLeaders.get(leader).getType()));
+                (String leader) -> !"hero".equals(allLeaders.get(leader).getType()));
             for (String leader : leaders) {
                 allItems.add(generate(Category.HERO, leader));
             }
@@ -89,7 +89,7 @@ public class HeroDraftItem extends DraftItem {
         for (FactionModel faction : factions) {
             List<String> leaders = faction.getLeaders();
             leaders.removeIf(
-                    (String leader) -> !"hero".equals(allLeaders.get(leader).getType()));
+                (String leader) -> !"hero".equals(allLeaders.get(leader).getType()));
             for (String leader : leaders) {
                 if (Arrays.asList(results).contains(leader)) {
                     continue;

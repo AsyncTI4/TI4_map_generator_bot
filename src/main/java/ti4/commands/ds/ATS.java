@@ -21,6 +21,6 @@ class ATS extends GameStateSubcommand {
             getPlayer().setAtsCount(count);
         }
         MessageHelper.sendMessageToChannel(
-                event.getChannel(), "Set commodities count to " + count + " on _ATS Armaments_.");
+            event.getChannel(), "Set commodities count to " + count + " on _ATS Armaments_.");
     }
 }

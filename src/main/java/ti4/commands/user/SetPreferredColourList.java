@@ -17,16 +17,16 @@ class SetPreferredColourList extends Subcommand {
     public SetPreferredColourList() {
         super("set_preferred_colours", "Set your preferred colour list");
         addOption(
-                OptionType.STRING,
-                "colour_list",
-                "Enter an ordered comma separated list of your preferred player colour.",
-                true);
+            OptionType.STRING,
+            "colour_list",
+            "Enter an ordered comma separated list of your preferred player colour.",
+            true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         List<String> colors = Helper.getListFromCSV(
-                event.getOption("colour_list", null, OptionMapping::getAsString).toLowerCase());
+            event.getOption("colour_list", null, OptionMapping::getAsString).toLowerCase());
         colors = new ArrayList<>(colors.stream().map(AliasHandler::resolveColor).toList());
 
         List<String> badColours = new ArrayList<>();
@@ -45,8 +45,8 @@ class SetPreferredColourList extends Subcommand {
         sb.append("Preferred Colour List updated to: `").append(colors).append("`");
         if (!badColours.isEmpty()) {
             sb.append("\nThe following colours were invalid and were not added: `")
-                    .append(badColours)
-                    .append("`");
+                .append(badColours)
+                .append("`");
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }

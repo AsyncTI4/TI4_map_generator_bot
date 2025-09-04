@@ -23,7 +23,8 @@ public class FileUploadService {
     }
 
     private static FileUpload createFileUpload(
-            BufferedImage bufferedImage, String filenamePrefix, String fileFormat, boolean saveLocalCopy) {
+        BufferedImage bufferedImage, String filenamePrefix, String fileFormat, boolean saveLocalCopy
+    ) {
         byte[] imageBytes;
         switch (fileFormat) {
             case "png" -> imageBytes = ImageHelper.writePng(bufferedImage);
@@ -39,7 +40,8 @@ public class FileUploadService {
     }
 
     private static FileUpload createFileUpload(
-            byte[] bytes, String filenamePrefix, String fileFormat, boolean saveLocalCopy) {
+        byte[] bytes, String filenamePrefix, String fileFormat, boolean saveLocalCopy
+    ) {
         if (bytes == null || bytes.length == 0) return null;
 
         if (saveLocalCopy) optionallySaveToLocal(bytes, filenamePrefix, fileFormat);
@@ -55,7 +57,7 @@ public class FileUploadService {
 
     private static void optionallySaveToLocal(byte[] bytes, String filenamePrefix, String filenameSuffix) {
         String mapImageStoragePath = Storage.getStoragePath() + File.separator + "mapImages" + File.separator
-                + filenamePrefix + "." + filenameSuffix;
+            + filenamePrefix + "." + filenameSuffix;
         try (FileOutputStream fileOutputStream = new FileOutputStream(mapImageStoragePath)) {
             fileOutputStream.write(bytes);
         } catch (IOException e) {

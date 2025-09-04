@@ -11,10 +11,10 @@ class RevealAndPutACIntoDiscard extends GameStateSubcommand {
 
     public RevealAndPutACIntoDiscard() {
         super(
-                Constants.REVEAL_AND_PUT_AC_INTO_DISCARD,
-                "Reveal Action Card from deck and put into discard pile",
-                true,
-                true);
+            Constants.REVEAL_AND_PUT_AC_INTO_DISCARD,
+            "Reveal Action Card from deck and put into discard pile",
+            true,
+            true);
     }
 
     @Override
@@ -22,9 +22,9 @@ class RevealAndPutACIntoDiscard extends GameStateSubcommand {
         Game game = getGame();
         String acID = game.drawActionCardAndDiscard();
         String sb = "Game: " + game.getName() + " " + "Player: "
-                + getPlayer().getUserName() + "\n" + "Revealed and discarded Action card: "
-                + Mapper.getActionCard(acID).getRepresentation()
-                + "\n";
+            + getPlayer().getUserName() + "\n" + "Revealed and discarded Action card: "
+            + Mapper.getActionCard(acID).getRepresentation()
+            + "\n";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
     }
 }

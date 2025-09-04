@@ -22,8 +22,7 @@ public class EgressClientManager {
     private static final HttpClient httpClient = HttpClient.newHttpClient();
 
     @Getter
-    private static final S3AsyncClient s3AsyncClient =
-            S3AsyncClient.builder().region(Region.US_EAST_1).build();
+    private static final S3AsyncClient s3AsyncClient = S3AsyncClient.builder().region(Region.US_EAST_1).build();
 
     @Getter
     private static final Properties webProperties;
@@ -31,7 +30,7 @@ public class EgressClientManager {
     static {
         webProperties = new Properties();
         try (InputStream input = new FileInputStream(
-                Objects.requireNonNull(ResourceHelper.getInstance().getWebFile("web.properties")))) {
+            Objects.requireNonNull(ResourceHelper.getInstance().getWebFile("web.properties")))) {
             webProperties.load(input);
         } catch (IOException e) {
             BotLogger.error("Could not load web properties.", e);

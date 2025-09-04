@@ -17,9 +17,9 @@ class ExploreShuffleIntoDeckFromHand extends GameStateSubcommand {
     ExploreShuffleIntoDeckFromHand() {
         super(Constants.SHUFFLE_INTO_DECK_FROM_HAND, "Discard an Exploration Card from the hand to deck.", true, true);
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.EXPLORE_CARD_ID,
-                        "Exploration card ids. May include multiple comma-separated ids.")
+            OptionType.STRING,
+            Constants.EXPLORE_CARD_ID,
+            "Exploration card ids. May include multiple comma-separated ids.")
                 .setRequired(true));
     }
 
@@ -28,8 +28,8 @@ class ExploreShuffleIntoDeckFromHand extends GameStateSubcommand {
         Game game = getGame();
         Player activePlayer = getPlayer();
         String ids = PatternHelper.SPACE_PATTERN
-                .matcher(event.getOption(Constants.EXPLORE_CARD_ID).getAsString())
-                .replaceAll("");
+            .matcher(event.getOption(Constants.EXPLORE_CARD_ID).getAsString())
+            .replaceAll("");
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {
@@ -37,14 +37,14 @@ class ExploreShuffleIntoDeckFromHand extends GameStateSubcommand {
             if (explore != null) {
                 activePlayer.removeFragment(id);
                 sb.append("Fragment discarded: ")
-                        .append(explore.textRepresentation())
-                        .append(System.lineSeparator());
+                    .append(explore.textRepresentation())
+                    .append(System.lineSeparator());
                 game.addExplore(id);
             } else {
                 sb.append("Card ID ")
-                        .append(id)
-                        .append(" not found, please retry")
-                        .append(System.lineSeparator());
+                    .append(id)
+                    .append(" not found, please retry")
+                    .append(System.lineSeparator());
             }
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

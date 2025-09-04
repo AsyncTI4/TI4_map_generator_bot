@@ -26,14 +26,14 @@ class KollectAgentButtonHandler {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         String msg2 = player.getFactionEmojiOrColor() + " selected "
-                + p2.getFactionEmojiOrColor() + " as user of "
-                + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "Captain Dust, the Kollecc" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                + " agent.";
+            + p2.getFactionEmojiOrColor() + " as user of "
+            + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            + "Captain Dust, the Kollecc" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
+            + " agent.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         List<Button> buttons = getKolleccAgentButtons(game, p2);
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(), p2.getRepresentationUnfogged() + " use buttons to resolve", buttons);
+            player.getCorrectChannel(), p2.getRepresentationUnfogged() + " use buttons to resolve", buttons);
         ButtonHelper.deleteMessage(event);
     }
 

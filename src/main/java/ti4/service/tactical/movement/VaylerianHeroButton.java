@@ -14,6 +14,6 @@ public final class VaylerianHeroButton implements MoveAbilityButton {
 
     public List<Button> build(MoveContext ctx) {
         return List.of(Buttons.blue(
-                ctx.player.finChecker() + "purgeVaylerianHero", "Use Vaylerian Hero", FactionEmojis.vaylerian));
+            ctx.player.finChecker() + "purgeVaylerianHero", "Use Vaylerian Hero", FactionEmojis.vaylerian));
     }
 }

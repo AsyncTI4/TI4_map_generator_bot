@@ -20,11 +20,11 @@ class SwapTwoSystems extends GameStateSubcommand {
     public SwapTwoSystems() {
         super(Constants.SWAP_SYSTEMS, "Swap two systems", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to swap from or RND")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to swap to or RND")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
     }
 
     @Override
@@ -65,9 +65,9 @@ class SwapTwoSystems extends GameStateSubcommand {
     private Tile getRandomTile() {
         Set<String> EXCLUDED_POSITIONS = Set.of("tl", "tr", "bl", "br");
         List<Tile> availableTiles = getGame().getTileMap().values().stream()
-                .filter(tile -> !EXCLUDED_POSITIONS.contains(tile.getPosition()))
-                .filter(tile -> !tile.getTileModel().isHyperlane())
-                .toList();
+            .filter(tile -> !EXCLUDED_POSITIONS.contains(tile.getPosition()))
+            .filter(tile -> !tile.getTileModel().isHyperlane())
+            .toList();
 
         if (availableTiles.isEmpty()) {
             return null;

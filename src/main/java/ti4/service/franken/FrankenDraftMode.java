@@ -1,9 +1,7 @@
 package ti4.service.franken;
 
 public enum FrankenDraftMode {
-    POWERED("powered", "Adds 1 extra faction technology/ability to pick from."),
-    ONEPICK("onepick", "Draft 1 item a time."),
-    POWEREDONEPICK("poweredonepick", "Combines powered and onepick modes.");
+    POWERED("powered", "Adds 1 extra faction technology/ability to pick from."), ONEPICK("onepick", "Draft 1 item a time."), POWEREDONEPICK("poweredonepick", "Combines powered and onepick modes.");
 
     private final String name;
     private final String description;
@@ -33,7 +31,7 @@ public enum FrankenDraftMode {
 
     public boolean search(String searchString) {
         return name.toLowerCase().contains(searchString)
-                || description.toLowerCase().contains(searchString)
-                || toString().contains(searchString);
+            || description.toLowerCase().contains(searchString)
+            || toString().contains(searchString);
     }
 }

@@ -62,10 +62,10 @@ public class FlagshipDraftItem extends DraftItem {
         }
         if (unit.getAfbDieCount() > 0) {
             sb.append("ANTI-FIGHTER BARRAGE ")
-                    .append(unit.getAfbHitsOn())
-                    .append("x")
-                    .append(unit.getAfbDieCount())
-                    .append(" ");
+                .append(unit.getAfbHitsOn())
+                .append("x")
+                .append(unit.getAfbDieCount())
+                .append(" ");
         }
         if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get());
         return sb.toString();
@@ -89,7 +89,7 @@ public class FlagshipDraftItem extends DraftItem {
         for (FactionModel faction : factions) {
             var units = faction.getUnits();
             units.removeIf(
-                    (String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
+                (String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
             allItems.add(generate(Category.FLAGSHIP, units.getFirst()));
         }
         return allItems;
@@ -111,7 +111,7 @@ public class FlagshipDraftItem extends DraftItem {
             }
             var units = faction.getUnits();
             units.removeIf(
-                    (String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
+                (String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
             allItems.add(generate(Category.FLAGSHIP, units.getFirst()));
         }
         return allItems;

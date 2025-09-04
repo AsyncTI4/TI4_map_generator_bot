@@ -28,8 +28,7 @@ public class GlobalSettings {
         URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES, //
         GUILD_ID_FOR_NEW_GAME_CATEGORIES, // Which guild to create new game categories in (DEPRECATED)
         MAX_GAMES_PER_CATEGORY, // Max # of games when creating a category
-        ALLOW_GAME_CREATION,
-        READY_TO_RECEIVE_COMMANDS; // Whether the bot is ready to receive commands
+        ALLOW_GAME_CREATION, READY_TO_RECEIVE_COMMANDS; // Whether the bot is ready to receive commands
 
         @Override
         public String toString() {
@@ -81,8 +80,7 @@ public class GlobalSettings {
 
     public static String getSettingsRepresentation() {
         StringBuilder sb = new StringBuilder("### Global Settings:\n```");
-        for (Entry<String, Object> entries :
-                settings.entrySet().stream().sorted(Entry.comparingByKey()).toList()) {
+        for (Entry<String, Object> entries : settings.entrySet().stream().sorted(Entry.comparingByKey()).toList()) {
             sb.append(entries.getKey()).append(": ").append(entries.getValue()).append("\n");
         }
         sb.append("```");

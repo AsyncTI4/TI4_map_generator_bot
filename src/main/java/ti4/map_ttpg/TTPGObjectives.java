@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"Public Objectives I", "Public Objectives II", "Secret Objectives", "Agenda", "Relics", "Other"})
+@JsonPropertyOrder({ "Public Objectives I", "Public Objectives II", "Secret Objectives", "Agenda", "Relics", "Other" })
 public class TTPGObjectives {
 
     @JsonProperty("Public Objectives I")

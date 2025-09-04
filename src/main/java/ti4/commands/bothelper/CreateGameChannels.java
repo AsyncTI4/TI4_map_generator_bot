@@ -24,14 +24,14 @@ class CreateGameChannels extends Subcommand {
     public CreateGameChannels() {
         super(Constants.CREATE_GAME_CHANNELS, "Create Role and Game Channels for a New Game");
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.GAME_FUN_NAME,
-                        "Fun Name for the Channel - e.g. pbd###-fun-name-goes-here")
+            OptionType.STRING,
+            Constants.GAME_FUN_NAME,
+            "Fun Name for the Channel - e.g. pbd###-fun-name-goes-here")
                 .setRequired(true));
         addOptions(new OptionData(
-                        OptionType.USER,
-                        Constants.PLAYER1,
-                        "Player1 @playerName - this will be the game owner, who will complete /game setup")
+            OptionType.USER,
+            Constants.PLAYER1,
+            "Player1 @playerName - this will be the game owner, who will complete /game setup")
                 .setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3 @playerName"));
@@ -41,11 +41,11 @@ class CreateGameChannels extends Subcommand {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8 @playerName"));
         addOptions(new OptionData(
-                OptionType.STRING, Constants.GAME_NAME, "Override default game/role name (next pbd###)"));
+            OptionType.STRING, Constants.GAME_NAME, "Override default game/role name (next pbd###)"));
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.CATEGORY,
-                        "Override default Category #category-name (PBD #XYZ-ZYX)")
+            OptionType.STRING,
+            Constants.CATEGORY,
+            "Override default Category #category-name (PBD #XYZ-ZYX)")
                 .setAutoComplete(true));
     }
 
@@ -61,9 +61,9 @@ class CreateGameChannels extends Subcommand {
         }
         if (CreateGameService.gameOrRoleAlreadyExists(gameName)) {
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    "Role or Game: **" + gameName
-                            + "** already exists accross all supported servers. Try again with a new name.");
+                event,
+                "Role or Game: **" + gameName
+                    + "** already exists accross all supported servers. Try again with a new name.");
             return;
         }
 
@@ -80,15 +80,15 @@ class CreateGameChannels extends Subcommand {
                 return;
             } else {
                 categoryChannel = AsyncTI4DiscordBot.jda
-                        .getCategoriesByName(categoryChannelName, false)
-                        .getFirst();
+                    .getCategoriesByName(categoryChannelName, false)
+                    .getFirst();
             }
         } else { // CATEGORY WAS NOT PROVIDED, FIND OR CREATE ONE
             categoryChannelName = CreateGameService.getCategoryNameForGame(gameName);
             if (categoryChannelName == null) {
                 MessageHelper.sendMessageToEventChannel(
-                        event,
-                        "Category could not be automatically determined. Please provide a category name for this game.");
+                    event,
+                    "Category could not be automatically determined. Please provide a category name for this game.");
                 return;
             }
             List<Category> categories = CreateGameService.getAllAvailablePBDCategories();
@@ -101,9 +101,9 @@ class CreateGameChannels extends Subcommand {
             if (categoryChannel == null) categoryChannel = CreateGameService.createNewCategory(categoryChannelName);
             if (categoryChannel == null) {
                 MessageHelper.sendMessageToEventChannel(
-                        event,
-                        "Could not automatically find a category that begins with **" + categoryChannelName
-                                + "** - Please create this category.");
+                    event,
+                    "Could not automatically find a category that begins with **" + categoryChannelName
+                        + "** - Please create this category.");
                 return;
             }
         }
@@ -111,9 +111,9 @@ class CreateGameChannels extends Subcommand {
         // CHECK IF CATEGORY EXISTS
         if (categoryChannel == null || categoryChannel.getType() != ChannelType.CATEGORY) {
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    "Category: **" + categoryChannelName
-                            + "** does not exist. Create the category or pick a different category, then try again.");
+                event,
+                "Category: **" + categoryChannelName
+                    + "** does not exist. Create the category or pick a different category, then try again.");
             return;
         }
 
@@ -121,8 +121,8 @@ class CreateGameChannels extends Subcommand {
         Guild guild = categoryChannel.getGuild();
         if (!CreateGameService.serverCanHostNewGame(guild)) {
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+                event,
+                "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
             return;
         }
 
@@ -130,9 +130,9 @@ class CreateGameChannels extends Subcommand {
         Category category = categoryChannel;
         if (category.getChannels().size() > 48) {
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    "Category: **" + category.getName() + "** is full on server **" + guild.getName()
-                            + "**. Create a new category then try again.");
+                event,
+                "Category: **" + category.getName() + "** is full on server **" + guild.getName()
+                    + "**. Create a new category then try again.");
             return;
         }
 
@@ -150,8 +150,7 @@ class CreateGameChannels extends Subcommand {
         }
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString();
 
-        Game game =
-                CreateGameService.createGameChannels(members, event, gameFunName, gameName, gameOwner, categoryChannel);
+        Game game = CreateGameService.createGameChannels(members, event, gameFunName, gameName, gameOwner, categoryChannel);
         if (game != null) {
             GameManager.save(game, "Created game channels");
         }

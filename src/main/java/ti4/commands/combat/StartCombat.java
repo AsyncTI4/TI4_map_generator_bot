@@ -22,12 +22,12 @@ class StartCombat extends GameStateSubcommand {
     public StartCombat() {
         super(Constants.START_COMBAT, "Start a new combat thread for a given tile.", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile to move units from")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.COMBAT_TYPE,
-                        "Type of combat to start 'space' or 'ground' - Default: space")
+            OptionType.STRING,
+            Constants.COMBAT_TYPE,
+            "Type of combat to start 'space' or 'ground' - Default: space")
                 .setAutoComplete(true));
     }
 
@@ -55,12 +55,12 @@ class StartCombat extends GameStateSubcommand {
 
         if (playersForCombat.size() > 2) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "There are more than 2 players in this system - something may not work correctly *yet*.");
+                event.getChannel(),
+                "There are more than 2 players in this system - something may not work correctly *yet*.");
         } else if (playersForCombat.size() < 2) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "There are less than 2 players in this system - a combat thread could not be created.");
+                event.getChannel(),
+                "There are less than 2 players in this system - a combat thread could not be created.");
             return;
         }
 
@@ -71,6 +71,6 @@ class StartCombat extends GameStateSubcommand {
         Player player2 = playersForCombat.getFirst();
 
         StartCombatService.findOrCreateCombatThread(
-                game, event.getChannel(), player1, player2, tile, event, combatType, "space");
+            game, event.getChannel(), player1, player2, tile, event, combatType, "space");
     }
 }

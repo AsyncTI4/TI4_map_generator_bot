@@ -24,7 +24,7 @@ public class AddUnitService {
             Tile tile = unit.tile();
             tile = FlipTileService.flipTileIfNeeded(tile, game);
             AddPlanetToPlayAreaService.addPlanetToPlayArea(
-                    event, tile, unit.uh().getName(), game);
+                event, tile, unit.uh().getName(), game);
 
             String color = unit.unitKey().getColorID();
             handleFogOfWar(tile, color, game, unit.unitKey() + " " + unit.getTotalRemoved());
@@ -33,12 +33,13 @@ public class AddUnitService {
     }
 
     public static void addUnits(
-            GenericInteractionCreateEvent event,
-            Tile tile,
-            Game game,
-            String color,
-            String unitList,
-            List<RemovedUnit> removed) {
+        GenericInteractionCreateEvent event,
+        Tile tile,
+        Game game,
+        String color,
+        String unitList,
+        List<RemovedUnit> removed
+    ) {
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
             List<Integer> states = pickStatesForAddedUnit(parsedUnit, removed);
@@ -52,7 +53,8 @@ public class AddUnitService {
     }
 
     public static void addUnits(
-            GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList) {
+        GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList
+    ) {
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
             tile.addUnit(parsedUnit.getLocation(), parsedUnit.getUnitKey(), parsedUnit.getCount());
@@ -70,9 +72,9 @@ public class AddUnitService {
         if (isTileAlreadyPinged(game, tile)) return;
 
         FoWHelper.pingSystem(
-                game,
-                tile.getPosition(),
-                ColorEmojis.getColorEmojiWithName(color) + " has modified units in the system: " + unitList);
+            game,
+            tile.getPosition(),
+            ColorEmojis.getColorEmojiWithName(color) + " has modified units in the system: " + unitList);
 
         markTileAsPinged(game, tile);
     }

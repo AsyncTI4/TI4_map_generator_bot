@@ -28,16 +28,16 @@ public interface ParentCommand extends Command {
 
     default void register(CommandListUpdateAction commands) {
         var command = Commands.slash(getName(), getDescription())
-                .addSubcommands(getSubcommands().values())
-                .addOptions(getOptions());
+            .addSubcommands(getSubcommands().values())
+            .addOptions(getOptions());
         commands.addCommands(command);
     }
 
     default void registerSearchCommands(CommandListUpdateAction commands) {
         if (getSearchSubcommands().isEmpty()) return;
         var command = Commands.slash(getName(), getDescription())
-                .addSubcommands(getSearchSubcommands().values())
-                .addOptions(getOptions());
+            .addSubcommands(getSearchSubcommands().values())
+            .addOptions(getOptions());
         commands.addCommands(command);
     }
 

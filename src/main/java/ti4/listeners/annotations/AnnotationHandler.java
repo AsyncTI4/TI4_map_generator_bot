@@ -46,14 +46,14 @@ public class AnnotationHandler {
             if (param.getType().equals(ModalInteractionEvent.class) && contextClass.equals(ModalContext.class))
                 continue;
             if (param.getType().equals(StringSelectInteractionEvent.class)
-                    && contextClass.equals(SelectionMenuContext.class)) continue;
+                && contextClass.equals(SelectionMenuContext.class)) continue;
 
             // string parameters
             if (param.getType().equals(String.class)) {
                 NamedParam nameAnnotation = param.getAnnotation(NamedParam.class);
                 String name = param.isNamePresent()
-                        ? param.getName()
-                        : (nameAnnotation == null ? null : nameAnnotation.value());
+                    ? param.getName()
+                    : (nameAnnotation == null ? null : nameAnnotation.value());
 
                 if (name == null) {
                     if (!hasComponentID) {
@@ -86,12 +86,12 @@ public class AnnotationHandler {
         }
         if (!badParams.isEmpty()) {
             String er = "Bad parameters detected in method `"
-                    + method.getClass().getName() + "." + method.getName() + "`. Please fix:\n> - ";
+                + method.getClass().getName() + "." + method.getName() + "`. Please fix:\n> - ";
             er += String.join(
-                    "\n> - ",
-                    badParams.stream()
-                            .map(param -> param.getType().getSimpleName() + " " + param.getName())
-                            .toList());
+                "\n> - ",
+                badParams.stream()
+                    .map(param -> param.getType().getSimpleName() + " " + param.getName())
+                    .toList());
 
             // This error can only be logged to the console because JDA isn't ready yet.
             // As such, in an effort to be notified if something goes horribly wrong, still add the handler
@@ -118,7 +118,7 @@ public class AnnotationHandler {
                 if (param.getType().equals(ModalInteractionEvent.class) && contextClass.equals(ModalContext.class))
                     args.add(ctx.getEvent());
                 if (param.getType().equals(StringSelectInteractionEvent.class)
-                        && contextClass.equals(SelectionMenuContext.class)) args.add(ctx.getEvent());
+                    && contextClass.equals(SelectionMenuContext.class)) args.add(ctx.getEvent());
                 if (param.getType().equals(MessageChannel.class))
                     args.add(ctx.getEvent().getMessageChannel());
 
@@ -156,7 +156,8 @@ public class AnnotationHandler {
     }
 
     private static <T extends ListenerContext> Consumer<T> buildConsumer(
-            Method method, Function<T, List<Object>> getArgs, boolean save) {
+        Method method, Function<T, List<Object>> getArgs, boolean save
+    ) {
         return context -> {
             List<Object> args = getArgs.apply(context);
             try {
@@ -169,31 +170,30 @@ public class AnnotationHandler {
                     if (arg instanceof ButtonInteractionEvent buttonInteractionEvent) {
                         origin = buttonInteractionEvent;
                         buttonInteractionEvent
-                                .getInteraction()
-                                .getMessage()
-                                .reply("The button failed. An exception has been logged for the developers.")
-                                .queue();
+                            .getInteraction()
+                            .getMessage()
+                            .reply("The button failed. An exception has been logged for the developers.")
+                            .queue();
                     }
                     if (arg instanceof StringSelectInteractionEvent selectInteractionEvent) {
                         origin = selectInteractionEvent;
                         selectInteractionEvent
-                                .getInteraction()
-                                .getMessage()
-                                .reply("The selection failed. An exception has been logged for the developers.")
-                                .queue();
+                            .getInteraction()
+                            .getMessage()
+                            .reply("The selection failed. An exception has been logged for the developers.")
+                            .queue();
                     }
                 }
                 BotLogger.error(
-                        origin,
-                        "Error within handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName()
-                                + "\":",
-                        e.getCause());
+                    origin,
+                    "Error within handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName()
+                        + "\":",
+                    e.getCause());
             } catch (Exception e) {
                 List<String> paramTypes = Arrays.stream(method.getParameters())
-                        .map(param -> param.getType().getSimpleName())
-                        .toList();
-                List<String> argTypes =
-                        args.stream().map(obj -> obj.getClass().getSimpleName()).toList();
+                    .map(param -> param.getType().getSimpleName())
+                    .toList();
+                List<String> argTypes = args.stream().map(obj -> obj.getClass().getSimpleName()).toList();
 
                 String methodName = method.getDeclaringClass().getSimpleName() + "." + method.getName();
                 String paramString = "(" + String.join(", ", paramTypes) + ")";
@@ -228,17 +228,18 @@ public class AnnotationHandler {
      * @return A map of prefix -> consumer which will
      */
     public static <C extends ListenerContext, H extends Annotation> Map<String, Consumer<C>> findKnownHandlers(
-            Class<C> contextClass, Class<H> handlerClass) {
+        Class<C> contextClass, Class<H> handlerClass
+    ) {
         Map<String, Consumer<C>> consumers = new HashMap<>();
         try {
             if (!handlers().contains(handlerClass)) {
                 BotLogger.warning(
-                        "Unknown handler class `" + handlerClass.getName() + "`. Please fix " + Constants.jazzPing());
+                    "Unknown handler class `" + handlerClass.getName() + "`. Please fix " + Constants.jazzPing());
                 return consumers;
             }
             if (!contexts().contains(contextClass)) {
                 BotLogger.warning(
-                        "Unknown context class `" + contextClass.getName() + "`. Please fix " + Constants.jazzPing());
+                    "Unknown context class `" + contextClass.getName() + "`. Please fix " + Constants.jazzPing());
                 return consumers;
             }
             for (Class<?> klass : AsyncTI4DiscordBot.getAllClasses()) {
@@ -250,7 +251,7 @@ public class AnnotationHandler {
                     String methodName = klass.getName() + "." + method.getName();
                     if (!Modifier.isStatic(method.getModifiers())) {
                         BotLogger.warning(
-                                "Method `" + methodName + "` is not static. Please fix it " + Constants.jazzPing());
+                            "Method `" + methodName + "` is not static. Please fix it " + Constants.jazzPing());
                         continue;
                     }
 

@@ -43,13 +43,13 @@ public class PriorityTrackHelper {
         if (priority != null) {
             if (priority < -1) {
                 MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(), "Priority must be between 1 and the number of players (or just -1).");
+                    game.getActionsChannel(), "Priority must be between 1 and the number of players (or just -1).");
                 return;
             }
 
             if (priority > players.size()) {
                 MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(), "Priority cannot exceed the number of players.");
+                    game.getActionsChannel(), "Priority cannot exceed the number of players.");
                 return;
             }
 
@@ -61,20 +61,20 @@ public class PriorityTrackHelper {
             if (priority != -1) {
                 int immutablePriority = priority;
                 var existingIndex = players.stream()
-                        .filter(p -> p.hasPriorityPosition() && p.getPriorityPosition() == immutablePriority)
-                        .findFirst();
+                    .filter(p -> p.hasPriorityPosition() && p.getPriorityPosition() == immutablePriority)
+                    .findFirst();
                 if (existingIndex.isPresent()) {
                     var existingPlayer = existingIndex.get();
                     existingPlayer.setPriorityPosition(-1); // Clear the existing player's priority
                     messageOutput += existingPlayer.getRepresentation() + " has been removed from position " + priority
-                            + " on the priority track.\n";
+                        + " on the priority track.\n";
                 }
             }
         } else {
             if (player.hasPriorityPosition()) {
                 // If the player already has a priority position, we don't need to assign them again
                 messageOutput += player.getRepresentation() + " is already on the priority track at position "
-                        + player.getPriorityPosition() + ".\n";
+                    + player.getPriorityPosition() + ".\n";
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), messageOutput);
                 return;
             }
@@ -91,7 +91,7 @@ public class PriorityTrackHelper {
                 // If no empty spot was found, return early with message
                 player.setPriorityPosition(-1); // Ensure data model matches inferred state
                 messageOutput += player.getRepresentation()
-                        + " could not be placed on the priority track because no empty spot was availble.\n";
+                    + " could not be placed on the priority track because no empty spot was availble.\n";
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), messageOutput);
                 return;
             }
@@ -101,7 +101,7 @@ public class PriorityTrackHelper {
             // Assign the player's priority
             player.setPriorityPosition(priority);
             messageOutput += player.getRepresentation() + " has been assigned to position " + priority
-                    + " on the priority track.";
+                + " on the priority track.";
         } else if (priority < 1 && player.hasPriorityPosition()) {
             // If priority is -1, remove the player from the priority track
             player.setPriorityPosition(-1);
@@ -148,8 +148,7 @@ public class PriorityTrackHelper {
         }
         for (var i = 0; i < currentPriorityTrack.size(); i++) {
             if (currentPriorityTrack.get(i) == null) {
-                var player =
-                        players.stream().filter(p -> !p.hasPriorityPosition()).findFirst();
+                var player = players.stream().filter(p -> !p.hasPriorityPosition()).findFirst();
                 if (player.isPresent()) {
                     player.get().setPriorityPosition(i + 1);
                 } else {
@@ -160,11 +159,7 @@ public class PriorityTrackHelper {
     }
 
     public enum PriorityTrackMode {
-        NONE("Priority Track not used"),
-        BASIC("Use to select Strategy Cards"),
-        AFTER_SPEAKER("Use to select remaining Strategy Cards after the Speaker"),
-        THIS_ROUND_ONLY("Use to select Strategy Cards for a single round"),
-        FULL("Replace Speaker order fully, and score in Priority order");
+        NONE("Priority Track not used"), BASIC("Use to select Strategy Cards"), AFTER_SPEAKER("Use to select remaining Strategy Cards after the Speaker"), THIS_ROUND_ONLY("Use to select Strategy Cards for a single round"), FULL("Replace Speaker order fully, and score in Priority order");
 
         private final String description;
 
@@ -178,7 +173,7 @@ public class PriorityTrackHelper {
 
         public boolean search(String searchString) {
             return toString().toLowerCase().contains(searchString)
-                    || description.toLowerCase().contains(searchString);
+                || description.toLowerCase().contains(searchString);
         }
 
         public static boolean isValid(String value) {

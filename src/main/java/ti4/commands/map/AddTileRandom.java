@@ -33,8 +33,7 @@ class AddTileRandom extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String positionString = event.getOption(Constants.POSITION).getAsString();
-        String randomType =
-                event.getOption(Constants.RANDOM_TYPE).getAsString().trim().toUpperCase();
+        String randomType = event.getOption(Constants.RANDOM_TYPE).getAsString().trim().toUpperCase();
         boolean drawOnly = event.getOption(Constants.DRAW_ONLY, false, OptionMapping::getAsBoolean);
 
         Game game = getGame();
@@ -66,11 +65,9 @@ class AddTileRandom extends GameStateSubcommand {
         List<String> drawnTiles = new ArrayList<>();
         StringBuilder msg = new StringBuilder();
         for (String position : positions) {
-            Set<TileModel> existingTileModels =
-                    game.getTileMap().values().stream().map(Tile::getTileModel).collect(Collectors.toSet());
+            Set<TileModel> existingTileModels = game.getTileMap().values().stream().map(Tile::getTileModel).collect(Collectors.toSet());
 
-            List<TileModel> availableTiles =
-                    AddTileService.availableTiles(sources, randomOption, existingTileModels, drawnTiles);
+            List<TileModel> availableTiles = AddTileService.availableTiles(sources, randomOption, existingTileModels, drawnTiles);
             if (availableTiles.isEmpty()) {
                 msg.append("No available tiles found.");
                 break;
@@ -83,12 +80,12 @@ class AddTileRandom extends GameStateSubcommand {
             }
 
             msg.append(drawOnly ? "Drew " : "Added ")
-                    .append(randomTile.getEmbedTitle())
-                    .append(" to ")
-                    .append(position)
-                    .append(" from ")
-                    .append(availableTiles.size())
-                    .append(" options.\n");
+                .append(randomTile.getEmbedTitle())
+                .append(" to ")
+                .append(position)
+                .append(" from ")
+                .append(availableTiles.size())
+                .append(" options.\n");
         }
 
         MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());

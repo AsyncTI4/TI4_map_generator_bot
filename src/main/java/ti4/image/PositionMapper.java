@@ -68,19 +68,19 @@ public class PositionMapper {
         }
         var tileIdToPlanets = TileHelper.getPlanetsByTileId(tileID);
         return tileIdToPlanets == null
-                ? null
-                : tileIdToPlanets.stream()
-                        .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getPositionInTile));
+            ? null
+            : tileIdToPlanets.stream()
+                .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getPositionInTile));
     }
 
     public static List<Point> getSpaceTokenPositions(String tileID) {
         List<Point> backup = List.of(
-                new Point(190, 30), new Point(215, 110), new Point(185, 205), new Point(100, 190), new Point(60, 130));
+            new Point(190, 30), new Point(215, 110), new Point(185, 205), new Point(100, 190), new Point(60, 130));
         TileModel tile = TileHelper.getTileById(tileID);
 
         return Optional.ofNullable(tile.getShipPositionsType())
-                .map(ShipPosition::getSpaceTokenLayout)
-                .orElse(backup);
+            .map(ShipPosition::getSpaceTokenLayout)
+            .orElse(backup);
     }
 
     public static boolean isTilePositionValid(String position) {
@@ -234,8 +234,8 @@ public class PositionMapper {
 
     private static String getTileSpaceUnitLayout(String tileId) {
         return Optional.ofNullable(TileHelper.getTileById(tileId).getShipPositionsType())
-                .orElse(ShipPositionModel.ShipPosition.TYPE08)
-                .getPositions();
+            .orElse(ShipPositionModel.ShipPosition.TYPE08)
+            .getPositions();
     }
 
     public static UnitTokenPosition getSpaceUnitPosition(String planetName, String tileID) {
@@ -328,8 +328,8 @@ public class PositionMapper {
         // So we need to rotate it backwards based on that initial direction
         Collections.rotate(ordering, -1 * side);
         return new ArrayList<>(ordering.stream()
-                .map(pos -> isTilePositionValid(pos) ? pos : "x")
-                .toList());
+            .map(pos -> isTilePositionValid(pos) ? pos : "x")
+            .toList());
     }
 
     // tileNum will be modulused to within the bounds of the ring (e.g. "tile 7" in ring 1 will become "tile 1")
@@ -400,7 +400,7 @@ public class PositionMapper {
     public static String getPositionOfTileOneRingLarger(String tileID) {
         int ring = Integer.parseInt(tileID) / 100;
         return getTileIDAtPositionInRingSide(
-                ring + 1, getRingSideNumberOfTileID(tileID), getPositionWithinHexSide(tileID));
+            ring + 1, getRingSideNumberOfTileID(tileID), getPositionWithinHexSide(tileID));
     }
 
     public static String getEquivalentPositionAtRing(int ring, String tileID) {
@@ -413,45 +413,45 @@ public class PositionMapper {
 
     public static int getLeftMostTileOffsetInGame(Game game) {
         return game.getTileMap().keySet().stream()
-                .mapToInt(pos -> {
-                    if (!Helper.isInteger(pos)) return 2080;
-                    Point p = getTilePosition(pos);
-                    return (p != null ? p.x : 2080);
-                })
-                .min()
-                .orElse(0);
+            .mapToInt(pos -> {
+                if (!Helper.isInteger(pos)) return 2080;
+                Point p = getTilePosition(pos);
+                return (p != null ? p.x : 2080);
+            })
+            .min()
+            .orElse(0);
     }
 
     public static int getRightMostTileOffsetInGame(Game game) {
         return game.getTileMap().keySet().stream()
-                .mapToInt(pos -> {
-                    if (!Helper.isInteger(pos)) return 2080;
-                    Point p = getTilePosition(pos);
-                    return (p != null ? p.x : 2080);
-                })
-                .max()
-                .orElse(0);
+            .mapToInt(pos -> {
+                if (!Helper.isInteger(pos)) return 2080;
+                Point p = getTilePosition(pos);
+                return (p != null ? p.x : 2080);
+            })
+            .max()
+            .orElse(0);
     }
 
     public static int getTopMostTileOffsetInGame(Game game) {
         return game.getTileMap().keySet().stream()
-                .mapToInt(pos -> {
-                    if (!Helper.isInteger(pos)) return 2550;
-                    Point p = getTilePosition(pos);
-                    return (p != null ? p.y : 2550);
-                })
-                .min()
-                .orElse(0);
+            .mapToInt(pos -> {
+                if (!Helper.isInteger(pos)) return 2550;
+                Point p = getTilePosition(pos);
+                return (p != null ? p.y : 2550);
+            })
+            .min()
+            .orElse(0);
     }
 
     public static int getBottomMostTileOffsetInGame(Game game) {
         return game.getTileMap().keySet().stream()
-                .mapToInt(pos -> {
-                    if (!Helper.isInteger(pos)) return 2550;
-                    Point p = getTilePosition(pos);
-                    return (p != null ? p.y : 2550);
-                })
-                .max()
-                .orElse(0);
+            .mapToInt(pos -> {
+                if (!Helper.isInteger(pos)) return 2550;
+                Point p = getTilePosition(pos);
+                return (p != null ? p.y : 2550);
+            })
+            .max()
+            .orElse(0);
     }
 }

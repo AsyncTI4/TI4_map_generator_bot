@@ -20,11 +20,11 @@ class RemoveFogTile extends GameStateSubcommand {
     public RemoveFogTile() {
         super(Constants.REMOVE_FOG_TILE, "Remove Fog of War tiles from the map.", true, true);
         addOptions(new OptionData(
-                        OptionType.STRING, Constants.POSITION, "Tile positions on map or ALL to remove all fog tiles")
+            OptionType.STRING, Constants.POSITION, "Tile positions on map or ALL to remove all fog tiles")
                 .setRequired(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to remove from")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to remove from")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -41,8 +41,8 @@ class RemoveFogTile extends GameStateSubcommand {
         for (Player targetPlayer : targetPlayers) {
             StringBuilder sb2 = new StringBuilder();
             Set<String> positionsToRemove = Constants.ALL.equals(positionMapping)
-                    ? new HashSet<>(targetPlayer.getFogTiles().keySet())
-                    : positions;
+                ? new HashSet<>(targetPlayer.getFogTiles().keySet())
+                : positions;
             for (String position : positionsToRemove) {
                 if (!PositionMapper.isTilePositionValid(position)) {
                     MessageHelper.replyToMessage(event, "Tile position '" + position + "' is invalid");
@@ -54,9 +54,9 @@ class RemoveFogTile extends GameStateSubcommand {
                 sb2.append(" ").append(position);
             }
             sb.append(targetPlayer.getRepresentation())
-                    .append(" removed fog tiles:")
-                    .append(sb2)
-                    .append("\n");
+                .append(" removed fog tiles:")
+                .append(sb2)
+                .append("\n");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }

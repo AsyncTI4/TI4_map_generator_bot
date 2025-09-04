@@ -31,7 +31,8 @@ public class ParseUnitService {
     }
 
     public List<ParsedUnit> getParsedUnits(
-            GenericInteractionCreateEvent event, String color, Tile tile, String unitList) {
+        GenericInteractionCreateEvent event, String color, Tile tile, String unitList
+    ) {
         if (!Mapper.isValidColor(color)) {
             MessageHelper.replyToMessage(event, "The unit color is invalid: " + color);
             return Collections.emptyList();
@@ -78,7 +79,7 @@ public class ParseUnitService {
 
         var parsedUnit = new ParsedUnit(unitKey, count, planetName);
         if (event instanceof SlashCommandInteractionEvent
-                && !validateParsedUnit(parsedUnit, tile, unitListToken, event)) {
+            && !validateParsedUnit(parsedUnit, tile, unitListToken, event)) {
             return null;
         }
         return parsedUnit;
@@ -96,10 +97,10 @@ public class ParseUnitService {
     }
 
     private boolean validateParsedUnit(
-            ParsedUnit parsedUnit, Tile tile, String unitListToken, GenericInteractionCreateEvent event) {
+        ParsedUnit parsedUnit, Tile tile, String unitListToken, GenericInteractionCreateEvent event
+    ) {
         boolean isValidUnit = parsedUnit.getUnitKey() != null;
-        boolean isValidUnitHolder =
-                parsedUnit.getLocation().equals(Constants.SPACE) || tile.isSpaceHolderValid(parsedUnit.getLocation());
+        boolean isValidUnitHolder = parsedUnit.getLocation().equals(Constants.SPACE) || tile.isSpaceHolderValid(parsedUnit.getLocation());
 
         if (isValidUnit && isValidUnitHolder) {
             return true;
@@ -110,29 +111,30 @@ public class ParseUnitService {
     }
 
     private void sendValidationError(
-            GenericInteractionCreateEvent event,
-            String token,
-            ParsedUnit parsedUnit,
-            boolean isValidUnit,
-            boolean isValidUnitHolder,
-            Tile tile) {
+        GenericInteractionCreateEvent event,
+        String token,
+        ParsedUnit parsedUnit,
+        boolean isValidUnit,
+        boolean isValidUnitHolder,
+        Tile tile
+    ) {
         String message = "Could not parse this section of the command: `" + token + "`\n"
-                + formatValidationMessage(
-                        "Unit",
-                        isValidUnit,
-                        parsedUnit.getUnitKey(),
-                        "UnitID or Alias not found. Try: `inf, mech, dn, etc.`")
-                + formatValidationMessage(
-                        "Planet",
-                        isValidUnitHolder,
-                        parsedUnit.getLocation(),
-                        "Planets in this system are: "
-                                + String.join(", ", tile.getUnitHolders().keySet()));
+            + formatValidationMessage(
+                "Unit",
+                isValidUnit,
+                parsedUnit.getUnitKey(),
+                "UnitID or Alias not found. Try: `inf, mech, dn, etc.`")
+            + formatValidationMessage(
+                "Planet",
+                isValidUnitHolder,
+                parsedUnit.getLocation(),
+                "Planets in this system are: "
+                    + String.join(", ", tile.getUnitHolders().keySet()));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
     }
 
     private String formatValidationMessage(String type, boolean isValid, Object value, String errorMessage) {
         return (isValid ? "✅" : "❌") + " " + type + " = `" + value + "`" + (isValid ? "" : " -> " + errorMessage)
-                + "\n";
+            + "\n";
     }
 }

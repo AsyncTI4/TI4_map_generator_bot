@@ -17,14 +17,14 @@ class DrawSpecificSO extends GameStateSubcommand {
     public DrawSpecificSO() {
         super(Constants.DRAW_SPECIFIC_SO, "Draw specific secret objective", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(
-                OptionType.USER, Constants.PLAYER, "Player who draws the secret objective (default is you)"));
+            OptionType.USER, Constants.PLAYER, "Player who draws the secret objective (default is you)"));
         addOptions(new OptionData(
-                OptionType.STRING,
-                Constants.PURGE_SO,
-                "Enter YES to purge the secret objective instead of drawing it"));
+            OptionType.STRING,
+            Constants.PURGE_SO,
+            "Enter YES to purge the secret objective instead of drawing it"));
     }
 
     @Override

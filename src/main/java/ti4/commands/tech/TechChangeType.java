@@ -19,11 +19,11 @@ class TechChangeType extends GameStateSubcommand {
     public TechChangeType() {
         super(Constants.CHANGE_TYPE, "Change what color a technology displays as", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Technology")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH_TYPE, "The type you're setting the technology to")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "2nd technology").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "3rd technology").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "4th technology").setAutoComplete(true));
@@ -39,7 +39,8 @@ class TechChangeType extends GameStateSubcommand {
     }
 
     private void parseParameter(
-            SlashCommandInteractionEvent event, OptionMapping techOption, OptionMapping techType, Game game) {
+        SlashCommandInteractionEvent event, OptionMapping techOption, OptionMapping techType, Game game
+    ) {
         if (techOption == null || techType == null) {
             return;
         }
@@ -52,9 +53,9 @@ class TechChangeType extends GameStateSubcommand {
 
         Map<String, TechnologyModel> techs = Mapper.getTechs();
         List<String> possibleTechs = techs.entrySet().stream()
-                .filter(value -> value.getValue().getName().toLowerCase().contains(techID))
-                .map(Map.Entry::getKey)
-                .toList();
+            .filter(value -> value.getValue().getName().toLowerCase().contains(techID))
+            .map(Map.Entry::getKey)
+            .toList();
         if (possibleTechs.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(event, "No matching technology found.");
             return;

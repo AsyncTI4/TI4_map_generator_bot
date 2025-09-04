@@ -26,6 +26,6 @@ class EndGameButtonHandler {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red("gameEnd", "Confirm to End and Delete Game"));
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getChannel(), "Please confirm to end and DELETE the game", buttons);
+            event.getChannel(), "Please confirm to end and DELETE the game", buttons);
     }
 }

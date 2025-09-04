@@ -26,6 +26,6 @@ class PingSystem extends GameStateSubcommand {
         }
 
         FoWHelper.pingSystem(
-                getGame(), position, event.getOption(Constants.MESSAGE).getAsString(), false);
+            getGame(), position, event.getOption(Constants.MESSAGE).getAsString(), false);
     }
 }

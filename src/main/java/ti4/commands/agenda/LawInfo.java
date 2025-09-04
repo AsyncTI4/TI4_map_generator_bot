@@ -25,21 +25,21 @@ class LawInfo extends GameStateSubcommand {
                 if (Mapper.isValidFaction(agendaText)) {
                     var elected = Mapper.getFaction(agendaText).getFactionName();
                     stringBuilder
-                            .append("> **Player Elected:** ")
-                            .append(elected)
-                            .append("\n");
+                        .append("> **Player Elected:** ")
+                        .append(elected)
+                        .append("\n");
                 } else if (Mapper.isValidPlanet(agendaText)) {
                     var elected = Mapper.getPlanet(agendaText).getName();
                     stringBuilder
-                            .append("> **Planet Elected:** ")
-                            .append(elected)
-                            .append("\n");
+                        .append("> **Planet Elected:** ")
+                        .append(elected)
+                        .append("\n");
                 } else if (Mapper.isValidSecretObjective(agendaText)) {
                     var elected = Mapper.getSecretObjective(agendaText).getName();
                     stringBuilder
-                            .append("> **Objective Elected:** ")
-                            .append(elected)
-                            .append("\n");
+                        .append("> **Objective Elected:** ")
+                        .append(elected)
+                        .append("\n");
                 }
             }
             lawNumber++;

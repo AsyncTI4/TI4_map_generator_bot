@@ -41,13 +41,13 @@ public class AverageTurnTimeService {
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
         GamesPage.consumeAllGames(
-                endedGamesFilter, game -> getAverageTurnTimeForGame(game, playerTurnTimes, playerAverageTurnTimes));
+            endedGamesFilter, game -> getAverageTurnTimeForGame(game, playerTurnTimes, playerAverageTurnTimes));
 
         HashMap<String, Long> playerMedianTurnTimes = playerAverageTurnTimes.entrySet().stream()
-                .map(e -> Map.entry(
-                        e.getKey(), Helper.median(e.getValue().stream().sorted().toList())))
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey, Map.Entry::getValue, (oldEntry, newEntry) -> oldEntry, HashMap::new));
+            .map(e -> Map.entry(
+                e.getKey(), Helper.median(e.getValue().stream().sorted().toList())))
+            .collect(Collectors.toMap(
+                Map.Entry::getKey, Map.Entry::getValue, (oldEntry, newEntry) -> oldEntry, HashMap::new));
 
         StringBuilder sb = new StringBuilder("## __**Average Turn Time:**__\n");
 
@@ -67,10 +67,10 @@ public class AverageTurnTimeService {
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
         int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 1, OptionMapping::getAsInt);
         List<Map.Entry<String, Map.Entry<Integer, Long>>> turnTimes = playerTurnTimes.entrySet().stream()
-                .filter(o -> o.getValue().getValue() != 0 && o.getValue().getKey() > minimumTurnsToShow)
-                .sorted(comparator)
-                .limit(topLimit)
-                .toList();
+            .filter(o -> o.getValue().getValue() != 0 && o.getValue().getKey() > minimumTurnsToShow)
+            .sorted(comparator)
+            .limit(topLimit)
+            .toList();
 
         for (var userTurnCountTotalTime : turnTimes) {
             var user = GameManager.getManagedPlayer(userTurnCountTotalTime.getKey());
@@ -85,9 +85,9 @@ public class AverageTurnTimeService {
             sb.append(DateTimeHelper.getTimeRepresentationToSeconds(averageTurnTime));
             if (showMedian)
                 sb.append(" (median: ")
-                        .append(DateTimeHelper.getTimeRepresentationToSeconds(
-                                playerMedianTurnTimes.get(userTurnCountTotalTime.getKey())))
-                        .append(")");
+                    .append(DateTimeHelper.getTimeRepresentationToSeconds(
+                        playerMedianTurnTimes.get(userTurnCountTotalTime.getKey())))
+                    .append(")");
             sb.append("` ").append(user.getName());
             sb.append("   [").append(turnCount).append(" total turns]");
             sb.append("\n");
@@ -98,19 +98,20 @@ public class AverageTurnTimeService {
     }
 
     public static void getAverageTurnTimeForGame(
-            Game game,
-            Map<String, Map.Entry<Integer, Long>> playerTurnTimes,
-            Map<String, Set<Long>> playerAverageTurnTimes) {
+        Game game,
+        Map<String, Map.Entry<Integer, Long>> playerTurnTimes,
+        Map<String, Set<Long>> playerAverageTurnTimes
+    ) {
         for (Player player : game.getRealPlayers()) {
             Integer totalTurns = player.getNumberOfTurns();
             Long totalTurnTime = player.getTotalTurnTime();
             Map.Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
             playerTurnTimes.merge(
-                    player.getUserID(),
-                    playerTurnTime,
-                    (oldEntry, newEntry) -> Map.entry(
-                            oldEntry.getKey() + playerTurnTime.getKey(),
-                            oldEntry.getValue() + playerTurnTime.getValue()));
+                player.getUserID(),
+                playerTurnTime,
+                (oldEntry, newEntry) -> Map.entry(
+                    oldEntry.getKey() + playerTurnTime.getKey(),
+                    oldEntry.getValue() + playerTurnTime.getValue()));
 
             if (playerTurnTime.getKey() == 0) continue;
             Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
@@ -124,12 +125,12 @@ public class AverageTurnTimeService {
 
     String getAverageTurnTime(List<User> users) {
         List<ManagedGame> userGames = users.stream()
-                .map(user -> GameManager.getManagedPlayer(user.getId()))
-                .filter(Objects::nonNull)
-                .map(ManagedPlayer::getGames)
-                .flatMap(Collection::stream)
-                .distinct()
-                .toList();
+            .map(user -> GameManager.getManagedPlayer(user.getId()))
+            .filter(Objects::nonNull)
+            .map(ManagedPlayer::getGames)
+            .flatMap(Collection::stream)
+            .distinct()
+            .toList();
 
         Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
         for (ManagedGame game : userGames) {

@@ -27,12 +27,12 @@ class WipeTurnTime extends Subcommand {
             return;
         }
         managedPlayer.getGames().stream()
-                .filter(not(ManagedGame::isFowMode))
-                .map(ManagedGame::getName)
-                .distinct()
-                .forEach(gameName -> ExecutionLockManager.wrapWithLockAndRelease(
-                                gameName, ExecutionLockManager.LockType.WRITE, () -> wipeTurnTime(gameName, userId))
-                        .run());
+            .filter(not(ManagedGame::isFowMode))
+            .map(ManagedGame::getName)
+            .distinct()
+            .forEach(gameName -> ExecutionLockManager.wrapWithLockAndRelease(
+                gameName, ExecutionLockManager.LockType.WRITE, () -> wipeTurnTime(gameName, userId))
+                .run());
 
         MessageHelper.sendMessageToChannel(event.getChannel(), "Wiped all of your turn times");
     }

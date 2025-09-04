@@ -10,14 +10,13 @@ import ti4.map.Game;
 @UtilityClass
 public class GameHelper {
 
-    public static final DateTimeFormatter CREATION_DATE_FORMATTER =
-            DateTimeFormatter.ofPattern("uuuu.MM.dd", Locale.ROOT);
+    public static final DateTimeFormatter CREATION_DATE_FORMATTER = DateTimeFormatter.ofPattern("uuuu.MM.dd", Locale.ROOT);
 
     public static long getCreationDateAsEpochMillis(Game game) {
         return LocalDate.parse(game.getCreationDate(), CREATION_DATE_FORMATTER)
-                .atStartOfDay(ZoneOffset.UTC)
-                .toInstant()
-                .toEpochMilli();
+            .atStartOfDay(ZoneOffset.UTC)
+            .toInstant()
+            .toEpochMilli();
     }
 
     public static LocalDate getCreationDateAsLocalDate(Game game) {

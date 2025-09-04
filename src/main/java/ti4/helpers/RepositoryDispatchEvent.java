@@ -10,8 +10,7 @@ import ti4.message.logging.BotLogger;
 
 public class RepositoryDispatchEvent {
 
-    private static final String GITHUB_API_URL =
-            "https://api.github.com/repos/AsyncTI4/TI4_map_generator_bot/dispatches";
+    private static final String GITHUB_API_URL = "https://api.github.com/repos/AsyncTI4/TI4_map_generator_bot/dispatches";
     private static final String REPO_DISPATCH_TOKEN = System.getenv("REPO_DISPATCH_TOKEN");
     private final String eventType;
     private final RespositoryDispatchClientPayload payload;
@@ -38,15 +37,15 @@ public class RepositoryDispatchEvent {
             bodyJson.append("}");
             RequestBody body = RequestBody.create(bodyJson.toString(), mediaType);
             Request request = new Request.Builder()
-                    .url(GITHUB_API_URL)
-                    .method("POST", body)
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader("Authorization", "Bearer " + REPO_DISPATCH_TOKEN)
-                    .build();
+                .url(GITHUB_API_URL)
+                .method("POST", body)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Authorization", "Bearer " + REPO_DISPATCH_TOKEN)
+                .build();
             try (Response response = client.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
                     BotLogger.error(
-                            "RespositoryDisptachEvent error: " + response.body().string());
+                        "RespositoryDisptachEvent error: " + response.body().string());
                 }
             }
         } catch (Exception e) {

@@ -45,10 +45,8 @@ public class AliasHandler {
     private static final Map<String, String> ttpgAttachmentAliasList = new HashMap<>();
     private static final Map<String, String> ttpgTokenAliasList = new HashMap<>();
     private static final Map<String, String> ttpgUnitAliasList = new HashMap<>();
-    private static final Map<String, String> allTileAliases =
-            new HashMap<>(); // not assigned in init() but in initAliases() using TileHelper HashMaps
-    private static final Map<String, String> allPlanetAliases =
-            new HashMap<>(); // not assigned in init() but in initAliases() using TileHelper HashMaps
+    private static final Map<String, String> allTileAliases = new HashMap<>(); // not assigned in init() but in initAliases() using TileHelper HashMaps
+    private static final Map<String, String> allPlanetAliases = new HashMap<>(); // not assigned in init() but in initAliases() using TileHelper HashMaps
 
     private static final List<String> factionAliasValuesList = new ArrayList<>();
     private static final List<String> unitValuesList = new ArrayList<>();
@@ -57,7 +55,7 @@ public class AliasHandler {
         readAliasFile("action_card_alias.properties", actionCardAliasList, "Could not read action card alias file");
         readAliasFile("agenda_alias.properties", agendaAliasList, "Could not read agenda alias file");
         readAliasFile(
-                "attachment_alias.properties", attachmentAliasList, "Could not read attachement token alias file");
+            "attachment_alias.properties", attachmentAliasList, "Could not read attachement token alias file");
         readAliasFile("cc_token_alias.properties", ccTokenAliasList, "Could not read CC token alias file");
         readAliasFile("exploration_alias.properties", explorationAliasList, "Could not read exploration alias file");
         readAliasFile("faction_alias.properties", factionAliasList, "Could not read faction alias file");
@@ -72,9 +70,9 @@ public class AliasHandler {
         readAliasFile("tilemap_alias.properties", tilemapAliasList, "Could not read tilemap alias file");
         readAliasFile("tokens_alias.properties", tokenAliasList, "Could not read token alias file");
         readAliasFile(
-                "ttpg_attachment_alias.properties",
-                ttpgAttachmentAliasList,
-                "Could not read TTPG attachment_alias file");
+            "ttpg_attachment_alias.properties",
+            ttpgAttachmentAliasList,
+            "Could not read TTPG attachment_alias file");
         readAliasFile("ttpg_token_alias.properties", ttpgTokenAliasList, "Could not read TTPG token_alias file");
         readAliasFile("ttpg_unit_alias.properties", ttpgUnitAliasList, "Could not read TTPG unit_alias file");
         readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
@@ -171,18 +169,18 @@ public class AliasHandler {
 
     private static void addNewPlanetAliases(PlanetModel planetModel) {
         Optional.ofNullable(planetModel.getAliases())
-                .orElse(new ArrayList<>())
-                .forEach(alias -> allPlanetAliases.put(alias.toLowerCase(), planetModel.getId()));
+            .orElse(new ArrayList<>())
+            .forEach(alias -> allPlanetAliases.put(alias.toLowerCase(), planetModel.getId()));
         allPlanetAliases.put(planetModel.getId(), planetModel.getId()); // add the planet itself to aliashandler
     }
 
     private static void addNewTileAliases(TileModel tileModel) {
         Optional.ofNullable(tileModel.getAliases())
-                .orElse(new ArrayList<>())
-                .forEach(alias -> allTileAliases.put(alias.toLowerCase(), tileModel.getId()));
+            .orElse(new ArrayList<>())
+            .forEach(alias -> allTileAliases.put(alias.toLowerCase(), tileModel.getId()));
         Optional.ofNullable(tileModel.getPlanets())
-                .orElse(new ArrayList<>())
-                .forEach(planet -> allTileAliases.put(planet.toLowerCase(), tileModel.getId()));
+            .orElse(new ArrayList<>())
+            .forEach(planet -> allTileAliases.put(planet.toLowerCase(), tileModel.getId()));
     }
 
     public static String resolveTile(String name) {
@@ -220,8 +218,8 @@ public class AliasHandler {
 
     public static String resolveColor(String name) {
         return Optional.ofNullable(Mapper.getColor(name))
-                .map(ColorModel::getName)
-                .orElse(name);
+            .map(ColorModel::getName)
+            .orElse(name);
     }
 
     public static String resolveUnit(String name) {
@@ -341,8 +339,8 @@ public class AliasHandler {
 
     public static String getFactionAliasEntryList(String faction) {
         return factionAliasValuesList.stream()
-                .filter(a -> a.startsWith(faction))
-                .findFirst()
-                .orElse(faction);
+            .filter(a -> a.startsWith(faction))
+            .findFirst()
+            .orElse(faction);
     }
 }

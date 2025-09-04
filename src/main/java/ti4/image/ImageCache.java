@@ -14,28 +14,28 @@ import ti4.settings.GlobalSettings;
 class ImageCache {
 
     private static final int FILE_IMAGE_CACHE_SIZE = GlobalSettings.getSetting(
-            GlobalSettings.ImplementedSettings.FILE_IMAGE_CACHE_MAX_SIZE.toString(), Integer.class, 2000);
+        GlobalSettings.ImplementedSettings.FILE_IMAGE_CACHE_MAX_SIZE.toString(), Integer.class, 2000);
     private static final int FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES = GlobalSettings.getSetting(
-            GlobalSettings.ImplementedSettings.FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES.toString(), Integer.class, 60 * 8);
+        GlobalSettings.ImplementedSettings.FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES.toString(), Integer.class, 60 * 8);
     private final Cache<String, BufferedImage> fileImageCache;
 
     private static final int URL_IMAGE_CACHE_SIZE = GlobalSettings.getSetting(
-            GlobalSettings.ImplementedSettings.URL_IMAGE_CACHE_MAX_SIZE.toString(), Integer.class, 2000);
+        GlobalSettings.ImplementedSettings.URL_IMAGE_CACHE_MAX_SIZE.toString(), Integer.class, 2000);
     private static final int URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES = GlobalSettings.getSetting(
-            GlobalSettings.ImplementedSettings.URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES.toString(), Integer.class, 60 * 8);
+        GlobalSettings.ImplementedSettings.URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES.toString(), Integer.class, 60 * 8);
     private final Cache<String, BufferedImage> urlImageCache;
 
     static {
         fileImageCache = Caffeine.newBuilder()
-                .maximumSize(FILE_IMAGE_CACHE_SIZE)
-                .expireAfterAccess(FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES, TimeUnit.MINUTES)
-                .recordStats()
-                .build();
+            .maximumSize(FILE_IMAGE_CACHE_SIZE)
+            .expireAfterAccess(FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES, TimeUnit.MINUTES)
+            .recordStats()
+            .build();
         urlImageCache = Caffeine.newBuilder()
-                .maximumSize(URL_IMAGE_CACHE_SIZE)
-                .expireAfterWrite(URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES, TimeUnit.MINUTES)
-                .recordStats()
-                .build();
+            .maximumSize(URL_IMAGE_CACHE_SIZE)
+            .expireAfterWrite(URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES, TimeUnit.MINUTES)
+            .recordStats()
+            .build();
         CacheManager.registerCache("fileImageCache", fileImageCache);
         CacheManager.registerCache("urlImageCache", urlImageCache);
     }

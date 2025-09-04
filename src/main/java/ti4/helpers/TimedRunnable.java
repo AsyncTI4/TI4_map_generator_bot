@@ -35,7 +35,7 @@ public class TimedRunnable implements Runnable {
             long secondsElapsed = stopWatch.getDuration().toSeconds();
             if (secondsElapsed >= warningThresholdSeconds) {
                 BotLogger.warning("'" + name + "' took longer than " + warningThresholdSeconds + " seconds ("
-                        + secondsElapsed + ").");
+                    + secondsElapsed + ").");
             }
         }
     }

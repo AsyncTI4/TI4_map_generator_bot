@@ -17,20 +17,19 @@ class SearchAgendasSubcommand extends SearchComponentModelSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        ComponentSource source =
-                ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
+        ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
         if (Mapper.isValidAgenda(searchString)) {
             event.getChannel()
-                    .sendMessageEmbeds(Mapper.getAgenda(searchString).getRepresentationEmbed(true))
-                    .queue();
+                .sendMessageEmbeds(Mapper.getAgenda(searchString).getRepresentationEmbed(true))
+                .queue();
             return;
         }
 
         List<MessageEmbed> messageEmbeds = Mapper.getAgendas().values().stream()
-                .filter(model -> model.search(searchString, source))
-                .map(model -> model.getRepresentationEmbed(true))
-                .toList();
+            .filter(model -> model.search(searchString, source))
+            .map(model -> model.getRepresentationEmbed(true))
+            .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }
 }

@@ -14,11 +14,12 @@ import ti4.message.MessageHelper;
 public class SwapFactionService {
 
     public static void secondHalfOfSwap(
-            Game game,
-            Player swapperPlayer,
-            Player removedPlayer,
-            User addedUser,
-            GenericInteractionCreateEvent event) {
+        Game game,
+        Player swapperPlayer,
+        Player removedPlayer,
+        User addedUser,
+        GenericInteractionCreateEvent event
+    ) {
         Collection<Player> players = game.getPlayers().values();
         if (players.stream().noneMatch(player -> player.getUserID().equals(removedPlayer.getUserID()))) {
             MessageHelper.replyToMessage(event, "Specify player that is in game to be swapped");
@@ -73,14 +74,12 @@ public class SwapFactionService {
             game.getTileMap().values().forEach(tile -> tile.swapFogData(player, swapperPlayer));
         }
 
-        String before =
-                "> **Before:** " + swapperPlayer.getRepresentation() + " & " + removedPlayer.getRepresentation() + "\n";
+        String before = "> **Before:** " + swapperPlayer.getRepresentation() + " & " + removedPlayer.getRepresentation() + "\n";
         swapperPlayer.setUserName(removedPlayer.getUserName());
         swapperPlayer.setUserID(removedPlayer.getUserID());
         player.setUserName(addedUser.getName());
         player.setUserID(addedUser.getId());
-        String after =
-                "> **After:** " + swapperPlayer.getRepresentation() + " & " + removedPlayer.getRepresentation() + "\n";
+        String after = "> **After:** " + swapperPlayer.getRepresentation() + " & " + removedPlayer.getRepresentation() + "\n";
 
         String message = "Users have swapped factions:\n" + before + after;
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);

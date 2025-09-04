@@ -21,8 +21,8 @@ class ArchiveOldThreads extends Subcommand {
     public ArchiveOldThreads() {
         super(Constants.ARCHIVE_OLD_THREADS, "Archive a number of the oldest active threads");
         addOptions(
-                new OptionData(OptionType.INTEGER, Constants.THREAD_COUNT, "Number of threads to archive (1 to 1000)")
-                        .setRequired(true));
+            new OptionData(OptionType.INTEGER, Constants.THREAD_COUNT, "Number of threads to archive (1 to 1000)")
+                .setRequired(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -40,27 +40,27 @@ class ArchiveOldThreads extends Subcommand {
     private static String getOldThreadsMessage(Guild guild, Integer channelCount) {
         List<ThreadChannel> threadChannels = guild.getThreadChannels();
         threadChannels = threadChannels.stream()
-                .filter(c -> c.getLatestMessageIdLong() != 0 && !c.isArchived())
-                .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
-                .limit(channelCount)
-                .toList();
+            .filter(c -> c.getLatestMessageIdLong() != 0 && !c.isArchived())
+            .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
+            .limit(channelCount)
+            .toList();
 
         StringBuilder sb = new StringBuilder("Least Active Threads:\n");
         for (ThreadChannel threadChannel : threadChannels) {
             OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
             Duration duration = Duration.between(
-                    latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
+                latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
             sb.append("> `")
-                    .append(latestActivityTime)
-                    .append(" (")
-                    .append(duration.toHours())
-                    .append(" hours ago)`  ")
-                    .append(threadChannel.getAsMention())
-                    .append(" **")
-                    .append(threadChannel.getName())
-                    .append("** from channel **")
-                    .append(threadChannel.getParentChannel().getName())
-                    .append("**\n");
+                .append(latestActivityTime)
+                .append(" (")
+                .append(duration.toHours())
+                .append(" hours ago)`  ")
+                .append(threadChannel.getAsMention())
+                .append(" **")
+                .append(threadChannel.getName())
+                .append("** from channel **")
+                .append(threadChannel.getParentChannel().getName())
+                .append("**\n");
         }
         return sb.toString();
     }

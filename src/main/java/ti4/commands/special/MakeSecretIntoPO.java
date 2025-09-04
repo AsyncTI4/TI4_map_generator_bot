@@ -18,9 +18,9 @@ class MakeSecretIntoPO extends GameStateSubcommand {
     public MakeSecretIntoPO() {
         super(Constants.MAKE_SO_INTO_PO, "Make a secret objective into a public objective", true, false);
         addOptions(new OptionData(
-                        OptionType.INTEGER,
-                        Constants.SECRET_OBJECTIVE_ID,
-                        "Secret objective ID, which is found between ()")
+            OptionType.INTEGER,
+            Constants.SECRET_OBJECTIVE_ID,
+            "Secret objective ID, which is found between ()")
                 .setRequired(true));
     }
 
@@ -49,7 +49,7 @@ class MakeSecretIntoPO extends GameStateSubcommand {
         }
         if (soName.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Only a scored secret objective may be made into a public objective.");
+                event.getChannel(), "Only a scored secret objective may be made into a public objective.");
             return;
         }
         game.addToSoToPoList(soName);
@@ -58,8 +58,8 @@ class MakeSecretIntoPO extends GameStateSubcommand {
         game.scorePublicObjective(playerWithSO.getUserID(), poIndex);
 
         String sb = "**Public Objective added from Secret:**" + "\n" + "("
-                + poIndex + ") " + "\n" + Mapper.getSecretObjectivesJustNames().get(soName)
-                + "\n";
+            + poIndex + ") " + "\n" + Mapper.getSecretObjectivesJustNames().get(soName)
+            + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, playerWithSO, event);

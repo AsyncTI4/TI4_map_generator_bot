@@ -22,7 +22,7 @@ public class ConventionsAgendaResolver implements AgendaResolver {
                 ActionCardHelper.discardRandomAC(event, game, playerWL, playerWL.getAc());
             }
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Discarded the action cards of those who voted \"Against\".");
+                game.getMainGameChannel(), "Discarded the action cards of those who voted \"Against\".");
         }
     }
 }

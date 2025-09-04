@@ -21,7 +21,7 @@ class AllNamesStatisticsService {
         GamesPage.consumeAllGames(GameStatisticsFilterer.getGamesFilter(event), game -> getName(game, count, names));
 
         MessageHelper.sendMessageToThread(
-                (MessageChannelUnion) event.getMessageChannel(), "Game Names", names.toString());
+            (MessageChannelUnion) event.getMessageChannel(), "Game Names", names.toString());
     }
 
     private static void getName(Game game, AtomicInteger gameCount, StringBuilder names) {

@@ -49,8 +49,9 @@ public class ActuatorApiKeyFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-            HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain)
-            throws ServletException, IOException {
+        HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain
+    )
+        throws ServletException, IOException {
         String apiKey = request.getHeader(API_KEY_HEADER);
         if (apiKey == null) {
             filterChain.doFilter(request, response);
@@ -67,8 +68,7 @@ public class ActuatorApiKeyFilter extends OncePerRequestFilter {
             }
             merged.add(new SimpleGrantedAuthority("ROLE_ACTUATOR"));
 
-            UsernamePasswordAuthenticationToken elevated =
-                    new UsernamePasswordAuthenticationToken(principal, credentials, merged);
+            UsernamePasswordAuthenticationToken elevated = new UsernamePasswordAuthenticationToken(principal, credentials, merged);
             if (current != null) {
                 elevated.setDetails(current.getDetails());
             }

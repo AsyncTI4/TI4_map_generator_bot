@@ -13,13 +13,13 @@ class ExploreReset extends GameStateSubcommand {
 
     public ExploreReset() {
         super(
-                Constants.RESET,
-                "Reset the exploration decks, emptying discards and adding all cards to their respective decks.",
-                true,
-                true);
+            Constants.RESET,
+            "Reset the exploration decks, emptying discards and adding all cards to their respective decks.",
+            true,
+            true);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.")
-                .setAutoComplete(true));
+            .setAutoComplete(true));
     }
 
     @Override
@@ -27,8 +27,8 @@ class ExploreReset extends GameStateSubcommand {
         if (!"YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
             MessageHelper.sendMessageToEventChannel(event, "Confirmation not received to reset exploration decks.");
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    event.getOption(Constants.CONFIRM).getAsString());
+                event.getMessageChannel(),
+                event.getOption(Constants.CONFIRM).getAsString());
             return;
         }
 

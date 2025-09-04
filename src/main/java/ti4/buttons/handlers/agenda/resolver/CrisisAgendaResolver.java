@@ -46,9 +46,9 @@ public class CrisisAgendaResolver implements AgendaResolver {
         }
         scButtons.add(Buttons.blue("sc_no_follow_" + winner, "Not Following"));
         MessageHelper.sendMessageToChannelWithButtons(
-                game.getMainGameChannel(),
-                "You may use these button to resolve the secondary ability of **"
-                        + Helper.getSCName(Integer.parseInt(winner), game) + "**.",
-                scButtons);
+            game.getMainGameChannel(),
+            "You may use these button to resolve the secondary ability of **"
+                + Helper.getSCName(Integer.parseInt(winner), game) + "**.",
+            scButtons);
     }
 }

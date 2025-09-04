@@ -21,7 +21,7 @@ public class WinningPathPersistenceService {
         BotLogger.info("**Recomputing win paths file**");
         Map<String, Map<String, Integer>> data = new HashMap<>();
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getNormalFinishedGamesFilter(null, null), game -> computeWinPath(game, data));
+            GameStatisticsFilterer.getNormalFinishedGamesFilter(null, null), game -> computeWinPath(game, data));
         writeData(data);
         BotLogger.info("**Finished recomputing win paths file**");
     }
@@ -51,8 +51,8 @@ public class WinningPathPersistenceService {
 
     private static Map<String, Map<String, Integer>> readData() {
         try {
-            Map<String, Map<String, Integer>> data =
-                    PersistenceManager.readObjectFromJsonFile(WINNING_PATHS_FILE, new TypeReference<>() {});
+            Map<String, Map<String, Integer>> data = PersistenceManager.readObjectFromJsonFile(WINNING_PATHS_FILE, new TypeReference<>() {
+            });
             return data == null ? new HashMap<>() : data;
         } catch (IOException e) {
             BotLogger.error("Failed to read winning paths file", e);

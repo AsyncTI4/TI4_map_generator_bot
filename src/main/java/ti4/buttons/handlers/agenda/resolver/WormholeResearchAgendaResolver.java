@@ -30,7 +30,7 @@ public class WormholeResearchAgendaResolver implements ForAgainstAgendaResolver 
             Button done = Buttons.red(finsFactionCheckerPrefix + "deleteButtons", "Done Losing Command Tokens");
             var buttons = List.of(loseTactic, loseFleet, loseStrat, done);
             String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
-                    + player.getCCRepresentation() + ". Use buttons to lose command tokens.";
+                + player.getCCRepresentation() + ". Use buttons to lose command tokens.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         }

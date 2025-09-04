@@ -19,16 +19,16 @@ public class GrantReallocationAgendaResolver implements AgendaResolver {
         Player player2 = game.getPlayerFromColorOrFaction(winner);
         if (player2 == null) return;
         MessageHelper.sendMessageToChannelWithButtons(
-                player2.getCorrectChannel(),
-                player2.getRepresentation() + ", please choose a technology to gain.",
-                List.of(Buttons.GET_A_TECH));
+            player2.getCorrectChannel(),
+            player2.getRepresentation() + ", please choose a technology to gain.",
+            List.of(Buttons.GET_A_TECH));
         String finsFactionCheckerPrefix = "FFCC_" + player2.getFaction() + "_";
         Button loseFleet = Buttons.red(finsFactionCheckerPrefix + "decrease_fleet_cc", "Lose 1 Fleet Token");
         Button done = Buttons.red(finsFactionCheckerPrefix + "deleteButtons", "Done Losing Command Tokens");
         MessageHelper.sendMessageToChannelWithButtons(
-                player2.getCorrectChannel(),
-                player2.getRepresentation()
-                        + ", after you have gained your technology, please remove one token from your fleet pool for each prerequisite on that technology.",
-                List.of(loseFleet, done));
+            player2.getCorrectChannel(),
+            player2.getRepresentation()
+                + ", after you have gained your technology, please remove one token from your fleet pool for each prerequisite on that technology.",
+            List.of(loseFleet, done));
     }
 }

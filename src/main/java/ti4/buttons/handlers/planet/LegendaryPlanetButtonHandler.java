@@ -15,6 +15,6 @@ class LegendaryPlanetButtonHandler {
         String planet = "garbozia";
         player.exhaustPlanetAbility(planet);
         ExploreService.explorePlanet(
-                event, game.getTileFromPlanet(planet), planet, "INDUSTRIAL", player, true, game, 1, false);
+            event, game.getTileFromPlanet(planet), planet, "INDUSTRIAL", player, true, game, 1, false);
     }
 }

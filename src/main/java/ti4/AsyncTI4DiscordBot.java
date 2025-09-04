@@ -110,37 +110,37 @@ public class AsyncTI4DiscordBot {
         GlobalSettings.loadSettings();
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
         jda = JDABuilder.createDefault(args[0])
-                // This is a privileged gateway intent that is used to update user information and join/leaves
-                // (including kicks).
-                // This is required to cache all members of a guild (including chunking)
-                .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                // This is a privileged gateway intent this is only used to enable access to the user content in
-                // messages
-                // (also including embeds/attachments/components).
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                // not 100 sure this is needed? It may be for the Emoji cache... but do we actually need that?
-                .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
-                // It *appears* we need to pull all members or else the bot has trouble pinging players
-                // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
-                // and avoid loading every user at startup
-                .setMemberCachePolicy(MemberCachePolicy.ALL)
-                .setChunkingFilter(ChunkingFilter.ALL)
-                // This allows us to use our own ShutdownHook, created below
-                .setEnableShutdownHook(false)
-                .build();
+            // This is a privileged gateway intent that is used to update user information and join/leaves
+            // (including kicks).
+            // This is required to cache all members of a guild (including chunking)
+            .enableIntents(GatewayIntent.GUILD_MEMBERS)
+            // This is a privileged gateway intent this is only used to enable access to the user content in
+            // messages
+            // (also including embeds/attachments/components).
+            .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+            // not 100 sure this is needed? It may be for the Emoji cache... but do we actually need that?
+            .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
+            // It *appears* we need to pull all members or else the bot has trouble pinging players
+            // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
+            // and avoid loading every user at startup
+            .setMemberCachePolicy(MemberCachePolicy.ALL)
+            .setChunkingFilter(ChunkingFilter.ALL)
+            // This allows us to use our own ShutdownHook, created below
+            .setEnableShutdownHook(false)
+            .build();
 
         jda.addEventListener(
-                new BotRuntimeStatsListener(),
-                new MessageListener(),
-                new DeletionListener(),
-                new ChannelCreationListener(),
-                new SlashCommandListener(),
-                ButtonListener.getInstance(),
-                ModalListener.getInstance(),
-                new SelectionMenuListener(),
-                new UserJoinServerListener(),
-                new UserLeaveServerListener(),
-                new AutoCompleteListener());
+            new BotRuntimeStatsListener(),
+            new MessageListener(),
+            new DeletionListener(),
+            new ChannelCreationListener(),
+            new SlashCommandListener(),
+            ButtonListener.getInstance(),
+            ModalListener.getInstance(),
+            new SelectionMenuListener(),
+            new UserJoinServerListener(),
+            new UserLeaveServerListener(),
+            new AutoCompleteListener());
 
         try {
             jda.awaitReady();
@@ -149,7 +149,7 @@ public class AsyncTI4DiscordBot {
         }
 
         jda.getPresence()
-                .setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
+            .setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
 
         BotLogger.info("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
 
@@ -302,7 +302,7 @@ public class AsyncTI4DiscordBot {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 jda.getPresence()
-                        .setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
+                    .setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
                 BotLogger.info("SHUTDOWN PROCESS STARTED");
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
                 BotLogger.info("NO LONGER ACCEPTING COMMANDS");
@@ -479,24 +479,24 @@ public class AsyncTI4DiscordBot {
 
     public static boolean isReadyToReceiveCommands() {
         return GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, false);
+            GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, false);
     }
 
     public static List<Category> getAvailablePBDCategories() {
         return guilds.stream()
-                .flatMap(guild -> guild.getCategories().stream())
-                .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
-                .toList();
+            .flatMap(guild -> guild.getCategories().stream())
+            .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
+            .toList();
     }
 
     public static List<Class<?>> getAllClasses() {
         if (classes.isEmpty()) {
             Reflections reflections = new Reflections(new ConfigurationBuilder()
-                    .setUrls(ClasspathHelper.forJavaClassPath())
-                    .setScanners(new SubTypesScanner(false)));
+                .setUrls(ClasspathHelper.forJavaClassPath())
+                .setScanners(new SubTypesScanner(false)));
             reflections.get(SubTypes.of(Object.class).asClass()).stream()
-                    .filter(c -> c.getPackageName().startsWith("ti4"))
-                    .forEach(classes::add);
+                .filter(c -> c.getPackageName().startsWith("ti4"))
+                .forEach(classes::add);
         }
         return classes;
     }

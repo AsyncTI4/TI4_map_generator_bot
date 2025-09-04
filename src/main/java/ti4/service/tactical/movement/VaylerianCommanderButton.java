@@ -14,6 +14,6 @@ public final class VaylerianCommanderButton implements MoveAbilityButton {
 
     public List<Button> build(MoveContext ctx) {
         return List.of(
-                Buttons.gray("declareUse_Vaylerian Commander", "Use Vaylerian Commander", FactionEmojis.vaylerian));
+            Buttons.gray("declareUse_Vaylerian Commander", "Use Vaylerian Commander", FactionEmojis.vaylerian));
     }
 }

@@ -12,8 +12,8 @@ class LeaderInfo extends GameStateSubcommand {
     public LeaderInfo() {
         super(Constants.INFO, "Send Leader info to your Cards-Info thread", false, true);
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                .setAutoComplete(true));
     }
 
     @Override

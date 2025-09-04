@@ -15,8 +15,8 @@ class RemoveSweepToken extends GameStateSubcommand {
     public RemoveSweepToken() {
         super(Constants.REMOVE_SWEEP_TOKEN, "Remove a sweep token from the selected system", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System to remove a sweep token from")
-                .setAutoComplete(true)
-                .setRequired(true));
+            .setAutoComplete(true)
+            .setRequired(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {

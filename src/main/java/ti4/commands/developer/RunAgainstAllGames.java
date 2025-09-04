@@ -50,10 +50,10 @@ class RunAgainstAllGames extends Subcommand {
             DateTimeFormatter FMT = DateTimeFormatter.ofPattern("uuuu.MM.dd", Locale.ROOT);
             LocalDate creationDate = LocalDate.parse(game.getCreationDate(), FMT);
             long endDateMilliseconds = creationDate
-                    .plusDays(DAYS_AFTER_CREATION_TO_DEFAULT_END)
-                    .atStartOfDay(java.time.ZoneOffset.UTC)
-                    .toInstant()
-                    .toEpochMilli();
+                .plusDays(DAYS_AFTER_CREATION_TO_DEFAULT_END)
+                .atStartOfDay(java.time.ZoneOffset.UTC)
+                .toInstant()
+                .toEpochMilli();
             game.setEndedDate(endDateMilliseconds);
             BotLogger.info(String.format("Set game %s ended date to %d", game.getName(), game.getEndedDate()));
             return true;

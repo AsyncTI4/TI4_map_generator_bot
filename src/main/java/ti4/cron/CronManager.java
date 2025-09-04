@@ -19,7 +19,8 @@ public class CronManager {
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
 
     public static void schedulePeriodically(
-            Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
+        Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit
+    ) {
         CRONS.put(clazz.getSimpleName(), runnable);
         TimedRunnable timedRunnable = new TimedRunnable(clazz.getSimpleName(), runnable);
         SCHEDULER.scheduleAtFixedRate(timedRunnable, initialDelay, period, unit);
@@ -32,7 +33,8 @@ public class CronManager {
     }
 
     public static void schedulePeriodicallyAtTime(
-            Class<?> clazz, Runnable runnable, int hour, int minute, ZoneId zoneId) {
+        Class<?> clazz, Runnable runnable, int hour, int minute, ZoneId zoneId
+    ) {
         CRONS.put(clazz.getSimpleName(), runnable);
         long initialDelaySeconds = calculateInitialDelaySeconds(hour, minute, zoneId);
         long periodSeconds = TimeUnit.DAYS.toSeconds(1);
@@ -41,8 +43,7 @@ public class CronManager {
 
     private static long calculateInitialDelaySeconds(int hour, int minute, ZoneId zoneId) {
         ZonedDateTime now = ZonedDateTime.now(zoneId);
-        ZonedDateTime nextRun =
-                now.withHour(hour).withMinute(minute).withSecond(0).withNano(0);
+        ZonedDateTime nextRun = now.withHour(hour).withMinute(minute).withSecond(0).withNano(0);
         if (now.isAfter(nextRun)) {
             nextRun = nextRun.plusDays(1);
         }

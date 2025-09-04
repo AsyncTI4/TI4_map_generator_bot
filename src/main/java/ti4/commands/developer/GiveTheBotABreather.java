@@ -14,7 +14,7 @@ class GiveTheBotABreather extends Subcommand {
     GiveTheBotABreather() {
         super("give_the_bot_a_breather", "Stop the bot from processing commands for a few seconds.");
         addOptions(new OptionData(
-                OptionType.INTEGER, Constants.SECONDS, "Number of seconds to sleep the bot - default 10"));
+            OptionType.INTEGER, Constants.SECONDS, "Number of seconds to sleep the bot - default 10"));
     }
 
     @Override

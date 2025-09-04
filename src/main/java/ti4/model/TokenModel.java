@@ -80,7 +80,7 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
         eb.setFooter(sb.toString());
 
         eb.setThumbnail("https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tokens/"
-                + imagePath + "?raw=true");
+            + imagePath + "?raw=true");
 
         return eb.build();
     }
@@ -88,14 +88,14 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         return id.toLowerCase().contains(searchString.toLowerCase())
-                || (aliasList != null && aliasList.toString().toLowerCase().contains(searchString.toLowerCase()))
-                || (spaceOrPlanet != null && spaceOrPlanet.toLowerCase().contains(searchString.toLowerCase()))
-                || (tokenPlanetName != null && tokenPlanetName.toLowerCase().contains(searchString.toLowerCase()))
-                || (attachmentID != null && attachmentID.toLowerCase().contains(searchString.toLowerCase()))
-                || (wormholes != null && wormholes.toString().toLowerCase().contains(searchString.toLowerCase()))
-                || (isAnomaly != null && isAnomaly && "anomaly".contains(searchString.toLowerCase()))
-                || (isRift != null && isRift && "gravity rift".contains(searchString.toLowerCase()))
-                || (isNebula != null && isNebula && "nebula".contains(searchString.toLowerCase()))
-                || getAutoCompleteName().toLowerCase().contains(searchString.toLowerCase());
+            || (aliasList != null && aliasList.toString().toLowerCase().contains(searchString.toLowerCase()))
+            || (spaceOrPlanet != null && spaceOrPlanet.toLowerCase().contains(searchString.toLowerCase()))
+            || (tokenPlanetName != null && tokenPlanetName.toLowerCase().contains(searchString.toLowerCase()))
+            || (attachmentID != null && attachmentID.toLowerCase().contains(searchString.toLowerCase()))
+            || (wormholes != null && wormholes.toString().toLowerCase().contains(searchString.toLowerCase()))
+            || (isAnomaly != null && isAnomaly && "anomaly".contains(searchString.toLowerCase()))
+            || (isRift != null && isRift && "gravity rift".contains(searchString.toLowerCase()))
+            || (isNebula != null && isNebula && "nebula".contains(searchString.toLowerCase()))
+            || getAutoCompleteName().toLowerCase().contains(searchString.toLowerCase());
     }
 }

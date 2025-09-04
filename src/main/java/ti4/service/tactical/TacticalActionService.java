@@ -44,55 +44,60 @@ public class TacticalActionService {
 
         // Handle output
         MessageHelper.sendMessageToEventChannel(
-                event, player.fogSafeEmoji() + " put all units back where they started.");
+            event, player.fogSafeEmoji() + " put all units back where they started.");
         if (unkEncountered)
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    player.fogSafeEmoji()
-                            + " some units could not be put back... You can put them back manually after movement.");
+                event,
+                player.fogSafeEmoji()
+                    + " some units could not be put back... You can put them back manually after movement.");
         TacticalActionOutputService.refreshButtonsAndMessageForChoosingTile(event, game, player);
     }
 
     public void reverseTileUnitMovement(
-            ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove) {
+        ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove
+    ) {
         reverseTileUnitMovement(event, game, player, tile, moveOrRemove, false);
     }
 
     private void reverseTileUnitMovement(
-            ButtonInteractionEvent event,
-            Game game,
-            Player player,
-            Tile tile,
-            String moveOrRemove,
-            boolean skipOutput) {
+        ButtonInteractionEvent event,
+        Game game,
+        Player player,
+        Tile tile,
+        String moveOrRemove,
+        boolean skipOutput
+    ) {
         TacticalActionDisplacementService.reverseTileUnitMovement(game, player, tile);
         if (skipOutput) return;
         refreshTileUI(event, game, player, tile, moveOrRemove);
     }
 
     public void moveAllFromTile(
-            ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove) {
+        ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove
+    ) {
         TacticalActionDisplacementService.moveAllFromTile(game, player, tile);
         refreshTileUI(event, game, player, tile, moveOrRemove);
     }
 
     public void moveAllShipsFromTile(
-            ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove) {
+        ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove
+    ) {
         TacticalActionDisplacementService.moveAllShipsFromTile(game, player, tile);
         refreshTileUI(event, game, player, tile, moveOrRemove);
     }
 
     public void moveSingleUnit(
-            ButtonInteractionEvent event,
-            Game game,
-            Player player,
-            Tile tile,
-            String planetName,
-            UnitType type,
-            int amt,
-            UnitState state,
-            String moveOrRemove,
-            String color) {
+        ButtonInteractionEvent event,
+        Game game,
+        Player player,
+        Tile tile,
+        String planetName,
+        UnitType type,
+        int amt,
+        UnitState state,
+        String moveOrRemove,
+        String color
+    ) {
         TacticalActionDisplacementService.moveSingleUnit(game, player, tile, planetName, type, amt, state, color);
 
         // refresh buttons
@@ -100,16 +105,17 @@ public class TacticalActionService {
     }
 
     public void reverseSingleUnit(
-            ButtonInteractionEvent event,
-            Game game,
-            Player player,
-            Tile tile,
-            String planetName,
-            UnitType type,
-            int amt,
-            UnitState state,
-            String moveOrRemove,
-            String color) {
+        ButtonInteractionEvent event,
+        Game game,
+        Player player,
+        Tile tile,
+        String planetName,
+        UnitType type,
+        int amt,
+        UnitState state,
+        String moveOrRemove,
+        String color
+    ) {
         TacticalActionDisplacementService.reverseSingleUnit(game, player, tile, planetName, type, amt, state, color);
 
         // refresh buttons
@@ -119,8 +125,8 @@ public class TacticalActionService {
     public boolean spendAndPlaceTokenIfNecessary(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
         boolean skipPlacingAbilities = shouldSkipPlacingAbilities(game, player);
         if (!skipPlacingAbilities
-                && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
-                && game.getStoredValue("vaylerianHeroActive").isEmpty()) {
+            && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
+            && game.getStoredValue("vaylerianHeroActive").isEmpty()) {
             if (!game.getStoredValue("absolLux").isEmpty()) {
                 player.setTacticalCC(player.getTacticalCC() + 1);
             }
@@ -137,7 +143,7 @@ public class TacticalActionService {
             tile = FlipTileService.flipTileIfNeeded(event, tile, game);
             if (tile == null) {
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), "Failed to flip the Wormhole Nexus. Please yell at Jazzxhands");
+                    event.getMessageChannel(), "Failed to flip the Wormhole Nexus. Please yell at Jazzxhands");
                 return false;
             }
         }
@@ -151,7 +157,7 @@ public class TacticalActionService {
             FOWPlusService.resolveVoidActivation(player, game);
             Button conclude = Buttons.red(player.finChecker() + "doneWithTacticalAction", "Conclude Tactical Action");
             MessageHelper.sendMessageToChannelWithButton(
-                    player.getCorrectChannel(), "All units were lost to The Void.", conclude);
+                player.getCorrectChannel(), "All units were lost to The Void.", conclude);
             ButtonHelper.deleteAllButtons(event);
             return;
         }
@@ -171,7 +177,7 @@ public class TacticalActionService {
 
         if (!game.isL1Hero() && !ctx.playersWithPds2.isEmpty()) {
             ButtonHelperTacticalAction.tacticalActionSpaceCannonOffenceStep(
-                    game, player, ctx.playersWithPds2, ctx.tile);
+                game, player, ctx.playersWithPds2, ctx.tile);
         }
         StartCombatService.combatCheck(game, event, ctx.tile);
         ButtonHelper.deleteAllButtons(event);
@@ -192,7 +198,8 @@ public class TacticalActionService {
     }
 
     private FinishMovementContext executeCoreFinishMovement(
-            ButtonInteractionEvent event, Game game, Player player, Tile tile) {
+        ButtonInteractionEvent event, Game game, Player player, Tile tile
+    ) {
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
 
         boolean unitsWereMoved = moveUnitsIntoActiveSystem(event, game, tile);
@@ -200,18 +207,18 @@ public class TacticalActionService {
         spendAndPlaceTokenIfNecessary(event, game, player, updatedTile);
 
         boolean hasGfsInRange = game.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")
-                || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0
-                || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player) > 0;
+            || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0
+            || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player) > 0;
 
         if (unitsWereMoved) {
             ButtonHelperTacticalAction.resolveAfterMovementEffects(event, game, player, updatedTile, unitsWereMoved);
             game.setStoredValue(
-                    "currentActionSummary" + player.getFaction(),
-                    game.getStoredValue("currentActionSummary" + player.getFaction()) + " Moved ships there.");
+                "currentActionSummary" + player.getFaction(),
+                game.getStoredValue("currentActionSummary" + player.getFaction()) + " Moved ships there.");
         } else if (!hasGfsInRange) {
             game.setStoredValue(
-                    "currentActionSummary" + player.getFaction(),
-                    game.getStoredValue("currentActionSummary" + player.getFaction()) + " Did not move units.");
+                "currentActionSummary" + player.getFaction(),
+                game.getStoredValue("currentActionSummary" + player.getFaction()) + " Did not move units.");
         }
 
         return new FinishMovementContext(updatedTile, unitsWereMoved, hasGfsInRange, playersWithPds2);
@@ -225,7 +232,8 @@ public class TacticalActionService {
     }
 
     private List<Button> buildFinishMovementButtons(
-            ButtonInteractionEvent event, Game game, Player player, FinishMovementContext ctx) {
+        ButtonInteractionEvent event, Game game, Player player, FinishMovementContext ctx
+    ) {
         List<Button> systemButtons;
         if (!ctx.unitsWereMoved && !ctx.hasGfsInRange) {
             systemButtons = getBuildButtons(event, game, player, ctx.tile);
@@ -244,7 +252,7 @@ public class TacticalActionService {
     public List<Button> getLandingTroopsButtons(Game game, Player player, Tile tile) {
         List<Button> buttons = getLandingUnitsButtons(game, player, tile);
         if ((game.isNaaluAgent() || player == game.getActivePlayer())
-                && tile.getPosition().equalsIgnoreCase(game.getActiveSystem())) {
+            && tile.getPosition().equalsIgnoreCase(game.getActiveSystem())) {
             buttons.add(Buttons.red(player.finChecker() + "doneLanding_" + tile.getPosition(), "Done Landing Troops"));
         } else {
             buttons.add(Buttons.red(player.finChecker() + "deleteButtons", "Done Resolving"));
@@ -261,9 +269,9 @@ public class TacticalActionService {
         }
         if (!game.getStoredValue("possiblyUsedRift").isEmpty()) {
             buttons.add(Buttons.green(
-                    player.finChecker() + "getRiftButtons_" + tile.getPosition(),
-                    "Units Travelled Through Gravity Rift",
-                    MiscEmojis.GravityRift));
+                player.finChecker() + "getRiftButtons_" + tile.getPosition(),
+                "Units Travelled Through Gravity Rift",
+                MiscEmojis.GravityRift));
         }
         if (player.hasUnexhaustedLeader("sardakkagent")) {
             buttons.addAll(ButtonHelperAgents.getSardakkAgentButtons(game));
@@ -272,9 +280,8 @@ public class TacticalActionService {
             buttons.addAll(ButtonHelperAgents.getMercerAgentInitialButtons(game, player));
         }
         if (player.hasAbility("shroud_of_lith")
-                && ButtonHelperFactionSpecific.getKolleccReleaseButtons(player, game)
-                                .size()
-                        > 1) {
+            && ButtonHelperFactionSpecific.getKolleccReleaseButtons(player, game)
+                .size() > 1) {
             buttons.add(Buttons.blue("shroudOfLithStart", "Use Shroud of Lith", FactionEmojis.kollecc));
         }
         buttons.add(Buttons.red(player.finChecker() + "doneWithTacticalAction", "Conclude Tactical Action"));
@@ -312,20 +319,21 @@ public class TacticalActionService {
     }
 
     private static List<Button> buildMoveFromTileSelectionButtons(
-            Player player, Game game, GenericInteractionCreateEvent event) {
+        Player player, Game game, GenericInteractionCreateEvent event
+    ) {
         List<Button> out = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
             Tile tile = tileEntry.getValue();
             boolean movedFrom = TacticalActionDisplacementService.hasDisplacementFromPosition(game, tile.getPosition());
             boolean hasUnits = hasUnitsOrAlliedUnitsWithoutCC(player, game, event, tile);
             boolean canSelect = (movedFrom || hasUnits)
-                    && (!CommandCounterHelper.hasCC(event, player.getColor(), tile)
-                            || ButtonHelper.nomadHeroAndDomOrbCheck(player, game));
+                && (!CommandCounterHelper.hasCC(event, player.getColor(), tile)
+                    || ButtonHelper.nomadHeroAndDomOrbCheck(player, game));
             if (canSelect) {
                 out.add(Buttons.green(
-                        player.finChecker() + "tacticalMoveFrom_" + tileEntry.getKey(),
-                        tile.getRepresentationForButtons(game, player),
-                        tile.getTileEmoji(player)));
+                    player.finChecker() + "tacticalMoveFrom_" + tileEntry.getKey(),
+                    tile.getRepresentationForButtons(game, player),
+                    tile.getTileEmoji(player)));
             }
         }
         return out;
@@ -343,8 +351,7 @@ public class TacticalActionService {
         for (Planet planet : tile.getPlanetUnitHolders()) {
             if (shouldSkipLandingOnPlanet(planet)) continue;
 
-            LandingContext ctx =
-                    LandingContext.of(game, player, tile, space, planet, landPrefix, unlandPrefix, committable);
+            LandingContext ctx = LandingContext.of(game, player, tile, space, planet, landPrefix, unlandPrefix, committable);
 
             addLandingAndUnlandingButtonsForPlanet(ctx, buttons, unlandUnitButtons);
             for (PlanetAbilityButton ability : PlanetAbilityButtons.ABILITIES) {
@@ -369,8 +376,8 @@ public class TacticalActionService {
 
     private boolean shouldSkipPlacingAbilities(Game game, Player player) {
         return game.isNaaluAgent()
-                || game.isL1Hero()
-                || (!game.getStoredValue("hiredGunsInPlay").isEmpty() && player != game.getActivePlayer());
+            || game.isL1Hero()
+            || (!game.getStoredValue("hiredGunsInPlay").isEmpty() && player != game.getActivePlayer());
     }
 
     private Button createBuildButton(Player player, Tile tile, int productionVal) {
@@ -380,12 +387,13 @@ public class TacticalActionService {
     }
 
     private boolean hasUnitsOrAlliedUnitsWithoutCC(
-            Player player, Game game, GenericInteractionCreateEvent event, Tile tile) {
+        Player player, Game game, GenericInteractionCreateEvent event, Tile tile
+    ) {
         boolean hasUnits = FoWHelper.playerHasUnitsInSystem(player, tile);
         for (Player p2 : game.getRealPlayers()) {
             if (player.getAllianceMembers().contains(p2.getFaction())) {
                 if (FoWHelper.playerHasUnitsInSystem(p2, tile)
-                        && !CommandCounterHelper.hasCC(event, p2.getColor(), tile)) {
+                    && !CommandCounterHelper.hasCC(event, p2.getColor(), tile)) {
                     hasUnits = true;
                 }
             }
@@ -396,7 +404,7 @@ public class TacticalActionService {
     private List<UnitType> getCommittableGroundUnitTypes(Player player, UnitHolder space) {
         List<UnitType> committable = new ArrayList<>(List.of(UnitType.Mech, UnitType.Infantry));
         boolean naaluFS = (player.hasUnit("naalu_flagship") || player.hasUnit("sigma_naalu_flagship_2"))
-                && space.getUnitCount(UnitType.Flagship, player) > 0;
+            && space.getUnitCount(UnitType.Flagship, player) > 0;
         boolean belkoFF = player.hasUnit("belkosea_fighter") || player.hasUnit("belkosea_fighter2");
         if (naaluFS || belkoFF) committable.add(UnitType.Fighter);
         return committable;
@@ -414,36 +422,36 @@ public class TacticalActionService {
         if (game == null) return false;
 
         if (game.isHomebrew()
-                || game.isExtraSecretMode()
-                || game.isFowMode()
-                || game.isAgeOfExplorationMode()
-                || game.isFacilitiesMode()
-                || game.isMinorFactionsMode()
-                || game.isLightFogMode()
-                || game.isRedTapeMode()
-                || game.isDiscordantStarsMode()
-                || game.isFrankenGame()
-                || game.isMiltyModMode()
-                || game.isAbsolMode()
-                || game.isVotcMode()
-                || game.isPromisesPromisesMode()
-                || game.isFlagshippingMode()
-                || game.isAllianceMode()
-                || (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode()))
-                || game.isHomebrewSCMode()
-                || game.isCommunityMode()
-                || game.getPlayerCountForMap() < 3
-                || game.getPlayerCountForMap() > 8) {
+            || game.isExtraSecretMode()
+            || game.isFowMode()
+            || game.isAgeOfExplorationMode()
+            || game.isFacilitiesMode()
+            || game.isMinorFactionsMode()
+            || game.isLightFogMode()
+            || game.isRedTapeMode()
+            || game.isDiscordantStarsMode()
+            || game.isFrankenGame()
+            || game.isMiltyModMode()
+            || game.isAbsolMode()
+            || game.isVotcMode()
+            || game.isPromisesPromisesMode()
+            || game.isFlagshippingMode()
+            || game.isAllianceMode()
+            || (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode()))
+            || game.isHomebrewSCMode()
+            || game.isCommunityMode()
+            || game.getPlayerCountForMap() < 3
+            || game.getPlayerCountForMap() > 8) {
             return false;
         }
 
         try {
             if (!game.checkAllDecksAreOfficial()
-                    || !game.checkAllTilesAreOfficial()
-                    || game.getFactions().stream()
-                            .map(Mapper::getFaction)
-                            .filter(Objects::nonNull)
-                            .anyMatch(faction -> !faction.getSource().isOfficial())) {
+                || !game.checkAllTilesAreOfficial()
+                || game.getFactions().stream()
+                    .map(Mapper::getFaction)
+                    .filter(Objects::nonNull)
+                    .anyMatch(faction -> !faction.getSource().isOfficial())) {
                 return false;
             }
         } catch (Exception e) {
@@ -454,7 +462,8 @@ public class TacticalActionService {
     }
 
     private void addLandingAndUnlandingButtonsForPlanet(
-            LandingContext ctx, List<Button> buttons, List<Button> unlandUnitButtons) {
+        LandingContext ctx, List<Button> buttons, List<Button> unlandUnitButtons
+    ) {
         for (UnitType unitType : ctx.committable) {
             for (UnitState state : UnitState.values()) {
                 for (int count = 1; count <= 2; count++) {
@@ -473,7 +482,8 @@ public class TacticalActionService {
     }
 
     private void maybeAddLandButton(
-            LandingContext ctx, Player unitOwner, UnitType unitType, UnitState state, int count, List<Button> buttons) {
+        LandingContext ctx, Player unitOwner, UnitType unitType, UnitState state, int count, List<Button> buttons
+    ) {
         if (!ctx.hasSpaceUnits(unitOwner, unitType, state, count)) return;
         String id = ctx.buildLandButtonId(count, unitType, unitOwner);
         String label = ctx.buildLandLabel(count, unitOwner, state, unitType);
@@ -481,7 +491,8 @@ public class TacticalActionService {
     }
 
     private void maybeAddUnlandButton(
-            LandingContext ctx, Player unitOwner, UnitType unitType, UnitState state, int count, List<Button> unland) {
+        LandingContext ctx, Player unitOwner, UnitType unitType, UnitState state, int count, List<Button> unland
+    ) {
         if (!ctx.hasPlanetUnits(unitOwner, unitType, state, count)) return;
         String id = ctx.buildUnlandButtonId(count, unitType, unitOwner);
         String label = ctx.buildUnlandLabel(count, unitOwner, state, unitType);

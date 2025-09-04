@@ -14,6 +14,6 @@ public final class EmergencyModificationsButton implements MoveAbilityButton {
 
     public List<Button> build(MoveContext ctx) {
         return List.of(
-                Buttons.gray("declareUse_Emergency Modifications", "Emergency Modifications", FactionEmojis.toldar));
+            Buttons.gray("declareUse_Emergency Modifications", "Emergency Modifications", FactionEmojis.toldar));
     }
 }

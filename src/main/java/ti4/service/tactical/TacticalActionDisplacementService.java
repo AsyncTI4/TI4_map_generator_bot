@@ -26,8 +26,7 @@ import ti4.service.regex.RegexService;
 public class TacticalActionDisplacementService {
 
     public Map<String, Map<UnitKey, List<Integer>>> reverseAllUnitMovement(Game game, Player player) {
-        Set<String> displacedKeys =
-                new HashSet<>(game.getTacticalActionDisplacement().keySet());
+        Set<String> displacedKeys = new HashSet<>(game.getTacticalActionDisplacement().keySet());
         Map<String, Map<UnitKey, List<Integer>>> displaced = game.getTacticalActionDisplacement();
 
         Pattern rx = Pattern.compile(RegexHelper.posRegex(game) + "-" + RegexHelper.unitHolderRegex(game, "uh"));
@@ -100,20 +99,20 @@ public class TacticalActionDisplacementService {
     }
 
     public Map<String, Map<UnitKey, List<Integer>>> moveSingleUnit(
-            Game game,
-            Player player,
-            Tile tile,
-            String planetName,
-            UnitType type,
-            int amt,
-            UnitState state,
-            String color) {
+        Game game,
+        Player player,
+        Tile tile,
+        String planetName,
+        UnitType type,
+        int amt,
+        UnitState state,
+        String color
+    ) {
         UnitHolder uh = planetName == null ? tile.getSpaceUnitHolder() : tile.getUnitHolderFromPlanet(planetName);
         if (uh == null) return game.getTacticalActionDisplacement();
         String uhKey = unitHolderKey(tile, uh);
 
-        Map<UnitKey, List<Integer>> displaced =
-                game.getTacticalActionDisplacement().getOrDefault(uhKey, new HashMap<>());
+        Map<UnitKey, List<Integer>> displaced = game.getTacticalActionDisplacement().getOrDefault(uhKey, new HashMap<>());
         UnitHolder fakeUh = new Space("fake", null);
         String pColor = resolveColorOrDefault(player, color);
         UnitKey unitKey = Units.getUnitKey(type, pColor);
@@ -127,20 +126,20 @@ public class TacticalActionDisplacementService {
     }
 
     public Map<String, Map<UnitKey, List<Integer>>> reverseSingleUnit(
-            Game game,
-            Player player,
-            Tile tile,
-            String planetName,
-            UnitType type,
-            int amt,
-            UnitState state,
-            String color) {
+        Game game,
+        Player player,
+        Tile tile,
+        String planetName,
+        UnitType type,
+        int amt,
+        UnitState state,
+        String color
+    ) {
         UnitHolder uh = planetName == null ? tile.getSpaceUnitHolder() : tile.getUnitHolderFromPlanet(planetName);
         if (uh == null) return game.getTacticalActionDisplacement();
         String uhKey = unitHolderKey(tile, uh);
 
-        Map<UnitKey, List<Integer>> displaced =
-                game.getTacticalActionDisplacement().getOrDefault(uhKey, new HashMap<>());
+        Map<UnitKey, List<Integer>> displaced = game.getTacticalActionDisplacement().getOrDefault(uhKey, new HashMap<>());
         String pColor = resolveColorOrDefault(player, color);
         UnitKey unitKey = Units.getUnitKey(type, pColor);
         if (!displaced.containsKey(unitKey)) return game.getTacticalActionDisplacement();
@@ -167,8 +166,7 @@ public class TacticalActionDisplacementService {
     public boolean applyDisplacementToActiveSystem(Game game, Tile tile) {
         boolean moved = false;
         UnitHolder activeSystemSpace = tile.getSpaceUnitHolder();
-        for (Entry<String, Map<UnitKey, List<Integer>>> e :
-                game.getTacticalActionDisplacement().entrySet()) {
+        for (Entry<String, Map<UnitKey, List<Integer>>> e : game.getTacticalActionDisplacement().entrySet()) {
             for (Entry<UnitKey, List<Integer>> unit : e.getValue().entrySet()) {
                 if (unit.getValue().stream().mapToInt(Integer::intValue).sum() > 0) moved = true;
                 activeSystemSpace.addUnitsWithStates(unit.getKey(), unit.getValue());
@@ -183,7 +181,8 @@ public class TacticalActionDisplacementService {
      * This does not move units into the active system; it only prepares the staged state for review.
      */
     public Map<String, Map<UnitKey, List<Integer>>> stageFullDisplacementAndRemoveFromOrigins(
-            Game game, Player player, Map<String, Map<UnitKey, List<Integer>>> displacement) {
+        Game game, Player player, Map<String, Map<UnitKey, List<Integer>>> displacement
+    ) {
         if (displacement == null) {
             game.setTacticalActionDisplacement(new HashMap<>());
             return game.getTacticalActionDisplacement();
@@ -201,8 +200,8 @@ public class TacticalActionDisplacementService {
             if (srcTile == null) continue;
 
             UnitHolder srcHolder = "space".equalsIgnoreCase(uhName)
-                    ? srcTile.getSpaceUnitHolder()
-                    : srcTile.getUnitHolderFromPlanet(uhName);
+                ? srcTile.getSpaceUnitHolder()
+                : srcTile.getUnitHolderFromPlanet(uhName);
             if (srcHolder == null) continue;
 
             for (Entry<UnitKey, List<Integer>> unitEntry : e.getValue().entrySet()) {
@@ -221,13 +220,14 @@ public class TacticalActionDisplacementService {
     }
 
     private void processUnitHolderMovement(
-            Game game,
-            Player player,
-            Set<Player> allowedAllies,
-            Tile tile,
-            UnitHolder unitHolder,
-            Map<String, Map<UnitKey, List<Integer>>> displaced,
-            List<UnitType> movableFromPlanets) {
+        Game game,
+        Player player,
+        Set<Player> allowedAllies,
+        Tile tile,
+        UnitHolder unitHolder,
+        Map<String, Map<UnitKey, List<Integer>>> displaced,
+        List<UnitType> movableFromPlanets
+    ) {
         String uhKey = unitHolderKey(tile, unitHolder);
         Map<UnitKey, List<Integer>> movement = displaced.getOrDefault(uhKey, new HashMap<>());
 
@@ -245,8 +245,7 @@ public class TacticalActionDisplacementService {
         if (player.unitBelongsToPlayer(unitKey)) return true;
 
         UnitType unitType = unitKey.getUnitType();
-        boolean eligibleType =
-                unitType == UnitType.Infantry || unitType == UnitType.Fighter || unitType == UnitType.Mech;
+        boolean eligibleType = unitType == UnitType.Infantry || unitType == UnitType.Fighter || unitType == UnitType.Mech;
         if (!eligibleType) return false;
 
         for (Player ally : allowedAllies) {

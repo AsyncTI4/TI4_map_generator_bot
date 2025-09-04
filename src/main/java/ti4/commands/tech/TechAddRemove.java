@@ -20,13 +20,13 @@ abstract class TechAddRemove extends GameStateSubcommand {
     TechAddRemove(String id, String description) {
         super(id, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Technology")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "2nd technology").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "3rd technology").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "4th technology").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color with the technology")
-                .setAutoComplete(true));
+            .setAutoComplete(true));
     }
 
     @Override
@@ -49,10 +49,9 @@ abstract class TechAddRemove extends GameStateSubcommand {
             } else {
                 Map<String, TechnologyModel> techs = Mapper.getTechs();
                 List<String> possibleTechs = techs.entrySet().stream()
-                        .filter(value ->
-                                value.getValue().getName().toLowerCase().contains(techID))
-                        .map(Map.Entry::getKey)
-                        .toList();
+                    .filter(value -> value.getValue().getName().toLowerCase().contains(techID))
+                    .map(Map.Entry::getKey)
+                    .toList();
                 if (possibleTechs.isEmpty()) {
                     MessageHelper.sendMessageToEventChannel(event, "No matching technology found.");
                     return;

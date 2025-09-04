@@ -22,15 +22,15 @@ class ExplorePlanet extends GameStateSubcommand {
     public ExplorePlanet() {
         super(Constants.PLANET, "Explore a specific planet.", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to explore")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Planet trait to explore").setAutoComplete(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
         addOptions(new OptionData(
-                OptionType.STRING,
-                Constants.OVERRIDE_EXPLORE_OWNERSHIP_REQ,
-                "Override ownership requirement. Enter YES if so"));
+            OptionType.STRING,
+            Constants.OVERRIDE_EXPLORE_OWNERSHIP_REQ,
+            "Override ownership requirement. Enter YES if so"));
     }
 
     @Override
@@ -53,8 +53,7 @@ class ExplorePlanet extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, "Invalid planet");
             return;
         }
-        String drawColor =
-                planet.getPlanetType() == null ? null : planet.getPlanetType().toString();
+        String drawColor = planet.getPlanetType() == null ? null : planet.getPlanetType().toString();
         OptionMapping traitOption = event.getOption(Constants.TRAIT);
         if (traitOption != null) {
             drawColor = traitOption.getAsString();

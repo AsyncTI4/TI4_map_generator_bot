@@ -22,13 +22,12 @@ class AddTile extends GameStateSubcommand {
         super(Constants.ADD_TILE, "Add tile to map", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name", true).setAutoComplete(true));
         addOptions(new OptionData(
-                OptionType.STRING, Constants.POSITION, "Tile position on map. Accepts comma separated list", true));
+            OptionType.STRING, Constants.POSITION, "Tile position on map. Accepts comma separated list", true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String planetTileName =
-                AliasHandler.resolveTile(event.getOptions().get(0).getAsString().toLowerCase());
+        String planetTileName = AliasHandler.resolveTile(event.getOptions().get(0).getAsString().toLowerCase());
         String positionOption = event.getOptions().get(1).getAsString();
         Set<String> positions = Helper.getSetFromCSV(positionOption);
 

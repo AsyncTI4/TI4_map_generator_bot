@@ -76,22 +76,22 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public boolean isValid() {
         return id != null
-                && !id.isEmpty()
-                && baseType != null
-                && name != null
-                && asyncId != null
-                && source != null
-                && (getFaction().isEmpty()
-                        || Mapper.isValidFaction(getFaction().orElse("").toLowerCase()))
-                && new HashSet<>(List.of(
-                                "CULTURAL",
-                                "HAZARDOUS",
-                                "INDUSTRIAL",
-                                "TECH_SPECIALTY",
-                                "LEGENDARY",
-                                "MECATOL_REX",
-                                "EMPTY_NONANOMALY"))
-                        .containsAll(getEligiblePlanetTypes());
+            && !id.isEmpty()
+            && baseType != null
+            && name != null
+            && asyncId != null
+            && source != null
+            && (getFaction().isEmpty()
+                || Mapper.isValidFaction(getFaction().orElse("").toLowerCase()))
+            && new HashSet<>(List.of(
+                "CULTURAL",
+                "HAZARDOUS",
+                "INDUSTRIAL",
+                "TECH_SPECIALTY",
+                "LEGENDARY",
+                "MECATOL_REX",
+                "EMPTY_NONANOMALY"))
+                    .containsAll(getEligiblePlanetTypes());
     }
 
     public String getAlias() {
@@ -190,13 +190,13 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public int getAfbDieCount(Player player, Game game) {
         if (capacityValue > 0
-                && player.getFaction().equalsIgnoreCase(game.getStoredValue("ShrapnelTurretsFaction"))
-                && getExpectedAfbHits() < 0.6) {
+            && player.getFaction().equalsIgnoreCase(game.getStoredValue("ShrapnelTurretsFaction"))
+            && getExpectedAfbHits() < 0.6) {
             return 2;
         }
         if (afbDieCount == 0
-                && isWarsunOrDreadnought()
-                && game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
+            && isWarsunOrDreadnought()
+            && game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
             return 1;
         }
         return afbDieCount;
@@ -221,7 +221,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     private int getSpaceCannonHitsOn(Player player, Game game) {
         if (game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())
-                || player.hasRelic("lightrailordnance")) {
+            || player.hasRelic("lightrailordnance")) {
             if ("spacedock".equalsIgnoreCase(baseType)) {
                 return 5;
             }
@@ -231,13 +231,13 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public int getAfbHitsOn(Player player, Game game) {
         if (capacityValue > 0
-                && game.getStoredValue("ShrapnelTurretsFaction").equalsIgnoreCase(player.getFaction())
-                && getExpectedAfbHits() < 0.6) {
+            && game.getStoredValue("ShrapnelTurretsFaction").equalsIgnoreCase(player.getFaction())
+            && getExpectedAfbHits() < 0.6) {
             return 8;
         }
         if (afbDieCount == 0
-                && isWarsunOrDreadnought()
-                && game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
+            && isWarsunOrDreadnought()
+            && game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
             return 5;
         }
         return afbHitsOn;
@@ -246,8 +246,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     public int getBombardDieCount(Player player, Game game) {
         if (!game.getStoredValue("BlitzFaction").equalsIgnoreCase(player.getFaction())) {
             if (game.getStoredValue("TnelisAgentFaction").equalsIgnoreCase(player.getFaction())
-                    && bombardDieCount == 0
-                    && afbDieCount > 0) {
+                && bombardDieCount == 0
+                && afbDieCount > 0) {
                 return afbDieCount;
             }
             return bombardDieCount;
@@ -263,8 +263,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private int getBombardHitsOn(Player player, Game game) {
         if (!game.getStoredValue("BlitzFaction").equalsIgnoreCase(player.getFaction())) {
             if (game.getStoredValue("TnelisAgentFaction").equalsIgnoreCase(player.getFaction())
-                    && bombardDieCount == 0
-                    && afbDieCount > 0) {
+                && bombardDieCount == 0
+                && afbDieCount > 0) {
                 return afbHitsOn;
             }
             return bombardHitsOn;
@@ -403,11 +403,11 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public boolean search(String searchString) {
         return name.toLowerCase().contains(searchString)
-                || getFaction().orElse("").toLowerCase().contains(searchString)
-                || id.toLowerCase().contains(searchString)
-                || baseType.toLowerCase().contains(searchString)
-                || getSubtitle().orElse("").toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
+            || getFaction().orElse("").toLowerCase().contains(searchString)
+            || id.toLowerCase().contains(searchString)
+            || baseType.toLowerCase().contains(searchString)
+            || getSubtitle().orElse("").toLowerCase().contains(searchString)
+            || searchTags.contains(searchString);
     }
 
     public static int sortFactionUnitsFirst(UnitModel a, UnitModel b) {

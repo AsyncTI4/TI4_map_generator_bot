@@ -67,20 +67,21 @@ public class AddTileService {
     }
 
     public static List<TileModel> availableTiles(
-            Set<ComponentSource> sources,
-            RandomOption type,
-            Set<TileModel> existingTileModels,
-            List<String> drawnTiles) {
+        Set<ComponentSource> sources,
+        RandomOption type,
+        Set<TileModel> existingTileModels,
+        List<String> drawnTiles
+    ) {
         List<TileModel> availableTiles = new ArrayList<>();
         switch (type) {
             case BR:
                 List<Supplier<List<TileModel>>> tileFinders = new Random().nextBoolean()
-                        ? List.of(
-                                () -> findBlueTiles(sources, existingTileModels, drawnTiles),
-                                () -> findRedTiles(sources, existingTileModels, drawnTiles))
-                        : List.of(
-                                () -> findRedTiles(sources, existingTileModels, drawnTiles),
-                                () -> findBlueTiles(sources, existingTileModels, drawnTiles));
+                    ? List.of(
+                        () -> findBlueTiles(sources, existingTileModels, drawnTiles),
+                        () -> findRedTiles(sources, existingTileModels, drawnTiles))
+                    : List.of(
+                        () -> findRedTiles(sources, existingTileModels, drawnTiles),
+                        () -> findBlueTiles(sources, existingTileModels, drawnTiles));
 
                 for (Supplier<List<TileModel>> tileFinder : tileFinders) {
                     availableTiles = tileFinder.get();
@@ -97,49 +98,47 @@ public class AddTileService {
                 break;
             case HS:
                 availableTiles = TileHelper.getAllTileModels().stream()
-                        .filter(tileModel -> tileModel.getTileBack() == TileBack.GREEN)
-                        .filter(tileModel -> sources.contains(tileModel.getSource()))
-                        .filter(tileModel -> !existingTileModels.contains(tileModel))
-                        .filter(tileModel -> !drawnTiles.contains(tileModel.getId()))
-                        .filter(tileModel -> new Tile(tileModel.getId(), "none").isHomeSystem())
-                        .collect(Collectors.toList());
+                    .filter(tileModel -> tileModel.getTileBack() == TileBack.GREEN)
+                    .filter(tileModel -> sources.contains(tileModel.getSource()))
+                    .filter(tileModel -> !existingTileModels.contains(tileModel))
+                    .filter(tileModel -> !drawnTiles.contains(tileModel.getId()))
+                    .filter(tileModel -> new Tile(tileModel.getId(), "none").isHomeSystem())
+                    .collect(Collectors.toList());
                 break;
             case HL:
                 availableTiles = TileHelper.getAllTileModels().stream()
-                        .filter(TileModel::isHyperlane)
-                        .collect(Collectors.toList());
+                    .filter(TileModel::isHyperlane)
+                    .collect(Collectors.toList());
                 break;
         }
         return availableTiles;
     }
 
     private static List<TileModel> findBlueTiles(
-            Set<ComponentSource> sources, Set<TileModel> existingTileModels, List<String> drawnTiles) {
+        Set<ComponentSource> sources, Set<TileModel> existingTileModels, List<String> drawnTiles
+    ) {
         return TileHelper.getAllTileModels().stream()
-                .filter(tileModel -> tileModel.getTileBack() == TileBack.BLUE)
-                .filter(tileModel -> sources.contains(tileModel.getSource()))
-                .filter(tileModel -> !existingTileModels.contains(tileModel))
-                .filter(tileModel -> !drawnTiles.contains(tileModel.getId()))
-                .collect(Collectors.toList());
+            .filter(tileModel -> tileModel.getTileBack() == TileBack.BLUE)
+            .filter(tileModel -> sources.contains(tileModel.getSource()))
+            .filter(tileModel -> !existingTileModels.contains(tileModel))
+            .filter(tileModel -> !drawnTiles.contains(tileModel.getId()))
+            .collect(Collectors.toList());
     }
 
     private static List<TileModel> findRedTiles(
-            Set<ComponentSource> sources, Set<TileModel> existingTileModels, List<String> drawnTiles) {
+        Set<ComponentSource> sources, Set<TileModel> existingTileModels, List<String> drawnTiles
+    ) {
         return TileHelper.getAllTileModels().stream()
-                .filter(tileModel -> tileModel.getTileBack() == TileBack.RED)
-                .filter(tileModel -> sources.contains(tileModel.getSource()))
-                // Allow duplicate tiles if they are empty
-                .filter(tileModel -> tileModel.isEmpty()
-                        || (!existingTileModels.contains(tileModel) && !drawnTiles.contains(tileModel.getId())))
-                .collect(Collectors.toList());
+            .filter(tileModel -> tileModel.getTileBack() == TileBack.RED)
+            .filter(tileModel -> sources.contains(tileModel.getSource()))
+            // Allow duplicate tiles if they are empty
+            .filter(tileModel -> tileModel.isEmpty()
+                || (!existingTileModels.contains(tileModel) && !drawnTiles.contains(tileModel.getId())))
+            .collect(Collectors.toList());
     }
 
     public enum RandomOption {
-        B("Blue tile"),
-        R("Red tile"),
-        HS("Home System"),
-        HL("Hyperlane"),
-        BR("50/50 for Blue/Red tile");
+        B("Blue tile"), R("Red tile"), HS("Home System"), HL("Hyperlane"), BR("50/50 for Blue/Red tile");
 
         private final String description;
 
@@ -153,7 +152,7 @@ public class AddTileService {
 
         public boolean search(String searchString) {
             return toString().toLowerCase().contains(searchString)
-                    || description.toLowerCase().contains(searchString);
+                || description.toLowerCase().contains(searchString);
         }
 
         public static boolean isValid(String value) {

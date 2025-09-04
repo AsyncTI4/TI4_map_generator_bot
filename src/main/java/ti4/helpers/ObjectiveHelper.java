@@ -19,14 +19,14 @@ public class ObjectiveHelper {
         PublicObjectiveModel po = Mapper.getPublicObjective(obj);
         if (fullEmbed) {
             MessageHelper.sendMessageToChannel(
-                    player.getCardsInfoThread(), "Stage 1 public objective at location " + loc1 + ".");
+                player.getCardsInfoThread(), "Stage 1 public objective at location " + loc1 + ".");
             player.getCardsInfoThread()
-                    .sendMessageEmbeds(po.getRepresentationEmbed())
-                    .queue();
+                .sendMessageEmbeds(po.getRepresentationEmbed())
+                .queue();
         } else {
             String sb = player.getRepresentationUnfogged() + ", stage 1 public objective at location "
-                    + loc1 + ":\n" + po.getRepresentation(!po.getAlias().equalsIgnoreCase(Constants.IMPERIUM_REX_ID))
-                    + "\n";
+                + loc1 + ":\n" + po.getRepresentation(!po.getAlias().equalsIgnoreCase(Constants.IMPERIUM_REX_ID))
+                + "\n";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb);
         }
     }
@@ -35,8 +35,8 @@ public class ObjectiveHelper {
         String obj = game.peekAtStage2(loc1, player);
         PublicObjectiveModel po = Mapper.getPublicObjective(obj);
         String sb = player.getRepresentationUnfogged() + ", stage 2 public objective at location "
-                + loc1 + ":\n" + po.getRepresentation()
-                + "\n";
+            + loc1 + ":\n" + po.getRepresentation()
+            + "\n";
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb);
     }
 }

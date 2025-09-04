@@ -21,28 +21,28 @@ class MostPlayedFactionsStatisticsService {
         Map<String, Integer> custodians = new HashMap<>();
 
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilter(event), game -> calculate(game, factionCount, custodians));
+            GameStatisticsFilterer.getGamesFilter(event), game -> calculate(game, factionCount, custodians));
 
         StringBuilder sb = new StringBuilder();
         sb.append("Plays per Faction:").append("\n");
         factionCount.entrySet().stream()
-                .filter(entry -> Mapper.isValidFaction(entry.getKey()))
-                .sorted(Map.Entry.comparingByValue())
-                .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
-                .forEach(entry -> sb.append("`")
-                        .append(StringUtils.leftPad(entry.getValue().toString(), 4))
-                        .append("x` ")
-                        .append(entry.getKey().getFactionEmoji())
-                        .append(" ")
-                        .append(entry.getKey().getFactionNameWithSourceEmoji())
-                        .append(" (Took Custodians a total of  ")
-                        .append(custodians.getOrDefault(entry.getKey().getAlias(), 0))
-                        .append(" times, or ")
-                        .append((float) custodians.getOrDefault(entry.getKey().getAlias(), 0) / entry.getValue())
-                        .append(")")
-                        .append("\n"));
+            .filter(entry -> Mapper.isValidFaction(entry.getKey()))
+            .sorted(Map.Entry.comparingByValue())
+            .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
+            .forEach(entry -> sb.append("`")
+                .append(StringUtils.leftPad(entry.getValue().toString(), 4))
+                .append("x` ")
+                .append(entry.getKey().getFactionEmoji())
+                .append(" ")
+                .append(entry.getKey().getFactionNameWithSourceEmoji())
+                .append(" (Took Custodians a total of  ")
+                .append(custodians.getOrDefault(entry.getKey().getAlias(), 0))
+                .append(" times, or ")
+                .append((float) custodians.getOrDefault(entry.getKey().getAlias(), 0) / entry.getValue())
+                .append(")")
+                .append("\n"));
         MessageHelper.sendMessageToThread(
-                (MessageChannelUnion) event.getMessageChannel(), "Plays per Faction", sb.toString());
+            (MessageChannelUnion) event.getMessageChannel(), "Plays per Faction", sb.toString());
     }
 
     private static void calculate(Game game, Map<String, Integer> factionCount, Map<String, Integer> custodians) {

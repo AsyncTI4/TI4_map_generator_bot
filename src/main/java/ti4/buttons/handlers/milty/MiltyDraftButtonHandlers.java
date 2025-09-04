@@ -42,13 +42,11 @@ class MiltyDraftButtonHandlers {
         switch (whichOnes) {
             case "all" -> displayFactions.addAll(game.getMiltyDraftManager().allFactions());
             case "picked" -> displayFactions.addAll(game.getMiltyDraftManager().pickedFactions());
-            case "remaining" ->
-                displayFactions.addAll(game.getMiltyDraftManager().remainingFactions());
+            case "remaining" -> displayFactions.addAll(game.getMiltyDraftManager().remainingFactions());
         }
 
         boolean first = true;
-        List<MessageEmbed> embeds =
-                displayFactions.stream().map(FactionModel::fancyEmbed).toList();
+        List<MessageEmbed> embeds = displayFactions.stream().map(FactionModel::fancyEmbed).toList();
         for (MessageEmbed e : embeds) {
             String message = "";
             if (first) message = player.getRepresentationUnfogged() + " Here's an overview of the factions:";
@@ -64,8 +62,7 @@ class MiltyDraftButtonHandlers {
             game.setStoredValue("keleresFlavorPreset", flavor);
             String preset = game.getStoredValue("keleresFlavorPreset");
             if (preset != null) {
-                String keleresName =
-                        Mapper.getFaction("keleres" + preset.charAt(0)).getFactionTitle();
+                String keleresName = Mapper.getFaction("keleres" + preset.charAt(0)).getFactionTitle();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Successfully preset " + keleresName);
                 MiltyService.offerKeleresSetupButtons(game.getMiltyDraftManager(), player);
                 ButtonHelper.deleteMessage(event);

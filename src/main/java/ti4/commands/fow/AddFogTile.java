@@ -23,15 +23,14 @@ class AddFogTile extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map", true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name", true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LABEL, "How you want the system to be labelled")
-                .setMaxLength(30));
+            .setMaxLength(30));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to add to")
-                .setAutoComplete(true));
+            .setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        List<String> positions =
-                Helper.getListFromCSV(event.getOption(Constants.POSITION).getAsString());
+        List<String> positions = Helper.getListFromCSV(event.getOption(Constants.POSITION).getAsString());
 
         List<Player> targetPlayers = CommandHelper.getTargetPlayersFromOption(getGame(), event);
         if (targetPlayers.isEmpty()) {
@@ -39,7 +38,7 @@ class AddFogTile extends GameStateSubcommand {
         }
 
         String planetTileName = AliasHandler.resolveTile(
-                event.getOption(Constants.TILE_NAME).getAsString().toLowerCase());
+            event.getOption(Constants.TILE_NAME).getAsString().toLowerCase());
         String tileName = Mapper.getTileID(planetTileName);
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
@@ -62,12 +61,12 @@ class AddFogTile extends GameStateSubcommand {
                 sb2.append(" ").append(target.getRepresentation());
             }
             sb.append("Added fog tile ")
-                    .append(position)
-                    .append(" (")
-                    .append(planetTileName)
-                    .append(") to")
-                    .append(sb2)
-                    .append("\n");
+                .append(position)
+                .append(" (")
+                .append(planetTileName)
+                .append(") to")
+                .append(sb2)
+                .append("\n");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }

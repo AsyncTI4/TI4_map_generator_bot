@@ -25,7 +25,7 @@ public class RelicInfoService {
 
     public static void sendRelicInfo(Player player) {
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-                player.getCardsInfoThread(), null, getRelicEmbeds(player), getRelicButtons());
+            player.getCardsInfoThread(), null, getRelicEmbeds(player), getRelicButtons());
     }
 
     private static List<MessageEmbed> getRelicEmbeds(Player player) {

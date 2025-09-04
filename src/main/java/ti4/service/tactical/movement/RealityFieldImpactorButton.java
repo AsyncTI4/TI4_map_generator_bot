@@ -14,6 +14,6 @@ public final class RealityFieldImpactorButton implements MoveAbilityButton {
 
     public List<Button> build(MoveContext ctx) {
         return List.of(Buttons.gray(
-                "declareUse_Reality Field Impactor", "Declare Reality Field Impactor", FactionEmojis.pharadn));
+            "declareUse_Reality Field Impactor", "Declare Reality Field Impactor", FactionEmojis.pharadn));
     }
 }

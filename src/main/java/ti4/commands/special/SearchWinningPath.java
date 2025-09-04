@@ -21,7 +21,7 @@ class SearchWinningPath extends Subcommand {
     SearchWinningPath() {
         super(Constants.SEARCH_WINNING_PATH, "List games with the provided winning path");
         addOptions(new OptionData(OptionType.STRING, Constants.WINNING_PATH, "Winning path to search for")
-                .setRequired(true));
+            .setRequired(true));
         addOptions(GameStatisticsFilterer.gameStatsFilters());
     }
 
@@ -31,17 +31,17 @@ class SearchWinningPath extends Subcommand {
 
         var foundGames = new HashSet<String>();
         StringBuilder sb = new StringBuilder("__**Games with Winning Path:**__ ")
-                .append(searchedPath)
-                .append("\n");
+            .append(searchedPath)
+            .append("\n");
 
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilterForWonGame(event).and(game -> game.getWinner()
-                        .map(winner -> hasWinningPath(game, winner, searchedPath))
-                        .orElse(false)),
-                game -> {
-                    foundGames.add(game.getName());
-                    sb.append(formatGame(game)).append("\n");
-                });
+            GameStatisticsFilterer.getGamesFilterForWonGame(event).and(game -> game.getWinner()
+                .map(winner -> hasWinningPath(game, winner, searchedPath))
+                .orElse(false)),
+            game -> {
+                foundGames.add(game.getName());
+                sb.append(formatGame(game)).append("\n");
+            });
 
         if (foundGames.isEmpty()) {
             sb.append("No games match the selected path.");
@@ -52,9 +52,9 @@ class SearchWinningPath extends Subcommand {
 
     private static boolean hasWinningPath(Game game, Player winner, String searchedPath) {
         return PatternHelper.UNDERSCORE_PATTERN
-                .matcher(WinningPathHelper.buildWinningPath(game, winner))
-                .replaceAll("") // needed due to Support for the Throne being italicized
-                .contains(searchedPath);
+            .matcher(WinningPathHelper.buildWinningPath(game, winner))
+            .replaceAll("") // needed due to Support for the Throne being italicized
+            .contains(searchedPath);
     }
 
     private static String formatGame(Game game) {

@@ -13,7 +13,7 @@ class ResetDrawStateAgendas extends GameStateSubcommand {
     public ResetDrawStateAgendas() {
         super(Constants.RESET_DRAW_STATE_FOR_AGENDAS, "Reset draw state of agenda deck", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES")
-                .setRequired(true));
+            .setRequired(true));
     }
 
     @Override

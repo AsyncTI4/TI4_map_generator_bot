@@ -17,11 +17,9 @@ public class TokenPlanetService {
     public enum TokenPlanets {
         mirage,
 
-        cradle,
-        oasis,
+        cradle, oasis,
 
-        illusion,
-        phantasm,
+        illusion, phantasm,
     }
 
     public static String adsf() {
@@ -58,8 +56,8 @@ public class TokenPlanetService {
         // Inform the player
         if (player != null) {
             String message = player.getRepresentation() + " moved " + model.getName() + " from "
-                    + oldTile.getRepresentationForButtons(game, player) + " to "
-                    + destination.getRepresentationForButtons(game, player) + ".";
+                + oldTile.getRepresentationForButtons(game, player) + " to "
+                + destination.getRepresentationForButtons(game, player) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
     }
@@ -74,8 +72,7 @@ public class TokenPlanetService {
         }
 
         Point tokenPlanetCenter = Constants.TOKEN_PLANET_CENTER_OFFSET;
-        Point planetCenter =
-                new Point(tokenPlanetPosition.x + tokenPlanetCenter.x, tokenPlanetPosition.y + tokenPlanetCenter.y);
+        Point planetCenter = new Point(tokenPlanetPosition.x + tokenPlanetCenter.x, tokenPlanetPosition.y + tokenPlanetCenter.y);
         Planet planetObject = new Planet(planetName, planetCenter);
         unitHolders.put(planetName, planetObject);
     }

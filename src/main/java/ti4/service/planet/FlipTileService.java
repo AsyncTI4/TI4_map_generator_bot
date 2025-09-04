@@ -73,11 +73,10 @@ public class FlipTileService {
             game.setTile(tile);
             flipped = true;
         } else if ("2025scptFinals".equals(game.getMapTemplateID())
-                && List.of("528", "529", "530", "501", "502", "503", "504").contains(tile.getPosition())) {
+            && List.of("528", "529", "530", "501", "502", "503", "504").contains(tile.getPosition())) {
             boolean anything = false;
             for (String pos : List.of("528", "529", "530", "501", "502", "503", "504")) {
-                for (UnitHolder uh :
-                        game.getTileByPosition(pos).getUnitHolders().values()) {
+                for (UnitHolder uh : game.getTileByPosition(pos).getUnitHolders().values()) {
                     if (uh.hasUnits()) {
                         anything = true;
                         break;

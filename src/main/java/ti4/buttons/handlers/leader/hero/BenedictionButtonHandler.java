@@ -24,11 +24,11 @@ class BenedictionButtonHandler {
         String pos1 = buttonID.split("_")[1];
         String pos2 = buttonID.split("_")[2];
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getFactionEmojiOrColor() + " moved all units in space from "
-                        + game.getTileByPosition(pos1).getRepresentationForButtons(game, player) + " to "
-                        + game.getTileByPosition(pos2).getRepresentationForButtons(game, player)
-                        + " using Airo Shir Aur, the Mahact hero. If they moved themselves and wish to move ground forces, they may do so either with slash command or modify units button.");
+            event.getMessageChannel(),
+            player.getFactionEmojiOrColor() + " moved all units in space from "
+                + game.getTileByPosition(pos1).getRepresentationForButtons(game, player) + " to "
+                + game.getTileByPosition(pos2).getRepresentationForButtons(game, player)
+                + " using Airo Shir Aur, the Mahact hero. If they moved themselves and wish to move ground forces, they may do so either with slash command or modify units button.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -36,10 +36,10 @@ class BenedictionButtonHandler {
     public static void benedictionStep1(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos1 = buttonID.split("_")[1];
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                player.getRepresentationUnfogged() + " please choose the system you wish to send the ships in "
-                        + game.getTileByPosition(pos1).getRepresentationForButtons(game, player) + " to.",
-                getBenediction2ndTileOptions(player, game, pos1));
+            event.getMessageChannel(),
+            player.getRepresentationUnfogged() + " please choose the system you wish to send the ships in "
+                + game.getTileByPosition(pos1).getRepresentationForButtons(game, player) + " to.",
+            getBenediction2ndTileOptions(player, game, pos1));
         ButtonHelper.deleteMessage(event);
     }
 
@@ -59,8 +59,8 @@ class BenedictionButtonHandler {
             Tile tile2 = game.getTileByPosition(pos2);
             if (FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, game)) {
                 buttons.add(Buttons.gray(
-                        finChecker + "mahactBenedictionFrom_" + pos1 + "_" + pos2,
-                        tile2.getRepresentationForButtons(game, origPlayer)));
+                    finChecker + "mahactBenedictionFrom_" + pos1 + "_" + pos2,
+                    tile2.getRepresentationForButtons(game, origPlayer)));
             }
         }
         return buttons;

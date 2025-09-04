@@ -34,11 +34,11 @@ public class AbilityDraftItem extends DraftItem {
             sb.append(abilityModel.getPermanentEffect().get()).append("\n");
         }
         if (abilityModel.getWindow().isPresent()
-                && abilityModel.getWindowEffect().isPresent()) {
+            && abilityModel.getWindowEffect().isPresent()) {
             sb.append("*")
-                    .append(abilityModel.getWindow().get())
-                    .append(":* ")
-                    .append(abilityModel.getWindowEffect().get());
+                .append(abilityModel.getWindow().get())
+                .append(":* ")
+                .append(abilityModel.getWindowEffect().get());
         }
         return sb.toString();
     }

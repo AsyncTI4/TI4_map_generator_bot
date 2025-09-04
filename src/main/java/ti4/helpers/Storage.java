@@ -293,8 +293,8 @@ public class Storage {
     @NotNull
     public static Path getGamePath(String gameName) {
         return Path.of(getStoragePath() + GAMES_PATH + gameName)
-                .toAbsolutePath()
-                .normalize();
+            .toAbsolutePath()
+            .normalize();
     }
 
     @NotNull

@@ -50,16 +50,16 @@ public class MuaatHeroService {
         if (muaat.hasLeaderUnlocked("muaathero")) {
             Leader playerLeader = muaat.getLeader("muaathero").orElse(null);
             StringBuilder message = new StringBuilder(muaat.getRepresentation())
-                    .append(" played ")
-                    .append(Helper.getLeaderFullRepresentation(playerLeader));
+                .append(" played ")
+                .append(Helper.getLeaderFullRepresentation(playerLeader));
             boolean purged = muaat.removeLeader(playerLeader);
             if (purged) {
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), message + " - Adjudicator Ba'al, the Muaat hero, has been purged.");
+                    event.getMessageChannel(), message + " - Adjudicator Ba'al, the Muaat hero, has been purged.");
             } else {
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        "Adjudicator Ba'al, the Muaat hero, was not purged - something went wrong.");
+                    event.getMessageChannel(),
+                    "Adjudicator Ba'al, the Muaat hero, was not purged - something went wrong.");
             }
         }
     }

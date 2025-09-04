@@ -21,14 +21,14 @@ class RelicSend extends GameStateSubcommand {
     public RelicSend() {
         super(Constants.RELIC_SEND, "Send a relic to another Player", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to send from Target to Source")
-                .setAutoComplete(true)
-                .setRequired(true));
+            .setAutoComplete(true)
+            .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Target Faction or Color")
-                .setAutoComplete(true)
-                .setRequired(true));
+            .setAutoComplete(true)
+            .setRequired(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source Faction or Color (default is you)")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source Faction or Color (default is you)")
+                .setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -70,23 +70,23 @@ class RelicSend extends GameStateSubcommand {
             }
         }
         if (shardCustomPOName != null
-                && shardPublicObjectiveID != null
-                && game.getCustomPublicVP().containsKey(shardCustomPOName)
-                && game.getCustomPublicVP().containsValue(shardPublicObjectiveID)) {
+            && shardPublicObjectiveID != null
+            && game.getCustomPublicVP().containsKey(shardCustomPOName)
+            && game.getCustomPublicVP().containsValue(shardPublicObjectiveID)) {
             game.unscorePublicObjective(player1.getUserID(), shardPublicObjectiveID);
             game.scorePublicObjective(player2.getUserID(), shardPublicObjectiveID);
         }
 
         if (player1.hasRelic(relicID) || !player2.hasRelic(relicID)) {
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    "Something may have gone wrong - please check your relics and ping Bothelper if there is a problem.");
+                event,
+                "Something may have gone wrong - please check your relics and ping Bothelper if there is a problem.");
             return;
         }
         RelicModel relicModel = Mapper.getRelic(relicID);
         String sb = player1.getRepresentation() + " sent a relic to "
-                + player2.getRepresentation() + "\n"
-                + relicModel.getSimpleRepresentation();
+            + player2.getRepresentation() + "\n"
+            + relicModel.getSimpleRepresentation();
         MessageHelper.sendMessageToEventChannel(event, sb);
         Helper.checkEndGame(game, player2);
     }

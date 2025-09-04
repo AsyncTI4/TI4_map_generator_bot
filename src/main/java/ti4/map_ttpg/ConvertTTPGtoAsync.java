@@ -143,7 +143,7 @@ public class ConvertTTPGtoAsync {
             TTPGMap ttpgMap = getTTPGMapFromJsonFile(file);
             if (ttpgMap == null) {
                 BotLogger.warning(
-                        "TTPG Import Failed:\n> filename: " + filename + " is not valid TTPG export JSON format");
+                    "TTPG Import Failed:\n> filename: " + filename + " is not valid TTPG export JSON format");
                 return false;
             }
             Game game = ConvertTTPGMaptoAsyncMap(ttpgMap, gamename);
@@ -211,10 +211,10 @@ public class ConvertTTPGtoAsync {
 
             // PLAYER STATS
             asyncPlayer.setFaction(
-                    asyncGame,
-                    AliasHandler.resolveFaction(ttpgPlayer.getFactionShort().toLowerCase()));
+                asyncGame,
+                AliasHandler.resolveFaction(ttpgPlayer.getFactionShort().toLowerCase()));
             asyncPlayer.setColor(
-                    AliasHandler.resolveColor(ttpgPlayer.getColorActual().toLowerCase()));
+                AliasHandler.resolveColor(ttpgPlayer.getColorActual().toLowerCase()));
             asyncPlayer.setCommodities(ttpgPlayer.getCommodities());
             asyncPlayer.setCommoditiesBase(ttpgPlayer.getMaxCommodities());
             asyncPlayer.setTg(ttpgPlayer.getTradeGoods());
@@ -228,8 +228,7 @@ public class ConvertTTPGtoAsync {
                 if (Objects.nonNull(ttpgSC)) asyncPlayer.addSC(Helper.getSCNumber(ttpgSC));
             }
             if (!ttpgPlayer.getStrategyCardsFaceDown().isEmpty()) {
-                String ttpgSCplayed =
-                        (String) ttpgPlayer.getStrategyCardsFaceDown().getFirst();
+                String ttpgSCplayed = (String) ttpgPlayer.getStrategyCardsFaceDown().getFirst();
                 if (Objects.nonNull(ttpgSCplayed)) asyncGame.setSCPlayed(Helper.getSCNumber(ttpgSCplayed), true);
             }
 
@@ -238,8 +237,7 @@ public class ConvertTTPGtoAsync {
                 String asyncScoredObjective = AliasHandler.resolveObjective(ttpgScoredObjective);
                 if (asyncGame.getSecretObjectives().contains(asyncScoredObjective)) {
                     asyncPlayer.setSecret(asyncScoredObjective);
-                    for (Entry<String, Integer> secretObjective :
-                            asyncPlayer.getSecrets().entrySet()) {
+                    for (Entry<String, Integer> secretObjective : asyncPlayer.getSecrets().entrySet()) {
                         if (secretObjective.getKey().equalsIgnoreCase(asyncScoredObjective)) {
                             asyncPlayer.setSecretScored(asyncScoredObjective, secretObjective.getValue());
                             asyncPlayer.removeSecret(secretObjective.getValue());
@@ -247,15 +245,13 @@ public class ConvertTTPGtoAsync {
                     }
 
                 } else if (asyncGame.getRevealedPublicObjectives().containsKey(asyncScoredObjective)) {
-                    for (Entry<String, Integer> revealedObjective :
-                            asyncGame.getRevealedPublicObjectives().entrySet()) {
+                    for (Entry<String, Integer> revealedObjective : asyncGame.getRevealedPublicObjectives().entrySet()) {
                         if (asyncScoredObjective.equalsIgnoreCase(revealedObjective.getKey())) {
                             asyncGame.scorePublicObjective(asyncPlayer.getUserID(), revealedObjective.getValue());
                         }
                     }
                 } else if (asyncGame.getCustomPublicVP().containsKey(ttpgScoredObjective)) {
-                    for (Entry<String, Integer> customObjective :
-                            asyncGame.getCustomPublicVP().entrySet()) {
+                    for (Entry<String, Integer> customObjective : asyncGame.getCustomPublicVP().entrySet()) {
                         if (ttpgScoredObjective.equalsIgnoreCase(customObjective.getKey())) {
                             asyncGame.scorePublicObjective(asyncPlayer.getUserID(), customObjective.getValue());
                         }
@@ -287,38 +283,38 @@ public class ConvertTTPGtoAsync {
                 // asyncPlayer.unsafeGetLeader("agent").setLocked(ttpgPlayer.getLeaders().getAgent().equals("unlocked")
                 // ? false : true);
                 asyncPlayer
-                        .unsafeGetLeader("commander")
-                        .setLocked(!"unlocked".equals(ttpgPlayer.getLeaders().getCommander()));
+                    .unsafeGetLeader("commander")
+                    .setLocked(!"unlocked".equals(ttpgPlayer.getLeaders().getCommander()));
                 asyncPlayer
-                        .unsafeGetLeader("hero")
-                        .setLocked(!"unlocked".equals(ttpgPlayer.getLeaders().getHero()));
+                    .unsafeGetLeader("hero")
+                    .setLocked(!"unlocked".equals(ttpgPlayer.getLeaders().getHero()));
             } else if ("keleres".equals(asyncPlayer.getFaction())) {
                 String subFaction = ttpgPlayer.getFactionShort().toLowerCase();
                 switch (subFaction) {
                     case "keleres - argent" -> {
                         System.out.println(subFaction);
                         asyncPlayer
-                                .unsafeGetLeader("kuuasi")
-                                .setLocked(!"unlocked"
-                                        .equals(ttpgPlayer.getLeaders().getHero()));
+                            .unsafeGetLeader("kuuasi")
+                            .setLocked(!"unlocked"
+                                .equals(ttpgPlayer.getLeaders().getHero()));
                         asyncPlayer.removeLeader("odlynn");
                         asyncPlayer.removeLeader("harka");
                     }
                     case "keleres - xxcha" -> {
                         System.out.println(subFaction);
                         asyncPlayer
-                                .unsafeGetLeader("odlynn")
-                                .setLocked(!"unlocked"
-                                        .equals(ttpgPlayer.getLeaders().getHero()));
+                            .unsafeGetLeader("odlynn")
+                            .setLocked(!"unlocked"
+                                .equals(ttpgPlayer.getLeaders().getHero()));
                         asyncPlayer.removeLeader("kuuasi");
                         asyncPlayer.removeLeader("harka");
                     }
                     case "keleres - mentak" -> {
                         System.out.println(subFaction);
                         asyncPlayer
-                                .unsafeGetLeader("harka")
-                                .setLocked(!"unlocked"
-                                        .equals(ttpgPlayer.getLeaders().getHero()));
+                            .unsafeGetLeader("harka")
+                            .setLocked(!"unlocked"
+                                .equals(ttpgPlayer.getLeaders().getHero()));
                         asyncPlayer.removeLeader("kuuasi");
                         asyncPlayer.removeLeader("odlynn");
                     }
@@ -327,11 +323,11 @@ public class ConvertTTPGtoAsync {
                 // asyncPlayer.getLeader("agent").setLocked(ttpgPlayer.getLeaders().getAgent().equals("unlocked") ?
                 // false : true);
                 asyncPlayer
-                        .unsafeGetLeader("commander")
-                        .setLocked(!"unlocked".equals(ttpgPlayer.getLeaders().getCommander()));
+                    .unsafeGetLeader("commander")
+                    .setLocked(!"unlocked".equals(ttpgPlayer.getLeaders().getCommander()));
                 asyncPlayer
-                        .unsafeGetLeader("hero")
-                        .setLocked(!"unlocked".equals(ttpgPlayer.getLeaders().getHero()));
+                    .unsafeGetLeader("hero")
+                    .setLocked(!"unlocked".equals(ttpgPlayer.getLeaders().getHero()));
             }
 
             // PURGE HERO IF PURGED
@@ -384,8 +380,10 @@ public class ConvertTTPGtoAsync {
             }
 
             // INDEX
-            if (index == ttpgMap.getPlayers().size() - 1) index = 0;
-            else index++; // shift ttpgPlayer array to match Async array
+            if (index == ttpgMap.getPlayers().size() - 1)
+                index = 0;
+            else
+                index++; // shift ttpgPlayer array to match Async array
             if (asyncGame.getPlayers().size() == asyncGame.getPlayerCountForMap()) break;
         }
 
@@ -469,14 +467,10 @@ public class ConvertTTPGtoAsync {
         }
 
         // EXPLORATION DECK
-        List<String> ttpgExploreCulturalCards =
-                ttpgMap.getDecks().getCardExplorationCultural().getDeck();
-        List<String> ttpgExploreHazardousCards =
-                ttpgMap.getDecks().getCardExplorationHazardous().getDeck();
-        List<String> ttpgExploreIndustrialCards =
-                ttpgMap.getDecks().getCardExplorationIndustrial().getDeck();
-        List<String> ttpgExploreFrontierCards =
-                ttpgMap.getDecks().getCardExplorationFrontier().getDeck();
+        List<String> ttpgExploreCulturalCards = ttpgMap.getDecks().getCardExplorationCultural().getDeck();
+        List<String> ttpgExploreHazardousCards = ttpgMap.getDecks().getCardExplorationHazardous().getDeck();
+        List<String> ttpgExploreIndustrialCards = ttpgMap.getDecks().getCardExplorationIndustrial().getDeck();
+        List<String> ttpgExploreFrontierCards = ttpgMap.getDecks().getCardExplorationFrontier().getDeck();
         List<String> exploreCards = new ArrayList<>() {
             {
                 if (Objects.nonNull(ttpgExploreCulturalCards)) addAll(ttpgExploreCulturalCards);
@@ -490,14 +484,10 @@ public class ConvertTTPGtoAsync {
         asyncGame.setExploreDeck(exploreCards);
 
         // EXPLORATION DISCARD
-        List<String> ttpgExploreCulturalDiscards =
-                ttpgMap.getDecks().getCardExplorationCultural().getDiscard();
-        List<String> ttpgExploreHazardousDiscards =
-                ttpgMap.getDecks().getCardExplorationHazardous().getDiscard();
-        List<String> ttpgExploreIndustrialDiscards =
-                ttpgMap.getDecks().getCardExplorationIndustrial().getDiscard();
-        List<String> ttpgExploreFrontierDiscards =
-                ttpgMap.getDecks().getCardExplorationFrontier().getDiscard();
+        List<String> ttpgExploreCulturalDiscards = ttpgMap.getDecks().getCardExplorationCultural().getDiscard();
+        List<String> ttpgExploreHazardousDiscards = ttpgMap.getDecks().getCardExplorationHazardous().getDiscard();
+        List<String> ttpgExploreIndustrialDiscards = ttpgMap.getDecks().getCardExplorationIndustrial().getDiscard();
+        List<String> ttpgExploreFrontierDiscards = ttpgMap.getDecks().getCardExplorationFrontier().getDiscard();
         List<String> exploreDiscards = new ArrayList<>() {
             {
                 if (Objects.nonNull(ttpgExploreCulturalDiscards)) addAll(ttpgExploreCulturalDiscards);
@@ -660,9 +650,9 @@ public class ConvertTTPGtoAsync {
                 for (char attachment : attachments.toCharArray()) {
                     if (!validAttachments.contains(String.valueOf(attachment))) {
                         String attachmentProper = attachment
-                                + (Character.isUpperCase(attachment)
-                                        ? "_cap"
-                                        : ""); // bypass AliasHandler's toLowercase'ing
+                            + (Character.isUpperCase(attachment)
+                                ? "_cap"
+                                : ""); // bypass AliasHandler's toLowercase'ing
                         String attachmentResolved = AliasHandler.resolveTTPGAttachment(attachmentProper);
                         System.out.println("          - " + attachment + ": " + attachmentResolved);
 
@@ -700,7 +690,7 @@ public class ConvertTTPGtoAsync {
                 String str = Character.toString(chr);
 
                 if (validColors.contains(
-                        str)) { // is a new Color, signify a new set of player's units //MAY ALSO BE AN ATTACHMENT???
+                    str)) { // is a new Color, signify a new set of player's units //MAY ALSO BE AN ATTACHMENT???
                     // reset color & count
                     color = AliasHandler.resolveColor(str.toLowerCase());
                     regionCount = 1;
@@ -713,7 +703,7 @@ public class ConvertTTPGtoAsync {
 
                 } else if (Character.isLowerCase(chr) && validUnits.contains(str)) { // is a unit, control_token, or CC
                     if (!color
-                            .isEmpty()) { // color hasn't shown up yet, so probably just tokens in space, skip unit crap
+                        .isEmpty()) { // color hasn't shown up yet, so probably just tokens in space, skip unit crap
                         if ("t".equals(str)) { // CC
                             tile.addCC(Mapper.getCCID(color));
                         } else if ("o".equals(str)) { // control_token
@@ -734,7 +724,7 @@ public class ConvertTTPGtoAsync {
                     }
 
                 } else if (validAttachments.contains(
-                        str)) { // attachments that were there that didn't match the RegEx above
+                    str)) { // attachments that were there that didn't match the RegEx above
                     if ("e".equals(str)) { // frontier token
                         System.out.println("attempt to add frontier token to " + tile.getPosition());
                         // tile.addToken(Mapper.getTokenPath(Constants.FRONTIER), Constants.SPACE);
@@ -797,7 +787,7 @@ public class ConvertTTPGtoAsync {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private static <A> A fromJson(JsonNode node, Class<A> clazz)
-            throws JsonProcessingException, IllegalArgumentException {
+        throws JsonProcessingException, IllegalArgumentException {
         return objectMapper.treeToValue(node, clazz);
     }
 

@@ -50,10 +50,10 @@ public class MechDraftItem extends DraftItem {
         }
         if (unit.getAfbDieCount() > 0) {
             sb.append("ANTI-FIGHTER BARRAGE ")
-                    .append(unit.getAfbHitsOn())
-                    .append("x")
-                    .append(unit.getAfbDieCount())
-                    .append(" ");
+                .append(unit.getAfbHitsOn())
+                .append("x")
+                .append(unit.getAfbDieCount())
+                .append(" ");
         }
         if (unit.getProductionValue() > 0) {
             sb.append("PRODUCTION ");

@@ -13,7 +13,7 @@ class ResetEvents extends GameStateSubcommand {
     public ResetEvents() {
         super(Constants.RESET_EVENTS, "Reset event deck", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES")
-                .setRequired(true));
+            .setRequired(true));
     }
 
     @Override
@@ -25,8 +25,8 @@ class ResetEvents extends GameStateSubcommand {
         }
         getGame().resetEvents();
         MessageHelper.replyToMessage(
-                event,
-                "Agenda deck reset to deck: `" + getGame().getEventDeckID()
-                        + "`. Discards removed. All shuffled as new");
+            event,
+            "Agenda deck reset to deck: `" + getGame().getEventDeckID()
+                + "`. Discards removed. All shuffled as new");
     }
 }

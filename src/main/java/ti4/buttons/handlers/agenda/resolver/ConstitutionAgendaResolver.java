@@ -19,8 +19,8 @@ public class ConstitutionAgendaResolver implements ForAgainstAgendaResolver {
         }
         game.setStoredValue("agendaConstitution", "true");
         MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(),
-                "# Removed all laws, will exhaust all home planets at the start of next Strategy Phase.");
+            game.getMainGameChannel(),
+            "# Removed all laws, will exhaust all home planets at the start of next Strategy Phase.");
     }
 
     @Override

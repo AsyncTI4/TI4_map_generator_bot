@@ -19,8 +19,8 @@ class AddSweepToken extends GameStateSubcommand {
     public AddSweepToken() {
         super(Constants.ADD_SWEEP_TOKEN, "Add a sweep token to the selected system", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System to add a sweep token to")
-                .setAutoComplete(true)
-                .setRequired(true));
+            .setAutoComplete(true)
+            .setRequired(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -28,7 +28,7 @@ class AddSweepToken extends GameStateSubcommand {
         Player player = getPlayer();
 
         String tileOption = StringUtils.substringBefore(
-                event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
+            event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
         Tile tile = TileHelper.getTile(event, tileOption, game);
         if (tile == null) return;
 

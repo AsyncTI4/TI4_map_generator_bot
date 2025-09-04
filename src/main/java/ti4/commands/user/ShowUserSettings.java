@@ -27,11 +27,11 @@ class ShowUserSettings extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-                event.getMessageChannel(),
-                null,
-                List.of(getSettingEmbed(
-                        event, UserSettingsManager.get(event.getUser().getId()))),
-                getUserSettingsButtons());
+            event.getMessageChannel(),
+            null,
+            List.of(getSettingEmbed(
+                event, UserSettingsManager.get(event.getUser().getId()))),
+            getUserSettingsButtons());
     }
 
     private static MessageEmbed getSettingEmbed(GenericInteractionCreateEvent event, UserSettings userSettings) {

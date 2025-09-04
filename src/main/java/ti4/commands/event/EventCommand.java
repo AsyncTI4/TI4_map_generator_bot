@@ -10,22 +10,22 @@ import ti4.helpers.Constants;
 public class EventCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new DrawEvent(),
-                    new PutEventTop(),
-                    new PutEventBottom(),
-                    new LookAtTopEvent(),
-                    new LookAtBottomEvent(),
-                    new RevealEvent(),
-                    new RevealSpecificEvent(),
-                    new AddEvent(),
-                    new RemoveEvent(),
-                    new ShowDiscardedEvents(),
-                    new ShuffleEvents(),
-                    new ResetEvents(),
-                    new PutDiscardBackIntoDeckEvents(),
-                    new EventInfo(),
-                    new PlayEvent())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new DrawEvent(),
+        new PutEventTop(),
+        new PutEventBottom(),
+        new LookAtTopEvent(),
+        new LookAtBottomEvent(),
+        new RevealEvent(),
+        new RevealSpecificEvent(),
+        new AddEvent(),
+        new RemoveEvent(),
+        new ShowDiscardedEvents(),
+        new ShuffleEvents(),
+        new ResetEvents(),
+        new PutDiscardBackIntoDeckEvents(),
+        new EventInfo(),
+        new PlayEvent())
+        .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

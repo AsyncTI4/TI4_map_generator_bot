@@ -24,8 +24,7 @@ public class GameMessageManager {
             allGameMessages = new GameMessages(new HashMap<>());
         }
 
-        List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+        List<GameMessage> messages = allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
         if (messages.stream().anyMatch(message -> message.messageId.equals(messageId))) {
             return;
         }
@@ -36,14 +35,14 @@ public class GameMessageManager {
     }
 
     public static synchronized String replace(
-            String gameName, String messageId, GameMessageType type, long gameSaveTime) {
+        String gameName, String messageId, GameMessageType type, long gameSaveTime
+    ) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             allGameMessages = new GameMessages(new HashMap<>());
         }
 
-        List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+        List<GameMessage> messages = allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
 
         String replacedMessageId = null;
         if (!messages.isEmpty()) {
@@ -100,8 +99,7 @@ public class GameMessageManager {
             return Optional.empty();
         }
 
-        GameMessage message =
-                messages.stream().filter(m -> m.type == type).findFirst().orElse(null);
+        GameMessage message = messages.stream().filter(m -> m.type == type).findFirst().orElse(null);
         if (message == null) {
             return Optional.empty();
         }
@@ -143,8 +141,7 @@ public class GameMessageManager {
             return Optional.empty();
         }
 
-        List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+        List<GameMessage> messages = allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
         return messages.stream().filter(filter).findFirst();
     }
 
@@ -154,8 +151,7 @@ public class GameMessageManager {
             return Collections.emptyList();
         }
 
-        List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+        List<GameMessage> messages = allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
         return messages.stream().filter(m -> m.type == type).toList();
     }
 
@@ -186,8 +182,7 @@ public class GameMessageManager {
 
     private static GameMessages readFile() {
         try {
-            GameMessages gameMessages =
-                    PersistenceManager.readObjectFromJsonFile(GAME_MESSAGES_FILE, GameMessages.class);
+            GameMessages gameMessages = PersistenceManager.readObjectFromJsonFile(GAME_MESSAGES_FILE, GameMessages.class);
             return gameMessages != null ? gameMessages : new GameMessages(new HashMap<>());
         } catch (IOException e) {
             BotLogger.error("Failed to read json data for GameMessages.", e);
@@ -206,5 +201,6 @@ public class GameMessageManager {
     private record GameMessages(Map<String, List<GameMessage>> gameNameToMessages) {}
 
     public record GameMessage(
-            String messageId, GameMessageType type, LinkedHashSet<String> factionsThatReacted, long gameSaveTime) {}
+        String messageId, GameMessageType type, LinkedHashSet<String> factionsThatReacted, long gameSaveTime
+    ) {}
 }

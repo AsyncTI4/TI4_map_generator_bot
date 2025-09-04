@@ -43,7 +43,8 @@ public class ExecutionLockManager {
     }
 
     public static Runnable wrapWithTryLockAndRelease(
-            String lockName, LockType lockType, Runnable task, MessageChannel messageChannel) {
+        String lockName, LockType lockType, Runnable task, MessageChannel messageChannel
+    ) {
         return () -> {
             boolean gotLock = tryLock(lockName, ExecutionLockManager.LockType.WRITE);
             if (gotLock) {
@@ -52,8 +53,8 @@ public class ExecutionLockManager {
             }
             if (messageChannel != null) {
                 MessageHelper.sendMessageToChannel(
-                        messageChannel,
-                        "The bot hasn't finished processing the last task for " + lockName + ". Please wait.");
+                    messageChannel,
+                    "The bot hasn't finished processing the last task for " + lockName + ". Please wait.");
             } else {
                 BotLogger.warning("The bot hasn't finished processing the last task for " + lockName + ".");
             }
@@ -80,7 +81,6 @@ public class ExecutionLockManager {
     }
 
     public enum LockType {
-        READ,
-        WRITE
+        READ, WRITE
     }
 }

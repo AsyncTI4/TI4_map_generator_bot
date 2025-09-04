@@ -12,7 +12,8 @@ import ti4.model.UnitModel;
 public class FrankenUnitService {
 
     public static void addUnits(
-            GenericInteractionCreateEvent event, Player player, List<String> unitIDs, boolean allowDuplicates) {
+        GenericInteractionCreateEvent event, Player player, List<String> unitIDs, boolean allowDuplicates
+    ) {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added units:\n");
         for (String unitID : unitIDs) {
             UnitModel unitModel = Mapper.getUnit(unitID);

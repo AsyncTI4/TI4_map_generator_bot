@@ -10,11 +10,11 @@ import ti4.service.tactical.MoveContext;
 public final class MidasTurbineButton implements MoveAbilityButton {
     public boolean enabled(MoveContext ctx) {
         return ctx.player.getTechs().contains("dsvadeb")
-                && !ctx.player.getExhaustedTechs().contains("dsvadeb");
+            && !ctx.player.getExhaustedTechs().contains("dsvadeb");
     }
 
     public List<Button> build(MoveContext ctx) {
         return List.of(Buttons.green(
-                ctx.player.finChecker() + "exhaustTech_dsvadeb", "Exhaust Midas Turbine", FactionEmojis.vaden));
+            ctx.player.finChecker() + "exhaustTech_dsvadeb", "Exhaust Midas Turbine", FactionEmojis.vaden));
     }
 }

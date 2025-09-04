@@ -38,7 +38,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
             }
             case "event" -> {
                 return Stream.of("immediate", "permanent", "temporary")
-                        .anyMatch(s -> s.equalsIgnoreCase(getCategoryDescription()));
+                    .anyMatch(s -> s.equalsIgnoreCase(getCategoryDescription()));
             }
             default -> {
                 return true;
@@ -48,7 +48,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
 
     public boolean staysInPlay() {
         return "permanent".equalsIgnoreCase(getCategoryDescription())
-                || "temporary".equalsIgnoreCase(getCategoryDescription());
+            || "temporary".equalsIgnoreCase(getCategoryDescription());
     }
 
     public String getAlias() {
@@ -131,8 +131,8 @@ public class EventModel implements ModelInterface, EmbeddableModel {
 
     public boolean search(String searchString) {
         return alias.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
+            || name.toLowerCase().contains(searchString)
+            || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {

@@ -15,7 +15,7 @@ class RemoveAdjacencyOverride extends GameStateSubcommand {
     public RemoveAdjacencyOverride() {
         super(Constants.REMOVE_ADJACENCY_OVERRIDE, "Remove Custom Adjacencies", true, true);
         addOptions(new OptionData(
-                        OptionType.STRING, Constants.PRIMARY_TILE, "Tiles to remove adjacencies or ALL to remove all")
+            OptionType.STRING, Constants.PRIMARY_TILE, "Tiles to remove adjacencies or ALL to remove all")
                 .setRequired(true));
     }
 

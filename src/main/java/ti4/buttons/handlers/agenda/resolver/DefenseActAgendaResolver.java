@@ -19,15 +19,15 @@ public class DefenseActAgendaResolver implements AgendaResolver {
         if (!"for".equalsIgnoreCase(winner)) {
             for (Player player : game.getRealPlayers()) {
                 if (!CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Pds)
-                        .isEmpty()) {
+                    .isEmpty()) {
                     MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCorrectChannel(),
-                            player.getRepresentation() + ", please destroy 1 of your PDS.",
-                            ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "pds"));
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + ", please destroy 1 of your PDS.",
+                        ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "pds"));
                 }
             }
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Sent buttons for each player to destroy 1 PDS.");
+                game.getMainGameChannel(), "Sent buttons for each player to destroy 1 PDS.");
         }
     }
 }

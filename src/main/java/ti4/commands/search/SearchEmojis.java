@@ -21,11 +21,11 @@ class SearchEmojis extends Subcommand {
     public SearchEmojis() {
         super(Constants.SEARCH_EMOJIS, "List all emojis the bot can use");
         addOptions(new OptionData(
-                OptionType.STRING,
-                Constants.SEARCH,
-                "Searches the text and limits results to those containing this string."));
+            OptionType.STRING,
+            Constants.SEARCH,
+            "Searches the text and limits results to those containing this string."));
         addOptions(new OptionData(
-                OptionType.BOOLEAN, Constants.INCLUDE_RAW_STRING, "Includes the raw emoji string for copy/paste"));
+            OptionType.BOOLEAN, Constants.INCLUDE_RAW_STRING, "Includes the raw emoji string for copy/paste"));
     }
 
     @Override
@@ -34,24 +34,24 @@ class SearchEmojis extends Subcommand {
         boolean includeRAW = event.getOption(Constants.INCLUDE_RAW_STRING, false, OptionMapping::getAsBoolean);
 
         List<Emoji> emojis = AsyncTI4DiscordBot.jda.getEmojis().stream()
-                .filter(RichCustomEmoji::isAvailable)
-                .filter(e -> e.getFormatted().toLowerCase().contains(searchString.toLowerCase()))
-                .sorted(Comparator.comparing(e -> e.getGuild().getName()))
-                .map(e -> (Emoji) e)
-                .toList();
+            .filter(RichCustomEmoji::isAvailable)
+            .filter(e -> e.getFormatted().toLowerCase().contains(searchString.toLowerCase()))
+            .sorted(Comparator.comparing(e -> e.getGuild().getName()))
+            .map(e -> (Emoji) e)
+            .toList();
         List<Emoji> appEmojis = TI4Emoji.allEmojiEnums().stream()
-                .filter(e -> e.emojiString().toLowerCase().contains(searchString.toLowerCase()))
-                .sorted(Comparator.comparing(TI4Emoji::name))
-                .map(TI4Emoji::asEmoji)
-                .toList();
+            .filter(e -> e.emojiString().toLowerCase().contains(searchString.toLowerCase()))
+            .sorted(Comparator.comparing(TI4Emoji::name))
+            .map(TI4Emoji::asEmoji)
+            .toList();
         List<Emoji> combined = new ArrayList<>();
         combined.addAll(appEmojis);
         combined.addAll(emojis);
 
         String message = combined.stream()
-                .sorted(Comparator.comparing(Emoji::getName))
-                .map(e -> getEmojiMessage(e, includeRAW))
-                .collect(Collectors.joining("\n"));
+            .sorted(Comparator.comparing(Emoji::getName))
+            .map(e -> getEmojiMessage(e, includeRAW))
+            .collect(Collectors.joining("\n"));
 
         if (emojis.size() > 3) {
             String threadName = event.getFullCommandName() + " search: " + searchString;

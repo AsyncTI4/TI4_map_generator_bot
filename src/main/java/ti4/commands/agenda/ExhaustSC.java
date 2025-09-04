@@ -15,7 +15,7 @@ class ExhaustSC extends GameStateSubcommand {
     public ExhaustSC() {
         super(Constants.EXHAUST_SC, "Exhaust a strategy card due to Absol agenda (or undo this)", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Strategy card you wish to exhaust")
-                .setRequired(true));
+            .setRequired(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO, "True to ready (undo) instead of exhaust"));
     }
 

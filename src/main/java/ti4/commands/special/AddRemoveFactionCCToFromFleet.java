@@ -19,10 +19,10 @@ abstract class AddRemoveFactionCCToFromFleet extends GameStateSubcommand {
     AddRemoveFactionCCToFromFleet(String id, String description) {
         super(id, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Faction Color for command token")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(
-                OptionType.STRING, Constants.FACTION_COLOR, "Color/Faction for which we set command tokens"));
+            OptionType.STRING, Constants.FACTION_COLOR, "Color/Faction for which we set command tokens"));
     }
 
     @Override

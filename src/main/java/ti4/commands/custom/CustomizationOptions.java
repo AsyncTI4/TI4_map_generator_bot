@@ -23,77 +23,77 @@ class CustomizationOptions extends GameStateSubcommand {
         List<Choice> hexBorderChoices = CommandHelper.toChoices("off", "dash", "solid");
 
         addOptions(new OptionData(OptionType.STRING, Constants.TEXT_SIZE, "tint/small/medium/large (default = medium)")
-                .setAutoComplete(true));
+            .setAutoComplete(true));
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.STRAT_PINGS,
-                        "Turn ON or OFF strategy card follow reminders at the start of turn")
+            OptionType.STRING,
+            Constants.STRAT_PINGS,
+            "Turn ON or OFF strategy card follow reminders at the start of turn")
                 .addChoices(onOff));
         addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.SHOW_FULL_COMPONENT_TEXT,
-                "Show full text of components when using/exhausting"));
+            OptionType.BOOLEAN,
+            Constants.SHOW_FULL_COMPONENT_TEXT,
+            "Show full text of components when using/exhausting"));
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.VERBOSITY,
-                        "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)")
+            OptionType.STRING,
+            Constants.VERBOSITY,
+            "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)")
                 .addChoices(verbChoices));
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.CC_N_PLASTIC_LIMIT,
-                        "Turn ON or OFF pings for exceeding component limits")
+            OptionType.STRING,
+            Constants.CC_N_PLASTIC_LIMIT,
+            "Turn ON or OFF pings for exceeding component limits")
                 .addChoices(onOff));
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.BOT_FACTION_REACTS,
-                        "Turn ON or OFF the bot leaving your faction react on msgs")
+            OptionType.STRING,
+            Constants.BOT_FACTION_REACTS,
+            "Turn ON or OFF the bot leaving your faction react on msgs")
                 .addChoices(onOff));
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.BOT_COLOR_REACTS,
-                        "Turn ON or OFF the bot leaving your color react on msgs")
+            OptionType.STRING,
+            Constants.BOT_COLOR_REACTS,
+            "Turn ON or OFF the bot leaving your color react on msgs")
                 .addChoices(onOff));
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.BOT_STRAT_REACTS,
-                        "Turn ON or OFF the bot leaving your strategy card react on msgs")
+            OptionType.STRING,
+            Constants.BOT_STRAT_REACTS,
+            "Turn ON or OFF the bot leaving your strategy card react on msgs")
                 .addChoices(onOff));
         addOptions(new OptionData(
-                OptionType.STRING,
-                Constants.SPIN_MODE,
-                "Automatically spin rings at status cleanup. ON for Fin logic, insert custom logic, OFF to turn off"));
+            OptionType.STRING,
+            Constants.SPIN_MODE,
+            "Automatically spin rings at status cleanup. ON for Fin logic, insert custom logic, OFF to turn off"));
         addOptions(
-                new OptionData(OptionType.BOOLEAN, Constants.SHOW_UNIT_TAGS, "Show faction unit tags on map images"));
+            new OptionData(OptionType.BOOLEAN, Constants.SHOW_UNIT_TAGS, "Show faction unit tags on map images"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.LIGHT_FOG_MODE, "Retain sight on formerly seen tiles"));
         addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.RED_TAPE_MODE,
-                "Reveal all objectives and diplo gets the power to pre-reveal"));
+            OptionType.BOOLEAN,
+            Constants.RED_TAPE_MODE,
+            "Reveal all objectives and diplo gets the power to pre-reveal"));
         // addOptions(new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace TG emojis with nomad coin
         // emojis"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.QUEUE_SO, "Queue secret objective discards"));
         // addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BUBBLES, "Show the bubbles around
         // anti-bombardment planets"));
         addOptions(
-                new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
+            new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TRANSACTION_METHOD, "Use the new transaction method"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BANNERS, "Show faction banner at start of turn"));
         addOptions(new OptionData(
-                        OptionType.STRING, Constants.SHOW_HEX_BORDERS, "Show borders around systems with player ships")
+            OptionType.STRING, Constants.SHOW_HEX_BORDERS, "Show borders around systems with player ships")
                 .addChoices(hexBorderChoices));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.HOMEBREW_MODE, "Mark the game as homebrew"));
         addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.INJECT_RULES_LINKS,
-                "Have the bot inject helpful links to rules within it's output"));
+            OptionType.BOOLEAN,
+            Constants.INJECT_RULES_LINKS,
+            "Have the bot inject helpful links to rules within it's output"));
         addOptions(new OptionData(
-                OptionType.INTEGER,
-                Constants.FAST_SC_FOLLOW,
-                "Consider People To Pass on SCs if they don't respond with X hours. Set X to 0 to turn off"));
+            OptionType.INTEGER,
+            Constants.FAST_SC_FOLLOW,
+            "Consider People To Pass on SCs if they don't respond with X hours. Set X to 0 to turn off"));
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.UNIT_SOURCE,
-                        "Swap player's owned units to units from another source")
+            OptionType.STRING,
+            Constants.UNIT_SOURCE,
+            "Swap player's owned units to units from another source")
                 .setAutoComplete(true));
     }
 
@@ -152,8 +152,8 @@ class CustomizationOptions extends GameStateSubcommand {
         if (shushing != null) {
             String ccNP = shushing.getAsString();
             if ("ON".equalsIgnoreCase(ccNP)
-                    || "OFF".equalsIgnoreCase(ccNP)
-                    || SpinRingsHelper.validateSpinSettings(ccNP)) {
+                || "OFF".equalsIgnoreCase(ccNP)
+                || SpinRingsHelper.validateSpinSettings(ccNP)) {
                 game.setSpinMode(ccNP.toUpperCase());
                 MessageHelper.replyToMessage(event, "Spin mode set to `" + ccNP + "`");
             } else {
@@ -164,8 +164,7 @@ class CustomizationOptions extends GameStateSubcommand {
         String textSize = event.getOption(Constants.TEXT_SIZE, null, OptionMapping::getAsString);
         if (textSize != null) game.setTextSize(textSize);
 
-        Boolean showFullTextComponents =
-                event.getOption(Constants.SHOW_FULL_COMPONENT_TEXT, null, OptionMapping::getAsBoolean);
+        Boolean showFullTextComponents = event.getOption(Constants.SHOW_FULL_COMPONENT_TEXT, null, OptionMapping::getAsBoolean);
         if (showFullTextComponents != null) game.setShowFullComponentTextEmbeds(showFullTextComponents);
 
         Boolean showUnitTags = event.getOption(Constants.SHOW_UNIT_TAGS, null, OptionMapping::getAsBoolean);

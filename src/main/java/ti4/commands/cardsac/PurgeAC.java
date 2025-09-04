@@ -17,7 +17,7 @@ class PurgeAC extends GameStateSubcommand {
     public PurgeAC() {
         super(Constants.PURGE_AC, "Purge an Action Card", true, true);
         addOptions(new OptionData(
-                        OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID, which is found between ()")
+            OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID, which is found between ()")
                 .setRequired(true));
     }
 
@@ -46,8 +46,8 @@ class PurgeAC extends GameStateSubcommand {
         }
 
         String sb = "Player: " + player.getUserName() + " - " + "Purged Action Card:"
-                + "\n" + Mapper.getActionCard(acID).getRepresentation()
-                + "\n";
+            + "\n" + Mapper.getActionCard(acID).getRepresentation()
+            + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
         ActionCardHelper.sendActionCardInfo(game, player);
     }

@@ -79,10 +79,10 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
         sb = new StringBuilder();
         if (spaceCannonHitsOn != 0 || spaceCannonDieCount != 0)
             sb.append("Space Cannon: ")
-                    .append(spaceCannonHitsOn)
-                    .append("x")
-                    .append(spaceCannonDieCount)
-                    .append("\n");
+                .append(spaceCannonHitsOn)
+                .append("x")
+                .append(spaceCannonDieCount)
+                .append("\n");
         if (abilityText != null) sb.append("Ability: ").append(abilityText).append("\n");
         if (getToken().isPresent())
             sb.append("Token: ").append(getToken().get()).append("\n");
@@ -95,8 +95,8 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
         eb.setFooter(sb.toString());
 
         eb.setThumbnail(
-                "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/attachment_token/"
-                        + imagePath + "?raw=true");
+            "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/attachment_token/"
+                + imagePath + "?raw=true");
 
         return eb.build();
     }
@@ -104,15 +104,15 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         return getName().toLowerCase().contains(searchString.toLowerCase())
-                || id.toLowerCase().contains(searchString.toLowerCase())
-                || (getToken().isPresent() && getToken().get().toLowerCase().contains(searchString.toLowerCase()))
-                || (resourcesModifier != 0 && "resources".contains(searchString.toLowerCase()))
-                || (influenceModifier != 0 && "influence".contains(searchString.toLowerCase()))
-                || (planetTypes != null && planetTypes.toString().contains(searchString.toLowerCase()))
-                || (techSpeciality != null && techSpeciality.toString().contains(searchString.toLowerCase()))
-                || (isLegendary() && "legendary".contains(searchString.toLowerCase()))
-                || (spaceCannonHitsOn != 0 && "space cannon".contains(searchString.toLowerCase()))
-                || (isFakeAttachment() && "fake".contains(searchString.toLowerCase()))
-                || getAutoCompleteName().toLowerCase().contains(searchString.toLowerCase());
+            || id.toLowerCase().contains(searchString.toLowerCase())
+            || (getToken().isPresent() && getToken().get().toLowerCase().contains(searchString.toLowerCase()))
+            || (resourcesModifier != 0 && "resources".contains(searchString.toLowerCase()))
+            || (influenceModifier != 0 && "influence".contains(searchString.toLowerCase()))
+            || (planetTypes != null && planetTypes.toString().contains(searchString.toLowerCase()))
+            || (techSpeciality != null && techSpeciality.toString().contains(searchString.toLowerCase()))
+            || (isLegendary() && "legendary".contains(searchString.toLowerCase()))
+            || (spaceCannonHitsOn != 0 && "space cannon".contains(searchString.toLowerCase()))
+            || (isFakeAttachment() && "fake".contains(searchString.toLowerCase()))
+            || getAutoCompleteName().toLowerCase().contains(searchString.toLowerCase());
     }
 }

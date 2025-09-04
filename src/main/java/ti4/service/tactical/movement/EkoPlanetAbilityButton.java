@@ -9,11 +9,11 @@ import ti4.service.tactical.MoveContext;
 public final class EkoPlanetAbilityButton implements MoveAbilityButton {
     public boolean enabled(MoveContext ctx) {
         return ctx.player.getPlanets().contains("eko")
-                && !ctx.player.getExhaustedPlanetsAbilities().contains("eko");
+            && !ctx.player.getExhaustedPlanetsAbilities().contains("eko");
     }
 
     public List<Button> build(MoveContext ctx) {
         return List.of(Buttons.gray(
-                ctx.player.finChecker() + "planetAbilityExhaust_" + "eko", "Use Eko's Ability To Ignore Anomalies"));
+            ctx.player.finChecker() + "planetAbilityExhaust_" + "eko", "Use Eko's Ability To Ignore Anomalies"));
     }
 }

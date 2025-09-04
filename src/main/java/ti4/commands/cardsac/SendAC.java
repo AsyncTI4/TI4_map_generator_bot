@@ -19,12 +19,12 @@ class SendAC extends GameStateSubcommand {
     public SendAC() {
         super(Constants.SEND_AC, "Send an action card to a player", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID to send")
-                .setRequired(true));
+            .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to send to")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
@@ -54,7 +54,7 @@ class SendAC extends GameStateSubcommand {
         // FoW specific pinging
         if (game.isFowMode()) {
             FoWHelper.pingPlayersTransaction(
-                    game, event, player, playerToSendTo, CardEmojis.ActionCard + " Action Card", null);
+                game, event, player, playerToSendTo, CardEmojis.ActionCard + " Action Card", null);
         }
 
         ActionCardHelper.sendActionCard(event, game, player, playerToSendTo, acID);

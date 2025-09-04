@@ -41,7 +41,7 @@ class SCTradeGoods extends GameStateSubcommand {
             Map<Integer, Integer> strategyCardToTradeGoodCount = game.getScTradeGoods();
             if (!strategyCardToTradeGoodCount.containsKey(sc)) {
                 MessageHelper.sendMessageToChannel(
-                        event.getChannel(), "Strategy card must be from possible ones in game.");
+                    event.getChannel(), "Strategy card must be from possible ones in game.");
                 return;
             }
             Set<Integer> scPicked = new HashSet<>();
@@ -50,7 +50,7 @@ class SCTradeGoods extends GameStateSubcommand {
             }
             if (scPicked.contains(sc)) {
                 MessageHelper.sendMessageToChannel(
-                        event.getChannel(), "Strategy card is already picked, can't add trade goods.");
+                    event.getChannel(), "Strategy card is already picked, can't add trade goods.");
                 return;
             }
             game.setScTradeGood(sc, tg);

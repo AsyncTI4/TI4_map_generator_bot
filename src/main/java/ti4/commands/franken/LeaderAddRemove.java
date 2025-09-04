@@ -20,15 +20,15 @@ abstract class LeaderAddRemove extends GameStateSubcommand {
     LeaderAddRemove(String name, String description) {
         super(name, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader Name")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER_1, "Leader Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER_2, "Leader Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER_3, "Leader Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER_4, "Leader Name").setAutoComplete(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                .setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -36,8 +36,8 @@ abstract class LeaderAddRemove extends GameStateSubcommand {
 
         // GET ALL ABILITY OPTIONS AS STRING
         for (OptionMapping option : event.getOptions().stream()
-                .filter(o -> o != null && o.getName().contains(Constants.LEADER))
-                .toList()) {
+            .filter(o -> o != null && o.getName().contains(Constants.LEADER))
+            .toList()) {
             leaderIDs.add(option.getAsString());
         }
 
@@ -46,7 +46,7 @@ abstract class LeaderAddRemove extends GameStateSubcommand {
 
         if (leaderIDs.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "No valid leaders were provided. Please see `/help list_leaders` for available choices.");
+                event, "No valid leaders were provided. Please see `/help list_leaders` for available choices.");
             return;
         }
 

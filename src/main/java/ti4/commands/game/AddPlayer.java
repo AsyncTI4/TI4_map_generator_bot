@@ -53,6 +53,6 @@ class AddPlayer extends GameStateSubcommand {
         }
         game.addPlayer(extraUser.getId(), extraUser.getName());
         MessageHelper.sendMessageToEventChannel(
-                event, extraUser.getName() + " added to game: " + game.getName() + " - successful");
+            event, extraUser.getName() + " added to game: " + game.getName() + " - successful");
     }
 }

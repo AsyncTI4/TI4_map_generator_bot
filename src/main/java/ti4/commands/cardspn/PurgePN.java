@@ -16,9 +16,9 @@ public class PurgePN extends GameStateSubcommand {
     public PurgePN() {
         super(Constants.PURGE_PN, "Purge promissory note", true, true);
         addOptions(new OptionData(
-                        OptionType.INTEGER,
-                        Constants.PROMISSORY_NOTE_ID,
-                        "Promissory note ID, which is found between ()")
+            OptionType.INTEGER,
+            Constants.PROMISSORY_NOTE_ID,
+            "Promissory note ID, which is found between ()")
                 .setRequired(true));
     }
 

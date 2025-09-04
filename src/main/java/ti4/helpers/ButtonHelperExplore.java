@@ -43,9 +43,9 @@ class ButtonHelperExplore {
             tile = game.getTileByPosition(planet);
         }
         buttons = Helper.getPlaceUnitButtons(
-                event, player, game, tile, "freelancers", "placeOneNDone_dontskipfreelancers");
+            event, player, game, tile, "freelancers", "placeOneNDone_dontskipfreelancers");
         String message = player.getRepresentation() + " Use the buttons to produce 1 unit. "
-                + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
+            + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -75,12 +75,9 @@ class ButtonHelperExplore {
             player.removeFragment(fragId);
             game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
             switch (fragId) {
-                case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" ->
-                    message.append(" a " + ExploreEmojis.CFrag + "cultural");
-                case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->
-                    message.append(" a " + ExploreEmojis.HFrag + "hazardous");
-                case "irf1", "irf2", "irf3", "irf4", "irf5" ->
-                    message.append(" an " + ExploreEmojis.IFrag + "industrial");
+                case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message.append(" a " + ExploreEmojis.CFrag + "cultural");
+                case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> message.append(" a " + ExploreEmojis.HFrag + "hazardous");
+                case "irf1", "irf2", "irf3", "irf4", "irf5" -> message.append(" an " + ExploreEmojis.IFrag + "industrial");
                 case "urf1", "urf2", "urf3" -> message.append(" an " + ExploreEmojis.UFrag + "unknown");
                 default -> message.append(" ").append(fragId);
             }
@@ -90,8 +87,7 @@ class ButtonHelperExplore {
                 player.removeFragment(fragId);
                 game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
                 switch (fragId) {
-                    case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" ->
-                        message.append(ExploreEmojis.CFrag);
+                    case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message.append(ExploreEmojis.CFrag);
                     case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> message.append(ExploreEmojis.HFrag);
                     case "irf1", "irf2", "irf3", "irf4", "irf5" -> message.append(ExploreEmojis.IFrag);
                     case "urf1", "urf2", "urf3" -> message.append(ExploreEmojis.UFrag);
@@ -109,7 +105,7 @@ class ButtonHelperExplore {
         if (player.hasTech("dslaner")) {
             player.setAtsCount(player.getAtsCount() + 1);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
         }
     }
 }

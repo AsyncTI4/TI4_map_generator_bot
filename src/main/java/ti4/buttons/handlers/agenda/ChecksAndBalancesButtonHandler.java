@@ -19,7 +19,8 @@ class ChecksAndBalancesButtonHandler {
 
     @ButtonHandler("checksNBalancesPt2_")
     public static void resolvePt2ChecksNBalances(
-            ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        ButtonInteractionEvent event, Player player, Game game, String buttonID
+    ) {
         int scPicked = Integer.parseInt(buttonID.split("_")[1]);
         String factionPicked = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(factionPicked);
@@ -27,13 +28,13 @@ class ChecksAndBalancesButtonHandler {
         PlayerStatsService.secondHalfOfPickSC(event, game, p2, scPicked);
 
         String recipientMessage = p2.getRepresentationUnfogged() + " was given " + Helper.getSCName(scPicked, game)
-                + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "") + ".";
+            + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "") + ".";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), recipientMessage);
 
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    p2.getRepresentationNoPing() + " was given " + Helper.getSCName(scPicked, game) + ".");
+                player.getCorrectChannel(),
+                p2.getRepresentationNoPing() + " was given " + Helper.getSCName(scPicked, game) + ".");
         }
         event.getMessage().delete().queue();
         List<Button> buttons = PickStrategyCardButtonHandler.getPlayerOptionsForChecksNBalances(player, game, scPicked);
@@ -45,7 +46,7 @@ class ChecksAndBalancesButtonHandler {
             Player privatePlayer = null;
             List<Player> players = game.getRealPlayers();
             if (game.isReverseSpeakerOrder()
-                    || !game.getStoredValue("willRevolution").isEmpty()) {
+                || !game.getStoredValue("willRevolution").isEmpty()) {
                 Collections.reverse(players);
             }
             for (Player p3 : players) {
@@ -66,10 +67,10 @@ class ChecksAndBalancesButtonHandler {
             game.setPhaseOfGame("strategy");
             game.updateActivePlayer(privatePlayer);
             MessageHelper.sendMessageToChannelWithButtons(
-                    privatePlayer.getCorrectChannel(),
-                    privatePlayer.getRepresentationUnfogged()
-                            + ", please choose which strategy card you wish to give someone else.",
-                    Helper.getRemainingSCButtons(game, privatePlayer));
+                privatePlayer.getCorrectChannel(),
+                privatePlayer.getRepresentationUnfogged()
+                    + ", please choose which strategy card you wish to give someone else.",
+                Helper.getRemainingSCButtons(game, privatePlayer));
         }
     }
 }

@@ -20,10 +20,10 @@ public class MyGamesService {
         if (managedPlayer == null) return Collections.emptyList();
 
         return managedPlayer.getGames().stream()
-                .filter(ManagedGame::isActive)
-                .map(game -> toSummary(game, userId))
-                .filter(Objects::nonNull)
-                .toList();
+            .filter(ManagedGame::isActive)
+            .map(game -> toSummary(game, userId))
+            .filter(Objects::nonNull)
+            .toList();
     }
 
     private MyGameSummary toSummary(ManagedGame managedGame, String userId) {

@@ -13,30 +13,30 @@ import ti4.helpers.Constants;
 public class BothelperCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new CreateGameChannels(),
-                    new CreateFOWGameChannels(),
-                    new ServerLimitStats(),
-                    new ArchiveOldThreads(),
-                    new FixGameChannelPermissions(),
-                    new ListCategoryChannelCounts(),
-                    new BeginVideoGeneration(),
-                    new JazzCommand(),
-                    new ListButtons(),
-                    new ReloadGame(),
-                    new ServerGameStats(),
-                    new CorrectFaction(),
-                    new ListDeadGames(),
-                    new RemoveTitle(),
-                    new EditTrackRecord(),
-                    new CheckNextPingTime(),
-                    new ListSlashCommandsUsed(),
-                    new ReserveGame())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new CreateGameChannels(),
+        new CreateFOWGameChannels(),
+        new ServerLimitStats(),
+        new ArchiveOldThreads(),
+        new FixGameChannelPermissions(),
+        new ListCategoryChannelCounts(),
+        new BeginVideoGeneration(),
+        new JazzCommand(),
+        new ListButtons(),
+        new ReloadGame(),
+        new ServerGameStats(),
+        new CorrectFaction(),
+        new ListDeadGames(),
+        new RemoveTitle(),
+        new EditTrackRecord(),
+        new CheckNextPingTime(),
+        new ListSlashCommandsUsed(),
+        new ReserveGame())
+        .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         return ParentCommand.super.accept(event)
-                && CommandHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.bothelperRoles);
+            && CommandHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.bothelperRoles);
     }
 
     @Override

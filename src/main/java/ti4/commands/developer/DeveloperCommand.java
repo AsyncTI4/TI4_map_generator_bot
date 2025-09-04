@@ -13,15 +13,15 @@ import ti4.helpers.Constants;
 public class DeveloperCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new SetGlobalSetting(),
-                    new RunManualDataMigration(),
-                    new GiveTheBotABreather(),
-                    new ButtonProcessingStatistics(),
-                    new CacheStatistics(),
-                    new RestoreGame(),
-                    new RunCron(),
-                    new RunAgainstAllGames())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new SetGlobalSetting(),
+        new RunManualDataMigration(),
+        new GiveTheBotABreather(),
+        new ButtonProcessingStatistics(),
+        new CacheStatistics(),
+        new RestoreGame(),
+        new RunCron(),
+        new RunAgainstAllGames())
+        .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {
@@ -35,7 +35,7 @@ public class DeveloperCommand implements ParentCommand {
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         return ParentCommand.super.accept(event)
-                && CommandHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.developerRoles);
+            && CommandHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.developerRoles);
     }
 
     @Override

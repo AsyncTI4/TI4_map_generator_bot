@@ -21,7 +21,7 @@ class POInfo extends GameStateSubcommand {
     public POInfo() {
         super("po_info", "Show Public Objectives", false, true);
         addOptions(new OptionData(
-                OptionType.BOOLEAN, Constants.INCLUDE_SCORED, "Also display which players have scored each objective"));
+            OptionType.BOOLEAN, Constants.INCLUDE_SCORED, "Also display which players have scored each objective"));
     }
 
     @Override
@@ -32,9 +32,9 @@ class POInfo extends GameStateSubcommand {
         Map<String, Integer> publicObjectiveIDs = game.getRevealedPublicObjectives();
         Map<String, List<String>> scoredPublicObjectives = game.getScoredPublicObjectives();
         List<PublicObjectiveModel> publicObjectives = publicObjectiveIDs.keySet().stream()
-                .filter(Mapper::isValidPublicObjective)
-                .map(Mapper::getPublicObjective)
-                .toList();
+            .filter(Mapper::isValidPublicObjective)
+            .map(Mapper::getPublicObjective)
+            .toList();
 
         Player currentPlayer = getPlayer();
         StringBuilder stringBuilder = new StringBuilder();
@@ -42,19 +42,17 @@ class POInfo extends GameStateSubcommand {
         int publicObjectiveNumber = 1;
         for (PublicObjectiveModel publicObjective : publicObjectives) {
             stringBuilder
-                    .append(publicObjectiveNumber)
-                    .append(". ")
-                    .append(publicObjective.getRepresentation())
-                    .append("\n");
+                .append(publicObjectiveNumber)
+                .append(". ")
+                .append(publicObjective.getRepresentation())
+                .append("\n");
 
             if (includeScored && scoredPublicObjectives.containsKey(publicObjective.getAlias())) {
-                List<Player> playersWhoHaveScoredObjective =
-                        scoredPublicObjectives.get(publicObjective.getAlias()).stream()
-                                .map(game::getPlayer)
-                                .filter(Objects::nonNull)
-                                .filter(player ->
-                                        !game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, player, currentPlayer))
-                                .toList();
+                List<Player> playersWhoHaveScoredObjective = scoredPublicObjectives.get(publicObjective.getAlias()).stream()
+                    .map(game::getPlayer)
+                    .filter(Objects::nonNull)
+                    .filter(player -> !game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, player, currentPlayer))
+                    .toList();
 
                 if (!playersWhoHaveScoredObjective.isEmpty()) {
                     stringBuilder.append("> Scored By:");

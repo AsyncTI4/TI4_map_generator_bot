@@ -23,20 +23,19 @@ class Observer extends Subcommand {
     public Observer() {
         super(Constants.OBSERVER, "Add or remove observers to game channels");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "The game name I.E. pbd###-xxxxxx")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player @playername").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ADD_REMOVE, "add or remove player as observer")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         User user = event.getOption(Constants.PLAYER).getAsUser();
         String gameName = event.getOption("game_name", null, OptionMapping::getAsString);
-        String addOrRemove =
-                event.getOption("add_remove", "", OptionMapping::getAsString).toLowerCase();
+        String addOrRemove = event.getOption("add_remove", "", OptionMapping::getAsString).toLowerCase();
 
         if (!GameManager.isValid(gameName)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Game not found: " + gameName);
@@ -54,11 +53,11 @@ class Observer extends Subcommand {
 
         // INVITE TO GAME SERVER IF MISSING
         if (!CreateGameService.inviteUsersToServer(guild, List.of(member), event.getChannel())
-                .isEmpty()) {
+            .isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "User was not a member of the Game's server (" + guild.getName()
-                            + ")\nPlease run this command again once the user joins the server.");
+                event.getChannel(),
+                "User was not a member of the Game's server (" + guild.getName()
+                    + ")\nPlease run this command again once the user joins the server.");
             return;
         }
 
@@ -91,24 +90,26 @@ class Observer extends Subcommand {
     }
 
     private void addObserver(
-            SlashCommandInteractionEvent event, String userID, GuildChannel channel, boolean skipMessage) {
+        SlashCommandInteractionEvent event, String userID, GuildChannel channel, boolean skipMessage
+    ) {
         if (channel == null) return;
         Guild guild = channel.getGuild();
         Member user = guild.getMemberById(userID);
         channel.getPermissionContainer()
-                .upsertPermissionOverride(user)
-                .grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)
-                .queue();
+            .upsertPermissionOverride(user)
+            .grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)
+            .queue();
         if (!skipMessage) {
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    "Observer permissions granted on " + user.getAsMention() + " to channel " + channel.getName() + ": "
-                            + channel.getJumpUrl());
+                event,
+                "Observer permissions granted on " + user.getAsMention() + " to channel " + channel.getName() + ": "
+                    + channel.getJumpUrl());
         }
     }
 
     private void removeObserver(
-            SlashCommandInteractionEvent event, String userID, GuildChannel channel, boolean skipMessage) {
+        SlashCommandInteractionEvent event, String userID, GuildChannel channel, boolean skipMessage
+    ) {
         if (channel == null) return;
         // clear permissions instead of revoking permissions.
         // This resets the member's perms to the default value,
@@ -116,14 +117,14 @@ class Observer extends Subcommand {
         Guild guild = channel.getGuild();
         Member user = guild.getMemberById(userID);
         channel.getPermissionContainer()
-                .upsertPermissionOverride(user)
-                .clear(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)
-                .queue();
+            .upsertPermissionOverride(user)
+            .clear(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)
+            .queue();
         if (!skipMessage) {
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    "Observer permissions revoked on " + user.getAsMention() + " to channel " + channel.getName() + ": "
-                            + channel.getJumpUrl());
+                event,
+                "Observer permissions revoked on " + user.getAsMention() + " to channel " + channel.getName() + ": "
+                    + channel.getJumpUrl());
         }
     }
 }

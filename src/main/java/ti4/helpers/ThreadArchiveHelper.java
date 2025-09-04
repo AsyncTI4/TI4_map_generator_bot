@@ -20,20 +20,20 @@ public class ThreadArchiveHelper {
         ExecutorServiceManager.runAsyncIfNotRunning("ThreadArchiveHelper task for `" + guild.getName() + "`", () -> {
             try {
                 long threadCount = guild.getThreadChannels().stream()
-                        .filter(c -> !c.isArchived())
-                        .count();
+                    .filter(c -> !c.isArchived())
+                    .count();
                 int closeCount = GlobalSettings.getSetting(
-                        GlobalSettings.ImplementedSettings.THREAD_AUTOCLOSE_COUNT.toString(),
-                        Integer.class,
-                        DEFAULT_CLOSE_COUNT);
+                    GlobalSettings.ImplementedSettings.THREAD_AUTOCLOSE_COUNT.toString(),
+                    Integer.class,
+                    DEFAULT_CLOSE_COUNT);
                 int maxThreadCount = GlobalSettings.getSetting(
-                        GlobalSettings.ImplementedSettings.MAX_THREAD_COUNT.toString(),
-                        Integer.class,
-                        DEFAULT_MAX_THREAD_COUNT);
+                    GlobalSettings.ImplementedSettings.MAX_THREAD_COUNT.toString(),
+                    Integer.class,
+                    DEFAULT_MAX_THREAD_COUNT);
 
                 if (threadCount > maxThreadCount) {
                     BotLogger.info("**" + guild.getName() + "** Max Threads Reached (" + threadCount + " out of  "
-                            + maxThreadCount + ") - Archiving " + closeCount + " threads");
+                        + maxThreadCount + ") - Archiving " + closeCount + " threads");
                     archiveOldThreads(guild, closeCount);
                 }
             } catch (Exception e) {
@@ -45,21 +45,21 @@ public class ThreadArchiveHelper {
     public static void archiveOldThreads(Guild guild, Integer threadCount) {
         // Try gathering all threads that are not bot-map or cards-info threads
         List<ThreadChannel> threadChannels = guild.getThreadChannels().stream()
-                .filter(c -> c.getLatestMessageIdLong() != 0 && !c.isArchived())
-                .filter(threadChannel -> !threadChannel.getName().contains("bot-map-updates")
-                        && !threadChannel.getName().contains("cards-info"))
-                .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
-                .limit(threadCount)
-                .toList();
+            .filter(c -> c.getLatestMessageIdLong() != 0 && !c.isArchived())
+            .filter(threadChannel -> !threadChannel.getName().contains("bot-map-updates")
+                && !threadChannel.getName().contains("cards-info"))
+            .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
+            .limit(threadCount)
+            .toList();
 
         // If there are fewer channels in the list than requested to close, include cards-info threads
         if (threadChannels.size() < (threadCount - 1)) {
             threadChannels = guild.getThreadChannels().stream()
-                    .filter(c -> c.getLatestMessageIdLong() != 0 && !c.isArchived())
-                    .filter(threadChannel -> !threadChannel.getName().contains("bot-map-updates"))
-                    .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
-                    .limit(threadCount)
-                    .toList();
+                .filter(c -> c.getLatestMessageIdLong() != 0 && !c.isArchived())
+                .filter(threadChannel -> !threadChannel.getName().contains("bot-map-updates"))
+                .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
+                .limit(threadCount)
+                .toList();
         }
 
         for (ThreadChannel threadChannel : threadChannels) {

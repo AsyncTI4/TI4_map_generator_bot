@@ -20,8 +20,8 @@ class MoveCoatl extends GameStateSubcommand {
     public MoveCoatl() {
         super(Constants.MOVE_COATL, "Moves the Coatl token.", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Target System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
     }
 
     @Override
@@ -30,11 +30,11 @@ class MoveCoatl extends GameStateSubcommand {
         Player player = getPlayer();
 
         String tileName = StringUtils.substringBefore(
-                event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
+            event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
         Tile tile = TileHelper.getTile(event, tileName, game);
         if (tile == null) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "Could not resolve tileID:  `" + tileName + "`. Tile not found");
+                event, "Could not resolve tileID:  `" + tileName + "`. Tile not found");
             return;
         }
 

@@ -24,8 +24,8 @@ public class TradeStrategyCardService {
         ButtonHelperStats.replenishComms(event, game, player, reacted);
         if (event instanceof ButtonInteractionEvent e) {
             String msg = " gained 3" + MiscEmojis.getTGorNomadCoinEmoji(game) + " " + player.gainTG(3)
-                    + " and replenished commodities (" + oldComm + " -> " + player.getCommodities() + MiscEmojis.comm
-                    + ")";
+                + " and replenished commodities (" + oldComm + " -> " + player.getCommodities() + MiscEmojis.comm
+                + ")";
             ReactionService.addReaction(e, game, player, msg);
         }
         CommanderUnlockCheckService.checkPlayer(player, "hacan");

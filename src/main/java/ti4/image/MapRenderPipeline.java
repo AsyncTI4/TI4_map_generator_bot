@@ -37,20 +37,19 @@ public class MapRenderPipeline {
             return;
         }
         var timedRunnable = new TimedRunnable(
-                "Render event task for " + renderEvent.game.getName(), EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
-                    try (var mapGenerator =
-                            new MapGenerator(renderEvent.game, renderEvent.displayType, renderEvent.event)) {
-                        mapGenerator.draw();
-                        if (renderEvent.uploadToDiscord) {
-                            uploadToDiscord(mapGenerator, renderEvent.callback());
-                        }
-                        if (renderEvent.uploadToWebsite) {
-                            mapGenerator.uploadToWebsite();
-                        }
-                    } catch (Exception e) {
-                        BotLogger.error(new LogOrigin(renderEvent.game), "Failed to render event.", e);
+            "Render event task for " + renderEvent.game.getName(), EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
+                try (var mapGenerator = new MapGenerator(renderEvent.game, renderEvent.displayType, renderEvent.event)) {
+                    mapGenerator.draw();
+                    if (renderEvent.uploadToDiscord) {
+                        uploadToDiscord(mapGenerator, renderEvent.callback());
                     }
-                });
+                    if (renderEvent.uploadToWebsite) {
+                        mapGenerator.uploadToWebsite();
+                    }
+                } catch (Exception e) {
+                    BotLogger.error(new LogOrigin(renderEvent.game), "Failed to render event.", e);
+                }
+            });
 
         ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
     }
@@ -67,31 +66,34 @@ public class MapRenderPipeline {
 
     public static void renderToWebsiteOnly(Game game, @Nullable GenericInteractionCreateEvent event) {
         if (GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) {
+            GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) {
             queue(game, event, null, null, false, true);
         }
     }
 
     public static void queue(
-            Game game, @Nullable SlashCommandInteractionEvent event, @Nullable Consumer<FileUpload> callback) {
+        Game game, @Nullable SlashCommandInteractionEvent event, @Nullable Consumer<FileUpload> callback
+    ) {
         queue(game, event, null, callback, true, true);
     }
 
     public static void queue(
-            Game game,
-            @Nullable GenericInteractionCreateEvent event,
-            @Nullable DisplayType displayType,
-            @Nullable Consumer<FileUpload> callback) {
+        Game game,
+        @Nullable GenericInteractionCreateEvent event,
+        @Nullable DisplayType displayType,
+        @Nullable Consumer<FileUpload> callback
+    ) {
         queue(game, event, displayType, callback, true, true);
     }
 
     private static void queue(
-            Game game,
-            @Nullable GenericInteractionCreateEvent event,
-            @Nullable DisplayType displayType,
-            @Nullable Consumer<FileUpload> callback,
-            boolean uploadToDiscord,
-            boolean uploadToWebsite) {
+        Game game,
+        @Nullable GenericInteractionCreateEvent event,
+        @Nullable DisplayType displayType,
+        @Nullable Consumer<FileUpload> callback,
+        boolean uploadToDiscord,
+        boolean uploadToWebsite
+    ) {
         if (game == null) {
             throw new IllegalArgumentException("game cannot be null in render pipeline");
         }
@@ -110,10 +112,11 @@ public class MapRenderPipeline {
     }
 
     record RenderEvent(
-            Game game,
-            GenericInteractionCreateEvent event,
-            DisplayType displayType,
-            Consumer<FileUpload> callback,
-            boolean uploadToDiscord,
-            boolean uploadToWebsite) {}
+        Game game,
+        GenericInteractionCreateEvent event,
+        DisplayType displayType,
+        Consumer<FileUpload> callback,
+        boolean uploadToDiscord,
+        boolean uploadToWebsite
+    ) {}
 }

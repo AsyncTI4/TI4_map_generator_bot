@@ -13,9 +13,9 @@ import ti4.service.tactical.PlanetAbilityButton;
 public final class TnelisDeployButton implements PlanetAbilityButton {
     public boolean enabled(LandingContext ctx) {
         return ctx.mainPlayer.hasUnit("tnelis_mech")
-                && ctx.tile.getSpaceUnitHolder().getUnitCount(UnitType.Destroyer, ctx.mainPlayer) > 0
-                && ButtonHelperFactionSpecific.vortexButtonAvailable(
-                        ctx.game, Units.getUnitKey(UnitType.Mech, ctx.mainPlayer.getColor()));
+            && ctx.tile.getSpaceUnitHolder().getUnitCount(UnitType.Destroyer, ctx.mainPlayer) > 0
+            && ButtonHelperFactionSpecific.vortexButtonAvailable(
+                ctx.game, Units.getUnitKey(UnitType.Mech, ctx.mainPlayer.getColor()));
     }
 
     public List<Button> build(LandingContext ctx) {

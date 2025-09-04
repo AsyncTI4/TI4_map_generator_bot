@@ -12,7 +12,7 @@ public class CloseLaunchThreadsCron {
 
     public static void register() {
         CronManager.schedulePeriodically(
-                CloseLaunchThreadsCron.class, CloseLaunchThreadsCron::closeLaunchThreads, 1, 60, TimeUnit.MINUTES);
+            CloseLaunchThreadsCron.class, CloseLaunchThreadsCron::closeLaunchThreads, 1, 60, TimeUnit.MINUTES);
     }
 
     private static void closeLaunchThreads() {

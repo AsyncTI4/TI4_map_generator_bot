@@ -18,30 +18,29 @@ class SearchPlanetsSubcommand extends SearchComponentModelSubcommand {
     public SearchPlanetsSubcommand() {
         super(Constants.SEARCH_PLANETS, "List all planets");
         addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.INCLUDE_ALIASES,
-                "Set to true to also include common aliases, the ID, and source of the unit."));
+            OptionType.BOOLEAN,
+            Constants.INCLUDE_ALIASES,
+            "Set to true to also include common aliases, the ID, and source of the unit."));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        ComponentSource source =
-                ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
+        ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
 
         if (Mapper.isValidPlanet(searchString)) {
             event.getChannel()
-                    .sendMessageEmbeds(Mapper.getPlanet(searchString).getRepresentationEmbed(includeAliases))
-                    .queue();
+                .sendMessageEmbeds(Mapper.getPlanet(searchString).getRepresentationEmbed(includeAliases))
+                .queue();
             return;
         }
 
         List<MessageEmbed> messageEmbeds = TileHelper.getAllPlanetModels().stream()
-                .filter(model -> model.search(searchString, source))
-                .sorted(Comparator.comparing(PlanetModel::getId))
-                .map(model -> model.getRepresentationEmbed(true))
-                .toList();
+            .filter(model -> model.search(searchString, source))
+            .sorted(Comparator.comparing(PlanetModel::getId))
+            .map(model -> model.getRepresentationEmbed(true))
+            .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }
 }

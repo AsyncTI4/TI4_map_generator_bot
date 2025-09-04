@@ -19,15 +19,15 @@ class ExploreFrontier extends GameStateSubcommand {
     public ExploreFrontier() {
         super(Constants.FRONTIER, "Explore a Frontier token on a Tile", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Location of the frontier tile")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.FORCE,
-                "True to explore even if there is no frontier token in the system"));
+            OptionType.BOOLEAN,
+            Constants.FORCE,
+            "True to explore even if there is no frontier token in the system"));
         addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Exploration card ID")
-                .setRequired(false)
-                .setAutoComplete(true));
+            .setRequired(false)
+            .setAutoComplete(true));
     }
 
     @Override
@@ -44,7 +44,7 @@ class ExploreFrontier extends GameStateSubcommand {
 
         if (!force && cardID != null && game.pickExplore(cardID) == null) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "Exploration Card ID: `" + cardID + "` is not in the deck or discard pile.");
+                event, "Exploration Card ID: `" + cardID + "` is not in the deck or discard pile.");
             return;
         }
 

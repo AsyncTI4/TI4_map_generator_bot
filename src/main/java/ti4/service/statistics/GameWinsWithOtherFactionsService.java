@@ -38,38 +38,39 @@ public class GameWinsWithOtherFactionsService {
         }
 
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilterForWonGame(event),
-                game -> getGameWinsWithOtherFactions(game, factionWinCount, factionGameCount, reqFactions));
+            GameStatisticsFilterer.getGamesFilterForWonGame(event),
+            game -> getGameWinsWithOtherFactions(game, factionWinCount, factionGameCount, reqFactions));
 
         StringBuilder sb = new StringBuilder();
         sb.append("Faction Win Percent:").append("\n");
 
         Mapper.getFactionsValues().stream()
-                .map(faction -> {
-                    double winCount = factionWinCount.getOrDefault(faction.getAlias(), 0);
-                    double gameCount = factionGameCount.getOrDefault(faction.getAlias(), 0);
-                    return Map.entry(faction, gameCount == 0 ? 0 : Math.round(100 * winCount / gameCount));
-                })
-                .filter(entry -> factionGameCount.containsKey(entry.getKey().getAlias()))
-                .sorted(Map.Entry.<FactionModel, Long>comparingByValue().reversed())
-                .forEach(entry -> sb.append("`")
-                        .append(StringUtils.leftPad(entry.getValue().toString(), 4))
-                        .append("%` (")
-                        .append(factionGameCount.getOrDefault(entry.getKey().getAlias(), 0))
-                        .append(" games) ")
-                        .append(entry.getKey().getFactionEmoji())
-                        .append(" ")
-                        .append(entry.getKey().getFactionNameWithSourceEmoji())
-                        .append("\n"));
+            .map(faction -> {
+                double winCount = factionWinCount.getOrDefault(faction.getAlias(), 0);
+                double gameCount = factionGameCount.getOrDefault(faction.getAlias(), 0);
+                return Map.entry(faction, gameCount == 0 ? 0 : Math.round(100 * winCount / gameCount));
+            })
+            .filter(entry -> factionGameCount.containsKey(entry.getKey().getAlias()))
+            .sorted(Map.Entry.<FactionModel, Long>comparingByValue().reversed())
+            .forEach(entry -> sb.append("`")
+                .append(StringUtils.leftPad(entry.getValue().toString(), 4))
+                .append("%` (")
+                .append(factionGameCount.getOrDefault(entry.getKey().getAlias(), 0))
+                .append(" games) ")
+                .append(entry.getKey().getFactionEmoji())
+                .append(" ")
+                .append(entry.getKey().getFactionNameWithSourceEmoji())
+                .append("\n"));
         MessageHelper.sendMessageToThread(
-                (MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
+            (MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
     }
 
     private void getGameWinsWithOtherFactions(
-            Game game,
-            Map<String, Integer> factionWinCount,
-            Map<String, Integer> factionGameCount,
-            List<String> reqFactions) {
+        Game game,
+        Map<String, Integer> factionWinCount,
+        Map<String, Integer> factionGameCount,
+        List<String> reqFactions
+    ) {
         Optional<Player> winner = game.getWinner();
         if (winner.isEmpty()) {
             return;

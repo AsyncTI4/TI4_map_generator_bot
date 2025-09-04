@@ -31,8 +31,7 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
 
     @Override
     void doAction(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {
-        String tokenName =
-                event.getOption(Constants.TOKEN, "", OptionMapping::getAsString).toLowerCase();
+        String tokenName = event.getOption(Constants.TOKEN, "", OptionMapping::getAsString).toLowerCase();
         if (tokenName.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Token not specified.");
             return;
@@ -63,16 +62,17 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                 return;
             }
             addToken(
-                    event,
-                    tile,
-                    tokenFileName,
-                    Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName),
-                    game);
+                event,
+                tile,
+                tokenFileName,
+                Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName),
+                game);
         }
     }
 
     private static void addToken(
-            GenericInteractionCreateEvent event, Tile tile, String tokenID, boolean needSpecifyPlanet, Game game) {
+        GenericInteractionCreateEvent event, Tile tile, String tokenID, boolean needSpecifyPlanet, Game game
+    ) {
         MessageChannel channel = event != null ? event.getMessageChannel() : game.getMainGameChannel();
         String unitHolder = Constants.SPACE;
         if (needSpecifyPlanet) {
@@ -117,7 +117,7 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                     int amt = planetUnitHolder.getUnitCount(key);
                     var removed = planetUnitHolder.removeUnit(key, amt);
                     if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech)
-                            .contains(key.getUnitType())) {
+                        .contains(key.getUnitType())) {
                         spaceUnitHolder.addUnitsWithStates(key, removed);
                     }
                 }
@@ -161,12 +161,12 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-                new OptionData(OptionType.STRING, Constants.TOKEN, "Token name")
-                        .setRequired(true)
-                        .setAutoComplete(true),
-                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                        .setRequired(true)
-                        .setAutoComplete(true),
-                new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.TOKEN, "Token name")
+                .setRequired(true)
+                .setAutoComplete(true),
+            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                .setRequired(true)
+                .setAutoComplete(true),
+            new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true));
     }
 }

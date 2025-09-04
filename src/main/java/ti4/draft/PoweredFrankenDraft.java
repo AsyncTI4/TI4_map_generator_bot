@@ -15,17 +15,7 @@ public class PoweredFrankenDraft extends FrankenDraft {
         switch (category) {
             case ABILITY -> limit = 4;
             case TECH, BLUETILE -> limit = 3;
-            case AGENT,
-                    COMMANDER,
-                    REDTILE,
-                    STARTINGFLEET,
-                    STARTINGTECH,
-                    HOMESYSTEM,
-                    PN,
-                    COMMODITIES,
-                    FLAGSHIP,
-                    MECH,
-                    HERO -> limit = 2;
+            case AGENT, COMMANDER, REDTILE, STARTINGFLEET, STARTINGTECH, HOMESYSTEM, PN, COMMODITIES, FLAGSHIP, MECH, HERO -> limit = 2;
             case DRAFTORDER -> limit = 1;
         }
         return limit;

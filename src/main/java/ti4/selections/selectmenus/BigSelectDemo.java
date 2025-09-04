@@ -45,8 +45,8 @@ public class BigSelectDemo implements Selection {
 
         if (!hasPageOption) {
             event.getChannel()
-                    .sendMessage("You selected: " + String.join(", ", keepValues))
-                    .queue();
+                .sendMessage("You selected: " + String.join(", ", keepValues))
+                .queue();
             return;
         }
 
@@ -58,7 +58,8 @@ public class BigSelectDemo implements Selection {
     }
 
     private static void serveDemoSelectMenu(
-            GenericInteractionCreateEvent event, List<String> preselected, int startIdx) {
+        GenericInteractionCreateEvent event, List<String> preselected, int startIdx
+    ) {
         StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(selectionID);
         int padding = 0;
         if (preselected != null) {
@@ -95,8 +96,8 @@ public class BigSelectDemo implements Selection {
         }
 
         event.getMessageChannel()
-                .sendMessage("")
-                .addComponents(ActionRow.of(menuBuilder.build()))
-                .queue();
+            .sendMessage("")
+            .addComponents(ActionRow.of(menuBuilder.build()))
+            .queue();
     }
 }

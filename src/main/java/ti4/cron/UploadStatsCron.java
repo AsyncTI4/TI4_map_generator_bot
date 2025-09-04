@@ -10,11 +10,11 @@ public class UploadStatsCron {
 
     public static void register() {
         CronManager.schedulePeriodicallyAtTime(
-                UploadStatsCron.class,
-                UploadStatsCron::uploadStats,
-                13,
-                30,
-                ZoneId.of("UTC")); // ParsleySage is currently pulling at 14:00 UTC
+            UploadStatsCron.class,
+            UploadStatsCron::uploadStats,
+            13,
+            30,
+            ZoneId.of("UTC")); // ParsleySage is currently pulling at 14:00 UTC
     }
 
     private static void uploadStats() {

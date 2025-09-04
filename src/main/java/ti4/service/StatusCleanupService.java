@@ -39,11 +39,10 @@ public class StatusCleanupService {
                             continue;
                         }
                         if (CommandCounterHelper.hasCC(player, tile)) {
-                            String msg =
-                                    player.getRepresentation() + ", in order to remove your command token from tile "
-                                            + tile.getRepresentationForButtons()
-                                            + " you need to first spend 1 command token from your command sheet, due to the ability of the Errant, the Toldar flagship."
-                                            + " If you don't wish to spend this command token, then your token will stay in the system. Use buttons to decide.";
+                            String msg = player.getRepresentation() + ", in order to remove your command token from tile "
+                                + tile.getRepresentationForButtons()
+                                + " you need to first spend 1 command token from your command sheet, due to the ability of the Errant, the Toldar flagship."
+                                + " If you don't wish to spend this command token, then your token will stay in the system. Use buttons to decide.";
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Buttons.gray("placeCCBack_" + tile.getPosition(), "Don't Spend"));
                             buttons.add(Buttons.red("lose1CC", "Spend 1 Command Token"));
@@ -86,10 +85,10 @@ public class StatusCleanupService {
             game.removeStoredValue(player.getFaction() + "scpickqueue");
 
             if (player.isRealPlayer()
-                    && game.getStoredValue("Pre Pass " + player.getFaction()) != null
-                    && game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
+                && game.getStoredValue("Pre Pass " + player.getFaction()) != null
+                && game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
                 if (game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())
-                        && !player.isPassed()) {
+                    && !player.isPassed()) {
                     game.setStoredValue("Pre Pass " + player.getFaction(), "");
                 }
             }
@@ -104,7 +103,7 @@ public class StatusCleanupService {
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get("sigma_cyber");
                 MessageHelper.sendMessageToChannel(
-                        game.getMainGameChannel(), "_" + pnModel.getName() + "_ has been returned.");
+                    game.getMainGameChannel(), "_" + pnModel.getName() + "_ has been returned.");
             }
         }
         for (int x = 0; x < 13; x++) {
@@ -134,7 +133,7 @@ public class StatusCleanupService {
         }
         if (!game.isFowMode() && game.getTableTalkChannel() != null && !game.isOmegaPhaseMode()) {
             MessageHelper.sendMessageToChannel(
-                    game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
+                game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
             ListPlayerInfoService.displayerScoringProgression(game, true, game.getTableTalkChannel(), "both");
         }
         game.clearAllEmptyStoredValues();
@@ -152,15 +151,15 @@ public class StatusCleanupService {
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
                 if (pnModel.getText().contains("eturn this card")
-                        && pnModel.getText().contains("end of the status phase")) {
+                    && pnModel.getText().contains("end of the status phase")) {
                     player.removePromissoryNote(pn);
                     pnOwner.setPromissoryNote(pn);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, pnOwner, false);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
                     MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            "_" + pnModel.getName() + "_ has been returned to " + pnOwner.getRepresentationNoPing()
-                                    + ".");
+                        player.getCorrectChannel(),
+                        "_" + pnModel.getName() + "_ has been returned to " + pnOwner.getRepresentationNoPing()
+                            + ".");
                 }
             }
         }
@@ -175,7 +174,6 @@ public class StatusCleanupService {
                     thread.getManager().setArchived(true).queueAfter(10, TimeUnit.SECONDS);
                 }
             }
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
     }
 }

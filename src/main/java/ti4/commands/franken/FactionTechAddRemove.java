@@ -19,14 +19,14 @@ abstract class FactionTechAddRemove extends GameStateSubcommand {
     FactionTechAddRemove(String name, String description) {
         super(name, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Technology Name")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "Technology Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "Technology Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "Technology Name").setAutoComplete(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                .setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -34,8 +34,8 @@ abstract class FactionTechAddRemove extends GameStateSubcommand {
 
         // GET ALL TECH OPTIONS AS STRING
         for (OptionMapping option : event.getOptions().stream()
-                .filter(o -> o != null && o.getName().contains(Constants.TECH))
-                .toList()) {
+            .filter(o -> o != null && o.getName().contains(Constants.TECH))
+            .toList()) {
             techIDs.add(option.getAsString());
         }
 
@@ -44,7 +44,7 @@ abstract class FactionTechAddRemove extends GameStateSubcommand {
 
         if (techIDs.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "No valid technologies were provided. Please see `/search techs` for available choices.");
+                event, "No valid technologies were provided. Please see `/search techs` for available choices.");
             return;
         }
 

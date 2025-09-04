@@ -18,11 +18,11 @@ class RefreshLeader extends GameStateSubcommand {
     public RefreshLeader() {
         super(Constants.REFRESH_LEADER, "Ready leader", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -42,13 +42,13 @@ class RefreshLeader extends GameStateSubcommand {
         var game = getGame();
         RefreshLeaderService.refreshLeader(player, playerLeader, game);
         StringBuilder message = new StringBuilder(player.getRepresentation())
-                .append(" readied ")
-                .append(Helper.getLeaderShortRepresentation(playerLeader));
+            .append(" readied ")
+            .append(Helper.getLeaderShortRepresentation(playerLeader));
         if (tgCount > 0) {
             message.append(" - ")
-                    .append(tgCount)
-                    .append(MiscEmojis.getTGorNomadCoinEmoji(game))
-                    .append(" transferred from leader to player");
+                .append(tgCount)
+                .append(MiscEmojis.getTGorNomadCoinEmoji(game))
+                .append(" transferred from leader to player");
         }
         String msg = message.toString();
         MessageHelper.sendMessageToEventChannel(event, msg);

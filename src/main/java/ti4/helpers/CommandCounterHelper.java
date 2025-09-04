@@ -24,10 +24,10 @@ public class CommandCounterHelper {
         if (player == null || !Mapper.isValidColor(player.getColor())) {
             if (event != null) {
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), "Cannot find player for whom to place a command token.");
+                    event.getMessageChannel(), "Cannot find player for whom to place a command token.");
             } else if (player != null) {
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(), "Cannot find player for whom to place a command token.");
+                    player.getCorrectChannel(), "Cannot find player for whom to place a command token.");
             }
             return;
         }
@@ -36,15 +36,15 @@ public class CommandCounterHelper {
         if (ccPath == null) {
             if (event != null) {
                 MessageHelper.sendMessageToChannel(
-                        (MessageChannel) event.getChannel(),
-                        "Command Counter: " + player.getColor() + " is not valid and not supported.");
+                    (MessageChannel) event.getChannel(),
+                    "Command Counter: " + player.getColor() + " is not valid and not supported.");
             }
             return;
         }
         if (player.getGame().isFowMode() && ping) {
             String colorMention = ColorEmojis.getColorEmojiWithName(player.getColor());
             FoWHelper.pingSystem(
-                    player.getGame(), tile.getPosition(), colorMention + " has placed a command token in the system.");
+                player.getGame(), tile.getPosition(), colorMention + " has placed a command token in the system.");
         }
         tile.addCC(ccID);
     }
@@ -54,7 +54,7 @@ public class CommandCounterHelper {
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null && event != null) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");
+                event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
         return tile.hasCC(ccID);
     }

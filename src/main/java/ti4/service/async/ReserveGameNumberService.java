@@ -43,16 +43,17 @@ public class ReserveGameNumberService {
     private static List<String> filterOutRealGames(List<String> reserved) {
         if (reserved == null) return new ArrayList<>();
         List<String> reservedAndNotTaken = reserved.stream()
-                .filter(Objects::nonNull)
-                .filter(Predicate.not(GameManager::isValid))
-                .toList();
+            .filter(Objects::nonNull)
+            .filter(Predicate.not(GameManager::isValid))
+            .toList();
         return new ArrayList<>(reservedAndNotTaken);
     }
 
     private static List<String> readReservedList() {
         if (reservedGameCache == null) {
             try {
-                List<String> reserved = PersistenceManager.readObjectFromJsonFile(fileName, new TypeReference<>() {});
+                List<String> reserved = PersistenceManager.readObjectFromJsonFile(fileName, new TypeReference<>() {
+                });
                 reservedGameCache = filterOutRealGames(reserved);
             } catch (Exception e) {
                 BotLogger.error("Failed to read json data for Reserved Game Cache.", e);

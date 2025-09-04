@@ -10,16 +10,16 @@ import ti4.helpers.Constants;
 public class LeaderCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new LeaderInfo(),
-                    new UnlockLeader(),
-                    new LockLeader(),
-                    new RefreshLeader(),
-                    new ExhaustLeader(),
-                    new PurgeLeader(),
-                    new ResetLeader(),
-                    new HeroPlay(),
-                    new HeroUnplay())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new LeaderInfo(),
+        new UnlockLeader(),
+        new LockLeader(),
+        new RefreshLeader(),
+        new ExhaustLeader(),
+        new PurgeLeader(),
+        new ResetLeader(),
+        new HeroPlay(),
+        new HeroUnplay())
+        .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

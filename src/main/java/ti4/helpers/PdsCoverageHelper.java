@@ -59,8 +59,7 @@ public class PdsCoverageHelper {
                     }
 
                     // Check units for PDS
-                    for (Map.Entry<Units.UnitKey, Integer> unitEntry :
-                            unitHolder.getUnits().entrySet()) {
+                    for (Map.Entry<Units.UnitKey, Integer> unitEntry : unitHolder.getUnits().entrySet()) {
                         if (unitEntry.getValue() == 0) {
                             continue;
                         }
@@ -72,8 +71,8 @@ public class PdsCoverageHelper {
 
                         UnitModel model = player.getUnitFromUnitKey(unitKey);
                         if (model == null
-                                || ("xxcha_mech".equalsIgnoreCase(model.getId())
-                                        && ButtonHelper.isLawInPlay(game, "articles_war"))) {
+                            || ("xxcha_mech".equalsIgnoreCase(model.getId())
+                                && ButtonHelper.isLawInPlay(game, "articles_war"))) {
                             continue;
                         }
 
@@ -142,15 +141,15 @@ public class PdsCoverageHelper {
             if (rerolls) {
                 // With rerolls: probability of success = 1 - ((X-1)/10)²
                 expectedHits = (100.0f * numberOfDice
-                                - diceList.stream()
-                                        .mapToInt(value -> (value - 1) * (value - 1))
-                                        .sum())
-                        / 100;
+                    - diceList.stream()
+                        .mapToInt(value -> (value - 1) * (value - 1))
+                        .sum())
+                    / 100;
             } else {
                 // Without rerolls: probability of success = (11-X)/10
                 expectedHits = (11.0f * numberOfDice
-                                - diceList.stream().mapToInt(Integer::intValue).sum())
-                        / 10;
+                    - diceList.stream().mapToInt(Integer::intValue).sum())
+                    / 10;
             }
 
             pdsCoverage.put(player.getFaction(), new PdsCoverage(numberOfDice, expectedHits, diceList, rerolls));
@@ -167,8 +166,8 @@ public class PdsCoverageHelper {
 
             UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).getFirst();
             if (removedUnit.getIsShip()
-                    && !removedUnit.getAsyncId().contains("ff")
-                    && removedUnit.getSpaceCannonDieCount() == 0) {
+                && !removedUnit.getAsyncId().contains("ff")
+                && removedUnit.getSpaceCannonDieCount() == 0) {
                 count += space.getUnitCount(unit);
             }
         }

@@ -26,11 +26,10 @@ public class AbsolArtifactAgendaResolver implements ForAgainstAgendaResolver {
         if (watchParty != null && !game.isFowMode()) {
             Tile tile = game.getMecatolTile();
             if (tile != null) {
-                FileUpload systemWithContext =
-                        new TileGenerator(game, event, null, 1, tile.getPosition()).createFileUpload();
+                FileUpload systemWithContext = new TileGenerator(game, event, null, 1, tile.getPosition()).createFileUpload();
                 String message = "# _Ixthian Artifact_ has resolved! " + watchPartyPing + "\n"
-                        + AgendaHelper.getSummaryOfVotes(game, true).replace("# _Ixthian Artifact_\n", "")
-                        + "\nSurrounding Mecatol Rex in " + game.getName() + ".";
+                    + AgendaHelper.getSummaryOfVotes(game, true).replace("# _Ixthian Artifact_\n", "")
+                    + "\nSurrounding Mecatol Rex in " + game.getName() + ".";
                 MessageHelper.sendMessageWithFile(watchParty, systemWithContext, message, false);
             }
         }

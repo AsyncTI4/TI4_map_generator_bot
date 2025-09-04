@@ -21,7 +21,7 @@ public class NexusAgendaResolver implements AgendaResolver {
                 String tokenFilename = Mapper.getTokenID("gamma");
                 tile.addToken(tokenFilename, Constants.SPACE);
                 MessageHelper.sendMessageToChannel(
-                        game.getMainGameChannel(), "Added a gamma wormhole to the Mecatol Rex system.");
+                    game.getMainGameChannel(), "Added a gamma wormhole to the Mecatol Rex system.");
             }
         }
     }

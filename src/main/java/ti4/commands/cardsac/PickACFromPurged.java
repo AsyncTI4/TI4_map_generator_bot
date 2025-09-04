@@ -17,7 +17,7 @@ class PickACFromPurged extends GameStateSubcommand {
     public PickACFromPurged() {
         super(Constants.PICK_AC_FROM_PURGED, "Pick an Action Card from the purged pile into your hand", true, true);
         addOptions(new OptionData(
-                        OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()")
+            OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()")
                 .setRequired(true));
     }
 
@@ -45,9 +45,9 @@ class PickACFromPurged extends GameStateSubcommand {
         }
 
         String sb = "Game: " + game.getName() + " " + "Player: "
-                + player.getUserName() + "\n" + "Picked card from Purged: "
-                + Mapper.getActionCard(acID).getRepresentation()
-                + "\n";
+            + player.getUserName() + "\n" + "Picked card from Purged: "
+            + Mapper.getActionCard(acID).getRepresentation()
+            + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
         ActionCardHelper.sendActionCardInfo(game, player);

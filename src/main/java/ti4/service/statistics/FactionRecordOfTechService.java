@@ -42,16 +42,16 @@ public class FactionRecordOfTechService {
         AtomicInteger gamesThatHadThem = new AtomicInteger();
 
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilter(event),
-                game -> getFactionRecordOfTech(game, techsResearched, gamesThatHadThem, faction, factionModel));
+            GameStatisticsFilterer.getGamesFilter(event),
+            game -> getFactionRecordOfTech(game, techsResearched, gamesThatHadThem, faction, factionModel));
 
         StringBuilder sb = new StringBuilder();
 
         sb.append("## __**Technologies Researched By ")
-                .append(factionModel.getFactionName())
-                .append(" (From ")
-                .append(gamesThatHadThem)
-                .append(" Games)**__\n");
+            .append(factionModel.getFactionName())
+            .append(" (From ")
+            .append(gamesThatHadThem)
+            .append(" Games)**__\n");
 
         boolean sortOrderAscending = event.getOption("ascending", false, OptionMapping::getAsBoolean);
         Comparator<Map.Entry<String, Integer>> comparator = (o1, o2) -> {
@@ -64,8 +64,8 @@ public class FactionRecordOfTechService {
 
         techsResearched.entrySet().stream().sorted(comparator).forEach(techResearched -> {
             sb.append("`")
-                    .append(Helper.leftpad(String.valueOf(index.get()), 3))
-                    .append(". ");
+                .append(Helper.leftpad(String.valueOf(index.get()), 3))
+                .append(". ");
             sb.append("` ").append(techResearched.getKey());
             sb.append(": ").append(techResearched.getValue());
             sb.append("\n");
@@ -76,11 +76,12 @@ public class FactionRecordOfTechService {
     }
 
     private void getFactionRecordOfTech(
-            Game game,
-            Map<String, Integer> techsResearched,
-            AtomicInteger gamesThatHadThem,
-            String faction,
-            FactionModel factionModel) {
+        Game game,
+        Map<String, Integer> techsResearched,
+        AtomicInteger gamesThatHadThem,
+        String faction,
+        FactionModel factionModel
+    ) {
         for (Player player : game.getRealPlayers()) {
             if (!player.getFaction().equalsIgnoreCase(faction)) {
                 continue;

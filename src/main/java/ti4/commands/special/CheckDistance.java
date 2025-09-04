@@ -16,36 +16,35 @@ import ti4.message.MessageHelper;
 
 class CheckDistance extends GameStateSubcommand {
 
-    public CheckDistance() {
-        super(Constants.CHECK_DISTANCE, "Check Distance", false, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check"));
-    }
-
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        Game game = getGame();
-
-        String tileID = event.getOption(Constants.TILE_NAME).getAsString().toLowerCase();
-        Tile tile = TileHelper.getTile(event, tileID, game);
-        if (tile == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
-            return;
+        public CheckDistance() {
+                super(Constants.CHECK_DISTANCE, "Check Distance", false, true);
+                addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                        .setRequired(true)
+                        .setAutoComplete(true));
+                addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check"));
         }
 
-        Player player = getPlayer();
-        int maxDistance = event.getOption(Constants.MAX_DISTANCE, 8, OptionMapping::getAsInt);
-        Map<String, Integer> distances =
-                CheckDistanceHelper.getTileDistances(game, player, tile.getPosition(), maxDistance, true);
+        @Override
+        public void execute(SlashCommandInteractionEvent event) {
+                Game game = getGame();
 
-        MessageHelper.sendMessageToEventChannel(
-                event,
-                distances.entrySet().stream()
-                        .map(entry -> entry.getKey() + ": " + entry.getValue())
-                        .sorted()
-                        .reduce("Distances: \n", (a, b) -> a + "\n" + b));
-    }
+                String tileID = event.getOption(Constants.TILE_NAME).getAsString().toLowerCase();
+                Tile tile = TileHelper.getTile(event, tileID, game);
+                if (tile == null) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
+                        return;
+                }
+
+                Player player = getPlayer();
+                int maxDistance = event.getOption(Constants.MAX_DISTANCE, 8, OptionMapping::getAsInt);
+                Map<String, Integer> distances = CheckDistanceHelper.getTileDistances(game, player, tile.getPosition(), maxDistance, true);
+
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        distances.entrySet().stream()
+                                .map(entry -> entry.getKey() + ": " + entry.getValue())
+                                .sorted()
+                                .reduce("Distances: \n", (a, b) -> a + "\n" + b));
+        }
 }

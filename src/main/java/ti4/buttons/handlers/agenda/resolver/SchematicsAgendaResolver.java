@@ -17,13 +17,13 @@ public class SchematicsAgendaResolver implements AgendaResolver {
         if (!"for".equalsIgnoreCase(winner)) {
             for (Player player : game.getRealPlayers()) {
                 if (player.getTechs().contains("ws")
-                        || player.getTechs().contains("pws2")
-                        || player.getTechs().contains("dsrohdws")) {
+                    || player.getTechs().contains("pws2")
+                    || player.getTechs().contains("dsrohdws")) {
                     ActionCardHelper.discardRandomAC(event, game, player, player.getAc());
                 }
             }
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Discarded the action cards of those that own the war sun technology.");
+                game.getMainGameChannel(), "Discarded the action cards of those that own the war sun technology.");
         }
     }
 }

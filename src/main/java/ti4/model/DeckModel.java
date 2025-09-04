@@ -87,11 +87,11 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
 
     public boolean isValid() {
         return alias != null
-                && name != null
-                && type != null
-                && description != null
-                && cardIDs != null
-                && source != null;
+            && name != null
+            && type != null
+            && description != null
+            && cardIDs != null
+            && source != null;
     }
 
     public String getAlias() {
@@ -166,15 +166,15 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         return alias.contains(searchString)
-                || name.contains(searchString)
-                || type.toString().contains(searchString)
-                || description.contains(searchString);
+            || name.contains(searchString)
+            || type.toString().contains(searchString)
+            || description.contains(searchString);
     }
 
     @Override
     public String getAutoCompleteName() {
         return StringUtils.left(
-                StringUtils.substringBefore("[" + type + "] " + name + " --> " + description, "\n"), 100);
+            StringUtils.substringBefore("[" + type + "] " + name + " --> " + description, "\n"), 100);
     }
 
     public ComponentSource getSource() {
@@ -190,11 +190,10 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
             case PUBLIC_STAGE_2_OBJECTIVE -> CardEmojis.Public2.toString();
             case SECRET_OBJECTIVE -> CardEmojis.SecretObjective.toString();
             case RELIC -> CardEmojis.RelicCard.toString();
-            case EXPLORE ->
-                CardEmojis.FrontierCard.toString()
-                        + CardEmojis.CulturalCard
-                        + CardEmojis.IndustrialCard
-                        + CardEmojis.HazardousCard;
+            case EXPLORE -> CardEmojis.FrontierCard.toString()
+                + CardEmojis.CulturalCard
+                + CardEmojis.IndustrialCard
+                + CardEmojis.HazardousCard;
             default -> "";
         };
     }

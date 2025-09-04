@@ -15,6 +15,6 @@ public final class CombatDronesButton implements PostMovementAbilityButton {
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.blue(
-                ctx.player.finChecker() + "combatDrones", "Use Combat Drones Ability", FactionEmojis.mirveda));
+            ctx.player.finChecker() + "combatDrones", "Use Combat Drones Ability", FactionEmojis.mirveda));
     }
 }

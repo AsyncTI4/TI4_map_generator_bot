@@ -69,8 +69,10 @@ public abstract class SettingInterface {
     public String longSummary(int pad, String extraInfoId) {
         String emote = emoji == null ? "" : emoji;
         String val;
-        if (Objects.equals(id, extraInfoId)) val = longValue() + (extraInfo != null ? " *" + extraInfo + "*" : "");
-        else val = shortValue();
+        if (Objects.equals(id, extraInfoId))
+            val = longValue() + (extraInfo != null ? " *" + extraInfo + "*" : "");
+        else
+            val = shortValue();
         return String.format("`%s`%s: %s", Helper.leftpad(name, pad), emote, val);
     }
 

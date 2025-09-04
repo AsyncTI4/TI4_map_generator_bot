@@ -40,14 +40,14 @@ class RelicButtonHandler {
         String relic = buttonID.replace("exhaustRelic_", "");
         if (!player.hasRelicReady(relic)) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), player.getFactionEmoji() + " doesn't have an unexhausted " + relic + ".");
+                event.getChannel(), player.getFactionEmoji() + " doesn't have an unexhausted " + relic + ".");
             return;
         }
         player.addExhaustedRelic(relic);
         MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                player.getFactionEmoji() + " exhausted "
-                        + Mapper.getRelic(relic).getName());
+            event.getChannel(),
+            player.getFactionEmoji() + " exhausted "
+                + Mapper.getRelic(relic).getName());
         ButtonHelper.deleteTheOneButton(event);
         if ("absol_luxarchtreatise".equalsIgnoreCase(relic)) {
             game.setStoredValue("absolLux", "true");
@@ -59,28 +59,28 @@ class RelicButtonHandler {
         List<String> deck = game.getAllRelics();
         if (deck.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "The " + ExploreEmojis.Relic + " relic deck & discard is empty - nothing to look at.");
+                event.getMessageChannel(),
+                "The " + ExploreEmojis.Relic + " relic deck & discard is empty - nothing to look at.");
             return;
         }
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "The top card of the " + ExploreEmojis.Relic + " relic deck has been sent to "
-                            + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
+                event.getMessageChannel(),
+                "The top card of the " + ExploreEmojis.Relic + " relic deck has been sent to "
+                    + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
         } else {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation(true, false) + " looked at top card of the " + ExploreEmojis.Relic
-                            + " relic deck. The card has been sent to their `#cards-info` thread.");
+                player.getCorrectChannel(),
+                player.getRepresentation(true, false) + " looked at top card of the " + ExploreEmojis.Relic
+                    + " relic deck. The card has been sent to their `#cards-info` thread.");
         }
 
         String topCard = deck.getFirst();
         RelicModel relic = Mapper.getRelic(topCard);
         String message = "You looked at the top of the " + ExploreEmojis.Relic + " relic deck and saw _"
-                + relic.getName() + "_.";
+            + relic.getName() + "_.";
         MessageHelper.sendMessageToChannelWithEmbed(
-                player.getCardsInfoThread(), message, relic.getRepresentationEmbed());
+            player.getCardsInfoThread(), message, relic.getRepresentationEmbed());
         ButtonHelper.deleteMessage(event);
     }
 
@@ -96,7 +96,7 @@ class RelicButtonHandler {
         String poID = buttonID.split(";")[1];
         String type = buttonID.split(";")[2];
         String msg = player.getRepresentation()
-                + ", please choose the relic you wish to purge in order to replace the objective with a " + type + ".";
+            + ", please choose the relic you wish to purge in order to replace the objective with a " + type + ".";
         List<Button> buttons = RelicHelper.getNeuraLoopButton(player, poID, type, game);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         ButtonHelper.deleteMessage(event);
@@ -111,8 +111,8 @@ class RelicButtonHandler {
         player.removeExhaustedRelic(relic);
         game.removeRevealedObjective(poID);
         String msg = player.getRepresentation() + " is using _Neuraloop_, purge "
-                + ("neuraloop".equals(relic) ? "itself" : Mapper.getRelic(relic).getName())
-                + ", to replace the recently revealed objective with a random " + type + ".";
+            + ("neuraloop".equals(relic) ? "itself" : Mapper.getRelic(relic).getName())
+            + ", to replace the recently revealed objective with a random " + type + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if ("stage1".equalsIgnoreCase(type)) {
             RevealPublicObjectiveService.revealS1(game, event, true);
@@ -138,7 +138,7 @@ class RelicButtonHandler {
         player.removeExhaustedRelic(relicId);
         String relicName = Mapper.getRelic(relicId).getName();
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), "Purged " + ExploreEmojis.Relic + " relic: " + relicName);
+            event.getMessageChannel(), "Purged " + ExploreEmojis.Relic + " relic: " + relicName);
         ButtonHelper.deleteMessage(event);
         String message = "Please choose a system to move from.";
         List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
@@ -151,7 +151,7 @@ class RelicButtonHandler {
         player.removeRelic(relicId);
         player.removeExhaustedRelic(relicId);
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), player.getRepresentationNoPing() + " has purged the _Eye of Vogul_.");
+            event.getMessageChannel(), player.getRepresentationNoPing() + " has purged the _Eye of Vogul_.");
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -159,18 +159,17 @@ class RelicButtonHandler {
     static void exhaustE6G0Network(ButtonInteractionEvent event, Player player, Game game) {
         player.addExhaustedRelic("e6-g0_network");
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(), player.getFactionEmoji() + " chose to exhaust _E6-G0 Network_.");
+            player.getCorrectChannel(), player.getFactionEmoji() + " chose to exhaust _E6-G0 Network_.");
         String message;
         if (player.hasAbility("scheming")) {
             game.drawActionCard(player.getUserID());
             game.drawActionCard(player.getUserID());
-            message =
-                    player.getFactionEmoji() + " drew 2 action cards with **Scheming**. Please discard 1 action card.";
+            message = player.getFactionEmoji() + " drew 2 action cards with **Scheming**. Please discard 1 action card.";
             ActionCardHelper.sendActionCardInfo(game, player, event);
             MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + " use buttons to discard",
-                    ActionCardHelper.getDiscardActionCardButtons(player, false));
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + " use buttons to discard",
+                ActionCardHelper.getDiscardActionCardButtons(player, false));
         } else if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
             message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
@@ -189,7 +188,7 @@ class RelicButtonHandler {
     static void crownOfEmphidiaExplore(ButtonInteractionEvent event, Player player, Game game) {
         player.addExhaustedRelic("emphidia");
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), player.getFactionEmojiOrColor() + " Exhausted _The Crown of Emphidia_.");
+            event.getMessageChannel(), player.getFactionEmojiOrColor() + " Exhausted _The Crown of Emphidia_.");
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
         ButtonHelper.deleteMessage(event);

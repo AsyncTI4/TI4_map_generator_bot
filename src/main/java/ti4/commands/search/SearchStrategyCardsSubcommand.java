@@ -19,21 +19,20 @@ class SearchStrategyCardsSubcommand extends SearchComponentModelSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        ComponentSource source =
-                ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
+        ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
         if (Mapper.isValidStrategyCard(searchString)) {
             event.getChannel()
-                    .sendMessageEmbeds(Mapper.getStrategyCard(searchString).getRepresentationEmbed(true))
-                    .queue();
+                .sendMessageEmbeds(Mapper.getStrategyCard(searchString).getRepresentationEmbed(true))
+                .queue();
             return;
         }
 
         List<MessageEmbed> messageEmbeds = Mapper.getStrategyCards().values().stream()
-                .filter(model -> model.search(searchString, source))
-                .sorted(Comparator.comparing(StrategyCardModel::getInitiative))
-                .map(model -> model.getRepresentationEmbed(true))
-                .toList();
+            .filter(model -> model.search(searchString, source))
+            .sorted(Comparator.comparing(StrategyCardModel::getInitiative))
+            .map(model -> model.getRepresentationEmbed(true))
+            .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }
 }

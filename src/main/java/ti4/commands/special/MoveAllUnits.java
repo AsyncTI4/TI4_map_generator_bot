@@ -22,18 +22,18 @@ class MoveAllUnits extends GameStateSubcommand {
     public MoveAllUnits() {
         super(Constants.MOVE_ALL_UNITS, "Move All Units From One System To Another", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to move from")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to move to")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                .setAutoComplete(true));
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.CC_USE,
-                        "\"t\"/\"tactic\" to add a token from tactic pool, \"r\"/\"retreat\" to add a token from reinforcements")
+            OptionType.STRING,
+            Constants.CC_USE,
+            "\"t\"/\"tactic\" to add a token from tactic pool, \"r\"/\"retreat\" to add a token from reinforcements")
                 .setAutoComplete(true));
     }
 
@@ -48,7 +48,7 @@ class MoveAllUnits extends GameStateSubcommand {
         }
 
         Tile tileTo = CommandHelper.getTile(
-                event, game, event.getOption(Constants.TILE_NAME_TO).getAsString());
+            event, game, event.getOption(Constants.TILE_NAME_TO).getAsString());
         if (tileTo == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find the system you're moving to.");
             return;

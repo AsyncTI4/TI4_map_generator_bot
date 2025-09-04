@@ -53,9 +53,9 @@ class UnitCommandHelper {
             return otherPlayer.getColor();
         }
         MessageHelper.replyToMessage(
-                event,
-                Constants.TARGET_FACTION_OR_COLOR
-                        + " option is not valid. Use `/special2 setup_neutral_player` for neutrals.");
+            event,
+            Constants.TARGET_FACTION_OR_COLOR
+                + " option is not valid. Use `/special2 setup_neutral_player` for neutrals.");
         return null;
     }
 }

@@ -20,7 +20,8 @@ import ti4.service.unit.RemoveUnitService.RemovedUnit;
 class CaptureUnitService {
 
     public static List<Player> listCapturingMechPlayers(
-            Game game, List<RemovedUnit> allUnits, RemovedUnit removedUnitType) {
+        Game game, List<RemovedUnit> allUnits, RemovedUnit removedUnitType
+    ) {
         if (removedUnitType.unitKey().getUnitType() != UnitType.Infantry) return Collections.emptyList();
         if (!(removedUnitType.uh() instanceof Planet planet)) return Collections.emptyList();
         if (ButtonHelper.isLawInPlay(game, "articles_war")) return Collections.emptyList();
@@ -37,13 +38,14 @@ class CaptureUnitService {
     }
 
     public static List<Player> listCapturingFlagshipPlayers(
-            Game game, List<RemovedUnit> allUnits, RemovedUnit removed) {
+        Game game, List<RemovedUnit> allUnits, RemovedUnit removed
+    ) {
         Tile tile = removed.tile();
 
         // "sigma_vuilraith_flagship_1" does not capture your own units
         List<Player> cabals = game.getRealPlayers().stream()
-                .filter(p -> p.hasUnit("cabal_flagship") || p.hasUnit("sigma_vuilraith_flagship_2"))
-                .toList();
+            .filter(p -> p.hasUnit("cabal_flagship") || p.hasUnit("sigma_vuilraith_flagship_2"))
+            .toList();
         List<Player> cabalsWithFs = new ArrayList<>();
         for (Player p : cabals) {
             // Flagship cannot capture itself
@@ -97,8 +99,8 @@ class CaptureUnitService {
             }
         }
         if (owner != game.getActivePlayer()
-                && game.getActivePlayer() != null
-                && !game.getActivePlayer().getAllianceMembers().contains(owner.getFaction())) {
+            && game.getActivePlayer() != null
+            && !game.getActivePlayer().getAllianceMembers().contains(owner.getFaction())) {
             playerOpponents.add(game.getActivePlayer());
         }
         return playerOpponents;

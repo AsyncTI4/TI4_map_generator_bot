@@ -25,9 +25,9 @@ public class TitlesHelper {
 
         Predicate<ManagedGame> thisPlayerIsInGame = game -> game.getPlayer(userId) != null;
         List<ManagedGame> games = GameManager.getManagedGames().stream()
-                .filter(thisPlayerIsInGame.and(ManagedGame::isHasEnded))
-                .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
-                .toList();
+            .filter(thisPlayerIsInGame.and(ManagedGame::isHasEnded))
+            .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
+            .toList();
 
         for (var managedGame : games) {
             var game = managedGame.getGame();
@@ -47,18 +47,18 @@ public class TitlesHelper {
         StringBuilder sb = new StringBuilder("**__").append(userName).append("'s Titles__**\n");
 
         Map<String, Integer> titles2 = titles.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+            .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         for (String title : titles2.keySet()) {
             sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
             if (gamesIncluded) {
                 sb.append("**")
-                        .append(title)
-                        .append("** x")
-                        .append(titles.get(title))
-                        .append(" (")
-                        .append(gameHistory.get(title))
-                        .append(")");
+                    .append(title)
+                    .append("** x")
+                    .append(titles.get(title))
+                    .append(" (")
+                    .append(gameHistory.get(title))
+                    .append(")");
             } else {
                 sb.append("**").append(title).append("** x").append(titles.get(title));
             }

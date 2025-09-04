@@ -36,8 +36,8 @@ public class CardsInfoService {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         sendVariousAdditionalButtons(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(
-                player,
-                """
+            player,
+            """
                 You may whisper to people from here by starting a message with `to[color]` or `to[faction]`.\
 
                 You may schedule a message to yourself (delivered at start of your next turn) by starting a message with `tofutureme`.\
@@ -58,12 +58,12 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("uydaiCommander", "Pay 1 Trade Good to Use Uydai Commander", FactionEmojis.uydai));
         }
         if (player.hasAbility("oracle_ai")
-                || player.getPromissoryNotesInPlayArea().contains("dspnauge")) {
+            || player.getPromissoryNotesInPlayArea().contains("dspnauge")) {
             buttons.add(Buttons.gray("initialPeak", "Peek At Next Objective", FactionEmojis.augers));
         }
         if (player.hasUnexhaustedLeader("mykomentoriagent")) {
             buttons.add(
-                    Buttons.gray("exhaustAgent_mykomentoriagent", "Use Myko-Mentori Agent", FactionEmojis.mykomentori));
+                Buttons.gray("exhaustAgent_mykomentoriagent", "Use Myko-Mentori Agent", FactionEmojis.mykomentori));
         }
         if (player.hasUnexhaustedLeader("hacanagent")) {
             buttons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
@@ -91,7 +91,7 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("freesystemsagent")) {
             buttons.add(Buttons.gray(
-                    "getAgentSelection_freesystemsagent", "Use Free Systems Agent", FactionEmojis.freesystems));
+                "getAgentSelection_freesystemsagent", "Use Free Systems Agent", FactionEmojis.freesystems));
         }
         if (player.hasUnexhaustedLeader("florzenagent")) {
             buttons.add(Buttons.gray("getAgentSelection_florzenagent", "Use Florzen Agent", FactionEmojis.florzen));
@@ -128,9 +128,9 @@ public class CardsInfoService {
         }
         if (player.hasAbility("laws_order") && !game.getLaws().isEmpty()) {
             buttons.add(Buttons.gray(
-                    player.getFinsFactionCheckerPrefix() + "useLawsOrder",
-                    "Pay To Ignore Laws",
-                    FactionEmojis.Keleres));
+                player.getFinsFactionCheckerPrefix() + "useLawsOrder",
+                "Pay To Ignore Laws",
+                FactionEmojis.Keleres));
         }
         if (player.hasAbility("military_industrial_complex")) {
             buttons.add(Buttons.gray("getAxisOrderReturns", "Un-Buy Axis Order (Fix Mistake)", FactionEmojis.axis));
@@ -149,7 +149,7 @@ public class CardsInfoService {
         }
         if (player.getPathTokenCounter() > 0) {
             buttons.add(
-                    Buttons.gray("redistributePath", "Redistribute 1 Command Token With Path", FactionEmojis.uydai));
+                Buttons.gray("redistributePath", "Redistribute 1 Command Token With Path", FactionEmojis.uydai));
         }
         if (player.hasAbility("prescience")) {
             buttons.add(Buttons.gray("listPath", "List How Many Path Tokens You Have", FactionEmojis.uydai));
@@ -180,7 +180,7 @@ public class CardsInfoService {
             buttons.add(Buttons.green("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw Action Card"));
         }
         if (player.hasTech("pa")
-                && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
+            && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
             buttons.add(Buttons.green("getPsychoButtons", "Use Psychoarcheology", TechEmojis.BioticTech));
         }
         if (player.hasUnexhaustedLeader("nekroagent")) {
@@ -188,27 +188,27 @@ public class CardsInfoService {
         }
         if (player.hasRelicReady("superweapongrom")) {
             buttons.add(Buttons.gray(
-                    "exhaustSuperweapon_grom", "Use Grom To Fire AFB Against Every Fighter", FactionEmojis.belkosea));
+                "exhaustSuperweapon_grom", "Use Grom To Fire AFB Against Every Fighter", FactionEmojis.belkosea));
         }
         if (player.hasRelicReady("superweaponmors")) {
             buttons.add(Buttons.gray(
-                    "exhaustSuperweapon_mors", "Use Mors to Damage Every Unit In System", FactionEmojis.belkosea));
+                "exhaustSuperweapon_mors", "Use Mors to Damage Every Unit In System", FactionEmojis.belkosea));
         }
         if (player.hasRelicReady("superweaponglatison")) {
             buttons.add(Buttons.gray(
-                    "exhaustSuperweapon_glatison", "Use Glatison To Repair Every Unit", FactionEmojis.belkosea));
+                "exhaustSuperweapon_glatison", "Use Glatison To Repair Every Unit", FactionEmojis.belkosea));
         }
         if (player.hasUnexhaustedLeader("vaylerianagent")) {
             buttons.add(Buttons.gray("exhaustAgent_vaylerianagent", "Use Vaylerian Agent", FactionEmojis.vaylerian));
         }
         if (player.ownsUnit("ghost_mech")
-                && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0
-                && !ButtonHelper.isLawInPlay(game, "articles_war")) {
+            && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0
+            && !ButtonHelper.isLawInPlay(game, "articles_war")) {
             buttons.add(Buttons.gray("creussMechStep1_", "Use Creuss Mech", FactionEmojis.Ghost));
         }
         if (player.ownsUnit("nivyn_mech2")
-                && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0
-                && !game.getLaws().containsKey("articles_war")) {
+            && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0
+            && !game.getLaws().containsKey("articles_war")) {
             buttons.add(Buttons.gray("nivynMechStep1_", "Use Nivyn Mech", FactionEmojis.nivyn));
         }
         if (player.hasUnexhaustedLeader("kolleccagent")) {
@@ -227,7 +227,7 @@ public class CardsInfoService {
         }
 
         if (player.hasAbility("divination")
-                && !ButtonHelperAbilities.getAllOmenDie(game).isEmpty()) {
+            && !ButtonHelperAbilities.getAllOmenDie(game).isEmpty()) {
             StringBuilder omenDice = new StringBuilder();
             for (int omenDie : ButtonHelperAbilities.getAllOmenDie(game)) {
                 omenDice.append(" ").append(omenDie);
@@ -269,14 +269,14 @@ public class CardsInfoService {
 
         // Refresh the various buttons if they're the last message in the thread
         player.getCardsInfoThread()
-                .retrieveMessageById(player.getCardsInfoThread().getLatestMessageId())
-                .queue(
-                        msg -> {
-                            if (msg != null && message.equals(msg.getContentRaw())) {
-                                msg.delete().queue();
-                            }
-                        },
-                        BotLogger::catchRestError);
+            .retrieveMessageById(player.getCardsInfoThread().getLatestMessageId())
+            .queue(
+                msg -> {
+                    if (msg != null && message.equals(msg.getContentRaw())) {
+                        msg.delete().queue();
+                    }
+                },
+                BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
 }

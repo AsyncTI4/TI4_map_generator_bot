@@ -47,7 +47,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
             return Optional.ofNullable(shortName).orElse(name);
         }
         return Optional.ofNullable(shortName)
-                .orElse(Mapper.getRelic(getHomebrewReplacesID().get()).getShortName());
+            .orElse(Mapper.getRelic(getHomebrewReplacesID().get()).getShortName());
     }
 
     public boolean getShrinkName() {
@@ -55,7 +55,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
             return Optional.ofNullable(shrinkName).orElse(false);
         }
         return Optional.ofNullable(shrinkName)
-                .orElse(Mapper.getRelic(getHomebrewReplacesID().get()).getShrinkName());
+            .orElse(Mapper.getRelic(getHomebrewReplacesID().get()).getShrinkName());
     }
 
     public Optional<String> getHomebrewReplacesID() {
@@ -107,9 +107,9 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
 
     public boolean search(String searchString) {
         return alias.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || text.toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
+            || name.toLowerCase().contains(searchString)
+            || text.toLowerCase().contains(searchString)
+            || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {

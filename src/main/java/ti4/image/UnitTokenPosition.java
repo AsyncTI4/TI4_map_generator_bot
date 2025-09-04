@@ -16,9 +16,10 @@ public class UnitTokenPosition implements Serializable {
 
     @JsonCreator
     public UnitTokenPosition(
-            @JsonProperty("unitHolderName") String unitHolderName,
-            @JsonProperty("coordinateMap") LinkedHashMap<String, List<Point>> coordinateMap,
-            @JsonProperty("removeUnitCoordinate") boolean removeUnitCoordinate) {
+        @JsonProperty("unitHolderName") String unitHolderName,
+        @JsonProperty("coordinateMap") LinkedHashMap<String, List<Point>> coordinateMap,
+        @JsonProperty("removeUnitCoordinate") boolean removeUnitCoordinate
+    ) {
         this.unitHolderName = unitHolderName;
         this.coordinateMap = coordinateMap;
         this.removeUnitCoordinate = removeUnitCoordinate;
@@ -65,9 +66,9 @@ public class UnitTokenPosition implements Serializable {
         List<Point> points = coordinateMap.get(unitAsyncID);
         if (points == null) {
             unitAsyncID = coordinateMap.keySet().stream()
-                    .filter(unitAsyncID::contains)
-                    .findFirst()
-                    .orElse(null); // TODO This is why Cavalry lands on Cruiser (id = "ca")
+                .filter(unitAsyncID::contains)
+                .findFirst()
+                .orElse(null); // TODO This is why Cavalry lands on Cruiser (id = "ca")
             if (unitAsyncID == null) {
                 return null;
             }

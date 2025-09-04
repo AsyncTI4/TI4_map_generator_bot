@@ -42,16 +42,14 @@ public class TransactionGenerator {
         int pnWidth = (int) (width * widthRatio);
         // Add player 1's color
         String pn1 = "pa_pn_color_" + Mapper.getColorID(p1.getColor()) + ".png";
-        BufferedImage color1 =
-                ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn1), pnWidth, pnHeight);
+        BufferedImage color1 = ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn1), pnWidth, pnHeight);
         g2.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
         g2.drawImage(color1, -1 * pnHeight, 0, null);
         g2.rotate(NINETY_DEGREES_RADIANS);
 
         // Add player 2's color
         String pn2 = "pa_pn_color_" + Mapper.getColorID(p2.getColor()) + ".png";
-        BufferedImage color2 =
-                ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn2), pnWidth, pnHeight);
+        BufferedImage color2 = ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn2), pnWidth, pnHeight);
         g2.rotate(NINETY_DEGREES_RADIANS);
         g2.drawImage(color2, height - pnHeight, -1 * width, null);
         g2.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
@@ -90,17 +88,15 @@ public class TransactionGenerator {
         if (p1.hasAbility("arbiters") || p2.hasAbility("arbiters")) {
             x += emojiSize + 5;
             drawEmojiWithCenteredInt(
-                    g2, CardEmojis.ActionCard, p1.getActionCards().size(), x, y);
+                g2, CardEmojis.ActionCard, p1.getActionCards().size(), x, y);
             drawEmojiWithCenteredInt(
-                    g2, CardEmojis.ActionCard, p2.getActionCards().size(), width - x - emojiSize, y);
+                g2, CardEmojis.ActionCard, p2.getActionCards().size(), width - x - emojiSize, y);
         }
 
         // Second Line, Frags
         // Frags
-        Function<String, Integer> p1fragcount = str ->
-                (int) p1.getFragments().stream().filter(f -> f.startsWith(str)).count();
-        Function<String, Integer> p2fragcount = str ->
-                (int) p2.getFragments().stream().filter(f -> f.startsWith(str)).count();
+        Function<String, Integer> p1fragcount = str -> (int) p1.getFragments().stream().filter(f -> f.startsWith(str)).count();
+        Function<String, Integer> p2fragcount = str -> (int) p2.getFragments().stream().filter(f -> f.startsWith(str)).count();
         y = 105;
         x = 5;
         drawEmojiWithCenteredInt(g2, ExploreEmojis.CFrag, p1fragcount.apply("crf"), x, y);
@@ -134,7 +130,8 @@ public class TransactionGenerator {
         TI4Emoji hero = LeaderEmojis.getLeaderEmoji(p1.getFaction() + "hero");
         if (MiscEmojis.goodDogs().contains(hero))
             DrawingUtil.drawEmoji(g2, hero, 210, 294, 200); // good doggies are smaller
-        else DrawingUtil.drawEmoji(g2, hero, 60, 294, 500);
+        else
+            DrawingUtil.drawEmoji(g2, hero, 60, 294, 500);
 
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
         for (Player player : List.of(p1, p2)) {
@@ -154,11 +151,11 @@ public class TransactionGenerator {
 
                 String thingToTransact = item.split("_")[2];
                 String furtherDetail = item.replace(
-                        item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
+                    item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
                 int amountToTransact = 1;
                 if ("frags".equalsIgnoreCase(thingToTransact)
-                        || (("PNs".equalsIgnoreCase(thingToTransact) || "ACs".equalsIgnoreCase(thingToTransact))
-                                && furtherDetail.contains("generic"))) {
+                    || (("PNs".equalsIgnoreCase(thingToTransact) || "ACs".equalsIgnoreCase(thingToTransact))
+                        && furtherDetail.contains("generic"))) {
                     amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
                     furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
                 }
@@ -256,11 +253,12 @@ public class TransactionGenerator {
 
     private static int totalMultilineHeight(Graphics2D g2, int numLines) {
         return g2.getFontMetrics().getAscent()
-                + (numLines - 1) * g2.getFontMetrics().getHeight();
+            + (numLines - 1) * g2.getFontMetrics().getHeight();
     }
 
     private static void drawStringMultilineVertCenter(
-            Graphics2D g2, String text, int x, int centerY, int width, HorizontalAlign hAlign) {
+        Graphics2D g2, String text, int x, int centerY, int width, HorizontalAlign hAlign
+    ) {
         int lineHeight = g2.getFontMetrics().getHeight();
         List<String> toDraw = DrawingUtil.layoutText(g2, text, width);
         int height = totalMultilineHeight(g2, toDraw.size());
@@ -272,7 +270,8 @@ public class TransactionGenerator {
     }
 
     private static int drawStringMultiLine(
-            Graphics2D g2, String text, int x, int y, int width, HorizontalAlign hAlign) {
+        Graphics2D g2, String text, int x, int y, int width, HorizontalAlign hAlign
+    ) {
         int lineHeight = g2.getFontMetrics().getHeight();
         List<String> toDraw = DrawingUtil.layoutText(g2, text, width);
         int deltaY = 0;
@@ -292,15 +291,15 @@ public class TransactionGenerator {
         g2.setFont(Storage.getFont32());
         if (amount != null)
             DrawingUtil.superDrawString(
-                    g2,
-                    "" + amount,
-                    x + 25,
-                    y + 25,
-                    Color.white,
-                    HorizontalAlign.Center,
-                    VerticalAlign.Center,
-                    stroke5,
-                    Color.black);
+                g2,
+                "" + amount,
+                x + 25,
+                y + 25,
+                Color.white,
+                HorizontalAlign.Center,
+                VerticalAlign.Center,
+                stroke5,
+                Color.black);
         g2.setFont(before);
     }
 }

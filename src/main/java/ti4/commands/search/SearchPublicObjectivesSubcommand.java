@@ -18,21 +18,20 @@ class SearchPublicObjectivesSubcommand extends SearchComponentModelSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        ComponentSource source =
-                ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
+        ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
         if (Mapper.isValidPublicObjective(searchString)) {
             event.getChannel()
-                    .sendMessageEmbeds(Mapper.getPublicObjective(searchString).getRepresentationEmbed(true))
-                    .queue();
+                .sendMessageEmbeds(Mapper.getPublicObjective(searchString).getRepresentationEmbed(true))
+                .queue();
             return;
         }
 
         List<MessageEmbed> messageEmbeds = Mapper.getPublicObjectives().values().stream()
-                .filter(model -> model.search(searchString, source))
-                .sorted(PublicObjectiveModel.sortByPointsAndName)
-                .map(model -> model.getRepresentationEmbed(true))
-                .toList();
+            .filter(model -> model.search(searchString, source))
+            .sorted(PublicObjectiveModel.sortByPointsAndName)
+            .map(model -> model.getRepresentationEmbed(true))
+            .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }
 }

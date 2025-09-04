@@ -12,6 +12,6 @@ public class ActionCardDeckService {
         game.shuffleActionCards();
         String playerRepresentation = player.getRepresentationNoPing();
         MessageHelper.sendMessageToChannel(
-                game.getActionsChannel(), playerRepresentation + " shuffled the action card deck.");
+            game.getActionsChannel(), playerRepresentation + " shuffled the action card deck.");
     }
 }

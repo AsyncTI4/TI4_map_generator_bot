@@ -20,7 +20,8 @@ public class ApplicationEmojiCacheService {
     public static List<CachedEmoji> readCachedEmojis() {
         List<CachedEmoji> cache = null;
         try {
-            cache = PersistenceManager.readObjectFromJsonFile("emojis.json", new TypeReference<>() {});
+            cache = PersistenceManager.readObjectFromJsonFile("emojis.json", new TypeReference<>() {
+            });
         } catch (Exception e) {
             BotLogger.error("Failed to read json data for EmojiCache.", e);
         }

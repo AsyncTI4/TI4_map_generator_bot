@@ -26,8 +26,7 @@ public class GameLaunchThreadHelper {
         if (threadChannel == null) {
             return;
         }
-        List<String> guildMemberIDs =
-                guild.getMembers().stream().map(ISnowflake::getId).toList();
+        List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
         for (String playerIds : game.getPlayerIDs()) {
             if (!guildMemberIDs.contains(playerIds)) {
                 return;
@@ -35,10 +34,10 @@ public class GameLaunchThreadHelper {
         }
         if (notify) {
             MessageHelper.sendMessageToChannel(
-                    game.getTableTalkChannel(),
-                    game.getPing() + " all users have now joined the server! Let the games begin!");
+                game.getTableTalkChannel(),
+                game.getPing() + " all users have now joined the server! Let the games begin!");
             MessageHelper.sendMessageToChannel(
-                    threadChannel, "All users have joined the game, this thread will now be closed.");
+                threadChannel, "All users have joined the game, this thread will now be closed.");
         }
         threadChannel.getManager().setArchived(true).queueAfter(5, TimeUnit.SECONDS);
     }

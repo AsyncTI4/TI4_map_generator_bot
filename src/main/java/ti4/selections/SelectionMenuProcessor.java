@@ -15,16 +15,15 @@ import ti4.service.game.GameNameService;
 
 public class SelectionMenuProcessor {
 
-    private static final Map<String, Consumer<SelectionMenuContext>> knownMenus =
-            AnnotationHandler.findKnownHandlers(SelectionMenuContext.class, SelectionHandler.class);
+    private static final Map<String, Consumer<SelectionMenuContext>> knownMenus = AnnotationHandler.findKnownHandlers(SelectionMenuContext.class, SelectionHandler.class);
 
     public static void queue(StringSelectInteractionEvent event) {
         String gameName = GameNameService.getGameNameFromChannel(event);
         ExecutorServiceManager.runAsync(
-                "SelectionMenuProcessor task for `" + gameName + "`",
-                gameName,
-                event.getMessageChannel(),
-                () -> process(event));
+            "SelectionMenuProcessor task for `" + gameName + "`",
+            gameName,
+            event.getMessageChannel(),
+            () -> process(event));
     }
 
     private static void process(StringSelectInteractionEvent event) {
@@ -36,7 +35,7 @@ public class SelectionMenuProcessor {
             }
         } catch (Exception e) {
             String message = "Selection Menu issue in event: " + event.getComponentId() + "\n> Channel: "
-                    + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
+                + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
             BotLogger.error(new LogOrigin(event), message, e);
         }
     }
@@ -99,7 +98,7 @@ public class SelectionMenuProcessor {
 
     public static String getSelectionMenuDebugText(StringSelectInteractionEvent event) {
         return "You selected:\n```\n" + "MenuID: "
-                + event.getComponentId() + "\n" + "Values: "
-                + event.getValues() + "\n" + "\n```";
+            + event.getComponentId() + "\n" + "Values: "
+            + event.getValues() + "\n" + "\n```";
     }
 }

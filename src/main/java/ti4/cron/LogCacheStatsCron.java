@@ -11,7 +11,7 @@ public class LogCacheStatsCron {
 
     public static void register() {
         CronManager.schedulePeriodically(
-                LogCacheStatsCron.class, LogCacheStatsCron::logCacheStats, 1, 4, TimeUnit.HOURS);
+            LogCacheStatsCron.class, LogCacheStatsCron::logCacheStats, 1, 4, TimeUnit.HOURS);
     }
 
     private static void logCacheStats() {

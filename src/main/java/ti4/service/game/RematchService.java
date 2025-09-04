@@ -48,12 +48,12 @@ public class RematchService {
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         TextChannel actionsChannel = game.getMainGameChannel();
         if ("The in-limbo PBD Archive"
-                        .equals(tableTalkChannel.getParentCategory().getName())
-                || "The in-limbo PBD Archive"
-                        .equals(actionsChannel.getParentCategory().getName())) {
+            .equals(tableTalkChannel.getParentCategory().getName())
+            || "The in-limbo PBD Archive"
+                .equals(actionsChannel.getParentCategory().getName())) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "These game channels are in the archive, so they cannot have a rematch created. Please create new game channels in the \"Making New Games\" forum channel in the HUB server");
+                event.getMessageChannel(),
+                "These game channels are in the archive, so they cannot have a rematch created. Please create new game channels in the \"Making New Games\" forum channel in the HUB server");
             return;
         }
 
@@ -94,18 +94,17 @@ public class RematchService {
         // ADD PLAYERS
         for (Player player : game.getPlayers().values()) {
             if (player.getFaction() != null
-                    && !"neutral".equals(player.getFaction())
-                    && !"null".equalsIgnoreCase(player.getFaction()))
+                && !"neutral".equals(player.getFaction())
+                && !"null".equalsIgnoreCase(player.getFaction()))
                 newGame.addPlayer(player.getUserID(), player.getUserName());
         }
         newGame.setPlayerCountForMap(newGame.getPlayers().size());
         newGame.setStrategyCardsPerPlayer(
-                newGame.getSCList().size() / newGame.getPlayers().size());
+            newGame.getSCList().size() / newGame.getPlayers().size());
 
         // CREATE CHANNELS
         String newGameName = game.getCustomName();
-        Matcher alreadyRematch =
-                Pattern.compile(" Rematch #" + RegexHelper.intRegex("num")).matcher(game.getCustomName());
+        Matcher alreadyRematch = Pattern.compile(" Rematch #" + RegexHelper.intRegex("num")).matcher(game.getCustomName());
         if (alreadyRematch.find()) {
             newGameName = newGameName.replace(alreadyRematch.group(), "");
             int prevMatch = Integer.parseInt(alreadyRematch.group("num"));
@@ -120,12 +119,11 @@ public class RematchService {
         String newBotThreadName = newName + Constants.BOT_CHANNEL_SUFFIX;
         newGame.setMainChannelID(actionsChannel.getId());
         actionsChannel
-                .retrievePinnedMessages()
-                .queue(msgs -> msgs.forEach(msg -> msg.getMessage().unpin().queue()), BotLogger::catchRestError);
+            .retrievePinnedMessages()
+            .queue(msgs -> msgs.forEach(msg -> msg.getMessage().unpin().queue()), BotLogger::catchRestError);
 
         // CREATE BOT/MAP THREAD
-        ThreadChannel botThread =
-                actionsChannel.createThreadChannel(newBotThreadName).complete();
+        ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName).complete();
         newGame.setBotMapUpdatesThreadID(botThread.getId());
         newGame.setUpPeakableObjectives(5, 1);
         newGame.setUpPeakableObjectives(5, 2);
@@ -133,15 +131,15 @@ public class RematchService {
 
         // INTRODUCTION TO BOT-MAP THREAD
         String botGetStartedMessage = gameRole.getAsMention() + " - bot/map channel\n"
-                + "This channel is for bot slash commands and updating the map, to help keep the actions channel clean.\n"
-                + "### __Use the following commands to get started:__\n"
-                + "> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n"
-                + "> `/player setup` to set player faction and color\n"
-                + "> `/game setup` to set player count and additional options\n"
-                + "> `/game set_order` to set the starting speaker order\n"
-                + "\n"
-                + "### __Other helpful commands:__\n"
-                + "> `/game replace` to replace a player in the game with a new one\n";
+            + "This channel is for bot slash commands and updating the map, to help keep the actions channel clean.\n"
+            + "### __Use the following commands to get started:__\n"
+            + "> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n"
+            + "> `/player setup` to set player faction and color\n"
+            + "> `/game setup` to set player count and additional options\n"
+            + "> `/game set_order` to set the starting speaker order\n"
+            + "\n"
+            + "### __Other helpful commands:__\n"
+            + "> `/game replace` to replace a player in the game with a new one\n";
         MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
         MessageHelper.sendMessageToChannelAndPin(botThread, "Website Live Map: https://asyncti4.com/game/" + newName);
 

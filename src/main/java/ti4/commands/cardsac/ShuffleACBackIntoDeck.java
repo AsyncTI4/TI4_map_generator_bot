@@ -14,12 +14,12 @@ class ShuffleACBackIntoDeck extends GameStateSubcommand {
 
     public ShuffleACBackIntoDeck() {
         super(
-                Constants.SHUFFLE_AC_BACK_INTO_DECK,
-                "Shuffle action card back into deck from the discard pile.",
-                true,
-                false);
+            Constants.SHUFFLE_AC_BACK_INTO_DECK,
+            "Shuffle action card back into deck from the discard pile.",
+            true,
+            false);
         addOptions(new OptionData(
-                        OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()")
+            OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()")
                 .setRequired(true));
     }
 
@@ -43,9 +43,9 @@ class ShuffleACBackIntoDeck extends GameStateSubcommand {
             return;
         }
         String sb = "Game: " + game.getName() + " " + "Player: "
-                + event.getUser().getName() + "\n" + "Card shuffled back into deck from discards: "
-                + Mapper.getActionCard(acID).getRepresentation()
-                + "\n";
+            + event.getUser().getName() + "\n" + "Card shuffled back into deck from discards: "
+            + Mapper.getActionCard(acID).getRepresentation()
+            + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
     }
 }

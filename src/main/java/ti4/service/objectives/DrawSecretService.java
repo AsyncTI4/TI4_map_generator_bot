@@ -32,11 +32,12 @@ public class DrawSecretService {
     }
 
     public static void drawSO(
-            GenericInteractionCreateEvent event, Game game, Player player, int count, boolean useTnelis) {
+        GenericInteractionCreateEvent event, Game game, Player player, int count, boolean useTnelis
+    ) {
         String output = " drew " + count + " secret objective" + (count > 1 ? "s" : "") + ".";
         if (useTnelis && player.hasAbility("plausible_deniability")) {
             output += "Drew a " + (count == 1 ? "second" : StringHelper.ordinal(count + 1))
-                    + " secret objective due to **Plausible Deniability**.";
+                + " secret objective due to **Plausible Deniability**.";
             count++;
         }
         List<String> idsDrawn = new ArrayList<>();
@@ -50,15 +51,15 @@ public class DrawSecretService {
         }
         if (event instanceof ButtonInteractionEvent bevent) {
             List<MessageEmbed> soEmbeds = idsDrawn.stream()
-                    .map(Mapper::getSecretObjective)
-                    .filter(Objects::nonNull)
-                    .map(SecretObjectiveModel::getRepresentationEmbed)
-                    .toList();
+                .map(Mapper::getSecretObjective)
+                .filter(Objects::nonNull)
+                .map(SecretObjectiveModel::getRepresentationEmbed)
+                .toList();
             bevent.getHook()
-                    .setEphemeral(true)
-                    .sendMessage("Drew the following secret objective(s):")
-                    .addEmbeds(soEmbeds)
-                    .queue();
+                .setEphemeral(true)
+                .sendMessage("Drew the following secret objective(s):")
+                .addEmbeds(soEmbeds)
+                .queue();
         }
     }
 
@@ -71,52 +72,51 @@ public class DrawSecretService {
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
                     MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentation()
-                                    + " due to **Plausible Deniability**, you were dealt an extra secret objective. Thus, you must also discard an extra secret objective.");
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                            + " due to **Plausible Deniability**, you were dealt an extra secret objective. Thus, you must also discard an extra secret objective.");
                 }
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event, game.getRound() == 1, false);
             }
         }
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                count + " " + CardEmojis.SecretObjective + " dealt to all players. Check your `#cards-info` threads.");
+            event.getMessageChannel(),
+            count + " " + CardEmojis.SecretObjective + " dealt to all players. Check your `#cards-info` threads.");
         if (game.getRound() == 1) {
             if (!game.isFowMode()) {
-                StringBuilder message =
-                        new StringBuilder("Here are the quick reference cards for the factions in this game.");
+                StringBuilder message = new StringBuilder("Here are the quick reference cards for the factions in this game.");
                 List<FileUpload> files = new ArrayList<>();
                 for (Player player : game.getRealPlayers()) {
                     String path = ResourceHelper.getResourceFromFolder(
-                            "quick_reference/", player.getFaction().toLowerCase() + ".png");
+                        "quick_reference/", player.getFaction().toLowerCase() + ".png");
                     if (path == null) {
                         message.append("\n- Could not get quick reference for ")
-                                .append(player.getFaction())
-                                .append(".");
+                            .append(player.getFaction())
+                            .append(".");
                     } else {
                         files.add(FileUploadService.createFileUpload(
-                                ImageHelper.read(path), player.getFaction() + "_ref"));
+                            ImageHelper.read(path), player.getFaction() + "_ref"));
                     }
                 }
                 if (!files.isEmpty() && files.size() <= 10) {
                     message.append(
-                            "\n-# A reminder that these reference cards are general overviews, and not specific mechanical text.");
+                        "\n-# A reminder that these reference cards are general overviews, and not specific mechanical text.");
                     MessageHelper.sendMessageWithFiles(
-                            game.getActionsChannel(), files, message.toString(), true, false);
+                        game.getActionsChannel(), files, message.toString(), true, false);
                 }
             }
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("startOfGameObjReveal", "Reveal Objectives and Start Strategy Phase"));
             MessageHelper.sendMessageToChannelWithButtons(
-                    game.getMainGameChannel(), "Press this button after everyone has discarded.", buttons);
+                game.getMainGameChannel(), "Press this button after everyone has discarded.", buttons);
             Player speaker = null;
             if (game.getPlayer(game.getSpeakerUserID()) != null) {
                 speaker = game.getPlayers().get(game.getSpeakerUserID());
             }
             if (speaker == null) {
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        "Speaker is not yet assigned. Secret objectives have been dealt, but please assign speaker soon (command is `/player speaker`).");
+                    event.getMessageChannel(),
+                    "Speaker is not yet assigned. Secret objectives have been dealt, but please assign speaker soon (command is `/player speaker`).");
             }
             Helper.setOrder(game);
         }

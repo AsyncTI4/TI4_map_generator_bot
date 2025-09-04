@@ -34,10 +34,10 @@ class SurveyResults extends Subcommand {
         });
 
         String result = "# __Survey Results__:\n" + generateQuestionResult("## Question #1: Whispers\n", question1Data)
-                + generateQuestionResult("## Question #2: Supports\n", question2Data)
-                + generateQuestionResult("## Question #3: How To Handle Rollback Disputes\n", question3Data)
-                + generateQuestionResult("## Question #4: Winmaking\n", question4Data)
-                + generateQuestionResult("## Question #5: Meta Preferences\n", question5Data);
+            + generateQuestionResult("## Question #2: Supports\n", question2Data)
+            + generateQuestionResult("## Question #3: How To Handle Rollback Disputes\n", question3Data)
+            + generateQuestionResult("## Question #4: Winmaking\n", question4Data)
+            + generateQuestionResult("## Question #5: Meta Preferences\n", question5Data);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
     }
@@ -48,8 +48,8 @@ class SurveyResults extends Subcommand {
 
     private String generateQuestionResult(String questionHeader, Map<String, Integer> data) {
         return questionHeader
-                + data.entrySet().stream()
-                        .map(entry -> "* " + entry.getKey() + ": " + entry.getValue() + "\n")
-                        .collect(Collectors.joining());
+            + data.entrySet().stream()
+                .map(entry -> "* " + entry.getKey() + ": " + entry.getValue() + "\n")
+                .collect(Collectors.joining());
     }
 }

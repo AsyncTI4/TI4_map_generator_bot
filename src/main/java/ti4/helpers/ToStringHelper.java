@@ -122,7 +122,7 @@ public class ToStringHelper {
                 }
 
                 if (value != null && value.getClass().isArray()) {
-                    Object[] objectArray = {value};
+                    Object[] objectArray = { value };
                     String arrayString = Arrays.deepToString(objectArray);
                     builder.append(arrayString, 1, arrayString.length() - 1);
                 } else {

@@ -41,7 +41,7 @@ public class CommanderDraftItem extends DraftItem {
         LeaderModel leader = getLeader();
         if (leader != null) {
             return "*" + leader.getAbilityWindow() + "* " + leader.getAbilityText() + " **Unlock:** "
-                    + leader.getUnlockCondition();
+                + leader.getUnlockCondition();
         }
         return "";
     }
@@ -67,8 +67,7 @@ public class CommanderDraftItem extends DraftItem {
         Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
         for (FactionModel faction : factions) {
             List<String> leaders = faction.getLeaders();
-            leaders.removeIf((String leader) ->
-                    !"commander".equals(allLeaders.get(leader).getType()));
+            leaders.removeIf((String leader) -> !"commander".equals(allLeaders.get(leader).getType()));
             for (String leader : leaders) {
                 allItems.add(generate(Category.COMMANDER, leader));
             }
@@ -88,8 +87,7 @@ public class CommanderDraftItem extends DraftItem {
         String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedLeaders"));
         for (FactionModel faction : factions) {
             List<String> leaders = faction.getLeaders();
-            leaders.removeIf((String leader) ->
-                    !"commander".equals(allLeaders.get(leader).getType()));
+            leaders.removeIf((String leader) -> !"commander".equals(allLeaders.get(leader).getType()));
             for (String leader : leaders) {
                 if (Arrays.asList(results).contains(leader)) {
                     continue;

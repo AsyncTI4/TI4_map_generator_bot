@@ -22,7 +22,7 @@ public class ParsedUnit {
         this.unitKey = unitKey;
         this.count = count;
         this.location = Constants.SPACE.equalsIgnoreCase(location)
-                ? Constants.SPACE
-                : AliasHandler.resolvePlanet(location.toLowerCase());
+            ? Constants.SPACE
+            : AliasHandler.resolvePlanet(location.toLowerCase());
     }
 }

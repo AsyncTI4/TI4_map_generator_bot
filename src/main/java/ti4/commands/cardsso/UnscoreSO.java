@@ -13,39 +13,39 @@ import ti4.service.info.SecretObjectiveInfoService;
 
 class UnscoreSO extends GameStateSubcommand {
 
-    public UnscoreSO() {
-        super(Constants.UNSCORE_SO, "Unscore Secret Objective", true, true);
-        addOptions(new OptionData(
+        public UnscoreSO() {
+                super(Constants.UNSCORE_SO, "Unscore Secret Objective", true, true);
+                addOptions(new OptionData(
                         OptionType.INTEGER,
                         Constants.SECRET_OBJECTIVE_ID,
                         "Scored secret objective ID, which is found between ()")
-                .setRequired(true)
-                .setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
-    }
-
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        Game game = getGame();
-        Player player = getPlayer();
-        int soId = event.getOption(Constants.SECRET_OBJECTIVE_ID).getAsInt();
-        boolean scored = game.unscoreSecretObjective(player.getUserID(), soId);
-        if (!scored) {
-            List<String> scoredSOs = player.getSecretsScored().entrySet().stream()
-                    .map(e -> "> (" + e.getValue() + ") "
-                            + SecretObjectiveInfoService.getSecretObjectiveRepresentationShort(e.getKey()))
-                    .toList();
-            StringBuilder sb = new StringBuilder(
-                    "Secret Objective ID found - please retry.\nYour current scored secret objectives are:\n");
-            scoredSOs.forEach(sb::append);
-            if (scoredSOs.isEmpty()) sb.append("> None");
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
-            return;
+                                .setRequired(true)
+                                .setAutoComplete(true));
+                addOptions(
+                        new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                                .setAutoComplete(true));
         }
 
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Unscored SO " + soId);
-        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
-    }
+        @Override
+        public void execute(SlashCommandInteractionEvent event) {
+                Game game = getGame();
+                Player player = getPlayer();
+                int soId = event.getOption(Constants.SECRET_OBJECTIVE_ID).getAsInt();
+                boolean scored = game.unscoreSecretObjective(player.getUserID(), soId);
+                if (!scored) {
+                        List<String> scoredSOs = player.getSecretsScored().entrySet().stream()
+                                .map(e -> "> (" + e.getValue() + ") "
+                                        + SecretObjectiveInfoService.getSecretObjectiveRepresentationShort(e.getKey()))
+                                .toList();
+                        StringBuilder sb = new StringBuilder(
+                                "Secret Objective ID found - please retry.\nYour current scored secret objectives are:\n");
+                        scoredSOs.forEach(sb::append);
+                        if (scoredSOs.isEmpty()) sb.append("> None");
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+                        return;
+                }
+
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Unscored SO " + soId);
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
+        }
 }

@@ -37,9 +37,9 @@ class ServerGameStats extends Subcommand {
         int roomForGames = 0;
 
         List<Guild> guilds = AsyncTI4DiscordBot.guilds.stream()
-                .filter(g -> !skipGuilds.contains(g.getId()))
-                .sorted(Comparator.comparing(Guild::getIdLong)) // Sort by creation date
-                .toList();
+            .filter(g -> !skipGuilds.contains(g.getId()))
+            .sorted(Comparator.comparing(Guild::getIdLong)) // Sort by creation date
+            .toList();
 
         Map<String, Integer> guildToGameCount = new HashMap<>();
 
@@ -48,13 +48,13 @@ class ServerGameStats extends Subcommand {
         }
 
         GameManager.getManagedGames().stream()
-                .map(ManagedGame::getMainGameChannel)
-                .filter(Objects::nonNull)
-                .distinct()
-                .filter(channel -> channel.getParentCategory() != null
-                        && !"The in-limbo PBD Archive"
-                                .equals(channel.getParentCategory().getName()))
-                .forEach(channel -> guildToGameCount.merge(channel.getGuild().getId(), 1, Integer::sum));
+            .map(ManagedGame::getMainGameChannel)
+            .filter(Objects::nonNull)
+            .distinct()
+            .filter(channel -> channel.getParentCategory() != null
+                && !"The in-limbo PBD Archive"
+                    .equals(channel.getParentCategory().getName()))
+            .forEach(channel -> guildToGameCount.merge(channel.getGuild().getId(), 1, Integer::sum));
 
         StringBuilder sb = new StringBuilder();
         sb.append("## __Server Game Statistics__\n");

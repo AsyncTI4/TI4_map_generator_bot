@@ -20,13 +20,13 @@ public class SabotageService {
         }
 
         if (player.hasUnit("empyrean_mech")
-                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Mech)
-                        .isEmpty()) {
+            && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Mech)
+                .isEmpty()) {
             return true;
         }
 
         if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
-                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
+            || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             return false;
         }
 
@@ -35,16 +35,16 @@ public class SabotageService {
 
     private static boolean allSabotagesAreDiscarded(Game game) {
         return game.getDiscardActionCards().containsKey("sabo1")
-                && game.getDiscardActionCards().containsKey("sabo2")
-                && game.getDiscardActionCards().containsKey("sabo3")
-                && game.getDiscardActionCards().containsKey("sabo4");
+            && game.getDiscardActionCards().containsKey("sabo2")
+            && game.getDiscardActionCards().containsKey("sabo3")
+            && game.getDiscardActionCards().containsKey("sabo4");
     }
 
     private static boolean allAcd2SabotagesAreDiscarded(Game game) {
         return game.getDiscardActionCards().containsKey("sabotage1_acd2")
-                && game.getDiscardActionCards().containsKey("sabotage2_acd2")
-                && game.getDiscardActionCards().containsKey("sabotage3_acd2")
-                && game.getDiscardActionCards().containsKey("sabotage4_acd2");
+            && game.getDiscardActionCards().containsKey("sabotage2_acd2")
+            && game.getDiscardActionCards().containsKey("sabotage3_acd2")
+            && game.getDiscardActionCards().containsKey("sabotage4_acd2");
     }
 
     public static boolean canSabotage(Player player, Game game) {
@@ -53,27 +53,26 @@ public class SabotageService {
         }
 
         if (player.hasUnit("empyrean_mech")
-                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Mech)
-                        .isEmpty()) {
+            && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Mech)
+                .isEmpty()) {
             return true;
         }
 
-        boolean bigAcDeckGame =
-                (game.getActionCardDeckSize() + game.getDiscardActionCards().size()) > 180;
+        boolean bigAcDeckGame = (game.getActionCardDeckSize() + game.getDiscardActionCards().size()) > 180;
         return (bigAcDeckGame || playerHasSabotage(player))
-                && !IsPlayerElectedService.isPlayerElected(game, player, "censure")
-                && !IsPlayerElectedService.isPlayerElected(game, player, "absol_censure");
+            && !IsPlayerElectedService.isPlayerElected(game, player, "censure")
+            && !IsPlayerElectedService.isPlayerElected(game, player, "absol_censure");
     }
 
     private static boolean playerHasSabotage(Player player) {
         return player.getActionCards().containsKey("sabo1")
-                || player.getActionCards().containsKey("sabo2")
-                || player.getActionCards().containsKey("sabo3")
-                || player.getActionCards().containsKey("sabo4")
-                || player.getActionCards().containsKey("sabotage_ds")
-                || player.getActionCards().containsKey("sabotage1_acd2")
-                || player.getActionCards().containsKey("sabotage2_acd2")
-                || player.getActionCards().containsKey("sabotage3_acd2")
-                || player.getActionCards().containsKey("sabotage4_acd2");
+            || player.getActionCards().containsKey("sabo2")
+            || player.getActionCards().containsKey("sabo3")
+            || player.getActionCards().containsKey("sabo4")
+            || player.getActionCards().containsKey("sabotage_ds")
+            || player.getActionCards().containsKey("sabotage1_acd2")
+            || player.getActionCards().containsKey("sabotage2_acd2")
+            || player.getActionCards().containsKey("sabotage3_acd2")
+            || player.getActionCards().containsKey("sabotage4_acd2");
     }
 }

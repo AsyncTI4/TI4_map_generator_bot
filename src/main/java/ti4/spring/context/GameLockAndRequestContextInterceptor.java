@@ -18,7 +18,8 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
 
     @Override
     public boolean preHandle(
-            @NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) {
+        @NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler
+    ) {
         String gameName = getGameNameFromUri(request);
         if (gameName == null) return true;
         if (!GameManager.isValid(gameName)) throw new InvalidGameNameException(gameName);
@@ -31,8 +32,7 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
     }
 
     private String getGameNameFromUri(HttpServletRequest request) {
-        Map<String, String> uriTemplateVars =
-                (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        Map<String, String> uriTemplateVars = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
         return uriTemplateVars.get("gameName");
     }
@@ -49,10 +49,11 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
 
     @Override
     public void afterCompletion(
-            @NotNull HttpServletRequest request,
-            @NotNull HttpServletResponse response,
-            @NotNull Object handler,
-            Exception exception) {
+        @NotNull HttpServletRequest request,
+        @NotNull HttpServletResponse response,
+        @NotNull Object handler,
+        Exception exception
+    ) {
         var game = RequestContext.getGame();
         if (game == null) return;
 

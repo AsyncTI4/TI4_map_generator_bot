@@ -12,17 +12,16 @@ import ti4.message.logging.BotLogger;
 import ti4.model.PublicObjectiveModel;
 
 public record Objective(
-        String key,
-        ti4.image.Objective.Type type,
-        Integer index,
-        Boolean revealed,
-        List<String> scoredPlayerIDs,
-        List<String> peekPlayerIDs) {
+    String key,
+    ti4.image.Objective.Type type,
+    Integer index,
+    Boolean revealed,
+    List<String> scoredPlayerIDs,
+    List<String> peekPlayerIDs
+) {
 
     public enum Type {
-        Stage1,
-        Stage2,
-        Custom
+        Stage1, Stage2, Custom
     }
 
     public static List<Objective> retrieve(Game game) {
@@ -59,10 +58,9 @@ public record Objective(
         return switch (type) {
             case Stage1 -> 1;
             case Stage2 -> 2;
-            case Custom ->
-                game.getCustomPublicVP().get(key) != null
-                        ? game.getCustomPublicVP().get(key)
-                        : 1;
+            case Custom -> game.getCustomPublicVP().get(key) != null
+                ? game.getCustomPublicVP().get(key)
+                : 1;
         };
     }
 
@@ -83,7 +81,7 @@ public record Objective(
         Integer worth = getWorth(game);
         if (revealed) {
             return String.format(
-                    "(%d) %s - %d VP", game.getRevealedPublicObjectives().get(key), name, worth);
+                "(%d) %s - %d VP", game.getRevealedPublicObjectives().get(key), name, worth);
         } else if (game.isRedTapeMode()) {
             return String.format("(%d) <Unrevealed> %s - %d VP", index, name, worth);
         }
@@ -96,29 +94,26 @@ public record Objective(
 
     private static Map<String, String> getCustomObjectives(Game game) {
         return game.getCustomPublicVP().keySet().stream()
-                .collect(Collectors.toMap(
-                        key -> key,
-                        name -> {
-                            name = name.replace("extra1", "");
-                            name = name.replace("extra2", "");
-                            String nameOfPO =
-                                    Mapper.getSecretObjectivesJustNames().get(name);
-                            return nameOfPO != null ? nameOfPO : name;
-                        },
-                        (key1, key2) -> key1,
-                        LinkedHashMap::new));
+            .collect(Collectors.toMap(
+                key -> key,
+                name -> {
+                    name = name.replace("extra1", "");
+                    name = name.replace("extra2", "");
+                    String nameOfPO = Mapper.getSecretObjectivesJustNames().get(name);
+                    return nameOfPO != null ? nameOfPO : name;
+                },
+                (key1, key2) -> key1,
+                LinkedHashMap::new));
     }
 
     private static List<String> getObjectiveList(Game game, Type type) {
         return switch (type) {
-            case Stage1 ->
-                game.getRevealedPublicObjectives().keySet().stream()
-                        .filter(Mapper.getPublicObjectivesStage1().keySet()::contains)
-                        .collect(Collectors.toList());
-            case Stage2 ->
-                game.getRevealedPublicObjectives().keySet().stream()
-                        .filter(Mapper.getPublicObjectivesStage2().keySet()::contains)
-                        .collect(Collectors.toList());
+            case Stage1 -> game.getRevealedPublicObjectives().keySet().stream()
+                .filter(Mapper.getPublicObjectivesStage1().keySet()::contains)
+                .collect(Collectors.toList());
+            case Stage2 -> game.getRevealedPublicObjectives().keySet().stream()
+                .filter(Mapper.getPublicObjectivesStage2().keySet()::contains)
+                .collect(Collectors.toList());
             case Custom -> getCustomObjectives(game).keySet().stream().toList();
         };
     }
@@ -127,7 +122,7 @@ public record Objective(
         Integer index = 1;
         for (String key : getObjectiveList(game, type)) {
             objectives.add(new Objective(
-                    key, type, index, Boolean.TRUE, getScoredPlayerIDs(game, key), getPeekPlayerIDs(game, key)));
+                key, type, index, Boolean.TRUE, getScoredPlayerIDs(game, key), getPeekPlayerIDs(game, key)));
             index++;
         }
     }
@@ -144,7 +139,7 @@ public record Objective(
 
         for (String key : inputList) {
             objectives.add(new Objective(
-                    key, type, index, Boolean.FALSE, getScoredPlayerIDs(game, key), getPeekPlayerIDs(game, key)));
+                key, type, index, Boolean.FALSE, getScoredPlayerIDs(game, key), getPeekPlayerIDs(game, key)));
             index++;
         }
     }

@@ -15,7 +15,7 @@ class RemoveCustomAdjacentTile extends GameStateSubcommand {
     public RemoveCustomAdjacentTile() {
         super(Constants.REMOVE_CUSTOM_ADJACENT_TILES, "Remove Custom Adjacent Tiles.", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PRIMARY_TILE, "Primary Tiles or ALL to remove all")
-                .setRequired(true));
+            .setRequired(true));
     }
 
     @Override

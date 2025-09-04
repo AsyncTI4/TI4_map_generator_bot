@@ -60,8 +60,8 @@ public class AddTileListService {
 
         if (!badTiles.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "There were some bad tiles that were replaced with gray tiles: " + badTiles + "\n");
+                event.getMessageChannel(),
+                "There were some bad tiles that were replaced with gray tiles: " + badTiles + "\n");
         }
 
         finishSetup(game, event);
@@ -113,17 +113,17 @@ public class AddTileListService {
         if (!game.isBaseGameMode()) {
             AddFrontierTokensService.addFrontierTokens(event, game);
             MessageHelper.sendMessageToChannel(
-                    channel, ExploreEmojis.Frontier + " frontier tokens have been added to empty spaces.");
+                channel, ExploreEmojis.Frontier + " frontier tokens have been added to empty spaces.");
         }
         if (!game.isOrdinianC1Mode() && !game.isLiberationC4Mode()) {
             MessageHelper.sendMessageToChannelWithButtons(
-                    game.getMainGameChannel(),
-                    "Press this button after every player is setup.",
-                    List.of(Buttons.green(
-                            "deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt)));
+                game.getMainGameChannel(),
+                "Press this button after every player is setup.",
+                List.of(Buttons.green(
+                    "deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt)));
 
             if (!game.isFowMode()
-                    && game.getRealPlayers().size() < game.getPlayers().size()) {
+                && game.getRealPlayers().size() < game.getPlayers().size()) {
                 ButtonHelper.offerPlayerSetupButtons(channel, game);
             }
         }
@@ -132,14 +132,14 @@ public class AddTileListService {
     public static Modal buildMapStringModal(Game game, String modalId) {
         String fieldId = "mapString";
         TextInput tags = TextInput.create(fieldId, TextInputStyle.PARAGRAPH)
-                .setPlaceholder("Paste the map string here.")
-                .setValue(game.getMapString()
-                        .substring(0, Math.min(game.getMapString().length(), 4000)))
-                .setRequired(true)
-                .build();
+            .setPlaceholder("Paste the map string here.")
+            .setValue(game.getMapString()
+                .substring(0, Math.min(game.getMapString().length(), 4000)))
+            .setRequired(true)
+            .build();
         return Modal.create(modalId, "Add Map String for " + game.getName())
-                .addComponents(Label.of("Enter Map String", tags))
-                .build();
+            .addComponents(Label.of("Enter Map String", tags))
+            .build();
     }
 
     @ModalHandler("addMapString")

@@ -22,18 +22,18 @@ public class EndOldGamesCron {
 
     public static void register() {
         CronManager.schedulePeriodicallyAtTime(
-                EndOldGamesCron.class, EndOldGamesCron::endOldGames, 2, 0, ZoneId.of("America/New_York"));
+            EndOldGamesCron.class, EndOldGamesCron::endOldGames, 2, 0, ZoneId.of("America/New_York"));
     }
 
     private static void endOldGames() {
         BotLogger.logCron("Running EndOldGamesCron.");
         try {
             GameManager.getManagedGames().stream()
-                    .filter(not(ManagedGame::isHasEnded))
-                    .map(ManagedGame::getName)
-                    .forEach(gameName -> ExecutionLockManager.wrapWithLockAndRelease(
-                                    gameName, ExecutionLockManager.LockType.WRITE, () -> endIfOld(gameName))
-                            .run());
+                .filter(not(ManagedGame::isHasEnded))
+                .map(ManagedGame::getName)
+                .forEach(gameName -> ExecutionLockManager.wrapWithLockAndRelease(
+                    gameName, ExecutionLockManager.LockType.WRITE, () -> endIfOld(gameName))
+                    .run());
         } catch (Exception e) {
             BotLogger.error("**Error ending inactive games!**", e);
         }
@@ -43,14 +43,14 @@ public class EndOldGamesCron {
     private void endIfOld(String gameName) {
         Game game = GameManager.getManagedGame(gameName).getGame();
         LocalDate lastModifiedDate = Instant.ofEpochMilli(game.getLastModifiedDate())
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate();
 
         LocalDate oldestLastModifiedDateBeforeEnding = LocalDate.now().minus(AUTOMATIC_GAME_END_INACTIVITY_THRESHOLD);
 
         if (lastModifiedDate.isBefore(oldestLastModifiedDateBeforeEnding)) {
             BotLogger.info("Game: " + game.getName() + " has not been modified since ~" + lastModifiedDate
-                    + " - the game flag `hasEnded` has been set to true");
+                + " - the game flag `hasEnded` has been set to true");
             // TODO: It'd be better if we could just call EndGameService
             game.setHasEnded(true);
             game.setEndedDate(System.currentTimeMillis());

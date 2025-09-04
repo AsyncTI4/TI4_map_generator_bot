@@ -60,9 +60,9 @@ public class DateTimeHelper {
         // sb.append(String.format("%02dm:", minutes));
 
         return String.format("%02ds:", totalSeconds)
-                + String.format("%03d:", milliSeconds)
-                + String.format("%03d:", microSeconds)
-                + String.format("%03d", nanoSeconds);
+            + String.format("%03d:", milliSeconds)
+            + String.format("%03d:", microSeconds)
+            + String.format("%03d", nanoSeconds);
     }
 
     public static String getCurrentTimestamp() {

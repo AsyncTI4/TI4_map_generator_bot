@@ -36,12 +36,12 @@ class SystemInfo extends GameStateSubcommand {
     public SystemInfo() {
         super(Constants.SYSTEM_INFO, "Info for system (all units)", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(
-                OptionType.INTEGER,
-                Constants.EXTRA_RINGS,
-                "Show additional rings around the selected system for context (Max 2)"));
+            OptionType.INTEGER,
+            Constants.EXTRA_RINGS,
+            "Show additional rings around the selected system for context (Max 2)"));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_2, "System/Tile name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_3, "System/Tile name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_4, "System/Tile name").setAutoComplete(true));
@@ -72,14 +72,14 @@ class SystemInfo extends GameStateSubcommand {
             Tile tile = TileHelper.getTile(event, tileID, game);
             if (tile == null) {
                 MessageHelper.sendMessageToChannel(
-                        event.getChannel(), "Tile " + tileOption.getAsString() + " not found");
+                    event.getChannel(), "Tile " + tileOption.getAsString() + " not found");
                 continue;
             }
             if (game.isFowMode()
-                    && !getPlayer().isGM()
-                    && !FoWHelper.getTilePositionsToShow(game, getPlayer()).contains(tile.getPosition())) {
+                && !getPlayer().isGM()
+                && !FoWHelper.getTilePositionsToShow(game, getPlayer()).contains(tile.getPosition())) {
                 MessageHelper.sendMessageToChannel(
-                        event.getChannel(), "You have no visibility to " + tile.getPosition() + ".");
+                    event.getChannel(), "You have no visibility to " + tile.getPosition() + ".");
                 continue;
             }
             String tileName = tile.getTilePath();
@@ -100,9 +100,9 @@ class SystemInfo extends GameStateSubcommand {
                 if (unitHolder instanceof Planet planet) {
                     sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(representation, game));
                     sb.append(" Resources: ")
-                            .append(planet.getResources())
-                            .append("/")
-                            .append(planet.getInfluence());
+                        .append(planet.getResources())
+                        .append("/")
+                        .append(planet.getInfluence());
                 } else {
                     sb.append(representation);
                 }
@@ -160,15 +160,14 @@ class SystemInfo extends GameStateSubcommand {
                     if (unitModel != null) {
                         sb.append(unitModel.getUnitEmoji()).append(" ");
                         sb.append(privateGame ? unitModel.getBaseType() : unitModel.getName())
-                                .append("\n");
+                            .append("\n");
                     } else {
                         sb.append(unitKey).append("\n");
                     }
                 }
                 sb.append("----------\n");
             }
-            FileUpload systemWithContext =
-                    new TileGenerator(game, event, null, context, tile.getPosition()).createFileUpload();
+            FileUpload systemWithContext = new TileGenerator(game, event, null, context, tile.getPosition()).createFileUpload();
             MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
             MessageHelper.sendMessageWithFile(event.getChannel(), systemWithContext, "System", false);
             if (game.isFowMode()) {
@@ -180,26 +179,24 @@ class SystemInfo extends GameStateSubcommand {
                 }
                 List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, game, tile);
                 if (!players.isEmpty()
-                        && !player.getAllianceMembers().contains(players.get(0).getFaction())
-                        && FoWHelper.playerHasShipsInSystem(player, tile)) {
+                    && !player.getAllianceMembers().contains(players.get(0).getFaction())
+                    && FoWHelper.playerHasShipsInSystem(player, tile)) {
                     Player player2 = players.get(0);
                     if (player2 == player) {
                         player2 = players.get(1);
                     }
                     List<Button> buttons = StartCombatService.getGeneralCombatButtons(
-                            game, tile.getPosition(), player, player2, "space");
+                        game, tile.getPosition(), player, player2, "space");
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
                     return;
                 } else {
                     for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                         if (unitHolder instanceof Planet) {
                             if (ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName())
-                                            .size()
-                                    > 1) {
-                                List<Player> listP =
-                                        ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
+                                .size() > 1) {
+                                List<Player> listP = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
                                 List<Button> buttons = StartCombatService.getGeneralCombatButtons(
-                                        game, tile.getPosition(), listP.get(0), listP.get(1), "ground");
+                                    game, tile.getPosition(), listP.get(0), listP.get(1), "ground");
                                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
                                 return;
                             }
@@ -222,10 +219,10 @@ class SystemInfo extends GameStateSubcommand {
                 sb.append(" (").append(color).append(") ");
             } else {
                 sb.append(player.getFactionEmoji())
-                        .append(" ")
-                        .append(" (")
-                        .append(color)
-                        .append(") ");
+                    .append(" ")
+                    .append(" (")
+                    .append(color)
+                    .append(") ");
             }
         }
     }

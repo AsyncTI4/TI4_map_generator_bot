@@ -44,10 +44,10 @@ class GeneratePainBoxMapString extends GameStateSubcommand {
         int supernovas = event.getOption(Constants.SUPERNOVAS, 0, OptionMapping::getAsInt);
         String fixedTiles = event.getOption(Constants.TILE_LIST, "", OptionMapping::getAsString);
         List<String> fixedTilesList = fixedTiles.isEmpty()
-                ? new ArrayList<>()
-                : Arrays.stream(COMMA_OR_WHITESPACE_PATTERN.split(fixedTiles))
-                        .map(String::trim)
-                        .toList();
+            ? new ArrayList<>()
+            : Arrays.stream(COMMA_OR_WHITESPACE_PATTERN.split(fixedTiles))
+                .map(String::trim)
+                .toList();
 
         List<String> tileList = new ArrayList<>();
         tileList.add("18");
@@ -58,10 +58,10 @@ class GeneratePainBoxMapString extends GameStateSubcommand {
 
         if (supernovas > 0) {
             List<TileModel> allSupernovas = AddTileService.availableTiles(
-                            AddTileService.getSources(game, true), RandomOption.R, new HashSet<>(), new ArrayList<>())
-                    .stream()
-                    .filter(TileModel::isSupernova)
-                    .collect(Collectors.toList());
+                AddTileService.getSources(game, true), RandomOption.R, new HashSet<>(), new ArrayList<>())
+                .stream()
+                .filter(TileModel::isSupernova)
+                .collect(Collectors.toList());
             for (int i = 0; i < supernovas; i++) {
                 Collections.shuffle(allSupernovas);
                 TileModel sn = allSupernovas.getFirst();

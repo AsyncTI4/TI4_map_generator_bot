@@ -14,10 +14,10 @@ class RelicReady extends GameStateSubcommand {
     public RelicReady() {
         super(Constants.RELIC_REFRESH, "Ready a relic", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to be readied")
-                .setAutoComplete(true)
-                .setRequired(true));
+            .setAutoComplete(true)
+            .setRequired(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override

@@ -12,16 +12,16 @@ class InitTspmap extends GameStateSubcommand {
 
     public InitTspmap() {
         super(
-                Constants.INIT_TSPMAP,
-                "Initialize the map to have the hyperlanes and edge adjacencies of Tispoon's endless map layout",
-                true,
-                false);
+            Constants.INIT_TSPMAP,
+            "Initialize the map to have the hyperlanes and edge adjacencies of Tispoon's endless map layout",
+            true,
+            false);
         addOption(
-                OptionType.STRING,
-                Constants.CONFIRM,
-                "Type 'YES' to confirm. This command can erase tiles",
-                true,
-                false);
+            OptionType.STRING,
+            Constants.CONFIRM,
+            "Type 'YES' to confirm. This command can erase tiles",
+            true,
+            false);
     }
 
     @Override

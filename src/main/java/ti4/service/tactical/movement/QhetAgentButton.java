@@ -11,9 +11,9 @@ import ti4.service.tactical.MoveContext;
 public final class QhetAgentButton implements MoveAbilityButton {
     public boolean enabled(MoveContext ctx) {
         return ctx.player.hasUnexhaustedLeader("qhetagent")
-                && ctx.active != null
-                && !ctx.active.isHomeSystem(ctx.game)
-                && FoWHelper.otherPlayersHaveShipsInSystem(ctx.player, ctx.active, ctx.game);
+            && ctx.active != null
+            && !ctx.active.isHomeSystem(ctx.game)
+            && FoWHelper.otherPlayersHaveShipsInSystem(ctx.player, ctx.active, ctx.game);
     }
 
     public List<Button> build(MoveContext ctx) {

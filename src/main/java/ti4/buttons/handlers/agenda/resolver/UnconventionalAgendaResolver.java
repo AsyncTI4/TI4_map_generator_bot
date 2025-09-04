@@ -24,7 +24,7 @@ public class UnconventionalAgendaResolver implements AgendaResolver {
                 ActionCardHelper.discardRandomAC(event, game, playerWL, playerWL.getAc());
             }
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Discarded the action cards of those who voted \"For\".");
+                game.getMainGameChannel(), "Discarded the action cards of those who voted \"For\".");
         } else {
             winOrLose = AgendaHelper.getWinningVoters(winner, game);
             for (Player playerWL : winOrLose) {
@@ -37,9 +37,9 @@ public class UnconventionalAgendaResolver implements AgendaResolver {
                         game.drawActionCard(playerWL.getUserID());
                         ActionCardHelper.sendActionCardInfo(game, playerWL, event);
                         MessageHelper.sendMessageToChannelWithButtons(
-                                playerWL.getCardsInfoThread(),
-                                playerWL.getRepresentationUnfogged() + ", please discard an action card.",
-                                ActionCardHelper.getDiscardActionCardButtons(playerWL, false));
+                            playerWL.getCardsInfoThread(),
+                            playerWL.getRepresentationUnfogged() + ", please discard an action card.",
+                            ActionCardHelper.getDiscardActionCardButtons(playerWL, false));
                     } else {
                         ActionCardHelper.sendActionCardInfo(game, playerWL, event);
                     }
@@ -48,7 +48,7 @@ public class UnconventionalAgendaResolver implements AgendaResolver {
                 ti4.helpers.ButtonHelper.checkACLimit(game, playerWL);
             }
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Drew 2 action cards for each of the players who voted \"For\".");
+                game.getMainGameChannel(), "Drew 2 action cards for each of the players who voted \"For\".");
         }
     }
 }

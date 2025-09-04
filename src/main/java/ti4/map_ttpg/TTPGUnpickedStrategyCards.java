@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"Leadership", "Technology", "Trade", "Imperial", "Diplomacy", "Warfare", "Construction", "Politics"
+@JsonPropertyOrder({ "Leadership", "Technology", "Trade", "Imperial", "Diplomacy", "Warfare", "Construction", "Politics"
 })
 public class TTPGUnpickedStrategyCards {
 

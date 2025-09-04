@@ -19,8 +19,8 @@ class NewPlayerInfo extends Subcommand {
 
     private static void sendNewPlayerInfoText(GenericInteractionCreateEvent event) {
         MessageHelper.sendMessageToThread(
-                event.getMessageChannel(),
-                "Info for Players new to AsyncTI4",
-                CreateGameService.getNewPlayerInfoText());
+            event.getMessageChannel(),
+            "Info for Players new to AsyncTI4",
+            CreateGameService.getNewPlayerInfoText());
     }
 }

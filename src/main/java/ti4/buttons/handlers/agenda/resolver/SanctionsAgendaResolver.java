@@ -20,7 +20,7 @@ public class SanctionsAgendaResolver implements AgendaResolver {
                 ActionCardHelper.discardRandomAC(event, game, playerWL, 1);
             }
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Discarded 1 random action card from each player's hand.");
+                game.getMainGameChannel(), "Discarded 1 random action card from each player's hand.");
         } else {
             for (Player playerWL : game.getRealPlayers()) {
                 ButtonHelper.checkACLimit(game, playerWL);

@@ -40,7 +40,7 @@ public class MessageListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()
-                || !AsyncTI4DiscordBot.isValidGuild(event.getGuild().getId())) {
+            || !AsyncTI4DiscordBot.isValidGuild(event.getGuild().getId())) {
             return;
         }
 
@@ -51,7 +51,7 @@ public class MessageListener extends ListenerAdapter {
         }
 
         ExecutorServiceManager.runAsync(
-                "MessageListener task", EXECUTION_TIME_WARNING_THRESHOLD_SECONDS, () -> processMessage(event, message));
+            "MessageListener task", EXECUTION_TIME_WARNING_THRESHOLD_SECONDS, () -> processMessage(event, message));
     }
 
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
@@ -68,13 +68,12 @@ public class MessageListener extends ListenerAdapter {
                 }
             }
             if ("572698679618568193".equalsIgnoreCase(event.getAuthor().getId())) {
-                TextChannel deletionLogChannel =
-                        AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
-                                .findFirst()
-                                .orElse(null);
+                TextChannel deletionLogChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
+                    .findFirst()
+                    .orElse(null);
                 if (deletionLogChannel == null) return;
                 String msg = "Message from dicecord: " + message.getContentRaw() + " " + message.getContentStripped()
-                        + " " + message.getContentDisplay() + " \nHere: " + message.getJumpUrl();
+                    + " " + message.getContentDisplay() + " \nHere: " + message.getJumpUrl();
                 if (!message.getComponents().isEmpty()) {
                     msg += "\n" + message.getComponents().getFirst().getType().name();
                 }
@@ -88,9 +87,9 @@ public class MessageListener extends ListenerAdapter {
             handleFogOfWarCombatThreadMirroring(event);
         } catch (Exception e) {
             BotLogger.error(
-                    "`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> "
-                            + event.getMessage().getJumpUrl(),
-                    e);
+                "`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> "
+                    + event.getMessage().getJumpUrl(),
+                e);
         }
     }
 
@@ -116,8 +115,8 @@ public class MessageListener extends ListenerAdapter {
             return false;
         }
         message.reply(
-                        "to explore strange new maps; to seek out new tiles and new factions\nhttps://discord.gg/RZ7qg9kbVZ")
-                .queue();
+            "to explore strange new maps; to seek out new tiles and new factions\nhttps://discord.gg/RZ7qg9kbVZ")
+            .queue();
         return true;
     }
 
@@ -130,11 +129,11 @@ public class MessageListener extends ListenerAdapter {
             return false;
         }
         String msg2 = lfgRole.getAsMention()
-                + " this game is looking for more members (it's old if it has -launched [FULL] in its title) "
-                + message.getJumpUrl();
+            + " this game is looking for more members (it's old if it has -launched [FULL] in its title) "
+            + message.getJumpUrl();
         TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("lfg-pings", true).stream()
-                .findFirst()
-                .orElse(null);
+            .findFirst()
+            .orElse(null);
         MessageHelper.sendMessageToChannel(lfgPings, msg2);
         return true;
     }
@@ -150,10 +149,10 @@ public class MessageListener extends ListenerAdapter {
         Game game = GameManager.getManagedGame(gameName).getGame();
         Player player = getPlayer(event, game);
         RoundSummaryHelper.storeEndOfRoundSummary(
-                game, player, messageBeginning, messageContent, true, event.getChannel());
+            game, player, messageBeginning, messageContent, true, event.getChannel());
         GameManager.save(
-                game,
-                "End of round summary."); // TODO: We should be locking since we're saving. Convert to ListenerContext?
+            game,
+            "End of round summary."); // TODO: We should be locking since we're saving. Convert to ListenerContext?
         return true;
     }
 
@@ -174,9 +173,9 @@ public class MessageListener extends ListenerAdapter {
 
         // Prevent whispers from fow combat threads
         if (game.isFowMode()
-                && event.getChannel() instanceof ThreadChannel
-                && event.getChannel().getName().contains("vs")
-                && event.getChannel().getName().contains("private")) {
+            && event.getChannel() instanceof ThreadChannel
+            && event.getChannel().getName().contains("vs")
+            && event.getChannel().getName().contains("private")) {
             return false;
         }
 
@@ -187,13 +186,13 @@ public class MessageListener extends ListenerAdapter {
 
         String messageLowerCase = messageText.toLowerCase();
         String receivingColorOrFaction = PATTERN.matcher(StringUtils.substringBetween(messageLowerCase, "to", " "))
-                .replaceAll("");
+            .replaceAll("");
 
         if ("futureme".equals(receivingColorOrFaction)) {
             whisperToFutureMe(event, game, sender);
             GameManager.save(
-                    game,
-                    "Whisper to future by " + sender.getUserName()); // TODO: We should be locking since we're saving
+                game,
+                "Whisper to future by " + sender.getUserName()); // TODO: We should be locking since we're saving
             return true;
         }
 
@@ -217,7 +216,7 @@ public class MessageListener extends ListenerAdapter {
         Player receiver = null;
         for (Player player : game.getRealPlayers()) {
             if (Objects.equals(receivingColorOrFaction, player.getFaction())
-                    || Objects.equals(receivingColorOrFaction, player.getColor())) {
+                || Objects.equals(receivingColorOrFaction, player.getColor())) {
                 receiver = player;
                 break;
             }
@@ -232,7 +231,7 @@ public class MessageListener extends ListenerAdapter {
             whisperToFutureColorOrFaction(event, game, messageContent, sender, receiver);
         } else {
             WhisperService.sendWhisper(
-                    game, sender, receiver, messageContent, "n", event.getChannel(), event.getGuild());
+                game, sender, receiver, messageContent, "n", event.getChannel(), event.getGuild());
             message.delete().queue();
         }
         GameManager.save(game, "Whisper"); // TODO: We should be locking since we're saving
@@ -240,14 +239,15 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private static void whisperToFutureColorOrFaction(
-            MessageReceivedEvent event, Game game, String messageContent, Player sender, Player receiver) {
+        MessageReceivedEvent event, Game game, String messageContent, Player sender, Player receiver
+    ) {
         String futureMsgKey = "futureMessageFor_" + receiver.getFaction() + "_" + sender.getFaction();
         game.setStoredValue(futureMsgKey, game.getStoredValue(futureMsgKey) + "\n\n" + messageContent);
         MessageHelper.sendMessageToChannel(
-                event.getChannel(), sender.getFactionEmoji() + " sent someone else a future message");
+            event.getChannel(), sender.getFactionEmoji() + " sent someone else a future message");
         MessageHelper.sendMessageToPlayerCardsInfoThread(
-                sender,
-                "You sent a future message to " + receiver.getRepresentationNoPing() + ":\n>>> " + messageContent);
+            sender,
+            "You sent a future message to " + receiver.getRepresentationNoPing() + ":\n>>> " + messageContent);
         event.getMessage().delete().queue();
     }
 
@@ -260,21 +260,21 @@ public class MessageListener extends ListenerAdapter {
         }
         game.setStoredValue("futureMessageFor" + player.getFaction(), previousThoughts + messageContent);
         MessageHelper.sendMessageToChannel(
-                event.getChannel(), player.getFactionEmoji() + " sent themselves a future message");
+            event.getChannel(), player.getFactionEmoji() + " sent themselves a future message");
         MessageHelper.sendMessageToPlayerCardsInfoThread(
-                player, "You sent yourself a future message:\n>>> " + messageContent);
+            player, "You sent yourself a future message:\n>>> " + messageContent);
         event.getMessage().delete().queue();
     }
 
     private static boolean addFactionEmojiReactionsToMessages(MessageReceivedEvent event, String gameName) {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame.getGame().isHiddenAgendaMode()
-                && managedGame.getGame().getPhaseOfGame().toLowerCase().contains("agenda")) {
+            && managedGame.getGame().getPhaseOfGame().toLowerCase().contains("agenda")) {
             Player player = getPlayer(event, managedGame.getGame());
             if (player == null
-                    || !player.isRealPlayer()
-                    || event.getChannel().getId().equals(player.getCardsInfoThreadID())
-                    || managedGame.isFowMode() && event.getChannel().equals(player.getPrivateChannel())) {
+                || !player.isRealPlayer()
+                || event.getChannel().getId().equals(player.getCardsInfoThreadID())
+                || managedGame.isFowMode() && event.getChannel().equals(player.getPrivateChannel())) {
                 return false;
             }
             if (!player.isSpeaker()) {
@@ -285,7 +285,7 @@ public class MessageListener extends ListenerAdapter {
             }
         }
         if (!managedGame.isFactionReactMode() && !managedGame.isColorReactMode() && !managedGame.isStratReactMode()
-                || managedGame.isFowMode()) {
+            || managedGame.isFowMode()) {
             return false;
         }
         Game game = managedGame.getGame();
@@ -296,10 +296,10 @@ public class MessageListener extends ListenerAdapter {
         try {
             event.getChannel().getHistory().retrievePast(2).queue(messages -> {
                 if (messages.size() == 2
-                        && !event.getMessage()
-                                .getAuthor()
-                                .getId()
-                                .equalsIgnoreCase(messages.get(1).getAuthor().getId())) {
+                    && !event.getMessage()
+                        .getAuthor()
+                        .getId()
+                        .equalsIgnoreCase(messages.get(1).getAuthor().getId())) {
                     if (managedGame.isFactionReactMode()) {
                         var emoji = Emoji.fromFormatted(player.getFactionEmoji());
                         messages.getFirst().addReaction(emoji).queue();
@@ -310,8 +310,8 @@ public class MessageListener extends ListenerAdapter {
                     }
                     if (managedGame.isStratReactMode()) {
                         if (game.getPhaseOfGame().contains("action")
-                                && !game.isHomebrewSCMode()
-                                && player.getLowestSC() != 100) {
+                            && !game.isHomebrewSCMode()
+                            && player.getLowestSC() != 100) {
 
                             for (Integer sc : player.getSCs()) {
                                 var emoji2 = CardEmojis.getSCFrontFromInteger(sc);
@@ -338,15 +338,15 @@ public class MessageListener extends ListenerAdapter {
      */
     private static void handleFogOfWarCombatThreadMirroring(MessageReceivedEvent event) {
         if (!AsyncTI4DiscordBot.fowServers.isEmpty()
-                && // fog servers exists
-                !AsyncTI4DiscordBot.fowServers.contains(event.getGuild())
-                && // event server IS NOT the fog server
-                !AsyncTI4DiscordBot.guildCommunityPlays
-                        .getId()
-                        .equals(event.getGuild().getId())
-                && // NOR the community server
-                AsyncTI4DiscordBot.guildPrimaryID.equals(
-                        Constants.ASYNCTI4_HUB_SERVER_ID)) { // bot is running in production
+            && // fog servers exists
+            !AsyncTI4DiscordBot.fowServers.contains(event.getGuild())
+            && // event server IS NOT the fog server
+            !AsyncTI4DiscordBot.guildCommunityPlays
+                .getId()
+                .equals(event.getGuild().getId())
+            && // NOR the community server
+            AsyncTI4DiscordBot.guildPrimaryID.equals(
+                Constants.ASYNCTI4_HUB_SERVER_ID)) { // bot is running in production
             return;
         } // else it's probably a dev/test server, so execute
 

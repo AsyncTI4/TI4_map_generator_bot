@@ -21,19 +21,18 @@ public class Ban extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.ABILITY, "Ability").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note")
-                .setAutoComplete(true));
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_ID, "Unit (mech/flagship)").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Technology").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile").setAutoComplete(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.BAN_COMMODITIES, "Ban Commodities").setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.BAN_COMMODITIES, "Ban Commodities").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.BAN_FLEET, "Ban Starting Fleet").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.BAN_HS, "Ban Home System").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.BAN_STARTING_TECH, "Ban Starting Technology")
-                .setAutoComplete(true));
+            .setAutoComplete(true));
 
-        OptionData banListOption =
-                new OptionData(OptionType.STRING, Constants.BAN_LIST, "Choose a Predefined Ban List", false);
+        OptionData banListOption = new OptionData(OptionType.STRING, Constants.BAN_LIST, "Choose a Predefined Ban List", false);
         for (FrankenBanList list : FrankenBanList.getAllBanLists()) {
             banListOption.addChoice(list.getAutoCompleteName(), list.getName());
         }
@@ -47,16 +46,16 @@ public class Ban extends GameStateSubcommand {
         sb.append("Ban Complete:\n");
 
         List<String> optionNames = List.of(
-                Constants.ABILITY,
-                Constants.LEADER,
-                Constants.PROMISSORY_NOTE_ID,
-                Constants.UNIT_ID,
-                Constants.TECH,
-                Constants.TILE_NAME,
-                Constants.BAN_COMMODITIES,
-                Constants.BAN_FLEET,
-                Constants.BAN_HS,
-                Constants.BAN_STARTING_TECH);
+            Constants.ABILITY,
+            Constants.LEADER,
+            Constants.PROMISSORY_NOTE_ID,
+            Constants.UNIT_ID,
+            Constants.TECH,
+            Constants.TILE_NAME,
+            Constants.BAN_COMMODITIES,
+            Constants.BAN_FLEET,
+            Constants.BAN_HS,
+            Constants.BAN_STARTING_TECH);
 
         for (String optionName : optionNames) {
             OptionMapping opt = event.getOption(optionName);

@@ -24,7 +24,8 @@ import ti4.settings.GlobalSettings;
 class GenerateSlicesService {
 
     public static boolean generateSlices(
-            GenericInteractionCreateEvent event, MiltyDraftManager draftManager, DraftSpec specs) {
+        GenericInteractionCreateEvent event, MiltyDraftManager draftManager, DraftSpec specs
+    ) {
         int sliceCount = specs.numSlices;
         boolean anomaliesCanTouch = specs.anomaliesCanTouch;
 
@@ -41,8 +42,8 @@ class GenerateSlicesService {
         List<MiltyDraftTile> allTiles = draftManager.getBlue();
         allTiles.addAll(draftManager.getRed());
         int totalWHs = (int) allTiles.stream()
-                .filter(tile -> tile.isHasAlphaWH() || tile.isHasBetaWH() || tile.isHasOtherWH())
-                .count();
+            .filter(tile -> tile.isHasAlphaWH() || tile.isHasBetaWH() || tile.isHasOtherWH())
+            .count();
         int extraWHs = Math.min(totalWHs - 1, (int) (sliceCount * 1.5));
         if (specs.playerIDs.size() == 1) extraWHs = 0; // disable the behavior if there's only 1 player
         if (specs.playerIDs.size() == 2) extraWHs = 3; // lessen the behavior if there's 2 players
@@ -65,8 +66,7 @@ class GenerateSlicesService {
         long quitDiff = 60L * 1000L * 1000L * 1000L;
         long minAttempts = 1000000L;
         long startTime = System.nanoTime();
-        int possibleSlices =
-                partitionedTiles.stream().map(List::size).min(Integer::compare).orElse(sliceCount);
+        int possibleSlices = partitionedTiles.stream().map(List::size).min(Integer::compare).orElse(sliceCount);
         while (!slicesCreated) {
             long elapTime = System.nanoTime() - startTime;
             if (i % 1000 == 0) {
@@ -79,12 +79,12 @@ class GenerateSlicesService {
 
             // Reset the draft, shuffle the tiers
             draftManager.clearSlices();
-            for (List<MiltyDraftTile> tier : partitionedTiles) Collections.shuffle(tier);
+            for (List<MiltyDraftTile> tier : partitionedTiles)
+                Collections.shuffle(tier);
 
             String nextSliceName = "A";
             for (int sliceIndex = 0; sliceIndex < possibleSlices; sliceIndex++) {
-                MiltyDraftSlice slice =
-                        assembleOneSlice(adjMatrix, partitionedTiles, sliceIndex, nextSliceName, anomaliesCanTouch);
+                MiltyDraftSlice slice = assembleOneSlice(adjMatrix, partitionedTiles, sliceIndex, nextSliceName, anomaliesCanTouch);
                 if (!checkIfSliceIsGood(specs, slice, reasons)) {
                     if ((draftManager.getSlices().size() + possibleSlices - sliceIndex) <= sliceCount) break;
                     continue;
@@ -93,19 +93,18 @@ class GenerateSlicesService {
                 // Slice is valid. Add it, then check if we are done
                 draftManager.addSlice(slice);
                 if (draftManager.getSlices().size() == sliceCount) break;
-                nextSliceName =
-                        Character.toString('A' + draftManager.getSlices().size());
+                nextSliceName = Character.toString('A' + draftManager.getSlices().size());
             }
 
             if (draftManager.getSlices().size() == sliceCount) {
                 long legends = draftManager.getSlices().stream()
-                        .flatMap(s -> s.getTiles().stream())
-                        .filter(MiltyDraftTile::isLegendary)
-                        .count();
+                    .flatMap(s -> s.getTiles().stream())
+                    .filter(MiltyDraftTile::isLegendary)
+                    .count();
                 long whs = draftManager.getSlices().stream()
-                        .flatMap(s -> s.getTiles().stream())
-                        .filter(MiltyDraftTile::hasAnyWormhole)
-                        .count();
+                    .flatMap(s -> s.getTiles().stream())
+                    .filter(MiltyDraftTile::hasAnyWormhole)
+                    .count();
                 if (legends > specs.maxLegend || legends < specs.minLegend) {
                     addReason.apply("legendTot");
                 } else if (whs < extraWHs) {
@@ -121,24 +120,23 @@ class GenerateSlicesService {
         }
 
         long elapsed = System.nanoTime() - startTime;
-        boolean debug =
-                GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
+        boolean debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
         if (!slicesCreated || elapsed >= 10000000000L || debug) {
             StringBuilder sb = new StringBuilder();
             sb.append("Milty draft took a while... jazz, take a look:\n");
             sb.append("`        Elapsed time:` ")
-                    .append(DateTimeHelper.getTimeRepresentationNanoSeconds(elapsed))
-                    .append("\n");
+                .append(DateTimeHelper.getTimeRepresentationNanoSeconds(elapsed))
+                .append("\n");
             sb.append("`           Quit time:` ")
-                    .append(DateTimeHelper.getTimeRepresentationNanoSeconds(quitDiff))
-                    .append("\n");
+                .append(DateTimeHelper.getTimeRepresentationNanoSeconds(quitDiff))
+                .append("\n");
             sb.append("`    Number of cycles:` ").append(i).append("\n");
             for (Map.Entry<String, Integer> reason : reasons.entrySet()) {
                 sb.append("`")
-                        .append(Helper.leftpad(reason.getKey(), 15))
-                        .append(" fail:` ")
-                        .append(reason.getValue())
-                        .append("\n");
+                    .append(Helper.leftpad(reason.getKey(), 15))
+                    .append(" fail:` ")
+                    .append(reason.getValue())
+                    .append("\n");
             }
             BotLogger.warning(new LogOrigin(event), sb.toString());
         }
@@ -146,17 +144,20 @@ class GenerateSlicesService {
     }
 
     private static MiltyDraftSlice assembleOneSlice(
-            List<List<Boolean>> adjMatrix,
-            List<List<MiltyDraftTile>> partition,
-            int sliceNum,
-            String sliceName,
-            boolean anomaliesCanTouch) {
+        List<List<Boolean>> adjMatrix,
+        List<List<MiltyDraftTile>> partition,
+        int sliceNum,
+        String sliceName,
+        boolean anomaliesCanTouch
+    ) {
         List<MiltyDraftTile> tiles = new ArrayList<>();
-        for (List<MiltyDraftTile> tier : partition) tiles.add(tier.get(sliceNum));
+        for (List<MiltyDraftTile> tier : partition)
+            tiles.add(tier.get(sliceNum));
         Collections.shuffle(tiles);
 
         List<Integer> ints = new ArrayList<>();
-        for (int k = 0; k < tiles.size(); k++) if (tiles.get(k).getTierList() == TierList.anomaly) ints.add(k + 1);
+        for (int k = 0; k < tiles.size(); k++)
+            if (tiles.get(k).getTierList() == TierList.anomaly) ints.add(k + 1);
         if (!anomaliesCanTouch && ints.size() == 2) { // just skip this if there's more than 2 anomalies tbh
             int turns = -4;
             boolean tryagain = true;
@@ -185,16 +186,15 @@ class GenerateSlicesService {
     }
 
     private static boolean checkIfSliceIsGood(DraftSpec spec, MiltyDraftSlice slice, Map<String, Integer> failReasons) {
-        Function<String, Integer> addReason =
-                reason -> failReasons.put(reason, failReasons.getOrDefault(reason, 0) + 1);
+        Function<String, Integer> addReason = reason -> failReasons.put(reason, failReasons.getOrDefault(reason, 0) + 1);
 
         int optInf = slice.getOptimalInf();
         int optRes = slice.getOptimalRes();
         int totalOptimal = slice.getOptimalTotalValue();
         if (optInf < spec.getMinInf()
-                || optRes < spec.getMinRes()
-                || totalOptimal < spec.getMinTot()
-                || totalOptimal > spec.getMaxTot()) {
+            || optRes < spec.getMinRes()
+            || totalOptimal < spec.getMinTot()
+            || totalOptimal > spec.getMaxTot()) {
             addReason.apply("value");
             return false;
         }
@@ -210,7 +210,7 @@ class GenerateSlicesService {
         }
         // if the spec says to load it up, don't fail here
         if (slice.getTiles().stream().filter(MiltyDraftTile::isLegendary).count() > 1
-                && spec.getMaxLegend() < spec.getNumSlices()) {
+            && spec.getMaxLegend() < spec.getNumSlices()) {
             addReason.apply("legend");
             return false;
         }
@@ -224,7 +224,8 @@ class GenerateSlicesService {
         for (String pos1 : tilePositions) {
             List<Boolean> row = new ArrayList<>();
             List<String> adj = PositionMapper.getAdjacentTilePositions(pos1);
-            for (String pos2 : tilePositions) row.add(adj.contains(pos2));
+            for (String pos2 : tilePositions)
+                row.add(adj.contains(pos2));
             adjMatrix.add(row);
         }
         return adjMatrix;

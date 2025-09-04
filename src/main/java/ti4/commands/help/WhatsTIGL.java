@@ -21,7 +21,7 @@ class WhatsTIGL extends Subcommand {
             MessageHelper.sendMessageToEventChannel(event, message);
         } catch (Exception e) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "See Pins: https://discord.com/channels/943410040369479690/1003741148017336360");
+                event, "See Pins: https://discord.com/channels/943410040369479690/1003741148017336360");
         }
     }
 }

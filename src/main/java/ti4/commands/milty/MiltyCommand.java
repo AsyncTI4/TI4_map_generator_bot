@@ -10,8 +10,8 @@ import ti4.helpers.Constants;
 public class MiltyCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new DebugMilty(), new ForcePick(), new SetupMilty(), new StartMilty(), new ShowMilty())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new DebugMilty(), new ForcePick(), new SetupMilty(), new StartMilty(), new ShowMilty())
+        .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

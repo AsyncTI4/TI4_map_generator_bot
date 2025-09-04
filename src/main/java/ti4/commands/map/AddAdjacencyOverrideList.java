@@ -12,16 +12,16 @@ class AddAdjacencyOverrideList extends GameStateSubcommand {
     public AddAdjacencyOverrideList() {
         super(Constants.ADD_ADJACENCY_OVERRIDE_LIST, "Add Custom Adjacent Tiles as a List.", true, true);
         addOptions(new OptionData(
-                        OptionType.STRING, Constants.ADJACENCY_OVERRIDES_LIST, "Primary:Direction:Secondary 101:nw:202")
+            OptionType.STRING, Constants.ADJACENCY_OVERRIDES_LIST, "Primary:Direction:Secondary 101:nw:202")
                 .setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String[] adjacencyListOptions = event.getOption(Constants.ADJACENCY_OVERRIDES_LIST)
-                .getAsString()
-                .toLowerCase()
-                .split(" ");
+            .getAsString()
+            .toLowerCase()
+            .split(" ");
         for (String adjacencyOption : adjacencyListOptions) {
             String[] adjacencyTile = adjacencyOption.split(":");
             if (adjacencyTile.length < 3) {

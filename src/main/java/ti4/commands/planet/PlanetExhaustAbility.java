@@ -32,7 +32,8 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
     }
 
     public static void doAction(
-            GenericInteractionCreateEvent event, Player player, String planet, Game game, boolean exhaust) {
+        GenericInteractionCreateEvent event, Player player, String planet, Game game, boolean exhaust
+    ) {
         doAction(player, planet, game, exhaust);
     }
 
@@ -60,19 +61,17 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             case "mallice", "hexmallice" -> {
                 int commCount = player.getCommodities();
                 if (commCount == 0) {
-                    output =
-                            "Use buttons to gain 2 trade goods. You have no commodities, but you may pretend to convert them to trade goods if you wish to futilely exhaust Mallice.";
+                    output = "Use buttons to gain 2 trade goods. You have no commodities, but you may pretend to convert them to trade goods if you wish to futilely exhaust Mallice.";
                 } else {
                     output = "Use buttons to gain 2 trade goods or to convert all " + commCount
-                            + " of your commodities to trade goods.";
+                        + " of your commodities to trade goods.";
                 }
                 buttons.add(Buttons.green("mallice_2_tg", "Gain 2 Trade Goods"));
                 buttons.add(Buttons.green("mallice_convert_comm", "Convert Commodities"));
             }
             case "hopesend" -> {
                 if (player.hasAbility("scheming")) {
-                    output =
-                            "Use buttons to drop 1 mech on a planet or to draw 2 action cards (**Scheming** increases this from the normal 1 action card).";
+                    output = "Use buttons to drop 1 mech on a planet or to draw 2 action cards (**Scheming** increases this from the normal 1 action card).";
                     buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
                     buttons.add(Buttons.green("draw_2_ACDelete", "Draw 2 Action Cards"));
                 } else {
@@ -88,9 +87,9 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             case "ordinianc4" -> {
                 ActionCardHelper.drawActionCards(game, player, 1, true);
                 String msg = "Your current command tokens are " + player.getCCRepresentation()
-                        + ". Use buttons to gain 1 command token.";
+                    + ". Use buttons to gain 1 command token.";
                 MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(), msg, ButtonHelper.getGainCCButtons(player));
+                    player.getCorrectChannel(), msg, ButtonHelper.getGainCCButtons(player));
             }
 
             case "uikos" -> {
@@ -99,10 +98,10 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 player.setCommodities(player.getCommodities() + comms);
                 ButtonHelperAgents.toldarAgentInitiation(game, player, comms);
                 MessageHelper.sendMessageToChannel(
-                        channel,
-                        player.getRepresentation() + " now has " + player.getCommodities() + " commodit"
-                                + (player.getCommodities() == 1 ? "y" : "ies") + " (from the " + comms
-                                + " that were on the card).");
+                    channel,
+                    player.getRepresentation() + " now has " + player.getCommodities() + " commodit"
+                        + (player.getCommodities() == 1 ? "y" : "ies") + " (from the " + comms
+                        + " that were on the card).");
             }
             case "mirage", "illusion", "phantasm" -> {
                 output = "Use buttons to put 2 fighters with your ships.";
@@ -116,19 +115,18 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             case "silence" -> {
                 output = "Use buttons to put 1 cruiser with your ships.";
                 buttons.addAll(
-                        Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
+                    Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
             }
             case "tarrock" -> {
                 String riderName = "Tarrock Ability";
-                List<Button> riderButtons =
-                        AgendaHelper.getAgendaButtons(riderName, game, player.getFinsFactionCheckerPrefix());
+                List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, player.getFinsFactionCheckerPrefix());
                 // List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
                 MessageHelper.sendMessageToChannelWithFactionReact(
-                        player.getCorrectChannel(),
-                        player.getRepresentation() + ", please choose your target.",
-                        game,
-                        player,
-                        riderButtons);
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", please choose your target.",
+                    game,
+                    player,
+                    riderButtons);
                 // MessageHelper.sendMessageToChannelWithPersistentReacts(game.getActionsChannel(), "Please indicate
                 // \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
             }
@@ -137,8 +135,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.addAll(getNewPrismLoseTechOptions(player));
             }
             case "echo" -> {
-                output =
-                        "Use buttons to place a frontier token in a system with no planets.\n-# Cannot yet place a double frontier token in a system, sorry.";
+                output = "Use buttons to place a frontier token in a system with no planets.\n-# Cannot yet place a double frontier token in a system, sorry.";
                 buttons.addAll(ButtonHelper.getEchoAvailableSystems(game, player));
             }
             case "domna" -> {
@@ -148,10 +145,10 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             case "eko" -> output = "blank";
             default -> {
                 if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null
-                        && game.isAbsolMode()
-                        && ButtonHelper.getUnitHolderFromPlanetName(planet, game)
-                                .getTokenList()
-                                .contains("attachment_nanoforge.png")) {
+                    && game.isAbsolMode()
+                    && ButtonHelper.getUnitHolderFromPlanetName(planet, game)
+                        .getTokenList()
+                        .contains("attachment_nanoforge.png")) {
                     player.refreshPlanet(planet);
                 }
             }
@@ -169,8 +166,8 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
             if (!techM.isUnitUpgrade()
-                    && (techM.getFaction().isEmpty()
-                            || techM.getFaction().orElse("").isEmpty())) {
+                && (techM.getFaction().isEmpty()
+                    || techM.getFaction().orElse("").isEmpty())) {
                 buttons.add(Buttons.gray(finChecker + "newPrism@" + tech, techM.getName()));
             }
         }

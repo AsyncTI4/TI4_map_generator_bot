@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"tactics", "fleet", "strategy"})
+@JsonPropertyOrder({ "tactics", "fleet", "strategy" })
 public class TTPGCommandTokens {
 
     @JsonProperty("tactics")

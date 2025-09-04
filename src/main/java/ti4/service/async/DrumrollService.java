@@ -20,8 +20,7 @@ public class DrumrollService {
     private static void sleepForTwoSeconds() {
         try {
             TimeUnit.SECONDS.sleep(2);
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
     }
 
     private static String drumrollString(String message, int iteration) {
@@ -33,7 +32,8 @@ public class DrumrollService {
     }
 
     private MessageHelper.MessageFunction drumrollFunction(
-            List<Message> bonusMessages, int seconds, String message, String gameName, Predicate<Game> resolve) {
+        List<Message> bonusMessages, int seconds, String message, String gameName, Predicate<Game> resolve
+    ) {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + seconds * 1000L;
 
@@ -66,31 +66,34 @@ public class DrumrollService {
     }
 
     public void doDrumrollMirrored(
-            MessageChannel main,
-            String msg,
-            int sec,
-            String gameName,
-            Predicate<Game> resolve,
-            MessageChannel channel2,
-            String msg2) {
+        MessageChannel main,
+        String msg,
+        int sec,
+        String gameName,
+        Predicate<Game> resolve,
+        MessageChannel channel2,
+        String msg2
+    ) {
         List<MessageChannel> chans = channel2 == null ? Collections.emptyList() : List.of(channel2);
         List<String> msgs = msg2 == null ? Collections.emptyList() : List.of(msg2);
         doDrumrollMultiChannel(main, msg, sec, gameName, resolve, chans, msgs);
     }
 
     public void doDrumrollMultiChannel(
-            MessageChannel main,
-            String msg,
-            int sec,
-            String gameName,
-            Predicate<Game> resolve,
-            List<MessageChannel> bonusChannels,
-            List<String> altMessages) {
+        MessageChannel main,
+        String msg,
+        int sec,
+        String gameName,
+        Predicate<Game> resolve,
+        List<MessageChannel> bonusChannels,
+        List<String> altMessages
+    ) {
         List<Message> bonusMessages = new ArrayList<>();
         if (bonusChannels != null) {
             List<String> msgs = new ArrayList<>();
             if (altMessages != null) msgs.addAll(altMessages);
-            while (msgs.size() < bonusChannels.size()) msgs.add(msg);
+            while (msgs.size() < bonusChannels.size())
+                msgs.add(msg);
 
             for (int i = 0; i < bonusChannels.size(); i++) {
                 MessageChannel mc = bonusChannels.get(i);

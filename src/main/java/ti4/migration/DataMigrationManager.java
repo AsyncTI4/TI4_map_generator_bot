@@ -53,18 +53,17 @@ public class DataMigrationManager {
 
         try {
             Map<String, Optional<LocalDate>> migrationNamesToCutoffDates = migrations.entrySet().stream()
-                    .collect(Collectors.toMap(Entry::getKey, entry -> getMigrationForGamesBeforeDate(entry.getKey())));
+                .collect(Collectors.toMap(Entry::getKey, entry -> getMigrationForGamesBeforeDate(entry.getKey())));
 
             for (Entry<String, Function<Game, Boolean>> entry : migrations.entrySet()) {
-                LocalDate migrationCutoffDate =
-                        migrationNamesToCutoffDates.get(entry.getKey()).orElse(null);
+                LocalDate migrationCutoffDate = migrationNamesToCutoffDates.get(entry.getKey()).orElse(null);
                 if (migrationCutoffDate == null) continue;
 
                 var migratedGames = migrateGames(
-                        GameManager.getManagedGames(), entry.getKey(), entry.getValue(), migrationCutoffDate);
+                    GameManager.getManagedGames(), entry.getKey(), entry.getValue(), migrationCutoffDate);
                 migrationNamesToAppliedGameNames
-                        .computeIfAbsent(entry.getKey(), k -> new ArrayList<>())
-                        .addAll(migratedGames);
+                    .computeIfAbsent(entry.getKey(), k -> new ArrayList<>())
+                    .addAll(migratedGames);
             }
         } catch (Exception e) {
             BotLogger.error("Issue running migrations:", e);
@@ -74,7 +73,7 @@ public class DataMigrationManager {
             if (!entry.getValue().isEmpty()) {
                 String gameNames = String.join(", ", entry.getValue());
                 BotLogger.info(String.format(
-                        "Migration %s run on following maps successfully: \n%s", entry.getKey(), gameNames));
+                    "Migration %s run on following maps successfully: \n%s", entry.getKey(), gameNames));
             }
         }
         return true;
@@ -86,19 +85,20 @@ public class DataMigrationManager {
             return Optional.of(LocalDate.parse(migrationDateString, MIGRATION_DATE_FORMATTER));
         } catch (Exception e) {
             BotLogger.error(
-                    String.format(
-                            "Migration needs a name ending in _DDMMYY (eg 251223 for 25th dec, 2023) (migration name: %s)",
-                            migrationDateString),
-                    e);
+                String.format(
+                    "Migration needs a name ending in _DDMMYY (eg 251223 for 25th dec, 2023) (migration name: %s)",
+                    migrationDateString),
+                e);
         }
         return Optional.empty();
     }
 
     private static List<String> migrateGames(
-            List<ManagedGame> games,
-            String migrationName,
-            Function<Game, Boolean> migrationMethod,
-            LocalDate migrationForGamesBeforeDate) {
+        List<ManagedGame> games,
+        String migrationName,
+        Function<Game, Boolean> migrationMethod,
+        LocalDate migrationForGamesBeforeDate
+    ) {
         List<String> migrationsApplied = new ArrayList<>();
         for (var managedGame : games) {
             if (managedGame.isHasEnded()) continue;
@@ -106,8 +106,7 @@ public class DataMigrationManager {
             LocalDate mapCreatedOn = null;
             try {
                 mapCreatedOn = LocalDate.parse(managedGame.getCreationDate(), GameHelper.CREATION_DATE_FORMATTER);
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
 
             if (mapCreatedOn == null || mapCreatedOn.isAfter(migrationForGamesBeforeDate)) {
                 continue;
@@ -119,7 +118,7 @@ public class DataMigrationManager {
             var changesMade = migrationMethod.apply(game);
             game.addMigration(migrationName);
             GameManager.save(
-                    game, "Data Migration - " + migrationName); // TODO: We should be locking since we're saving
+                game, "Data Migration - " + migrationName); // TODO: We should be locking since we're saving
             if (changesMade) {
                 migrationsApplied.add(game.getName());
             }

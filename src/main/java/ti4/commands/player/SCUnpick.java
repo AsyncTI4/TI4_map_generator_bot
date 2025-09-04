@@ -15,28 +15,28 @@ import ti4.message.MessageHelper;
 
 class SCUnpick extends GameStateSubcommand {
 
-    public SCUnpick() {
-        super(Constants.SC_UNPICK, "Unpick a Strategy Card", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number")
-                .setRequired(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color returning strategy card")
-                        .setAutoComplete(true));
-    }
+        public SCUnpick() {
+                super(Constants.SC_UNPICK, "Unpick a Strategy Card", true, true);
+                addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number")
+                        .setRequired(true));
+                addOptions(
+                        new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color returning strategy card")
+                                .setAutoComplete(true));
+        }
 
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        Game game = getGame();
+        @Override
+        public void execute(SlashCommandInteractionEvent event) {
+                Game game = getGame();
 
-        OptionMapping option = event.getOption(Constants.STRATEGY_CARD);
-        int scUnpicked = option.getAsInt();
+                OptionMapping option = event.getOption(Constants.STRATEGY_CARD);
+                int scUnpicked = option.getAsInt();
 
-        Player player = getPlayer();
-        player.removeSC(scUnpicked);
-        List<Button> scButtons = Helper.getRemainingSCButtons(game, player);
-        game.updateActivePlayer(player);
-        game.setPhaseOfGame("strategy");
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(), player.getRepresentation() + ", please pick a strategy card.", scButtons);
-    }
+                Player player = getPlayer();
+                player.removeSC(scUnpicked);
+                List<Button> scButtons = Helper.getRemainingSCButtons(game, player);
+                game.updateActivePlayer(player);
+                game.setPhaseOfGame("strategy");
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(), player.getRepresentation() + ", please pick a strategy card.", scButtons);
+        }
 }

@@ -29,9 +29,9 @@ public class RegulationsAgendaResolver implements ForAgainstAgendaResolver {
         }
 
         MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(),
-                game.getPing()
-                        + ", all player that had more than 4 command tokens in their fleet pools have had the excess removed.");
+            game.getMainGameChannel(),
+            game.getPing()
+                + ", all player that had more than 4 command tokens in their fleet pools have had the excess removed.");
     }
 
     @Override
@@ -40,7 +40,7 @@ public class RegulationsAgendaResolver implements ForAgainstAgendaResolver {
             playerB.setFleetCC(playerB.getFleetCC() + 1);
         }
         MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(),
-                game.getPing() + ", all players have had 1 command token added to their respective fleet pools.");
+            game.getMainGameChannel(),
+            game.getPing() + ", all players have had 1 command token added to their respective fleet pools.");
     }
 }

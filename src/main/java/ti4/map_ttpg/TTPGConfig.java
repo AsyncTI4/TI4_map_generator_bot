@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"codex1", "codex2", "codex3", "baseMagen"})
+@JsonPropertyOrder({ "codex1", "codex2", "codex3", "baseMagen" })
 public class TTPGConfig {
 
     @JsonProperty("codex1")

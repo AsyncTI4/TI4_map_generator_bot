@@ -14,8 +14,8 @@ public final class RiftUsedButton implements PostMovementAbilityButton {
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.green(
-                ctx.player.finChecker() + "getRiftButtons_" + ctx.tile.getPosition(),
-                "Units Travelled Through Gravity Rift",
-                MiscEmojis.GravityRift));
+            ctx.player.finChecker() + "getRiftButtons_" + ctx.tile.getPosition(),
+            "Units Travelled Through Gravity Rift",
+            MiscEmojis.GravityRift));
     }
 }

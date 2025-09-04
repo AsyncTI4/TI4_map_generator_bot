@@ -70,30 +70,24 @@ public class LogOrigin {
 
     @NotNull
     private static String buildEventString(@Nonnull GenericInteractionCreateEvent event) {
-        StringBuilder builder =
-                new StringBuilder().append(event.getUser().getEffectiveName()).append(" ");
+        StringBuilder builder = new StringBuilder().append(event.getUser().getEffectiveName()).append(" ");
 
         switch (event) {
-            case SlashCommandInteractionEvent sEvent ->
-                builder.append("used command `")
-                        .append(sEvent.getCommandString())
-                        .append("`\n");
-            case ButtonInteractionEvent bEvent ->
-                builder.append("pressed button ")
-                        .append(ButtonHelper.getButtonRepresentation(bEvent.getButton()))
-                        .append("\n");
-            case StringSelectInteractionEvent sEvent ->
-                builder.append("selected ")
-                        .append(SelectionMenuProcessor.getSelectionMenuDebugText(sEvent))
-                        .append("\n");
-            case ModalInteractionEvent mEvent ->
-                builder.append("used modal ")
-                        .append(ModalListener.getModalDebugText(mEvent))
-                        .append("\n");
-            default ->
-                builder.append("initiated an unexpected event of type `")
-                        .append(event.getType())
-                        .append("`\n");
+            case SlashCommandInteractionEvent sEvent -> builder.append("used command `")
+                .append(sEvent.getCommandString())
+                .append("`\n");
+            case ButtonInteractionEvent bEvent -> builder.append("pressed button ")
+                .append(ButtonHelper.getButtonRepresentation(bEvent.getButton()))
+                .append("\n");
+            case StringSelectInteractionEvent sEvent -> builder.append("selected ")
+                .append(SelectionMenuProcessor.getSelectionMenuDebugText(sEvent))
+                .append("\n");
+            case ModalInteractionEvent mEvent -> builder.append("used modal ")
+                .append(ModalListener.getModalDebugText(mEvent))
+                .append("\n");
+            default -> builder.append("initiated an unexpected event of type `")
+                .append(event.getType())
+                .append("`\n");
         }
 
         return builder.toString();

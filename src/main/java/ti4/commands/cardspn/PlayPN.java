@@ -16,9 +16,9 @@ class PlayPN extends GameStateSubcommand {
     public PlayPN() {
         super(Constants.PLAY_PN, "Play Promissory Note", true, true);
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.PROMISSORY_NOTE_ID,
-                        "Promissory note ID, which is found between (), or name/part of name")
+            OptionType.STRING,
+            Constants.PROMISSORY_NOTE_ID,
+            "Promissory note ID, which is found between (), or name/part of name")
                 .setRequired(true));
     }
 
@@ -26,8 +26,7 @@ class PlayPN extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
 
-        String value =
-                event.getOption(Constants.PROMISSORY_NOTE_ID).getAsString().toLowerCase();
+        String value = event.getOption(Constants.PROMISSORY_NOTE_ID).getAsString().toLowerCase();
         String pnID = null;
         int pnIndex;
         try {
@@ -47,7 +46,7 @@ class PlayPN extends GameStateSubcommand {
                     if (pnName.contains(value) || pn.getKey().contains(value)) {
                         if (foundSimilarName && !cardName.equals(pnName)) {
                             MessageHelper.sendMessageToEventChannel(
-                                    event, "Multiple cards with similar name found, please use ID.");
+                                event, "Multiple cards with similar name found, please use ID.");
                             return;
                         }
                         pnID = pn.getKey();

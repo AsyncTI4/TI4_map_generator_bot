@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 public class CombatCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(new CombatRoll(), new StartCombat())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

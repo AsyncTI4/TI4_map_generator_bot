@@ -33,8 +33,8 @@ public class GenericCardModel implements ModelInterface, EmbeddableModel {
     public boolean search(String searchString) {
         searchString = searchString.toLowerCase();
         return alias.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || cardType.toString().contains(searchString);
+            || name.toLowerCase().contains(searchString)
+            || cardType.toString().contains(searchString);
     }
 
     public String getRepresentation() {

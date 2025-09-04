@@ -12,8 +12,8 @@ class RemoveLaw extends GameStateSubcommand {
     public RemoveLaw() {
         super(Constants.REMOVE_LAW, "Remove Law", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
     }
 
     @Override

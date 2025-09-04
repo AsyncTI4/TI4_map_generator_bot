@@ -19,8 +19,7 @@ import ti4.service.emoji.UnitEmojis;
 public class Units {
 
     private static final String EMDASH = "—";
-    private static final Pattern UNIT_PATTERN =
-            Pattern.compile(RegexHelper.colorRegex(null) + EMDASH + RegexHelper.unitTypeRegex());
+    private static final Pattern UNIT_PATTERN = Pattern.compile(RegexHelper.colorRegex(null) + EMDASH + RegexHelper.unitTypeRegex());
     private static final Map<UnitType, Map<String, UnitKey>> keys = new ConcurrentHashMap<>();
 
     /**
@@ -102,22 +101,9 @@ public class Units {
     }
 
     public enum UnitType {
-        Infantry("gf"),
-        Mech("mf"),
-        Pds("pd"),
-        Spacedock("sd"),
-        Monument("monument"), // ground based
-        Fighter("ff"),
-        Destroyer("dd"),
-        Cruiser("ca"),
-        Carrier("cv"),
-        Dreadnought("dn"),
-        Flagship("fs"),
-        Warsun("ws"), // ships
-        PlenaryOrbital("plenaryorbital"),
-        TyrantsLament("tyrantslament"),
-        Lady("lady"),
-        Cavalry("cavalry"), // relics
+        Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), Monument("monument"), // ground based
+        Fighter("ff"), Destroyer("dd"), Cruiser("ca"), Carrier("cv"), Dreadnought("dn"), Flagship("fs"), Warsun("ws"), // ships
+        PlenaryOrbital("plenaryorbital"), TyrantsLament("tyrantslament"), Lady("lady"), Cavalry("cavalry"), // relics
         StarfallPds("starfallpds");
 
         @Getter
@@ -223,7 +209,8 @@ public class Units {
 
         public static List<Integer> emptyList() {
             List<Integer> ls = new ArrayList<>();
-            for (int i = 0; i < values().length; i++) ls.add(0);
+            for (int i = 0; i < values().length; i++)
+                ls.add(0);
             return ls;
         }
 

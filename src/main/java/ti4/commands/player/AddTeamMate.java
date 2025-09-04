@@ -16,7 +16,7 @@ class AddTeamMate extends GameStateSubcommand {
         super(Constants.ADD_TEAMMATE, "Add a teammate", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "User who is on your team").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to add the user to")
-                .setAutoComplete(true));
+            .setAutoComplete(true));
     }
 
     @Override
@@ -26,14 +26,14 @@ class AddTeamMate extends GameStateSubcommand {
         User player2 = event.getOption(Constants.PLAYER2).getAsUser();
         if (player.getTeamMateIDs().contains(player2.getId())) {
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    "User " + player2.getAsMention() + " is already a part of " + player.getFaction() + "'s team.");
+                event,
+                "User " + player2.getAsMention() + " is already a part of " + player.getFaction() + "'s team.");
             return;
         }
         player.addTeamMateID(player2.getId());
 
         game.setCommunityMode(true);
         MessageHelper.sendMessageToEventChannel(
-                event, "Added " + player2.getAsMention() + " as part of " + player.getFaction() + "'s team.");
+            event, "Added " + player2.getAsMention() + " as part of " + player.getFaction() + "'s team.");
     }
 }

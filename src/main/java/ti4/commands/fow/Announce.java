@@ -17,7 +17,7 @@ class Announce extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         MessageHelper.sendMessageToChannel(
-                getGame().getMainGameChannel(),
-                "📣 " + event.getOption(Constants.MSG).getAsString());
+            getGame().getMainGameChannel(),
+            "📣 " + event.getOption(Constants.MSG).getAsString());
     }
 }

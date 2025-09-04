@@ -17,9 +17,9 @@ class ShowPNToAll extends GameStateSubcommand {
     public ShowPNToAll() {
         super(Constants.SHOW_TO_ALL, "Show Promissory Note to table", true, true);
         addOptions(new OptionData(
-                        OptionType.INTEGER,
-                        Constants.PROMISSORY_NOTE_ID,
-                        "Promissory note ID, which is found between ()")
+            OptionType.INTEGER,
+            Constants.PROMISSORY_NOTE_ID,
+            "Promissory note ID, which is found between ()")
                 .setRequired(true));
     }
 

@@ -42,11 +42,11 @@ public class StrategyCardManager {
                 ButtonHelperAgents.resolveArtunoCheck(player, tradeGoodCount);
                 tradeGoodCount = 0;
                 MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(),
-                        "The trade goods that would be placed on **" + Helper.getSCName(strategyCard, game)
-                                + "** have instead been given to the Kyro "
-                                + (game.isFrankenGame() ? "hero " : "")
-                                + "player, as per the text on Speygh, the Kyro Hero.");
+                    game.getActionsChannel(),
+                    "The trade goods that would be placed on **" + Helper.getSCName(strategyCard, game)
+                        + "** have instead been given to the Kyro "
+                        + (game.isFrankenGame() ? "hero " : "")
+                        + "player, as per the text on Speygh, the Kyro Hero.");
             }
         }
         strategyCardToTradeGoodCount.put(strategyCard, tradeGoodCount);

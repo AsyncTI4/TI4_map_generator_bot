@@ -19,11 +19,11 @@ abstract class PNAddRemove extends GameStateSubcommand {
     PNAddRemove(String name, String description) {
         super(name, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                .setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -31,8 +31,8 @@ abstract class PNAddRemove extends GameStateSubcommand {
 
         // GET ALL PN OPTIONS AS STRING
         for (OptionMapping option : event.getOptions().stream()
-                .filter(o -> o != null && o.getName().contains(Constants.PROMISSORY_NOTE_ID))
-                .toList()) {
+            .filter(o -> o != null && o.getName().contains(Constants.PROMISSORY_NOTE_ID))
+            .toList()) {
             pnIDs.add(option.getAsString());
         }
 

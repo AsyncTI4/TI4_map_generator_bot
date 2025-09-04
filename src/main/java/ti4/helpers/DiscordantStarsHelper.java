@@ -41,7 +41,7 @@ public class DiscordantStarsHelper {
                 if (unitHolder instanceof Planet planet) {
                     if (player.getPlanets().contains(planet.getName())) {
                         if (planet.hasGroundForces(game)
-                                && planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
+                            && planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                             planet.removeToken(Constants.GARDEN_WORLDS_PNG);
                         } else if (!planet.hasGroundForces(game)) {
                             planet.addToken(Constants.GARDEN_WORLDS_PNG);
@@ -65,7 +65,7 @@ public class DiscordantStarsHelper {
                 if (unitHolder instanceof Planet planet) {
                     if (player.getPlanets().contains(planet.getName())) {
                         if (planet.getUnitCount(UnitType.Spacedock, player) < 1
-                                && planet.getTokenList().contains("attachment_positiveinf2.png")) {
+                            && planet.getTokenList().contains("attachment_positiveinf2.png")) {
                             planet.removeToken("attachment_positiveinf2.png");
                         } else if (planet.getUnitCount(UnitType.Spacedock, player) > 0) {
                             planet.addToken("attachment_positiveinf2.png");
@@ -112,8 +112,8 @@ public class DiscordantStarsHelper {
                     if (unitHolder instanceof Planet planet) {
                         if (player.getPlanets().contains(planet.getName())) {
                             if (!oneMechCheck(planet.getName(), activeMap, player)
-                                    && ((planet.getTokenList().contains(Constants.OLRADIN_MECH_INF_PNG))
-                                            || (planet.getTokenList().contains(Constants.OLRADIN_MECH_RES_PNG)))) {
+                                && ((planet.getTokenList().contains(Constants.OLRADIN_MECH_INF_PNG))
+                                    || (planet.getTokenList().contains(Constants.OLRADIN_MECH_RES_PNG)))) {
                                 planet.removeToken(Constants.OLRADIN_MECH_INF_PNG);
                                 planet.removeToken(Constants.OLRADIN_MECH_RES_PNG);
                             } else if (oneMechCheck(planet.getName(), activeMap, player)) {
@@ -140,10 +140,10 @@ public class DiscordantStarsHelper {
                     if (unitHolder instanceof Planet planet) {
                         if (player.getPlanets().contains(planet.getName())) {
                             if (planet.getUnitCount(UnitType.Mech, player) < 1
-                                    && planet.getTokenList().contains(Constants.OLRADIN_MECH_INF_PNG)) {
+                                && planet.getTokenList().contains(Constants.OLRADIN_MECH_INF_PNG)) {
                                 planet.removeToken(Constants.OLRADIN_MECH_INF_PNG);
                             } else if (planet.getUnitCount(UnitType.Mech, player) > 0
-                                    && !planet.getTokenList().contains(Constants.OLRADIN_MECH_INF_PNG)) {
+                                && !planet.getTokenList().contains(Constants.OLRADIN_MECH_INF_PNG)) {
                                 planet.addToken(tokenToAdd);
                             }
                         }
@@ -168,9 +168,9 @@ public class DiscordantStarsHelper {
 
     public static void handleOlradinPoliciesWhenExhaustingPlanets(Game game, Player player, String planet) {
         if (game == null
-                || !"action".equalsIgnoreCase(game.getPhaseOfGame())
-                || player == null
-                || !player.hasOlradinPolicies()) return;
+            || !"action".equalsIgnoreCase(game.getPhaseOfGame())
+            || player == null
+            || !player.hasOlradinPolicies()) return;
         PlanetModel planetModel = Mapper.getPlanet(planet);
         if (planetModel == null) return;
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
@@ -207,14 +207,14 @@ public class DiscordantStarsHelper {
 
     private static void resolveEconomyExploitAbility(Player player, PlanetModel planetModel, Game game) {
         if (!player.isHasUsedEconomyExploitAbility()
-                && player.hasAbility("policy_the_economy_exploit")) { // add a fighter with ships
+            && player.hasAbility("policy_the_economy_exploit")) { // add a fighter with ships
             player.setHasUsedEconomyExploitAbility(true);
             String msg = player.getRepresentation() + " Due to your exhausting of " + planetModel.getAutoCompleteName()
-                    + " you may resolve your _Policy - The Economy: Exploit ➖_ ability."
-                    + " You may place 1 fighter from your reinforcements in a system that contains 1 or more of your ships.";
+                + " you may resolve your _Policy - The Economy: Exploit ➖_ ability."
+                + " You may place 1 fighter from your reinforcements in a system that contains 1 or more of your ships.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             List<Button> buttons = new ArrayList<>(
-                    Helper.getTileWithShipsPlaceUnitButtons(player, game, "ff", "placeOneNDone_skipbuild"));
+                Helper.getTileWithShipsPlaceUnitButtons(player, game, "ff", "placeOneNDone_skipbuild"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Resolve ability", buttons);
         }
     }
@@ -223,12 +223,12 @@ public class DiscordantStarsHelper {
         UnitHolder uh = ButtonHelper.getUnitHolderFromPlanetName(planetModel.getId(), game);
 
         if (!player.isHasUsedPeopleConnectAbility()
-                && player.hasAbility("policy_the_people_connect")
-                && uh != null
-                && uh.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
+            && player.hasAbility("policy_the_people_connect")
+            && uh != null
+            && uh.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
             String msg = player.getRepresentation() + ", due to your exhausting of " + planetModel.getAutoCompleteName()
-                    + ", you may resolve your _Policy - The People: Connect ➕_ ability."
-                    + " You may move 1 infantry on " + planetModel.getName() + " to another planet you control.";
+                + ", you may resolve your _Policy - The People: Connect ➕_ ability."
+                + " You may move 1 infantry on " + planetModel.getName() + " to another planet you control.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             List<Button> buttons = ButtonHelperAbilities.offerOlradinConnectButtons(player, game, planetModel.getId());
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Resolve Ability", buttons);
@@ -239,7 +239,7 @@ public class DiscordantStarsHelper {
         if (!player.isHasUsedEconomyEmpowerAbility() && player.hasAbility("policy_the_economy_empower")) {
             player.setHasUsedEconomyEmpowerAbility(true);
             String msg = player.getRepresentation() + ", due to your exhausting of " + planetModel.getAutoCompleteName()
-                    + ", you may resolve your _Policy - The Economy: Empower ➕_ ability. You gain 1 commodity.";
+                + ", you may resolve your _Policy - The Economy: Empower ➕_ ability. You gain 1 commodity.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             Button getCommButton = Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm);
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), "Resolve Ability.", getCommButton);
@@ -250,10 +250,9 @@ public class DiscordantStarsHelper {
         if (!player.isHasUsedEnvironmentPreserveAbility() && player.hasAbility("policy_the_environment_preserve")) {
             List<Button> buttons = ButtonHelperAbilities.getOlradinPreserveButtons(game, player, planetModel.getId());
             if (!buttons.isEmpty()) {
-                String msg =
-                        player.getRepresentation() + ", due to your exhausting of " + planetModel.getAutoCompleteName()
-                                + ", you may resolve your _Policy - The Environment: Preserve ➕_ ability."
-                                + " You may reveal the top card of the planets types exploration deck; if it is a relic fragment, gain it, otherwise discard that card.";
+                String msg = player.getRepresentation() + ", due to your exhausting of " + planetModel.getAutoCompleteName()
+                    + ", you may resolve your _Policy - The Environment: Preserve ➕_ ability."
+                    + " You may reveal the top card of the planets types exploration deck; if it is a relic fragment, gain it, otherwise discard that card.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Resolve ability", buttons);
             }
@@ -262,43 +261,43 @@ public class DiscordantStarsHelper {
 
     public static void drawRedBackTiles(GenericInteractionCreateEvent event, Game game, Player player, int count) {
         List<String> tilesToPullFrom = new ArrayList<>(List.of(
-                // Source:  https://discord.com/channels/943410040369479690/1009507056606249020/1140518249088434217
-                //
-                // https://cdn.discordapp.com/attachments/1009507056606249020/1140518248794820628/Starmap_Roll_Helper.xlsx
+            // Source:  https://discord.com/channels/943410040369479690/1009507056606249020/1140518249088434217
+            //
+            // https://cdn.discordapp.com/attachments/1009507056606249020/1140518248794820628/Starmap_Roll_Helper.xlsx
 
-                "39",
-                "40",
-                "41",
-                "42",
-                "43",
-                "44",
-                "45",
-                "46",
-                "47",
-                "48",
-                "49",
-                "67",
-                "68",
-                "77",
-                "78",
-                "79",
-                "80",
-                "d117",
-                "d118",
-                "d119",
-                "d120",
-                "d121",
-                "d122",
-                "d123"));
+            "39",
+            "40",
+            "41",
+            "42",
+            "43",
+            "44",
+            "45",
+            "46",
+            "47",
+            "48",
+            "49",
+            "67",
+            "68",
+            "77",
+            "78",
+            "79",
+            "80",
+            "d117",
+            "d118",
+            "d119",
+            "d120",
+            "d121",
+            "d122",
+            "d123"));
 
         // if (includeAllTiles) tilesToPullFrom = TileHelper.getAllTiles().values().stream().filter(tile ->
         // !tile.isAnomaly() && !tile.isHomeSystem() && !tile.isHyperlane()).map(TileModel::getId).toList();
         tilesToPullFrom.removeAll(
-                game.getTileMap().values().stream().map(Tile::getTileID).toList());
+            game.getTileMap().values().stream().map(Tile::getTileID).toList());
         if (!game.isDiscordantStarsMode()) {
             tilesToPullFrom.removeAll(tilesToPullFrom.stream()
-                    .filter(tileID -> tileID.contains("d"))
-                    .toList());
+                .filter(tileID -> tileID.contains("d"))
+                .toList());
         }
         List<String> tileToPullFromUnshuffled = new ArrayList<>(tilesToPullFrom);
         Collections.shuffle(tilesToPullFrom);
@@ -317,9 +316,9 @@ public class DiscordantStarsHelper {
             tileEmbeds.add(tile.getRepresentationEmbed(false));
         }
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getRepresentation() + " drew " + count + " red back tiles from this list:\n> "
-                        + tileToPullFromUnshuffled);
+            event.getMessageChannel(),
+            player.getRepresentation() + " drew " + count + " red back tiles from this list:\n> "
+                + tileToPullFromUnshuffled);
 
         event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
         if (ids.size() == 1) {
@@ -329,8 +328,8 @@ public class DiscordantStarsHelper {
 
     public static void drawBlueBackTiles(GenericInteractionCreateEvent event, Game game, Player player, int count) {
         List<MiltyDraftTile> unusedBlueTiles = new ArrayList<>(Helper.getUnusedTiles(game).stream()
-                .filter(tile -> tile.getTierList().isBlue())
-                .toList());
+            .filter(tile -> tile.getTierList().isBlue())
+            .toList());
 
         List<MiltyDraftTile> tileToPullFromUnshuffled = new ArrayList<>(unusedBlueTiles);
         Collections.shuffle(unusedBlueTiles);
@@ -349,13 +348,13 @@ public class DiscordantStarsHelper {
             ids.add(tile.getTileID());
         }
         String tileString = String.join(
-                ",",
-                tileToPullFromUnshuffled.stream()
-                        .map(t -> t.getTile().getTileID())
-                        .toList());
+            ",",
+            tileToPullFromUnshuffled.stream()
+                .map(t -> t.getTile().getTileID())
+                .toList());
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getRepresentation() + " drew " + count + " blue back tiles from this list:\n> " + tileString);
+            event.getMessageChannel(),
+            player.getRepresentation() + " drew " + count + " blue back tiles from this list:\n> " + tileString);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Use `/map add_tile` to add it to the map.");
 
         event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
@@ -368,7 +367,8 @@ public class DiscordantStarsHelper {
     }
 
     public static void setTrapForPlanet(
-            GenericInteractionCreateEvent event, Game game, String planetName, String trap, Player player) {
+        GenericInteractionCreateEvent event, Game game, String planetName, String trap, Player player
+    ) {
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
         Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
         String planetUnitHolderName = trapCardsPlanets.get(trap);
@@ -380,29 +380,30 @@ public class DiscordantStarsHelper {
         player.setTrapCardPlanet(trap, unitHolder.getName());
         player.setTrapCard(trap);
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " put a trap on the planet "
-                        + Helper.getPlanetRepresentation(planetName, game));
+            player.getCorrectChannel(),
+            player.getRepresentationUnfogged() + " put a trap on the planet "
+                + Helper.getPlanetRepresentation(planetName, game));
         MessageHelper.sendMessageToChannel(
-                player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + " set the trap "
-                        + ButtonHelperAbilities.translateNameIntoTrapIDOrReverse(trap) + " on the planet "
-                        + Helper.getPlanetRepresentation(planetName, game));
+            player.getCardsInfoThread(),
+            player.getRepresentationUnfogged() + " set the trap "
+                + ButtonHelperAbilities.translateNameIntoTrapIDOrReverse(trap) + " on the planet "
+                + Helper.getPlanetRepresentation(planetName, game));
         CommanderUnlockCheckService.checkPlayer(player, "lizho");
     }
 
     public static void revealTrapForPlanet(
-            GenericInteractionCreateEvent event,
-            Game game,
-            String planetName,
-            String trap,
-            Player player,
-            boolean reveal) {
+        GenericInteractionCreateEvent event,
+        Game game,
+        String planetName,
+        String trap,
+        Player player,
+        boolean reveal
+    ) {
         if (!player.getTrapCardsPlanets().containsValue(planetName) && planetName != null) {
             MessageHelper.sendMessageToChannel(
-                    player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + " could not find a trap for the planet "
-                            + Helper.getPlanetRepresentation(planetName, game));
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + " could not find a trap for the planet "
+                    + Helper.getPlanetRepresentation(planetName, game));
             return;
         }
         Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
@@ -421,7 +422,7 @@ public class DiscordantStarsHelper {
                 if (reveal && planet != null) {
 
                     String sb = trapCard.getRepresentation() + "\n" + "__**" + "Has been revealed on planet: "
-                            + representation + "**__";
+                        + representation + "**__";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
                     if ("Minefields".equalsIgnoreCase(trapCard.getName())) {
                         for (Player p2 : game.getRealPlayers()) {
@@ -429,10 +430,10 @@ public class DiscordantStarsHelper {
                                 continue;
                             }
                             RemoveUnitService.removeUnits(
-                                    event, game.getTileFromPlanet(planet), game, p2.getColor(), "2 inf " + planet);
+                                event, game.getTileFromPlanet(planet), game, p2.getColor(), "2 inf " + planet);
                         }
                         MessageHelper.sendMessageToChannel(
-                                player.getCorrectChannel(), "Destroyed up to 2 enemy infantry from " + representation);
+                            player.getCorrectChannel(), "Destroyed up to 2 enemy infantry from " + representation);
                     }
                     if ("Account Siphon".equalsIgnoreCase(trapCard.getName())) {
                         for (Player p2 : game.getRealPlayers()) {
@@ -442,15 +443,15 @@ public class DiscordantStarsHelper {
                             if (p2.getPlanets().contains(planet)) {
                                 List<Button> buttons = new ArrayList<>();
                                 buttons.add(Buttons.green(
-                                        "steal2tg_" + p2.getFaction(),
-                                        "Steal 2 Trade Goods From " + p2.getFactionEmojiOrColor()));
+                                    "steal2tg_" + p2.getFaction(),
+                                    "Steal 2 Trade Goods From " + p2.getFactionEmojiOrColor()));
                                 buttons.add(Buttons.blue(
-                                        "steal3comm_" + p2.getFaction(),
-                                        "Steal 3 Commodities From " + p2.getFactionEmojiOrColor()));
+                                    "steal3comm_" + p2.getFaction(),
+                                    "Steal 3 Commodities From " + p2.getFactionEmojiOrColor()));
                                 MessageHelper.sendMessageToChannelWithButtons(
-                                        player.getCorrectChannel(),
-                                        player.getRepresentationUnfogged() + ", use buttons to resolve.",
-                                        buttons);
+                                    player.getCorrectChannel(),
+                                    player.getRepresentationUnfogged() + ", use buttons to resolve.",
+                                    buttons);
                             }
                         }
                     }
@@ -471,8 +472,8 @@ public class DiscordantStarsHelper {
 
         StringBuilder sb = new StringBuilder();
         List<String> tilesWithGloryTokens = ButtonHelperAgents.getGloryTokenTiles(game).stream()
-                .map(Tile::getPosition)
-                .toList();
+            .map(Tile::getPosition)
+            .toList();
         for (String planetId : player.getPlanets()) {
             Planet planet = game.getUnitHolderFromPlanet(planetId);
             int mechsOnPlanet = planet.getUnitCount(UnitType.Mech, player);
@@ -481,24 +482,23 @@ public class DiscordantStarsHelper {
             }
 
             Tile planetTile = game.getTileFromPlanet(planetId);
-            Set<String> tilesAdjacentToMechPlanet =
-                    FoWHelper.getAdjacentTiles(game, planetTile.getPosition(), player, false, true);
+            Set<String> tilesAdjacentToMechPlanet = FoWHelper.getAdjacentTiles(game, planetTile.getPosition(), player, false, true);
             boolean hasAdjacentGloryToken = tilesAdjacentToMechPlanet.stream().anyMatch(tilesWithGloryTokens::contains);
 
             if (hasAdjacentGloryToken) {
                 AddUnitService.addUnits(
-                        event, planetTile, game, player.getColor(), mechsOnPlanet + " infantry " + planetId);
+                    event, planetTile, game, player.getColor(), mechsOnPlanet + " infantry " + planetId);
                 sb.append(player.getRepresentationNoPing())
-                        .append(" added ")
-                        .append(mechsOnPlanet)
-                        .append(UnitEmojis.infantry)
-                        .append(" to ")
-                        .append(planet.getPlanetModel().getName())
-                        .append(" due to ")
-                        .append(mechsOnPlanet)
-                        .append(" Skald ")
-                        .append(UnitEmojis.mech)
-                        .append(" being adjacent to a **Glory** token.\n");
+                    .append(" added ")
+                    .append(mechsOnPlanet)
+                    .append(UnitEmojis.infantry)
+                    .append(" to ")
+                    .append(planet.getPlanetModel().getName())
+                    .append(" due to ")
+                    .append(mechsOnPlanet)
+                    .append(" Skald ")
+                    .append(UnitEmojis.mech)
+                    .append(" being adjacent to a **Glory** token.\n");
             }
         }
 

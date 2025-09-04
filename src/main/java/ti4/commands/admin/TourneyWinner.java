@@ -25,7 +25,7 @@ public class TourneyWinner extends Subcommand {
         addOptions(new OptionData(OptionType.USER, Constants.USER, "Player who won the tournament", true));
         addOptions(new OptionData(OptionType.STRING, TOURNEYNAME, "Which tournament the player won", true));
         addOptions(new OptionData(OptionType.STRING, REMOVE, "Remove this user from the list instead")
-                .addChoices(removeOpts));
+            .addChoices(removeOpts));
     }
 
     @Override

@@ -27,10 +27,10 @@ class AddTileListRandom extends GameStateSubcommand {
 
     AddTileListRandom() {
         super(
-                Constants.ADD_TILE_LIST_RANDOM,
-                "Show dialog for tile list to generate map (supports random options from /map add_tile_random)",
-                true,
-                false);
+            Constants.ADD_TILE_LIST_RANDOM,
+            "Show dialog for tile list to generate map (supports random options from /map add_tile_random)",
+            true,
+            false);
     }
 
     @Override
@@ -42,16 +42,16 @@ class AddTileListRandom extends GameStateSubcommand {
         Modal.Builder newModalBuilder = Modal.create(modal.getId(), modal.getTitle());
         modal.getComponents().forEach(newModalBuilder::addComponents);
         boolean hasExistingErTiles = game.getTileMap().values().stream()
-                .anyMatch(t -> t.getTileID().toLowerCase().startsWith("er"));
+            .anyMatch(t -> t.getTileID().toLowerCase().startsWith("er"));
         TextInput sourcesInput = TextInput.create(Constants.INCLUDE_ERONOUS_TILES, TextInputStyle.SHORT)
-                .setPlaceholder("(Y)es / (N)o")
-                .setValue(hasExistingErTiles ? "Yes" : "No")
-                .setRequired(false)
-                .build();
+            .setPlaceholder("(Y)es / (N)o")
+            .setValue(hasExistingErTiles ? "Yes" : "No")
+            .setRequired(false)
+            .build();
 
         newModalBuilder
-                .addComponents(Label.of("Include Eronous tiles", sourcesInput))
-                .build();
+            .addComponents(Label.of("Include Eronous tiles", sourcesInput))
+            .build();
         modal = newModalBuilder.build();
 
         event.replyModal(modal).queue();
@@ -63,8 +63,7 @@ class AddTileListRandom extends GameStateSubcommand {
         String eronousTiles = event.getValue(Constants.INCLUDE_ERONOUS_TILES).getAsString();
         eronousTiles = eronousTiles.toLowerCase().trim();
 
-        Set<ComponentSource> sources =
-                AddTileService.getSources(game, ("y".equals(eronousTiles) || "yes".equals(eronousTiles)));
+        Set<ComponentSource> sources = AddTileService.getSources(game, ("y".equals(eronousTiles) || "yes".equals(eronousTiles)));
 
         StringTokenizer tileListTokenizer = new StringTokenizer(mapStringRaw, " ");
         List<String> tilesToAdd = new ArrayList<>();
@@ -81,10 +80,10 @@ class AddTileListRandom extends GameStateSubcommand {
             if (RandomOption.isValid(tileToken)) {
                 // Ignoring existing tiles from the map as those will be cleared by addTileListToMap
                 List<TileModel> availableTiles = AddTileService.availableTiles(
-                        sources, RandomOption.valueOf(tileToken), new HashSet<>(), tilesToAdd);
+                    sources, RandomOption.valueOf(tileToken), new HashSet<>(), tilesToAdd);
                 if (availableTiles.isEmpty()) {
                     MessageHelper.sendMessageToChannel(
-                            event.getChannel(), "Not enough " + tileToken + " tiles to draw from.");
+                        event.getChannel(), "Not enough " + tileToken + " tiles to draw from.");
                     return;
                 }
 

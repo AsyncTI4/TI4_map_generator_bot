@@ -40,6 +40,6 @@ class ListSpends extends GameStateSubcommand {
 
     private String playerSpends(Player player) {
         return "> " + player.getUserName() + ": " + player.getTotalExpenses()
-                + " total combined influence and resources spend collectively on units built and command tokens gained.";
+            + " total combined influence and resources spend collectively on units built and command tokens gained.";
     }
 }

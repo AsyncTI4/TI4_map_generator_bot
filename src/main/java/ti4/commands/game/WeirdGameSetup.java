@@ -23,41 +23,41 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.COMMUNITY_MODE, "True to enable Community mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FOW_MODE, "True to enable FoW mode"));
         addOptions(new OptionData(
-                OptionType.BOOLEAN, Constants.BASE_GAME_MODE, "True to switch to No Expansion (base game) mode."));
+            OptionType.BOOLEAN, Constants.BASE_GAME_MODE, "True to switch to No Expansion (base game) mode."));
         addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.MILTYMOD_MODE,
-                "True to switch to MiltyMod mode (only compatabile with No Expansion Mode)"));
+            OptionType.BOOLEAN,
+            Constants.MILTYMOD_MODE,
+            "True to switch to MiltyMod mode (only compatabile with No Expansion Mode)"));
         addOptions(new OptionData(
-                OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's "));
+            OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's "));
         addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.DISCORDANT_STARS_MODE,
-                "True to add the Discordant Stars factions to the pool."));
+            OptionType.BOOLEAN,
+            Constants.DISCORDANT_STARS_MODE,
+            "True to add the Discordant Stars factions to the pool."));
         addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.UNCHARTED_SPACE_STUFF,
-                "True to add the Uncharted Space Stuff to the draft pool."));
+            OptionType.BOOLEAN,
+            Constants.UNCHARTED_SPACE_STUFF,
+            "True to add the Uncharted Space Stuff to the draft pool."));
         // addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may
         // not be released to all games yet."));
         addOptions(new OptionData(
-                OptionType.INTEGER, Constants.CC_LIMIT, "Command token limit each player should have, default 16."));
+            OptionType.INTEGER, Constants.CC_LIMIT, "Command token limit each player should have, default 16."));
         addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.EXTRA_SECRET_MODE,
-                "True to allow each player to start with 2 secret objectives. Great for SftT-less games!"));
+            OptionType.BOOLEAN,
+            Constants.EXTRA_SECRET_MODE,
+            "True to allow each player to start with 2 secret objectives. Great for SftT-less games!"));
         addOptions(new OptionData(
-                OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
+            OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
         addOptions(
-                new OptionData(OptionType.BOOLEAN, Constants.FACILITIES_MODE, "True to enable Cacotopos Facilities"));
+            new OptionData(OptionType.BOOLEAN, Constants.FACILITIES_MODE, "True to enable Cacotopos Facilities"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_SWAP_MODE, "True to enable No Support Swaps"));
         addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.LIMITED_WHISPERS_MODE,
-                "True to enable hiding the details of written deals"));
+            OptionType.BOOLEAN,
+            Constants.LIMITED_WHISPERS_MODE,
+            "True to enable hiding the details of written deals"));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.PRIORITY_TRACK, "Enable the Priority Track for this game")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.PRIORITY_TRACK, "Enable the Priority Track for this game")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -72,8 +72,8 @@ class WeirdGameSetup extends GameStateSubcommand {
 
         if (!setGameMode(event, game)) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "Something went wrong and the game modes could not be set, please see error above.");
+                event.getChannel(),
+                "Something went wrong and the game modes could not be set, please see error above.");
         }
 
         // Boolean betaTestMode = event.getOption(Constants.BETA_TEST_MODE, null, OptionMapping::getAsBoolean);
@@ -120,16 +120,16 @@ class WeirdGameSetup extends GameStateSubcommand {
             PriorityTrackMode priorityTrackMode = PriorityTrackMode.parse(priorityTrackModeString);
             if (game.isCompetitiveTIGLGame()) {
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        "TIGL Games can not be mixed with other game modes. Priority Track is unchanged.");
+                    event.getMessageChannel(),
+                    "TIGL Games can not be mixed with other game modes. Priority Track is unchanged.");
             } else if (game.isOmegaPhaseMode() && priorityTrackMode != PriorityTrackMode.FULL) {
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        "Omega Phase requires the __full__ Priority Track. Priority Track is unchanged.");
+                    event.getMessageChannel(),
+                    "Omega Phase requires the __full__ Priority Track. Priority Track is unchanged.");
             } else if ("strategy".equals(game.getPhaseOfGame())) {
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        "Cannot add or remove the Priority Track during the Strategy Phase. Either UNDO out of it or wait for after it. Priority Track is unchanged.");
+                    event.getMessageChannel(),
+                    "Cannot add or remove the Priority Track during the Strategy Phase. Either UNDO out of it or wait for after it. Priority Track is unchanged.");
             } else {
                 game.setPriorityTrackMode(priorityTrackMode);
             }
@@ -138,50 +138,48 @@ class WeirdGameSetup extends GameStateSubcommand {
 
     private static boolean setGameMode(SlashCommandInteractionEvent event, Game game) {
         if (event.getOption(Constants.TIGL_GAME) == null
-                && event.getOption(Constants.ABSOL_MODE) == null
-                && event.getOption(Constants.DISCORDANT_STARS_MODE) == null
-                && event.getOption(Constants.BASE_GAME_MODE) == null
-                && event.getOption(Constants.MILTYMOD_MODE) == null
-                && event.getOption(Constants.VOTC_MODE) == null
-                && event.getOption(FOWOption.RIFTSET_MODE.toString()) == null) {
+            && event.getOption(Constants.ABSOL_MODE) == null
+            && event.getOption(Constants.DISCORDANT_STARS_MODE) == null
+            && event.getOption(Constants.BASE_GAME_MODE) == null
+            && event.getOption(Constants.MILTYMOD_MODE) == null
+            && event.getOption(Constants.VOTC_MODE) == null
+            && event.getOption(FOWOption.RIFTSET_MODE.toString()) == null) {
             return true; // no changes were made
         }
-        boolean isTIGLGame =
-                event.getOption(Constants.TIGL_GAME, game.isCompetitiveTIGLGame(), OptionMapping::getAsBoolean);
+        boolean isTIGLGame = event.getOption(Constants.TIGL_GAME, game.isCompetitiveTIGLGame(), OptionMapping::getAsBoolean);
         boolean absolMode = event.getOption(Constants.ABSOL_MODE, game.isAbsolMode(), OptionMapping::getAsBoolean);
-        boolean miltyModMode =
-                event.getOption(Constants.MILTYMOD_MODE, game.isMiltyModMode(), OptionMapping::getAsBoolean);
+        boolean miltyModMode = event.getOption(Constants.MILTYMOD_MODE, game.isMiltyModMode(), OptionMapping::getAsBoolean);
         boolean discordantStarsMode = event.getOption(
-                Constants.DISCORDANT_STARS_MODE, game.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
-        boolean baseGameMode =
-                event.getOption(Constants.BASE_GAME_MODE, game.isBaseGameMode(), OptionMapping::getAsBoolean);
+            Constants.DISCORDANT_STARS_MODE, game.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
+        boolean baseGameMode = event.getOption(Constants.BASE_GAME_MODE, game.isBaseGameMode(), OptionMapping::getAsBoolean);
         boolean votcMode = event.getOption(Constants.VOTC_MODE, game.isVotcMode(), OptionMapping::getAsBoolean);
         return setGameMode(
-                event, game, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame, votcMode);
+            event, game, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame, votcMode);
     }
 
     // TODO: find a better way to handle this - this is annoying
     // NOTE: (Jazz) This seems okay. Could use improvements to reduce manual handling, but it's fine for now.
     public static boolean setGameMode(
-            GenericInteractionCreateEvent event,
-            Game game,
-            boolean baseGameMode,
-            boolean absolMode,
-            boolean miltyModMode,
-            boolean discordantStarsMode,
-            boolean isTIGLGame,
-            boolean votcMode) {
+        GenericInteractionCreateEvent event,
+        Game game,
+        boolean baseGameMode,
+        boolean absolMode,
+        boolean miltyModMode,
+        boolean discordantStarsMode,
+        boolean isTIGLGame,
+        boolean votcMode
+    ) {
         if (isTIGLGame
-                && (baseGameMode
-                        || absolMode
-                        || discordantStarsMode
-                        || game.isHomebrewSCMode()
-                        || game.isFowMode()
-                        || game.isAllianceMode()
-                        || game.isCommunityMode()
-                        || votcMode)) {
+            && (baseGameMode
+                || absolMode
+                || discordantStarsMode
+                || game.isHomebrewSCMode()
+                || game.isFowMode()
+                || game.isAllianceMode()
+                || game.isCommunityMode()
+                || votcMode)) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
+                event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {
             TIGLHelper.initializeTIGLGame(game);
@@ -193,22 +191,22 @@ class WeirdGameSetup extends GameStateSubcommand {
 
         if (miltyModMode && !baseGameMode) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "Milty Mod Mode can only be combined with No Expansion Mode. Please set the game to No Expansion Mode first.");
+                event.getMessageChannel(),
+                "Milty Mod Mode can only be combined with No Expansion Mode. Please set the game to No Expansion Mode first.");
             return false;
         }
 
         if (baseGameMode && (absolMode || discordantStarsMode)) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "No Expansion Mode is not supported with Discordant Stars or Absol Mode");
+                event.getMessageChannel(),
+                "No Expansion Mode is not supported with Discordant Stars or Absol Mode");
             return false;
         } else if (baseGameMode && miltyModMode) {
             if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_miltymod"))) return false;
             if (!game.validateAndSetPublicObjectivesStage1Deck(
-                    event, Mapper.getDeck("public_stage_1_objectives_miltymod"))) return false;
+                event, Mapper.getDeck("public_stage_1_objectives_miltymod"))) return false;
             if (!game.validateAndSetPublicObjectivesStage2Deck(
-                    event, Mapper.getDeck("public_stage_2_objectives_miltymod"))) return false;
+                event, Mapper.getDeck("public_stage_2_objectives_miltymod"))) return false;
             if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_miltymod")))
                 return false;
             if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_miltymod"))) return false;

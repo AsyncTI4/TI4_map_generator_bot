@@ -37,8 +37,8 @@ class ColorUtil {
         if (p == null) return getColor(null);
         ColorModel colorModel = Mapper.getColor(p.getColor());
         return (colorModel != null && colorModel.getSecondaryColor() != null)
-                ? colorModel.getSecondaryColor()
-                : getPlayerMainColor(p);
+            ? colorModel.getSecondaryColor()
+            : getPlayerMainColor(p);
     }
 
     private Color getColor(String color) {

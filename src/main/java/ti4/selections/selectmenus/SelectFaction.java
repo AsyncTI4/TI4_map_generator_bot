@@ -37,30 +37,29 @@ public class SelectFaction implements Selection {
         }
 
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                "You selected: " + event.getSelectedOptions().getFirst().getLabel());
+            event.getMessageChannel(),
+            "You selected: " + event.getSelectedOptions().getFirst().getLabel());
 
         String fakeButtonID = selectionID + "_" + event.getUser().getId() + "_"
-                + event.getValues().getFirst();
+            + event.getValues().getFirst();
         ButtonHelper.resolveSetupStep2(game, event, fakeButtonID);
     }
 
     public static void offerFactionSelectionMenu(GenericInteractionCreateEvent event) {
         List<FactionModel> factions = Mapper.getFactionsValues().stream()
-                .sorted(Comparator.comparing(FactionModel::getFactionName))
-                .sorted(Comparator.comparing(FactionModel::getSource))
-                .toList();
+            .sorted(Comparator.comparing(FactionModel::getFactionName))
+            .sorted(Comparator.comparing(FactionModel::getSource))
+            .toList();
         List<List<FactionModel>> factionPages = ListUtils.partition(factions, 25);
         List<StringSelectMenu> menus = new ArrayList<>();
 
         for (List<FactionModel> factionPage : factionPages) {
             StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(selectionID);
             for (FactionModel faction : factionPage) {
-                Emoji emojiToUse =
-                        FactionEmojis.getFactionIcon(faction.getAlias()).asEmoji();
+                Emoji emojiToUse = FactionEmojis.getFactionIcon(faction.getAlias()).asEmoji();
                 SelectOption option = SelectOption.of(faction.getFactionName(), faction.getAlias())
-                        .withDescription(faction.getAlias())
-                        .withLabel(faction.getAutoCompleteName());
+                    .withDescription(faction.getAlias())
+                    .withLabel(faction.getAutoCompleteName());
                 option = option.withEmoji(emojiToUse);
                 menuBuilder.addOptions(option);
             }
@@ -69,9 +68,9 @@ public class SelectFaction implements Selection {
         }
         for (StringSelectMenu menu : menus) {
             event.getMessageChannel()
-                    .sendMessage("")
-                    .addComponents(ActionRow.of(menu))
-                    .queue();
+                .sendMessage("")
+                .addComponents(ActionRow.of(menu))
+                .queue();
         }
     }
 }

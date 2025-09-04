@@ -10,22 +10,22 @@ import ti4.helpers.Constants;
 public class DiscordantStarsCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new ZelianHero(),
-                    new TrapToken(),
-                    new TrapReveal(),
-                    new TrapSwap(),
-                    new FlipGrace(),
-                    new SetPolicy(),
-                    new DrawBlueBackTile(),
-                    new DrawRedBackTile(),
-                    new AddOmenDie(),
-                    new KyroHero(),
-                    new ATS(),
-                    new PathToken(),
-                    new HonorCount(),
-                    new DishonorCount(),
-                    new SetPlanetTradeGoods())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new ZelianHero(),
+        new TrapToken(),
+        new TrapReveal(),
+        new TrapSwap(),
+        new FlipGrace(),
+        new SetPolicy(),
+        new DrawBlueBackTile(),
+        new DrawRedBackTile(),
+        new AddOmenDie(),
+        new KyroHero(),
+        new ATS(),
+        new PathToken(),
+        new HonorCount(),
+        new DishonorCount(),
+        new SetPlanetTradeGoods())
+        .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

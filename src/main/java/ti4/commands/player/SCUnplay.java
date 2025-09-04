@@ -19,8 +19,8 @@ class SCUnplay extends GameStateSubcommand {
         super(Constants.SC_UNPLAY, "Unplay a Strategy Card", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number"));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -34,13 +34,12 @@ class SCUnplay extends GameStateSubcommand {
 
         if (playersSCs.size() != 1 && event.getOption(Constants.STRATEGY_CARD) == null) { // Only one SC selected
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    "Player has more than one strategy card. Please try again, using the `strategy_card` option.");
+                event,
+                "Player has more than one strategy card. Please try again, using the `strategy_card` option.");
             return;
         }
 
-        Integer scToUnplay =
-                event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()), OptionMapping::getAsInt);
+        Integer scToUnplay = event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()), OptionMapping::getAsInt);
         Game game = getGame();
         game.setSCPlayed(scToUnplay, false);
 
@@ -55,8 +54,8 @@ class SCUnplay extends GameStateSubcommand {
         }
 
         MessageHelper.sendMessageToEventChannel(
-                event,
-                "Strategy card has been flipped: " + CardEmojis.getSCBackFromInteger(scToUnplay) + " to "
-                        + CardEmojis.getSCFrontFromInteger(scToUnplay) + " (unplayed).");
+            event,
+            "Strategy card has been flipped: " + CardEmojis.getSCBackFromInteger(scToUnplay) + " to "
+                + CardEmojis.getSCFrontFromInteger(scToUnplay) + " (unplayed).");
     }
 }

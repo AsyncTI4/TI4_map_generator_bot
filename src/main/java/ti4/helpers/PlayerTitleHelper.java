@@ -21,10 +21,10 @@ public class PlayerTitleHelper {
     public static void offerEveryoneTitlePossibilities(Game game) {
         for (Player player : game.getRealAndEliminatedPlayers()) {
             String msg = player.getRepresentation()
-                    + ", you have the opportunity to anonymously bestow one title on someone else in this game."
-                    + " Titles are just for fun, and have no real significance, but could a nice way to take something away from this game."
-                    + " Feel free to not. If you choose to, it's a 2 button process. First select the title, then the player you wish to bestow it upon.\n\n"
-                    + "Of you don't see buttons for titles, try exiting Discord and reopening it.";
+                + ", you have the opportunity to anonymously bestow one title on someone else in this game."
+                + " Titles are just for fun, and have no real significance, but could a nice way to take something away from this game."
+                + " Feel free to not. If you choose to, it's a 2 button process. First select the title, then the player you wish to bestow it upon.\n\n"
+                + "Of you don't see buttons for titles, try exiting Discord and reopening it.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("bestowTitleStep1_Life Of The Table", "Life Of The Table"));
             buttons.add(Buttons.green("bestowTitleStep1_Fun To Be Around", "Fun To Be Around"));
@@ -50,7 +50,7 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.red("bestowTitleStep1_A Sneaky One", "A Sneaky One"));
             buttons.add(Buttons.red("bestowTitleStep1_You Made Me Mad", "You Made Me Mad"));
             buttons.add(
-                    Buttons.red("bestowTitleStep1_A Vuil'Raith In Xxcha Clothing", "A Vuil'Raith In Xxcha Clothing"));
+                Buttons.red("bestowTitleStep1_A Vuil'Raith In Xxcha Clothing", "A Vuil'Raith In Xxcha Clothing"));
             // buttons.add(Buttons.red("bestowTitleStep1_Space Risker", "Space Risker"));
             buttons.add(Buttons.red("bestowTitleStep1_A Warlord", "A Warlord"));
             buttons.add(Buttons.red("bestowTitleStep1_Word Breaker", "Word Breaker"));
@@ -59,23 +59,22 @@ public class PlayerTitleHelper {
 
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
             MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(),
-                    "Titles here (if you don't see them, try exiting Discord and reopening it)",
-                    buttons);
+                player.getCardsInfoThread(),
+                "Titles here (if you don't see them, try exiting Discord and reopening it)",
+                buttons);
             var userSettings = UserSettingsManager.get(player.getUserID());
             if (!userSettings.isHasIndicatedStatPreferences()) {
                 buttons = getOptInButtons(game, player);
                 msg = player.getRepresentation() + ", congratz on finishing a game of async!"
-                        + " Async has a website that collects and displays games and player stats, but we don't want to display your game stats without your permission."
-                        + " You can indicate what you're comfortable with displaying below with the buttons, and once you submit an answer you will not be asked again."
-                        + " However, you can always change your preferences with the `/statisticis opt_in` and `/statistics opt_out` commands."
-                        + "\nIf you want to see what a fully displayed profile looks like, check out this profile: <https://www.ti4ultimate.com/community/async/player-profile?playerId=406>.";
+                    + " Async has a website that collects and displays games and player stats, but we don't want to display your game stats without your permission."
+                    + " You can indicate what you're comfortable with displaying below with the buttons, and once you submit an answer you will not be asked again."
+                    + " However, you can always change your preferences with the `/statisticis opt_in` and `/statistics opt_out` commands."
+                    + "\nIf you want to see what a fully displayed profile looks like, check out this profile: <https://www.ti4ultimate.com/community/async/player-profile?playerId=406>.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
                 MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(), "Submit decision with these buttons", buttons);
+                    player.getCardsInfoThread(), "Submit decision with these buttons", buttons);
             } else {
-                msg =
-                        "If you have any interest in general or specific player stats in async, feel free to check out this website: <https://www.ti4ultimate.com/community/async/>.";
+                msg = "If you have any interest in general or specific player stats in async, feel free to check out this website: <https://www.ti4ultimate.com/community/async/>.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
             }
         }
@@ -106,7 +105,7 @@ public class PlayerTitleHelper {
             }
             case "4" -> {
                 buttons.add(
-                        Buttons.red("answerSurvey_Might Win Make In Any Position_5", "I may winmake in any position"));
+                    Buttons.red("answerSurvey_Might Win Make In Any Position_5", "I may winmake in any position"));
                 buttons.add(Buttons.blue("answerSurvey_May Winmake If Cannot Win_5", "I may winmake if I cannot win"));
                 buttons.add(Buttons.green("answerSurvey_Will Not Winmake_5", "I will not winmake"));
                 buttons.add(Buttons.gray("answerSurvey_No Preference_5", "Prefer Not To Answer"));
@@ -141,9 +140,9 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.red("purgeSupportsconfirmed", "Purge Supports"));
             buttons.add(Buttons.gray("deleteButtons", "Oops Mistake"));
             MessageHelper.sendMessageToChannelWithButtons(
-                    event.getChannel(),
-                    "Please confirm that you are pressing this button to purge all _Supports for the Thrones_ from the game.",
-                    buttons);
+                event.getChannel(),
+                "Please confirm that you are pressing this button to purge all _Supports for the Thrones_ from the game.",
+                buttons);
         }
     }
 
@@ -152,7 +151,7 @@ public class PlayerTitleHelper {
         game.setNoSwapMode(true);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
-                event.getChannel(), "Made it so you cannot swap _Supports For The Thrones_ in this game.");
+            event.getChannel(), "Made it so you cannot swap _Supports For The Thrones_ in this game.");
     }
 
     @ButtonHandler("setLimitedWhispers")
@@ -160,7 +159,7 @@ public class PlayerTitleHelper {
         game.setLimitedWhispersMode(true);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
-                event.getChannel(), "Made it so you can send hidden (redacted) deals via the transaction button.");
+            event.getChannel(), "Made it so you can send hidden (redacted) deals via the transaction button.");
     }
 
     @ButtonHandler(value = "answerSurvey_", save = false)
@@ -196,16 +195,15 @@ public class PlayerTitleHelper {
             case "5" -> {
                 userSettings.setWinmakingPref(answer);
                 msg = "### Survey Question 5/5: Meta Preferences\n" + msg;
-                msg +=
-                        " Many players prefer not to play \"space risk\", where the game features early and ferocious attacks without an objective providing motivation for the attacks."
-                                + " Many other players prefer not to play with a \"passive boat float\" where everyone sits in their slice until the end game and players promise forever wars for the slightest early game aggression."
-                                + " Which describes you better?";
+                msg += " Many players prefer not to play \"space risk\", where the game features early and ferocious attacks without an objective providing motivation for the attacks."
+                    + " Many other players prefer not to play with a \"passive boat float\" where everyone sits in their slice until the end game and players promise forever wars for the slightest early game aggression."
+                    + " Which describes you better?";
             }
             case "6" -> {
                 userSettings.setMetaPref(answer);
                 msg += " Thank you for completing the survey."
-                        + " You will see anonymous results after the first strategy phase of every game if at least two people in the game have completed the survey."
-                        + " You can retake this survey at any time via /user survey, but you will never be asked to complete it again. Hope you have a good rest of your day!";
+                    + " You will see anonymous results after the first strategy phase of every game if at least two people in the game have completed the survey."
+                    + " You can retake this survey at any time via /user survey, but you will never be asked to complete it again. Hope you have a good rest of your day!";
             }
         }
         if (event instanceof SlashCommandInteractionEvent sevent) {
@@ -285,13 +283,14 @@ public class PlayerTitleHelper {
 
     @ButtonHandler("setOptInSinglePreference_")
     public static void setOptInSinglePreference(
-            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        Game game, Player player, ButtonInteractionEvent event, String buttonID
+    ) {
         game.setStoredValue(buttonID.split("_")[1], buttonID.split("_")[2]);
         String msg = "Altered a value";
         event.getMessage()
-                .editMessage(msg)
-                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(getOptInButtons(game, player)))
-                .queue();
+            .editMessage(msg)
+            .setComponents(ButtonHelper.turnButtonListIntoActionRowList(getOptInButtons(game, player)))
+            .queue();
     }
 
     @ButtonHandler("setOptInStats_")
@@ -344,18 +343,19 @@ public class PlayerTitleHelper {
 
     @ButtonHandler(value = "bestowTitleStep1_", save = false)
     public static void resolveBestowTitleStep1(
-            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        Game game, Player player, ButtonInteractionEvent event, String buttonID
+    ) {
         String title = buttonID.split("_")[1];
         String msg = player.getRepresentation() + ", please choose the player you wish to give the title of \"" + title
-                + "\".";
+            + "\".";
         List<Button> buttons = new ArrayList<>();
         for (Player player2 : game.getRealPlayersNDummies()) {
             if (player2 == player) {
                 continue;
             }
             buttons.add(Buttons.green(
-                    "bestowTitleStep2_" + title + "_" + player2.getFaction(),
-                    player2.getFactionModel().getFactionName() + " (" + player2.getUserName() + ")"));
+                "bestowTitleStep2_" + title + "_" + player2.getFaction(),
+                player2.getFactionModel().getFactionName() + " (" + player2.getUserName() + ")"));
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         ButtonHelper.deleteMessage(event);
@@ -363,7 +363,8 @@ public class PlayerTitleHelper {
 
     @ButtonHandler("bestowTitleStep2_")
     public static void resolveBestowTitleStep2(
-            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        Game game, Player player, ButtonInteractionEvent event, String buttonID
+    ) {
         String title = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(faction);

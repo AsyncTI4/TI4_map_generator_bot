@@ -84,7 +84,8 @@ public abstract class SettingsMenu {
     /** Action Handler. Returns null on a success */
     String resetSettings() {
         if (enabledSettings().isEmpty()) return "No settings to reset.";
-        for (SettingInterface setting : enabledSettings()) setting.reset();
+        for (SettingInterface setting : enabledSettings())
+            setting.reset();
         return null;
     }
 
@@ -101,13 +102,14 @@ public abstract class SettingsMenu {
 
     String menuSummaryString(String lastSettingTouched) {
         StringBuilder sb = new StringBuilder("# **__").append(menuName).append(":__**");
-        for (String line : description) sb.append("\n- *").append(line).append("*");
+        for (String line : description)
+            sb.append("\n- *").append(line).append("*");
         sb.append("\n");
 
         int pad = enabledSettings().stream()
-                .map(x -> x.getName().length())
-                .max(Comparator.comparingInt(x -> x))
-                .orElse(15);
+            .map(x -> x.getName().length())
+            .max(Comparator.comparingInt(x -> x))
+            .orElse(15);
         for (SettingInterface setting : enabledSettings()) {
             sb.append("> ");
             sb.append(setting.longSummary(pad, lastSettingTouched));
@@ -143,10 +145,10 @@ public abstract class SettingsMenu {
         if (shortDescrOnly) return sb.toString();
 
         int maxlength = enabledSettings().stream()
-                .filter(s -> s.getId() != null)
-                .map(s -> s.getId().length())
-                .max(Comparator.comparingInt(x -> x))
-                .orElse(5);
+            .filter(s -> s.getId() != null)
+            .map(s -> s.getId().length())
+            .max(Comparator.comparingInt(x -> x))
+            .orElse(5);
         for (SettingInterface setting : enabledSettings()) {
             sb.append("\n> ").append(setting.shortSummary(maxlength));
         }
@@ -202,7 +204,7 @@ public abstract class SettingsMenu {
     private void buttonFailed(GenericInteractionCreateEvent event, String userMsg, boolean pingJazz) {
         if (pingJazz) {
             BotLogger.error(
-                    new LogOrigin(event), userMsg + "\n" + Constants.jazzPing() + " Menu Framework button has failed.");
+                new LogOrigin(event), userMsg + "\n" + Constants.jazzPing() + " Menu Framework button has failed.");
             userMsg += "\n> *Jazz has been pinged to take a look.*";
         }
         if (event instanceof ButtonInteractionEvent buttonEvent)
@@ -231,7 +233,8 @@ public abstract class SettingsMenu {
     }
 
     private boolean handleButtonPress(
-            GenericInteractionCreateEvent event, String buttonType, String action, List<String> path) {
+        GenericInteractionCreateEvent event, String buttonType, String action, List<String> path
+    ) {
         List<String> remainingPath = new ArrayList<>(path); // copy to prevent pointer shenanigans
         if (!remainingPath.isEmpty()) {
             String menu = remainingPath.getFirst();
@@ -325,27 +328,27 @@ public abstract class SettingsMenu {
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             setMessageId(buttonEvent.getMessage());
             buttonEvent
-                    .getHook()
-                    .editOriginal(newSummary)
-                    .setComponents(actionRows)
-                    .queue();
+                .getHook()
+                .editOriginal(newSummary)
+                .setComponents(actionRows)
+                .queue();
         } else if (event instanceof ModalInteractionEvent modalEvent) {
             if (modalEvent.getMessage() != null) {
                 modalEvent
-                        .getMessage()
-                        .editMessage(newSummary)
-                        .setComponents(actionRows)
-                        .queue();
+                    .getMessage()
+                    .editMessage(newSummary)
+                    .setComponents(actionRows)
+                    .queue();
             }
         } else if (event instanceof StringSelectInteractionEvent selectEvent) {
             if (messageId == null) {
                 return;
             }
             selectEvent
-                    .getGuildChannel()
-                    .editMessageById(messageId, newSummary)
-                    .setComponents(actionRows)
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
+                .getGuildChannel()
+                .editMessageById(messageId, newSummary)
+                .setComponents(actionRows)
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -401,13 +404,12 @@ public abstract class SettingsMenu {
             List<Button> buttonsToUse = new ArrayList<>();
             if (pageNum > 0) {
                 Button prevPage = Button.of(
-                        ButtonStyle.PRIMARY, navString + (pageNum - 1), "Previous Page", Emoji.fromUnicode("⏪"));
+                    ButtonStyle.PRIMARY, navString + (pageNum - 1), "Previous Page", Emoji.fromUnicode("⏪"));
                 buttonsToUse.add(prevPage);
             }
             buttonsToUse.addAll(paginated.get(pageNum));
             if (pageNum < maxPage) {
-                Button nextPage =
-                        Button.of(ButtonStyle.PRIMARY, navString + (pageNum + 1), "Next Page", Emoji.fromUnicode("⏩"));
+                Button nextPage = Button.of(ButtonStyle.PRIMARY, navString + (pageNum + 1), "Next Page", Emoji.fromUnicode("⏩"));
                 buttonsToUse.add(nextPage);
             }
             return buttonsToUse;
@@ -419,8 +421,8 @@ public abstract class SettingsMenu {
         String prefixID = menuAction + "_" + navId() + "_";
         List<SettingInterface> interfaces = new ArrayList<>(enabledSettings());
         List<Button> settingButtons = interfaces.stream()
-                .flatMap(setting -> new ArrayList<>(setting.getButtons(prefixID)).stream())
-                .toList();
+            .flatMap(setting -> new ArrayList<>(setting.getButtons(prefixID)).stream())
+            .toList();
         List<Button> output = new ArrayList<>();
         if (!settingButtons.isEmpty())
             output.add(Button.of(ButtonStyle.DANGER, prefixID + "reset", "Reset to default settings"));

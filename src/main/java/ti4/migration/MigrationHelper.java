@@ -108,7 +108,7 @@ class MigrationHelper {
 
     public static void swapBagItem(DraftBag bag, int index, DraftItem newItem) {
         BotLogger.info(String.format(
-                "Draft Bag replacing %s with %s", bag.Contents.get(index).getAlias(), newItem.getAlias()));
+            "Draft Bag replacing %s with %s", bag.Contents.get(index).getAlias(), newItem.getAlias()));
         bag.Contents.remove(index);
         bag.Contents.add(index, newItem);
     }

@@ -26,8 +26,8 @@ public class ExportToCsvService {
         StringBuilder output = new StringBuilder(header(playerCount));
 
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilter(event),
-                game -> output.append(System.lineSeparator()).append(gameToCsv(game)));
+            GameStatisticsFilterer.getGamesFilter(event),
+            game -> output.append(System.lineSeparator()).append(gameToCsv(game)));
 
         if (output.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No games found matching filter.");
@@ -80,14 +80,13 @@ public class ExportToCsvService {
             fields.add(Integer.toString(p.getSecretVictoryPoints()));
             fields.add(Integer.toString(p.getPublicVictoryPoints(false)));
             fields.add(Integer.toString(
-                    p.getTotalVictoryPoints() - p.getSecretVictoryPoints() - p.getPublicVictoryPoints(false)));
+                p.getTotalVictoryPoints() - p.getSecretVictoryPoints() - p.getPublicVictoryPoints(false)));
             fields.add(String.join("|", p.getTechs()));
             fields.add(String.join("|", p.getRelics()));
             fields.add(Boolean.toString(p.getLeaderByType("hero").isEmpty()));
         }
 
-        List<String> outputFields =
-                fields.stream().map(f -> f.contains(",") ? "\"" + f + "\"" : f).toList();
+        List<String> outputFields = fields.stream().map(f -> f.contains(",") ? "\"" + f + "\"" : f).toList();
         return String.join(",", outputFields);
     }
 }

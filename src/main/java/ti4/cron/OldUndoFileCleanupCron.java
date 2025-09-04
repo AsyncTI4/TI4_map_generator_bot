@@ -17,7 +17,7 @@ public class OldUndoFileCleanupCron {
 
     public static void register() {
         CronManager.schedulePeriodicallyAtTime(
-                OldUndoFileCleanupCron.class, OldUndoFileCleanupCron::cleanup, 3, 0, ZoneId.of("America/New_York"));
+            OldUndoFileCleanupCron.class, OldUndoFileCleanupCron::cleanup, 3, 0, ZoneId.of("America/New_York"));
     }
 
     private static void cleanup() {
@@ -36,8 +36,7 @@ public class OldUndoFileCleanupCron {
         int count = 0;
 
         Path baseGameUndoDirectory = Storage.getBaseGameUndoDirectory();
-        try (DirectoryStream<Path> subdirectories =
-                Files.newDirectoryStream(baseGameUndoDirectory, Files::isDirectory)) {
+        try (DirectoryStream<Path> subdirectories = Files.newDirectoryStream(baseGameUndoDirectory, Files::isDirectory)) {
             for (Path subdirectory : subdirectories) {
                 count += deleteOldFilesInDirectory(subdirectory, cutoff);
             }
@@ -46,8 +45,8 @@ public class OldUndoFileCleanupCron {
         }
 
         BotLogger.info(String.format(
-                "OldUndoFileCleanupCron: Cleaned up `%d` undo files that were over `%d` days old (%s)",
-                count, daysOld, cutoff));
+            "OldUndoFileCleanupCron: Cleaned up `%d` undo files that were over `%d` days old (%s)",
+            count, daysOld, cutoff));
     }
 
     private int deleteOldFilesInDirectory(Path directory, Instant cutoff) {

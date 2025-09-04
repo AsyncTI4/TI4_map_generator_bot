@@ -26,10 +26,9 @@ public class SleeperTokenHelper {
             if (tile != null) {
                 break;
             }
-            for (Map.Entry<String, UnitHolder> unitHolderEntry :
-                    tile_.getUnitHolders().entrySet()) {
+            for (Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
                 if (unitHolderEntry.getValue() instanceof Planet
-                        && unitHolderEntry.getKey().equals(planetName)) {
+                    && unitHolderEntry.getKey().equals(planetName)) {
                     tile = tile_;
                     unitHolder = unitHolderEntry.getValue();
                     break;

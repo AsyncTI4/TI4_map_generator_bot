@@ -24,30 +24,30 @@ class FactionWinPercentStatisticsService {
         Map<String, Integer> factionWinsWithRelics = new HashMap<>();
 
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilterForWonGame(event),
-                game -> getFactionWinPercent(game, factionWinCount, factionGameCount, factionWinsWithRelics));
+            GameStatisticsFilterer.getGamesFilterForWonGame(event),
+            game -> getFactionWinPercent(game, factionWinCount, factionGameCount, factionWinsWithRelics));
 
         StringBuilder sb = new StringBuilder();
         sb.append("Faction Win Percent:").append("\n");
         Mapper.getFactionsValues().stream()
-                .map(faction -> {
-                    double winCount = factionWinCount.getOrDefault(faction.getAlias(), 0);
-                    double gameCount = factionGameCount.getOrDefault(faction.getAlias(), 0);
-                    return Map.entry(faction, gameCount == 0 ? 0 : Math.round(100 * winCount / gameCount));
-                })
-                .filter(entry -> factionGameCount.containsKey(entry.getKey().getAlias()))
-                .sorted(Map.Entry.<FactionModel, Long>comparingByValue().reversed())
-                .forEach(entry -> sb.append("`")
-                        .append(StringUtils.leftPad(entry.getValue().toString(), 4))
-                        .append("%` (")
-                        .append(factionGameCount.getOrDefault(entry.getKey().getAlias(), 0))
-                        .append(" games) ")
-                        .append(entry.getKey().getFactionEmoji())
-                        .append(" ")
-                        .append(entry.getKey().getFactionNameWithSourceEmoji())
-                        .append("\n"));
+            .map(faction -> {
+                double winCount = factionWinCount.getOrDefault(faction.getAlias(), 0);
+                double gameCount = factionGameCount.getOrDefault(faction.getAlias(), 0);
+                return Map.entry(faction, gameCount == 0 ? 0 : Math.round(100 * winCount / gameCount));
+            })
+            .filter(entry -> factionGameCount.containsKey(entry.getKey().getAlias()))
+            .sorted(Map.Entry.<FactionModel, Long>comparingByValue().reversed())
+            .forEach(entry -> sb.append("`")
+                .append(StringUtils.leftPad(entry.getValue().toString(), 4))
+                .append("%` (")
+                .append(factionGameCount.getOrDefault(entry.getKey().getAlias(), 0))
+                .append(" games) ")
+                .append(entry.getKey().getFactionEmoji())
+                .append(" ")
+                .append(entry.getKey().getFactionNameWithSourceEmoji())
+                .append("\n"));
         MessageHelper.sendMessageToThread(
-                (MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
+            (MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
 
         // StringBuilder sb2 = new StringBuilder();
         // sb2.append("Winning Faction Relic Holding Percent:").append("\n");
@@ -82,10 +82,11 @@ class FactionWinPercentStatisticsService {
     }
 
     private static void getFactionWinPercent(
-            Game game,
-            Map<String, Integer> factionWinCount,
-            Map<String, Integer> factionGameCount,
-            Map<String, Integer> factionWinsWithRelics) {
+        Game game,
+        Map<String, Integer> factionWinCount,
+        Map<String, Integer> factionGameCount,
+        Map<String, Integer> factionWinsWithRelics
+    ) {
         List<Player> winners = game.getWinners();
         if (winners.isEmpty()) {
             return;
@@ -105,20 +106,20 @@ class FactionWinPercentStatisticsService {
         }
 
         game.getRealAndEliminatedAndDummyPlayers()
-                .forEach(player -> incrementMapValue(factionGameCount, player.getFaction()));
+            .forEach(player -> incrementMapValue(factionGameCount, player.getFaction()));
     }
 
     private static boolean hasEmphidiaScored(Game game, Player winner) {
         return game.getScoredPublicObjectives().entrySet().stream()
-                .filter(entry -> entry.getValue().contains(winner.getUserID()))
-                .map(Map.Entry::getKey)
-                .anyMatch(poID -> poID.toLowerCase().contains("emphidia"));
+            .filter(entry -> entry.getValue().contains(winner.getUserID()))
+            .map(Map.Entry::getKey)
+            .anyMatch(poID -> poID.toLowerCase().contains("emphidia"));
     }
 
     private static boolean usedRelicsOrEmphidia(Player winner, boolean emphidiaScored) {
         return emphidiaScored
-                || winner.getRelics().stream()
-                        .anyMatch(relic -> "shard".equalsIgnoreCase(relic) || "obsidian".equalsIgnoreCase(relic));
+            || winner.getRelics().stream()
+                .anyMatch(relic -> "shard".equalsIgnoreCase(relic) || "obsidian".equalsIgnoreCase(relic));
     }
 
     private static void incrementMapValue(Map<String, Integer> map, String key) {

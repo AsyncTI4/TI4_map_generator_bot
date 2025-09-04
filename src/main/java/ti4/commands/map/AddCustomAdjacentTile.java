@@ -24,13 +24,11 @@ class AddCustomAdjacentTile extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String primaryTile =
-                event.getOption(Constants.PRIMARY_TILE).getAsString().toLowerCase();
-        String adjacentTiles =
-                event.getOption(Constants.ADJACENT_TILES).getAsString().toLowerCase();
+        String primaryTile = event.getOption(Constants.PRIMARY_TILE).getAsString().toLowerCase();
+        String adjacentTiles = event.getOption(Constants.ADJACENT_TILES).getAsString().toLowerCase();
         if (primaryTile.isBlank() || adjacentTiles.isBlank()) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Bad data, try again. Example: primary:0a adjacent:1a,1b,1c,1d");
+                event.getChannel(), "Bad data, try again. Example: primary:0a adjacent:1a,1b,1c,1d");
             return;
         }
 

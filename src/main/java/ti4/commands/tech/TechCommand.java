@@ -10,16 +10,16 @@ import ti4.helpers.Constants;
 public class TechCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new TechAdd(),
-                    new TechRemove(),
-                    new TechPurge(),
-                    new TechExhaust(),
-                    new TechRefresh(),
-                    new TechInfo(),
-                    new GetTechButton(),
-                    new TechChangeType(),
-                    new TechShowDeck())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new TechAdd(),
+        new TechRemove(),
+        new TechPurge(),
+        new TechExhaust(),
+        new TechRefresh(),
+        new TechInfo(),
+        new GetTechButton(),
+        new TechChangeType(),
+        new TechShowDeck())
+        .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

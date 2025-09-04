@@ -44,11 +44,11 @@ class ObjectiveBox {
         graphics.drawRect(x - horizontalBoxOffset, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
         if (objective.revealed() && Mapper.getPublicObjective(objective.key()) != null) {
             generator.addWebsiteOverlay(
-                    Mapper.getPublicObjective(objective.key()),
-                    x - horizontalBoxOffset,
-                    y - spacingBetweenBoxes,
-                    boxWidth,
-                    objectiveBoxHeight);
+                Mapper.getPublicObjective(objective.key()),
+                x - horizontalBoxOffset,
+                y - spacingBetweenBoxes,
+                boxWidth,
+                objectiveBoxHeight);
         }
 
         x += maxTextWidth + bufferBetweenTextAndTokens;
@@ -58,8 +58,7 @@ class ObjectiveBox {
     public static Integer getMaxTextWidth(Game game, Graphics graphics, List<Objective> objectives) {
         int maxTextWidth = 0;
         for (Objective objective : objectives) {
-            maxTextWidth =
-                    Math.max(maxTextWidth, graphics.getFontMetrics().stringWidth(objective.getDisplayText(game)));
+            maxTextWidth = Math.max(maxTextWidth, graphics.getFontMetrics().stringWidth(objective.getDisplayText(game)));
         }
         return maxTextWidth;
     }
@@ -70,10 +69,10 @@ class ObjectiveBox {
 
     public static Integer getBoxWidth(Game game, Integer maxTextWidth, Integer scoreTokenSpacing) {
         return Math.max(
-                getMinimumBoxWidth(game),
-                Math.min(
-                        MapGenerator.getMaxObjectiveWidth(game),
-                        getMaxLengthOfTokens(game, maxTextWidth, scoreTokenSpacing)));
+            getMinimumBoxWidth(game),
+            Math.min(
+                MapGenerator.getMaxObjectiveWidth(game),
+                getMaxLengthOfTokens(game, maxTextWidth, scoreTokenSpacing)));
     }
 
     public static Integer getVerticalSpacing() {
@@ -82,8 +81,8 @@ class ObjectiveBox {
 
     private static Integer getMaxLengthOfTokens(Game game, Integer maxTextWidth, Integer scoreTokenSpacing) {
         return maxTextWidth
-                + (bufferBetweenTextAndTokens * 2)
-                + (game.getRealAndEliminatedAndDummyPlayers().size() * scoreTokenSpacing);
+            + (bufferBetweenTextAndTokens * 2)
+            + (game.getRealAndEliminatedAndDummyPlayers().size() * scoreTokenSpacing);
     }
 
     private void displayScoreMarkers(Game game, Graphics graphics, MapGenerator generator, Objective objective) {
@@ -98,10 +97,10 @@ class ObjectiveBox {
         try {
             int numberOfRealPlayers = game.getRealAndEliminatedAndDummyPlayers().size();
             int minimumTokenSpacingToStayInsideBox = numberOfRealPlayers == 0
-                    ? 1
-                    : spaceForTokens
-                                    / game.getRealAndEliminatedAndDummyPlayers().size()
-                            + 1;
+                ? 1
+                : spaceForTokens
+                    / game.getRealAndEliminatedAndDummyPlayers().size()
+                    + 1;
             int controlTokenSpacing = Math.min(scoreTokenSpacing, minimumTokenSpacingToStayInsideBox);
 
             for (String playerID : playerIDs) {
@@ -109,26 +108,24 @@ class ObjectiveBox {
                 if (player == null) continue;
 
                 boolean convertToGeneric = generator.shouldConvertToGeneric(player);
-                String controlID =
-                        convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
+                String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
 
                 if (controlID.contains("null")) {
                     continue;
                 }
 
-                BufferedImage controlTokenImage =
-                        ImageHelper.readScaled(Mapper.getCCPath(controlID), controlTokenScale);
+                BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), controlTokenScale);
                 if (objective.isMultiScoring(game) || game.isFowMode()) {
                     DrawingUtil.drawControlToken(
-                            graphics, controlTokenImage, player, x, y, convertToGeneric, controlTokenScale);
+                        graphics, controlTokenImage, player, x, y, convertToGeneric, controlTokenScale);
                     x += controlTokenSpacing;
 
                 } else {
                     int xPosition = x
-                            + controlTokenSpacing
-                                    * (game.getRealPlayers().indexOf(player)); // TODO: fix cabal at index 0 for pbd1000
+                        + controlTokenSpacing
+                            * (game.getRealPlayers().indexOf(player)); // TODO: fix cabal at index 0 for pbd1000
                     DrawingUtil.drawControlToken(
-                            graphics, controlTokenImage, player, xPosition, y, convertToGeneric, controlTokenScale);
+                        graphics, controlTokenImage, player, xPosition, y, convertToGeneric, controlTokenScale);
                 }
             }
         } catch (Exception e) {

@@ -39,7 +39,7 @@ public class UserSettingsManager {
     private static void persistFile(UserSettings userSettings) {
         try {
             PersistenceManager.writeObjectToJsonFile(
-                    USER_SETTINGS_PATH, userSettings.getUserId() + ".json", userSettings);
+                USER_SETTINGS_PATH, userSettings.getUserId() + ".json", userSettings);
         } catch (Exception e) {
             BotLogger.error("Failed to write json data for UserSettingsManager.", e);
         }

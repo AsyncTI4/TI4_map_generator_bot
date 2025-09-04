@@ -21,10 +21,11 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-            @NotNull HttpServletRequest request,
-            @NotNull HttpServletResponse response,
-            @NotNull FilterChain filterChain)
-            throws ServletException, IOException {
+        @NotNull HttpServletRequest request,
+        @NotNull HttpServletResponse response,
+        @NotNull FilterChain filterChain
+    )
+        throws ServletException, IOException {
         var cachingResponse = new ContentCachingResponseWrapper(response);
         SREStats.incrementWebserverRequestCount();
         SREStats.incrementRequestCount();
@@ -40,8 +41,8 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
         if (cachingResponse.getStatus() >= START_OF_HTTP_ERROR_RANGE) {
             String body = new String(cachingResponse.getContentAsByteArray(), cachingResponse.getCharacterEncoding());
             String error = String.format(
-                    "Request to %s returned status %s with body: %s",
-                    request.getRequestURI(), cachingResponse.getStatus(), body);
+                "Request to %s returned status %s with body: %s",
+                request.getRequestURI(), cachingResponse.getStatus(), body);
             BotLogger.error(error);
             SREStats.incrementWebserverRequestErrorCount();
         }

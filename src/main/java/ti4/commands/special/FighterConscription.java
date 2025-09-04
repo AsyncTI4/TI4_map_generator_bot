@@ -13,8 +13,8 @@ class FighterConscription extends GameStateSubcommand {
         super(Constants.FIGHTER_CONSCRIPTION, "Fighter Conscription +1 fighter in each space area", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                .setAutoComplete(true));
     }
 
     @Override

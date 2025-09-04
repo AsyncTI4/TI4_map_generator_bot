@@ -17,15 +17,14 @@ class BeginVideoGeneration extends Subcommand {
     BeginVideoGeneration() {
         super(Constants.BEGIN_VIDEO_GEN, "Kickoff Video Process in AWS");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Name of the Game to video-ize.")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
         String game = event.getOption(Constants.GAME_NAME).getAsString();
         MessageHelper.sendMessageToEventChannel(event, "Launching Video Creation for:" + game);
-        AWSBatch client =
-                AWSBatchClientBuilder.standard().withRegion("us-east-1").build();
+        AWSBatch client = AWSBatchClientBuilder.standard().withRegion("us-east-1").build();
         SubmitJobRequest sjr = new SubmitJobRequest();
         sjr.setJobName("video-" + game);
         sjr.setJobDefinition("getting-started-wizard-job-definition:11");

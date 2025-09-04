@@ -32,12 +32,12 @@ public class ShowGameCommand extends GameStateCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-                new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown").setAutoComplete(true),
-                new OptionData(
-                                OptionType.STRING,
-                                Constants.DISPLAY_TYPE,
-                                "Show map in specific format. all, map, stats")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown").setAutoComplete(true),
+            new OptionData(
+                OptionType.STRING,
+                Constants.DISPLAY_TYPE,
+                "Show map in specific format. all, map, stats")
+                    .setAutoComplete(true));
     }
 
     @Override
@@ -50,10 +50,10 @@ public class ShowGameCommand extends GameStateCommand {
             if (temp.equals(DisplayType.split.getValue())) {
                 displayType = DisplayType.map;
                 MapRenderPipeline.queue(
-                        game,
-                        event,
-                        displayType,
-                        fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
+                    game,
+                    event,
+                    displayType,
+                    fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
                 displayType = DisplayType.stats;
             } else {
                 for (DisplayType i : DisplayType.values()) {

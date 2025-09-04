@@ -25,20 +25,20 @@ public class SabotageAutoReactCron {
 
     public static void register() {
         CronManager.schedulePeriodically(
-                SabotageAutoReactCron.class,
-                SabotageAutoReactCron::autoReact,
-                5,
-                SCHEDULED_PERIOD_MINUTES,
-                TimeUnit.MINUTES);
+            SabotageAutoReactCron.class,
+            SabotageAutoReactCron::autoReact,
+            5,
+            SCHEDULED_PERIOD_MINUTES,
+            TimeUnit.MINUTES);
     }
 
     private static void autoReact() {
         BotLogger.logCron("Running SabotageAutoReactCron.");
 
         GameManager.getManagedGames().stream()
-                .filter(not(ManagedGame::isHasEnded))
-                .map(ManagedGame::getGame)
-                .forEach(SabotageAutoReactCron::autoReact);
+            .filter(not(ManagedGame::isHasEnded))
+            .map(ManagedGame::getGame)
+            .forEach(SabotageAutoReactCron::autoReact);
 
         BotLogger.logCron("Finished SabotageAutoReactCron.");
     }
@@ -52,8 +52,7 @@ public class SabotageAutoReactCron {
     }
 
     private static void automaticallyReactToSabotageWindows(Game game) {
-        List<GameMessageManager.GameMessage> acMessages =
-                GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD);
+        List<GameMessageManager.GameMessage> acMessages = GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD);
         if (acMessages.isEmpty()) {
             return;
         }

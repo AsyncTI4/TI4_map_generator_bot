@@ -27,7 +27,8 @@ public class MovementController {
     @PostMapping
     @PreAuthorize("@security.canAccessGame(#gameName)")
     public ResponseEntity<String> commit(
-            @PathVariable String gameName, @RequestBody MovementDisplacementRequest request) {
+        @PathVariable String gameName, @RequestBody MovementDisplacementRequest request
+    ) {
         Game game = RequestContext.getGame();
         Player player = RequestContext.getPlayer();
 

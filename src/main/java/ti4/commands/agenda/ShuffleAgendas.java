@@ -13,7 +13,7 @@ class ShuffleAgendas extends GameStateSubcommand {
     public ShuffleAgendas() {
         super(Constants.SHUFFLE_AGENDAS, "Shuffle agenda deck", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES")
-                .setRequired(true));
+            .setRequired(true));
     }
 
     @Override

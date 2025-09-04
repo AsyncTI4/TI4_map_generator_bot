@@ -23,8 +23,8 @@ public class SharedResearchAgendaResolver implements AgendaResolver {
                 }
             }
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(),
-                    "A command token from each player has been placed in their home system.");
+                game.getMainGameChannel(),
+                "A command token from each player has been placed in their home system.");
         }
     }
 }

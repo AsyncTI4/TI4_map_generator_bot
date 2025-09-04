@@ -16,9 +16,9 @@ class SearchCommandsSubcommand extends Subcommand {
     public SearchCommandsSubcommand() {
         super(Constants.SEARCH_COMMANDS, "List all of the bot's commands and subcommands");
         addOptions(new OptionData(
-                OptionType.STRING,
-                Constants.SEARCH,
-                "Searches the text and limits results to those containing this string."));
+            OptionType.STRING,
+            Constants.SEARCH,
+            "Searches the text and limits results to those containing this string."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_OPTIONS, "True to include command options"));
         addOptions(new OptionData(OptionType.BOOLEAN, "show_counts", "True to show some debug count info"));
     }
@@ -76,8 +76,8 @@ class SearchCommandsSubcommand extends Subcommand {
 
                 boolean foundMatchingOptions = !suboptionSB.isEmpty();
                 if (searchString == null
-                        || subcommandText.toLowerCase().contains(searchString.toLowerCase())
-                        || foundMatchingOptions) {
+                    || subcommandText.toLowerCase().contains(searchString.toLowerCase())
+                    || foundMatchingOptions) {
                     commandSB.append(subcommandText).append("\n");
                     commandSB.append(suboptionSB);
                 }

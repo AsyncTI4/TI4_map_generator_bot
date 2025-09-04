@@ -13,10 +13,10 @@ class Rematch extends GameStateSubcommand {
 
     public Rematch() {
         super(
-                Constants.REMATCH,
-                "Create a new game with the same players and channels as the current game",
-                true,
-                false);
+            Constants.REMATCH,
+            "Create a new game with the same players and channels as the current game",
+            true,
+            false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES").setRequired(true));
     }
 

@@ -14,12 +14,12 @@ class SetGlobalSetting extends Subcommand {
     public SetGlobalSetting() {
         super(Constants.SET_SETTING, "Set or change a global setting");
         addOptions(new OptionData(OptionType.STRING, Constants.SETTING_NAME, "Setting to set")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.SETTING_VALUE, "Value to set").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.SETTING_TYPE, "Type of setting")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
     }
 
     @Override
@@ -33,9 +33,9 @@ class SetGlobalSetting extends Subcommand {
             GlobalSettings.setSetting(setting.getAsString(), Boolean.parseBoolean(value.getAsString()));
 
         MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                "Setting `" + "(" + type.getAsString() + ") " + setting.getAsString() + "` set to `"
-                        + value.getAsString() + "`");
+            event.getChannel(),
+            "Setting `" + "(" + type.getAsString() + ") " + setting.getAsString() + "` set to `"
+                + value.getAsString() + "`");
         MessageHelper.sendMessageToChannel(event.getChannel(), GlobalSettings.getSettingsRepresentation());
     }
 }

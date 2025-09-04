@@ -21,20 +21,20 @@ class RelicPurgeFragments extends GameStateSubcommand {
 
     public RelicPurgeFragments() {
         super(
-                Constants.PURGE_FRAGMENTS,
-                "Purge a number of relic fragments (for example, to gain a relic; may use unknown fragments).",
-                true,
-                true);
+            Constants.PURGE_FRAGMENTS,
+            "Purge a number of relic fragments (for example, to gain a relic; may use unknown fragments).",
+            true,
+            true);
         addOptions(
-                new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.")
-                        .setAutoComplete(true)
-                        .setRequired(true),
-                new OptionData(
-                        OptionType.INTEGER,
-                        Constants.COUNT,
-                        "Number of fragments to purge (default 3, use this for NRA Fabrication or Black Market Forgery)."),
-                new OptionData(OptionType.BOOLEAN, Constants.ALSO_DRAW_RELIC, "'true' to also draw a relic"),
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.")
+                .setAutoComplete(true)
+                .setRequired(true),
+            new OptionData(
+                OptionType.INTEGER,
+                Constants.COUNT,
+                "Number of fragments to purge (default 3, use this for NRA Fabrication or Black Market Forgery)."),
+            new OptionData(OptionType.BOOLEAN, Constants.ALSO_DRAW_RELIC, "'true' to also draw a relic"),
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
@@ -74,12 +74,9 @@ class RelicPurgeFragments extends GameStateSubcommand {
             activePlayer.removeFragment(fragid);
             game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
             switch (fragid) {
-                case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" ->
-                    message.append("a " + ExploreEmojis.CFrag + "cultural");
-                case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->
-                    message.append("a " + ExploreEmojis.HFrag + "hazardous");
-                case "irf1", "irf2", "irf3", "irf4", "irf5" ->
-                    message.append("an " + ExploreEmojis.IFrag + "industrial");
+                case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message.append("a " + ExploreEmojis.CFrag + "cultural");
+                case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> message.append("a " + ExploreEmojis.HFrag + "hazardous");
+                case "irf1", "irf2", "irf3", "irf4", "irf5" -> message.append("an " + ExploreEmojis.IFrag + "industrial");
                 case "urf1", "urf2", "urf3" -> message.append("an " + ExploreEmojis.UFrag + "unknown");
                 default -> message.append(" ").append(fragid);
             }
@@ -89,8 +86,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
                 activePlayer.removeFragment(fragid);
                 game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
                 switch (fragid) {
-                    case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" ->
-                        message.append(ExploreEmojis.CFrag);
+                    case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message.append(ExploreEmojis.CFrag);
                     case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> message.append(ExploreEmojis.HFrag);
                     case "irf1", "irf2", "irf3", "irf4", "irf5" -> message.append(ExploreEmojis.IFrag);
                     case "urf1", "urf2", "urf3" -> message.append(ExploreEmojis.UFrag);
@@ -105,7 +101,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
         if (activePlayer.hasTech("dslaner")) {
             activePlayer.setAtsCount(activePlayer.getAtsCount() + 1);
             MessageHelper.sendMessageToEventChannel(
-                    event, activePlayer.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                event, activePlayer.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
         }
 
         boolean drawRelic = event.getOption(Constants.ALSO_DRAW_RELIC, false, OptionMapping::getAsBoolean);

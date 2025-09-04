@@ -28,9 +28,9 @@ public class AbilityInfoService {
     private static List<MessageEmbed> getAbilityMessageEmbeds(Player player) {
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
         for (AbilityModel model : player.getAbilities().stream()
-                .map(Mapper::getAbility)
-                .sorted(Comparator.comparing(AbilityModel::getAlias))
-                .toList()) {
+            .map(Mapper::getAbility)
+            .sorted(Comparator.comparing(AbilityModel::getAlias))
+            .toList()) {
             MessageEmbed representationEmbed = model.getRepresentationEmbed();
             messageEmbeds.add(representationEmbed);
         }

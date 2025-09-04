@@ -56,8 +56,8 @@ class ListTurnStats extends GameStateSubcommand {
         long hours = total / 60; // total hours (truncates)
 
         return "> " + player.getUserName() + ": `"
-                + String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, millis)
-                + "` ("
-                + numTurns + " turns)";
+            + String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, millis)
+            + "` ("
+            + numTurns + " turns)";
     }
 }

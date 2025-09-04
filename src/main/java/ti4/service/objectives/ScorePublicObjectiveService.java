@@ -29,7 +29,8 @@ import ti4.service.leader.HeroUnlockCheckService;
 public class ScorePublicObjectiveService {
 
     public static void scorePO(
-            GenericInteractionCreateEvent event, MessageChannel channel, Game game, Player player, int poID) {
+        GenericInteractionCreateEvent event, MessageChannel channel, Game game, Player player, int poID
+    ) {
         String both = getNameNEMoji(game, poID);
         String poName = both.split("_")[0];
         String id = "";
@@ -45,11 +46,11 @@ public class ScorePublicObjectiveService {
             int playerProgress = ListPlayerInfoService.getPlayerProgressOnObjective(id, game, player);
             if (playerProgress < threshold) {
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getFactionEmoji() + ", the bot does not believe you meet the requirements to score "
-                                + poName + ". The bot has you at " + playerProgress + "/" + threshold
-                                + ". If this is a mistake, please report and then you can manually score via `/status po_score` with the number ID of `"
-                                + poID + "`.");
+                    player.getCorrectChannel(),
+                    player.getFactionEmoji() + ", the bot does not believe you meet the requirements to score "
+                        + poName + ". The bot has you at " + playerProgress + "/" + threshold
+                        + ". If this is a mistake, please report and then you can manually score via `/status po_score` with the number ID of `"
+                        + poID + "`.");
                 return;
             }
         }
@@ -59,16 +60,16 @@ public class ScorePublicObjectiveService {
         }
         if (!scored) {
             MessageHelper.sendMessageToChannel(
-                    channel,
-                    player.getFactionEmoji() + ", no such public objective ID found, or already scored, please retry.");
+                channel,
+                player.getFactionEmoji() + ", no such public objective ID found, or already scored, please retry.");
         } else {
             informAboutScoring(event, channel, game, player, poID);
             for (Player p2 : player.getNeighbouringPlayers(true)) {
                 if (p2.hasLeaderUnlocked("syndicatecommander")) {
                     p2.setTg(p2.getTg() + 1);
                     String msg = p2.getRepresentationUnfogged() + ", you gained 1 trade good"
-                            + " due to your neighbor scoring a public objective while you have Fillipo Rois, the Tnelis commander."
-                            + " Your trade goods went from " + (p2.getTg() - 1) + " -> " + p2.getTg() + ".";
+                        + " due to your neighbor scoring a public objective while you have Fillipo Rois, the Tnelis commander."
+                        + " Your trade goods went from " + (p2.getTg() - 1) + " -> " + p2.getTg() + ".";
                     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
                     ButtonHelperAbilities.pillageCheck(p2, game);
                     ButtonHelperAgents.resolveArtunoCheck(player, 1);
@@ -104,7 +105,8 @@ public class ScorePublicObjectiveService {
     }
 
     private static void informAboutScoring(
-            GenericInteractionCreateEvent event, MessageChannel channel, Game game, Player player, int poID) {
+        GenericInteractionCreateEvent event, MessageChannel channel, Game game, Player player, int poID
+    ) {
         String both = getNameNEMoji(game, poID);
         String poName = both.split("_")[0];
         String emojiName = both.split("_")[1];
@@ -117,11 +119,11 @@ public class ScorePublicObjectiveService {
         HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
         if (player.hasAbility("dark_purpose")) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " gains 1 command token from **Dark Purpose**.");
+                player.getCorrectChannel(),
+                player.getRepresentation() + " gains 1 command token from **Dark Purpose**.");
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
-                    + player.getCCRepresentation() + ". Use buttons to gain 1 command token.";
+                + player.getCCRepresentation() + ". Use buttons to gain 1 command token.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
         String idC = "";
@@ -135,23 +137,22 @@ public class ScorePublicObjectiveService {
             if (!game.getStoredValue("toldarHeroPlayer").equalsIgnoreCase(player.getFaction())) {
                 Player p2 = game.getPlayerFromColorOrFaction(game.getStoredValue("toldarHeroPlayer"));
                 MessageHelper.sendMessageToChannel(
-                        p2.getCorrectChannel(),
-                        p2.getRepresentation() + " gains 2 command tokens due to their Concord Renewed hero ability.");
+                    p2.getCorrectChannel(),
+                    p2.getRepresentation() + " gains 2 command tokens due to their Concord Renewed hero ability.");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(p2);
                 String message2 = p2.getRepresentationUnfogged() + ", your current command tokens are "
-                        + p2.getCCRepresentation() + ". Use buttons to gain 2 command tokens.";
+                    + p2.getCCRepresentation() + ". Use buttons to gain 2 command tokens.";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message2, buttons);
             }
         }
         if (player.hasAbility("reflect")) {
 
-            List<String> scoredPlayerList =
-                    game.getScoredPublicObjectives().computeIfAbsent(idC, key -> new ArrayList<>());
+            List<String> scoredPlayerList = game.getScoredPublicObjectives().computeIfAbsent(idC, key -> new ArrayList<>());
             if (scoredPlayerList.size() > 1 && Mapper.getPublicObjective(idC) != null) {
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + " is drawing 1 action card due to scoring an objective someone else already scored while having the _Reflect_ Honor card.");
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                        + " is drawing 1 action card due to scoring an objective someone else already scored while having the _Reflect_ Honor card.");
                 game.drawActionCard(player.getUserID());
                 ButtonHelper.checkACLimit(game, player);
                 ActionCardHelper.sendActionCardInfo(game, player, event);
@@ -162,19 +163,18 @@ public class ScorePublicObjectiveService {
             return;
         }
         if (poName.toLowerCase().contains("sway the council")
-                || poName.toLowerCase().contains("erect a monument")
-                || poName.toLowerCase().contains("found a golden age")
-                || poName.toLowerCase().contains("amass wealth")
-                || poName.toLowerCase().contains("manipulate galactic law")
-                || poName.toLowerCase().contains("hold vast reserves")) {
+            || poName.toLowerCase().contains("erect a monument")
+            || poName.toLowerCase().contains("found a golden age")
+            || poName.toLowerCase().contains("amass wealth")
+            || poName.toLowerCase().contains("manipulate galactic law")
+            || poName.toLowerCase().contains("hold vast reserves")) {
             String message2 = player.getRepresentationUnfogged()
-                    + ", please choose the planets you wish to exhaust to score the objective.";
+                + ", please choose the planets you wish to exhaust to score the objective.";
             if (player.hasLeaderUnlocked("xxchahero")
-                    && (poName.toLowerCase().contains("amass wealth")
-                            || poName.toLowerCase().contains("hold vast reserves"))) {
-                message2 +=
-                        "\n-# NB: Xxekir Grom , the Xxcha hero, will allow you to use the combined values of each planet for"
-                                + " __either__ the resource or influence requirement of this objective, but __not__ both.";
+                && (poName.toLowerCase().contains("amass wealth")
+                    || poName.toLowerCase().contains("hold vast reserves"))) {
+                message2 += "\n-# NB: Xxekir Grom , the Xxcha hero, will allow you to use the combined values of each planet for"
+                    + " __either__ the resource or influence requirement of this objective, but __not__ both.";
             }
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
             Button DoneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
@@ -186,13 +186,13 @@ public class ScorePublicObjectiveService {
             if (oldtg > 4) {
                 player.setTg(oldtg - 5);
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation() + ", automatically deducted 5 trade goods (" + oldtg + "->"
-                                + player.getTg() + ").");
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", automatically deducted 5 trade goods (" + oldtg + "->"
+                        + player.getTg() + ").");
             } else {
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        "Didn't deduct 5 trade goods because you don't have 5 trade goods.");
+                    player.getCorrectChannel(),
+                    "Didn't deduct 5 trade goods because you don't have 5 trade goods.");
             }
         }
         if (poName.contains("Centralize Galactic Trade")) {
@@ -200,13 +200,13 @@ public class ScorePublicObjectiveService {
             if (oldtg > 9) {
                 player.setTg(oldtg - 10);
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation() + ", automatically deducted 10 trade goods (" + oldtg + "->"
-                                + player.getTg() + ").");
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", automatically deducted 10 trade goods (" + oldtg + "->"
+                        + player.getTg() + ").");
             } else {
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        "Didn't deduct 10 trade goods because you don't have 10 trade goods.");
+                    player.getCorrectChannel(),
+                    "Didn't deduct 10 trade goods because you don't have 10 trade goods.");
             }
         }
         if (poName.contains("Lead From the Front")) {
@@ -220,43 +220,43 @@ public class ScorePublicObjectiveService {
                 if (currentStrat >= requiredSpend) {
                     for (int x = 0; x < requiredSpend; x++) {
                         ButtonHelperCommanders.resolveMuaatCommanderCheck(
-                                player, game, event, "scored " + CardEmojis.Public1 + " _Lead from the Front_.");
+                            player, game, event, "scored " + CardEmojis.Public1 + " _Lead from the Front_.");
                     }
                     player.setStrategicCC(currentStrat - requiredSpend);
                     MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentation()
-                                    + ", 3 command tokens have automatically been deducted from your strategy pool ("
-                                    + currentStrat + "->" + player.getStrategicCC() + ").");
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                            + ", 3 command tokens have automatically been deducted from your strategy pool ("
+                            + currentStrat + "->" + player.getStrategicCC() + ").");
                 } else {
                     String currentCC = player.getCCRepresentation();
                     int subtract = requiredSpend - currentStrat;
                     for (int x = 0; x < currentStrat; x++) {
                         ButtonHelperCommanders.resolveMuaatCommanderCheck(
-                                player, game, event, "scored " + CardEmojis.Public1 + " _Lead from the Front_.");
+                            player, game, event, "scored " + CardEmojis.Public1 + " _Lead from the Front_.");
                     }
                     player.setStrategicCC(0);
                     player.setTacticalCC(currentTact - subtract);
                     if (currentStrat == 0) {
                         MessageHelper.sendMessageToChannel(
-                                player.getCorrectChannel(),
-                                player.getRepresentation()
-                                        + ", 3 command tokens have automatically been deducted from your tactic pool ("
-                                        + currentCC + "->" + player.getCCRepresentation() + ")");
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                + ", 3 command tokens have automatically been deducted from your tactic pool ("
+                                + currentCC + "->" + player.getCCRepresentation() + ")");
                     } else {
                         MessageHelper.sendMessageToChannel(
-                                player.getCorrectChannel(),
-                                player.getRepresentation()
-                                        + ", " + subtract + " and " + currentStrat
-                                        + " command tokens (3 total) have automatically been deducted from your tactic and/or strategy pools respectively ("
-                                        + currentCC + "->" + player.getCCRepresentation() + ")");
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                + ", " + subtract + " and " + currentStrat
+                                + " command tokens (3 total) have automatically been deducted from your tactic and/or strategy pools respectively ("
+                                + currentCC + "->" + player.getCCRepresentation() + ")");
                     }
                 }
             } else {
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + ", you do not have 3 command tokens in your tactic and/or strategy pools. No command tokens have been removed.");
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                        + ", you do not have 3 command tokens in your tactic and/or strategy pools. No command tokens have been removed.");
             }
         }
         if (poName.contains("Galvanize the People")) {
@@ -270,43 +270,43 @@ public class ScorePublicObjectiveService {
                 if (currentStrat >= requiredSpend) {
                     for (int x = 0; x < requiredSpend; x++) {
                         ButtonHelperCommanders.resolveMuaatCommanderCheck(
-                                player, game, event, "scored " + CardEmojis.Public2 + " _Galvanize the People_.");
+                            player, game, event, "scored " + CardEmojis.Public2 + " _Galvanize the People_.");
                     }
                     player.setStrategicCC(currentStrat - requiredSpend);
                     MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentation()
-                                    + ", 6 command tokens have automatically been deducted from your strategy pool ("
-                                    + currentStrat + "->" + player.getStrategicCC() + ")");
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                            + ", 6 command tokens have automatically been deducted from your strategy pool ("
+                            + currentStrat + "->" + player.getStrategicCC() + ")");
                 } else {
                     String currentCC = player.getCCRepresentation();
                     int subtract = requiredSpend - currentStrat;
                     for (int x = 0; x < currentStrat; x++) {
                         ButtonHelperCommanders.resolveMuaatCommanderCheck(
-                                player, game, event, "scored " + CardEmojis.Public2 + " _Galvanize the People_.");
+                            player, game, event, "scored " + CardEmojis.Public2 + " _Galvanize the People_.");
                     }
                     player.setStrategicCC(0);
                     player.setTacticalCC(currentTact - subtract);
                     if (currentStrat == 0) {
                         MessageHelper.sendMessageToChannel(
-                                player.getCorrectChannel(),
-                                player.getRepresentation()
-                                        + ", 6 command tokens have automatically been deducted from your tactic pool ("
-                                        + currentCC + "->" + player.getCCRepresentation() + ")");
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                + ", 6 command tokens have automatically been deducted from your tactic pool ("
+                                + currentCC + "->" + player.getCCRepresentation() + ")");
                     } else {
                         MessageHelper.sendMessageToChannel(
-                                player.getCorrectChannel(),
-                                player.getRepresentation()
-                                        + ", " + subtract + " and " + currentStrat
-                                        + " command tokens (6 total) have automatically been deducted from your tactic and/or strategy pools respectively ("
-                                        + currentCC + "->" + player.getCCRepresentation() + ")");
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                + ", " + subtract + " and " + currentStrat
+                                + " command tokens (6 total) have automatically been deducted from your tactic and/or strategy pools respectively ("
+                                + currentCC + "->" + player.getCCRepresentation() + ")");
                     }
                 }
             } else {
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + ", you do not have 6 command tokens in your tactic and/or strategy pools. No command tokens have been removed.");
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                        + ", you do not have 6 command tokens in your tactic and/or strategy pools. No command tokens have been removed.");
             }
         }
     }

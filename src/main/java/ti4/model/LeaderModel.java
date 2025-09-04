@@ -39,14 +39,14 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean isValid() {
         return ID != null
-                && type != null
-                && faction != null
-                && name != null
-                && title != null
-                && abilityWindow != null
-                && abilityText != null
-                && unlockCondition != null
-                && source != null;
+            && type != null
+            && faction != null
+            && name != null
+            && title != null
+            && abilityWindow != null
+            && abilityText != null
+            && unlockCondition != null
+            && source != null;
     }
 
     @Override
@@ -88,10 +88,10 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         if (includeTitle) representation.append(": ").append(title); // add title
         if (includeAbility && Constants.HERO.equals(type))
             representation
-                    .append(" - ")
-                    .append("__**")
-                    .append(getAbilityName())
-                    .append("**__"); // add hero ability name
+                .append(" - ")
+                .append("__**")
+                .append(getAbilityName())
+                .append("**__"); // add hero ability name
         if (includeAbility)
             representation.append(" - *").append(abilityWindow).append("* ").append(abilityText); // add ability
         if (includeUnlockCondition) representation.append(" *Unlock:* ").append(unlockCondition);
@@ -104,7 +104,8 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     }
 
     public MessageEmbed getRepresentationEmbed(
-            boolean includeID, boolean includeFactionType, boolean showUnlockConditions, boolean includeFlavourText) {
+        boolean includeID, boolean includeFactionType, boolean showUnlockConditions, boolean includeFlavourText
+    ) {
         EmbedBuilder eb = new EmbedBuilder();
         FactionModel factionModel = Mapper.getFaction(faction);
         String factionEmoji = FactionEmojis.getFactionIcon(faction).toString();
@@ -116,7 +117,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
         // TITLE
         String title = factionEmoji + " __**" + name + "**__ " + LeaderEmojis.getLeaderTypeEmoji(type) + " "
-                + this.title + source.emoji();
+            + this.title + source.emoji();
         eb.setTitle(title);
 
         Emoji emoji = getLeaderEmoji().asEmoji();
@@ -151,23 +152,23 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
     public String getNameRepresentation() {
         return FactionEmojis.getFactionIcon(faction) + " " + LeaderEmojis.getLeaderTypeEmoji(type)
-                + getLeaderEmoji() + " " + name + " " + " (" + title + ") "
-                + source.emoji();
+            + getLeaderEmoji() + " " + name + " " + " (" + title + ") "
+            + source.emoji();
     }
 
     public boolean search(String searchString) {
         if (searchString == null) return true;
         searchString = searchString.toLowerCase();
         return ID.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || title.toLowerCase().contains(searchString)
-                || getAbilityName().orElse("").toLowerCase().contains(searchString)
-                || abilityWindow.toLowerCase().contains(searchString)
-                || abilityText.toLowerCase().contains(searchString)
-                || unlockCondition.toLowerCase().contains(searchString)
-                || getAutoCompleteName().toLowerCase().contains(searchString)
-                || source.toString().toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
+            || name.toLowerCase().contains(searchString)
+            || title.toLowerCase().contains(searchString)
+            || getAbilityName().orElse("").toLowerCase().contains(searchString)
+            || abilityWindow.toLowerCase().contains(searchString)
+            || abilityText.toLowerCase().contains(searchString)
+            || unlockCondition.toLowerCase().contains(searchString)
+            || getAutoCompleteName().toLowerCase().contains(searchString)
+            || source.toString().toLowerCase().contains(searchString)
+            || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {

@@ -46,10 +46,10 @@ public class EndTurnService {
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
         if (!game.isFowMode()) {
             ButtonHelper.updateMap(
-                    game,
-                    event,
-                    "End of Turn " + player.getInRoundTurnCount() + ", Round " + game.getRound() + " for "
-                            + player.getRepresentationNoPing() + ".");
+                game,
+                event,
+                "End of Turn " + player.getInRoundTurnCount() + ", Round " + game.getRound() + " for "
+                    + player.getRepresentationNoPing() + ".");
         }
     }
 
@@ -67,15 +67,16 @@ public class EndTurnService {
     }
 
     public static void pingNextPlayer(
-            GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
+        GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed
+    ) {
         resetStoredValuesEndOfTurn(game, mainPlayer);
 
         var userSettings = UserSettingsManager.get(mainPlayer.getUserID());
 
         if ("No Preference".equalsIgnoreCase(userSettings.getSandbagPref())) {
             String msg = mainPlayer.getRepresentation() + " the bot could auto pass on scoring secrets for you in the "
-                    + "status phase if you cannot score any secrets. This might speed up the game as people won't be waiting on you in the cases "
-                    + "where you can score nothing. Do you want to enable this feature? Once you answer, you will not be asked again. ";
+                + "status phase if you cannot score any secrets. This might speed up the game as people won't be waiting on you in the cases "
+                + "where you can score nothing. Do you want to enable this feature? Once you answer, you will not be asked again. ";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("sandbagPref_bot", "Allow the bot"));
             buttons.add(Buttons.red("sandbagPref_manual", "Always manual"));
@@ -97,19 +98,18 @@ public class EndTurnService {
         if (game.isFowMode()) {
             FowCommunicationThreadService.checkNewNeighbors(game, mainPlayer);
             MessageHelper.sendMessageToChannel(
-                    mainPlayer.getPrivateChannel(),
-                    "# End of Turn " + mainPlayer.getInRoundTurnCount() + ", Round " + game.getRound() + " for "
-                            + mainPlayer.getRepresentation());
+                mainPlayer.getPrivateChannel(),
+                "# End of Turn " + mainPlayer.getInRoundTurnCount() + ", Round " + game.getRound() + " for "
+                    + mainPlayer.getRepresentation());
         } else {
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), mainPlayer.getRepresentation(true, false) + " ended turn.");
+                game.getMainGameChannel(), mainPlayer.getRepresentation(true, false) + " ended turn.");
             if ("statushomework".equalsIgnoreCase(game.getPhaseOfGame())) {
                 return;
             }
         }
 
-        MessageChannel gameChannel =
-                game.getMainGameChannel() == null ? event.getMessageChannel() : game.getMainGameChannel();
+        MessageChannel gameChannel = game.getMainGameChannel() == null ? event.getMessageChannel() : game.getMainGameChannel();
 
         // MAKE ALL NON-REAL PLAYERS PASSED
         for (Player player : game.getPlayers().values()) {
@@ -121,8 +121,8 @@ public class EndTurnService {
         if (game.getPlayers().values().stream().allMatch(Player::isPassed)) {
             if (mainPlayer.getSecretsUnscored().containsKey("pe")) {
                 MessageHelper.sendMessageToChannel(
-                        mainPlayer.getCardsInfoThread(),
-                        "You were the last player to pass, and so you can score _Prove Endurance_.");
+                    mainPlayer.getCardsInfoThread(),
+                    "You were the last player to pass, and so you can score _Prove Endurance_.");
             }
             EndPhaseService.EndActionPhase(event, game, gameChannel);
             game.updateActivePlayer(null);
@@ -133,9 +133,9 @@ public class EndTurnService {
         Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);
         if (!game.isFowMode()) {
             GameMessageManager.remove(game.getName(), GameMessageType.TURN)
-                    .ifPresent(messageId -> game.getMainGameChannel()
-                            .deleteMessageById(messageId)
-                            .queue());
+                .ifPresent(messageId -> game.getMainGameChannel()
+                    .deleteMessageById(messageId)
+                    .queue());
         }
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game);
         if (isFowPrivateGame) {
@@ -148,14 +148,14 @@ public class EndTurnService {
         }
         CommanderUnlockCheckService.checkPlayer(nextPlayer, "sol");
         if (!game.isFowMode()
-                && !game.getStoredValue("currentActionSummary" + mainPlayer.getFaction())
-                        .isEmpty()) {
+            && !game.getStoredValue("currentActionSummary" + mainPlayer.getFaction())
+                .isEmpty()) {
             for (ThreadChannel summary : game.getActionsChannel().getThreadChannels()) {
                 if ("Turn Summary".equalsIgnoreCase(summary.getName())) {
                     MessageHelper.sendMessageToChannel(
-                            summary,
-                            "(Turn " + mainPlayer.getInRoundTurnCount() + ") " + mainPlayer.getFactionEmoji()
-                                    + game.getStoredValue("currentActionSummary" + mainPlayer.getFaction()));
+                        summary,
+                        "(Turn " + mainPlayer.getInRoundTurnCount() + ") " + mainPlayer.getFactionEmoji()
+                            + game.getStoredValue("currentActionSummary" + mainPlayer.getFaction()));
                     game.removeStoredValue("currentActionSummary" + mainPlayer.getFaction());
                 }
             }

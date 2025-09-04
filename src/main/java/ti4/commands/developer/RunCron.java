@@ -13,8 +13,8 @@ class RunCron extends Subcommand {
     RunCron() {
         super(Constants.RUN_CRON, "Run a cron manually.");
         addOptions(new OptionData(OptionType.STRING, Constants.CRON_NAME, "The cron to run")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
     }
 
     @Override

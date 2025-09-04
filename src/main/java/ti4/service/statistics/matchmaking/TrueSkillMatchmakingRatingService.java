@@ -34,9 +34,8 @@ class TrueSkillMatchmakingRatingService {
             for (int i = 0; i < gamePlayers.size(); i++) {
                 MatchmakingPlayer gamePlayer = gamePlayers.get(i);
                 var trueSkillPlayer = userIdToTrueSkillPlayer.computeIfAbsent(
-                        gamePlayer.userId(), k -> new Player<>(gamePlayer.userId()));
-                Rating rating =
-                        trueSkillPlayerToRating.computeIfAbsent(trueSkillPlayer, id -> gameInfo.getDefaultRating());
+                    gamePlayer.userId(), k -> new Player<>(gamePlayer.userId()));
+                Rating rating = trueSkillPlayerToRating.computeIfAbsent(trueSkillPlayer, id -> gameInfo.getDefaultRating());
                 userIdToUsername.put(gamePlayer.userId(), gamePlayer.username());
 
                 var team = new Team();
@@ -45,8 +44,7 @@ class TrueSkillMatchmakingRatingService {
                 ranks[i] = gamePlayer.rank();
             }
 
-            Map<IPlayer, Rating> newRatings =
-                    new FactorGraphTrueSkillCalculator().calculateNewRatings(gameInfo, teams, ranks);
+            Map<IPlayer, Rating> newRatings = new FactorGraphTrueSkillCalculator().calculateNewRatings(gameInfo, teams, ranks);
             trueSkillPlayerToRating.putAll(newRatings);
         }
 
@@ -54,17 +52,17 @@ class TrueSkillMatchmakingRatingService {
     }
 
     private static List<MatchmakingRating> buildMatchmakingRatings(
-            Map<String, Player<String>> players, Map<IPlayer, Rating> ratings, Map<String, String> userIdToUsername) {
+        Map<String, Player<String>> players, Map<IPlayer, Rating> ratings, Map<String, String> userIdToUsername
+    ) {
         return players.entrySet().stream()
-                .map(entry -> {
-                    String userId = entry.getKey();
-                    String username = userIdToUsername.get(userId);
-                    Rating rating = ratings.get(entry.getValue());
-                    double calibrationPercent =
-                            Math.min(100, SIGMA_CALIBRATION_THRESHOLD / rating.getStandardDeviation() * 100);
-                    return new MatchmakingRating(userId, username, rating.getMean(), calibrationPercent);
-                })
-                .sorted(Comparator.comparing(MatchmakingRating::rating).reversed())
-                .toList();
+            .map(entry -> {
+                String userId = entry.getKey();
+                String username = userIdToUsername.get(userId);
+                Rating rating = ratings.get(entry.getValue());
+                double calibrationPercent = Math.min(100, SIGMA_CALIBRATION_THRESHOLD / rating.getStandardDeviation() * 100);
+                return new MatchmakingRating(userId, username, rating.getMean(), calibrationPercent);
+            })
+            .sorted(Comparator.comparing(MatchmakingRating::rating).reversed())
+            .toList();
     }
 }

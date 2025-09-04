@@ -9,8 +9,7 @@ import ti4.helpers.Constants;
 
 public class TiglCommand implements ParentCommand {
 
-    private final Map<String, Subcommand> subcommands =
-            Stream.of(new ChangeNickname()).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+    private final Map<String, Subcommand> subcommands = Stream.of(new ChangeNickname()).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

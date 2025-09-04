@@ -11,10 +11,10 @@ class OfferAFKTimeOptions extends GameStateSubcommand {
 
     public OfferAFKTimeOptions() {
         super(
-                Constants.OFFER_AFKTIME_OPTIONS,
-                "Offer hours in UTC which you'll be afk usually in (sleeping)",
-                true,
-                true);
+            Constants.OFFER_AFKTIME_OPTIONS,
+            "Offer hours in UTC which you'll be afk usually in (sleeping)",
+            true,
+            true);
     }
 
     @Override

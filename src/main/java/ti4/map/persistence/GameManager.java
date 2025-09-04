@@ -14,13 +14,12 @@ import ti4.map.Player;
 @UtilityClass
 public class GameManager {
 
-    private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame =
-            new ConcurrentHashMap<>(); // TODO: We can evaluate dropping the managed objects entirely
+    private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame = new ConcurrentHashMap<>(); // TODO: We can evaluate dropping the managed objects entirely
     private static final ConcurrentMap<String, ManagedPlayer> playerNameToManagedPlayer = new ConcurrentHashMap<>();
 
     public static void initialize() {
         GameLoadService.loadManagedGames()
-                .forEach(managedGame -> gameNameToManagedGame.put(managedGame.getName(), managedGame));
+            .forEach(managedGame -> gameNameToManagedGame.put(managedGame.getName(), managedGame));
     }
 
     private static Game load(String gameName) {
@@ -64,16 +63,16 @@ public class GameManager {
 
     public static boolean save(Game game, String reason) {
         boolean wasActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
-                .map(ManagedGame::isActive)
-                .orElse(false);
+            .map(ManagedGame::isActive)
+            .orElse(false);
         if (!GameSaveService.save(game, reason)) {
             return false;
         }
         gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
 
         boolean isActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
-                .map(ManagedGame::isActive)
-                .orElse(false);
+            .map(ManagedGame::isActive)
+            .orElse(false);
         if (wasActive != isActive) {
             AsyncTI4DiscordBot.updatePresence();
         }

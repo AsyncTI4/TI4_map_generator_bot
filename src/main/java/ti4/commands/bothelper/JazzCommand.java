@@ -32,14 +32,14 @@ class JazzCommand extends Subcommand {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("jazzButton", "Jazz button", MiscEmojis.ScoutSpinner));
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), Constants.jazzPing() + " button", buttons);
+            event.getMessageChannel(), Constants.jazzPing() + " button", buttons);
     }
 
     private static boolean jazzCheck(GenericInteractionCreateEvent event) {
         if (Constants.jazzId.equals(event.getUser().getId())) return true;
         if (Constants.honoraryJazz.contains(event.getUser().getId())) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "You are an honorary jazz so you may proceed");
+                event.getMessageChannel(), "You are an honorary jazz so you may proceed");
             return true;
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not " + Constants.jazzPing());
@@ -59,15 +59,15 @@ class JazzCommand extends Subcommand {
     @ButtonHandler("jazzButton")
     private static void jazzButton() {
         AsyncTI4DiscordBot.jda
-                .getGuildById("847560709730730064")
-                .getTextChannelById("1352824638354231439")
-                .sendMessage("```fix\nBorgJedi used /search my_titles player: @Mentak\n```")
-                .queue();
+            .getGuildById("847560709730730064")
+            .getTextChannelById("1352824638354231439")
+            .sendMessage("```fix\nBorgJedi used /search my_titles player: @Mentak\n```")
+            .queue();
 
         AsyncTI4DiscordBot.jda
-                .getGuildById("847560709730730064")
-                .getTextChannelById("1352824638354231439")
-                .sendMessage("**__Mentak's Titles__**\n` 1.`**You Made Me Mad** x5 (g15, g15, g15, g15, g15)")
-                .queue();
+            .getGuildById("847560709730730064")
+            .getTextChannelById("1352824638354231439")
+            .sendMessage("**__Mentak's Titles__**\n` 1.`**You Made Me Mad** x5 (g15, g15, g15, g15, g15)")
+            .queue();
     }
 }

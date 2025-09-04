@@ -26,10 +26,10 @@ class SCPick extends GameStateSubcommand {
     public SCPick() {
         super(Constants.SC_PICK, "Pick a strategy card", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number")
-                .setRequired(true));
+            .setRequired(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -49,9 +49,9 @@ class SCPick extends GameStateSubcommand {
         int playerSCCount = player.getSCs().size();
         if (playerSCCount >= maxSCsPerPlayer) {
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    "Player may not pick another strategy card. Max strategy cards per player for this game is "
-                            + maxSCsPerPlayer + ".");
+                event,
+                "Player may not pick another strategy card. Max strategy cards per player for this game is "
+                    + maxSCsPerPlayer + ".");
             return;
         }
 
@@ -73,7 +73,8 @@ class SCPick extends GameStateSubcommand {
     }
 
     private static void secondHalfOfSCPick(
-            GenericInteractionCreateEvent event, Player player, Game game, int scPicked) {
+        GenericInteractionCreateEvent event, Player player, Game game, int scPicked
+    ) {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
 
         String msgExtra = "";
@@ -124,9 +125,9 @@ class SCPick extends GameStateSubcommand {
             if (!allPicked) {
                 game.setPhaseOfGame("strategy");
                 MessageHelper.sendMessageToChannelWithButtons(
-                        privatePlayer.getPrivateChannel(),
-                        "Use buttons to pick your strategy card.",
-                        Helper.getRemainingSCButtons(game, privatePlayer));
+                    privatePlayer.getPrivateChannel(),
+                    "Use buttons to pick your strategy card.",
+                    Helper.getRemainingSCButtons(game, privatePlayer));
             }
         } else {
             if (!allPicked) {

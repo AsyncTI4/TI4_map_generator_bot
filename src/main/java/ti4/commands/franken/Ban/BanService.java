@@ -31,7 +31,7 @@ public class BanService implements IBanService {
             if (isBlank(id) || Mapper.getPromissoryNote(id) == null) return "";
             appendStoredValue(game, "bannedPNs", id);
             return "Successfully banned promissory note: "
-                    + Mapper.getPromissoryNote(id).getName() + ".\n";
+                + Mapper.getPromissoryNote(id).getName() + ".\n";
         });
 
         BAN_APPLIERS.put(Constants.TECH, (game, id) -> {

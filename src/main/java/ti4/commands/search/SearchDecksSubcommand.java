@@ -18,20 +18,19 @@ class SearchDecksSubcommand extends SearchComponentModelSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        ComponentSource source =
-                ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
+        ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
         if (Mapper.isValidDeck(searchString)) {
             event.getChannel()
-                    .sendMessageEmbeds(Mapper.getDeck(searchString).getRepresentationEmbed())
-                    .queue();
+                .sendMessageEmbeds(Mapper.getDeck(searchString).getRepresentationEmbed())
+                .queue();
             return;
         }
 
         List<MessageEmbed> messageEmbeds = Mapper.getDecks().values().stream()
-                .filter(model -> model.search(searchString, source))
-                .map(DeckModel::getRepresentationEmbed)
-                .toList();
+            .filter(model -> model.search(searchString, source))
+            .map(DeckModel::getRepresentationEmbed)
+            .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }
 }

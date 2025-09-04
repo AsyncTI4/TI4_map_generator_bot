@@ -36,8 +36,8 @@ public class ModalListener extends ListenerAdapter {
     public void onModalInteraction(@Nonnull ModalInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
             event.reply("Please try again in a moment. The bot is not ready to handle button presses.")
-                    .setEphemeral(true)
-                    .queue();
+                .setEphemeral(true)
+                .queue();
             return;
         }
 
@@ -45,10 +45,10 @@ public class ModalListener extends ListenerAdapter {
 
         String gameName = GameNameService.getGameNameFromChannel(event);
         ExecutorServiceManager.runAsync(
-                "ModalListener task for  `" + gameName + "`",
-                gameName,
-                event.getMessageChannel(),
-                () -> handleModal(event));
+            "ModalListener task for  `" + gameName + "`",
+            gameName,
+            event.getMessageChannel(),
+            () -> handleModal(event));
     }
 
     private void handleModal(@Nonnull ModalInteractionEvent event) {
@@ -60,7 +60,7 @@ public class ModalListener extends ListenerAdapter {
             }
         } catch (Exception e) {
             String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: "
-                    + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
+                + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
             BotLogger.error(new LogOrigin(event), message, e);
         }
     }
@@ -98,9 +98,9 @@ public class ModalListener extends ListenerAdapter {
         StringBuilder output = new StringBuilder("INPUT:\n```\n" + "MenuID: " + event.getModalId());
         for (ModalMapping field : event.getValues()) {
             output.append("\n> Field: ")
-                    .append(field.getCustomId())
-                    .append(" => ")
-                    .append(field.getAsString());
+                .append(field.getCustomId())
+                .append(" => ")
+                .append(field.getAsString());
         }
         output.append("\n```");
         return output.toString();

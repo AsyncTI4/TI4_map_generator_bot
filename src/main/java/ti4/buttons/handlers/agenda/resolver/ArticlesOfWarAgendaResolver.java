@@ -27,6 +27,6 @@ public class ArticlesOfWarAgendaResolver implements ForAgainstAgendaResolver {
             ButtonHelperAgents.resolveArtunoCheck(playerWL, 3);
         }
         MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(), "Each player that voted \"For\" has gained 3 trade goods.");
+            game.getMainGameChannel(), "Each player that voted \"For\" has gained 3 trade goods.");
     }
 }

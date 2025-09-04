@@ -13,8 +13,8 @@ class RiseOfMessiah extends GameStateSubcommand {
         super(Constants.RISE_OF_A_MESSIAH, "RiseOfMessiah +1 Inf to each planet", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                .setAutoComplete(true));
     }
 
     @Override

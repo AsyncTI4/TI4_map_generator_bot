@@ -16,9 +16,9 @@ class ExploreRemoveFromGame extends GameStateSubcommand {
     ExploreRemoveFromGame() {
         super(Constants.REMOVE, "Remove an Exploration card from the game.", true, true);
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.EXPLORE_CARD_ID,
-                        "Exploration card ids. May include multiple comma-separated ids.")
+            OptionType.STRING,
+            Constants.EXPLORE_CARD_ID,
+            "Exploration card ids. May include multiple comma-separated ids.")
                 .setRequired(true));
     }
 
@@ -26,8 +26,8 @@ class ExploreRemoveFromGame extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         String ids = PatternHelper.SPACE_PATTERN
-                .matcher(event.getOption(Constants.EXPLORE_CARD_ID).getAsString())
-                .replaceAll("");
+            .matcher(event.getOption(Constants.EXPLORE_CARD_ID).getAsString())
+            .replaceAll("");
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {
@@ -35,8 +35,8 @@ class ExploreRemoveFromGame extends GameStateSubcommand {
             game.purgeExplore(id);
             if (explore != null) {
                 sb.append("Exploration card removed: ")
-                        .append(explore.textRepresentation())
-                        .append(System.lineSeparator());
+                    .append(explore.textRepresentation())
+                    .append(System.lineSeparator());
             } else {
                 sb.append("Removed id without matching card: ").append(id).append(System.lineSeparator());
             }

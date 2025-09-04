@@ -18,8 +18,8 @@ class BanFaction extends GameStateSubcommand {
     public BanFaction() {
         super(Constants.BAN_FACTION, "Ban A Faction From The Draft", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction Name")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION2, "Faction  Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION3, "Faction  Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION4, "Faction  Name").setAutoComplete(true));
@@ -33,8 +33,8 @@ class BanFaction extends GameStateSubcommand {
         // GET ALL ABILITY OPTIONS AS STRING
         List<String> abilityIDs = new ArrayList<>();
         for (OptionMapping option : event.getOptions().stream()
-                .filter(o -> o != null && o.getName().contains(Constants.FACTION))
-                .toList()) {
+            .filter(o -> o != null && o.getName().contains(Constants.FACTION))
+            .toList()) {
             abilityIDs.add(option.getAsString());
         }
 
@@ -44,8 +44,8 @@ class BanFaction extends GameStateSubcommand {
         for (String ability : abilityIDs) {
             game.setStoredValue("bannedFactions", game.getStoredValue("bannedFactions") + "finSep" + ability);
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "Successfully banned " + Mapper.getFaction(ability).getFactionName());
+                event.getChannel(),
+                "Successfully banned " + Mapper.getFaction(ability).getFactionName());
         }
     }
 }

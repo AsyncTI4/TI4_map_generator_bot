@@ -24,8 +24,7 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        List<String> unusedColors =
-                game.getUnusedColors().stream().map(ColorModel::getName).toList();
+        List<String> unusedColors = game.getUnusedColors().stream().map(ColorModel::getName).toList();
         if (unusedColors.isEmpty()) {
             MessageHelper.replyToMessage(event, "Unable to find an unused color. This is probably a bug?");
             return;
@@ -41,9 +40,9 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
 
         game.setupNeutralPlayer(color);
         MessageHelper.replyToMessage(
-                event,
-                "Neutral player has been set as " + color + "**"
-                        + ColorEmojis.getColorEmoji(color).toString().toUpperCase() + "**.");
+            event,
+            "Neutral player has been set as " + color + "**"
+                + ColorEmojis.getColorEmoji(color).toString().toUpperCase() + "**.");
     }
 
     public String pickNeutralColor(List<String> unusedColors) {

@@ -11,14 +11,13 @@ import ti4.service.tactical.PostMovementButtonContext;
 public final class ShroudOfLithButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
         return ctx.player.hasAbility("shroud_of_lith")
-                && ButtonHelperFactionSpecific.getKolleccReleaseButtons(ctx.player, ctx.game)
-                                .size()
-                        > 1;
+            && ButtonHelperFactionSpecific.getKolleccReleaseButtons(ctx.player, ctx.game)
+                .size() > 1;
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(
-                Buttons.blue("shroudOfLithStart", "Use Shroud of Lith", FactionEmojis.kollecc),
-                Buttons.gray("refreshLandingButtons", "Refresh Landing Buttons", FactionEmojis.kollecc));
+            Buttons.blue("shroudOfLithStart", "Use Shroud of Lith", FactionEmojis.kollecc),
+            Buttons.gray("refreshLandingButtons", "Refresh Landing Buttons", FactionEmojis.kollecc));
     }
 }

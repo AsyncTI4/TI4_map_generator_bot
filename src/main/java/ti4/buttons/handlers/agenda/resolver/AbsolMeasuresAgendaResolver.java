@@ -28,9 +28,9 @@ public class AbsolMeasuresAgendaResolver implements ForAgainstAgendaResolver {
                     game.drawActionCard(playerWL.getUserID());
                     ActionCardHelper.sendActionCardInfo(game, playerWL, event);
                     MessageHelper.sendMessageToChannelWithButtons(
-                            playerWL.getCardsInfoThread(),
-                            playerWL.getRepresentationUnfogged() + ", please discard an action card.",
-                            ActionCardHelper.getDiscardActionCardButtons(playerWL, false));
+                        playerWL.getCardsInfoThread(),
+                        playerWL.getRepresentationUnfogged() + ", please discard an action card.",
+                        ActionCardHelper.getDiscardActionCardButtons(playerWL, false));
                 } else {
                     ActionCardHelper.sendActionCardInfo(game, playerWL, event);
                 }
@@ -42,8 +42,8 @@ public class AbsolMeasuresAgendaResolver implements ForAgainstAgendaResolver {
             p2.setStrategicCC(p2.getStrategicCC());
         }
         MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(),
-                "Drew 2 action cards for each of the players who voted \"For\" and placed 1 command token in the strategy pool of each player that voted \"Against\".");
+            game.getMainGameChannel(),
+            "Drew 2 action cards for each of the players who voted \"For\" and placed 1 command token in the strategy pool of each player that voted \"Against\".");
     }
 
     @Override

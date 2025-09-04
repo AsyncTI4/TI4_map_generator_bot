@@ -10,16 +10,16 @@ import ti4.helpers.Constants;
 public class PlanetCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new PlanetAdd(),
-                    new PlanetRemove(),
-                    new PlanetExhaust(),
-                    new PlanetRefresh(),
-                    new PlanetExhaustAbility(),
-                    new PlanetRefreshAbility(),
-                    new PlanetRefreshAll(),
-                    new PlanetExhaustAll(),
-                    new PlanetInfo())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new PlanetAdd(),
+        new PlanetRemove(),
+        new PlanetExhaust(),
+        new PlanetRefresh(),
+        new PlanetExhaustAbility(),
+        new PlanetRefreshAbility(),
+        new PlanetRefreshAll(),
+        new PlanetExhaustAll(),
+        new PlanetInfo())
+        .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

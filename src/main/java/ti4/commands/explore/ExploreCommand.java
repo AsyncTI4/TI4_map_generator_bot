@@ -10,19 +10,19 @@ import ti4.helpers.Constants;
 public class ExploreCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new ExploreDiscardFromDeck(),
-                    new ExploreShuffleIntoDeckFromHand(),
-                    new ExploreDrawAndDiscard(),
-                    new ExploreRemoveFromGame(),
-                    new ExploreShuffleBackIntoDeck(),
-                    new ExploreInfo(),
-                    new ExplorePlanet(),
-                    new ExploreReset(),
-                    new ExploreFrontier(),
-                    new ExploreUse(),
-                    new ExploreShuffle(),
-                    new ExploreLookAtTop())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new ExploreDiscardFromDeck(),
+        new ExploreShuffleIntoDeckFromHand(),
+        new ExploreDrawAndDiscard(),
+        new ExploreRemoveFromGame(),
+        new ExploreShuffleBackIntoDeck(),
+        new ExploreInfo(),
+        new ExplorePlanet(),
+        new ExploreReset(),
+        new ExploreFrontier(),
+        new ExploreUse(),
+        new ExploreShuffle(),
+        new ExploreLookAtTop())
+        .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

@@ -19,7 +19,7 @@ class PeekAtSecretDeck extends GameStateSubcommand {
     public PeekAtSecretDeck() {
         super("peek_secret_objective_deck", "Peek at the top of the secret objective deck", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of secrets to peek at, default 1")
-                .setRequired(true));
+            .setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, "index_to_draw", "Which of the secrets to draw (1, 2, 3, ...)"));
         addOptions(new OptionData(OptionType.BOOLEAN, "shuffle", "True to shuffle"));
     }
@@ -34,13 +34,13 @@ class PeekAtSecretDeck extends GameStateSubcommand {
         Integer peekedSoIndexToDraw = event.getOption("index_to_draw", null, OptionMapping::getAsInt);
         if (peekedSoIndexToDraw == null) {
             var embeds = peekedObjectives.stream()
-                    .map(secretId -> Mapper.getSecretObjective(secretId).getRepresentationEmbed(true))
-                    .toList();
+                .map(secretId -> Mapper.getSecretObjective(secretId).getRepresentationEmbed(true))
+                .toList();
             MessageHelper.sendMessageEmbedsToCardsInfoThread(getPlayer(), "", embeds);
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "To draw the peeked card, use the draw option and the index of the "
-                            + "card (1, 2, 3; from top to bottom).");
+                event.getChannel(),
+                "To draw the peeked card, use the draw option and the index of the "
+                    + "card (1, 2, 3; from top to bottom).");
         } else {
             peekedSoIndexToDraw -= 1;
             if (peekedSoIndexToDraw < 0) {
@@ -48,7 +48,7 @@ class PeekAtSecretDeck extends GameStateSubcommand {
                 return;
             } else if (peekedSoIndexToDraw >= peekedObjectives.size()) {
                 MessageHelper.sendMessageToChannel(
-                        event.getChannel(), "Draw index must be less than or equal to the number of peeked secrets.");
+                    event.getChannel(), "Draw index must be less than or equal to the number of peeked secrets.");
                 return;
             }
             Player player = getPlayer();

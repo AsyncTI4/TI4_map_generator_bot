@@ -7,7 +7,7 @@ import java.util.Map.Entry;
 public final class StringHelper {
 
     public static String ordinal(int i) {
-        String[] suffixes = {"th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"};
+        String[] suffixes = { "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th" };
         return switch (i % 100) {
             case 11, 12, 13 -> i + "th";
             default -> i + suffixes[i % 10];

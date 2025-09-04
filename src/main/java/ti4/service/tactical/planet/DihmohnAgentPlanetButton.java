@@ -11,8 +11,8 @@ import ti4.service.tactical.PlanetAbilityButton;
 public final class DihmohnAgentPlanetButton implements PlanetAbilityButton {
     public boolean enabled(LandingContext ctx) {
         return (ctx.planet.getUnitCount(UnitType.Infantry, ctx.mainPlayer) > 0
-                        || ctx.planet.getUnitCount(UnitType.Mech, ctx.mainPlayer) > 0)
-                && ctx.mainPlayer.hasUnexhaustedLeader("dihmohnagent");
+            || ctx.planet.getUnitCount(UnitType.Mech, ctx.mainPlayer) > 0)
+            && ctx.mainPlayer.hasUnexhaustedLeader("dihmohnagent");
     }
 
     public List<Button> build(LandingContext ctx) {

@@ -110,7 +110,8 @@ public class BotLogger {
     }
 
     public static void error(
-            @Nonnull GenericInteractionCreateEvent event, @Nonnull String message, Throwable throwable) {
+        @Nonnull GenericInteractionCreateEvent event, @Nonnull String message, Throwable throwable
+    ) {
         logToChannel(new LogOrigin(event), message, throwable, LogSeverity.Error);
     }
 
@@ -157,10 +158,11 @@ public class BotLogger {
      * @param severity - The severity of the log message
      */
     private static void logToChannel(
-            @Nullable LogOrigin origin,
-            @Nonnull String message,
-            @Nullable Throwable err,
-            @Nonnull LogSeverity severity) {
+        @Nullable LogOrigin origin,
+        @Nonnull String message,
+        @Nullable Throwable err,
+        @Nonnull LogSeverity severity
+    ) {
         // Count Error-severity logs once per entry
         if (severity == LogSeverity.Error) {
             SREStats.incrementErrorCount();
@@ -201,10 +203,11 @@ public class BotLogger {
             String msgChunk = compiledMessage.substring(i, Math.min(i + MAX_DISCORD_MESSAGE_SIZE, msgLength));
 
             if (err == null
-                    || i + MAX_DISCORD_MESSAGE_SIZE
-                            < msgLength) { // If length could overflow or there is no error to trace
-                if (channel == null) scheduleWebhookMessage(msgChunk); // Send message on webhook
-                else channel.sendMessage(msgChunk).queue(); // Send message on channel
+                || i + MAX_DISCORD_MESSAGE_SIZE < msgLength) { // If length could overflow or there is no error to trace
+                if (channel == null)
+                    scheduleWebhookMessage(msgChunk); // Send message on webhook
+                else
+                    channel.sendMessage(msgChunk).queue(); // Send message on channel
             } else { // Handle error on last send
                 ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
 
@@ -212,13 +215,13 @@ public class BotLogger {
                     scheduleWebhookMessage(msgChunk); // Send message on webhook
                 } else {
                     channel.sendMessage(msgChunk).queue(m -> m.createThreadChannel("Stack Trace")
-                            .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-                            .queue(t -> {
-                                MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(err));
-                                t.getManager()
-                                        .setArchived(true)
-                                        .queueAfter(SECONDS_TO_WAIT_BEFORE_QUEUEING_STACKTRACE, TimeUnit.SECONDS);
-                            }));
+                        .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
+                        .queue(t -> {
+                            MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(err));
+                            t.getManager()
+                                .setArchived(true)
+                                .queueAfter(SECONDS_TO_WAIT_BEFORE_QUEUEING_STACKTRACE, TimeUnit.SECONDS);
+                        }));
                 }
             }
         }
@@ -241,22 +244,21 @@ public class BotLogger {
             sendMessageToBotLogWebhook(message);
         } else {
             CronManager.scheduleOnce(
-                    BotLogger.class,
-                    () -> sendMessageToBotLogWebhook(message),
-                    timeToNextMessage,
-                    TimeUnit.MILLISECONDS);
+                BotLogger.class,
+                () -> sendMessageToBotLogWebhook(message),
+                timeToNextMessage,
+                TimeUnit.MILLISECONDS);
         }
     }
 
     private static void sendMessageToBotLogWebhook(String message) {
-        String botLogWebhookURL =
-                switch (AsyncTI4DiscordBot.guildPrimaryID) {
-                    case Constants.ASYNCTI4_HUB_SERVER_ID -> // AsyncTI4 Primary HUB Production Server
-                        "https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v";
-                    case "1059645656295292968" -> // PrisonerOne's Test Server
-                        "https://discord.com/api/webhooks/1159478386998116412/NiyxcE-6TVkSH0ACNpEhwbbEdIBrvTWboZBTwuooVfz5n4KccGa_HRWTbCcOy7ivZuEp";
-                    case null, default -> null;
-                };
+        String botLogWebhookURL = switch (AsyncTI4DiscordBot.guildPrimaryID) {
+            case Constants.ASYNCTI4_HUB_SERVER_ID -> // AsyncTI4 Primary HUB Production Server
+                "https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v";
+            case "1059645656295292968" -> // PrisonerOne's Test Server
+                "https://discord.com/api/webhooks/1159478386998116412/NiyxcE-6TVkSH0ACNpEhwbbEdIBrvTWboZBTwuooVfz5n4KccGa_HRWTbCcOy7ivZuEp";
+            case null, default -> null;
+        };
 
         if (botLogWebhookURL == null) {
             System.out.println("\"ERROR: Unable to get url for bot-log webhook\n " + message);
@@ -285,8 +287,7 @@ public class BotLogger {
 
     public static void catchRestError(Throwable e) {
         // This has become too annoying, so we are limiting to testing mode/debug mode
-        boolean debugMode =
-                GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
+        boolean debugMode = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
         if (System.getenv("TESTING") != null || debugMode) {
             // if it's ignored, it's not actionable.
             if (ignoredError(e)) return;
@@ -314,9 +315,9 @@ public class BotLogger {
         if (guild == null) return null;
 
         return guild.getTextChannelsByName(severity.channelName, false).stream()
+            .findFirst()
+            .orElse(guild.getTextChannelsByName("bot-log", false).stream()
                 .findFirst()
-                .orElse(guild.getTextChannelsByName("bot-log", false).stream()
-                        .findFirst()
-                        .orElse(null));
+                .orElse(null));
     }
 }

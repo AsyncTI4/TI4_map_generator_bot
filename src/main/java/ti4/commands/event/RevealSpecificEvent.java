@@ -18,8 +18,8 @@ class RevealSpecificEvent extends GameStateSubcommand {
     public RevealSpecificEvent() {
         super(Constants.REVEAL_SPECIFIC, "Reveal top Event from deck", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.EVENT_ID, "Event ID (text ID found in /search events)")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOption(OptionType.BOOLEAN, Constants.FORCE, "Force reveal the Event (even if it's not in the deck)");
     }
 

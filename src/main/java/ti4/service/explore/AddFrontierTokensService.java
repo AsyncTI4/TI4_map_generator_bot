@@ -17,8 +17,8 @@ public class AddFrontierTokensService {
         Collection<Tile> tileList = game.getTileMap().values();
         for (Tile tile : tileList) {
             if (((tile.getPlanetUnitHolders().isEmpty() && tile.getUnitHolders().size() == 2)
-                            || Mapper.getFrontierTileIds().contains(tile.getTileID()))
-                    && !game.isBaseGameMode()) {
+                || Mapper.getFrontierTileIds().contains(tile.getTileID()))
+                && !game.isBaseGameMode()) {
                 boolean hasMirage = false;
                 for (UnitHolder unitholder : tile.getUnitHolders().values()) {
                     if (unitholder.getName().equals(Constants.MIRAGE)) {

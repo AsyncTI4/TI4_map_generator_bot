@@ -18,7 +18,8 @@ import ti4.model.UnitModel;
 public class UnitInfoService {
 
     public static void sendUnitInfo(
-            Game game, Player player, GenericInteractionCreateEvent event, boolean showAllUnits) {
+        Game game, Player player, GenericInteractionCreateEvent event, boolean showAllUnits
+    ) {
         String headerText = player.getRepresentation() + " Somebody" + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendUnitInfo(player, showAllUnits);
@@ -26,10 +27,10 @@ public class UnitInfoService {
 
     public static void sendUnitInfo(Player player, boolean showAllUnits) {
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-                player.getCardsInfoThread(),
-                "__**Unit Info:**__",
-                getUnitMessageEmbeds(player, showAllUnits),
-                getUnitInfoButtons());
+            player.getCardsInfoThread(),
+            "__**Unit Info:**__",
+            getUnitMessageEmbeds(player, showAllUnits),
+            getUnitInfoButtons());
     }
 
     private static List<Button> getUnitInfoButtons() {
@@ -48,8 +49,7 @@ public class UnitInfoService {
         } else {
             unitList.addAll(player.getSpecialUnitsOwned());
         }
-        for (UnitModel unitModel :
-                unitList.stream().sorted().map(Mapper::getUnit).toList()) {
+        for (UnitModel unitModel : unitList.stream().sorted().map(Mapper::getUnit).toList()) {
             MessageEmbed unitRepresentationEmbed = unitModel.getRepresentationEmbed(false);
             messageEmbeds.add(unitRepresentationEmbed);
         }

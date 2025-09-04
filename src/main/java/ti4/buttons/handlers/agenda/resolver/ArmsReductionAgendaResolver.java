@@ -26,7 +26,7 @@ public class ArmsReductionAgendaResolver implements ForAgainstAgendaResolver {
             if (excessCruisers > 0) {
                 removeButtons.addAll(ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "cruiser"));
                 message = player.getRepresentation() + ", please remove " + excessCruisers + " excess cruiser"
-                        + (excessCruisers == 1 ? "" : "s");
+                    + (excessCruisers == 1 ? "" : "s");
             }
 
             int excessDreadnoughts = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false) - 2;
@@ -34,10 +34,10 @@ public class ArmsReductionAgendaResolver implements ForAgainstAgendaResolver {
                 removeButtons.addAll(ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "cruiser"));
                 if (message.isEmpty()) {
                     message = player.getRepresentation() + ", please remove " + excessDreadnoughts
-                            + " excess dreadnought" + (excessDreadnoughts == 1 ? "" : "s");
+                        + " excess dreadnought" + (excessDreadnoughts == 1 ? "" : "s");
                 } else {
                     message += player.getRepresentation() + " and " + excessDreadnoughts + " excess dreadnought"
-                            + (excessDreadnoughts == 1 ? "" : "s");
+                        + (excessDreadnoughts == 1 ? "" : "s");
                 }
             }
 
@@ -47,14 +47,14 @@ public class ArmsReductionAgendaResolver implements ForAgainstAgendaResolver {
             }
         }
         MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(), "Sent buttons for each player to remove excess dreadnoughts and cruisers.");
+            game.getMainGameChannel(), "Sent buttons for each player to remove excess dreadnoughts and cruisers.");
     }
 
     @Override
     public void handleAgainst(Game game, ButtonInteractionEvent event, int agendaNumericId) {
         game.setStoredValue("agendaArmsReduction", "true");
         MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(),
-                "# Will exhaust all planets with a technology specialty at the start of next Strategy Phase.");
+            game.getMainGameChannel(),
+            "# Will exhaust all planets with a technology specialty at the start of next Strategy Phase.");
     }
 }

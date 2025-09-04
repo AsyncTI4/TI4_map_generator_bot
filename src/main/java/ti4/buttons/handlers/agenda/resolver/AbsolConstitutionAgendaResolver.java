@@ -41,7 +41,7 @@ public class AbsolConstitutionAgendaResolver implements ForAgainstAgendaResolver
             } else {
                 discardedAgendas.add(id2);
                 MessageHelper.sendMessageToChannel(
-                        game.getMainGameChannel(), "Found the non-law agenda: " + agendaDetails.getName());
+                    game.getMainGameChannel(), "Found the non-law agenda: " + agendaDetails.getName());
             }
         }
     }

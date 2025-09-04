@@ -14,8 +14,8 @@ class RelicAddBackIntoDeck extends GameStateSubcommand {
     public RelicAddBackIntoDeck() {
         super(Constants.ADD_BACK_INTO_DECK, "Add relic back into deck if already purged", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to add back into deck")
-                .setAutoComplete(true)
-                .setRequired(true));
+            .setAutoComplete(true)
+            .setRequired(true));
     }
 
     @Override

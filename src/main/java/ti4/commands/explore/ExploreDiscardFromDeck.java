@@ -16,9 +16,9 @@ class ExploreDiscardFromDeck extends GameStateSubcommand {
     ExploreDiscardFromDeck() {
         super(Constants.DISCARD_FROM_DECK, "Discard an Exploration Card from the deck.", true, true);
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.EXPLORE_CARD_ID,
-                        "Exploration card ids. May include multiple comma-separated ids.")
+            OptionType.STRING,
+            Constants.EXPLORE_CARD_ID,
+            "Exploration card ids. May include multiple comma-separated ids.")
                 .setRequired(true));
     }
 
@@ -26,8 +26,8 @@ class ExploreDiscardFromDeck extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         String ids = PatternHelper.SPACE_PATTERN
-                .matcher(event.getOption(Constants.EXPLORE_CARD_ID).getAsString())
-                .replaceAll("");
+            .matcher(event.getOption(Constants.EXPLORE_CARD_ID).getAsString())
+            .replaceAll("");
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {
@@ -35,13 +35,13 @@ class ExploreDiscardFromDeck extends GameStateSubcommand {
             if (explore != null) {
                 game.discardExplore(id);
                 sb.append("Card discarded: ")
-                        .append(explore.textRepresentation())
-                        .append(System.lineSeparator());
+                    .append(explore.textRepresentation())
+                    .append(System.lineSeparator());
             } else {
                 sb.append("Card ID ")
-                        .append(id)
-                        .append(" not found, please retry")
-                        .append(System.lineSeparator());
+                    .append(id)
+                    .append(" not found, please retry")
+                    .append(System.lineSeparator());
             }
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

@@ -55,9 +55,9 @@ class SetDeck extends GameStateSubcommand {
                         changedDecks.put(deckModel.getType(), deckModel);
                     } else {
                         MessageHelper.sendMessageToChannel(
-                                event.getChannel(),
-                                "Something went wrong and the deck ***" + value
-                                        + "*** could not be set, please see error above or try executing the command again (without copy/pasting).");
+                            event.getChannel(),
+                            "Something went wrong and the deck ***" + value
+                                + "*** could not be set, please see error above or try executing the command again (without copy/pasting).");
                     }
                 }
                 if (deckType.equals(Constants.TECHNOLOGY_DECK)) {
@@ -70,9 +70,9 @@ class SetDeck extends GameStateSubcommand {
         if (CollectionUtils.isNotEmpty(changedDecks.keySet())) {
             List<String> changeMessage = new ArrayList<>();
             changedDecks
-                    .values()
-                    .forEach(deck -> changeMessage.add(deck.getType() + " deck has been changed to:\n`"
-                            + deck.getAlias() + "`: " + deck.getName() + "\n>>> " + deck.getDescription()));
+                .values()
+                .forEach(deck -> changeMessage.add(deck.getType() + " deck has been changed to:\n`"
+                    + deck.getAlias() + "`: " + deck.getName() + "\n>>> " + deck.getDescription()));
             MessageHelper.sendMessageToChannel(event.getChannel(), String.join("\n", changeMessage));
         }
     }

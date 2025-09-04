@@ -14,7 +14,7 @@ class StartPhase extends GameStateSubcommand {
     public StartPhase() {
         super(Constants.START_PHASE, "Start a specific phase of the game", true, false);
         addOptions(new OptionData(
-                        OptionType.STRING, Constants.SPECIFIC_PHASE, "What phase do you wish to get buttons for?")
+            OptionType.STRING, Constants.SPECIFIC_PHASE, "What phase do you wish to get buttons for?")
                 .setRequired(true)
                 .setAutoComplete(true));
     }

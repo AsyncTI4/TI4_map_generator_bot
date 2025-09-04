@@ -28,15 +28,15 @@ class PoliticsPosition extends Subcommand {
     public static void searchGames(SlashCommandInteractionEvent event) {
 
         Predicate<ManagedGame> endedGamesFilter = game -> game.isHasEnded()
-                && game.getRound() == 5
-                && game.getRealPlayers().size() == 6
-                && !game.isFowMode()
-                && game.isHasWinner();
+            && game.getRound() == 5
+            && game.getRealPlayers().size() == 6
+            && !game.isFowMode()
+            && game.isHasWinner();
 
         var filteredManagedGames = GameManager.getManagedGames().stream()
-                .filter(endedGamesFilter)
-                .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
-                .toList();
+            .filter(endedGamesFilter)
+            .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
+            .toList();
 
         int games = 0;
         int gamesWithCustodians = 0;
@@ -52,30 +52,28 @@ class PoliticsPosition extends Subcommand {
 
             for (Player player : game.getRealPlayers()) {
                 if ("3".equalsIgnoreCase(game.getStoredValue("Round1SCPickFor" + player.getFaction()))
-                        && player.getAllianceMembers().isEmpty()) {
+                    && player.getAllianceMembers().isEmpty()) {
                     games++;
                     if ("8"
-                                    .equalsIgnoreCase(game.getStoredValue(
-                                            "Round" + game.getRound() + "SCPickFor" + player.getFaction()))
-                            || "1"
-                                    .equalsIgnoreCase(game.getStoredValue(
-                                            "Round" + game.getRound() + "SCPickFor" + player.getFaction()))) {
+                        .equalsIgnoreCase(game.getStoredValue(
+                            "Round" + game.getRound() + "SCPickFor" + player.getFaction()))
+                        || "1"
+                            .equalsIgnoreCase(game.getStoredValue(
+                                "Round" + game.getRound() + "SCPickFor" + player.getFaction()))) {
                         gamesWith8Or1++;
                     }
 
                     String idC = "";
-                    for (Entry<String, Integer> po :
-                            game.getRevealedPublicObjectives().entrySet()) {
+                    for (Entry<String, Integer> po : game.getRevealedPublicObjectives().entrySet()) {
                         if (po.getValue().equals(0)) {
                             idC = po.getKey();
                             break;
                         }
                     }
                     if (!idC.isEmpty()) {
-                        List<String> scoredPlayerList =
-                                game.getScoredPublicObjectives().computeIfAbsent(idC, key -> new ArrayList<>());
+                        List<String> scoredPlayerList = game.getScoredPublicObjectives().computeIfAbsent(idC, key -> new ArrayList<>());
                         if (!scoredPlayerList.isEmpty()
-                                && scoredPlayerList.getFirst().equalsIgnoreCase(player.getUserID())) {
+                            && scoredPlayerList.getFirst().equalsIgnoreCase(player.getUserID())) {
                             gamesWithCustodians++;
                         }
                     }

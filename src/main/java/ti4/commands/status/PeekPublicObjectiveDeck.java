@@ -31,8 +31,8 @@ class PeekPublicObjectiveDeck extends GameStateSubcommand {
         Game game = getGame();
         int stage = event.getOption(STAGE_COMMAND_NAME).getAsInt();
         int count = Optional.ofNullable(event.getOption(Constants.COUNT))
-                .map(OptionMapping::getAsInt)
-                .orElse(1);
+            .map(OptionMapping::getAsInt)
+            .orElse(1);
         List<String> publicObjectiveDeck = stage == 1 ? game.getPublicObjectives1() : game.getPublicObjectives2();
 
         List<MessageEmbed> publicObjectiveEmbedMessages = new ArrayList<>(count);

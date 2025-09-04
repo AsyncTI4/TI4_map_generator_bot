@@ -2,9 +2,8 @@ package ti4.service.statistics;
 
 public enum PlayerStatTypes {
     PLAYER_WIN_PERCENT("Player win percent", "Shows the win percent of each player rounded to the nearest integer"), //
-    PLAYER_GAME_COUNT("Player game count", "Shows the number of games each player has played in"),
-    PLAYER_MATCHMAKING_RATING(
-            "Player matchmaking rating", "Shows player matchmaking rating calculated with the TrueSkill algorithm");
+    PLAYER_GAME_COUNT("Player game count", "Shows the number of games each player has played in"), PLAYER_MATCHMAKING_RATING(
+        "Player matchmaking rating", "Shows player matchmaking rating calculated with the TrueSkill algorithm");
 
     private final String name;
     private final String description;
@@ -34,7 +33,7 @@ public enum PlayerStatTypes {
 
     public boolean search(String searchString) {
         return name.toLowerCase().contains(searchString)
-                || description.toLowerCase().contains(searchString)
-                || toString().contains(searchString);
+            || description.toLowerCase().contains(searchString)
+            || toString().contains(searchString);
     }
 }

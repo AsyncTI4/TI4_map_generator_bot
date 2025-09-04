@@ -28,8 +28,7 @@ public class MatchmakingRatingEventService {
         List<MatchmakingGame> games = new ArrayList<>();
         boolean onlyTiglGames = event.getOption("tigl_only", false, OptionMapping::getAsBoolean);
         boolean showRating = event.getOption("show_my_rating", false, OptionMapping::getAsBoolean);
-        Predicate<Game> filter =
-                GameStatisticsFilterer.getFinishedGamesFilter(6, null).and(not(Game::isAllianceMode));
+        Predicate<Game> filter = GameStatisticsFilterer.getFinishedGamesFilter(6, null).and(not(Game::isAllianceMode));
         if (onlyTiglGames) {
             filter = filter.and(Game::isCompetitiveTIGLGame).and(Game::isNormalGame);
         }
@@ -40,7 +39,8 @@ public class MatchmakingRatingEventService {
     }
 
     private static void sendMessage(
-            SlashCommandInteractionEvent event, List<MatchmakingRating> playerRatings, boolean showRating) {
+        SlashCommandInteractionEvent event, List<MatchmakingRating> playerRatings, boolean showRating
+    ) {
         int maxListSize = Math.min(MAX_LIST_SIZE, playerRatings.size());
         StringBuilder sb = new StringBuilder();
         sb.append("__**Player Matchmaking Ratings:**__\n");
@@ -50,43 +50,41 @@ public class MatchmakingRatingEventService {
                 continue;
             }
             listSize++;
-            String formattedString =
-                    String.format("%d. `%s` `Rating=%.3f`\n", listSize, playerRating.username(), playerRating.rating());
+            String formattedString = String.format("%d. `%s` `Rating=%.3f`\n", listSize, playerRating.username(), playerRating.rating());
             sb.append(formattedString);
         }
 
         double averageRating = playerRatings.stream()
-                .mapToDouble(MatchmakingRating::rating)
-                .average()
-                .orElse(Double.NaN);
+            .mapToDouble(MatchmakingRating::rating)
+            .average()
+            .orElse(Double.NaN);
         String formattedString = String.format(
-                """
+            """
 
                 This list only includes the top %d players with a high confidence in their rating.
 
                 The average rating of the player base is `%.3f`
                 """,
-                maxListSize, averageRating);
+            maxListSize, averageRating);
         sb.append(formattedString);
 
         playerRatings.stream()
-                .filter(playerRating ->
-                        playerRating.userId().equals(event.getUser().getId()))
-                .findFirst()
-                .ifPresent(playerRating -> {
-                    if (showRating && playerRating.calibrationPercent() == 100) {
-                        sb.append(String.format("\nYour rating is `%.3f`.", playerRating.rating()));
-                    } else {
-                        sb.append(String.format(
-                                "\nWe are `%.1f%%` of the way to a high confidence in your rating.",
-                                playerRating.calibrationPercent()));
-                        if (showRating) {
-                            sb.append(" We cannot show your rating until it reaches high confidence.");
-                        }
+            .filter(playerRating -> playerRating.userId().equals(event.getUser().getId()))
+            .findFirst()
+            .ifPresent(playerRating -> {
+                if (showRating && playerRating.calibrationPercent() == 100) {
+                    sb.append(String.format("\nYour rating is `%.3f`.", playerRating.rating()));
+                } else {
+                    sb.append(String.format(
+                        "\nWe are `%.1f%%` of the way to a high confidence in your rating.",
+                        playerRating.calibrationPercent()));
+                    if (showRating) {
+                        sb.append(" We cannot show your rating until it reaches high confidence.");
                     }
-                });
+                }
+            });
 
         MessageHelper.sendMessageToThread(
-                (MessageChannelUnion) event.getMessageChannel(), "Player Matchmaking Ratings", sb.toString());
+            (MessageChannelUnion) event.getMessageChannel(), "Player Matchmaking Ratings", sb.toString());
     }
 }

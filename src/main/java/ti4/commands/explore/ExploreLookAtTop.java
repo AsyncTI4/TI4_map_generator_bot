@@ -18,8 +18,8 @@ class ExploreLookAtTop extends GameStateSubcommand {
     public ExploreLookAtTop() {
         super(Constants.LOOK_AT_TOP, "Privately look at the top card of an exploration deck.", false, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.")
-                .setAutoComplete(true)
-                .setRequired(true));
+            .setAutoComplete(true)
+            .setRequired(true));
     }
 
     @Override
@@ -39,7 +39,7 @@ class ExploreLookAtTop extends GameStateSubcommand {
         String playerFactionNameWithEmoji = player.getFactionEmoji();
         if (deck.isEmpty() && discardPile.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(
-                    event, traitNameWithEmoji + " exploration deck & discard is empty - nothing to look at.");
+                event, traitNameWithEmoji + " exploration deck & discard is empty - nothing to look at.");
         }
 
         StringBuilder sb = new StringBuilder();
@@ -50,8 +50,8 @@ class ExploreLookAtTop extends GameStateSubcommand {
 
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                "The top card of the " + traitNameWithEmoji + " exploration deck has been set to "
-                        + playerFactionNameWithEmoji + " `#cards-info` thread.");
+            player.getCorrectChannel(),
+            "The top card of the " + traitNameWithEmoji + " exploration deck has been set to "
+                + playerFactionNameWithEmoji + " `#cards-info` thread.");
     }
 }

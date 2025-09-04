@@ -106,14 +106,14 @@ public class PickStrategyCardService {
     }
 
     public static void checkForForcePickLastStratCard(
-            GenericInteractionCreateEvent event, Player privatePlayer, Game game, String msgExtra) {
+        GenericInteractionCreateEvent event, Player privatePlayer, Game game, String msgExtra
+    ) {
         List<Button> scButtons = Helper.getRemainingSCButtons(game, privatePlayer);
-        if (scButtons.size()
-                == 1) { // if there is only one strategy card left to pick (4p/8p games), force pick last strategy card
+        if (scButtons.size() == 1) { // if there is only one strategy card left to pick (4p/8p games), force pick last strategy card
             MessageHelper.sendMessageToChannel(
-                    privatePlayer.getCorrectChannel(),
-                    privatePlayer.getRepresentation()
-                            + ", you have only one available strategy card to pick. Bot will force pick for you.");
+                privatePlayer.getCorrectChannel(),
+                privatePlayer.getRepresentation()
+                    + ", you have only one available strategy card to pick. Bot will force pick for you.");
             int unpickedStrategyCard = 0;
             for (Integer sc : game.getSCList()) {
                 if (sc <= 0) continue; // some older games have a 0 in the list of SCs
@@ -138,7 +138,8 @@ public class PickStrategyCardService {
     }
 
     public static boolean checkForQueuedSCPick(
-            ButtonInteractionEvent event, Player privatePlayer, Game game, String msgExtra) {
+        ButtonInteractionEvent event, Player privatePlayer, Game game, String msgExtra
+    ) {
         Player player = privatePlayer;
         String alreadyQueued = game.getStoredValue(player.getFaction() + "scpickqueue");
 
@@ -150,9 +151,9 @@ public class PickStrategyCardService {
             for (String scNum : alreadyQueued.split("_")) {
                 if (!player.isNpc()) {
                     game.setStoredValue(
-                            player.getFaction() + "scpickqueue",
-                            game.getStoredValue(player.getFaction() + "scpickqueue")
-                                    .replace(scNum + "_", ""));
+                        player.getFaction() + "scpickqueue",
+                        game.getStoredValue(player.getFaction() + "scpickqueue")
+                            .replace(scNum + "_", ""));
                 }
                 int sc = Integer.parseInt(scNum);
                 boolean held = false;
@@ -168,13 +169,13 @@ public class PickStrategyCardService {
             }
             if (unpickedStrategyCard == 0) {
                 MessageHelper.sendMessageToChannel(
-                        player.getCardsInfoThread(),
-                        "Tried to pick your queued strategy card, but they were all already taken.");
+                    player.getCardsInfoThread(),
+                    "Tried to pick your queued strategy card, but they were all already taken.");
                 return false;
             } else {
                 MessageHelper.sendMessageToChannel(
-                        privatePlayer.getCorrectChannel(),
-                        privatePlayer.getRepresentation(false, false) + " had queued an strategy card pick.");
+                    privatePlayer.getCorrectChannel(),
+                    privatePlayer.getRepresentation(false, false) + " had queued an strategy card pick.");
                 return PickStrategyCardButtonHandler.scPick(event, game, player, "scPick_" + unpickedStrategyCard);
             }
         }
@@ -196,7 +197,7 @@ public class PickStrategyCardService {
 
         List<Player> activePlayers = Helper.getSpeakerOrFullPriorityOrder(game);
         if (game.isReverseSpeakerOrder()
-                || !game.getStoredValue("willRevolution").isEmpty()) {
+            || !game.getStoredValue("willRevolution").isEmpty()) {
             Collections.reverse(activePlayers);
         }
         return activePlayers;

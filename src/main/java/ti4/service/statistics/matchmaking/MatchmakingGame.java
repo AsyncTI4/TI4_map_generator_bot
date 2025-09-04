@@ -13,19 +13,18 @@ record MatchmakingGame(String name, long endedDate, List<MatchmakingPlayer> play
 
     private static List<MatchmakingPlayer> getPlayers(Game game) {
         return game.getRealAndEliminatedPlayers().stream()
-                .map(player -> {
-                    String userId = player.getUserID();
-                    String username = GameManager.getManagedPlayer(userId).getName();
-                    int rank =
-                            calculatePlayerRank(isWinner(game, player), game.getVp(), player.getTotalVictoryPoints());
-                    return new MatchmakingPlayer(userId, username, rank);
-                })
-                .toList();
+            .map(player -> {
+                String userId = player.getUserID();
+                String username = GameManager.getManagedPlayer(userId).getName();
+                int rank = calculatePlayerRank(isWinner(game, player), game.getVp(), player.getTotalVictoryPoints());
+                return new MatchmakingPlayer(userId, username, rank);
+            })
+            .toList();
     }
 
     private static boolean isWinner(Game game, Player player) {
         return game.getWinners().stream()
-                .anyMatch(gamePlayer -> gamePlayer.getUserID().equals(player.getUserID()));
+            .anyMatch(gamePlayer -> gamePlayer.getUserID().equals(player.getUserID()));
     }
 
     private static int calculatePlayerRank(boolean isWinner, int gameVictoryPoints, int playerVictoryPoints) {

@@ -19,8 +19,8 @@ class RelicDrawSpecific extends GameStateSubcommand {
     public RelicDrawSpecific() {
         super(Constants.RELIC_DRAW_SPECIFIC, "Draw a specific relic", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to exhaust")
-                .setAutoComplete(true)
-                .setRequired(true));
+            .setAutoComplete(true)
+            .setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do edit"));
         addOption(OptionType.BOOLEAN, Constants.FORCE, "Force draw the relic (even if it's not in the deck)");
     }
@@ -33,7 +33,7 @@ class RelicDrawSpecific extends GameStateSubcommand {
         List<String> allRelics = game.getAllRelics();
         if (!allRelics.contains(relicID) && !forced) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Invalid relic or relic not present in deck: `" + relicID + "`");
+                event.getChannel(), "Invalid relic or relic not present in deck: `" + relicID + "`");
             return;
         }
         allRelics.remove(relicID);
@@ -45,7 +45,7 @@ class RelicDrawSpecific extends GameStateSubcommand {
             message += " (FORCE DRAW: This relic was not in the deck but was forcefully drawn from the ether)";
         }
         MessageHelper.sendMessageToChannelWithEmbed(
-                event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
+            event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
         RelicHelper.resolveRelicEffects(event, game, player, relicID);
     }
 }

@@ -39,22 +39,22 @@ import ti4.service.option.FOWOptionService.FOWOption;
 public class GMService {
 
     private static final List<Button> GMBUTTONS = Arrays.asList(
-            Buttons.REFRESH_MAP,
-            Buttons.SHOW_DECKS,
-            Buttons.green("gmShowGameAs_", "Show Game As..."),
-            Buttons.green("gmCheckPlayerHands_", "Check Player Hands for..."),
-            Buttons.green("gmWhoCanSee~MDL", "Who Can See Position..."),
-            Buttons.EDIT_SUMMARIES,
-            Buttons.green("gmLore", "Manage Lore"),
-            Buttons.gray("gmRefresh", "Refresh"));
+        Buttons.REFRESH_MAP,
+        Buttons.SHOW_DECKS,
+        Buttons.green("gmShowGameAs_", "Show Game As..."),
+        Buttons.green("gmCheckPlayerHands_", "Check Player Hands for..."),
+        Buttons.green("gmWhoCanSee~MDL", "Who Can See Position..."),
+        Buttons.EDIT_SUMMARIES,
+        Buttons.green("gmLore", "Manage Lore"),
+        Buttons.gray("gmRefresh", "Refresh"));
 
     private static final List<Button> HAND_CHECK_BUTTONS = Arrays.asList(
-            Buttons.gray("gmCheckPlayerHands_sabotage", "Sabotages", CardEmojis.ActionCard),
-            Buttons.gray("gmCheckPlayerHands_whens", "Whens/Afters", CardEmojis.ActionCard),
-            Buttons.gray("gmCheckPlayerHands_deadly", "Deadlies/Briberies", CardEmojis.ActionCard),
-            Buttons.gray("gmCheckPlayerHands_confusing", "Confusing/Confounding", CardEmojis.ActionCard),
-            Buttons.gray("gmCheckPlayerHands_secret", "Unscored SOs", CardEmojis.SecretObjective),
-            Buttons.DONE_DELETE_BUTTONS);
+        Buttons.gray("gmCheckPlayerHands_sabotage", "Sabotages", CardEmojis.ActionCard),
+        Buttons.gray("gmCheckPlayerHands_whens", "Whens/Afters", CardEmojis.ActionCard),
+        Buttons.gray("gmCheckPlayerHands_deadly", "Deadlies/Briberies", CardEmojis.ActionCard),
+        Buttons.gray("gmCheckPlayerHands_confusing", "Confusing/Confounding", CardEmojis.ActionCard),
+        Buttons.gray("gmCheckPlayerHands_secret", "Unscored SOs", CardEmojis.SecretObjective),
+        Buttons.DONE_DELETE_BUTTONS);
 
     private static final String ACTIVITY_LOG_THREAD = "-activity-log";
     private static final String STATUS_SUMMARY_THREAD = "Status Summaries";
@@ -62,16 +62,16 @@ public class GMService {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM HH:mm:ss");
 
     private static final List<String> GM = List.of(
-            "Galactic Mechanic",
-            "Grape Muncher",
-            "Giant Moth",
-            "Gremlin Manager",
-            "Gnome Monarch",
-            "Gravity Manipulator",
-            "Giraffe Magician",
-            "Goblin Motivator",
-            "Gummybear Manufacturer",
-            "Gondola Maestro");
+        "Galactic Mechanic",
+        "Grape Muncher",
+        "Giant Moth",
+        "Gremlin Manager",
+        "Gnome Monarch",
+        "Gravity Manipulator",
+        "Giraffe Magician",
+        "Goblin Motivator",
+        "Gummybear Manufacturer",
+        "Gondola Maestro");
 
     public static void showGMButtons(Game game) {
         if (!game.isFowMode()) return;
@@ -120,29 +120,28 @@ public class GMService {
         String timestamp = "`[" + LocalDateTime.now().format(formatter) + "]` ";
         String log = timestamp + eventLog + (ping ? " - " + gmPing(game) : "");
         ThreadGetter.getThreadInChannel(
-                getGMChannel(game), game.getName() + ACTIVITY_LOG_THREAD, true, false, threadChannel -> {
-                    if (jumpUrl != null) {
-                        MessageHelper.sendMessageToChannel(threadChannel, log + " - " + jumpUrl);
-                    } else if (player == null) {
-                        MessageHelper.sendMessageToChannel(threadChannel, log);
-                    } else {
-                        jumpToLatestMessage(
-                                player,
-                                latestJumpUrl ->
-                                        MessageHelper.sendMessageToChannel(threadChannel, log + " - " + latestJumpUrl));
-                    }
-                });
+            getGMChannel(game), game.getName() + ACTIVITY_LOG_THREAD, true, false, threadChannel -> {
+                if (jumpUrl != null) {
+                    MessageHelper.sendMessageToChannel(threadChannel, log + " - " + jumpUrl);
+                } else if (player == null) {
+                    MessageHelper.sendMessageToChannel(threadChannel, log);
+                } else {
+                    jumpToLatestMessage(
+                        player,
+                        latestJumpUrl -> MessageHelper.sendMessageToChannel(threadChannel, log + " - " + latestJumpUrl));
+                }
+            });
     }
 
     private static void jumpToLatestMessage(Player player, Consumer<String> callback) {
         MessageChannel privateChannel = player != null ? player.getPrivateChannel() : null;
         if (privateChannel != null) {
             privateChannel
-                    .getHistory()
-                    .retrievePast(1)
-                    .queue(
-                            messages -> callback.accept(messages.getFirst().getJumpUrl()),
-                            throwable -> callback.accept("No latest message."));
+                .getHistory()
+                .retrievePast(1)
+                .queue(
+                    messages -> callback.accept(messages.getFirst().getJumpUrl()),
+                    throwable -> callback.accept("No latest message."));
         } else {
             callback.accept("No private channel.");
         }
@@ -160,18 +159,18 @@ public class GMService {
         if (!faction.isEmpty()) {
             Player showAs = game.getPlayerFromColorOrFaction(faction);
             ShowGameService.simpleShowGame(
-                    game, new UserOverridenGenericInteractionCreateEvent(event, showAs.getMember()));
+                game, new UserOverridenGenericInteractionCreateEvent(event, showAs.getMember()));
         } else {
             List<Button> factionButtons = new ArrayList<>();
             for (Player player : game.getRealPlayers()) {
                 factionButtons.add(Buttons.green(
-                        "gmShowGameAs_" + player.getFaction(),
-                        StringUtils.capitalize(player.getColor()) + ", " + player.getUserName(),
-                        player.getFactionEmoji()));
+                    "gmShowGameAs_" + player.getFaction(),
+                    StringUtils.capitalize(player.getColor()) + ", " + player.getUserName(),
+                    player.getFactionEmoji()));
             }
             factionButtons.add(Buttons.DONE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
-                    event.getChannel(), "Please choose the player who to view the game as:", factionButtons);
+                event.getChannel(), "Please choose the player who to view the game as:", factionButtons);
         }
     }
 
@@ -196,15 +195,15 @@ public class GMService {
                     List<String> whens = AgendaHelper.getPossibleWhenNames(player);
                     if (!whens.isEmpty()) {
                         sbWhens.append("> ")
-                                .append(player.getRepresentationUnfoggedNoPing())
-                                .append(": ");
+                            .append(player.getRepresentationUnfoggedNoPing())
+                            .append(": ");
                         sbWhens.append(String.join(", ", whens)).append("\n");
                     }
                     List<String> afters = AgendaHelper.getPossibleAfterNames(player);
                     if (!afters.isEmpty()) {
                         sbAfters.append("> ")
-                                .append(player.getRepresentationUnfoggedNoPing())
-                                .append(": ");
+                            .append(player.getRepresentationUnfoggedNoPing())
+                            .append(": ");
                         sbAfters.append(String.join(", ", afters)).append("\n");
                     }
                 }
@@ -217,28 +216,27 @@ public class GMService {
                     String allSecrets = SecretObjectiveInfoService.getSecretObjectiveCardInfo(game, player);
                     String unscored = StringUtils.substringAfter(allSecrets, "Unscored");
                     sos.append("__")
-                            .append(player.getRepresentationUnfoggedNoPing())
-                            .append(" Unscored")
-                            .append(unscored)
-                            .append("\n");
+                        .append(player.getRepresentationUnfoggedNoPing())
+                        .append(" Unscored")
+                        .append(unscored)
+                        .append("\n");
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), sos.toString());
             }
-            default ->
-                MessageHelper.sendMessageToChannelWithButtons(
-                        event.getChannel(), "Please choose what to look for:", HAND_CHECK_BUTTONS);
+            default -> MessageHelper.sendMessageToChannelWithButtons(
+                event.getChannel(), "Please choose what to look for:", HAND_CHECK_BUTTONS);
         }
     }
 
     @ButtonHandler("gmWhoCanSee~MDL")
     public static void whoCanSeePosition(ButtonInteractionEvent event) {
         TextInput position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
-                .setPlaceholder("000")
-                .setRequiredRange(3, 4)
-                .build();
+            .setPlaceholder("000")
+            .setRequiredRange(3, 4)
+            .build();
         Modal modal = Modal.create("gmWhoCanSeeResolve", "Who Can See Position")
-                .addComponents(Label.of("Position", position))
-                .build();
+            .addComponents(Label.of("Position", position))
+            .build();
         event.replyModal(modal).queue();
     }
 
@@ -265,8 +263,8 @@ public class GMService {
             for (String ac : player.getActionCards().keySet()) {
                 if (ac.startsWith(acId)) {
                     sb.append("> ")
-                            .append(player.getRepresentationUnfoggedNoPing())
-                            .append("\n");
+                        .append(player.getRepresentationUnfoggedNoPing())
+                        .append("\n");
                     break;
                 }
             }
@@ -278,19 +276,19 @@ public class GMService {
         if (!game.isFowMode() || !game.getFowOption(FOWOption.STATUS_SUMMARY)) return;
 
         ThreadGetter.getThreadInChannel(
-                game.getMainGameChannel(), STATUS_SUMMARY_THREAD, true, false, threadChannel -> {
-                    MessageHelper.sendMessageToChannel(
-                            threadChannel, "# Round " + game.getRound() + " Status Summary " + game.getPing());
-                    ExploreService.secondHalfOfExpInfo(
-                            Arrays.asList(
-                                    Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER),
-                            threadChannel,
-                            null,
-                            game,
-                            true,
-                            false);
+            game.getMainGameChannel(), STATUS_SUMMARY_THREAD, true, false, threadChannel -> {
+                MessageHelper.sendMessageToChannel(
+                    threadChannel, "# Round " + game.getRound() + " Status Summary " + game.getPing());
+                ExploreService.secondHalfOfExpInfo(
+                    Arrays.asList(
+                        Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER),
+                    threadChannel,
+                    null,
+                    game,
+                    true,
+                    false);
 
-                    RelicHelper.showRemaining(threadChannel, true, game, null);
-                });
+                RelicHelper.showRemaining(threadChannel, true, game, null);
+            });
     }
 }

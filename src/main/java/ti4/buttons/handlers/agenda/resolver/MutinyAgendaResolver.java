@@ -18,8 +18,8 @@ public class MutinyAgendaResolver implements AgendaResolver {
     public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         boolean agendaWentFor = "for".equalsIgnoreCase(winner);
         List<Player> winningOrLosingPlayers = agendaWentFor
-                ? AgendaHelper.getWinningVoters(winner, game)
-                : AgendaHelper.getLosingVoters(winner, game);
+            ? AgendaHelper.getWinningVoters(winner, game)
+            : AgendaHelper.getLosingVoters(winner, game);
         if (winningOrLosingPlayers.isEmpty()) {
             return;
         }

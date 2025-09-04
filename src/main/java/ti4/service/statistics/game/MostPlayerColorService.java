@@ -21,20 +21,20 @@ class MostPlayerColorService {
         Map<String, Integer> colorCount = new HashMap<>();
 
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilter(event), game -> getMostPlayedColor(game, colorCount));
+            GameStatisticsFilterer.getGamesFilter(event), game -> getMostPlayedColor(game, colorCount));
 
         StringBuilder sb = new StringBuilder();
         sb.append("Plays per Colour:").append("\n");
         colorCount.entrySet().stream()
-                .filter(e -> Mapper.isValidColor(e.getKey()))
-                .sorted(Map.Entry.comparingByValue())
-                .forEach(entry -> sb.append("`")
-                        .append(StringUtils.leftPad(entry.getValue().toString(), 4))
-                        .append("x` ")
-                        .append(ColorEmojis.getColorEmojiWithName(entry.getKey()))
-                        .append("\n"));
+            .filter(e -> Mapper.isValidColor(e.getKey()))
+            .sorted(Map.Entry.comparingByValue())
+            .forEach(entry -> sb.append("`")
+                .append(StringUtils.leftPad(entry.getValue().toString(), 4))
+                .append("x` ")
+                .append(ColorEmojis.getColorEmojiWithName(entry.getKey()))
+                .append("\n"));
         MessageHelper.sendMessageToThread(
-                (MessageChannelUnion) event.getMessageChannel(), "Plays per Colour", sb.toString());
+            (MessageChannelUnion) event.getMessageChannel(), "Plays per Colour", sb.toString());
     }
 
     private static void getMostPlayedColor(Game game, Map<String, Integer> colorCount) {

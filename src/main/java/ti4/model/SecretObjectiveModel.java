@@ -104,8 +104,8 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
 
     public boolean search(String searchString) {
         return alias.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
+            || name.toLowerCase().contains(searchString)
+            || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {

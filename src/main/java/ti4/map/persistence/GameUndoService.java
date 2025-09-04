@@ -50,9 +50,9 @@ class GameUndoService {
             int oldestUndoNumberThatShouldExist = maxUndoNumber - maxUndoFilesPerGame;
 
             undoNumbers.stream()
-                    .filter(undoIndex -> undoIndex < oldestUndoNumberThatShouldExist)
-                    .map(undoIndex -> getUndoFileName(gameName, undoIndex))
-                    .forEach(fileName -> deleteFile(Storage.getGameUndo(gameName, fileName)));
+                .filter(undoIndex -> undoIndex < oldestUndoNumberThatShouldExist)
+                .map(undoIndex -> getUndoFileName(gameName, undoIndex))
+                .forEach(fileName -> deleteFile(Storage.getGameUndo(gameName, fileName)));
 
             return maxUndoNumber;
         } catch (Exception e) {
@@ -76,7 +76,7 @@ class GameUndoService {
 
     private static Game lockAndUndo(Game gameToUndo, int undoIndex, int latestUndoIndex) {
         return GameFileLockManager.wrapWithWriteLock(
-                gameToUndo.getName(), () -> undo(gameToUndo, undoIndex, latestUndoIndex));
+            gameToUndo.getName(), () -> undo(gameToUndo, undoIndex, latestUndoIndex));
     }
 
     private static Game undo(Game gameToUndo, int undoIndex, int latestUndoIndex) {
@@ -130,8 +130,7 @@ class GameUndoService {
         if (gameToUndo.isFowMode()) {
             return;
         }
-        Map<String, String> undoNamesToCommandText =
-                GameUndoNameService.getUndoNamesToCommandText(gameToUndo, latestUndoIndex - undoIndex);
+        Map<String, String> undoNamesToCommandText = GameUndoNameService.getUndoNamesToCommandText(gameToUndo, latestUndoIndex - undoIndex);
         List<String> undoCommands = new ArrayList<>();
         for (int i = latestUndoIndex; i > undoIndex; i--) {
             String fileName = getUndoFileName(gameToUndo.getName(), i);
@@ -146,20 +145,21 @@ class GameUndoService {
     }
 
     private static void sendUndoConfirmationMessage(
-            Game game, int undoIndex, int latestUndoIndex, List<String> undoCommands) {
+        Game game, int undoIndex, int latestUndoIndex, List<String> undoCommands
+    ) {
         StringBuilder sb = new StringBuilder("Rolled back to save `")
-                .append(undoIndex)
-                .append("` from `")
-                .append(latestUndoIndex)
-                .append("`:\n");
+            .append(undoIndex)
+            .append("` from `")
+            .append(latestUndoIndex)
+            .append("`:\n");
 
         String gameName = game.getName();
         for (int i = 0; i < undoCommands.size(); i++) {
             sb.append("> `")
-                    .append(latestUndoIndex - i)
-                    .append("` ")
-                    .append(undoCommands.get(i))
-                    .append("\n");
+                .append(latestUndoIndex - i)
+                .append("` ")
+                .append(undoCommands.get(i))
+                .append("\n");
         }
         ButtonHelper.findOrCreateThreadWithMessage(game, gameName + "-undo-log", sb.toString());
     }
@@ -167,10 +167,10 @@ class GameUndoService {
     private static void generateSavedButtons(Game game) {
         try {
             if (!game.getSavedButtons().isEmpty()
-                    && game.getSavedChannel() != null
-                    && !game.getPhaseOfGame().contains("status")) {
+                && game.getSavedChannel() != null
+                && !game.getPhaseOfGame().contains("status")) {
                 MessageHelper.sendMessageToChannelWithButtons(
-                        game.getSavedChannel(), game.getSavedMessage(), ButtonHelper.getSavedButtons(game));
+                    game.getSavedChannel(), game.getSavedMessage(), ButtonHelper.getSavedButtons(game));
             }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Error trying to generated saved buttons for " + game.getName(), e);

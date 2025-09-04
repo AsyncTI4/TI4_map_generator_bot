@@ -48,8 +48,7 @@ public class ManagedGame {
         name = game.getName();
         hasEnded = game.isHasEnded();
         hasWinner = game.hasWinner();
-        vpGoalReached =
-                game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
+        vpGoalReached = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
         fowMode = game.isFowMode();
         factionReactMode = game.isBotFactionReacts();
         colorReactMode = game.isBotColorReacts();
@@ -60,8 +59,8 @@ public class ManagedGame {
         lastModifiedDate = game.getLastModifiedDate();
         activePlayerId = sanitizeToNull(game.getActivePlayerID());
         lastActivePlayerChange = game.getLastActivePlayerChange() == null
-                ? 0
-                : game.getLastActivePlayerChange().getTime();
+            ? 0
+            : game.getLastActivePlayerChange().getTime();
         endedDate = game.getEndedDate();
         round = game.getRound();
         guild = game.getGuild();
@@ -71,11 +70,11 @@ public class ManagedGame {
         launchPostThread = game.getLaunchPostThread();
 
         players = game.getPlayers().values().stream()
-                .map(p -> GameManager.addOrMergePlayer(this, p))
-                .collect(toUnmodifiableSet());
+            .map(p -> GameManager.addOrMergePlayer(this, p))
+            .collect(toUnmodifiableSet());
         playerToIsReal = game.getPlayers().values().stream()
-                .collect(Collectors.toUnmodifiableMap(
-                        p -> getPlayer(p.getUserID()), p -> p.isRealPlayer() && !p.isNpc()));
+            .collect(Collectors.toUnmodifiableMap(
+                p -> getPlayer(p.getUserID()), p -> p.isRealPlayer() && !p.isNpc()));
 
         final long sixtyDays = 1000L * 60 * 60 * 24 * 60;
         stale = (System.currentTimeMillis() - game.getLastModifiedDate()) > sixtyDays;
@@ -107,9 +106,9 @@ public class ManagedGame {
 
     public List<ManagedPlayer> getRealPlayers() {
         return playerToIsReal.entrySet().stream()
-                .filter(Map.Entry::getValue)
-                .map(Map.Entry::getKey)
-                .toList();
+            .filter(Map.Entry::getValue)
+            .map(Map.Entry::getKey)
+            .toList();
     }
 
     public boolean matches(Game game) {

@@ -29,10 +29,10 @@ class KyroHero extends GameStateSubcommand {
         game.setStoredValue("kyroHeroSC", dieResult + "");
         game.setStoredValue("kyroHeroPlayer", player.getFaction());
         MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                Helper.getSCName(dieResult, game)
-                        + " has been marked with Speygh, the Kyro hero, and the faction that played the hero as "
-                        + player.getFaction() + ".");
+            event.getChannel(),
+            Helper.getSCName(dieResult, game)
+                + " has been marked with Speygh, the Kyro hero, and the faction that played the hero as "
+                + player.getFaction() + ".");
         ListTurnOrderService.turnOrder(event, game);
     }
 }

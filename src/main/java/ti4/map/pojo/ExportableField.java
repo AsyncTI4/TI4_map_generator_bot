@@ -10,4 +10,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RUNTIME)
 @Documented
-public @interface ExportableField {}
+public @interface ExportableField {
+}

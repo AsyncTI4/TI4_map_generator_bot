@@ -9,10 +9,10 @@ class NaaluCommander extends GameStateSubcommand {
 
     public NaaluCommander() {
         super(
-                Constants.NAALU_COMMANDER,
-                "Look at your neighbours' promissory notes and the top and bottom of the agenda deck.",
-                false,
-                true);
+            Constants.NAALU_COMMANDER,
+            "Look at your neighbours' promissory notes and the top and bottom of the agenda deck.",
+            false,
+            true);
     }
 
     @Override

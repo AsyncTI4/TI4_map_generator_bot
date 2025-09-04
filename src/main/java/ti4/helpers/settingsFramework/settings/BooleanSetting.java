@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 
 @Getter
 @Setter
-@JsonIncludeProperties({"id", "val"})
+@JsonIncludeProperties({ "id", "val" })
 public class BooleanSetting extends SettingInterface {
     private boolean val;
     private String whenFalse;

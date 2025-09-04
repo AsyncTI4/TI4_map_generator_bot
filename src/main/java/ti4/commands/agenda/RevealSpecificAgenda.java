@@ -19,7 +19,7 @@ class RevealSpecificAgenda extends GameStateSubcommand {
     public RevealSpecificAgenda() {
         super(Constants.REVEAL_SPECIFIC, "Reveal top Agenda from deck", true, false);
         addOptions(new OptionData(
-                        OptionType.STRING, Constants.AGENDA_ID, "Agenda Card ID (text ID found in /search agendas)")
+            OptionType.STRING, Constants.AGENDA_ID, "Agenda Card ID (text ID found in /search agendas)")
                 .setRequired(true)
                 .setAutoComplete(true));
         addOption(OptionType.BOOLEAN, Constants.FORCE, "Force reveal the agenda (even if it's not in the deck)");

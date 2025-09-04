@@ -72,11 +72,11 @@ public class TileHelper {
 
         if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(
-                    Stream.of(storedFiles).filter(file -> !file.isDirectory()).toList());
+                Stream.of(storedFiles).filter(file -> !file.isDirectory()).toList());
         }
         files.addAll(Stream.of(new File(resourcePath).listFiles())
-                .filter(file -> !file.isDirectory())
-                .toList());
+            .filter(file -> !file.isDirectory())
+            .toList());
 
         List<String> badObjects = new ArrayList<>();
         files.forEach(file -> {
@@ -84,8 +84,8 @@ public class TileHelper {
                 PlanetModel planet = objectMapper.readValue(new FileInputStream(file), PlanetModel.class);
                 planetIdsToPlanetModels.put(planet.getId(), planet);
                 tileIdsToPlanetModels
-                        .computeIfAbsent(planet.getTileId(), k -> new ArrayList<>())
-                        .add(planet);
+                    .computeIfAbsent(planet.getTileId(), k -> new ArrayList<>())
+                    .add(planet);
                 if (!planet.isValid()) {
                     badObjects.add(planet.getAlias());
                 }
@@ -95,7 +95,7 @@ public class TileHelper {
         });
         if (!badObjects.isEmpty())
             BotLogger.warning("The following **PlanetModel** are improperly formatted, but were imported anyway:\n> "
-                    + String.join("\n> ", badObjects));
+                + String.join("\n> ", badObjects));
     }
 
     private static void initTilesFromJson() {
@@ -106,13 +106,13 @@ public class TileHelper {
 
         if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
-                    .filter(File::exists)
-                    .filter(file -> !file.isDirectory())
-                    .toList());
-        }
-        files.addAll(Stream.of(new File(resourcePath).listFiles())
+                .filter(File::exists)
                 .filter(file -> !file.isDirectory())
                 .toList());
+        }
+        files.addAll(Stream.of(new File(resourcePath).listFiles())
+            .filter(file -> !file.isDirectory())
+            .toList());
         List<String> badObjects = new ArrayList<>();
         files.forEach(file -> {
             try {
@@ -131,13 +131,12 @@ public class TileHelper {
         });
         if (!badObjects.isEmpty())
             BotLogger.warning("The following **TileModel** are improperly formatted, but were imported anyway:\n> "
-                    + String.join("\n> ", badObjects));
+                + String.join("\n> ", badObjects));
     }
 
     private static void duplicateDraftTiles(TileModel tile) {
         String color = PatternHelper.BLANK_WORD_PATTERN.matcher(tile.getAlias()).replaceAll("");
-        String namePre =
-                Character.toUpperCase(color.charAt(0)) + color.substring(1).toLowerCase() + ", draft tile ";
+        String namePre = Character.toUpperCase(color.charAt(0)) + color.substring(1).toLowerCase() + ", draft tile ";
 
         for (int i = 0; i < 13; i++) {
             TileModel newTile = new TileModel();
@@ -200,16 +199,16 @@ public class TileHelper {
         if (TILE_WITH_NAME_PATTERN.matcher(tileNameOrPos).matches()) {
             // If the tileNameOrPos is in the format "123 (XYZ)", we extract the position only
             tileNameOrPos = tileNameOrPos
-                    .trim()
-                    .substring(0, tileNameOrPos.indexOf(' '))
-                    .trim();
+                .trim()
+                .substring(0, tileNameOrPos.indexOf(' '))
+                .trim();
         }
 
         String tileAlias = AliasHandler.resolveTile(tileNameOrPos);
         if (game.isTileDuplicated(tileAlias)) {
             if (event != null)
                 MessageHelper.replyToMessage(
-                        event, "Duplicate tile name `" + tileAlias + "` found, please use position coordinates");
+                    event, "Duplicate tile name `" + tileAlias + "` found, please use position coordinates");
             return null;
         }
 

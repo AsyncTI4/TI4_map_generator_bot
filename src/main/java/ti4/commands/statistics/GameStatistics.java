@@ -12,11 +12,11 @@ class GameStatistics extends Subcommand {
     public GameStatistics() {
         super(Constants.GAMES, "Game Statistics");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_STATISTIC, "Choose a statistic to show")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(GameStatisticsFilterer.gameStatsFilters());
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction that you wish to get the history of")
-                .setAutoComplete(true));
+            .setAutoComplete(true));
     }
 
     @Override

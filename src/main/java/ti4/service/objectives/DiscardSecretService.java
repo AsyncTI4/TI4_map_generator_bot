@@ -26,7 +26,7 @@ public class DiscardSecretService {
         boolean removed = game.discardSecretObjective(player.getUserID(), SOID);
         if (!removed) {
             MessageHelper.sendMessageToPlayerCardsInfoThread(
-                    player, "No such secret objective ID found, please retry.");
+                player, "No such secret objective ID found, please retry.");
             return;
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, "Secret objective discarded.");
@@ -34,12 +34,12 @@ public class DiscardSecretService {
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         if (!soIDString.isEmpty()) {
             String msg = "You discarded the secret objective _"
-                    + Mapper.getSecretObjective(soIDString).getName() + "_."
-                    + " If this was an accident, you can get it back with the below button. This will tell everyone that you made a mistake discarding and are picking the secret objective back up.";
+                + Mapper.getSecretObjective(soIDString).getName() + "_."
+                + " If this was an accident, you can get it back with the below button. This will tell everyone that you made a mistake discarding and are picking the secret objective back up.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.gray(
-                    "drawSpecificSO_" + soIDString,
-                    "Retrieve " + Mapper.getSecretObjective(soIDString).getName()));
+                "drawSpecificSO_" + soIDString,
+                "Retrieve " + Mapper.getSecretObjective(soIDString).getName()));
             buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }

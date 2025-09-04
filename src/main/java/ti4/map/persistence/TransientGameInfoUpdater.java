@@ -20,7 +20,7 @@ class TransientGameInfoUpdater {
             DiscordantStarsHelper.checkOlradinMech(game);
         } catch (Exception e) {
             BotLogger.error(
-                    new LogOrigin(game), "Error adding transient attachment tokens for game " + game.getName(), e);
+                new LogOrigin(game), "Error adding transient attachment tokens for game " + game.getName(), e);
         }
     }
 }

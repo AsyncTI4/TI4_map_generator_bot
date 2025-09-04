@@ -16,11 +16,11 @@ class NovaSeed extends GameStateSubcommand {
     public NovaSeed() {
         super(Constants.NOVA_SEED, "Nova seed a system", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true));
+            .setRequired(true)
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player using nova seed"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color using nova seed")
-                .setAutoComplete(true));
+            .setAutoComplete(true));
     }
 
     @Override
@@ -30,7 +30,7 @@ class NovaSeed extends GameStateSubcommand {
         Tile tile = TileHelper.getTile(event, tileID, game);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
+                event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
 

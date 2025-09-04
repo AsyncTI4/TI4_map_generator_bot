@@ -19,21 +19,20 @@ public class SearchTokensSubcommand extends SearchComponentModelSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        ComponentSource source =
-                ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
+        ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
         if (Mapper.isValidToken(searchString)) {
             event.getChannel()
-                    .sendMessageEmbeds(Mapper.getToken(searchString).getRepresentationEmbed())
-                    .queue();
+                .sendMessageEmbeds(Mapper.getToken(searchString).getRepresentationEmbed())
+                .queue();
             return;
         }
 
         List<MessageEmbed> messageEmbeds = Mapper.getTokens().values().stream()
-                .filter(model -> model.search(searchString, source))
-                .sorted(Comparator.comparing(TokenModel::getSource))
-                .map(TokenModel::getRepresentationEmbed)
-                .toList();
+            .filter(model -> model.search(searchString, source))
+            .sorted(Comparator.comparing(TokenModel::getSource))
+            .map(TokenModel::getRepresentationEmbed)
+            .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }
 }

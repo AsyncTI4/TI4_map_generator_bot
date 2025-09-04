@@ -35,9 +35,9 @@ class CheckAllDistance extends GameStateSubcommand {
         StringBuilder sb = new StringBuilder("Distances");
         Game game = getGame();
         List<String> positions = game.getTileMap().values().stream() // .filter(t -> t.getHyperlaneData(0) == null)
-                .map(Tile::getPosition)
-                .sorted()
-                .toList();
+            .map(Tile::getPosition)
+            .sorted()
+            .toList();
         for (String pos : positions) {
             sb.append(",").append(pos);
         }
@@ -47,10 +47,10 @@ class CheckAllDistance extends GameStateSubcommand {
         for (String pos : positions) {
             Map<String, Integer> distances = CheckDistanceHelper.getTileDistances(game, player, pos, maxDistance, true);
             String row = distances.entrySet().stream()
-                    .filter(dist -> positions.contains(dist.getKey()))
-                    .sorted(Entry.comparingByKey())
-                    .map(entry -> entry.getValue() == null ? "99" : Integer.toString(entry.getValue()))
-                    .reduce(pos, (a, b) -> a + "," + b);
+                .filter(dist -> positions.contains(dist.getKey()))
+                .sorted(Entry.comparingByKey())
+                .map(entry -> entry.getValue() == null ? "99" : Integer.toString(entry.getValue()))
+                .reduce(pos, (a, b) -> a + "," + b);
             data.add(row);
         }
 

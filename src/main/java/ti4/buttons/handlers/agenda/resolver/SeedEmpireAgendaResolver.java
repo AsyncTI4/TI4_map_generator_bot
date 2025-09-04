@@ -19,11 +19,11 @@ public class SeedEmpireAgendaResolver implements ForAgainstAgendaResolver {
         Integer poIndex = game.addCustomPO("Seed of an Empire", 1);
         List<Player> winOrLose = AgendaHelper.getPlayersWithMostPoints(game);
         MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(), "Custom objective _Seed of an Empire_ has been added.");
+            game.getMainGameChannel(), "Custom objective _Seed of an Empire_ has been added.");
         for (Player playerWL : winOrLose) {
             game.scorePublicObjective(playerWL.getUserID(), poIndex);
             MessageHelper.sendMessageToChannel(
-                    playerWL.getCorrectChannel(), playerWL.getRepresentation() + " scored _Seed of an Empire_.");
+                playerWL.getCorrectChannel(), playerWL.getRepresentation() + " scored _Seed of an Empire_.");
             Helper.checkEndGame(game, playerWL);
             if (playerWL.getTotalVictoryPoints() >= game.getVp()) {
                 break;
@@ -36,11 +36,11 @@ public class SeedEmpireAgendaResolver implements ForAgainstAgendaResolver {
         Integer poIndex = game.addCustomPO("Seed of an Empire", 1);
         List<Player> winOrLose = AgendaHelper.getPlayersWithLeastPoints(game);
         MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(), "Custom objective _Seed of an Empire_ has been added.");
+            game.getMainGameChannel(), "Custom objective _Seed of an Empire_ has been added.");
         for (Player playerWL : winOrLose) {
             game.scorePublicObjective(playerWL.getUserID(), poIndex);
             MessageHelper.sendMessageToChannel(
-                    playerWL.getCorrectChannel(), playerWL.getRepresentation() + " scored _Seed of an Empire_.");
+                playerWL.getCorrectChannel(), playerWL.getRepresentation() + " scored _Seed of an Empire_.");
             Helper.checkEndGame(game, playerWL);
             if (playerWL.getTotalVictoryPoints() >= game.getVp()) {
                 break;

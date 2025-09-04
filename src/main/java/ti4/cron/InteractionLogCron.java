@@ -9,6 +9,6 @@ public class InteractionLogCron {
     public static void register() {
         BotLogger.info("Registering bot log cron");
         CronManager.schedulePeriodically(
-                InteractionLogCron.class, LogBufferManager::sendBufferedLogsToDiscord, 2, 2, TimeUnit.MINUTES);
+            InteractionLogCron.class, LogBufferManager::sendBufferedLogsToDiscord, 2, 2, TimeUnit.MINUTES);
     }
 }

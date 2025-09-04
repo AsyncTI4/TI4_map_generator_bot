@@ -15,19 +15,18 @@ import ti4.model.TechnologyModel;
 public class ShowTechDeckService {
 
     public static void displayTechDeck(Game game, GenericInteractionCreateEvent event, String deck) {
-        List<TechnologyModel> techs =
-                switch (deck) {
-                    case Constants.PROPULSION -> game.getPropulsionTechDeck();
-                    case Constants.WARFARE -> game.getWarfareTechDeck();
-                    case Constants.CYBERNETIC -> game.getCyberneticTechDeck();
-                    case Constants.BIOTIC -> game.getBioticTechDeck();
-                    case Constants.UNIT_UPGRADE -> game.getUnitUpgradeTechDeck();
-                    default -> new ArrayList<>();
-                };
+        List<TechnologyModel> techs = switch (deck) {
+            case Constants.PROPULSION -> game.getPropulsionTechDeck();
+            case Constants.WARFARE -> game.getWarfareTechDeck();
+            case Constants.CYBERNETIC -> game.getCyberneticTechDeck();
+            case Constants.BIOTIC -> game.getBioticTechDeck();
+            case Constants.UNIT_UPGRADE -> game.getUnitUpgradeTechDeck();
+            default -> new ArrayList<>();
+        };
         List<MessageEmbed> embeds = techs.stream()
-                .filter(t -> !t.isFactionTech())
-                .map(t -> t.getRepresentationEmbed(false, true))
-                .toList();
+            .filter(t -> !t.isFactionTech())
+            .map(t -> t.getRepresentationEmbed(false, true))
+            .toList();
         String message = StringUtils.capitalize(deck) + " Technology Deck:";
         MessageHelper.sendMessageToChannelWithEmbeds(event.getMessageChannel(), message, embeds);
     }

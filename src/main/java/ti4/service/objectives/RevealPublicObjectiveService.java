@@ -43,34 +43,34 @@ public class RevealPublicObjectiveService {
         var channel = game.getActionsChannel();
         if (game.isLiberationC4Mode()) {
             if (game.getRevealedPublicObjectives().get("Control Ordinian") == null
-                    || game.getRevealedPublicObjectives().get("Control Ordinian") == 0) {
+                || game.getRevealedPublicObjectives().get("Control Ordinian") == 0) {
                 game.addCustomPO("Control Ordinian", 2);
                 MessageHelper.sendMessageToChannel(
-                        channel,
-                        "### " + game.getPing() + ", a stage 2 public objective has been revealed." + "\n### "
-                                + game.getPing()
-                                + " _Liberate Ordinian_ is no longer scorable. _Control Ordinian_ is now available to be scored.");
+                    channel,
+                    "### " + game.getPing() + ", a stage 2 public objective has been revealed." + "\n### "
+                        + game.getPing()
+                        + " _Liberate Ordinian_ is no longer scorable. _Control Ordinian_ is now available to be scored.");
                 EmbedBuilder control = new EmbedBuilder();
                 control.setTitle(SourceEmojis.Codex + "__**Control Ordinian**__");
                 control.setDescription("Control Ordinian.");
                 control.setColor(WHITE_COLOR);
                 channel.sendMessageEmbeds(List.of(po.getRepresentationEmbed(), control.build()))
-                        .queue(m -> m.pin().queue());
+                    .queue(m -> m.pin().queue());
             } else {
                 MessageHelper.sendMessageToChannel(
-                        channel, "### " + game.getPing() + ", a stage 2 public objective has been revealed.");
+                    channel, "### " + game.getPing() + ", a stage 2 public objective has been revealed.");
                 channel.sendMessageEmbeds(po.getRepresentationEmbed())
-                        .queue(m -> m.pin().queue());
+                    .queue(m -> m.pin().queue());
             }
         } else {
             channel.sendMessageEmbeds(po.getRepresentationEmbed())
-                    .queue(m -> m.pin().queue());
+                .queue(m -> m.pin().queue());
         }
 
         if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {
             if (!game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(
-                        channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
+                    channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
             }
             return;
         }
@@ -78,8 +78,8 @@ public class RevealPublicObjectiveService {
         int playersWithSCs = 0;
         for (Player player : game.getRealPlayers()) {
             if (player.getSCs() != null
-                    && !player.getSCs().isEmpty()
-                    && !player.getSCs().contains(0)) {
+                && !player.getSCs().isEmpty()
+                && !player.getSCs().contains(0)) {
                 playersWithSCs++;
             }
         }
@@ -88,17 +88,17 @@ public class RevealPublicObjectiveService {
             StatusCleanupService.runStatusCleanup(game);
             if (!game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(
-                        channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
+                    channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
             }
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "### " + game.getPing() + " **Status Cleanup Run!**");
+                game.getMainGameChannel(), "### " + game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
                 DisplayType displayType = DisplayType.map;
                 MapRenderPipeline.queue(
-                        game,
-                        event,
-                        displayType,
-                        fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
+                    game,
+                    event,
+                    displayType,
+                    fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
             }
         }
     }
@@ -110,17 +110,15 @@ public class RevealPublicObjectiveService {
         PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());
         MessageHelper.sendMessageToChannel(
-                channel, game.getPing() + ", two stage 2 public objectives has been revealed.");
+            channel, game.getPing() + ", two stage 2 public objectives has been revealed.");
         channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed()))
-                .queue(m -> m.pin().queue());
+            .queue(m -> m.pin().queue());
 
         int maxSCsPerPlayer;
         if (game.getRealPlayers().isEmpty()) {
-            maxSCsPerPlayer =
-                    game.getSCList().size() / Math.max(1, game.getPlayers().size());
+            maxSCsPerPlayer = game.getSCList().size() / Math.max(1, game.getPlayers().size());
         } else {
-            maxSCsPerPlayer =
-                    game.getSCList().size() / Math.max(1, game.getRealPlayers().size());
+            maxSCsPerPlayer = game.getSCList().size() / Math.max(1, game.getRealPlayers().size());
         }
 
         if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;
@@ -145,10 +143,10 @@ public class RevealPublicObjectiveService {
             }
         }
         MessageHelper.sendMessageToChannel(
-                channel, game.getPing() + ", a secret objective has been converted to a public objective.");
+            channel, game.getPing() + ", a secret objective has been converted to a public objective.");
         if (po != null) {
             channel.sendMessageEmbeds(List.of(po.getRepresentationEmbed()))
-                    .queue(m -> m.pin().queue());
+                .queue(m -> m.pin().queue());
         }
     }
 
@@ -166,14 +164,14 @@ public class RevealPublicObjectiveService {
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         var channel = game.getActionsChannel();
         MessageHelper.sendMessageToChannel(
-                channel, "### " + game.getPing() + ", a stage 1 public objective has been revealed.");
+            channel, "### " + game.getPing() + ", a stage 1 public objective has been revealed.");
         channel.sendMessageEmbeds(po.getRepresentationEmbed())
-                .queue(m -> m.pin().queue());
+            .queue(m -> m.pin().queue());
         RelicHelper.offerInitialNeuraLoopChoice(game, objective.getKey());
         if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {
             if (!game.isFowMode() && !Objects.equals(objective.getKey(), Constants.IMPERIUM_REX_ID)) {
                 MessageHelper.sendMessageToChannel(
-                        channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
+                    channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
             }
             return objective.getKey();
         }
@@ -181,8 +179,8 @@ public class RevealPublicObjectiveService {
         int playersWithSCs = 0;
         for (Player player : game.getRealPlayers()) {
             if (player.getSCs() != null
-                    && !player.getSCs().isEmpty()
-                    && !player.getSCs().contains(0)) {
+                && !player.getSCs().isEmpty()
+                && !player.getSCs().contains(0)) {
                 playersWithSCs++;
             }
         }
@@ -191,16 +189,16 @@ public class RevealPublicObjectiveService {
             StatusCleanupService.runStatusCleanup(game);
             if (!game.isFowMode() && !Objects.equals(objective.getKey(), Constants.IMPERIUM_REX_ID)) {
                 MessageHelper.sendMessageToChannel(
-                        channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
+                    channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
             }
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "### " + game.getPing() + ", it's time for the Status Cleanup Run!");
+                game.getMainGameChannel(), "### " + game.getPing() + ", it's time for the Status Cleanup Run!");
             if (!game.isFowMode()) {
                 MapRenderPipeline.queue(
-                        game,
-                        event,
-                        DisplayType.map,
-                        fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
+                    game,
+                    event,
+                    DisplayType.map,
+                    fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
             }
         }
 
@@ -216,30 +214,28 @@ public class RevealPublicObjectiveService {
         var channel = game.getActionsChannel();
         if (game.isLiberationC4Mode()) {
             MessageHelper.sendMessageToChannel(
-                    channel,
-                    game.getPing()
-                            + ", two regular stage 1 public objectives, along with the __Liberate Ordinian__ scenario public objective, have been revealed.");
+                channel,
+                game.getPing()
+                    + ", two regular stage 1 public objectives, along with the __Liberate Ordinian__ scenario public objective, have been revealed.");
             EmbedBuilder liberate = new EmbedBuilder();
             liberate.setTitle(SourceEmojis.Codex + "__**Liberate Ordinian**__");
             liberate.setDescription("Win a combat against the Nekro Virus.");
             liberate.setColor(WHITE_COLOR);
             channel.sendMessageEmbeds(
-                            List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed(), liberate.build()))
-                    .queue(m -> m.pin().queue());
+                List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed(), liberate.build()))
+                .queue(m -> m.pin().queue());
         } else {
             MessageHelper.sendMessageToChannel(
-                    channel, game.getPing() + ", two stage 1 public objectives have been revealed.");
+                channel, game.getPing() + ", two stage 1 public objectives have been revealed.");
             channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed()))
-                    .queue(m -> m.pin().queue());
+                .queue(m -> m.pin().queue());
         }
 
         int maxSCsPerPlayer;
         if (game.getRealPlayers().isEmpty()) {
-            maxSCsPerPlayer =
-                    game.getSCList().size() / Math.max(1, game.getPlayers().size());
+            maxSCsPerPlayer = game.getSCList().size() / Math.max(1, game.getPlayers().size());
         } else {
-            maxSCsPerPlayer =
-                    game.getSCList().size() / Math.max(1, game.getRealPlayers().size());
+            maxSCsPerPlayer = game.getSCList().size() / Math.max(1, game.getRealPlayers().size());
         }
 
         if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;
@@ -271,15 +267,15 @@ public class RevealPublicObjectiveService {
         if (game.getPublicObjectives1Peakable().isEmpty()) {
             MessageHelper.sendMessageToChannel(channel, game.getPing() + ", all objectives have been revealed.");
             channel.sendMessageEmbeds(List.of(
-                            po1.getRepresentationEmbed(),
-                            po2.getRepresentationEmbed(),
-                            po3.getRepresentationEmbed(),
-                            po4.getRepresentationEmbed(),
-                            po6.getRepresentationEmbed(),
-                            po7.getRepresentationEmbed(),
-                            po8.getRepresentationEmbed(),
-                            po9.getRepresentationEmbed()))
-                    .queue(m -> m.pin().queue());
+                po1.getRepresentationEmbed(),
+                po2.getRepresentationEmbed(),
+                po3.getRepresentationEmbed(),
+                po4.getRepresentationEmbed(),
+                po6.getRepresentationEmbed(),
+                po7.getRepresentationEmbed(),
+                po8.getRepresentationEmbed(),
+                po9.getRepresentationEmbed()))
+                .queue(m -> m.pin().queue());
 
         } else {
             Map.Entry<String, Integer> objective5 = game.revealStage1();
@@ -288,26 +284,24 @@ public class RevealPublicObjectiveService {
             PublicObjectiveModel po10 = Mapper.getPublicObjective(objective10.getKey());
             MessageHelper.sendMessageToChannel(channel, game.getPing() + ", all objectives have been revealed.");
             channel.sendMessageEmbeds(List.of(
-                            po1.getRepresentationEmbed(),
-                            po2.getRepresentationEmbed(),
-                            po3.getRepresentationEmbed(),
-                            po4.getRepresentationEmbed(),
-                            po5.getRepresentationEmbed(),
-                            po6.getRepresentationEmbed(),
-                            po7.getRepresentationEmbed(),
-                            po8.getRepresentationEmbed(),
-                            po9.getRepresentationEmbed(),
-                            po10.getRepresentationEmbed()))
-                    .queue(m -> m.pin().queue());
+                po1.getRepresentationEmbed(),
+                po2.getRepresentationEmbed(),
+                po3.getRepresentationEmbed(),
+                po4.getRepresentationEmbed(),
+                po5.getRepresentationEmbed(),
+                po6.getRepresentationEmbed(),
+                po7.getRepresentationEmbed(),
+                po8.getRepresentationEmbed(),
+                po9.getRepresentationEmbed(),
+                po10.getRepresentationEmbed()))
+                .queue(m -> m.pin().queue());
         }
 
         int maxSCsPerPlayer;
         if (game.getRealPlayers().isEmpty()) {
-            maxSCsPerPlayer =
-                    game.getSCList().size() / Math.max(1, game.getPlayers().size());
+            maxSCsPerPlayer = game.getSCList().size() / Math.max(1, game.getPlayers().size());
         } else {
-            maxSCsPerPlayer =
-                    game.getSCList().size() / Math.max(1, game.getRealPlayers().size());
+            maxSCsPerPlayer = game.getSCList().size() / Math.max(1, game.getRealPlayers().size());
         }
 
         if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;

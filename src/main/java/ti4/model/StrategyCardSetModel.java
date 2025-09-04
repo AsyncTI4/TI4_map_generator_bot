@@ -20,10 +20,10 @@ public class StrategyCardSetModel implements ModelInterface {
     @Override
     public boolean isValid() {
         return scIDs != null
-                && !scIDs.isEmpty()
-                && StringUtils.isNotBlank(name)
-                && StringUtils.isNotBlank(alias)
-                && source != null;
+            && !scIDs.isEmpty()
+            && StringUtils.isNotBlank(name)
+            && StringUtils.isNotBlank(alias)
+            && source != null;
     }
 
     @Override
@@ -38,11 +38,11 @@ public class StrategyCardSetModel implements ModelInterface {
 
     public String getSCName(int scNumber) {
         return scIDs.stream()
-                .map(Mapper::getStrategyCard)
-                .filter(sc -> sc.getInitiative() == scNumber)
-                .map(StrategyCardModel::getName)
-                .findFirst()
-                .orElse("Name Unknown - Invalid Strategy Card Initiative Number: " + scNumber);
+            .map(Mapper::getStrategyCard)
+            .filter(sc -> sc.getInitiative() == scNumber)
+            .map(StrategyCardModel::getName)
+            .findFirst()
+            .orElse("Name Unknown - Invalid Strategy Card Initiative Number: " + scNumber);
     }
 
     public Optional<String> getDescription() {
@@ -51,16 +51,16 @@ public class StrategyCardSetModel implements ModelInterface {
 
     public Optional<StrategyCardModel> getStrategyCardModelByInitiative(int initiative) {
         return scIDs.stream()
-                .map(Mapper::getStrategyCard)
-                .filter(sc -> sc.getInitiative() == initiative)
-                .findFirst();
+            .map(Mapper::getStrategyCard)
+            .filter(sc -> sc.getInitiative() == initiative)
+            .findFirst();
     }
 
     public Optional<StrategyCardModel> getStrategyCardModelByName(String name) {
         return scIDs.stream()
-                .map(Mapper::getStrategyCard)
-                .filter(sc -> name.equalsIgnoreCase(sc.getName()))
-                .findFirst();
+            .map(Mapper::getStrategyCard)
+            .filter(sc -> name.equalsIgnoreCase(sc.getName()))
+            .findFirst();
     }
 
     @JsonIgnore

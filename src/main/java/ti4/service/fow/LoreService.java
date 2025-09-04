@@ -38,10 +38,10 @@ import ti4.model.PlanetModel;
 public class LoreService {
 
     private static final List<Button> LORE_BUTTONS = Arrays.asList(
-            Buttons.blue("gmLoreEdit_System~MDL", "Add to System"),
-            Buttons.blue("gmLoreEdit_Planet~MDL", "Add to Planet"),
-            Buttons.gray("gmLoreRefresh", "Refresh"),
-            Buttons.DONE_DELETE_BUTTONS);
+        Buttons.blue("gmLoreEdit_System~MDL", "Add to System"),
+        Buttons.blue("gmLoreEdit_Planet~MDL", "Add to Planet"),
+        Buttons.gray("gmLoreRefresh", "Refresh"),
+        Buttons.DONE_DELETE_BUTTONS);
 
     private static final String SYSTEM_LORE_KEY = "fowSystemLore";
 
@@ -58,8 +58,7 @@ public class LoreService {
         List<ActionRow> buttons = Buttons.paginateButtons(getLoreButtons(game), LORE_BUTTONS, pageNum, "gmLore");
 
         if (StringUtils.isBlank(page)) {
-            String msg =
-                    """
+            String msg = """
                 ### Lore Management\
 
                 -# System Lore is shown to the first player to conclude an action with units in the system.\
@@ -112,7 +111,7 @@ public class LoreService {
                 String[] splitLore = savedLore.split(";");
                 if (splitLore.length == 2 || splitLore.length == 3) {
                     savedLoreMap.put(
-                            splitLore[0], new String[] {splitLore[1], splitLore.length == 3 ? splitLore[2] : ""});
+                        splitLore[0], new String[] { splitLore[1], splitLore.length == 3 ? splitLore[2] : "" });
                 } else {
                     BotLogger.warning(new LogOrigin(game), "Invalid lore string: " + savedLore);
                 }
@@ -128,15 +127,15 @@ public class LoreService {
         String addingTo = systemLore ? "System" : "Planet";
 
         TextInput.Builder position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
-                .setRequired(true)
-                .setPlaceholder(systemLore ? "000" : "Sem-Lore");
+            .setRequired(true)
+            .setPlaceholder(systemLore ? "000" : "Sem-Lore");
         TextInput.Builder lore = TextInput.create(Constants.MESSAGE, TextInputStyle.PARAGRAPH)
-                .setRequired(false)
-                .setPlaceholder("Once upon a time...")
-                .setMaxLength(1000);
+            .setRequired(false)
+            .setPlaceholder("Once upon a time...")
+            .setMaxLength(1000);
         TextInput.Builder footer = TextInput.create("footer", TextInputStyle.SHORT)
-                .setRequired(false)
-                .setPlaceholder("Please use `/add_token token:gravityrift` on this system.");
+            .setRequired(false)
+            .setPlaceholder("Please use `/add_token token:gravityrift` on this system.");
 
         if (!"System".equals(target) && !"Planet".equals(target)) {
             position.setValue(target);
@@ -148,11 +147,11 @@ public class LoreService {
         }
 
         Modal editLoreModal = Modal.create("gmLoreSave" + addingTo, "Add Lore to " + addingTo)
-                .addComponents(
-                        Label.of(addingTo, position.build()),
-                        Label.of("Lore (clear to delete)", lore.build()),
-                        Label.of("Other info", footer.build()))
-                .build();
+            .addComponents(
+                Label.of(addingTo, position.build()),
+                Label.of("Lore (clear to delete)", lore.build()),
+                Label.of("Other info", footer.build()))
+            .build();
         event.replyModal(editLoreModal).queue();
     }
 
@@ -167,14 +166,14 @@ public class LoreService {
         if (systemLore) {
             if (!PositionMapper.isTilePositionValid(target) || game.getTileByPosition(target) == null) {
                 MessageHelper.sendMessageToChannel(
-                        event.getChannel(), "Position " + target + " is invalid to save lore `" + loreText + "`");
+                    event.getChannel(), "Position " + target + " is invalid to save lore `" + loreText + "`");
                 return;
             }
         } else {
             planet = Mapper.getPlanet(AliasHandler.resolvePlanet(target));
             if (planet == null || !game.getPlanets().contains(planet.getID())) {
                 MessageHelper.sendMessageToChannel(
-                        event.getChannel(), "Planet " + target + " is invalid to save lore `" + loreText + "`");
+                    event.getChannel(), "Planet " + target + " is invalid to save lore `" + loreText + "`");
                 return;
             }
             target = planet.getID();
@@ -184,14 +183,14 @@ public class LoreService {
         if (StringUtils.isBlank(loreText)) {
             savedLoreMap.remove(target);
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Removed Lore from " + (planet != null ? planet.getName() : target));
+                event.getChannel(), "Removed Lore from " + (planet != null ? planet.getName() : target));
         } else {
             savedLoreMap.put(target, new String[] {
                 loreText.replace(";", "").replace("|", ""),
                 footerText.replace(";", "").replace("|", "")
             });
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Saved Lore to " + (planet != null ? planet.getName() : target));
+                event.getChannel(), "Saved Lore to " + (planet != null ? planet.getName() : target));
         }
 
         setLore(game, savedLoreMap);
@@ -199,8 +198,8 @@ public class LoreService {
 
     private static void setLore(Game game, Map<String, String[]> lore) {
         String loreString = lore.entrySet().stream()
-                .map(entry -> entry.getKey() + ";" + entry.getValue()[0] + ";" + entry.getValue()[1])
-                .collect(Collectors.joining("|"));
+            .map(entry -> entry.getKey() + ";" + entry.getValue()[0] + ";" + entry.getValue()[1])
+            .collect(Collectors.joining("|"));
         game.setStoredValue(SYSTEM_LORE_KEY, loreString);
     }
 
@@ -210,7 +209,7 @@ public class LoreService {
         String titleTile = "";
         if (isSystemLore && tile != null && tile.getTileModel() != null) {
             titleTile = target + " - " + tile.getTileModel().getNameNullSafe() + " "
-                    + tile.getTileModel().getEmoji();
+                + tile.getTileModel().getEmoji();
         } else if (planet != null) {
             titleTile = planet.getName() + " " + planet.getEmoji();
         }
@@ -265,7 +264,7 @@ public class LoreService {
         MessageHelper.sendMessageToChannelWithEmbed(player.getPrivateChannel(), "You found a Lore Fragment", embed);
 
         GMService.logPlayerActivity(
-                game, player, player.getRepresentationUnfoggedNoPing() + " was shown the lore of " + target);
+            game, player, player.getRepresentationUnfoggedNoPing() + " was shown the lore of " + target);
 
         lore.remove(target);
         setLore(game, lore);

@@ -17,7 +17,7 @@ public class NaaluCommanderService {
     public static void secondHalfOfNaaluCommander(GenericInteractionCreateEvent event, Game game, Player player) {
         if (!game.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "Only players with access to M'aban, the Naalu Commander, unlocked may use this ability.");
+                event, "Only players with access to M'aban, the Naalu Commander, unlocked may use this ability.");
             return;
         }
 
@@ -57,9 +57,9 @@ public class NaaluCommanderService {
 
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(),
-                    player.getRepresentation()
-                            + " is using M'aban, the Naalu Commander, to look at the top & bottom agenda, and their neighbour's promissory notes.");
+                game.getMainGameChannel(),
+                player.getRepresentation()
+                    + " is using M'aban, the Naalu Commander, to look at the top & bottom agenda, and their neighbour's promissory notes.");
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
     }

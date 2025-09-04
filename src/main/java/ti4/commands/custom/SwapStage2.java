@@ -23,6 +23,6 @@ class SwapStage2 extends GameStateSubcommand {
         int loc2 = event.getOption(Constants.LOCATION2).getAsInt();
         game.swapStage2(loc1, loc2);
         MessageHelper.sendMessageToChannel(
-                event.getChannel(), "Objectives at position " + loc1 + " and position " + loc2 + " swapped.");
+            event.getChannel(), "Objectives at position " + loc1 + " and position " + loc2 + " swapped.");
     }
 }

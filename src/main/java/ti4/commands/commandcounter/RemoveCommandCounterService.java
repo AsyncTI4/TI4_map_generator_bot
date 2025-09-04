@@ -30,12 +30,12 @@ public class RemoveCommandCounterService {
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Command Counter: " + color + " is not valid and not supported.");
+                game.getMainGameChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
         if (game.isFowMode()) {
             String colorMention = ColorEmojis.getColorEmojiWithName(color);
             FoWHelper.pingSystem(
-                    game, tile.getPosition(), colorMention + " command token has been removed from the system.");
+                game, tile.getPosition(), colorMention + " command token has been removed from the system.");
         }
         tile.removeCC(ccID);
     }
@@ -46,7 +46,7 @@ public class RemoveCommandCounterService {
                 int cc = player.getTacticalCC();
                 if (cc == 0) {
                     MessageHelper.sendMessageToChannel(
-                            event.getChannel(), "You don't have a command token in your tactic pool.");
+                        event.getChannel(), "You don't have a command token in your tactic pool.");
                     break;
                 } else if (!CommandCounterHelper.hasCC(event, color, tile)) {
                     cc -= 1;

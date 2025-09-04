@@ -14,7 +14,7 @@ class RemoveEvent extends GameStateSubcommand {
     public RemoveEvent() {
         super(Constants.REMOVE_EVENT, "Remove event", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.EVENT_ID, "Event ID, which is found between ()")
-                .setRequired(true));
+            .setRequired(true));
     }
 
     @Override

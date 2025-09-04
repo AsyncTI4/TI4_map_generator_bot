@@ -10,11 +10,11 @@ import ti4.service.tactical.PostMovementButtonContext;
 public final class AtokeraHeroButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
         return ctx.player.hasLeaderUnlocked("atokeraherp")
-                && !ctx.tile.getPlanetUnitHolders().isEmpty();
+            && !ctx.tile.getPlanetUnitHolders().isEmpty();
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(
-                Buttons.blue(ctx.player.finChecker() + "purgeAtokeraHero", "Use Atokera Hero", FactionEmojis.atokera));
+            Buttons.blue(ctx.player.finChecker() + "purgeAtokeraHero", "Use Atokera Hero", FactionEmojis.atokera));
     }
 }

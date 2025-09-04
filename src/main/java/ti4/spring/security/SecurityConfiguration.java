@@ -23,18 +23,18 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/actuator/**")
-                        .hasRole("ACTUATOR")
-                        // Public API paths
-                        .requestMatchers("/api/public/**")
-                        .permitAll()
-                        // Everything else requires auth
-                        .anyRequest()
-                        .authenticated())
-                // Add API key filter for /actuator/** when key is configured.
-                .addFilterBefore(new ActuatorApiKeyFilter(actuatorApiKey), AuthorizationFilter.class)
-                .oauth2ResourceServer(
-                        oauth2 -> oauth2.opaqueToken(token -> token.introspector(discordOpaqueTokenIntrospector)));
+            .authorizeHttpRequests(auth -> auth.requestMatchers("/actuator/**")
+                .hasRole("ACTUATOR")
+                // Public API paths
+                .requestMatchers("/api/public/**")
+                .permitAll()
+                // Everything else requires auth
+                .anyRequest()
+                .authenticated())
+            // Add API key filter for /actuator/** when key is configured.
+            .addFilterBefore(new ActuatorApiKeyFilter(actuatorApiKey), AuthorizationFilter.class)
+            .oauth2ResourceServer(
+                oauth2 -> oauth2.opaqueToken(token -> token.introspector(discordOpaqueTokenIntrospector)));
 
         return http.build();
     }

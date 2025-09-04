@@ -24,47 +24,45 @@ public class SearchGameForFactionHelper {
     public static int searchGames(String faction, GenericInteractionCreateEvent event, boolean includeEndedGames) {
 
         Predicate<ManagedGame> factionFilter = game -> game.getGame().getPlayerFromColorOrFaction(faction) != null;
-        Predicate<ManagedGame> endedGamesFilter =
-                includeEndedGames ? game -> true : game -> !game.isHasEnded() && !game.isFowMode();
+        Predicate<ManagedGame> endedGamesFilter = includeEndedGames ? game -> true : game -> !game.isHasEnded() && !game.isFowMode();
         Predicate<ManagedGame> onlyEndedFoWGames = game -> !game.isFowMode() || game.isHasEnded();
-        Predicate<ManagedGame> allFilterPredicates =
-                endedGamesFilter.and(onlyEndedFoWGames).and(factionFilter);
+        Predicate<ManagedGame> allFilterPredicates = endedGamesFilter.and(onlyEndedFoWGames).and(factionFilter);
 
         var filteredManagedGames = GameManager.getManagedGames().stream()
-                .filter(allFilterPredicates)
-                .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
-                .toList();
+            .filter(allFilterPredicates)
+            .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
+            .toList();
 
         int index = 1;
 
         StringBuilder sb = new StringBuilder("**__")
-                .append(Mapper.getFaction(faction).getFactionName())
-                .append("'s Games__**\n");
+            .append(Mapper.getFaction(faction).getFactionName())
+            .append("'s Games__**\n");
         for (var managedGame : filteredManagedGames) {
             sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
             var game = managedGame.getGame();
             sb.append(getPlayerMapListRepresentation(
-                    game, game.getPlayerFromColorOrFaction(faction).getUserID(), false, false, false));
+                game, game.getPlayerFromColorOrFaction(faction).getUserID(), false, false, false));
             sb.append("\n");
             index++;
         }
         if (event instanceof SlashCommandInteractionEvent slash) {
             MessageHelper.sendMessageToThread(
-                    slash.getChannel(), Mapper.getFaction(faction).getFactionName() + "'s Game List", sb.toString());
+                slash.getChannel(), Mapper.getFaction(faction).getFactionName() + "'s Game List", sb.toString());
         }
         if (event instanceof ButtonInteractionEvent butt) {
             MessageHelper.sendMessageToThread(
-                    butt.getChannel(), Mapper.getFaction(faction).getFactionName() + "'s Game List", sb.toString());
+                butt.getChannel(), Mapper.getFaction(faction).getFactionName() + "'s Game List", sb.toString());
         }
         return filteredManagedGames.size();
     }
 
     private static String getPlayerMapListRepresentation(
-            Game game, String userID, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes) {
+        Game game, String userID, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes
+    ) {
         Player player = game.getPlayer(userID);
         if (player == null) return "";
-        String gameChannelLink =
-                game.getActionsChannel() == null ? "" : game.getActionsChannel().getAsMention();
+        String gameChannelLink = game.getActionsChannel() == null ? "" : game.getActionsChannel().getAsMention();
         StringBuilder sb = new StringBuilder();
         if (Mapper.isValidFaction(player.getFaction())) sb.append(player.getFactionEmoji());
         if (player.getColor() != null && !"null".equals(player.getColor()))
