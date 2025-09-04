@@ -281,7 +281,7 @@ class ActionCardDeck2ButtonHandler {
         ButtonHelperAgents.toldarAgentInitiation(game, p2, 2);
         MessageHelper.sendMessageToChannel(
                 p2.getCorrectChannel(),
-                p2.getFactionEmoji() + " gained 2 commodities due to _Ancient Trade Routes_ and is neighbors with "
+                p2.getFactionEmoji() + " gained 2 commodities due to _Ancient Trade Routes_ and may transact with "
                         + player.getFactionEmojiOrColor() + " for this turn.");
         event.getMessage().delete().queue();
     }
