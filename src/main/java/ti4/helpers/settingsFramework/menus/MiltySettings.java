@@ -45,7 +45,7 @@ public class MiltySettings extends SettingsMenu {
         draftMode = new ChoiceSetting<>("DraftType", "Draft Type", "milty");
         draftMode.setEmoji(MiltyDraftEmojis.sliceA);
         draftMode.setAllValues(
-                Arrays.stream(DraftingMode.values()).collect(Collectors.toMap(DraftingMode::toString, x -> x)));
+            Arrays.stream(DraftingMode.values()).collect(Collectors.toMap(DraftingMode::toString, x -> x)));
         draftMode.setShow(DraftingMode::toString);
 
         // Get the correct JSON node for initialization if applicable.
@@ -55,8 +55,8 @@ public class MiltySettings extends SettingsMenu {
         // Check if this node represents this menu
         List<String> historicIDs = List.of("milty", "main");
         if (json != null
-                && json.has("menuId")
-                && historicIDs.contains(json.get("menuId").asText(""))) {
+            && json.has("menuId")
+            && historicIDs.contains(json.get("menuId").asText(""))) {
             draftMode.initialize(json.get("draftMode"));
         }
 
@@ -109,11 +109,10 @@ public class MiltySettings extends SettingsMenu {
 
     @Override
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "startMilty" -> startMilty(event);
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "startMilty" -> startMilty(event);
+            default -> null;
+        };
         return (error == null ? "success" : error);
     }
 
@@ -121,9 +120,7 @@ public class MiltySettings extends SettingsMenu {
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
     public enum DraftingMode {
-        none,
-        milty,
-        franken;
+        none, milty, franken;
 
         public String show() {
             return switch (this) {
