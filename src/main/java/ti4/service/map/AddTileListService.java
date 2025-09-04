@@ -31,6 +31,7 @@ import ti4.service.ShowGameService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.explore.AddFrontierTokensService;
+import ti4.service.fow.GMService;
 
 @UtilityClass
 public class AddTileListService {
@@ -117,7 +118,7 @@ public class AddTileListService {
         }
         if (!game.isOrdinianC1Mode() && !game.isLiberationC4Mode()) {
             MessageHelper.sendMessageToChannelWithButtons(
-                    game.getMainGameChannel(),
+                    game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel(),
                     "Press this button after every player is setup.",
                     List.of(Buttons.green(
                             "deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt)));

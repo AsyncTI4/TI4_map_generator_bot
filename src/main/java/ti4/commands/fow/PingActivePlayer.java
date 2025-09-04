@@ -42,6 +42,7 @@ class PingActivePlayer extends GameStateSubcommand {
             latestPingMilliseconds = game.getLastActivePlayerChange().getTime();
         }
 
+        String isAfk = activePlayer.isAFK() ? " They are currently AFK." : "";
         long milliSinceLastPing = System.currentTimeMillis() - latestPingMilliseconds;
         if (!game.getPlayersWithGMRole().contains(playerThatRanCommand)
                 && milliSinceLastPing < PING_COOLDOWN
@@ -49,7 +50,7 @@ class PingActivePlayer extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Active player was pinged recently. Command on cooldown for "
-                            + formatMillis(PING_COOLDOWN - milliSinceLastPing) + ".");
+                            + formatMillis(PING_COOLDOWN - milliSinceLastPing) + "." + isAfk);
         } else {
             String ping = activePlayer.getRepresentationUnfogged() + " this is a gentle reminder that it is your turn.";
             if (game.isFowMode()) {
@@ -59,7 +60,7 @@ class PingActivePlayer extends GameStateSubcommand {
                                                 == GMService.getGMChannel(game).getIdLong()
                                         ? activePlayer.getRepresentationUnfoggedNoPing()
                                         : "Active player")
-                                + " has been pinged.");
+                                + " has been pinged." + isAfk);
                 MessageHelper.sendPrivateMessageToPlayer(activePlayer, game, ping);
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), ping);
