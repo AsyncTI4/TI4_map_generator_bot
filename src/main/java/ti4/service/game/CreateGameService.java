@@ -74,10 +74,9 @@ public class CreateGameService {
     private static void reportNewGameCreated(Game game) {
         if (game == null) return;
 
-        TextChannel bothelperLoungeChannel =
-                AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true).stream()
-                        .findFirst()
-                        .orElse(null);
+        TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true).stream()
+            .findFirst()
+            .orElse(null);
         if (bothelperLoungeChannel == null) return;
         List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
         if (threadChannels.isEmpty()) return;
@@ -86,23 +85,24 @@ public class CreateGameService {
         for (ThreadChannel threadChannel_ : threadChannels) {
             if (threadChannel_.getName().equals(threadName)) {
                 String guildName = game.getGuild() == null
-                        ? "Server Unknown"
-                        : game.getGuild().getName();
+                    ? "Server Unknown"
+                    : game.getGuild().getName();
                 MessageHelper.sendMessageToChannel(
-                        threadChannel_,
-                        "Game: **" + game.getName() + "** on server **" + guildName + "** has been created.");
+                    threadChannel_,
+                    "Game: **" + game.getName() + "** on server **" + guildName + "** has been created.");
                 break;
             }
         }
     }
 
     public static Game createGameChannels(
-            List<Member> members,
-            GenericInteractionCreateEvent event,
-            String gameFunName,
-            String gameName,
-            Member gameOwner,
-            Category categoryChannel) {
+        List<Member> members,
+        GenericInteractionCreateEvent event,
+        String gameFunName,
+        String gameName,
+        Member gameOwner,
+        Category categoryChannel
+    ) {
         // SET GUILD BASED ON CATEGORY SELECTED
         Guild guild = categoryChannel.getGuild();
 
@@ -112,17 +112,17 @@ public class CreateGameService {
         // CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!serverCanHostNewGame(guild)) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+                event.getMessageChannel(),
+                "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
             return null;
         }
 
         // CHECK IF CATEGORY HAS ROOM
         if (categoryChannel.getChannels().size() > 48) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "Category: **" + categoryChannel.getName() + "** is full on server **" + guild.getName()
-                            + "**. Create a new category then try again.");
+                event.getMessageChannel(),
+                "Category: **" + categoryChannel.getName() + "** is full on server **" + guild.getName()
+                    + "**. Create a new category then try again.");
             return null;
         }
 
@@ -161,24 +161,23 @@ public class CreateGameService {
 
         // CREATE TABLETALK CHANNEL
         TextChannel chatChannel = guild.createTextChannel(newChatChannelName, categoryChannel)
-                .syncPermissionOverrides()
-                .addRolePermissionOverride(gameRoleID, permission, 0)
-                .complete();
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleID, permission, 0)
+            .complete();
         newGame.setTableTalkChannelID(chatChannel.getId());
 
         // CREATE ACTIONS CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, categoryChannel)
-                .syncPermissionOverrides()
-                .addRolePermissionOverride(gameRoleID, permission, 0)
-                .complete();
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleID, permission, 0)
+            .complete();
         newGame.setMainChannelID(actionsChannel.getId());
 
         Role bothelperRole = getRole("Bothelper", guild);
         List<Member> nonGameBothelpers = new ArrayList<>();
         if (bothelperRole != null) {
             for (Member botHelper : guild.getMembersWithRoles(bothelperRole)) {
-                boolean inGame =
-                        members.stream().anyMatch(member -> member.getId().equals(botHelper.getId()));
+                boolean inGame = members.stream().anyMatch(member -> member.getId().equals(botHelper.getId()));
                 if (!inGame) {
                     nonGameBothelpers.add(botHelper);
                 }
@@ -188,19 +187,17 @@ public class CreateGameService {
         TextChannelManager chatChannelManager = chatChannel.getManager();
         TextChannelManager actionsChannelManager = actionsChannel.getManager();
         for (Member botHelper : nonGameBothelpers) {
-            chatChannelManager =
-                    chatChannelManager.putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0);
-            actionsChannelManager =
-                    actionsChannelManager.putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0);
+            chatChannelManager = chatChannelManager.putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0);
+            actionsChannelManager = actionsChannelManager.putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0);
         }
         chatChannelManager.queue();
         actionsChannelManager.queue();
 
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel
-                .createThreadChannel(newBotThreadName)
-                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
-                .complete();
+            .createThreadChannel(newBotThreadName)
+            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
+            .complete();
         newGame.setBotMapUpdatesThreadID(botThread.getId());
         introductionToBotMapUpdatesThread(newGame);
         introductionForNewPlayers(newGame);
@@ -212,8 +209,8 @@ public class CreateGameService {
 
         // Report Channel Creation back to Launch channel
         String message = "Role and Channels have been set up:\n> " + role.getName()
-                + "\n> " + chatChannel.getAsMention()
-                + "\n> " + actionsChannel.getAsMention();
+            + "\n> " + chatChannel.getAsMention()
+            + "\n> " + actionsChannel.getAsMention();
         MessageHelper.sendMessageToEventChannel(event, message);
 
         reportNewGameCreated(newGame);
@@ -222,13 +219,13 @@ public class CreateGameService {
 
         // AUTOCLOSE LAUNCH THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread
-                && "making-new-games".equals(thread.getParentChannel().getName())) {
+            && "making-new-games".equals(thread.getParentChannel().getName())) {
             newGame.setLaunchPostThreadID(thread.getId());
             ThreadChannelManager manager = thread.getManager()
-                    .setName(StringUtils.left(newGame.getName() + "-launched [FULL] - " + thread.getName(), 100))
-                    .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
+                .setName(StringUtils.left(newGame.getName() + "-launched [FULL] - " + thread.getName(), 100))
+                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             if (thread.getName().toLowerCase().contains("tigl")
-                    || newGame.getCustomName().toLowerCase().contains("tigl")) {
+                || newGame.getCustomName().toLowerCase().contains("tigl")) {
                 TIGLHelper.initializeTIGLGame(newGame);
             }
             if (missingMembers.isEmpty()) {
@@ -250,9 +247,9 @@ public class CreateGameService {
         Button miltyButton = Buttons.green("miltySetup", "Start Milty Setup");
         Button addMapString = Buttons.green("addMapString~MDL", "Add Prebuilt Map String");
         MessageHelper.sendMessageToChannelWithButtons(
-                actionsChannel,
-                "How would you like to set up the players and map?",
-                List.of(miltyButton, addMapString));
+            actionsChannel,
+            "How would you like to set up the players and map?",
+            List.of(miltyButton, addMapString));
 
         // Button offerOptions = Buttons.green("offerGameOptionButtons", "Options");
         GameOptionService.offerGameOptionButtons(game, actionsChannel);
@@ -262,8 +259,8 @@ public class CreateGameService {
         HomebrewService.offerGameHomebrewButtons(actionsChannel);
         ButtonHelper.offerPlayerSetupButtons(actionsChannel, game);
         MessageHelper.sendMessageToChannel(
-                actionsChannel,
-                "Reminder that all games played on this server must abide by the [AsyncTI4 Code of Conduct](https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006)");
+            actionsChannel,
+            "Reminder that all games played on this server must abide by the [AsyncTI4 Code of Conduct](https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006)");
     }
 
     private static void introductionToBotMapUpdatesThread(Game game) {
@@ -272,24 +269,23 @@ public class CreateGameService {
             return;
         }
         String botGetStartedMessage = game.getPing() + " - bot/map channel\n"
-                + "This channel is for bot slash commands and updating the map, to help keep the actions channel clean.\n"
-                + "### __Use the following commands to get started:__\n"
-                + "> `/map add_tile_list` and insert your TTPG map string\n"
-                + "> `/player setup` to set player faction and color\n"
-                + "> `/game setup` to set player count and additional options\n"
-                + "> `/game set_order` to set the starting speaker order if you're using a weird map\n"
-                + "> `/milty setup` to bring up a menu for handling a specific milty draft\n"
-                + "> `/milty quickstart` to quickly launch a milty draft that doesnt deviate too much\n\n"
-                + "### __Other helpful commands:__\n"
-                + "> `/game replace` to replace a player in the game with a new one\n";
+            + "This channel is for bot slash commands and updating the map, to help keep the actions channel clean.\n"
+            + "### __Use the following commands to get started:__\n"
+            + "> `/map add_tile_list` and insert your TTPG map string\n"
+            + "> `/player setup` to set player faction and color\n"
+            + "> `/game setup` to set player count and additional options\n"
+            + "> `/game set_order` to set the starting speaker order if you're using a weird map\n"
+            + "> `/milty setup` to bring up a menu for handling a specific milty draft\n"
+            + "> `/milty quickstart` to quickly launch a milty draft that doesnt deviate too much\n\n"
+            + "### __Other helpful commands:__\n"
+            + "> `/game replace` to replace a player in the game with a new one\n";
         MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
         MessageHelper.sendMessageToChannelAndPin(
-                botThread, "Website Live Map: https://www.AsyncTI4.com/game/" + game.getName());
+            botThread, "Website Live Map: https://www.AsyncTI4.com/game/" + game.getName());
     }
 
     private static void sendMessageAboutAggressionMetas(Game game) {
-        String aggressionMsg =
-                """
+        String aggressionMsg = """
             Strangers playing with each other for the first time can have different aggression metas, and be unpleasantly surprised when they find themselves playing with others who don't share that meta.\
              Therefore, you can use the buttons below to anonymously share your aggression meta, and if a conflict seems apparent, you can have a conversation about it, or leave the game if the difference is too much and the conversation went badly. These have no binding effect on the game, they just are for setting expectations and starting necessary conversations at the start, rather than in a tense moment 3 weeks down the line\
             .\s
@@ -308,17 +304,17 @@ public class CreateGameService {
 
     private static void introductionToActionsChannel(Game game) {
         String actionsGetStartedMessage = game.getPing() + " - actions channel\n"
-                + "This channel is for taking actions in the game, primarily using buttons or the odd slash command.\n"
-                + "Generally, you don't want to chat in here once the game starts, as ideally this channel is a clean ledger of what has happened in the game for others to quickly read.\n";
+            + "This channel is for taking actions in the game, primarily using buttons or the odd slash command.\n"
+            + "Generally, you don't want to chat in here once the game starts, as ideally this channel is a clean ledger of what has happened in the game for others to quickly read.\n";
         MessageHelper.sendMessageToChannelAndPin(game.getActionsChannel(), actionsGetStartedMessage);
     }
 
     private static void introductionToTableTalkChannel(Game game) {
         TextChannel chatChannel = game.getTableTalkChannel();
         String tabletalkGetStartedMessage = game.getPing() + " - table talk channel\n"
-                + "This channel is for typical over the table conversation, as you would over the table while playing the game in real life.\n"
-                + "If this group has agreed to whispers (secret conversations), you can create private threads off this channel, or utilize the bots in built whispers (explained in more detail in your cards info once you're set up).\n"
-                + "Typical things that go here are: general conversation, deal proposals, memes - everything that isn't either an actual action in the game or a bot command\n";
+            + "This channel is for typical over the table conversation, as you would over the table while playing the game in real life.\n"
+            + "If this group has agreed to whispers (secret conversations), you can create private threads off this channel, or utilize the bots in built whispers (explained in more detail in your cards info once you're set up).\n"
+            + "Typical things that go here are: general conversation, deal proposals, memes - everything that isn't either an actual action in the game or a bot command\n";
         // +
         // game.getPing()
         // + " if you are playing with strangers, you should take a few moments at the start here to discuss how you're
@@ -354,32 +350,32 @@ public class CreateGameService {
         }
 
         chatChannel
-                .createThreadChannel("Info for Players new to AsyncTI4")
-                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
-                .queue(
-                        introThread -> {
-                            try {
-                                StringBuilder msg = new StringBuilder();
-                                for (Player p : newPlayers) {
-                                    msg.append(p.getRepresentation());
-                                }
-                                msg.append(getNewPlayerInfoText());
-                                String message = msg.toString();
-                                if (botThread != null) {
-                                    message = message.replace("the bot-map-updates thread", botThread.getJumpUrl());
-                                }
-                                MessageHelper.sendMessageToChannel(introThread, message);
-                                BufferedImage colorsImage = ImageHelper.readScaled(
-                                        ResourceHelper.getInstance().getExtraFile("Compiled_Async_colors.png"),
-                                        731,
-                                        593);
-                                FileUpload fileUpload = FileUploadService.createFileUpload(colorsImage, "colors");
-                                MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
-                            } catch (Exception e) {
-                                BotLogger.error(new LogOrigin(game), "newPlayerIntro", e);
-                            }
-                        },
-                        null);
+            .createThreadChannel("Info for Players new to AsyncTI4")
+            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
+            .queue(
+                introThread -> {
+                    try {
+                        StringBuilder msg = new StringBuilder();
+                        for (Player p : newPlayers) {
+                            msg.append(p.getRepresentation());
+                        }
+                        msg.append(getNewPlayerInfoText());
+                        String message = msg.toString();
+                        if (botThread != null) {
+                            message = message.replace("the bot-map-updates thread", botThread.getJumpUrl());
+                        }
+                        MessageHelper.sendMessageToChannel(introThread, message);
+                        BufferedImage colorsImage = ImageHelper.readScaled(
+                            ResourceHelper.getInstance().getExtraFile("Compiled_Async_colors.png"),
+                            731,
+                            593);
+                        FileUpload fileUpload = FileUploadService.createFileUpload(colorsImage, "colors");
+                        MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
+                    } catch (Exception e) {
+                        BotLogger.error(new LogOrigin(game), "newPlayerIntro", e);
+                    }
+                },
+                null);
     }
 
     /**
@@ -389,8 +385,7 @@ public class CreateGameService {
      * @return the list of missing members
      */
     public static List<Member> inviteUsersToServer(Guild guild, List<Member> members, MessageChannel channel) {
-        List<String> guildMemberIDs =
-                guild.getMembers().stream().map(ISnowflake::getId).toList();
+        List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
         List<Member> missingMembers = new ArrayList<>();
         for (Member member : members) {
             if (!guildMemberIDs.contains(member.getId())) {
@@ -400,18 +395,18 @@ public class CreateGameService {
         if (!missingMembers.isEmpty()) {
             StringBuilder sb = new StringBuilder();
             sb.append(
-                    "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
+                "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
             sb.append(guild.getName()).append("** server.\n");
             sb.append(Helper.getGuildInviteURL(guild, missingMembers.size() + 10))
-                    .append("\n");
+                .append("\n");
             sb.append("The following players need to join the server:\n");
             for (Member member : missingMembers) {
                 sb.append("> ").append(member.getAsMention()).append("\n");
             }
             sb.append(
-                    "You will be automatically added to the game channels when you join the server."
-                            + "\nNote that if for some reason you are not automatically added to the game after joining the server,"
-                            + " you can fix this by having one of the other game members run `/game ping` in the actions channel.");
+                "You will be automatically added to the game channels when you join the server."
+                    + "\nNote that if for some reason you are not automatically added to the game after joining the server,"
+                    + " you can fix this by having one of the other game members run `/game ping` in the actions channel.");
             MessageHelper.sendMessageToChannel(channel, sb.toString());
         }
         return missingMembers;
@@ -468,8 +463,8 @@ public class CreateGameService {
         // GET ALL PBD ROLES FROM ALL GUILDS
         for (Guild guild : guilds) {
             List<Role> pbdRoles = guild.getRoles().stream()
-                    .filter(r -> r.getName().startsWith("pbd"))
-                    .toList();
+                .filter(r -> r.getName().startsWith("pbd"))
+                .toList();
 
             // EXISTING ROLE NAMES
             for (Role role : pbdRoles) {
@@ -482,8 +477,8 @@ public class CreateGameService {
 
         // GET ALL EXISTING PBD MAP NAMES
         List<String> gameNames = GameManager.getGameNames().stream()
-                .filter(gameName -> gameName.startsWith("pbd"))
-                .toList();
+            .filter(gameName -> gameName.startsWith("pbd"))
+            .toList();
         for (String gameName : gameNames) {
             String pbdNum = gameName.replace("pbd", "");
             if (Helper.isInteger(pbdNum)) {
@@ -497,9 +492,9 @@ public class CreateGameService {
     @Nullable
     private static Guild getServerWithMostCapacity() {
         List<Guild> guilds = AsyncTI4DiscordBot.serversToCreateNewGamesOn.stream()
-                .filter(CreateGameService::serverHasRoomForNewFullCategory)
-                .sorted(Comparator.comparing(CreateGameService::getServerCapacityForNewGames))
-                .toList();
+            .filter(CreateGameService::serverHasRoomForNewFullCategory)
+            .sorted(Comparator.comparing(CreateGameService::getServerCapacityForNewGames))
+            .toList();
 
         if (guilds.isEmpty() && serverHasRoomForNewFullCategory(AsyncTI4DiscordBot.guildPrimary)) {
             return AsyncTI4DiscordBot.guildPrimary;
@@ -507,13 +502,13 @@ public class CreateGameService {
 
         if (guilds.isEmpty()) {
             BotLogger.warning(
-                    "`CreateGameService.getServerWithMostCapacity` No available servers to create a new game category");
+                "`CreateGameService.getServerWithMostCapacity` No available servers to create a new game category");
             return null;
         }
 
         String debugText = guilds.stream()
-                .map(g -> g.getName() + ": " + getServerCapacityForNewGames(g))
-                .collect(Collectors.joining("\n"));
+            .map(g -> g.getName() + ": " + getServerCapacityForNewGames(g))
+            .collect(Collectors.joining("\n"));
         BotLogger.info("Server Game Capacity Check:\n" + debugText);
         return guilds.getLast();
     }
@@ -526,7 +521,7 @@ public class CreateGameService {
         int roleCount = guild.getRoles().size();
         if (roleCount >= MAX_ROLE_COUNT) {
             BotLogger.warning("`CreateGameService.serverHasRoomForNewRole` Cannot create a new role. Server **"
-                    + guild.getName() + "** currently has **" + roleCount + "** roles.");
+                + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return false;
         }
         return true;
@@ -546,16 +541,16 @@ public class CreateGameService {
         if (guild == null) return false;
 
         int settingForMaxGamesPerCategory = GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10);
+            GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10);
         int maxGamesPerCategory = Math.max(1, Math.min(25, settingForMaxGamesPerCategory));
 
         // SPACE FOR 25 ROLES
         int roleCount = guild.getRoles().size();
         if (roleCount > (MAX_ROLE_COUNT - maxGamesPerCategory)) {
             BotLogger.warning(
-                    "`CreateGameService.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
-                            + guild.getName() + "** currently has **" + roleCount
-                            + "** roles and a new category requires space for " + maxGamesPerCategory + " roles.");
+                "`CreateGameService.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
+                    + guild.getName() + "** currently has **" + roleCount
+                    + "** roles and a new category requires space for " + maxGamesPerCategory + " roles.");
             return false;
         }
 
@@ -564,11 +559,11 @@ public class CreateGameService {
         int channelsCountRequiredForNewCategory = 1 + 2 * maxGamesPerCategory;
         if (channelCount > (MAX_CHANNEL_COUNT - channelsCountRequiredForNewCategory)) {
             BotLogger.warning(
-                    "`CreateGameService.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
-                            + guild.getName() + "** currently has " + channelCount
-                            + " channels and a new category requires space for "
-                            + channelsCountRequiredForNewCategory
-                            + " new channels (including 1 for the category itself)");
+                "`CreateGameService.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
+                    + guild.getName() + "** currently has " + channelCount
+                    + " channels and a new category requires space for "
+                    + channelsCountRequiredForNewCategory
+                    + " new channels (including 1 for the category itself)");
             return false;
         }
 
@@ -580,7 +575,7 @@ public class CreateGameService {
         int channelsCountRequiredForNewGame = 2;
         if (channelCount > (MAX_CHANNEL_COUNT - channelsCountRequiredForNewGame)) {
             BotLogger.warning("`CreateGameService.serverHasRoomForNewChannels` Cannot create new channels. Server **"
-                    + guild.getName() + "** currently has " + channelCount + " channels.");
+                + guild.getName() + "** currently has " + channelCount + " channels.");
             return false;
         }
         return true;
@@ -601,7 +596,7 @@ public class CreateGameService {
             try {
                 int lowerBound = Integer.parseInt(StringUtils.substringBetween(category.getName(), "PBD #", "-"));
                 int upperBound = Integer.parseInt(
-                        StringUtils.substringBefore(StringUtils.substringAfter(category.getName(), "-"), " "));
+                    StringUtils.substringBefore(StringUtils.substringAfter(category.getName(), "-"), " "));
                 if (lowerBound <= gameNumber && gameNumber <= upperBound) {
                     return category.getName();
                 }
@@ -613,7 +608,7 @@ public class CreateGameService {
 
         // Derive a category name logically
         int settingForMaxGamePerCategory = GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10);
+            GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10);
         int maxGamesPerCategory = Math.max(1, Math.min(25, settingForMaxGamePerCategory));
         int gameNumberMod = gameNumber % maxGamesPerCategory;
         int lowerBound = gameNumber - gameNumberMod;
@@ -629,7 +624,7 @@ public class CreateGameService {
         Guild guild = getServerWithMostCapacity();
         if (guild == null) {
             BotLogger.warning(
-                    "`CreateGameService.createNewCategory` No available servers to create a new game category");
+                "`CreateGameService.createNewCategory` No available servers to create a new game category");
             return null;
         }
 
@@ -647,11 +642,9 @@ public class CreateGameService {
         Role everyoneRole = getRole("@everyone", guild);
         ChannelAction<Category> createCategoryAction = guild.createCategory(categoryName);
         if (bothelperRole != null)
-            createCategoryAction =
-                    createCategoryAction.addRolePermissionOverride(bothelperRole.getIdLong(), allow, null);
+            createCategoryAction = createCategoryAction.addRolePermissionOverride(bothelperRole.getIdLong(), allow, null);
         if (spectatorRole != null)
-            createCategoryAction =
-                    createCategoryAction.addRolePermissionOverride(spectatorRole.getIdLong(), allow, null);
+            createCategoryAction = createCategoryAction.addRolePermissionOverride(spectatorRole.getIdLong(), allow, null);
         if (everyoneRole != null)
             createCategoryAction = createCategoryAction.addRolePermissionOverride(everyoneRole.getIdLong(), null, deny);
         return createCategoryAction.complete();
@@ -660,9 +653,9 @@ public class CreateGameService {
     // TODO: Can this just be guild.getRolesByName?
     public static Role getRole(String name, Guild guild) {
         return guild.getRoles().stream()
-                .filter(role -> role.getName().equalsIgnoreCase(name))
-                .findFirst()
-                .orElse(null);
+            .filter(role -> role.getName().equalsIgnoreCase(name))
+            .findFirst()
+            .orElse(null);
     }
 
     public static String getNewPlayerInfoText() {
@@ -690,6 +683,6 @@ public class CreateGameService {
 
     public static boolean isGameCreationAllowed() {
         return GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.ALLOW_GAME_CREATION.toString(), Boolean.class, true);
+            GlobalSettings.ImplementedSettings.ALLOW_GAME_CREATION.toString(), Boolean.class, true);
     }
 }
