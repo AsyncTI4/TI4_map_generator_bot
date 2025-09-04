@@ -1265,7 +1265,8 @@ public class AgendaHelper {
 
         boolean playerPrevotesIsEmpty =
                 game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
-        boolean playerIsNotActivePlayer = player != game.getActivePlayer();
+        boolean playerIsNotActivePlayer =
+                (player != game.getActivePlayer() || "agendaWaiting".equalsIgnoreCase(game.getPhaseOfGame()));
         boolean playerIsPrevoting = !playerPrevotesIsEmpty && playerIsNotActivePlayer;
         if (playerIsPrevoting) {
             if ("0".equalsIgnoreCase(votes)) {

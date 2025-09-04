@@ -79,7 +79,7 @@ public class DrawSecretService {
             }
         }
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
+                game.getMainGameChannel(),
                 count + " " + CardEmojis.SecretObjective + " dealt to all players. Check your `#cards-info` threads.");
         if (game.getRound() == 1) {
             if (!game.isFowMode()) {
