@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
@@ -95,13 +96,13 @@ class CreateGameButton extends Subcommand {
                         return;
                     }
                     // Used for specific people we are limiting the amount of games of
-                    // if (member.getId().equalsIgnoreCase("400038967744921612")) {
-                    //     if (ongoingAmount > 6) {
-                    //         MessageHelper.sendMessageToChannel(event.getChannel(), "One of the games proposed members
-                    // is currently under a limit and cannot join more games at this time");
-                    //         return;
-                    //     }
-                    // }
+                    if (member.getId().equalsIgnoreCase("163392891148959744")) {
+                        if (ongoingAmount > 5) {
+                            MessageHelper.sendMessageToChannel(event.getChannel(), "One of the games proposed members"
+                    +" is currently under a limit and cannot join more games at this time");
+                            return;
+                        }
+                    }
                 }
                 if (gameOwner == null) gameOwner = member;
             } else {

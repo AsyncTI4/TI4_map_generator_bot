@@ -28,10 +28,7 @@ class ButtonHelperExplore {
         if ("".equalsIgnoreCase(exhaustedMessage)) {
             exhaustedMessage = "Explore";
         }
-        boolean deletedMessage = JdaComponentHelper.removeComponentFromMessageAndDeleteIfEmpty(event);
-        if (!deletedMessage) {
-            event.getMessage().editMessage(exhaustedMessage).queue();
-        }
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("freelancersBuild_")
