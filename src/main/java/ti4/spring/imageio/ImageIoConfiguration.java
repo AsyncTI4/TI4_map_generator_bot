@@ -30,7 +30,10 @@ public class ImageIoConfiguration {
     }
 
     private static boolean ensureWebpWriterRegistered() {
-        if (hasWebpWriter()) return true;
+        if (hasWebpWriter()) {
+            BotLogger.info("WebP writer already registered at startup.");
+            return true;
+        }
 
         try {
             BotLogger.warning("WebP writer was not detected at startup, scanning for it.");
