@@ -1,4 +1,3 @@
-// src/main/java/ti4/config/ImageIoStartup.java
 package ti4.spring.imageio;
 
 import java.util.Arrays;
