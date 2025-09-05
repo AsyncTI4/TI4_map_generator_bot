@@ -3,9 +3,9 @@ package ti4.helpers;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Arrays;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class ToStringHelper {
+public class ToStringHelper {
 
     public static ToStringHelper of(Object self) {
         return new ToStringHelper(self.getClass().getSimpleName());

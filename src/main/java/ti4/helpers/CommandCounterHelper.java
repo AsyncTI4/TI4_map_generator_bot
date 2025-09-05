@@ -1,8 +1,8 @@
 package ti4.helpers;
 
-import javax.annotation.Nullable;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.jetbrains.annotations.Nullable;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;

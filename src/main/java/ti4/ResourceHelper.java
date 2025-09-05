@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import ti4.helpers.Constants;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.Storage;
