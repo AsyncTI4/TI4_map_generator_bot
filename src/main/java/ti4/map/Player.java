@@ -1055,14 +1055,17 @@ public class Player extends PlayerProperties {
                     }
                 }
             }
-            if (hasUnit("bentor_mech") && firstTime > 0) {
-                int mechsRemain = 4 - ButtonHelper.getNumberOfUnitsOnTheBoard(game, this, "mech", true);
-                List<Button> buttons = new ArrayList<>(
-                        Helper.getPlanetPlaceUnitButtons(this, game, "mech", "placeOneNDone_skipbuild"));
-                String message = getRepresentation()
-                        + " due to your mech deploy ability, you may now place a mech on a planet you control.";
-                for (int i = 0; i < firstTime && i < mechsRemain; i++) {
-                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(), message, buttons);
+            if (firstTime > 0) {
+                CommanderUnlockCheckService.checkConditionsAndUnlock(this, "bentor");
+                if (hasUnit("bentor_mech")) {
+                    int mechsRemain = 4 - ButtonHelper.getNumberOfUnitsOnTheBoard(game, this, "mech", true);
+                    List<Button> buttons = new ArrayList<>(
+                            Helper.getPlanetPlaceUnitButtons(this, game, "mech", "placeOneNDone_skipbuild"));
+                    String message = getRepresentation()
+                            + " due to your mech deploy ability, you may now place a mech on a planet you control.";
+                    for (int i = 0; i < firstTime && i < mechsRemain; i++) {
+                        MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(), message, buttons);
+                    }
                 }
             }
         }

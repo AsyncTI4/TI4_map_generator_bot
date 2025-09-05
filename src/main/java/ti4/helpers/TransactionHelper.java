@@ -7,8 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -756,13 +757,13 @@ public class TransactionHelper {
                 event.getMessage().delete().queue();
                 String modalId = "finishDealDetails_" + other;
                 String fieldID = "details";
-                TextInput summary = TextInput.create(fieldID, "Edit deal details", TextInputStyle.PARAGRAPH)
+                TextInput summary = TextInput.create(fieldID, TextInputStyle.PARAGRAPH)
                         .setPlaceholder("Edit your deals details here.")
                         .setValue("The deal is that I ")
                         .build();
 
                 Modal modal = Modal.create(modalId, "Deal Details")
-                        .addComponents(ActionRow.of(summary))
+                        .addComponents(Label.of("Edit deal details", summary))
                         .build();
 
                 event.replyModal(modal).queue();
@@ -776,12 +777,12 @@ public class TransactionHelper {
                 event.getMessage().delete().queue();
                 String modalId = "finishDealDetailsInvert_" + other;
                 String fieldID = "details";
-                TextInput summary = TextInput.create(fieldID, "Edit deal details", TextInputStyle.PARAGRAPH)
+                TextInput summary = TextInput.create(fieldID, TextInputStyle.PARAGRAPH)
                         .setPlaceholder("Edit your deals details here.")
                         .setValue("The deal is that you ")
                         .build();
                 Modal modal = Modal.create(modalId, "Deal Details")
-                        .addComponents(ActionRow.of(summary))
+                        .addComponents(Label.of("Edit deal details", summary))
                         .build();
                 event.replyModal(modal).queue();
                 return;
@@ -789,6 +790,39 @@ public class TransactionHelper {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, stuffToTransButtons);
+    }
+
+    // Left for future reference.
+    private static Modal buildTransactionModel(Player p1, Player p2, Game game) {
+        Modal.Builder modal = Modal.create("transactionModelFinish_" + p1.getFaction(), "Traction");
+        List<Player> players = new ArrayList<>();
+        players.add(p1);
+        players.add(p2);
+
+        for (Player player : players) {
+            Player otherPlayer = p1;
+            if (player == otherPlayer) {
+                otherPlayer = p2;
+            }
+            if (player.getTg() > 0) {
+                StringSelectMenu.Builder tgs = StringSelectMenu.create("TGs" + player.getFaction());
+                for (int tg = 1; tg < player.getTg() + 1; tg++) {
+                    tgs.addOption("" + tg, "" + tg);
+                }
+                modal.addComponents(
+                        Label.of("Trade Goods From " + player.getFactionModel().getFactionName(), tgs.build()));
+            }
+            if (player.getCommodities() > 0) {
+                StringSelectMenu.Builder comms = StringSelectMenu.create("Comms" + player.getFaction());
+                for (int comm = 1; comm < player.getCommodities() + 1; comm++) {
+                    comms.addOption("" + comm, "" + comm);
+                }
+                modal.addComponents(
+                        Label.of("Commodities From " + player.getFactionModel().getFactionName(), comms.build()));
+            }
+        }
+
+        return modal.build();
     }
 
     private static boolean resolveAgeOfCommerceTechCheck(Player owner, Player receiver, String tech, Game game) {
@@ -1441,7 +1475,7 @@ public class TransactionHelper {
                 MessageHelper.sendMessageToChannelWithButtons(
                         p1.getPrivateChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
             }
-            MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
+            MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), "**🤝 Transaction:** " + message2);
         } else {
             TextChannel channel = game.getMainGameChannel();
             if ("pbd1000".equalsIgnoreCase(game.getName())) {

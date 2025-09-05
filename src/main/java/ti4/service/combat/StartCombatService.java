@@ -14,6 +14,8 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
@@ -40,6 +42,7 @@ import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.fow.GMService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -528,6 +531,14 @@ public class StartCombatService {
                 }
             }
         }
+
+        GMService.logPlayerActivity(
+                game,
+                player1,
+                player1.getRepresentationUnfoggedNoPing() + " VS " + player2.getRepresentationUnfoggedNoPing() + " "
+                        + StringUtils.capitalize(spaceOrGround) + " combat began",
+                threadChannel.getJumpUrl(),
+                false);
     }
 
     private static void offerRedGhostCommanderButtons(Player player, Game game, GenericInteractionCreateEvent event) {
@@ -720,7 +731,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
             int capitalShips = ButtonHelper.checkFleetAndCapacity(player, game, tile, true, true)[0];
-            if (player.getSecretsUnscored().containsKey("dyp") && capitalShips >= 3) {
+            if ("space".equalsIgnoreCase(type) && player.getSecretsUnscored().containsKey("dyp") && capitalShips >= 3) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         msg
@@ -1226,6 +1237,18 @@ public class StartCombatService {
                         "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                                 + "The Thundarian",
                         FactionEmojis.Nomad));
+            }
+            List<Tile> flagshipTile =
+                    CheckUnitContainmentService.getTilesContainingPlayersUnits(game, agentHolder, UnitType.Flagship);
+            if (isSpaceCombat
+                    && agentHolder.hasUnit("empyrean_flagship")
+                    && !flagshipTile.isEmpty()
+                    && FoWHelper.getAdjacentTiles(game, pos, agentHolder, false, true)
+                            .contains(flagshipTile.getFirst().getPosition())) {
+                buttons.add(Buttons.gray(
+                        finChecker + "empyreanFlagshipAbilityStep1_" + pos,
+                        "Use Empyrean Flagship Ability",
+                        FactionEmojis.Empyrean));
             }
 
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("yinagent")) {

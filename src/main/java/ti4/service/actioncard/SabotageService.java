@@ -15,13 +15,7 @@ public class SabotageService {
             return false;
         }
 
-        if (player.hasTechReady("it") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))) {
-            return true;
-        }
-
-        if (player.hasUnit("empyrean_mech")
-                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Mech)
-                        .isEmpty()) {
+        if (couldUseInstinctTraining(player) || couldUseWatcherMech(player, game)) {
             return true;
         }
 
@@ -31,6 +25,16 @@ public class SabotageService {
         }
 
         return !allSabotagesAreDiscarded(game) && !allAcd2SabotagesAreDiscarded(game);
+    }
+
+    public static boolean couldUseInstinctTraining(Player player) {
+        return player.hasTechReady("it") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"));
+    }
+
+    public static boolean couldUseWatcherMech(Player player, Game game) {
+        return player.hasUnit("empyrean_mech")
+                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Mech)
+                        .isEmpty();
     }
 
     private static boolean allSabotagesAreDiscarded(Game game) {

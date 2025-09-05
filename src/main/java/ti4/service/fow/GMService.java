@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Role;
@@ -31,6 +31,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
+import ti4.service.actioncard.SabotageService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.info.SecretObjectiveInfoService;
@@ -179,7 +180,20 @@ public class GMService {
     public static void checkPlayerHands(ButtonInteractionEvent event, String buttonID, Game game) {
         String option = buttonID.replace("gmCheckPlayerHands_", "");
         switch (option) {
-            case "sabotage" -> checkWhoHas("sabo", game, event);
+            case "sabotage" -> {
+                checkWhoHas("sabo", game, event);
+                for (Player p : game.getRealPlayers()) {
+                    if (SabotageService.couldUseWatcherMech(p, game)) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getChannel(), "> " + p.getRepresentationUnfoggedNoPing() + " has Watcher mechs");
+                    }
+                    if (SabotageService.couldUseInstinctTraining(p)) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getChannel(),
+                                "> " + p.getRepresentationUnfoggedNoPing() + " has Instinct Training");
+                    }
+                }
+            }
             case "deadly" -> {
                 checkWhoHas("deadly_plot", game, event);
                 checkWhoHas("bribery", game, event);
@@ -232,12 +246,12 @@ public class GMService {
 
     @ButtonHandler("gmWhoCanSee~MDL")
     public static void whoCanSeePosition(ButtonInteractionEvent event) {
-        TextInput position = TextInput.create(Constants.POSITION, "Position", TextInputStyle.SHORT)
+        TextInput position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
                 .setPlaceholder("000")
                 .setRequiredRange(3, 4)
                 .build();
         Modal modal = Modal.create("gmWhoCanSeeResolve", "Who Can See Position")
-                .addComponents(ActionRow.of(position))
+                .addComponents(Label.of("Position", position))
                 .build();
         event.replyModal(modal).queue();
     }
@@ -275,7 +289,7 @@ public class GMService {
     }
 
     public static void createFOWStatusSummary(Game game) {
-        if (!game.isFowMode() || !game.getFowOption(FOWOption.STATUS_SUMMARY)) return;
+        if (!game.isFowMode() || !game.getFowOption(FOWOption.STATUS_SUMMARY) || FOWPlusService.isActive(game)) return;
 
         ThreadGetter.getThreadInChannel(
                 game.getMainGameChannel(), STATUS_SUMMARY_THREAD, true, false, threadChannel -> {

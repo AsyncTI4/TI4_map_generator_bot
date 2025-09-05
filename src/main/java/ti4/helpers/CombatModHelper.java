@@ -323,7 +323,8 @@ public class CombatModHelper {
                 }
             }
             case Constants.MOD_HAS_FRAGILE ->
-                meetsCondition = player.getAbilities().contains("fragile");
+                meetsCondition =
+                        player.getAbilities().contains("fragile") && !ButtonHelper.isLawInPlay(game, "articles_war");
             case Constants.MOD_OPPONENT_NO_CC_FLEET ->
                 meetsCondition = !player.getMahactCC().contains(opponent.getColor());
             case "next_to_structure" ->
