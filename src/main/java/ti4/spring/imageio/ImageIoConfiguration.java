@@ -29,6 +29,8 @@ public class ImageIoConfiguration {
     }
 
     private static boolean ensureWebpWriterRegistered() {
+        if (hasWebpWriter()) return true;
+
         ClassLoader appCl = ImageIoConfiguration.class.getClassLoader();
         ClassLoader prev = Thread.currentThread().getContextClassLoader();
         try {
