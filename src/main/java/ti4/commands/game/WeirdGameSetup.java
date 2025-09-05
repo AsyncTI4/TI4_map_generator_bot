@@ -1,6 +1,7 @@
 package ti4.commands.game;
 
 import java.util.ArrayList;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -248,8 +249,6 @@ class WeirdGameSetup extends GameStateSubcommand {
                 if (player.getUnitByBaseType("mech") != null)
                     player.removeOwnedUnitByID(player.getUnitByBaseType("mech").getId());
             }
-
-            game.setScSetID("base_game");
 
             game.setTechnologyDeckID("techs_base");
             game.setBaseGameMode(true);

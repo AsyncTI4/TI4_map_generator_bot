@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -2678,7 +2679,7 @@ public class ButtonHelperActionCards {
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                player.getFactionEmoji() + " gained " + count + " trade goods" + (count == 1 ? "" : "s") + " (" + oldTg
+                player.getFactionEmoji() + " gained " + count + " trade good" + (count == 1 ? "" : "s") + " (" + oldTg
                         + "->" + player.getTg() + ") from mining " + bestPlanet + ".");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, count);
