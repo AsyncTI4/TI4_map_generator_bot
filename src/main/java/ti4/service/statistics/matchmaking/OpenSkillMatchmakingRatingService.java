@@ -6,7 +6,7 @@ import com.pocketcombats.openskill.data.PlayerResult;
 import com.pocketcombats.openskill.data.SimplePlayerResult;
 import com.pocketcombats.openskill.data.SimpleTeamResult;
 import com.pocketcombats.openskill.data.TeamResult;
-import com.pocketcombats.openskill.model.PlackettLuce;
+import com.pocketcombats.openskill.model.BradleyTerryFull;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -18,12 +18,13 @@ class OpenSkillMatchmakingRatingService {
 
     private static final double STARTING_SIGMA = 8.333333333333334;
     private static final double STARTING_MU = 25;
+    private static final double SIGMA_CALIBRATION_THRESHOLD = 4;
 
     static List<MatchmakingRating> calculateRatings(List<MatchmakingGame> games) {
         games.sort(Comparator.comparingLong(MatchmakingGame::endedDate).thenComparing(MatchmakingGame::name));
 
         RatingModelConfig config = RatingModelConfig.builder().build();
-        Adjudicator<String> adjudicator = new Adjudicator<>(config, new PlackettLuce(config));
+        Adjudicator<String> adjudicator = new Adjudicator<>(config, new BradleyTerryFull(config));
 
         Map<String, PlayerResult<String>> userIdsToRatings = new HashMap<>();
         Map<String, String> userIdToUsername = new HashMap<>();
@@ -60,7 +61,8 @@ class OpenSkillMatchmakingRatingService {
                     String userId = entry.getKey();
                     String username = userIdToUsername.get(userId);
                     PlayerResult<String> rating = entry.getValue();
-                    double calibrationPercent = 100;
+                    double calibrationPercent =
+                        Math.min(100, SIGMA_CALIBRATION_THRESHOLD / rating.sigma() * 100);
                     return new MatchmakingRating(userId, username, rating.mu(), calibrationPercent);
                 })
                 .sorted(Comparator.comparing(MatchmakingRating::rating).reversed())
