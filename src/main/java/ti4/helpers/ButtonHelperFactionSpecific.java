@@ -737,7 +737,7 @@ public class ButtonHelperFactionSpecific {
                     player.getRepresentationUnfogged() + " you have all your mechs out and can't DEPLOY more.");
             return;
         }
-        for (String planet : player.getPlanets()) {
+        for (String planet : player.getPlanetsAllianceMode()) {
             buttons.add(Buttons.green(
                     "titansConstructionMechDeployStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }

@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
-import ti4.executors.ExecutorServiceManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 
@@ -18,7 +17,8 @@ public class DeletionListener extends ListenerAdapter {
     @Override
     public void onMessageDelete(@Nonnull MessageDeleteEvent event) {
         if (!validateEvent(event)) return;
-        ExecutorServiceManager.runAsync("DeletionListener task", () -> handleMessageDelete(event));
+        // ExecutorServiceManager.runAsync("DeletionListener task", () -> handleMessageDelete(event));
+        // reinstate this when it works/someone has time to make it work.
     }
 
     private static boolean validateEvent(MessageDeleteEvent event) {

@@ -543,6 +543,19 @@ public class Helper {
         return player;
     }
 
+    public static Player getPlayerFromLeader(Game game, String leader) {
+        Player player = null;
+        if (leader != null) {
+            for (Player player_ : game.getPlayers().values()) {
+                if (player_.isRealPlayer() && player_.hasLeader(leader)) {
+                    player = player_;
+                    break;
+                }
+            }
+        }
+        return player;
+    }
+
     public static Player getPlayerFromUnit(Game game, String unit) {
         Player player = null;
         if (unit != null) {

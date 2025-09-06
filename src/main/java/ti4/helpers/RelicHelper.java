@@ -293,13 +293,19 @@ public class RelicHelper {
                     .append(formatPercent.format(deckDrawChance))
                     .append("):");
             Collections.sort(allRelics);
+            int x = 1;
             for (String relicId : allRelics) {
                 String relicName = Mapper.getRelic(relicId).getName();
-                text.append("\n1. ")
+                text.append("\n" + x + ". ")
                         .append(ExploreEmojis.Relic)
                         .append(" _")
                         .append(relicName)
-                        .append("_");
+                        .append("_ ")
+                        .append(Mapper.getRelic(relicId)
+                                .getText()
+                                .replace("\n", " ")
+                                .replace("> ", ""));
+                x++;
             }
         }
 

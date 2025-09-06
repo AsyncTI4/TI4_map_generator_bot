@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -3180,7 +3180,10 @@ public class Game extends GameProperties {
 
         GameSettings settings = miltySettings.getGameSettings();
         setVp(settings.getPointTotal().getVal());
-        setMaxSOCountPerPlayer(settings.getSecrets().getVal());
+
+        if (getMaxSOCountPerPlayer() != 4) {
+            setMaxSOCountPerPlayer(settings.getSecrets().getVal());
+        }
         if (settings.getTigl().isVal()) {
             TIGLHelper.initializeTIGLGame(this);
         }
@@ -3212,8 +3215,10 @@ public class Game extends GameProperties {
         setStrategyCardSet(deckSettings.getStratCards().getChosenKey());
 
         // Setup peakable objectives
-        setUpPeakableObjectives(miltySettings.getGameSettings().getStage1s().getVal(), 1);
-        setUpPeakableObjectives(miltySettings.getGameSettings().getStage2s().getVal(), 2);
+        if (getPublicObjectives1Peakable().size() != 4) {
+            setUpPeakableObjectives(miltySettings.getGameSettings().getStage1s().getVal(), 1);
+            setUpPeakableObjectives(miltySettings.getGameSettings().getStage2s().getVal(), 2);
+        }
 
         if (isAbsolMode() && !deckSettings.getAgendas().getChosenKey().contains("absol")) {
             MessageHelper.sendMessageToChannel(

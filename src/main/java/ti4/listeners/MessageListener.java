@@ -67,24 +67,24 @@ public class MessageListener extends ListenerAdapter {
                     if (addFactionEmojiReactionsToMessages(event, gameName)) return;
                 }
             }
-            if ("572698679618568193".equalsIgnoreCase(event.getAuthor().getId())) {
-                TextChannel deletionLogChannel =
-                        AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
-                                .findFirst()
-                                .orElse(null);
-                if (deletionLogChannel == null) return;
-                String msg = "Message from dicecord: " + message.getContentRaw() + " " + message.getContentStripped()
-                        + " " + message.getContentDisplay() + " \nHere: " + message.getJumpUrl();
-                if (!message.getComponents().isEmpty()) {
-                    msg += "\n" + message.getComponents().getFirst().getType().name();
-                }
-                if (!message.getEmbeds().isEmpty()) {
-                    MessageHelper.sendMessageToChannelWithEmbeds(deletionLogChannel, msg, message.getEmbeds());
-                } else {
-                    MessageHelper.sendMessageToChannel(deletionLogChannel, msg + "\n No embeds");
-                }
-                return;
-            }
+            // if ("572698679618568193".equalsIgnoreCase(event.getAuthor().getId())) {
+            //     TextChannel deletionLogChannel =
+            //             AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
+            //                     .findFirst()
+            //                     .orElse(null);
+            //     if (deletionLogChannel == null) return;
+            //     String msg = "Message from dicecord: " + message.getContentRaw() + " " + message.getContentStripped()
+            //             + " " + message.getContentDisplay() + " \nHere: " + message.getJumpUrl();
+            //     if (!message.getComponents().isEmpty()) {
+            //         msg += "\n" + message.getComponents().getFirst().getType().name();
+            //     }
+            //     if (!message.getEmbeds().isEmpty()) {
+            //         MessageHelper.sendMessageToChannelWithEmbeds(deletionLogChannel, msg, message.getEmbeds());
+            //     } else {
+            //         MessageHelper.sendMessageToChannel(deletionLogChannel, msg + "\n No embeds");
+            //     }
+            //     return;
+            // }
             handleFogOfWarCombatThreadMirroring(event);
         } catch (Exception e) {
             BotLogger.error(

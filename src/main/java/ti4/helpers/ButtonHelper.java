@@ -670,6 +670,7 @@ public class ButtonHelper {
                     }
                 }
             }
+            player.setNpc(false);
             // send back all the PNs of others that the player was holding
             Set<String> pns = new HashSet<>(player.getPromissoryNotes().keySet());
             for (String pnID : pns) {
@@ -7294,7 +7295,9 @@ public class ButtonHelper {
     }
 
     @ButtonHandler("autoProveEndurance_")
-    public static void autoProveEndurance(Player player, Game game, String buttonID) {
+    public static void autoProveEndurance(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         game.setStoredValue("autoProveEndurance_" + player.getFaction(), buttonID.split("_")[1]);
+        deleteMessage(event);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Successfully logged response");
     }
 }

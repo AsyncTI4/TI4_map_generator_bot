@@ -25,6 +25,7 @@ public class Source {
         codex2,
         codex3,
         codex4,
+        te,
 
         // big homebrew
         ds,
@@ -107,7 +108,7 @@ public class Source {
 
         public boolean isOfficial() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3, codex4 -> true;
+                case base, pok, codex1, codex2, codex3, codex4, te -> true;
                 default -> false;
             };
         }
@@ -121,7 +122,7 @@ public class Source {
 
         public boolean isDs() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3, codex4, ds, uncharted_space, blue_reverie -> true;
+                case base, pok, codex1, codex2, codex3, codex4, ds, uncharted_space, blue_reverie, te -> true;
                 default -> false;
             };
         }

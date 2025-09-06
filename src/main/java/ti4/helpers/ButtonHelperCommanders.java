@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -437,7 +437,7 @@ public class ButtonHelperCommanders {
                 + " Automatically used Tungstantus, the Ul commander, to gain 1 trade good " + player.gainTG(1) + ".";
         if (Helper.getPlayerFromAbility(game, "pillage") != null) {
             msg += "\nThis trade good can be spent before " + FactionEmojis.Mentak
-                    + "**Pillage** resolves, since it is a \"when\".";
+                    + "**Pillage** resolves, since the gaining occurs at the same time as the spending.";
         }
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);

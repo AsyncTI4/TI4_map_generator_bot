@@ -249,8 +249,6 @@ class WeirdGameSetup extends GameStateSubcommand {
                     player.removeOwnedUnitByID(player.getUnitByBaseType("mech").getId());
             }
 
-            game.setScSetID("base_game");
-
             game.setTechnologyDeckID("techs_base");
             game.setBaseGameMode(true);
             game.setAbsolMode(false);
