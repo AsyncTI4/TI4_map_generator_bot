@@ -7298,6 +7298,6 @@ public class ButtonHelper {
     public static void autoProveEndurance(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         game.setStoredValue("autoProveEndurance_" + player.getFaction(), buttonID.split("_")[1]);
         deleteMessage(event);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Successfully logged response");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Successfully logged response.");
     }
 }

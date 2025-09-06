@@ -185,12 +185,12 @@ public class GMService {
                 for (Player p : game.getRealPlayers()) {
                     if (SabotageService.couldUseWatcherMech(p, game)) {
                         MessageHelper.sendMessageToChannel(
-                                event.getChannel(), "> " + p.getRepresentationUnfoggedNoPing() + " has Watcher mechs");
+                                event.getChannel(), "> " + p.getRepresentationUnfoggedNoPing() + " has Watcher mechs.");
                     }
                     if (SabotageService.couldUseInstinctTraining(p)) {
                         MessageHelper.sendMessageToChannel(
                                 event.getChannel(),
-                                "> " + p.getRepresentationUnfoggedNoPing() + " has Instinct Training");
+                                "> " + p.getRepresentationUnfoggedNoPing() + " has _Instinct Training_.");
                     }
                 }
             }
