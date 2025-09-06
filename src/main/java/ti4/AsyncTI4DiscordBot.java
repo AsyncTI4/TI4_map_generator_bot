@@ -92,6 +92,10 @@ public class AsyncTI4DiscordBot {
     private static Guild guildSenary;
     private static Guild guildSeptenary;
     private static Guild guildOctonary;
+    private static Guild guildNonary;
+    private static Guild guildDecenary;
+    private static Guild guildUndenary;
+    private static Guild guildDuodenary;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
     private static Guild guildMegagame;
@@ -224,6 +228,33 @@ public class AsyncTI4DiscordBot {
             guildMegagame = jda.getGuildById(args[12]);
             success &= startBot(guildMegagame);
             // serversToCreateNewGamesOn.add(guildMegagame);  // Don't create random games on this server
+        }
+
+        // Async: Ship Flag
+        if (args.length >= 14) {
+            guildNonary = jda.getGuildById(args[13]);
+            success &= startBot(guildNonary);
+            // serversToCreateNewGamesOn.add(guildNonary);  // ON HOLD FOR NOW
+        }
+
+        // Async: 10th Server
+        if (args.length >= 15) {
+            guildDecenary = jda.getGuildById(args[14]);
+            success &= startBot(guildDecenary);
+            // serversToCreateNewGamesOn.add(guildDecenary);  // SERVER DOESN'T EXIST YET
+        }
+        // Async: 11th Server
+        if (args.length >= 16) {
+            guildUndenary = jda.getGuildById(args[15]);
+            success &= startBot(guildUndenary);
+            // serversToCreateNewGamesOn.add(guildUndenary);  // SERVER DOESN'T EXIST YET
+        }
+
+        // Async: 12th Server
+        if (args.length >= 17) {
+            guildDuodenary = jda.getGuildById(args[16]);
+            success &= startBot(guildDuodenary);
+            // serversToCreateNewGamesOn.add(guildDuodenary);  // SERVER DOESN'T EXIST YET
         }
 
         // Async: FOW Chapter Secondary
@@ -398,6 +429,10 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("1250131684393881616")); // Async Senary (Tommer Hawk)
         adminRoles.add(jda.getRoleById("1312882116597518422")); // Async Septenary (Duder's Domain)
         adminRoles.add(jda.getRoleById("1378702133297414170")); // Async Octonary (What's up Dock)
+        adminRoles.add(jda.getRoleById("1410728648817770532")); // Async Nonary (Ship Flag)
+        adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Decenary (TBD)
+        adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Undenary (TBD)
+        adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
         adminRoles.add(jda.getRoleById("951230650680225863")); // Community Server
         adminRoles.add(jda.getRoleById("1218342096474341396")); // Megagame Server
@@ -431,6 +466,10 @@ public class AsyncTI4DiscordBot {
         developerRoles.add(jda.getRoleById("1250131684393881615")); // Async Senary (Tommer Hawk)
         developerRoles.add(jda.getRoleById("1312882116597518421")); // Async Septenary (Duder's Domain)
         developerRoles.add(jda.getRoleById("1378702133297414169")); // Async Octonary (What's up Dock)
+        developerRoles.add(jda.getRoleById("1410728648817770531")); // Async Nonary (Ship Flag)
+        developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Decenary (TBD)
+        developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Undenary (TBD)
+        developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
         developerRoles.add(jda.getRoleById("1395072365389680711")); // Megagame Server
         developerRoles.add(jda.getRoleById("1215453013154734130")); // Sigma's Server
@@ -456,6 +495,10 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1250131684393881613")); // Async Senary (Tommer Hawk)
         bothelperRoles.add(jda.getRoleById("1312882116597518419")); // Async Septenary (Duder's Domain)
         bothelperRoles.add(jda.getRoleById("1378702133297414167")); // Async Octonary (What's up Dock)
+        bothelperRoles.add(jda.getRoleById("1410728648817770529")); // Async Nonary (Ship Flag)
+        bothelperRoles.add(jda.getRoleById("0000000000000000000")); // Async Decenary (TBD)
+        bothelperRoles.add(jda.getRoleById("0000000000000000000")); // Async Undenary (TBD)
+        bothelperRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
         bothelperRoles.add(jda.getRoleById("1248693989193023519")); // Community Server

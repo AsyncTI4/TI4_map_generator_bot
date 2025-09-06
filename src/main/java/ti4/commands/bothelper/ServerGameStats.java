@@ -29,6 +29,7 @@ class ServerGameStats extends Subcommand {
         List<String> skipGuilds = new ArrayList<>();
         skipGuilds.add("847560709730730064"); // CPTI
         skipGuilds.add("1062139934745559160"); // FoW
+        skipGuilds.add("1218341032857440259"); // Megagame
 
         boolean includeHub = event.getOption(Constants.INCLUDE_HUB, false, OptionMapping::getAsBoolean);
         if (!includeHub) skipGuilds.add(Constants.ASYNCTI4_HUB_SERVER_ID);
