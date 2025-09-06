@@ -6,9 +6,9 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import javax.annotation.Nullable;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.message.logging.BotLogger;
 
 public class Storage {

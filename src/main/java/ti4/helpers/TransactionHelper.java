@@ -1475,7 +1475,7 @@ public class TransactionHelper {
                 MessageHelper.sendMessageToChannelWithButtons(
                         p1.getPrivateChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
             }
-            MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
+            MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), "**🤝 Transaction:** " + message2);
         } else {
             TextChannel channel = game.getMainGameChannel();
             if ("pbd1000".equalsIgnoreCase(game.getName())) {
