@@ -160,12 +160,6 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "yin_breakthrough",
-        "Undraftable": true,
-        "source": "te"
-    },
-    {
-        "ItemCategory": "ABILITY",
         "ItemId": "pillage",
         "OptionalSwaps": [
             "AGENT:mentakagent",
