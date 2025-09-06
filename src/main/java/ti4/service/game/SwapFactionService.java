@@ -3,7 +3,6 @@ package ti4.service.game;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -15,11 +14,7 @@ import ti4.message.MessageHelper;
 public class SwapFactionService {
 
     public static void secondHalfOfSwap(
-            Game game,
-            Player addedPlayer,
-            Player removedPlayer,
-            User addedUser,
-            GenericInteractionCreateEvent event) {
+            Game game, Player addedPlayer, Player removedPlayer, User addedUser, GenericInteractionCreateEvent event) {
         Collection<Player> players = game.getPlayers().values();
         if (players.stream().noneMatch(player -> player.getUserID().equals(removedPlayer.getUserID()))) {
             MessageHelper.replyToMessage(event, "Specify player that is in game to be swapped");
@@ -74,16 +69,14 @@ public class SwapFactionService {
             game.getTileMap().values().forEach(tile -> tile.swapFogData(player, addedPlayer));
         }
 
-        String before =
-                "> **Before:** " + addedPlayer.getRepresentation() + " & " + player.getRepresentation() + "\n";
+        String before = "> **Before:** " + addedPlayer.getRepresentation() + " & " + player.getRepresentation() + "\n";
         addedPlayer.setUserName(removedPlayer.getUserName());
         addedPlayer.setUserID(removedPlayer.getUserID());
         addedPlayer.removeTeamMateID(removedPlayer.getUserID());
         player.setUserName(addedUser.getName());
         player.setUserID(addedUser.getId());
         player.removeTeamMateID(addedUser.getId());
-        String after =
-                "> **After:** " + addedPlayer.getRepresentation() + " & " + player.getRepresentation() + "\n";
+        String after = "> **After:** " + addedPlayer.getRepresentation() + " & " + player.getRepresentation() + "\n";
 
         String message = "Users have swapped factions:\n" + before + after;
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);

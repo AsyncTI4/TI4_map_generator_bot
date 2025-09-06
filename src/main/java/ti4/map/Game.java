@@ -3,6 +3,13 @@ package ti4.map;
 import static java.util.function.Predicate.*;
 import static org.apache.commons.collections4.CollectionUtils.*;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.awt.Point;
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
@@ -24,19 +31,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -49,6 +43,9 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
@@ -3184,7 +3181,7 @@ public class Game extends GameProperties {
         GameSettings settings = miltySettings.getGameSettings();
         setVp(settings.getPointTotal().getVal());
 
-        if(getMaxSOCountPerPlayer() != 4){
+        if (getMaxSOCountPerPlayer() != 4) {
             setMaxSOCountPerPlayer(settings.getSecrets().getVal());
         }
         if (settings.getTigl().isVal()) {
@@ -3218,7 +3215,7 @@ public class Game extends GameProperties {
         setStrategyCardSet(deckSettings.getStratCards().getChosenKey());
 
         // Setup peakable objectives
-        if(getPublicObjectives1Peakable().size() != 4){
+        if (getPublicObjectives1Peakable().size() != 4) {
             setUpPeakableObjectives(miltySettings.getGameSettings().getStage1s().getVal(), 1);
             setUpPeakableObjectives(miltySettings.getGameSettings().getStage2s().getVal(), 2);
         }

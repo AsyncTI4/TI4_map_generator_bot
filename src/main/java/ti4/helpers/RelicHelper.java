@@ -5,13 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -298,12 +296,15 @@ public class RelicHelper {
             int x = 1;
             for (String relicId : allRelics) {
                 String relicName = Mapper.getRelic(relicId).getName();
-                text.append("\n"+x+". ")
+                text.append("\n" + x + ". ")
                         .append(ExploreEmojis.Relic)
                         .append(" _")
                         .append(relicName)
                         .append("_ ")
-                        .append(Mapper.getRelic(relicId).getText().replace("\n"," ").replace("> ",""));
+                        .append(Mapper.getRelic(relicId)
+                                .getText()
+                                .replace("\n", " ")
+                                .replace("> ", ""));
                 x++;
             }
         }
