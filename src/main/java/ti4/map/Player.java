@@ -1093,12 +1093,16 @@ public class Player extends PlayerProperties {
 
     public int getCommoditiesBonus() {
         int bonus = 0;
-        if (game.playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
-            bonus++;
-        }
         if (getAbilities().contains("policy_the_economy_exploit")) {
             bonus += 2 - getCommoditiesBase();
         }
+        if (ButtonHelper.isLawInPlay(game, "absol_equality")) {
+            bonus = 3 - getCommoditiesBase();
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
+            bonus++;
+        }
+
         if (hasAbility("necrophage")) {
             bonus += ButtonHelper.getNumberOfUnitsOnTheBoard(
                     game, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), getColor()));
@@ -1120,6 +1124,7 @@ public class Player extends PlayerProperties {
                 }
             }
         }
+
         return bonus;
     }
 

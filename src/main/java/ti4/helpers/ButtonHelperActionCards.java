@@ -2678,7 +2678,7 @@ public class ButtonHelperActionCards {
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                player.getFactionEmoji() + " gained " + count + " trade goods" + (count == 1 ? "" : "s") + " (" + oldTg
+                player.getFactionEmoji() + " gained " + count + " trade good" + (count == 1 ? "" : "s") + " (" + oldTg
                         + "->" + player.getTg() + ") from mining " + bestPlanet + ".");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, count);

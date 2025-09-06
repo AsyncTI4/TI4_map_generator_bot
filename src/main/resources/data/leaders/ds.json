@@ -413,7 +413,7 @@
         "id": "toldaragent",
         "faction": "toldar",
         "type": "agent",
-        "name": "Zhroth Khuvad",
+        "name": "Maertin Donaais",
         "title": "Esteemed Philanthropist",
         "abilityWindow": "When another player gains any number of commodities",
         "abilityText": "You may exhaust this card to gain an equal number of commodities and convert that player's commodities to trade goods.",
@@ -427,7 +427,7 @@
         "name": "Razalka Gris",
         "title": "Ghost Squadron ",
         "abilityWindow": "After a system is activated",
-        "abilityText":  "You may exhaust this card to choose 1 system; until the end of movement, other players' ships in that system do not affect ships' movement.",
+        "abilityText": "You may exhaust this card to choose 1 system; until the end of movement, other players' ships in that system do not affect ships' movement.",
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },
@@ -850,7 +850,6 @@
         "unlockCondition": "Win 2 combats in 1 turn",
         "source": "ds"
     },
-    
     {
         "id": "toldarcommander",
         "faction": "toldar",

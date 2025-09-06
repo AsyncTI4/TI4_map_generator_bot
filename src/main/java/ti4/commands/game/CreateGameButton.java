@@ -95,13 +95,15 @@ class CreateGameButton extends Subcommand {
                         return;
                     }
                     // Used for specific people we are limiting the amount of games of
-                    // if (member.getId().equalsIgnoreCase("400038967744921612")) {
-                    //     if (ongoingAmount > 6) {
-                    //         MessageHelper.sendMessageToChannel(event.getChannel(), "One of the games proposed members
-                    // is currently under a limit and cannot join more games at this time");
-                    //         return;
-                    //     }
-                    // }
+                    if (member.getId().equalsIgnoreCase("163392891148959744")) {
+                        if (ongoingAmount > 5) {
+                            MessageHelper.sendMessageToChannel(
+                                    event.getChannel(),
+                                    "One of the games proposed members"
+                                            + " is currently under a limit and cannot join more games at this time");
+                            return;
+                        }
+                    }
                 }
                 if (gameOwner == null) gameOwner = member;
             } else {

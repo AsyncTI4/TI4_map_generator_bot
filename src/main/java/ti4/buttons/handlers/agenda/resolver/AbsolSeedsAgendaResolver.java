@@ -36,7 +36,7 @@ public class AbsolSeedsAgendaResolver implements ForAgainstAgendaResolver {
                 if (p2 != playerWL) {
                     MessageHelper.sendMessageToChannelWithButtons(
                             playerWL.getCardsInfoThread(),
-                            "You owe " + p2.getRepresentation() + "a promissory note.",
+                            "You owe " + p2.getRepresentationNoPing() + "a promissory note.",
                             ButtonHelper.getForcedPNSendButtons(game, p2, playerWL));
                 }
             }
