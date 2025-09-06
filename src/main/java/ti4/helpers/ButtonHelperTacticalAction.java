@@ -227,7 +227,9 @@ public class ButtonHelperTacticalAction {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         title
-                                + "There are players with Space Cannon Offence coverage in this system.\n"
+                                + "There " + (playersWithPds2.size() == 1 ? "is " : "are ") + playersWithPds2.size()
+                                + " player" + (playersWithPds2.size() == 1 ? "" : "s")
+                                + " with Space Cannon Offence coverage in this system.\n"
                                 + "Please resolve those before continuing, or float the window if irrelevant.");
             }
             List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
