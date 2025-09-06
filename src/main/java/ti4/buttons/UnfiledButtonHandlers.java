@@ -2043,7 +2043,8 @@ public class UnfiledButtonHandlers {
                     && (buttonID.contains("tacticalAction")
                             || buttonID.contains("warfare")
                             || buttonID.contains("anarchy7Build")
-                            || buttonID.contains("lumi7Build"))) {
+                            || buttonID.contains("lumi7Build")
+                            || buttonID.contains("ministerBuild"))) {
                 ButtonHelperFactionSpecific.offerASNButtonsStep1(game, player, buttonID);
             }
             player.resetSpentThings();

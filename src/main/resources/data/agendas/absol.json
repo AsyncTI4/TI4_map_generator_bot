@@ -137,7 +137,7 @@
     {
         "alias": "absol_equality",
         "name": "Economic Equality",
-        "type": "Directive",
+        "type": "Law",
         "target": "For/Against",
         "text1": "Each player returns all their trade goods to the supply. All players have a commodity value of 3.  The player that cast the most votes \"For\" replenishes their commodities.",
         "text2": "Against: The player who cast the most votes \"Against\" gains a number of trade goods equal to their current number of trade goods. For every 3 trade goods they gain this way, all other players lose 1 trade good, if able.",

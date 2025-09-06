@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
+import ti4.helpers.BreakthroughHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -123,6 +124,9 @@ public class ScorePublicObjectiveService {
             String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
                     + player.getCCRepresentation() + ". Use buttons to gain 1 command token.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+        }
+        if (player.hasAbility("yin_breakthrough")) {
+            BreakthroughHelper.resolveYinBreakthroughAbility(game, player);
         }
         String idC = "";
         for (Entry<String, Integer> po : game.getRevealedPublicObjectives().entrySet()) {
