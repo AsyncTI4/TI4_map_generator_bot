@@ -25,7 +25,6 @@
         "Undraftable": true,
         "source": "pok"
     },
-
     {
         "ItemCategory": "ABILITY",
         "ItemId": "star_forge",
@@ -217,7 +216,7 @@
         "source": "pok"
     },
     {
-        "ItemCategory": "PN",    
+        "ItemCategory": "PN",
         "ItemId": "antivirus",
         "Undraftable": true,
         "source": "pok"

@@ -22,12 +22,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
 import ti4.helpers.ButtonHelper;
@@ -311,8 +311,8 @@ public class MapGenerator implements AutoCloseable {
                 .map(BorderAnomalyHolder::getTile)
                 .collect(Collectors.toSet()));
 
-        tilesWithExtra.forEach(key -> addTile(tileMap.get(key), TileStep.Extras));
         sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Tile));
+        tilesWithExtra.forEach(key -> addTile(tileMap.get(key), TileStep.Extras));
         sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Units));
         if (!game.getTileDistances().isEmpty()) {
             sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Distance));

@@ -4,7 +4,7 @@
         "name": "Ancient Trade Routes",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Choose up to 2 other players. You and each of those players gain 2 commodities. During this turn, treat those players as if they were your neighbors.",
+        "text": "Choose up to 2 other players; you do not have to be neighbors to perform transactions with those players during this turn. You and each of those players gain 2 commodities.",
         "flavorText": "\"Stationmaster,\" Kier said nervously, \"these routes have been dead for centuries.\" Artuno smirked. \"See to it that they are reinstated, then. The Memoria will accompany you if necessary.\"",
         "source": "action_deck_2"
     },

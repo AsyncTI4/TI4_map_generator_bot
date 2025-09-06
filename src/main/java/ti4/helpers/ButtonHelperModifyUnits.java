@@ -631,6 +631,9 @@ public class ButtonHelperModifyUnits {
                             "flagship",
                             "warsun",
                             "fighter"));
+                    if (!justSummarizing) {
+                        game.setStoredValue(p2.getFaction() + "graviton", "");
+                    }
                 }
             }
         }

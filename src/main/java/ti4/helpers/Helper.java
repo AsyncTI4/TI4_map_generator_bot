@@ -19,6 +19,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
@@ -39,7 +40,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
@@ -535,6 +535,19 @@ public class Helper {
         if (leader != null) {
             for (Player player_ : game.getPlayers().values()) {
                 if (player_.isRealPlayer() && player_.hasLeaderUnlocked(leader)) {
+                    player = player_;
+                    break;
+                }
+            }
+        }
+        return player;
+    }
+
+    public static Player getPlayerFromLeader(Game game, String leader) {
+        Player player = null;
+        if (leader != null) {
+            for (Player player_ : game.getPlayers().values()) {
+                if (player_.isRealPlayer() && player_.hasLeader(leader)) {
                     player = player_;
                     break;
                 }

@@ -100,7 +100,8 @@ public class StartTurnService {
                     buttons.add(Buttons.red("autoProveEndurance_no", "Decline Prove Endurance", "🙅"));
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCardsInfoThread(),
-                            "All other players have passed. As such, when you pass, you could score _Prove Endurance_."
+                            player.getRepresentation()
+                                    + " All other players have passed. As such, when you pass, you could score _Prove Endurance_."
                                     + " You may use these buttons to queue scoring this when you pass (or not).",
                             buttons);
                 }
@@ -330,6 +331,10 @@ public class StartTurnService {
                     - acButtons.size();
             if (game.isFowMode()) {
                 numOfComponentActions += acButtons.size();
+            }
+            if (IsPlayerElectedService.isPlayerElected(player.getGame(), player, "censure")
+                    || IsPlayerElectedService.isPlayerElected(player.getGame(), player, "absol_censure")) {
+                numOfComponentActions += 1;
             }
             Button componentAction =
                     Buttons.green(finChecker + "componentAction", "Component Action (" + numOfComponentActions + ")");

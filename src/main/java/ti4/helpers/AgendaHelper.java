@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -29,7 +30,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
@@ -1265,7 +1265,8 @@ public class AgendaHelper {
 
         boolean playerPrevotesIsEmpty =
                 game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
-        boolean playerIsNotActivePlayer = player != game.getActivePlayer();
+        boolean playerIsNotActivePlayer =
+                (player != game.getActivePlayer() || "agendaWaiting".equalsIgnoreCase(game.getPhaseOfGame()));
         boolean playerIsPrevoting = !playerPrevotesIsEmpty && playerIsNotActivePlayer;
         if (playerIsPrevoting) {
             if ("0".equalsIgnoreCase(votes)) {

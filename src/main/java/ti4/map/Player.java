@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -35,7 +36,6 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.draft.DraftBag;
@@ -1055,14 +1055,17 @@ public class Player extends PlayerProperties {
                     }
                 }
             }
-            if (hasUnit("bentor_mech") && firstTime > 0) {
-                int mechsRemain = 4 - ButtonHelper.getNumberOfUnitsOnTheBoard(game, this, "mech", true);
-                List<Button> buttons = new ArrayList<>(
-                        Helper.getPlanetPlaceUnitButtons(this, game, "mech", "placeOneNDone_skipbuild"));
-                String message = getRepresentation()
-                        + " due to your mech deploy ability, you may now place a mech on a planet you control.";
-                for (int i = 0; i < firstTime && i < mechsRemain; i++) {
-                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(), message, buttons);
+            if (firstTime > 0) {
+                CommanderUnlockCheckService.checkConditionsAndUnlock(this, "bentor");
+                if (hasUnit("bentor_mech")) {
+                    int mechsRemain = 4 - ButtonHelper.getNumberOfUnitsOnTheBoard(game, this, "mech", true);
+                    List<Button> buttons = new ArrayList<>(
+                            Helper.getPlanetPlaceUnitButtons(this, game, "mech", "placeOneNDone_skipbuild"));
+                    String message = getRepresentation()
+                            + " due to your mech deploy ability, you may now place a mech on a planet you control.";
+                    for (int i = 0; i < firstTime && i < mechsRemain; i++) {
+                        MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(), message, buttons);
+                    }
                 }
             }
         }
@@ -1090,12 +1093,16 @@ public class Player extends PlayerProperties {
 
     public int getCommoditiesBonus() {
         int bonus = 0;
-        if (game.playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
-            bonus++;
-        }
         if (getAbilities().contains("policy_the_economy_exploit")) {
             bonus += 2 - getCommoditiesBase();
         }
+        if (ButtonHelper.isLawInPlay(game, "absol_equality")) {
+            bonus = 3 - getCommoditiesBase();
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
+            bonus++;
+        }
+
         if (hasAbility("necrophage")) {
             bonus += ButtonHelper.getNumberOfUnitsOnTheBoard(
                     game, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), getColor()));
@@ -1117,6 +1124,7 @@ public class Player extends PlayerProperties {
                 }
             }
         }
+
         return bonus;
     }
 
