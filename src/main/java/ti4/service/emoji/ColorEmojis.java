@@ -6,19 +6,82 @@ import ti4.model.ColorModel;
 public enum ColorEmojis implements TI4Emoji {
 
     // Colors
-    black, bloodred, blue, brown, chocolate, chrome, rainbow, sherbet, rose, emerald, ethereal, forest, gold, gray, green, lavender, //
-    lightgray, lime, navy, orange, orca, petrol, pink, purple, red, spring, sunset, tan, teal, turquoise, yellow, //
-    copper, plum, peach, rust, tropical, jupiter, poison, vapourwave, watermelon, checker, paintball, wasp, magma, glacier, plaid, harlequin, //
-    splitbloodred, splitblue, splitchocolate, splitemerald, splitgold, splitgreen, splitlime, splitnavy, splitorange, //
-    splitpetrol, splitpink, splitpurple, splitrainbow, splitred, splittan, splitteal, splitturquoise, splityellow, riftset; //
+    black,
+    bloodred,
+    blue,
+    brown,
+    chocolate,
+    chrome,
+    rainbow,
+    sherbet,
+    rose,
+    emerald,
+    ethereal,
+    forest,
+    gold,
+    gray,
+    green,
+    lavender, //
+    lightgray,
+    lime,
+    navy,
+    orange,
+    orca,
+    petrol,
+    pink,
+    purple,
+    red,
+    ruby,
+    spring,
+    sunset,
+    tan,
+    teal,
+    turquoise,
+    yellow, //
+    copper,
+    plum,
+    peach,
+    rust,
+    tropical,
+    jupiter,
+    poison,
+    vapourwave,
+    watermelon,
+    checker,
+    paintball,
+    wasp,
+    magma,
+    glacier,
+    plaid,
+    harlequin, //
+    splitbloodred,
+    splitblue,
+    splitchocolate,
+    splitemerald,
+    splitgold,
+    splitgreen,
+    splitlime,
+    splitnavy,
+    splitorange, //
+    splitpetrol,
+    splitpink,
+    splitpurple,
+    splitrainbow,
+    splitred,
+    splittan,
+    splitteal,
+    splitturquoise,
+    splityellow,
+    riftset,
+    nightmare,
+    dawn; //
 
     public static String getColorEmojiWithName(String color) {
         if (getColorEmojiWithNameLegacy(color) != null) {
             return getColorEmojiWithNameLegacy(color);
         }
         ColorModel model = Mapper.getColor(color);
-        if (model != null)
-            return getColorEmoji(color) + " **" + model.getName() + "**";
+        if (model != null) return getColorEmoji(color) + " **" + model.getName() + "**";
         return getColorEmoji(color) + " " + color;
     }
 
@@ -60,6 +123,7 @@ public enum ColorEmojis implements TI4Emoji {
             case "rbw", "rainbow" -> rainbow + "**Rainbow**";
             case "sbt", "sherbet" -> sherbet + "**Sherbet**";
             case "eth", "ethereal" -> ethereal + "**Ethereal**";
+            case "rby", "ruby" -> ruby + "**Ruby**";
             case "cpr", "copper" -> copper + "**Copper**";
             case "plm", "plum" -> plum + "**Plum**";
             case "pch", "peach" -> peach + "**Peach**";
@@ -94,6 +158,8 @@ public enum ColorEmojis implements TI4Emoji {
             case "splitptr", "splitpetrol" -> splitpetrol + "**SplitPetrol**";
             case "splitrbw", "splitrainbow" -> splitrainbow + "**SplitRainbow**";
             case "ero", "riftset" -> riftset + "**RiftSet**";
+            case "nm", "nightmare" -> nightmare + "**Nightmare**";
+            case "dw", "dawn" -> dawn + "**Dawn**";
             default -> null;
         };
     }
@@ -132,6 +198,7 @@ public enum ColorEmojis implements TI4Emoji {
             case "rbw", "rainbow" -> rainbow;
             case "sbt", "sherbet" -> sherbet;
             case "eth", "ethereal" -> ethereal;
+            case "rby", "ruby" -> ruby;
             case "cpr", "copper" -> copper;
             case "plm", "plum" -> plum;
             case "pch", "peach" -> peach;
@@ -166,6 +233,8 @@ public enum ColorEmojis implements TI4Emoji {
             case "splitptr", "splitpetrol" -> splitpetrol;
             case "splitrbw", "splitrainbow" -> splitrainbow;
             case "ero", "riftset" -> riftset;
+            case "dw", "dawn" -> dawn;
+            case "nm", "nightmare" -> nightmare;
 
             default -> TI4Emoji.getRandomGoodDog();
         };

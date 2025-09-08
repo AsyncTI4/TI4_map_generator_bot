@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -23,7 +22,7 @@ import ti4.service.leader.RefreshLeaderService;
 class PersonalCleanup extends GameStateSubcommand {
 
     public PersonalCleanup() {
-        super(Constants.PERSONAL_CLEANUP, "Status phase cleanup", true, true);
+        super(Constants.PERSONAL_CLEANUP, "Status Phase cleanup", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm command with YES").setRequired(true));
     }
 
@@ -36,7 +35,7 @@ class PersonalCleanup extends GameStateSubcommand {
         }
         Game game = getGame();
         runStatusCleanup(game);
-        MessageHelper.replyToMessage(event, "Player has completed status phase.");
+        MessageHelper.replyToMessage(event, "Player has completed Status Phase.");
     }
 
     private void runStatusCleanup(Game game) {
@@ -57,8 +56,7 @@ class PersonalCleanup extends GameStateSubcommand {
         }
         Map<Integer, Boolean> scPlayed = game.getScPlayed();
         for (Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
-            if (player.getSCs().contains(sc.getKey()))
-                sc.setValue(false);
+            if (player.getSCs().contains(sc.getKey())) sc.setValue(false);
         }
 
         player.setPassed(false);

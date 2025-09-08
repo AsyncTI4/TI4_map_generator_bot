@@ -18,10 +18,10 @@ class HeroPlay extends GameStateSubcommand {
     public HeroPlay() {
         super(Constants.ACTIVE_LEADER, "Play Hero", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action")
-            .setAutoComplete(true));
-        addOptions(
-            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
                 .setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -33,12 +33,14 @@ class HeroPlay extends GameStateSubcommand {
         Leader playerLeader = player.unsafeGetLeader(leader);
 
         if (playerLeader == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Leader '" + leader + "'' could not be found. The leader might have been purged earlier.");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Leader '" + leader + "'' could not be found. The leader might have been purged earlier.");
             return;
         }
 
         if (playerLeader.isLocked()) {
-            MessageHelper.sendMessageToEventChannel(event, "Leader is locked, use command to unlock `/leaders unlock leader:" + leader + "`");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Leader is locked, use command to unlock `/leaders unlock leader:" + leader + "`");
             MessageHelper.sendMessageToEventChannel(event, Helper.getLeaderLockedRepresentation(playerLeader));
             return;
         }

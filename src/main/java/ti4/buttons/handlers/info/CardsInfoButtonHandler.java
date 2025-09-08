@@ -1,6 +1,7 @@
 package ti4.buttons.handlers.info;
 
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -12,6 +13,15 @@ class CardsInfoButtonHandler {
 
     @ButtonHandler(value = "cardsInfo", save = false)
     public static void sendCardsInfo(Game game, Player player, GenericInteractionCreateEvent event) {
+        if (player == null) {
+            return;
+        }
+        if (!game.isFowMode()) {
+            ThreadChannel channel = player.getCardsInfoThread();
+            channel.getManager()
+                    .setArchived(true)
+                    .queue(); // archiving it to combat a common bug that is solved via archiving
+        }
         CardsInfoService.sendCardsInfo(game, player, event);
     }
 }

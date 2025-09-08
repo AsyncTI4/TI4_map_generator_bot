@@ -1,18 +1,21 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
+import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
+import ti4.map.Game;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 import ti4.service.emoji.TI4Emoji;
 
 public class HeroDraftItem extends DraftItem {
+
     public HeroDraftItem(String itemId) {
         super(Category.HERO, itemId);
     }
@@ -37,7 +40,8 @@ public class HeroDraftItem extends DraftItem {
     public String getLongDescriptionImpl() {
         LeaderModel leader = getLeader();
         if (leader != null) {
-            return "**" + leader.getAbilityName().orElse("").replace("\n", "") + "** - " + "*" + leader.getAbilityWindow() + "* " + leader.getAbilityText();
+            return "**" + leader.getAbilityName().orElse("").replace("\n", "") + "** - " + "*"
+                    + leader.getAbilityWindow() + "* " + leader.getAbilityText();
         }
         return "";
     }
@@ -63,9 +67,34 @@ public class HeroDraftItem extends DraftItem {
         Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
         for (FactionModel faction : factions) {
             List<String> leaders = faction.getLeaders();
-            leaders.removeIf((String leader) -> !"hero".equals(allLeaders.get(leader).getType()));
+            leaders.removeIf(
+                    (String leader) -> !"hero".equals(allLeaders.get(leader).getType()));
             for (String leader : leaders) {
-                allItems.add(DraftItem.generate(Category.HERO, leader));
+                allItems.add(generate(Category.HERO, leader));
+            }
+        }
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
+        List<DraftItem> allItems = buildAllItems(factions, game);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.HERO);
+        return allItems;
+    }
+
+    private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
+        List<DraftItem> allItems = new ArrayList<>();
+        Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
+        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedLeaders"));
+        for (FactionModel faction : factions) {
+            List<String> leaders = faction.getLeaders();
+            leaders.removeIf(
+                    (String leader) -> !"hero".equals(allLeaders.get(leader).getType()));
+            for (String leader : leaders) {
+                if (Arrays.asList(results).contains(leader)) {
+                    continue;
+                }
+                allItems.add(generate(Category.HERO, leader));
             }
         }
         return allItems;

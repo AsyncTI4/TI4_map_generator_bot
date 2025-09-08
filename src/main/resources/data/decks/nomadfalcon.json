@@ -4,7 +4,7 @@
         "name": "PoK Techs with NomadFalcon's Techs added",
         "type": "technology",
         "description": "All techs available in PoK + Codexes + NomadFalcon's Techs.",
-        "cardIDs": ["amd","gd","fl","lwd","nm","dxa","hm","x89","ps","md","da","asc","st","gls","td","ie","ws","sd2","lw2","l4","cm","pws2","qdn","ac2","sdn2","mc","hcf2","vax","exo2","cr2","scc","lgf","it","mi","bio","nes","ffac2","mr","pm","so2","wg","ds","is","so","ng","vay","vpw","ers","dn2","dd2","pds2","cv2","ff2","inf2","htp","nf","yso","ic","tp",
+        "cardIDs": ["amd","gd","fl","lwd","nm","dxa","hm","x89c4","ps","md","da","asc","st","gls","td","ie","ws","sd2","lw2","l4","cm","pws2","qdn","ac2","sdn2","mc","hcf2","vax","exo2","cr2","scc","lgf","it","mi","bio","nes","ffac2","mr","pm","so2","wg","ds","is","so","ng","vay","vpw","ers","dn2","dd2","pds2","cv2","ff2","inf2","htp","nf","yso","ic","tp",
                     "det","sr","pa","bs","aida","sar","sdn","pi","swa2","as","cl2","pfa","m2","se2","dt2","ah","vw","gr","sc","tcs","ht2","vtx","iihq","asn",
                     "nf_al","nf_bws","nf_hg","nf_prs","nf_pdn","nf_brs","nf_gdn","nf_ni","nf_clp","nf_tfp"
         ],
@@ -15,7 +15,7 @@
         "name": "DS Techs with NomadFalcon's Techs added",
         "type": "technology",
         "description": "All techs available in PoK + Codexes + DS  + NomadFalcon's Techs.",
-        "cardIDs": ["amd","gd","fl","lwd","nm","dxa","hm","x89","ps","md","da","asc","st","gls","td","ie","ws","sd2","lw2","l4","cm","pws2","qdn","ac2","sdn2","mc","hcf2","vax","exo2","cr2","scc","lgf","it","mi","bio","nes","ffac2","mr","pm","so2","wg","ds","is","so","ng","vay","vpw","ers","dn2","dd2","pds2","cv2","ff2","inf2","htp","nf","yso","ic","tp",
+        "cardIDs": ["amd","gd","fl","lwd","nm","dxa","hm","x89c4","ps","md","da","asc","st","gls","td","ie","ws","sd2","lw2","l4","cm","pws2","qdn","ac2","sdn2","mc","hcf2","vax","exo2","cr2","scc","lgf","it","mi","bio","nes","ffac2","mr","pm","so2","wg","ds","is","so","ng","vay","vpw","ers","dn2","dd2","pds2","cv2","ff2","inf2","htp","nf","yso","ic","tp",
                     "det","sr","pa","bs","aida","sar","sdn","pi","swa2","as","cl2","pfa","m2","se2","dt2","ah","vw","gr","sc","tcs","ht2","vtx","iihq","asn",
                     "dsaxisb","dsaxisy","dsbentg","dsbenty","dsceldr","dsceldsd","dscheidn","dscheir","dscymiinf","dscymiy","dsdihmdn","dsdihmy","dsedyng","dsedyny","dsflorg","dsflorff","dsfreeg","dsfreey","dsghemcv","dsghemg","dsghotg","dsghoty","dsgledb","dsgledpds","dsaugug","dsauguy","dskjalg","dskjalcv","dskollb","dskolly","dskolug","dskolur","dskortg","dskortr","dskyrog","dskyroy","dslaneb","dslaner","dslizhb","dslizhff","dskhrag","dskhracr","dsmirvr","dsmirvpds","dsmortr","dsmorty","dsmykog","dsmykosd","dsnivymf","dsnivyy","dsnokadd","dsnokay","dsolrab","dsolrar","dsrhodb","dsrhody","dsrohdws","dsrohdy","dstneldd","dstnely","dsvadeb","dsvadey","dsvaylr","dsvaylcr","dsveldr","dsvelddn","dszelir","dszeliinf",
                     "nf_al","nf_bws","nf_hg","nf_prs","nf_pdn","nf_brs","nf_gdn","nf_ni","nf_clp","nf_tfp"

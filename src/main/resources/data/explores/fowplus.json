@@ -1,0 +1,76 @@
+[
+      {
+        "id": "gamma2",
+        "name": "Gamma Relay",
+        "type": "Frontier",
+        "resolution": "Token",
+        "text": "Place a gamma wormhole token in this system. Then, purge this card.",
+        "attachmentId": "gamma",
+        "flavorText": "*Veteran spacers spoke in hushed tones of a dark portal drifting in the void beyond the outer edge of the Oort Cloud.*",
+        "source": "fowplus"
+    },
+    {
+        "id": "folderspace2",
+        "name": "Folded Space",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Place 1 command token from your reinforcements in your fleet pool and move any number of your units in this system to the space area of another system that contains no other players' ships.",
+        "flavorText": "*Captain Kask gave the command to enter the shimmering gate. There was no return, but beyond it, allies awaited.*",
+        "source": "fowplus"
+    },
+    {
+        "id": "fowplus_wave",
+        "name": "Gravity Wave",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Remove all your non-infantry units from this system and place them in any adjacent system that does not contain other players' ships. Then place a Gravity Rift token in this system. [Note: Infantry will not survive.]",
+        "flavorText": "*Gravity twisted violently, ejecting vessels into nearby space.*",
+        "source": "fowplus"
+    },
+    {
+        "id": "fowplus_vortex",
+        "name": "Vortex Wakeing",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Destroy all non-carried fighters in this system. Then place a Vortex token in this system.",
+        "flavorText": "*Space warps unnaturally. Instruments fail, and reality stutters.*",
+        "source": "fowplus"
+    },
+    {
+        "id": "fowplus_clarity",
+        "name": "Tactical Clarity",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Remove your command token from this system and gain 1 command token. Then you may perform another action.",
+        "flavorText": "*In the stillness of deep space, the path ahead became undeniable.*",
+        "source": "fowplus"
+    },
+    {
+        "id": "fowplus_fracture",
+        "name": "Fracture Protocol",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "You may destroy a ship in this system to place two ships of lower cost in its place.",
+        "flavorText": "*The vessel split open — not in failure, but in purpose.*",
+        "source": "fowplus"
+    },
+    {
+        "id": "fowplus_spoor",
+        "name": "Quantum Spoor",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Gain 1 non-faction technology owned by at least one of your neighbors.",
+        "flavorText": "*Our sensors caught the residue of something massive. We followed its path — and found data impossible to fake.*",
+        "source": "fowplus"
+    },
+
+    {
+        "id": "fowplus_sacrifice",
+        "name": "Founder's Sacrifice",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may place a Space Dock from your reinforcements on this planet. If you do, destroy all your ground forces on the planet.",
+        "flavorText": "*They did not build the dock. They became it.*",
+        "source": "fowplus"
+    }
+]

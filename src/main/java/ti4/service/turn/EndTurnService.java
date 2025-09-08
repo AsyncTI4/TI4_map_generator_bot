@@ -1,11 +1,14 @@
 package ti4.service.turn;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.FoWHelper;
@@ -14,8 +17,10 @@ import ti4.map.Player;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 public class EndTurnService {
@@ -25,8 +30,9 @@ public class EndTurnService {
         if (turnOrder.isEmpty()) {
             return null;
         }
-        while (!turnOrder.getLast().equals(currentPlayer))
+        while (!turnOrder.getLast().equals(currentPlayer) && turnOrder.contains(currentPlayer)) {
             Collections.rotate(turnOrder, 1);
+        }
         for (Player p : turnOrder) {
             if (!p.isPassed() && !p.isEliminated()) {
                 return p;
@@ -39,7 +45,11 @@ public class EndTurnService {
         pingNextPlayer(event, game, player);
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
         if (!game.isFowMode()) {
-            ButtonHelper.updateMap(game, event, "End of Turn " + player.getInRoundTurnCount() + ", Round " + game.getRound() + " for " + player.getRepresentationNoPing() + ".");
+            ButtonHelper.updateMap(
+                    game,
+                    event,
+                    "End of Turn " + player.getInRoundTurnCount() + ", Round " + game.getRound() + " for "
+                            + player.getRepresentationNoPing() + ".");
         }
     }
 
@@ -47,10 +57,31 @@ public class EndTurnService {
         pingNextPlayer(event, game, mainPlayer, false);
     }
 
-    public static void pingNextPlayer(GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
+    private static void resetStoredValuesEndOfTurn(Game game, Player player) {
         game.setStoredValue("lawsDisabled", "no");
         game.removeStoredValue("endTurnWhenSCFinished");
         game.removeStoredValue("fleetLogWhenSCFinished");
+        game.removeStoredValue("mahactHeroTarget");
+        game.removeStoredValue("possiblyUsedRift");
+        game.setActiveSystem("");
+    }
+
+    public static void pingNextPlayer(
+            GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
+        resetStoredValuesEndOfTurn(game, mainPlayer);
+
+        var userSettings = UserSettingsManager.get(mainPlayer.getUserID());
+
+        if ("No Preference".equalsIgnoreCase(userSettings.getSandbagPref())) {
+            String msg = mainPlayer.getRepresentation() + " the bot could auto pass on scoring secrets for you in the "
+                    + "status phase if you cannot score any secrets. This might speed up the game as people won't be waiting on you in the cases "
+                    + "where you can score nothing. Do you want to enable this feature? Once you answer, you will not be asked again. ";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("sandbagPref_bot", "Allow the bot"));
+            buttons.add(Buttons.red("sandbagPref_manual", "Always manual"));
+            MessageHelper.sendMessageToChannel(mainPlayer.getCardsInfoThread(), msg, buttons);
+        }
+
         CommanderUnlockCheckService.checkPlayer(mainPlayer, "sol", "hacan");
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
@@ -63,19 +94,24 @@ public class EndTurnService {
                 }
             }
         }
-        game.setStoredValue("mahactHeroTarget", "");
-        game.setActiveSystem("");
-        game.setStoredValue("possiblyUsedRift", "");
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _\n"
-                + "**End of Turn " + mainPlayer.getInRoundTurnCount() + ", Round " + game.getRound() + " for** " + mainPlayer.getRepresentation());
+            FowCommunicationThreadService.checkNewNeighbors(game, mainPlayer);
+            MessageHelper.sendMessageToChannel(
+                    mainPlayer.getPrivateChannel(),
+                    "# End of Turn " + mainPlayer.getInRoundTurnCount() + ", Round " + game.getRound() + " for "
+                            + mainPlayer.getRepresentation());
         } else {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), mainPlayer.getRepresentation(true, false) + " ended turn.");
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(), mainPlayer.getRepresentation(true, false) + " ended turn.");
+            if ("statushomework".equalsIgnoreCase(game.getPhaseOfGame())) {
+                return;
+            }
         }
 
-        MessageChannel gameChannel = game.getMainGameChannel() == null ? event.getMessageChannel() : game.getMainGameChannel();
+        MessageChannel gameChannel =
+                game.getMainGameChannel() == null ? event.getMessageChannel() : game.getMainGameChannel();
 
-        //MAKE ALL NON-REAL PLAYERS PASSED
+        // MAKE ALL NON-REAL PLAYERS PASSED
         for (Player player : game.getPlayers().values()) {
             if (!player.isRealPlayer()) {
                 player.setPassed(true);
@@ -84,8 +120,9 @@ public class EndTurnService {
 
         if (game.getPlayers().values().stream().allMatch(Player::isPassed)) {
             if (mainPlayer.getSecretsUnscored().containsKey("pe")) {
-                MessageHelper.sendMessageToChannel(mainPlayer.getCardsInfoThread(),
-                    "You were the last player to pass, and so you can score _Prove Endurance_.");
+                MessageHelper.sendMessageToChannel(
+                        mainPlayer.getCardsInfoThread(),
+                        "You were the last player to pass, and so you can score _Prove Endurance_.");
             }
             EndPhaseService.EndActionPhase(event, game, gameChannel);
             game.updateActivePlayer(null);
@@ -93,22 +130,36 @@ public class EndTurnService {
             ButtonHelperAgents.checkForEdynAgentActive(game, event);
             return;
         }
-
         Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);
         if (!game.isFowMode()) {
-            GameMessageManager
-                .remove(game.getName(), GameMessageType.TURN)
-                .ifPresent(messageId -> game.getMainGameChannel().deleteMessageById(messageId).queue());
+            GameMessageManager.remove(game.getName(), GameMessageType.TURN)
+                    .ifPresent(messageId -> game.getMainGameChannel()
+                            .deleteMessageById(messageId)
+                            .queue());
         }
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game);
         if (isFowPrivateGame) {
+            game.removeStoredValue("ghostagent_active");
             FoWHelper.pingAllPlayersWithFullStats(game, event, mainPlayer, "ended turn");
         }
-        ButtonHelper.checkFleetInEveryTile(mainPlayer, game, event);
+        ButtonHelper.checkFleetInEveryTile(mainPlayer, game);
         if (mainPlayer != nextPlayer) {
             ButtonHelper.checkForPrePassing(game, mainPlayer);
         }
         CommanderUnlockCheckService.checkPlayer(nextPlayer, "sol");
+        if (!game.isFowMode()
+                && !game.getStoredValue("currentActionSummary" + mainPlayer.getFaction())
+                        .isEmpty()) {
+            for (ThreadChannel summary : game.getActionsChannel().getThreadChannels()) {
+                if ("Turn Summary".equalsIgnoreCase(summary.getName())) {
+                    MessageHelper.sendMessageToChannel(
+                            summary,
+                            "(Turn " + mainPlayer.getInRoundTurnCount() + ") " + mainPlayer.getFactionEmoji()
+                                    + game.getStoredValue("currentActionSummary" + mainPlayer.getFaction()));
+                    game.removeStoredValue("currentActionSummary" + mainPlayer.getFaction());
+                }
+            }
+        }
         if (justPassed) {
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, nextPlayer, event)) {
                 StartTurnService.turnStart(event, game, nextPlayer);
@@ -118,6 +169,5 @@ public class EndTurnService {
                 StartTurnService.turnStart(event, game, nextPlayer);
             }
         }
-
     }
 }

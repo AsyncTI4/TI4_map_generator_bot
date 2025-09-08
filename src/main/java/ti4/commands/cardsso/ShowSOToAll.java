@@ -1,7 +1,6 @@
 package ti4.commands.cardsso;
 
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -16,8 +15,16 @@ class ShowSOToAll extends GameStateSubcommand {
 
     public ShowSOToAll() {
         super(Constants.SHOW_TO_ALL, "Show a secret objective to all players", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID, which is found between ()").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ONLY_PHASE, "Show only the phase of the secret objective (action/agenda/status). Default false"));
+        addOptions(new OptionData(
+                        OptionType.INTEGER,
+                        Constants.SECRET_OBJECTIVE_ID,
+                        "Secret objective ID, which is found between ()")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.ONLY_PHASE,
+                "Show only the phase of the secret objective (action/agenda/status). Default false"));
     }
 
     @Override
@@ -41,7 +48,8 @@ class ShowSOToAll extends GameStateSubcommand {
                 }
             }
         }
-        boolean onlyPhase = event.getOption(Constants.ONLY_PHASE) != null && event.getOption(Constants.ONLY_PHASE).getAsBoolean();
+        boolean onlyPhase = event.getOption(Constants.ONLY_PHASE) != null
+                && event.getOption(Constants.ONLY_PHASE).getAsBoolean();
         if (soID == null) {
             MessageHelper.sendMessageToEventChannel(event, "No such secret objective ID found, please retry.");
             return;

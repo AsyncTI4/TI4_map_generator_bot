@@ -1,13 +1,12 @@
 package ti4.service;
 
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DisplayType;
@@ -46,31 +45,53 @@ public class ShowGameService {
         });
     }
 
-    public static void ephemeralShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
-        MapRenderPipeline.queue(game, event, displayType, fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
+    private static void ephemeralShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
+        MapRenderPipeline.queue(
+                game,
+                event,
+                displayType,
+                fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
     }
 
     private static MessageChannel sendMessage(Game game, GenericInteractionCreateEvent event) {
         MessageChannel channel = event.getMessageChannel();
-        if (!game.isFowMode() && game.getActionsChannel() != null && game.getBotMapUpdatesThread() != null && channel.equals(game.getActionsChannel())) {
+        if (!game.isFowMode()
+                && game.getActionsChannel() != null
+                && game.getBotMapUpdatesThread() != null
+                && channel.equals(game.getActionsChannel())) {
             channel = game.getBotMapUpdatesThread();
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
         } else if (game.isFowMode()) {
             Player player = game.getPlayer(event.getUser().getId());
             MessageChannel privateChannel = player != null ? player.getPrivateChannel() : null;
             if (!event.getClass().equals(UserOverridenGenericInteractionCreateEvent.class)
-                && game.getRealPlayers().contains(player) && !game.getPlayersWithGMRole().contains(player)
-                && privateChannel != null && !channel.equals(privateChannel)) {
+                    && game.getRealPlayers().contains(player)
+                    && !game.getPlayersWithGMRole().contains(player)
+                    && privateChannel != null
+                    && !channel.equals(privateChannel)) {
                 channel = privateChannel;
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + ((TextChannel) privateChannel).getJumpUrl());
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(), "Map Image sent to " + ((TextChannel) privateChannel).getJumpUrl());
             }
         }
         return channel;
     }
 
-    public static boolean includeButtons(DisplayType displayType) {
+    private static boolean includeButtons(DisplayType displayType) {
         return switch (displayType) {
-            case wormholes, anomalies, legendaries, empties, aetherstream, spacecannon, traits, techskips, attachments, shipless -> false;
+            case wormholes,
+                    anomalies,
+                    legendaries,
+                    empties,
+                    aetherstream,
+                    spacecannon,
+                    traits,
+                    techskips,
+                    attachments,
+                    shipless,
+                    unlocked -> false;
             default -> true;
         };
     }

@@ -1,9 +1,8 @@
 package ti4.model;
 
-import java.awt.*;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.awt.Color;
+import java.util.List;
 import lombok.Data;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import ti4.image.Mapper;
@@ -36,45 +35,33 @@ public class ColorModel implements ModelInterface {
     }
 
     public Color getPrimaryColor() {
-        return primaryColor();
+        if (primaryColor != null)
+            return new Color(primaryColor.getRed(), primaryColor.getGreen(), primaryColor.getBlue());
+        if (primaryColorRef != null) return Mapper.getColor(primaryColorRef).getPrimaryColor();
+        return new Color(255, 255, 255);
     }
 
     public Color getSecondaryColor() {
-        return secondaryColor();
+        if (secondaryColor != null)
+            return new Color(secondaryColor.getRed(), secondaryColor.getGreen(), secondaryColor.getBlue());
+        if (secondaryColorRef != null) return Mapper.getColor(secondaryColorRef).getPrimaryColor();
+        return getPrimaryColor();
     }
 
     public String getHue() {
         return (hue == null ? "null" : hue);
     }
 
-    public Color primaryColor() {
-        if (primaryColor != null)
-            return new Color(primaryColor.getRed(), primaryColor.getGreen(), primaryColor.getBlue());
-        if (primaryColorRef != null)
-            return Mapper.getColor(primaryColorRef).primaryColor();
-        return new Color(255, 255, 255);
-    }
-
-    public Color secondaryColor() {
-        if (secondaryColor != null)
-            return new Color(secondaryColor.getRed(), secondaryColor.getGreen(), secondaryColor.getBlue());
-        if (secondaryColorRef != null)
-            return Mapper.getColor(secondaryColorRef).primaryColor();
-        return primaryColor();
-    }
-
     @JsonIgnore
-    public String getRepresentation(boolean includeName) {
-        if (includeName)
-            return ColorEmojis.getColorEmojiWithName(name);
+    private String getRepresentation(boolean includeName) {
+        if (includeName) return ColorEmojis.getColorEmojiWithName(name);
         return ColorEmojis.getColorEmoji(name).toString();
     }
 
     @JsonIgnore
     public Emoji getEmoji() {
         String emoji = getRepresentation(false);
-        if (emoji != null)
-            return Emoji.fromFormatted(emoji);
+        if (emoji != null) return Emoji.fromFormatted(emoji);
         return null;
     }
 
@@ -88,23 +75,23 @@ public class ColorModel implements ModelInterface {
     }
 
     private double primaryLuminance() {
-        return relativeLuminance(primaryColor());
+        return relativeLuminance(getPrimaryColor());
     }
 
     private double secondaryLuminance() {
-        return relativeLuminance(secondaryColor());
+        return relativeLuminance(getSecondaryColor());
     }
 
     // For the sRGB colorspace, the relative luminance of a color is defined as
     //    L = 0.2126 * R + 0.7152 * G + 0.0722 * B
     // where R, G and B are defined as:
-    //    if XsRGB <= 0.03928 then  X = XsRGB/12.92 
+    //    if XsRGB <= 0.03928 then  X = XsRGB/12.92
     //    else                      X = ((XsRGB+0.055)/1.055) ^ 2.4
     private static double relativeLuminance(Color color) {
         if (color == null) return 0;
-        double RsRGB = ((double) color.getRed()) / 255.0;
-        double GsRGB = ((double) color.getGreen()) / 255.0;
-        double BsRGB = ((double) color.getBlue()) / 255.0;
+        double RsRGB = color.getRed() / 255.0;
+        double GsRGB = color.getGreen() / 255.0;
+        double BsRGB = color.getBlue() / 255.0;
         double r = color.getRed() <= 10 ? RsRGB / 12.92 : Math.pow((RsRGB + 0.055) / 1.055, 2.4);
         double g = color.getGreen() <= 10 ? GsRGB / 12.92 : Math.pow((GsRGB + 0.055) / 1.055, 2.4);
         double b = color.getBlue() <= 10 ? BsRGB / 12.92 : Math.pow((BsRGB + 0.055) / 1.055, 2.4);
@@ -113,8 +100,22 @@ public class ColorModel implements ModelInterface {
 
     // This results in a value ranging from 1:1 (no contrast at all) to 21:1 (the highest possible contrast).
     private static double contrastRatio(double color1, double color2) {
-        if (color1 < color2)
-            return contrastRatio(color2, color1);
+        if (color1 < color2) return contrastRatio(color2, color1);
         return (color1 + 0.05) / (color2 + 0.05);
+    }
+
+    @Override
+    public String toString() {
+        return "ColorModel{" + "alias='"
+                + alias + '\'' + ", name='"
+                + name + '\'' + ", displayName='"
+                + displayName + '\'' + ", aliases="
+                + aliases + ", textColor='"
+                + textColor + '\'' + ", hue='"
+                + hue + '\'' + ", primaryColor="
+                + primaryColor + ", secondaryColor="
+                + secondaryColor + ", primaryColorRef='"
+                + primaryColorRef + '\'' + ", secondaryColorRef='"
+                + secondaryColorRef + '\'' + '}';
     }
 }

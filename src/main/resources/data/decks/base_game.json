@@ -82,7 +82,7 @@
         "name": "Base Techs",
         "type": "technology",
         "description": "All techs available in Base Game",
-        "cardIDs": ["amd","gd","fl","lwd","nm","dxa","hm","x89","ps","md","da","asc","st","gls","td","ie","ws","sd2","lw2","l4","cm","pws2","qdn","ac2","sdn2","mc","hcf2","vax","exo2","cr2","scc","lgf","it","mi","bio","nes","ffac2","mr","pm","so2","wg","ds","is","so","ng","vay","vpw","ers","dn2","dd2","pds2","cv2","ff2","inf2","htp","nf","yso","ic","tp"],
+        "cardIDs": ["amd","gd","fl","lwd","nm","dxa","hm","x89c4","ps","md","da","asc","st","gls","td","ie","ws","sd2","lw2","l4","cm","pws2","qdn","ac2","sdn2","mc","hcf2","vax","exo2","cr2","scc","lgf","it","mi","bio","nes","ffac2","mr","pm","so2","wg","ds","is","so","ng","vay","vpw","ers","dn2","dd2","pds2","cv2","ff2","inf2","htp","nf","yso","ic","tp"],
         "source": "base"
     }
 ]

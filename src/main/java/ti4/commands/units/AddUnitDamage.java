@@ -1,7 +1,6 @@
 package ti4.commands.units;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -32,15 +31,20 @@ public class AddUnitDamage extends GameStateCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri")
-                .setRequired(true),
-            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
-                .setAutoComplete(true),
-            new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command")
-        );
+                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                        .setRequired(true)
+                        .setAutoComplete(true),
+                new OptionData(
+                                OptionType.STRING,
+                                Constants.UNIT_NAMES,
+                                "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri")
+                        .setRequired(true),
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
+                        .setAutoComplete(true),
+                new OptionData(
+                        OptionType.BOOLEAN,
+                        Constants.NO_MAPGEN,
+                        "'True' to not generate a map update with this command"));
     }
 
     @Override

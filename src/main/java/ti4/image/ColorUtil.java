@@ -6,17 +6,15 @@ import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.ColorModel;
 import ti4.model.StrategyCardModel;
 
 @UtilityClass
-public class ColorUtil {
+class ColorUtil {
 
     public static final Color EliminatedColor = new Color(150, 0, 24); // Carmine
     public static final Color ActiveColor = new Color(80, 200, 120); // Emerald
@@ -39,14 +37,14 @@ public class ColorUtil {
         if (p == null) return getColor(null);
         ColorModel colorModel = Mapper.getColor(p.getColor());
         return (colorModel != null && colorModel.getSecondaryColor() != null)
-            ? colorModel.getSecondaryColor()
-            : getPlayerMainColor(p);
+                ? colorModel.getSecondaryColor()
+                : getPlayerMainColor(p);
     }
 
-    public Color getColor(String color) {
+    private Color getColor(String color) {
         color = Mapper.getColorName(color);
         if (color == null) return Color.WHITE;
-        if (color.equals("orca")) return getColor("gray");
+        if ("orca".equals(color)) return getColor("gray");
         ColorModel model = Mapper.getColor(color);
         return model.getPrimaryColor();
     }

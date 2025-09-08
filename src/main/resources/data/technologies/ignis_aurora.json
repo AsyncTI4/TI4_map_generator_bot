@@ -258,7 +258,7 @@
         "requirements": "G",
         "faction": "arborec",
         "source": "ignis_aurora",
-        "text": "At the start of the status phase, you may choose 1 Bioplasmosis attachment and place it on a planet you control.",
+        "text": "ACTION: Exhaust this card to place 1 infantry on up to 3 planets that you control.\nAt the start of the action phase, you may choose 1 system. Resolve each of your unit’s Production abilities in that system.",
         "homebrewReplacesID": "bio"
     },
     {

@@ -1,0 +1,40 @@
+{
+    "id": "as05",
+    "name": "Gaia/Gensis/Aeva - Saera",
+    "aliases": [
+        "as05",
+        "gaia",
+        "gensis",
+        "aeva",
+        "saera"
+    ],
+    "imagePath": "as05.png",
+    "shipPositionsType": "TYPE03",
+    "spaceTokenLocations": [
+        {
+            "x": 250.0,
+            "y": 90.0
+        },
+        {
+            "x": 80.0,
+            "y": 10.0
+        },
+        {
+            "x": 135.0,
+            "y": 105.0
+        },
+        {
+            "x": 80.0,
+            "y": 185.0
+        }
+    ],
+    "wormholes": [],
+    "planets": [
+        "gaia",
+        "gensis",
+        "aeva"
+    ],
+    "isNebula": true,
+    "source": "eronous",
+    "tileBack": "green"
+}

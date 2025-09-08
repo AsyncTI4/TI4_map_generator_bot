@@ -324,6 +324,22 @@
         ]
     },
     {
+        "alias": "plus1_roll_in_arcane_citadel",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "arcane_defender",
+        "scope": "_groundforce_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": ":shield: Defenders get +1 to rolls in the arcane citadel."
+            }
+        ]
+    },
+    {
         "alias": "nivyn_commander",
         "type": "extrarolls",
         "value": "+1",
@@ -353,6 +369,22 @@
                 "type": "custom",
                 "alias": "custom",
                 "message": "> Lizho Commander Grants an Extra Die\n"
+            }
+        ]
+    },
+    {
+        "alias": "toldar_commander",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "toldar_commander_particular",
+        "scope": "_best_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "> Toldar Commander Grants an Extra Die\n"
             }
         ]
     },
@@ -749,6 +781,22 @@
             {
                 "type": "unit",
                 "alias": "bentor_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    
+    {
+        "alias": "plus_x_code_always_mech",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "code",
+        "persistenceType": "ALWAYS",
+        "scope": "mf",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "toldar_mech"
             }
         ],
         "forCombatAbility": "combatround"

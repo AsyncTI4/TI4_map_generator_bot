@@ -1,12 +1,11 @@
 package ti4.helpers;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-
+import javax.annotation.Nullable;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -16,8 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 
@@ -29,7 +28,9 @@ public class TIGLHelper {
         AGENT("Async Rank - Agent", 2), //
         COMMANDER("Async Rank - Commander", 3), //
         HERO("Async Rank - Hero", 4), //
-        EMPEROR("Async Rank - Galactic Emperor", 99), // this is only obtainable once per TIGL season, not per HERO rankup game
+        EMPEROR(
+                "Async Rank - Galactic Emperor",
+                99), // this is only obtainable once per TIGL season, not per HERO rankup game
         HERO_ARBOREC("Async Rank - Letani Miasmiala", -1), //
         HERO_ARGENT("Async Rank - Mirik Aun Sissiri", -1), //
         HERO_CABAL("Async Rank - It Feeds on Carrion", -1), //
@@ -67,14 +68,14 @@ public class TIGLHelper {
         }
 
         public String getName() {
-            return this.name;
+            return name;
         }
 
         public String getShortName() {
-            return StringUtils.substringAfter(getName(), "- ");
+            return StringUtils.substringAfter(name, "- ");
         }
 
-        public Integer getIndex() {
+        Integer getIndex() {
             return index;
         }
 
@@ -91,20 +92,20 @@ public class TIGLHelper {
             return roles.getFirst();
         }
 
-        public TIGLRank getNextRank() {
+        TIGLRank getNextRank() {
             return switch (this) {
-                case UNRANKED -> TIGLRank.MINISTER;
-                case MINISTER -> TIGLRank.AGENT;
-                case AGENT -> TIGLRank.COMMANDER;
-                case COMMANDER -> TIGLRank.HERO;
-                case HERO, EMPEROR -> TIGLRank.EMPEROR;
+                case UNRANKED -> MINISTER;
+                case MINISTER -> AGENT;
+                case AGENT -> COMMANDER;
+                case COMMANDER -> HERO;
+                case HERO, EMPEROR -> EMPEROR;
                 default -> null;
             };
         }
 
         /**
          * Converts a string identifier to the corresponding SimpleStatistics enum value.
-         * 
+         *
          * @param id the string identifier
          * @return the SimpleStatistics enum value, or null if not found
          */
@@ -149,9 +150,11 @@ public class TIGLHelper {
     public static void initializeTIGLGame(Game game) {
         game.setCompetitiveTIGLGame(true);
         sendTIGLSetupText(game);
-        List<User> users = game.getPlayers().values().stream().map(Player::getUser).toList();
+        List<User> users =
+                game.getPlayers().values().stream().map(Player::getUser).toList();
         if (!allUsersAreMembersOfHubServer(users)) {
-            String message = "Warning - there are players here who are not members of the AsyncTI4 HUB server. Automatic TIGL rank handling will not work.";
+            String message =
+                    "Warning - there are players here who are not members of the AsyncTI4 HUB server. Automatic TIGL rank handling will not work.";
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
             return;
         }
@@ -163,16 +166,17 @@ public class TIGLHelper {
     }
 
     public static void sendTIGLSetupText(Game game) {
-        String message = "# " + MiscEmojis.TIGL + "TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n" +
-            "Please ensure you have all:\n" +
-            "- [Signed up for TIGL](https://forms.gle/QQKWraMyd373GsLN6) - there is no need to confirm your signup was successful\n" +
-            "- Read and accepted the TIGL [Code of Conduct](https://discord.com/channels/943410040369479690/1003741148017336360/1155173892734861402)\n" +
-            "For more information, please see this channel: https://discord.com/channels/943410040369479690/1003741148017336360\n" +
-            "By continuing forward with this game, it is assumed you have accepted and are subject to the TIGL Code of Conduct";
+        String message = "# " + MiscEmojis.TIGL
+                + "TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n"
+                + "Please ensure you have all:\n"
+                + "- [Signed up for TIGL](https://forms.gle/QQKWraMyd373GsLN6) - there is no need to confirm your signup was successful\n"
+                + "- Read and accepted the TIGL [Code of Conduct](https://discord.com/channels/943410040369479690/1003741148017336360/1155173892734861402)\n"
+                + "For more information, please see this channel: https://discord.com/channels/943410040369479690/1003741148017336360\n"
+                + "By continuing forward with this game, it is assumed you have accepted and are subject to the TIGL Code of Conduct";
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
     }
 
-    public static List<Role> getAllTIGLRoles() {
+    private static List<Role> getAllTIGLRoles() {
         List<Role> roles = new ArrayList<>();
         for (TIGLRank rank : TIGLRank.values()) {
             roles.add(rank.getRole());
@@ -186,9 +190,9 @@ public class TIGLHelper {
 
     public static List<TIGLRank> getAllHeroTIGLRanks() {
         return getAllTIGLRanks().stream()
-            .filter(r -> r.getIndex() == -1)
-            .sorted(Comparator.comparing(TIGLRank::toString))
-            .toList();
+                .filter(r -> r.getIndex() == -1)
+                .sorted(Comparator.comparing(TIGLRank::toString))
+                .toList();
     }
 
     private static TIGLRank getTIGLRankFromRole(@Nullable Role role) {
@@ -214,17 +218,17 @@ public class TIGLHelper {
         return lowestRank;
     }
 
-    public static List<TIGLRank> getUsersTIGLRanks(User user) {
+    private static List<TIGLRank> getUsersTIGLRanks(User user) {
         Member hubMember = AsyncTI4DiscordBot.guildPrimary.getMemberById(user.getId());
         if (hubMember == null) {
             return new ArrayList<>();
         }
         return hubMember.getRoles().stream()
-            .filter(r -> getAllTIGLRoles().contains(r))
-            .map(TIGLHelper::getTIGLRankFromRole)
-            .filter(Objects::nonNull)
-            .sorted(Comparator.comparing(TIGLRank::getIndex))
-            .toList();
+                .filter(r -> getAllTIGLRoles().contains(r))
+                .map(TIGLHelper::getTIGLRankFromRole)
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparing(TIGLRank::getIndex))
+                .toList();
     }
 
     private static TIGLRank getUsersHighestTIGLRank(User user) {
@@ -248,10 +252,14 @@ public class TIGLHelper {
     private static void promoteUser(User user, TIGLRank toRank) {
         TIGLRank currentRank = getUsersHighestTIGLRank(user);
         if (toRank.getIndex() - currentRank.getIndex() == 1) {
-            AsyncTI4DiscordBot.guildPrimary.addRoleToMember(user, toRank.getRole()).queue();
-            // AsyncTI4DiscordBot.guildPrimary.removeRoleFromMember(user, currentRank.getRole()).queueAfter(5, TimeUnit.SECONDS);
+            AsyncTI4DiscordBot.guildPrimary
+                    .addRoleToMember(user, toRank.getRole())
+                    .queue();
+            // AsyncTI4DiscordBot.guildPrimary.removeRoleFromMember(user, currentRank.getRole()).queueAfter(5,
+            // TimeUnit.SECONDS);
         }
-        String message = user.getAsMention() + " has been promoted to **" + toRank.getRole().getName() + "**!";
+        String message = user.getAsMention() + " has been promoted to **"
+                + toRank.getRole().getName() + "**!";
         MessageHelper.sendMessageToChannel(getTIGLChannel(), message);
     }
 
@@ -272,10 +280,15 @@ public class TIGLHelper {
         }
         for (Member member : membersWithRole) {
             sb.append(member.getAsMention());
-            AsyncTI4DiscordBot.guildPrimary.removeRoleFromMember(member, heroRank.getRole()).queueAfter(10, TimeUnit.SECONDS);
+            AsyncTI4DiscordBot.guildPrimary
+                    .removeRoleFromMember(member, heroRank.getRole())
+                    .queueAfter(10, TimeUnit.SECONDS);
         }
-        AsyncTI4DiscordBot.guildPrimary.addRoleToMember(user, heroRank.getRole()).queue();
-        MessageHelper.sendMessageToChannel(getTIGLChannel(), LeaderEmojis.getLeaderEmoji(faction + "hero").toString());
+        AsyncTI4DiscordBot.guildPrimary
+                .addRoleToMember(user, heroRank.getRole())
+                .queue();
+        MessageHelper.sendMessageToChannel(
+                getTIGLChannel(), LeaderEmojis.getLeaderEmoji(faction + "hero").toString());
         MessageHelper.sendMessageToChannel(getTIGLChannel(), sb.toString());
         // do stuff
     }
@@ -302,7 +315,8 @@ public class TIGLHelper {
         if (channels.isEmpty()) {
             return null;
         } else if (channels.size() > 1) {
-            BotLogger.warning("TIGLHelper.getTIGLChannel: there appears to be more than one TIGL Channel: `" + TIGL_CHANNEL_NAME + "`");
+            BotLogger.warning("TIGLHelper.getTIGLChannel: there appears to be more than one TIGL Channel: `"
+                    + TIGL_CHANNEL_NAME + "`");
         }
         return channels.getFirst();
     }
@@ -312,13 +326,14 @@ public class TIGLHelper {
             return null;
         }
         ThreadChannel thread = getTIGLChannel().getThreadChannels().stream()
-            .filter(c -> TIGL_ADMIN_THREAD.equals(c.getName()))
-            .findFirst()
-            .orElse(null);
+                .filter(c -> TIGL_ADMIN_THREAD.equals(c.getName()))
+                .findFirst()
+                .orElse(null);
         if (thread != null) {
             return thread;
         }
-        for (ThreadChannel archivedThread : getTIGLChannel().retrieveArchivedPrivateThreadChannels().complete()) {
+        for (ThreadChannel archivedThread :
+                getTIGLChannel().retrieveArchivedPrivateThreadChannels().complete()) {
             if (TIGL_ADMIN_THREAD.equals(archivedThread.getName())) {
                 archivedThread.getManager().setArchived(false).complete();
                 thread = archivedThread;

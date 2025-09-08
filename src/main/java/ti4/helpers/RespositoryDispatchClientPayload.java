@@ -3,7 +3,7 @@ package ti4.helpers;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RespositoryDispatchClientPayload {
+class RespositoryDispatchClientPayload {
     private final Map<String, String> records;
 
     /**
@@ -14,7 +14,7 @@ public class RespositoryDispatchClientPayload {
     }
 
     public RespositoryDispatchClientPayload() {
-        this.records = new HashMap<>(1);
+        records = new HashMap<>(1);
     }
 
     public void addRecord(String key, String value) {
@@ -30,9 +30,11 @@ public class RespositoryDispatchClientPayload {
     }
 
     public String toJson() {
-        return "\"client_payload\":{" + records.entrySet().stream()
-            .map(e -> "\"" + e.getKey() + "\":\"" + e.getValue() + "\"")
-            .reduce((a, b) -> a + "," + b)
-            .orElse("") + "}";
+        return "\"client_payload\":{"
+                + records.entrySet().stream()
+                        .map(e -> "\"" + e.getKey() + "\":\"" + e.getValue() + "\"")
+                        .reduce((a, b) -> a + "," + b)
+                        .orElse("")
+                + "}";
     }
 }

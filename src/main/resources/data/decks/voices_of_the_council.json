@@ -1,0 +1,65 @@
+[
+    {
+        "alias": "agendas_cryypter",
+        "name": "Voices of the Council Agendas",
+        "type": "agenda",
+        "description": "All agendas for Voices of the Council",
+        "cardIDs": [
+            "cryypter_revolution","cryypter_secret","cryypter_arms_reduction","cryypter_classified","cryypter_redistribution",
+            "cryypter_committee","cryypter_disarmamament","cryypter_conventions","cryypter_economic_equality","cryypter_travel_ban",
+            "cryypter_sanctions","cryypter_regulations","cryypter_defense_act","cryypter_arbiter","cryypter_incentive",
+            "cryypter_artifact","cryypter_abolishment","cryypter_minister_commerce","cryypter_minister_exploration",
+            "cryypter_minister_industry","cryypter_minister_peace","cryypter_minister_policy","cryypter_minister_sciences",
+            "cryypter_minister_war","cryypter_miscount","cryypter_mutiny","cryypter_constitution","cryypter_prophecy",
+            "cryypter_execution","cryypter_schematics","cryypter_conscription","cryypter_seed_empire","cryypter_shared_research",
+            "cryypter_plowshares","cryypter_unconventional","cryypter_wormhole_recon","cryypter_wormhole_research",
+            "cryypter_standardization","cryypter_articles_war","cryypter_checks","cryypter_clandestine","cryypter_crisis",
+            "cryypter_minister_antiquities","cryypter_nexus","cryypter_censure","cryypter_rearmament","cryypter_rep_govt",
+            "cryypter_grant_reallocation","cryypter_warrant","covert"
+        ],
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "techs_cryypter",
+        "name": "Voices of the Council Techs",
+        "type": "technology",
+        "description": "All techs for Voices of the Council",
+        "cardIDs": ["amd", "gd", "fl", "lwd", "nm", "dxa", "hm", "x89c4", "ps", "md",
+            "da", "asc", "st", "gls", "td", "ie", "ws", "sd2", "lw2", "l4", "cm",
+            "pws2", "qdn", "ac2", "sdn2", "mc", "hcf2", "vax", "exo2", "cr2", "scc",
+            "lgf", "it", "mi", "bio", "nes", "ffac2", "mr", "pm", "so2", "wg", "ds",
+            "is", "so", "ng", "vay", "vpw", "ers", "dn2", "dd2", "pds2", "cv2", "ff2",
+            "inf2", "htp", "nf", "yso", "ic", "tp", "det", "sr", "pa", "bs", "aida",
+            "sar", "sdn", "cryypter_pi", "swa2", "as", "cl2", "pfa", "m2", "se2", "dt2",
+            "ah", "vw", "gr", "sc", "tcs", "ht2", "vtx", "iihq", "asn"],
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "action_cards_cryypter",
+        "name": "Voices of the Council Action Cards",
+        "type": "action_card",
+        "description": "All action cards for Voices of the Council",
+        "cardIDs": ["cryypter_abs", "arch_expedition", "assassin", "blitz", "bribery",
+            "bunker", "confounding", "confusing", "cryypter_const_rider", "counterstroke",
+            "coup", "courageous", "cripple", "deadly_plot", "decoy", "dh1", "dh2", "dh3",
+            "dh4", "diplo_rider", "disable", "disgrace", "distinguished", "divert_funding",
+            "cryypter_dp1", "cryypter_dp2", "cryypter_dp3", "cryypter_dp4", "economic_initiative",
+            "emergency", "experimental", "f_conscription", "f_deployment", "f_prototype",
+            "f_researched", "fire_team", "fs1", "fs2", "fs3", "fs4", "fsb", "ghost_ship",
+            "ghost_squad", "cryypter_hack", "harness", "imp_rider", "impersonation",
+            "industrial_initiative", "infiltrate", "insider", "insub", "intercept",
+            "investments", "jamming", "lead_rider", "lost_star", "lucky", "master_plan",
+            "mb1", "mb2", "mb3", "mb4", "meltdown", "messiah", "mining_initiative",
+            "mjets1", "mjets2", "mjets3", "mjets4", "nav_suite", "parley", "plagiarize",
+            "plague", "politic_rider", "probe", "rally", "refit", "reflective", "reparations",
+            "repeal", "reveal_prototype", "reverse_engineer", "rout", "s_retreat1",
+            "s_retreat2", "s_retreat3", "s_retreat4", "sabo1", "sabo2", "sabo3", "sabo4",
+            "salvage", "sanction", "scramble", "scuttle", "seize", "sh1", "sh2", "sh3",
+            "sh4", "silence_space", "solar_flare", "spy", "stability", "summit", "tactical",
+            "tech_rider", "trade_rider", "unexpected", "unstable", "upgrade", "uprising",
+            "veto", "war_effort", "war_machine1", "war_machine2", "war_machine3",
+            "war_machine4", "cryypter_war_rider", "waylay"
+        ],
+        "source": "voices_of_the_council"
+    }
+]

@@ -1,0 +1,107 @@
+{
+    "id": "aeva",
+    "tileId": "as05",
+    "name": "Aeva",
+    "aliases": [
+        "aeva"
+    ],
+    "positionInTile": {
+        "x": 228.0,
+        "y": 222.0
+    },
+    "resources": 0,
+    "influence": 3,
+    "factionHomeworld": "saera",
+    "planetType": "FACTION",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": null,
+    "legendaryAbilityText": null,
+    "unitPositions": {
+        "unitHolderName": "aeva",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 189.0,
+                    "y": 206.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 261.0,
+                    "y": 179.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 194.0,
+                    "y": 233.0
+                },
+                {
+                    "x": 211.0,
+                    "y": 233.0
+                },
+                {
+                    "x": 228.0,
+                    "y": 233.0
+                },
+                {
+                    "x": 203.0,
+                    "y": 244.0
+                },
+                {
+                    "x": 221.0,
+                    "y": 244.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 196.0,
+                    "y": 162.0
+                },
+                {
+                    "x": 214.0,
+                    "y": 162.0
+                },
+                {
+                    "x": 189.0,
+                    "y": 175.0
+                },
+                {
+                    "x": 207.0,
+                    "y": 175.0
+                },
+                {
+                    "x": 225.0,
+                    "y": 175.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 208.0,
+                    "y": 203.0
+                },
+                {
+                    "x": 175.0,
+                    "y": 203.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 135.0,
+                    "y": 179.0
+                },
+                {
+                    "x": 127.0,
+                    "y": 210.0
+                },
+                {
+                    "x": 135.0,
+                    "y": 241.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "source": "eronous"
+}

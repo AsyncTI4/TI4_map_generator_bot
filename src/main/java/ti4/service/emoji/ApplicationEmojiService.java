@@ -13,17 +13,15 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.apache.commons.collections4.SetUtils;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.emoji.ApplicationEmoji;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import org.apache.commons.collections4.SetUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
 
 public class ApplicationEmojiService {
@@ -32,9 +30,9 @@ public class ApplicationEmojiService {
     private static final Map<String, CachedEmoji> emojis = new HashMap<>();
     private static final Map<String, EmojiFileData> emojiFiles = new HashMap<>();
 
-    private static boolean spoofing = false;
-    private static boolean cacheInitialized = false;
-    private static boolean filesInitialized = false;
+    private static boolean spoofing;
+    private static boolean cacheInitialized;
+    private static boolean filesInitialized;
 
     private static void initAll() {
         initFromCache();
@@ -44,8 +42,8 @@ public class ApplicationEmojiService {
     public static void uploadNewEmojis() {
         initAll();
         List<EmojiFileData> newEmojis = emojiFiles.values().stream()
-            .filter(data -> !emojis.containsKey(data.getName()))
-            .toList();
+                .filter(data -> !emojis.containsKey(data.getName()))
+                .toList();
         BotLogger.info("Uploading " + newEmojis.size() + " new emojis...");
         boolean success = createAppEmojis(newEmojis);
         pushEmojiListToCache(success);
@@ -54,9 +52,10 @@ public class ApplicationEmojiService {
     public static void reuploadStaleEmojis() {
         initAll(); // Redundant, probably. Short circuits anyway.
         List<EmojiFileData> staleEmojis = emojiFiles.values().stream()
-            .filter(data -> emojis.containsKey(data.getName()))
-            .filter(data -> emojis.get(data.getName()).getTimeCreated() < data.getFile().lastModified())
-            .toList();
+                .filter(data -> emojis.containsKey(data.getName()))
+                .filter(data -> emojis.get(data.getName()).getTimeCreated()
+                        < data.getFile().lastModified())
+                .toList();
         BotLogger.info("Re-uploading " + staleEmojis.size() + " stale emojis...");
         boolean success = reuploadAppEmojis(staleEmojis);
         pushEmojiListToCache(success);
@@ -65,8 +64,8 @@ public class ApplicationEmojiService {
     public static void deleteHangingEmojis() {
         initAll(); // Redundant, probably. Short circuits anyway.
         List<CachedEmoji> hangingEmojis = emojis.values().stream()
-            .filter(emoji -> !emojiFiles.containsKey(emoji.getName()))
-            .toList();
+                .filter(emoji -> !emojiFiles.containsKey(emoji.getName()))
+                .toList();
         BotLogger.info("Deleting " + hangingEmojis.size() + " hanging emojis...");
         boolean success = deleteAppEmojis(hangingEmojis);
         pushEmojiListToCache(success);
@@ -74,11 +73,15 @@ public class ApplicationEmojiService {
 
     public static void reportMissingEnums() {
         initAll(); // Redundant, probably. Short circuits anyway.
-        Set<String> emojiEnumNames = new HashSet<>(TI4Emoji.allEmojiEnums().stream().map(TI4Emoji::name).toList());
-        Set<String> emojiFileNames = new HashSet<>(enumerateEmojiFilesRecursive().map(EmojiFileData::new).map(EmojiFileData::getName).toList());
+        Set<String> emojiEnumNames = new HashSet<>(
+                TI4Emoji.allEmojiEnums().stream().map(TI4Emoji::name).toList());
+        Set<String> emojiFileNames = new HashSet<>(enumerateEmojiFilesRecursive()
+                .map(EmojiFileData::new)
+                .map(EmojiFileData::getName)
+                .toList());
         Set<String> missingEnums = SetUtils.difference(emojiFileNames, emojiEnumNames);
         if (!missingEnums.isEmpty()) {
-            BotLogger.error("Missing " + missingEnums.size() + " Emoji enums: " + missingEnums);
+            BotLogger.info("Missing " + missingEnums.size() + " Emoji enums: " + missingEnums);
         }
         Set<String> missingFiles = SetUtils.difference(emojiEnumNames, emojiFileNames);
         if (!missingFiles.isEmpty()) {
@@ -89,7 +92,7 @@ public class ApplicationEmojiService {
     public static void spoofEmojis() {
         List<TI4Emoji> ti4Emojis = new ArrayList<>(TI4Emoji.allEmojiEnums());
         for (TI4Emoji e : ti4Emojis) {
-            String formatted = "<normalEmoji>";
+            String formatted = "<" + e.name() + ">";
             if (MiscEmojis.goodDogs().contains(e)) formatted = "<goodDoggy>";
             emojis.put(e.name(), new CachedEmoji(e.name(), "1234", formatted, 0));
         }
@@ -102,8 +105,8 @@ public class ApplicationEmojiService {
         if (cacheInitialized) return;
 
         List<CachedEmoji> cached = ApplicationEmojiCacheService.readCachedEmojis();
-        if (cached.size() == 0) {
-            BotLogger.log("No cached emojis found. Initializing from Discord.");
+        if (cached.isEmpty()) {
+            BotLogger.info("No cached emojis found. Initializing from Discord.");
             resetCacheFromDiscord();
         } else {
             cached.forEach(c -> emojis.put(c.getName(), c));
@@ -114,8 +117,9 @@ public class ApplicationEmojiService {
     private static void initFileData() {
         if (filesInitialized) return;
         try {
-            enumerateEmojiFilesRecursive().map(EmojiFileData::new)
-                .forEach(data -> emojiFiles.put(data.getName(), data));
+            enumerateEmojiFilesRecursive()
+                    .map(EmojiFileData::new)
+                    .forEach(data -> emojiFiles.put(data.getName(), data));
             filesInitialized = true;
         } catch (Exception e) {
             BotLogger.error("Unknown exception initializing emojis:", e);
@@ -125,12 +129,12 @@ public class ApplicationEmojiService {
     // CREATE -------------------------------------------------------------------------------------------------------
     private static ApplicationEmoji createAppEmoji(EmojiFileData emoji) {
         try {
-            return AsyncTI4DiscordBot.jda.createApplicationEmoji(emoji.getName(), emoji.getIcon()).complete();
+            return AsyncTI4DiscordBot.jda
+                    .createApplicationEmoji(emoji.getName(), emoji.getIcon())
+                    .complete();
         } catch (Exception e) {
             // Check if we failed because it already exists...
-
             BotLogger.error("Failed to upload emoji file: " + emoji.getName(), e);
-
             return null;
         }
     }
@@ -138,10 +142,10 @@ public class ApplicationEmojiService {
     private static boolean createAppEmojis(List<EmojiFileData> toUpload) {
         if (toUpload.isEmpty()) return true;
         Map<String, CachedEmoji> uploaded = toUpload.parallelStream()
-            .map(ApplicationEmojiService::createAppEmoji)
-            .filter(Objects::nonNull)
-            .map(CachedEmoji::new)
-            .collect(Collectors.toConcurrentMap(CachedEmoji::getName, e -> e));
+                .map(ApplicationEmojiService::createAppEmoji)
+                .filter(Objects::nonNull)
+                .map(CachedEmoji::new)
+                .collect(Collectors.toConcurrentMap(CachedEmoji::getName, e -> e));
         emojis.putAll(uploaded);
         return uploaded.size() == toUpload.size();
     }
@@ -149,7 +153,11 @@ public class ApplicationEmojiService {
     // DELETE -------------------------------------------------------------------------------------------------------
     private static boolean deleteAppEmoji(CachedEmoji emoji) {
         try {
-            AsyncTI4DiscordBot.jda.retrieveApplicationEmojiById(emoji.getId()).complete().delete().complete();
+            AsyncTI4DiscordBot.jda
+                    .retrieveApplicationEmojiById(emoji.getId())
+                    .complete()
+                    .delete()
+                    .complete();
             return true;
         } catch (Exception e) {
             BotLogger.error("Failed to delete emoji file: " + emoji.getName(), e);
@@ -161,7 +169,7 @@ public class ApplicationEmojiService {
         if (toDelete.isEmpty()) return true;
         boolean success = true;
         Map<String, Boolean> deleted = toDelete.parallelStream()
-            .collect(Collectors.toConcurrentMap(CachedEmoji::getName, ApplicationEmojiService::deleteAppEmoji));
+                .collect(Collectors.toConcurrentMap(CachedEmoji::getName, ApplicationEmojiService::deleteAppEmoji));
         for (Entry<String, Boolean> deleted2 : deleted.entrySet()) {
             if (deleted2.getValue()) {
                 emojis.remove(deleted2.getKey());
@@ -178,16 +186,16 @@ public class ApplicationEmojiService {
         CachedEmoji oldEmoji = emojis.get(name);
         try {
             Icon emojiIcon = file.getIcon();
-            return AsyncTI4DiscordBot.jda.retrieveApplicationEmojiById(oldEmoji.getId())
-                .flatMap(appEmoji -> {
-                    emojis.get(name).setFormatted(fallbackEmoji);
-                    return appEmoji.delete();
-                })
-                .flatMap(v -> AsyncTI4DiscordBot.jda.createApplicationEmoji(name, emojiIcon))
-                .complete();
+            return AsyncTI4DiscordBot.jda
+                    .retrieveApplicationEmojiById(oldEmoji.getId())
+                    .flatMap(appEmoji -> {
+                        emojis.get(name).setFormatted(fallbackEmoji);
+                        return appEmoji.delete();
+                    })
+                    .flatMap(v -> AsyncTI4DiscordBot.jda.createApplicationEmoji(name, emojiIcon))
+                    .complete();
         } catch (Exception e) {
             BotLogger.error(Constants.jazzPing() + " Failed to upload emoji file: " + name, e);
-
             return null;
         }
     }
@@ -208,16 +216,15 @@ public class ApplicationEmojiService {
             }
             return success;
         } catch (Exception e) {
-
             BotLogger.error(Constants.jazzPing() + " Failed to upload emoji files: ", e);
-
             return false;
         }
     }
 
     // Footgun
     private static void resetCacheFromDiscord() {
-        List<ApplicationEmoji> appEmojis = AsyncTI4DiscordBot.jda.retrieveApplicationEmojis().complete();
+        List<ApplicationEmoji> appEmojis =
+                AsyncTI4DiscordBot.jda.retrieveApplicationEmojis().complete();
         BotLogger.info("> - Discord has " + appEmojis.size() + " emojis.");
         emojis.clear();
         appEmojis.stream().map(CachedEmoji::new).forEach(e -> emojis.put(e.getName(), e));
@@ -227,8 +234,7 @@ public class ApplicationEmojiService {
     // SERVICE ------------------------------------------------------------------------------------------------------
     public static boolean isValidAppEmoji(CustomEmoji emoji) {
         CachedEmoji cached = emojis.get(emoji.getName());
-        if (cached == null)
-            return false;
+        if (cached == null) return false;
         return cached.getFormatted().equals(emoji.getFormatted());
     }
 
@@ -236,17 +242,16 @@ public class ApplicationEmojiService {
     public static class EmojiFileData {
         private final File file;
         private final String name;
-        private Icon icon = null;
+        private Icon icon;
 
-        public Icon getIcon() throws IOException {
-            if (icon == null)
-                icon = Icon.from(file);
+        Icon getIcon() throws IOException {
+            if (icon == null) icon = Icon.from(file);
             return icon;
         }
 
         public EmojiFileData(File f) {
-            this.file = f;
-            this.name = fileName(f);
+            file = f;
+            name = fileName(f);
         }
     }
 
@@ -274,12 +279,20 @@ public class ApplicationEmojiService {
         });
     }
 
-    public static String fileName(File file) {
-        return file.getName().replace(".png", "").replace(".jpg", "").replace(".gif", "").replace(".webp", "");
+    private static String fileName(File file) {
+        return file.getName()
+                .replace(".png", "")
+                .replace(".jpg", "")
+                .replace(".gif", "")
+                .replace(".webp", "");
     }
 
     private static boolean isValidEmojiFile(File file) {
-        return file.isFile() && (file.getName().endsWith(".png") || file.getName().endsWith(".jpg") || file.getName().endsWith(".gif") || file.getName().endsWith(".webp"));
+        return file.isFile()
+                && (file.getName().endsWith(".png")
+                        || file.getName().endsWith(".jpg")
+                        || file.getName().endsWith(".gif")
+                        || file.getName().endsWith(".webp"));
     }
 
     private static boolean isIgnoredDirectory(File file) {

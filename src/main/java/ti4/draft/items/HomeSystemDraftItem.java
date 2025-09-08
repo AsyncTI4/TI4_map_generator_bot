@@ -1,12 +1,14 @@
 package ti4.draft.items;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import ti4.draft.DraftItem;
+import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
+import ti4.map.Game;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.PlanetModel;
@@ -15,6 +17,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TI4Emoji;
 
 public class HomeSystemDraftItem extends DraftItem {
+
     public HomeSystemDraftItem(String itemId) {
         super(Category.HOMESYSTEM, itemId);
     }
@@ -67,7 +70,25 @@ public class HomeSystemDraftItem extends DraftItem {
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            allItems.add(DraftItem.generate(Category.HOMESYSTEM, faction.getAlias()));
+            allItems.add(generate(Category.HOMESYSTEM, faction.getAlias()));
+        }
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
+        List<DraftItem> allItems = buildAllItems(factions, game);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.HOMESYSTEM);
+        return allItems;
+    }
+
+    private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
+        List<DraftItem> allItems = new ArrayList<>();
+        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedHSs"));
+        for (FactionModel faction : factions) {
+            if (Arrays.asList(results).contains(faction.getAlias())) {
+                continue;
+            }
+            allItems.add(generate(Category.HOMESYSTEM, faction.getAlias()));
         }
         return allItems;
     }

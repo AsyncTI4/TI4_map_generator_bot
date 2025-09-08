@@ -1,5 +1,11 @@
 package ti4.map;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,16 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import org.jetbrains.annotations.Nullable;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-
+import javax.annotation.Nullable;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -50,9 +47,13 @@ public class Planet extends UnitHolder {
         PlanetModel planetInfo = Mapper.getPlanet(name);
         if (Optional.ofNullable(planetInfo).isPresent()) {
             if (planetInfo.getPlanetTypes() != null) {
-                planetType.addAll(planetInfo.getPlanetTypes().stream().map(PlanetTypeModel.PlanetType::toString).toList());
+                planetType.addAll(planetInfo.getPlanetTypes().stream()
+                        .map(PlanetTypeModel.PlanetType::toString)
+                        .toList());
             }
-            if (planetInfo.getPlanetType() == null && planetInfo.getPlanetTypes() != null && !planetInfo.getPlanetTypes().isEmpty()) {
+            if (planetInfo.getPlanetType() == null
+                    && planetInfo.getPlanetTypes() != null
+                    && !planetInfo.getPlanetTypes().isEmpty()) {
                 originalPlanetType = planetInfo.getPlanetTypes().getFirst().toString();
             } else if (planetInfo.getPlanetType() != null) {
                 originalPlanetType = planetInfo.getPlanetType().toString();
@@ -60,12 +61,16 @@ public class Planet extends UnitHolder {
             if (planetInfo.getContrastColor() != null) {
                 contrastColor = planetInfo.getContrastColor();
             }
-            if (!Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).isEmpty()) {
-                originalTechSpeciality = planetInfo.getTechSpecialties().getFirst().toString();
-                techSpeciality.addAll(planetInfo.getTechSpecialties().stream().map(TechSpecialtyModel.TechSpecialty::toString).toList());
+            if (!Optional.ofNullable(planetInfo.getTechSpecialties())
+                    .orElse(new ArrayList<>())
+                    .isEmpty()) {
+                originalTechSpeciality =
+                        planetInfo.getTechSpecialties().getFirst().toString();
+                techSpeciality.addAll(planetInfo.getTechSpecialties().stream()
+                        .map(TechSpecialtyModel.TechSpecialty::toString)
+                        .toList());
             }
-            if (!StringUtils.isBlank(planetInfo.getLegendaryAbilityName()))
-                hasAbility = true;
+            if (!isBlank(planetInfo.getLegendaryAbilityName())) hasAbility = true;
         }
         resetOriginalPlanetResInf();
     }
@@ -92,7 +97,9 @@ public class Planet extends UnitHolder {
         return tokenList.stream().anyMatch(token -> {
             AttachmentModel attach = Mapper.getAttachmentInfo(token);
             if (attach != null && attach.isFakeAttachment()) return false;
-
+            if (token.contains("superweapon")) return false;
+            if (token.contains("token_tomb")) return false;
+            if (token.contains("facility")) return false;
             if (token.contains("sleeper")) return false;
             if (token.contains("dmz_large")) return false;
             if (token.contains("custodiavigilia")) return false;
@@ -103,29 +110,37 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
     public List<String> getAttachments() {
-        return tokenList.stream().filter(token -> {
-            AttachmentModel attach = Mapper.getAttachmentInfo(token);
-            if (attach != null && attach.isFakeAttachment()) return false;
+        return tokenList.stream()
+                .filter(token -> {
+                    AttachmentModel attach = Mapper.getAttachmentInfo(token);
+                    if (attach != null && attach.isFakeAttachment()) return false;
+                    if (token.contains("superweapon")) return false;
+                    if (token.contains("token_tomb")) return false;
+                    if (token.contains("facility")) return false;
+                    if (token.contains("sleeper")) return false;
+                    if (token.contains("dmz_large")) return false;
+                    if (token.contains("custodiavigilia")) return false;
+                    return !Helper.isFakeAttachment(token);
+                })
+                .toList();
+    }
 
-            if (token.contains("sleeper")) return false;
-            if (token.contains("dmz_large")) return false;
-            if (token.contains("custodiavigilia")) return false;
-            return !Helper.isFakeAttachment(token);
-        }).toList();
+    public String getRepresentation(Game game) {
+        return Helper.getPlanetRepresentation(getName(), game);
     }
 
     public boolean hasGroundForces(Player player) {
         return getUnits().keySet().stream()
-            .filter(player::unitBelongsToPlayer)
-            .map(uk -> player.getPriorityUnitByAsyncID(uk.asyncID(), this))
-            .filter(Objects::nonNull)
-            .anyMatch(UnitModel::getIsGroundForce);
+                .filter(player::unitBelongsToPlayer)
+                .map(uk -> player.getPriorityUnitByAsyncID(uk.asyncID(), this))
+                .filter(Objects::nonNull)
+                .anyMatch(UnitModel::getIsGroundForce);
     }
 
     public boolean hasGroundForces(Game game) {
         return getUnits().keySet().stream()
-            .flatMap(uk -> game.getPriorityUnitByUnitKey(uk, this).stream())
-            .anyMatch(UnitModel::getIsGroundForce);
+                .flatMap(uk -> game.getPriorityUnitByUnitKey(uk, this).stream())
+                .anyMatch(UnitModel::getIsGroundForce);
     }
 
     @Override
@@ -275,7 +290,7 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public boolean hasTechSpecialty(TechnologyType type) {
         return techSpeciality.contains(type.toString().toLowerCase())
-            || techSpeciality.contains(type.toString().toUpperCase());
+                || techSpeciality.contains(type.toString().toUpperCase());
     }
 
     @JsonIgnore
@@ -297,14 +312,15 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public boolean isLegendary() {
         PlanetModel model = getPlanetModel();
-        if (model.isLegendary()) return true;
+        if ("ghoti".equalsIgnoreCase(getName())) {
+            return false;
+        }
+        if (model != null && model.isLegendary()) return true;
 
         for (String token : tokenList) {
             AttachmentModel attachment = Mapper.getAttachmentInfo(token);
-            if (attachment == null)
-                continue;
-            if (attachment.isLegendary())
-                return true;
+            if (attachment == null) continue;
+            if (attachment.isLegendary()) return true;
         }
         return hasAbility;
     }

@@ -1,7 +1,6 @@
 package ti4.listeners.context;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
@@ -17,8 +16,7 @@ public class ButtonContext extends ListenerContext {
     }
 
     public ButtonInteractionEvent getEvent() {
-        if (event instanceof ButtonInteractionEvent button)
-            return button;
+        if (event instanceof ButtonInteractionEvent button) return button;
         return null;
     }
 
@@ -27,18 +25,19 @@ public class ButtonContext extends ListenerContext {
     }
 
     public ButtonContext(ButtonInteractionEvent event) {
-        super(event, event.getButton().getId());
+        super(event, event.getButton().getCustomId());
         if (!isValid()) {
             return;
         }
 
         // Proceed with additional button things
-        this.messageID = event.getMessageId();
+        messageID = event.getMessageId();
 
         if (componentID.contains("deleteThisButton")) {
             componentID = componentID.replace("deleteThisButton", "");
             ButtonHelper.deleteTheOneButton(event);
         }
+
         if (componentID.contains("deleteThisMessage")) {
             componentID = componentID.replace("deleteThisMessage", "");
             ButtonHelper.deleteMessage(event);

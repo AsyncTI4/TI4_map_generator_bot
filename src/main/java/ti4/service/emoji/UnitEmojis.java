@@ -3,22 +3,32 @@ package ti4.service.emoji;
 public enum UnitEmojis implements TI4Emoji {
 
     // Structures
-    spacedock, pds,
+    spacedock,
+    pds,
 
     // Ships
-    warsun, flagship, dreadnought, carrier, cruiser, destroyer, fighter,
+    warsun,
+    flagship,
+    dreadnought,
+    carrier,
+    cruiser,
+    destroyer,
+    fighter,
 
     // Ground forces
-    mech, infantry,
+    mech,
+    infantry,
 
     // Homebrew
-    TyrantsLament, PlenaryOrbital, Monument;
+    TyrantsLament,
+    PlenaryOrbital,
+    Monument;
 
     @Override
     public String toString() {
         return emojiString();
     }
-    
+
     public static String getUnitEmoji(String unit) {
         return switch (unit.toLowerCase()) {
             case "sd", "dock", "space dock", "spacedock" -> spacedock.toString();
@@ -35,7 +45,7 @@ public enum UnitEmojis implements TI4Emoji {
             case "tyrantslament", "tyrants lament" -> TyrantsLament.toString();
             case "plenaryorbital", "plenary orbital" -> PlenaryOrbital.toString();
             case "monument" -> Monument.toString();
-            default -> TI4Emoji.getRandomGoodDog().toString() + "`" + unit + "`";
+            default -> null;
         };
     }
 }

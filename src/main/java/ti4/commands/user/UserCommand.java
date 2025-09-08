@@ -3,7 +3,6 @@ package ti4.commands.user;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
@@ -16,6 +15,10 @@ public class UserCommand implements ParentCommand {
                     new SetPersonalPingInterval(),
                     new SetPingOnNextTurn(),
                     new OfferAFKTimeOptions(),
+                    new Survey(),
+                    new MessageMyGames(),
+                    new SetPreferredSettings(),
+                    new WipeTurnTime(),
                     new SetFowFilter())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

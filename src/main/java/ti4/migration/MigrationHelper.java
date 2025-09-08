@@ -1,11 +1,9 @@
 package ti4.migration;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
@@ -13,10 +11,10 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
-public class MigrationHelper {
+class MigrationHelper {
 
     public static boolean replaceTokens(Game game, Map<String, String> replacements) {
         boolean found = false;
@@ -41,8 +39,9 @@ public class MigrationHelper {
         }
 
         boolean mapNeededMigrating = false;
-        for (String toReplace : replacements.keySet()) {
-            String replacement = replacements.get(toReplace);
+        for (Map.Entry<String, String> entry : replacements.entrySet()) {
+            String toReplace = entry.getKey();
+            String replacement = entry.getValue();
 
             mapNeededMigrating |= replace(game.getPublicObjectives1(), toReplace, replacement);
             mapNeededMigrating |= replaceKey(game.getRevealedPublicObjectives(), toReplace, replacement);
@@ -57,8 +56,9 @@ public class MigrationHelper {
         }
 
         boolean mapNeededMigrating = false;
-        for (String toReplace : replacements.keySet()) {
-            String replacement = replacements.get(toReplace);
+        for (Map.Entry<String, String> entry : replacements.entrySet()) {
+            String toReplace = entry.getKey();
+            String replacement = entry.getValue();
 
             mapNeededMigrating |= replace(game.getActionCards(), toReplace, replacement);
             mapNeededMigrating |= replaceKey(game.getDiscardActionCards(), toReplace, replacement);
@@ -76,8 +76,9 @@ public class MigrationHelper {
         }
 
         boolean mapNeededMigrating = false;
-        for (String toReplace : replacements.keySet()) {
-            String replacement = replacements.get(toReplace);
+        for (Map.Entry<String, String> entry : replacements.entrySet()) {
+            String toReplace = entry.getKey();
+            String replacement = entry.getValue();
 
             mapNeededMigrating |= replace(game.getAgendas(), toReplace, replacement);
             mapNeededMigrating |= replaceKey(game.getDiscardAgendas(), toReplace, replacement);
@@ -86,7 +87,7 @@ public class MigrationHelper {
         return mapNeededMigrating;
     }
 
-    public static <K, V> boolean replaceKey(Map<K, V> map, K toReplace, K replacement) {
+    private static <K, V> boolean replaceKey(Map<K, V> map, K toReplace, K replacement) {
         if (map.containsKey(toReplace)) {
             V value = map.get(toReplace);
             map.put(replacement, value);
@@ -96,7 +97,7 @@ public class MigrationHelper {
         return false;
     }
 
-    public static <K> boolean replace(List<K> list, K toReplace, K replacement) {
+    private static <K> boolean replace(List<K> list, K toReplace, K replacement) {
         int index = list.indexOf(toReplace);
         if (index > -1) {
             list.set(index, replacement);
@@ -106,40 +107,9 @@ public class MigrationHelper {
     }
 
     public static void swapBagItem(DraftBag bag, int index, DraftItem newItem) {
-        BotLogger.info(String.format("Draft Bag replacing %s with %s", bag.Contents.get(index).getAlias(), newItem.getAlias()));
+        BotLogger.info(String.format(
+                "Draft Bag replacing %s with %s", bag.Contents.get(index).getAlias(), newItem.getAlias()));
         bag.Contents.remove(index);
         bag.Contents.add(index, newItem);
-    }
-
-    public static boolean removeWekkersAbsolsPoliticalSecrets(Game game) {
-        if ("g14".equals(game.getName())) {
-            return false;
-        }
-        boolean removed = false;
-        for (Player player : game.getPlayers().values()) {
-            for (String ownedPN : new ArrayList<>(player.getPromissoryNotesOwned())) {
-                if (ownedPN.startsWith("wekkerabsol_")) {
-                    player.removeOwnedPromissoryNoteByID(ownedPN);
-                    removed = true;
-                }
-            }
-        }
-        return removed;
-    }
-
-    public static boolean removeWekkersAbsolsPoliticalSecretsAgain(Game game) {
-        if ("g14".equals(game.getName())) {
-            return false;
-        }
-        boolean removed = false;
-        for (Player player : game.getPlayers().values()) {
-            for (String pn : new ArrayList<>(player.getPromissoryNotes().keySet())) {
-                if (pn.startsWith("wekkerabsol_")) {
-                    player.removePromissoryNote(pn);
-                    removed = true;
-                }
-            }
-        }
-        return removed;
     }
 }

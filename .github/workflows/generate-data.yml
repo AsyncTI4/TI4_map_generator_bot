@@ -1,0 +1,178 @@
+name: Generate TypeScript Data Files
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Generate TypeScript files
+        run: |
+          echo "Generating TypeScript files for all categories..."
+
+          # Define all categories to generate
+          categories=(
+            "tech"
+            "tokens"
+            "units"
+            "planets"
+            "relics"
+            "secret_objectives"
+            "public_objectives"
+            "promissory_notes"
+            "leaders"
+            "colors"
+            "agendas"
+            "systems"
+          )
+
+          for category in "${categories[@]}"; do
+            echo "Generating $category..."
+            python scripts/generate_data.py "$category"
+          done
+
+          # List generated files
+          echo "Generated files:"
+          ls -la *.ts || echo "No .ts files found"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install Prettier
+        run: npm install --global prettier
+
+      - name: Format TypeScript files with Prettier
+        run: |
+          echo "Formatting TypeScript files with Prettier..."
+
+          # Create a basic prettier config for consistent formatting
+          cat > .prettierrc << EOF
+          {
+            "semi": true,
+            "trailingComma": "es5",
+            "singleQuote": false,
+            "printWidth": 80,
+            "tabWidth": 2,
+            "useTabs": false
+          }
+          EOF
+
+          # Format all generated .ts files
+          for file in *.ts; do
+            if [ -f "$file" ]; then
+              echo "Formatting $file..."
+              prettier --write "$file"
+            fi
+          done
+
+          # List formatted files
+          echo "Formatted files:"
+          ls -la *.ts || echo "No .ts files found"
+
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+        with:
+          repository: "AsyncTI4/ti4_web_new"
+          token: ${{ secrets.TARGET_REPO_TOKEN }}
+          path: "target-repo"
+
+      - name: Copy generated files to target repo
+        run: |
+          echo "Copying generated TypeScript files to target repository..."
+
+          # Ensure data directory exists
+          mkdir -p target-repo/src/data
+
+          # Copy all generated .ts files
+          for file in *.ts; do
+            if [ -f "$file" ]; then
+              echo "Copying $file to target-repo/src/data/"
+              cp "$file" target-repo/src/data/
+            fi
+          done
+
+          # List files in target directory
+          echo "Files in target repo data directory:"
+          ls -la target-repo/src/data/
+
+      - name: Check for changes
+        id: check-changes
+        run: |
+          cd target-repo
+
+          # Check if there are any changes
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No changes detected in generated files"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected in generated files"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+
+            # Show what changed
+            echo "Changed files:"
+            git diff --name-only
+            git diff --cached --name-only
+          fi
+
+      - name: Create Pull Request
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          cd target-repo
+
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Set up git remote with token authentication
+          git remote set-url origin https://x-access-token:${{ secrets.TARGET_REPO_TOKEN }}@github.com/AsyncTI4/ti4_web_new.git
+
+          # Create and switch to new branch
+          BRANCH_NAME="auto-update-data-${{ github.run_number }}"
+          git checkout -b "$BRANCH_NAME"
+
+          # Add and commit changes
+          git add .
+          git commit -m "Update generated data files from TI4_map_generator_bot"
+
+          # Push branch
+          git push origin "$BRANCH_NAME"
+
+          # Create pull request using GitHub CLI
+          gh pr create \
+            --title "Auto-generated: Update data files" \
+            --body "This pull request contains automatically generated TypeScript data files.
+
+          **Generated categories:** tech, tokens, units, planets, relics, secret_objectives, public_objectives, promissory_notes, leaders, colors, agendas, systems
+
+          **Source commit:** ${{ github.sha }}
+          **Source repository:** ${{ github.repository }}
+
+          Generated by GitHub Actions workflow in TI4_map_generator_bot." \
+            --head "$BRANCH_NAME" \
+            --base main
+        env:
+          GH_TOKEN: ${{ secrets.TARGET_REPO_TOKEN }}
+
+      - name: Output results
+        run: |
+          if [ "${{ steps.check-changes.outputs.has_changes }}" == "true" ]; then
+            echo "✅ Data generation completed successfully!"
+            echo "📁 Generated all data categories"
+            echo "🔄 Pull request created in ti4_web_new repository"
+          else
+            echo "✅ Data generation completed successfully!"
+            echo "📁 Generated all data categories"
+            echo "ℹ️ No changes detected - no pull request created"
+          fi

@@ -2,7 +2,7 @@
     "id": "m28",
     "name": "Bunker",
     "aliases": ["m28", "bunker"],
-    "imagePath": "M28_bunker.png",
+    "imagePath": "m28_bunker.png",
     "shipPositionsType": "TYPE17",
     "spaceTokenLocations": null,
     "wormholes": [null],

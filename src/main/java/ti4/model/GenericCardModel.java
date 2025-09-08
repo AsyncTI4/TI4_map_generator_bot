@@ -19,24 +19,22 @@ public class GenericCardModel implements ModelInterface, EmbeddableModel {
     ComponentSource source;
 
     public boolean isValid() {
-        return alias != null
-            && name != null
-            && text != null
-            && cardType != null
-            && source != null;
+        return alias != null && name != null && text != null && cardType != null && source != null;
     }
 
     public String autoCompleteString() {
-        return getAlias() + ": " + getName() + " [" + getSource().toString() + "]";
+        return alias + ": " + name + " [" + source.toString() + "]";
     }
 
     public String getAutoCompleteName() {
-        return getAlias() + ": " + getName() + " [" + getSource().toString() + "]";
+        return alias + ": " + name + " [" + source.toString() + "]";
     }
 
     public boolean search(String searchString) {
         searchString = searchString.toLowerCase();
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getCardType().toString().contains(searchString);
+        return alias.toLowerCase().contains(searchString)
+                || name.toLowerCase().contains(searchString)
+                || cardType.toString().contains(searchString);
     }
 
     public String getRepresentation() {
@@ -48,7 +46,7 @@ public class GenericCardModel implements ModelInterface, EmbeddableModel {
         return sb.toString();
     }
 
-    public String cardTypeEmoji() {
+    private String cardTypeEmoji() {
         return switch (cardType) {
             case trap -> FactionEmojis.lizho.toString();
         };

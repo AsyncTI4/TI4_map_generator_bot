@@ -1,7 +1,6 @@
 package ti4.commands.special;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -22,9 +21,17 @@ import ti4.service.leader.CommanderUnlockCheckService;
 class MoveCreussWormhole extends GameStateSubcommand {
 
     public MoveCreussWormhole() {
-        super(Constants.MOVE_CREUSS_WORMHOLE, "Adds or moves a Creuss wormhole token to the target system.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Target System/Tile name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.CREUSS_TOKEN_NAME, "Token Name").setRequired(true).setAutoComplete(true));
+        super(
+                Constants.MOVE_CREUSS_WORMHOLE,
+                "Adds or moves a Creuss wormhole token to the target system.",
+                true,
+                true);
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Target System/Tile name")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CREUSS_TOKEN_NAME, "Token Name")
+                .setRequired(true)
+                .setAutoComplete(true));
     }
 
     @Override
@@ -32,10 +39,12 @@ class MoveCreussWormhole extends GameStateSubcommand {
         Game game = getGame();
         Player player = getPlayer();
 
-        String tileName = StringUtils.substringBefore(event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
+        String tileName = StringUtils.substringBefore(
+                event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
         Tile tile = TileHelper.getTile(event, tileName, game);
         if (tile == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Could not resolve tileID:  `" + tileName + "`. Tile not found");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Could not resolve tileID:  `" + tileName + "`. Tile not found");
             return;
         }
 
@@ -45,13 +54,17 @@ class MoveCreussWormhole extends GameStateSubcommand {
             tokenName = "creuss" + tokenName;
         }
         if (!isValidCreussWormhole(tokenName)) {
-            MessageHelper.sendMessageToEventChannel(event, "Token Name: " + tokenName + " is not a valid Creuss Wormhole Token.");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Token Name: " + tokenName + " is not a valid Creuss Wormhole Token.");
             return;
         }
 
         StringBuilder sb = new StringBuilder(player.getRepresentation());
         tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
-        sb.append(" moved ").append(MiscEmojis.getCreussWormhole(tokenName)).append(" to ").append(tile.getRepresentation());
+        sb.append(" moved ")
+                .append(MiscEmojis.getCreussWormhole(tokenName))
+                .append(" to ")
+                .append(tile.getRepresentation());
         for (Tile tile_ : game.getTileMap().values()) {
             if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
                 sb.append(" (from ").append(tile_.getRepresentation()).append(")");
@@ -67,5 +80,4 @@ class MoveCreussWormhole extends GameStateSubcommand {
         List<String> validNames = List.of("creussalpha", "creussbeta", "creussgamma");
         return validNames.contains(tokenName);
     }
-
 }

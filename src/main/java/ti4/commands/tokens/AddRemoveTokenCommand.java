@@ -3,7 +3,6 @@ package ti4.commands.tokens;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -20,20 +19,18 @@ import ti4.message.MessageHelper;
 
 abstract class AddRemoveTokenCommand extends GameStateCommand {
 
-    public AddRemoveTokenCommand() {
+    AddRemoveTokenCommand() {
         super(true, true);
     }
 
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.PLANET, "Planet name")
-                .setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color")
-                .setAutoComplete(true));
+                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                        .setRequired(true)
+                        .setAutoComplete(true),
+                new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true),
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override

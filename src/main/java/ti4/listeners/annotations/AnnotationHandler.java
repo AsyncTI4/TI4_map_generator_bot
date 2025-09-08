@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -26,7 +25,7 @@ import ti4.listeners.context.ModalContext;
 import ti4.listeners.context.SelectionMenuContext;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 public class AnnotationHandler {
 
@@ -42,14 +41,19 @@ public class AnnotationHandler {
             if (param.getType().equals(MessageChannel.class)) continue;
 
             // other event parameters
-            if (param.getType().equals(ButtonInteractionEvent.class) && contextClass.equals(ButtonContext.class)) continue;
-            if (param.getType().equals(ModalInteractionEvent.class) && contextClass.equals(ModalContext.class)) continue;
-            if (param.getType().equals(StringSelectInteractionEvent.class) && contextClass.equals(SelectionMenuContext.class)) continue;
+            if (param.getType().equals(ButtonInteractionEvent.class) && contextClass.equals(ButtonContext.class))
+                continue;
+            if (param.getType().equals(ModalInteractionEvent.class) && contextClass.equals(ModalContext.class))
+                continue;
+            if (param.getType().equals(StringSelectInteractionEvent.class)
+                    && contextClass.equals(SelectionMenuContext.class)) continue;
 
             // string parameters
             if (param.getType().equals(String.class)) {
                 NamedParam nameAnnotation = param.getAnnotation(NamedParam.class);
-                String name = param.isNamePresent() ? param.getName() : (nameAnnotation == null ? null : nameAnnotation.value());
+                String name = param.isNamePresent()
+                        ? param.getName()
+                        : (nameAnnotation == null ? null : nameAnnotation.value());
 
                 if (name == null) {
                     if (!hasComponentID) {
@@ -81,8 +85,13 @@ public class AnnotationHandler {
             badParams.add(param);
         }
         if (!badParams.isEmpty()) {
-            String er = "Bad parameters detected in method `" + method.getClass().getName() + "." + method.getName() + "`. Please fix:\n> - ";
-            er += String.join("\n> - ", badParams.stream().map(param -> param.getType().getSimpleName() + " " + param.getName()).toList());
+            String er = "Bad parameters detected in method `"
+                    + method.getClass().getName() + "." + method.getName() + "`. Please fix:\n> - ";
+            er += String.join(
+                    "\n> - ",
+                    badParams.stream()
+                            .map(param -> param.getType().getSimpleName() + " " + param.getName())
+                            .toList());
 
             // This error can only be logged to the console because JDA isn't ready yet.
             // As such, in an effort to be notified if something goes horribly wrong, still add the handler
@@ -104,10 +113,14 @@ public class AnnotationHandler {
                 if (param.getType().equals(Game.class)) args.add(ctx.getGame());
                 if (param.getType().equals(Player.class)) args.add(ctx.getPlayer());
                 if (param.getType().equals(GenericInteractionCreateEvent.class)) args.add(ctx.getEvent());
-                if (param.getType().equals(ButtonInteractionEvent.class) && contextClass.equals(ButtonContext.class)) args.add(ctx.getEvent());
-                if (param.getType().equals(ModalInteractionEvent.class) && contextClass.equals(ModalContext.class)) args.add(ctx.getEvent());
-                if (param.getType().equals(StringSelectInteractionEvent.class) && contextClass.equals(SelectionMenuContext.class)) args.add(ctx.getEvent());
-                if (param.getType().equals(MessageChannel.class)) args.add(ctx.getEvent().getMessageChannel());
+                if (param.getType().equals(ButtonInteractionEvent.class) && contextClass.equals(ButtonContext.class))
+                    args.add(ctx.getEvent());
+                if (param.getType().equals(ModalInteractionEvent.class) && contextClass.equals(ModalContext.class))
+                    args.add(ctx.getEvent());
+                if (param.getType().equals(StringSelectInteractionEvent.class)
+                        && contextClass.equals(SelectionMenuContext.class)) args.add(ctx.getEvent());
+                if (param.getType().equals(MessageChannel.class))
+                    args.add(ctx.getEvent().getMessageChannel());
 
                 // string parameters
                 // if the string is unnamed, assume it is the componentID
@@ -142,7 +155,8 @@ public class AnnotationHandler {
         };
     }
 
-    private static <T extends ListenerContext> Consumer<T> buildConsumer(Method method, Function<T, List<Object>> getArgs, boolean save) {
+    private static <T extends ListenerContext> Consumer<T> buildConsumer(
+            Method method, Function<T, List<Object>> getArgs, boolean save) {
         return context -> {
             List<Object> args = getArgs.apply(context);
             try {
@@ -150,22 +164,36 @@ public class AnnotationHandler {
                 context.setShouldSave(save);
                 method.invoke(null, args.toArray());
             } catch (InvocationTargetException e) {
-                BotLogger.error("Error within handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName() + "\":", e.getCause());
+                GenericInteractionCreateEvent origin = null;
                 for (Object arg : args) {
                     if (arg instanceof ButtonInteractionEvent buttonInteractionEvent) {
-                        buttonInteractionEvent.getInteraction().getMessage()
-                            .reply("The button failed. An exception has been logged for the developers.")
-                            .queue();
+                        origin = buttonInteractionEvent;
+                        buttonInteractionEvent
+                                .getInteraction()
+                                .getMessage()
+                                .reply("The button failed. An exception has been logged for the developers.")
+                                .queue();
                     }
                     if (arg instanceof StringSelectInteractionEvent selectInteractionEvent) {
-                        selectInteractionEvent.getInteraction().getMessage()
-                            .reply("The selection failed. An exception has been logged for the developers.")
-                            .queue();
+                        origin = selectInteractionEvent;
+                        selectInteractionEvent
+                                .getInteraction()
+                                .getMessage()
+                                .reply("The selection failed. An exception has been logged for the developers.")
+                                .queue();
                     }
                 }
+                BotLogger.error(
+                        origin,
+                        "Error within handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName()
+                                + "\":",
+                        e.getCause());
             } catch (Exception e) {
-                List<String> paramTypes = Arrays.stream(method.getParameters()).map(param -> param.getType().getSimpleName()).toList();
-                List<String> argTypes = args.stream().map(obj -> obj.getClass().getSimpleName()).toList();
+                List<String> paramTypes = Arrays.stream(method.getParameters())
+                        .map(param -> param.getType().getSimpleName())
+                        .toList();
+                List<String> argTypes =
+                        args.stream().map(obj -> obj.getClass().getSimpleName()).toList();
 
                 String methodName = method.getDeclaringClass().getSimpleName() + "." + method.getName();
                 String paramString = "(" + String.join(", ", paramTypes) + ")";
@@ -192,22 +220,25 @@ public class AnnotationHandler {
      * Find all functions that are tagged with `@handlerClass`, and which take parameters based on `contextClass`.
      * <p>
      * Untagged String parameters are assumed to be `componentID`. Use {@link NamedParam} to tag string parameters for now
-     * 
+     *
      * @param <C> {@link AnnotationHandler#contexts}
      * @param <H> {@link AnnotationHandler#handlers}
      * @param contextClass Which context type to accept parameters based upon
      * @param handlerClass Which handler annotation to look for
      * @return A map of prefix -> consumer which will
      */
-    public static <C extends ListenerContext, H extends Annotation> Map<String, Consumer<C>> findKnownHandlers(Class<C> contextClass, Class<H> handlerClass) {
+    public static <C extends ListenerContext, H extends Annotation> Map<String, Consumer<C>> findKnownHandlers(
+            Class<C> contextClass, Class<H> handlerClass) {
         Map<String, Consumer<C>> consumers = new HashMap<>();
         try {
             if (!handlers().contains(handlerClass)) {
-                BotLogger.warning("Unknown handler class `" + handlerClass.getName() + "`. Please fix " + Constants.jazzPing());
+                BotLogger.warning(
+                        "Unknown handler class `" + handlerClass.getName() + "`. Please fix " + Constants.jazzPing());
                 return consumers;
             }
             if (!contexts().contains(contextClass)) {
-                BotLogger.warning("Unknown context class `" + contextClass.getName() + "`. Please fix " + Constants.jazzPing());
+                BotLogger.warning(
+                        "Unknown context class `" + contextClass.getName() + "`. Please fix " + Constants.jazzPing());
                 return consumers;
             }
             for (Class<?> klass : AsyncTI4DiscordBot.getAllClasses()) {
@@ -218,7 +249,8 @@ public class AnnotationHandler {
 
                     String methodName = klass.getName() + "." + method.getName();
                     if (!Modifier.isStatic(method.getModifiers())) {
-                        BotLogger.warning("Method `" + methodName + "` is not static. Please fix it " + Constants.jazzPing());
+                        BotLogger.warning(
+                                "Method `" + methodName + "` is not static. Please fix it " + Constants.jazzPing());
                         continue;
                     }
 
@@ -226,11 +258,14 @@ public class AnnotationHandler {
                     if (argGetter == null) {
                         continue;
                     }
-                    
+
                     for (H handler : handlers) {
                         String val = null;
-                        Boolean save = true;
-                        if (handler instanceof ButtonHandler bh) { val = bh.value(); save = bh.save(); };
+                        boolean save = true;
+                        if (handler instanceof ButtonHandler bh) {
+                            val = bh.value();
+                            save = bh.save();
+                        }
                         if (handler instanceof SelectionHandler sh) val = sh.value();
                         if (handler instanceof ModalHandler mh) val = mh.value();
                         if (val == null) continue;
@@ -248,5 +283,4 @@ public class AnnotationHandler {
         BotLogger.info("Registered " + consumers.size() + " handlers of type " + handlerClass.getName());
         return consumers;
     }
-
 }

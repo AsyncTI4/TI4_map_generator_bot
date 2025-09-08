@@ -24,11 +24,11 @@ Branch permissions can be granted, but for now you may fork the repository and c
 2. Create a new Discord Server
 3. Record the Server's ID (right click Server Name -> "Copy Server ID")
 4. Setup a Test Bot - see [Step 1 from here](https://discord.com/developers/docs/getting-started#step-1-creating-an-app). The main steps are:
-* Note down the bot's credentials.
-* Enable "Privileged Gateway Intents".
-* Tick both Installation Contexts' Methods.
-* Ensure Default Install Settings are correct.
-* Create an install link, paste it into the discord server you want your bot in.
+   * Note down the bot's credentials.
+   * Enable "Privileged Gateway Intents".
+   * Tick both Installation Contexts' Methods.
+   * Ensure Default Install Settings are correct.
+   * Create an install link, paste it into the discord server you want your bot in.
 5. Invite your Test Bot to your server
 6. Create a `bot-log` channel, and `Admin`, `Developer` and `Bothelper` roles; add the role IDs to `src/main/java/ti4/AsyncTI4DiscordBot.java`
 
@@ -88,15 +88,13 @@ Set the 5 {VARIABLES} to match your Discord App/Bot's Token, UserID, ServerID, a
 
 #### Default Formatter
 
-Ensure your default formatter is set to use the `eclipse-formatter.xml` configuration file.
+The bot won't build successfully unless the code is well formatted. We use Spotless to enforce this at compile time.
 
-For VSCode you can set it within User/Workspace settings:
+It's best to get "format on save" set up using Spotless, which you can do with plugins.
 
-![image](https://github.com/AsyncTI4/TI4_map_generator_bot/assets/39609802/9a86b828-f16a-49c9-b223-af9624bd9ffe)
+Plugins: https://github.com/diffplug/spotless
 
-In VSCode, to check your current formatter, you can use prompt `Java: Open Java Formatter Settings` and it should open the `eclipse-formatter.xml` file if set correctly.
-
-![image](https://github.com/AsyncTI4/TI4_map_generator_bot/assets/39609802/f036b3ff-a1b1-40ba-8d64-e3fed493ae76)
+We previously used eclipse-formatter.xml. If you worked on this bot in the past, you may have that set as your default formatter. You can safely remove references to that formatter from local dev files, e.g. `./.vscode/settings.json`.
 
 ### Running from Terminal
 
@@ -151,6 +149,20 @@ In a seperate terminal, run:
 ```
 jdb -attach localhost:5005
 ```
+
+On Windows, you'll need Powershell, and you'll create a file called run_locally.ps1. Your file should look something like this. 
+
+```bash
+$env:DB_PATH="./storage"
+$env:RESOURCE_PATH="./src/main/resources"
+$jar_with_deps="<YOUR USER PATH?>/.m2/repository/me/terterro/TI4_map_generator_discord_bot/1.0-SNAPSHOT/TI4_map_generator_discord_bot-1.0-SNAPSHOT-jar-with-dependencies.jar"
+$discordBotKey="YOUR BOT KEY HERE"
+$discordUserID="YOUR USER ID HERE"
+$discordServerID="YOUR SERVER ID HERE"
+
+java -jar $jar_with_deps $discordBotKey $discordUserID $discordServerID
+```
+
 ## Run Container
 
 ### Windows 10, VS Code, Docker/Podman Desktop

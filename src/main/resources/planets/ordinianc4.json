@@ -1,0 +1,49 @@
+{
+    "id": "ordinianc4",
+    "tileId": "c41",
+    "name": "Ordinian",
+    "shortNamePNAttach": "Ordinian",
+    "shrinkNamePNAttach": true,
+    "aliases": [
+        "ordinianc4"
+    ],
+    "positionInTile": { "x": 171.0, "y": 149.0 },
+    "resources": 0,
+    "influence": 0,
+    "factionHomeworld": null,
+    "planetType": "MR",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": "Barren Husk",
+    "legendaryAbilityText": "You may exhaust this card when you pass to draw 1 action card and gain 1 command token",
+    "unitPositions": {
+        "unitHolderName": "ordinianc4",
+        "coordinateMap": {
+            "control": [{ "x": 131.0, "y": 143.0 }],
+            "sd": [{ "x": 191.0, "y": 178.0 }],
+            "pd": [
+                { "x": 136.0, "y": 170.0 },
+                { "x": 153.0, "y": 170.0 },
+                { "x": 170.0, "y": 170.0 },
+                { "x": 145.0, "y": 181.0 },
+                { "x": 163.0, "y": 181.0 }
+            ],
+            "mf": [
+                { "x": 128.0, "y": 99.0 },
+                { "x": 146.0, "y": 99.0 },
+                { "x": 164.0, "y": 99.0 },
+                { "x": 121.0, "y": 112.0 },
+                { "x": 139.0, "y": 112.0 },
+                { "x": 157.0, "y": 112.0 },
+                { "x": 175.0, "y": 112.0 }
+            ],
+            "tkn_gf": [
+                { "x": 150.0, "y": 140.0 },
+                { "x": 117.0, "y": 140.0 }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "flavourText": "The Nekro Virus did something here once. Idk nobody cares about flavor text.",
+    "source": "base"
+}

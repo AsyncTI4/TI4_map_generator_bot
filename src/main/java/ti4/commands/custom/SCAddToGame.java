@@ -12,7 +12,8 @@ class SCAddToGame extends GameStateSubcommand {
 
     public SCAddToGame() {
         super(Constants.ADD_SC_TO_GAME, "Add a Stategy Card # to the game", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card to add").setRequired(true));
+        addOptions(
+                new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card to add").setRequired(true));
     }
 
     @Override
@@ -25,5 +26,4 @@ class SCAddToGame extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card already exists: " + sc);
         }
     }
-
 }

@@ -1,11 +1,14 @@
 package ti4.service.milty;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.MessageTopLevelComponent;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -13,9 +16,6 @@ import net.dv8tion.jda.api.entities.MessageHistory.MessageRetrieveAction;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.LayoutComponent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -23,9 +23,9 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.message.MessageHelper.MessageFunction;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class DraftDisplayService {
@@ -34,14 +34,15 @@ public class DraftDisplayService {
     private static final String POSITION = "**__Speaker Order:__**";
     private static final String SUMMARY_START = "# **__Draft Picks So Far__**:";
 
-    public void updateDraftInformation(GenericInteractionCreateEvent event, MiltyDraftManager manager, Game game, String category) {
+    public void updateDraftInformation(
+            GenericInteractionCreateEvent event, MiltyDraftManager manager, Game game, String category) {
         MessageChannel channel = game.getMainGameChannel();
         if (channel == null) return;
 
         getMessageHistory(event, channel).queue(editDraftInfo(manager, game, category), BotLogger::catchRestError);
     }
 
-    public void repostDraftInformation(GenericInteractionCreateEvent event, MiltyDraftManager manager, Game game) {
+    public void repostDraftInformation(MiltyDraftManager manager, Game game) {
         MessageChannel channel = game.getMainGameChannel();
         if (channel == null) return;
 
@@ -51,10 +52,10 @@ public class DraftDisplayService {
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, SLICES, manager.getSliceButtons());
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, FACTIONS, manager.getFactionButtons());
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, POSITION, manager.getPositionButtons());
-        pingCurrentDraftPlayer(event, manager, game, true);
+        pingCurrentDraftPlayer(manager, game, true);
     }
 
-    public void pingCurrentDraftPlayer(GenericInteractionCreateEvent event, MiltyDraftManager manager, Game game, boolean clearOldButtons) {
+    public void pingCurrentDraftPlayer(MiltyDraftManager manager, Game game, boolean clearOldButtons) {
         String msg = "Nobody is up to draft...";
         Player p = manager.getCurrentDraftPlayer(game);
         if (p != null) msg = "### " + p.getPing() + " is up to draft!";
@@ -76,7 +77,8 @@ public class DraftDisplayService {
     // Private Helper Functions
     // -----------------------------------------------------------------------------------
 
-    private static MessageRetrieveAction getMessageHistory(GenericInteractionCreateEvent event, MessageChannel channel) {
+    private static MessageRetrieveAction getMessageHistory(
+            GenericInteractionCreateEvent event, MessageChannel channel) {
         if (event != null && event.getMessageChannel() == channel && event instanceof ButtonInteractionEvent bEvent) {
             return channel.getHistoryAround(bEvent.getMessage(), 10);
         }
@@ -90,12 +92,13 @@ public class DraftDisplayService {
             case "order" -> txt.equals(POSITION);
             default -> false;
         };
-        List<Button> categoryButtons = switch (category) {
-            case "slice" -> manager.getSliceButtons();
-            case "faction" -> manager.getFactionButtons();
-            case "order" -> manager.getPositionButtons();
-            default -> List.of();
-        };
+        List<Button> categoryButtons =
+                switch (category) {
+                    case "slice" -> manager.getSliceButtons();
+                    case "faction" -> manager.getFactionButtons();
+                    case "order" -> manager.getPositionButtons();
+                    default -> Collections.emptyList();
+                };
         String newSummary = manager.getOverallSummaryString(game);
         return hist -> {
             boolean summaryDone = false, categoryDone = false, sliceImgDone = false;
@@ -105,12 +108,12 @@ public class DraftDisplayService {
 
                 if (!summaryDone && txt.startsWith(SUMMARY_START)) {
                     summaryDone = true;
-                    editMessage(game, msg, newSummary, null);
+                    editMessage(msg, newSummary, null);
                 }
 
                 if (!categoryDone && isCategory.test(txt)) {
                     categoryDone = true;
-                    editMessage(game, msg, null, categoryButtons);
+                    editMessage(msg, null, categoryButtons);
                 }
 
                 if (!sliceImgDone && messageIsSliceImg(msg)) {
@@ -122,8 +125,8 @@ public class DraftDisplayService {
         };
     }
 
-    private void editMessage(Game game, Message msg, String newMessage, List<Button> newButtons) {
-        List<LayoutComponent> newComponents = new ArrayList<>();
+    private void editMessage(Message msg, String newMessage, List<Button> newButtons) {
+        List<MessageTopLevelComponent> newComponents = new ArrayList<>();
         if (newButtons != null) {
             List<List<Button>> partitioned = new ArrayList<>(ListUtils.partition(newButtons, 5));
             List<ActionRow> newRows = partitioned.stream().map(ActionRow::of).toList();
@@ -132,8 +135,7 @@ public class DraftDisplayService {
 
         if (newMessage != null && newButtons != null)
             msg.editMessage(newMessage).setComponents(newComponents).queue(Consumers.nop(), BotLogger::catchRestError);
-        else if (newMessage != null)
-            msg.editMessage(newMessage).queue(Consumers.nop(), BotLogger::catchRestError);
+        else if (newMessage != null) msg.editMessage(newMessage).queue(Consumers.nop(), BotLogger::catchRestError);
         else if (newButtons != null)
             msg.editMessageComponents(newComponents).queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -188,7 +190,8 @@ public class DraftDisplayService {
     }
 
     private MessageFunction clearOldPingsAndButtonsFunc(boolean clearFirstPing, boolean clearOldDraftInfo) {
-        return msg -> msg.getChannel().getHistoryBefore(msg, 100).queue(hist -> clearHistMessages(hist, clearFirstPing, clearOldDraftInfo), BotLogger::catchRestError);
+        return msg -> msg.getChannel()
+                .getHistoryBefore(msg, 100)
+                .queue(hist -> clearHistMessages(hist, clearFirstPing, clearOldDraftInfo), BotLogger::catchRestError);
     }
-
 }

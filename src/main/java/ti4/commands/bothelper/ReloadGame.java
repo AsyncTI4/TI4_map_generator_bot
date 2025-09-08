@@ -6,15 +6,14 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 
 public class ReloadGame extends Subcommand {
 
-    public ReloadGame()  {
+    public ReloadGame() {
         super(Constants.RELOAD_GAME, "Reload game from disk");
-        addOptions(
-            new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name to load to").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name to load to").setRequired(true));
     }
 
     @Override

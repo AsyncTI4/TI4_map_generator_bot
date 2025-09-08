@@ -162,7 +162,7 @@
         "faction": "cabal",
         "playArea": false,
         "source": "pok",
-        "text": "After you activate a system: Your ships do not roll for gravity rifts during this movement, apply an additional +1 to the move values of your ships that would move out of or through a gravity rift instead. Then, return this card to the Vuil'raith player."
+        "text": "After you activate a system: Your ships do not roll for gravity rifts during this movement, apply an additional +1 to the move values of your ships that would move out of or through a gravity rift instead. Then, return this card to the Vuil'raith player. [Note: This promissory note will only ever add +1 movement total, regardless of how many gravity rifts you pass through]"
     },
     {
         "alias": "acq",

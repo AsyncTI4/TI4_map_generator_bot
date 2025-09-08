@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
 import ti4.model.ColorModel;
 
-public class ColourHelper {
+class ColourHelper {
 
     public static List<ColorModel> sortColours(String factionId, List<ColorModel> colours) {
         List<ColorModel> newcolours = new ArrayList<>(colours);
@@ -24,7 +23,7 @@ public class ColourHelper {
         newcolours.sort((c1, c2) -> colourValue(factionId, c2) - colourValue(factionId, c1));
         return newcolours;
     }
-    
+
     private static int colourValue(String factionId, ColorModel colour) {
         return colourValue(factionId, colour.getAlias());
     }
@@ -545,7 +544,7 @@ public class ColourHelper {
                     case "rbw":
                         return 37;
                 }
-                // Discordant Stars
+            // Discordant Stars
             case "augers":
                 switch (colour) {
                     case "lvn", "ppl", "plm", "sns":
@@ -786,7 +785,7 @@ public class ColourHelper {
                     case "red", "rst", "bld":
                         return 35;
                 }
-                // other homebrew
+            // other homebrew
             case "drahn":
                 switch (colour) {
                     case "red", "rst", "bld":
@@ -795,7 +794,7 @@ public class ColourHelper {
                         return 30;
                 }
         }
-        if (colour.equals("orca")) {
+        if ("orca".equals(colour)) {
             return 5;
         }
         return 15;

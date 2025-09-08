@@ -7,7 +7,7 @@ import java.util.Map.Entry;
 public final class StringHelper {
 
     public static String ordinal(int i) {
-        String[] suffixes = { "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th" };
+        String[] suffixes = {"th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"};
         return switch (i % 100) {
             case 11, 12, 13 -> i + "th";
             default -> i + suffixes[i % 10];
@@ -15,8 +15,29 @@ public final class StringHelper {
     }
 
     public static String numberToWords(int i) {
-        String[] first20 = { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
-            "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty" };
+        String[] first20 = {
+            "zero",
+            "one",
+            "two",
+            "three",
+            "four",
+            "five",
+            "six",
+            "seven",
+            "eight",
+            "nine",
+            "ten",
+            "eleven",
+            "twelve",
+            "thirteen",
+            "fourteen",
+            "fifteen",
+            "sixteen",
+            "seventeen",
+            "eighteen",
+            "nineteen",
+            "twenty"
+        };
         if (i >= 0 && i <= 20) return first20[i];
         return Integer.toString(i);
     }
@@ -37,7 +58,8 @@ public final class StringHelper {
         return escape;
     }
 
-    // Calling .replace over and over like this is actually pretty slow, probably better to iterate character by character
+    // Calling .replace over and over like this is actually pretty slow, probably better to iterate character by
+    // character
     public static String escape(String input) {
         if (input == null) return null;
         String output = input;
@@ -63,8 +85,7 @@ public final class StringHelper {
         char currentChar = id.charAt(index);
         id = (index == 0) ? "" : id.substring(0, index);
 
-        if (currentChar >= 'a' && currentChar < 'z')
-            return id + (char) (currentChar + 1);
+        if (currentChar >= 'a' && currentChar < 'z') return id + (char) (currentChar + 1);
         if (currentChar == 'z') {
             return nextId(id) + "a";
         }

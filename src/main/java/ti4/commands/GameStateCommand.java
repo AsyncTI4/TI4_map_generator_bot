@@ -11,7 +11,7 @@ public abstract class GameStateCommand implements ParentCommand {
     private final boolean saveGame;
     private final boolean playerCommand;
 
-    public GameStateCommand(boolean saveGame, boolean playerCommand) {
+    protected GameStateCommand(boolean saveGame, boolean playerCommand) {
         this.saveGame = saveGame;
         this.playerCommand = playerCommand;
         commandGameState = new CommandGameState(saveGame, playerCommand);

@@ -3,33 +3,32 @@ package ti4.helpers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-
 import ti4.service.game.RematchService;
 import ti4.testUtils.BaseTi4Test;
 
-public class MiscHelperTest extends BaseTi4Test {
+class MiscHelperTest extends BaseTi4Test {
     @Test
     void testNextRematchId() {
-        assertEquals(StringHelper.nextId("a"), "b");
-        assertEquals(StringHelper.nextId("n"), "o");
-        assertEquals(StringHelper.nextId("z"), "aa");
-        assertEquals(StringHelper.nextId("aa"), "ab");
-        assertEquals(StringHelper.nextId("ax"), "ay");
-        assertEquals(StringHelper.nextId("az"), "ba");
-        assertEquals(StringHelper.nextId("zz"), "aaa");
-        assertEquals(StringHelper.nextId("azz"), "baa");
-        assertEquals(StringHelper.nextId("baz"), "bba");
-        assertEquals(StringHelper.nextId("bzz"), "caa");
+        assertEquals("b", StringHelper.nextId("a"));
+        assertEquals("o", StringHelper.nextId("n"));
+        assertEquals("aa", StringHelper.nextId("z"));
+        assertEquals("ab", StringHelper.nextId("aa"));
+        assertEquals("ay", StringHelper.nextId("ax"));
+        assertEquals("ba", StringHelper.nextId("az"));
+        assertEquals("aaa", StringHelper.nextId("zz"));
+        assertEquals("baa", StringHelper.nextId("azz"));
+        assertEquals("bba", StringHelper.nextId("baz"));
+        assertEquals("caa", StringHelper.nextId("bzz"));
     }
 
     @Test
     void testNextRematchGameName() {
-        assertEquals(RematchService.newGameName("island4"), "island4b");
-        assertEquals(RematchService.newGameName("island4n"), "island4o");
-        assertEquals(RematchService.newGameName("pbd1234"), "pbd1234b");
-        assertEquals(RematchService.newGameName("pbd1234a"), "pbd1234b");
-        assertEquals(RematchService.newGameName("pbd1234z"), "pbd1234aa");
-        assertEquals(RematchService.newGameName("asdf123"), "asdf123b");
-        assertEquals(RematchService.newGameName("asdf123z"), "asdf123aa");
+        assertEquals("island4b", RematchService.newGameName("island4"));
+        assertEquals("island4o", RematchService.newGameName("island4n"));
+        assertEquals("pbd1234b", RematchService.newGameName("pbd1234"));
+        assertEquals("pbd1234b", RematchService.newGameName("pbd1234a"));
+        assertEquals("pbd1234aa", RematchService.newGameName("pbd1234z"));
+        assertEquals("asdf123b", RematchService.newGameName("asdf123"));
+        assertEquals("asdf123aa", RematchService.newGameName("asdf123z"));
     }
 }

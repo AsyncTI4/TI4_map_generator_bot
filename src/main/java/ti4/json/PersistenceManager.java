@@ -1,21 +1,20 @@
 package ti4.json;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.io.File;
+import java.io.IOException;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Storage;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class PersistenceManager {
 
-    public static final String PERSISTENCE_MANAGER_JSON_PATH = Storage.getStoragePath() + "/pm_json/";
+    private static final String PERSISTENCE_MANAGER_JSON_PATH = Storage.getStoragePath() + "/pm_json/";
     private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     public static void writeObjectToJsonFile(String fileName, Object object) throws IOException {
@@ -36,15 +35,6 @@ public class PersistenceManager {
             throw new IOException("Failed to create directories: " + parentDir.getAbsolutePath());
         }
         objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, object);
-    }
-
-    public static <T> List<T> readListFromJsonFile(String fileName, Class<T> clazz) throws IOException {
-        return readListFromJsonFile(PERSISTENCE_MANAGER_JSON_PATH, fileName, clazz);
-    }
-
-    public static <T> List<T> readListFromJsonFile(String directory, String fileName, Class<T> clazz) throws IOException {
-        JavaType ref = objectMapper.getTypeFactory().constructParametricType(List.class, clazz);
-        return readObjectFromJsonFile(directory, fileName, ref);
     }
 
     public static <T> T readObjectFromJsonFile(String fileName, Class<T> clazz) throws IOException {
@@ -72,6 +62,16 @@ public class PersistenceManager {
         return objectMapper.readValue(file, clazz);
     }
 
+    public static <T> T readObjectFromJsonFile(String directory, String fileName, TypeReference<T> typeReference)
+            throws IOException {
+        JavaType ref = objectMapper.getTypeFactory().constructType(typeReference);
+        return readObjectFromJsonFile(directory, fileName, ref);
+    }
+
+    public static <T> T readObjectFromJsonFile(String fileName, TypeReference<T> typeReference) throws IOException {
+        return readObjectFromJsonFile(PERSISTENCE_MANAGER_JSON_PATH, fileName, typeReference);
+    }
+
     @NotNull
     private static File getFile(String directory, String fileName) {
         return new File(directory + File.separator + fileName);
@@ -84,5 +84,4 @@ public class PersistenceManager {
             BotLogger.error("Failed to delete file: " + file.getAbsolutePath());
         }
     }
-
 }

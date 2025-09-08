@@ -1,11 +1,7 @@
 package ti4.commands.fow;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -16,7 +12,11 @@ import ti4.service.fow.FowCommunicationThreadService;
 class PrivateCommunicationsCheck extends GameStateSubcommand {
 
     public PrivateCommunicationsCheck() {
-        super(Constants.CHECK_PRIVATE_COMMUNICATIONS, "Check the status of private communication threads and offer a button to suggest new ones.", false, true);
+        super(
+                Constants.CHECK_PRIVATE_COMMUNICATIONS,
+                "Check the status of private communication threads and offer a button to suggest new ones.",
+                false,
+                true);
         addOption(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which check as", false, true);
     }
 
@@ -26,19 +26,32 @@ class PrivateCommunicationsCheck extends GameStateSubcommand {
         Game game = getGame();
 
         if (!FowCommunicationThreadService.isActive(game)) {
-            MessageHelper.replyToMessage(event, "Bot managed communication threads are not enabled.\nEnable them with `/fow fow_options`");
+            MessageHelper.replyToMessage(
+                    event, "Bot managed communication threads are not enabled.\nEnable them with `/fow fow_options`");
             return;
         }
 
         Player commandUser = game.getPlayer(event.getUser().getId());
-        if (player != commandUser && !game.getPlayersWithGMRole().contains(commandUser)) {
+        if (commandUser == null) {
+            MessageHelper.replyToMessage(event, "You are not a player in this game.");
+            return;
+        }
+
+        boolean teammate = false;
+        for (Player p : game.getRealPlayers()) {
+            if (p.getTeamMateIDs().contains(commandUser.getUserID())) {
+                player = p;
+                teammate = true;
+                break;
+            }
+        }
+
+        if (player != commandUser && !game.getPlayersWithGMRole().contains(commandUser) && !teammate) {
             MessageHelper.replyToMessage(event, "Only GM can use this for another player.");
             return;
         }
 
-        List<Button> buttons = new ArrayList<>();
-        FowCommunicationThreadService.checkNewNeighbors(game, player, buttons);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Communication threads with neighbors checked."
-            + (buttons.isEmpty() ? " No new neighbors found." : ""), buttons);
+        FowCommunicationThreadService.checkNewNeighbors(game, player);
+        MessageHelper.replyToMessage(event, "Communication threads with neighbors checked.");
     }
 }

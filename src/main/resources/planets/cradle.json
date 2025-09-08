@@ -1,0 +1,24 @@
+{
+    "id": "cradle",
+    "tileId": null,
+    "name": "Cradle",
+    "aliases": ["cradle"],
+    "positionInTile": null,
+    "resources": 1,
+    "influence": 1,
+    "factionHomeworld": null,
+    "planetType": "INDUSTRIAL",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": "",
+    "legendaryAbilityText": "",
+    "legendaryAbilityFlavourText": "**",
+    "planetLayout": {
+        "unitHolderName": "cradle",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": { "x": 87, "y": 55 }
+    },
+    "contrastColor": "orange",
+    "flavourText": "**",
+    "source": "ascendant_sun"
+}

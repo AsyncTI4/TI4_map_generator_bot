@@ -2,10 +2,11 @@ package ti4.map;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 import ti4.helpers.Constants;
+import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
+import ti4.map.pojo.ExportableField;
 
 @Getter
 @Setter
@@ -14,7 +15,7 @@ public class GameProperties {
     private @ExportableField String ownerID;
     private @ExportableField String ownerName = "";
     private @ExportableField String creationDate;
-    private @ExportableField String name; //pbdXXXX
+    private @ExportableField String name; // pbdXXXX
     private @ExportableField String customName = "";
     private @ExportableField String mapTemplateID;
     private @ExportableField String phaseOfGame = "";
@@ -27,6 +28,7 @@ public class GameProperties {
     private @ExportableField long lastModifiedDate;
     private @ExportableField long endedDate;
     private @ExportableField boolean hasEnded;
+    private @ExportableField boolean replacementMade;
 
     // Deck IDs
     private @ExportableField String acDeckID = "action_cards_pok";
@@ -36,7 +38,7 @@ public class GameProperties {
     private @ExportableField String relicDeckID = "relics_pok";
     private @ExportableField String agendaDeckID = "agendas_pok";
     private @ExportableField String explorationDeckID = "explores_pok";
-    private @ExportableField String technologyDeckID = "techs_pok";
+    private @ExportableField String technologyDeckID = "techs_pok_c4";
     private @ExportableField String scSetID = "pok";
     private @ExportableField String eventDeckID = "";
 
@@ -67,6 +69,8 @@ public class GameProperties {
 
     // Customization Flags/Settings
     private boolean botFactionReacts;
+    private boolean botColorReacts;
+    private boolean botStratReacts;
     private boolean botShushing;
     private boolean ccNPlasticLimit = true;
     private boolean injectRulesLinks = true;
@@ -81,8 +85,8 @@ public class GameProperties {
     private boolean showUnitTags;
     private boolean stratPings = true;
     private boolean testBetaFeaturesMode;
-    private boolean showOwnedPNsInPlayerArea = false;
-    private String hexBorderStyle = "off";
+    private boolean showOwnedPNsInPlayerArea;
+    private String hexBorderStyle = "off"; // values are off/dash/solid
     private String textSize = "medium";
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
     private int autoPingSpacer;
@@ -94,7 +98,17 @@ public class GameProperties {
     private @ExportableField boolean ageOfExplorationMode;
     private @ExportableField boolean facilitiesMode;
     private @ExportableField boolean minorFactionsMode;
+    private @ExportableField boolean totalWarMode;
+    private @ExportableField boolean dangerousWildsMode;
+    private @ExportableField boolean civilizedSocietyMode;
+    private @ExportableField boolean ageOfFightersMode;
+    private @ExportableField boolean stellarAtomicsMode;
+    private @ExportableField boolean noSwapMode;
+    private @ExportableField boolean limitedWhispersMode;
+    private @ExportableField boolean ageOfCommerceMode;
     private @ExportableField boolean hiddenAgendaMode;
+    private @ExportableField boolean ordinianC1Mode;
+    private @ExportableField boolean liberationC4Mode;
     private @ExportableField boolean allianceMode;
     private @ExportableField boolean communityMode;
     private @ExportableField boolean competitiveTIGLGame;
@@ -126,7 +140,6 @@ public class GameProperties {
     private @ExportableField String tableTalkChannelID;
     private @ExportableField String mainChannelID;
     private String savedChannelID;
-    private @ExportableField List<String> fogOfWarGMIDs = new ArrayList<>(1); // Game Masters
 
     // More complex objects below
     private @ExportableField String mapString;
@@ -135,10 +148,22 @@ public class GameProperties {
     private List<String> secretObjectives;
     private List<String> actionCards;
     private List<String> agendas;
+    private List<String> mandates;
     private List<String> events; // ignis_aurora
+
+    // Priority Track
+    private PriorityTrackMode priorityTrackMode = PriorityTrackMode.NONE;
+
+    public boolean hasAnyPriorityTrackMode() {
+        return priorityTrackMode != PriorityTrackMode.NONE;
+    }
+
+    public boolean hasFullPriorityTrackMode() {
+        return priorityTrackMode == PriorityTrackMode.FULL;
+    }
 
     // Misc Helpers
     public String getID() {
-        return getName();
+        return name;
     }
 }

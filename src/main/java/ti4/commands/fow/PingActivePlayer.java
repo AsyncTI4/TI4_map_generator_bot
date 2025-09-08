@@ -7,8 +7,11 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.fow.GMService;
 
 class PingActivePlayer extends GameStateSubcommand {
+
+    private static final long PING_COOLDOWN = 28800000; // (1000 * 60 * 60 * 8); //eight hours
 
     public PingActivePlayer() {
         super(Constants.PING_ACTIVE_PLAYER, "Ping the active player in this game", true, true);
@@ -39,13 +42,22 @@ class PingActivePlayer extends GameStateSubcommand {
             latestPingMilliseconds = game.getLastActivePlayerChange().getTime();
         }
 
+        String isAfk = activePlayer.isAFK() ? " They are currently AFK." : "";
         long milliSinceLastPing = System.currentTimeMillis() - latestPingMilliseconds;
-        if (!game.getPlayersWithGMRole().contains(playerThatRanCommand) && milliSinceLastPing < (1000 * 60 * 60 * 8) && !samePlayer) { //eight hours
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player was pinged recently. Try again later.");
+        if (!game.getPlayersWithGMRole().contains(playerThatRanCommand)
+                && milliSinceLastPing < PING_COOLDOWN
+                && !samePlayer) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player was pinged recently." + isAfk);
         } else {
             String ping = activePlayer.getRepresentationUnfogged() + " this is a gentle reminder that it is your turn.";
             if (game.isFowMode()) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player has been pinged.");
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        (event.getChannelIdLong()
+                                                == GMService.getGMChannel(game).getIdLong()
+                                        ? activePlayer.getRepresentationUnfoggedNoPing()
+                                        : "Active player")
+                                + " has been pinged." + isAfk);
                 MessageHelper.sendPrivateMessageToPlayer(activePlayer, game, ping);
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), ping);

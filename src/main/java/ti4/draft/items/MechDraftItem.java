@@ -1,12 +1,14 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
+import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
+import ti4.map.Game;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.UnitModel;
@@ -14,6 +16,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 
 public class MechDraftItem extends DraftItem {
+
     public MechDraftItem(String itemId) {
         super(Category.MECH, itemId);
     }
@@ -47,9 +50,10 @@ public class MechDraftItem extends DraftItem {
         }
         if (unit.getAfbDieCount() > 0) {
             sb.append("ANTI-FIGHTER BARRAGE ")
-                .append(unit.getAfbHitsOn())
-                .append("x").append(unit.getAfbDieCount())
-                .append(" ");
+                    .append(unit.getAfbHitsOn())
+                    .append("x")
+                    .append(unit.getAfbDieCount())
+                    .append(" ");
         }
         if (unit.getProductionValue() > 0) {
             sb.append("PRODUCTION ");
@@ -78,7 +82,28 @@ public class MechDraftItem extends DraftItem {
         for (FactionModel faction : factions) {
             var units = faction.getUnits();
             units.removeIf((String unit) -> !"mech".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(DraftItem.generate(Category.MECH, units.getFirst()));
+            allItems.add(generate(Category.MECH, units.getFirst()));
+        }
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
+        List<DraftItem> allItems = buildAllItems(factions, game);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.MECH);
+        return allItems;
+    }
+
+    private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
+        List<DraftItem> allItems = new ArrayList<>();
+        Map<String, UnitModel> allUnits = Mapper.getUnits();
+        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedMechs"));
+        for (FactionModel faction : factions) {
+            if (Arrays.asList(results).contains(faction.getAlias())) {
+                continue;
+            }
+            var units = faction.getUnits();
+            units.removeIf((String unit) -> !"mech".equals(allUnits.get(unit).getBaseType()));
+            allItems.add(generate(Category.MECH, units.getFirst()));
         }
         return allItems;
     }

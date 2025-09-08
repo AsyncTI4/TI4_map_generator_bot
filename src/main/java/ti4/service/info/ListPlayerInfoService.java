@@ -1,10 +1,11 @@
 package ti4.service.info;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.helpers.ButtonHelper;
@@ -18,11 +19,13 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
 public class ListPlayerInfoService {
@@ -31,7 +34,13 @@ public class ListPlayerInfoService {
         return switch (objID) {
             // stage 1's
             case "push_boundaries" -> 2;
-            case "outer_rim", "ancient_monuments", "revolutionize", "deep_space", "lead", "research_outposts", "infrastructure" -> 3;
+            case "outer_rim",
+                    "ancient_monuments",
+                    "revolutionize",
+                    "deep_space",
+                    "lead",
+                    "research_outposts",
+                    "infrastructure" -> 3;
             case "make_history" -> 2;
             case "corner", "become_legend", "master_science", "build_defenses" -> 4;
             case "develop" -> 2;
@@ -61,9 +70,9 @@ public class ListPlayerInfoService {
             case "protect_border" -> 5;
             case "distant_lands" -> 2;
 
-            //status phase secrets
+            // Status Phase secrets
             case "pem" -> 8; // 8 production
-            case "sai" -> 1; //legendary
+            case "sai" -> 1; // legendary
             case "syc" -> 1; // control a planet in same system someone else does
             case "sb" -> 1; // have a PN in your play area
             case "otf" -> 9; // 9 gf on a planet without a dock
@@ -72,11 +81,11 @@ public class ListPlayerInfoService {
             case "eh" -> 12; // 12 influence
             case "dp" -> 3; // 3 laws in play
             case "dhw" -> 2; // 2 frags
-            case "dfat" -> 1; //nexus
+            case "dfat" -> 1; // nexus
             case "te" -> 1; // be next to HS
             case "ose" -> 3; // control rex and have 3 ships
-            case "mrm" -> 4; //4 hazardous
-            case "mlp" -> 4; //4 techs of a color
+            case "mrm" -> 4; // 4 hazardous
+            case "mlp" -> 4; // 4 techs of a color
             case "mp" -> 4; // 4 industrial
             case "lsc" -> 3; // 3 anomalies
             case "fwm" -> 3; // 3 SD
@@ -90,7 +99,7 @@ public class ListPlayerInfoService {
             case "faa" -> 4; // 4 cultural
             case "fc" -> (game.getRealPlayers().size() - 1); // neighbors
 
-            // Omega phase objectives
+            // Omega Phase objectives
             case "corner_omegaphase" -> 4;
             case "galvanize_omegaphase" -> 6;
             case "manipulate_law_omegaphase", "golden_age_omegaphase" -> 16;
@@ -117,43 +126,42 @@ public class ListPlayerInfoService {
 
     record ObjectiveResult(boolean canFullyMeet, int closenessScore) {}
 
-    public ObjectiveResult checkObjective(List<String> planets, int tradeGoods, int goal, Player player, Game game, int closestScore) {
+    private ObjectiveResult checkObjective(
+            List<String> planets, int tradeGoods, int goal, Player player, Game game, int closestScore) {
         return backtrack(planets, 0, 0, 0, new HashSet<>(), tradeGoods, goal, player, game, closestScore);
     }
 
     private ObjectiveResult backtrack(
-        List<String> planets,
-        int currentResources,
-        int currentInfluence,
-        int index,
-        Set<String> usedPlanets,
-        int remainingTradeGoods,
-        int goal,
-        Player player,
-        Game game,
-        int closestScore
-    ) {
-        // Success condition  
+            List<String> planets,
+            int currentResources,
+            int currentInfluence,
+            int index,
+            Set<String> usedPlanets,
+            int remainingTradeGoods,
+            int goal,
+            Player player,
+            Game game,
+            int closestScore) {
+        // Success condition
         if (currentResources >= goal && currentInfluence >= goal) {
             return new ObjectiveResult(true, goal * 2);
         }
-        int additionalResources2 = Math.min(remainingTradeGoods,
-            Math.max(0, goal - currentResources));
-        int additionalInfluence2 = Math.min(remainingTradeGoods - additionalResources2,
-            Math.max(0, goal - currentInfluence));
+        int additionalResources2 = Math.min(remainingTradeGoods, Math.max(0, goal - currentResources));
+        int additionalInfluence2 =
+                Math.min(remainingTradeGoods - additionalResources2, Math.max(0, goal - currentInfluence));
 
         int newResources2 = currentResources + additionalResources2;
         int newInfluence2 = currentInfluence + additionalInfluence2;
 
-        // Calculate closeness score  
+        // Calculate closeness score
         int resourceShortfall2 = Math.max(0, goal - newResources2);
         int influenceShortfall2 = Math.max(0, goal - newInfluence2);
         int closenessScore2 = goal * 2 - (resourceShortfall2 + influenceShortfall2);
         closestScore = Math.max(closenessScore2, closestScore);
 
-        // Failure condition - run out of options  
+        // Failure condition - run out of options
         if (index >= planets.size() && remainingTradeGoods == 0) {
-            // Calculate closeness score  
+            // Calculate closeness score
             int resourceShortfall = Math.max(0, goal - currentResources);
             int influenceShortfall = Math.max(0, goal - currentInfluence);
             int closenessScore = goal * 2 - (resourceShortfall + influenceShortfall);
@@ -161,18 +169,17 @@ public class ListPlayerInfoService {
             return new ObjectiveResult(false, Math.max(0, closenessScore));
         }
 
-        // If we've run out of planets, try using trade goods  
+        // If we've run out of planets, try using trade goods
         if (index >= planets.size()) {
-            // Try using remaining trade goods for resources  
-            int additionalResources = Math.min(remainingTradeGoods,
-                Math.max(0, goal - currentResources));
-            int additionalInfluence = Math.min(remainingTradeGoods - additionalResources,
-                Math.max(0, goal - currentInfluence));
+            // Try using remaining trade goods for resources
+            int additionalResources = Math.min(remainingTradeGoods, Math.max(0, goal - currentResources));
+            int additionalInfluence =
+                    Math.min(remainingTradeGoods - additionalResources, Math.max(0, goal - currentInfluence));
 
             int newResources = currentResources + additionalResources;
             int newInfluence = currentInfluence + additionalInfluence;
 
-            // Calculate closeness score  
+            // Calculate closeness score
             int resourceShortfall = Math.max(0, goal - newResources);
             int influenceShortfall = Math.max(0, goal - newInfluence);
             int closenessScore = goal * 2 - (resourceShortfall + influenceShortfall);
@@ -184,6 +191,22 @@ public class ListPlayerInfoService {
         String current = planets.get(index);
 
         Planet planet = game.getPlanetsInfo().get(current);
+        if (planet == null) {
+            BotLogger.warning(
+                    new LogOrigin(player),
+                    "ListPlayerInfoService: Planet \"" + current + "\" not found for game " + game.getName());
+            return backtrack(
+                    planets,
+                    currentResources,
+                    currentInfluence,
+                    index + 1,
+                    usedPlanets,
+                    remainingTradeGoods,
+                    goal,
+                    player,
+                    game,
+                    closestScore);
+        }
         int resources = planet.getResources();
         int influence = planet.getInfluence();
         if (player.hasLeaderUnlocked("xxchahero")) {
@@ -191,47 +214,63 @@ public class ListPlayerInfoService {
             influence += planet.getResources();
         }
         if (resources > 0) {
-            ObjectiveResult resourceResult = backtrack(planets,
-                currentResources + resources,
-                currentInfluence,
-                index + 1,
-                usedPlanets,
-                remainingTradeGoods, goal, player, game, closestScore);
+            ObjectiveResult resourceResult = backtrack(
+                    planets,
+                    currentResources + resources,
+                    currentInfluence,
+                    index + 1,
+                    usedPlanets,
+                    remainingTradeGoods,
+                    goal,
+                    player,
+                    game,
+                    closestScore);
             closestScore = Math.max(resourceResult.closenessScore, closestScore);
             if (resourceResult.canFullyMeet()) {
                 return resourceResult;
             }
         }
-        // Try using planet for influence  
+        // Try using planet for influence
         if (influence > 0) {
-            ObjectiveResult influenceResult = backtrack(planets,
-                currentResources,
-                currentInfluence + influence,
-                index + 1,
-                usedPlanets,
-                remainingTradeGoods, goal, player, game, closestScore);
+            ObjectiveResult influenceResult = backtrack(
+                    planets,
+                    currentResources,
+                    currentInfluence + influence,
+                    index + 1,
+                    usedPlanets,
+                    remainingTradeGoods,
+                    goal,
+                    player,
+                    game,
+                    closestScore);
             closestScore = Math.max(influenceResult.closenessScore, closestScore);
             if (influenceResult.canFullyMeet()) {
                 return influenceResult;
             }
         }
 
-        // Skip this planet  
-        return backtrack(planets,
-            currentResources,
-            currentInfluence,
-            index + 1,
-            usedPlanets,
-            remainingTradeGoods, goal, player, game, closestScore);
+        // Skip this planet
+        return backtrack(
+                planets,
+                currentResources,
+                currentInfluence,
+                index + 1,
+                usedPlanets,
+                remainingTradeGoods,
+                goal,
+                player,
+                game,
+                closestScore);
     }
 
-    public static void displayerScoringProgression(Game game, boolean onlyThisGameObj, MessageChannel channel, String stage1sOrTwos) {
+    public static void displayerScoringProgression(
+            Game game, boolean onlyThisGameObj, MessageChannel channel, String stage1sOrTwos) {
         StringBuilder msg = new StringBuilder();
         int x = 1;
         if (onlyThisGameObj) {
             for (String id : game.getRevealedPublicObjectives().keySet()) {
                 if (Mapper.getPublicObjective(id) != null) {
-                    msg.append(representScoring(game, id, x)).append("\n");
+                    msg.append(representScoring(game, id, x)).append("\n\n");
                     x++;
                 }
             }
@@ -241,17 +280,20 @@ public class ListPlayerInfoService {
             }
             msg.append(representSecrets(game)).append("\n");
             msg.append(representSupports(game)).append("\n");
+            if (gameHasTransferablePoints(game)) {
+                msg.append(representTransferablePoints(game)).append("\n");
+            }
             msg.append(representTotalVPs(game)).append("\n");
         } else {
             for (String id : Mapper.getPublicObjectives().keySet()) {
                 if (Mapper.getPublicObjective(id).getSource() == Source.ComponentSource.pok
-                    || Mapper.getPublicObjective(id).getSource() == Source.ComponentSource.base) {
-                    if (stage1sOrTwos.equalsIgnoreCase("" + Mapper.getPublicObjective(id).getPoints())
-                        || stage1sOrTwos.equalsIgnoreCase("both")) {
+                        || Mapper.getPublicObjective(id).getSource() == Source.ComponentSource.base) {
+                    if (stage1sOrTwos.equalsIgnoreCase(
+                                    "" + Mapper.getPublicObjective(id).getPoints())
+                            || "both".equalsIgnoreCase(stage1sOrTwos)) {
                         msg.append(representScoring(game, id, x)).append("\n");
                         x++;
                     }
-
                 }
             }
         }
@@ -262,10 +304,11 @@ public class ListPlayerInfoService {
         return representScoring(game, objID, x, false);
     }
 
-    public static String representScoring(Game game, String objID, int x, boolean secret) {
+    private static String representScoring(Game game, String objID, int x, boolean secret) {
         StringBuilder representation;
         if (secret) {
-            representation = new StringBuilder(x + ". " + SecretObjectiveInfoService.getSecretObjectiveRepresentation(objID) + "> ");
+            representation = new StringBuilder(
+                    x + ". " + SecretObjectiveInfoService.getSecretObjectiveRepresentation(objID) + "> ");
         } else {
             PublicObjectiveModel model = Mapper.getPublicObjective(objID);
             if (x > 0) {
@@ -278,21 +321,33 @@ public class ListPlayerInfoService {
             for (Player player : game.getRealPlayers()) {
                 representation.append(player.getFactionEmoji()).append(": ");
                 if (secret) {
-                    if (game.didPlayerScoreThisAlready(player.getUserID(), objID) || game.didPlayerScoreThisAlready(player.getUserID(), Mapper.getSecretObjectivesJustNames().get(objID))) {
+                    if (game.didPlayerScoreThisAlready(player.getUserID(), objID)
+                            || game.didPlayerScoreThisAlready(
+                                    player.getUserID(),
+                                    Mapper.getSecretObjectivesJustNames().get(objID))) {
                         representation.append("✅  ");
                     } else {
                         if (getObjectiveThreshold(objID, game) > 0) {
-                            representation.append(" (").append(getPlayerProgressOnObjective(objID, game, player)).append("/").append(getObjectiveThreshold(objID, game)).append(")  ");
+                            representation
+                                    .append(" (")
+                                    .append(getPlayerProgressOnObjective(objID, game, player))
+                                    .append("/")
+                                    .append(getObjectiveThreshold(objID, game))
+                                    .append(")  ");
                         } else {
                             representation.append("0/1  ");
                         }
                     }
                 } else {
                     if (game.getRevealedPublicObjectives().containsKey(objID)
-                        && game.didPlayerScoreThisAlready(player.getUserID(), objID)) {
+                            && game.didPlayerScoreThisAlready(player.getUserID(), objID)) {
                         representation.append("✅  ");
                     } else {
-                        representation.append(getPlayerProgressOnObjective(objID, game, player)).append("/").append(getObjectiveThreshold(objID, game)).append("  ");
+                        representation
+                                .append(getPlayerProgressOnObjective(objID, game, player))
+                                .append("/")
+                                .append(getObjectiveThreshold(objID, game))
+                                .append("  ");
                     }
                 }
             }
@@ -300,31 +355,90 @@ public class ListPlayerInfoService {
         return representation.toString();
     }
 
-    public static String representSecrets(Game game) {
+    private static String representSecrets(Game game) {
         StringBuilder representation = new StringBuilder("__**Scored Secret Objectives**__\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
-                representation.append(player.getFactionEmoji()).append(": ").append(player.getSoScored()).append("/").append(player.getMaxSOCount()).append("  ");
+                representation
+                        .append(player.getFactionEmoji())
+                        .append(": ")
+                        .append(player.getSoScored())
+                        .append("/")
+                        .append(player.getMaxSOCount())
+                        .append("  ");
             }
         }
         return representation.toString();
     }
 
-    public static String representSupports(Game game) {
+    private static String representSupports(Game game) {
         StringBuilder representation = new StringBuilder("__**Support Victory Points**__\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
-                representation.append(player.getFactionEmoji()).append(": ").append(player.getSupportForTheThroneVictoryPoints()).append("/1  ");
+                representation
+                        .append(player.getFactionEmoji())
+                        .append(": ")
+                        .append(player.getSupportForTheThroneVictoryPoints())
+                        .append("/1  ");
             }
         }
         return representation.toString();
     }
 
-    public static String representTotalVPs(Game game) {
+    private static String getTransferablePointRepresentation(String objectiveId) {
+        return switch (objectiveId) {
+            case Constants.VOICE_OF_THE_COUNCIL_PO, "Shard of the Throne", "Political Censure" -> objectiveId;
+            case "Shard of the Throne (1)", "Shard of the Throne (2)", "Shard of the Throne (3)" -> objectiveId;
+            case "Ixthian Rex Point" -> objectiveId;
+            default -> null;
+        };
+    }
+
+    private static boolean gameHasTransferablePoints(Game game) {
+        return game.getCustomPublicVP().keySet().stream()
+                .anyMatch(obj -> getTransferablePointRepresentation(obj) != null);
+    }
+
+    private static String representTransferablePoints(Game game) {
+        StringBuilder representation = new StringBuilder("__**Transferable Points**__");
+        if (!game.isFowMode()) {
+            for (var objective : game.getCustomPublicVP().entrySet()) {
+                String mutablePointRepresentation = getTransferablePointRepresentation(objective.getKey());
+                if (mutablePointRepresentation == null) continue;
+
+                List<String> scoringPlayers = game.getScoredPublicObjectives().get(objective.getKey());
+                if (scoringPlayers == null) {
+                    scoringPlayers = Collections.emptyList();
+                }
+                representation
+                        .append("\n> ")
+                        .append(mutablePointRepresentation)
+                        .append(" (")
+                        .append(objective.getValue())
+                        .append(" VP)")
+                        .append(": ")
+                        .append(scoringPlayers.stream()
+                                .map(game::getPlayer)
+                                .filter(Objects::nonNull)
+                                .map(Player::getRepresentationNoPing)
+                                .reduce((a, b) -> a + ", " + b)
+                                .orElse("Not currently held"));
+            }
+        }
+        return representation.toString();
+    }
+
+    private static String representTotalVPs(Game game) {
         StringBuilder representation = new StringBuilder("__**Total Victory Points**__\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
-                representation.append(player.getFactionEmoji()).append(": ").append(player.getTotalVictoryPoints()).append("/").append(game.getVp()).append("  ");
+                representation
+                        .append(player.getFactionEmoji())
+                        .append(": ")
+                        .append(player.getTotalVictoryPoints())
+                        .append("/")
+                        .append(game.getVp())
+                        .append("  ");
             }
         }
         return representation.toString();
@@ -350,8 +464,9 @@ public class ListPlayerInfoService {
             case "outer_rim", "control_borderlands", "control_borderlands_omegaphase" -> {
                 int edge = 0;
                 for (Tile tile : game.getTileMap().values()) {
-                    if (FoWHelper.playerHasUnitsInSystem(player, tile) && tile.isEdgeOfBoard(game)
-                        && tile != player.getHomeSystemTile()) {
+                    if (FoWHelper.playerHasUnitsInSystem(player, tile)
+                            && tile.isEdgeOfBoard(game)
+                            && tile != player.getHomeSystemTile()) {
                         edge++;
                     }
                 }
@@ -369,18 +484,24 @@ public class ListPlayerInfoService {
             }
             case "infrastructure", "protect_border" -> {
                 int counter = 0;
-                for (String planet : player.getPlanets()) {
+                int maxPlanets = counter;
+                for (String planet : player.getPlanetsAllianceMode()) {
                     UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-                    if (uH != null && game.getTileFromPlanet(planet) != player.getHomeSystemTile()
-                        && (uH.getUnitCount(Units.UnitType.Spacedock, player) > 0
-                            || uH.getUnitCount(Units.UnitType.Pds, player) > 0)) {
-                        counter++;
+                    if (uH != null && game.getTileFromPlanet(planet) != player.getHomeSystemTile()) {
+                        if (uH.getUnitCount(Units.UnitType.Spacedock, player) > 0
+                                || uH.getUnitCount(Units.UnitType.Pds, player) > 0) {
+                            counter++;
+                        }
+                        maxPlanets++;
                     }
                 }
                 if (player.hasAbility("privileged_citizenry")) {
                     counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false);
                 }
-                return counter;
+                if (player.hasAbility("orbital_foundries")) {
+                    counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                }
+                return Math.min(counter, maxPlanets);
             }
             case "corner", "unify_colonies", "corner_omegaphase" -> {
                 int max = 0;
@@ -404,7 +525,6 @@ public class ListPlayerInfoService {
             }
             case "master_science_omegaphase" -> {
                 return ButtonHelper.getNumberOfNonUnitUpgrades(player);
-
             }
             case "monument", "golden_age" -> {
                 int x = Helper.getPlayerResourcesAvailable(player, game) + player.getTg() + comms;
@@ -443,7 +563,8 @@ public class ListPlayerInfoService {
                 int count = 0;
                 Tile mecatol = game.getMecatolTile();
                 if (mecatol == null) return 2;
-                for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, mecatol.getPosition(), player, false)) {
+                for (String pos :
+                        FoWHelper.getAdjacentTilesAndNotThisTile(game, mecatol.getPosition(), player, false)) {
                     Tile tile2 = game.getTileByPosition(pos);
                     if (FoWHelper.playerHasShipsInSystem(player, tile2)) {
                         count++;
@@ -455,7 +576,8 @@ public class ListPlayerInfoService {
                 int count = 0;
                 Tile mecatol = game.getMecatolTile();
                 if (mecatol == null) return 3;
-                for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, mecatol.getPosition(), player, false)) {
+                for (String pos :
+                        FoWHelper.getAdjacentTilesAndNotThisTile(game, mecatol.getPosition(), player, false)) {
                     Tile tile2 = game.getTileByPosition(pos);
                     if (tile2.containsPlayersUnits(player)) {
                         count++;
@@ -480,12 +602,21 @@ public class ListPlayerInfoService {
                     int forInfluence = Math.min(3, Helper.getPlayerInfluenceAvailable(player, game));
                     return forTG + leftOverTg + forInfluence + forResources;
                 } else {
-                    return forTG + checkObjective(player.getReadiedPlanets(), leftOverTg, 3, player, game, 0).closenessScore;
+                    return forTG
+                            + checkObjective(player.getReadiedPlanets(), leftOverTg, 3, player, game, 0).closenessScore;
                 }
             }
             case "build_defenses", "massive_cities", "massive_cities_omegaphase" -> {
-                return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
-                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd", false);
+                int counter = 0;
+                if (player.hasAbility("orbital_foundries")) {
+                    counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                }
+                if (player.hasUnit("ghoti_flagship")) {
+                    counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", false);
+                }
+                return counter
+                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
+                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd", false);
             }
             case "lost_outposts", "ancient_monuments", "ancient_monuments_omegaphase" -> {
                 int count = 0;
@@ -494,7 +625,8 @@ public class ListPlayerInfoService {
                     if (planet.hasAttachment()) {
                         count++;
                     } else {
-                        if (planet.getName().contains("custodia") && game.getStoredValue("terraformedPlanet").equalsIgnoreCase(planet.getName())) {
+                        if (planet.getName().contains("custodia")
+                                && game.getStoredValue("terraformedPlanet").equalsIgnoreCase(planet.getName())) {
                             count++;
                         }
                     }
@@ -503,8 +635,8 @@ public class ListPlayerInfoService {
             }
             case "engineer_marvel" -> {
                 return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "fs", false)
-                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "lady", false)
-                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "lady", false)
+                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
             }
             case "deep_space", "vast_territories", "vast_territories_omegaphase" -> {
                 return ButtonHelper.getNumberOfTilesPlayerIsInWithNoPlanets(game, player);
@@ -536,7 +668,7 @@ public class ListPlayerInfoService {
                 int count = 0;
                 for (String planet : player.getPlanets()) {
                     Tile tile = game.getTileFromPlanet(planet);
-                    if (tile != null && tile.isHomeSystem() && tile != player.getHomeSystemTile()) {
+                    if (tile != null && tile.isHomeSystem(game) && tile != player.getHomeSystemTile()) {
                         count++;
                     }
                 }
@@ -544,8 +676,9 @@ public class ListPlayerInfoService {
             }
             case "supremacy", "supremacy_omegaphase" -> {
                 int count = 0;
-                for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship, Units.UnitType.Warsun, Units.UnitType.Lady)) {
-                    if ((tile.isHomeSystem() && tile != player.getHomeSystemTile()) || tile.isMecatol()) {
+                for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                        game, player, Units.UnitType.Flagship, Units.UnitType.Warsun, Units.UnitType.Lady)) {
+                    if ((tile.isHomeSystem(game) && tile != player.getHomeSystemTile()) || tile.isMecatol()) {
                         count++;
                     }
                 }
@@ -562,7 +695,8 @@ public class ListPlayerInfoService {
                     int forInfluence = Math.min(6, Helper.getPlayerInfluenceAvailable(player, game));
                     return forTG + leftOverTg + forInfluence + forResources;
                 } else {
-                    return forTG + checkObjective(player.getReadiedPlanets(), leftOverTg, 6, player, game, 0).closenessScore;
+                    return forTG
+                            + checkObjective(player.getReadiedPlanets(), leftOverTg, 6, player, game, 0).closenessScore;
                 }
             }
             case "distant_lands", "distant_lands_omegaphase" -> {
@@ -584,7 +718,7 @@ public class ListPlayerInfoService {
                 // This number may be inaccurate when it's greater than 3, but it is always accurate for 2
                 return Math.min(planetsAdjToHomes.size(), homesAdjTo.size());
             }
-            //status phase secrets
+            // Status Phase secrets
             case "pem" -> {
                 return ButtonHelper.checkHighestProductionSystem(player, game); // 8 production
             }
@@ -593,7 +727,8 @@ public class ListPlayerInfoService {
                 for (String p : player.getPlanets()) {
                     Planet planet = game.getPlanetsInfo().get(p);
                     if (planet == null) {
-                        BotLogger.warning(new BotLogger.LogMessageOrigin(player), "Planet \"" + p + "\" not found for game " + game.getName());
+                        BotLogger.warning(
+                                new LogOrigin(player), "Planet \"" + p + "\" not found for game " + game.getName());
                     } else if (planet.isLegendary()) {
                         count++;
                     }
@@ -631,7 +766,7 @@ public class ListPlayerInfoService {
             }
             case "mtm" -> {
                 int count = 0;
-                for (String planet : player.getPlanets()) {
+                for (String planet : player.getPlanetsAllianceMode()) {
                     UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                     if (uH != null && uH.getUnitCount(Units.UnitType.Mech, player) > 0) {
                         count++;
@@ -661,8 +796,8 @@ public class ListPlayerInfoService {
             }
             case "dfat" -> {
                 Tile tile = Optional.ofNullable(game.getTileFromPlanet("mallice"))
-                    .orElseGet(() -> game.getTileFromPlanet("hexmallice"));
-                if (tile == null || !FoWHelper.playerHasUnitsInSystem(player, tile)) {
+                        .orElseGet(() -> game.getTileFromPlanet("hexmallice"));
+                if (!FoWHelper.playerHasUnitsInSystem(player, tile)) {
                     return 0;
                 } else {
                     return 1;
@@ -678,8 +813,7 @@ public class ListPlayerInfoService {
                     if (tile == null) {
                         continue;
                     }
-                    for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player,
-                        false, false)) {
+                    for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, false)) {
                         Tile tile2 = game.getTileByPosition(pos);
                         if (ButtonHelper.checkNumberShips(player, tile2) > 0) {
                             count++;
@@ -690,18 +824,17 @@ public class ListPlayerInfoService {
             }
             case "ose" -> {
                 Tile mecatol = game.getMecatolTile();
-                boolean controlsMecatol = player.getPlanets().stream()
-                    .anyMatch(Constants.MECATOLS::contains);
-                if (mecatol == null || !FoWHelper.playerHasUnitsInSystem(player, mecatol) || !controlsMecatol) {
+                boolean controlsMecatol = player.getPlanets().stream().anyMatch(Constants.MECATOLS::contains);
+                if (!FoWHelper.playerHasUnitsInSystem(player, mecatol) || !controlsMecatol) {
                     return 0;
                 } else {
                     return ButtonHelper.checkNumberShips(player, mecatol);
                 }
             }
             case "mrm" -> {
-                return ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", false); //4 hazardous
+                return ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", false); // 4 hazardous
             }
-            case "mlp" -> {//4 techs of a color
+            case "mlp" -> { // 4 techs of a color
                 int maxNum = 0;
                 for (TechnologyType type : TechnologyType.mainFour)
                     maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, type));
@@ -714,8 +847,7 @@ public class ListPlayerInfoService {
                 int count = 0;
                 for (Tile tile : game.getTileMap().values()) {
                     if (ButtonHelper.checkNumberShips(player, tile) > 0) {
-                        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player,
-                            false, false)) {
+                        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, false)) {
                             Tile tile2 = game.getTileByPosition(pos);
                             if (tile2.isAnomaly(game)) {
                                 count++;
@@ -744,14 +876,14 @@ public class ListPlayerInfoService {
                     if (!Mapper.getTech(nekroTech).getFaction().orElse("").isEmpty()) {
                         count += 1;
                     }
-
                 }
                 return count;
             }
             case "btgk" -> {
                 int alpha = 0;
                 for (Tile tile : game.getTileMap().values()) {
-                    if (FoWHelper.doesTileHaveAlpha(game, tile.getPosition()) && FoWHelper.playerHasShipsInSystem(player, tile)) {
+                    if (FoWHelper.doesTileHaveAlpha(game, tile.getPosition())
+                            && FoWHelper.playerHasShipsInSystem(player, tile)) {
                         alpha = 1;
                         break;
                     }
@@ -759,7 +891,8 @@ public class ListPlayerInfoService {
 
                 int beta = 0;
                 for (Tile tile : game.getTileMap().values()) {
-                    if (FoWHelper.doesTileHaveBeta(game, tile.getPosition()) && FoWHelper.playerHasShipsInSystem(player, tile)) {
+                    if (FoWHelper.doesTileHaveBeta(game, tile.getPosition())
+                            && FoWHelper.playerHasShipsInSystem(player, tile)) {
                         beta = 1;
                         break;
                     }
@@ -781,7 +914,8 @@ public class ListPlayerInfoService {
                     if (p2 == player) {
                         continue;
                     }
-                    for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, Units.UnitType.Spacedock)) {
+                    for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                            game, p2, Units.UnitType.Spacedock)) {
                         if (ButtonHelper.checkNumberShips(player, tile) > 0) {
                             count++;
                         }
@@ -798,7 +932,6 @@ public class ListPlayerInfoService {
             case "fc" -> {
                 return player.getNeighbourCount(); // neighbors
             }
-
         }
         return 0;
     }

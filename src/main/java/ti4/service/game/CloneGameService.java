@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 
 @UtilityClass
 public class CloneGameService {
@@ -27,10 +27,8 @@ public class CloneGameService {
 
         long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
-        Role gameRole = guild.createRole()
-            .setName(cloneName)
-            .setMentionable(true)
-            .complete();
+        Role gameRole =
+                guild.createRole().setName(cloneName).setMentionable(true).complete();
         for (Player player : game.getRealPlayers()) {
             Member member = guild.getMemberById(player.getUserID());
             if (member != null) {
@@ -41,23 +39,23 @@ public class CloneGameService {
         long gameRoleID = gameRole.getIdLong();
         // CREATE TABLETALK CHANNEL
         TextChannel chatChannel = guild.createTextChannel(newChatChannelName, category)
-            .syncPermissionOverrides()
-            .addRolePermissionOverride(gameRoleID, permission, 0)
-            .complete();
+                .syncPermissionOverrides()
+                .addRolePermissionOverride(gameRoleID, permission, 0)
+                .complete();
 
         // CREATE ACTIONS CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
-            .syncPermissionOverrides()
-            .addRolePermissionOverride(gameRoleID, permission, 0)
-            .complete();
+                .syncPermissionOverrides()
+                .addRolePermissionOverride(gameRoleID, permission, 0)
+                .complete();
 
         game.setTableTalkChannelID(chatChannel.getId());
         game.setMainChannelID(actionsChannel.getId());
         game.setName(cloneName);
         game.shuffleDecks();
         // CREATE BOT/MAP THREAD
-        ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
-            .complete();
+        ThreadChannel botThread =
+                actionsChannel.createThreadChannel(newBotThreadName).complete();
         game.setBotMapUpdatesThreadID(botThread.getId());
         for (Player player : game.getRealPlayers()) {
             player.setCardsInfoThreadID(null);

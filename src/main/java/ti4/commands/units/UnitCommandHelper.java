@@ -1,9 +1,9 @@
 package ti4.commands.units;
 
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.jetbrains.annotations.Nullable;
 import ti4.commands.CommandHelper;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.CommandCounterHelper;
@@ -37,11 +37,11 @@ class UnitCommandHelper {
             case "t/tactic", "t", "tactic", "tac", "tact" -> {
                 RemoveCommandCounterService.fromTacticsPool(event, color, tile, game);
                 CommandCounterHelper.addCC(event, game, color, tile);
-                Helper.isCCCountCorrect(event, game, color);
+                Helper.isCCCountCorrect(game, color);
             }
             case "r/retreat/reinforcements", "r", "retreat", "reinforcements" -> {
                 CommandCounterHelper.addCC(event, game, color, tile);
-                Helper.isCCCountCorrect(event, game, color);
+                Helper.isCCCountCorrect(game, color);
             }
         }
     }
@@ -52,7 +52,10 @@ class UnitCommandHelper {
         if (otherPlayer != null) {
             return otherPlayer.getColor();
         }
-        MessageHelper.replyToMessage(event, Constants.TARGET_FACTION_OR_COLOR + " option is not valid. Use `/special2 setup_neutral_player` for neutrals.");
+        MessageHelper.replyToMessage(
+                event,
+                Constants.TARGET_FACTION_OR_COLOR
+                        + " option is not valid. Use `/special2 setup_neutral_player` for neutrals.");
         return null;
     }
 }

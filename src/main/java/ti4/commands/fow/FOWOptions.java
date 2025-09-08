@@ -13,6 +13,6 @@ class FOWOptions extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        FOWOptionService.offerFOWOptionButtons(getGame(), event.getChannel());
+        FOWOptionService.offerFOWOptionButtons(getGame());
     }
 }

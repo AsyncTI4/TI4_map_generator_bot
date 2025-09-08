@@ -1,7 +1,6 @@
 package ti4.commands.franken;
 
 import java.util.Objects;
-
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -21,19 +20,25 @@ class FrankenEdit extends GameStateSubcommand {
     public FrankenEdit() {
         super(Constants.FRANKEN_EDIT, "Frankendraft Edit Commands", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FRANKEN_EDIT_ACTION, "add/remove/swap/view")
-            .addChoice("Force Bag Swap", "forceSwap")
-            .addChoice("Add Card To Bag", "addBag").addChoice("Remove Card From Bag", "removeBag")
-            .addChoice("Swap Cards In Bag", "swapBag").addChoice("View Bag", "viewBag")
-            .addChoice("Add Card To Hand", "addHand").addChoice("Remove Card From Hand", "removeHand")
-            .addChoice("Swap Cards In Hand", "swapHand").addChoice("View Hand", "viewHand")
-            .addChoice("Add Card To Queue", "addQueue").addChoice("Remove Card From Queue", "removeQueue")
-            .addChoice("Swap Cards In Queue", "swapQueue").addChoice("View Queue", "viewQueue")
-            .addChoice("View All", "viewAll")
-            .setRequired(true));
+                .addChoice("Force Bag Swap", "forceSwap")
+                .addChoice("Add Card To Bag", "addBag")
+                .addChoice("Remove Card From Bag", "removeBag")
+                .addChoice("Swap Cards In Bag", "swapBag")
+                .addChoice("View Bag", "viewBag")
+                .addChoice("Add Card To Hand", "addHand")
+                .addChoice("Remove Card From Hand", "removeHand")
+                .addChoice("Swap Cards In Hand", "swapHand")
+                .addChoice("View Hand", "viewHand")
+                .addChoice("Add Card To Queue", "addQueue")
+                .addChoice("Remove Card From Queue", "removeQueue")
+                .addChoice("Swap Cards In Queue", "swapQueue")
+                .addChoice("View Queue", "viewQueue")
+                .addChoice("View All", "viewAll")
+                .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FRANKEN_ITEM + "1", "The card to edit"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FRANKEN_ITEM + "2", "Use with 'swap'. The card to swap Arg1 with."));
+        addOptions(new OptionData(
+                OptionType.STRING, Constants.FRANKEN_ITEM + "2", "Use with 'swap'. The card to swap Arg1 with."));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player @playername"));
-
     }
 
     @Override
@@ -45,8 +50,9 @@ class FrankenEdit extends GameStateSubcommand {
         String command = editOption.getAsString();
 
         if ("viewAll".equals(command)) {
-            MessageHelper.sendMessageToUser("====================\n" + game.getName() +
-                " Frankendraft Status\n====================", event.getUser());
+            MessageHelper.sendMessageToUser(
+                    "====================\n" + game.getName() + " Frankendraft Status\n====================",
+                    event.getUser());
             for (var player : game.getRealPlayers()) {
                 dmPlayerBag(game, player, player.getCurrentDraftBag(), "Held Bag", event.getUser());
                 dmPlayerBag(game, player, player.getDraftHand(), "Hand", event.getUser());
@@ -89,11 +95,13 @@ class FrankenEdit extends GameStateSubcommand {
                 }
             } else if (command.contains("remove")) {
                 if (card1 != null) {
-                    editingBag.Contents.removeIf((DraftItem item) -> Objects.equals(item.getAlias(), card1.getAsString()));
+                    editingBag.Contents.removeIf(
+                            (DraftItem item) -> Objects.equals(item.getAlias(), card1.getAsString()));
                 }
             } else if (command.contains("swap")) {
                 if (card1 != null && card2 != null) {
-                    editingBag.Contents.removeIf((DraftItem item) -> Objects.equals(item.getAlias(), card1.getAsString()));
+                    editingBag.Contents.removeIf(
+                            (DraftItem item) -> Objects.equals(item.getAlias(), card1.getAsString()));
                     editingBag.Contents.add(DraftItem.generateFromAlias(card2.getAsString()));
                 }
             }
@@ -104,7 +112,12 @@ class FrankenEdit extends GameStateSubcommand {
 
     private void dmPlayerBag(Game game, Player player, DraftBag bag, String bagName, User user) {
         StringBuilder sb = new StringBuilder();
-        sb.append(game.getName()).append(" ").append(player.getUserName()).append(" Current ").append(bagName).append(":\n");
+        sb.append(game.getName())
+                .append(" ")
+                .append(player.getUserName())
+                .append(" Current ")
+                .append(bagName)
+                .append(":\n");
         for (DraftItem item : bag.Contents) {
             sb.append(item.getAlias());
             sb.append("\n");

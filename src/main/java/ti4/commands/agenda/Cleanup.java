@@ -1,7 +1,6 @@
 package ti4.commands.agenda;
 
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -14,7 +13,7 @@ import ti4.message.MessageHelper;
 class Cleanup extends GameStateSubcommand {
 
     public Cleanup() {
-        super(Constants.CLEANUP, "Agenda phase cleanup", true, false);
+        super(Constants.CLEANUP, "Agenda Phase cleanup", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm command with YES").setRequired(true));
     }
 

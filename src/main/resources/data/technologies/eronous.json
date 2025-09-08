@@ -1,0 +1,116 @@
+[
+    {
+        "alias": "cantoy",
+        "name": "Integrated Systems",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYY",
+        "faction": "canto",
+        "source": "eronous",
+        "text": "After 1 of your opponents units is destroyed, you may exhaust this card to gain the unit upgrade technology of that unit type. During a space combat, after 1 of your opponents units are destroyed. Exhaust this card to gain the unit upgrade technology of that unit type."
+    },
+    {
+        "alias": "cantor",
+        "name": "Syoblade",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "faction": "canto",
+        "source": "eronous",
+        "text": "During the first round of ground combat, apply +2 to the result of each of your unit's combat rolls."
+    },
+    {
+        "alias": "eidolonff",
+        "name": "Wurm’s Eye II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "BG",
+        "baseUpgrade": "ff2",
+        "faction": "eidolon",
+        "source": "eronous",
+        "text": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. 1(x2), 7, 2, -;"
+    },
+    {
+        "alias": "eidolonb",
+        "name": "Daetalin Engine",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBB",
+        "faction": "eidolon",
+        "source": "eronous",
+        "text": "During your tactical actions, you may treat each system that contains no planets as adjacent to each other."
+    },
+    {
+        "alias": "shadowssd",
+        "name": "Umbrae Ring II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "baseUpgrade": "sd2",
+        "faction": "shadows",
+        "source": "eronous",
+        "text": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. 1(x2), 7, 2, -;"
+    },
+    {
+        "alias": "shadowsy",
+        "name": "Byophysma",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "shadows",
+        "source": "eronous",
+        "text": "When you produce units in a system, you may exhaust this card to place up to 1 non-fighter ship you produce in an adjacent system that does not contain another player's ships."
+    },
+    {
+        "alias": "mechig",
+        "name": "Overdrive",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "mechi",
+        "source": "eronous",
+        "text": "After another player activates a system that contains one of your units with PRODUCTION. You may produce one unit in that system."
+    },
+    {
+        "alias": "mechiy",
+        "name": "Ikanium Shielding",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYY",
+        "faction": "mechi",
+        "source": "eronous",
+        "text": "Each of your units with PRODUCTION gains PLANETARY SHIELD. Planets that contain one of your Space Docks cannot be bombarded."
+    },
+    {
+        "alias": "saeracr",
+        "name": "Avenger II ",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GRY",
+        "baseUpgrade": "cr2",
+        "faction": "saera",
+        "source": "eronous",
+        "text": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit in your home system if able. 2, 6, 3, 1; Abilities: ANTI-FIGHTER BARRAGE 6"
+    },
+    {
+        "alias": "saeray",
+        "name": "Hielas Array",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "saera",
+        "source": "eronous",
+        "text": "After a player activates a system that contains 1 or more of another player’s units, you may exhaust this card and spend 1 token from your strategy pool; immediately end that player's turn."
+    }
+    
+]

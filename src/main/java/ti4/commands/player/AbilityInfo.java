@@ -7,14 +7,12 @@ import ti4.service.info.AbilityInfoService;
 
 class AbilityInfo extends GameStateSubcommand {
 
-    public AbilityInfo() {
+    AbilityInfo() {
         super(Constants.ABILITY_INFO, "Send faction abilities information to your #cards-info thread", false, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        AbilityInfoService.sendAbilityInfo(getGame(), getPlayer(), event);
+        AbilityInfoService.sendAbilityInfo(getPlayer(), event);
     }
-
-
 }

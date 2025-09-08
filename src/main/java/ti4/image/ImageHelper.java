@@ -1,22 +1,27 @@
 package ti4.image;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
+import com.luciad.imageio.webp.CompressionType;
+import com.luciad.imageio.webp.WebPWriteParam;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-
+import javax.annotation.Nullable;
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.service.emoji.TI4Emoji;
 
 @UtilityClass
@@ -27,7 +32,7 @@ public class ImageHelper {
         if (filePath == null) {
             return null;
         }
-        return ImageCache.getInstance().getOrLoadStaticImage(filePath, k -> readImage(filePath));
+        return ImageCache.getOrLoadStaticImage(filePath, k -> readImage(filePath));
     }
 
     @Nullable
@@ -35,7 +40,7 @@ public class ImageHelper {
         if (filePath == null) {
             return null;
         }
-        return ImageCache.getInstance().getOrLoadStaticImage(percent + filePath, k -> {
+        return ImageCache.getOrLoadStaticImage(percent + filePath, k -> {
             BufferedImage image = readImage(filePath);
             if (image == null) {
                 return null;
@@ -49,7 +54,7 @@ public class ImageHelper {
         if (filePath == null) {
             return null;
         }
-        return ImageCache.getInstance().getOrLoadStaticImage(width + "x" + height + filePath, k -> {
+        return ImageCache.getOrLoadStaticImage(width + "x" + height + filePath, k -> {
             BufferedImage image = readImage(filePath);
             if (image == null) {
                 return null;
@@ -63,16 +68,14 @@ public class ImageHelper {
 
     @Nullable
     public static BufferedImage readEmojiImageScaled(String emoji, int size) {
-        if (Emoji.fromFormatted(emoji) instanceof CustomEmoji e)
-            return ImageHelper.readURLScaled(e.getImageUrl(), size, size);
+        Emoji em = Emoji.fromFormatted(emoji);
+        if (em instanceof CustomEmoji e) return readURLScaled(e.getImageUrl(), size, size);
         return null;
     }
 
     @Nullable
     public static BufferedImage readEmojiImageScaled(TI4Emoji emoji, int size) {
-        if (emoji.asEmoji() != null && emoji.asEmoji() instanceof CustomEmoji e)
-            return ImageHelper.readURLScaled(e.getImageUrl(), size, size);
-        return null;
+        return readEmojiImageScaled(emoji.emojiString(), size);
     }
 
     @Nullable
@@ -80,7 +83,7 @@ public class ImageHelper {
         if (imageURL == null) {
             return null;
         }
-        return ImageCache.getInstance().getOrLoadExpiringImage(width + "x" + height + imageURL, k -> {
+        return ImageCache.getOrLoadExpiringImage(width + "x" + height + imageURL, k -> {
             BufferedImage image = readImageURL(imageURL);
             if (image == null) {
                 return null;
@@ -110,7 +113,7 @@ public class ImageHelper {
         return square(originalImage, newSize);
     }
 
-    public static BufferedImage square(@NotNull BufferedImage originalImage, int newSize) {
+    private static BufferedImage square(@NotNull BufferedImage originalImage, int newSize) {
         BufferedImage outputImage = new BufferedImage(newSize, newSize, BufferedImage.TYPE_INT_ARGB);
         int newX = (newSize - originalImage.getWidth()) / 2;
         int newY = (newSize - originalImage.getHeight()) / 2;
@@ -162,6 +165,29 @@ public class ImageHelper {
     public static byte[] writePng(BufferedImage image) {
         try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
             ImageIO.write(image, "png", byteArrayOutputStream);
+            return byteArrayOutputStream.toByteArray();
+        }
+    }
+
+    @SneakyThrows
+    public static byte[] writeWebp(BufferedImage image) {
+        var imageWithoutAlpha = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
+        try (var byteArrayOutputStream = new ByteArrayOutputStream();
+                var imageOutputStream = ImageIO.createImageOutputStream(byteArrayOutputStream)) {
+            ImageWriter writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
+
+            WebPWriteParam writeParam = ((WebPWriteParam) writer.getDefaultWriteParam());
+            writeParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            writeParam.setCompressionType(CompressionType.Lossy);
+            writeParam.setUseSharpYUV(false);
+            writeParam.setAlphaCompressionAlgorithm(0);
+            // writeParam.setCompressionQuality(.5f);
+            // writeParam.setMethod(1); //0-6, lower is faster, higher is better quality
+
+            writer.setOutput(imageOutputStream);
+
+            // Encode
+            writer.write(null, new IIOImage(imageWithoutAlpha, null, null), writeParam);
             return byteArrayOutputStream.toByteArray();
         }
     }

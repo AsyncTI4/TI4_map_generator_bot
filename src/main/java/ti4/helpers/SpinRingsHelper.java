@@ -2,9 +2,10 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
-
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -16,16 +17,15 @@ import ti4.service.fow.FowCommunicationThreadService;
 public class SpinRingsHelper {
     private static final String DEFAULT_MSG = "Spun the rings";
     private static final List<String> STATUS_MSGS = Arrays.asList(
-      "Shifted the cosmic rings",
-        "Aligned the stellar orbits",
-        "Twisted the galactic core",
-        "Rearranged the celestial dance",
-        "Tilted the astral axis",
-        "Rotated the planetary rings",
-        "Adjusted the star-bound gyroscope",
-        "Spiraled the galactic arms",
-        "Warped the orbital paths"
-    );
+            "Shifted the cosmic rings",
+            "Aligned the stellar orbits",
+            "Twisted the galactic core",
+            "Rearranged the celestial dance",
+            "Tilted the astral axis",
+            "Rotated the planetary rings",
+            "Adjusted the star-bound gyroscope",
+            "Spiraled the galactic arms",
+            "Warped the orbital paths");
 
     private static final String CW = "cw";
     private static final String CCW = "ccw";
@@ -35,7 +35,7 @@ public class SpinRingsHelper {
         String[] customSpins = customSpinSptring.toLowerCase().split(" ");
         for (String spinString : customSpins) {
 
-            //Needs to have Ring:Direction:Steps  
+            // Needs to have Ring:Direction:Steps
             String[] spinSettings = spinString.toLowerCase().split(":");
             if (spinSettings.length != 3) {
                 return false;
@@ -47,7 +47,7 @@ public class SpinRingsHelper {
                 if (ring <= 0) {
                     return false;
                 }
-                smallestRing = ring < smallestRing ? ring : smallestRing;
+                smallestRing = Math.min(ring, smallestRing);
             }
 
             String direction = spinSettings[1];
@@ -55,7 +55,7 @@ public class SpinRingsHelper {
                 return false;
             }
 
-            //Step counts must be less than tiles in smallest ring
+            // Step counts must be less than tiles in smallest ring
             for (String stepsString : spinSettings[2].split(",")) {
                 int steps = parseInt(stepsString);
                 if (steps < 0 || steps > smallestRing * 6 - 1) {
@@ -68,19 +68,21 @@ public class SpinRingsHelper {
 
     /*
      * Custom rotation with random support
-     * 
+     *
      * Ring:Direction:Steps
      * 1:cw:1 2:ccw:2
-     * 
+     *
      * Or with random options
-     * 1,2:rnd:2,3 
+     * 1,2:rnd:2,3
      * to spin ring 1 OR 2 to random direction for 2 OR 3 steps
-     * 
+     *
      */
     public static void spinRingsCustom(Game game, String customSpinString, String flavourMsg) {
         String[] customSpins = customSpinString.toLowerCase().split(" ");
         StringBuffer sb = new StringBuffer(flavourMsg != null ? flavourMsg : "## ⚙️ " + randomStatusMessage());
+
         List<Tile> tilesToSet = new ArrayList<>();
+        List<String[]> customHyperlanesToMove = new ArrayList<>();
 
         for (String spinString : customSpins) {
             Random random = new Random();
@@ -122,7 +124,11 @@ public class SpinRingsHelper {
                             pos = x - steps;
                         }
                     }
+                    String fromPosition = tile.getPosition();
                     tile.setPosition(ring + (pos < 10 ? "0" : "") + pos);
+                    if (game.getCustomHyperlaneData().get(fromPosition) != null) {
+                        customHyperlanesToMove.add(new String[] {fromPosition, tile.getPosition()});
+                    }
                     tilesToSet.add(tile);
                     updateHomeSystem(game, tile);
                 }
@@ -132,6 +138,14 @@ public class SpinRingsHelper {
 
         for (Tile tile : tilesToSet) {
             game.setTile(tile);
+        }
+        if (!customHyperlanesToMove.isEmpty()) {
+            Map<String, String> currentData = game.getCustomHyperlaneData();
+            Map<String, String> previousData = new HashMap<>(currentData);
+            for (String[] pair : customHyperlanesToMove) {
+                currentData.remove(pair[0]);
+                currentData.put(pair[1], previousData.get(pair[0]));
+            }
         }
         game.rebuildTilePositionAutoCompleteList();
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb.toString());
@@ -146,7 +160,7 @@ public class SpinRingsHelper {
         }
     }
 
-    //the original spin logic which does
+    // the original spin logic which does
     // - ring 1 cw one step
     // - ring 2 ccw two steps
     // - ring 3 cw three steps (except 6p map HS positions)
@@ -166,11 +180,11 @@ public class SpinRingsHelper {
                 }
                 if (tile == null) {
                     continue;
-                } 
+                }
 
                 if (y == 2) {
-                    if ((x - y) < 1) {
-                        tile.setPosition(y + "" + ((x - y) + (y * 6)));
+                    if ((x - 2) < 1) {
+                        tile.setPosition(2 + "" + ((x - 2) + (2 * 6)));
                     } else {
                         if ((x - y) < 10) {
                             tile.setPosition(y + "0" + (x - y));
@@ -205,13 +219,14 @@ public class SpinRingsHelper {
     }
 
     private static void spunMessage(StringBuffer sb, int ring, String direction, int steps, Game game) {
-        sb.append("\n-# Ring ").append(ring).append(" ");
+        sb.append("\n-# Ring ");
+        sb.append(game.isFowMode() ? "?" : ring).append(" ");
         sb.append(game.isFowMode() ? "?" : direction.toUpperCase()).append(" for ");
         sb.append(game.isFowMode() ? "?" : steps).append(" steps.");
     }
 
     private static void updateHomeSystem(Game game, Tile tile) {
-        if (!tile.isHomeSystem()) return;
+        if (!tile.isHomeSystem(game)) return;
 
         for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
             if (tile.getPosition().equals(player.getHomeSystemPosition())) {

@@ -1,0 +1,34 @@
+{
+    "id": "c41",
+    "name": "Ordinian (C4)",
+    "aliases": [
+        "ordinianc4"
+    ],
+    "imagePath": "C4_Ordinian.png",
+    "shipPositionsType": "TYPE04",
+    "spaceTokenLocations": [
+        {
+            "x": 135.0,
+            "y": 55.0
+        },
+        {
+            "x": 185.0,
+            "y": 110.0
+        },
+        {
+            "x": 130.0,
+            "y": 170.0
+        },
+        {
+            "x": 65.0,
+            "y": 100.0
+        }
+    ],
+    "wormholes": [],
+    "planets": [
+        "ordinianc4"
+    ],
+    "source": "base",
+    "isNebula": true,
+    "tileBack": "black"
+}

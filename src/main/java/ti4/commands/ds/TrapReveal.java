@@ -1,7 +1,6 @@
 package ti4.commands.ds;
 
 import java.util.Collection;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -15,8 +14,10 @@ import ti4.message.MessageHelper;
 class TrapReveal extends GameStateSubcommand {
 
     public TrapReveal() {
-        super(Constants.LIZHO_REVEAL_TRAP, "Select planets were to reveal trap tokens", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet").setRequired(true).setAutoComplete(true));
+        super(Constants.LIZHO_REVEAL_TRAP, "Select planets where to reveal trap tokens", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet")
+                .setRequired(true)
+                .setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.LIZHO_TRAP_ID, "Trap ID").setRequired(true));
     }
 

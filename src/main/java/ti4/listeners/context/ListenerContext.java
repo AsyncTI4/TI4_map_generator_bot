@@ -1,18 +1,17 @@
 package ti4.listeners.context;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.CommandHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.event.EventAuditService;
@@ -28,25 +27,27 @@ public abstract class ListenerContext {
     protected final Game game;
     protected Player player;
     protected MessageChannel privateChannel, mainGameChannel, actionsChannel;
-    protected final GenericInteractionCreateEvent event;
-    
+    final GenericInteractionCreateEvent event;
+
     @Setter
     protected boolean shouldSave = true;
 
     public abstract GenericInteractionCreateEvent getEvent();
 
-    public abstract String getContextType();
+    protected abstract String getContextType();
 
     public boolean isValid() {
         return contextIsValid;
     }
 
-    public ListenerContext(GenericInteractionCreateEvent event, String compID) {
+    ListenerContext(GenericInteractionCreateEvent event, String compID) {
         this.event = event;
-        this.componentID = this.origComponentID = compID;
+        componentID = origComponentID = compID;
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        game = GameManager.isValid(gameName) ? GameManager.getManagedGame(gameName).getGame() : null;
+        game = GameManager.isValid(gameName)
+                ? GameManager.getManagedGame(gameName).getGame()
+                : null;
         player = null;
         privateChannel = event.getMessageChannel();
         mainGameChannel = event.getMessageChannel();
@@ -56,19 +57,23 @@ public abstract class ListenerContext {
             player = CommandHelper.getPlayerFromGame(game, event.getMember(), userID);
 
             if (player == null && !"showGameAgain".equalsIgnoreCase(componentID)) {
-                event.getMessageChannel().sendMessage(event.getUser().getAsMention()+" is not a player of the game").queue();
+                event.getMessageChannel()
+                        .sendMessage(event.getUser().getAsMention() + " is not a player of the game")
+                        .queue();
                 contextIsValid = false;
                 return;
             }
 
-            if (getContextType().equals("button")) {
+            if ("button".equals(getContextType())) {
                 componentID = componentID.replace("delete_buttons_", "resolveAgendaVote_");
                 game.increaseButtonPressCount();
             }
 
             if (game.isFowMode()) {
                 if (player != null && player.isRealPlayer() && player.getPrivateChannel() == null) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Private channels are not set up for this game. Messages will be suppressed.");
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(),
+                            "Private channels are not set up for this game. Messages will be suppressed.");
                     privateChannel = null;
                 } else if (player != null) {
                     privateChannel = player.getPrivateChannel();
@@ -85,7 +90,9 @@ public abstract class ListenerContext {
                 componentID = componentID.replace("dummyPlayerSpoof" + identity + "_", "");
             }
 
-            if (player != null && game.getActivePlayerID() != null && player.getUserID().equalsIgnoreCase(game.getActivePlayerID())) {
+            if (player != null
+                    && game.getActivePlayerID() != null
+                    && player.getUserID().equalsIgnoreCase(game.getActivePlayerID())) {
                 AutoPingMetadataManager.delayPing(gameName);
             }
         }
@@ -104,7 +111,7 @@ public abstract class ListenerContext {
         }
     }
 
-    public boolean checkFinsFactionChecker() {
+    private boolean checkFinsFactionChecker() {
         GenericInteractionCreateEvent event = getEvent();
         if (factionChecked || componentID == null || !componentID.startsWith("FFCC_")) {
             return true;
