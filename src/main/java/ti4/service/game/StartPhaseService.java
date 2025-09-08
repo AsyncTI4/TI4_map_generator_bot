@@ -706,7 +706,7 @@ public class StartPhaseService {
                         playerButtons);
             }
             if (player.getRelics() != null && player.hasRelic("emphidia")) {
-                for (String pl : player.getPlanets()) {
+                for (String pl : player.getPlanetsAllianceMode()) {
                     Tile tile = game.getTile(AliasHandler.resolveTile(pl));
                     if (tile == null) {
                         continue;

@@ -1,0 +1,151 @@
+[
+    {
+        "id": "underhanded_maneuver",
+        "name": "Underhanded Maneuver",
+        "faction": "arvaxi",
+        "window": "At the start of the strategy phase",
+        "windowEffect": "You may choose 1 of your neighbours. That player must give you 1 action card from their hand.",
+        "source": "balacasi"
+    },
+    {
+        "id": "scrap_metal",
+        "name": "Scrap Metal",
+        "faction": "arvaxi",
+        "window": "After you discard an action card without resolving its effects",
+        "windowEffect": "Gain 1 commodity or convert 1 commodity to a trade good. Game effects cannot prevent you from playing action cards.",
+        "source": "balacasi"
+    },
+    {
+        "id": "ultimate_authority",
+        "name": "Ultimate Authority",
+        "faction": "arvaxi",
+        "permanentEffect": "Apply +1 to the influence value of planets that contain 3 or more of your units. After you explore a planet that contains 3 or more of your units, draw 1 action card.",
+        "source": "balacasi"
+    },
+    {
+        "id": "quantum_fabrication",
+        "name": "Quantum Fabrication",
+        "faction": "xan",
+        "permanentEffect": "When you place a space dock on a planet in a non-home system using the primary or secondary ability of the Construction strategy card, you may use its PRODUCTION ability immediately.",
+        "source": "balacasi"
+    },
+    {
+        "id": "transformation_protocol",
+        "name": "Transformation Protocol",
+        "faction": "xan",
+        "permanentEffect": "When casting votes on an agenda, you may choose up to 2 of your ships that have SUSTAIN DAMAGE to become damaged. For each ship chosen, cast 4 additional votes.",
+        "source": "balacasi"
+    },
+    {
+        "id": "eusociality",
+        "name": "Eusociality",
+        "faction": "kalora",
+        "permanentEffect": "When you retreat during a space combat in a system that doesn't contain your command tokens, you do not place a command token into the target system. You may treat “Skilled Retreat” action cards as a retreat for the purpose of this ability.",
+        "source": "balacasi"
+    },
+    {
+        "id": "carapace_regeneration",
+        "name": "Carapace Regeneration",
+        "faction": "kalora",
+        "permanentEffect": "After you retreat during a space combat, repair all of your damaged ships that retreated.",
+        "source": "balacasi"
+    },
+    {
+        "id": "primordial",
+        "name": "Primordial",
+        "faction": "kalora",
+        "permanentEffect": "When you score a public objective, if you are the first to score that objective, you may gain trade goods equal to the number of other players in the game.",
+        "source": "balacasi"
+    },
+    {
+        "id": "initiation",
+        "name": "Initiation",
+        "faction": "lunarium",
+        "permanentEffect": "During setup, place 1 command token from your reinforcements on your faction sheet. ",
+        "source": "balacasi"
+    },
+    {
+        "id": "expanding_minds",
+        "name": "Expanding Minds",
+        "faction": "lunarium",
+        "permanentEffect": "You may have up to 6 command tokens on your faction sheet. Your secret objective limit is equal to the number of command tokens on your faction sheet. ",
+        "source": "balacasi"
+    },
+    {
+        "id": "multitasking",
+        "name": "Multitasking",
+        "faction": "lunarium",
+        "permanentEffect": "When you redistribute command tokens or draw a secret objective, you may move any number of command tokens between your fleet pool and your faction sheet.",
+        "source": "balacasi"
+    },
+    {
+        "id": "patience",
+        "name": "Patience",
+        "faction": "conclave",
+        "permanentEffect": "At the end of the strategy phase, place the Obsidian Infinity token on your strategy card. You are last in initiative order. When you perform a strategic action, resolve your strategy card’s secondary ability instead of its primary ability.",
+        "source": "balacasi"
+    },
+    {
+        "id": "strategic_fluidity",
+        "name": "Strategic Fluidity",
+        "faction": "conclave",
+        "permanentEffect": "When you would spend a token from your strategy pool to resolve the secondary ability of a strategy card other than Politics, you may spend an additional command token from your strategy pool to resolve the primary ability of that card instead.",
+        "source": "balacasi"
+    },
+    {
+        "id": "increased_surveillance",
+        "name": "Increased Surveillance",
+        "faction": "conclave",
+        "permanentEffect": "When you resolve the primary ability of a strategy card, place a control token on your commander. At the start of the status phase, remove your control tokens from your commander.",
+        "source": "balacasi"
+    },
+    {
+        "id": "rewrite_destiny",
+        "name": "Rewrite Destiny",
+        "faction": "tyris",
+        "permanentEffect": "Once per status phase, when the speaker reveals a public objective, you may spend 1 command token from your strategy pool to discard that objective. The speaker then reveals a new public objective from the same deck and reshuffles it.",
+        "source": "balacasi"
+    },
+    {
+        "id": "arrow_of_time",
+        "name": "Arrow of Time",
+        "faction": "tyris",
+        "permanentEffect": "During each of your turns in the action phase, you may take an additional non-strategic action.",
+        "source": "balacasi"
+    },
+    {
+        "id": "phantom_energy",
+        "name": "Phantom Energy",
+        "faction": "tyris",
+        "permanentEffect": "After you explore a frontier token during a tactical action, you may place a control token on a unit space on your faction sheet that matches a ship in the active system. You may move ships that have a control token on your faction sheet out of systems containing your command tokens. At the end of your turn, remove control tokens from your faction sheet for any ships matching those you have in systems that contain your command tokens.",
+        "source": "balacasi"
+    },
+    {
+        "id": "veiled_ember_forge",
+        "name": "Veiled Ember Forge",
+        "faction": "vyserix",
+        "permanentEffect": "After you gain control of a planet with a technology specialty, you may place 1 PDS on that planet.",
+        "source": "balacasi"
+    },
+    {
+        "id": "scattered_legions",
+        "name": "Scattered Legions",
+        "faction": "vyserix",
+        "permanentEffect": "At the end of your turns, you may not have more ground forces on a non-home planet than the greater of its resource or influence values. Place any excess on a planet you control in your home system, or return them to your reinforcements.",
+        "source": "balacasi"
+    },
+    {
+        "id": "marked_prey",
+        "name": "Marked Prey",
+        "faction": "zephyrion",
+        "permanentEffect": "At the start of the strategy phase, place any number of your bounty tokens from your reinforcements on the unit space of non-fighter ships on other players’ factions sheets. You can place a maximum of 1 bounty token per ship, per faction.",
+        "source": "balacasi"
+    },
+    {
+        "id": "confirmed_kill",
+        "name": "Confirmed Kill",
+        "faction": "zephyrion",
+        "permanentEffect": "During your turn, if a ship with a bounty token on its unit space is destroyed, return the bounty token to your reinforcements and gain 3 trade goods.",
+        "source": "balacasi"
+    }
+]
