@@ -235,12 +235,16 @@ public class AsyncTI4DiscordBot {
         //    fowServers.add(guildFogOfWarSecondary);
         // }
 
-        if (!success) {
-            BotLogger.info("Failed to start the bot on one or more servers. Aborting.");
-            BotLogger.warning("Failed to start the bot on one or more servers. Aborting.");
-            BotLogger.error("Failed to start the bot on one or more servers. Aborting.");
+        if (guildPrimary == null || guilds.isEmpty()) {
+            BotLogger.info("Failed to start the bot on the primary guild. Aborting.");
+            BotLogger.warning("Failed to start the bot on the primary guild. Aborting.");
+            BotLogger.error("Failed to start the bot on the primary guild. Aborting.");
             return;
         }
+
+        BotLogger.info("FINISHED INITIALIZING SERVERS\n> "
+                + guilds.size() + " servers connected\n> "
+                + serversToCreateNewGamesOn.size() + " servers for new games");
 
         // Attempt to start a "Search Only" version of the bot on eligible servers
         for (Guild searchGuild : jda.getGuilds()) {
@@ -346,7 +350,7 @@ public class AsyncTI4DiscordBot {
     private static Guild initGuild(String guildID, boolean addToNewGameServerList) {
         Guild guild = jda.getGuildById(guildID);
         if (guild == null) {
-            BotLogger.error("BOT FAILED TO FIND GUILD with ID: `" + guildID
+            BotLogger.error("JDA FAILED TO FIND GUILD with ID: `" + guildID
                     + "` - please ensure AsyncTI4 is added to that server and has Admin permissions.");
             return null;
         }
@@ -366,7 +370,7 @@ public class AsyncTI4DiscordBot {
         }
         if (guildPrimaryID.equals(guild.getId())) {
             guildPrimary = guild;
-            BotLogger.init(); // requires guildPrimary bot-log channel existing 
+            BotLogger.init(); // requires guildPrimary bot-log channel existing
         }
         try {
             CommandListUpdateAction commands = guild.updateCommands();
