@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.cron.CronManager;
-import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.ThreadArchiveHelper;
@@ -249,17 +248,12 @@ public class BotLogger {
     }
 
     private static void sendMessageToBotLogWebhook(String message) {
-        String botLogWebhookURL =
-                switch (AsyncTI4DiscordBot.guildPrimaryID) {
-                    case Constants.ASYNCTI4_HUB_SERVER_ID -> // AsyncTI4 Primary HUB Production Server
-                        "https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v";
-                    case "1059645656295292968" -> // PrisonerOne's Test Server
-                        "https://discord.com/api/webhooks/1159478386998116412/NiyxcE-6TVkSH0ACNpEhwbbEdIBrvTWboZBTwuooVfz5n4KccGa_HRWTbCcOy7ivZuEp";
-                    case null, default -> null;
-                };
-
+        String botLogWebhookURL = GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.BOT_LOG_WEBHOOK_URL.toString(), String.class, null);
         if (botLogWebhookURL == null) {
-            System.out.println("\"ERROR: Unable to get url for bot-log webhook\n " + message);
+            System.out.println(
+                    "\"ERROR: Unable to get url for bot-log webhook. May need to add to GlobalSettings with /developer settings command. "
+                            + message);
             return;
         }
         DiscordWebhook webhook = new DiscordWebhook(botLogWebhookURL);
@@ -267,7 +261,10 @@ public class BotLogger {
         try {
             webhook.execute();
         } catch (Exception exception) {
-            System.out.println("[BOT-LOG-WEBHOOK] " + message + "\n" + exception.getMessage());
+            System.out.println(
+                    "[BOT-LOG-WEBHOOK] WARNING Failed to execute webhook. This error message will not get posted to the bot-log channel."
+                            + "\nMessage:\n> " + message
+                            + "\nException:\n> " + exception.getMessage());
         }
     }
 
