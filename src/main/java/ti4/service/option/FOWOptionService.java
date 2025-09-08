@@ -49,6 +49,8 @@ public class FOWOptionService {
         HIDE_EXPLORES(
                 FOWOptionCategory.VISIBILITY, "Hide Explore Decks", "Disables looking at explore and relic decks"),
         HIDE_MAP(FOWOptionCategory.VISIBILITY, "Hide Unexplored Map", "Hides unexplored (blue 0b) map tiles."),
+        HIDE_PLAYER_INFOS(
+                FOWOptionCategory.VISIBILITY, "Hide Player Infos", "Hides anchored player info areas from the map."),
         STATS_FROM_HS_ONLY(
                 FOWOptionCategory.VISIBILITY,
                 "Stats from HS",

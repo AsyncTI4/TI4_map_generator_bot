@@ -80,6 +80,7 @@ public class FOWPlusService {
             game.setFowOption(FOWOption.STATS_FROM_HS_ONLY, true);
             game.setFowOption(FOWOption.HIDE_EXPLORES, true);
             game.setFowOption(FOWOption.HIDE_MAP, true);
+            game.setFowOption(FOWOption.HIDE_PLAYER_INFOS, true);
             game.setExplorationDeckID("explores_fowplus");
 
             MessageHelper.sendMessageToChannel(
@@ -91,6 +92,7 @@ public class FOWPlusService {
                             + "- Player stats only visible from HS\n"
                             + "- Hide explore/relic decks\n"
                             + "- Hide unexplored (0b) map tiles\n"
+                            + "- Hide anchored player info areas\n"
                             + "### In addition, following changes are in effect:\n"
                             + "- Can only activate tiles you can see (Blind Tile button to activate any other tile)\n"
                             + "- Activating a tile without a tile is valid and will send ships into The Void\n"
