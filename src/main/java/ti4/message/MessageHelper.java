@@ -43,8 +43,6 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Constants;
-import ti4.helpers.DiscordWebhook;
 import ti4.helpers.Helper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.map.Game;
@@ -1049,36 +1047,6 @@ public class MessageHelper {
             return;
         }
         sendMessageToChannelWithEmbeds(channel, message, embeds);
-    }
-
-    @Deprecated
-    public static void sendMessageToBotLogWebhook(String message) {
-        if (getBotLogWebhookURL() == null) {
-            System.out.println("[BOT-LOG-WEBHOOK] " + message);
-            return;
-        }
-        DiscordWebhook webhook = new DiscordWebhook(getBotLogWebhookURL());
-        webhook.setContent(message);
-        try {
-            webhook.execute();
-        } catch (Exception ignored) {
-            System.out.println("[BOT-LOG-WEBHOOK] " + message + ignored.getMessage());
-        }
-    }
-
-    /**
-     * @return a webhook URL for the bot-log channel of the Primary guild. Add
-     *         your test server's ID and #bot-log channel webhook url here
-     */
-    @Deprecated
-    public static String getBotLogWebhookURL() {
-        return switch (AsyncTI4DiscordBot.guildPrimaryID) {
-            case Constants.ASYNCTI4_HUB_SERVER_ID -> // AsyncTI4 Primary HUB Production Server
-                "https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v";
-            case "1059645656295292968" -> // PrisonerOne's Test Server
-                "https://discord.com/api/webhooks/1159478386998116412/NiyxcE-6TVkSH0ACNpEhwbbEdIBrvTWboZBTwuooVfz5n4KccGa_HRWTbCcOy7ivZuEp";
-            default -> null;
-        };
     }
 
     private static List<Button> sanitizeButtons(List<Button> buttons, MessageChannel channel) {
