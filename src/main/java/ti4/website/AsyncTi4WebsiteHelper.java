@@ -18,6 +18,7 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.StorageClass;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
@@ -141,7 +142,8 @@ public class AsyncTi4WebsiteHelper {
                     String.format("webdata/%s/%s.json", gameId, gameId),
                     AsyncRequestBody.fromString(json),
                     "application/json",
-                    "no-cache, no-store, must-revalidate");
+                    "no-cache, no-store, must-revalidate",
+                    null);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Could not put data to web server", e);
         }
@@ -162,7 +164,8 @@ public class AsyncTi4WebsiteHelper {
                     String.format("overlays/%s/%s.json", gameId, gameId),
                     AsyncRequestBody.fromString(json),
                     "application/json",
-                    "no-cache, no-store, must-revalidate");
+                    "no-cache, no-store, must-revalidate",
+                    null);
         } catch (Exception e) {
             BotLogger.error("Could not put overlay to web server", e);
         }
@@ -273,7 +276,8 @@ public class AsyncTi4WebsiteHelper {
                     String.format(mapPath, gameName, dtstamp),
                     AsyncRequestBody.fromBytes(imageBytes),
                     "image/" + fileFormat,
-                    null);
+                    null,
+                    StorageClass.ONEZONE_IA);
         } catch (Exception e) {
             BotLogger.error(
                     new LogOrigin(player),
@@ -299,14 +303,19 @@ public class AsyncTi4WebsiteHelper {
         return urls;
     }
 
-    private static void putObjectInBucket(String key, AsyncRequestBody body, String contentType, String cacheControl) {
+    private static void putObjectInBucket(String key, AsyncRequestBody body, String contentType, String cacheControl,
+            StorageClass storageClass) {
         String websiteBucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
 
-        PutObjectRequest.Builder requestBuilder =
-                PutObjectRequest.builder().bucket(websiteBucket).key(key).contentType(contentType);
+        PutObjectRequest.Builder requestBuilder = PutObjectRequest.builder().bucket(websiteBucket).key(key)
+                .contentType(contentType);
 
         if (cacheControl != null) {
             requestBuilder.cacheControl(cacheControl);
+        }
+
+        if (storageClass != null) {
+            requestBuilder.storageClass(storageClass);
         }
 
         PutObjectRequest request = requestBuilder.build();
