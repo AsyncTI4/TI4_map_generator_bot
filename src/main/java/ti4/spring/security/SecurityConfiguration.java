@@ -28,6 +28,9 @@ public class SecurityConfiguration {
                         // Public API paths
                         .requestMatchers("/api/public/**")
                         .permitAll()
+                        // WebSocket handshake endpoint
+                        .requestMatchers("/ws/**")
+                        .permitAll()
                         // Everything else requires auth
                         .anyRequest()
                         .authenticated())
