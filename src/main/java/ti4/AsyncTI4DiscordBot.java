@@ -230,32 +230,32 @@ public class AsyncTI4DiscordBot {
             // serversToCreateNewGamesOn.add(guildMegagame);  // Don't create random games on this server
         }
 
-        // // Async: Ship Flag
-        // if (args.length >= 14) {
-        //     guildNonary = jda.getGuildById(args[13]);
-        //     success &= startBot(guildNonary);
-        //     // serversToCreateNewGamesOn.add(guildNonary);  // ON HOLD FOR NOW
-        // }
+        // Async: Ship Flag
+        if (args.length >= 14) {
+            guildNonary = jda.getGuildById(args[13]);
+            success &= startBot(guildNonary);
+            serversToCreateNewGamesOn.add(guildNonary);
+        }
 
-        // // Async: 10th Server
-        // if (args.length >= 15) {
-        //     guildDecenary = jda.getGuildById(args[14]);
-        //     success &= startBot(guildDecenary);
-        //     // serversToCreateNewGamesOn.add(guildDecenary);  // SERVER DOESN'T EXIST YET
-        // }
-        // // Async: 11th Server
-        // if (args.length >= 16) {
-        //     guildUndenary = jda.getGuildById(args[15]);
-        //     success &= startBot(guildUndenary);
-        //     // serversToCreateNewGamesOn.add(guildUndenary);  // SERVER DOESN'T EXIST YET
-        // }
+        // Async: 10th Server
+        if (args.length >= 15) {
+            guildDecenary = jda.getGuildById(args[14]);
+            success &= startBot(guildDecenary);
+            // serversToCreateNewGamesOn.add(guildDecenary);  // SERVER DOESN'T EXIST YET
+        }
+        // Async: 11th Server
+        if (args.length >= 16) {
+            guildUndenary = jda.getGuildById(args[15]);
+            success &= startBot(guildUndenary);
+            // serversToCreateNewGamesOn.add(guildUndenary);  // SERVER DOESN'T EXIST YET
+        }
 
-        // // Async: 12th Server
-        // if (args.length >= 17) {
-        //     guildDuodenary = jda.getGuildById(args[16]);
-        //     success &= startBot(guildDuodenary);
-        //     // serversToCreateNewGamesOn.add(guildDuodenary);  // SERVER DOESN'T EXIST YET
-        // }
+        // Async: 12th Server
+        if (args.length >= 17) {
+            guildDuodenary = jda.getGuildById(args[16]);
+            success &= startBot(guildDuodenary);
+            // serversToCreateNewGamesOn.add(guildDuodenary);  // SERVER DOESN'T EXIST YET
+        }
 
         // Async: FOW Chapter Secondary
         // if (args.length >= 13) {
