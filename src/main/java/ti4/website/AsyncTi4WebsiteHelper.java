@@ -303,12 +303,12 @@ public class AsyncTi4WebsiteHelper {
         return urls;
     }
 
-    private static void putObjectInBucket(String key, AsyncRequestBody body, String contentType, String cacheControl,
-            StorageClass storageClass) {
+    private static void putObjectInBucket(
+            String key, AsyncRequestBody body, String contentType, String cacheControl, StorageClass storageClass) {
         String websiteBucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
 
-        PutObjectRequest.Builder requestBuilder = PutObjectRequest.builder().bucket(websiteBucket).key(key)
-                .contentType(contentType);
+        PutObjectRequest.Builder requestBuilder =
+                PutObjectRequest.builder().bucket(websiteBucket).key(key).contentType(contentType);
 
         if (cacheControl != null) {
             requestBuilder.cacheControl(cacheControl);
