@@ -477,6 +477,7 @@ public class AsyncTI4DiscordBot {
         developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
         developerRoles.add(jda.getRoleById("1395072365389680711")); // Megagame Server
+        developerRoles.add(jda.getRoleById("1172651397397880832")); // PrisonerOne's Test Server
         developerRoles.add(jda.getRoleById("1215453013154734130")); // Sigma's Server
         developerRoles.add(jda.getRoleById("1225597362186223746")); // ForlornGeas's Server
         developerRoles.add(jda.getRoleById("1226068105071956058")); // Rintsi's Server
