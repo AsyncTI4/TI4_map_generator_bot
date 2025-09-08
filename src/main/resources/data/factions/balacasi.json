@@ -1,0 +1,366 @@
+[
+    {
+        "alias": "arvaxi",
+        "factionName": "The Arvaxi Covenant",
+        "homeSystem": "ba1",
+        "startingFleet": "1 dn, 1 cv, 4 ff, 2 inf l, 2 inf v, sd l",
+        "commodities": 3,
+        "factionTech": [
+            "baarvag",
+            "baarvay"
+        ],
+        "startingTech": [
+            "aida",
+            "nm"
+        ],
+        "homePlanets": [
+            "lirastra",
+            "vraxil"
+        ],
+        "abilities": [
+            "underhanded_maneuver",
+            "scrap_metal",
+            "ultimate_authority"
+        ],
+        "leaders": [
+            "arvaxiagent",
+            "arvaxicommander",
+            "arvaxihero"
+        ],
+        "promissoryNotes": [
+            "bapnarva"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "arvaxi_flagship",
+            "infantry",
+            "arvaxi_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "source": "balacasi"
+    },
+    {
+        "alias": "xan",
+        "factionName": "The Constituants of Xan",
+        "homeSystem": "ba7",
+        "startingFleet": "2 dd, 2 cv, 2 ff, 2 inf t, 2 inf x, sd x",
+        "commodities": 4,
+        "factionTech": [
+            "baxanws",
+            "baxansd"
+        ],
+        "startingTech": [
+            "aida",
+            "st"
+        ],
+        "homePlanets": [
+            "thar",
+            "xan"
+        ],
+        "abilities": [
+            "quantum_fabrication",
+            "transformation_protocol"
+        ],
+        "leaders": [
+            "xanagent",
+            "xancommander",
+            "xanhero"
+        ],
+        "promissoryNotes": [
+            "bapnxan"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "xan_flagship",
+            "infantry",
+            "xan_mech",
+            "pds",
+            "xan_spacedock",
+            "xan_warsun"
+        ],
+        "complexity": "Moderate",
+        "source": "balacasi"
+    },
+    {
+        "alias": "kalora",
+        "factionName": "The Kalora Swarm",
+        "homeSystem": "ba2",
+        "startingFleet": "1 cr, 1 cv, 1 ff, 1 dn, 4 inf k, sd k",
+        "commodities": 2,
+        "factionTech": [
+            "bakalor",
+            "bakalodn"
+        ],
+        "startingTech": [
+            "det",
+            "ps"
+        ],
+        "homePlanets": [
+            "krax"
+        ],
+        "abilities": [
+            "eusociality",
+            "carapace_regeneration",
+            "primordial"
+        ],
+        "leaders": [
+            "kaloraagent",
+            "kaloracommander",
+            "kalorahero"
+        ],
+        "promissoryNotes": [
+            "bapnkalo"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "kalora_dreadnought",
+            "kalora_flagship",
+            "infantry",
+            "kalora_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Moderate",
+        "source": "balacasi"
+    },
+    {
+        "alias": "lunarium",
+        "factionName": "The Lunarium Conspiracies",
+        "homeSystem": "ba6",
+        "startingFleet": "1 dd, 1 cv, 2 ff, 1 dn, 3 inf t, 2 inf l, sd t",
+        "commodities": 3,
+        "factionTech": [
+            "balunag",
+            "balunacv"
+        ],
+        "startingTech": [
+            "pi",
+            "pa"
+        ],
+        "homePlanets": [
+            "luna",
+            "terranovus"
+        ],
+        "abilities": [
+            "initiation",
+            "expanding_minds",
+            "multitasking"
+        ],
+        "leaders": [
+            "lunariumagent",
+            "lunariumcommander",
+            "lunariumhero"
+        ],
+        "promissoryNotes": [
+            "bapnluna"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "lunarium_carrier",
+            "dreadnought",
+            "lunarium_flagship",
+            "infantry",
+            "lunarium_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Moderate",
+        "source": "balacasi"
+    },
+    {
+        "alias": "conclave",
+        "factionName": "The Obsidian Conclave",
+        "homeSystem": "ba4",
+        "startingFleet": "1 dd, 1 cv, 2 ff, 1 dn, 3 inf v, sd v",
+        "commodities": 3,
+        "factionTech": [
+            "baconcg",
+            "baconcy"
+        ],
+        "startingTech": [
+            "pi"
+        ],
+        "homePlanets": [
+            "velarune"
+        ],
+        "abilities": [
+            "patience",
+            "strategic_fluidity",
+            "increased_surveillance"
+        ],
+        "leaders": [
+            "conclaveagent",
+            "conclavecommander",
+            "conclavehero"
+        ],
+        "promissoryNotes": [
+            "bapnconc"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "conclave_flagship",
+            "infantry",
+            "conclave_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Moderate",
+        "source": "balacasi"
+    },
+    {
+        "alias": "tyris",
+        "factionName": "The Tyris Continuum",
+        "homeSystem": "ba5",
+        "startingFleet": "1 dd, 2 cv, 3 ff, 3 inf x, sd x",
+        "commodities": 3,
+        "factionTech": [
+            "batyriy",
+            "batyriinf"
+        ],
+        "startingTech": [
+            "nm",
+            "det"
+        ],
+        "homePlanets": [
+            "xelvorr",
+            "vaelthuun"
+        ],
+        "abilities": [
+            "rewrite_destiny",
+            "arrow_of_time",
+            "phantom_energy"
+        ],
+        "leaders": [
+            "tyrisagent",
+            "tyriscommander",
+            "tyrishero"
+        ],
+        "promissoryNotes": [
+            "bapntyri"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "tyris_flagship",
+            "tyris_infantry",
+            "tyris_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Moderate",
+        "source": "balacasi"
+    },
+    {
+        "alias": "vyserix",
+        "factionName": "The Vyserix Ascendancy",
+        "homeSystem": "ba3",
+        "startingFleet": "1 dd, 1 cv, 2 ff, 4 inf v, sd v",
+        "commodities": 3,
+        "factionTech": [
+            "bavyseb",
+            "bavysepds"
+        ],
+        "startingTech": [
+            "pa",
+            "md"
+        ],
+        "homePlanets": [
+            "hexaraii",
+            "vyseraiii",
+            "tala9"
+        ],
+        "abilities": [
+            "veiled_ember_forge",
+            "scattered_legions"
+        ],
+        "leaders": [
+            "vyserixagent",
+            "vyserixcommander",
+            "vyserixhero"
+        ],
+        "promissoryNotes": [
+            "bapnvyse"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "vyserix_flagship",
+            "infantry",
+            "vyserix_mech",
+            "vyserix_pds",
+            "spacedock"
+        ],
+        "complexity": "Moderate",
+        "source": "balacasi"
+    },
+    {
+        "alias": "zephyrion",
+        "factionName": "The Zephyrion Pursuit",
+        "homeSystem": "ba8",
+        "startingFleet": "2 cr, 1 cv, 2 ff, 3 inf d, sd d",
+        "commodities": 2,
+        "factionTech": [
+            "bazephcr",
+            "bazephy"
+        ],
+        "startingTech": [
+            "sdn",
+            "sar"
+        ],
+        "homePlanets": [
+            "zephyrax",
+            "dralius"
+        ],
+        "abilities": [
+            "marked_prey",
+            "confirmed_kill"
+        ],
+        "leaders": [
+            "zephyrionagent",
+            "zephyrioncommander",
+            "zephyrionhero"
+        ],
+        "promissoryNotes": [
+            "bapnzeph"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "zephyrion_cruiser",
+            "carrier",
+            "dreadnought",
+            "zephyrion_flagship",
+            "infantry",
+            "zephyrion_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "source": "balacasi"
+    }
+]

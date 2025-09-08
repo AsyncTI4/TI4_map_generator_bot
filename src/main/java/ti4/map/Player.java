@@ -333,6 +333,7 @@ public class Player extends PlayerProperties {
                 || getTechs().contains("so2")
                 || getTechs().contains("inf2")
                 || getTechs().contains("lw2")
+                || getTechs().contains("batyriinf")
                 || getTechs().contains("dscymiinf")
                 || getTechs().contains("absol_inf2")
                 || getTechs().contains("dsqhetinf")
@@ -347,6 +348,7 @@ public class Player extends PlayerProperties {
                 || getTechs().contains("dsrohdws")
                 || getTechs().contains("ws")
                 || getTechs().contains("absol_ws")
+                || getTechs().contains("baxanws")
                 || getTechs().contains("absol_pws2")
                 || hasUnit("muaat_warsun")
                 || hasUnit("rohdhna_warsun");
