@@ -37,8 +37,8 @@
         "source": "balacasi"
     },
     {
-        "id": "eurociality",
-        "name": "Eurociality",
+        "id": "eusociality",
+        "name": "Eusociality",
         "faction": "kalora",
         "permanentEffect": "When you retreat during a space combat in a system that doesn't contain your command tokens, you do not place a command token into the target system. You may treat “Skilled Retreat” action cards as a retreat for the purpose of this ability.",
         "source": "balacasi"
