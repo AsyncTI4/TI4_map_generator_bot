@@ -57,6 +57,7 @@ import ti4.model.PlanetModel;
 import ti4.model.StrategyCardModel;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.settings.GlobalSettings;
 import ti4.website.AsyncTi4WebsiteHelper;
 import ti4.website.model.WebsiteOverlay;
@@ -540,7 +541,8 @@ public class MapGenerator implements AutoCloseable {
         y = drawObjectives(tempY);
         y = laws(y);
         y = events(y);
-        if (displayTypeBasic != DisplayType.stats) {
+        if (displayTypeBasic != DisplayType.stats
+                && (!isFowModeActive() || !game.getFowOption(FOWOption.HIDE_PLAYER_INFOS))) {
             playerInfo(game);
         }
 
