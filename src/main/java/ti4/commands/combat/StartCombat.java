@@ -2,7 +2,6 @@ package ti4.commands.combat;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -23,9 +22,12 @@ class StartCombat extends GameStateSubcommand {
     public StartCombat() {
         super(Constants.START_COMBAT, "Start a new combat thread for a given tile.", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile to move units from")
-            .setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_TYPE,
-            "Type of combat to start 'space' or 'ground' - Default: space")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.COMBAT_TYPE,
+                        "Type of combat to start 'space' or 'ground' - Default: space")
                 .setAutoComplete(true));
     }
 
@@ -52,21 +54,23 @@ class StartCombat extends GameStateSubcommand {
         }
 
         if (playersForCombat.size() > 2) {
-            MessageHelper.sendMessageToChannel(event.getChannel(),
-                "There are more than 2 players in this system - something may not work correctly *yet*.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "There are more than 2 players in this system - something may not work correctly *yet*.");
         } else if (playersForCombat.size() < 2) {
-            MessageHelper.sendMessageToChannel(event.getChannel(),
-                "There are less than 2 players in this system - a combat thread could not be created.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "There are less than 2 players in this system - a combat thread could not be created.");
             return;
         }
 
         // Try to get players in order of [activePlayer, otherPlayer, ... (discarded players)]
         Player player1 = game.getActivePlayer();
-        if (player1 == null)
-            player1 = playersForCombat.getFirst();
+        if (player1 == null) player1 = playersForCombat.getFirst();
         playersForCombat.remove(player1);
         Player player2 = playersForCombat.getFirst();
 
-        StartCombatService.findOrCreateCombatThread(game, event.getChannel(), player1, player2, tile, event, combatType, "space");
+        StartCombatService.findOrCreateCombatThread(
+                game, event.getChannel(), player1, player2, tile, event, combatType, "space");
     }
 }

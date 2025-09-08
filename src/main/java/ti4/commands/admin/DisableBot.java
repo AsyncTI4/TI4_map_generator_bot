@@ -16,5 +16,4 @@ public class DisableBot extends Subcommand {
         GlobalSettings.setSetting(GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
         MessageHelper.sendMessageToEventChannel(event, "Bot has been told to stop processing events.");
     }
-
 }

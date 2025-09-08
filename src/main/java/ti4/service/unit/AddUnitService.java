@@ -1,7 +1,6 @@
 package ti4.service.unit;
 
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
@@ -11,7 +10,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.service.emoji.ColorEmojis;
-import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
@@ -25,7 +23,8 @@ public class AddUnitService {
 
             Tile tile = unit.tile();
             tile = FlipTileService.flipTileIfNeeded(tile, game);
-            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, unit.uh().getName(), game);
+            AddPlanetToPlayAreaService.addPlanetToPlayArea(
+                    event, tile, unit.uh().getName(), game);
 
             String color = unit.unitKey().getColorID();
             handleFogOfWar(tile, color, game, unit.unitKey() + " " + unit.getTotalRemoved());
@@ -33,7 +32,13 @@ public class AddUnitService {
         }
     }
 
-    public static void addUnits(GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList, List<RemovedUnit> removed) {
+    public static void addUnits(
+            GenericInteractionCreateEvent event,
+            Tile tile,
+            Game game,
+            String color,
+            String unitList,
+            List<RemovedUnit> removed) {
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
             List<Integer> states = pickStatesForAddedUnit(parsedUnit, removed);
@@ -46,7 +51,8 @@ public class AddUnitService {
         checkFleetCapacity(tile, color, game);
     }
 
-    public static void addUnits(GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList) {
+    public static void addUnits(
+            GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList) {
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
             tile.addUnit(parsedUnit.getLocation(), parsedUnit.getUnitKey(), parsedUnit.getCount());
@@ -63,8 +69,10 @@ public class AddUnitService {
 
         if (isTileAlreadyPinged(game, tile)) return;
 
-        FoWHelper.pingSystem(game, tile.getPosition(),
-            ColorEmojis.getColorEmojiWithName(color) + " has modified units in the system: " + unitList);
+        FoWHelper.pingSystem(
+                game,
+                tile.getPosition(),
+                ColorEmojis.getColorEmojiWithName(color) + " has modified units in the system: " + unitList);
 
         markTileAsPinged(game, tile);
     }
@@ -81,7 +89,6 @@ public class AddUnitService {
         Player player = game.getPlayerFromColorOrFaction(color);
         if (player != null) {
             ButtonHelper.checkFleetAndCapacity(player, game, tile);
-
         }
     }
 
@@ -103,9 +110,8 @@ public class AddUnitService {
             }
         }
         if (amtRemaining > 0) {
-            states.set(0, states.get(0) + amtRemaining);
+            states.set(0, states.getFirst() + amtRemaining);
         }
         return states;
     }
-
 }

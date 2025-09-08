@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -55,8 +54,10 @@ class SetDeck extends GameStateSubcommand {
                     if (SetDeckService.setDeck(event, game, deckType, deckModel)) {
                         changedDecks.put(deckModel.getType(), deckModel);
                     } else {
-                        MessageHelper.sendMessageToChannel(event.getChannel(),
-                            "Something went wrong and the deck ***" + value + "*** could not be set, please see error above or try executing the command again (without copy/pasting).");
+                        MessageHelper.sendMessageToChannel(
+                                event.getChannel(),
+                                "Something went wrong and the deck ***" + value
+                                        + "*** could not be set, please see error above or try executing the command again (without copy/pasting).");
                     }
                 }
                 if (deckType.equals(Constants.TECHNOLOGY_DECK)) {
@@ -68,7 +69,10 @@ class SetDeck extends GameStateSubcommand {
 
         if (CollectionUtils.isNotEmpty(changedDecks.keySet())) {
             List<String> changeMessage = new ArrayList<>();
-            changedDecks.values().forEach(deck -> changeMessage.add(deck.getType() + " deck has been changed to:\n`" + deck.getAlias() + "`: " + deck.getName() + "\n>>> " + deck.getDescription()));
+            changedDecks
+                    .values()
+                    .forEach(deck -> changeMessage.add(deck.getType() + " deck has been changed to:\n`"
+                            + deck.getAlias() + "`: " + deck.getName() + "\n>>> " + deck.getDescription()));
             MessageHelper.sendMessageToChannel(event.getChannel(), String.join("\n", changeMessage));
         }
     }

@@ -1,11 +1,10 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -13,9 +12,9 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.sticker.Sticker;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
+import ti4.helpers.Stickers;
 import ti4.image.TileHelper;
 import ti4.image.UnitTokenPosition;
-import ti4.helpers.Stickers;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechSpecialtyModel.TechSpecialty;
@@ -56,23 +55,23 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private String contrastColor;
     private ComponentSource source;
 
+    private String cachedStickerUrl;
+
     @JsonIgnore
     public boolean isValid() {
-        return id != null
-            && name != null
-            && source != null;
+        return id != null && name != null && source != null;
     }
 
     @JsonIgnore
     public String getAlias() {
-        return getId();
+        return id;
     }
 
     public String getShortName() {
-        return Optional.ofNullable(shortName).orElse(getName());
+        return Optional.ofNullable(shortName).orElse(name);
     }
 
-    public boolean getShrinkName() {
+    private boolean getShrinkName() {
         return Optional.ofNullable(shrinkName).orElse(false);
     }
 
@@ -86,8 +85,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @Deprecated
     public Point getPositionInTile() {
-        if (positionInTile != null)
-            return positionInTile;
+        if (positionInTile != null) return positionInTile;
         else if (planetLayout != null && planetLayout.getCenterPosition() != null) {
             return planetLayout.getCenterPosition();
         }
@@ -126,7 +124,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         StringBuilder sb = new StringBuilder();
-        sb.append(getEmoji()).append("__").append(getName()).append("__");
+        sb.append(getEmoji()).append("__").append(name).append("__");
         eb.setTitle(sb.toString());
 
         if (getPlanetType() != null) {
@@ -138,19 +136,20 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
             }
         }
 
-        TileModel tile = TileHelper.getTileById(getTileId());
+        TileModel tile = TileHelper.getTileById(tileId);
         sb = new StringBuilder();
         sb.append(getInfResEmojis()).append(getPlanetTypeEmoji()).append(getTechSpecialtyEmoji());
         if (tile != null) sb.append("\nSystem: ").append(tile.getName());
         eb.setDescription(sb.toString());
-        if (getBasicAbilityText() != null) eb.addField("Ability:", getBasicAbilityText(), false);
-        if (getLegendaryAbilityName() != null) eb.addField(MiscEmojis.LegendaryPlanet + getLegendaryAbilityName(), getLegendaryAbilityText(), false);
-        if (getLegendaryAbilityFlavourText() != null) eb.addField("", getLegendaryAbilityFlavourText(), false);
-        if (getFlavourText() != null) eb.addField("", getFlavourText(), false);
+        if (basicAbilityText != null) eb.addField("Ability:", basicAbilityText, false);
+        if (legendaryAbilityName != null)
+            eb.addField(MiscEmojis.LegendaryPlanet + legendaryAbilityName, legendaryAbilityText, false);
+        if (legendaryAbilityFlavourText != null) eb.addField("", legendaryAbilityFlavourText, false);
+        if (flavourText != null) eb.addField("", flavourText, false);
 
         sb = new StringBuilder();
-        sb.append("ID: ").append(getId());
-        if (includeAliases) sb.append("\nAliases: ").append(getAliases());
+        sb.append("ID: ").append(id);
+        if (includeAliases) sb.append("\nAliases: ").append(aliases);
         eb.setFooter(sb.toString());
 
         if (getStickerOrEmojiURL() != null) eb.setThumbnail(getStickerOrEmojiURL());
@@ -160,21 +159,16 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public MessageEmbed getLegendaryEmbed() {
-        if (StringUtils.isBlank(getLegendaryAbilityName())) return null; //no ability name, no embed
-        if (StringUtils.isBlank(getLegendaryAbilityText())) return null; //no ability text, no embed
+        if (StringUtils.isBlank(legendaryAbilityName)) return null; // no ability name, no embed
+        if (StringUtils.isBlank(legendaryAbilityText)) return null; // no ability text, no embed
 
         EmbedBuilder eb = new EmbedBuilder();
 
-        eb.setTitle(MiscEmojis.LegendaryPlanet + "__" + getLegendaryAbilityName() + "__");
+        eb.setTitle(MiscEmojis.LegendaryPlanet + "__" + legendaryAbilityName + "__");
         eb.setColor(Color.black);
 
-        eb.setDescription(getLegendaryAbilityText());
-        //if (getLegendaryAbilityFlavourText() != null) eb.addField("", getLegendaryAbilityFlavourText(), false);
+        eb.setDescription(legendaryAbilityText);
         if (getStickerOrEmojiURL() != null) eb.setThumbnail(getStickerOrEmojiURL());
-
-        // footer can have some of the planet info
-        //eb.setFooter(getName());
-
         return eb.build();
     }
 
@@ -195,9 +189,9 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     private String getTechSpecialtyEmoji() {
-        if (getTechSpecialties() == null || getTechSpecialties().isEmpty()) return "";
+        if (techSpecialties == null || techSpecialties.isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
-        for (TechSpecialty techSpecialty : getTechSpecialties()) {
+        for (TechSpecialty techSpecialty : techSpecialties) {
             switch (techSpecialty) {
                 case BIOTIC -> sb.append(TechEmojis.BioticTech);
                 case CYBERNETIC -> sb.append(TechEmojis.CyberneticTech);
@@ -212,9 +206,9 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     private String getTechSpecialtyStringRepresentation() {
-        if (getTechSpecialties() == null || getTechSpecialties().isEmpty()) return "";
+        if (techSpecialties == null || techSpecialties.isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
-        for (TechSpecialty techSpecialty : getTechSpecialties()) {
+        for (TechSpecialty techSpecialty : techSpecialties) {
             switch (techSpecialty) {
                 case BIOTIC -> sb.append("G");
                 case CYBERNETIC -> sb.append("Y");
@@ -229,18 +223,18 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public boolean isLegendary() {
-        return getLegendaryAbilityName() != null;
+        return legendaryAbilityName != null;
     }
 
     @JsonIgnore
     public TI4Emoji getEmoji() {
-        return PlanetEmojis.getPlanetEmoji(getId());
+        return PlanetEmojis.getPlanetEmoji(id);
     }
 
     @JsonIgnore
-    public String getEmojiURL() {
+    private String getEmojiURL() {
         TI4Emoji emoji = getEmoji();
-        if (getEmoji().equals(PlanetEmojis.SemLore) && !getId().equals("semlore")) {
+        if (getEmoji().equals(PlanetEmojis.SemLore) && !"semlore".equals(id)) {
             return null;
         }
         if (emoji.asEmoji() instanceof CustomEmoji customEmoji) {
@@ -250,26 +244,37 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
-    public String getStickerOrEmojiURL() {
-        long ident = Stickers.getPlanetSticker(getId());
-        if (ident == -1) {
-            return getEmojiURL();
+    private String getStickerOrEmojiURL() {
+        if (cachedStickerUrl != null) {
+            return cachedStickerUrl;
         }
-        return AsyncTI4DiscordBot.jda.retrieveSticker(Sticker.fromId(ident)).complete().getIconUrl();
+
+        long ident = Stickers.getPlanetSticker(id);
+        if (ident == -1) {
+            cachedStickerUrl = getEmojiURL();
+        } else {
+            cachedStickerUrl = AsyncTI4DiscordBot.jda
+                    .retrieveSticker(Sticker.fromId(ident))
+                    .complete()
+                    .getIconUrl();
+        }
+
+        return cachedStickerUrl;
     }
 
     public boolean search(String searchString) {
-        return getName().toLowerCase().contains(searchString)
-            || getId().toLowerCase().contains(searchString)
-            || getSource().toString().contains(searchString)
-            || getSearchTags().contains(searchString);
+        return name.toLowerCase().contains(searchString)
+                || id.toLowerCase().contains(searchString)
+                || source.toString().contains(searchString)
+                || searchTags.contains(searchString);
     }
 
     @JsonIgnore
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getName()).append(" (").append(getResources()).append("/").append(getInfluence());
-        if (!getTechSpecialtyStringRepresentation().isBlank()) sb.append(" ").append(getTechSpecialtyStringRepresentation());
+        sb.append(name).append(" (").append(resources).append("/").append(influence);
+        if (!getTechSpecialtyStringRepresentation().isBlank())
+            sb.append(" ").append(getTechSpecialtyStringRepresentation());
         sb.append(")");
         return sb.toString();
     }

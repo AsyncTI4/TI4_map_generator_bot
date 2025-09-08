@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Helper;
 import ti4.image.PositionMapper;
 
@@ -19,7 +17,7 @@ public class MapTemplateModel implements ModelInterface {
         // This field is for when you want a specific tile on the map, in the same position every time
         // Such as Mecatol Rex in the middle, or hyperlanes for a 3,4,5,7,8 player game, etc.
         private String staticTileId;
-        private Boolean custodians; //add custodian to this tile (presently only works with MR)
+        private Boolean custodians; // add custodian to this tile (presently only works with MR)
 
         // These three fields control if a particular tile is a placeholder for a milty draft tile.
         private Integer playerNumber;
@@ -44,21 +42,21 @@ public class MapTemplateModel implements ModelInterface {
 
     public boolean isValid() {
         return alias != null
-            && (tileDisplayCoords().size() == (1 + tilesPerPlayer()))
-            && ((bluePerPlayer() + redPerPlayer()) == tilesPerPlayer());
+                && (tileDisplayCoords().size() == (1 + tilesPerPlayer()))
+                && ((bluePerPlayer() + redPerPlayer()) == tilesPerPlayer());
     }
 
     public String autoCompleteString() {
-        return getAlias() + ": " + getPlayerCount() + " player map by " + getAuthor();
+        return alias + ": " + playerCount + " player map by " + author;
     }
 
     // ---------------------------------------------------------------------------------------------
     // Helper Functions
     // ---------------------------------------------------------------------------------------------
-    public int tilesPerPlayer() {
+    private int tilesPerPlayer() {
         int calculated = (int) templateTiles.stream()
-            .filter(t -> t.playerNumber != null && t.miltyTileIndex != null && t.playerNumber == 1)
-            .count();
+                .filter(t -> t.playerNumber != null && t.miltyTileIndex != null && t.playerNumber == 1)
+                .count();
         return tilesPerPlayer == null ? calculated : tilesPerPlayer;
     }
 
@@ -71,7 +69,7 @@ public class MapTemplateModel implements ModelInterface {
     }
 
     public List<String> emulatedTiles() {
-        List<String> emulate = getSliceEmulateTiles();
+        List<String> emulate = sliceEmulateTiles;
         if (emulate == null || emulate.isEmpty()) {
             emulate = List.of("310", "311", "207", "309", "208", "104");
         }
@@ -79,7 +77,7 @@ public class MapTemplateModel implements ModelInterface {
     }
 
     public List<Point> tileDisplayCoords() {
-        List<String> emulate = getSliceEmulateTiles();
+        List<String> emulate = sliceEmulateTiles;
         if (emulate == null || emulate.isEmpty()) {
             emulate = List.of("310", "311", "207", "309", "208", "104");
         }
@@ -93,8 +91,7 @@ public class MapTemplateModel implements ModelInterface {
             minx = Math.min(minx, p.x);
             miny = Math.min(miny, p.y);
         }
-        for (Point p : displayCoords)
-            p.translate(-1 * minx, -1 * miny);
+        for (Point p : displayCoords) p.translate(-1 * minx, -1 * miny);
         return displayCoords;
     }
 
@@ -107,10 +104,11 @@ public class MapTemplateModel implements ModelInterface {
     }
 
     public int numRings() {
-        String highestPosition = getTemplateTiles().stream().map(MapTemplateTile::getPos)
-            .filter(Helper::isInteger)
-            .max(Comparator.comparingInt(Integer::parseInt))
-            .orElse(null);
+        String highestPosition = templateTiles.stream()
+                .map(MapTemplateTile::getPos)
+                .filter(Helper::isInteger)
+                .max(Comparator.comparingInt(Integer::parseInt))
+                .orElse(null);
         if (highestPosition == null) return 0;
 
         String firstTwoDigits = StringUtils.left(highestPosition, highestPosition.length() - 2);
@@ -128,7 +126,8 @@ public class MapTemplateModel implements ModelInterface {
 
                 try {
                     locations.add(Integer.parseInt(t.getPos()));
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
             }
         }
         return locations;

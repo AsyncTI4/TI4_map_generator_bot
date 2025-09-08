@@ -2,7 +2,6 @@ package ti4.commands.help;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.ResourceHelper;
@@ -20,10 +19,10 @@ class Monuments extends Subcommand {
         showMonumentsHelp(event);
     }
 
-    public static void showMonumentsHelp(GenericInteractionCreateEvent event) {
+    private static void showMonumentsHelp(GenericInteractionCreateEvent event) {
         String path = ResourceHelper.getInstance().getHelpFile("Monuments.txt");
         try {
-            String message = new String(Files.readAllBytes(Paths.get(path)));
+            String message = Files.readString(Paths.get(path));
             MessageHelper.sendMessageToEventChannel(event, message);
         } catch (Exception e) {
             MessageHelper.sendMessageToEventChannel(event, "MONUMENTS HELP FILE IS BLANK");

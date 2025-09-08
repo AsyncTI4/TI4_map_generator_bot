@@ -16,8 +16,12 @@ class PurgeLeader extends GameStateSubcommand {
 
     public PurgeLeader() {
         super(Constants.PURGE_LEADER, "Purge leader", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -27,9 +31,10 @@ class PurgeLeader extends GameStateSubcommand {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
         boolean purged = player.removeLeader(playerLeader);
         if (purged) {
-            MessageHelper.sendMessageToEventChannel(event, LeaderEmojis.getLeaderEmoji(playerLeader).toString());
-            String message = player.getRepresentation() +
-                " purged " + Helper.getLeaderShortRepresentation(playerLeader);
+            MessageHelper.sendMessageToEventChannel(
+                    event, LeaderEmojis.getLeaderEmoji(playerLeader).toString());
+            String message =
+                    player.getRepresentation() + " purged " + Helper.getLeaderShortRepresentation(playerLeader);
             MessageHelper.sendMessageToEventChannel(event, message);
         } else {
             MessageHelper.sendMessageToEventChannel(event, "Leader not found");

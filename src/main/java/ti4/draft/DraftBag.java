@@ -7,11 +7,9 @@ public class DraftBag {
 
     public List<DraftItem> Contents = new ArrayList<>();
 
-
-    public String toStoreString()
-    {
+    public String toStoreString() {
         StringBuilder sb = new StringBuilder();
-        for (DraftItem item: Contents) {
+        for (DraftItem item : Contents) {
             sb.append(item.getAlias());
             sb.append(",");
         }
@@ -21,7 +19,7 @@ public class DraftBag {
 
     public int getCategoryCount(DraftItem.Category cat) {
         int count = 0;
-        for (DraftItem item: Contents) {
+        for (DraftItem item : Contents) {
             if (item.ItemCategory == cat) {
                 count++;
             }

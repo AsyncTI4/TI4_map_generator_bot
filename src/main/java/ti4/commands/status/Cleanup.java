@@ -18,7 +18,6 @@ class Cleanup extends GameStateSubcommand {
     }
 
     @Override
-
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())) {

@@ -11,8 +11,12 @@ class AddControlToken extends GameStateSubcommand {
 
     public AddControlToken() {
         super(Constants.ADD_CONTROL_TOKEN, "Add or remove a faction control token to a law", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction that owns the token, default you").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction that owns the token, default you")
+                        .setAutoComplete(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO, "True to remove instead of add tokens"));
     }
 
@@ -44,7 +48,6 @@ class AddControlToken extends GameStateSubcommand {
                 msg = msg.replaceFirst(player.getColor() + "_", "");
             }
             MessageHelper.sendMessageToChannel(event.getChannel(), "Removed control token to law #" + lawId + ".");
-
         }
 
         game.setStoredValue("controlTokensOnAgenda" + lawId, msg);

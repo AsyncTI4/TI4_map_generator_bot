@@ -5,9 +5,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
+import javax.annotation.Nullable;
 import lombok.Data;
-import org.jetbrains.annotations.Nullable;
 
 @Data
 public class PlayerProperties {
@@ -39,6 +38,7 @@ public class PlayerProperties {
     private boolean readyToPassBag;
     private boolean searchWarrant;
     private boolean dummy;
+    private boolean npc;
     private boolean autoPassOnWhensAfters;
     private boolean eliminated;
     private boolean fogInitialized;
@@ -75,15 +75,15 @@ public class PlayerProperties {
     // LANEFIR TECH "ATS Armaments"
     private int atsCount;
 
-    //Stat tracking
+    // Stat tracking
     private int sarweenCounter;
     private int pillageCounter;
     private int magenInfantryCounter;
 
-    //Omega Phase
+    // Omega Phase
     private int priorityPosition;
 
-    //uydai tracking
+    // uydai tracking
     private int pathTokenCounter;
     private int harvestCounter;
     private int honorCounter;

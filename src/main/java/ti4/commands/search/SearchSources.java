@@ -1,6 +1,7 @@
 package ti4.commands.search;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -8,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -34,9 +34,16 @@ class SearchSources extends Subcommand {
     public SearchSources() {
         super(Constants.SEARCH_SOURCES, "List all sources the bot has");
         addOptions(
-            new OptionData(OptionType.STRING, Constants.SOURCE, "Limit results to a specific source.").setAutoComplete(true),
-            new OptionData(OptionType.BOOLEAN, CANAL, "unspecified for all sources, True for 'official' only, False for 'community' only"),
-            new OptionData(OptionType.BOOLEAN, CHECK_SOURCES, "True: Cancel search, counts elements in json files per source, and compare to sources file"));
+                new OptionData(OptionType.STRING, Constants.SOURCE, "Limit results to a specific source.")
+                        .setAutoComplete(true),
+                new OptionData(
+                        OptionType.BOOLEAN,
+                        CANAL,
+                        "unspecified for all sources, True for 'official' only, False for 'community' only"),
+                new OptionData(
+                        OptionType.BOOLEAN,
+                        CHECK_SOURCES,
+                        "True: Cancel search, counts elements in json files per source, and compare to sources file"));
     }
 
     /*
@@ -62,26 +69,33 @@ class SearchSources extends Subcommand {
 
         if (Mapper.isValidSource(sourceString)) {
             SourceModel model = Mapper.getSource(sourceString);
-            event.getChannel().sendMessageEmbeds(model.getRepresentationEmbed(getOccurrencesByCompType(model.getSource()))).queue(); // change getRepEmbed function here as well
+            event.getChannel()
+                    .sendMessageEmbeds(model.getRepresentationEmbed(getOccurrencesByCompType(model.getSource())))
+                    .queue(); // change getRepEmbed function here as well
             return;
         }
 
         List<MessageEmbed> messageEmbeds = Mapper.getSources().values().stream()
-            .filter(model -> model.search(sourceString, source))
-            .filter(model -> canalBool == null || canalBool == model.isCanalOfficial())
-            .sorted((r1, r2) -> { // should sort by canal ('official' before 'community') then subcanal (null values before non-null values, but all 'official' should have null subcanal and all 'community' should have non null subcanal) then source
-                if (r1.getCanal().equals(r2.getCanal())) {
-                    if (r1.getSubcanal() == null && r2.getSubcanal() == null) return r1.getSource().compareTo(r2.getSource());
-                    if (r1.getSubcanal() == null) return -1;
-                    if (r2.getSubcanal() == null) return 1;
-                    if (r1.getSubcanal().equals(r2.getSubcanal())) return r1.getSource().compareTo(r2.getSource());
-                    return r1.getSubcanal().compareTo(r2.getSubcanal());
-                }
-                return -r1.getCanal().compareTo(r2.getName());
-            })
-            //.sorted((r1, r2) -> (r1.getCanal()+r1.getSubcanal()).compareTo((r2.getCanal()+r2.getSubcanal()))) // raise a bug for null values
-            .map(model -> model.getRepresentationEmbed(getOccurrencesByCompType(model.getSource())))
-            .toList();
+                .filter(model -> model.search(sourceString, source))
+                .filter(model -> canalBool == null || canalBool == model.isCanalOfficial())
+                .sorted((r1, r2) -> { // should sort by canal ('official' before 'community') then subcanal (null
+                    // values before non-null values, but all 'official' should have null subcanal
+                    // and all 'community' should have non null subcanal) then source
+                    if (r1.getCanal().equals(r2.getCanal())) {
+                        if (r1.getSubcanal() == null && r2.getSubcanal() == null)
+                            return r1.getSource().compareTo(r2.getSource());
+                        if (r1.getSubcanal() == null) return -1;
+                        if (r2.getSubcanal() == null) return 1;
+                        if (r1.getSubcanal().equals(r2.getSubcanal()))
+                            return r1.getSource().compareTo(r2.getSource());
+                        return r1.getSubcanal().compareTo(r2.getSubcanal());
+                    }
+                    return -r1.getCanal().compareTo(r2.getName());
+                })
+                // .sorted((r1, r2) -> (r1.getCanal()+r1.getSubcanal()).compareTo((r2.getCanal()+r2.getSubcanal()))) //
+                // raise a bug for null values
+                .map(model -> model.getRepresentationEmbed(getOccurrencesByCompType(model.getSource())))
+                .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }
 
@@ -97,23 +111,36 @@ class SearchSources extends Subcommand {
         occurrences.put("Action Cards", Mapper.getActionCardsSources(compSource).size());
         occurrences.put("Agendas", Mapper.getAgendasSources(compSource).size());
         occurrences.put("Attachments", Mapper.getAttachmentsSources(compSource).size());
-        //occurrences.put("Colors", get...(compSource).size());
-        //occurrences.put("Combat Modifiers", get...(compSource).size());
+        // occurrences.put("Colors", get...(compSource).size());
+        // occurrences.put("Combat Modifiers", get...(compSource).size());
         occurrences.put("Decks", Mapper.getDecksSources(compSource).size());
         occurrences.put("Events", Mapper.getEventsSources(compSource).size());
         occurrences.put("Explores", Mapper.getExploresSources(compSource).size());
         occurrences.put("Factions", Mapper.getFactionsSources(compSource).size());
-        occurrences.put("Draft Errata", Mapper.getDraftErratasSources(compSource).size()); // Draft Errata is related to files in \data\franken_errata\*
-        occurrences.put("Generic Cards", Mapper.getGenericCardsSources(compSource).size());
+        occurrences.put(
+                "Draft Errata",
+                Mapper.getDraftErratasSources(compSource)
+                        .size()); // Draft Errata is related to files in \data\franken_errata\*
+        occurrences.put(
+                "Generic Cards", Mapper.getGenericCardsSources(compSource).size());
         occurrences.put("Leaders", Mapper.getLeadersSources(compSource).size());
-        //occurrences.put("Map Templates", get...(compSource).size());
-        occurrences.put("Promissory Notes", Mapper.getPromissoryNotesSources(compSource).size());
-        occurrences.put("Public Objectives", Mapper.getPublicObjectivesSources(compSource).size());
+        // occurrences.put("Map Templates", get...(compSource).size());
+        occurrences.put(
+                "Promissory Notes", Mapper.getPromissoryNotesSources(compSource).size());
+        occurrences.put(
+                "Public Objectives",
+                Mapper.getPublicObjectivesSources(compSource).size());
         occurrences.put("Relics", Mapper.getRelicsSources(compSource).size());
-        occurrences.put("Secret Objectives", Mapper.getSecretObjectivesSources(compSource).size());
-        occurrences.put("Strategy Card Sets", Mapper.getStrategyCardSetsSources(compSource).size());
-        occurrences.put("Strategy Cards", Mapper.getStrategyCardsSources(compSource).size());
-        occurrences.put("Technologies", Mapper.getTechnologiesSources(compSource).size());
+        occurrences.put(
+                "Secret Objectives",
+                Mapper.getSecretObjectivesSources(compSource).size());
+        occurrences.put(
+                "Strategy Card Sets",
+                Mapper.getStrategyCardSetsSources(compSource).size());
+        occurrences.put(
+                "Strategy Cards", Mapper.getStrategyCardsSources(compSource).size());
+        occurrences.put(
+                "Technologies", Mapper.getTechnologiesSources(compSource).size());
         occurrences.put("Tokens", Mapper.getTokensSources(compSource).size());
         occurrences.put("Units", Mapper.getUnitsSources(compSource).size());
         occurrences.put("Planets", Mapper.getPlanetsSources(compSource).size());
@@ -160,30 +187,73 @@ class SearchSources extends Subcommand {
         List<String> tileSources = Mapper.getTilesSources(null);
 
         List<String> componentSources = Stream.of(
-            abilitySources, actioncardSources, agendaSources, attachmentSources, deckSources, eventSources,
-            exploreSources, factionSources, drafterrataSources, genericcardSources, leaderSources, promissorynoteSources,
-            publicobjectiveSources, relicSources, secretobjectiveSources, strategycardsetSources, strategycardSources,
-            technologySources, tokenSources, unitSources, planetSources, tileSources //
-        ).flatMap(i -> i.stream()).toList();
+                        abilitySources,
+                        actioncardSources,
+                        agendaSources,
+                        attachmentSources,
+                        deckSources,
+                        eventSources,
+                        exploreSources,
+                        factionSources,
+                        drafterrataSources,
+                        genericcardSources,
+                        leaderSources,
+                        promissorynoteSources,
+                        publicobjectiveSources,
+                        relicSources,
+                        secretobjectiveSources,
+                        strategycardsetSources,
+                        strategycardSources,
+                        technologySources,
+                        tokenSources,
+                        unitSources,
+                        planetSources,
+                        tileSources //
+                        )
+                .flatMap(Collection::stream)
+                .toList();
 
-        Map<String, Long> uniqueComponentSources = componentSources.stream().collect(Collectors.groupingBy(e -> e, Collectors.counting())) // Groups by distinct value and counts initial occurrences
-            .entrySet().stream().sorted(Map.Entry.comparingByKey()).sorted(Collections.reverseOrder(Map.Entry.comparingByValue())) // Sorts by values DESC then untie with key ASC
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new)); // Converts back to Map
+        Map<String, Long> uniqueComponentSources = componentSources.stream()
+                .collect(Collectors.groupingBy(
+                        e -> e, Collectors.counting())) // Groups by distinct value and counts initial occurrences
+                .entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .sorted(Collections.reverseOrder(
+                        Map.Entry.comparingByValue())) // Sorts by values DESC then untie with key ASC
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new)); // Converts back to Map
 
         // Sources from sources.json file
         List<String> sources = Mapper.getSources().values().stream()
-            .map(model -> model.getSource().toString()).toList();
+                .map(model -> model.getSource().toString())
+                .toList();
 
         // Sources from Source.java Enum file
-        List<String> enumSources = Arrays.asList(ComponentSource.values()).stream().map(entry -> entry.toString()).toList();
+        List<String> enumSources = Arrays.stream(ComponentSource.values())
+                .map(ComponentSource::toString)
+                .toList();
 
         // Build answer
         StringBuilder uniqueComponentSourcesTextList = new StringBuilder();
 
         uniqueComponentSourcesTextList.append("**All \\resources\\ JSON content:**\n");
-        uniqueComponentSourcesTextList.append(uniqueComponentSources.size()).append(" sources: ").append(uniqueComponentSources.values().stream().mapToLong(d -> d).sum()).append(" elements");
+        uniqueComponentSourcesTextList
+                .append(uniqueComponentSources.size())
+                .append(" sources: ")
+                .append(uniqueComponentSources.values().stream()
+                        .mapToLong(d -> d)
+                        .sum())
+                .append(" elements");
         for (var component : uniqueComponentSources.entrySet()) {
-            uniqueComponentSourcesTextList.append("\n> - ").append(component.getKey()).append(": ").append(component.getValue());
+            uniqueComponentSourcesTextList
+                    .append("\n> - ")
+                    .append(component.getKey())
+                    .append(": ")
+                    .append(component.getValue());
         }
         // TO DO: find a way to add emoji to list given by previous instruction
 
@@ -191,12 +261,14 @@ class SearchSources extends Subcommand {
 
         uniqueComponentSourcesTextList.append("**Implementation missing in \\resources\\ JSON content:**\n");
         uniqueComponentSourcesTextList.append("Compared to sources.json\n");
-        for (int i = 0; i < sources.size(); i++) {
-            if (!uniqueComponentSources.containsKey(sources.get(i))) uniqueComponentSourcesTextList.append("- ").append(sources.get(i)).append("\n");
+        for (String string : sources) {
+            if (!uniqueComponentSources.containsKey(string))
+                uniqueComponentSourcesTextList.append("- ").append(string).append("\n");
         }
         uniqueComponentSourcesTextList.append("Compared to Source.java Enum\n");
-        for (int i = 0; i < enumSources.size(); i++) {
-            if (!uniqueComponentSources.containsKey(enumSources.get(i))) uniqueComponentSourcesTextList.append("- ").append(enumSources.get(i)).append("\n");
+        for (String s : enumSources) {
+            if (!uniqueComponentSources.containsKey(s))
+                uniqueComponentSourcesTextList.append("- ").append(s).append("\n");
         }
 
         uniqueComponentSourcesTextList.append("\n");
@@ -204,11 +276,16 @@ class SearchSources extends Subcommand {
         uniqueComponentSourcesTextList.append("**Entries missing in sources.json:**\n");
         uniqueComponentSourcesTextList.append("Compared to \\resources\\ JSON content\n");
         for (Map.Entry<String, Long> entry : uniqueComponentSources.entrySet()) {
-            if (!sources.contains(entry.getKey())) uniqueComponentSourcesTextList.append("- ").append(entry.getKey()).append("\n");
+            if (!sources.contains(entry.getKey()))
+                uniqueComponentSourcesTextList
+                        .append("- ")
+                        .append(entry.getKey())
+                        .append("\n");
         }
         uniqueComponentSourcesTextList.append("Compared to Source.java Enum\n");
-        for (int i = 0; i < enumSources.size(); i++) {
-            if (!sources.contains(enumSources.get(i))) uniqueComponentSourcesTextList.append("- ").append(enumSources.get(i)).append("\n");
+        for (String enumSource : enumSources) {
+            if (!sources.contains(enumSource))
+                uniqueComponentSourcesTextList.append("- ").append(enumSource).append("\n");
         }
 
         uniqueComponentSourcesTextList.append("\n");
@@ -216,15 +293,20 @@ class SearchSources extends Subcommand {
         uniqueComponentSourcesTextList.append("**Entries missing in Source.java Enum:**\n");
         uniqueComponentSourcesTextList.append("Compared to \\resources\\ JSON content\n");
         for (Map.Entry<String, Long> entry : uniqueComponentSources.entrySet()) {
-            if (!enumSources.contains(entry.getKey())) uniqueComponentSourcesTextList.append("- ").append(entry.getKey()).append("\n");
+            if (!enumSources.contains(entry.getKey()))
+                uniqueComponentSourcesTextList
+                        .append("- ")
+                        .append(entry.getKey())
+                        .append("\n");
         }
         uniqueComponentSourcesTextList.append("Compared to sources.json\n");
-        for (int i = 0; i < sources.size(); i++) {
-            if (!enumSources.contains(sources.get(i))) uniqueComponentSourcesTextList.append("- ").append(sources.get(i)).append("\n");
+        for (String source : sources) {
+            if (!enumSources.contains(source))
+                uniqueComponentSourcesTextList.append("- ").append(source).append("\n");
         }
 
         // Send answer
-        MessageHelper.sendMessageToThread(event.getChannel(), "Sources check", uniqueComponentSourcesTextList.toString());
+        MessageHelper.sendMessageToThread(
+                event.getChannel(), "Sources check", uniqueComponentSourcesTextList.toString());
     }
-
 }

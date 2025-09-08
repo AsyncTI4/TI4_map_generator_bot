@@ -1,7 +1,6 @@
 package ti4.commands.map;
 
 import java.util.Set;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -16,7 +15,12 @@ class RemoveTile extends GameStateSubcommand {
 
     public RemoveTile() {
         super(Constants.REMOVE_TILE, "Remove tile from map", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map. Accepts comma separated list", true).setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.POSITION,
+                        "Tile position on map. Accepts comma separated list",
+                        true)
+                .setAutoComplete(true));
     }
 
     @Override

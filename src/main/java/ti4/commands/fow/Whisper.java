@@ -16,7 +16,12 @@ class Whisper extends GameStateSubcommand {
 
     public Whisper() {
         super(Constants.WHISPER, "Send a private message to a player in fog mode", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to which you send the message").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.TARGET_FACTION_OR_COLOR,
+                        "Faction or Color to which you send the message")
+                .setAutoComplete(true)
+                .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.MSG, "Message to send").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ANON, "Send anonymously").setAutoComplete(true));
     }
@@ -25,8 +30,10 @@ class Whisper extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         if (!game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game is not fog mode, and should not use this command."
-                +" Instead whisper by beginning your message with to[color] or to[faction] from inside your `#cards-info` thread (for instance, saying `toblue hi`).");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "This game is not fog mode, and should not use this command."
+                            + " Instead whisper by beginning your message with to[color] or to[faction] from inside your `#cards-info` thread (for instance, saying `toblue hi`).");
             return;
         }
 
@@ -38,6 +45,7 @@ class Whisper extends GameStateSubcommand {
 
         String msg = event.getOption(Constants.MSG).getAsString();
         String anonY = event.getOption(Constants.ANON, "", OptionMapping::getAsString);
-        WhisperService.sendWhisper(game, getPlayer(), otherPlayer, msg, anonY, event.getMessageChannel(), event.getGuild());
+        WhisperService.sendWhisper(
+                game, getPlayer(), otherPlayer, msg, anonY, event.getMessageChannel(), event.getGuild());
     }
 }

@@ -13,7 +13,9 @@ class StellarConverter extends GameStateSubcommand {
 
     public StellarConverter() {
         super(Constants.STELLAR_CONVERTER, "Stellar Convert a planet.", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to be converted.").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to be converted.")
+                .setRequired(true)
+                .setAutoComplete(true));
     }
 
     @Override

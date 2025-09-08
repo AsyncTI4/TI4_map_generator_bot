@@ -1,9 +1,8 @@
 package ti4.draft;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import java.util.List;
+import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
@@ -12,12 +11,14 @@ import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.franken.FrankenDraftBagService;
 
 public abstract class BagDraft {
-    protected final Game owner;
+    private static final Pattern FORWARD_SLASH_PATTERN = Pattern.compile("/");
+    private final Game owner;
 
     public static BagDraft GenerateDraft(String draftType, Game game) {
         if ("franken".equals(draftType)) {
@@ -35,7 +36,7 @@ public abstract class BagDraft {
         return null;
     }
 
-    public BagDraft(Game owner) {
+    BagDraft(Game owner) {
         this.owner = owner;
     }
 
@@ -59,7 +60,8 @@ public abstract class BagDraft {
         List<Player> players = owner.getRealPlayers();
 
         for (Player p : players) {
-            if (!p.getCurrentDraftBag().Contents.isEmpty() || !p.getDraftQueue().Contents.isEmpty()) {
+            if (!p.getCurrentDraftBag().Contents.isEmpty()
+                    || !p.getDraftQueue().Contents.isEmpty()) {
                 if (p.getDraftHand().Contents.size() != owner.getFrankenBagSize()) {
                     return false;
                 }
@@ -90,9 +92,10 @@ public abstract class BagDraft {
             }
         }
         player.setReadyToPassBag(!newBagCanBeDraftedFrom);
-        MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(),
-            player.getRepresentationUnfogged() + " you have been passed a new draft bag!",
-            Buttons.gray(FrankenDraftBagService.ACTION_NAME + "show_bag", "Click here to show your current bag"));
+        MessageHelper.sendMessageToChannelWithButton(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + " you have been passed a new draft bag!",
+                Buttons.gray(FrankenDraftBagService.ACTION_NAME + "show_bag", "Click here to show your current bag"));
     }
 
     public boolean allPlayersReadyToPass() {
@@ -128,13 +131,18 @@ public abstract class BagDraft {
     public ThreadChannel regenerateBagChannel(Player player) {
         TextChannel actionsChannel = owner.getMainGameChannel();
         if (actionsChannel == null) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(player), "`Helper.getBagChannel`: actionsChannel is null for game, or community game private channel not set: " + owner.getName());
+            BotLogger.warning(
+                    new LogOrigin(player),
+                    "`Helper.getBagChannel`: actionsChannel is null for game, or community game private channel not set: "
+                            + owner.getName());
             return null;
         }
 
-        String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-" + player.getUserName().replaceAll("/", "");
+        String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-"
+                + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("");
         if (owner.isFowMode()) {
-            threadName = owner.getName() + "-" + "bag-info-" + player.getUserName().replaceAll("/", "") + "-private";
+            threadName = owner.getName() + "-" + "bag-info-"
+                    + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("") + "-private";
         }
 
         ThreadChannel existingChannel = findExistingBagChannel(player, threadName);
@@ -145,42 +153,53 @@ public abstract class BagDraft {
             }
 
             // Clear out all messages from the existing thread
-            existingChannel.getHistory().retrievePast(100).submit().thenAccept(m -> {
-                if (m.size() > 1) {
-                    existingChannel.deleteMessages(m).submit().join();
-                }
-            }).join();
+            existingChannel
+                    .getHistory()
+                    .retrievePast(100)
+                    .submit()
+                    .thenAccept(m -> {
+                        if (m.size() > 1) {
+                            existingChannel.deleteMessages(m).submit().join();
+                        }
+                    })
+                    .join();
             return existingChannel;
         }
 
         // CREATE NEW THREAD
-        //Make card info thread a public thread in community mode
+        // Make card info thread a public thread in community mode
         boolean isPrivateChannel = (!owner.isFowMode());
         if (owner.getName().contains("pbd100") || owner.getName().contains("pbd500")) {
             isPrivateChannel = true;
         }
         ThreadChannelAction threadAction = ((TextChannel) player.getCorrectChannel())
-            .createThreadChannel(threadName, isPrivateChannel)
-            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
+                .createThreadChannel(threadName, isPrivateChannel)
+                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
         if (isPrivateChannel) {
             threadAction = threadAction.setInvitable(false);
         }
-        ThreadChannel threadChannel = threadAction.complete(); // Must `complete` if we're using this channel as part of an interaction that saves the game
+        ThreadChannel threadChannel =
+                threadAction
+                        .complete(); // Must `complete` if we're using this channel as part of an interaction that saves
+        // the
+        // game
         player.setBagInfoThreadID(threadChannel.getId());
         return threadChannel;
     }
 
     public ThreadChannel findExistingBagChannel(Player player) {
-        String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-" + player.getUserName().replaceAll("/", "");
+        String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-"
+                + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("");
         if (owner.isFowMode()) {
-            threadName = owner.getName() + "-" + "bag-info-" + player.getUserName().replaceAll("/", "") + "-private";
+            threadName = owner.getName() + "-" + "bag-info-"
+                    + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("") + "-private";
         }
         return findExistingBagChannel(player, threadName);
     }
 
     private ThreadChannel findExistingBagChannel(Player player, String threadName) {
         TextChannel actionsChannel = (TextChannel) player.getCorrectChannel();
-        //ATTEMPT TO FIND BY ID
+        // ATTEMPT TO FIND BY ID
         String bagInfoThread = player.getBagInfoThreadID();
         try {
             if (bagInfoThread != null && !bagInfoThread.isBlank() && !"null".equals(bagInfoThread)) {
@@ -199,7 +218,8 @@ public abstract class BagDraft {
 
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
                 // Must `complete` if we're using this channel as part of an interaction that saves the game
-                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                List<ThreadChannel> hiddenThreadChannels =
+                        actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                     if (threadChannel_.getId().equals(bagInfoThread)) {
                         player.setBagInfoThreadID(threadChannel_.getId());
@@ -208,10 +228,14 @@ public abstract class BagDraft {
                 }
             }
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(player), "`Player.getBagInfoThread`: Could not find existing Bag Info thead using ID: " + bagInfoThread + " for potential thread name: " + threadName, e);
+            BotLogger.error(
+                    new LogOrigin(player),
+                    "`Player.getBagInfoThread`: Could not find existing Bag Info thead using ID: " + bagInfoThread
+                            + " for potential thread name: " + threadName,
+                    e);
         }
 
-        //ATTEMPT TO FIND BY NAME
+        // ATTEMPT TO FIND BY NAME
         try {
             if (bagInfoThread != null && !bagInfoThread.isBlank() && !"null".equals(bagInfoThread)) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
@@ -229,7 +253,8 @@ public abstract class BagDraft {
 
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
                 // Must `complete` if we're using this channel as part of an interaction that saves the game
-                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                List<ThreadChannel> hiddenThreadChannels =
+                        actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                     if (threadChannel_.getName().equals(threadName)) {
                         player.setBagInfoThreadID(threadChannel_.getId());
@@ -238,7 +263,10 @@ public abstract class BagDraft {
                 }
             }
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(player), "`Player.getBagInfoThread`: Could not find existing Bag Info thead using name: " + threadName, e);
+            BotLogger.error(
+                    new LogOrigin(player),
+                    "`Player.getBagInfoThread`: Could not find existing Bag Info thead using name: " + threadName,
+                    e);
         }
         return null;
     }
@@ -263,7 +291,11 @@ public abstract class BagDraft {
             } else {
                 sb.append(player.getRepresentationNoPing());
             }
-            sb.append(" (").append(player.getDraftHand().Contents.size()).append("/").append(owner.getFrankenBagSize()).append(")");
+            sb.append(" (")
+                    .append(player.getDraftHand().Contents.size())
+                    .append("/")
+                    .append(owner.getFrankenBagSize())
+                    .append(")");
             sb.append("\n");
         }
         return sb.toString();

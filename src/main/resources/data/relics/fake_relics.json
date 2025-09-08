@@ -93,7 +93,7 @@
     {
         "alias": "superweaponavailyn",
         "name": "Superweapon Availyn",
-        "text": "This system is a nebula. During combat, you may exhaust this card to move up to 3 of your fighters on the game board into the active system. [Note: You must be participating in the combat] PRODUCTION 3",
+        "text": "This system is a nebula. During combat, you may exhaust this card to move up to 3 of your fighters from this system to the active system. [Note: You must be participating in the combat] PRODUCTION 3",
         "isFakeRelic": true,
         "source": "ds"
     },

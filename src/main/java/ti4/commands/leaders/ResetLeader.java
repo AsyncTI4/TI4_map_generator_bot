@@ -12,7 +12,9 @@ class ResetLeader extends GameStateSubcommand {
 
     public ResetLeader() {
         super(Constants.RESET, "Reset all leaders", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     @Override

@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -30,8 +29,8 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
@@ -64,7 +63,7 @@ public class MiltyDraftHelper {
         int spanW = (int) Math.ceil(Math.sqrt(sliceCount));
         int spanH = (sliceCount + spanW - 1) / spanW;
 
-        float scale = 1f;
+        float scale = 1.0f;
         int scaled = (int) (mapTemplate.squareSliceImageSize() * scale);
         int width = scaled * spanW;
         int height = scaled * spanH;
@@ -78,9 +77,11 @@ public class MiltyDraftHelper {
         StringBuilder desc = new StringBuilder();
         for (MiltyDraftSlice slice : slices) {
             Player playerPicked = game.getPlayers().values().stream()
-                .filter(player -> manager.getPlayerDraft(player) != null)
-                .filter(player -> slice.equals(manager.getPlayerDraft(player).getSlice()))
-                .findFirst().orElse(null);
+                    .filter(player -> manager.getPlayerDraft(player) != null)
+                    .filter(player ->
+                            slice.equals(manager.getPlayerDraft(player).getSlice()))
+                    .findFirst()
+                    .orElse(null);
 
             BufferedImage sliceImage;
             if (game.isFowMode()) {
@@ -121,7 +122,8 @@ public class MiltyDraftHelper {
 
         List<String> tileStrings = new ArrayList<>();
         tileStrings.add(ResourceHelper.getInstance().getTileFile("00_green.png"));
-        tileStrings.addAll(slice.getTiles().stream().map(t -> t.getTile().getTilePath()).toList());
+        tileStrings.addAll(
+                slice.getTiles().stream().map(t -> t.getTile().getTilePath()).toList());
 
         String fow = slice.getTiles().getFirst().getTile().getFowTilePath(null);
         BufferedImage fogFilter = ImageHelper.read(fow);
@@ -171,10 +173,10 @@ public class MiltyDraftHelper {
         featureEmojis.addAll(legendary);
 
         List<Point> featurePoints = Arrays.asList(
-            new Point(83, 3), new Point(220, 3),
-            new Point(60, 43), new Point(243, 43),
-            new Point(37, 83), new Point(266, 83),
-            new Point(14, 123), new Point(289, 123));
+                new Point(83, 3), new Point(220, 3),
+                new Point(60, 43), new Point(243, 43),
+                new Point(37, 83), new Point(266, 83),
+                new Point(14, 123), new Point(289, 123));
 
         int resources = slice.getTotalRes();
         int influence = slice.getTotalInf();
@@ -204,13 +206,24 @@ public class MiltyDraftHelper {
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(Color.white);
         graphics.setFont(Storage.getFont50());
-        DrawingUtil.superDrawString(graphics, totalsString, hs.x + 172, hs.y + 110, Color.white, hCenter, null, outlineStroke, Color.black);
-        DrawingUtil.superDrawString(graphics, optimalString, hs.x + 172, hs.y + 165, Color.white, hCenter, null, outlineStroke, Color.black);
+        DrawingUtil.superDrawString(
+                graphics, totalsString, hs.x + 172, hs.y + 110, Color.white, hCenter, null, outlineStroke, Color.black);
+        DrawingUtil.superDrawString(
+                graphics,
+                optimalString,
+                hs.x + 172,
+                hs.y + 165,
+                Color.white,
+                hCenter,
+                null,
+                outlineStroke,
+                Color.black);
 
         return sliceImage;
     }
 
-    private static BufferedImage sliceImageWithPlayerInfo(MiltyDraftSlice slice, MiltyDraftManager manager, Player player) {
+    private static BufferedImage sliceImageWithPlayerInfo(
+            MiltyDraftSlice slice, MiltyDraftManager manager, Player player) {
         MapTemplateModel mapTemplate = Mapper.getMapTemplate(manager.getMapTemplate());
         List<Point> tilePositions = mapTemplate.tileDisplayCoords();
         Point hs = tilePositions.getFirst();
@@ -221,7 +234,16 @@ public class MiltyDraftHelper {
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(Color.white);
         graphics.setFont(Storage.getFont64());
-        DrawingUtil.superDrawString(graphics, slice.getName(), hs.x + 172, hs.y + 50, Color.white, hCenter, null, outlineStroke, Color.black);
+        DrawingUtil.superDrawString(
+                graphics,
+                slice.getName(),
+                hs.x + 172,
+                hs.y + 50,
+                Color.white,
+                hCenter,
+                null,
+                outlineStroke,
+                Color.black);
 
         if (player != null) {
             graphics.setColor(Color.white);
@@ -230,15 +252,24 @@ public class MiltyDraftHelper {
             PlayerDraft pd = manager.getPlayerDraft(player);
             String playerName = player.getUserName();
             String faction = pd.getFaction() == null ? "no faction" : pd.getFaction();
-            DrawingUtil.superDrawString(graphics, playerName, hs.x + 172, hs.y + 230, Color.red, hCenter, null, outlineStroke, Color.black);
+            DrawingUtil.superDrawString(
+                    graphics, playerName, hs.x + 172, hs.y + 230, Color.red, hCenter, null, outlineStroke, Color.black);
 
             if (pd.getFaction() != null) {
                 FactionModel factionModel = Mapper.getFaction(faction);
                 String factionName = factionModel.getFactionName();
-                if (factionModel.getAlias().startsWith("keleres"))
-                    factionName = "The Council Keleres";
+                if (factionModel.getAlias().startsWith("keleres")) factionName = "The Council Keleres";
                 graphics.setFont(Storage.getFont35());
-                DrawingUtil.superDrawString(graphics, factionName, hs.x + 172, hs.y + 270, Color.orange, hCenter, null, outlineStroke, Color.black);
+                DrawingUtil.superDrawString(
+                        graphics,
+                        factionName,
+                        hs.x + 172,
+                        hs.y + 270,
+                        Color.orange,
+                        hCenter,
+                        null,
+                        outlineStroke,
+                        Color.black);
                 BufferedImage img = getEmojiImage(factionModel.getFactionEmoji());
                 int offset = graphics.getFontMetrics().stringWidth(factionName) / 2 + 10;
                 graphics.drawImage(img, hs.x + 172 - offset - 40, hs.y + 240, null);
@@ -259,12 +290,12 @@ public class MiltyDraftHelper {
 
     public static void initDraftTiles(MiltyDraftManager manager, Game game) {
         List<ComponentSource> sources = new ArrayList<>(Arrays.asList(
-            ComponentSource.base,
-            ComponentSource.codex1,
-            ComponentSource.codex2,
-            ComponentSource.codex3,
-            ComponentSource.codex4,
-            ComponentSource.pok));
+                ComponentSource.base,
+                ComponentSource.codex1,
+                ComponentSource.codex2,
+                ComponentSource.codex3,
+                ComponentSource.codex4,
+                ComponentSource.pok));
         if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.ds);
             sources.add(ComponentSource.uncharted_space);
@@ -280,9 +311,9 @@ public class MiltyDraftHelper {
         MiltyDraftTile draftTile = new MiltyDraftTile();
         if (wormholes != null) {
             for (WormholeModel.Wormhole wormhole : wormholes) {
-                if (WormholeModel.Wormhole.ALPHA == wormhole) {
+                if (wormhole == WormholeModel.Wormhole.ALPHA) {
                     draftTile.setHasAlphaWH(true);
-                } else if (WormholeModel.Wormhole.BETA == wormhole) {
+                } else if (wormhole == WormholeModel.Wormhole.BETA) {
                     draftTile.setHasBetaWH(true);
                 } else {
                     draftTile.setHasOtherWH(true);
@@ -326,14 +357,16 @@ public class MiltyDraftHelper {
 
     private static boolean isInvalid(TileModel tileModel) {
         TileModel.TileBack back = tileModel.getTileBack();
-        if (!TileModel.TileBack.RED.equals(back) && !TileModel.TileBack.BLUE.equals(back)) {
+        if (back != TileBack.RED && back != TileBack.BLUE) {
             return true;
         }
 
         String id = tileModel.getId().toLowerCase();
-        String path = tileModel.getImagePath() == null ? "" : tileModel.getImagePath().toLowerCase();
-        List<String> disallowedTerms = List.of("corner", "lane", "mecatol", "blank", "border", "fow", "anomaly", "deltawh",
-            "seed", "mr", "mallice", "ethan", "prison", "kwon", "home", "hs", "red", "blue", "green", "gray", "gate", "setup");
+        String path =
+                tileModel.getImagePath() == null ? "" : tileModel.getImagePath().toLowerCase();
+        List<String> disallowedTerms = List.of(
+                "corner", "lane", "mecatol", "blank", "border", "fow", "anomaly", "deltawh", "seed", "mr", "mallice",
+                "ethan", "prison", "kwon", "home", "hs", "red", "blue", "green", "gray", "gate", "setup");
         return disallowedTerms.stream().anyMatch(term -> id.contains(term) || path.contains(term));
     }
 
@@ -342,9 +375,11 @@ public class MiltyDraftHelper {
 
         String mapTemplate = manager.getMapTemplate();
         if (mapTemplate == null) {
-            MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(manager.getPlayers().size());
+            MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(
+                    manager.getPlayers().size());
             if (defaultTemplate == null) {
-                throw new Exception("idk how to build this map yet: " + game.getName() + ", players: " + manager.getPlayers().size());
+                throw new Exception("idk how to build this map yet: " + game.getName() + ", players: "
+                        + manager.getPlayers().size());
             }
             mapTemplate = defaultTemplate.getAlias();
         }
@@ -357,7 +392,8 @@ public class MiltyDraftHelper {
 
         String mapTemplate = manager.getMapTemplate();
         if (mapTemplate == null) {
-            MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(manager.getPlayers().size());
+            MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(
+                    manager.getPlayers().size());
             if (defaultTemplate == null) {
                 throw new Exception("idk how to build this map yet");
             }
@@ -368,7 +404,8 @@ public class MiltyDraftHelper {
     }
 
     // TODO (Jazz): add map template
-    public static List<MiltyDraftSlice> parseSlicesFromString(String sliceString, List<ComponentSource> allowedSources) {
+    public static List<MiltyDraftSlice> parseSlicesFromString(
+            String sliceString, List<ComponentSource> allowedSources) {
         try {
             sliceString = sliceString.replace("|", ";");
             MiltyDraftManager manager = new MiltyDraftManager();

@@ -17,15 +17,25 @@ import ti4.service.combat.CombatRollType;
 class CombatRoll extends GameStateSubcommand {
 
     public CombatRoll() {
-        super(Constants.COMBAT_ROLL, "*V2* *BETA* Combat rolls for units on tile. *Auto includes modifiers*", true, true);
+        super(
+                Constants.COMBAT_ROLL,
+                "*V2* *BETA* Combat rolls for units on tile. *Auto includes modifiers*",
+                true,
+                true);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-            .setRequired(true)
-            .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "(optional) Space or planet to have combat at (default is space)")
-            .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_ROLL_TYPE, "Switch to afb/bombardment/spacecannonoffence/spacecannondefence"));
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.PLANET,
+                        "(optional) Space or planet to have combat at (default is space)")
+                .setAutoComplete(true));
+        addOptions(new OptionData(
+                OptionType.STRING,
+                Constants.COMBAT_ROLL_TYPE,
+                "Switch to afb/bombardment/spacecannonoffence/spacecannondefence"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "roll for player (default you)")
-            .setAutoComplete(true));
+                .setAutoComplete(true));
     }
 
     @Override
@@ -46,8 +56,7 @@ class CombatRoll extends GameStateSubcommand {
         String tileOption = event.getOption(Constants.TILE_NAME).getAsString().toLowerCase();
         Tile tile = TileHelper.getTile(event, tileOption, game);
         if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(),
-                "Tile " + tileOption + " not found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Tile " + tileOption + " not found");
             return;
         }
 

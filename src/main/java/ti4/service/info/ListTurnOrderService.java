@@ -3,7 +3,6 @@ package ti4.service.info;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -29,7 +28,7 @@ public class ListTurnOrderService {
             return;
         }
 
-        HashMap<Integer, String> order = new HashMap<>();
+        Map<Integer, String> order = new HashMap<>();
         for (Player player : game.getRealPlayers()) {
             order.put(player.getInitiative(), buildPlayerScText(game, player, pingPeople));
         }
@@ -74,7 +73,7 @@ public class ListTurnOrderService {
         if (pingPeople || game.isFowMode()) {
             textBuilder.append(player.getRepresentation());
         } else {
-            textBuilder.append(player.getFactionEmoji() + " " + player.getUserName());
+            textBuilder.append(player.getFactionEmoji()).append(" ").append(player.getUserName());
         }
 
         if (passed) {

@@ -13,8 +13,12 @@ class MarkFollowed extends GameStateSubcommand {
 
     public MarkFollowed() {
         super(Constants.MARK_FOLLOWED, "Mark player as having followed a strategy card", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Initiative number for the strategy card being followed").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color following").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(
+                        OptionType.INTEGER, Constants.SC, "Initiative number for the strategy card being followed")
+                .setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color following")
+                .setAutoComplete(true)
+                .setRequired(true));
     }
 
     @Override
@@ -22,8 +26,9 @@ class MarkFollowed extends GameStateSubcommand {
         Player player = getPlayer();
         int sc = event.getOption(Constants.SC).getAsInt();
         player.addFollowedSC(sc);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully marked " +
-            player.getRepresentation() + " as having followed **" + Helper.getSCName(sc, getGame()) + "**.");
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                "Successfully marked " + player.getRepresentation() + " as having followed **"
+                        + Helper.getSCName(sc, getGame()) + "**.");
     }
-
 }

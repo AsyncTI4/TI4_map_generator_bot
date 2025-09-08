@@ -14,7 +14,10 @@ class RevealEvent extends GameStateSubcommand {
     public RevealEvent() {
         super(Constants.REVEAL, "Reveal top Agenda from deck", true, false);
         addOption(OptionType.INTEGER, Constants.COUNT, "Number of cards to reveal (Default = 1, Min 1, Max 2)");
-        addOption(OptionType.BOOLEAN, Constants.REVEAL_FROM_BOTTOM, "Reveal the agenda from the bottom of the deck instead of the top");
+        addOption(
+                OptionType.BOOLEAN,
+                Constants.REVEAL_FROM_BOTTOM,
+                "Reveal the agenda from the bottom of the deck instead of the top");
     }
 
     @Override

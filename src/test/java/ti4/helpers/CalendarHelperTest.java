@@ -1,13 +1,12 @@
 package ti4.helpers;
 
-import java.util.Calendar;
-
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CalendarHelperTest {
+import java.util.Calendar;
+import org.junit.jupiter.api.Test;
+
+class CalendarHelperTest {
 
     @Test
     void testIsBetween() {

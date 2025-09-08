@@ -1,9 +1,8 @@
 package ti4.listeners;
 
-import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.List;
-
+import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -11,10 +10,11 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
-import ti4.executors.ExecutorManager;
+import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.SusSlashCommandService;
 import ti4.service.game.GameNameService;
 
@@ -22,12 +22,17 @@ public class SlashCommandListener extends ListenerAdapter {
 
     private static final long DELAY_THRESHOLD_MILLISECONDS = 1500;
 
-    private static final List<String> SLASHCOMMANDS_WITH_MODALS = Arrays.asList(Constants.ADD_TILE_LIST, Constants.ADD_TILE_LIST_RANDOM);
+    private static final List<String> SLASHCOMMANDS_WITH_MODALS =
+            Arrays.asList(Constants.ADD_TILE_LIST, Constants.ADD_TILE_LIST_RANDOM, Constants.EDIT_TRACK_RECORD);
 
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
-        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands() && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
-            event.getInteraction().reply("Please try again in a moment.\nThe bot is rebooting and is not ready to receive commands.").setEphemeral(true).queue();
+        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()
+                && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
+            event.getInteraction()
+                    .reply("Please try again in a moment.\nThe bot is rebooting and is not ready to receive commands.")
+                    .setEphemeral(true)
+                    .queue();
             return;
         }
 
@@ -40,13 +45,15 @@ public class SlashCommandListener extends ListenerAdapter {
 
     private static void queue(SlashCommandInteractionEvent event) {
         String gameName = GameNameService.getGameName(event);
-        ExecutorManager.runAsync(eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event));
+        ExecutorServiceManager.runAsync(
+                eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event));
     }
 
     private static String eventToString(SlashCommandInteractionEvent event, String gameName) {
-        return "SlashCommandListener task for `" + event.getUser().getEffectiveName() + "`" +
-            (gameName == null ? "" : " in `" + gameName + "`") +
-            ": `" + event.getCommandString() + "`";
+        return "SlashCommandListener task for `" + event.getUser().getEffectiveName() + "`"
+                + (gameName == null ? "" : " in `" + gameName + "`")
+                + ": `"
+                + event.getCommandString() + "`";
     }
 
     private static void process(SlashCommandInteractionEvent event) {
@@ -66,7 +73,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 String messageText = "Error trying to execute command: " + command.getName();
                 String errorMessage = ExceptionUtils.getMessage(e);
                 event.getHook().editOriginal(errorMessage).queue();
-                BotLogger.error(new BotLogger.LogMessageOrigin(event), messageText, e);
+                BotLogger.error(new LogOrigin(event), messageText, e);
             }
         }
 
@@ -79,12 +86,16 @@ public class SlashCommandListener extends ListenerAdapter {
         if (eventDelay > DELAY_THRESHOLD_MILLISECONDS || processingRuntime > DELAY_THRESHOLD_MILLISECONDS) {
             String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(eventDelay);
             String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(processingRuntime);
-            String message = event.getChannel().getAsMention() + " " + event.getUser().getEffectiveName() + " used: `" + event.getCommandString() + "`\n> Warning: " +
-                "This slash command took over " + DELAY_THRESHOLD_MILLISECONDS + "ms to respond or execute\n> " +
-                DateTimeHelper.getTimestampFromMillisecondsEpoch(eventTime) + " command was issued by user\n> " +
-                DateTimeHelper.getTimestampFromMillisecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
-                DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (processingRuntime > eventDelay ? "😲" : "");
-            BotLogger.warning(new BotLogger.LogMessageOrigin(event), message);
+            String message = event.getChannel().getAsMention() + " "
+                    + event.getUser().getEffectiveName() + " used: `" + event.getCommandString() + "`\n> Warning: "
+                    + "This slash command took over "
+                    + DELAY_THRESHOLD_MILLISECONDS + "ms to respond or execute\n> "
+                    + DateTimeHelper.getTimestampFromMillisecondsEpoch(eventTime)
+                    + " command was issued by user\n> " + DateTimeHelper.getTimestampFromMillisecondsEpoch(startTime)
+                    + " `" + responseTime + "` to respond\n> "
+                    + DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime)
+                    + " `" + executionTime + "` to execute" + (processingRuntime > eventDelay ? "😲" : "");
+            BotLogger.warning(new LogOrigin(event), message);
         }
     }
 
@@ -96,10 +107,14 @@ public class SlashCommandListener extends ListenerAdapter {
         Member member = event.getMember();
         if (member != null) {
             String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
-            event.getChannel().sendMessage(commandText).queue(m -> {
-                BotLogger.logSlashCommand(event, m);
-                SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, m.getJumpUrl());
-            }, BotLogger::catchRestError);
+            event.getChannel()
+                    .sendMessage(commandText)
+                    .queue(
+                            m -> {
+                                BotLogger.logSlashCommand(event, m);
+                                SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, m.getJumpUrl());
+                            },
+                            BotLogger::catchRestError);
         }
     }
 }

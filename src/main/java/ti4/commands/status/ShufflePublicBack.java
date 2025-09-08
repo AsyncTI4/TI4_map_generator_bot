@@ -13,7 +13,9 @@ class ShufflePublicBack extends GameStateSubcommand {
 
     public ShufflePublicBack() {
         super(Constants.SHUFFLE_OBJECTIVE_BACK, "Shuffle Public Objective back into deck", true, false);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PO_ID, "Public Objective ID that is between ()").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.PO_ID, "Public Objective ID that is between ()")
+                .setRequired(true)
+                .setAutoComplete(true));
     }
 
     @Override
@@ -21,14 +23,16 @@ class ShufflePublicBack extends GameStateSubcommand {
         Game game = getGame();
         OptionMapping option = event.getOption(Constants.PO_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please choose what public objective to shuffle back in");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Please choose what public objective to shuffle back in");
             return;
         }
         boolean shuffled = game.shuffleObjectiveBackIntoDeck(option.getAsInt());
         if (!shuffled) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Public Objective ID found, please retry");
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Public Objective shuffled back: " + option.getAsInt());
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Public Objective shuffled back: " + option.getAsInt());
         }
     }
 }

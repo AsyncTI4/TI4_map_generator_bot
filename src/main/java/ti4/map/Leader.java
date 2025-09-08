@@ -1,12 +1,11 @@
 package ti4.map;
 
-import java.awt.*;
-import java.util.Comparator;
-import java.util.Optional;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.awt.*;
+import java.util.Comparator;
+import java.util.Optional;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Constants;
@@ -23,12 +22,13 @@ public class Leader {
     private boolean active;
 
     @JsonCreator
-    public Leader(@JsonProperty("id") String id,
-        @JsonProperty("type") String type,
-        @JsonProperty("tgCount") int tgCount,
-        @JsonProperty("exhausted") boolean exhausted,
-        @JsonProperty("locked") boolean locked,
-        @JsonProperty("active") boolean active) {
+    public Leader(
+            @JsonProperty("id") String id,
+            @JsonProperty("type") String type,
+            @JsonProperty("tgCount") int tgCount,
+            @JsonProperty("exhausted") boolean exhausted,
+            @JsonProperty("locked") boolean locked,
+            @JsonProperty("active") boolean active) {
         this.id = id;
         this.type = type;
         this.tgCount = tgCount;
@@ -93,7 +93,7 @@ public class Leader {
 
     @JsonIgnore
     public Optional<LeaderModel> getLeaderModel() {
-        return Optional.ofNullable(Mapper.getLeader(getId()));
+        return Optional.ofNullable(Mapper.getLeader(id));
     }
 
     @JsonIgnore
@@ -107,26 +107,26 @@ public class Leader {
             return null;
         }
         EmbedBuilder eb = new EmbedBuilder();
-        MessageEmbed modelEmbed = getLeaderModel().get().getRepresentationEmbed(false, false, isLocked(), false);
+        MessageEmbed modelEmbed = getLeaderModel().get().getRepresentationEmbed(false, false, locked, false);
         eb.copyFrom(modelEmbed);
 
-        if (getTgCount() > 0) {
+        if (tgCount > 0) {
             String desc = modelEmbed.getDescription();
-            eb.setDescription(desc + "\n" + MiscEmojis.tg(getTgCount()));
+            eb.setDescription(desc + "\n" + MiscEmojis.tg(tgCount));
         }
 
-        if (isExhausted()) {
+        if (exhausted) {
             eb.setColor(Color.GRAY);
         } else {
             eb.setColor(Color.GREEN);
         }
 
-        if (isLocked()) {
+        if (locked) {
             eb.setColor(Color.RED);
             eb.setAuthor("🔒 Locked");
         }
 
-        if (isActive()) {
+        if (active) {
             eb.setColor(Color.BLUE);
             eb.setAuthor("🔒 ACTIVE - Leader will be purged during Status Phase cleanup");
         }

@@ -1,12 +1,11 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
@@ -14,9 +13,7 @@ import ti4.model.Source.ComponentSource;
 public class DraftErrataModel implements ModelInterface {
     @Override
     public boolean isValid() {
-        return ItemCategory != null
-            && ItemId != null
-            && source != null;
+        return ItemCategory != null && ItemId != null && source != null;
     }
 
     @Override
@@ -33,7 +30,7 @@ public class DraftErrataModel implements ModelInterface {
     public DraftErrataModel[] AdditionalComponents;
     public DraftErrataModel[] OptionalSwaps;
     public boolean Undraftable;
-    private String alternateText;
+    public String alternateText;
 
     public boolean AlwaysAddToPool;
 
@@ -45,13 +42,12 @@ public class DraftErrataModel implements ModelInterface {
         ItemId = split[1];
     }
 
-    public DraftErrataModel() {
-
-    }
+    public DraftErrataModel() {}
 
     public static void filterUndraftablesAndShuffle(List<DraftItem> items, DraftItem.Category listCategory) {
         Map<String, DraftErrataModel> frankenErrata = Mapper.getFrankenErrata();
-        items.removeIf((DraftItem item) -> frankenErrata.containsKey(item.getAlias()) && frankenErrata.get(item.getAlias()).Undraftable);
+        items.removeIf((DraftItem item) ->
+                frankenErrata.containsKey(item.getAlias()) && frankenErrata.get(item.getAlias()).Undraftable);
         items.addAll(DraftItem.getAlwaysIncludeItems(listCategory));
         Set<DraftItem> itemsSet = Set.copyOf(items); // Remove duplicates
         items.clear();
@@ -79,6 +75,6 @@ public class DraftErrataModel implements ModelInterface {
     }
 
     public boolean searchSource(ComponentSource searchSource) {
-        return (searchSource == null || (getSource() != null && getSource().equals(searchSource)));
+        return (searchSource == null || (source != null && source == searchSource));
     }
 }

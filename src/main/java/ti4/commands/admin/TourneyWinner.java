@@ -1,7 +1,6 @@
 package ti4.commands.admin;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command.Choice;
@@ -25,7 +24,8 @@ public class TourneyWinner extends Subcommand {
         super("tourney_winner", "Adds or removes a user from the list of Tournament Winners.");
         addOptions(new OptionData(OptionType.USER, Constants.USER, "Player who won the tournament", true));
         addOptions(new OptionData(OptionType.STRING, TOURNEYNAME, "Which tournament the player won", true));
-        addOptions(new OptionData(OptionType.STRING, REMOVE, "Remove this user from the list instead").addChoices(removeOpts));
+        addOptions(new OptionData(OptionType.STRING, REMOVE, "Remove this user from the list instead")
+                .addChoices(removeOpts));
     }
 
     @Override
@@ -42,7 +42,7 @@ public class TourneyWinner extends Subcommand {
         }
 
         String removeStr = event.getOption("remove", "no", OptionMapping::getAsString);
-        boolean remove = removeStr.equalsIgnoreCase("remove");
+        boolean remove = "remove".equalsIgnoreCase(removeStr);
 
         String output;
         if (remove) {

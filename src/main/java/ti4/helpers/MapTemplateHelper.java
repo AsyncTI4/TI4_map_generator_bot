@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.image.DrawingUtil;
@@ -38,8 +37,8 @@ public class MapTemplateHelper {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         MapTemplateModel template = Mapper.getMapTemplate(mapTemplate);
         List<PlayerDraft> speakerOrdered = manager.getDraft().values().stream()
-            .sorted(Comparator.comparing(PlayerDraft::getPosition))
-            .toList();
+                .sorted(Comparator.comparing(PlayerDraft::getPosition))
+                .toList();
 
         Map<String, String> positionMap = new HashMap<>();
         for (MapTemplateTile templateTile : template.getTemplateTiles()) {
@@ -51,23 +50,28 @@ public class MapTemplateHelper {
 
         List<String> badTiles = AddTileListService.addTileMapToGame(game, positionMap);
         if (!badTiles.isEmpty()) {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "There were some bad tiles that were replaced with red tiles: " + badTiles + "\n");
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    "There were some bad tiles that were replaced with red tiles: " + badTiles + "\n");
             throw new Exception("Bad tiles, aborting setup: " + game.getName());
         }
         AddTileListService.finishSetup(game, null);
     }
 
-    private static Entry<String, String> inferTileFromTemplateAndDraft(MapTemplateTile templateTile, List<PlayerDraft> draft) throws Exception {
+    private static Entry<String, String> inferTileFromTemplateAndDraft(
+            MapTemplateTile templateTile, List<PlayerDraft> draft) throws Exception {
         String tileId = null;
         String position = templateTile.getPos();
         if (templateTile.getStaticTileId() != null) {
             tileId = templateTile.getStaticTileId();
         } else if (templateTile.getPlayerNumber() != null) {
             PlayerDraft player = draft.stream()
-                .filter(p -> p.getPosition().equals(templateTile.getPlayerNumber()))
-                .findFirst().orElse(null);
+                    .filter(p -> p.getPosition().equals(templateTile.getPlayerNumber()))
+                    .findFirst()
+                    .orElse(null);
             if (player == null) {
-                throw new Exception("Something went wrong, could not find player at speaker order: " + templateTile.getPlayerNumber());
+                throw new Exception("Something went wrong, could not find player at speaker order: "
+                        + templateTile.getPlayerNumber());
             }
             if (templateTile.getMiltyTileIndex() != null) {
                 int index = templateTile.getMiltyTileIndex();
@@ -99,13 +103,40 @@ public class MapTemplateHelper {
     }
 
     private static Tile getTileFromTemplateTile(MapTemplateTile tile) {
-        List<String> backupColors = Arrays.asList("red", "blue", "yellow", "emerald", "lavender", "petrol", "chocolate",
-            "ethereal", "forest", "gold", "green", "grey", "navy", "spring", "teal", "black", "lightgrey", "rainbow",
-            "turquoise", "lightbrown", "orange", "pink", "sunset", "bloodred", "brown", "chrome", "purple", "rose", "white", "tan");
+        List<String> backupColors = Arrays.asList(
+                "red",
+                "blue",
+                "yellow",
+                "emerald",
+                "lavender",
+                "petrol",
+                "chocolate",
+                "ethereal",
+                "forest",
+                "gold",
+                "green",
+                "grey",
+                "navy",
+                "spring",
+                "teal",
+                "black",
+                "lightgrey",
+                "rainbow",
+                "turquoise",
+                "lightbrown",
+                "orange",
+                "pink",
+                "sunset",
+                "bloodred",
+                "brown",
+                "chrome",
+                "purple",
+                "rose",
+                "white",
+                "tan");
 
         String tileID = null;
-        if (tile.getStaticTileId() != null)
-            tileID = tile.getStaticTileId();
+        if (tile.getStaticTileId() != null) tileID = tile.getStaticTileId();
         else if (tile.getPlayerNumber() != null) {
             String color = backupColors.get(tile.getPlayerNumber());
             if (tile.getMiltyTileIndex() != null) {
@@ -132,10 +163,12 @@ public class MapTemplateHelper {
         return null;
     }
 
-    public static void buildPartialMapFromMiltyData(Game game, GenericInteractionCreateEvent event, String mapTemplate) {
+    public static void buildPartialMapFromMiltyData(
+            Game game, GenericInteractionCreateEvent event, String mapTemplate) {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         MapTemplateModel template = Mapper.getMapTemplate(mapTemplate);
-        List<Player> players = manager.getPlayers().stream().map(game::getPlayer).toList();
+        List<Player> players =
+                manager.getPlayers().stream().map(game::getPlayer).toList();
         boolean somethingHappened = false;
         // fill in draft tiles for all players
         for (Player p : players) {
@@ -145,17 +178,25 @@ public class MapTemplateHelper {
             MiltyDraftSlice slice = draft.getSlice();
             for (MapTemplateTile tile : template.getTemplateTiles()) {
                 Tile gameTile = game.getTileByPosition(tile.getPos());
-                if (tile.getPos() != null && tile.getPlayerNumber() != null && tile.getPlayerNumber().equals(playerNum)) {
-                    if (gameTile != null && !TileHelper.isDraftTile(gameTile.getTileModel())) continue; //already set
+                if (tile.getPos() != null
+                        && tile.getPlayerNumber() != null
+                        && tile.getPlayerNumber().equals(playerNum)) {
+                    if (gameTile != null && !TileHelper.isDraftTile(gameTile.getTileModel())) continue; // already set
 
                     if (slice != null && tile.getMiltyTileIndex() != null) {
-                        String tileID = slice.getTiles().get(tile.getMiltyTileIndex()).getTile().getTileID();
+                        String tileID = slice.getTiles()
+                                .get(tile.getMiltyTileIndex())
+                                .getTile()
+                                .getTileID();
                         tileID = AliasHandler.resolveTile(tileID);
 
                         Tile toAdd = new Tile(tileID, tile.getPos());
                         game.setTile(toAdd);
                         somethingHappened = true;
-                    } else if (faction != null && !faction.startsWith("keleres") && tile.getHome() != null && tile.getHome()) {
+                    } else if (faction != null
+                            && !faction.startsWith("keleres")
+                            && tile.getHome() != null
+                            && tile.getHome()) {
                         String tileID = Mapper.getFaction(faction).getHomeSystem();
                         tileID = AliasHandler.resolveTile(tileID);
 
@@ -173,7 +214,8 @@ public class MapTemplateHelper {
 
                 if (tile.getPos() != null && tile.getCustodians() != null && tile.getCustodians()) {
                     Tile newgametile = game.getTileByPosition(tile.getPos());
-                    if (newgametile != null) AddTileService.addCustodianToken(newgametile, game); //only works on MR for now
+                    if (newgametile != null)
+                        AddTileService.addCustodianToken(newgametile, game); // only works on MR for now
                 }
             }
         }
@@ -183,7 +225,8 @@ public class MapTemplateHelper {
         }
     }
 
-    public static FileUpload generateTemplatePreviewImage(GenericInteractionCreateEvent event, Game game, MapTemplateModel model) {
+    public static FileUpload generateTemplatePreviewImage(
+            GenericInteractionCreateEvent event, Game game, MapTemplateModel model) {
         TileGenerator generator = new TileGenerator(game, event, DisplayType.all);
 
         int rings = model.numRings();
@@ -210,7 +253,7 @@ public class MapTemplateHelper {
         DrawingUtil.superDrawString(g2, "Template: " + model.getAlias(), 10, y, null, null, null, null, null);
         y += 100;
         if (model.getAuthor() != null) {
-            //g2.(Storage);
+            // g2.(Storage);
             g2.setFont(Storage.getFont64());
             DrawingUtil.superDrawString(g2, "Author: " + model.getAuthor(), 10, y, null, null, null, null, null);
             y += 70;

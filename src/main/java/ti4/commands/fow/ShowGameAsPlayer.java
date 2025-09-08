@@ -12,11 +12,19 @@ class ShowGameAsPlayer extends GameStateSubcommand {
 
     public ShowGameAsPlayer() {
         super(Constants.SHOW_GAME_AS_PLAYER, "Shows map as the specified player sees it.", false, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which to show the map as", true, true));
+        addOptions(new OptionData(
+                OptionType.STRING,
+                Constants.FACTION_COLOR,
+                "Faction or Color to which to show the map as",
+                true,
+                true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        ShowGameService.simpleShowGame(getGame(), new UserOverridenGenericInteractionCreateEvent(event, getPlayer().getMember()));
+        ShowGameService.simpleShowGame(
+                getGame(),
+                new UserOverridenGenericInteractionCreateEvent(
+                        event, getPlayer().getMember()));
     }
 }

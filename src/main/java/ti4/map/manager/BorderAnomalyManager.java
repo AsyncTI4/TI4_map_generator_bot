@@ -2,7 +2,6 @@ package ti4.map.manager;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 
@@ -23,8 +22,8 @@ public class BorderAnomalyManager {
 
     public boolean has(String tile, Integer direction) {
         return anomalies.stream()
-            .filter(anomaly -> anomaly.getType() != BorderAnomalyModel.BorderAnomalyType.ARROW)
-            .anyMatch(anomaly -> anomaly.getTile().equals(tile) && anomaly.getDirection() == direction);
+                .filter(anomaly -> anomaly.getType() != BorderAnomalyModel.BorderAnomalyType.ARROW)
+                .anyMatch(anomaly -> anomaly.getTile().equals(tile) && anomaly.getDirection() == direction);
     }
 
     public void add(String tile, Integer direction, BorderAnomalyModel.BorderAnomalyType anomalyType) {

@@ -8,7 +8,7 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 
 @UtilityClass
-public class ProceedToScoringButtonHandler {
+class ProceedToScoringButtonHandler {
     @ButtonHandler("proceed_to_scoring")
     public void proceedToScoring(ButtonInteractionEvent event, Game game) {
         StatusHelper.BeginScoring(event, game, event.getChannel());

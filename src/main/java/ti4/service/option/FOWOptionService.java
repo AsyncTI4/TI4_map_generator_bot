@@ -2,25 +2,28 @@ package ti4.service.option;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 
 @UtilityClass
 public class FOWOptionService {
 
-    public enum FOWOptionCategory { 
-        GAME, VISIBILITY, OTHER;
+    private static final Pattern FOW_OPTION_ = Pattern.compile("fowOption_");
+
+    public enum FOWOptionCategory {
+        GAME,
+        VISIBILITY,
+        OTHER;
 
         static FOWOptionCategory fromString(String string) {
-            for (FOWOptionCategory category : FOWOptionCategory.values()) {
+            for (FOWOptionCategory category : values()) {
                 if (category.name().equalsIgnoreCase(string)) {
                     return category;
                 }
@@ -30,24 +33,35 @@ public class FOWOptionService {
     }
 
     public enum FOWOption {
-        //Comm Options (max 5)
+        // Comm Options (max 5)
         MANAGED_COMMS(FOWOptionCategory.GAME, "Managed comms", "Use managed player-to-player communication threads"),
-        ALLOW_AGENDA_COMMS(FOWOptionCategory.GAME, "Allow comms in agenda", "Managed player-to-player communication threads allow talking with everyone in Agenda Phase"),
-        STATUS_SUMMARY(FOWOptionCategory.GAME, "Status summary", "Prints explores info as summary thread in status homework"),
+        ALLOW_AGENDA_COMMS(
+                FOWOptionCategory.GAME,
+                "Allow comms in agenda",
+                "Managed player-to-player communication threads allow talking with everyone in Agenda Phase"),
+        STATUS_SUMMARY(
+                FOWOptionCategory.GAME, "Status summary", "Prints explores info as summary thread in status homework"),
         HIDE_TOTAL_VOTES(FOWOptionCategory.GAME, "Hide total votes", "Hide total votes amount in agenda"),
         HIDE_VOTE_ORDER(FOWOptionCategory.GAME, "Hide voting order", "Hide player colors from vote order"),
-        
-        //Visibility Options (max 5)
+
+        // Visibility Options (max 5)
         BRIGHT_NOVAS(FOWOptionCategory.VISIBILITY, "Bright Novas", "Locations of Supernovas are always visible"),
-        HIDE_EXPLORES(FOWOptionCategory.VISIBILITY, "Hide Explore Decks", "Disables looking at explore and relic decks"),
+        HIDE_EXPLORES(
+                FOWOptionCategory.VISIBILITY, "Hide Explore Decks", "Disables looking at explore and relic decks"),
         HIDE_MAP(FOWOptionCategory.VISIBILITY, "Hide Unexplored Map", "Hides unexplored (blue 0b) map tiles."),
-        STATS_FROM_HS_ONLY(FOWOptionCategory.VISIBILITY, "Stats from HS", "Only way to see players stats is to see their Home System"),
+        HIDE_PLAYER_INFOS(
+                FOWOptionCategory.VISIBILITY, "Hide Player Infos", "Hides anchored player info areas from the map."),
+        STATS_FROM_HS_ONLY(
+                FOWOptionCategory.VISIBILITY,
+                "Stats from HS",
+                "Only way to see players stats is to see their Home System"),
 
-        //Other Options (max 5)
-        HIDE_PLAYER_NAMES(FOWOptionCategory.OTHER, "Hide real names", "Completely hide player Discord names on the map"),
-        FOW_PLUS(FOWOptionCategory.OTHER, "FoW Plus Mode", "Hello darkness my old friend... WIP - ask Solax for details"),
+        // Other Options (max 5)
+        HIDE_PLAYER_NAMES(
+                FOWOptionCategory.OTHER, "Hide real names", "Completely hide player Discord names on the map"),
 
-        //Hidden from normal options
+        // Hidden from normal options
+        FOW_PLUS(null, "FoW Plus Mode", "Hello darkness my old friend... WIP - ask Solax for details", false),
         RIFTSET_MODE(null, "RiftSet Mode", "For Eronous to run fow300", false);
 
         private final FOWOptionCategory category;
@@ -66,7 +80,7 @@ public class FOWOptionService {
             this.visible = visible;
         }
 
-        public FOWOptionCategory getCategory() {
+        FOWOptionCategory getCategory() {
             return category;
         }
 
@@ -74,16 +88,16 @@ public class FOWOptionService {
             return title;
         }
 
-        public String getDescription() {
+        String getDescription() {
             return description;
         }
 
-        public boolean isVisible() {
+        boolean isVisible() {
             return visible;
         }
 
         public static FOWOption fromString(String value) {
-            for (FOWOption option : FOWOption.values()) {
+            for (FOWOption option : values()) {
                 if (option.name().equalsIgnoreCase(value)) {
                     return option;
                 }
@@ -101,7 +115,8 @@ public class FOWOptionService {
         offerFOWOptionButtons(null, game, FOWOptionCategory.GAME);
     }
 
-    private static void offerFOWOptionButtons(ButtonInteractionEvent event, Game game, FOWOptionCategory selectedCategory) {
+    private static void offerFOWOptionButtons(
+            ButtonInteractionEvent event, Game game, FOWOptionCategory selectedCategory) {
         StringBuilder sb = new StringBuilder("### Change FoW " + selectedCategory + " Options\n\n");
 
         List<ActionRow> rows = new ArrayList<>();
@@ -117,22 +132,33 @@ public class FOWOptionService {
 
         List<Button> optionButtons = new ArrayList<>();
         for (FOWOption option : FOWOption.values()) {
-            if (!option.isVisible() || !option.getCategory().equals(selectedCategory)) continue;
+            if (!option.isVisible() || option.getCategory() != selectedCategory) continue;
 
             boolean currentValue = game.getFowOption(option);
-            sb.append(valueRepresentation(currentValue)).append(" **").append(option.getTitle()).append("**\n");
+            sb.append(valueRepresentation(currentValue))
+                    .append(" **")
+                    .append(option.getTitle())
+                    .append("**\n");
             sb.append("-# ").append(option.getDescription()).append("\n");
 
-            optionButtons.add(currentValue
-                ? Buttons.red("fowOption_" + selectedCategory + "_false_" + option, "Disable " + option.getTitle())
-                : Buttons.green("fowOption_" + selectedCategory + "_true_" + option, "Enable " + option.getTitle()));
+            optionButtons.add(
+                    currentValue
+                            ? Buttons.red(
+                                    "fowOption_" + selectedCategory + "_false_" + option,
+                                    "Disable " + option.getTitle())
+                            : Buttons.green(
+                                    "fowOption_" + selectedCategory + "_true_" + option,
+                                    "Enable " + option.getTitle()));
         }
 
         rows.add(ActionRow.of(optionButtons));
         rows.add(ActionRow.of(categoryButtons));
 
         if (event == null) {
-            GMService.getGMChannel(game).sendMessage(sb.toString()).addComponents(rows).queue();
+            GMService.getGMChannel(game)
+                    .sendMessage(sb.toString())
+                    .addComponents(rows)
+                    .queue();
         } else {
             event.getHook().editOriginal(sb.toString()).setComponents(rows).queue();
         }
@@ -140,25 +166,13 @@ public class FOWOptionService {
 
     @ButtonHandler("fowOption_")
     public static void changeFOWOptions(ButtonInteractionEvent event, Game game, String buttonID) {
-        String[] parts = buttonID.split("fowOption_")[1].split("_", 3);
+        String[] parts = FOW_OPTION_.split(buttonID)[1].split("_", 3);
         FOWOptionCategory category = FOWOptionCategory.fromString(parts[0]);
         String value = parts[1];
         String option = parts[2];
 
         FOWOption fowOption = FOWOption.fromString(option);
         boolean newValue = Boolean.parseBoolean(value);
-        if (FOWOption.FOW_PLUS.equals(fowOption)) {
-            FOWPlusService.toggleTag(game, newValue);
-            if (newValue) {
-                game.setFowOption(FOWOption.ALLOW_AGENDA_COMMS, false);
-                game.setFowOption(FOWOption.HIDE_TOTAL_VOTES, true);
-                game.setFowOption(FOWOption.HIDE_VOTE_ORDER, true);
-                game.setFowOption(FOWOption.STATS_FROM_HS_ONLY, true);
-                game.setFowOption(FOWOption.HIDE_EXPLORES, true);
-                game.setFowOption(FOWOption.HIDE_MAP, true);
-            }
-        }
-
         game.setFowOption(fowOption, newValue);
         offerFOWOptionButtons(event, game, category);
     }

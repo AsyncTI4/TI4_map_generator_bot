@@ -2,7 +2,6 @@ package ti4.commands.special;
 
 import java.util.List;
 import java.util.Random;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -12,20 +11,21 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
+import ti4.service.emoji.ColorEmojis;
 
 public class SetupNeutralPlayer extends GameStateSubcommand {
 
     public SetupNeutralPlayer() {
         super("setup_neutral_player", "Setup neutral player units", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color for neutral units")
-            .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color for neutral units").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        List<String> unusedColors = game.getUnusedColors().stream().map(ColorModel::getName).toList();
+        List<String> unusedColors =
+                game.getUnusedColors().stream().map(ColorModel::getName).toList();
         if (unusedColors.isEmpty()) {
             MessageHelper.replyToMessage(event, "Unable to find an unused color. This is probably a bug?");
             return;
@@ -40,12 +40,27 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
         }
 
         game.setupNeutralPlayer(color);
-        MessageHelper.replyToMessage(event, "Neutral player has been set as " + color + ".");
+        MessageHelper.replyToMessage(
+                event,
+                "Neutral player has been set as " + color + "**"
+                        + ColorEmojis.getColorEmoji(color).toString().toUpperCase() + "**.");
     }
 
     public String pickNeutralColor(List<String> unusedColors) {
+        if (unusedColors.contains("gray")) {
+            return "gray";
+        }
         Random random = new Random();
+        String colour;
+        for (int i = 0; i < 10; i++) {
+            int randomIndex = random.nextInt(unusedColors.size());
+            colour = unusedColors.get(randomIndex);
+            if (!colour.contains("split")) {
+                return colour;
+            }
+        }
         int randomIndex = random.nextInt(unusedColors.size());
-        return unusedColors.get(randomIndex);
+        colour = unusedColors.get(randomIndex);
+        return colour;
     }
 }

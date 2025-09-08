@@ -1,10 +1,11 @@
 package ti4.website.model.stats;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,20 +15,18 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.BotLogger;
+import ti4.map.helper.GameHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.AgendaModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
+import ti4.website.EgressClientManager;
 
 public class GameStatsDashboardPayload {
 
@@ -39,9 +38,8 @@ public class GameStatsDashboardPayload {
 
     @JsonIgnore
     public String getJson() {
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.writeValueAsString(this);
+            return EgressClientManager.getObjectMapper().writeValueAsString(this);
         } catch (Exception e) {
             BotLogger.error("Could not get GameStatsDashboardPayload JSON for Game ", e);
             return null;
@@ -70,13 +68,14 @@ public class GameStatsDashboardPayload {
     public Map<String, Map<String, Boolean>> getConfig() {
         boolean baseMagen = game.getRealAndEliminatedPlayers().stream().anyMatch(p -> p.hasTech("md_base"));
         return Map.of(
-            "config", Map.of(
-                "baseMagen", baseMagen,
-                "codex1", true, //TODO: don't fake this
-                "codex2", true, //TODO: don't fake this
-                "codex3", true, //TODO: don't fake this
-                "codex4", true, //TODO: don't fake this
-                "note_that_this_map_is_probably_not_accurate", true));
+                "config",
+                Map.of(
+                        "baseMagen", baseMagen,
+                        "codex1", true, // TODO: don't fake this
+                        "codex2", true, // TODO: don't fake this
+                        "codex3", true, // TODO: don't fake this
+                        "codex4", true, // TODO: don't fake this
+                        "note_that_this_map_is_probably_not_accurate", true));
     }
 
     public String getHexSummary() {
@@ -90,15 +89,15 @@ public class GameStatsDashboardPayload {
 
     public List<String> getLaws() {
         var lawsInPlay = game.getLaws().keySet().stream()
-            .map(Mapper::getAgenda)
-            .filter(Objects::nonNull)
-            .map(AgendaModel::getName)
-            .toList();
+                .map(Mapper::getAgenda)
+                .filter(Objects::nonNull)
+                .map(AgendaModel::getName)
+                .toList();
         var agendasInDiscard = game.getDiscardAgendas().keySet().stream()
-            .map(Mapper::getAgenda)
-            .filter(Objects::nonNull)
-            .map(AgendaModel::getName)
-            .toList();
+                .map(Mapper::getAgenda)
+                .filter(Objects::nonNull)
+                .map(AgendaModel::getName)
+                .toList();
         return Stream.concat(lawsInPlay.stream(), agendasInDiscard.stream()).toList();
     }
 
@@ -112,41 +111,39 @@ public class GameStatsDashboardPayload {
         // Relics
         var relics = new ArrayList<String>();
         game.getRealAndEliminatedPlayers().stream()
-            .map(Player::getRelics)
-            .flatMap(Collection::stream)
-            .forEach(customPublicVp -> {
-                if (customPublicVp.startsWith("absol_shardofthethrone")) {
-                    var shardNumber = customPublicVp.charAt(customPublicVp.length() - 1);
-                    relics.add("Shard of the Throne " + shardNumber + " (Absol)");
-                } else if (customPublicVp.toLowerCase().contains("shard")) {
-                    relics.add("Shard of the Throne");
-                }
-            });
+                .map(Player::getRelics)
+                .flatMap(Collection::stream)
+                .forEach(customPublicVp -> {
+                    if (customPublicVp.startsWith("absol_shardofthethrone")) {
+                        var shardNumber = customPublicVp.charAt(customPublicVp.length() - 1);
+                        relics.add("Shard of the Throne " + shardNumber + " (Absol)");
+                    } else if (customPublicVp.toLowerCase().contains("shard")) {
+                        relics.add("Shard of the Throne");
+                    }
+                });
         // some older games may have added these custom
-        game.getCustomPublicVP().keySet()
-            .forEach(customPublicVp -> {
-                if (customPublicVp.toLowerCase().contains("shard") && !relics.contains("Shard of the Throne")) {
-                    relics.add("Shard of the Throne");
-                } else if (customPublicVp.toLowerCase().contains("emphidia")) {
-                    relics.add("The Crown of Emphidia");
-                }
-            });
+        game.getCustomPublicVP().keySet().forEach(customPublicVp -> {
+            if (customPublicVp.toLowerCase().contains("shard") && !relics.contains("Shard of the Throne")) {
+                relics.add("Shard of the Throne");
+            } else if (customPublicVp.toLowerCase().contains("emphidia")) {
+                relics.add("The Crown of Emphidia");
+            }
+        });
         objectives.put("Relics", relics);
 
         // Agenda
         var agendas = new ArrayList<String>();
-        game.getCustomPublicVP().keySet()
-            .forEach(customPublicVp -> {
-                if (customPublicVp.toLowerCase().contains("censure")) {
-                    agendas.add("Political Censure");
-                } else if (customPublicVp.equalsIgnoreCase(Constants.VOICE_OF_THE_COUNCIL_PO)) {
-                    agendas.add(Constants.VOICE_OF_THE_COUNCIL_ID);
-                } else if (customPublicVp.toLowerCase().contains("mutiny")) {
-                    agendas.add("Mutiny");
-                } else if (customPublicVp.toLowerCase().contains("seed")) {
-                    agendas.add("Seed of an Empire");
-                }
-            });
+        game.getCustomPublicVP().keySet().forEach(customPublicVp -> {
+            if (customPublicVp.toLowerCase().contains("censure")) {
+                agendas.add("Political Censure");
+            } else if (customPublicVp.equalsIgnoreCase(Constants.VOICE_OF_THE_COUNCIL_PO)) {
+                agendas.add(Constants.VOICE_OF_THE_COUNCIL_ID);
+            } else if (customPublicVp.toLowerCase().contains("mutiny")) {
+                agendas.add("Mutiny");
+            } else if (customPublicVp.toLowerCase().contains("seed")) {
+                agendas.add("Seed of an Empire");
+            }
+        });
         objectives.put("Agenda", agendas);
 
         // Custom
@@ -155,46 +152,47 @@ public class GameStatsDashboardPayload {
         // Other (Supports + Imperial Rider)
         var otherObjectives = new ArrayList<String>();
         game.getPlayers().values().stream()
-            .map(Player::getPromissoryNotesOwned)
-            .flatMap(Collection::stream)
-            .map(Mapper::getPromissoryNote)
-            .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
-            .map(pn -> "Support for the Throne (" + pn.getColor().get() + ")")
-            .forEach(otherObjectives::add);
-        game.getCustomPublicVP().keySet()
-            .forEach(customPublicVp -> {
-                if (customPublicVp.toLowerCase().contains("rider")) {
-                    otherObjectives.add("Imperial Rider");
-                }
-            });
+                .map(Player::getPromissoryNotesOwned)
+                .flatMap(Collection::stream)
+                .map(Mapper::getPromissoryNote)
+                .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
+                .map(pn -> "Support for the Throne (" + pn.getColor().get() + ")")
+                .forEach(otherObjectives::add);
+        game.getCustomPublicVP().keySet().forEach(customPublicVp -> {
+            if (customPublicVp.toLowerCase().contains("rider")) {
+                otherObjectives.add("Imperial Rider");
+            }
+        });
         objectives.put("Other", otherObjectives);
 
         var revealedPublics = game.getRevealedPublicObjectives().keySet().stream()
-            .map(Mapper::getPublicObjective)
-            .filter(Objects::nonNull)
-            .toList();
+                .map(Mapper::getPublicObjective)
+                .filter(Objects::nonNull)
+                .toList();
 
-        //Public I
-        objectives.put("Public Objectives I",
-            revealedPublics.stream()
-                .filter(publicObjective -> publicObjective.getPoints() == 1)
-                .map(PublicObjectiveModel::getName)
-                .toList());
+        // Public I
+        objectives.put(
+                "Public Objectives I",
+                revealedPublics.stream()
+                        .filter(publicObjective -> publicObjective.getPoints() == 1)
+                        .map(PublicObjectiveModel::getName)
+                        .toList());
 
-        //Public II
-        objectives.put("Public Objectives II",
-            revealedPublics.stream()
-                .filter(publicObjective -> publicObjective.getPoints() == 2)
-                .map(PublicObjectiveModel::getName)
-                .toList());
+        // Public II
+        objectives.put(
+                "Public Objectives II",
+                revealedPublics.stream()
+                        .filter(publicObjective -> publicObjective.getPoints() == 2)
+                        .map(PublicObjectiveModel::getName)
+                        .toList());
 
         // Secrets
         List<String> secrets = new ArrayList<>();
         for (Player player : game.getRealAndEliminatedPlayers()) {
             secrets.addAll(player.getSecretsScored().keySet().stream()
-                .map(Mapper::getSecretObjective)
-                .map(SecretObjectiveModel::getName)
-                .toList());
+                    .map(Mapper::getSecretObjective)
+                    .map(SecretObjectiveModel::getName)
+                    .toList());
         }
         objectives.put("Secret Objectives", secrets);
 
@@ -207,8 +205,8 @@ public class GameStatsDashboardPayload {
 
     public List<PlayerStatsDashboardPayload> getPlayers() {
         return game.getRealAndEliminatedPlayers().stream()
-            .map(PlayerStatsDashboardPayload::new)
-            .toList();
+                .map(PlayerStatsDashboardPayload::new)
+                .toList();
     }
 
     public int getRound() {
@@ -222,7 +220,7 @@ public class GameStatsDashboardPayload {
     public long getSetupTimestamp() {
         LocalDate localDate;
         try {
-            localDate = LocalDate.parse(game.getCreationDate(), DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+            localDate = GameHelper.getCreationDateAsLocalDate(game);
         } catch (DateTimeParseException e) {
             localDate = LocalDate.now();
         }
@@ -262,11 +260,12 @@ public class GameStatsDashboardPayload {
 
     public Map<String, Integer> getUnpickedStrategyCards() {
         return game.getScTradeGoods().entrySet().stream()
-            .filter(e -> e.getValue() > 0) // TGs > 0
-            .map(e -> Map.entry(game.getStrategyCardModelByInitiative(e.getKey()), e.getValue())) // Optional(SCModel), TGs
-            .filter(e -> e.getKey().isPresent())
-            .map(e -> Map.entry(e.getKey().get().getName(), e.getValue())) // SCName, TGs
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1));
+                .filter(e -> e.getValue() > 0) // TGs > 0
+                .map(e -> Map.entry(
+                        game.getStrategyCardModelByInitiative(e.getKey()), e.getValue())) // Optional(SCModel), TGs
+                .filter(e -> e.getKey().isPresent())
+                .map(e -> Map.entry(e.getKey().get().getName(), e.getValue())) // SCName, TGs
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1));
     }
 
     public String winner() {

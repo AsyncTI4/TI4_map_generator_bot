@@ -1,7 +1,6 @@
 package ti4.commands.units;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -18,10 +17,19 @@ class AddCaptureUnits extends GameStateSubcommand {
 
     public AddCaptureUnits() {
         super(Constants.ADD_UNITS, "Capture units", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit' Eg. 2 infantry, carrier, 2 fighter, mech").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color for unit").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color capturing (default you)").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command"));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.UNIT_NAMES,
+                        "Comma separated list of '{count} unit' Eg. 2 infantry, carrier, 2 fighter, mech")
+                .setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color for unit")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color capturing (default you)")
+                        .setAutoComplete(true));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command"));
     }
 
     @Override
@@ -37,9 +45,11 @@ class AddCaptureUnits extends GameStateSubcommand {
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
             // fighters and infantry are added as your own color
-            if (parsedUnit.getUnitKey().getUnitType().equals(Units.UnitType.Fighter) ||
-                    parsedUnit.getUnitKey().getUnitType().equals(Units.UnitType.Infantry)) {
-                Units.UnitKey unitKey = Mapper.getUnitKey(parsedUnit.getUnitKey().getUnitType().toString(), getPlayer().getColor());
+            if (parsedUnit.getUnitKey().getUnitType() == Units.UnitType.Fighter
+                    || parsedUnit.getUnitKey().getUnitType() == Units.UnitType.Infantry) {
+                Units.UnitKey unitKey = Mapper.getUnitKey(
+                        parsedUnit.getUnitKey().getUnitType().toString(),
+                        getPlayer().getColor());
                 parsedUnit = new ParsedUnit(unitKey, parsedUnit.getCount(), "space");
             }
             tile.addUnit("space", parsedUnit.getUnitKey(), parsedUnit.getCount());

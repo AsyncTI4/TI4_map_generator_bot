@@ -14,7 +14,9 @@ class SleeperToken extends GameStateSubcommand {
 
     public SleeperToken() {
         super(Constants.SLEEPER_TOKEN, "Select planets were to add/remove Sleeper tokens", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet")
+                .setRequired(true)
+                .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET2, "2nd Planet").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET3, "3rd Planet").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET4, "4th Planet").setAutoComplete(true));

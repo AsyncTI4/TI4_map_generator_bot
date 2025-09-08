@@ -19,7 +19,7 @@
     },
     {
         "alias": "absol_jr",
-        "name": "JR-SX455-O",
+        "name": "JR-XS455-0",
         "text": "ACTION: Exhaust this agent and choose a planet. The player that controls that planet may place a structure on that planet. If they do not, they gain 1 trade good for each structure on that planet.",
         "source": "absol",
         "flavourText": "*There was a long moment, stretching in silence until Dart blurted, “Can we help you somehow?”\nAll of the individuals seemed startled by the question, but the titan seemed the most perplexed.  “I do not know,” it said at last.  “I only remember that… I want to learn.  And… and to remember.”\n\n“I have no name. You,” it said, pointing to Dart. “Perhaps I shall be Dart II.”\n“H-how about Junior instead?” Dart offered. “I wouldn’t want anyone to get us confused, we already look so… uh… alike.”\nThe titan nodded solemnly.  “Yes. Yes, this is true.” It turned. “Junior. Yes. I like that name, and I would also like to come with you.”*",
@@ -67,7 +67,7 @@
         "source": "absol",
         "flavourText": "*Trilossa slipped the core into the hololattice's main terminal.  The lattice was ancient - as old as the Flight itself - and tampering with it was tantamount to sin.  Hopefully the rest of the Flight would would see the necessity of the upgrade.*",
         "shortName": "Quantum\n-core",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/QuantumCore.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/QuantumCore.jpg?raw=true"
     },
     {
         "alias": "absol_emelpar",

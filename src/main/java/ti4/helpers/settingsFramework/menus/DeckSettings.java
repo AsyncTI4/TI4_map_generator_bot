@@ -1,13 +1,11 @@
 package ti4.helpers.settingsFramework.menus;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
@@ -19,7 +17,7 @@ import ti4.service.emoji.CardEmojis;
 
 // This is a sub-menu
 @Getter
-@JsonIgnoreProperties({ "messageId" })
+@JsonIgnoreProperties("messageId")
 public class DeckSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
@@ -38,7 +36,9 @@ public class DeckSettings extends SettingsMenu {
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
     private ChoiceSetting<DeckModel> deckChoice(String id, String defaultDeck, DeckModel.DeckType deckType) {
-        List<DeckModel> decks = Mapper.getDecks().values().stream().filter(deck -> deck.getType() == deckType).toList();
+        List<DeckModel> decks = Mapper.getDecks().values().stream()
+                .filter(deck -> deck.getType() == deckType)
+                .toList();
 
         ChoiceSetting<DeckModel> choice = new ChoiceSetting<>(id, deckType.typeName(), defaultDeck);
         choice.setEmoji(deckType.deckEmoji());
@@ -47,8 +47,12 @@ public class DeckSettings extends SettingsMenu {
         return choice;
     }
 
-    protected DeckSettings(JsonNode json, SettingsMenu parent, Optional<Game> game) {
-        super("decks", "Card Decks", "Manually adjust which decks your game will use. This should be automatic, for the most part", parent);
+    DeckSettings(JsonNode json, SettingsMenu parent, Optional<Game> game) {
+        super(
+                "decks",
+                "Card Decks",
+                "Manually adjust which decks your game will use. This should be automatic, for the most part",
+                parent);
 
         // Get default deck IDs for this game
         String defaultStage1 = game.map(Game::getStage1PublicDeckID).orElse("public_stage_1_objectives_pok");
@@ -83,7 +87,9 @@ public class DeckSettings extends SettingsMenu {
 
         // Verify this is the correct JSON node and continue initialization
         List<String> historicIDs = new ArrayList<>(List.of("decks"));
-        if (json != null && json.has("menuId") && historicIDs.contains(json.get("menuId").asText(""))) {
+        if (json != null
+                && json.has("menuId")
+                && historicIDs.contains(json.get("menuId").asText(""))) {
             stage1.initialize(json.get("stage1"));
             stage2.initialize(json.get("stage2"));
             secrets.initialize(json.get("secrets"));

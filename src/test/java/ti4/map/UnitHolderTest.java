@@ -1,22 +1,20 @@
 package ti4.map;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+
 import java.awt.*;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Units;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-
 class UnitHolderTest {
 
-    public int sum(List<Integer> vals) {
-        return vals.stream().collect(Collectors.summingInt(i -> i));
+    private int sum(List<Integer> vals) {
+        return vals.stream().mapToInt(i -> i).sum();
     }
 
     @Test
-    public void testRemovingUnitsInExcess() {
+    void testRemovingUnitsInExcess() {
         Units.UnitKey unitKey = new Units.UnitKey(Units.UnitType.Destroyer, "red");
 
         UnitHolder unitHolder = new Space("whatever", new Point(0, 0));
@@ -28,7 +26,7 @@ class UnitHolderTest {
     }
 
     @Test
-    public void testRemovingExactNumberOfUnits() {
+    void testRemovingExactNumberOfUnits() {
         Units.UnitKey unitKey = new Units.UnitKey(Units.UnitType.Destroyer, "red");
 
         UnitHolder unitHolder = new Space("whatever", new Point(0, 0));
@@ -40,7 +38,7 @@ class UnitHolderTest {
     }
 
     @Test
-    public void testRemovingSomeOfTheUnits() {
+    void testRemovingSomeOfTheUnits() {
         Units.UnitKey unitKey = new Units.UnitKey(Units.UnitType.Destroyer, "red");
 
         UnitHolder unitHolder = new Space("whatever", new Point(0, 0));
@@ -50,5 +48,4 @@ class UnitHolderTest {
 
         assertThat(sum(actuallyRemoved)).isEqualTo(2);
     }
-
 }

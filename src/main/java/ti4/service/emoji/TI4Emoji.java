@@ -8,18 +8,16 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Constants;
-import ti4.message.BotLogger;
+import ti4.message.logging.BotLogger;
 import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
 
 public interface TI4Emoji {
 
     default Emoji asEmoji() {
-        String mention = this.toString();
+        String mention = toString();
         if (mention.isBlank()) return null;
         return Emoji.fromFormatted(mention);
     }
@@ -61,7 +59,10 @@ public interface TI4Emoji {
     static <T extends TI4Emoji> T getEmojiFromName(Class<T> clazz, String name) {
         if (!clazz.isEnum()) return null;
         List<T> consts = Arrays.asList(clazz.getEnumConstants());
-        return consts.stream().filter(c -> c.name().equalsIgnoreCase(name)).findFirst().orElse(null);
+        return consts.stream()
+                .filter(c -> c.name().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
     }
 
     static TI4Emoji findEmoji(String category, String name) {
@@ -109,24 +110,53 @@ public interface TI4Emoji {
     // LIST OF SYMBOLS FOR FOG STUFF
     static List<TI4Emoji> symbols() {
         return new ArrayList<>(Arrays.asList(
-            // Unit emojis
-            UnitEmojis.warsun, UnitEmojis.spacedock, UnitEmojis.pds, UnitEmojis.mech, UnitEmojis.infantry, UnitEmojis.flagship,
-            UnitEmojis.fighter, UnitEmojis.dreadnought, UnitEmojis.destroyer, UnitEmojis.carrier, UnitEmojis.cruiser,
-            // Explores
-            ExploreEmojis.HFrag, ExploreEmojis.CFrag, ExploreEmojis.IFrag, ExploreEmojis.UFrag, ExploreEmojis.Relic,
-            ExploreEmojis.Cultural, ExploreEmojis.Industrial, ExploreEmojis.Hazardous, ExploreEmojis.Frontier,
-            // Planet
-            PlanetEmojis.SemLord,
-            // Cards
-            CardEmojis.ActionCard, CardEmojis.Agenda, CardEmojis.PN,
-            CardEmojis.SecretObjective, CardEmojis.Public1, CardEmojis.Public2,
-            // Tech
-            TechEmojis.CyberneticTech, TechEmojis.PropulsionTech, TechEmojis.BioticTech, TechEmojis.WarfareTech,
-            // Other
-            MiscEmojis.tg, MiscEmojis.comm, MiscEmojis.Sleeper,
-            MiscEmojis.influence, MiscEmojis.resources,
-            MiscEmojis.WHalpha, MiscEmojis.WHbeta, MiscEmojis.WHgamma, MiscEmojis.LegendaryPlanet,
-            MiscEmojis.SpeakerToken, MiscEmojis.BortWindow));
+                // Unit emojis
+                UnitEmojis.warsun,
+                UnitEmojis.spacedock,
+                UnitEmojis.pds,
+                UnitEmojis.mech,
+                UnitEmojis.infantry,
+                UnitEmojis.flagship,
+                UnitEmojis.fighter,
+                UnitEmojis.dreadnought,
+                UnitEmojis.destroyer,
+                UnitEmojis.carrier,
+                UnitEmojis.cruiser,
+                // Explores
+                ExploreEmojis.HFrag,
+                ExploreEmojis.CFrag,
+                ExploreEmojis.IFrag,
+                ExploreEmojis.UFrag,
+                ExploreEmojis.Relic,
+                ExploreEmojis.Cultural,
+                ExploreEmojis.Industrial,
+                ExploreEmojis.Hazardous,
+                ExploreEmojis.Frontier,
+                // Planet
+                PlanetEmojis.SemLord,
+                // Cards
+                CardEmojis.ActionCard,
+                CardEmojis.Agenda,
+                CardEmojis.PN,
+                CardEmojis.SecretObjective,
+                CardEmojis.Public1,
+                CardEmojis.Public2,
+                // Tech
+                TechEmojis.CyberneticTech,
+                TechEmojis.PropulsionTech,
+                TechEmojis.BioticTech,
+                TechEmojis.WarfareTech,
+                // Other
+                MiscEmojis.tg,
+                MiscEmojis.comm,
+                MiscEmojis.Sleeper,
+                MiscEmojis.influence,
+                MiscEmojis.resources,
+                MiscEmojis.WHalpha,
+                MiscEmojis.WHbeta,
+                MiscEmojis.WHgamma,
+                MiscEmojis.LegendaryPlanet,
+                MiscEmojis.SpeakerToken,
+                MiscEmojis.BortWindow));
     }
-
 }
