@@ -118,11 +118,15 @@ public class FOWCombatThreadMirroring {
         return combatParticipants;
     }
 
-    public static boolean mirrorCombatMessage(GenericInteractionCreateEvent event, Game game, String message) {
+    public static boolean mirrorCombatMessage(
+            GenericInteractionCreateEvent event, Player combatPlayer, Game game, String message) {
         if (!isFowCombatThread(event.getChannel())) return false;
 
-        Player player = getCommunityModePlayer(event.getMember(), game);
-        return mirrorMessage((ThreadChannel) event.getChannel(), player, game, parseCombatRollMessage(message, player));
+        Player actualPlayer = combatPlayer.getFaction() != null && !"neutral".equals(combatPlayer.getFaction())
+                ? getCommunityModePlayer(event.getMember(), game)
+                : combatPlayer;
+        return mirrorMessage(
+                (ThreadChannel) event.getChannel(), actualPlayer, game, parseCombatRollMessage(message, combatPlayer));
     }
 
     public static boolean mirrorMessage(GenericInteractionCreateEvent event, Game game, String message) {

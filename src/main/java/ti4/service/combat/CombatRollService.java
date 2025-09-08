@@ -265,7 +265,7 @@ public class CombatRollService {
                 event,
                 tile,
                 combatOnHolder);
-        FOWCombatThreadMirroring.mirrorCombatMessage(event, game, message);
+        FOWCombatThreadMirroring.mirrorCombatMessage(event, player, game, message);
         String hits = substringAfter(message, "Total hits ");
         hits = hits.split(" ")[0].replace("*", "");
         int h = Integer.parseInt(hits);
