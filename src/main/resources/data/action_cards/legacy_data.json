@@ -1022,5 +1022,14 @@
         "text": "Remove up to 4 of your units from that system and place them on any planets you control or in any space areas that contain your ships.",
         "flavorText": "The Mentak crew handed out brochures, recruiting with promises of a grand new life on a distant world. In truth, we traded our quiet colony for a desperate land-grab on the front lines.",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "final_mission",
+        "name": "Final Mission",
+        "phase": "Action",
+        "window": "After 1 of your non-fighter ships is destroyed",
+        "text": "Choose 1 planet in that unit's system. Destroy 1 of another player's ground forces or PDS on that planet.",
+        "flavorText": "The Exotrireme became a guide missile in its death-throes, transforming the Sol base into a burning crater of steel and death.",
+        "source": "action_deck_2_old"
     }
 ]
