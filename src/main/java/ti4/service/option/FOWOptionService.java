@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 
 @UtilityClass
@@ -58,12 +57,9 @@ public class FOWOptionService {
         // Other Options (max 5)
         HIDE_PLAYER_NAMES(
                 FOWOptionCategory.OTHER, "Hide real names", "Completely hide player Discord names on the map"),
-        FOW_PLUS(
-                FOWOptionCategory.OTHER,
-                "FoW Plus Mode",
-                "Hello darkness my old friend... WIP - ask Solax for details"),
 
         // Hidden from normal options
+        FOW_PLUS(null, "FoW Plus Mode", "Hello darkness my old friend... WIP - ask Solax for details", false),
         RIFTSET_MODE(null, "RiftSet Mode", "For Eronous to run fow300", false);
 
         private final FOWOptionCategory category;
@@ -175,18 +171,6 @@ public class FOWOptionService {
 
         FOWOption fowOption = FOWOption.fromString(option);
         boolean newValue = Boolean.parseBoolean(value);
-        if (fowOption == FOWOption.FOW_PLUS) {
-            FOWPlusService.toggleTag(game, newValue);
-            if (newValue) {
-                game.setFowOption(FOWOption.ALLOW_AGENDA_COMMS, false);
-                game.setFowOption(FOWOption.HIDE_TOTAL_VOTES, true);
-                game.setFowOption(FOWOption.HIDE_VOTE_ORDER, true);
-                game.setFowOption(FOWOption.STATS_FROM_HS_ONLY, true);
-                game.setFowOption(FOWOption.HIDE_EXPLORES, true);
-                game.setFowOption(FOWOption.HIDE_MAP, true);
-            }
-        }
-
         game.setFowOption(fowOption, newValue);
         offerFOWOptionButtons(event, game, category);
     }
