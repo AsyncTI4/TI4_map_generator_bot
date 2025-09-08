@@ -78,6 +78,16 @@ public enum FactionEmojis implements TI4Emoji {
     belkosea,
     toldar, //
 
+    // balacasi
+    arvaxi,
+    xan,
+    kalora,
+    lunarium,
+    conclave,
+    tyris,
+    vyserix,
+    zephyrion,
+
     // Franken
     Franken1,
     Franken2,
@@ -235,6 +245,14 @@ public enum FactionEmojis implements TI4Emoji {
             case "zealots" -> zealots;
             case "zelian" -> zelian;
             case "uydai" -> uydai;
+            case "arvaxi" -> arvaxi;
+            case "xan" -> xan;
+            case "kalora" -> kalora;
+            case "lunarium" -> lunarium;
+            case "conclave" -> conclave;
+            case "tyris" -> tyris;
+            case "vyserix" -> vyserix;
+            case "zephyrion" -> zephyrion;
             case "pharadn" -> pharadn;
             case "qhet" -> qhet;
             case "atokera" -> atokera;
