@@ -401,7 +401,7 @@ public class ButtonHelperTacticalAction {
             for (Player player_ : playersAdj) {
                 String playerMessage = player_.getRepresentationUnfogged() + " - System "
                         + tile.getRepresentationForButtons(game, player_)
-                        + " has been activated ";
+                        + " has been activated by " + player.getFactionEmojiOrColor() + ".";
                 MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
             }
             ButtonHelper.resolveOnActivationEnemyAbilities(game, tile, player, false, event);
