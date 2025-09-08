@@ -1,5 +1,6 @@
 package ti4.spring.imageio;
 
+import com.luciad.imageio.webp.WebPImageWriterSpi;
 import java.util.Arrays;
 import java.util.Iterator;
 import javax.imageio.ImageIO;
@@ -29,25 +30,22 @@ public class ImageIoConfiguration {
     }
 
     private static boolean ensureWebpWriterRegistered() {
-        ClassLoader appCl = ImageIoConfiguration.class.getClassLoader();
-        ClassLoader prev = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(appCl);
+        if (hasWebpWriter()) {
+            BotLogger.info("WebP writer already registered at startup.");
+            return true;
+        }
 
+        try {
+            BotLogger.warning("WebP writer was not detected at startup, scanning for it.");
             ImageIO.scanForPlugins();
             if (hasWebpWriter()) return true;
 
-            Class<?> spiKlass = Class.forName("com.luciad.imageio.webp.WebPImageWriterSpi", false, appCl);
-            ImageWriterSpi spi =
-                    (ImageWriterSpi) spiKlass.getDeclaredConstructor().newInstance();
-            IIORegistry.getDefaultInstance().registerServiceProvider(spi);
-
+            BotLogger.warning("WebP writer was not found during scan, attempting to register it.");
+            IIORegistry.getDefaultInstance().registerServiceProvider(new WebPImageWriterSpi());
             return hasWebpWriter();
         } catch (Exception e) {
             BotLogger.error("Failed to register WebP SPI explicitly", e);
             return hasWebpWriter();
-        } finally {
-            Thread.currentThread().setContextClassLoader(prev);
         }
     }
 
