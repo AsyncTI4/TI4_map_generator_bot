@@ -170,6 +170,14 @@
         ]
     },
     {
+        "source": "balacasi",
+        "name": "Balacasi",
+        "canal": "community",
+        "subcanal": "lil homebrew",
+        "credits": "balacasi",
+        "description": "New Factions"
+    },
+    {
         "source": "franken",
         "name": "Franken",
         "canal": "community",
