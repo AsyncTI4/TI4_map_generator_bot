@@ -105,14 +105,12 @@ public class AsyncTI4DiscordBot {
     private static final List<Class<?>> classes = new ArrayList<>();
 
     public static void main(String[] args) {
-        SpringApplication.run(AsyncTI4DiscordBot.class, args);
-
-        // guildPrimaryID must be set before initializing listeners that use webhook logging
-        guildPrimaryID = args[2];
-        BotLogger.info("BOT LOG WEBHOOK FOUND for GuildID:" + guildPrimaryID);
-
         GlobalSettings.loadSettings();
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
+        BotLogger.info("\n# __BOT IS STARTING UP__");
+
+        SpringApplication.run(AsyncTI4DiscordBot.class, args);
+
         jda = JDABuilder.createDefault(args[0])
                 // This is a privileged gateway intent that is used to update user information and join/leaves
                 // (including kicks).
@@ -155,7 +153,7 @@ public class AsyncTI4DiscordBot {
         jda.getPresence()
                 .setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
 
-        BotLogger.info("\n# __BOT IS STARTING UP__");
+        BotLogger.info("INITIALIZING SERVERS");
 
         // Primary HUB Server
         guildPrimary = jda.getGuildById(args[2]);
@@ -275,6 +273,13 @@ public class AsyncTI4DiscordBot {
         for (Guild searchGuild : jda.getGuilds()) {
             if (guilds.stream().anyMatch(g -> g.getId().equals(searchGuild.getId()))) continue;
             startBotSearchOnly(searchGuild);
+        }
+
+        // Check for and report a missing bot-log webhook
+        if (!GlobalSettings.settingExists(ImplementedSettings.BOT_LOG_WEBHOOK_URL)) {
+            BotLogger.warning(
+                    "BOT-LOG WEBHOOK NOT FOUND for Primary GuildID:" + guildPrimaryID
+                            + "\nPlease set a valid bot-log Webhook URL using `/developer setting setting_name:bot_log_webhook_url setting_type:string setting_value:<url>`");
         }
 
         // LOAD DATA
