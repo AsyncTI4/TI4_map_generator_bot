@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "ba2",
+    "name": "Krax -- Kalora",
+    "aliases": [
+        "krax",
+        "ba2",
+        "kalora"
+    ],
+    "imagePath": "BA2_Krax.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "krax"
+    ],
+    "source": "balacasi"
+}
