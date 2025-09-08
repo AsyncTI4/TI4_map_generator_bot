@@ -47,10 +47,7 @@ class PingActivePlayer extends GameStateSubcommand {
         if (!game.getPlayersWithGMRole().contains(playerThatRanCommand)
                 && milliSinceLastPing < PING_COOLDOWN
                 && !samePlayer) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "Active player was pinged recently. Command on cooldown for "
-                            + formatMillis(PING_COOLDOWN - milliSinceLastPing) + "." + isAfk);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player was pinged recently." + isAfk);
         } else {
             String ping = activePlayer.getRepresentationUnfogged() + " this is a gentle reminder that it is your turn.";
             if (game.isFowMode()) {
@@ -67,12 +64,5 @@ class PingActivePlayer extends GameStateSubcommand {
             }
             AutoPingMetadataManager.addPing(game.getName());
         }
-    }
-
-    private static String formatMillis(long millis) {
-        long totalMinutes = (millis + 59999) / 60000; // adds 59.999s before division to round up
-        long hours = totalMinutes / 60;
-        long minutes = totalMinutes % 60;
-        return hours + "h " + minutes + "min";
     }
 }
