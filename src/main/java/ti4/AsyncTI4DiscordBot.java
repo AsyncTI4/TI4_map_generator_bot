@@ -2,7 +2,6 @@ package ti4;
 
 import static org.reflections.scanners.Scanners.*;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -110,6 +109,7 @@ public class AsyncTI4DiscordBot {
 
         // guildPrimaryID must be set before initializing listeners that use webhook logging
         guildPrimaryID = args[2];
+        BotLogger.info("BOT LOG WEBHOOK FOUND for GuildID:" + guildPrimaryID);
 
         GlobalSettings.loadSettings();
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
