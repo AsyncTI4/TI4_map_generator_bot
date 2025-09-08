@@ -1169,13 +1169,14 @@ public class Game extends GameProperties {
         String prevFaction =
                 (prevPlayer != null && prevPlayer.getFaction() != null) ? prevPlayer.getFaction() : "jazzwuzhere&p1too";
         long elapsedTime = newTime.getTime() - lastActivePlayerChange.getTime();
-        if (prevPlayer != null && !factionsInCombat.contains(prevFaction) && !isTemporaryPingDisable()) {
-            prevPlayer.updateTurnStats(elapsedTime);
-        } else {
-            if (prevPlayer != null) {
+        if (prevPlayer != null) {
+            if (!factionsInCombat.contains(prevFaction) && !isTemporaryPingDisable()) {
+                prevPlayer.updateTurnStats(elapsedTime);
+            } else {
                 prevPlayer.updateTurnStatsWithAverage(elapsedTime);
             }
         }
+
         setStoredValue("factionsInCombat", "");
         setTemporaryPingDisable(false);
         // reset timers for ping and stats
