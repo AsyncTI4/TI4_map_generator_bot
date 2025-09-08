@@ -156,109 +156,82 @@ public class AsyncTI4DiscordBot {
         BotLogger.info("INITIALIZING SERVERS");
 
         // Primary HUB Server
-        guildPrimary = jda.getGuildById(args[2]);
-        boolean success = startBot(guildPrimary);
+        guildPrimaryID = args[2];
+        initGuild(args[2], false);
 
         // Community Plays TI
         if (args.length >= 4) {
-            guildCommunityPlays = jda.getGuildById(args[3]);
-            success &= startBot(guildCommunityPlays);
+            guildCommunityPlays = initGuild(args[3], false);
         }
 
         // Async: FOW Chapter
         if (args.length >= 5) {
-            guildFogOfWar = jda.getGuildById(args[4]);
-            success &= startBot(guildFogOfWar);
+            guildFogOfWar = initGuild(args[4], false);
             fowServers.add(guildFogOfWar);
         }
 
         // Async: Stroter's Paradise
         if (args.length >= 6) {
-            guildSecondary = jda.getGuildById(args[5]);
-            success &= startBot(guildSecondary);
-            serversToCreateNewGamesOn.add(guildSecondary);
+            guildSecondary = initGuild(args[5], true);
         }
 
         // Async: Dreadn't
         if (args.length >= 7) {
-            guildTertiary = jda.getGuildById(args[6]);
-            success &= startBot(guildTertiary);
-            serversToCreateNewGamesOn.add(guildTertiary);
+            guildTertiary = initGuild(args[6], true);
         }
 
         // Async: War Sun Tzu
         if (args.length >= 8) {
-            guildQuaternary = jda.getGuildById(args[7]);
-            success &= startBot(guildQuaternary);
-            serversToCreateNewGamesOn.add(guildQuaternary);
+            guildQuaternary = initGuild(args[7], true);
         }
 
         // Async: Fighter Club
         if (args.length >= 9) {
-            guildQuinary = jda.getGuildById(args[8]);
-            success &= startBot(guildQuinary);
-            serversToCreateNewGamesOn.add(guildQuinary);
+            guildQuinary = initGuild(args[8], true);
         }
 
         // Async: Tommer Hawk
         if (args.length >= 10) {
-            guildSenary = jda.getGuildById(args[9]);
-            success &= startBot(guildSenary);
-            serversToCreateNewGamesOn.add(guildSenary);
+            guildSenary = initGuild(args[9], true);
         }
 
         // Async: Duder's Domain
         if (args.length >= 11) {
-            guildSeptenary = jda.getGuildById(args[10]);
-            success &= startBot(guildSeptenary);
-            serversToCreateNewGamesOn.add(guildSeptenary);
+            guildSeptenary = initGuild(args[10], true);
         }
 
         // Async: What's up Dock
         if (args.length >= 12) {
-            guildOctonary = jda.getGuildById(args[11]);
-            success &= startBot(guildOctonary);
-            serversToCreateNewGamesOn.add(guildOctonary);
+            guildOctonary = initGuild(args[11], true);
         }
 
         // Async: Megagame server
         if (args.length >= 13) {
-            guildMegagame = jda.getGuildById(args[12]);
-            success &= startBot(guildMegagame);
-            // serversToCreateNewGamesOn.add(guildMegagame);  // Don't create random games on this server
+            guildMegagame = initGuild(args[12], false);
         }
 
         // Async: Ship Flag
         if (args.length >= 14) {
-            guildNonary = jda.getGuildById(args[13]);
-            success &= startBot(guildNonary);
-            serversToCreateNewGamesOn.add(guildNonary);
+            guildNonary = initGuild(args[13], true);
         }
 
         // Async: 10th Server
         if (args.length >= 15) {
-            guildDecenary = jda.getGuildById(args[14]);
-            success &= startBot(guildDecenary);
-            // serversToCreateNewGamesOn.add(guildDecenary);  // SERVER DOESN'T EXIST YET
+            guildDecenary = initGuild(args[14], true);
         }
         // Async: 11th Server
         if (args.length >= 16) {
-            guildUndenary = jda.getGuildById(args[15]);
-            success &= startBot(guildUndenary);
-            // serversToCreateNewGamesOn.add(guildUndenary);  // SERVER DOESN'T EXIST YET
+            guildUndenary = initGuild(args[15], true);
         }
 
         // Async: 12th Server
         if (args.length >= 17) {
-            guildDuodenary = jda.getGuildById(args[16]);
-            success &= startBot(guildDuodenary);
-            // serversToCreateNewGamesOn.add(guildDuodenary);  // SERVER DOESN'T EXIST YET
+            guildDuodenary = initGuild(args[16], true);
         }
 
         // Async: FOW Chapter Secondary
         // if (args.length >= 13) {
-        //    guildFogOfWarSecondary = jda.getGuildById(args[12]);
-        //    startBot(guildFogOfWarSecondary);
+        //    guildFogOfWarSecondary = initGuild(args[12], false);
         //    fowServers.add(guildFogOfWarSecondary);
         // }
 
@@ -370,9 +343,30 @@ public class AsyncTI4DiscordBot {
         }));
     }
 
+    private static Guild initGuild(String guildID, boolean addToNewGameServerList) {
+        Guild guild = jda.getGuildById(guildID);
+        if (guild == null) {
+            BotLogger.error("BOT FAILED TO FIND GUILD with ID: `" + guildID
+                    + "` - please ensure AsyncTI4 is added to that server and has Admin permissions.");
+            return null;
+        }
+        if (!startBot(guild)) {
+            BotLogger.error("Failed to start bot for guild: " + guild.getName());
+            return null;
+        }
+        if (addToNewGameServerList) {
+            serversToCreateNewGamesOn.add(guild);
+        }
+        return guild;
+    }
+
     private static boolean startBot(Guild guild) {
         if (guild == null) {
             return false;
+        }
+        if (guildPrimaryID.equals(guild.getId())) {
+            guildPrimary = guild;
+            BotLogger.init(); // requires guildPrimary bot-log channel existing 
         }
         try {
             CommandListUpdateAction commands = guild.updateCommands();
@@ -382,6 +376,7 @@ public class AsyncTI4DiscordBot {
             guilds.add(guild);
         } catch (Exception e) {
             BotLogger.error("\n# FAILED TO START BOT ", e);
+            return false;
         }
         return true;
     }
