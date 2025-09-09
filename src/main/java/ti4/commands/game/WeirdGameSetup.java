@@ -14,6 +14,7 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 class WeirdGameSetup extends GameStateSubcommand {
@@ -58,6 +59,10 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(
                 new OptionData(OptionType.STRING, Constants.PRIORITY_TRACK, "Enable the Priority Track for this game")
                         .setAutoComplete(true));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                FOWOption.FOW_PLUS.toString(),
+                "True to enable FoW+ Mode (only in Fog of War games)"));
     }
 
     @Override
@@ -133,6 +138,11 @@ class WeirdGameSetup extends GameStateSubcommand {
             } else {
                 game.setPriorityTrackMode(priorityTrackMode);
             }
+        }
+
+        Boolean fowPlus = event.getOption(FOWOption.FOW_PLUS.toString(), null, OptionMapping::getAsBoolean);
+        if (fowPlus != null && game.isFowMode()) {
+            FOWPlusService.setActive(game, fowPlus);
         }
     }
 

@@ -912,9 +912,8 @@ public class FoWHelper {
             return;
         }
         // get players adjacent
-        List<Player> players = getAdjacentPlayers(game, position, true);
-        for (Player player_ : players) {
-            if (player_.isRealPlayer()) {
+        for (Player player_ : game.getRealPlayers()) {
+            if (FoWHelper.getTilePositionsToShow(game, player_).contains(position)) {
                 String playerMessage = player_.getRepresentation() + " - System " + tile.getRepresentationForButtons()
                         + " has been pinged:\n>>> " + message;
                 List<Button> refreshButton = viewSystemButton
