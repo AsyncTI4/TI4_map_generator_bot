@@ -397,11 +397,14 @@ public class ButtonHelperTacticalAction {
                 }
             }
         } else {
-            List<Player> playersAdj = FoWHelper.getAdjacentPlayers(game, pos, true);
-            for (Player player_ : playersAdj) {
+            for (Player player_ : game.getRealPlayers()) {
+                if (player_ == player
+                        || !FoWHelper.getTilePositionsToShow(game, player_).contains(pos)) {
+                    continue;
+                }
                 String playerMessage = player_.getRepresentationUnfogged() + " - System "
                         + tile.getRepresentationForButtons(game, player_)
-                        + " has been activated ";
+                        + " has been activated by " + player.getFactionEmojiOrColor() + ".";
                 MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
             }
             ButtonHelper.resolveOnActivationEnemyAbilities(game, tile, player, false, event);

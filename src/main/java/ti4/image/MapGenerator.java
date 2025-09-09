@@ -57,6 +57,7 @@ import ti4.model.PlanetModel;
 import ti4.model.StrategyCardModel;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.settings.GlobalSettings;
 import ti4.website.AsyncTi4WebsiteHelper;
 import ti4.website.model.WebsiteOverlay;
@@ -210,10 +211,9 @@ public class MapGenerator implements AutoCloseable {
      */
     private static int getHeightOfPlayerAreasSection(Game game, int playerCountForMap, int objectivesY) {
         final int typicalPlayerAreaHeight = 340;
-        final int unrealPlayerHeight = 35;
         int playersY = playerCountForMap * typicalPlayerAreaHeight;
         int unrealPlayers = game.getNotRealPlayers().size();
-        playersY += unrealPlayers * unrealPlayerHeight;
+        playersY += Math.round(unrealPlayers / 20.0f) * 15;
         for (Player player : game.getPlayers().values()) {
             if ("neutral".equalsIgnoreCase(player.getFaction()) || (player.isNpc() && player.isDummy())) {
                 playersY -= 350;
@@ -223,7 +223,7 @@ public class MapGenerator implements AutoCloseable {
             } else if (player.getSecretsScored().size() >= 4) {
                 playersY += (player.getSecretsScored().size() - 4) * 43 + 23;
             }
-            playersY += (player.getTeamMateIDs().size() - 1) * unrealPlayerHeight;
+            playersY += (player.getTeamMateIDs().size() - 1) * 35;
         }
         final int columnsOfLaws = 2;
         final int lawHeight = 115;
@@ -540,7 +540,8 @@ public class MapGenerator implements AutoCloseable {
         y = drawObjectives(tempY);
         y = laws(y);
         y = events(y);
-        if (displayTypeBasic != DisplayType.stats) {
+        if (displayTypeBasic != DisplayType.stats
+                && (!isFowModeActive() || !game.getFowOption(FOWOption.HIDE_PLAYER_INFOS))) {
             playerInfo(game);
         }
 
