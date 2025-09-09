@@ -261,12 +261,12 @@ public class AsyncTi4WebsiteHelper {
                 });
     }
 
-    public static void putMap(String gameName, String fileFormat, byte[] imageBytes, boolean frog, Player player) {
-        if (!uploadsEnabled()) return;
+    public static String putMap(String gameName, String fileFormat, byte[] imageBytes, boolean frog, Player player) {
+        if (!uploadsEnabled()) return null;
         String bucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
         if (bucket == null || bucket.isEmpty()) {
             BotLogger.error("S3 bucket not configured.");
-            return;
+            return null;
         }
 
         try {
@@ -280,17 +280,19 @@ public class AsyncTi4WebsiteHelper {
             LocalDateTime date = LocalDateTime.now();
             String dtstamp = date.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
+            String key = String.format(mapPath, gameName, dtstamp);
+            String fileName = dtstamp + "." + fileFormat;
+
             putObjectInBucket(
-                    String.format(mapPath, gameName, dtstamp),
-                    AsyncRequestBody.fromBytes(imageBytes),
-                    "image/" + fileFormat,
-                    null,
-                    StorageClass.ONEZONE_IA);
+                    key, AsyncRequestBody.fromBytes(imageBytes), "image/" + fileFormat, null, StorageClass.ONEZONE_IA);
+
+            return fileName;
         } catch (Exception e) {
             BotLogger.error(
                     new LogOrigin(player),
                     "Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.",
                     e);
+            return null;
         }
     }
 
