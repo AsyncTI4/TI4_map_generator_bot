@@ -31,6 +31,7 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
     }
 
     private String getGameNameFromUri(HttpServletRequest request) {
+        @SuppressWarnings("unchecked")
         Map<String, String> uriTemplateVars =
                 (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
