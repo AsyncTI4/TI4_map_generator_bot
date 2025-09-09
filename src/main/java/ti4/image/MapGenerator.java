@@ -45,6 +45,7 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
@@ -59,8 +60,6 @@ import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.settings.GlobalSettings;
-import ti4.spring.api.image.GameImageService;
-import ti4.spring.context.SpringContext;
 import ti4.website.AsyncTi4WebsiteHelper;
 import ti4.website.model.WebsiteOverlay;
 
@@ -416,8 +415,9 @@ public class MapGenerator implements AutoCloseable {
                 String fileName =
                         AsyncTi4WebsiteHelper.putMap(game.getName(), imageFormat, mainImageBytes, false, null);
                 if (fileName != null) {
-                    GameImageService gameImageService = SpringContext.getBean(GameImageService.class);
-                    gameImageService.saveImage(game, fileName);
+                    game.setLastImageFileName(fileName);
+                    // TODO: we cannot save here as this is async, remove!
+                    GameManager.save(game, "update last image");
                 }
                 AsyncTi4WebsiteHelper.putData(game.getName(), game);
                 AsyncTi4WebsiteHelper.putOverlays(game.getID(), websiteOverlays);
