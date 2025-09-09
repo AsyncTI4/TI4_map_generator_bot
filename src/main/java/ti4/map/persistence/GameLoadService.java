@@ -78,7 +78,7 @@ import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
-class GameLoadService {
+public class GameLoadService {
 
     private static final Pattern PEEKED_OBJECTIVE_PATTERN = Pattern.compile("(?>([a-z_]+):((?>\\d+,)+);)");
     private static final ObjectMapper mapper = ObjectMapperFactory.build();
