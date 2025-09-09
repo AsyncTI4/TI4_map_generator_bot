@@ -16,7 +16,7 @@ import ti4.spring.context.RequestContext;
 
 @RequiredArgsConstructor
 @RestController
-// TODO: thus should be /image
+// TODO: this should be /image
 @RequestMapping("/api/public/game/{gameName}")
 public class GameImageController {
 
