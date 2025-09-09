@@ -26,6 +26,8 @@ import ti4.map.persistence.ManagedGame;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.settings.GlobalSettings;
+import ti4.spring.context.SpringContext;
+import ti4.spring.ws.WebSocketNotifier;
 import ti4.website.model.WebCardPool;
 import ti4.website.model.WebLaw;
 import ti4.website.model.WebObjectives;
@@ -144,6 +146,12 @@ public class AsyncTi4WebsiteHelper {
                     "application/json",
                     "no-cache, no-store, must-revalidate",
                     null);
+
+            // Notify any subscribed clients for this game to refresh
+            try {
+                SpringContext.getBean(WebSocketNotifier.class).notifyGameRefresh(gameId);
+            } catch (Exception ignored) {
+            }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Could not put data to web server", e);
         }
