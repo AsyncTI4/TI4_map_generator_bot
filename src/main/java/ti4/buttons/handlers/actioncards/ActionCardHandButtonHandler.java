@@ -3,6 +3,7 @@ package ti4.buttons.handlers.actioncards;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -200,6 +201,7 @@ class ActionCardHandButtonHandler {
                     .sendMessage("Could not parse action card ID: " + acID + ". Please play manually.")
                     .queue();
         }
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("getDiscardButtonsACs")

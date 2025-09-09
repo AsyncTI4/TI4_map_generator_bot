@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -174,7 +175,7 @@ public class PickStrategyCardService {
             } else {
                 MessageHelper.sendMessageToChannel(
                         privatePlayer.getCorrectChannel(),
-                        privatePlayer.getRepresentation(false, false) + " had queued an strategy card pick.");
+                        privatePlayer.getRepresentation(false, false) + " had queued a strategy card pick.");
                 return PickStrategyCardButtonHandler.scPick(event, game, player, "scPick_" + unpickedStrategyCard);
             }
         }
