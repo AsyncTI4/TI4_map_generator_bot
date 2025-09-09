@@ -69,6 +69,44 @@ public class FOWPlusService {
         return game.getFowOption(FOWOption.FOW_PLUS);
     }
 
+    public static void setActive(Game game, boolean active) {
+        game.setFowOption(FOWOption.FOW_PLUS, active);
+        toggleTag(game, active);
+
+        if (active) {
+            game.setFowOption(FOWOption.ALLOW_AGENDA_COMMS, false);
+            game.setFowOption(FOWOption.HIDE_TOTAL_VOTES, true);
+            game.setFowOption(FOWOption.HIDE_VOTE_ORDER, true);
+            game.setFowOption(FOWOption.STATS_FROM_HS_ONLY, true);
+            game.setFowOption(FOWOption.HIDE_EXPLORES, true);
+            game.setFowOption(FOWOption.HIDE_MAP, true);
+            game.setFowOption(FOWOption.HIDE_PLAYER_INFOS, true);
+            game.setExplorationDeckID("explores_fowplus");
+
+            MessageHelper.sendMessageToChannel(
+                    GMService.getGMChannel(game),
+                    "### FoW+ mode activated. Following options are forced:\n"
+                            + "- No comms in agenda phase\n"
+                            + "- Hide total votes\n"
+                            + "- Hide vote order\n"
+                            + "- Player stats only visible from HS\n"
+                            + "- Hide explore/relic decks\n"
+                            + "- Hide unexplored (0b) map tiles\n"
+                            + "- Hide anchored player info areas\n"
+                            + "### In addition, following changes are in effect:\n"
+                            + "- Can only activate tiles you can see (Blind Tile button to activate any other tile)\n"
+                            + "- Activating a tile without a tile is valid and will send ships into The Void\n"
+                            + "- Cannot remove tokens from tiles you cannot see\n"
+                            + "- Explore deck set to `explores_fowplus`");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    GMService.getGMChannel(game),
+                    "### FoW+ mode disabled.\n"
+                            + "Use `/fow fow_options` to reset options.\n"
+                            + "Use `/game set_deck` to reset explore deck.");
+        }
+    }
+
     public static void toggleTag(Game game, boolean active) {
         if (active) {
             game.addTag(FOWPLUS_TAG);

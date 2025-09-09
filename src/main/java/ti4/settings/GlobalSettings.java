@@ -29,7 +29,8 @@ public class GlobalSettings {
         GUILD_ID_FOR_NEW_GAME_CATEGORIES, // Which guild to create new game categories in (DEPRECATED)
         MAX_GAMES_PER_CATEGORY, // Max # of games when creating a category
         ALLOW_GAME_CREATION,
-        READY_TO_RECEIVE_COMMANDS; // Whether the bot is ready to receive commands
+        READY_TO_RECEIVE_COMMANDS, // Whether the bot is ready to receive commands
+        BOT_LOG_WEBHOOK_URL; // Webhook URL to send rogue bot log messages to
 
         @Override
         public String toString() {
@@ -51,6 +52,10 @@ public class GlobalSettings {
     public static <T> void setSetting(String attr, T val) {
         settings.put(attr, val);
         saveSettings();
+    }
+
+    public static boolean settingExists(ImplementedSettings setting) {
+        return settings.containsKey(setting.toString());
     }
 
     private static void saveSettings() {

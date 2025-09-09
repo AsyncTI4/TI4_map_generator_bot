@@ -174,7 +174,7 @@ public class PickStrategyCardService {
             } else {
                 MessageHelper.sendMessageToChannel(
                         privatePlayer.getCorrectChannel(),
-                        privatePlayer.getRepresentation(false, false) + " had queued an strategy card pick.");
+                        privatePlayer.getRepresentation(false, false) + " had queued a strategy card pick.");
                 return PickStrategyCardButtonHandler.scPick(event, game, player, "scPick_" + unpickedStrategyCard);
             }
         }

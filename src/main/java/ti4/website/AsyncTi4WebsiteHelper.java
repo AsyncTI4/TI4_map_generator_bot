@@ -18,6 +18,7 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.StorageClass;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
@@ -25,6 +26,8 @@ import ti4.map.persistence.ManagedGame;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.settings.GlobalSettings;
+import ti4.spring.context.SpringContext;
+import ti4.spring.ws.WebSocketNotifier;
 import ti4.website.model.WebCardPool;
 import ti4.website.model.WebLaw;
 import ti4.website.model.WebObjectives;
@@ -141,7 +144,14 @@ public class AsyncTi4WebsiteHelper {
                     String.format("webdata/%s/%s.json", gameId, gameId),
                     AsyncRequestBody.fromString(json),
                     "application/json",
-                    "no-cache, no-store, must-revalidate");
+                    "no-cache, no-store, must-revalidate",
+                    null);
+
+            // Notify any subscribed clients for this game to refresh
+            try {
+                SpringContext.getBean(WebSocketNotifier.class).notifyGameRefresh(gameId);
+            } catch (Exception ignored) {
+            }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Could not put data to web server", e);
         }
@@ -162,7 +172,8 @@ public class AsyncTi4WebsiteHelper {
                     String.format("overlays/%s/%s.json", gameId, gameId),
                     AsyncRequestBody.fromString(json),
                     "application/json",
-                    "no-cache, no-store, must-revalidate");
+                    "no-cache, no-store, must-revalidate",
+                    null);
         } catch (Exception e) {
             BotLogger.error("Could not put overlay to web server", e);
         }
@@ -250,12 +261,12 @@ public class AsyncTi4WebsiteHelper {
                 });
     }
 
-    public static void putMap(String gameName, String fileFormat, byte[] imageBytes, boolean frog, Player player) {
-        if (!uploadsEnabled()) return;
+    public static String putMap(String gameName, String fileFormat, byte[] imageBytes, boolean frog, Player player) {
+        if (!uploadsEnabled()) return null;
         String bucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
         if (bucket == null || bucket.isEmpty()) {
             BotLogger.error("S3 bucket not configured.");
-            return;
+            return null;
         }
 
         try {
@@ -269,16 +280,19 @@ public class AsyncTi4WebsiteHelper {
             LocalDateTime date = LocalDateTime.now();
             String dtstamp = date.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
+            String key = String.format(mapPath, gameName, dtstamp);
+            String fileName = dtstamp + "." + fileFormat;
+
             putObjectInBucket(
-                    String.format(mapPath, gameName, dtstamp),
-                    AsyncRequestBody.fromBytes(imageBytes),
-                    "image/" + fileFormat,
-                    null);
+                    key, AsyncRequestBody.fromBytes(imageBytes), "image/" + fileFormat, null, StorageClass.ONEZONE_IA);
+
+            return fileName;
         } catch (Exception e) {
             BotLogger.error(
                     new LogOrigin(player),
                     "Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.",
                     e);
+            return null;
         }
     }
 
@@ -299,7 +313,8 @@ public class AsyncTi4WebsiteHelper {
         return urls;
     }
 
-    private static void putObjectInBucket(String key, AsyncRequestBody body, String contentType, String cacheControl) {
+    private static void putObjectInBucket(
+            String key, AsyncRequestBody body, String contentType, String cacheControl, StorageClass storageClass) {
         String websiteBucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
 
         PutObjectRequest.Builder requestBuilder =
@@ -307,6 +322,10 @@ public class AsyncTi4WebsiteHelper {
 
         if (cacheControl != null) {
             requestBuilder.cacheControl(cacheControl);
+        }
+
+        if (storageClass != null) {
+            requestBuilder.storageClass(storageClass);
         }
 
         PutObjectRequest request = requestBuilder.build();
