@@ -14,7 +14,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import ti4.AsyncTI4DiscordBot;
 import ti4.executors.CircuitBreaker;
 
-// Run before Spring Security so that service availability is reported as 503
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RequiredArgsConstructor
 @Component
