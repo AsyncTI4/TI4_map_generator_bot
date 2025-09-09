@@ -1,50 +1,38 @@
 package ti4.spring.api.image;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import static software.amazon.awssdk.utils.StringUtils.isBlank;
+
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import javax.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ti4.map.Game;
-import ti4.map.persistence.GameLoadService;
 import ti4.map.persistence.GameManager;
+import ti4.map.persistence.ManagedGame;
 
 @Service
 @RequiredArgsConstructor
 public class GameImageService {
 
-    private static final int MAX_ENTRIES = 5000;
-
-    private final Map<String, String> lastImageByGame =
-            Collections.synchronizedMap(new LinkedHashMap<>(16, 0.75f, true) {
-                @Override
-                protected boolean removeEldestEntry(Map.Entry<String, String> eldest) {
-                    return size() > MAX_ENTRIES;
-                }
-            });
+    private static final Cache<String, String> gameNameToLastImageFileNameCache =
+            Caffeine.newBuilder().maximumSize(5000).build();
 
     @Nullable
-    public String getLastImage(String gameName) {
-        if (gameName == null || gameName.isBlank()) return null;
+    String getLastImage(String gameName) {
+        if (!GameManager.isValid(gameName)) return null;
 
-        String cached = lastImageByGame.get(gameName);
-        if (cached != null) return cached;
+        ManagedGame managedGame = GameManager.getManagedGame(gameName);
 
-        Game game = GameLoadService.load(gameName);
-        if (game == null) return null;
-
-        String value = game.getLastImageFileName();
-        if (value != null && !value.isBlank()) {
-            lastImageByGame.put(gameName, value);
-        }
-        return value;
+        return gameNameToLastImageFileNameCache.get(
+                gameName, k -> managedGame.getGame().getLastImageFileName());
     }
 
-    public void saveImage(Game game, String fileNameOnly) {
-        if (game == null || fileNameOnly == null || fileNameOnly.isBlank()) return;
-        game.setLastImageFileName(fileNameOnly);
-        lastImageByGame.put(game.getName(), fileNameOnly);
+    public void saveImage(Game game, String lastImageFileName) {
+        if (game == null || isBlank(lastImageFileName)) return;
+
+        game.setLastImageFileName(lastImageFileName);
+        gameNameToLastImageFileNameCache.put(game.getName(), lastImageFileName);
         GameManager.save(game, "update last image");
     }
 }
