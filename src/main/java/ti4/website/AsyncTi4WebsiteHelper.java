@@ -147,16 +147,13 @@ public class AsyncTi4WebsiteHelper {
                     "no-cache, no-store, must-revalidate",
                     null);
 
-            notifyGameRefreshWebsocket(gameId);
+            // Notify any subscribed clients for this game to refresh
+            try {
+                SpringContext.getBean(WebSocketNotifier.class).notifyGameRefresh(gameId);
+            } catch (Exception ignored) {
+            }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Could not put data to web server", e);
-        }
-    }
-
-    private static void notifyGameRefreshWebsocket(String gameId) {
-        try {
-            SpringContext.getBean(WebSocketNotifier.class).notifyGameRefresh(gameId);
-        } catch (Exception ignored) {
         }
     }
 
