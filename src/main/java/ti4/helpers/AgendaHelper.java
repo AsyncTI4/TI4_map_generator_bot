@@ -3291,10 +3291,15 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannelWithButtons(
                 channel, "Please choose which system you wish to remove your command token from.", buttons);
     }
-
+    
     private static String getPlayerVoteText(Game game, Player player) {
+        getPlayerVoteText(game, player, -1)
+    }
+
+    private static String getPlayerVoteText(Game game, Player player, int maxVotes) {
         StringBuilder sb = new StringBuilder();
         int voteCount = getVoteCountFromPlanets(game, player);
+        String mostVotes = voteCount == maxVotes ? ":first_place:" : "";
         Map<String, Integer> additionalVotes = getAdditionalVotesFromOtherSources(game, player);
         String additionalVotesText = getAdditionalVotesFromOtherSourcesText(additionalVotes);
 
@@ -3315,13 +3320,13 @@ public class AgendaHelper {
             sb.append(" __cannot__ vote due to having used _Stellar Atomics_.**");
 
         } else if (player.hasLeaderUnlocked("xxchahero")) {
-            sb.append(" vote count: **" + MiscEmojis.ResInf + " ").append(voteCount);
+            sb.append(" vote count: **" + MiscEmojis.ResInf + " ").append(voteCount).append(mostVotes);
         } else if (player.hasAbility("lithoids")) { // Vote with planet resources, not influence
-            sb.append(" vote count: **" + MiscEmojis.resources + " ").append(voteCount);
+            sb.append(" vote count: **" + MiscEmojis.resources + " ").append(voteCount).append(mostVotes);
         } else if (player.hasAbility("biophobic")) {
-            sb.append(" vote count: **" + PlanetEmojis.SemLore + " ").append(voteCount);
+            sb.append(" vote count: **" + PlanetEmojis.SemLore + " ").append(voteCount).append(mostVotes);
         } else {
-            sb.append(" vote count: **" + MiscEmojis.influence + " ").append(voteCount);
+            sb.append(" vote count: **" + MiscEmojis.influence + " ").append(voteCount).append(mostVotes);
         }
         if (!additionalVotesText.isEmpty()) {
             int additionalVoteCount = additionalVotes.values().stream()
@@ -3334,6 +3339,27 @@ public class AgendaHelper {
             }
             sb.append("  ").append(additionalVotesText);
         } else sb.append("**");
+
+        // Hacan Alliance
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "hacancommander")) {
+            int tgs = player.getTg();
+            sb.append("\n-# ").append(player.getRepresentationNoPing()).append(" could spend up to ")
+                .append(tgs).append(" of their own trade good").append(tgs == 1 ? "" : "s")
+                .append(" for up to ").append(2*tgs).append(" additional votes. They could also be gifted extra trade goods for extra additional votes.");
+        }
+        // Kyro Alliance
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "kyrocommander")) {
+            sb.append("\n-# ").append(player.getRepresentationNoPing()).append(" could kill up to 4 of their for up to 4 additional votes.");
+            boolean allianceGiftable = false;
+            for (String pn : player.getPromissoryNotesOwned()) {
+                allianceGiftable |= pn.endsWith("_an");
+            }
+            if (player.hasLeaderUnlocked("kyrocommander") && allianceGiftable)
+            {
+                sb.append(" They could also gift their _Alliance_ to another player, enabling up to 4 extra additional votes.");
+            }
+        }
+        
         if (game.getLaws().containsKey("rep_govt")) {
             sb = new StringBuilder();
             sb.append(" vote count (_Representative Government_): **1**");
@@ -3341,7 +3367,7 @@ public class AgendaHelper {
         if (game.getLaws().containsKey("absol_government")) {
             sb = new StringBuilder();
             sb.append(" vote count (_Representative Government_): **")
-                    .append(voteCount)
+                    .append(voteCount).append(mostVotes)
                     .append("**");
         }
         return sb.toString();
@@ -3489,15 +3515,6 @@ public class AgendaHelper {
             additionalVotesAndSources.put("with " + FactionEmojis.Xxcha + " commander accounted for", 0);
         } else if (game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
             additionalVotesAndSources.put("with " + FactionEmojis.Xxcha + " _Alliance_ accounted for", 0);
-        }
-
-        // Hacan Alliance
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "hacancommander")) {
-            additionalVotesAndSources.put(FactionEmojis.Hacan + " Alliance not calculated", 0);
-        }
-        // Kyro Alliance
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "kyrocommander")) {
-            additionalVotesAndSources.put(FactionEmojis.kyro + " Alliance not calculated", 0);
         }
 
         // Absol Shard of the Throne
@@ -4102,23 +4119,27 @@ public class AgendaHelper {
 
     public static void listVoteCount(Game game, MessageChannel channel) {
         List<Player> orderList = getVotingOrder(game);
-        int votes = 0;
+        int totalVotes = 0;
+        int maxVotes = 2;
         for (Player player : orderList) {
-            votes += getTotalVoteCount(game, player);
+            int vote = getTotalVoteCount(game, player);
+            totalVotes += vote;
+            maxVotes = Math.max(maxVotes, vote);
         }
         boolean hideTotalVotes = game.getFowOption(FOWOption.HIDE_TOTAL_VOTES);
         boolean hideVoteOrder = game.getFowOption(FOWOption.HIDE_VOTE_ORDER);
-        StringBuilder sb = new StringBuilder("**__Vote Count (Total votes: " + (hideTotalVotes ? "???" : votes));
+        StringBuilder sb = new StringBuilder("### Vote Count");
         sb.append("):__**\n");
         int itemNo = 1;
         for (Player player : orderList) {
             sb.append("`").append(itemNo).append(".` ");
             sb.append(hideVoteOrder ? "???" : player.getRepresentation(false, false));
             if (player.getUserID().equals(game.getSpeakerUserID())) sb.append(MiscEmojis.SpeakerToken);
-            sb.append(getPlayerVoteText(game, player));
+            sb.append(getPlayerVoteText(game, player, maxVotes));
             sb.append("\n");
             itemNo++;
         }
+        sb.append("__Total votes: ").append(hideTotalVotes ? "???" : totalVotes).append("__");
         MessageHelper.sendMessageToChannel(channel, sb.toString());
     }
 
