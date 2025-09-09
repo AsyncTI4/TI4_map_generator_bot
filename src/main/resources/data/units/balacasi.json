@@ -190,7 +190,7 @@
         "combatHitsOn": 9,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "This unit has capacity equal to the number of your scored secret objectives plus 4."
+        "ability": "Apply +1 to the capacity of this ship for each of your scored secret objectives"
     },
     {
         "id": "lunarium_carrier2",
@@ -208,7 +208,7 @@
         "combatHitsOn": 9,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "After you activate this system, you may place 1 fighter in this system. This unit has capacity equal to the number of your scored secret objectives plus 6. "
+        "ability": "After you activate this system, you may place 1 fighter in this system. Apply +1 to the capacity of this ship for each of your scored secret objectives."
     },
     {
         "id": "conclave_flagship",
@@ -251,6 +251,7 @@
         "upgradesToUnitId": "xan_warsun2",
         "source": "balacasi",
         "faction": "xan",
+        "moveValue": 2,
         "capacityValue": 4,
         "capacityUsed": 1,
         "combatHitsOn": 3,

@@ -1240,7 +1240,7 @@
     },
     {
         "alias": "coup",
-        "name": "Coup D'etat",
+        "name": "Coup d'Etat",
         "phase": "Action",
         "window": "When another player would perform a strategic action",
         "text": "End that player's turn, the strategic action is not resolved and the strategy card is not exhausted.",

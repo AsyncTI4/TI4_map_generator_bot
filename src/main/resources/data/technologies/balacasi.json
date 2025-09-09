@@ -93,7 +93,7 @@
     },
     {
         "alias": "baconcy",
-        "name": "Strategic Inversion",
+        "name": "Sacrificial Command",
         "types": [
             "CYBERNETIC"
         ],
@@ -104,7 +104,7 @@
     },
     {
         "alias": "baconcg",
-        "name": "Sacrificial Command",
+        "name": "Strategic Inversion",
         "types": [
             "BIOTIC"
         ],
@@ -176,7 +176,7 @@
         "types": [
             "UNITUPGRADE"
         ],
-        "requirements": "RY",
+        "requirements": "RYG",
         "faction": "zephyrion",
         "baseUpgrade": "cr2",
         "source": "balacasi",
