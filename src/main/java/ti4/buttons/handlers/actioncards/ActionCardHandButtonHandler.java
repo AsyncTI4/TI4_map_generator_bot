@@ -200,6 +200,7 @@ class ActionCardHandButtonHandler {
                     .sendMessage("Could not parse action card ID: " + acID + ". Please play manually.")
                     .queue();
         }
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("getDiscardButtonsACs")

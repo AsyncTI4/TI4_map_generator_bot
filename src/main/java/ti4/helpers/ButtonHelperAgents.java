@@ -1351,7 +1351,8 @@ public class ButtonHelperAgents {
             }
             if (!actionRow2.isEmpty()
                     && !exhaustedMessage.contains("choose the user of the agent")
-                    && !exhaustedMessage.contains("wanna ")
+                    && !exhaustedMessage.toLowerCase().contains("wanna ")
+                    && !exhaustedMessage.contains("please choose the target")
                     && !exhaustedMessage.contains("please choose the faction to give")
                     && !exhaustedMessage.contains("choose the target of the agent")) {
                 if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 2) {
