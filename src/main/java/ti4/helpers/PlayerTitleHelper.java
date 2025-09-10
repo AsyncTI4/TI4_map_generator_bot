@@ -58,10 +58,7 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.red("bestowTitleStep1_Spice Bringer", "Spice Bringer"));
 
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(),
-                    "Titles here (if you don't see them, try exiting Discord and reopening it)",
-                    buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Titles here", buttons);
             var userSettings = UserSettingsManager.get(player.getUserID());
             if (!userSettings.isHasIndicatedStatPreferences()) {
                 buttons = getOptInButtons(game, player);

@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -3456,7 +3453,7 @@ public class ButtonHelper {
         }
         int ageOfFightersFleet;
         if (game.isAgeOfFightersMode()) {
-            if (player.hasTech("hcf2")) {
+            if (player.hasTech("hcf2") || player.hasTech("absol_hcf2")) {
                 ageOfFightersFleet = Math.min(numFighter2s, fleetCap - numOfCapitalShips);
             } else {
                 ageOfFightersFleet = Math.min(numFighter2s, (fleetCap - numOfCapitalShips) / 2);
@@ -3469,7 +3466,7 @@ public class ButtonHelper {
                 capacityViolated = true;
             } else {
                 numFighter2s = numInfNFightersNMechs - capacity;
-                if (player.hasTech("hcf2")) {
+                if (player.hasTech("hcf2") || player.hasTech("absol_hcf2")) {
                     numFighter2sFleet += numFighter2s;
                 } else {
                     numFighter2sFleet += numFighter2s * 2;
@@ -6866,6 +6863,9 @@ public class ButtonHelper {
         String messageID = buttonID.split("_")[1];
         String msg = player.getFactionEmoji() + " successfully preset " + messageID;
         String part2 = player.getFaction();
+        if (messageID.toLowerCase().contains("pre pass")) {
+            ButtonHelperActionCards.checkForPlayingBountyContracts(game, player);
+        }
         if (game.getStoredValue(messageID) != null
                 && !game.getStoredValue(messageID).isEmpty()) {
             part2 = game.getStoredValue(messageID) + "_" + player.getFaction();
