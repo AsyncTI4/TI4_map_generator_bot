@@ -212,7 +212,8 @@ public class ActionCardHelper {
                 "last_minute_deliberation",
                 "revolution",
                 "deflection",
-                "summit");
+                "summit",
+                "bounty_contracts");
         return CollectionUtils.containsAny(prePlayable, player.getActionCards().keySet());
     }
 

@@ -116,7 +116,7 @@ public class ScorePublicObjectiveService {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
         }
         HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
-        if (player.hasAbility("dark_purpose")) {
+        if (player.hasAbility("dark_purpose") && !poName.toLowerCase().contains("custodian")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " gains 1 command token from **Dark Purpose**.");

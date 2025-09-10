@@ -1911,6 +1911,24 @@ public class ButtonHelperActionCards {
         }
     }
 
+    public static void checkForPlayingBountyContracts(Game game, Player player) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
+            return;
+        }
+        if (player.getActionCards().containsKey("bounty_contracts")
+                && game.getStoredValue("Bounty Contracts").isEmpty()) {
+            String msg = player.getRepresentation()
+                    + ", you have the option to pre-play _Bounty Contracts_."
+                    + " Start-of-status-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("resolvePreassignment_Bounty Contracts", "Pre-Play Bounty Contracts"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        }
+    }
+
     public static void checkForPlayingManipulateInvestments(Game game, Player player) {
         if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
                 || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {

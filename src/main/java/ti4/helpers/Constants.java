@@ -1119,6 +1119,7 @@ public class Constants {
     public static final String SET_PLANET_COMMS = "set_planet_comms";
     public static final String PILLAGE_COUNT = "pillage_count";
     public static final String SARWEEN_COUNT = "sarween_count";
+    public static final String GHOST_COMMANDER_COUNT = "ghost_commander_count";
     public static final String MAGEN_INFANTRY_COUNT = "magen_infantry_count";
     public static final String PATH_TOKEN_COUNT = "path_token_count";
     public static final String HONOR_COUNT = "honor_count";

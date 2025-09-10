@@ -124,10 +124,12 @@ public class EndTurnService {
                         mainPlayer.getCardsInfoThread(),
                         "You were the last player to pass, and so you can score _Prove Endurance_.");
             }
-            EndPhaseService.EndActionPhase(event, game, gameChannel);
-            game.updateActivePlayer(null);
-            ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, mainPlayer, event);
-            ButtonHelperAgents.checkForEdynAgentActive(game, event);
+            if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, mainPlayer, event)) {
+                EndPhaseService.EndActionPhase(event, game, gameChannel);
+                game.updateActivePlayer(null);
+                ButtonHelperAgents.checkForEdynAgentActive(game, event);
+            }
+
             return;
         }
         Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);
