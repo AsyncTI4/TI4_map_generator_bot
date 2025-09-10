@@ -3,7 +3,6 @@ package ti4.service.turn;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -125,14 +124,12 @@ public class EndTurnService {
                         mainPlayer.getCardsInfoThread(),
                         "You were the last player to pass, and so you can score _Prove Endurance_.");
             }
-            if(!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, mainPlayer, event)){
+            if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, mainPlayer, event)) {
                 EndPhaseService.EndActionPhase(event, game, gameChannel);
                 game.updateActivePlayer(null);
                 ButtonHelperAgents.checkForEdynAgentActive(game, event);
             }
-            
-            
-            
+
             return;
         }
         Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);

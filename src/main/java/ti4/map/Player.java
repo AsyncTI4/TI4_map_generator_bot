@@ -241,7 +241,6 @@ public class Player extends PlayerProperties {
         addSpentThing("tg_" + newTgSpent);
     }
 
-
     public void increaseInfantrySpentThisWindow(int amount) {
         int oldTgSpent = getSpentInfantryThisWindow();
         int newTgSpent = oldTgSpent + amount;
