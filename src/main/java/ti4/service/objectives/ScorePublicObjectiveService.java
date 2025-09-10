@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -116,7 +117,7 @@ public class ScorePublicObjectiveService {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
         }
         HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
-        if (player.hasAbility("dark_purpose")) {
+        if (player.hasAbility("dark_purpose") && !poName.toLowerCase().contains("custodian")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " gains 1 command token from **Dark Purpose**.");
