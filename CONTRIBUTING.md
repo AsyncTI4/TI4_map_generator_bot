@@ -88,11 +88,34 @@ Set the 5 {VARIABLES} to match your Discord App/Bot's Token, UserID, ServerID, a
 
 #### Default Formatter
 
-The bot won't build successfully unless the code is well formatted. We use Spotless to enforce this at compile time.
+The bot won't build successfully unless the code is well formatted. We use the [Spotless](https://github.com/diffplug/spotless) plugin for Maven to enforce this at compile time.
+
+You can run `mvn spotless:apply` to check for and apply the formatting.
 
 It's best to get "format on save" set up using Spotless, which you can do with plugins.
 
-Plugins: https://github.com/diffplug/spotless
+For VSCode, you can use the [RunOnSave](https://marketplace.visualstudio.com/items?itemName=emeraldwalk.RunOnSave) plugin.
+
+Add the following to your VSCode workspace settings:
+
+```json
+"settings": {
+"java.compile.nullAnalysis.mode": "automatic",
+"java.configuration.updateBuildConfiguration": "automatic",
+"java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx8G -Xms100m -Xlog:disable",
+"githubPullRequests.ignoredPullRequestBranches": ["master"],
+"files.encoding": "utf8",
+"java.project.encoding": "setDefault",
+"emeraldwalk.runonsave": {
+	"commands": [
+	{
+		"match": "\\.java$",
+		"cmd": "echo File Saved: '${relativeFile}' - Running mvn spotless:apply && mvn spotless:apply"
+		// "cmd": "echo File Saved: '${relativeFile}' - Running mvn spotless:apply && mvn spotless:apply -DspotlessFiles=.*\\${fileBasename}" // Only run on the saved file - can't seem to get this working
+	}
+	]
+}
+```
 
 We previously used eclipse-formatter.xml. If you worked on this bot in the past, you may have that set as your default formatter. You can safely remove references to that formatter from local dev files, e.g. `./.vscode/settings.json`.
 
