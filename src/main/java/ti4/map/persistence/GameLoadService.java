@@ -59,7 +59,7 @@ import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
-class GameLoadService {
+public class GameLoadService {
 
     private static final Pattern PEEKED_OBJECTIVE_PATTERN = Pattern.compile("(?>([a-z_]+):((?>\\d+,)+);)");
     private static final ObjectMapper mapper = ObjectMapperFactory.build();
@@ -607,6 +607,7 @@ class GameLoadService {
                 case Constants.SAVED_MESSAGE -> game.setSavedMessage(info);
                 case Constants.BOT_MAP_CHANNEL -> game.setBotMapUpdatesThreadID(info);
                 case Constants.GAME_LAUNCH_THREAD_ID -> game.setLaunchPostThreadID(info);
+                case Constants.LAST_IMAGE_FILE_NAME -> game.setLastImageFileName(info);
 
                 // GAME MODES / SETTINGS
                 case Constants.TIGL_GAME -> game.setCompetitiveTIGLGame(loadBooleanOrDefault(info, false));
