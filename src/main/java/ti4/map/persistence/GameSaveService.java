@@ -399,6 +399,10 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.GAME_LAUNCH_THREAD_ID + " " + game.getLaunchPostThreadID());
         writer.write(System.lineSeparator());
+        if (game.getLastImageFileName() != null) {
+            writer.write(Constants.LAST_IMAGE_FILE_NAME + " " + game.getLastImageFileName());
+            writer.write(System.lineSeparator());
+        }
 
         // GAME MODES
         writer.write(Constants.TIGL_GAME + " " + game.isCompetitiveTIGLGame());

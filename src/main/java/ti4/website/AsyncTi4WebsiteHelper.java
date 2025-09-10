@@ -26,6 +26,8 @@ import ti4.map.persistence.ManagedGame;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.settings.GlobalSettings;
+import ti4.spring.context.SpringContext;
+import ti4.spring.ws.WebSocketNotifier;
 import ti4.website.model.WebCardPool;
 import ti4.website.model.WebLaw;
 import ti4.website.model.WebObjectives;
@@ -144,6 +146,12 @@ public class AsyncTi4WebsiteHelper {
                     "application/json",
                     "no-cache, no-store, must-revalidate",
                     null);
+
+            // Notify any subscribed clients for this game to refresh
+            try {
+                SpringContext.getBean(WebSocketNotifier.class).notifyGameRefresh(gameId);
+            } catch (Exception ignored) {
+            }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Could not put data to web server", e);
         }
@@ -253,12 +261,12 @@ public class AsyncTi4WebsiteHelper {
                 });
     }
 
-    public static void putMap(String gameName, String fileFormat, byte[] imageBytes, boolean frog, Player player) {
-        if (!uploadsEnabled()) return;
+    public static String putMap(String gameName, String fileFormat, byte[] imageBytes, boolean frog, Player player) {
+        if (!uploadsEnabled()) return null;
         String bucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
         if (bucket == null || bucket.isEmpty()) {
             BotLogger.error("S3 bucket not configured.");
-            return;
+            return null;
         }
 
         try {
@@ -272,17 +280,19 @@ public class AsyncTi4WebsiteHelper {
             LocalDateTime date = LocalDateTime.now();
             String dtstamp = date.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
+            String key = String.format(mapPath, gameName, dtstamp);
+            String fileName = dtstamp + "." + fileFormat;
+
             putObjectInBucket(
-                    String.format(mapPath, gameName, dtstamp),
-                    AsyncRequestBody.fromBytes(imageBytes),
-                    "image/" + fileFormat,
-                    null,
-                    StorageClass.ONEZONE_IA);
+                    key, AsyncRequestBody.fromBytes(imageBytes), "image/" + fileFormat, null, StorageClass.ONEZONE_IA);
+
+            return fileName;
         } catch (Exception e) {
             BotLogger.error(
                     new LogOrigin(player),
                     "Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.",
                     e);
+            return null;
         }
     }
 
