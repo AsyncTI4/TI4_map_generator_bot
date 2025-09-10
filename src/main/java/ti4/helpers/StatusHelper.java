@@ -159,7 +159,7 @@ public class StatusHelper {
         for (Player player : game.getRealPlayers()) {
             List<String> scorables = new ArrayList<>();
 
-            if (game.getStoredValue("Bounty Contracts").contains(player.getFaction())
+            if (game.getStoredValue("BountyContracts").contains(player.getFaction())
                     && player.getActionCards().containsKey("bounty_contracts")) {
                 ActionCardHelper.playAC(event, game, player, "bounty_contracts", game.getMainGameChannel());
             }
