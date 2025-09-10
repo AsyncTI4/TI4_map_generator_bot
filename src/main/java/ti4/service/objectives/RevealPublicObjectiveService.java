@@ -109,6 +109,10 @@ public class RevealPublicObjectiveService {
 
         PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());
+
+        RelicHelper.offerInitialNeuraLoopChoice(game, objective1.getKey());
+        RelicHelper.offerInitialNeuraLoopChoice(game, objective2.getKey());
+
         MessageHelper.sendMessageToChannel(
                 channel, game.getPing() + ", two stage 2 public objectives has been revealed.");
         channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed()))
