@@ -3076,7 +3076,7 @@ public class Helper {
         } else {
             return tc.createInvite()
                     .setMaxUses(uses)
-                    .setMaxAge((long) (forever ? 0 : 4), TimeUnit.DAYS)
+                    .setMaxAge((long) (forever ? 0 : 7), TimeUnit.DAYS)
                     .complete()
                     .getUrl();
         }
