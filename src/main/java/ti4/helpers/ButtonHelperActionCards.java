@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -1917,7 +1916,8 @@ public class ButtonHelperActionCards {
                 || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             return;
         }
-        if (player.getActionCards().containsKey("bounty_contracts") && game.getStoredValue("Bounty Contracts").isEmpty()) {
+        if (player.getActionCards().containsKey("bounty_contracts")
+                && game.getStoredValue("Bounty Contracts").isEmpty()) {
             String msg = player.getRepresentation()
                     + ", you have the option to pre-play _Bounty Contracts_."
                     + " Start-of-status-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."

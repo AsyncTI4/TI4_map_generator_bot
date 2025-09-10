@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -59,10 +58,7 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.red("bestowTitleStep1_Spice Bringer", "Spice Bringer"));
 
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(),
-                    "Titles here",
-                    buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Titles here", buttons);
             var userSettings = UserSettingsManager.get(player.getUserID());
             if (!userSettings.isHasIndicatedStatPreferences()) {
                 buttons = getOptInButtons(game, player);

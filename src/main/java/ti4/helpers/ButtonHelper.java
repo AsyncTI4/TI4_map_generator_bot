@@ -19,12 +19,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.function.Consumers;
-
 import lombok.Data;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -50,6 +45,8 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -3469,7 +3466,7 @@ public class ButtonHelper {
                 capacityViolated = true;
             } else {
                 numFighter2s = numInfNFightersNMechs - capacity;
-                if (player.hasTech("hcf2")|| player.hasTech("absol_hcf2")) {
+                if (player.hasTech("hcf2") || player.hasTech("absol_hcf2")) {
                     numFighter2sFleet += numFighter2s;
                 } else {
                     numFighter2sFleet += numFighter2s * 2;
@@ -6866,7 +6863,7 @@ public class ButtonHelper {
         String messageID = buttonID.split("_")[1];
         String msg = player.getFactionEmoji() + " successfully preset " + messageID;
         String part2 = player.getFaction();
-        if(messageID.toLowerCase().contains("pre pass")){
+        if (messageID.toLowerCase().contains("pre pass")) {
             ButtonHelperActionCards.checkForPlayingBountyContracts(game, player);
         }
         if (game.getStoredValue(messageID) != null

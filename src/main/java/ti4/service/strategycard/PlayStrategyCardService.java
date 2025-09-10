@@ -3,7 +3,6 @@ package ti4.service.strategycard;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
@@ -305,7 +304,10 @@ public class PlayStrategyCardService {
                 if (player3.hasUnexhaustedLeader("mahactagent")
                         && !ButtonHelper.getTilesWithYourCC(player, game, event).isEmpty()
                         && !winnuHero) {
-                    if(scModel.usesAutomationForSCID("pok6warfare") && ButtonHelper.getTilesWithYourCC(player, game, event).size() == 1){
+                    if (scModel.usesAutomationForSCID("pok6warfare")
+                            && ButtonHelper.getTilesWithYourCC(player, game, event)
+                                            .size()
+                                    == 1) {
                         continue;
                     }
                     empNMahButtons.addFirst(
