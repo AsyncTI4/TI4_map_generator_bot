@@ -284,7 +284,11 @@ public class AsyncTi4WebsiteHelper {
             String fileName = dtstamp + "." + fileFormat;
 
             putObjectInBucket(
-                    key, AsyncRequestBody.fromBytes(imageBytes), "image/" + fileFormat, null, StorageClass.INTELLIGENT_TIERING);
+                    key,
+                    AsyncRequestBody.fromBytes(imageBytes),
+                    "image/" + fileFormat,
+                    null,
+                    StorageClass.INTELLIGENT_TIERING);
 
             return fileName;
         } catch (Exception e) {
