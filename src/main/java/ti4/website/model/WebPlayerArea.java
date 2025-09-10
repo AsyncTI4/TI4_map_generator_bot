@@ -29,6 +29,7 @@ public class WebPlayerArea {
     private String color;
     private String displayName;
     private String discordId;
+    private String cardsInfoThreadLink;
     private boolean passed;
     private boolean eliminated;
     private boolean active;
@@ -154,6 +155,7 @@ public class WebPlayerArea {
         webPlayerArea.setColor(player.getColor());
         webPlayerArea.setDisplayName(player.getDisplayName());
         webPlayerArea.setDiscordId(player.getUserID());
+        webPlayerArea.setCardsInfoThreadLink(player.getCardsInfoThreadJumpLink());
         webPlayerArea.setPassed(player.isPassed());
         webPlayerArea.setEliminated(player.isEliminated());
         webPlayerArea.setActive(player.isActivePlayer());

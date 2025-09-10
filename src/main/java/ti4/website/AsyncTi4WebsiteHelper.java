@@ -137,6 +137,8 @@ public class AsyncTi4WebsiteHelper {
             webData.put("gameRound", game.getRound());
             webData.put("gameName", game.getName());
             webData.put("gameCustomName", game.getCustomName());
+            webData.put("tableTalkJumpLink", game.getTabletalkJumpLink());
+            webData.put("actionsJumpLink", game.getActionsJumpLink());
 
             String json = EgressClientManager.getObjectMapper().writeValueAsString(webData);
 

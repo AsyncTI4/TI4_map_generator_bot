@@ -506,11 +506,11 @@ public class Player extends PlayerProperties {
         if (isPrivateChannel) {
             threadAction = threadAction.setInvitable(false);
         }
+        String message = "Hello " + getPing() + "! This is your private channel.";
         if (createWithQueue) {
             threadAction.queue(
                     c -> {
                         setCardsInfoThreadID(c.getId());
-                        String message = "Hello " + getPing() + "! This is your private channel.";
                         MessageHelper.sendMessageToChannel(c, message);
                     },
                     BotLogger::catchRestError);
@@ -520,8 +520,15 @@ public class Player extends PlayerProperties {
         if (useComplete) {
             threadChannel = threadAction.complete();
             setCardsInfoThreadID(threadChannel.getId());
+            MessageHelper.sendMessageToChannel(threadChannel, message);
         }
         return threadChannel;
+    }
+
+    public String getCardsInfoThreadJumpLink() {
+        ThreadChannel threadChannel = getCardsInfoThread();
+        if (threadChannel == null) return null;
+        return threadChannel.getJumpUrl();
     }
 
     /**
