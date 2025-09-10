@@ -195,6 +195,12 @@
         "source": "eronous"
     },
     {
+        "id": "whall",
+        "imagePath": "token_whunknown.png",
+        "spaceOrPlanet": "space",
+        "source": "other"
+    },
+    {
         "id": "illusion",
         "imagePath": "token_illusion.png",
         "spaceOrPlanet": "space",
