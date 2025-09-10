@@ -265,7 +265,7 @@ public class BotLogger {
         }
 
         // try and create a webhook
-        TextChannel channel = getLogChannel(LogSeverity.Error);
+        TextChannel channel = getLogChannel(LogSeverity.Info);
         if (channel == null) {
             System.out.println("ERROR: Unable to create bot-log webhook, no bot-log-error channel found.");
             return null;
