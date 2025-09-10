@@ -304,6 +304,12 @@ public class PlayStrategyCardService {
                 if (player3.hasUnexhaustedLeader("mahactagent")
                         && !ButtonHelper.getTilesWithYourCC(player, game, event).isEmpty()
                         && !winnuHero) {
+                    if (scModel.usesAutomationForSCID("pok6warfare")
+                            && ButtonHelper.getTilesWithYourCC(player, game, event)
+                                            .size()
+                                    == 1) {
+                        continue;
+                    }
                     empNMahButtons.addFirst(
                             Buttons.red("mahactA_follow_" + scToPlay, "Use Mahact Agent", FactionEmojis.Mahact));
                     MessageHelper.sendMessageToChannelWithButtons(

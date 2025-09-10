@@ -427,6 +427,14 @@ public class UnfiledButtonHandlers {
         Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
         buttons.add(DoneExhausting);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Please pay one resource.", buttons);
+        if (player.hasTech("yso")) {
+            List<Button> unitButtons2 = new ArrayList<>();
+            unitButtons2.add(Buttons.gray("startYinSpinner", "Yin Spin 2 Duders", FactionEmojis.Yin));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + " you may use this to Yin Spin.",
+                    unitButtons2);
+        }
     }
 
     @ButtonHandler("removeAllStructures_")
