@@ -94,26 +94,20 @@ You can run `mvn spotless:apply` to check for and apply the formatting.
 
 It's best to get "format on save" set up using Spotless, which you can do with plugins.
 
-For VSCode, you can use the [RunOnSave](https://marketplace.visualstudio.com/items?itemName=emeraldwalk.RunOnSave) plugin.
-
-Add the following to your VSCode workspace settings:
+For Windows/VSCode, you can use the [RunOnSave](https://marketplace.visualstudio.com/items?itemName=emeraldwalk.RunOnSave) plugin. To run `mvn spotless:apply` every time you save a `.java` file, add the following to your VSCode workspace settings:
 
 ```json
 "settings": {
-"java.compile.nullAnalysis.mode": "automatic",
-"java.configuration.updateBuildConfiguration": "automatic",
-"java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx8G -Xms100m -Xlog:disable",
-"githubPullRequests.ignoredPullRequestBranches": ["master"],
-"files.encoding": "utf8",
-"java.project.encoding": "setDefault",
-"emeraldwalk.runonsave": {
-	"commands": [
-	{
-		"match": "\\.java$",
-		"cmd": "echo File Saved: '${relativeFile}' - Running mvn spotless:apply && mvn spotless:apply"
-		// "cmd": "echo File Saved: '${relativeFile}' - Running mvn spotless:apply && mvn spotless:apply -DspotlessFiles=.*\\${fileBasename}" // Only run on the saved file - can't seem to get this working
-	}
-	]
+  // "existingSettings": "here",
+  "emeraldwalk.runonsave": {
+    "commands": [
+      {
+        "match": "\\.java$",
+        "cmd": "echo File Saved: '${relativeFile}' - Running mvn spotless:apply && mvn spotless:apply"
+        // "cmd": "echo File Saved: '${relativeFile}' - Running mvn spotless:apply && mvn spotless:apply -DspotlessFiles=.*\\${fileBasename}" // Only run on the saved file - can't seem to get this working
+      }
+    ]
+  }
 }
 ```
 
