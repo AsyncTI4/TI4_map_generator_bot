@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 import ti4.executors.ExecutionLockManager;
@@ -23,26 +24,39 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         if (gameName == null) return true;
         if (!GameManager.isValid(gameName)) throw new InvalidGameNameException(gameName);
 
-        boolean isWrite = MUTATION_METHODS.contains(request.getMethod());
-        lockGame(gameName, isWrite);
-        setupGameRequestContext(gameName);
+        setupGameRequestContext(gameName, handler);
+        lockGame(gameName, request);
 
         return true;
     }
 
     private String getGameNameFromUri(HttpServletRequest request) {
+        @SuppressWarnings("unchecked")
         Map<String, String> uriTemplateVars =
                 (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
         return uriTemplateVars.get("gameName");
     }
 
-    private void setupGameRequestContext(String gameName) {
+    private void setupGameRequestContext(String gameName, Object handler) {
         var game = GameManager.getManagedGame(gameName).getGame();
         RequestContext.setGame(game);
+
+        boolean shouldSaveGame = true;
+        if (handler instanceof HandlerMethod handlerMethod) {
+            SetupRequestContext annotation = handlerMethod.getMethodAnnotation(SetupRequestContext.class);
+            if (annotation == null) {
+                annotation = handlerMethod.getBeanType().getAnnotation(SetupRequestContext.class);
+            }
+            if (annotation != null) {
+                shouldSaveGame = annotation.value();
+            }
+        }
+        RequestContext.setSaveGame(shouldSaveGame);
     }
 
-    private static void lockGame(String gameName, boolean isWrite) {
+    private static void lockGame(String gameName, HttpServletRequest request) {
+        boolean isWrite = MUTATION_METHODS.contains(request.getMethod()) && RequestContext.shouldSaveGame();
         var lockType = isWrite ? ExecutionLockManager.LockType.WRITE : ExecutionLockManager.LockType.READ;
         ExecutionLockManager.lock(gameName, lockType);
     }
