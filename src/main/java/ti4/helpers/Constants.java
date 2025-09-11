@@ -1200,6 +1200,20 @@ public class Constants {
     public static final String CRON_NAME = "cron_name";
     public static final String RUN_CRON = "run_cron";
 
+
+    public static final String BREAKTHROUGH_CMD = "breakthrough";
+    public static final String BREAKTHROUGH_LOCK = "lock";
+    public static final String BREAKTHROUGH_UNLOCK = "unlock";
+    public static final String BREAKTHROUGH_EXHAUST = "exhaust";
+    public static final String BREAKTHROUGH_READY = "ready";
+    public static final String BREAKTHROUGH_SET_TG = "set_tg";
+    public static final String BREAKTHROUGH_ACTIVATE = "activate";
+    public static final String BREAKTHROUGH = "breakthrough";
+    public static final String BREAKTHROUGH_EXH = "breakthrough_exh";
+    public static final String BREAKTHROUGH_UNL = "breakthrough_unl";
+    public static final String BREAKTHROUGH_ACTV = "breakthrough_actv";
+    public static final String BREAKTHROUGH_TGS = "breakthrough_tgs";
+
     public static final String AC_DECK_ID = "ac_deck_id";
     public static final String SO_DECK_ID = "so_deck_id";
     public static final String STAGE_1_PUBLIC_DECK_ID = "stage_1_public_deck_id";

@@ -869,6 +869,12 @@ class GameSaveService {
                                     .toList()));
             writer.write(System.lineSeparator());
 
+            writeStrLine(writer, Constants.BREAKTHROUGH, player.getBreakthroughID());
+            writeBoolLine(writer, Constants.BREAKTHROUGH_UNL, player.isBreakthroughUnlocked());
+            writeBoolLine(writer, Constants.BREAKTHROUGH_EXH, player.isBreakthroughExhausted());
+            writeBoolLine(writer, Constants.BREAKTHROUGH_ACTV, player.isBreakthroughActive());
+            writeIntLine(writer, Constants.BREAKTHROUGH_TGS, player.getBreakthroughTGs());
+
             StringBuilder leaderInfo = new StringBuilder();
             if (player.getLeaders().isEmpty()) leaderInfo.append("none");
             for (Leader leader : player.getLeaders()) {
