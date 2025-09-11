@@ -11,11 +11,12 @@ public class BreakthroughLock extends GameStateSubcommand {
     public BreakthroughLock() {
         super(Constants.BREAKTHROUGH_LOCK, "Lock breakthrough", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
         BreakthroughCommandHelper.lockBreakthrough(getPlayer());
     }
-
 }

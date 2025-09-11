@@ -11,7 +11,9 @@ public class BreakthroughInfo extends GameStateSubcommand {
     public BreakthroughInfo() {
         super(Constants.INFO, "Send breakthrough information to your Cards Info channel", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {

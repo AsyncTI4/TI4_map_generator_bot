@@ -1,0 +1,60 @@
+[
+    {
+        "alias": "arborecbt",
+        "name": "Psychospore",
+        "faction": "arborec",
+        "synergy": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "text": "ACTION: Exhaust this card to remove a command token from a system that contains 1 or more of your infantry and return it to your reinforcements. Then, place 1 infantry in that system.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "letnevbt",
+        "name": "Gravleash Maneuvers",
+        "displayName": "Gravleash\nManeuvers",
+        "faction": "letnev",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "Before you roll dice during space combat, apply +X to the results of 1 of your ship's rolls, where X is the number of ship types you have in the combat.\nDuring movement, your non-fighter ships' move values are equal to the highest move value amongst moving ships in the system they started in.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "muaatbt",
+        "name": "Stellar Genesis",
+        "displayName": "Stellar\nGenesis",
+        "faction": "muaat",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "When you gain this card, place the Avernus planet token into a non-home system that is adjacent to a planet you control; gain the Avernus planet card and ready it.\nAfter you move one of your war suns out of or through Avernus's system and into a non-home system, you may move the Avernus token with it.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "winnubt",
+        "name": "Imperator",
+        "faction": "winnu",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "Apply +1 to the results of each of your unit's combat rolls for each \"Support for the Throne\" in your opponent's play area.\nAfter you activate a system that contains a legendary planet, apply +1 to the move value of 1 of your ships during this tactical action.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "yinbt",
+        "name": "Yin Ascendant",
+        "displayName": "Yin\nAscendant",
+        "faction": "yin",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "When you gain this card or score a public objective, gain the alliance ability of a random, unused faction.",
+        "source": "thunders_edge"
+    }
+]

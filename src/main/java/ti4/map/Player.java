@@ -229,28 +229,23 @@ public class Player extends PlayerProperties {
         return bt.equals(getBreakthroughID());
     }
 
-
     public boolean hasUnlockedBreakthrough(String bt) {
         return hasBreakthrough(bt) && isBreakthroughUnlocked();
     }
-
 
     public boolean hasReadyBreakthrough(String bt) {
         return hasUnlockedBreakthrough(bt) && !isBreakthroughExhausted();
     }
 
-
     public boolean hasActiveBreakthrough(String bt) {
         return hasUnlockedBreakthrough(bt) && isBreakthroughActive();
     }
-
 
     @JsonIgnore
     public BreakthroughModel getBreakthroughModel() {
         if (getBreakthroughID() == null) return null;
         return Mapper.getBreakthrough(getBreakthroughID());
     }
-
 
     @JsonIgnore
     public Set<TechnologyType> getSynergies() {
@@ -259,11 +254,14 @@ public class Player extends PlayerProperties {
             synergies.addAll(getBreakthroughModel().getSynergy());
         }
         if (hasRelic("quantumcore")) {
-            synergies.addAll(List.of(TechnologyType.BIOTIC, TechnologyType.WARFARE, TechnologyType.PROPULSION, TechnologyType.CYBERNETIC));
+            synergies.addAll(List.of(
+                    TechnologyType.BIOTIC,
+                    TechnologyType.WARFARE,
+                    TechnologyType.PROPULSION,
+                    TechnologyType.CYBERNETIC));
         }
         return Collections.unmodifiableSet(synergies);
     }
-
 
     @JsonIgnore
     public int getSpentInfantryThisWindow() {

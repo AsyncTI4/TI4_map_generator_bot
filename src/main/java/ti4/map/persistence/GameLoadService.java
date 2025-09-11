@@ -57,6 +57,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
+import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -895,9 +896,12 @@ class GameLoadService {
                     player.setDebtTokens(debtTokens);
                 }
                 case Constants.BREAKTHROUGH -> player.setBreakthroughID(readStringLine(tokenizer.nextToken()));
-                case Constants.BREAKTHROUGH_EXH -> player.setBreakthroughExhausted(Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.BREAKTHROUGH_UNL -> player.setBreakthroughUnlocked(Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.BREAKTHROUGH_ACTV -> player.setBreakthroughActive(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_EXH ->
+                    player.setBreakthroughExhausted(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_UNL ->
+                    player.setBreakthroughUnlocked(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_ACTV ->
+                    player.setBreakthroughActive(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.BREAKTHROUGH_TGS -> player.setBreakthroughTGs(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STRATEGY_CARD ->
                     player.setSCs(new LinkedHashSet<>(getCardList(tokenizer.nextToken()).stream()
@@ -1205,6 +1209,11 @@ class GameLoadService {
                 tile.addToken(token, unitHolderName);
             }
         }
+    }
+
+    private static String readStringLine(String data) {
+        if (data.isBlank()) return null;
+        return StringHelper.unescape(data);
     }
 
     private static Map<String, List<String>> loadPeekedPublicObjectives(String data) {

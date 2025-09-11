@@ -41,6 +41,7 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.PatternHelper;
 import ti4.helpers.Storage;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
@@ -968,6 +969,23 @@ class GameSaveService {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         writer.write(saveID + " " + sb);
+        writer.write(System.lineSeparator());
+    }
+
+    private static void writeStrLine(Writer writer, String field, String str) throws IOException {
+        String output = StringHelper.escape(str != null ? str : "");
+        writer.write(field + " " + output);
+        writer.write(System.lineSeparator());
+    }
+
+    private static void writeBoolLine(Writer writer, String field, boolean bool) throws IOException {
+        String output = bool ? "true" : "false";
+        writer.write(field + " " + output);
+        writer.write(System.lineSeparator());
+    }
+
+    private static void writeIntLine(Writer writer, String field, int val) throws IOException {
+        writer.write(field + " " + val);
         writer.write(System.lineSeparator());
     }
 
