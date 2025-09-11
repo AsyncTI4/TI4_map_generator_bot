@@ -26,9 +26,14 @@ public class CircuitBreakerFilter extends OncePerRequestFilter {
             @NotNull HttpServletResponse response,
             @NotNull FilterChain filterChain)
             throws ServletException, IOException {
-        if (CircuitBreaker.isOpen() || !AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
+        if (CircuitBreaker.isOpen()) {
             response.sendError(
-                    HttpStatus.SERVICE_UNAVAILABLE.value(), "Unable to handle this request at this time");
+                    HttpStatus.SERVICE_UNAVAILABLE.value(), "Service temporarily unavailable: circuit breaker is open");
+            return;
+        }
+        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
+            response.sendError(
+                    HttpStatus.SERVICE_UNAVAILABLE.value(), "Service temporarily unavailable: bot is not ready");
             return;
         }
 
