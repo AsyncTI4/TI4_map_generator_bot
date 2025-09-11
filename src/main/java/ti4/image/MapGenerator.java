@@ -415,10 +415,10 @@ public class MapGenerator implements AutoCloseable {
             if (testing == null && displayTypeBasic == DisplayType.all && !isFoWPrivate) {
                 String fileName =
                         AsyncTi4WebsiteHelper.putMap(game.getName(), imageFormat, mainImageBytes, false, null);
-                if (fileName != null) {
-                    GameImageService gameImageService = SpringContext.getBean(GameImageService.class);
-                    gameImageService.saveImage(game, fileName);
-                }
+
+                GameImageService gameImageService = SpringContext.getBean(GameImageService.class);
+                gameImageService.saveMapImageName(game, fileName);
+
                 AsyncTi4WebsiteHelper.putData(game.getName(), game);
                 AsyncTi4WebsiteHelper.putOverlays(game.getID(), websiteOverlays);
                 AsyncTi4WebsiteHelper.putPlayerData(game.getID(), game);
