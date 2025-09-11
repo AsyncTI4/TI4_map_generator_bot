@@ -1709,16 +1709,12 @@ public class ButtonHelperModifyUnits {
                             && !"statusScoring".equalsIgnoreCase(game.getPhaseOfGame()))) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        playerRep
-                                + successMessage.replace("Produce", " produce").replace("Place", " place"));
+                        playerRep + " " + successMessage.substring(0,1).toLowerCase() + successMessage.substring(1);
             } else {
                 ButtonHelper.sendMessageToRightStratThread(
                         player,
                         game,
-                        playerRep
-                                + successMessage
-                                        .replace("Produced", " produced")
-                                        .replace("Place", " place"),
+                        playerRep + " " + successMessage.substring(0,1).toLowerCase() + successMessage.substring(1),
                         "construction");
             }
 
@@ -1786,7 +1782,7 @@ public class ButtonHelperModifyUnits {
             if (editedMessage.contains("Produced")) {
                 editedMessage += "\n " + successMessage;
             } else {
-                editedMessage = playerRep + " " + successMessage;
+                editedMessage = playerRep + " " + successMessage.substring(0,1).toLowerCase() + successMessage.substring(1);
             }
 
             if (editedMessage.contains("place 2 infantry")) {
@@ -2006,7 +2002,7 @@ public class ButtonHelperModifyUnits {
                 }
             }
         }
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), playerRep + " " + successMessage);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), playerRep + " " + successMessage.substring(0,1).toLowerCase + successMessage.substring(1));
         String message2 = player.getRepresentationUnfogged() + ", please choose the planets you wish to exhaust.";
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
         if (skipbuild.contains("freelancers")) {
