@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -323,7 +322,7 @@ public class StartTurnService {
         List<Button> startButtons = new ArrayList<>();
         boolean hadAnyUnplayedSCs = false;
 
-        if(doneActionThisTurn && player.hasTech("fl")){
+        if (doneActionThisTurn && player.hasTech("fl")) {
             confirmed2ndAction = true;
         }
         if (!doneActionThisTurn || confirmed2ndAction) {

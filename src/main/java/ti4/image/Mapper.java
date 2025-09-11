@@ -1,5 +1,15 @@
 package ti4.image;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,22 +31,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import javax.annotation.Nullable;
-
 import org.jetbrains.annotations.NotNull;
-
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -112,6 +108,7 @@ public class Mapper {
     private static final Map<String, TechnologyModel> technologies = new HashMap<>();
     private static final Map<String, TokenModel> tokens = new HashMap<>();
     private static final Map<String, UnitModel> units = new HashMap<>();
+    private static final Map<String, BreakthroughModel> breakthroughs = new HashMap<>();
 
     private static final Cache<String, ColorModel> colorToColorModelCache =
             Caffeine.newBuilder().maximumSize(1000).build();
@@ -153,6 +150,7 @@ public class Mapper {
         importJsonObjectsFromFolder("strategy_card_sets", strategyCardSets, StrategyCardSetModel.class);
         importJsonObjectsFromFolder("strategy_cards", strategyCards, StrategyCardModel.class);
         importJsonObjectsFromFolder("technologies", technologies, TechnologyModel.class);
+
         importJsonObjectsFromFolder("tokens", tokens, TokenModel.class);
         importJsonObjectsFromFolder("units", units, UnitModel.class);
         readData("decals.properties", decals);
@@ -368,15 +366,15 @@ public class Mapper {
         }
         return acNameList;
     }
-    //breakthroughs
+    // breakthroughs
 
     public static Map<String, BreakthroughModel> getBreakthroughs() {
         return breakthroughs;
     }
-    public static BreakthroughModel getBreakthrough(String id) {
-            return breakthroughs.get(id);
-        }
 
+    public static BreakthroughModel getBreakthrough(String id) {
+        return breakthroughs.get(id);
+    }
 
     public static boolean isValidBreakthrough(String id) {
         return breakthroughs.containsKey(id);

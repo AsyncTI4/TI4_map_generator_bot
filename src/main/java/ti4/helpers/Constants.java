@@ -1200,7 +1200,6 @@ public class Constants {
     public static final String CRON_NAME = "cron_name";
     public static final String RUN_CRON = "run_cron";
 
-
     public static final String BREAKTHROUGH_CMD = "breakthrough";
     public static final String BREAKTHROUGH_LOCK = "lock";
     public static final String BREAKTHROUGH_UNLOCK = "unlock";

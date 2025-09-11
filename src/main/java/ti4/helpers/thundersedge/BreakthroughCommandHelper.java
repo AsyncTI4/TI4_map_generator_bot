@@ -5,18 +5,13 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.buttons.Buttons;
 import ti4.commands.CommandHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
-import ti4.service.emoji.DiceEmojis;
-import ti4.service.emoji.MiscEmojis;
 
 public class BreakthroughCommandHelper {
 
@@ -46,7 +41,8 @@ public class BreakthroughCommandHelper {
         withBreakthrough(player, bt -> {
             player.setBreakthroughExhausted(true);
             String message = player.getRepresentation() + " exhausted their breakthrough " + bt.getName() + ":";
-            MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), message, bt.getRepresentationEmbed());
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(), message, bt.getRepresentationEmbed());
         });
     }
 
@@ -54,7 +50,8 @@ public class BreakthroughCommandHelper {
         withBreakthrough(player, bt -> {
             player.setBreakthroughExhausted(false);
             String message = player.getRepresentation() + " readied their breakthrough " + bt.getName() + ":";
-            MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), message, bt.getRepresentationEmbed());
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(), message, bt.getRepresentationEmbed());
         });
     }
 
@@ -77,7 +74,6 @@ public class BreakthroughCommandHelper {
             player.setBreakthroughUnlocked(false);
             String message = player.getRepresentation() + " locked their breakthrough " + bt.getName() + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-
         });
     }
 
@@ -101,16 +97,19 @@ public class BreakthroughCommandHelper {
         });
     }
 
-
     public static void setBreakthroughTGs(Player player, int newTgs) {
         if (newTgs < 0) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "You cannot have negative trade goods on your breakthrough.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "You cannot have negative trade goods on your breakthrough.");
         } else if (!player.isBreakthroughUnlocked()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "You do not have your breakthrough unlocked, so you cannot add trade goods to it.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "You do not have your breakthrough unlocked, so you cannot add trade goods to it.");
         } else {
             int initial = player.getBreakthroughTGs();
             player.setBreakthroughTGs(newTgs);
-            String msg = player.getRepresentation() + " set the TGs on their breakthrough to " + newTgs + ". (" + initial + "->" + newTgs + ")";
+            String msg = player.getRepresentation() + " set the TGs on their breakthrough to " + newTgs + ". ("
+                    + initial + "->" + newTgs + ")";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         }
     }
@@ -129,13 +128,11 @@ public class BreakthroughCommandHelper {
             String pm = matcher.group("pm");
             int amt = Integer.parseInt(matcher.group("amt"));
             if (pm != null && !pm.isBlank()) {
-                if (pm.equals("-"))
-                    return initial - amt;
+                if (pm.equals("-")) return initial - amt;
                 return initial + amt;
             }
             return amt;
         }
         return initial;
     }
-
 }

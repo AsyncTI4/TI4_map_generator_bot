@@ -274,7 +274,7 @@
         "name": "Yin Breakthrough",
         "faction": "yin",
         "permanentEffect": "When you gain this card or score a public objective, gain the alliance ability of a random, unused faction.",
-        "source": "te"
+        "source": "thunders_edge"
     },
     {
         "id": "crafty",

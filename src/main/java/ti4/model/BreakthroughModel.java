@@ -1,16 +1,13 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.Color;
 import java.util.List;
 import java.util.Optional;
-
-import org.apache.commons.collections4.CollectionUtils;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.apache.commons.collections4.CollectionUtils;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.emoji.FactionEmojis;
@@ -28,10 +25,7 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
     private ComponentSource source;
 
     public boolean isValid() {
-        return alias != null
-            && name != null
-            && source != null
-            && text != null;
+        return alias != null && name != null && source != null && text != null;
     }
 
     public Optional<String> getFaction() {
@@ -49,8 +43,7 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public TechnologyType getFirstSynergy() {
-        if (synergy == null || synergy.isEmpty())
-            return TechnologyType.NONE;
+        if (synergy == null || synergy.isEmpty()) return TechnologyType.NONE;
         return synergy.getFirst();
     }
 
@@ -75,18 +68,20 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        //TITLE
-        eb.setTitle(getFactionEmoji() + " **__" + getName() + "__** " + getSource().emoji());
+        // TITLE
+        eb.setTitle(
+                getFactionEmoji() + " **__" + getName() + "__** " + getSource().emoji());
 
-        //DESCRIPTION
+        // DESCRIPTION
         StringBuilder description = new StringBuilder();
         description.append("SYNERGY: ").append(getSynergyEmojis()).append("\n");
         description.append(getText());
         eb.setDescription(description.toString());
 
-        //FOOTER
+        // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
+        if (includeID)
+            footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         eb.setFooter(footer.toString());
 
         eb.setColor(getEmbedColor());
@@ -95,7 +90,7 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
 
     private Color getEmbedColor() {
         return switch (getFirstSynergy()) {
-            case PROPULSION -> Color.blue; //Color.decode("#00FF00");
+            case PROPULSION -> Color.blue; // Color.decode("#00FF00");
             case CYBERNETIC -> Color.yellow;
             case BIOTIC -> Color.green;
             case WARFARE -> Color.red;
@@ -105,7 +100,9 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getFaction().orElse("").contains(searchString);
+        return getAlias().toLowerCase().contains(searchString)
+                || getName().toLowerCase().contains(searchString)
+                || getFaction().orElse("").contains(searchString);
     }
 
     public String getAutoCompleteName() {
@@ -120,34 +117,38 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
         if (synergy.size() == 2) {
             TechnologyType synergy2 = synergy.get(1);
             return switch (getFirstSynergy()) {
-                case PROPULSION -> TechEmojis.SynergyPropulsionLeft.toString() +
-                    switch (synergy2) {
-                        case BIOTIC -> TechEmojis.SynergyBioticRight;
-                        case CYBERNETIC -> TechEmojis.SynergyCyberneticRight;
-                        case WARFARE -> TechEmojis.SynergyWarfareRight;
-                        default -> TechEmojis.SynergyPropulsionRight;
-                    };
-                case BIOTIC -> TechEmojis.SynergyBioticLeft.toString() +
-                    switch (synergy2) {
-                        case PROPULSION -> TechEmojis.SynergyPropulsionRight;
-                        case CYBERNETIC -> TechEmojis.SynergyCyberneticRight;
-                        case WARFARE -> TechEmojis.SynergyWarfareRight;
-                        default -> TechEmojis.SynergyBioticRight;
-                    };
-                case CYBERNETIC -> TechEmojis.SynergyCyberneticLeft.toString() +
-                    switch (synergy2) {
-                        case PROPULSION -> TechEmojis.SynergyPropulsionRight;
-                        case BIOTIC -> TechEmojis.SynergyBioticRight;
-                        case WARFARE -> TechEmojis.SynergyWarfareRight;
-                        default -> TechEmojis.SynergyCyberneticRight;
-                    };
-                case WARFARE -> TechEmojis.SynergyWarfareLeft.toString() +
-                    switch (synergy2) {
-                        case PROPULSION -> TechEmojis.SynergyPropulsionRight;
-                        case BIOTIC -> TechEmojis.SynergyBioticRight;
-                        case CYBERNETIC -> TechEmojis.SynergyCyberneticRight;
-                        default -> TechEmojis.SynergyWarfareRight;
-                    };
+                case PROPULSION ->
+                    TechEmojis.SynergyPropulsionLeft.toString()
+                            + switch (synergy2) {
+                                case BIOTIC -> TechEmojis.SynergyBioticRight;
+                                case CYBERNETIC -> TechEmojis.SynergyCyberneticRight;
+                                case WARFARE -> TechEmojis.SynergyWarfareRight;
+                                default -> TechEmojis.SynergyPropulsionRight;
+                            };
+                case BIOTIC ->
+                    TechEmojis.SynergyBioticLeft.toString()
+                            + switch (synergy2) {
+                                case PROPULSION -> TechEmojis.SynergyPropulsionRight;
+                                case CYBERNETIC -> TechEmojis.SynergyCyberneticRight;
+                                case WARFARE -> TechEmojis.SynergyWarfareRight;
+                                default -> TechEmojis.SynergyBioticRight;
+                            };
+                case CYBERNETIC ->
+                    TechEmojis.SynergyCyberneticLeft.toString()
+                            + switch (synergy2) {
+                                case PROPULSION -> TechEmojis.SynergyPropulsionRight;
+                                case BIOTIC -> TechEmojis.SynergyBioticRight;
+                                case WARFARE -> TechEmojis.SynergyWarfareRight;
+                                default -> TechEmojis.SynergyCyberneticRight;
+                            };
+                case WARFARE ->
+                    TechEmojis.SynergyWarfareLeft.toString()
+                            + switch (synergy2) {
+                                case PROPULSION -> TechEmojis.SynergyPropulsionRight;
+                                case BIOTIC -> TechEmojis.SynergyBioticRight;
+                                case CYBERNETIC -> TechEmojis.SynergyCyberneticRight;
+                                default -> TechEmojis.SynergyWarfareRight;
+                            };
                 default -> TechEmojis.SynergyNone.toString();
             };
         }
@@ -158,33 +159,38 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
     public String getBackgroundResource() {
         if (synergy.size() == 2) {
             TechnologyType synergy2 = synergy.get(1);
-            String mid = switch (getFirstSynergy()) {
-                case PROPULSION -> switch (synergy2) {
-                    case BIOTIC -> "multicolorbg";
-                    case WARFARE -> "multicolorbr";
-                    case CYBERNETIC -> "multicolorby";
-                    default -> "propulsion";
-                };
-                case BIOTIC -> switch (synergy2) {
-                    case PROPULSION -> "multicolorbg";
-                    case WARFARE -> "multicolorgr";
-                    case CYBERNETIC -> "multicolorgy";
-                    default -> "biotic";
-                };
-                case WARFARE -> switch (synergy2) {
-                    case PROPULSION -> "multicolorbr";
-                    case BIOTIC -> "multicolorgr";
-                    case CYBERNETIC -> "multicolorry";
-                    default -> "warfare";
-                };
-                case CYBERNETIC -> switch (synergy2) {
-                    case PROPULSION -> "multicolorby";
-                    case BIOTIC -> "multicolorgy";
-                    case WARFARE -> "multicolorry";
-                    default -> "cybernetic";
-                };
-                default -> null;
-            };
+            String mid =
+                    switch (getFirstSynergy()) {
+                        case PROPULSION ->
+                            switch (synergy2) {
+                                case BIOTIC -> "multicolorbg";
+                                case WARFARE -> "multicolorbr";
+                                case CYBERNETIC -> "multicolorby";
+                                default -> "propulsion";
+                            };
+                        case BIOTIC ->
+                            switch (synergy2) {
+                                case PROPULSION -> "multicolorbg";
+                                case WARFARE -> "multicolorgr";
+                                case CYBERNETIC -> "multicolorgy";
+                                default -> "biotic";
+                            };
+                        case WARFARE ->
+                            switch (synergy2) {
+                                case PROPULSION -> "multicolorbr";
+                                case BIOTIC -> "multicolorgr";
+                                case CYBERNETIC -> "multicolorry";
+                                default -> "warfare";
+                            };
+                        case CYBERNETIC ->
+                            switch (synergy2) {
+                                case PROPULSION -> "multicolorby";
+                                case BIOTIC -> "multicolorgy";
+                                case WARFARE -> "multicolorry";
+                                default -> "cybernetic";
+                            };
+                        default -> null;
+                    };
             if (mid == null) return null;
             return "pa_tech_techicons_" + mid + ".png";
         }

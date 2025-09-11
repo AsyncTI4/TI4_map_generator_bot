@@ -13,7 +13,9 @@ public class BreakthroughActivate extends GameStateSubcommand {
     public BreakthroughActivate() {
         super(Constants.BREAKTHROUGH_ACTIVATE, "Activate (or unactivate) breakthrough", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -24,7 +26,8 @@ public class BreakthroughActivate extends GameStateSubcommand {
         } else {
             boolean active = player.isBreakthroughActive();
             player.setBreakthroughActive(!active);
-            String message = player.getRepresentation() + (active ? " de-" : " ") + "activated their breakthrough " + bt.getName();
+            String message = player.getRepresentation() + (active ? " de-" : " ") + "activated their breakthrough "
+                    + bt.getName();
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         }
     }
