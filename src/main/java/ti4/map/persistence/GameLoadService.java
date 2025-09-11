@@ -894,6 +894,11 @@ class GameLoadService {
                     }
                     player.setDebtTokens(debtTokens);
                 }
+                case Constants.BREAKTHROUGH -> player.setBreakthroughID(readStringLine(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_EXH -> player.setBreakthroughExhausted(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_UNL -> player.setBreakthroughUnlocked(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_ACTV -> player.setBreakthroughActive(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_TGS -> player.setBreakthroughTGs(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STRATEGY_CARD ->
                     player.setSCs(new LinkedHashSet<>(getCardList(tokenizer.nextToken()).stream()
                             .map(Integer::valueOf)
