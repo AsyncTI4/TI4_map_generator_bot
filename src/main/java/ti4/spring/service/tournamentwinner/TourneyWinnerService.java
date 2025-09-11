@@ -13,7 +13,7 @@ public class TourneyWinnerService {
     private TournamentWinnerRepository tournamentWinnerRepository;
 
     public boolean exists(String userId) {
-        return tournamentWinnerRepository.existsById(userId);
+        return tournamentWinnerRepository.existsByUserId(userId);
     }
 
     public void add(String userId, String userName, String tourneyName) {
