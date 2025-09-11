@@ -20,6 +20,8 @@ import ti4.executors.CircuitBreaker;
 @Component
 public class CircuitBreakerFilter extends OncePerRequestFilter {
 
+    private static final String SERVICE_UNAVAILABLE_MESSAGE = "Service temporarily unavailable: ";
+
     @Override
     protected void doFilterInternal(
             @NotNull HttpServletRequest request,
@@ -28,12 +30,12 @@ public class CircuitBreakerFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         if (CircuitBreaker.isOpen()) {
             response.sendError(
-                    HttpStatus.SERVICE_UNAVAILABLE.value(), "Service temporarily unavailable: circuit breaker is open");
+                    HttpStatus.SERVICE_UNAVAILABLE.value(), SERVICE_UNAVAILABLE_MESSAGE + "circuit breaker is open");
             return;
         }
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
             response.sendError(
-                    HttpStatus.SERVICE_UNAVAILABLE.value(), "Service temporarily unavailable: bot is not ready");
+                    HttpStatus.SERVICE_UNAVAILABLE.value(), SERVICE_UNAVAILABLE_MESSAGE + "bot is not ready");
             return;
         }
 
