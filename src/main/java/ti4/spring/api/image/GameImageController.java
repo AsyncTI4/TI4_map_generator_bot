@@ -1,43 +1,34 @@
 package ti4.spring.api.image;
 
-import static software.amazon.awssdk.utils.StringUtils.isBlank;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
-import ti4.spring.context.RequestContext;
-import ti4.spring.context.SetupRequestContext;
+import ti4.map.persistence.GameLoadService;
 
 @RequiredArgsConstructor
 @RestController
-// TODO: this should be /image
-@RequestMapping("/api/public/game/{gameName}")
 public class GameImageController {
 
     private final GameImageService gameImageService;
 
-    // TODO: once the above is /image, this doesn't need to specify anything
-    @SetupRequestContext(false)
-    @GetMapping("/image")
+    @GetMapping("/api/public/game/{gameName}/image")
     public ResponseEntity<String> get(@PathVariable String gameName) {
-        String latestMapImageName = gameImageService.getLatestMapImageName(gameName);
-        if (isBlank(latestMapImageName)) {
+        String last = gameImageService.getLastImage(gameName);
+        if (last == null || last.isBlank()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(latestMapImageName);
+        return ResponseEntity.ok(last);
     }
 
-    @SetupRequestContext(save = false)
-    @PostMapping("/refresh")
+    @PostMapping("/api/public/game/{gameName}/refresh")
     public ResponseEntity<String> refresh(@PathVariable String gameName) {
-        Game game = RequestContext.getGame();
+        Game game = GameLoadService.load(gameName);
         if (game == null) {
             return ResponseEntity.notFound().build();
         }

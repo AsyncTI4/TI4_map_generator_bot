@@ -17,6 +17,7 @@ public class GameProperties {
     private @ExportableField String creationDate;
     private @ExportableField String name; // pbdXXXX
     private @ExportableField String customName = "";
+    private @ExportableField String lastImageFileName;
     private @ExportableField String mapTemplateID;
     private @ExportableField String phaseOfGame = "";
     private @ExportableField int maxSOCountPerPlayer = 3;

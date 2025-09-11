@@ -13,7 +13,6 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(gameLockAndRequestContextInterceptor)
-                .addPathPatterns("/api/game/{gameName}/**", "/api/public/game/{gameName}/**");
+        registry.addInterceptor(gameLockAndRequestContextInterceptor).addPathPatterns("/api/game/{gameName}/**");
     }
 }
