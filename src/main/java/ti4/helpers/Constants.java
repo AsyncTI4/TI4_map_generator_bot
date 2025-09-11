@@ -1252,6 +1252,7 @@ public class Constants {
     public static final String FACTION_IMAGE_URL = "faction_image_url";
     public static final String SET_FACTION_ICON = "set_faction_icon";
     public static final String SET_FACTION_DISPLAY_NAME = "set_faction_display_name";
+    public static final String SET_BREAKTHROUGH = "set_breakthrough";
     public static final String SET_HOMESYSTEM_POS = "set_hs_position";
     public static final String FRANKEN_FACTION_NAME = "franken_faction_suffix";
     public static final String FORCE = "force";

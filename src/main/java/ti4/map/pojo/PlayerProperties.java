@@ -5,7 +5,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
 import javax.annotation.Nullable;
+
 import lombok.Data;
 
 @Data
@@ -75,7 +77,7 @@ public class PlayerProperties {
     // LANEFIR TECH "ATS Armaments"
     private int atsCount;
 
-    private String breakthroughID = null;
+    private String breakthroughID = "";
     private boolean breakthroughUnlocked = false;
     private boolean breakthroughExhausted = false;
     private boolean breakthroughActive = false;
