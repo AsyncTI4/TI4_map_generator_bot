@@ -80,6 +80,7 @@ public class Constants {
     public static final String COMMUNITY_MODE = "community_mode";
     public static final String ALLIANCE_MODE = "alliance_mode";
     public static final String FOW_MODE = "fow_mode";
+    public static final String AVERNUS = "avernus";
     public static final String FOW_OPTIONS = "fow_options";
     public static final String BASE_GAME_MODE = "base_game_mode";
     public static final String LIGHT_FOG_MODE = "light_fog_mode";

@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -12,6 +13,7 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperBreakthroughs;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -19,6 +21,7 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.model.BreakthroughModel;
 import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
@@ -76,6 +79,24 @@ public class ComponentActionHelper {
             Button tButton = Buttons.gray(finChecker + prefix + "doTotalWarPoint_", "Gain 1 Victory Point (Total War)");
             compButtons.add(tButton);
         }
+
+        BreakthroughModel bt = p1.getBreakthroughModel();
+        if (bt != null && bt.getText().contains("ACTION:")) {
+            if (p1.hasReadyBreakthrough(bt.getAlias())) {
+                boolean validAction = switch (bt.getAlias()) {
+                    case "arborecbt" -> game.getTileMap().values().stream()
+                        .filter(Tile.tileHasPlayersInfAndCC(p1))
+                        .count() > 0;
+                    default -> true;
+                };
+                if (validAction) {
+                    TI4Emoji btEmoji = bt.getFactionEmoji();
+                    Button btButton = Buttons.red(finChecker + prefix + "exhaustBT_" + bt.getAlias(), "Exhaust " + bt.getName(), btEmoji);
+                    compButtons.add(btButton);
+                }
+            }
+        }
+
 
         // Leaders
         for (Leader leader : p1.getLeaders()) {
@@ -717,6 +738,18 @@ public class ComponentActionHelper {
                         p1.getRepresentationUnfogged()
                                 + ", please choose which player owns the soon-to-be nuked planet.",
                         buttons);
+            }
+            case "exhaustBT" -> {
+                BreakthroughModel btModel = Mapper.getBreakthrough(buttonID);
+                p1.setBreakthroughExhausted(true);
+                String message = p1.getRepresentation() + " exhausted " + btModel.getName();
+                MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, btModel.getRepresentationEmbed());
+                boolean implemented = TeHelperBreakthroughs.handleBreakthroughExhaust(event, game, p1, buttonID);
+
+                if (!implemented) {
+                    String unimplemented = "IDK how to do this yet. " + Constants.jazzPing() + " please implement this bt";
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), unimplemented);
+                }
             }
             case "doTotalWarPoint" -> {
                 ButtonHelperActionCards.decrease10CommsinHS(p1, game);
