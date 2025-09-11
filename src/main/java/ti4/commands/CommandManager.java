@@ -4,10 +4,12 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.agenda.AgendaCommand;
 import ti4.commands.async.AsyncCommand;
 import ti4.commands.bothelper.BothelperCommand;
+import ti4.commands.breakthrough.BreakthroughCommand;
 import ti4.commands.button.GenericButtonCommand;
 import ti4.commands.cardsac.ACCardsCommand;
 import ti4.commands.cardspn.PNCardsCommand;
@@ -112,6 +114,7 @@ public class CommandManager {
                     new DiscordantStarsCommand(),
                     new StatisticsCommand(),
                     new TechCommand(),
+                    new BreakthroughCommand(),
                     new PlanetCommand(),
                     new SelectionBoxDemoCommand(),
                     new UserCommand(),
