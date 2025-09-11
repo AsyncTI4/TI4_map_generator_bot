@@ -6,12 +6,14 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
 import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.json.PersistenceManager;
 import ti4.message.logging.BotLogger;
 
+@UtilityClass
 public class TourneyWinnersService {
 
     private static final String fileName = "tourneyWinners.json";
