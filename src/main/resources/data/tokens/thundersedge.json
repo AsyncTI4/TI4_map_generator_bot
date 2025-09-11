@@ -1,0 +1,21 @@
+[
+    {
+        "id": "avernus",
+        "imagePath": "token_avernus.png",
+        "aliasList": [
+            "avernus",
+            "token_avernus",
+            "stargate"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "id": "thundersedge",
+        "imagePath": "token_thundersedge.png",
+        "aliasList": [
+            "thundersedge",
+            "token_thundersedge"
+        ],
+        "source": "thunders_edge"
+    }
+]

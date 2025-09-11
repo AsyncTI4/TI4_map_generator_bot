@@ -3725,6 +3725,12 @@ public class ButtonHelper {
                         id, "Use " + prettyPlanet + " Ability" + pass, PlanetEmojis.getPlanetEmojiOrNull(planet)));
             }
         }
+        String expeditionText = game.getExpeditions().getTopLevelExpeditionButtonText();
+        boolean thundersEdgeOnBoard = game.getTileFromPlanet("thundersedge") != null;
+        if (expeditionText != null && !thundersEdgeOnBoard) {
+            endButtons.add(Buttons.gray(player.finChecker() + "expeditionInfoAndButtons", expeditionText));
+        }
+
 
         boolean hasStratCC =
                 player.getStrategicCC() > 0 || player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar");
