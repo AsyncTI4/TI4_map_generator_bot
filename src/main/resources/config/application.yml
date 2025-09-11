@@ -16,7 +16,7 @@ spring:
     url: "jdbc:sqlite:${DB_PATH:./}/tibot.db"
     driver-class-name: org.sqlite.JDBC
     hikari:
-      maximum-pool-size: 2
+      maximum-pool-size: 10
       connection-init-sql: |
         PRAGMA busy_timeout=5000;
         PRAGMA synchronous=NORMAL;

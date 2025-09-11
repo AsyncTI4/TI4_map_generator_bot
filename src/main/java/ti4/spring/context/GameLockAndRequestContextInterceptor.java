@@ -1,5 +1,6 @@
 package ti4.spring.context;
 
+import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -30,12 +31,13 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         return true;
     }
 
-    private String getGameNameFromUri(HttpServletRequest request) {
-        @SuppressWarnings("unchecked")
-        Map<String, String> uriTemplateVars =
-                (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-
-        return uriTemplateVars.get("gameName");
+    private String getGameNameFromUri(ServletRequest request) {
+        Object attributes = request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        if (!(attributes instanceof Map<?, ?> vars)) {
+            return null;
+        }
+        Object gameNameObject = vars.get("gameName");
+        return (gameNameObject instanceof String gameName) ? gameName : null;
     }
 
     private void setupGameRequestContext(String gameName, HttpServletRequest request, Object handler) {
