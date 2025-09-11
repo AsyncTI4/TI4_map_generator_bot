@@ -1252,6 +1252,11 @@ public class ActionCardHelper {
                             player.getFinsFactionCheckerPrefix() + "resolveInsiderInformation", buttonLabel));
                     MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
                 }
+                if ("smuggler_routes".equals(automationID)) {
+                    codedButtons.add(Buttons.green(
+                            player.getFinsFactionCheckerPrefix() + "moveShipToAdjacentSystemStep1", buttonLabel));
+                    MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+                }
                 if ("assassin".equals(automationID)) {
                     codedButtons.add(
                             Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveAssRepsStep1", buttonLabel));

@@ -17,6 +17,7 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
+import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.CombatTempModHelper;
@@ -302,6 +303,13 @@ public class PlayerTechService {
                         + ", please choose who you wish to target with _Mageon Implants_.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
+            }
+            case "dslaneb" -> {
+                deleteIfButtonEvent(event);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "Purging a frag or spending a CC (and exhausting tech) is not automated at this time");
+                ButtonHelperAgents.moveShipToAdjacentSystemStep1(game, player, null);
             }
             case "nekroc4r" -> {
                 List<Button> buttons = ButtonHelperFactionSpecific.getc4RedTechButtons(player);

@@ -150,6 +150,14 @@ public class ComponentActionHelper {
                                     factionEmoji);
                             compButtons.add(lButton);
                         }
+                        led = "conclaveagent";
+                        if (p1.hasExternalAccessToLeader(led)) {
+                            Button lButton = Buttons.gray(
+                                    finChecker + prefix + "leader_" + led,
+                                    "Use " + leaderName + " as Conclave Agent",
+                                    factionEmoji);
+                            compButtons.add(lButton);
+                        }
                         led = "yssarilagent";
                         Button lButton = Buttons.gray(
                                 finChecker + prefix + "leader_" + led,
@@ -389,6 +397,7 @@ public class ComponentActionHelper {
                             "naaluagent",
                             "muaatagent",
                             "xxchaagent",
+                            "conclaveagent",
                             "axisagent",
                             "bentoragent",
                             "kolumeagent",

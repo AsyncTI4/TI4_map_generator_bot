@@ -1974,6 +1974,10 @@ public class ButtonHelperAbilities {
             if (player.hasAbility("divination")) {
                 rollOmenDiceAtStartOfStrat(game, player);
             }
+            if (player.hasUnit("tyris_flagship")
+                    && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", false) > 0) {
+                game.setStoredValue("phantomEnergy", game.getStoredValue("phantomEnergy") + "fs");
+            }
             if (player.hasAbility("protocols")) {
                 List<Button> buttons = getAvailableProtocols(player);
                 String sb = player.getRepresentationUnfogged() + ", your **Protocols** ability was triggered."
