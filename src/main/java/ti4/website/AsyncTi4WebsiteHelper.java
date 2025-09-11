@@ -95,10 +95,8 @@ public class AsyncTi4WebsiteHelper {
 
         try {
             List<WebPlayerArea> playerDataList = new ArrayList<>();
-            for (Player player : game.getPlayers().values()) {
-                if (!player.isDummy()) {
-                    playerDataList.add(WebPlayerArea.fromPlayer(player, game));
-                }
+            for (Player player : game.getRealPlayersNNeutral()) {
+                playerDataList.add(WebPlayerArea.fromPlayer(player, game));
             }
 
             WebTilePositions webTilePositions = WebTilePositions.fromGame(game);

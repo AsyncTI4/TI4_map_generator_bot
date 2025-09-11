@@ -48,6 +48,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper.TIGLRank;
+import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
@@ -385,14 +386,14 @@ public class Player extends PlayerProperties {
     }
 
     /**
-     * @param useComplete if false, will skip the RestAction.complete() steps, which may cause new Cards Info threads to be created despite
+     * @param useComplete if false, will skip the RestAction.complete() steps, which may cause new Cards Info threads to be created even if some already exist
      * @param createWithQueue if true, will return null, and will create a new CardsInfo thread (if required) using a RestAction.queue() instead of a .complete()
      * @return
      */
     @JsonIgnore
     @Nullable
     private ThreadChannel getCardsInfoThread(boolean useComplete, boolean createWithQueue) {
-        Game game = this.game;
+        ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
         TextChannel actionsChannel = game.getMainGameChannel();
         if (game.isFowMode() || game.isCommunityMode()) {
             actionsChannel = (TextChannel) getPrivateChannel();
@@ -408,7 +409,7 @@ public class Player extends PlayerProperties {
         if (actionsChannel == null) {
             BotLogger.warning(
                     new LogOrigin(this),
-                    "`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: "
+                    "`Player.getCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: "
                             + game.getName());
             return null;
         }
@@ -2203,6 +2204,11 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public boolean isRealPlayer() {
         return !(isDummy() || getFaction() == null || getColor() == null || "null".equals(getColor()));
+    }
+
+    @JsonIgnore
+    public boolean isSpectator() {
+        return !isRealPlayer() && !isDummy() && !isNpc();
     }
 
     @Override
