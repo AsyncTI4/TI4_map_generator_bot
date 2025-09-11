@@ -9,8 +9,5 @@ interface TournamentWinnerRepository extends JpaRepository<TournamentWinner, Lon
 
     boolean existsByUserId(String userId);
 
-    @Modifying
-    @Transactional
-    @Query("DELETE FROM TournamentWinner t WHERE t.userId = :userId AND t.tourneyName = :tourneyName")
     int deleteByUserIdAndTourneyName(String userId, String tourneyName);
 }
