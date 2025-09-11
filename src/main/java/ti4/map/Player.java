@@ -371,27 +371,13 @@ public class Player extends PlayerProperties {
         return false;
     }
 
-    @NotNull
-    @JsonIgnore
-    public ThreadChannel getCardsInfoThread() {
-        return getCardsInfoThread(true, false);
-    }
-
     /**
-     * Will create new Player Cards-Info threads (even if they exist but are archived) unless they exist and are open
-     */
-    public void createCardsInfoThreadChannelsIfRequired() {
-        getCardsInfoThread(false, true);
-    }
-
-    /**
-     * @param useComplete if false, will skip the RestAction.complete() steps, which may cause new Cards Info threads to be created even if some already exist
-     * @param createWithQueue if true, will return null, and will create a new CardsInfo thread (if required) using a RestAction.queue() instead of a .complete()
-     * @return
+     * Searches for the Player's CardsInfo ThreadChannel, or will create a new one if an existing ThreadChannel cannot be retrieved.
+     * @return ThreadChannel for the player's cards info
      */
     @JsonIgnore
     @Nullable
-    private ThreadChannel getCardsInfoThread(boolean useComplete, boolean createWithQueue) {
+    public ThreadChannel getCardsInfoThread() {
         // ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild()); bot didn't like this!
         TextChannel actionsChannel = game.getMainGameChannel();
         if (game.isFowMode() || game.isCommunityMode()) {
@@ -440,15 +426,12 @@ public class Player extends PlayerProperties {
                 }
 
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                if (useComplete) {
-                    hiddenThreadChannels = actionsChannel
-                            .retrieveArchivedPrivateThreadChannels()
-                            .complete();
-                    for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                        if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
-                            setCardsInfoThreadID(threadChannel_.getId());
-                            return threadChannel_;
-                        }
+                hiddenThreadChannels =
+                        actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                    if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
+                        setCardsInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
                     }
                 }
             }
@@ -475,16 +458,13 @@ public class Player extends PlayerProperties {
             }
 
             // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-            if (useComplete) {
-                if (hiddenThreadChannels.isEmpty())
-                    hiddenThreadChannels = actionsChannel
-                            .retrieveArchivedPrivateThreadChannels()
-                            .complete();
-                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                    if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
-                        setCardsInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
+            if (hiddenThreadChannels.isEmpty())
+                hiddenThreadChannels =
+                        actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+            for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
+                    setCardsInfoThreadID(threadChannel_.getId());
+                    return threadChannel_;
                 }
             }
         } catch (Exception e) {
@@ -497,9 +477,6 @@ public class Player extends PlayerProperties {
         // CREATE NEW THREAD
         // Make card info thread a public thread in community mode
         boolean isPrivateChannel = !game.isFowMode();
-        if (game.getName().contains("pbd100") || game.getName().contains("pbd500")) {
-            isPrivateChannel = true;
-        }
         ThreadChannelAction threadAction = actionsChannel
                 .createThreadChannel(threadName, isPrivateChannel)
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK);
@@ -507,21 +484,9 @@ public class Player extends PlayerProperties {
             threadAction = threadAction.setInvitable(false);
         }
         String message = "Hello " + getPing() + "! This is your private channel.";
-        if (createWithQueue) {
-            threadAction.queue(
-                    c -> {
-                        setCardsInfoThreadID(c.getId());
-                        MessageHelper.sendMessageToChannel(c, message);
-                    },
-                    BotLogger::catchRestError);
-            return null;
-        }
-        ThreadChannel threadChannel = null;
-        if (useComplete) {
-            threadChannel = threadAction.complete();
-            setCardsInfoThreadID(threadChannel.getId());
-            MessageHelper.sendMessageToChannel(threadChannel, message);
-        }
+        ThreadChannel threadChannel = threadAction.complete();
+        setCardsInfoThreadID(threadChannel.getId());
+        MessageHelper.sendMessageToChannel(threadChannel, message);
         return threadChannel;
     }
 
