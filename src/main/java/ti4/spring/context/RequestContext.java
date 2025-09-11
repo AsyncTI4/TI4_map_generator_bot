@@ -31,7 +31,7 @@ public class RequestContext {
     }
 
     static boolean shouldSaveGame() {
-        return saveGame.get();
+        return getGame() != null && saveGame.get();
     }
 
     static void setSaveGame(boolean saveGame) {
