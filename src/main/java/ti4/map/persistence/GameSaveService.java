@@ -46,6 +46,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
 import ti4.json.ObjectMapperFactory;
+import ti4.map.Expeditions;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -191,6 +192,35 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.CURRENT_ACDRAWSTATUS_INFO + " " + game.getCurrentACDrawStatusInfo());
         writer.write(System.lineSeparator());
+
+        // TE Expeditions
+        Expeditions exp = game.getExpeditions();
+        if (exp.getTechSkip() != null) {
+            writer.write(Constants.EXPEDITION_TECHSKIP + " " + exp.getTechSkip());
+            writer.write(System.lineSeparator());
+        }
+        if (exp.getTradeGoods() != null) {
+            writer.write(Constants.EXPEDITION_TRADEGOODS + " " + exp.getTradeGoods());
+            writer.write(System.lineSeparator());
+        }
+        if (exp.getFiveRes() != null) {
+            writer.write(Constants.EXPEDITION_FIVERES + " " + exp.getFiveRes());
+            writer.write(System.lineSeparator());
+        }
+        if (exp.getFiveInf() != null) {
+            writer.write(Constants.EXPEDITION_FIVEINF + " " + exp.getFiveInf());
+            writer.write(System.lineSeparator());
+        }
+        if (exp.getSecret() != null) {
+            writer.write(Constants.EXPEDITION_SECRET + " " + exp.getSecret());
+            writer.write(System.lineSeparator());
+        }
+        if (exp.getActionCards() != null) {
+            writer.write(Constants.EXPEDITION_ACTIONCARDS + " " + exp.getActionCards());
+            writer.write(System.lineSeparator());
+        }
+
+
 
         writer.write(Constants.LAST_ACTIVE_PLAYER_CHANGE + " "
                 + game.getLastActivePlayerChange().getTime());

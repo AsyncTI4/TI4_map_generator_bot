@@ -98,6 +98,7 @@ public class Constants {
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
     public static final String UNCHARTED_SPACE_STUFF = "uncharted_space_stuff";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
+    public static final String THUNDERSEDGE = "thundersedge";
     public static final String PLAYER_PRIVATE_CHANNEL = "playerPrivateChannel";
     public static final String CHANNEL_FOR_COMMUNITY = "channelForCommunity";
     public static final String NOTEPAD = "notepad";
@@ -485,6 +486,13 @@ public class Constants {
     public static final String DISPLACED_UNITS_ACTIVATION = "displaced_units_activation";
     public static final String DISPLACED_UNITS_ACTIVATION_NEW = "displaced_units_activation_new";
     public static final String AC_ID = "ac_id";
+
+    public static final String EXPEDITION_TECHSKIP = "expedition_skip";
+    public static final String EXPEDITION_TRADEGOODS = "expedition_tgs";
+    public static final String EXPEDITION_FIVERES = "expedition_5r";
+    public static final String EXPEDITION_FIVEINF = "expedition_5i";
+    public static final String EXPEDITION_SECRET = "expedition_so";
+    public static final String EXPEDITION_ACTIONCARDS = "expedition_acs";
 
     public static final String INACTIVE_LEADER = "hero_unplay";
     public static final String ACTIVE_LEADER = "hero_play";
