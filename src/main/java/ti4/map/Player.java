@@ -392,7 +392,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     @Nullable
     private ThreadChannel getCardsInfoThread(boolean useComplete, boolean createWithQueue) {
-        Game game = this.game;
+        ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
         TextChannel actionsChannel = game.getMainGameChannel();
         if (game.isFowMode() || game.isCommunityMode()) {
             actionsChannel = (TextChannel) getPrivateChannel();
