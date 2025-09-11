@@ -2205,6 +2205,11 @@ public class Player extends PlayerProperties {
         return !(isDummy() || getFaction() == null || getColor() == null || "null".equals(getColor()));
     }
 
+    @JsonIgnore
+    public boolean isSpectator() {
+        return !isRealPlayer() && !isDummy() && !isNpc();
+    }
+
     @Override
     public String getFogFilter() {
         return super.getFogFilter() == null ? "default" : super.getFogFilter();
