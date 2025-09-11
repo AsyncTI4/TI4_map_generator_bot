@@ -12,8 +12,8 @@ public class TourneyWinnerService {
 
     private TournamentWinnerRepository tournamentWinnerRepository;
 
-    public void exists(String userId) {
-        tournamentWinnerRepository.existsById(userId);
+    public boolean exists(String userId) {
+        return tournamentWinnerRepository.existsById(userId);
     }
 
     public void add(String userId, String userName, String tourneyName) {
