@@ -3,6 +3,7 @@ package ti4.commands.franken;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
 import ti4.commands.franken.Ban.Ban;
@@ -31,6 +32,7 @@ public class FrankenCommand implements ParentCommand {
                     new Ban(),
                     new DraftLimits(),
                     new BanFaction(),
+                    new SetBreakthrough(),
                     new ApplyDraftBags(),
                     new SetHomeSystemPosition())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));

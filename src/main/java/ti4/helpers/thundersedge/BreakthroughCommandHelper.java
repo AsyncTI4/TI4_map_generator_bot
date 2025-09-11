@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.commands.CommandHelper;
+import ti4.helpers.BreakthroughHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -64,6 +66,9 @@ public class BreakthroughCommandHelper {
             String message = player.getRepresentation() + " unlocked their breakthrough " + bt.getName() + ".";
             List<MessageEmbed> embeds = Collections.singletonList(bt.getRepresentationEmbed());
             MessageHelper.sendMessageToChannelWithEmbeds(player.getCorrectChannel(), message, embeds);
+            if("yinbt".equalsIgnoreCase(bt.getID())){
+                BreakthroughHelper.resolveYinBreakthroughAbility(player.getGame(), player);
+            }
         });
     }
 

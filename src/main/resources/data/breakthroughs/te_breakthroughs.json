@@ -56,5 +56,16 @@
         ],
         "text": "When you gain this card or score a public objective, gain the alliance ability of a random, unused faction.",
         "source": "thunders_edge"
+    },
+    {
+        "alias": "ghostbt",
+        "name": "Unknown",
+        "faction": "ghost",
+        "synergy": [
+            "PROPULSION",
+            "CYBERNETIC"
+        ],
+        "text": "[Note: Exact text unknown. Best guess is after this] Each system that contains a wormhole and one of your units gains PRODUCTION 1 as if it were 1 of your units.",
+        "source": "thunders_edge"
     }
 ]
