@@ -48,7 +48,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper.TIGLRank;
-import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
@@ -393,7 +392,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     @Nullable
     private ThreadChannel getCardsInfoThread(boolean useComplete, boolean createWithQueue) {
-        ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
+        // ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild()); bot didn't like this!
         TextChannel actionsChannel = game.getMainGameChannel();
         if (game.isFowMode() || game.isCommunityMode()) {
             actionsChannel = (TextChannel) getPrivateChannel();
