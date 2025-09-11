@@ -42,13 +42,13 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         boolean shouldSaveGame = MUTATION_METHODS.contains(request.getMethod());
         if (handler instanceof HandlerMethod handlerMethod) {
             SetupRequestContext annotation = handlerMethod.getMethodAnnotation(SetupRequestContext.class);
-            if (annotation == null) {
-                annotation = handlerMethod.getBeanType().getAnnotation(SetupRequestContext.class);
+            if (annotation != null) {
+                if (!annotation.value()) {
+                    return;
+                }
+                // Only save if both the method is a mutation and the annotation allows saving.
+                shouldSaveGame &= annotation.save();
             }
-            boolean shouldSetupContext = annotation.value();
-            if (!shouldSetupContext) return;
-
-            shouldSaveGame = annotation.save();
         }
 
         var game = GameManager.getManagedGame(gameName).getGame();
