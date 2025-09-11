@@ -2402,7 +2402,7 @@ public class Helper {
 
             String msg = player.getRepresentationUnfogged() + " is over the command token limit of " + limit
                     + ". Command tokens used: " + ccCount;
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## " + msg);
             GMService.logPlayerActivity(game, player, msg);
         }
     }
@@ -3076,7 +3076,7 @@ public class Helper {
         } else {
             return tc.createInvite()
                     .setMaxUses(uses)
-                    .setMaxAge((long) (forever ? 0 : 4), TimeUnit.DAYS)
+                    .setMaxAge((long) (forever ? 0 : 7), TimeUnit.DAYS)
                     .complete()
                     .getUrl();
         }

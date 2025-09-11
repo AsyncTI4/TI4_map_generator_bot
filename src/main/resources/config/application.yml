@@ -4,17 +4,34 @@
 
 server:
   port: 8081
+  error:
+    include-message: always
+    include-binding-errors: never
+    include-stacktrace: never
 
 management:
   endpoints:
     web:
       exposure:
         include: prometheus
-  endpoint:
-    prometheus:
-      enabled: true
-  metrics:
-    enabled: true
-    export:
-      prometheus:
-        enabled: true
+
+spring:
+  datasource:
+    url: "jdbc:sqlite:${DB_PATH:./}/tibot.db"
+    driver-class-name: org.sqlite.JDBC
+    hikari:
+      maximum-pool-size: 10
+      connection-init-sql: |
+        PRAGMA busy_timeout=5000;
+        PRAGMA synchronous=NORMAL;
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.jdbc.time_zone: UTC
+    open-in-view: false
+  data:
+    jdbc:
+      repositories:
+        enabled: false

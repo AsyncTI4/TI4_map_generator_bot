@@ -95,10 +95,8 @@ public class AsyncTi4WebsiteHelper {
 
         try {
             List<WebPlayerArea> playerDataList = new ArrayList<>();
-            for (Player player : game.getPlayers().values()) {
-                if (!player.isDummy()) {
-                    playerDataList.add(WebPlayerArea.fromPlayer(player, game));
-                }
+            for (Player player : game.getRealPlayersNNeutral()) {
+                playerDataList.add(WebPlayerArea.fromPlayer(player, game));
             }
 
             WebTilePositions webTilePositions = WebTilePositions.fromGame(game);
@@ -137,6 +135,8 @@ public class AsyncTi4WebsiteHelper {
             webData.put("gameRound", game.getRound());
             webData.put("gameName", game.getName());
             webData.put("gameCustomName", game.getCustomName());
+            webData.put("tableTalkJumpLink", game.getTabletalkJumpLink());
+            webData.put("actionsJumpLink", game.getActionsJumpLink());
 
             String json = EgressClientManager.getObjectMapper().writeValueAsString(webData);
 
@@ -147,13 +147,16 @@ public class AsyncTi4WebsiteHelper {
                     "no-cache, no-store, must-revalidate",
                     null);
 
-            // Notify any subscribed clients for this game to refresh
-            try {
-                SpringContext.getBean(WebSocketNotifier.class).notifyGameRefresh(gameId);
-            } catch (Exception ignored) {
-            }
+            notifyGameRefreshWebsocket(gameId);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Could not put data to web server", e);
+        }
+    }
+
+    private static void notifyGameRefreshWebsocket(String gameId) {
+        try {
+            SpringContext.getBean(WebSocketNotifier.class).notifyGameRefresh(gameId);
+        } catch (Exception ignored) {
         }
     }
 
@@ -284,7 +287,11 @@ public class AsyncTi4WebsiteHelper {
             String fileName = dtstamp + "." + fileFormat;
 
             putObjectInBucket(
-                    key, AsyncRequestBody.fromBytes(imageBytes), "image/" + fileFormat, null, StorageClass.ONEZONE_IA);
+                    key,
+                    AsyncRequestBody.fromBytes(imageBytes),
+                    "image/" + fileFormat,
+                    null,
+                    StorageClass.INTELLIGENT_TIERING);
 
             return fileName;
         } catch (Exception e) {

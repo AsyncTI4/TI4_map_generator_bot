@@ -11,6 +11,7 @@ public class RequestContext {
 
     // TODO: Debate combining this with the Command/Button processing context
     private static final ThreadLocal<Game> game = new ThreadLocal<>();
+    private static final ThreadLocal<Boolean> saveGame = ThreadLocal.withInitial(() -> true);
 
     @NotNull
     public static String getUserId() {
@@ -29,7 +30,16 @@ public class RequestContext {
         return getGame().getPlayer(getUserId());
     }
 
+    static boolean shouldSaveGame() {
+        return getGame() != null && saveGame.get();
+    }
+
+    static void setSaveGame(boolean saveGame) {
+        RequestContext.saveGame.set(saveGame);
+    }
+
     static void clearContext() {
         game.remove();
+        saveGame.remove();
     }
 }

@@ -231,7 +231,7 @@ public class FOWPlusService {
 
     // If the target position is void or hyperlane that does not connect to tile we are checking from
     public static boolean shouldTraverseAdjacency(Game game, String position, int dirFrom) {
-        if (!isActive(game)) return true;
+        if (!isActive(game) && !game.getFowOption(FOWOption.HIDE_MAP)) return true;
 
         if (isVoid(game, position)) {
             return false;
