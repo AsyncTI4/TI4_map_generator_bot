@@ -127,7 +127,7 @@ class PlayerAreaGenerator {
         }
 
         String spectatorNames = game.getPlayers().values().stream()
-                .filter(p -> !p.isRealPlayer() && !p.isDummy() && !p.isNpc())
+                .filter(Player::isSpectator)
                 .map(Player::getUserName)
                 .collect(Collectors.joining(", "));
 

@@ -31,7 +31,7 @@ public class ThreadArchiveHelper {
                         Integer.class,
                         DEFAULT_MAX_THREAD_COUNT);
 
-                if (threadCount > maxThreadCount) {
+                if (threadCount >= maxThreadCount) {
                     BotLogger.info("**" + guild.getName() + "** Max Threads Reached (" + threadCount + " out of  "
                             + maxThreadCount + ") - Archiving " + closeCount + " threads");
                     archiveOldThreads(guild, closeCount);
