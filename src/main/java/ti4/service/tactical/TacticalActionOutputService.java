@@ -272,6 +272,11 @@ public class TacticalActionOutputService {
 
         // Calculate bonus move value
         int bonusMoveValue = 0;
+         if (player.hasUnlockedBreakthrough("letnevbt") && allMovingUnits != null && !allMovingUnits.isEmpty()) {
+            int maxBase = allMovingUnits.stream().map(key -> getUnitMoveValue(game, player, tile, key, null, true)).max(Integer::compare).orElse(baseMoveValue);
+            bonusMoveValue = maxBase - baseMoveValue;
+        }
+
         if (player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
             bonusMoveValue++;
         }

@@ -14,6 +14,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
+import ti4.service.breakthrough.StellarGenesisService;
 
 public class BreakthroughCommandHelper {
 
@@ -69,6 +70,9 @@ public class BreakthroughCommandHelper {
             if("yinbt".equalsIgnoreCase(bt.getID())){
                 BreakthroughHelper.resolveYinBreakthroughAbility(player.getGame(), player);
             }
+            if (bt.getAlias().equals("muaatbt"))
+                StellarGenesisService.serveAvernusButtons(game, player);
+
         });
     }
 
