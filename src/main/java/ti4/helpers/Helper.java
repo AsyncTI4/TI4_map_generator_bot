@@ -1646,10 +1646,13 @@ public class Helper {
             if (tile.isSupernova() && player.hasTech("mr") && FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 productionValueTotal += 5;
             }
+            if (player.hasUnlockedBreakthrough("ghostbt")
+                && !tile.getWormholes().isEmpty()
+                && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+                productionValueTotal += 1;
+            }
         }
-        if(player.hasUnlockedBreakthrough("ghostbt") && !tile.getWormholes().isEmpty()&& FoWHelper.playerHasUnitsInSystem(player, tile) ){
-            productionValueTotal += 1;
-        }
+        
         if (!player.getPlanets().contains(uH.getName())) {
             return productionValueTotal;
         }

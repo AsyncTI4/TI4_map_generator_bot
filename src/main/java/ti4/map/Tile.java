@@ -1,5 +1,7 @@
 package ti4.map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,16 +14,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
-
 import javax.annotation.Nullable;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CalendarHelper;
@@ -104,7 +100,6 @@ public class Tile {
         };
     }
 
-
     public void inheritFogData(Tile t) {
         fog.putAll(t.getFog());
         fogLabel.putAll(t.getFogLabel());
@@ -127,9 +122,9 @@ public class Tile {
 
     public static Predicate<Tile> tileHasPlayersInfAndCC(Player player) {
         Predicate<UnitKey> isInf = unit -> unit.getUnitType() == UnitType.Infantry;
-        return tile -> tile.containsPlayersUnitsWithKeyCondition(player, isInf) && CommandCounterHelper.hasCC(null, player.getColor(), tile);
+        return tile -> tile.containsPlayersUnitsWithKeyCondition(player, isInf)
+                && CommandCounterHelper.hasCC(null, player.getColor(), tile);
     }
-
 
     public boolean isSpaceHolderValid(String spaceHolder) {
         return unitHolders.get(spaceHolder) != null;

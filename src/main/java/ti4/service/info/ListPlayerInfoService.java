@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.helpers.ButtonHelper;
@@ -520,7 +519,6 @@ public class ListPlayerInfoService {
                 int synergyTotal = 0;
                 for (TechnologyType type : synergies)
                     synergyTotal += ButtonHelper.getNumberOfCertainTypeOfTech(player, type);
-
 
                 int numAbove1 = 0;
                 for (TechnologyType type : TechnologyType.mainFour) {

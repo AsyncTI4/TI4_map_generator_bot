@@ -7,7 +7,6 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -29,15 +28,18 @@ public class StellarGenesisService {
 
     public static void serveAvernusButtons(Game game, Player player) {
         List<Tile> playerPlanetTiles = player.getPlanets().stream()
-            .map(game::getTileFromPlanet)
-            .filter(Objects::nonNull).toList();
+                .map(game::getTileFromPlanet)
+                .filter(Objects::nonNull)
+                .toList();
         Set<Tile> adjToPlanetTiles = playerPlanetTiles.stream()
-            .flatMap(t -> FoWHelper.getAdjacentTiles(game, t.getPosition(), player, false).stream().map(game::getTileByPosition))
-            .collect(Collectors.toSet());
+                .flatMap(t -> FoWHelper.getAdjacentTiles(game, t.getPosition(), player, false).stream()
+                        .map(game::getTileByPosition))
+                .collect(Collectors.toSet());
 
         Predicate<Tile> nonHome = tile -> !tile.isHomeSystem(game);
         Predicate<Tile> nonHomeAndAdj = nonHome.and(tile -> adjToPlanetTiles.contains(tile));
-        List<Button> avernusLocations = ButtonHelper.getTilesWithPredicateForAction(player, game, "placeAvernus", nonHomeAndAdj, false);
+        List<Button> avernusLocations =
+                ButtonHelper.getTilesWithPredicateForAction(player, game, "placeAvernus", nonHomeAndAdj, false);
         String message = "Choose a tile to place Avernus:";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, avernusLocations);
     }
@@ -54,7 +56,8 @@ public class StellarGenesisService {
 
             AddPlanetService.addPlanet(player, Constants.AVERNUS, game, event, false);
             player.getExhaustedPlanets().remove(Constants.AVERNUS);
-            String message = player.getRepresentation() + " placed Avernus in " + tile.getRepresentationForButtons(game, player) + ".";
+            String message = player.getRepresentation() + " placed Avernus in "
+                    + tile.getRepresentationForButtons(game, player) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.deleteMessage(event);
         }

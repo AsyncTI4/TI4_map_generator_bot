@@ -13,11 +13,7 @@ import ti4.message.MessageHelper;
 class SetBreakthrough extends GameStateSubcommand {
 
     public SetBreakthrough() {
-        super(
-                Constants.SET_BREAKTHROUGH,
-                "Set the breakthrough you are using",
-                true,
-                true);
+        super(Constants.SET_BREAKTHROUGH, "Set the breakthrough you are using", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction Who's Breakthrough it is")
                 .setRequired(true)
                 .setAutoComplete(true));
@@ -29,9 +25,11 @@ class SetBreakthrough extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
-        String breakthrough = event.getOption(Constants.FACTION, null, OptionMapping::getAsString) +"bt";
+        String breakthrough = event.getOption(Constants.FACTION, null, OptionMapping::getAsString) + "bt";
         player.setBreakthroughID(breakthrough);
         MessageHelper.sendMessageToEventChannel(
-                event, player.getFactionEmojiOrColor() + " breakthrough set to: `" + Mapper.getBreakthrough(breakthrough).getName() + "`");
+                event,
+                player.getFactionEmojiOrColor() + " breakthrough set to: `"
+                        + Mapper.getBreakthrough(breakthrough).getName() + "`");
     }
 }

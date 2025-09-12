@@ -220,8 +220,6 @@ class GameSaveService {
             writer.write(System.lineSeparator());
         }
 
-
-
         writer.write(Constants.LAST_ACTIVE_PLAYER_CHANGE + " "
                 + game.getLastActivePlayerChange().getTime());
         writer.write(System.lineSeparator());

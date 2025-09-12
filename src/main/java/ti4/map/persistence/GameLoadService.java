@@ -2,6 +2,9 @@ package ti4.map.persistence;
 
 import static ti4.map.persistence.GamePersistenceKeys.*;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -24,18 +27,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import javax.annotation.Nullable;
-
-import org.jetbrains.annotations.NotNull;
-
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;

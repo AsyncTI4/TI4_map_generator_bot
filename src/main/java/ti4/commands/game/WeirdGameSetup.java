@@ -1,7 +1,6 @@
 package ti4.commands.game;
 
 import java.util.ArrayList;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -60,9 +59,11 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(
                 new OptionData(OptionType.STRING, Constants.PRIORITY_TRACK, "Enable the Priority Track for this game")
                         .setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.THUNDERS_EDGE_MODE, "True to enable the work in progress Thunders Edge Mode")
-                        .setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.THUNDERS_EDGE_MODE,
+                        "True to enable the work in progress Thunders Edge Mode")
+                .setAutoComplete(true));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 FOWOption.FOW_PLUS.toString(),

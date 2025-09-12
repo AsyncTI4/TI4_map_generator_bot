@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.agenda.AgendaCommand;
 import ti4.commands.async.AsyncCommand;

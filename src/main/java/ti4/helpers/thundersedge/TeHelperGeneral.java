@@ -4,33 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
-import ti4.helpers.RelicHelper;
-import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Expeditions;
 import ti4.map.Game;
-import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
-import ti4.model.StrategyCardModel;
-import ti4.model.TechnologyModel;
-import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
 
 public class TeHelperGeneral {
-
-
 
     @ButtonHandler("expeditionInfo")
     private static void expeditionInfo(ButtonInteractionEvent event, Game game, Player player) {
@@ -46,7 +35,8 @@ public class TeHelperGeneral {
     }
 
     @ButtonHandler("placeThundersEdge")
-    public static void resolvePlaceThundersEdge(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void resolvePlaceThundersEdge(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Expeditions exp = game.getExpeditions();
         String part1 = "placeThundersEdge";
         String part2 = part1 + "_" + RegexHelper.posRegex(game);
@@ -56,9 +46,13 @@ public class TeHelperGeneral {
         String newMessage = null;
         List<Button> newButtons = new ArrayList<>();
         if ((matcher = Pattern.compile(part1).matcher(buttonID)).matches()) {
-            List<Tile> tiles = game.getTileMap().values().stream().filter(Tile.tileMayHaveThundersEdge()).toList();
-            tiles.stream().map(t -> Buttons.green("placeThundersEdge_" + t.getPosition(), t.getRepresentationForButtons(game, player)))
-                .forEach(newButtons::add);
+            List<Tile> tiles = game.getTileMap().values().stream()
+                    .filter(Tile.tileMayHaveThundersEdge())
+                    .toList();
+            tiles.stream()
+                    .map(t -> Buttons.green(
+                            "placeThundersEdge_" + t.getPosition(), t.getRepresentationForButtons(game, player)))
+                    .forEach(newButtons::add);
             newMessage = player.getRepresentation() + " You can place Thunder's Edge on any of the following tiles:";
 
         } else if ((matcher = Pattern.compile(part2).matcher(buttonID)).matches()) {
@@ -66,8 +60,10 @@ public class TeHelperGeneral {
             Tile tile = game.getTileByPosition(pos);
             String prefix = player.getFinsFactionCheckerPrefix() + "placeThundersEdge_" + pos + "_";
 
-            newMessage = player.getRepresentation() + " You are placing place Thunder's Edge on " + tile.getRepresentationForButtons(game, player);
-            newMessage += "\nYou must select one of the players with the most completed expeditions to place infantry on Thunder's Edge:";
+            newMessage = player.getRepresentation() + " You are placing place Thunder's Edge on "
+                    + tile.getRepresentationForButtons(game, player);
+            newMessage +=
+                    "\nYou must select one of the players with the most completed expeditions to place infantry on Thunder's Edge:";
             exp.getFactionsWithMostComplete().forEach(faction -> {
                 Player p2 = game.getPlayerFromColorOrFaction(faction);
                 if (p2 != null) newButtons.add(Buttons.blue(prefix + faction, p2.getFactionEmoji()));
@@ -86,15 +82,18 @@ public class TeHelperGeneral {
                 int most = exp.getMostCompleteByAny();
                 AddUnitService.addUnits(event, tile, game, p2.getColor(), most + " inf t");
                 ButtonHelper.deleteMessage(event);
-                String message = "Placed Thunder's Edge in " + tile.getRepresentationForButtons(game, player) + " and added " + most + " " + p2.getRepresentation() + " infantry.";
+                String message = "Placed Thunder's Edge in " + tile.getRepresentationForButtons(game, player)
+                        + " and added " + most + " " + p2.getRepresentation() + " infantry.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             }
         }
 
         if (newMessage != null) {
             // edit the message with the new partX buttons
-            event.getMessage().editMessage(newMessage).setComponents(ButtonHelper.turnButtonListIntoActionRowList(newButtons)).queue();
+            event.getMessage()
+                    .editMessage(newMessage)
+                    .setComponents(ButtonHelper.turnButtonListIntoActionRowList(newButtons))
+                    .queue();
         }
     }
-
 }

@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -172,7 +171,8 @@ public class TacticalActionOutputService {
                             (uh instanceof Planet p) ? " from the planet " + p.getRepresentation(game) : "";
                     unitMoveStr += unitHolderStr;
 
-                    String distanceStr = validateMoveValue(game, player, tile, key, movingUnitsFromTile, distance, riftDistance);
+                    String distanceStr =
+                            validateMoveValue(game, player, tile, key, movingUnitsFromTile, distance, riftDistance);
                     unitMoveStr += distanceStr;
                     lines.add(unitMoveStr);
                 }
@@ -214,7 +214,13 @@ public class TacticalActionOutputService {
     }
 
     private String validateMoveValue(
-            Game game, Player player, Tile tile, UnitKey unit, Set<UnitKey> allMovingUnits, int distance, int riftDistance) {
+            Game game,
+            Player player,
+            Tile tile,
+            UnitKey unit,
+            Set<UnitKey> allMovingUnits,
+            int distance,
+            int riftDistance) {
         int moveValue = getUnitMoveValue(game, player, tile, unit, allMovingUnits, false);
         if (moveValue == 0) return "";
 
@@ -250,7 +256,8 @@ public class TacticalActionOutputService {
         return output;
     }
 
-    private int getUnitMoveValue(Game game, Player player, Tile tile, UnitKey unit,Set<UnitKey> allMovingUnits, boolean skipBonus) {
+    private int getUnitMoveValue(
+            Game game, Player player, Tile tile, UnitKey unit, Set<UnitKey> allMovingUnits, boolean skipBonus) {
         UnitModel model = player.getUnitFromUnitKey(unit);
         if (model == null) {
             return 0;
@@ -273,8 +280,11 @@ public class TacticalActionOutputService {
 
         // Calculate bonus move value
         int bonusMoveValue = 0;
-         if (player.hasUnlockedBreakthrough("letnevbt") && allMovingUnits != null && !allMovingUnits.isEmpty()) {
-            int maxBase = allMovingUnits.stream().map(key -> getUnitMoveValue(game, player, tile, key, null, true)).max(Integer::compare).orElse(baseMoveValue);
+        if (player.hasUnlockedBreakthrough("letnevbt") && allMovingUnits != null && !allMovingUnits.isEmpty()) {
+            int maxBase = allMovingUnits.stream()
+                    .map(key -> getUnitMoveValue(game, player, tile, key, null, true))
+                    .max(Integer::compare)
+                    .orElse(baseMoveValue);
             bonusMoveValue = maxBase - baseMoveValue;
         }
 
