@@ -488,6 +488,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.BASE_GAME_MODE + " " + game.isBaseGameMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.THUNDERS_EDGE_MODE + " " + game.isThundersEdge());
+        writer.write(System.lineSeparator());
         writer.write(Constants.LIGHT_FOG_MODE + " " + game.isLightFogMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.CPTI_EXPLORE_MODE + " " + game.isCptiExploreMode());

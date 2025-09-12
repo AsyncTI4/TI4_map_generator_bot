@@ -1,11 +1,13 @@
 package ti4.helpers.settingsFramework.menus;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
+
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -33,6 +35,7 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting ignis;
     private final BooleanSetting eronous;
     private final BooleanSetting actionCardDeck2;
+    private final BooleanSetting teDemo;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -49,6 +52,7 @@ public class SourceSettings extends SettingsMenu {
         pok = new BooleanSetting("PoK", "Prophecy of Kings", true);
         codexes = new BooleanSetting("Codexes", "Codex 1-4", true);
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
+        teDemo = new BooleanSetting("ThundersEdge", "Thunders Edge Demo", game.isThundersEdge());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
         absol = new BooleanSetting("Absol", "Absol Mod", game.isAbsolMode());
         ignis = new BooleanSetting(
@@ -103,6 +107,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(base);
         ls.add(pok);
         ls.add(codexes);
+        ls.add(teDemo);
         ls.add(discoStars);
         ls.add(unchartedSpace);
         ls.add(absol);
@@ -182,6 +187,14 @@ public class SourceSettings extends SettingsMenu {
                                 "This setting only controls factions. If you want technologies, relics, explores, etc, you need to also enable **__Uncharted Space__**.")
                         .setEphemeral(true)
                         .queue();
+            case "ThundersEdge" ->{
+                event.getHook()
+                        .sendMessage(
+                                "This is only a demo of TE. Only the 6 factions that have revealed breakthroughs will be draftable. No Fracture.")
+                        .setEphemeral(true)
+                        .queue();
+                game.setThundersEdge(true);
+            }
             case "Ignis" -> {
                 boolean ignis = this.ignis.isVal();
 

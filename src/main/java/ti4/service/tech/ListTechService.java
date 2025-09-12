@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -252,15 +253,33 @@ public class ListTechService {
             wilds++;
         }
 
+        // All sources of pre-requisites below can also apply via synergy.
+        // - Replace all synergies that the player has with a simple "X"
+        Set<TechnologyType> synergies = player.getSynergies();
+        for (TechnologyType synergy : synergies) {
+            requirements = switch (synergy) {
+                case PROPULSION -> requirements.replace("B", "X");
+                case BIOTIC -> requirements.replace("G", "X");
+                case CYBERNETIC -> requirements.replace("Y", "X");
+                case WARFARE -> requirements.replace("R", "X");
+                default -> requirements;
+            };
+        }
+
+
         for (String techID : player.getTechs()) {
             TechnologyModel playerTech = Mapper.getTech(techID);
             if (playerTech == null) continue;
             for (TechnologyType type : playerTech.getTypes()) {
+                if (synergies.contains(type)) {
+                    requirements = requirements.replaceFirst("X", "");
+                    continue;
+                }
                 switch (type) {
-                    case BIOTIC -> requirements = G.matcher(requirements).replaceFirst("");
-                    case WARFARE -> requirements = R.matcher(requirements).replaceFirst("");
-                    case PROPULSION -> requirements = B.matcher(requirements).replaceFirst("");
-                    case CYBERNETIC -> requirements = Y.matcher(requirements).replaceFirst("");
+                    case BIOTIC -> requirements = requirements.replaceFirst("G", "");
+                    case WARFARE -> requirements = requirements.replaceFirst("R", "");
+                    case PROPULSION -> requirements = requirements.replaceFirst("B", "");
+                    case CYBERNETIC -> requirements = requirements.replaceFirst("Y", "");
                     case UNITUPGRADE -> {
                         if (game.playerHasLeaderUnlockedOrAlliance(player, "kjalengardcommander")) {
                             wilds++;
@@ -270,6 +289,7 @@ public class ListTechService {
                 }
             }
         }
+
         if (ButtonHelper.isLawInPlay(game, "schematics")
                 && ("ws".equalsIgnoreCase(tech.getAlias())
                         || "ws".equalsIgnoreCase(tech.getBaseUpgrade().orElse("beh")))) {

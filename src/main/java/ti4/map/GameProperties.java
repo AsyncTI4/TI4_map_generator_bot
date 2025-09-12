@@ -2,6 +2,7 @@ package ti4.map;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 import ti4.helpers.Constants;
@@ -94,6 +95,7 @@ public class GameProperties {
 
     // Game modes / homebrew flags
     private @ExportableField boolean baseGameMode; // TODO: Make this obsolete
+    private @ExportableField boolean thundersEdge;
     private @ExportableField boolean prophecyOfKings = true;
     private @ExportableField boolean ageOfExplorationMode;
     private @ExportableField boolean facilitiesMode;

@@ -1,29 +1,7 @@
 package ti4.map.persistence;
 
-import static ti4.map.persistence.GamePersistenceKeys.ENDGAMEINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDMAPINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYER;
-import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYERINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDTILE;
-import static ti4.map.persistence.GamePersistenceKeys.ENDTOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.ENDUNITDAMAGE;
-import static ti4.map.persistence.GamePersistenceKeys.ENDUNITHOLDER;
-import static ti4.map.persistence.GamePersistenceKeys.ENDUNITS;
-import static ti4.map.persistence.GamePersistenceKeys.GAMEINFO;
-import static ti4.map.persistence.GamePersistenceKeys.MAPINFO;
-import static ti4.map.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.PLANET_TOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.PLAYER;
-import static ti4.map.persistence.GamePersistenceKeys.PLAYERINFO;
-import static ti4.map.persistence.GamePersistenceKeys.TILE;
-import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.UNITDAMAGE;
-import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
-import static ti4.map.persistence.GamePersistenceKeys.UNITS;
+import static ti4.map.persistence.GamePersistenceKeys.*;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -46,11 +24,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -328,6 +313,12 @@ class GameLoadService {
                 case Constants.PO2PEAKABLE -> game.setPublicObjectives2Peakable(getCardList(info));
                 case Constants.PO1PEEKED -> game.setPublicObjectives1Peeked(loadPeekedPublicObjectives(info));
                 case Constants.PO2PEEKED -> game.setPublicObjectives2Peeked(loadPeekedPublicObjectives(info));
+                case Constants.EXPEDITION_TECHSKIP -> game.getExpeditions().setTechSkip(info);
+                case Constants.EXPEDITION_TRADEGOODS -> game.getExpeditions().setTradeGoods(info);
+                case Constants.EXPEDITION_FIVERES -> game.getExpeditions().setFiveRes(info);
+                case Constants.EXPEDITION_FIVEINF -> game.getExpeditions().setFiveInf(info);
+                case Constants.EXPEDITION_SECRET -> game.getExpeditions().setSecret(info);
+                case Constants.EXPEDITION_ACTIONCARDS -> game.getExpeditions().setActionCards(info);
                 case Constants.SO_TO_PO -> game.setSoToPoList(getCardList(info));
                 case Constants.PURGED_PN -> game.setPurgedPNs(getCardList(info));
                 case Constants.REVEALED_PO -> game.setRevealedPublicObjectives(getParsedCards(info));
@@ -669,6 +660,7 @@ class GameLoadService {
                 case Constants.JUST_PLAYED_COMPONENT_AC ->
                     game.setJustPlayedComponentAC(loadBooleanOrDefault(info, false));
                 case Constants.BASE_GAME_MODE -> game.setBaseGameMode(loadBooleanOrDefault(info, false));
+                case Constants.THUNDERS_EDGE_MODE -> game.setThundersEdge(loadBooleanOrDefault(info, false));
                 case Constants.LIGHT_FOG_MODE -> game.setLightFogMode(loadBooleanOrDefault(info, false));
                 case Constants.CPTI_EXPLORE_MODE -> game.setCptiExploreMode(loadBooleanOrDefault(info, false));
                 case Constants.RED_TAPE_MODE -> game.setRedTapeMode(loadBooleanOrDefault(info, false));

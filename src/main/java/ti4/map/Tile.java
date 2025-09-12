@@ -94,6 +94,17 @@ public class Tile {
                     (planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
     }
 
+    public static Predicate<Tile> tileMayHaveThundersEdge() {
+        return tile -> {
+            if (tile.getTilePath().toLowerCase().contains("hyperlane")) return false;
+            if (tile.getPlanetUnitHolders().size() > 0) return false;
+            if (tile.isSupernova()) return false;
+            if (tile.getTileModel().hasWormhole()) return false;
+            return true;
+        };
+    }
+
+
     public void inheritFogData(Tile t) {
         fog.putAll(t.getFog());
         fogLabel.putAll(t.getFogLabel());
