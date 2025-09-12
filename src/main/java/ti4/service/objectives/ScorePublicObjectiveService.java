@@ -125,7 +125,7 @@ public class ScorePublicObjectiveService {
                     + player.getCCRepresentation() + ". Use buttons to gain 1 command token.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
-        if (player.hasAbility("yin_breakthrough")) {
+        if (player.hasAbility("yin_breakthrough") || player.hasUnlockedBreakthrough("yinbt")) {
             BreakthroughHelper.resolveYinBreakthroughAbility(game, player);
         }
         String idC = "";

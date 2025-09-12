@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CalendarHelper;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
@@ -89,6 +90,16 @@ public class Tile {
                     (planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
     }
 
+    public static Predicate<Tile> tileMayHaveThundersEdge() {
+        return tile -> {
+            if (tile.getTilePath().toLowerCase().contains("hyperlane")) return false;
+            if (tile.getPlanetUnitHolders().size() > 0) return false;
+            if (tile.isSupernova()) return false;
+            if (tile.getTileModel().hasWormhole()) return false;
+            return true;
+        };
+    }
+
     public void inheritFogData(Tile t) {
         fog.putAll(t.getFog());
         fogLabel.putAll(t.getFogLabel());
@@ -107,6 +118,12 @@ public class Tile {
     @Nullable
     public String getTokenPath(String tokenID) {
         return Mapper.getTokenPath(tokenID);
+    }
+
+    public static Predicate<Tile> tileHasPlayersInfAndCC(Player player) {
+        Predicate<UnitKey> isInf = unit -> unit.getUnitType() == UnitType.Infantry;
+        return tile -> tile.containsPlayersUnitsWithKeyCondition(player, isInf)
+                && CommandCounterHelper.hasCC(null, player.getColor(), tile);
     }
 
     public boolean isSpaceHolderValid(String spaceHolder) {

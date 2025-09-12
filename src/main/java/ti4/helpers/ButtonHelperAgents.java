@@ -841,7 +841,7 @@ public class ButtonHelperAgents {
             String faction = rest.replace("xxchaagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             message = p2.getRepresentationUnfogged()
-                    + ", please choose the planet you wish to ready. Removing the infantry from your own planets is not automated but is an option for you to do.";
+                    + ", please choose the planet you wish to ready. Removing the infantry from planets is not automatically done but is an option for you to do.";
             List<Button> buttons = new ArrayList<>();
             for (String planet : p2.getExhaustedPlanets()) {
                 buttons.add(Buttons.gray(
@@ -849,6 +849,24 @@ public class ButtonHelperAgents {
                         Helper.getPlanetRepresentation(planet, game)));
             }
             MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, buttons);
+        }
+        if ("conclaveagent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Conclave"
+                    + ssruuSlash + " agent.";
+            MessageHelper.sendMessageToChannel(channel, exhaustText);
+            String faction = rest.replace("conclaveagent_", "");
+            Player p2 = game.getPlayerFromColorOrFaction(faction);
+            String msg =
+                    p2.getRepresentationUnfogged() + ", please choose the system that you wish to move a ship from.";
+            List<Button> buttons = new ArrayList<>();
+            for (Tile tile : game.getTileMap().values()) {
+                if (FoWHelper.playerHasShipsInSystem(p2, tile)) {
+                    buttons.add(Buttons.green(
+                            "moveShipToAdjacentSystemStep2_" + tile.getPosition() + "_agent",
+                            tile.getRepresentationForButtons(game, p2)));
+                }
+            }
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons);
         }
 
         if ("redcreussagent".equalsIgnoreCase(agent)) {
@@ -2239,6 +2257,63 @@ public class ButtonHelperAgents {
                         "fogAllianceAgentStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
             }
         }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+    }
+
+    @ButtonHandler("moveShipToAdjacentSystemStep1")
+    public static void moveShipToAdjacentSystemStep1(Game game, Player player, ButtonInteractionEvent event) {
+        String msg =
+                player.getRepresentationUnfogged() + ", please choose the system that you wish to move a ship from.";
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (FoWHelper.playerHasShipsInSystem(player, tile)) {
+                buttons.add(Buttons.green(
+                        "moveShipToAdjacentSystemStep2_" + tile.getPosition(),
+                        tile.getRepresentationForButtons(game, player)));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+        if (event != null) {
+            ButtonHelper.deleteMessage(event);
+        }
+    }
+
+    @ButtonHandler("moveShipToAdjacentSystemStep2_")
+    public static void moveShipToAdjacentSystemStep2(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String msg = player.getRepresentationUnfogged()
+                + ", please choose the adjacent system you wish to move the ship to.";
+        List<Button> buttons = new ArrayList<>();
+        String ogTile = buttonID.split("_")[1];
+        for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, ogTile, player, false)) {
+            Tile tile = game.getTileByPosition(pos);
+
+            if ((tile.isAsteroidField()
+                            && !player.getTechs().contains("amd")
+                            && !player.getRelics().contains("circletofthevoid")
+                            && !player.hasAbility("celestial_being"))
+                    || (tile.isSupernova()
+                            && !player.getTechs().contains("mr")
+                            && !player.getRelics().contains("circletofthevoid")
+                            && !player.hasAbility("celestial_being"))
+                    || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                continue;
+            }
+            String og = ogTile;
+            if (buttonID.contains("agent") && game.getTileByPosition(ogTile).hasPlayerCC(player)) {
+                og += "_agent";
+            }
+
+            buttons.add(Buttons.green(
+                    "fogAllianceAgentStep3_" + tile.getPosition() + "_" + og,
+                    tile.getRepresentationForButtons(game, player)));
+        }
+        if (buttonID.contains("hero")) {
+            ButtonHelper.deleteTheOneButton(event);
+        } else {
+            ButtonHelper.deleteMessage(event);
+        }
+
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 

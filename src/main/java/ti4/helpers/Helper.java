@@ -109,6 +109,15 @@ public class Helper {
         return acs;
     }
 
+    public static Player getPlayerFromUnlockedBreakthrough(Game game, String breakthrough) {
+        if (breakthrough != null) {
+            for (Player p : game.getRealPlayers()) {
+                if (p.hasUnlockedBreakthrough(breakthrough)) return p;
+            }
+        }
+        return null;
+    }
+
     public static boolean isSaboAllowed(Game game, Player player) {
         if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
             return false;
@@ -1634,7 +1643,13 @@ public class Helper {
             if (tile.isSupernova() && player.hasTech("mr") && FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 productionValueTotal += 5;
             }
+            if (player.hasUnlockedBreakthrough("ghostbt")
+                    && !tile.getWormholes().isEmpty()
+                    && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+                productionValueTotal += 1;
+            }
         }
+
         if (!player.getPlanets().contains(uH.getName())) {
             return productionValueTotal;
         }

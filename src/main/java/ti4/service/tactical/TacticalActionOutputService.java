@@ -171,7 +171,8 @@ public class TacticalActionOutputService {
                             (uh instanceof Planet p) ? " from the planet " + p.getRepresentation(game) : "";
                     unitMoveStr += unitHolderStr;
 
-                    String distanceStr = validateMoveValue(game, player, tile, key, distance, riftDistance);
+                    String distanceStr =
+                            validateMoveValue(game, player, tile, key, movingUnitsFromTile, distance, riftDistance);
                     unitMoveStr += distanceStr;
                     lines.add(unitMoveStr);
                 }
@@ -213,8 +214,14 @@ public class TacticalActionOutputService {
     }
 
     private String validateMoveValue(
-            Game game, Player player, Tile tile, UnitKey unit, int distance, int riftDistance) {
-        int moveValue = getUnitMoveValue(game, player, tile, unit, false);
+            Game game,
+            Player player,
+            Tile tile,
+            UnitKey unit,
+            Set<UnitKey> allMovingUnits,
+            int distance,
+            int riftDistance) {
+        int moveValue = getUnitMoveValue(game, player, tile, unit, allMovingUnits, false);
         if (moveValue == 0) return "";
 
         String output = "";
@@ -249,7 +256,8 @@ public class TacticalActionOutputService {
         return output;
     }
 
-    private int getUnitMoveValue(Game game, Player player, Tile tile, UnitKey unit, boolean skipBonus) {
+    private int getUnitMoveValue(
+            Game game, Player player, Tile tile, UnitKey unit, Set<UnitKey> allMovingUnits, boolean skipBonus) {
         UnitModel model = player.getUnitFromUnitKey(unit);
         if (model == null) {
             return 0;
@@ -272,6 +280,14 @@ public class TacticalActionOutputService {
 
         // Calculate bonus move value
         int bonusMoveValue = 0;
+        if (player.hasUnlockedBreakthrough("letnevbt") && allMovingUnits != null && !allMovingUnits.isEmpty()) {
+            int maxBase = allMovingUnits.stream()
+                    .map(key -> getUnitMoveValue(game, player, tile, key, null, true))
+                    .max(Integer::compare)
+                    .orElse(baseMoveValue);
+            bonusMoveValue = maxBase - baseMoveValue;
+        }
+
         if (player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
             bonusMoveValue++;
         }

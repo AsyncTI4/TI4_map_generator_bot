@@ -20,6 +20,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -55,7 +56,7 @@ public class AddPlanetService {
         player.addPlanet(planet);
 
         player.exhaustPlanet(planet);
-        if ("mirage".equals(planet)) {
+        if ("mirage".equals(planet) || "avernus".equals(planet) || "thundersedge".equals(planet)) {
             game.clearPlanetsCache();
         }
         Tile tile = game.getTileFromPlanet(planet);
@@ -505,6 +506,9 @@ public class AddPlanetService {
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "freesystems");
         if (Constants.MECATOLS.contains(planet) && player.controlsMecatol(true)) {
             CommanderUnlockCheckService.checkPlayer(player, "winnu");
+        }
+        if ("thundersedge".equalsIgnoreCase(planet) && player.isRealPlayer() && !player.isBreakthroughUnlocked()) {
+            BreakthroughCommandHelper.unlockBreakthrough(game, player);
         }
     }
 }

@@ -515,9 +515,19 @@ public class ListPlayerInfoService {
                 return ButtonHelper.getNumberOfUnitUpgrades(player);
             }
             case "diversify", "master_science" -> {
+                Set<TechnologyType> synergies = player.getSynergies();
+                int synergyTotal = 0;
+                for (TechnologyType type : synergies)
+                    synergyTotal += ButtonHelper.getNumberOfCertainTypeOfTech(player, type);
+
                 int numAbove1 = 0;
                 for (TechnologyType type : TechnologyType.mainFour) {
-                    if (ButtonHelper.getNumberOfCertainTypeOfTech(player, type) >= 2) {
+                    if (synergies.contains(type)) {
+                        if (synergyTotal >= 2) {
+                            synergyTotal -= 2;
+                            numAbove1++;
+                        }
+                    } else if (ButtonHelper.getNumberOfCertainTypeOfTech(player, type) >= 2) {
                         numAbove1++;
                     }
                 }

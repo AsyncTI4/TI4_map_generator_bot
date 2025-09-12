@@ -467,6 +467,21 @@
         "forCombatAbility": "AFB"
     },
     {
+        "alias": "plus1_per_opponent_sftt",
+        "type": "result_modifier",
+        "value": "+1",
+        "valueScalingType": "opponent_sftt",
+        "persistenceType": "CONDITIONAL",
+        "condition": "opponent_has_sftt",
+        "related": [
+            {
+                "type": "breakthrough",
+                "alias": "winnubt"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
         "alias": "plus1_roll_plasmascoring_afb",
         "type": "extrarolls",
         "value": "+1",
@@ -785,7 +800,6 @@
         ],
         "forCombatAbility": "combatround"
     },
-    
     {
         "alias": "plus_x_code_always_mech",
         "type": "mods",

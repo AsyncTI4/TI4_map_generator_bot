@@ -19,7 +19,8 @@ public class TokenPlanetService {
 
         cradle,
         oasis,
-
+        avernus,
+        thundersedge,
         illusion,
         phantasm,
     }

@@ -1,0 +1,31 @@
+{
+    "id": "thundersedge",
+    "name": "Thunder's Edge",
+    "shortName": "Thund. Edge",
+    "shrinkNamePNAttach": true,
+    "aliases": [
+        "thunder'sedge",
+        "thundersedge",
+        "thunder",
+        "te"
+    ],
+    "resources": 5,
+    "influence": 1,
+    "planetTypes": [
+        "NONE"
+    ],
+    "legendaryAbilityName": "Jupiter Brain",
+    "legendaryAbilityText": "Gain your breakthrough when you gain this card if you do not already have it. You may exhaust this card at the end of your turn to perform another action.",
+    "legendaryAbilityFlavourText": "Heirarch online. State your request.",
+    "planetLayout": {
+        "unitHolderName": "thundersedge",
+        "resourcesLocation": "BottomLeft",
+        "extraIcons": 1,
+        "centerPosition": {
+            "x": 118,
+            "y": 114
+        },
+        "planetRadius": 120
+    },
+    "source": "thunders_edge"
+}

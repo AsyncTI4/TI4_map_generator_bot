@@ -102,6 +102,7 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("zelianagent")) {
             buttons.add(Buttons.gray("getAgentSelection_zelianagent", "Use Zelian Agent", FactionEmojis.zelian));
         }
+
         if (player.hasUnexhaustedLeader("mirvedaagent")) {
             buttons.add(Buttons.gray("getAgentSelection_mirvedaagent", "Use Mirveda Agent", FactionEmojis.mirveda));
         }

@@ -1,8 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -139,6 +137,11 @@ public class ButtonHelperHeroes {
         List<Button> buttons = getArgentHeroStep3Buttons(game, player, buttonID);
         String pos1 = buttonID.split("_")[1];
         Tile destination = game.getTileByPosition(pos1);
+        if (buttonID.contains("agent")) {
+            CommandCounterHelper.addCC(null, player, destination);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Added a command counter to the destination system.");
+        }
         String msg =
                 player.getRepresentation() + ", please choose the units you wish to move. These will move stuff to "
                         + destination.getRepresentationForButtons(game, player) + ".";
