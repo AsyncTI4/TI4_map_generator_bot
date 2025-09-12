@@ -24,6 +24,7 @@ public class CombatModifierModel implements ModelInterface {
     private String scopeExcept;
     private String condition;
     private CombatRollType forCombatAbility;
+    private Boolean singleUnitMod = false;
     private Boolean applyEachForQuantity = false;
     private Boolean applyToOpponent = false;
 

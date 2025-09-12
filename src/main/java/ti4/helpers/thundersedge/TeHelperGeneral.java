@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
@@ -67,7 +66,9 @@ public class TeHelperGeneral {
                     "\nYou must select one of the players with the most completed expeditions to place infantry on Thunder's Edge:";
             exp.getFactionsWithMostComplete().forEach(faction -> {
                 Player p2 = game.getPlayerFromColorOrFaction(faction);
-                if (p2 != null) newButtons.add(Buttons.blue(prefix + faction, p2.getFactionModel().getFactionName()));
+                if (p2 != null)
+                    newButtons.add(
+                            Buttons.blue(prefix + faction, p2.getFactionModel().getFactionName()));
             });
 
         } else if ((matcher = Pattern.compile(part3).matcher(buttonID)).matches()) {
