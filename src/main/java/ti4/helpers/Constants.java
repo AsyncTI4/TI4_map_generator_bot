@@ -377,7 +377,7 @@ public class Constants {
     private static final String CRADLE = "cradle";
     private static final String ILLUSION = "illusion";
     private static final String PHANTASM = "phantasm";
-    public static final List<String> TOKEN_PLANETS = List.of(MIRAGE, OASIS, CRADLE, ILLUSION, PHANTASM);
+    public static final List<String> TOKEN_PLANETS = List.of(MIRAGE, OASIS, CRADLE, ILLUSION, PHANTASM,AVERNUS,THUNDERSEDGE);
 
     public static final String FRONTIER = "frontier";
 
