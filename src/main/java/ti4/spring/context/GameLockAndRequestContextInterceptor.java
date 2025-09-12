@@ -25,8 +25,8 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         if (gameName == null) return true;
         if (!GameManager.isValid(gameName)) throw new InvalidGameNameException(gameName);
 
-        setupGameRequestContext(gameName, request, handler);
-        lockGame(gameName);
+        boolean requestContextSetup = setupGameRequestContext(gameName, request, handler);
+        if (requestContextSetup) lockGame(gameName);
 
         return true;
     }
@@ -40,13 +40,13 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         return (gameNameObject instanceof String gameName) ? gameName : null;
     }
 
-    private void setupGameRequestContext(String gameName, HttpServletRequest request, Object handler) {
+    private boolean setupGameRequestContext(String gameName, HttpServletRequest request, Object handler) {
         boolean shouldSaveGame = MUTATION_METHODS.contains(request.getMethod());
         if (handler instanceof HandlerMethod handlerMethod) {
             SetupRequestContext annotation = handlerMethod.getMethodAnnotation(SetupRequestContext.class);
             if (annotation != null) {
                 if (!annotation.value()) {
-                    return;
+                    return false;
                 }
                 // Only save if both the method is a mutation and the annotation allows saving.
                 shouldSaveGame &= annotation.save();
@@ -56,6 +56,7 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         var game = GameManager.getManagedGame(gameName).getGame();
         RequestContext.setGame(game);
         RequestContext.setSaveGame(shouldSaveGame);
+        return true;
     }
 
     private static void lockGame(String gameName) {
