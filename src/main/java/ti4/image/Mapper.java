@@ -1111,10 +1111,7 @@ public class Mapper {
     }
 
     public static String getTokenID(String tokenID) {
-        for(Object token : tokensFromProperties.keySet()){
-            System.out.println(token);
-        }
-        
+
         return tokensFromProperties.getProperty(tokenID);
     }
 

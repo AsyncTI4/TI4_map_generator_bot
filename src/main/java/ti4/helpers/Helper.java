@@ -19,12 +19,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
@@ -43,6 +38,8 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
@@ -1647,12 +1644,12 @@ public class Helper {
                 productionValueTotal += 5;
             }
             if (player.hasUnlockedBreakthrough("ghostbt")
-                && !tile.getWormholes().isEmpty()
-                && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+                    && !tile.getWormholes().isEmpty()
+                    && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
                 productionValueTotal += 1;
             }
         }
-        
+
         if (!player.getPlanets().contains(uH.getName())) {
             return productionValueTotal;
         }

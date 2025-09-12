@@ -3,7 +3,6 @@ package ti4.service.objectives;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -107,7 +106,7 @@ public class DrawSecretService {
                             game.getActionsChannel(), files, message.toString(), true, false);
                 }
             }
-            if(game.isThundersEdge()){
+            if (game.isThundersEdge()) {
                 Planet uH = game.getUnitHolderFromPlanet("mr");
                 uH.addToken("attachment_legendary.png");
             }

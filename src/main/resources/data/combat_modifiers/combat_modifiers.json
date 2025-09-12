@@ -474,7 +474,6 @@
         "persistenceType": "CONDITIONAL",
         "condition": "spacecombat",
         "scope": "_mostdice_",
-        "singleUnitMod": true,
         "related": [
             {
                 "type": "breakthrough",
