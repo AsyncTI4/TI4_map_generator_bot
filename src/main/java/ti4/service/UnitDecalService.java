@@ -2,7 +2,8 @@ package ti4.service;
 
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Constants;
-import ti4.service.async.TourneyWinnersService;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.tournamentwinner.TourneyWinnerService;
 
 @UtilityClass
 public class UnitDecalService {
@@ -11,7 +12,7 @@ public class UnitDecalService {
         return switch (decalID) {
             case "caballed" -> userID.equals(Constants.eronousId); // caballed -> eronous
             case "cb_10" -> userID.equals(Constants.jazzId); // jazz -> jazz
-            case "cb_11" -> TourneyWinnersService.isPlayerWinner(userID); // tournament winner decal
+            case "cb_11" -> getTournamentWinnerService().exists(userID); // tournament winner decal
             case "cb_52" -> userID.equals(Constants.sigmaId); // sigma -> void
             case "cb_93" -> userID.equals(Constants.bambamId); // bambam -> larry david
             case "cb_94" -> userID.equals(Constants.tspId); // HolyTispoon -> HolyTispoon
@@ -22,5 +23,9 @@ public class UnitDecalService {
             case "cb_54" -> false; // disable Australia icon
             default -> true;
         };
+    }
+
+    private static TourneyWinnerService getTournamentWinnerService() {
+        return SpringContext.getBean(TourneyWinnerService.class);
     }
 }
