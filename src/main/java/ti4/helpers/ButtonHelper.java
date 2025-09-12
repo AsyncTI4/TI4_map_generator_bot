@@ -3731,7 +3731,6 @@ public class ButtonHelper {
             endButtons.add(Buttons.gray(player.finChecker() + "expeditionInfoAndButtons", expeditionText));
         }
 
-
         boolean hasStratCC =
                 player.getStrategicCC() > 0 || player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar");
         // Technologies

@@ -44,6 +44,7 @@ public class PsychosporeService {
     @ButtonHandler("resolvePsychospore_")
     private void resolvePsychospore(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String rx = "resolvePsychospore_" + RegexHelper.posRegex(game);
+        ButtonHelper.deleteMessage(event);
         RegexService.runMatcher(rx, buttonID, matcher -> {
             String pos = matcher.group("pos");
 
@@ -63,8 +64,10 @@ public class PsychosporeService {
                 bonusInfantry.add(Buttons.green(id, label, PlanetEmojis.getPlanetEmoji(planetOrSpace)));
             }
             bonusInfantry.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Skip placing an infantry"));
-            String postPsychosporeMsg = player.getRepresentationUnfogged() + " use the buttons to place an infantry in the system:";
-            MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCorrectChannel(), postPsychosporeMsg, bonusInfantry);
+            String postPsychosporeMsg =
+                    player.getRepresentationUnfogged() + " use the buttons to place an infantry in the system:";
+            MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
+                    player.getCorrectChannel(), postPsychosporeMsg, bonusInfantry);
         });
     }
 }

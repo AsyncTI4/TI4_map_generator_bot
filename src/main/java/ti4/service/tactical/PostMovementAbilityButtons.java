@@ -1,7 +1,6 @@
 package ti4.service.tactical;
 
 import java.util.List;
-
 import ti4.service.tactical.postmovement.AtokeraHeroButton;
 import ti4.service.tactical.postmovement.BombardmentButton;
 import ti4.service.tactical.postmovement.CombatDronesButton;

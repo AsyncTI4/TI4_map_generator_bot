@@ -1,5 +1,6 @@
 package ti4.map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -7,15 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.function.Consumers;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
@@ -34,6 +31,7 @@ public class Expeditions {
 
     @JsonIgnore
     private Game game = null;
+
     private Map<String, String> expeditionFactions = new LinkedHashMap<>();
 
     public String getTechSkip() {
@@ -96,21 +94,32 @@ public class Expeditions {
 
     @JsonIgnore
     public int getMostCompleteByAny() {
-        Map<String, Long> factionCounts = expeditionFactions.values().stream().collect(Collectors.groupingBy(x -> x, Collectors.counting()));
-        long most = factionCounts.values().stream().max(Comparator.comparingLong(x -> x)).orElse(0l);
+        Map<String, Long> factionCounts =
+                expeditionFactions.values().stream().collect(Collectors.groupingBy(x -> x, Collectors.counting()));
+        long most = factionCounts.values().stream()
+                .max(Comparator.comparingLong(x -> x))
+                .orElse(0l);
         return (int) most;
     }
 
     @JsonIgnore
     public List<String> getFactionsWithMostComplete() {
-        Map<String, Long> factionCounts = expeditionFactions.values().stream().collect(Collectors.groupingBy(x -> x, Collectors.counting()));
-        long most = factionCounts.values().stream().max(Comparator.comparingLong(x -> x)).orElse(0l);
-        return new ArrayList<>(factionCounts.entrySet().stream().filter(e -> e.getValue() == most).map(e -> e.getKey()).toList());
+        Map<String, Long> factionCounts =
+                expeditionFactions.values().stream().collect(Collectors.groupingBy(x -> x, Collectors.counting()));
+        long most = factionCounts.values().stream()
+                .max(Comparator.comparingLong(x -> x))
+                .orElse(0l);
+        return new ArrayList<>(factionCounts.entrySet().stream()
+                .filter(e -> e.getValue() == most)
+                .map(e -> e.getKey())
+                .toList());
     }
 
     @JsonIgnore
     public int getRemainingExpeditionCount() {
-        return (int) expeditionFactions.entrySet().stream().filter(e -> e.getValue() == null).count();
+        return (int) expeditionFactions.entrySet().stream()
+                .filter(e -> e.getValue() == null)
+                .count();
     }
 
     @JsonIgnore
@@ -122,7 +131,6 @@ public class Expeditions {
             return null;
         }
     }
-
 
     @JsonIgnore
     private String playerInfo(String faction) {
@@ -181,7 +189,8 @@ public class Expeditions {
     }
 
     @ButtonHandler("TEexpedition_")
-    private static void handleExpeditionButtonPress(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+    private static void handleExpeditionButtonPress(
+            String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String expeditionType = buttonID.replace("TEexpedition_", "");
         Expeditions exp = game.getExpeditions();
         MessageChannel channel = player.getCorrectChannel();
@@ -194,7 +203,8 @@ public class Expeditions {
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "skips");
                 buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), String.format(whichExp, "TECH SKIP"));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use the buttons to exhaust 1 tech skip:", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(), "Use the buttons to exhaust 1 tech skip:", buttons);
             }
             case "tradeGoods" -> {
                 success = true;
@@ -202,12 +212,14 @@ public class Expeditions {
                 MessageHelper.sendMessageToChannel(channel, String.format(whichExp, "3 TRADE GOODS"));
                 List<Button> buttons = null;
                 if (oldTg < 3) {
-                    output = "You do not have enough trade goods to do this automatically. Use the buttons to spend TGs:";
+                    output =
+                            "You do not have enough trade goods to do this automatically. Use the buttons to spend TGs:";
                     buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "tgsonly");
                     buttons.add(Buttons.red("deleteButtons_spitItOut", "Done spending TGs"));
                 } else {
                     player.setTg(player.getTg() - 3);
-                    output = player.getRepresentation() + " Automatically deducted 3tg (" + oldTg + "->" + player.getTg() + ")";
+                    output = player.getRepresentation() + " Automatically deducted 3tg (" + oldTg + "->"
+                            + player.getTg() + ")";
                 }
                 MessageHelper.sendMessageToChannelWithButtons(channel, output, buttons);
             }
@@ -216,14 +228,16 @@ public class Expeditions {
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
                 buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
                 MessageHelper.sendMessageToChannel(channel, String.format(whichExp, "5 RESOURCES"));
-                MessageHelper.sendMessageToChannelWithButtons(channel, "Use the buttons to spend 5 resources:", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel, "Use the buttons to spend 5 resources:", buttons);
             }
             case "fiveInf" -> {
                 success = true;
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                 buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
                 MessageHelper.sendMessageToChannel(channel, String.format(whichExp, "5 INFLUENCE"));
-                MessageHelper.sendMessageToChannelWithButtons(channel, "Use the buttons to spend 5 influence:", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel, "Use the buttons to spend 5 influence:", buttons);
             }
             case "secret" -> {
                 success = true;
@@ -232,9 +246,11 @@ public class Expeditions {
                 if (soButtons != null && !soButtons.isEmpty()) {
                     output += "\n-# Use the buttons in your private channel to discard an unscored secret.";
                     MessageHelper.sendMessageToChannel(channel, output);
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Use the buttons to discard a secret objective:", soButtons);
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(), "Use the buttons to discard a secret objective:", soButtons);
                 } else {
-                    output += "\n-# you may not have an unscored secret to discard... use game undo if this was a mistake";
+                    output +=
+                            "\n-# you may not have an unscored secret to discard... use game undo if this was a mistake";
                     MessageHelper.sendMessageToChannel(channel, output);
                 }
             }
@@ -245,7 +261,8 @@ public class Expeditions {
                 if (acButtons != null && acButtons.size() >= 2) {
                     output += "\n-# Use the buttons in your private channel to discard 2 action cards.";
                     MessageHelper.sendMessageToChannel(channel, output);
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Use the buttons to discard action cards:", acButtons);
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(), "Use the buttons to discard action cards:", acButtons);
                 } else {
                     output += "\n-# you may not have enough action cards... use game undo if this was a mistake";
                     MessageHelper.sendMessageToChannel(channel, output);
@@ -258,14 +275,21 @@ public class Expeditions {
             exp.getExpeditionFactions().put(expeditionType, player.getFaction());
             if (exp.getRemainingExpeditionCount() == 0) {
                 String message = "# ATTENTION " + game.getPing() + "\n";
-                message += player.getRepresentation() + " has completed the last expedition! They can now place the __**Thunder's Edge**__ planet on the board:";
-                message += "\n-# Thunder's Edge must be placed on a tile that does not have any planets or printed wormholes.";
-                Button button = Buttons.green(player.getFinsFactionCheckerPrefix() + "placeThundersEdge", "Place Thunder's Edge");
+                message += player.getRepresentation()
+                        + " has completed the last expedition! They can now place the __**Thunder's Edge**__ planet on the board:";
+                message +=
+                        "\n-# Thunder's Edge must be placed on a tile that does not have any planets or printed wormholes.";
+                Button button = Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "placeThundersEdge", "Place Thunder's Edge");
                 MessageHelper.sendMessageToChannel(channel, message);
-                MessageHelper.sendMessageToChannelWithButton(channel, "Use the button to begin placing Thunder's Edge:", button);
+                MessageHelper.sendMessageToChannelWithButton(
+                        channel, "Use the button to begin placing Thunder's Edge:", button);
             }
             BreakthroughCommandHelper.unlockBreakthrough(game, player);
         }
-        event.getHook().editOriginal(exp.printExpeditionInfo()).setComponents().queue(Consumers.nop(), BotLogger::catchRestError);
+        event.getHook()
+                .editOriginal(exp.printExpeditionInfo())
+                .setComponents()
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

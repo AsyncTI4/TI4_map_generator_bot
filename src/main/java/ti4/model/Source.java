@@ -123,7 +123,8 @@ public class Source {
 
         public boolean isDs() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3, codex4, ds, uncharted_space, blue_reverie, thunders_edge -> true;
+                case base, pok, codex1, codex2, codex3, codex4, ds, uncharted_space, blue_reverie, thunders_edge ->
+                    true;
                 default -> false;
             };
         }

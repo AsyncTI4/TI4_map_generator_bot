@@ -92,6 +92,7 @@
         "id": "legendary",
         "imagePath": "attachment_legendary.png",
         "isLegendary": true,
+        "isFakeAttachment": true,
         "source": "other"
     },
     {

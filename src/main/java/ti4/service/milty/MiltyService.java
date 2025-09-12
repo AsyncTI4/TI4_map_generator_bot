@@ -7,13 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
@@ -113,12 +111,12 @@ public class MiltyService {
         // Load Player & Faction Ban Specifications
         PlayerFactionSettings pfSettings = settings.getPlayerSettings();
         specs.bannedFactions.addAll(pfSettings.getBanFactions().getKeys());
-        if(game.isThundersEdge()){
+        if (game.isThundersEdge()) {
             List<String> newKeys = new ArrayList<>();
-            newKeys.addAll(List.of("arborec","ghost","letnev","winnu","muaat","yin"));
+            newKeys.addAll(List.of("arborec", "ghost", "letnev", "winnu", "muaat", "yin"));
             specs.priorityFactions.addAll(newKeys);
             specs.numFactions = Math.min(6, specs.numFactions);
-        }else{
+        } else {
             specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
         }
         specs.setPlayerIDs(new ArrayList<>(pfSettings.getGamePlayers().getKeys()));
@@ -358,6 +356,15 @@ public class MiltyService {
                     event.getMessageChannel(),
                     "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
             return;
+        }
+
+        // BREAKTHROUGH
+        if (game.isThundersEdge() && Mapper.getBreakthrough(factionModel.getAlias() + "bt") != null) {
+            player.setBreakthroughID(factionModel.getAlias() + "bt");
+            player.setBreakthroughUnlocked(false);
+            player.setBreakthroughExhausted(false);
+            player.setBreakthroughActive(false);
+            player.setBreakthroughTGs(0);
         }
 
         // HOME SYSTEM

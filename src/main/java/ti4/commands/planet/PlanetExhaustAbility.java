@@ -2,6 +2,7 @@ package ti4.commands.planet;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -109,10 +110,10 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "2ff", "placeOneNDone_skipbuild"));
             }
             // Homebrew
-            case "mr" -> {
-                output = "Use buttons to destroy a ground force on a legendary or a planet adjacent to Mecatol Rex.";
-                buttons.addAll(ButtonHelper.customRexLegendary(player, game));
-            }
+            // case "mr" -> {
+            //     output = "Use buttons to destroy a ground force on a legendary or a planet adjacent to Mecatol Rex.";
+            //     buttons.addAll(ButtonHelper.customRexLegendary(player, game));
+            // }
             case "silence" -> {
                 output = "Use buttons to put 1 cruiser with your ships.";
                 buttons.addAll(

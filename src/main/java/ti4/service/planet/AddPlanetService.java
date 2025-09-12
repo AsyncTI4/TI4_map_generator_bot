@@ -510,6 +510,5 @@ public class AddPlanetService {
         if ("thundersedge".equalsIgnoreCase(planet) && player.isRealPlayer() && !player.isBreakthroughUnlocked()) {
             BreakthroughCommandHelper.unlockBreakthrough(game, player);
         }
-
     }
 }

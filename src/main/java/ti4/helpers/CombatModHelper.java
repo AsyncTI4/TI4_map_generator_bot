@@ -9,9 +9,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
-
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -213,10 +211,11 @@ public class CombatModHelper {
         if (player.getBreakthroughModel() != null) {
             BreakthroughModel model = player.getBreakthroughModel();
             List<CombatModifierModel> relevantMods = combatModifiers.values().stream()
-                .filter(modifier -> modifier.isRelevantTo("breakthrough", model.getAlias()))
-                .toList();
+                    .filter(modifier -> modifier.isRelevantTo("breakthrough", model.getAlias()))
+                    .toList();
             for (CombatModifierModel mod : relevantMods) {
-                if (checkModPassesCondition(mod, tile, player, opponent, unitsByQuantity,opponentUnitsByQuantity, game)) {
+                if (checkModPassesCondition(
+                        mod, tile, player, opponent, unitsByQuantity, opponentUnitsByQuantity, game)) {
                     modifiers.add(new NamedCombatModifierModel(mod, model.getRepresentation(true)));
                 }
             }
@@ -665,12 +664,12 @@ public class CombatModHelper {
         value = Math.floor(value); // to make sure eg +1 per 2 destroyer doesn't return 2.5 etc
         return (int) value;
     }
+
     public static int getUniqueNonFighterShipCount(Game game, Tile activeSystem, Player player) {
         UnitHolder space = activeSystem.getSpaceUnitHolder();
         int numberUniq = 0;
         for (UnitKey key : space.getUnitsByState().keySet()) {
             if (!player.unitBelongsToPlayer(key)) continue;
-
 
             UnitModel model = player.getUnitFromUnitKey(key);
             if (model != null && model.getIsShip() && space.getUnitCount(key) > 0) {
@@ -680,12 +679,10 @@ public class CombatModHelper {
         return numberUniq;
     }
 
-
     public static int getOpponentSfttCount(Player player) {
-            return (int) player.getPromissoryNotesInPlayArea().stream()
+        return (int) player.getPromissoryNotesInPlayArea().stream()
                 .map(Mapper::getPromissoryNote)
                 .filter(pn -> pn.getName().equals("Support for the Throne"))
                 .count();
-        }
-
+    }
 }

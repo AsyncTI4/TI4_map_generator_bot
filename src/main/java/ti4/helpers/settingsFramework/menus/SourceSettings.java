@@ -1,13 +1,11 @@
 package ti4.helpers.settingsFramework.menus;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -187,7 +185,7 @@ public class SourceSettings extends SettingsMenu {
                                 "This setting only controls factions. If you want technologies, relics, explores, etc, you need to also enable **__Uncharted Space__**.")
                         .setEphemeral(true)
                         .queue();
-            case "ThundersEdge" ->{
+            case "ThundersEdge" -> {
                 event.getHook()
                         .sendMessage(
                                 "This is only a demo of TE. Only the 6 factions that have revealed breakthroughs will be draftable. No Fracture.")

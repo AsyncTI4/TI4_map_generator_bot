@@ -2,7 +2,6 @@ package ti4.service.map;
 
 import java.awt.Point;
 import java.util.Map;
-
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;

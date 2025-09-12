@@ -2,7 +2,6 @@ package ti4.map;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 import ti4.helpers.Constants;

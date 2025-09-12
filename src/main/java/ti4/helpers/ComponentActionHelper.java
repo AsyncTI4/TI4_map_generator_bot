@@ -83,20 +83,23 @@ public class ComponentActionHelper {
         BreakthroughModel bt = p1.getBreakthroughModel();
         if (bt != null && bt.getText().contains("ACTION:")) {
             if (p1.hasReadyBreakthrough(bt.getAlias())) {
-                boolean validAction = switch (bt.getAlias()) {
-                    case "arborecbt" -> game.getTileMap().values().stream()
-                        .filter(Tile.tileHasPlayersInfAndCC(p1))
-                        .count() > 0;
-                    default -> true;
-                };
+                boolean validAction =
+                        switch (bt.getAlias()) {
+                            case "arborecbt" ->
+                                game.getTileMap().values().stream()
+                                                .filter(Tile.tileHasPlayersInfAndCC(p1))
+                                                .count()
+                                        > 0;
+                            default -> true;
+                        };
                 if (validAction) {
                     TI4Emoji btEmoji = bt.getFactionEmoji();
-                    Button btButton = Buttons.red(finChecker + prefix + "exhaustBT_" + bt.getAlias(), "Exhaust " + bt.getName(), btEmoji);
+                    Button btButton = Buttons.green(
+                            finChecker + prefix + "exhaustBT_" + bt.getAlias(), "Exhaust " + bt.getName(), btEmoji);
                     compButtons.add(btButton);
                 }
             }
         }
-
 
         // Leaders
         for (Leader leader : p1.getLeaders()) {
@@ -743,11 +746,13 @@ public class ComponentActionHelper {
                 BreakthroughModel btModel = Mapper.getBreakthrough(buttonID);
                 p1.setBreakthroughExhausted(true);
                 String message = p1.getRepresentation() + " exhausted " + btModel.getName();
-                MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, btModel.getRepresentationEmbed());
+                MessageHelper.sendMessageToChannelWithEmbed(
+                        event.getMessageChannel(), message, btModel.getRepresentationEmbed());
                 boolean implemented = TeHelperBreakthroughs.handleBreakthroughExhaust(event, game, p1, buttonID);
 
                 if (!implemented) {
-                    String unimplemented = "IDK how to do this yet. " + Constants.jazzPing() + " please implement this bt";
+                    String unimplemented =
+                            "IDK how to do this yet. " + Constants.jazzPing() + " please implement this bt";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), unimplemented);
                 }
             }
