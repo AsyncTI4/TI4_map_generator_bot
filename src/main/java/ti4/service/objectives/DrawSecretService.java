@@ -17,6 +17,7 @@ import ti4.helpers.StringHelper;
 import ti4.image.ImageHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
@@ -104,6 +105,10 @@ public class DrawSecretService {
                     MessageHelper.sendMessageWithFiles(
                             game.getActionsChannel(), files, message.toString(), true, false);
                 }
+            }
+            if (game.isThundersEdge()) {
+                Planet uH = game.getUnitHolderFromPlanet("mr");
+                uH.addToken("attachment_legendary.png");
             }
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("startOfGameObjReveal", "Reveal Objectives and Start Strategy Phase"));

@@ -40,6 +40,7 @@ import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
+import ti4.map.Expeditions;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -537,6 +538,8 @@ public class MapGenerator implements AutoCloseable {
         // TURN ORDER
         coord = drawTurnOrderTracker(coord.x + roundLen + 100 + landscapeShift, coord.y);
 
+        drawExpeditionTracker(mapWidth - 1200, coord.y - 265);
+
         y = coord.y + 30;
         x = 10 + landscapeShift;
         int tempY = y;
@@ -848,6 +851,38 @@ public class MapGenerator implements AutoCloseable {
             }
         }
         return new Point(x, y);
+    }
+
+    private void drawExpeditionTracker(int x, int y) {
+        Expeditions exp = game.getExpeditions();
+        boolean thundersEdgeOnBoard = game.getTileFromPlanet("thundersedge") != null;
+        if (exp.getRemainingExpeditionCount() == 6 || thundersEdgeOnBoard) return;
+
+        drawGeneralImage(x, y, "Expeditions.png");
+        if (exp.getTradeGoods() != null) {
+            Player p = game.getPlayerFromColorOrFaction(exp.getTradeGoods());
+            DrawingUtil.getAndDrawControlToken(graphics, p, x + 47, y + 101, isFoWPrivate, 1.0f);
+        }
+        if (exp.getFiveRes() != null) {
+            Player p = game.getPlayerFromColorOrFaction(exp.getFiveRes());
+            DrawingUtil.getAndDrawControlToken(graphics, p, x + 114, y + 5, isFoWPrivate, 1.0f);
+        }
+        if (exp.getActionCards() != null) {
+            Player p = game.getPlayerFromColorOrFaction(exp.getActionCards());
+            DrawingUtil.getAndDrawControlToken(graphics, p, x + 182, y + 101, isFoWPrivate, 1.0f);
+        }
+        if (exp.getTechSkip() != null) {
+            Player p = game.getPlayerFromColorOrFaction(exp.getTechSkip());
+            DrawingUtil.getAndDrawControlToken(graphics, p, x + 47, y + 150, isFoWPrivate, 1.0f);
+        }
+        if (exp.getSecret() != null) {
+            Player p = game.getPlayerFromColorOrFaction(exp.getSecret());
+            DrawingUtil.getAndDrawControlToken(graphics, p, x + 114, y + 243, isFoWPrivate, 1.0f);
+        }
+        if (exp.getFiveInf() != null) {
+            Player p = game.getPlayerFromColorOrFaction(exp.getFiveInf());
+            DrawingUtil.getAndDrawControlToken(graphics, p, x + 182, y + 150, isFoWPrivate, 1.0f);
+        }
     }
 
     private int drawCardDecks(int x, int y) {

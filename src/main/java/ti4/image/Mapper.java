@@ -44,6 +44,7 @@ import ti4.model.AbilityModel;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.AttachmentModel;
+import ti4.model.BreakthroughModel;
 import ti4.model.ColorModel;
 import ti4.model.ColorableModelInterface;
 import ti4.model.CombatModifierModel;
@@ -107,6 +108,7 @@ public class Mapper {
     private static final Map<String, TechnologyModel> technologies = new HashMap<>();
     private static final Map<String, TokenModel> tokens = new HashMap<>();
     private static final Map<String, UnitModel> units = new HashMap<>();
+    private static final Map<String, BreakthroughModel> breakthroughs = new HashMap<>();
 
     private static final Cache<String, ColorModel> colorToColorModelCache =
             Caffeine.newBuilder().maximumSize(1000).build();
@@ -130,6 +132,7 @@ public class Mapper {
         importJsonObjectsFromFolder("action_cards", actionCards, ActionCardModel.class);
         importJsonObjectsFromFolder("agendas", agendas, AgendaModel.class);
         importJsonObjectsFromFolder("attachments", attachments, AttachmentModel.class);
+        importJsonObjectsFromFolder("breakthroughs", breakthroughs, BreakthroughModel.class);
         importJsonObjectsFromFolder("colors", colors, ColorModel.class);
         importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class);
         importJsonObjectsFromFolder("decks", decks, DeckModel.class);
@@ -147,6 +150,7 @@ public class Mapper {
         importJsonObjectsFromFolder("strategy_card_sets", strategyCardSets, StrategyCardSetModel.class);
         importJsonObjectsFromFolder("strategy_cards", strategyCards, StrategyCardModel.class);
         importJsonObjectsFromFolder("technologies", technologies, TechnologyModel.class);
+
         importJsonObjectsFromFolder("tokens", tokens, TokenModel.class);
         importJsonObjectsFromFolder("units", units, UnitModel.class);
         readData("decals.properties", decals);
@@ -361,6 +365,19 @@ public class Mapper {
             acNameList.put(entry.getKey(), entry.getValue().getName());
         }
         return acNameList;
+    }
+    // breakthroughs
+
+    public static Map<String, BreakthroughModel> getBreakthroughs() {
+        return breakthroughs;
+    }
+
+    public static BreakthroughModel getBreakthrough(String id) {
+        return breakthroughs.get(id);
+    }
+
+    public static boolean isValidBreakthrough(String id) {
+        return breakthroughs.containsKey(id);
     }
 
     // ####################
@@ -1090,6 +1107,7 @@ public class Mapper {
     }
 
     public static String getTokenID(String tokenID) {
+
         return tokensFromProperties.getProperty(tokenID);
     }
 

@@ -94,6 +94,7 @@ public class GameProperties {
 
     // Game modes / homebrew flags
     private @ExportableField boolean baseGameMode; // TODO: Make this obsolete
+    private @ExportableField boolean thundersEdge;
     private @ExportableField boolean prophecyOfKings = true;
     private @ExportableField boolean ageOfExplorationMode;
     private @ExportableField boolean facilitiesMode;

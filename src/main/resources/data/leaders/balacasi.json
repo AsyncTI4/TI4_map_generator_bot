@@ -63,7 +63,7 @@
         "title": "The Invincible",
         "abilityName": "Titles Are Silly",
         "abilityWindow": "ACTION:",
-        "abilityText": "Gain 1 trade good for each damaged unit on the game board owned by another player. Then, repair all of your damaged units and choose any number of other players. For each chosen player, repair all of their damaged units that are in or adjacent to a system that contains 1 of your space docks.",
+        "abilityText": "Gain 1 trade good for each damaged unit on the game board owned by another player. Then, repair all of your damaged units and choose any number of other players. For each chosen player, repair all of their damaged units that are in or adjacent to a system that contains 1 of your space docks. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "balacasi"
     },

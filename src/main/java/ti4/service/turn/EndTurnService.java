@@ -14,6 +14,7 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.FoWHelper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
@@ -58,6 +59,20 @@ public class EndTurnService {
     }
 
     private static void resetStoredValuesEndOfTurn(Game game, Player player) {
+        if (player.hasAbility("phantom_energy")
+                && !game.getStoredValue("phantomEnergy").isEmpty()) {
+            for (Tile tile : game.getTileMap().values()) {
+                if (tile.hasPlayerCC(player)) {
+                    for (String asyncID : tile.getSpaceUnitHolder()
+                            .getUnitAsyncIdsOnHolder(player.getColorID())
+                            .keySet()) {
+                        game.setStoredValue(
+                                "phantomEnergy",
+                                game.getStoredValue("phantomEnergy").replace(asyncID, ""));
+                    }
+                }
+            }
+        }
         game.setStoredValue("lawsDisabled", "no");
         game.removeStoredValue("endTurnWhenSCFinished");
         game.removeStoredValue("fleetLogWhenSCFinished");

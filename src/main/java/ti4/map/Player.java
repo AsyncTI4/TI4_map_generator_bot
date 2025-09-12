@@ -58,6 +58,7 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.AbilityModel;
+import ti4.model.BreakthroughModel;
 import ti4.model.ColorModel;
 import ti4.model.FactionModel;
 import ti4.model.GenericCardModel;
@@ -67,6 +68,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ColorEmojis;
@@ -220,6 +222,45 @@ public class Player extends PlayerProperties {
 
     public void removeTransactionItem(String thing) {
         getTransactionItems().remove(thing);
+    }
+
+    public boolean hasBreakthrough(String bt) {
+        if (bt == null || getBreakthroughID() == null || getBreakthroughID().isEmpty()) return false;
+        return bt.equals(getBreakthroughID());
+    }
+
+    public boolean hasUnlockedBreakthrough(String bt) {
+        return hasBreakthrough(bt) && isBreakthroughUnlocked();
+    }
+
+    public boolean hasReadyBreakthrough(String bt) {
+        return hasUnlockedBreakthrough(bt) && !isBreakthroughExhausted();
+    }
+
+    public boolean hasActiveBreakthrough(String bt) {
+        return hasUnlockedBreakthrough(bt) && isBreakthroughActive();
+    }
+
+    @JsonIgnore
+    public BreakthroughModel getBreakthroughModel() {
+        if (getBreakthroughID() == null || getBreakthroughID().isEmpty()) return null;
+        return Mapper.getBreakthrough(getBreakthroughID());
+    }
+
+    @JsonIgnore
+    public Set<TechnologyType> getSynergies() {
+        Set<TechnologyType> synergies = new HashSet<>();
+        if (isBreakthroughUnlocked()) {
+            synergies.addAll(getBreakthroughModel().getSynergy());
+        }
+        if (hasRelic("quantumcore")) {
+            synergies.addAll(List.of(
+                    TechnologyType.BIOTIC,
+                    TechnologyType.WARFARE,
+                    TechnologyType.PROPULSION,
+                    TechnologyType.CYBERNETIC));
+        }
+        return Collections.unmodifiableSet(synergies);
     }
 
     @JsonIgnore

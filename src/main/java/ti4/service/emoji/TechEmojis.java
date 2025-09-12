@@ -25,7 +25,17 @@ public enum TechEmojis implements TI4Emoji {
 
     UnitUpgradeTech,
     UnitTechSkip,
-    NonUnitTechSkip;
+    NonUnitTechSkip,
+    SynergyPropulsionLeft,
+    SynergyPropulsionRight, //
+    SynergyBioticLeft,
+    SynergyBioticRight, //
+    SynergyCyberneticLeft,
+    SynergyCyberneticRight, //
+    SynergyWarfareLeft,
+    SynergyWarfareRight, //
+    SynergyAll,
+    SynergyNone;
 
     @NotNull
     public static TI4Emoji getBasicTechEmoji(String type) {

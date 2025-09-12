@@ -111,7 +111,14 @@ public class MiltyService {
         // Load Player & Faction Ban Specifications
         PlayerFactionSettings pfSettings = settings.getPlayerSettings();
         specs.bannedFactions.addAll(pfSettings.getBanFactions().getKeys());
-        specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
+        if (game.isThundersEdge()) {
+            List<String> newKeys = new ArrayList<>();
+            newKeys.addAll(List.of("arborec", "ghost", "letnev", "winnu", "muaat", "yin"));
+            specs.priorityFactions.addAll(newKeys);
+            specs.numFactions = Math.min(6, specs.numFactions);
+        } else {
+            specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
+        }
         specs.setPlayerIDs(new ArrayList<>(pfSettings.getGamePlayers().getKeys()));
         if (pfSettings.getPresetDraftOrder().isVal()) {
             specs.playerDraftOrder = new ArrayList<>(game.getPlayers().keySet());
@@ -349,6 +356,15 @@ public class MiltyService {
                     event.getMessageChannel(),
                     "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
             return;
+        }
+
+        // BREAKTHROUGH
+        if (game.isThundersEdge() && Mapper.getBreakthrough(factionModel.getAlias() + "bt") != null) {
+            player.setBreakthroughID(factionModel.getAlias() + "bt");
+            player.setBreakthroughUnlocked(false);
+            player.setBreakthroughExhausted(false);
+            player.setBreakthroughActive(false);
+            player.setBreakthroughTGs(0);
         }
 
         // HOME SYSTEM

@@ -80,8 +80,10 @@ public class Constants {
     public static final String COMMUNITY_MODE = "community_mode";
     public static final String ALLIANCE_MODE = "alliance_mode";
     public static final String FOW_MODE = "fow_mode";
+    public static final String AVERNUS = "avernus";
     public static final String FOW_OPTIONS = "fow_options";
     public static final String BASE_GAME_MODE = "base_game_mode";
+    public static final String THUNDERS_EDGE_MODE = "thunders_edge_mode";
     public static final String LIGHT_FOG_MODE = "light_fog_mode";
     public static final String CPTI_EXPLORE_MODE = "cpti_explore_mode";
     public static final String RED_TAPE_MODE = "red_tape_mode";
@@ -97,6 +99,7 @@ public class Constants {
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
     public static final String UNCHARTED_SPACE_STUFF = "uncharted_space_stuff";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
+    public static final String THUNDERSEDGE = "thundersedge";
     public static final String PLAYER_PRIVATE_CHANNEL = "playerPrivateChannel";
     public static final String CHANNEL_FOR_COMMUNITY = "channelForCommunity";
     public static final String NOTEPAD = "notepad";
@@ -374,7 +377,8 @@ public class Constants {
     private static final String CRADLE = "cradle";
     private static final String ILLUSION = "illusion";
     private static final String PHANTASM = "phantasm";
-    public static final List<String> TOKEN_PLANETS = List.of(MIRAGE, OASIS, CRADLE, ILLUSION, PHANTASM);
+    public static final List<String> TOKEN_PLANETS =
+            List.of(MIRAGE, OASIS, CRADLE, ILLUSION, PHANTASM, AVERNUS, THUNDERSEDGE);
 
     public static final String FRONTIER = "frontier";
 
@@ -484,6 +488,13 @@ public class Constants {
     public static final String DISPLACED_UNITS_ACTIVATION = "displaced_units_activation";
     public static final String DISPLACED_UNITS_ACTIVATION_NEW = "displaced_units_activation_new";
     public static final String AC_ID = "ac_id";
+
+    public static final String EXPEDITION_TECHSKIP = "expedition_skip";
+    public static final String EXPEDITION_TRADEGOODS = "expedition_tgs";
+    public static final String EXPEDITION_FIVERES = "expedition_5r";
+    public static final String EXPEDITION_FIVEINF = "expedition_5i";
+    public static final String EXPEDITION_SECRET = "expedition_so";
+    public static final String EXPEDITION_ACTIONCARDS = "expedition_acs";
 
     public static final String INACTIVE_LEADER = "hero_unplay";
     public static final String ACTIVE_LEADER = "hero_play";
@@ -1200,6 +1211,19 @@ public class Constants {
     public static final String CRON_NAME = "cron_name";
     public static final String RUN_CRON = "run_cron";
 
+    public static final String BREAKTHROUGH_CMD = "breakthrough";
+    public static final String BREAKTHROUGH_LOCK = "lock";
+    public static final String BREAKTHROUGH_UNLOCK = "unlock";
+    public static final String BREAKTHROUGH_EXHAUST = "exhaust";
+    public static final String BREAKTHROUGH_READY = "ready";
+    public static final String BREAKTHROUGH_SET_TG = "set_tg";
+    public static final String BREAKTHROUGH_ACTIVATE = "activate";
+    public static final String BREAKTHROUGH = "breakthrough";
+    public static final String BREAKTHROUGH_EXH = "breakthrough_exh";
+    public static final String BREAKTHROUGH_UNL = "breakthrough_unl";
+    public static final String BREAKTHROUGH_ACTV = "breakthrough_actv";
+    public static final String BREAKTHROUGH_TGS = "breakthrough_tgs";
+
     public static final String AC_DECK_ID = "ac_deck_id";
     public static final String SO_DECK_ID = "so_deck_id";
     public static final String STAGE_1_PUBLIC_DECK_ID = "stage_1_public_deck_id";
@@ -1239,6 +1263,7 @@ public class Constants {
     public static final String FACTION_IMAGE_URL = "faction_image_url";
     public static final String SET_FACTION_ICON = "set_faction_icon";
     public static final String SET_FACTION_DISPLAY_NAME = "set_faction_display_name";
+    public static final String SET_BREAKTHROUGH = "set_breakthrough";
     public static final String SET_HOMESYSTEM_POS = "set_hs_position";
     public static final String FRANKEN_FACTION_NAME = "franken_faction_suffix";
     public static final String FORCE = "force";

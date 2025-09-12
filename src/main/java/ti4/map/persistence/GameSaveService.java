@@ -41,10 +41,12 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.PatternHelper;
 import ti4.helpers.Storage;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
 import ti4.json.ObjectMapperFactory;
+import ti4.map.Expeditions;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -190,6 +192,33 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.CURRENT_ACDRAWSTATUS_INFO + " " + game.getCurrentACDrawStatusInfo());
         writer.write(System.lineSeparator());
+
+        // TE Expeditions
+        Expeditions exp = game.getExpeditions();
+        if (exp.getTechSkip() != null) {
+            writer.write(Constants.EXPEDITION_TECHSKIP + " " + exp.getTechSkip());
+            writer.write(System.lineSeparator());
+        }
+        if (exp.getTradeGoods() != null) {
+            writer.write(Constants.EXPEDITION_TRADEGOODS + " " + exp.getTradeGoods());
+            writer.write(System.lineSeparator());
+        }
+        if (exp.getFiveRes() != null) {
+            writer.write(Constants.EXPEDITION_FIVERES + " " + exp.getFiveRes());
+            writer.write(System.lineSeparator());
+        }
+        if (exp.getFiveInf() != null) {
+            writer.write(Constants.EXPEDITION_FIVEINF + " " + exp.getFiveInf());
+            writer.write(System.lineSeparator());
+        }
+        if (exp.getSecret() != null) {
+            writer.write(Constants.EXPEDITION_SECRET + " " + exp.getSecret());
+            writer.write(System.lineSeparator());
+        }
+        if (exp.getActionCards() != null) {
+            writer.write(Constants.EXPEDITION_ACTIONCARDS + " " + exp.getActionCards());
+            writer.write(System.lineSeparator());
+        }
 
         writer.write(Constants.LAST_ACTIVE_PLAYER_CHANGE + " "
                 + game.getLastActivePlayerChange().getTime());
@@ -456,6 +485,8 @@ class GameSaveService {
         writer.write(Constants.ACTIVATION_COUNT + " " + game.getActivationCount());
         writer.write(System.lineSeparator());
         writer.write(Constants.BASE_GAME_MODE + " " + game.isBaseGameMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.THUNDERS_EDGE_MODE + " " + game.isThundersEdge());
         writer.write(System.lineSeparator());
         writer.write(Constants.LIGHT_FOG_MODE + " " + game.isLightFogMode());
         writer.write(System.lineSeparator());
@@ -869,6 +900,12 @@ class GameSaveService {
                                     .toList()));
             writer.write(System.lineSeparator());
 
+            writeStrLine(writer, Constants.BREAKTHROUGH, player.getBreakthroughID());
+            writeBoolLine(writer, Constants.BREAKTHROUGH_UNL, player.isBreakthroughUnlocked());
+            writeBoolLine(writer, Constants.BREAKTHROUGH_EXH, player.isBreakthroughExhausted());
+            writeBoolLine(writer, Constants.BREAKTHROUGH_ACTV, player.isBreakthroughActive());
+            writeIntLine(writer, Constants.BREAKTHROUGH_TGS, player.getBreakthroughTGs());
+
             StringBuilder leaderInfo = new StringBuilder();
             if (player.getLeaders().isEmpty()) leaderInfo.append("none");
             for (Leader leader : player.getLeaders()) {
@@ -962,6 +999,23 @@ class GameSaveService {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         writer.write(saveID + " " + sb);
+        writer.write(System.lineSeparator());
+    }
+
+    private static void writeStrLine(Writer writer, String field, String str) throws IOException {
+        String output = StringHelper.escape(str != null ? str : "");
+        writer.write(field + " " + output);
+        writer.write(System.lineSeparator());
+    }
+
+    private static void writeBoolLine(Writer writer, String field, boolean bool) throws IOException {
+        String output = bool ? "true" : "false";
+        writer.write(field + " " + output);
+        writer.write(System.lineSeparator());
+    }
+
+    private static void writeIntLine(Writer writer, String field, int val) throws IOException {
+        writer.write(field + " " + val);
         writer.write(System.lineSeparator());
     }
 
