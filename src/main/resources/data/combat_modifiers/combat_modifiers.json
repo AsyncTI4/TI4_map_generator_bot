@@ -467,22 +467,6 @@
         "forCombatAbility": "AFB"
     },
     {
-        "alias": "plusX_letnev_breakthrough",
-        "type": "result_modifier",
-        "value": "+1",
-        "valueScalingType": "unique_ships",
-        "persistenceType": "CONDITIONAL",
-        "condition": "spacecombat",
-        "scope": "_mostdice_",
-        "related": [
-            {
-                "type": "breakthrough",
-                "alias": "letnevbt"
-            }
-        ],
-        "forCombatAbility": "combatround"
-    },
-    {
         "alias": "plus1_per_opponent_sftt",
         "type": "result_modifier",
         "value": "+1",
