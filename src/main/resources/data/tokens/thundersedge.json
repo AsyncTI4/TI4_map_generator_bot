@@ -2,20 +2,26 @@
     {
         "id": "avernus",
         "imagePath": "token_avernus.png",
+        "spaceOrPlanet": "space",
         "aliasList": [
             "avernus",
             "token_avernus",
             "stargate"
         ],
+        "tokenPlanetName": "avernus",
+        "isPlanet": true,
         "source": "thunders_edge"
     },
     {
         "id": "thundersedge",
         "imagePath": "token_thundersedge.png",
+        "spaceOrPlanet": "space",
         "aliasList": [
             "thundersedge",
             "token_thundersedge"
         ],
+        "tokenPlanetName": "thundersedge",
+        "isPlanet": true,
         "source": "thunders_edge"
     }
 ]
