@@ -5,6 +5,8 @@ import static ti4.helpers.StringHelper.ordinal;
 import java.text.NumberFormat;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.winningpath.WinningPathPersistenceService;
 
 @UtilityClass
 public class WinningPathComparisonService {
@@ -12,7 +14,8 @@ public class WinningPathComparisonService {
     public static String compareWinningPathToAllOthers(String winningPath, int playerCount, int victoryPointTotal) {
         StringBuilder sb = new StringBuilder();
         Map<String, Integer> winningPathCounts =
-                WinningPathPersistenceService.getWinningPathCounts(playerCount, victoryPointTotal);
+            SpringContext.getBean(WinningPathPersistenceService.class)
+                .getWinningPathCounts(playerCount, victoryPointTotal);
         int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
         if (gamesWithWinnerCount >= 100) {
             int winningPathCount = winningPathCounts.getOrDefault(winningPath, 1);

@@ -1,6 +1,6 @@
 package ti4;
 
-import static org.reflections.scanners.Scanners.*;
+import static org.reflections.scanners.Scanners.SubTypes;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -71,6 +71,8 @@ import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.winningpath.WinningPathPersistenceService;
 
 @SpringBootApplication
 public class AsyncTI4DiscordBot {
@@ -303,6 +305,9 @@ public class AsyncTI4DiscordBot {
         CloseLaunchThreadsCron.register();
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
+
+        // TO BE REMOVED AFTER FIRST RECOMPUTE
+        SpringContext.getBean(WinningPathPersistenceService.class).recompute();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
