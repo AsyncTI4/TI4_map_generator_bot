@@ -13,7 +13,6 @@ import ti4.map.Game;
 import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
-import ti4.service.draft.DraftSpec;
 import ti4.service.draft.DraftTileManager;
 
 @UtilityClass
@@ -28,12 +27,12 @@ public class MiltyService {
             TIGLHelper.sendTIGLSetupText(game);
         }
 
-        DraftSpec specs = DraftSpec.CreateFromMiltySettings(settings);
+        MiltyDraftSpec specs = MiltyDraftSpec.CreateFromMiltySettings(settings);
 
         return startFromSpecs(event, specs);
     }
 
-    public static String startFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
+    public static String startFromSpecs(GenericInteractionCreateEvent event, MiltyDraftSpec specs) {
         Game game = specs.game;
 
         if (specs.presetSlices != null) {

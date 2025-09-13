@@ -1,4 +1,4 @@
-package ti4.service.draft;
+package ti4.service.milty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +11,9 @@ import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.map.Game;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source;
-import ti4.service.milty.MiltyDraftSlice;
 
 @Data
-public class DraftSpec {
+public class MiltyDraftSpec {
     public Game game;
     public List<String> playerIDs, bannedFactions, priorityFactions, playerDraftOrder;
     public MapTemplateModel template;
@@ -30,7 +29,7 @@ public class DraftSpec {
     // other
     public List<MiltyDraftSlice> presetSlices;
 
-    public DraftSpec(Game game) {
+    public MiltyDraftSpec(Game game) {
         this.game = game;
         playerIDs = new ArrayList<>(game.getPlayerIDs());
         bannedFactions = new ArrayList<>();
@@ -46,9 +45,9 @@ public class DraftSpec {
         factionSources = new ArrayList<>(tileSources);
     }
 
-    public static DraftSpec CreateFromMiltySettings(MiltySettings settings) {
+    public static MiltyDraftSpec CreateFromMiltySettings(MiltySettings settings) {
         Game game = settings.getGame();
-        DraftSpec specs = new DraftSpec(game);
+        MiltyDraftSpec specs = new MiltyDraftSpec(game);
 
         // Load Game Specifications
         GameSettings gameSettings = settings.getGameSettings();
