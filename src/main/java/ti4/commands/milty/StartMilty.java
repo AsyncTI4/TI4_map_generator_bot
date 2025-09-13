@@ -13,7 +13,7 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
-import ti4.service.draft.DraftSpec;
+import ti4.service.milty.MiltyDraftSpec;
 import ti4.service.milty.MiltyService;
 
 class StartMilty extends GameStateSubcommand {
@@ -32,7 +32,7 @@ class StartMilty extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        DraftSpec specs = new DraftSpec(game);
+        MiltyDraftSpec specs = new MiltyDraftSpec(game);
 
         // Map Template ---------------------------------------------------------------------------
         MapTemplateModel template = getMapTemplateFromOption(event, game);

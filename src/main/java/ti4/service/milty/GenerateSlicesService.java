@@ -17,7 +17,6 @@ import ti4.image.PositionMapper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.MapTemplateModel;
-import ti4.service.draft.DraftSpec;
 import ti4.service.draft.DraftTileManager;
 import ti4.settings.GlobalSettings;
 
@@ -28,7 +27,7 @@ class GenerateSlicesService {
             GenericInteractionCreateEvent event,
             DraftTileManager tileManager,
             MiltyDraftManager draftManager,
-            DraftSpec specs) {
+            MiltyDraftSpec specs) {
         int sliceCount = specs.numSlices;
         boolean anomaliesCanTouch = specs.anomaliesCanTouch;
 
@@ -191,7 +190,8 @@ class GenerateSlicesService {
         return slice;
     }
 
-    private static boolean checkIfSliceIsGood(DraftSpec spec, MiltyDraftSlice slice, Map<String, Integer> failReasons) {
+    private static boolean checkIfSliceIsGood(
+            MiltyDraftSpec spec, MiltyDraftSlice slice, Map<String, Integer> failReasons) {
         Function<String, Integer> addReason =
                 reason -> failReasons.put(reason, failReasons.getOrDefault(reason, 0) + 1);
 
