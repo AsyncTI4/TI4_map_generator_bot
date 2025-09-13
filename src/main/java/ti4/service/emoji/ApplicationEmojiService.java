@@ -18,11 +18,11 @@ import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.emoji.ApplicationEmoji;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import org.apache.commons.collections4.SetUtils;
+import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.message.logging.BotLogger;
 import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
-import ti4.spring.jda.JdaService;
 
 public class ApplicationEmojiService {
 
@@ -129,7 +129,7 @@ public class ApplicationEmojiService {
     // CREATE -------------------------------------------------------------------------------------------------------
     private static ApplicationEmoji createAppEmoji(EmojiFileData emoji) {
         try {
-            return JdaService.jda
+            return AsyncTI4DiscordBot.jda
                     .createApplicationEmoji(emoji.getName(), emoji.getIcon())
                     .complete();
         } catch (Exception e) {
@@ -153,7 +153,7 @@ public class ApplicationEmojiService {
     // DELETE -------------------------------------------------------------------------------------------------------
     private static boolean deleteAppEmoji(CachedEmoji emoji) {
         try {
-            JdaService.jda
+            AsyncTI4DiscordBot.jda
                     .retrieveApplicationEmojiById(emoji.getId())
                     .complete()
                     .delete()
@@ -186,13 +186,13 @@ public class ApplicationEmojiService {
         CachedEmoji oldEmoji = emojis.get(name);
         try {
             Icon emojiIcon = file.getIcon();
-            return JdaService.jda
+            return AsyncTI4DiscordBot.jda
                     .retrieveApplicationEmojiById(oldEmoji.getId())
                     .flatMap(appEmoji -> {
                         emojis.get(name).setFormatted(fallbackEmoji);
                         return appEmoji.delete();
                     })
-                    .flatMap(v -> JdaService.jda.createApplicationEmoji(name, emojiIcon))
+                    .flatMap(v -> AsyncTI4DiscordBot.jda.createApplicationEmoji(name, emojiIcon))
                     .complete();
         } catch (Exception e) {
             BotLogger.error(Constants.jazzPing() + " Failed to upload emoji file: " + name, e);
@@ -224,7 +224,7 @@ public class ApplicationEmojiService {
     // Footgun
     private static void resetCacheFromDiscord() {
         List<ApplicationEmoji> appEmojis =
-                JdaService.jda.retrieveApplicationEmojis().complete();
+                AsyncTI4DiscordBot.jda.retrieveApplicationEmojis().complete();
         BotLogger.info("> - Discord has " + appEmojis.size() + " emojis.");
         emojis.clear();
         appEmojis.stream().map(CachedEmoji::new).forEach(e -> emojis.put(e.getName(), e));

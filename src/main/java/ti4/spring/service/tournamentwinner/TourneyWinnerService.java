@@ -4,7 +4,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
 import org.springframework.stereotype.Service;
-import ti4.spring.jda.JdaService;
+import ti4.AsyncTI4DiscordBot;
 
 @AllArgsConstructor
 @Service
@@ -28,7 +28,7 @@ public class TourneyWinnerService {
         StringBuilder sb = new StringBuilder("__**All Async TI4 Tournament Winners:**__");
         List<TournamentWinner> winners = tournamentWinnerRepository.findAll();
         for (TournamentWinner winner : winners) {
-            User user = JdaService.jda.getUserById(winner.getUserId());
+            User user = AsyncTI4DiscordBot.jda.getUserById(winner.getUserId());
             String name = user != null ? user.getEffectiveName() : winner.getUserName();
             sb.append("\n> ").append(name).append(" won ").append(winner.getTourneyName());
         }

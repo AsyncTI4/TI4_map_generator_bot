@@ -8,31 +8,31 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import ti4.AsyncTI4DiscordBot;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
-import ti4.spring.jda.JdaService;
 
 public class DeletionListener extends ListenerAdapter {
 
     @Override
     public void onMessageDelete(@Nonnull MessageDeleteEvent event) {
-        if (!validateEvent(event)) {}
+        if (!validateEvent(event)) return;
         // ExecutorServiceManager.runAsync("DeletionListener task", () -> handleMessageDelete(event));
         // reinstate this when it works/someone has time to make it work.
     }
 
     private static boolean validateEvent(MessageDeleteEvent event) {
-        if (!JdaService.isReadyToReceiveCommands()) {
+        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
             return false;
         }
         String eventGuild = event.getGuild().getId();
-        return JdaService.isValidGuild(eventGuild);
+        return AsyncTI4DiscordBot.isValidGuild(eventGuild);
     }
 
     private void handleMessageDelete(MessageDeleteEvent event) {
         try {
             TextChannel deletionLogChannel =
-                    JdaService.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
+                    AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
                             .findFirst()
                             .orElse(null);
             if (deletionLogChannel == null) return;

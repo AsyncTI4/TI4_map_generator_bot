@@ -36,6 +36,7 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
@@ -82,7 +83,6 @@ import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.user.AFKService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
-import ti4.spring.jda.JdaService;
 
 public class Player extends PlayerProperties {
 
@@ -322,7 +322,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public Role getRoleForCommunity() {
         try {
-            return JdaService.jda.getRoleById(getRoleIDForCommunity());
+            return AsyncTI4DiscordBot.jda.getRoleById(getRoleIDForCommunity());
         } catch (Exception e) {
         }
         return null;
@@ -332,7 +332,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public MessageChannel getPrivateChannel() {
         try {
-            return JdaService.jda.getTextChannelById(getPrivateChannelID());
+            return AsyncTI4DiscordBot.jda.getTextChannelById(getPrivateChannelID());
         } catch (Exception e) {
             return null;
         }
@@ -1168,7 +1168,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public User getUser() {
         // TODO: This is to handle JDA being null during tests. We should think of a cleaner solution.
-        return JdaService.jda == null ? null : JdaService.jda.getUserById(getUserID());
+        return AsyncTI4DiscordBot.jda == null ? null : AsyncTI4DiscordBot.jda.getUserById(getUserID());
     }
 
     @Override
@@ -1176,7 +1176,7 @@ public class Player extends PlayerProperties {
         User userById = getUser();
         if (userById == null) return super.getUserName();
 
-        Member member = JdaService.guildPrimary.getMemberById(getUserID());
+        Member member = AsyncTI4DiscordBot.guildPrimary.getMemberById(getUserID());
         if (member == null) {
             setUserName(userById.getName());
         } else {
@@ -1251,7 +1251,7 @@ public class Player extends PlayerProperties {
             if (roleForCommunity == null && !getTeamMateIDs().isEmpty()) {
                 StringBuilder sb = new StringBuilder((noFactionIcon ? "" : getFactionEmoji()));
                 for (String userID : getTeamMateIDs()) {
-                    User userById = JdaService.jda.getUserById(userID);
+                    User userById = AsyncTI4DiscordBot.jda.getUserById(userID);
                     if (userById == null) {
                         continue;
                     }

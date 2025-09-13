@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
+import ti4.AsyncTI4DiscordBot;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -29,7 +30,6 @@ import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.WhisperService;
 import ti4.service.game.CreateGameService;
 import ti4.service.game.GameNameService;
-import ti4.spring.jda.JdaService;
 
 public class MessageListener extends ListenerAdapter {
 
@@ -39,8 +39,8 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
-        if (!JdaService.isReadyToReceiveCommands()
-                || !JdaService.isValidGuild(event.getGuild().getId())) {
+        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()
+                || !AsyncTI4DiscordBot.isValidGuild(event.getGuild().getId())) {
             return;
         }
 
@@ -69,7 +69,7 @@ public class MessageListener extends ListenerAdapter {
             }
             // if ("572698679618568193".equalsIgnoreCase(event.getAuthor().getId())) {
             //     TextChannel deletionLogChannel =
-            //             JdaService.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
+            //             AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
             //                     .findFirst()
             //                     .orElse(null);
             //     if (deletionLogChannel == null) return;
@@ -132,7 +132,7 @@ public class MessageListener extends ListenerAdapter {
         String msg2 = lfgRole.getAsMention()
                 + " this game is looking for more members (it's old if it has -launched [FULL] in its title) "
                 + message.getJumpUrl();
-        TextChannel lfgPings = JdaService.guildPrimary.getTextChannelsByName("lfg-pings", true).stream()
+        TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("lfg-pings", true).stream()
                 .findFirst()
                 .orElse(null);
         MessageHelper.sendMessageToChannel(lfgPings, msg2);
@@ -337,13 +337,16 @@ public class MessageListener extends ListenerAdapter {
      * replicate messages in combat threads so that observers can see
      */
     private static void handleFogOfWarCombatThreadMirroring(MessageReceivedEvent event) {
-        if (!JdaService.fowServers.isEmpty()
+        if (!AsyncTI4DiscordBot.fowServers.isEmpty()
                 && // fog servers exists
-                !JdaService.fowServers.contains(event.getGuild())
+                !AsyncTI4DiscordBot.fowServers.contains(event.getGuild())
                 && // event server IS NOT the fog server
-                !JdaService.guildCommunityPlays.getId().equals(event.getGuild().getId())
+                !AsyncTI4DiscordBot.guildCommunityPlays
+                        .getId()
+                        .equals(event.getGuild().getId())
                 && // NOR the community server
-                JdaService.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) { // bot is running in production
+                AsyncTI4DiscordBot.guildPrimaryID.equals(
+                        Constants.ASYNCTI4_HUB_SERVER_ID)) { // bot is running in production
             return;
         } // else it's probably a dev/test server, so execute
 

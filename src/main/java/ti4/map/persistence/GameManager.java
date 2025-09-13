@@ -7,9 +7,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.AsyncTI4DiscordBot;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class GameManager {
@@ -75,7 +75,7 @@ public class GameManager {
                 .map(ManagedGame::isActive)
                 .orElse(false);
         if (wasActive != isActive) {
-            JdaService.updatePresence();
+            AsyncTI4DiscordBot.updatePresence();
         }
         return true;
     }

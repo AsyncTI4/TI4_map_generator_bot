@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -14,7 +15,6 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.franken.FrankenDraftBagService;
-import ti4.spring.jda.JdaService;
 
 public abstract class BagDraft {
     private static final Pattern FORWARD_SLASH_PATTERN = Pattern.compile("/");
@@ -205,7 +205,7 @@ public abstract class BagDraft {
             if (bagInfoThread != null && !bagInfoThread.isBlank() && !"null".equals(bagInfoThread)) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
 
-                ThreadChannel threadChannel = JdaService.jda.getThreadChannelById(bagInfoThread);
+                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(bagInfoThread);
                 if (threadChannel != null) return threadChannel;
 
                 // SEARCH FOR EXISTING OPEN THREAD
@@ -240,7 +240,7 @@ public abstract class BagDraft {
             if (bagInfoThread != null && !bagInfoThread.isBlank() && !"null".equals(bagInfoThread)) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
 
-                ThreadChannel threadChannel = JdaService.jda.getThreadChannelById(bagInfoThread);
+                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(bagInfoThread);
                 if (threadChannel != null) return threadChannel;
 
                 // SEARCH FOR EXISTING OPEN THREAD

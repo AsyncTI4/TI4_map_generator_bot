@@ -11,10 +11,10 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import lombok.Data;
 import lombok.Getter;
+import ti4.AsyncTI4DiscordBot;
 import ti4.image.Mapper;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
-import ti4.spring.jda.JdaService;
 
 public class Units {
 
@@ -58,7 +58,7 @@ public class Units {
 
         @JsonIgnore
         public String getFileName() {
-            if (JdaService.testingMode) return getFileName(false);
+            if (AsyncTI4DiscordBot.testingMode) return getFileName(false);
             return getFileName(RandomHelper.isOneInX(Constants.EYE_CHANCE));
         }
 

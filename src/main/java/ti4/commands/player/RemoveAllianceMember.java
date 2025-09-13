@@ -3,13 +3,13 @@ package ti4.commands.player;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.AsyncTI4DiscordBot;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.spring.jda.JdaService;
 
 class RemoveAllianceMember extends GameStateSubcommand {
 
@@ -42,11 +42,11 @@ class RemoveAllianceMember extends GameStateSubcommand {
         }
 
         player.getCardsInfoThread()
-                .removeThreadMember(JdaService.jda.getUserById(targetPlayer.getUserID()))
+                .removeThreadMember(AsyncTI4DiscordBot.jda.getUserById(targetPlayer.getUserID()))
                 .queue();
         targetPlayer
                 .getCardsInfoThread()
-                .removeThreadMember(JdaService.jda.getUserById(player.getUserID()))
+                .removeThreadMember(AsyncTI4DiscordBot.jda.getUserById(player.getUserID()))
                 .queue();
 
         MessageHelper.sendMessageToEventChannel(

@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import ti4.AsyncTI4DiscordBot;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.GameLaunchThreadHelper;
@@ -19,7 +20,6 @@ import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
-import ti4.spring.jda.JdaService;
 
 public class UserJoinServerListener extends ListenerAdapter {
 
@@ -30,17 +30,17 @@ public class UserJoinServerListener extends ListenerAdapter {
     }
 
     private static boolean validateEvent(GenericGuildEvent event) {
-        if (!JdaService.isReadyToReceiveCommands()) {
+        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
             return false;
         }
         String eventGuild = event.getGuild().getId();
-        return JdaService.isValidGuild(eventGuild);
+        return AsyncTI4DiscordBot.isValidGuild(eventGuild);
     }
 
     private void handleGuildMemberJoin(GuildMemberJoinEvent event) {
         try {
-            if (event.getGuild() == JdaService.guildPrimary) {
-                JdaService.guildPrimary.getTextChannelsByName("welcome-and-waving", true).stream()
+            if (event.getGuild() == AsyncTI4DiscordBot.guildPrimary) {
+                AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("welcome-and-waving", true).stream()
                         .findFirst()
                         .ifPresent(
                                 welcomeChannel -> MessageHelper.sendMessageToChannel(

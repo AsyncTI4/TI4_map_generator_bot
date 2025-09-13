@@ -29,6 +29,7 @@ import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
+import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.commands.CommandHelper;
@@ -49,7 +50,6 @@ import ti4.service.image.FileUploadService;
 import ti4.service.option.GameOptionService;
 import ti4.settings.GlobalSettings;
 import ti4.settings.users.UserSettingsManager;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class CreateGameService {
@@ -75,7 +75,7 @@ public class CreateGameService {
         if (game == null) return;
 
         TextChannel bothelperLoungeChannel =
-                JdaService.guildPrimary.getTextChannelsByName("staff-lounge", true).stream()
+                AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true).stream()
                         .findFirst()
                         .orElse(null);
         if (bothelperLoungeChannel == null) return;
@@ -443,7 +443,7 @@ public class CreateGameService {
     }
 
     public static boolean gameOrRoleAlreadyExists(String name) {
-        List<Guild> guilds = JdaService.jda.getGuilds();
+        List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
         List<String> gameAndRoleNames = new ArrayList<>();
 
         // GET ALL PBD ROLES FROM ALL GUILDS
@@ -462,7 +462,7 @@ public class CreateGameService {
     }
 
     private static List<Integer> getAllExistingPBDNumbers() {
-        List<Guild> guilds = new ArrayList<>(JdaService.guilds);
+        List<Guild> guilds = new ArrayList<>(AsyncTI4DiscordBot.guilds);
         List<Integer> pbdNumbers = new ArrayList<>();
 
         // GET ALL PBD ROLES FROM ALL GUILDS
@@ -496,13 +496,13 @@ public class CreateGameService {
 
     @Nullable
     private static Guild getServerWithMostCapacity() {
-        List<Guild> guilds = JdaService.serversToCreateNewGamesOn.stream()
+        List<Guild> guilds = AsyncTI4DiscordBot.serversToCreateNewGamesOn.stream()
                 .filter(CreateGameService::serverHasRoomForNewFullCategory)
                 .sorted(Comparator.comparing(CreateGameService::getServerCapacityForNewGames))
                 .toList();
 
-        if (guilds.isEmpty() && serverHasRoomForNewFullCategory(JdaService.guildPrimary)) {
-            return JdaService.guildPrimary;
+        if (guilds.isEmpty() && serverHasRoomForNewFullCategory(AsyncTI4DiscordBot.guildPrimary)) {
+            return AsyncTI4DiscordBot.guildPrimary;
         }
 
         if (guilds.isEmpty()) {
@@ -622,7 +622,7 @@ public class CreateGameService {
     }
 
     public static List<Category> getAllAvailablePBDCategories() {
-        return JdaService.getAvailablePBDCategories();
+        return AsyncTI4DiscordBot.getAvailablePBDCategories();
     }
 
     public static Category createNewCategory(String categoryName) {
@@ -633,7 +633,7 @@ public class CreateGameService {
             return null;
         }
 
-        List<Category> categories = JdaService.jda.getCategoriesByName(categoryName, false);
+        List<Category> categories = AsyncTI4DiscordBot.jda.getCategoriesByName(categoryName, false);
         if (!categories.isEmpty()) {
             String message = categories.stream().map(Channel::getAsMention).collect(Collectors.joining("\n"));
             BotLogger.info("Game Channel Creation - Category Already Exists:\n" + message);
@@ -675,7 +675,7 @@ public class CreateGameService {
     }
 
     public static boolean isLockedFromCreatingGames(GenericInteractionCreateEvent event) {
-        if (CommandHelper.hasRole(event, JdaService.bothelperRoles)) {
+        if (CommandHelper.hasRole(event, AsyncTI4DiscordBot.bothelperRoles)) {
             return false;
         }
 
