@@ -95,6 +95,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.draft.DraftTileManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -198,6 +199,7 @@ public class Game extends GameProperties {
     private Map<String, Integer> tileDistances = new HashMap<>();
 
     private MiltyDraftManager miltyDraftManager;
+    private DraftTileManager draftTileManager;
 
     @Getter
     private Expeditions expeditions = new Expeditions(this);
@@ -377,6 +379,16 @@ public class Game extends GameProperties {
 
     public void setMiltyDraftManager(MiltyDraftManager miltyDraftManager) {
         this.miltyDraftManager = miltyDraftManager;
+    }
+
+    @NotNull
+    @JsonIgnore
+    public DraftTileManager getDraftTileManager() {
+        if (draftTileManager == null) {
+            draftTileManager = new DraftTileManager();
+            draftTileManager.reset(this);
+        }
+        return draftTileManager;
     }
 
     @Nullable
@@ -1886,7 +1898,8 @@ public class Game extends GameProperties {
     }
 
     /**
-     * @param soToPoList - a list of Secret Objective IDs that have been turned into Public Objectives (typically via Classified Document Leaks)
+     * @param soToPoList - a list of Secret Objective IDs that have been turned into
+     *                   Public Objectives (typically via Classified Document Leaks)
      */
     public void setSoToPoList(List<String> soToPoList) {
         this.soToPoList = soToPoList;
@@ -1901,7 +1914,8 @@ public class Game extends GameProperties {
     }
 
     /**
-     * @return Map of (ObjectiveModelID or ProperName if Custom, List of ({@link Player#getUserID}))
+     * @return Map of (ObjectiveModelID or ProperName if Custom, List of
+     *         ({@link Player#getUserID}))
      */
     public Map<String, List<String>> getScoredPublicObjectives() {
         return scoredPublicObjectives;
@@ -3219,7 +3233,8 @@ public class Game extends GameProperties {
         DeckSettings deckSettings = miltySettings.getGameSettings().getDecks();
 
         boolean success = true;
-        // &= is the "and operator". It will assign true to success iff success is true and the result is true.
+        // &= is the "and operator". It will assign true to success iff success is true
+        // and the result is true.
         // Otherwise it will propagate a false value to the end
         success &= validateAndSetPublicObjectivesStage1Deck(
                 event, deckSettings.getStage1().getValue());
@@ -4018,7 +4033,8 @@ public class Game extends GameProperties {
 
     /**
      * @param scID
-     * @return true when the Game's SC Set contains a strategt card which uses a certain automation
+     * @return true when the Game's SC Set contains a strategt card which uses a
+     *         certain automation
      */
     public boolean usesStrategyCardAutomation(String scID) {
         return getStrategyCardSet().getStrategyCardModels().stream()
@@ -4487,10 +4503,12 @@ public class Game extends GameProperties {
                 .count();
         int round = getRound();
         String phaseOfGame = StringUtils.defaultString(getPhaseOfGame());
-        // if we're in action, we haven't revealed this round's public; can't filter on status because sometimes people
+        // if we're in action, we haven't revealed this round's public; can't filter on
+        // status because sometimes people
         // reveal despite game end
         int extraIfNotActionPhase = phaseOfGame.contains("action") ? 0 : 1;
-        // if neuraloop is in the deck, or we're not using Codex 4, we can make additional assumptions about number of
+        // if neuraloop is in the deck, or we're not using Codex 4, we can make
+        // additional assumptions about number of
         // publics
         if (relics.contains("neuraloop") || !isCodex4()) {
             // 5 revealed by round 5 and Incentive Program
@@ -4498,9 +4516,11 @@ public class Game extends GameProperties {
             if (round < 5) {
                 // We can't have less stage 1s than this
                 if (revealedStage1Count < round + 1) return true;
-                // Round + 1 revealed by this point, plus Incentive Program; 1 extra if we're not in action phase
+                // Round + 1 revealed by this point, plus Incentive Program; 1 extra if we're
+                // not in action phase
                 if (revealedStage1Count > round + 2 + extraIfNotActionPhase) return true;
-                // At most 1 Stage 2 can be revealed, by Incentive Program; 1 extra if we're not in action phase and its
+                // At most 1 Stage 2 can be revealed, by Incentive Program; 1 extra if we're not
+                // in action phase and its
                 // round 4
                 int extraIfRound4AndNotActionPhase = round != 4 ? 0 : extraIfNotActionPhase;
                 if (revealedStage2Count > 1 + extraIfRound4AndNotActionPhase) return true;
@@ -4509,12 +4529,14 @@ public class Game extends GameProperties {
                 // We can't have less stage 1s than this
                 if (revealedStage1Count < 5) return true;
                 if (revealedStage2Count < round - 4) return true;
-                // 1 revealed per round past round 4 and Incentive Program; 1 extra if we're not in action phase
+                // 1 revealed per round past round 4 and Incentive Program; 1 extra if we're not
+                // in action phase
                 if (revealedStage2Count > round - 3 + extraIfNotActionPhase) return true;
             }
         }
 
-        // Extra stage 1 on round 1, Incentive Program during agenda phase; 1 extra if we're not in action phase
+        // Extra stage 1 on round 1, Incentive Program during agenda phase; 1 extra if
+        // we're not in action phase
         return revealedStage1Count + revealedStage2Count > round + 2 + extraIfNotActionPhase;
     }
 

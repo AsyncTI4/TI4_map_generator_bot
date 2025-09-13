@@ -14,10 +14,10 @@ import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel;
 import ti4.model.TechSpecialtyModel;
 import ti4.model.TileModel;
+import ti4.service.draft.DraftTileManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
-import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftTile;
 
 public class BlueTileDraftItem extends DraftItem {
@@ -78,19 +78,19 @@ public class BlueTileDraftItem extends DraftItem {
         return PlanetEmojis.SemLor;
     }
 
-    public static List<DraftItem> buildAllDraftableItems(MiltyDraftManager draftManager) {
+    public static List<DraftItem> buildAllDraftableItems(DraftTileManager draftTileManager) {
         List<DraftItem> allItems = new ArrayList<>();
-        for (MiltyDraftTile tile : draftManager.getBlue()) {
+        for (MiltyDraftTile tile : draftTileManager.getBlue()) {
             allItems.add(generate(DraftItem.Category.BLUETILE, tile.getTile().getTileID()));
         }
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.BLUETILE);
         return allItems;
     }
 
-    public static List<DraftItem> buildAllDraftableItems(MiltyDraftManager draftManager, Game game) {
+    public static List<DraftItem> buildAllDraftableItems(DraftTileManager draftTileManager, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
         String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedTiles"));
-        for (MiltyDraftTile tile : draftManager.getBlue()) {
+        for (MiltyDraftTile tile : draftTileManager.getBlue()) {
             if (Arrays.asList(results).contains(tile.getTile().getTileID())) {
                 continue;
             }
