@@ -83,6 +83,14 @@ import ti4.website.model.WebsiteOverlay;
 
 class PlayerAreaGenerator {
 
+    private static final Stroke stroke1 = new BasicStroke(1.0f);
+    private static final Stroke stroke2 = new BasicStroke(2.0f);
+    private static final Stroke stroke3 = new BasicStroke(3.0f);
+    private static final Stroke stroke4 = new BasicStroke(4.0f);
+    private static final Stroke stroke5 = new BasicStroke(5.0f);
+    private static final Stroke stroke8 = new BasicStroke(8.0f);
+    private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -1.5707963267948966;
+
     private final Graphics graphics;
     private final Game game;
     private final boolean isFoWPrivate;
@@ -90,16 +98,8 @@ class PlayerAreaGenerator {
     private final List<WebsiteOverlay> websiteOverlays;
     private final int mapWidth;
     private final int scoreTokenSpacing;
-
     private final ResourceHelper resourceHelper = ResourceHelper.getInstance();
     private final Map<UnitKey, Integer> unitCount = new HashMap<>();
-
-    private static final Stroke stroke1 = new BasicStroke(1.0f);
-    private static final Stroke stroke2 = new BasicStroke(2.0f);
-    private static final Stroke stroke3 = new BasicStroke(3.0f);
-    private static final Stroke stroke4 = new BasicStroke(4.0f);
-    private static final Stroke stroke5 = new BasicStroke(5.0f);
-    private static final Stroke stroke8 = new BasicStroke(8.0f);
 
     PlayerAreaGenerator(
             Graphics graphics,
@@ -2284,7 +2284,7 @@ class PlayerAreaGenerator {
         AffineTransform orig = g2.getTransform();
         g2.setStroke(stroke2);
         g2.setFont(Storage.getFont18());
-        g2.rotate(-1.5707963267948966);
+        g2.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
 
         g2.setColor(textColor);
         String firstRow = StringUtils.left(StringUtils.substringBefore(displayText, "\n"), 20)
