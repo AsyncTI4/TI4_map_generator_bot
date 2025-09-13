@@ -38,9 +38,10 @@ import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.statistics.game.WinningPathComparisonService;
 import ti4.service.statistics.game.WinningPathHelper;
-import ti4.service.statistics.game.WinningPathPersistenceService;
 import ti4.service.tigl.TiglGameReport;
 import ti4.service.tigl.TiglPlayerResult;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.winningpath.WinningPathPersistenceService;
 import ti4.website.UltimateStatisticsWebsiteHelper;
 
 @UtilityClass
@@ -200,7 +201,7 @@ public class EndGameService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
 
         writeChronicle(game, event, publish);
-        WinningPathPersistenceService.addGame(game);
+        SpringContext.getBean(WinningPathPersistenceService.class).addGame(game);
     }
 
     private static void writeChronicle(Game game, GenericInteractionCreateEvent event, boolean publish) {
