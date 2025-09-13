@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import ti4.AsyncTI4DiscordBot;
 import ti4.commands.CommandHelper;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.commands.uncategorized.ServerPromoteCommand;
@@ -67,6 +66,7 @@ import ti4.service.map.MapPresetService;
 import ti4.service.statistics.PlayerStatTypes;
 import ti4.service.statistics.game.GameStatTypes;
 import ti4.settings.GlobalSettings;
+import ti4.spring.jda.JdaService;
 
 public class AutoCompleteProvider {
 
@@ -340,7 +340,7 @@ public class AutoCompleteProvider {
             case Constants.CATEGORY -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Category> categories = new ArrayList<>();
-                for (Guild guild : AsyncTI4DiscordBot.guilds) {
+                for (Guild guild : JdaService.guilds) {
                     categories.addAll(guild.getCategories());
                 }
                 List<Command.Choice> options = categories.stream()
