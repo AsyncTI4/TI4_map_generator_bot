@@ -1,4 +1,4 @@
-package ti4.spring.ws;
+package ti4.spring.websocket;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
