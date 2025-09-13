@@ -36,7 +36,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import org.apache.commons.lang3.StringUtils;
-import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -79,6 +78,7 @@ import ti4.model.UnitModel;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.user.AFKService;
+import ti4.spring.jda.JdaService;
 import ti4.website.model.WebsiteOverlay;
 
 class PlayerAreaGenerator {
@@ -203,7 +203,7 @@ class PlayerAreaGenerator {
 
         // Player/Teammate Names
         for (String teammateID : teammateIDs) {
-            User user = AsyncTI4DiscordBot.jda.getUserById(teammateID);
+            User user = JdaService.jda.getUserById(teammateID);
 
             int leftJustified = x;
             int topOfName = y + 10;
@@ -213,7 +213,7 @@ class PlayerAreaGenerator {
                 Guild guild = game.getGuild();
                 Member member = guild != null ? guild.getMemberById(teammateID) : null;
                 if (member == null) {
-                    member = AsyncTI4DiscordBot.guildPrimary.getMemberById(teammateID);
+                    member = JdaService.guildPrimary.getMemberById(teammateID);
                 }
                 userName.append(" ");
 
@@ -2284,7 +2284,7 @@ class PlayerAreaGenerator {
         AffineTransform orig = g2.getTransform();
         g2.setStroke(stroke2);
         g2.setFont(Storage.getFont18());
-        g2.rotate(Math.toRadians(-90));
+        g2.rotate(-1.5707963267948966);
 
         g2.setColor(textColor);
         String firstRow = StringUtils.left(StringUtils.substringBefore(displayText, "\n"), 20)

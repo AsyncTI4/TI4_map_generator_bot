@@ -27,7 +27,7 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.settings.GlobalSettings;
 import ti4.spring.context.SpringContext;
-import ti4.spring.ws.WebSocketNotifier;
+import ti4.spring.websocket.WebSocketNotifier;
 import ti4.website.model.WebCardPool;
 import ti4.website.model.WebLaw;
 import ti4.website.model.WebObjectives;
