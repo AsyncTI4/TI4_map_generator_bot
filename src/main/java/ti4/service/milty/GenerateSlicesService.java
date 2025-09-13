@@ -17,14 +17,18 @@ import ti4.image.PositionMapper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.MapTemplateModel;
-import ti4.service.milty.MiltyService.DraftSpec;
+import ti4.service.draft.DraftSpec;
+import ti4.service.draft.DraftTileManager;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass
 class GenerateSlicesService {
 
     public static boolean generateSlices(
-            GenericInteractionCreateEvent event, MiltyDraftManager draftManager, DraftSpec specs) {
+            GenericInteractionCreateEvent event,
+            DraftTileManager tileManager,
+            MiltyDraftManager draftManager,
+            DraftSpec specs) {
         int sliceCount = specs.numSlices;
         boolean anomaliesCanTouch = specs.anomaliesCanTouch;
 
@@ -38,8 +42,8 @@ class GenerateSlicesService {
         Map<String, Integer> reasons = new HashMap<>();
         Function<String, Integer> addReason = reason -> reasons.put(reason, reasons.getOrDefault(reason, 0) + 1);
 
-        List<MiltyDraftTile> allTiles = draftManager.getBlue();
-        allTiles.addAll(draftManager.getRed());
+        List<MiltyDraftTile> allTiles = tileManager.getBlue();
+        allTiles.addAll(tileManager.getRed());
         int totalWHs = (int) allTiles.stream()
                 .filter(tile -> tile.isHasAlphaWH() || tile.isHasBetaWH() || tile.isHasOtherWH())
                 .count();
@@ -48,15 +52,17 @@ class GenerateSlicesService {
         if (specs.playerIDs.size() == 2) extraWHs = 3; // lessen the behavior if there's 2 players
         if (!specs.extraWHs) extraWHs = 0;
 
-        // Partition blue tiles to split them up into "tiers" so that slices get 1 good tile, 1 medium tile, and 1 meh
+        // Partition blue tiles to split them up into "tiers" so that slices get 1 good
+        // tile, 1 medium tile, and 1 meh
         // tile
-        List<MiltyDraftTile> blue = draftManager.getBlue();
+        List<MiltyDraftTile> blue = tileManager.getBlue();
         blue.sort(Comparator.comparingDouble(MiltyDraftTile::abstractValue));
         int bluePerPartition = Math.ceilDiv(blue.size(), bluePerPlayer);
         List<List<MiltyDraftTile>> partitionedTiles = new ArrayList<>(ListUtils.partition(blue, bluePerPartition));
 
-        // Partition RED tiles into "tiers" so that slices don't get dumb stuff like 2 supernovae, 2 rifts, etc
-        List<MiltyDraftTile> red = draftManager.getRed();
+        // Partition RED tiles into "tiers" so that slices don't get dumb stuff like 2
+        // supernovae, 2 rifts, etc
+        List<MiltyDraftTile> red = tileManager.getRed();
         red.sort(Comparator.comparingDouble(MiltyDraftTile::abstractValue));
         int redPerPartition = Math.ceilDiv(red.size(), redPerPlayer);
         partitionedTiles.addAll(ListUtils.partition(red, redPerPartition));
@@ -117,6 +123,7 @@ class GenerateSlicesService {
             i++;
         }
         if (!slicesCreated) {
+            tileManager.clear();
             draftManager.clear();
         }
 
