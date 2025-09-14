@@ -12,7 +12,7 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.service.milty.MiltyService;
+import ti4.service.draft.PlayerSetupService;
 
 class Setup extends GameStateSubcommand {
 
@@ -63,6 +63,6 @@ class Setup extends GameStateSubcommand {
         String positionHS = StringUtils.substringBefore(
                 event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString),
                 " "); // Substring to grab "305" from "305 Moll Primus (Mentak)" autocomplete
-        MiltyService.secondHalfOfPlayerSetup(player, game, color, faction, positionHS, event, setSpeaker);
+        PlayerSetupService.secondHalfOfPlayerSetup(player, game, color, faction, positionHS, event, setSpeaker);
     }
 }
