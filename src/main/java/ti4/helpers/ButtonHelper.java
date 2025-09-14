@@ -95,7 +95,6 @@ import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.decks.ShowActionCardsService;
-import ti4.service.draft.PlayerSetupService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -111,6 +110,7 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftTile;
+import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.regex.RegexService;
 import ti4.service.tech.ShowTechDeckService;
@@ -5861,7 +5861,7 @@ public class ButtonHelper {
         }
         Collections.shuffle(colors);
         for (int i = 0; i < players.size() && i < 12; i++) {
-            PlayerSetupService.secondHalfOfPlayerSetup(
+            MiltyService.secondHalfOfPlayerSetup(
                     players.get(i), game, colors.get(i), "franken" + emojiNum.get(i), "20" + (i + 1), event, false);
         }
         MessageHelper.sendMessageToChannel(
@@ -6236,9 +6236,9 @@ public class ButtonHelper {
         if (game.getPlayerFromColorOrFaction(color) != null) color = player.getNextAvailableColour();
         if (buttonID.split("_").length == 6 || speaker != null) {
             if (speaker != null) {
-                PlayerSetupService.secondHalfOfPlayerSetup(player, game, color, factionId, pos, event, false);
+                MiltyService.secondHalfOfPlayerSetup(player, game, color, factionId, pos, event, false);
             } else {
-                PlayerSetupService.secondHalfOfPlayerSetup(
+                MiltyService.secondHalfOfPlayerSetup(
                         player, game, color, factionId, pos, event, "yes".equalsIgnoreCase(buttonID.split("_")[5]));
             }
         } else {

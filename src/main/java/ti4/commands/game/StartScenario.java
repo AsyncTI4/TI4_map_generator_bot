@@ -17,10 +17,10 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
-import ti4.service.draft.PlayerSetupService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.map.AddTileListService;
+import ti4.service.milty.MiltyService;
 import ti4.service.objectives.DrawSecretService;
 import ti4.service.unit.AddUnitService;
 
@@ -76,7 +76,7 @@ public class StartScenario extends GameStateSubcommand {
                     speaker = chance == face;
                 }
                 if (tile != null) {
-                    PlayerSetupService.secondHalfOfPlayerSetup(
+                    MiltyService.secondHalfOfPlayerSetup(
                             players.get(face),
                             game,
                             players.get(face).getNextAvailableColour(),
@@ -144,7 +144,7 @@ public class StartScenario extends GameStateSubcommand {
                     default -> color;
                 };
                 if (tile != null) {
-                    PlayerSetupService.secondHalfOfPlayerSetup(
+                    MiltyService.secondHalfOfPlayerSetup(
                             players.get(face), game, color, faction, tile.getPosition(), event, speaker);
                     players.remove(face);
                 }
