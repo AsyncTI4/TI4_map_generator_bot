@@ -290,6 +290,22 @@ public class ExploreService {
                     Mapper.getPlanet(planetName).getName()
                             + " has been automatically readied because you have _Pre-Fab Arcologies_.");
         }
+        if (player.hasAbility("ultimate_authority")) {
+            Planet plan = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+            if (plan != null) {
+                if (plan.getUnitCount(player.getColorID()) > 2) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
+                    MessageHelper.sendMessageToChannel(
+                            (MessageChannel) event.getChannel(),
+                            player.getRepresentation() + " can draw 1 AC via their ultimate authority ability");
+                    MessageHelper.sendMessageToChannel(
+                            (MessageChannel) event.getChannel(),
+                            player.getRepresentation() + " use button to resolve",
+                            buttons);
+                }
+            }
+        }
         if (ButtonHelper.doesPlayerHaveFSHere("ghemina_flagship_lord", player, tile)) {
             AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planetName);
             MessageHelper.sendMessageToChannel(

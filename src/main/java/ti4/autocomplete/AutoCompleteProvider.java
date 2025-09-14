@@ -952,6 +952,12 @@ public class AutoCompleteProvider {
                 options = searchModels(event, Mapper.getActionCards().values(), source);
             case Constants.SEARCH_AGENDAS ->
                 options = searchModels(event, Mapper.getAgendas().values(), source);
+            case Constants.SEARCH_GALACTIC_EVENTS ->
+                options = searchModels(event, Mapper.getGalacticEvents().values(), source);
+            case Constants.SEARCH_RULES ->
+                options = searchModels(event, Mapper.getRules().values(), source);
+            case Constants.SEARCH_BREAKTHROUGHS ->
+                options = searchModels(event, Mapper.getBreakthroughs().values(), source);
             case Constants.SEARCH_ATTACHMENTS ->
                 options = searchModels(event, Mapper.getAttachments().values(), source);
             // no /search colors yet, but there is /help sample_colors

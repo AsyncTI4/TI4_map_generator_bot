@@ -14,8 +14,6 @@ public class SearchCommand implements ParentCommand {
                     // - keep in this command /search commands, sources, emojis, games, forgames, mygames, mytitles
                     // - create a new command /search_comps for all the rest
 
-                    new SearchCommandsSubcommand(),
-
                     /* From \data\ */
                     new SearchAbilitiesSubcommand(),
                     new SearchActionCardsSubcommand(),
@@ -23,10 +21,7 @@ public class SearchCommand implements ParentCommand {
                     new SearchAttachmentsSubcommand(),
                     // no /search colors yet, but there is /help sample_colors
                     // no /search combat_modifiers yet
-                    new SearchDecksSubcommand(),
-                    new SearchEventsSubcommand(),
                     new SearchExploresSubcommand(),
-                    new SearchFactionsSubcommand(),
                     // no /search franken_errata yet
                     // no /search generic_cards yet
                     new SearchLeadersSubcommand(),
@@ -35,23 +30,20 @@ public class SearchCommand implements ParentCommand {
                     new SearchPublicObjectivesSubcommand(),
                     new SearchRelicsSubcommand(),
                     new SearchSecretObjectivesSubcommand(),
-                    new SearchSources(),
-                    // no /search strategy_card_sets yet
-                    new SearchStrategyCardsSubcommand(),
+                    // new SearchSources(),
                     new SearchTechsSubcommand(),
                     new SearchTokensSubcommand(),
                     new SearchUnitsSubcommand(),
-
-                    /* From \resources\ */
-                    new SearchEmojis(),
                     new SearchPlanetsSubcommand(),
                     new SearchTilesSubcommand(),
+                    new SearchBreakthroughs(),
+                    new SearchRules(),
+                    new SearchGalacticEventsSubcommand(),
 
                     /* From others */
                     // new SearchGames(),
                     new SearchForGame(),
-                    new SearchMyGames(),
-                    new SearchMyTitles())
+                    new SearchMyGames())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

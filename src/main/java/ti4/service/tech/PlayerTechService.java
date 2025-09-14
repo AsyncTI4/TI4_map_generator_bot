@@ -304,6 +304,19 @@ public class PlayerTechService {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
+            case "baarvag" -> { // Mageon
+                deleteIfButtonEvent(event);
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentationUnfogged() + " use buttons to discard",
+                        ActionCardHelper.getDiscardActionCardButtons(player, false));
+                String message =
+                        player.getRepresentationUnfogged() + ", after discarding an AC, use this button to draw an AC.";
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                sendNextActionButtonsIfButtonEvent(event, game, player);
+            }
             case "dslaneb" -> {
                 deleteIfButtonEvent(event);
                 MessageHelper.sendMessageToChannel(
