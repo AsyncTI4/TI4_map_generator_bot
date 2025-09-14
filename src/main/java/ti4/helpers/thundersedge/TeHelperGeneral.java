@@ -32,6 +32,7 @@ public class TeHelperGeneral {
         String info = game.getExpeditions().printExpeditionInfo();
         List<Button> butts = game.getExpeditions().getRemainingExpeditionButtons(player);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), info, butts);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("placeThundersEdge")

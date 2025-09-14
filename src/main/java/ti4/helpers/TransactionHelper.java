@@ -1403,7 +1403,7 @@ public class TransactionHelper {
                 if (game.isNoSwapMode()) {
                     if (id.endsWith("sftt") && p1.getPromissoryNotesInPlayArea().contains(p2.getColor() + "_sftt")) {
                         MessageHelper.sendMessageToChannel(
-                                event.getMessageChannel(),
+                                p1.getCardsInfoThread(),
                                 p1.getRepresentation()
                                         + ", you cannot swap _Supports For The Thrones_ in this game (it has banned _Support For The Throne_ swaps).");
                         return;

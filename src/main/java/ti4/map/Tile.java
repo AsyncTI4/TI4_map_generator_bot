@@ -627,6 +627,16 @@ public class Tile {
         return false;
     }
 
+    public boolean hasLegendary() {
+        for (Planet planet : getPlanetUnitHolders()) {
+            if (planet.isLegendary()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @JsonIgnore
     public boolean containsPlayersUnits(Player p) {
         return unitHolders.values().stream()

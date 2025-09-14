@@ -19,6 +19,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
+import ti4.service.turn.StartTurnService;
 
 public class PlanetExhaustAbility extends PlanetAddRemove {
 
@@ -84,6 +85,10 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             case "primor" -> {
                 output = "Use buttons to drop 2 infantry on a planet.";
                 buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
+            }
+            case "thundersedge" -> {
+                output = "Use buttons to do another action.";
+                buttons.addAll(StartTurnService.getStartOfTurnButtons(player, game, true, null));
             }
             case "ordinianc4" -> {
                 ActionCardHelper.drawActionCards(game, player, 1, true);
