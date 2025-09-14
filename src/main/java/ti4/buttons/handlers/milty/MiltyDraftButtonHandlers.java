@@ -13,9 +13,9 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
-import ti4.service.draft.FactionExtraSetupHelper;
 import ti4.service.milty.DraftDisplayService;
 import ti4.service.milty.MiltyDraftManager;
+import ti4.service.milty.MiltyService;
 import ti4.service.regex.RegexService;
 
 @UtilityClass
@@ -67,7 +67,7 @@ class MiltyDraftButtonHandlers {
                 String keleresName =
                         Mapper.getFaction("keleres" + preset.charAt(0)).getFactionTitle();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Successfully preset " + keleresName);
-                FactionExtraSetupHelper.offerKeleresSetupButtons(game.getMiltyDraftManager(), player);
+                MiltyService.offerKeleresSetupButtons(game.getMiltyDraftManager(), player);
                 ButtonHelper.deleteMessage(event);
             }
         });
