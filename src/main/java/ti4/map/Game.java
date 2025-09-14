@@ -95,6 +95,8 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.draft.DraftLoadService;
+import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftTileManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
@@ -200,6 +202,7 @@ public class Game extends GameProperties {
 
     private MiltyDraftManager miltyDraftManager;
     private DraftTileManager draftTileManager;
+    private DraftManager draftManager;
 
     @Getter
     private Expeditions expeditions = new Expeditions(this);
@@ -207,6 +210,10 @@ public class Game extends GameProperties {
     @Setter
     @Getter
     private String miltyDraftString;
+
+    @Setter
+    @Getter
+    private List<String> draftString;
 
     @Setter
     private MiltySettings miltySettings;
@@ -389,6 +396,23 @@ public class Game extends GameProperties {
             draftTileManager.reset(this);
         }
         return draftTileManager;
+    }
+
+    @NotNull
+    @JsonIgnore
+    public DraftManager getDraftManager() {
+        if(draftManager == null) {
+            if (!draftString.isEmpty()) {
+                try {
+                    draftManager = DraftLoadService.loadDraftManager(this, draftString);
+                } catch (Exception e) {
+                    draftManager = new DraftManager(this, getRealPlayerIDs());
+                }
+            } else {
+                draftManager = new DraftManager(this, getRealPlayerIDs());
+            }
+        }
+        return draftManager;
     }
 
     @Nullable

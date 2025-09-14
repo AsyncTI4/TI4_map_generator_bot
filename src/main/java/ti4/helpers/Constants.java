@@ -1006,6 +1006,7 @@ public class Constants {
     public static final String BAG_DRAFT = "bag_draft";
     public static final String MILTY_DRAFT_MANAGER = "milty_draft_manager";
     public static final String MILTY_DRAFT_SETTINGS = "milty_draft_settings";
+    public static final String DRAFT_MANAGER = "draft_manager";
 
     // ABILITY, TECH, AGENT, COMMANDER, HERO, MECH, FLAGSHIP, COMMODITIES, PN, HOMESYSTEM, STARTINGTECH, STARTINGFLEET,
     // BLUETILE, REDTILE, DRAFTORDER

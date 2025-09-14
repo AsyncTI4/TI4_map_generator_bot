@@ -27,7 +27,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
-import ti4.service.milty.DraftDisplayService;
+import ti4.service.milty.MiltyDraftDisplayService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.settings.users.UserSettingsManager;
 
@@ -199,7 +199,7 @@ class Replace extends GameStateSubcommand {
         if (game.getMiltyDraftManager().getDraftIndex()
                 < game.getMiltyDraftManager().getDraftOrder().size()) {
             MiltyDraftManager manager = game.getMiltyDraftManager();
-            DraftDisplayService.repostDraftInformation(manager, game);
+            MiltyDraftDisplayService.repostDraftInformation(manager, game);
         }
 
         game.setReplacementMade(true);

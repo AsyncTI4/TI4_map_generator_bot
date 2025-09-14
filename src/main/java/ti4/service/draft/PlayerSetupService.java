@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -43,6 +45,25 @@ import ti4.service.tech.ListTechService;
 
 @UtilityClass
 public class PlayerSetupService {
+    @Data
+    public static class PlayerSetupState {
+        private String color;
+        private String faction;
+        private String positionHS;
+        private boolean setSpeaker;
+    }
+
+    public static void setupPlayer(PlayerSetupState setupState, Player player, Game game, GenericInteractionCreateEvent event) {
+        secondHalfOfPlayerSetup(
+                player,
+                game,
+                setupState.getColor(),
+                setupState.getFaction(),
+                setupState.getPositionHS(),
+                event,
+                setupState.isSetSpeaker());
+    }
+
     public static void secondHalfOfPlayerSetup(
             Player player,
             Game game,

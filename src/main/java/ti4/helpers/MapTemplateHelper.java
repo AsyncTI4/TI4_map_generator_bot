@@ -91,10 +91,17 @@ public class MapTemplateHelper {
     }
 
     public static String getPlayerHomeSystemLocation(PlayerDraft pd, String mapTemplate) {
+        if(pd.getFaction() == null) return null;
+        return getPlayerHomeSystemLocation(pd.getPosition(), mapTemplate);
+    }
+
+    public static String getPlayerHomeSystemLocation(Integer speakerPosition, String mapTemplate) {
+        if (speakerPosition == null) return null;
+
         MapTemplateModel template = Mapper.getMapTemplate(mapTemplate);
         for (MapTemplateTile t : template.getTemplateTiles()) {
-            if (t.getPlayerNumber() != null && t.getPlayerNumber().equals(pd.getPosition())) {
-                if (pd.getFaction() != null && t.getHome() != null && t.getHome()) {
+            if (t.getPlayerNumber() != null && t.getPlayerNumber().equals(speakerPosition)) {
+                if (t.getHome() != null && t.getHome()) {
                     return t.getPos();
                 }
             }
@@ -102,7 +109,7 @@ public class MapTemplateHelper {
         return null;
     }
 
-    private static Tile getTileFromTemplateTile(MapTemplateTile tile) {
+    public static Tile getTileFromTemplateTile(MapTemplateTile tile) {
         List<String> backupColors = Arrays.asList(
                 "red",
                 "blue",

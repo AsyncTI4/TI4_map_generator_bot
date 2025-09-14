@@ -1,22 +1,22 @@
-package ti4.service.milty;
+package ti4.service.draft;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
-import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
-import ti4.model.FactionModel;
-import ti4.service.draft.DraftTileManager;
+import ti4.service.draft.draftables.FactionDraftable;
+import ti4.service.draft.draftables.SliceDraftable;
+import ti4.service.draft.draftables.SpeakerOrderDraftable;
+import ti4.service.draft.orchestrators.PublicSnakeDraftOrchestrator;
 
 @UtilityClass
-public class MiltyService {
+public class DraftSetupService {
     public static String startFromSettings(GenericInteractionCreateEvent event, MiltySettings settings) {
         Game game = settings.getGame();
 
@@ -27,12 +27,12 @@ public class MiltyService {
             TIGLHelper.sendTIGLSetupText(game);
         }
 
-        MiltyDraftSpec specs = MiltyDraftSpec.CreateFromMiltySettings(settings);
+        DraftSpec specs = DraftSpec.CreateFromMiltySettings(settings);
 
         return startFromSpecs(event, specs);
     }
 
-    public static String startFromSpecs(GenericInteractionCreateEvent event, MiltyDraftSpec specs) {
+    public static String startFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
         Game game = specs.game;
 
         if (specs.presetSlices != null) {
@@ -42,29 +42,43 @@ public class MiltyService {
 
         // Milty Draft Manager Setup
         // --------------------------------------------------------------
+
+        // Setup managers and game state
         DraftTileManager tileManager = game.getDraftTileManager();
         tileManager.addAllDraftTiles(specs.tileSources);
-        MiltyDraftManager draftManager = game.getMiltyDraftManager();
-        draftManager.setMapTemplate(specs.template.getAlias());
+        DraftManager draftManager = game.getDraftManager();
         game.setMapTemplateID(specs.template.getAlias());
-        List<String> players = new ArrayList<>(specs.playerIDs);
+
+        FactionDraftable factionDraftable = new FactionDraftable();
+        factionDraftable.initialize(specs.numFactions, specs.factionSources, specs.priorityFactions, specs.bannedFactions);
+        draftManager.addDraftable(factionDraftable);
+
+        SpeakerOrderDraftable speakerOrderDraftable = new SpeakerOrderDraftable();
+        speakerOrderDraftable.initialize(draftManager.getPlayerStates().size());
+        draftManager.addDraftable(speakerOrderDraftable);
+
+        // Setup Public Snake Draft Orchestrator
+        PublicSnakeDraftOrchestrator orchestrator = new PublicSnakeDraftOrchestrator();
+        List<String> players = null;
         boolean staticOrder = specs.playerDraftOrder != null && !specs.playerDraftOrder.isEmpty();
         if (staticOrder) {
             players = new ArrayList<>(specs.playerDraftOrder)
                     .stream().filter(p -> specs.playerIDs.contains(p)).toList();
         }
-        initDraftOrder(draftManager, players, staticOrder);
+        // initDraftOrder(draftManager, players, staticOrder);
+        orchestrator.initialize(draftManager, players);
+        draftManager.setOrchestrator(orchestrator);
 
         // initialize factions
-        List<String> unbannedFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
-                .filter(f -> specs.factionSources.contains(f.getSource()))
-                .filter(f -> !specs.bannedFactions.contains(f.getAlias()))
-                .filter(f -> !f.getAlias().contains("keleres")
-                        || "keleresm".equals(f.getAlias())) // Limit the pool to only 1 keleres flavor
-                .map(FactionModel::getAlias)
-                .toList());
-        List<String> factionDraft = createFactionDraft(specs.numFactions, unbannedFactions, specs.priorityFactions);
-        draftManager.setFactionDraft(factionDraft);
+        // List<String> unbannedFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
+        //         .filter(f -> specs.factionSources.contains(f.getSource()))
+        //         .filter(f -> !specs.bannedFactions.contains(f.getAlias()))
+        //         .filter(f -> !f.getAlias().contains("keleres")
+        //                 || "keleresm".equals(f.getAlias())) // Limit the pool to only 1 keleres flavor
+        //         .map(FactionModel::getAlias)
+        //         .toList());
+        // List<String> factionDraft = createFactionDraft(specs.numFactions, unbannedFactions, specs.priorityFactions);
+        // draftManager.setFactionDraft(factionDraft);
 
         // validate slice count + sources
         int redTiles = tileManager.getRed().size();
@@ -88,19 +102,26 @@ public class MiltyService {
 
         game.clearTileMap();
         try {
-            MiltyDraftHelper.buildPartialMap(game, event);
+            PartialMapService.tryUpdateMap(event, draftManager);
         } catch (Exception e) {
             // Ignore
         }
 
+        SliceDraftable sliceDraftable = new SliceDraftable();
+        
         if (specs.presetSlices != null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "### You are using preset slices!! Starting the draft right away!");
-            specs.presetSlices.forEach(draftManager::addSlice);
-            MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
+            sliceDraftable.initialize(specs.presetSlices);
+            draftManager.addDraftable(sliceDraftable);
+            draftManager.preDraftStart();
+
+            // MessageHelper.sendMessageToChannel(
+            //         event.getMessageChannel(), "### You are using preset slices!! Starting the draft right away!");
+                    
+            // specs.presetSlices.forEach(draftManager::addSlice);
+            // MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
         } else {
             event.getMessageChannel().sendMessage(startMsg).queue((ignore) -> {
-                boolean slicesCreated = GenerateSlicesService.generateSlices(event, tileManager, draftManager, specs);
+                boolean slicesCreated = SliceGeneratorService.generateSlices(event, sliceDraftable, tileManager, specs);
                 if (!slicesCreated) {
                     String msg = "Generating slices was too hard so I gave up.... Please try again.";
                     if (specs.numSlices == maxSlices) {
@@ -108,54 +129,14 @@ public class MiltyService {
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 } else {
-                    MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
+                    // MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
+                    draftManager.addDraftable(sliceDraftable);
+                    draftManager.preDraftStart();
                     game.setPhaseOfGame("miltydraft");
                     GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
                 }
             });
         }
         return null;
-    }
-
-    private static void initDraftOrder(MiltyDraftManager draftManager, List<String> playerIDs, boolean staticOrder) {
-        List<String> players = new ArrayList<>(playerIDs);
-        if (!staticOrder) {
-            Collections.shuffle(players);
-        }
-
-        List<String> playersReversed = new ArrayList<>(players);
-        Collections.reverse(playersReversed);
-
-        List<String> draftOrder = new ArrayList<>(players);
-        draftOrder.addAll(playersReversed);
-        draftOrder.addAll(players);
-
-        draftManager.setDraftOrder(draftOrder);
-        draftManager.setPlayers(players);
-    }
-
-    private static List<String> createFactionDraft(
-            int factionCount, List<String> factions, List<String> firstFactions) {
-        List<String> randomOrder = new ArrayList<>(firstFactions);
-        Collections.shuffle(randomOrder);
-        Collections.shuffle(factions);
-        randomOrder.addAll(factions);
-
-        int i = 0;
-        List<String> output = new ArrayList<>();
-        while (output.size() < factionCount) {
-            if (i >= randomOrder.size()) return output;
-            String f = randomOrder.get(i);
-            i++;
-            if (output.contains(f)) continue;
-            output.add(f);
-        }
-        return output;
-    }
-
-    public static void miltySetup(GenericInteractionCreateEvent event, Game game) {
-        MiltySettings menu = game.initializeMiltySettings();
-        menu.postMessageAndButtons(event);
-        ButtonHelper.deleteMessage(event);
     }
 }
