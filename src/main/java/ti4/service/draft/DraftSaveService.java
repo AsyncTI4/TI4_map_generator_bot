@@ -2,7 +2,6 @@ package ti4.service.draft;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Constants;
 
@@ -15,7 +14,8 @@ public class DraftSaveService {
         lines.add("players:" + String.join(",", draftManager.getPlayerStates().keySet()));
 
         // Save orchestrator
-        lines.add("orchestrator:" + draftManager.getOrchestrator().getClass().getSimpleName() + ":" + draftManager.getOrchestrator().save());
+        lines.add("orchestrator:" + draftManager.getOrchestrator().getClass().getSimpleName() + ":"
+                + draftManager.getOrchestrator().save());
 
         // Save draftables
         for (Draftable draftable : draftManager.getDraftables()) {
@@ -36,7 +36,8 @@ public class DraftSaveService {
 
             // Save orchestrator state
             if (state.getOrchestratorState() != null) {
-                String[] orchestratorPlayerStates = draftManager.getOrchestrator().savePlayerStates(draftManager);
+                String[] orchestratorPlayerStates =
+                        draftManager.getOrchestrator().savePlayerStates(draftManager);
                 for (String orchestratorState : orchestratorPlayerStates) {
                     lines.add("playerorchestratorstate:" + userId + ":" + orchestratorState);
                 }

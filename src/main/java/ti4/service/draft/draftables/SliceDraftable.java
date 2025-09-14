@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.service.draft.DraftChoice;
@@ -54,7 +53,8 @@ public class SliceDraftable extends Draftable {
             String choiceKey = slice.getName();
             String buttonText = MiltyDraftEmojis.getMiltyDraftEmoji(choiceKey).toString();
             String simpleName = slice.getName();
-            String inlineSummary = MiltyDraftEmojis.getMiltyDraftEmoji(choiceKey).toString();
+            String inlineSummary =
+                    MiltyDraftEmojis.getMiltyDraftEmoji(choiceKey).toString();
             String buttonSuffix = choiceKey;
             choices.add(new DraftChoice(getType(), choiceKey, buttonText, simpleName, inlineSummary, buttonSuffix));
         }
@@ -72,20 +72,20 @@ public class SliceDraftable extends Draftable {
     }
 
     @Override
-    public String handleCustomButtonPress(GenericInteractionCreateEvent event, DraftManager draftManager,
-            String playerUserId, String buttonId) {
+    public String handleCustomButtonPress(
+            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId) {
 
         return "Unknown button press: " + buttonId;
     }
 
     @Override
     public String isValidDraftChoice(DraftManager draftManager, String playerUserId, DraftChoice choice) {
-        if (!CommonDraftableValidators.isChoiceKeyInList(choice,
-                slices.stream().map(MiltyDraftSlice::getName).toList())) {
+        if (!CommonDraftableValidators.isChoiceKeyInList(
+                choice, slices.stream().map(MiltyDraftSlice::getName).toList())) {
             return "That slice is not recognized.";
         }
-        if (!CommonDraftableValidators.hasRemainingChoices(draftManager, playerUserId, getType(),
-                getNumChoicesPerPlayer())) {
+        if (!CommonDraftableValidators.hasRemainingChoices(
+                draftManager, playerUserId, getType(), getNumChoicesPerPlayer())) {
             return "You have already picked your slice.";
         }
 
@@ -93,8 +93,8 @@ public class SliceDraftable extends Draftable {
     }
 
     @Override
-    public void draftChoiceSideEffects(GenericInteractionCreateEvent event, DraftManager draftManager,
-            String playerUserId, DraftChoice choice) {
+    public void draftChoiceSideEffects(
+            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice) {
         PartialMapService.tryUpdateMap(event, draftManager);
     }
 
@@ -112,7 +112,6 @@ public class SliceDraftable extends Draftable {
     public String getDefaultInlineSummary() {
         return MiltyDraftEmojis.getMiltyDraftEmoji(null).toString();
     }
-    
 
     @Override
     public FileUpload generateDraftImage(DraftManager draftManager) {
@@ -121,8 +120,7 @@ public class SliceDraftable extends Draftable {
 
     @Override
     public String save() {
-        return String.join(
-                ";", slices.stream().map(MiltyDraftSlice::ttsString).toList());
+        return String.join(";", slices.stream().map(MiltyDraftSlice::ttsString).toList());
     }
 
     @Override
@@ -130,12 +128,12 @@ public class SliceDraftable extends Draftable {
         slices = new ArrayList<>(DraftSliceHelper.parseSlicesFromString(data));
     }
 
-        @Override
+    @Override
     public void validateState(DraftManager draftManager) {
         int numPlayers = draftManager.getPlayerStates().size();
         if (slices.size() < numPlayers) {
-            throw new IllegalStateException("Number of slices (" + slices.size() + ") is less than number of players ("
-                    + numPlayers + ")");
+            throw new IllegalStateException(
+                    "Number of slices (" + slices.size() + ") is less than number of players (" + numPlayers + ")");
         }
 
         // Ensure no two players have picked the same slice.
@@ -152,11 +150,11 @@ public class SliceDraftable extends Draftable {
     @Override
     public void setupPlayer(DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
         PlayerDraftState pState = draftManager.getPlayerStates().get(playerUserId);
-        if (!pState.getPicks().containsKey(getType()) || pState.getPicks().get(getType()).isEmpty()) {
+        if (!pState.getPicks().containsKey(getType())
+                || pState.getPicks().get(getType()).isEmpty()) {
             throw new IllegalStateException("Player " + playerUserId + " has not picked a slice");
         }
 
         // Do nothing; slice tiles get placed during choice side effects
     }
-
 }

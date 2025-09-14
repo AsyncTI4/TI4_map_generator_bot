@@ -2,7 +2,6 @@ package ti4.service.draft;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.TIGLHelper;
@@ -50,7 +49,8 @@ public class DraftSetupService {
         game.setMapTemplateID(specs.template.getAlias());
 
         FactionDraftable factionDraftable = new FactionDraftable();
-        factionDraftable.initialize(specs.numFactions, specs.factionSources, specs.priorityFactions, specs.bannedFactions);
+        factionDraftable.initialize(
+                specs.numFactions, specs.factionSources, specs.priorityFactions, specs.bannedFactions);
         draftManager.addDraftable(factionDraftable);
 
         SpeakerOrderDraftable speakerOrderDraftable = new SpeakerOrderDraftable();
@@ -108,7 +108,7 @@ public class DraftSetupService {
         }
 
         SliceDraftable sliceDraftable = new SliceDraftable();
-        
+
         if (specs.presetSlices != null) {
             sliceDraftable.initialize(specs.presetSlices);
             draftManager.addDraftable(sliceDraftable);
@@ -116,7 +116,7 @@ public class DraftSetupService {
 
             // MessageHelper.sendMessageToChannel(
             //         event.getMessageChannel(), "### You are using preset slices!! Starting the draft right away!");
-                    
+
             // specs.presetSlices.forEach(draftManager::addSlice);
             // MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
         } else {

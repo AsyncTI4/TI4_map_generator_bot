@@ -7,11 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-
-import org.apache.commons.collections4.ListUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.collections4.ListUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
@@ -104,8 +102,7 @@ public class SliceGeneratorService {
                 // Slice is valid. Add it, then check if we are done
                 slices.add(slice);
                 if (slices.size() == sliceCount) break;
-                nextSliceName =
-                        Character.toString('A' + slices.size());
+                nextSliceName = Character.toString('A' + slices.size());
             }
 
             if (slices.size() == sliceCount) {
@@ -197,8 +194,7 @@ public class SliceGeneratorService {
         return slice;
     }
 
-    private static boolean checkIfSliceIsGood(
-            DraftSpec spec, MiltyDraftSlice slice, Map<String, Integer> failReasons) {
+    private static boolean checkIfSliceIsGood(DraftSpec spec, MiltyDraftSlice slice, Map<String, Integer> failReasons) {
         Function<String, Integer> addReason =
                 reason -> failReasons.put(reason, failReasons.getOrDefault(reason, 0) + 1);
 

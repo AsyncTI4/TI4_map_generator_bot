@@ -774,7 +774,7 @@ class GameLoadService {
                 case Constants.MILTY_DRAFT_MANAGER -> game.setMiltyDraftString(info); // We will parse this later
                 case Constants.MILTY_DRAFT_SETTINGS -> game.setMiltyJson(info); // We will parse this later
                 case Constants.DRAFT_MANAGER -> {
-                    if(game.getDraftString() == null) {
+                    if (game.getDraftString() == null) {
                         game.setDraftString(new ArrayList<>());
                     }
                     game.getDraftString().add(info); // We will parse this later

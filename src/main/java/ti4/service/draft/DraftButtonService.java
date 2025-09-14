@@ -19,24 +19,22 @@ public class DraftButtonService {
     public static final String DELETE_BUTTON = "@$!#deletebutton";
     // Button handlers may return this string to indicate that there was no error,
     // and that the message should be deleted.
-    public static final String DELETE_MESSAGE= "@$!#deletemessage";
+    public static final String DELETE_MESSAGE = "@$!#deletemessage";
 
     @ButtonHandler(DRAFT_BUTTON_PREFIX)
     public static void handleDraftButtonClick(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        //DEBUG
+        // DEBUG
         BotLogger.info("Handling draft button click: " + buttonID);
 
         String innerButtonID = buttonID.substring(DRAFT_BUTTON_PREFIX.length());
         DraftManager draftManager = game.getDraftManager();
         String outcome = draftManager.routeButtonPress(event, player, innerButtonID);
-        if(outcome != null) {
-            if(outcome.equals(DELETE_BUTTON)) {
+        if (outcome != null) {
+            if (outcome.equals(DELETE_BUTTON)) {
                 ButtonHelper.deleteTheOneButton(event);
-            }
-            else if(outcome.equals(DELETE_MESSAGE)) {
+            } else if (outcome.equals(DELETE_MESSAGE)) {
                 ButtonHelper.deleteMessage(event);
-            }
-            else {
+            } else {
                 // Another message, likely an error.
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), outcome);
             }

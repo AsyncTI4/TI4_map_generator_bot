@@ -91,7 +91,7 @@ public class MapTemplateHelper {
     }
 
     public static String getPlayerHomeSystemLocation(PlayerDraft pd, String mapTemplate) {
-        if(pd.getFaction() == null) return null;
+        if (pd.getFaction() == null) return null;
         return getPlayerHomeSystemLocation(pd.getPosition(), mapTemplate);
     }
 

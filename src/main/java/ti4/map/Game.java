@@ -401,7 +401,7 @@ public class Game extends GameProperties {
     @NotNull
     @JsonIgnore
     public DraftManager getDraftManager() {
-        if(draftManager == null) {
+        if (draftManager == null) {
             if (!draftString.isEmpty()) {
                 try {
                     draftManager = DraftLoadService.loadDraftManager(this, draftString);

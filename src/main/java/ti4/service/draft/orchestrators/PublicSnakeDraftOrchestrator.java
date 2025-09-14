@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
@@ -71,8 +70,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             int choicesPerPlayer = d.getNumChoicesPerPlayer();
             int picksNeeded = draftManager.getPlayerStates().size() * choicesPerPlayer;
             if (d.getAllDraftChoices().size() < picksNeeded) {
-                throw new IllegalStateException("Not enough draft choices of type " + d.getType() +
-                        " for all players to pick " + choicesPerPlayer);
+                throw new IllegalStateException("Not enough draft choices of type " + d.getType()
+                        + " for all players to pick " + choicesPerPlayer);
             }
         }
 
@@ -80,13 +79,13 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
         List<String> playerOrder = getPlayerOrder(draftManager);
 
-        PublicDraftInfoHelper.send(draftManager, playerOrder, getCurrentPlayer(playerOrder),
-                getNextPlayer(playerOrder), List.of());
+        PublicDraftInfoHelper.send(
+                draftManager, playerOrder, getCurrentPlayer(playerOrder), getNextPlayer(playerOrder), List.of());
     }
 
     @Override
-    public String handleDraftChoice(GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId,
-            DraftChoice choice) {
+    public String handleDraftChoice(
+            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice) {
         List<String> playerOrder = getPlayerOrder(draftManager);
 
         // Picks are made one player at a time, with all buttons visible.
@@ -103,8 +102,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         }
 
         // Persist the choice in Player State.
-        Map<DraftableType, List<DraftChoice>> playerChoices = draftManager.getPlayerStates().get(playerUserId)
-                .getPicks();
+        Map<DraftableType, List<DraftChoice>> playerChoices =
+                draftManager.getPlayerStates().get(playerUserId).getPicks();
         if (!playerChoices.containsKey(choice.getType())) {
             playerChoices.put(choice.getType(), new ArrayList<>());
         }
@@ -145,7 +144,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     public String[] savePlayerStates(DraftManager draftManager) {
         String[] playerStates = new String[draftManager.getPlayerStates().size()];
         int i = 0;
-        for (Map.Entry<String, PlayerDraftState> entry : draftManager.getPlayerStates().entrySet()) {
+        for (Map.Entry<String, PlayerDraftState> entry :
+                draftManager.getPlayerStates().entrySet()) {
             String playerUserId = entry.getKey();
             PlayerDraftState playerState = entry.getValue();
             OrchestratorState orchestratorState = playerState.getOrchestratorState();
@@ -168,12 +168,14 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
     @Override
     public void validateState(DraftManager draftManager) {
-        if (currentPlayerIndex < 0 || currentPlayerIndex >= draftManager.getPlayerStates().size()) {
+        if (currentPlayerIndex < 0
+                || currentPlayerIndex >= draftManager.getPlayerStates().size()) {
             throw new IllegalStateException("Current player index is out of bounds: " + currentPlayerIndex);
         }
         // Ensure all players have a valid State, with unique and valid order indices.
         Set<Integer> distinctOrderIndices = new HashSet<>();
-        for (Map.Entry<String, PlayerDraftState> entry : draftManager.getPlayerStates().entrySet()) {
+        for (Map.Entry<String, PlayerDraftState> entry :
+                draftManager.getPlayerStates().entrySet()) {
             String playerUserId = entry.getKey();
             PlayerDraftState playerState = entry.getValue();
             OrchestratorState orchestratorState = playerState.getOrchestratorState();
@@ -181,7 +183,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
                 throw new IllegalStateException("Player " + playerUserId + " has invalid orchestrator state");
             }
             State state = (State) orchestratorState;
-            if (state.getOrderIndex() < 0 || state.getOrderIndex() >= draftManager.getPlayerStates().size()) {
+            if (state.getOrderIndex() < 0
+                    || state.getOrderIndex() >= draftManager.getPlayerStates().size()) {
                 throw new IllegalStateException(
                         "Player " + playerUserId + " has out of bounds order index: " + state.getOrderIndex());
             }
@@ -201,8 +204,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     }
 
     @Override
-    public String handleCustomButtonPress(GenericInteractionCreateEvent event, DraftManager draftManager,
-            String playerUserId, String buttonId) {
+    public String handleCustomButtonPress(
+            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId) {
         throw new UnsupportedOperationException("This class doesn't provide any buttons.");
     }
 
@@ -224,8 +227,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         int numPlayers = draftManager.getPlayerStates().size();
         for (int i = 0; i < numPlayers; i++) {
             for (String playerUserId : draftManager.getPlayerStates().keySet()) {
-                State orchestratorState = (State) draftManager.getPlayerStates().get(playerUserId)
-                        .getOrchestratorState();
+                State orchestratorState =
+                        (State) draftManager.getPlayerStates().get(playerUserId).getOrchestratorState();
                 if (orchestratorState.getOrderIndex() == i) {
                     playerOrder.add(playerUserId);
                     break;

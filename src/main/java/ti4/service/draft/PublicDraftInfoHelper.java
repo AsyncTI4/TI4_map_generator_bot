@@ -7,10 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.function.Consumers;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -23,6 +19,8 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.helpers.Helper;
@@ -67,14 +65,17 @@ public class PublicDraftInfoHelper {
 
     private static final String SUMMARY_START = "# **__Draft Picks So Far__**:";
 
-    public static void send(DraftManager draftManager, List<String> playerOrder, String currentPlayer,
-            String nextPlayer, List<Button> extraButtons) {
+    public static void send(
+            DraftManager draftManager,
+            List<String> playerOrder,
+            String currentPlayer,
+            String nextPlayer,
+            List<Button> extraButtons) {
 
         Game game = draftManager.getGame();
         MessageChannel channel = game.getMainGameChannel();
-        if (channel == null)
-            return;
-        
+        if (channel == null) return;
+
         List<String> clearOldAttachments = new ArrayList<>();
 
         // MiltyDraftHelper.generateAndPostSlices(game);
@@ -106,22 +107,32 @@ public class PublicDraftInfoHelper {
         pingCurrentPlayer(draftManager, currentPlayer, clearOldHeaders, clearOldAttachments, extraButtons);
     }
 
-    public static void edit(GenericInteractionCreateEvent event, DraftManager draftManager, List<String> playerOrder, String currentPlayer,
-            String nextPlayer, DraftableType draftableType) {
+    public static void edit(
+            GenericInteractionCreateEvent event,
+            DraftManager draftManager,
+            List<String> playerOrder,
+            String currentPlayer,
+            String nextPlayer,
+            DraftableType draftableType) {
 
         Game game = draftManager.getGame();
         MessageChannel channel = game.getMainGameChannel();
-        if (channel == null)
-            return;
+        if (channel == null) return;
 
         String draftSummary = draftManager.canInlineSummary()
                 ? getInlineSummary(draftManager, playerOrder, currentPlayer, nextPlayer)
                 : getBulletPointSummary(draftManager, playerOrder, currentPlayer, nextPlayer);
 
-        getMessageHistory(event, channel).queue(editDraftInfo(draftManager, draftableType, draftSummary), BotLogger::catchRestError);
+        getMessageHistory(event, channel)
+                .queue(editDraftInfo(draftManager, draftableType, draftSummary), BotLogger::catchRestError);
     }
 
-    public static void pingCurrentPlayer(DraftManager draftManager, String currentPlayerUserID, List<String> clearMessageHeaders, List<String> clearAttachments, List<Button> extraButtons) {
+    public static void pingCurrentPlayer(
+            DraftManager draftManager,
+            String currentPlayerUserID,
+            List<String> clearMessageHeaders,
+            List<String> clearAttachments,
+            List<Button> extraButtons) {
         Game game = draftManager.getGame();
         String msg = "Nobody is up to draft...";
         Player p = game.getPlayer(currentPlayerUserID);
@@ -149,14 +160,14 @@ public class PublicDraftInfoHelper {
      */
 
     // Produce button message
-    
+
     private List<Button> getDraftButtons(DraftManager draftManager, Draftable draftable) {
         List<DraftChoice> allDraftChoices = draftable.getAllDraftChoices();
         List<Button> buttons = new ArrayList<>();
         for (DraftChoice choice : allDraftChoices) {
             // Skip this choice if someone already has it.
-            if (draftManager.getPlayerStates().values().stream().anyMatch(
-                    pState -> pState.getPicks().containsKey(choice.getType())
+            if (draftManager.getPlayerStates().values().stream()
+                    .anyMatch(pState -> pState.getPicks().containsKey(choice.getType())
                             && pState.getPicks().get(choice.getType()).contains(choice))) {
                 continue;
             }
@@ -166,7 +177,8 @@ public class PublicDraftInfoHelper {
             boolean grayButton = buttonText.matches(".*[a-zA-Z]+.*");
             Button button = grayButton
                     ? Buttons.gray(draftable.getButtonPrefix() + "_" + choice.getButtonSuffix(), choice.getButtonText())
-                    : Buttons.green(draftable.getButtonPrefix() + "_" + choice.getButtonSuffix(), choice.getButtonText());
+                    : Buttons.green(
+                            draftable.getButtonPrefix() + "_" + choice.getButtonSuffix(), choice.getButtonText());
             buttons.add(button);
         }
 
@@ -178,8 +190,8 @@ public class PublicDraftInfoHelper {
 
     // Summary generation
 
-    private static String getInlineSummary(DraftManager draftManager, List<String> playerOrder, String currentPlayer,
-            String nextPlayer) {
+    private static String getInlineSummary(
+            DraftManager draftManager, List<String> playerOrder, String currentPlayer, String nextPlayer) {
         Game game = draftManager.getGame();
         List<Draftable> draftables = draftManager.getDraftables();
         int padding = String.format("%s", playerOrder.size()).length() + 1;
@@ -207,19 +219,13 @@ public class PublicDraftInfoHelper {
                 }
             }
 
-            if (nextPlayer != null && userId.equals(nextPlayer))
-                sb.append("*");
-            if (currentPlayer != null && userId.equals(currentPlayer))
-                sb.append("**__");
+            if (nextPlayer != null && userId.equals(nextPlayer)) sb.append("*");
+            if (currentPlayer != null && userId.equals(currentPlayer)) sb.append("**__");
             sb.append(player.getUserName());
-            if (currentPlayer != null && userId.equals(currentPlayer))
-                sb.append("   <- CURRENTLY DRAFTING");
-            if (nextPlayer != null && userId.equals(nextPlayer))
-                sb.append("   <- on deck");
-            if (currentPlayer != null && userId.equals(currentPlayer))
-                sb.append("__**");
-            if (nextPlayer != null && userId.equals(nextPlayer))
-                sb.append("*");
+            if (currentPlayer != null && userId.equals(currentPlayer)) sb.append("   <- CURRENTLY DRAFTING");
+            if (nextPlayer != null && userId.equals(nextPlayer)) sb.append("   <- on deck");
+            if (currentPlayer != null && userId.equals(currentPlayer)) sb.append("__**");
+            if (nextPlayer != null && userId.equals(nextPlayer)) sb.append("*");
 
             pickNum++;
         }
@@ -240,8 +246,8 @@ public class PublicDraftInfoHelper {
     // etc.
     // The actual summary text could be the button text, and the parent list would
     // be the Draftable Type.
-    private static String getBulletPointSummary(DraftManager draftManager, List<String> playerOrder,
-            String currentPlayer, String nextPlayer) {
+    private static String getBulletPointSummary(
+            DraftManager draftManager, List<String> playerOrder, String currentPlayer, String nextPlayer) {
         throw new UnsupportedOperationException("Bullet point summary not implemented yet");
     }
 
@@ -255,7 +261,8 @@ public class PublicDraftInfoHelper {
         return channel.getHistoryAround(channel.getLatestMessageIdLong(), 100);
     }
 
-    private Consumer<MessageHistory> editDraftInfo(DraftManager draftManager, DraftableType draftableType, String newSummary) {
+    private Consumer<MessageHistory> editDraftInfo(
+            DraftManager draftManager, DraftableType draftableType, String newSummary) {
         Draftable draftable = draftManager.getDraftables().stream()
                 .filter(d -> d.getType() == draftableType)
                 .findFirst()
@@ -313,10 +320,14 @@ public class PublicDraftInfoHelper {
     // Clear previous
 
     /** This method is assumed to ONLY run as a callback on player ping. Therefore, all found pings will be removed */
-    private void clearHistMessages(MessageHistory hist, boolean clearFirstPing, List<String> clearMessageHeaders, List<String> clearAttachments) {
+    private void clearHistMessages(
+            MessageHistory hist,
+            boolean clearFirstPing,
+            List<String> clearMessageHeaders,
+            List<String> clearAttachments) {
         boolean removePings = clearFirstPing;
         HashSet<String> removeHeaders = new HashSet<>(clearMessageHeaders != null ? clearMessageHeaders : List.of());
-        HashSet<String> removeAttachments = new HashSet<>(clearAttachments != null ? clearAttachments : List.of()); 
+        HashSet<String> removeAttachments = new HashSet<>(clearAttachments != null ? clearAttachments : List.of());
         HashSet<String> seenHeader = new HashSet<>();
         HashSet<String> seenAttachment = new HashSet<>();
         for (Message msg : hist.getRetrievedHistory()) {
@@ -326,9 +337,9 @@ public class PublicDraftInfoHelper {
                 removePings = true;
             }
 
-            for(String header : removeHeaders) {
+            for (String header : removeHeaders) {
                 if (msgTxt.startsWith(header)) {
-                    if(seenHeader.contains(header)) {
+                    if (seenHeader.contains(header)) {
                         msg.delete().queue();
                     } else {
                         seenHeader.add(header);
@@ -338,9 +349,9 @@ public class PublicDraftInfoHelper {
             }
 
             for (Attachment atch : msg.getAttachments()) {
-                for(String attachName : removeAttachments) {
+                for (String attachName : removeAttachments) {
                     if (atch.getFileName().contains(attachName)) {
-                        if(seenAttachment.contains(attachName)) {
+                        if (seenAttachment.contains(attachName)) {
                             msg.delete().queue();
                         } else {
                             seenAttachment.add(attachName);
@@ -373,9 +384,12 @@ public class PublicDraftInfoHelper {
         }
     }
 
-    private MessageFunction clearOldPingsAndButtonsFunc(boolean clearFirstPing, List<String> clearMessageHeaders, List<String> clearAttachments) {
+    private MessageFunction clearOldPingsAndButtonsFunc(
+            boolean clearFirstPing, List<String> clearMessageHeaders, List<String> clearAttachments) {
         return msg -> msg.getChannel()
                 .getHistoryBefore(msg, 100)
-                .queue(hist -> clearHistMessages(hist, clearFirstPing, clearMessageHeaders, clearAttachments), BotLogger::catchRestError);
+                .queue(
+                        hist -> clearHistMessages(hist, clearFirstPing, clearMessageHeaders, clearAttachments),
+                        BotLogger::catchRestError);
     }
 }

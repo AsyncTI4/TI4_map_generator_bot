@@ -1,7 +1,6 @@
 package ti4.service.draft;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -28,12 +27,15 @@ public abstract class Draftable extends DraftLifecycleHooks {
     public List<Button> getCustomButtons() {
         return List.of();
     }
-    // Handle a non-draft-choice button press. Returns an error string if the button press is invalid, or null if it was handled.
-    public abstract String handleCustomButtonPress(GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId);
+    // Handle a non-draft-choice button press. Returns an error string if the button press is invalid, or null if it was
+    // handled.
+    public abstract String handleCustomButtonPress(
+            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId);
     // Validate a draft choice before it's applied.
     public abstract String isValidDraftChoice(DraftManager draftManager, String playerUserId, DraftChoice choice);
     // Apply a draft choice to the draft state. Can also have side-effects on the draft state.
-    public void draftChoiceSideEffects(GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice) {
+    public void draftChoiceSideEffects(
+            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice) {
         // Empty
     }
 
@@ -53,15 +55,17 @@ public abstract class Draftable extends DraftLifecycleHooks {
     // Persistence
 
     public abstract String save();
+
     public abstract void load(String data);
+
     public abstract void validateState(DraftManager draftManager);
 
     // Common Lifecycle Logic
     @Override
     public boolean canEndDraft(DraftManager draftManager) {
         for (String playerUserId : draftManager.getPlayerStates().keySet()) {
-            if (CommonDraftableValidators.hasRemainingChoices(draftManager, playerUserId, getType(),
-                    getNumChoicesPerPlayer())) {
+            if (CommonDraftableValidators.hasRemainingChoices(
+                    draftManager, playerUserId, getType(), getNumChoicesPerPlayer())) {
                 return false;
             }
         }

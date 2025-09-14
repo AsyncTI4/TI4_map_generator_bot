@@ -2,7 +2,6 @@ package ti4.service.draft;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
 import ti4.service.draft.draftables.FactionDraftable;
@@ -13,12 +12,12 @@ public class DraftLoadService {
     // For security reasons, make sure we only deserialize known types.
     private static final List<Class<? extends Draftable>> KNOWN_DRAFTABLE_TYPES = List.of(
             FactionDraftable.class
-    // Add other Draftable subclasses here as they are created.
-    );
+            // Add other Draftable subclasses here as they are created.
+            );
     private static final List<Class<? extends DraftOrchestrator>> KNOWN_ORCHESTRATOR_TYPES = List.of(
             PublicSnakeDraftOrchestrator.class
-    // Add DraftOrchestrator subclasses here as they are created.
-    );
+            // Add DraftOrchestrator subclasses here as they are created.
+            );
 
     public DraftManager loadDraftManager(Game game, List<String> draftData) {
         DraftOrchestrator orchestrator = null;
@@ -31,7 +30,7 @@ public class DraftLoadService {
                 playerUserIds = List.of(data.substring("players:".length()).split(","));
             } else if (data.startsWith("orchestrator:")) {
                 orchestrator = loadOrchestrator(data);
-            } else if(data.startsWith("draftable:")) {
+            } else if (data.startsWith("draftable:")) {
                 Draftable draftable = loadDraftable(data);
                 draftables.add(draftable);
             }
@@ -44,19 +43,23 @@ public class DraftLoadService {
 
         // Setup player states
         for (String data : draftData) {
-            if(data.startsWith("playerchoice:")) {
+            if (data.startsWith("playerchoice:")) {
                 String[] tokens = data.split(":");
                 String playerUserId = tokens[1];
                 DraftChoice choice = loadDraftChoice(draftables, tokens[2]);
                 PlayerDraftState playerState = draftManager.getPlayerStates().get(playerUserId);
-                playerState.getPicks().computeIfAbsent(choice.getType(), k -> new ArrayList<>()).add(choice);
-            } else if(data.startsWith("playerorchestratorstate:")) {
+                playerState
+                        .getPicks()
+                        .computeIfAbsent(choice.getType(), k -> new ArrayList<>())
+                        .add(choice);
+            } else if (data.startsWith("playerorchestratorstate:")) {
                 String[] tokens = data.split(":");
                 String playerUserId = tokens[1];
                 String orchestratorStateData = tokens[2];
                 PlayerDraftState playerState = draftManager.getPlayerStates().get(playerUserId);
                 if (orchestrator != null) {
-                    PlayerDraftState.OrchestratorState orchestratorState = orchestrator.loadPlayerState(orchestratorStateData);
+                    PlayerDraftState.OrchestratorState orchestratorState =
+                            orchestrator.loadPlayerState(orchestratorStateData);
                     playerState.setOrchestratorState(orchestratorState);
                 }
             }
@@ -77,7 +80,8 @@ public class DraftLoadService {
         for (Class<? extends DraftOrchestrator> knownClass : KNOWN_ORCHESTRATOR_TYPES) {
             if (knownClass.getName().equals(className)) {
                 try {
-                    DraftOrchestrator orchestrator = knownClass.getDeclaredConstructor().newInstance();
+                    DraftOrchestrator orchestrator =
+                            knownClass.getDeclaredConstructor().newInstance();
                     orchestrator.load(orchestratorData);
                     return orchestrator;
                 } catch (Exception e) {

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import lombok.Data;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -15,22 +14,23 @@ import ti4.service.map.AddTileListService;
 @Data
 public class DraftManager {
     public DraftManager(Game game, List<String> players) {
-        if(game == null) {
+        if (game == null) {
             throw new IllegalArgumentException("Game cannot be null");
         }
-        if(orchestrator == null) {
+        if (orchestrator == null) {
             throw new IllegalArgumentException("Orchestrator cannot be null");
         }
-        if(draftables == null) {
+        if (draftables == null) {
             throw new IllegalArgumentException("Draftables cannot be null");
         }
-        if(players == null || players.isEmpty()) {
+        if (players == null || players.isEmpty()) {
             throw new IllegalArgumentException("Players cannot be null or empty");
         }
         this.game = game;
         // this.orchestrator = orchestrator;
         // this.draftables = new ArrayList<>(draftables);
-        this.playerStates = players.stream().collect(HashMap::new, (m, p) -> m.put(p, new PlayerDraftState()), Map::putAll);
+        this.playerStates =
+                players.stream().collect(HashMap::new, (m, p) -> m.put(p, new PlayerDraftState()), Map::putAll);
     }
 
     private final Game game;
@@ -41,21 +41,21 @@ public class DraftManager {
     private final Map<String, PlayerDraftState> playerStates;
 
     public void setOrchestrator(DraftOrchestrator orchestrator) {
-        if(orchestrator == null) {
+        if (orchestrator == null) {
             throw new IllegalArgumentException("Orchestrator cannot be null");
         }
-        if(this.orchestrator != null) {
+        if (this.orchestrator != null) {
             throw new IllegalStateException("Orchestrator is already set");
         }
         this.orchestrator = orchestrator;
     }
 
     public void addDraftable(Draftable draftable) {
-        if(draftable == null) {
+        if (draftable == null) {
             throw new IllegalArgumentException("Draftable cannot be null");
         }
-        for(Draftable d : draftables) {
-            if(d.getType().equals(draftable.getType())) {
+        for (Draftable d : draftables) {
+            if (d.getType().equals(draftable.getType())) {
                 throw new IllegalArgumentException("Draftable of type " + draftable.getType() + " is already added");
             }
         }
@@ -65,10 +65,10 @@ public class DraftManager {
     // Player management
 
     public void replacePlayer(String oldUserId, String newUserId) {
-        if(!playerStates.containsKey(oldUserId)) {
+        if (!playerStates.containsKey(oldUserId)) {
             throw new IllegalArgumentException("Cannot replace player " + oldUserId + "; not in draft");
         }
-        if(playerStates.containsKey(newUserId)) {
+        if (playerStates.containsKey(newUserId)) {
             throw new IllegalArgumentException("Cannot replace player with " + newUserId + "; already in draft");
         }
 
@@ -77,10 +77,10 @@ public class DraftManager {
     }
 
     public void swapPlayers(String userId1, String userId2) {
-        if(!playerStates.containsKey(userId1)) {
+        if (!playerStates.containsKey(userId1)) {
             throw new IllegalArgumentException("Cannot swap player " + userId1 + "; not in draft");
         }
-        if(!playerStates.containsKey(userId2)) {
+        if (!playerStates.containsKey(userId2)) {
             throw new IllegalArgumentException("Cannot swap player " + userId2 + "; not in draft");
         }
 
@@ -93,8 +93,8 @@ public class DraftManager {
     // Information Access
 
     public boolean canInlineSummary() {
-        for(Draftable d : draftables) {
-            if(!d.hasInlineSummary()) {
+        for (Draftable d : draftables) {
+            if (!d.hasInlineSummary()) {
                 return false;
             }
         }
@@ -102,11 +102,11 @@ public class DraftManager {
     }
 
     public List<DraftChoice> getPlayerChoices(String playerUserId, DraftableType type) {
-        if(!playerStates.containsKey(playerUserId)) {
+        if (!playerStates.containsKey(playerUserId)) {
             throw new IllegalArgumentException("Player " + playerUserId + " is not in the draft");
         }
         PlayerDraftState pState = playerStates.get(playerUserId);
-        if(!pState.getPicks().containsKey(type)) {
+        if (!pState.getPicks().containsKey(type)) {
             return List.of();
         }
         List<DraftChoice> choices = pState.getPicks().get(type);
@@ -115,11 +115,11 @@ public class DraftManager {
 
     public List<String> getPlayersWithChoiceKey(String choiceKey) {
         List<String> playersWithChoice = new ArrayList<>();
-        for(String userId : playerStates.keySet()) {
+        for (String userId : playerStates.keySet()) {
             PlayerDraftState pState = playerStates.get(userId);
-            for(List<DraftChoice> choices : pState.getPicks().values()) {
-                for(DraftChoice choice : choices) {
-                    if(choiceKey.equals(choice.getChoiceKey())) {
+            for (List<DraftChoice> choices : pState.getPicks().values()) {
+                for (DraftChoice choice : choices) {
+                    if (choiceKey.equals(choice.getChoiceKey())) {
                         playersWithChoice.add(userId);
                         break;
                     }
@@ -131,9 +131,9 @@ public class DraftManager {
 
     public List<DraftChoice> getAllPicksOfType(DraftableType type) {
         List<DraftChoice> allChoices = new ArrayList<>();
-        for(String userId : playerStates.keySet()) {
+        for (String userId : playerStates.keySet()) {
             PlayerDraftState pState = playerStates.get(userId);
-            if(pState.getPicks().containsKey(type)) {
+            if (pState.getPicks().containsKey(type)) {
                 allChoices.addAll(pState.getPicks().get(type));
             }
         }
@@ -143,21 +143,23 @@ public class DraftManager {
     // Interaction handling
 
     public String routeButtonPress(ButtonInteractionEvent event, Player player, String buttonID) {
-        for(Draftable d : draftables) {
-            if(buttonID.startsWith(d.getButtonPrefix())) {
+        for (Draftable d : draftables) {
+            if (buttonID.startsWith(d.getButtonPrefix())) {
                 String innerButtonID = buttonID.substring(d.getButtonPrefix().length());
-                for(DraftChoice choice : d.getAllDraftChoices()) {
-                    if(innerButtonID.equals(choice.getButtonSuffix())) {
-                        if(orchestrator == null) {
+                for (DraftChoice choice : d.getAllDraftChoices()) {
+                    if (innerButtonID.equals(choice.getButtonSuffix())) {
+                        if (orchestrator == null) {
                             throw new IllegalStateException("Draft choice button pressed, but no orchestrator is set");
                         }
                         String validationError = d.isValidDraftChoice(this, player.getUserID(), choice);
-                        if(validationError != null) {
+                        if (validationError != null) {
                             return validationError;
                         }
                         // More validation, and add the button to the player's state
                         String status = orchestrator.handleDraftChoice(event, this, player.getUserID(), choice);
-                        if(status != null && status != DraftButtonService.DELETE_BUTTON && status != DraftButtonService.DELETE_MESSAGE) {
+                        if (status != null
+                                && status != DraftButtonService.DELETE_BUTTON
+                                && status != DraftButtonService.DELETE_MESSAGE) {
                             return status;
                         }
                         // Side effects, if any
@@ -165,14 +167,15 @@ public class DraftManager {
                         return status;
                     }
                 }
-                
+
                 String status = d.handleCustomButtonPress(event, this, player.getUserID(), innerButtonID);
                 return status;
             }
         }
 
-        if(orchestrator != null && buttonID.startsWith(orchestrator.getButtonPrefix())) {
-            String innerButtonID = buttonID.substring(orchestrator.getButtonPrefix().length());
+        if (orchestrator != null && buttonID.startsWith(orchestrator.getButtonPrefix())) {
+            String innerButtonID =
+                    buttonID.substring(orchestrator.getButtonPrefix().length());
             String status = orchestrator.handleCustomButtonPress(event, this, innerButtonID, buttonID);
             return status;
         }
@@ -188,7 +191,7 @@ public class DraftManager {
      * If the draft cannot start immediately, anything blocking it should call tryStartDraft() once resolved.
      */
     public void preDraftStart() {
-        for(Draftable d : draftables) {
+        for (Draftable d : draftables) {
             d.preDraftStart(this);
         }
         orchestrator.preDraftStart(this);
@@ -200,7 +203,7 @@ public class DraftManager {
      * Whenever something blocking the draft from starting is resolved, this should be called.
      */
     public void tryStartDraft() {
-        if(!canStartDraft()) {
+        if (!canStartDraft()) {
             return;
         }
 
@@ -208,11 +211,11 @@ public class DraftManager {
     }
 
     public boolean canStartDraft() {
-        if(draftables.isEmpty() || orchestrator == null) {
+        if (draftables.isEmpty() || orchestrator == null) {
             return false;
         }
-        for(Draftable d : draftables) {
-            if(!d.canStartDraft(this)) {
+        for (Draftable d : draftables) {
+            if (!d.canStartDraft(this)) {
                 return false;
             }
         }
@@ -226,11 +229,11 @@ public class DraftManager {
      * @param event
      */
     public void endDraft(GenericInteractionCreateEvent event) {
-        if(!canEndDraft()) {
+        if (!canEndDraft()) {
             throw new IllegalStateException("Cannot end draft; not all draftables are ready");
         }
 
-        for(Draftable draftable : draftables) {
+        for (Draftable draftable : draftables) {
             draftable.onDraftEnd(this);
         }
 
@@ -242,8 +245,8 @@ public class DraftManager {
      * @return true if all components can stop drafting picks, false otherwise.
      */
     public boolean canEndDraft() {
-        for(Draftable d : draftables) {
-            if(!d.canEndDraft(this)) {
+        for (Draftable d : draftables) {
+            if (!d.canEndDraft(this)) {
                 return false;
             }
         }
@@ -255,13 +258,13 @@ public class DraftManager {
      * @param event
      */
     public void trySetupPlayers(GenericInteractionCreateEvent event) {
-        if(!canSetupPlayers()) {
+        if (!canSetupPlayers()) {
             return;
         }
 
-        for(String userId : playerStates.keySet()) {
+        for (String userId : playerStates.keySet()) {
             PlayerSetupService.PlayerSetupState playerSetupState = new PlayerSetupService.PlayerSetupState();
-            for(Draftable draftable : draftables) {
+            for (Draftable draftable : draftables) {
                 draftable.setupPlayer(this, userId, playerSetupState);
             }
             PlayerSetupService.setupPlayer(playerSetupState, game.getPlayer(userId), game, event);
@@ -271,39 +274,39 @@ public class DraftManager {
     }
 
     private boolean canSetupPlayers() {
-        for(Draftable d : draftables) {
-            if(!d.canSetupPlayers(this)) {
+        for (Draftable d : draftables) {
+            if (!d.canSetupPlayers(this)) {
                 return false;
             }
         }
         return orchestrator.canSetupPlayers(this);
     }
-    
+
     /**
      * Check that all required fields are set and that all shared state is consistent.
      */
     public void validateState() {
-        if(game == null) {
+        if (game == null) {
             throw new IllegalStateException("Game not set");
         }
-        if(draftables.isEmpty()) {
+        if (draftables.isEmpty()) {
             throw new IllegalStateException("Draftables not set");
         }
-        if(orchestrator == null) {
+        if (orchestrator == null) {
             throw new IllegalStateException("Orchestrator not set");
         }
-        if(playerStates.isEmpty()) {
+        if (playerStates.isEmpty()) {
             throw new IllegalStateException("No players in draft");
         }
         // Is it correct to check this here? Is this the expected value?
-        if(playerStates.size() != game.getRealPlayers().size()) {
+        if (playerStates.size() != game.getRealPlayers().size()) {
             throw new IllegalStateException("Number of players in draft does not match number of players in game");
         }
-        if(draftables.isEmpty()) {
+        if (draftables.isEmpty()) {
             throw new IllegalStateException("No draftables in draft");
         }
         orchestrator.validateState(this);
-        for(Draftable d : draftables) {
+        for (Draftable d : draftables) {
             d.validateState(this);
         }
     }

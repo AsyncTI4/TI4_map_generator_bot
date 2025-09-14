@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.MapTemplateHelper;
 import ti4.image.Mapper;
@@ -58,22 +57,20 @@ public class SeatDraftable extends Draftable {
     }
 
     @Override
-    public String handleCustomButtonPress(GenericInteractionCreateEvent event, DraftManager draftManager,
-            String playerUserId, String buttonId) {
+    public String handleCustomButtonPress(
+            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId) {
 
         return "Unknown button press: " + buttonId;
     }
 
     @Override
     public String isValidDraftChoice(DraftManager draftManager, String playerUserId, DraftChoice choice) {
-        if (!CommonDraftableValidators.hasRemainingChoices(draftManager, playerUserId, getType(),
-                getNumChoicesPerPlayer())) {
+        if (!CommonDraftableValidators.hasRemainingChoices(
+                draftManager, playerUserId, getType(), getNumChoicesPerPlayer())) {
             return "You already have a Seat pick!";
         }
-        List<String> choiceKeys = IntStream.rangeClosed(1, numSeats)
-                .boxed()
-                .map(Object::toString)
-                .collect(Collectors.toList());
+        List<String> choiceKeys =
+                IntStream.rangeClosed(1, numSeats).boxed().map(Object::toString).collect(Collectors.toList());
         if (!CommonDraftableValidators.isChoiceKeyInList(choice, choiceKeys)) {
             return "That seat pick is not valid!";
         }
@@ -82,8 +79,8 @@ public class SeatDraftable extends Draftable {
     }
 
     @Override
-    public void draftChoiceSideEffects(GenericInteractionCreateEvent event, DraftManager draftManager,
-            String playerUserId, DraftChoice choice) {
+    public void draftChoiceSideEffects(
+            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice) {
         PartialMapService.tryUpdateMap(event, draftManager);
     }
 
@@ -119,15 +116,16 @@ public class SeatDraftable extends Draftable {
         }
         int numPlayers = draftManager.getPlayerStates().size();
         if (numSeats < numPlayers) {
-            throw new IllegalStateException("Number of seats (" + numSeats + ") is less than number of players ("
-                    + numPlayers + ")");
+            throw new IllegalStateException(
+                    "Number of seats (" + numSeats + ") is less than number of players (" + numPlayers + ")");
         }
 
         // Ensure seat count is consistent with map template
-        MapTemplateModel mapTemplate = Mapper.getMapTemplate(draftManager.getGame().getMapTemplateID());
+        MapTemplateModel mapTemplate =
+                Mapper.getMapTemplate(draftManager.getGame().getMapTemplateID());
         if (mapTemplate == null) {
-            throw new IllegalStateException(
-                    "Map template ID is not set or invalid: " + draftManager.getGame().getMapTemplateID());
+            throw new IllegalStateException("Map template ID is not set or invalid: "
+                    + draftManager.getGame().getMapTemplateID());
         }
         if (mapTemplate.getPlayerCount() < numSeats) {
             throw new IllegalStateException("Map template " + mapTemplate.getAlias() + " only supports "
@@ -148,16 +146,16 @@ public class SeatDraftable extends Draftable {
     @Override
     public void setupPlayer(DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
         PlayerDraftState pState = draftManager.getPlayerStates().get(playerUserId);
-        if (!pState.getPicks().containsKey(getType()) || pState.getPicks().get(getType()).isEmpty()) {
+        if (!pState.getPicks().containsKey(getType())
+                || pState.getPicks().get(getType()).isEmpty()) {
             throw new IllegalStateException("Player " + playerUserId + " has not picked a seat");
         }
 
         String seat = pState.getPicks().get(getType()).get(0).getChoiceKey();
         int seatNum = Integer.parseInt(seat);
 
-        String homeTilePosition = MapTemplateHelper.getPlayerHomeSystemLocation(seatNum,
-                draftManager.getGame().getMapTemplateID());
+        String homeTilePosition = MapTemplateHelper.getPlayerHomeSystemLocation(
+                seatNum, draftManager.getGame().getMapTemplateID());
         playerSetupState.setPositionHS(homeTilePosition);
     }
-
 }

@@ -2,7 +2,6 @@ package ti4.service.draft;
 
 import java.util.List;
 import java.util.Map;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.AliasHandler;
@@ -27,7 +26,7 @@ public class PartialMapService {
      * This function depends on knowing which class types have the required
      * information,
      * so it kinda breaks the abstraction a bit, but oh well.
-     * 
+     *
      * @param draftManager
      */
     public void tryUpdateMap(GenericInteractionCreateEvent event, DraftManager draftManager) {
@@ -57,13 +56,13 @@ public class PartialMapService {
             // Nothing of value to place on the map
             return;
         }
-        
+
         boolean updateMap = false;
 
         for (PlayerDraftState pState : draftManager.getPlayerStates().values()) {
             // Get their position, to see if we can do anything
-            Integer position = getPlayerPosition(pState,
-                    seatDraftable == null ? speakerOrderDraftable.getType() : seatDraftable.getType());
+            Integer position = getPlayerPosition(
+                    pState, seatDraftable == null ? speakerOrderDraftable.getType() : seatDraftable.getType());
             if (position == null) {
                 // Player hasn't picked a position yet
                 continue;
@@ -90,8 +89,10 @@ public class PartialMapService {
                     // Doesn't pertain to this player
                     continue;
                 }
-                if (templateTile.getHome() != null && templateTile.getHome()
-                        && factionModel != null && !factionModel.getAlias().startsWith("keleres")) {
+                if (templateTile.getHome() != null
+                        && templateTile.getHome()
+                        && factionModel != null
+                        && !factionModel.getAlias().startsWith("keleres")) {
                     String hsTileId = factionModel.getHomeSystem();
                     hsTileId = AliasHandler.resolveTile(hsTileId);
                     Tile toAdd = new Tile(hsTileId, templateTile.getPos());
@@ -126,8 +127,7 @@ public class PartialMapService {
         Integer position = null;
 
         Map<DraftableType, List<DraftChoice>> choices = pState.getPicks();
-        if (choices.containsKey(seatDraftable)
-                && !choices.get(seatDraftable).isEmpty()) {
+        if (choices.containsKey(seatDraftable) && !choices.get(seatDraftable).isEmpty()) {
             String seatStr = choices.get(seatDraftable).get(0).getChoiceKey();
             position = Integer.parseInt(seatStr);
         }
@@ -193,8 +193,8 @@ public class PartialMapService {
     private String getMapTemplateModelId(Game game) {
         String mapTemplateId = game.getMapTemplateID();
         if (mapTemplateId == null || mapTemplateId.isEmpty()) {
-            MapTemplateModel mapTemplateModel = Mapper
-                    .getDefaultMapTemplateForPlayerCount(game.getRealPlayers().size());
+            MapTemplateModel mapTemplateModel = Mapper.getDefaultMapTemplateForPlayerCount(
+                    game.getRealPlayers().size());
             if (mapTemplateModel == null) {
                 throw new IllegalStateException(
                         "No default map template for " + game.getRealPlayers().size() + " players");

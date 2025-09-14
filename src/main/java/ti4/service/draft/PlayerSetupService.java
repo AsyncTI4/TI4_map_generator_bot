@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -53,7 +52,8 @@ public class PlayerSetupService {
         private boolean setSpeaker;
     }
 
-    public static void setupPlayer(PlayerSetupState setupState, Player player, Game game, GenericInteractionCreateEvent event) {
+    public static void setupPlayer(
+            PlayerSetupState setupState, Player player, Game game, GenericInteractionCreateEvent event) {
         secondHalfOfPlayerSetup(
                 player,
                 game,

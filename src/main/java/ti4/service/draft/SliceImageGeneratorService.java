@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
@@ -40,13 +39,14 @@ public class SliceImageGeneratorService {
         SliceDraftable sliceDraftable = draftManager.getDraftables().stream()
                 .filter(d -> d instanceof SliceDraftable)
                 .map(d -> (SliceDraftable) d)
-                .findFirst().orElse(null);
-        if (sliceDraftable == null)
-            return null;
+                .findFirst()
+                .orElse(null);
+        if (sliceDraftable == null) return null;
 
         Function<String, String> getPlayerFromSlice = (sliceName) -> {
             return draftManager.getPlayersWithChoiceKey(sliceName).stream()
-                .findFirst().orElse(null);
+                    .findFirst()
+                    .orElse(null);
         };
         Function<String, FactionModel> getFactionFromPlayer = (playerUserID) -> {
             List<DraftChoice> factionChoices = draftManager.getPlayerChoices(playerUserID, FactionDraftable.TYPE);
@@ -56,11 +56,15 @@ public class SliceImageGeneratorService {
             return null;
         };
 
-        return generateImage(draftManager.getGame(), sliceDraftable.getDraftSlices(), getPlayerFromSlice, getFactionFromPlayer);
+        return generateImage(
+                draftManager.getGame(), sliceDraftable.getDraftSlices(), getPlayerFromSlice, getFactionFromPlayer);
     }
 
-    public static FileUpload generateImage(Game game, List<MiltyDraftSlice> slices,
-            Function<String, String> getPlayerFromSlice, Function<String, FactionModel> getFactionFromPlayer) {
+    public static FileUpload generateImage(
+            Game game,
+            List<MiltyDraftSlice> slices,
+            Function<String, String> getPlayerFromSlice,
+            Function<String, FactionModel> getFactionFromPlayer) {
         MapTemplateModel mapTemplate = Mapper.getMapTemplate(game.getMapTemplateID());
 
         int sliceCount = slices.size();
@@ -104,8 +108,7 @@ public class SliceImageGeneratorService {
                 deltaX = 0;
             }
 
-            if (!desc.isEmpty())
-                desc.append(";\n");
+            if (!desc.isEmpty()) desc.append(";\n");
             desc.append(slice.ttsString());
         }
 
@@ -138,8 +141,7 @@ public class SliceImageGeneratorService {
             BufferedImage img = ImageHelper.read(tilePath);
             Point p = tilePositions.get(index);
             graphics.drawImage(img, p.x, p.y, null);
-            if (taken)
-                graphics.drawImage(fogFilter, p.x, p.y, null);
+            if (taken) graphics.drawImage(fogFilter, p.x, p.y, null);
             index++;
         }
         List<TI4Emoji> whs = new ArrayList<>();
@@ -149,14 +151,10 @@ public class SliceImageGeneratorService {
         List<TI4Emoji> yellowSkips = new ArrayList<>();
         List<TI4Emoji> redSkips = new ArrayList<>();
         for (MiltyDraftTile tile : slice.getTiles()) {
-            if (tile.isHasAlphaWH())
-                whs.add(MiscEmojis.WHalpha);
-            if (tile.isHasBetaWH())
-                whs.add(MiscEmojis.WHbeta);
-            if (tile.isHasOtherWH())
-                whs.add(MiscEmojis.WHgamma);
-            if (tile.isLegendary())
-                legendary.add(MiscEmojis.LegendaryPlanet);
+            if (tile.isHasAlphaWH()) whs.add(MiscEmojis.WHalpha);
+            if (tile.isHasBetaWH()) whs.add(MiscEmojis.WHbeta);
+            if (tile.isHasOtherWH()) whs.add(MiscEmojis.WHgamma);
+            if (tile.isLegendary()) legendary.add(MiscEmojis.LegendaryPlanet);
 
             for (UnitHolder uh : tile.getTile().getPlanetUnitHolders()) {
                 if (uh instanceof Planet p) {
@@ -207,8 +205,7 @@ public class SliceImageGeneratorService {
 
             graphics.drawImage(featureImage, fPoint.x + hs.x, fPoint.y + hs.y, null);
             index++;
-            if (index >= featurePoints.size())
-                break;
+            if (index >= featurePoints.size()) break;
         }
 
         HorizontalAlign hCenter = HorizontalAlign.Center;
@@ -231,10 +228,7 @@ public class SliceImageGeneratorService {
     }
 
     private static BufferedImage sliceImageWithPlayerInfo(
-            MapTemplateModel mapTemplate,
-            MiltyDraftSlice slice,
-            Player player,
-            FactionModel factionModel) {
+            MapTemplateModel mapTemplate, MiltyDraftSlice slice, Player player, FactionModel factionModel) {
         List<Point> tilePositions = mapTemplate.tileDisplayCoords();
         Point hs = tilePositions.getFirst();
 
@@ -265,8 +259,7 @@ public class SliceImageGeneratorService {
 
             if (factionModel != null) {
                 String factionName = factionModel.getFactionName();
-                if (factionModel.getAlias().startsWith("keleres"))
-                    factionName = "The Council Keleres";
+                if (factionModel.getAlias().startsWith("keleres")) factionName = "The Council Keleres";
                 graphics.setFont(Storage.getFont35());
                 DrawingUtil.superDrawString(
                         graphics,

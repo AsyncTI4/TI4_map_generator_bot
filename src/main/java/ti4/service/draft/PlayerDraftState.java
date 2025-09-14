@@ -3,13 +3,7 @@ package ti4.service.draft;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-// import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
-// import ti4.service.emoji.FactionEmojis;
-// import ti4.service.emoji.MiltyDraftEmojis;
-// import ti4.service.milty.MiltyDraftSlice;
 
 @Data
 public class PlayerDraftState {
@@ -19,7 +13,7 @@ public class PlayerDraftState {
 
     private Map<DraftableType, List<DraftChoice>> picks = new HashMap<>();
 
-    public static abstract class OrchestratorState {
+    public abstract static class OrchestratorState {
         // Empty base class for extension by orchestrators
     }
 

@@ -1,7 +1,6 @@
 package ti4.service.draft.draftables;
 
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
@@ -22,10 +21,10 @@ public class CommonDraftableValidators {
         return false;
     }
 
-    public boolean hasRemainingChoices(DraftManager draftManager, String playerUserId, DraftableType type, int maxChoices) {
-                PlayerDraftState pState = draftManager.getPlayerStates().get(playerUserId);
-        if(pState.getPicks().containsKey(type) && 
-           pState.getPicks().get(type).size() >= maxChoices) {
+    public boolean hasRemainingChoices(
+            DraftManager draftManager, String playerUserId, DraftableType type, int maxChoices) {
+        PlayerDraftState pState = draftManager.getPlayerStates().get(playerUserId);
+        if (pState.getPicks().containsKey(type) && pState.getPicks().get(type).size() >= maxChoices) {
             return false;
         }
         return true;

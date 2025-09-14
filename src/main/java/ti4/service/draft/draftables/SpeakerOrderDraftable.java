@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
@@ -57,16 +56,16 @@ public class SpeakerOrderDraftable extends Draftable {
     }
 
     @Override
-    public String handleCustomButtonPress(GenericInteractionCreateEvent event, DraftManager draftManager,
-            String playerUserId, String buttonId) {
+    public String handleCustomButtonPress(
+            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId) {
 
         return "Unknown button press: " + buttonId;
     }
 
     @Override
     public String isValidDraftChoice(DraftManager draftManager, String playerUserId, DraftChoice choice) {
-        if (!CommonDraftableValidators.hasRemainingChoices(draftManager, playerUserId, getType(),
-                getNumChoicesPerPlayer())) {
+        if (!CommonDraftableValidators.hasRemainingChoices(
+                draftManager, playerUserId, getType(), getNumChoicesPerPlayer())) {
             return "You already have a Speaker order pick!";
         }
         List<String> choiceKeys = IntStream.rangeClosed(1, numPlayers)
@@ -81,8 +80,8 @@ public class SpeakerOrderDraftable extends Draftable {
     }
 
     @Override
-    public void draftChoiceSideEffects(GenericInteractionCreateEvent event, DraftManager draftManager,
-            String playerUserId, DraftChoice choice) {
+    public void draftChoiceSideEffects(
+            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice) {
         PartialMapService.tryUpdateMap(event, draftManager);
     }
 
@@ -118,8 +117,8 @@ public class SpeakerOrderDraftable extends Draftable {
         }
         int numDraftPlayers = draftManager.getPlayerStates().size();
         if (numPlayers < numDraftPlayers) {
-            throw new IllegalStateException("Number of speaker positions (" + numPlayers + ") is less than number of players drafting ("
-                    + numDraftPlayers + ")");
+            throw new IllegalStateException("Number of speaker positions (" + numPlayers
+                    + ") is less than number of players drafting (" + numDraftPlayers + ")");
         }
 
         // Ensure no two players have picked the same speaker position.
@@ -127,7 +126,8 @@ public class SpeakerOrderDraftable extends Draftable {
         Set<String> chosenSpeakerPositions = new HashSet<>();
         for (DraftChoice choice : speakerChoices) {
             if (chosenSpeakerPositions.contains(choice.getChoiceKey())) {
-                throw new IllegalStateException("Multiple players have chosen speaker position " + choice.getChoiceKey());
+                throw new IllegalStateException(
+                        "Multiple players have chosen speaker position " + choice.getChoiceKey());
             }
             chosenSpeakerPositions.add(choice.getChoiceKey());
         }
@@ -136,7 +136,8 @@ public class SpeakerOrderDraftable extends Draftable {
     @Override
     public void setupPlayer(DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
         PlayerDraftState pState = draftManager.getPlayerStates().get(playerUserId);
-        if (!pState.getPicks().containsKey(getType()) || pState.getPicks().get(getType()).isEmpty()) {
+        if (!pState.getPicks().containsKey(getType())
+                || pState.getPicks().get(getType()).isEmpty()) {
             throw new IllegalStateException("Player " + playerUserId + " has not picked a speaker order");
         }
 
@@ -145,8 +146,8 @@ public class SpeakerOrderDraftable extends Draftable {
         playerSetupState.setSetSpeaker(speakerNum == 1);
 
         if (shouldAlsoSetSeat(draftManager)) {
-            String homeTilePosition = MapTemplateHelper.getPlayerHomeSystemLocation(speakerNum,
-                    draftManager.getGame().getMapTemplateID());
+            String homeTilePosition = MapTemplateHelper.getPlayerHomeSystemLocation(
+                    speakerNum, draftManager.getGame().getMapTemplateID());
             playerSetupState.setPositionHS(homeTilePosition);
         } else {
             draftManager.getGame().setPriorityTrackMode(PriorityTrackMode.THIS_ROUND_ONLY);
