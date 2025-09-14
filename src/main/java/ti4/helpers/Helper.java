@@ -71,7 +71,6 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
-import ti4.service.draft.DraftTileManager;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -86,6 +85,7 @@ import ti4.service.fow.GMService;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.map.TokenPlanetService;
+import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
@@ -223,10 +223,14 @@ public class Helper {
         return players;
     }
 
+    // TODO: (Jazz): This method *should* include base game + pok tiles (+ DS tiles if and only if DS mode is set)
+    //     - Once the bot is using milty draft settings, we can make this accurately pull in tiles
+    //     - from every source available to the active game
     public static List<MiltyDraftTile> getUnusedTiles(Game game) {
-        DraftTileManager draftTileManager = game.getDraftTileManager();
-        draftTileManager.reset(game);
-        List<MiltyDraftTile> allTiles = new ArrayList<>(draftTileManager.getAll())
+        MiltyDraftManager draftManager = game.getMiltyDraftManager();
+        draftManager.init(game);
+
+        List<MiltyDraftTile> allTiles = new ArrayList<>(draftManager.getAll())
                 .stream()
                         .filter(tile -> game.getTile(tile.getTile().getTileID()) == null)
                         .toList();
@@ -2508,7 +2512,7 @@ public class Helper {
     }
 
     /**
-     * @param text   string to add spaces on the left
+     * @param text string to add spaces on the left
      * @param length minimum length of string
      * @return left padded string
      */
@@ -2520,7 +2524,7 @@ public class Helper {
     }
 
     /**
-     * @param text   string to add spaces on the right
+     * @param text string to add spaces on the right
      * @param length minimum length of string
      * @return right padded string
      */
@@ -2978,10 +2982,10 @@ public class Helper {
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(),
                         """
-                                ## Note about FoW
-                                When you press **End Game** all the game channels will be deleted immediately!
-                                A new thread will be generated under the **#fow-war-stories** channel.
-                                Round Summaries will be shared there. So it is advised to hold end-of-game chat until then.""");
+                        ## Note about FoW
+                        When you press **End Game** all the game channels will be deleted immediately!
+                        A new thread will be generated under the **#fow-war-stories** channel.
+                        Round Summaries will be shared there. So it is advised to hold end-of-game chat until then.""");
                 List<Button> titleButton = new ArrayList<>();
                 titleButton.add(Buttons.blue("offerToGiveTitles", "Offer to bestow a Title"));
                 titleButton.add(Buttons.gray("deleteButtons", "No titles for this game"));

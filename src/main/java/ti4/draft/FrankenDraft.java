@@ -25,7 +25,8 @@ import ti4.map.Game;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.FactionModel;
-import ti4.service.draft.DraftTileManager;
+import ti4.service.milty.MiltyDraftHelper;
+import ti4.service.milty.MiltyDraftManager;
 
 public class FrankenDraft extends BagDraft {
 
@@ -186,12 +187,12 @@ public class FrankenDraft extends BagDraft {
 
         allDraftableItems.put(DraftItem.Category.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(game));
 
-        DraftTileManager draftTileManager = game.getDraftTileManager();
-        draftTileManager.reset(game);
+        MiltyDraftManager draftManager = game.getMiltyDraftManager();
+        draftManager.clear();
+        MiltyDraftHelper.initDraftTiles(draftManager, game);
+        allDraftableItems.put(DraftItem.Category.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftManager, game));
         allDraftableItems.put(
-                DraftItem.Category.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftTileManager, game));
-        allDraftableItems.put(
-                DraftItem.Category.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftTileManager, game));
+                DraftItem.Category.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager, game));
 
         List<DraftBag> bags = new ArrayList<>();
 
