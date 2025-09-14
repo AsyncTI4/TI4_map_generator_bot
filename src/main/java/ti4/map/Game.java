@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -961,6 +961,9 @@ public class Game extends GameProperties {
         String scText = playerSC + "";
         if (!scText.equalsIgnoreCase(getSCNumberIfNaaluInPlay(player, scText))) {
             playerSC = 0;
+            if (player.hasAbility("patience")) {
+                playerSC = 9;
+            }
         }
         for (int sc : orderedSCsBasic) {
             Player holder = getPlayerFromSC(sc);
@@ -968,6 +971,9 @@ public class Game extends GameProperties {
             int judger = sc;
             if (holder != null && !scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
                 judger = 0;
+                if (player.hasAbility("patience")) {
+                    judger = 9;
+                }
             }
             if (judger > playerSC) {
                 orderedSCs.add(sc);
@@ -979,8 +985,11 @@ public class Game extends GameProperties {
             int judger = sc;
             if (holder != null && !scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
                 judger = 0;
+                if (player.hasAbility("patience")) {
+                    judger = 9;
+                }
             }
-            if (judger == 0) {
+            if (judger == 0 || (player.hasAbility("patience") && judger == 9)) {
                 orderedSCs.add(sc);
             }
         }
@@ -990,8 +999,11 @@ public class Game extends GameProperties {
             int judger = sc;
             if (holder != null && !scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
                 judger = 0;
+                if (player.hasAbility("patience")) {
+                    judger = 9;
+                }
             }
-            if (judger < playerSC && judger != 0) {
+            if (judger < playerSC && judger != 0 && (!player.hasAbility("patience") || judger != 9)) {
                 orderedSCs.add(sc);
             }
         }
@@ -2624,7 +2636,15 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public List<String> getTechnologyDeck() {
-        return Mapper.getDecks().get(getTechnologyDeckID()).getNewDeck();
+        List<String> techDeck = Mapper.getDecks().get(getTechnologyDeckID()).getNewDeck();
+        for (Player player : getRealPlayers()) {
+            for (String tech : player.getFactionTechs()) {
+                if (!techDeck.contains(tech)) {
+                    techDeck.add(tech);
+                }
+            }
+        }
+        return techDeck;
     }
 
     @JsonIgnore
@@ -4400,6 +4420,10 @@ public class Game extends GameProperties {
     public String getSCNumberIfNaaluInPlay(Player player, String scText) {
         if (player.hasTheZeroToken()) // naalu 0 token ability
         scText = "0/" + scText;
+        if (player.hasAbility("patience")) {
+            scText = "9/" + scText;
+        }
+
         return scText;
     }
 

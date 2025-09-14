@@ -139,7 +139,8 @@ public class PlayerFactionSettings extends SettingsMenu {
 
         if (parent != null && parent instanceof MiltySettings ms) {
             if (ms.getSourceSettings().getDiscoStars().isVal())
-                ls.add(Buttons.red(idPrefix + "dsFactionsOnly", "Only DS Factions", SourceEmojis.DiscordantStars));
+                ls.add(Buttons.red(
+                        idPrefix + "dsFactionsOnly", "Only DS and BR Factions", SourceEmojis.DiscordantStars));
         }
         return ls;
     }

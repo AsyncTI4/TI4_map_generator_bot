@@ -561,8 +561,11 @@ class PlayerAreaGenerator {
         if (player.hasTheZeroToken()) {
             drawSC(0, center, true);
         }
+        if (player.hasAbility("patience")) {
+            drawSC(9, center, true);
+        }
 
-        boolean big = playerSCs.size() == 1 && !player.hasTheZeroToken();
+        boolean big = playerSCs.size() == 1 && !player.hasTheZeroToken() && !player.hasAbility("patience");
         List<Point> smallPoints = List.of(
                 new Point(center.x - 16, center.y - 16),
                 new Point(center.x + 16, center.y - 16),

@@ -168,6 +168,7 @@ public class Player extends PlayerProperties {
 
     public int getInitiative() {
         if (hasTheZeroToken()) return 0;
+        if (hasAbility("patience")) return 9;
         return getLowestSC();
     }
 

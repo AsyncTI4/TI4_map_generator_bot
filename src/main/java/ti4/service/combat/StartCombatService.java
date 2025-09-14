@@ -1229,6 +1229,15 @@ public class StartCombatService {
                                 + "Letnev Agent",
                         FactionEmojis.Letnev));
             }
+            if ((!game.isFowMode() || agentHolder == p1)
+                    && agentHolder.hasUnexhaustedLeader("xanagent")
+                    && "space".equalsIgnoreCase(groundOrSpace)) {
+                buttons.add(Buttons.gray(
+                        finChecker + "getAgentSelection_xanagent",
+                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Xan Agent",
+                        FactionEmojis.xan));
+            }
 
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("nomadagentthundarian")) {
                 buttons.add(Buttons.gray(

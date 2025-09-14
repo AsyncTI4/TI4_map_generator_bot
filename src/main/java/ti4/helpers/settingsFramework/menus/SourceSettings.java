@@ -192,6 +192,7 @@ public class SourceSettings extends SettingsMenu {
                         .setEphemeral(true)
                         .queue();
                 game.setThundersEdge(true);
+                game.setRelicDeckID("relics_pok_te");
             }
             case "Ignis" -> {
                 boolean ignis = this.ignis.isVal();
