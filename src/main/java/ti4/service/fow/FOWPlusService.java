@@ -233,11 +233,11 @@ public class FOWPlusService {
     public static boolean shouldTraverseAdjacency(Game game, String position, int dirFrom) {
         if (!isActive(game) && !game.getFowOption(FOWOption.HIDE_MAP)) return true;
 
-        if (isVoid(game, position)) {
+        Tile targetTile = game.getTileByPosition(position);
+        if (isVoid(game, position) || targetTile == null) {
             return false;
         }
 
-        Tile targetTile = game.getTileByPosition(position);
         if (targetTile.getTileModel() != null && targetTile.getTileModel().isHyperlane()) {
             boolean hasHyperlaneConnection = false;
             for (int i = 0; i < 6; i++) {
