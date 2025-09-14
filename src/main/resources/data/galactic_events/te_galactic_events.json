@@ -9,7 +9,7 @@
     {
         "alias": "call_of_the_void",
         "name": "Call of the Void",
-        "text": "- When you activate a system in the Fracture, gain 1 command token.\n- When you activate a system in the Fracture, apply +1 to the move values of each of your ships.",
+        "text": "After you move 1 or more units into the active system, if that system is in the fracture, gain 1 command token.\n- When you activate a system in the Fracture, apply +1 to the move values of each of your ships.",
         "complexity": 1,
         "flavorText": "This place... it is a graveyard. I can't see it but I can feel it. Souls all around me, yelling, screaming at me to leave. But I can't leave. Not yet. Maybe not ever. There is something here, I know it. I can find what happened here, I can. - Last log of Kel Zin, explorer",
         "source": "thunders_edge"
