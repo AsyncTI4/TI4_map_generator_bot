@@ -7,6 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
@@ -20,7 +23,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -1403,7 +1405,7 @@ public class TransactionHelper {
                 if (game.isNoSwapMode()) {
                     if (id.endsWith("sftt") && p1.getPromissoryNotesInPlayArea().contains(p2.getColor() + "_sftt")) {
                         MessageHelper.sendMessageToChannel(
-                                event.getMessageChannel(),
+                                p1.getCardsInfoThread(),
                                 p1.getRepresentation()
                                         + ", you cannot swap _Supports For The Thrones_ in this game (it has banned _Support For The Throne_ swaps).");
                         return;
