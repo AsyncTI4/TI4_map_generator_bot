@@ -21,30 +21,18 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.FactionModel;
+import ti4.service.draft.PlayerSetupService;
 import ti4.service.map.AddTileListService;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
 
 @UtilityClass
 class FinishDraftService {
 
-    private FactionModel determineKeleresFlavor(MiltyDraftManager manager, Game game) {
-        List<String> flavors = List.of("mentak", "xxcha", "argent");
-        List<String> valid =
-                flavors.stream().filter(Predicate.not(manager::isFactionTaken)).toList();
-        String preset = game.getStoredValue("keleresFlavorPreset");
-        if (valid.contains(preset)) return Mapper.getFaction("keleres" + preset.charAt(0));
-        if (valid.size() == 1) {
-            preset = valid.getFirst();
-            return Mapper.getFaction("keleres" + preset.charAt(0));
-        }
-        return null;
-    }
-
     public void finishDraft(GenericInteractionCreateEvent event, MiltyDraftManager manager, Game game) {
         MessageChannel mainGameChannel = game.getMainGameChannel();
         try {
             MiltyDraftHelper.buildPartialMap(game, event);
-            boolean keleresExists = false;
+            boolean keleresSettingUp = false;
             for (String playerId : manager.getPlayers()) {
                 Player player = game.getPlayer(playerId);
                 PlayerDraft picks = manager.getPlayerDraft(playerId);
@@ -58,46 +46,19 @@ class FinishDraftService {
                 boolean speaker = picks.getPosition() == 1;
 
                 if (faction.startsWith("keleres")) {
-                    FactionModel preset = determineKeleresFlavor(manager, game);
-                    if (preset != null) {
-                        faction = preset.getAlias();
-                    } else {
-                        faction = null;
-                        keleresExists = true;
-                        Set<String> allowed = new HashSet<>(Set.of("mentak", "xxcha", "argent"));
-                        for (PlayerDraft pd : manager.getDraft().values()) {
-                            allowed.remove(pd.getFaction());
-                        }
-                        List<Button> buttons = new ArrayList<>();
-                        String message = player.getPing() + " choose a flavor of keleres:";
-                        if (allowed.isEmpty()) {
-                            MessageHelper.sendMessageToPlayerCardsInfoThread(
-                                    player,
-                                    "*Hrrnnggh*\nThis is awkward, all of the Keleres flavors got drafted. I'll let you pick any of them, but don't do that again!");
-                            allowed.addAll(Set.of("mentak", "xxcha", "argent"));
-                        }
-                        for (String flavor : allowed) {
-                            String emoji = Mapper.getFaction(flavor).getFactionEmoji();
-                            String keleres = "keleres" + flavor.charAt(0);
-                            String id = String.format(
-                                    "setupStep5_%s_%s_%s_%s_%s",
-                                    player.getUserID(), keleres, color, pos, speaker ? "yes" : "no");
-                            String msg = "Keleres (" + flavor + ")";
-                            Button butt = Buttons.green(id, msg).withEmoji(Emoji.fromFormatted(emoji));
-                            buttons.add(butt);
-                        }
-                        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
-                                player.getCardsInfoThread(), message, buttons);
+                    faction = getKeleresAlias(player, manager, game, color, pos, speaker);
+                    if (faction == null) {
+                        keleresSettingUp = true;
                     }
                 }
 
                 if (faction != null) {
-                    MiltyService.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, speaker);
+                    PlayerSetupService.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, speaker);
                 }
             }
             game.setPhaseOfGame("playerSetup");
             AddTileListService.finishSetup(game, event);
-            if (keleresExists) {
+            if (keleresSettingUp) {
                 MessageHelper.sendMessageToChannel(
                         game.getActionsChannel(),
                         "## " + game.getPing()
@@ -120,5 +81,49 @@ class FinishDraftService {
             MessageHelper.sendMessageToChannel(mainGameChannel, error.toString());
             BotLogger.error(new LogOrigin(event, game), e.getMessage(), e);
         }
+    }
+
+    private String getKeleresAlias(
+            Player player, MiltyDraftManager manager, Game game, String color, String pos, boolean speaker) {
+        FactionModel preset = determineKeleresFlavor(manager, game);
+        if (preset != null) {
+            return preset.getAlias();
+        }
+        Set<String> allowed = new HashSet<>(Set.of("mentak", "xxcha", "argent"));
+        for (PlayerDraft pd : manager.getDraft().values()) {
+            allowed.remove(pd.getFaction());
+        }
+        List<Button> buttons = new ArrayList<>();
+        String message = player.getPing() + " choose a flavor of keleres:";
+        if (allowed.isEmpty()) {
+            MessageHelper.sendMessageToPlayerCardsInfoThread(
+                    player,
+                    "*Hrrnnggh*\nThis is awkward, all of the Keleres flavors got drafted. I'll let you pick any of them, but don't do that again!");
+            allowed.addAll(Set.of("mentak", "xxcha", "argent"));
+        }
+        for (String flavor : allowed) {
+            String emoji = Mapper.getFaction(flavor).getFactionEmoji();
+            String keleres = "keleres" + flavor.charAt(0);
+            String id = String.format(
+                    "setupStep5_%s_%s_%s_%s_%s", player.getUserID(), keleres, color, pos, speaker ? "yes" : "no");
+            String msg = "Keleres (" + flavor + ")";
+            Button butt = Buttons.green(id, msg).withEmoji(Emoji.fromFormatted(emoji));
+            buttons.add(butt);
+        }
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCardsInfoThread(), message, buttons);
+        return null;
+    }
+
+    private FactionModel determineKeleresFlavor(MiltyDraftManager manager, Game game) {
+        List<String> flavors = List.of("mentak", "xxcha", "argent");
+        List<String> valid =
+                flavors.stream().filter(Predicate.not(manager::isFactionTaken)).toList();
+        String preset = game.getStoredValue("keleresFlavorPreset");
+        if (valid.contains(preset)) return Mapper.getFaction("keleres" + preset.charAt(0));
+        if (valid.size() == 1) {
+            preset = valid.getFirst();
+            return Mapper.getFaction("keleres" + preset.charAt(0));
+        }
+        return null;
     }
 }
