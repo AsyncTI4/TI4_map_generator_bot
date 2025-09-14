@@ -18,6 +18,7 @@ class TransientGameInfoUpdater {
             DiscordantStarsHelper.checkSigil(game);
             DiscordantStarsHelper.checkSaeraMech(game);
             DiscordantStarsHelper.checkOlradinMech(game);
+            DiscordantStarsHelper.checkUltimateAuthority(game);
         } catch (Exception e) {
             BotLogger.error(
                     new LogOrigin(game), "Error adding transient attachment tokens for game " + game.getName(), e);

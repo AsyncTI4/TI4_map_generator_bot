@@ -3,6 +3,9 @@ package ti4.helpers;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import ti4.service.emoji.TI4Emoji;
 
 public final class StringHelper {
 
@@ -90,5 +93,55 @@ public final class StringHelper {
             return nextId(id) + "a";
         }
         return "a".repeat(id.length() + 1);
+    }
+
+    public static String stripEmojis(String initial) {
+        return replaceWithEmojis(initial, true);
+    }
+
+    public static String replaceWithEmojis(String initial) {
+        return replaceWithEmojis(initial, false);
+    }
+
+    private static Pattern emojiToReplace = Pattern.compile("<(?<cat>\\w+):(?<name>\\w+)>");
+
+    private static String replaceWithEmojis(String initial, boolean replaceWithBlank) {
+        StringBuilder output = new StringBuilder();
+        int index = 0;
+        do {
+            // Get the start of the next emoji, append everything we've gone past to the
+            int pos = initial.indexOf('<', index);
+            if (pos == -1) {
+                output.append(initial.substring(index));
+                break;
+            }
+            output.append(initial.substring(index, pos));
+
+            int end = initial.indexOf('>', pos);
+            if (end == -1) {
+                output.append(initial.substring(pos));
+                break;
+            }
+            String candidateEmoji = initial.substring(pos, end + 1);
+
+            Matcher emojiBits = emojiToReplace.matcher(candidateEmoji);
+            if (emojiBits.matches()) {
+                if (!replaceWithBlank) {
+                    String category = emojiBits.group("cat");
+                    String name = emojiBits.group("name");
+                    TI4Emoji emoji = TI4Emoji.findEmoji(category, name);
+                    if (emoji != null) {
+                        output.append(emoji.emojiString());
+                    } else {
+                        output.append(candidateEmoji);
+                    }
+                }
+            } else {
+                output.append(candidateEmoji);
+            }
+            index = end + 1;
+        } while (index < initial.length());
+
+        return output.toString();
     }
 }

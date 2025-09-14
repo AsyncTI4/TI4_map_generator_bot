@@ -1470,8 +1470,15 @@ public class ButtonHelperModifyUnits {
                     player.getFactionEmoji()
                             + " did not place a command token in system they retreated to due to Kado S'mah-Qar, the Kollecc commander.");
         } else {
-            CommandCounterHelper.addCC(event, player, tile2, true);
-            Helper.isCCCountCorrect(player);
+            if (player.hasAbility("eusociality") && !CommandCounterHelper.hasCC(event, player.getColor(), tile1)) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getFactionEmoji()
+                                + " did not place a command token in system they retreated to due to the Eusosociality ability.");
+            } else {
+                CommandCounterHelper.addCC(event, player, tile2, true);
+                Helper.isCCCountCorrect(player);
+            }
         }
 
         for (Map.Entry<String, UnitHolder> entry : tile1.getUnitHolders().entrySet()) {

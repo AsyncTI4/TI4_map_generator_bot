@@ -1,0 +1,28 @@
+[
+    {
+        "alias": "relics_pok_te",
+        "name": "PoK & TE Relics",
+        "type": "relic",
+        "description": "All Relics in both official expansions game",
+        "cardIDs": [
+            "codex",
+            "dominusorb",
+            "dynamiscore",
+            "emelpar",
+            "emphidia",
+            "mawofworlds",
+            "nanoforge",
+            "obsidian",
+            "prophetstears",
+            "shard",
+            "stellarconverter",
+            "thalnos",
+            "titanprototype",
+            "neuraloop",
+            "circletofthevoid",
+            "bookoflatvinia",
+            "quantumcore"
+        ],
+        "source": "pok"
+    }
+]

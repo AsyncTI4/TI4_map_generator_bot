@@ -1213,6 +1213,9 @@ public class MapGenerator implements AutoCloseable {
             int scsize = 96;
             List<Integer> playerSCs = new ArrayList<>(player.getSCs());
             if (player.hasTheZeroToken()) playerSCs.add(0);
+            if (player.hasAbility("patience")) {
+                playerSCs.add(9);
+            }
             Collections.sort(playerSCs);
 
             point = PositionMapper.getPlayerStats("newsc");

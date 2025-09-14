@@ -152,6 +152,9 @@ public class Helper {
             return "Player has " + FactionEmojis.Yssaril
                     + " _Transparasteel Plating_, and all other players have passed.";
         }
+        if (player.hasTech("baarvag")) {
+            return "Player has Unyielding Will and thus their ACs cannot be canceled.";
+        }
         return null;
     }
 
@@ -1869,6 +1872,9 @@ public class Helper {
                     cost += (int) removedUnit.getCost() * entry.getValue();
                 }
                 totalUnits += entry.getValue();
+                if (player.hasUnit("arvaxi_mech") && removedUnit.getUnitType() == UnitType.Mech) {
+                    totalUnits -= entry.getValue();
+                }
             }
         }
         if (regulated) {

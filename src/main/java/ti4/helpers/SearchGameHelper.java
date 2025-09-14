@@ -212,7 +212,15 @@ public class SearchGameHelper {
 
         for (var managedGame : filteredManagedGames) {
             if (managedGame.getTableTalkChannel() != null) {
-                String msg2 = "The player " + user.getName() + " sends the following msg:\n" + msg;
+                String name = user.getName();
+                if (managedGame.getTableTalkChannel().getGuild().getMemberById(user.getId()) != null) {
+                    name = managedGame
+                            .getTableTalkChannel()
+                            .getGuild()
+                            .getMemberById(user.getId())
+                            .getNickname();
+                }
+                String msg2 = "The player " + name + " sends the following msg:\n" + msg;
                 if (pingGame) {
                     msg2 = managedGame.getGame().getPing() + " " + msg2;
                 }

@@ -176,6 +176,16 @@ public class PlayHeroService {
                         player.getRepresentation()
                                 + " can now repair opponent units near their space docks (not automated, use /remove_all_sustain_damage)");
             }
+            case "mirvedahero" -> {
+                List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, "pds", "placeOneNDone_skipbuild");
+                String message = "Please choose a planet to place a PDS";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "You will unfortunately need to use dicecord to roll the PDS and bombardment of all your units against one system/planet. /roll");
+            }
             case "florzenhero" -> {
                 for (Tile tile : game.getTileMap().values()) {
                     for (UnitHolder uH : tile.getPlanetUnitHolders()) {

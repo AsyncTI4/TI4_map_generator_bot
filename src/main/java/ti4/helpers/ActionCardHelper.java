@@ -415,6 +415,7 @@ public class ActionCardHelper {
                 return "You are passed and the active player owns _Transparasteel Plating_, preventing you from playing action cards.";
             }
         }
+
         if ("Action".equalsIgnoreCase(actionCardWindow) && game.getPlayer(activePlayerID) != player) {
             return "You are trying to play an action card with a component action, and the game does not think you are the active player."
                     + " You may fix this with `/player turn_start`. Until then, you are #denied.";

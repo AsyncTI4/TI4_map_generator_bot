@@ -3350,6 +3350,10 @@ public class ButtonHelper {
                 UnitModel unit = entry.getKey();
                 if ("space".equalsIgnoreCase(capChecker.getName())) {
                     capacity += unit.getCapacityValue() * entry.getValue();
+                    if (unit.getUnitType() == UnitType.Carrier
+                            && (player.hasUnit("lunarium_carrier") || player.hasUnit("lunarium_carrier2"))) {
+                        capacity += player.getSoScored() * entry.getValue();
+                    }
                 }
                 // System.out.println(unit.getBaseType());
                 if ("spacedock".equalsIgnoreCase(unit.getBaseType())
@@ -3709,6 +3713,7 @@ public class ButtonHelper {
                 "prism",
                 "echo",
                 "domna",
+                "thundersedge",
                 "uikos", // DS
                 "illusion",
                 "phantasm"); // Other
@@ -4219,6 +4224,13 @@ public class ButtonHelper {
         if (tile == null || tile.getRepresentationForButtons(game, player).contains("Hyperlane")) return false;
         if (game.isNaaluAgent() && tile.isHomeSystem(game)) return false;
         if (!FOWPlusService.canActivatePosition(tile.getPosition(), player, game)) return false;
+        if (tile.isAsteroidField()) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.hasTech("cm") && p2 != player && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+                    return false;
+                }
+            }
+        }
 
         return !CommandCounterHelper.hasCC(null, player.getColor(), tile) || game.isL1Hero();
     }
