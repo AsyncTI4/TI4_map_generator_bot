@@ -99,8 +99,8 @@
     {
         "alias": "ralnel",
         "factionName": "The Ral Nel Consortium",
-        "homeSystem": "93",
-        "startingFleet": "2 inf m, 2 inf r, cv, 2 ff, dn, pds r, pds m, dd, sd m",
+        "homeSystem": "",
+        "startingFleet": "",
         "commodities": 4,
         "factionTech": [],
         "startingTech": [],
