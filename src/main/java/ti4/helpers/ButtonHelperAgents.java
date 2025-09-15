@@ -850,11 +850,11 @@ public class ButtonHelperAgents {
             }
             MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, buttons);
         }
-        if ("conclaveagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Conclave"
+        if ("onyxxaagent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Onyxxa"
                     + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
-            String faction = rest.replace("conclaveagent_", "");
+            String faction = rest.replace("onyxxaagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             String msg =
                     p2.getRepresentationUnfogged() + ", please choose the system that you wish to move a ship from.";

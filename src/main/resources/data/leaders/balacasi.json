@@ -136,8 +136,8 @@
         "source": "balacasi"
     },
     {
-        "id": "conclaveagent",
-        "faction": "conclave",
+        "id": "onyxxaagent",
+        "faction": "onyxxa",
         "type": "agent",
         "name": "Innovator Zeth",
         "title": "The Wise",
@@ -147,8 +147,8 @@
         "source": "balacasi"
     },
     {
-        "id": "conclavecommander",
-        "faction": "conclave",
+        "id": "onyxxacommander",
+        "faction": "onyxxa",
         "type": "commander",
         "name": "Strategist Kreel",
         "title": "The Judicial",
@@ -158,8 +158,8 @@
         "source": "balacasi"
     },
     {
-        "id": "conclavehero",
-        "faction": "conclave",
+        "id": "onyxxahero",
+        "faction": "onyxxa",
         "type": "hero",
         "name": "Grandmaster Xel'Kor",
         "title": "The Invincible",

@@ -631,7 +631,7 @@
         "id": "augurs_monument",
         "baseType": "monument",
         "asyncId": "monument",
-        "name": "AI Conclave",
+        "name": "AI Onyxxa",
         "subtitle": "Augurs Monument",
         "source": "monuments",
         "faction": "augers",
