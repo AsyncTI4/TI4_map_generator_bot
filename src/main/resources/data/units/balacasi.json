@@ -211,12 +211,12 @@
         "ability": "After you activate this system, you may place 1 fighter in this system. Apply +1 to the capacity of this ship for each of your scored secret objectives."
     },
     {
-        "id": "conclave_flagship",
+        "id": "onyxxa_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
         "name": "Igneous Khan",
         "source": "balacasi",
-        "faction": "conclave",
+        "faction": "onyxxa",
         "moveValue": 1,
         "capacityValue": 3,
         "capacityUsed": 1,
@@ -229,12 +229,12 @@
         "ability": "After you win a space combat in this system, gain 1 command token."
     },
     {
-        "id": "conclave_mech",
+        "id": "onyxxa_mech",
         "baseType": "mech",
         "asyncId": "mf",
         "name": "Obelisk",
         "source": "balacasi",
-        "faction": "conclave",
+        "faction": "onyxxa",
         "capacityUsed": 1,
         "cost": 2,
         "combatHitsOn": 6,

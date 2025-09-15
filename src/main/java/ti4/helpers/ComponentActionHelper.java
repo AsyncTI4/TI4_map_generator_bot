@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -173,11 +174,11 @@ public class ComponentActionHelper {
                                     factionEmoji);
                             compButtons.add(lButton);
                         }
-                        led = "conclaveagent";
+                        led = "onyxxaagent";
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Buttons.gray(
                                     finChecker + prefix + "leader_" + led,
-                                    "Use " + leaderName + " as Conclave Agent",
+                                    "Use " + leaderName + " as Onyxxa Agent",
                                     factionEmoji);
                             compButtons.add(lButton);
                         }
@@ -420,7 +421,7 @@ public class ComponentActionHelper {
                             "naaluagent",
                             "muaatagent",
                             "xxchaagent",
-                            "conclaveagent",
+                            "onyxxaagent",
                             "axisagent",
                             "bentoragent",
                             "kolumeagent",

@@ -87,6 +87,30 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 
+    public static void xxchaHeroTEStart(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+
+        String msg = player.getRepresentation() + ", please choose whether you want to place a mech or a pds.";
+        buttons.add(Buttons.gray("xxchaHeroTEStep2_mech", "Place Mech", UnitEmojis.mech));
+        buttons.add(Buttons.gray("xxchaHeroTEStep2_pds", "Place PDS", UnitEmojis.pds));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+    }
+
+    @ButtonHandler("xxchaHeroTEStep2_")
+    public static void xxchaHeroTEStep2_(
+            Game game, Player player, GenericInteractionCreateEvent event, String buttonID) {
+        String unit = buttonID.split("_")[1];
+        List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "placeOneNDone_skipbuildxxcha");
+
+        String msg = player.getRepresentation() + " please choose the planet you wish to put this " + unit + " on.";
+
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
     static List<Button> getArgentHeroStep3Buttons(Game game, Player player, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         String pos1 = buttonID.split("_")[1];

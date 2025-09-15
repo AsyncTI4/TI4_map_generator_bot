@@ -183,8 +183,8 @@
         "source": "balacasi"
     },
     {
-        "alias": "conclave",
-        "factionName": "The Obsidian Conclave",
+        "alias": "onyxxa",
+        "factionName": "The Onyxxa Complex",
         "homeSystem": "ba4",
         "startingFleet": "1 dd, 1 cv, 2 ff, 1 dn, 3 inf v, sd v",
         "commodities": 3,
@@ -204,9 +204,9 @@
             "increased_surveillance"
         ],
         "leaders": [
-            "conclaveagent",
-            "conclavecommander",
-            "conclavehero"
+            "onyxxaagent",
+            "onyxxacommander",
+            "onyxxahero"
         ],
         "promissoryNotes": [
             "bapnconc"
@@ -217,9 +217,9 @@
             "cruiser",
             "carrier",
             "dreadnought",
-            "conclave_flagship",
+            "onyxxa_flagship",
             "infantry",
-            "conclave_mech",
+            "onyxxa_mech",
             "pds",
             "spacedock"
         ],

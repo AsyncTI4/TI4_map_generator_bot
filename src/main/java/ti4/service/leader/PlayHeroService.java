@@ -3,11 +3,13 @@ package ti4.service.leader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.ActionCardHelper;
@@ -121,6 +123,9 @@ public class PlayHeroService {
             case "kollecchero" ->
                 RelicHelper.drawWithAdvantage(
                         player, game, game.getRealPlayers().size());
+            case "xxchahero-te" -> {
+                ButtonHelperHeroes.xxchaHeroTEStart(game, player);
+            }
             case "titanshero" -> {
                 Tile t = player.getHomeSystemTile();
                 if (game.getTileFromPlanet("elysium") != null && game.getTileFromPlanet("elysium") == t) {
@@ -134,7 +139,7 @@ public class PlayHeroService {
                             "Use the following command to add the attachment: `/add_token token:titanshero`");
                 }
             }
-            case "conclavehero" -> {
+            case "onyxxahero" -> {
                 List<Button> buttons = new ArrayList<>();
                 for (Tile tile : game.getTileMap().values()) {
                     if (FoWHelper.playerHasActualShipsInSystem(player, tile)) {

@@ -3073,7 +3073,7 @@ public class ButtonHelper {
 
                 remainingButtons.add(b);
                 newActionRow.add(b);
-                if (!b.getCustomId().contains("deleteButtons")
+                if (!b.getCustomId().equalsIgnoreCase("deleteButtons")
                         && !b.getCustomId().contains("ultimateUndo")) {
                     hasRealButton = true;
                 }

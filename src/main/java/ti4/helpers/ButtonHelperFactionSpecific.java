@@ -1510,7 +1510,7 @@ public class ButtonHelperFactionSpecific {
                     player2.getCorrectChannel(),
                     player2.getFactionEmoji()
                             + " gained 3 consolation trade goods from having their strategy card stolen via _Quantumn Datahub Node_ "
-                            + player2.gainTG(3) + ".");
+                            + player2.gainTG(3, true) + ".");
         }
 
         int player1SC = Integer.parseInt(buttonID.split("_")[4]);
