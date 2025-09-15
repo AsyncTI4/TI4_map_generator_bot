@@ -7,10 +7,7 @@
         "commodities": 1,
         "factionTech": [],
         "startingTech": [],
-        "homePlanets": [
-            "ordinian",
-            "revelation"
-        ],
+        "homePlanets": [],
         "abilities": [
             "liberate",
             "galvanize",
