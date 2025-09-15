@@ -28,11 +28,11 @@
             "cruiser",
             "carrier",
             "dreadnought",
-            "bastion_flagship",
+            "flagship",
             "infantry",
-            "bastion_mech",
+            "mech",
             "pds",
-            "bastion_spacedock"
+            "spacedock"
         ],
         "source": "thunders_edge"
     },
@@ -58,9 +58,9 @@
             "cruiser",
             "carrier",
             "dreadnought",
-            "deepwrought_flagship",
+            "flagship",
             "infantry",
-            "deepwrought_mech",
+            "mech",
             "pds",
             "spacedock"
         ],
@@ -88,9 +88,9 @@
             "cruiser",
             "carrier",
             "dreadnought",
-            "crimson_flagship",
+            "flagship",
             "infantry",
-            "crimson_mech",
+            "mech",
             "pds",
             "spacedock"
         ],
@@ -119,13 +119,13 @@
         ],
         "units": [
             "fighter",
-            "ralnel_destroyer",
+            "destroyer",
             "cruiser",
             "carrier",
             "dreadnought",
-            "ralnel_flagship",
+            "flagship",
             "infantry",
-            "ralnel_mech",
+            "mech",
             "pds",
             "spacedock"
         ],
