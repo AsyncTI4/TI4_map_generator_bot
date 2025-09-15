@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -14,10 +16,12 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
+import ti4.service.draft.DraftButtonService;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
 import ti4.service.draft.Draftable;
 import ti4.service.draft.DraftableType;
+import ti4.service.draft.FactionExtraSetupHelper;
 import ti4.service.draft.PartialMapService;
 import ti4.service.draft.PlayerDraftState;
 import ti4.service.draft.PlayerSetupService.PlayerSetupState;
@@ -72,12 +76,14 @@ public class FactionDraftable extends Draftable {
             FactionModel faction = Mapper.getFaction(factionAlias);
             if (faction == null) continue;
             String choiceKey = factionAlias;
-            String buttonText = faction.getFactionEmoji() + " " + faction.getFactionName();
+            String buttonText = faction.getFactionName();
+            String buttonEmoji = faction.getFactionEmoji();
             String simpleName = faction.getFactionName();
+            String formattedName = faction.getFactionEmoji() + " **" + faction.getFactionName() + "**"; 
             String inlineSummary = faction.getFactionEmoji();
             String buttonSuffix = factionAlias;
             DraftChoice choice =
-                    new DraftChoice(getType(), choiceKey, buttonText, simpleName, inlineSummary, buttonSuffix);
+                    new DraftChoice(getType(), choiceKey, buttonText, buttonEmoji, simpleName, formattedName, inlineSummary, buttonSuffix);
             choices.add(choice);
         }
         return choices;
@@ -96,9 +102,9 @@ public class FactionDraftable extends Draftable {
     @Override
     public List<Button> getCustomButtons() {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.blue(getButtonPrefix() + "remaininginfo", "Remaining faction info"));
-        buttons.add(Buttons.blue(getButtonPrefix() + "pickedinfo", "Picked faction info"));
-        buttons.add(Buttons.blue(getButtonPrefix() + "allinfo", "All faction info"));
+        buttons.add(Buttons.blue(DraftButtonService.DRAFT_BUTTON_PREFIX + getButtonPrefix() + "remaininginfo", "Remaining faction info"));
+        buttons.add(Buttons.blue(DraftButtonService.DRAFT_BUTTON_PREFIX + getButtonPrefix() + "pickedinfo", "Picked faction info"));
+        buttons.add(Buttons.blue(DraftButtonService.DRAFT_BUTTON_PREFIX + getButtonPrefix() + "allinfo", "All faction info"));
         return buttons;
     }
 
@@ -182,6 +188,17 @@ public class FactionDraftable extends Draftable {
     @Override
     public void draftChoiceSideEffects(
             GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice) {
+
+        if (choice.getChoiceKey().contains("keleres")) {
+            Predicate<String> isFactionTaken = f -> {
+                return !draftManager.getPlayersWithChoiceKey(getType(), f).isEmpty();
+            };
+            Predicate<String> isInDraft = f -> {
+                return draftFactions.contains(f);
+            };
+            FactionExtraSetupHelper.offerKeleresSetupButtons(draftManager.getGame().getPlayer(playerUserId), isFactionTaken, isInDraft);
+        }
+
         PartialMapService.tryUpdateMap(event, draftManager);
     }
 
@@ -237,7 +254,7 @@ public class FactionDraftable extends Draftable {
         }
 
         // Ensure all factions in draftFactions are valid
-        Set<String> distinctFactions = new HashSet<>(draftFactions);
+        Set<String> distinctFactions = new HashSet<>();
         for (String factionAlias : draftFactions) {
             FactionModel faction = Mapper.getFaction(factionAlias);
             if (faction == null) {

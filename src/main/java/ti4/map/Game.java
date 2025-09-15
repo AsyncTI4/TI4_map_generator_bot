@@ -363,13 +363,11 @@ public class Game extends GameProperties {
         return returnValue;
     }
 
-    @JsonIgnore
     public MiltyDraftManager getMiltyDraftManagerUnsafe() {
         return miltyDraftManager;
     }
 
     @NotNull
-    @JsonIgnore
     public MiltyDraftManager getMiltyDraftManager() {
         if (miltyDraftManager == null) {
             miltyDraftManager = new MiltyDraftManager();
@@ -389,27 +387,28 @@ public class Game extends GameProperties {
     }
 
     @NotNull
-    @JsonIgnore
     public DraftTileManager getDraftTileManager() {
         if (draftTileManager == null) {
             draftTileManager = new DraftTileManager();
-            draftTileManager.reset(this);
         }
         return draftTileManager;
     }
 
+    public DraftManager getDraftManagerUnsafe() {
+        return draftManager;
+    }
+
     @NotNull
-    @JsonIgnore
     public DraftManager getDraftManager() {
         if (draftManager == null) {
-            if (!draftString.isEmpty()) {
+            if (draftString != null && !draftString.isEmpty()) {
                 try {
                     draftManager = DraftLoadService.loadDraftManager(this, draftString);
                 } catch (Exception e) {
-                    draftManager = new DraftManager(this, getRealPlayerIDs());
+                    draftManager = new DraftManager(this);
                 }
             } else {
-                draftManager = new DraftManager(this, getRealPlayerIDs());
+                draftManager = new DraftManager(this);
             }
         }
         return draftManager;

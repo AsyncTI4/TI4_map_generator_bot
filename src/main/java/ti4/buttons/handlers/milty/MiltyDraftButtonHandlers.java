@@ -67,7 +67,8 @@ class MiltyDraftButtonHandlers {
                 String keleresName =
                         Mapper.getFaction("keleres" + preset.charAt(0)).getFactionTitle();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Successfully preset " + keleresName);
-                FactionExtraSetupHelper.offerKeleresSetupButtons(game.getMiltyDraftManager(), player);
+                FactionExtraSetupHelper.offerKeleresSetupButtons(player, game.getMiltyDraftManager()::isFactionTaken,
+                        f -> game.getMiltyDraftManager().getFactionDraft().contains(f));
                 ButtonHelper.deleteMessage(event);
             }
         });

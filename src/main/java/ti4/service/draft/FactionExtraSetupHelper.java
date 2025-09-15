@@ -2,6 +2,8 @@ package ti4.service.draft;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
@@ -10,21 +12,20 @@ import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
-import ti4.service.milty.MiltyDraftManager;
 
 @UtilityClass
 public class FactionExtraSetupHelper {
-    public static void offerKeleresSetupButtons(MiltyDraftManager manager, Player player) {
+    public static void offerKeleresSetupButtons(Player player, Predicate<String> isTaken, Predicate<String> isInDraft) {
         List<String> flavors = List.of("mentak", "xxcha", "argent");
         List<Button> keleresPresets = new ArrayList<>();
         boolean warn = false;
         for (String f : flavors) {
-            if (manager.isFactionTaken(f)) continue;
+            if (isTaken.test(f)) continue;
 
             FactionModel model = Mapper.getFaction(f);
             String id = "draftPresetKeleres_" + f;
             String label = StringUtils.capitalize(f);
-            if (manager.getFactionDraft().contains(f)) {
+            if (isInDraft.test(f)) {
                 keleresPresets.add(Buttons.gray(id, label + " 🛑", model.getFactionEmoji()));
                 warn = true;
             } else {

@@ -8,6 +8,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.MapTemplateHelper;
 import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.model.FactionModel;
@@ -31,21 +32,12 @@ public class PartialMapService {
      */
     public void tryUpdateMap(GenericInteractionCreateEvent event, DraftManager draftManager) {
         Game game = draftManager.getGame();
-        String mapTemplateId = getMapTemplateModelId(game);
+        String mapTemplateId = getMapTemplateModelId(draftManager);
         SliceDraftable sliceDraftable = getSliceDraftable(draftManager);
         SeatDraftable seatDraftable = getSeatDraftable(draftManager);
         SpeakerOrderDraftable speakerOrderDraftable = getSpeakerOrderDraftable(draftManager);
         FactionDraftable factionDraftable = getFactionDraftable(draftManager);
         MapTemplateModel mapTemplateModel = Mapper.getMapTemplate(mapTemplateId);
-
-        // General map setup tasks
-        for (MapTemplateTile templateTile : mapTemplateModel.getTemplateTiles()) {
-            if (templateTile.getPos() != null && templateTile.getCustodians() != null && templateTile.getCustodians()) {
-                Tile newgametile = game.getTileByPosition(templateTile.getPos());
-                if (newgametile != null)
-                    AddTileService.addCustodianToken(newgametile, game); // only works on MR for now
-            }
-        }
 
         if (seatDraftable == null && speakerOrderDraftable == null) {
             // No way to place tiles on the map
@@ -58,6 +50,24 @@ public class PartialMapService {
         }
 
         boolean updateMap = false;
+
+        // General map setup tasks
+        for (MapTemplateTile templateTile : mapTemplateModel.getTemplateTiles()) {
+            Tile gameTile = game.getTileByPosition(templateTile.getPos());
+            
+            if(gameTile == null && templateTile.getPos() != null) {
+                Tile toAdd = MapTemplateHelper.getTileFromTemplateTile(templateTile);
+                if(toAdd != null) {
+                    game.setTile(toAdd);
+                    updateMap = true;
+                }
+            }
+            
+            if (templateTile.getPos() != null && templateTile.getCustodians() != null && templateTile.getCustodians()) {
+                if (gameTile != null)
+                    AddTileService.addCustodianToken(gameTile, game); // only works on MR for now
+            }
+        }
 
         for (PlayerDraftState pState : draftManager.getPlayerStates().values()) {
             // Get their position, to see if we can do anything
@@ -80,7 +90,8 @@ public class PartialMapService {
                 if (templateTile.getPos() == null) {
                     continue;
                 }
-                if (game.getTileByPosition(templateTile.getPos()) != null) {
+                Tile gameTile = game.getTileByPosition(templateTile.getPos());
+                if (gameTile != null && !TileHelper.isDraftTile(gameTile.getTileModel())) {
                     // Tile already placed here
                     continue;
                 }
@@ -108,12 +119,6 @@ public class PartialMapService {
                     Tile toAdd = new Tile(tileID, templateTile.getPos());
                     game.setTile(toAdd);
                     updateMap = true;
-                } else {
-                    Tile toAdd = MapTemplateHelper.getTileFromTemplateTile(templateTile);
-                    if (toAdd != null) {
-                        game.setTile(toAdd);
-                        updateMap = true;
-                    }
                 }
             }
         }
@@ -190,14 +195,14 @@ public class PartialMapService {
         return null;
     }
 
-    private String getMapTemplateModelId(Game game) {
-        String mapTemplateId = game.getMapTemplateID();
+    private String getMapTemplateModelId(DraftManager draftManager) {
+        String mapTemplateId = draftManager.getGame().getMapTemplateID();
         if (mapTemplateId == null || mapTemplateId.isEmpty()) {
             MapTemplateModel mapTemplateModel = Mapper.getDefaultMapTemplateForPlayerCount(
-                    game.getRealPlayers().size());
+                    draftManager.getPlayerStates().size());
             if (mapTemplateModel == null) {
                 throw new IllegalStateException(
-                        "No default map template for " + game.getRealPlayers().size() + " players");
+                        "No default map template for " + draftManager.getPlayerStates().size() + " players");
             }
             mapTemplateId = mapTemplateModel.getAlias();
         }

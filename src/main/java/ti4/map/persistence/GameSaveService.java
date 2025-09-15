@@ -56,6 +56,8 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.draft.DraftManager;
+import ti4.service.draft.DraftSaveService;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -612,6 +614,19 @@ class GameSaveService {
         } else {
             writer.write(Constants.MILTY_DRAFT_MANAGER + " " + game.getMiltyDraftString());
             writer.write(System.lineSeparator());
+        }
+
+        DraftManager draftManager = game.getDraftManagerUnsafe();
+        if (draftManager != null) {
+            for(String saveLine : DraftSaveService.saveDraftManager(draftManager)) {
+                writer.write(Constants.DRAFT_MANAGER + " " + saveLine);
+                writer.write(System.lineSeparator());
+            }
+        } else if (game.getDraftString() != null) {
+            for(String saveLine : game.getDraftString()) {
+                writer.write(Constants.DRAFT_MANAGER + " " + saveLine);
+                writer.write(System.lineSeparator());
+            }
         }
 
         MiltySettings miltySettings = game.getMiltySettingsUnsafe();

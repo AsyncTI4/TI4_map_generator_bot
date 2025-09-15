@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.MapTemplateHelper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
@@ -36,11 +37,13 @@ public class SpeakerOrderDraftable extends Draftable {
         List<DraftChoice> choices = new ArrayList<>();
         for (int i = 1; i <= numPlayers; i++) {
             String choiceKey = "" + i;
-            String buttonText = MiltyDraftEmojis.getSpeakerPickEmoji(i).toString();
-            String simpleName = "Pick " + i;
+            String buttonText = null;
+            String buttonEmoji = MiltyDraftEmojis.getSpeakerPickEmoji(i).toString();
+            String simpleName = StringHelper.ordinal(i) + " Pick";
+            String formattedName = StringHelper.ordinal(i) + " Pick";
             String inlineSummary = MiltyDraftEmojis.getSpeakerPickEmoji(i).toString();
             String buttonSuffix = "" + i;
-            choices.add(new DraftChoice(getType(), choiceKey, buttonText, simpleName, inlineSummary, buttonSuffix));
+            choices.add(new DraftChoice(getType(), choiceKey, buttonText, buttonEmoji, simpleName, formattedName, inlineSummary, buttonSuffix));
         }
         return choices;
     }

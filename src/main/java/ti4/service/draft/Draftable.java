@@ -48,7 +48,7 @@ public abstract class Draftable extends DraftLifecycleHooks {
     // Get the default inline summary text when a player hasn't made a selection.
     public abstract String getDefaultInlineSummary();
     // Generate and upload the draft summary image for this Draftable. Return null if no image is generated.
-    public FileUpload generateDraftImage(DraftManager draftManager) {
+    public FileUpload generateDraftImage(DraftManager draftManager, String uniqueKey) {
         return null;
     }
 

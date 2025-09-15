@@ -21,7 +21,8 @@ public class DraftSetupService {
 
         // Load the general game settings
         boolean success = game.loadGameSettingsFromSettings(event, settings);
-        if (!success) return "Fix the game settings before continuing";
+        if (!success)
+            return "Fix the game settings before continuing";
         if (game.isCompetitiveTIGLGame()) {
             TIGLHelper.sendTIGLSetupText(game);
         }
@@ -46,6 +47,9 @@ public class DraftSetupService {
         DraftTileManager tileManager = game.getDraftTileManager();
         tileManager.addAllDraftTiles(specs.tileSources);
         DraftManager draftManager = game.getDraftManager();
+        draftManager.resetForNewDraft();
+        draftManager.setPlayers(specs.playerIDs);
+
         game.setMapTemplateID(specs.template.getAlias());
 
         FactionDraftable factionDraftable = new FactionDraftable();
@@ -70,14 +74,17 @@ public class DraftSetupService {
         draftManager.setOrchestrator(orchestrator);
 
         // initialize factions
-        // List<String> unbannedFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
-        //         .filter(f -> specs.factionSources.contains(f.getSource()))
-        //         .filter(f -> !specs.bannedFactions.contains(f.getAlias()))
-        //         .filter(f -> !f.getAlias().contains("keleres")
-        //                 || "keleresm".equals(f.getAlias())) // Limit the pool to only 1 keleres flavor
-        //         .map(FactionModel::getAlias)
-        //         .toList());
-        // List<String> factionDraft = createFactionDraft(specs.numFactions, unbannedFactions, specs.priorityFactions);
+        // List<String> unbannedFactions = new
+        // ArrayList<>(Mapper.getFactionsValues().stream()
+        // .filter(f -> specs.factionSources.contains(f.getSource()))
+        // .filter(f -> !specs.bannedFactions.contains(f.getAlias()))
+        // .filter(f -> !f.getAlias().contains("keleres")
+        // || "keleresm".equals(f.getAlias())) // Limit the pool to only 1 keleres
+        // flavor
+        // .map(FactionModel::getAlias)
+        // .toList());
+        // List<String> factionDraft = createFactionDraft(specs.numFactions,
+        // unbannedFactions, specs.priorityFactions);
         // draftManager.setFactionDraft(factionDraft);
 
         // validate slice count + sources
@@ -94,8 +101,7 @@ public class DraftSetupService {
         }
 
         String startMsg = "## Generating the milty draft!!";
-        startMsg +=
-                "\n - Also clearing out any tiles that may have already been on the map so that the draft will fill in tiles properly.";
+        startMsg += "\n - Also clearing out any tiles that may have already been on the map so that the draft will fill in tiles properly.";
         if (specs.numSlices == maxSlices) {
             startMsg += "\n - *You asked for the max number of slices, so this may take several seconds*";
         }
@@ -115,7 +121,8 @@ public class DraftSetupService {
             draftManager.preDraftStart();
 
             // MessageHelper.sendMessageToChannel(
-            //         event.getMessageChannel(), "### You are using preset slices!! Starting the draft right away!");
+            // event.getMessageChannel(), "### You are using preset slices!! Starting the
+            // draft right away!");
 
             // specs.presetSlices.forEach(draftManager::addSlice);
             // MiltyDraftDisplayService.repostDraftInformation(draftManager, game);

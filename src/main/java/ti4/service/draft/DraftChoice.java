@@ -7,7 +7,9 @@ public class DraftChoice {
     private final DraftableType type;
     private final String choiceKey;
     private final String buttonText;
+    private final String buttonEmoji;
     private final String simpleName;
+    private final String formattedName;
     private final String inlineSummary;
     private final String buttonSuffix;
 }

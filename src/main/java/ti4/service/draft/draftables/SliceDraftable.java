@@ -51,12 +51,14 @@ public class SliceDraftable extends Draftable {
         List<DraftChoice> choices = new ArrayList<>();
         for (MiltyDraftSlice slice : slices) {
             String choiceKey = slice.getName();
-            String buttonText = MiltyDraftEmojis.getMiltyDraftEmoji(choiceKey).toString();
+            String buttonText = null;
+            String buttonEmoji = MiltyDraftEmojis.getMiltyDraftEmoji(choiceKey).toString();
             String simpleName = slice.getName();
+            String formattedName = "Slice " + slice.getName();
             String inlineSummary =
                     MiltyDraftEmojis.getMiltyDraftEmoji(choiceKey).toString();
             String buttonSuffix = choiceKey;
-            choices.add(new DraftChoice(getType(), choiceKey, buttonText, simpleName, inlineSummary, buttonSuffix));
+            choices.add(new DraftChoice(getType(), choiceKey, buttonText, buttonEmoji, simpleName, formattedName, inlineSummary, buttonSuffix));
         }
         return choices;
     }
@@ -114,8 +116,8 @@ public class SliceDraftable extends Draftable {
     }
 
     @Override
-    public FileUpload generateDraftImage(DraftManager draftManager) {
-        return SliceImageGeneratorService.tryGenerateImage(draftManager);
+    public FileUpload generateDraftImage(DraftManager draftManager, String uniqueKey) {
+        return SliceImageGeneratorService.tryGenerateImage(draftManager, uniqueKey);
     }
 
     @Override

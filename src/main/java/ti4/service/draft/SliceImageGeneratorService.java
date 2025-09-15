@@ -35,20 +35,17 @@ import ti4.service.milty.MiltyDraftTile;
 
 @UtilityClass
 public class SliceImageGeneratorService {
-    public static FileUpload tryGenerateImage(DraftManager draftManager) {
-        SliceDraftable sliceDraftable = draftManager.getDraftables().stream()
-                .filter(d -> d instanceof SliceDraftable)
-                .map(d -> (SliceDraftable) d)
-                .findFirst()
-                .orElse(null);
+    public static FileUpload tryGenerateImage(DraftManager draftManager, String uniqueKey) {
+        SliceDraftable sliceDraftable = (SliceDraftable) draftManager.getDraftableByType(SliceDraftable.TYPE);
         if (sliceDraftable == null) return null;
 
         Function<String, String> getPlayerFromSlice = (sliceName) -> {
-            return draftManager.getPlayersWithChoiceKey(sliceName).stream()
+            return draftManager.getPlayersWithChoiceKey(SliceDraftable.TYPE, sliceName).stream()
                     .findFirst()
                     .orElse(null);
         };
         Function<String, FactionModel> getFactionFromPlayer = (playerUserID) -> {
+            if(playerUserID == null) return null;
             List<DraftChoice> factionChoices = draftManager.getPlayerChoices(playerUserID, FactionDraftable.TYPE);
             if (!factionChoices.isEmpty()) {
                 return FactionDraftable.getFactionByChoice(factionChoices.get(0));
@@ -57,14 +54,15 @@ public class SliceImageGeneratorService {
         };
 
         return generateImage(
-                draftManager.getGame(), sliceDraftable.getDraftSlices(), getPlayerFromSlice, getFactionFromPlayer);
+                draftManager.getGame(), sliceDraftable.getDraftSlices(), getPlayerFromSlice, getFactionFromPlayer, uniqueKey);
     }
 
     public static FileUpload generateImage(
             Game game,
             List<MiltyDraftSlice> slices,
             Function<String, String> getPlayerFromSlice,
-            Function<String, FactionModel> getFactionFromPlayer) {
+            Function<String, FactionModel> getFactionFromPlayer,
+            String uniqueKey) {
         MapTemplateModel mapTemplate = Mapper.getMapTemplate(game.getMapTemplateID());
 
         int sliceCount = slices.size();
@@ -112,7 +110,7 @@ public class SliceImageGeneratorService {
             desc.append(slice.ttsString());
         }
 
-        FileUpload fileUpload = FileUploadService.createFileUpload(mainImage, game.getName() + "_slice_draft");
+        FileUpload fileUpload = FileUploadService.createFileUpload(mainImage, uniqueKey);
         fileUpload.setDescription(desc.toString());
         return fileUpload;
     }

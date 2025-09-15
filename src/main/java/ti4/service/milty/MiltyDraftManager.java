@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import lombok.Data;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -334,7 +335,9 @@ public class MiltyDraftManager {
         }
 
         if ("faction".equals(category) && item.contains("keleres")) {
-            FactionExtraSetupHelper.offerKeleresSetupButtons(this, player);
+            Predicate<String> isTaken = this::isFactionTaken;
+            Predicate<String> isInDraft = f -> factionDraft.contains(f);
+            FactionExtraSetupHelper.offerKeleresSetupButtons(player, isTaken, isInDraft);
         }
 
         try {

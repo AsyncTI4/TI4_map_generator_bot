@@ -14,6 +14,7 @@ import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
 import ti4.model.Source.ComponentSource;
+import ti4.service.draft.DraftSetupService;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.milty.MiltyService;
 
@@ -145,6 +146,7 @@ public class MiltySettings extends SettingsMenu {
     }
 
     private String startMilty(GenericInteractionCreateEvent event) {
-        return MiltyService.startFromSettings(event, this);
+        //return MiltyService.startFromSettings(event, this);
+        return DraftSetupService.startFromSettings(event, this);
     }
 }

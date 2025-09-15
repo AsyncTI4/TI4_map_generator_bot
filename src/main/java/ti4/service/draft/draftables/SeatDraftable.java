@@ -37,11 +37,13 @@ public class SeatDraftable extends Draftable {
         List<DraftChoice> choices = new ArrayList<>();
         for (int i = 1; i <= numSeats; i++) {
             String choiceKey = "" + i;
-            String buttonText = MiltyDraftEmojis.getSpeakerPickEmoji(i).toString();
+            String buttonText = null;
+            String buttonEmoji = MiltyDraftEmojis.getSpeakerPickEmoji(i).toString();
             String simpleName = "Seat " + i;
+            String formattedName = simpleName;
             String inlineSummary = MiltyDraftEmojis.getSpeakerPickEmoji(i).toString();
             String buttonSuffix = "" + i;
-            choices.add(new DraftChoice(getType(), choiceKey, buttonText, simpleName, inlineSummary, buttonSuffix));
+            choices.add(new DraftChoice(getType(), choiceKey, buttonText, buttonEmoji, simpleName, formattedName, inlineSummary, buttonSuffix));
         }
         return choices;
     }

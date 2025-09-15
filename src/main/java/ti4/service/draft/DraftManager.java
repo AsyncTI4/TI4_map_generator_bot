@@ -13,24 +13,19 @@ import ti4.service.map.AddTileListService;
 
 @Data
 public class DraftManager {
-    public DraftManager(Game game, List<String> players) {
+    public DraftManager(Game game) {
         if (game == null) {
             throw new IllegalArgumentException("Game cannot be null");
-        }
-        if (orchestrator == null) {
-            throw new IllegalArgumentException("Orchestrator cannot be null");
         }
         if (draftables == null) {
             throw new IllegalArgumentException("Draftables cannot be null");
         }
-        if (players == null || players.isEmpty()) {
-            throw new IllegalArgumentException("Players cannot be null or empty");
-        }
         this.game = game;
         // this.orchestrator = orchestrator;
         // this.draftables = new ArrayList<>(draftables);
-        this.playerStates =
-                players.stream().collect(HashMap::new, (m, p) -> m.put(p, new PlayerDraftState()), Map::putAll);
+        // this.playerStates =
+        // players.stream().collect(HashMap::new, (m, p) -> m.put(p, new
+        // PlayerDraftState()), Map::putAll);
     }
 
     private final Game game;
@@ -38,7 +33,21 @@ public class DraftManager {
     // The order of draftables is the correct order for summarizing, applying, etc.
     private final List<Draftable> draftables = new ArrayList<>();
     // Key: Player's UserID
-    private final Map<String, PlayerDraftState> playerStates;
+    private final Map<String, PlayerDraftState> playerStates = new HashMap<>();
+
+    // Setup
+
+    public void setPlayers(List<String> players) {
+        if (players == null || players.isEmpty()) {
+            throw new IllegalArgumentException("Players cannot be null or empty");
+        }
+        for (String player : players) {
+            if (playerStates.containsKey(player)) {
+                throw new IllegalArgumentException("Duplicate player: " + player);
+            }
+            playerStates.put(player, new PlayerDraftState());
+        }
+    }
 
     public void setOrchestrator(DraftOrchestrator orchestrator) {
         if (orchestrator == null) {
@@ -60,6 +69,12 @@ public class DraftManager {
             }
         }
         draftables.add(draftable);
+    }
+
+    public void resetForNewDraft() {
+        this.orchestrator = null;
+        this.draftables.clear();
+        this.playerStates.clear();
     }
 
     // Player management
@@ -113,16 +128,14 @@ public class DraftManager {
         return choices;
     }
 
-    public List<String> getPlayersWithChoiceKey(String choiceKey) {
+    public List<String> getPlayersWithChoiceKey(DraftableType type, String choiceKey) {
         List<String> playersWithChoice = new ArrayList<>();
         for (String userId : playerStates.keySet()) {
-            PlayerDraftState pState = playerStates.get(userId);
-            for (List<DraftChoice> choices : pState.getPicks().values()) {
-                for (DraftChoice choice : choices) {
-                    if (choiceKey.equals(choice.getChoiceKey())) {
-                        playersWithChoice.add(userId);
-                        break;
-                    }
+            List<DraftChoice> choices = getPlayerChoices(userId, type);
+            for (DraftChoice choice : choices) {
+                if (choice.getChoiceKey().equals(choiceKey)) {
+                    playersWithChoice.add(userId);
+                    break;
                 }
             }
         }
@@ -138,6 +151,15 @@ public class DraftManager {
             }
         }
         return allChoices;
+    }
+
+    public Draftable getDraftableByType(DraftableType type) {
+        for (Draftable d : draftables) {
+            if (d.getType().equals(type)) {
+                return d;
+            }
+        }
+        return null;
     }
 
     // Interaction handling
@@ -157,9 +179,7 @@ public class DraftManager {
                         }
                         // More validation, and add the button to the player's state
                         String status = orchestrator.handleDraftChoice(event, this, player.getUserID(), choice);
-                        if (status != null
-                                && status != DraftButtonService.DELETE_BUTTON
-                                && status != DraftButtonService.DELETE_MESSAGE) {
+                        if (DraftButtonService.isError(status)) {
                             return status;
                         }
                         // Side effects, if any
@@ -174,9 +194,8 @@ public class DraftManager {
         }
 
         if (orchestrator != null && buttonID.startsWith(orchestrator.getButtonPrefix())) {
-            String innerButtonID =
-                    buttonID.substring(orchestrator.getButtonPrefix().length());
-            String status = orchestrator.handleCustomButtonPress(event, this, innerButtonID, buttonID);
+            String innerButtonID = buttonID.substring(orchestrator.getButtonPrefix().length());
+            String status = orchestrator.handleCustomButtonPress(event, this, player.getUserID(), innerButtonID);
             return status;
         }
 
@@ -187,8 +206,10 @@ public class DraftManager {
 
     /**
      * Components should do any work needed before the draft starts.
-     * If that requires user interaction, this entails sending public/private buttons.
-     * If the draft cannot start immediately, anything blocking it should call tryStartDraft() once resolved.
+     * If that requires user interaction, this entails sending public/private
+     * buttons.
+     * If the draft cannot start immediately, anything blocking it should call
+     * tryStartDraft() once resolved.
      */
     public void preDraftStart() {
         for (Draftable d : draftables) {
@@ -200,7 +221,8 @@ public class DraftManager {
     }
 
     /**
-     * Whenever something blocking the draft from starting is resolved, this should be called.
+     * Whenever something blocking the draft from starting is resolved, this should
+     * be called.
      */
     public void tryStartDraft() {
         if (!canStartDraft()) {
@@ -224,8 +246,11 @@ public class DraftManager {
 
     /**
      * End the selection of draft choices, and begin doing post-draft work.
-     * If any component needs to get player interaction to complete its work, it should send buttons now.
-     * If all components are ready to setup players, do so here. Otherwise call trySetupPlayers() whenever something blocking is resolved.
+     * If any component needs to get player interaction to complete its work, it
+     * should send buttons now.
+     * If all components are ready to setup players, do so here. Otherwise call
+     * trySetupPlayers() whenever something blocking is resolved.
+     * 
      * @param event
      */
     public void endDraft(GenericInteractionCreateEvent event) {
@@ -241,7 +266,9 @@ public class DraftManager {
     }
 
     /**
-     * Whether all lifecycle components are ready to end the picking of draft choices.
+     * Whether all lifecycle components are ready to end the picking of draft
+     * choices.
+     * 
      * @return true if all components can stop drafting picks, false otherwise.
      */
     public boolean canEndDraft() {
@@ -254,7 +281,9 @@ public class DraftManager {
     }
 
     /**
-     * Attempt to do player setup and start the game. If any component is not ready, return without doing anything.
+     * Attempt to do player setup and start the game. If any component is not ready,
+     * return without doing anything.
+     * 
      * @param event
      */
     public void trySetupPlayers(GenericInteractionCreateEvent event) {
@@ -267,7 +296,12 @@ public class DraftManager {
             for (Draftable draftable : draftables) {
                 draftable.setupPlayer(this, userId, playerSetupState);
             }
-            PlayerSetupService.setupPlayer(playerSetupState, game.getPlayer(userId), game, event);
+            Player player = game.getPlayer(userId);
+            if(playerSetupState.getColor() == null) {
+                String color = player.getNextAvailableColour();
+                playerSetupState.setColor(color);
+            }
+            PlayerSetupService.setupPlayer(playerSetupState, player, game, event);
         }
 
         AddTileListService.finishSetup(game, event);
@@ -283,7 +317,8 @@ public class DraftManager {
     }
 
     /**
-     * Check that all required fields are set and that all shared state is consistent.
+     * Check that all required fields are set and that all shared state is
+     * consistent.
      */
     public void validateState() {
         if (game == null) {
@@ -295,13 +330,14 @@ public class DraftManager {
         if (orchestrator == null) {
             throw new IllegalStateException("Orchestrator not set");
         }
-        if (playerStates.isEmpty()) {
+        if (playerStates == null || playerStates.isEmpty()) {
             throw new IllegalStateException("No players in draft");
         }
-        // Is it correct to check this here? Is this the expected value?
-        if (playerStates.size() != game.getRealPlayers().size()) {
-            throw new IllegalStateException("Number of players in draft does not match number of players in game");
-        }
+        // TODO: What could we do here instead, to confirm we have the correct number of players?
+        // if (playerStates.size() != game.getRealPlayers().size()) {
+        // throw new IllegalStateException("Number of players in draft does not match
+        // number of players in game");
+        // }
         if (draftables.isEmpty()) {
             throw new IllegalStateException("No draftables in draft");
         }
@@ -312,7 +348,8 @@ public class DraftManager {
     }
 
     // Players involved
-    // Draft types w/ available choices (e.g. factions for this draft) and type-specific settings
+    // Draft types w/ available choices (e.g. factions for this draft) and
+    // type-specific settings
     // Orchestrator
     // Current state (incl draft choices, orchestrator state, etc.)
 }

@@ -31,7 +31,7 @@ import ti4.message.MessageHelper.MessageFunction;
 import ti4.message.logging.BotLogger;
 
 @UtilityClass
-public class PublicDraftInfoHelper {
+public class PublicDraftInfoService {
     // ui things...for snake draft, in order!
     // generate and post and UPDATE slice image (requires slice draftable, template,
     // and displays player name+faction emoji)
@@ -74,15 +74,17 @@ public class PublicDraftInfoHelper {
 
         Game game = draftManager.getGame();
         MessageChannel channel = game.getMainGameChannel();
-        if (channel == null) return;
+        if (channel == null)
+            return;
 
         List<String> clearOldAttachments = new ArrayList<>();
 
         // MiltyDraftHelper.generateAndPostSlices(game);
         for (Draftable d : draftManager.getDraftables()) {
-            FileUpload uploadedImage = d.generateDraftImage(draftManager);
+            String uniqueKey = game.getName() + "_" + d.getType().toString().toLowerCase();
+            FileUpload uploadedImage = d.generateDraftImage(draftManager, uniqueKey);
             if (uploadedImage != null) {
-                clearOldAttachments.add(uploadedImage.getName());
+                clearOldAttachments.add(uniqueKey);
                 MessageHelper.sendFileUploadToChannel(channel, uploadedImage);
             }
         }
@@ -117,7 +119,8 @@ public class PublicDraftInfoHelper {
 
         Game game = draftManager.getGame();
         MessageChannel channel = game.getMainGameChannel();
-        if (channel == null) return;
+        if (channel == null)
+            return;
 
         String draftSummary = draftManager.canInlineSummary()
                 ? getInlineSummary(draftManager, playerOrder, currentPlayer, nextPlayer)
@@ -136,18 +139,21 @@ public class PublicDraftInfoHelper {
         Game game = draftManager.getGame();
         String msg = "Nobody is up to draft...";
         Player p = game.getPlayer(currentPlayerUserID);
-        if (p != null) msg = "### " + p.getPing() + " is up to draft!";
+        if (p != null)
+            msg = "### " + p.getPing() + " is up to draft!";
 
         // List<Button> buttons = new ArrayList<>();
         // buttons.add(Buttons.gray("showMiltyDraft", "Show draft again"));
-        // buttons.add(Buttons.blue("miltyFactionInfo_remaining", "Remaining faction info"));
+        // buttons.add(Buttons.blue("miltyFactionInfo_remaining", "Remaining faction
+        // info"));
         // buttons.add(Buttons.blue("miltyFactionInfo_picked", "Picked faction info"));
         // buttons.add(Buttons.blue("miltyFactionInfo_all", "All faction info"));
         List<Button> buttons = new ArrayList<>(extraButtons != null ? extraButtons : List.of());
         buttons = MessageHelper.addUndoButtonToList(buttons, game.getName());
 
         MessageChannel channel = game.getMainGameChannel();
-        if (channel == null) return;
+        if (channel == null)
+            return;
         MessageFunction clearOldFunc = clearOldPingsAndButtonsFunc(true, clearMessageHeaders, clearAttachments);
         MessageHelper.splitAndSentWithAction(msg, channel, buttons, clearOldFunc);
     }
@@ -174,11 +180,12 @@ public class PublicDraftInfoHelper {
 
             String buttonText = choice.getButtonText();
             // If there's any writing on the button, use a gray background for readability.
-            boolean grayButton = buttonText.matches(".*[a-zA-Z]+.*");
+            boolean grayButton = buttonText != null && !buttonText.isBlank();
             Button button = grayButton
-                    ? Buttons.gray(draftable.getButtonPrefix() + "_" + choice.getButtonSuffix(), choice.getButtonText())
+                    ? Buttons.gray(produceChoiceButton(draftable, choice), choice.getButtonText(),
+                            choice.getButtonEmoji())
                     : Buttons.green(
-                            draftable.getButtonPrefix() + "_" + choice.getButtonSuffix(), choice.getButtonText());
+                            produceChoiceButton(draftable, choice), choice.getButtonText(), choice.getButtonEmoji());
             buttons.add(button);
         }
 
@@ -186,6 +193,11 @@ public class PublicDraftInfoHelper {
         buttons.addAll(draftable.getCustomButtons());
 
         return buttons;
+    }
+
+    private String produceChoiceButton(Draftable handler, DraftChoice choice) {
+        return DraftButtonService.DRAFT_BUTTON_PREFIX + handler.getButtonPrefix()
+                + choice.getButtonSuffix();
     }
 
     // Summary generation
@@ -219,13 +231,19 @@ public class PublicDraftInfoHelper {
                 }
             }
 
-            if (nextPlayer != null && userId.equals(nextPlayer)) sb.append("*");
-            if (currentPlayer != null && userId.equals(currentPlayer)) sb.append("**__");
+            if (nextPlayer != null && userId.equals(nextPlayer))
+                sb.append("*");
+            if (currentPlayer != null && userId.equals(currentPlayer))
+                sb.append("**__");
             sb.append(player.getUserName());
-            if (currentPlayer != null && userId.equals(currentPlayer)) sb.append("   <- CURRENTLY DRAFTING");
-            if (nextPlayer != null && userId.equals(nextPlayer)) sb.append("   <- on deck");
-            if (currentPlayer != null && userId.equals(currentPlayer)) sb.append("__**");
-            if (nextPlayer != null && userId.equals(nextPlayer)) sb.append("*");
+            if (currentPlayer != null && userId.equals(currentPlayer))
+                sb.append("   <- CURRENTLY DRAFTING");
+            if (nextPlayer != null && userId.equals(nextPlayer))
+                sb.append("   <- on deck");
+            if (currentPlayer != null && userId.equals(currentPlayer))
+                sb.append("__**");
+            if (nextPlayer != null && userId.equals(nextPlayer))
+                sb.append("*");
 
             pickNum++;
         }
@@ -263,21 +281,32 @@ public class PublicDraftInfoHelper {
 
     private Consumer<MessageHistory> editDraftInfo(
             DraftManager draftManager, DraftableType draftableType, String newSummary) {
-        Draftable draftable = draftManager.getDraftables().stream()
-                .filter(d -> d.getType() == draftableType)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No draftable found for type " + draftableType));
+        Draftable draftable = draftManager.getDraftableByType(draftableType);
+        if (draftable == null) {
+            throw new IllegalArgumentException("No draftable of type " + draftableType + " found");
+        }
         Predicate<String> isDraftableType = txt -> {
             String header = draftable.getChoiceHeader();
             return txt.equals(header);
         };
         List<Button> draftableButtons = new ArrayList<>(getDraftButtons(draftManager, draftable));
-        FileUpload draftableImage = draftable.generateDraftImage(draftManager);
+
+        // Images are good place for representing several elements of the draft state.
+        // Assume they're not siloed to any draftable, and always try to do them all.
+        Map<String, FileUpload> updateKeys = new HashMap<>();
+        for (Draftable d : draftManager.getDraftables()) {
+            String key = draftManager.getGame().getName() + "_" + d.getType().toString().toLowerCase();
+            FileUpload fileUpload = d.generateDraftImage(draftManager, key);
+            if(fileUpload != null) {
+                updateKeys.put(key, fileUpload);
+            }
+        }
 
         return hist -> {
-            boolean summaryDone = false, categoryDone = false, sliceImgDone = false;
+            boolean summaryDone = false, categoryDone = false;
             for (Message msg : hist.getRetrievedHistory()) {
-                if (!msg.getAuthor().getId().equals(AsyncTI4DiscordBot.getBotId())) continue;
+                if (!msg.getAuthor().getId().equals(AsyncTI4DiscordBot.getBotId()))
+                    continue;
                 String txt = msg.getContentRaw();
 
                 if (!summaryDone && txt.startsWith(SUMMARY_START)) {
@@ -290,11 +319,20 @@ public class PublicDraftInfoHelper {
                     editMessage(msg, null, draftableButtons);
                 }
 
-                if (!sliceImgDone && draftableImage != null) {
+                if (!updateKeys.isEmpty()) {
                     for (Attachment atch : msg.getAttachments()) {
-                        if (atch.getFileName().contains(draftableImage.getName())) {
-                            sliceImgDone = true;
-                            msg.editMessageAttachments(draftableImage).queue();
+                        String keyDone = null;
+                        for (Map.Entry<String, FileUpload> entry : updateKeys.entrySet()) {
+                            String uniqueKey = entry.getKey();
+                            FileUpload draftableImage = entry.getValue();
+                            if (atch.getFileName().contains(uniqueKey)) {
+                                keyDone = uniqueKey;
+                                msg.editMessageAttachments(draftableImage).queue();
+                                break;
+                            }
+                        }
+                        if (keyDone != null) {
+                            updateKeys.remove(keyDone);
                         }
                     }
                 }
@@ -312,14 +350,18 @@ public class PublicDraftInfoHelper {
 
         if (newMessage != null && newButtons != null)
             msg.editMessage(newMessage).setComponents(newComponents).queue(Consumers.nop(), BotLogger::catchRestError);
-        else if (newMessage != null) msg.editMessage(newMessage).queue(Consumers.nop(), BotLogger::catchRestError);
+        else if (newMessage != null)
+            msg.editMessage(newMessage).queue(Consumers.nop(), BotLogger::catchRestError);
         else if (newButtons != null)
             msg.editMessageComponents(newComponents).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     // Clear previous
 
-    /** This method is assumed to ONLY run as a callback on player ping. Therefore, all found pings will be removed */
+    /**
+     * This method is assumed to ONLY run as a callback on player ping. Therefore,
+     * all found pings will be removed
+     */
     private void clearHistMessages(
             MessageHistory hist,
             boolean clearFirstPing,
@@ -333,7 +375,8 @@ public class PublicDraftInfoHelper {
         for (Message msg : hist.getRetrievedHistory()) {
             String msgTxt = msg.getContentRaw();
             if (msgTxt.contains("is up to draft")) {
-                if (removePings) msg.delete().queue();
+                if (removePings)
+                    msg.delete().queue();
                 removePings = true;
             }
 
@@ -345,6 +388,14 @@ public class PublicDraftInfoHelper {
                         seenHeader.add(header);
                     }
                     break;
+                }
+            }
+
+            if (msgTxt.contains(SUMMARY_START)) {
+                if (seenHeader.contains(SUMMARY_START)) {
+                    msg.delete().queue();
+                } else {
+                    seenHeader.add(SUMMARY_START);
                 }
             }
 
@@ -362,24 +413,24 @@ public class PublicDraftInfoHelper {
             }
 
             // if (clearOldDraftInfo && msgTxt.startsWith(SUMMARY_START)) {
-            //     if (removeSummary) msg.delete().queue();
-            //     removeSummary = true;
+            // if (removeSummary) msg.delete().queue();
+            // removeSummary = true;
             // }
             // if (clearOldDraftInfo && msgTxt.equals(SLICES)) {
-            //     if (removeSliceMsgs) msg.delete().queue();
-            //     removeSliceMsgs = true;
+            // if (removeSliceMsgs) msg.delete().queue();
+            // removeSliceMsgs = true;
             // }
             // if (clearOldDraftInfo && msgTxt.equals(FACTIONS)) {
-            //     if (removeFactionMsgs) msg.delete().queue();
-            //     removeFactionMsgs = true;
+            // if (removeFactionMsgs) msg.delete().queue();
+            // removeFactionMsgs = true;
             // }
             // if (clearOldDraftInfo && msgTxt.equals(POSITION)) {
-            //     if (removePositionMsgs) msg.delete().queue();
-            //     removePositionMsgs = true;
+            // if (removePositionMsgs) msg.delete().queue();
+            // removePositionMsgs = true;
             // }
             // if (clearOldDraftInfo && messageIsSliceImg(msg)) {
-            //     if (removeImages) msg.delete().queue();
-            //     removeImages = true;
+            // if (removeImages) msg.delete().queue();
+            // removeImages = true;
             // }
         }
     }

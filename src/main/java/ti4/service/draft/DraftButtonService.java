@@ -21,6 +21,13 @@ public class DraftButtonService {
     // and that the message should be deleted.
     public static final String DELETE_MESSAGE = "@$!#deletemessage";
 
+    public static boolean isError(String outcome) {
+        return outcome != null
+                && !outcome.isEmpty()
+                && !outcome.equals(DELETE_BUTTON)
+                && !outcome.equals(DELETE_MESSAGE);
+    }
+
     @ButtonHandler(DRAFT_BUTTON_PREFIX)
     public static void handleDraftButtonClick(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         // DEBUG
