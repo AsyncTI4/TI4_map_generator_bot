@@ -121,6 +121,9 @@ public class PlayHeroService {
             case "kollecchero" ->
                 RelicHelper.drawWithAdvantage(
                         player, game, game.getRealPlayers().size());
+            case "xxchahero-te" -> {
+                ButtonHelperHeroes.xxchaHeroTEStart(game, player);
+            }
             case "titanshero" -> {
                 Tile t = player.getHomeSystemTile();
                 if (game.getTileFromPlanet("elysium") != null && game.getTileFromPlanet("elysium") == t) {
@@ -134,7 +137,7 @@ public class PlayHeroService {
                             "Use the following command to add the attachment: `/add_token token:titanshero`");
                 }
             }
-            case "conclavehero" -> {
+            case "onyxxahero" -> {
                 List<Button> buttons = new ArrayList<>();
                 for (Tile tile : game.getTileMap().values()) {
                     if (FoWHelper.playerHasActualShipsInSystem(player, tile)) {

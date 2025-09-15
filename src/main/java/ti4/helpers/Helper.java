@@ -598,6 +598,9 @@ public class Helper {
         Point position = new Point(tokenPlanetPos);
         if (tile.getTileModel().getNumPlanets() == 3) position = new Point(Constants.MIRAGE_TRIPLE_POSITION);
         position.translate(offset.x, offset.y);
+        if (tokenID.toLowerCase().contains("thundersedge")) {
+            return Constants.SPACE_CENTER_POSITION;
+        }
         return position;
     }
 

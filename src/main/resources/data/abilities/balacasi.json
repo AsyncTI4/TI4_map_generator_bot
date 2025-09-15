@@ -81,21 +81,21 @@
     {
         "id": "patience",
         "name": "Patience",
-        "faction": "conclave",
+        "faction": "onyxxa",
         "permanentEffect": "At the end of the strategy phase, place the Obsidian Infinity token on your strategy card. You are last in initiative order. When you perform a strategic action, resolve your strategy card’s secondary ability instead of its primary ability.",
         "source": "balacasi"
     },
     {
         "id": "strategic_fluidity",
         "name": "Strategic Fluidity",
-        "faction": "conclave",
+        "faction": "onyxxa",
         "permanentEffect": "When you would spend a token from your strategy pool to resolve the secondary ability of a strategy card other than Politics, you may spend an additional command token from your strategy pool to resolve the primary ability of that card instead.",
         "source": "balacasi"
     },
     {
         "id": "increased_surveillance",
         "name": "Increased Surveillance",
-        "faction": "conclave",
+        "faction": "onyxxa",
         "permanentEffect": "When you resolve the primary ability of a strategy card, place a control token on your commander. At the start of the status phase, remove your control tokens from your commander.",
         "source": "balacasi"
     },

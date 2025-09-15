@@ -36,6 +36,12 @@ public enum FactionEmojis implements TI4Emoji {
     Keleres,
     RedCreuss,
 
+    // Thunder's Edge
+    Ralnel,
+    Crimson,
+    Bastion,
+    Deepwrought,
+
     // Discordant Stars
     augers,
     axis,
@@ -83,7 +89,7 @@ public enum FactionEmojis implements TI4Emoji {
     xan,
     kalora,
     lunarium,
-    conclave,
+    onyxxa,
     tyris,
     vyserix,
     zephyrion,
@@ -210,6 +216,11 @@ public enum FactionEmojis implements TI4Emoji {
             case "keleres", "keleresx", "keleresm", "keleresa" -> Keleres;
             case "redcreuss", "redghost" -> RedCreuss;
 
+            case "ralnel" -> Ralnel;
+            case "bastion" -> Bastion;
+            case "crimson" -> Crimson;
+            case "deepwrought" -> Deepwrought;
+
             case "augers" -> augers;
             case "axis" -> axis;
             case "bentor" -> bentor;
@@ -249,7 +260,7 @@ public enum FactionEmojis implements TI4Emoji {
             case "xan" -> xan;
             case "kalora" -> kalora;
             case "lunarium" -> lunarium;
-            case "conclave" -> conclave;
+            case "onyxxa" -> onyxxa;
             case "tyris" -> tyris;
             case "vyserix" -> vyserix;
             case "zephyrion" -> zephyrion;
