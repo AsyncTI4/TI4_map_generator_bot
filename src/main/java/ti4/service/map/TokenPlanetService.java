@@ -75,8 +75,12 @@ public class TokenPlanetService {
         }
 
         Point tokenPlanetCenter = Constants.TOKEN_PLANET_CENTER_OFFSET;
+
         Point planetCenter =
                 new Point(tokenPlanetPosition.x + tokenPlanetCenter.x, tokenPlanetPosition.y + tokenPlanetCenter.y);
+        if (planetName.equalsIgnoreCase("thundersedge")) {
+            planetCenter = Constants.SPACE_CENTER_POSITION;
+        }
         Planet planetObject = new Planet(planetName, planetCenter);
         unitHolders.put(planetName, planetObject);
     }

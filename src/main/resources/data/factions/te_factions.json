@@ -1,0 +1,134 @@
+[
+    {
+        "alias": "bastion",
+        "factionName": "Last Bastion",
+        "homeSystem": "",
+        "startingFleet": "",
+        "commodities": 1,
+        "factionTech": [],
+        "startingTech": [],
+        "homePlanets": [
+            "ordinian",
+            "revelation"
+        ],
+        "abilities": [
+            "liberate",
+            "galvanize",
+            "phoenixstandard"
+        ],
+        "leaders": [
+            "bastionagent",
+            "bastioncommander",
+            "bastionhero"
+        ],
+        "promissoryNotes": [],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "bastion_flagship",
+            "infantry",
+            "bastion_mech",
+            "pds",
+            "bastion_spacedock"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "deepwrought",
+        "factionName": "The Deepwrought Scholarate",
+        "homeSystem": "",
+        "startingFleet": "",
+        "commodities": 0,
+        "factionTech": [],
+        "startingTech": [],
+        "homePlanets": [],
+        "abilities": [],
+        "leaders": [
+            "deepwroughtagent",
+            "deepwroughtcommander",
+            "deepwroughthero"
+        ],
+        "promissoryNotes": [],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "deepwrought_flagship",
+            "infantry",
+            "deepwrought_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "crimson",
+        "factionName": "The Crimson Something",
+        "homeSystem": "",
+        "startingFleet": "",
+        "commodities": 0,
+        "factionTech": [],
+        "startingTech": [],
+        "homePlanets": [],
+        "abilities": [],
+        "leaders": [
+            "crimsonagent",
+            "crimsoncommander",
+            "crimsonhero"
+        ],
+        "promissoryNotes": [],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "crimson_flagship",
+            "infantry",
+            "crimson_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "ralnel",
+        "factionName": "The Ral Nel Consortium",
+        "homeSystem": "93",
+        "startingFleet": "2 inf m, 2 inf r, cv, 2 ff, dn, pds r, pds m, dd, sd m",
+        "commodities": 4,
+        "factionTech": [],
+        "startingTech": [],
+        "homePlanets": [],
+        "abilities": [
+            "survivalinstinct",
+            "miniaturization"
+        ],
+        "leaders": [
+            "ralnelagent",
+            "ralnelcommander",
+            "ralnelhero"
+        ],
+        "promissoryNotes": [
+            "nanolink"
+        ],
+        "units": [
+            "fighter",
+            "ralnel_destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "ralnel_flagship",
+            "infantry",
+            "ralnel_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "thunders_edge"
+    }
+]
