@@ -1,9 +1,7 @@
 package ti4.service.emoji;
 
 import java.util.Objects;
-
 import javax.annotation.Nullable;
-
 import org.jetbrains.annotations.NotNull;
 
 public enum FactionEmojis implements TI4Emoji {
