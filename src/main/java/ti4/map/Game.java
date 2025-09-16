@@ -673,6 +673,21 @@ public class Game extends GameProperties {
         return getFowOption(FOWOption.HIDE_PLAYER_NAMES);
     }
 
+    public List<String> getGalacticEvents() {
+        List<String> galEvents = new ArrayList<>();
+        if (isMinorFactionsMode()) galEvents.add("minor_factions");
+        if (isAgeOfExplorationMode()) galEvents.add("age_exploration");
+        if (isHiddenAgendaMode()) galEvents.add("hidden_agenda");
+        if (isTotalWarMode()) galEvents.add("total_war");
+        if (isDangerousWildsMode()) galEvents.add("dangerous_wilds");
+        if (isStellarAtomicsMode()) galEvents.add("stellar_atomics");
+        if (isCivilizedSocietyMode()) galEvents.add("civilized_society");
+        if (isAgeOfFightersMode()) galEvents.add("age_fighters");
+        if (isAgeOfCommerceMode()) galEvents.add("age_commerce");
+        // if (isCallOfTheVoidMode()) galEvents.add("call_of_the_void");
+        return Collections.unmodifiableList(galEvents);
+    }
+
     @JsonIgnore
     public String getGameModesText() {
         boolean isNormalGame = isNormalGame();
@@ -683,16 +698,7 @@ public class Game extends GameProperties {
         gameModes.put(SourceEmojis.MiltyMod + "MiltyMod", isMiltyModMode());
         gameModes.put(MiscEmojis.TIGL + "TIGL", isCompetitiveTIGLGame());
         gameModes.put("Community", isCommunityMode());
-        gameModes.put("Minor Factions", isMinorFactionsMode());
-        gameModes.put("Age of Exploration", isAgeOfExplorationMode());
-        gameModes.put("Hidden Agenda", isHiddenAgendaMode());
-        gameModes.put("Total War", isTotalWarMode());
-        gameModes.put("Dangerous Wilds", isDangerousWildsMode());
-        gameModes.put("Stellar Atomics", isStellarAtomicsMode());
-        gameModes.put("Civilized Society", isCivilizedSocietyMode());
-        gameModes.put("Age Of Fighters", isAgeOfFightersMode());
         gameModes.put("No Support Swaps", isNoSwapMode());
-        gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
         gameModes.put("Liberation", isLiberationC4Mode());
         gameModes.put("Ordinian", isOrdinianC1Mode());
         gameModes.put("Alliance", isAllianceMode());
@@ -708,6 +714,9 @@ public class Game extends GameProperties {
         gameModes.put("Priority Track", hasAnyPriorityTrackMode());
         gameModes.put("Homebrew", isHomebrew());
 
+        for (String galEvent : getGalacticEvents()) {
+            gameModes.put(Mapper.getGalacticEvent(galEvent).getName(), true);
+        }
         for (String tag : getTags()) {
             gameModes.put(tag, true);
         }
@@ -1574,7 +1583,7 @@ public class Game extends GameProperties {
         removeSOFromGame(id);
         addToSoToPoList(id);
         // addRevealedPublicObjective(id);
-        Integer so = addCustomPO(Mapper.getSecretObjectivesJustNames().get(id), 1);
+        addCustomPO(Mapper.getSecretObjectivesJustNames().get(id), 1);
         for (Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
             if (entry.getKey().equals(Mapper.getSecretObjectivesJustNames().get(id))) {
                 return entry;
