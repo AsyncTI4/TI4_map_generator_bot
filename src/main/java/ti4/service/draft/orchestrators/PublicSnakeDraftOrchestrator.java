@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.buttons.Buttons;
@@ -19,9 +18,9 @@ import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftOrchestrator;
 import ti4.service.draft.Draftable;
 import ti4.service.draft.DraftableType;
-import ti4.service.draft.PlayerDraftState;
 import ti4.service.draft.OrchestratorState;
 import ti4.service.draft.PartialMapService;
+import ti4.service.draft.PlayerDraftState;
 import ti4.service.draft.PlayerSetupService.PlayerSetupState;
 import ti4.service.draft.PublicDraftInfoService;
 
@@ -56,7 +55,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
                 playerState.setOrchestratorState(orchestratorState);
             }
         } else {
-            List<String> shuffledPlayers = new ArrayList<>(draftManager.getPlayerStates().keySet());
+            List<String> shuffledPlayers =
+                    new ArrayList<>(draftManager.getPlayerStates().keySet());
             Collections.shuffle(shuffledPlayers);
             for (String playerUserId : shuffledPlayers) {
                 PlayerDraftState playerState = draftManager.getPlayerStates().get(playerUserId);
@@ -74,7 +74,10 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     public void startDraft(DraftManager draftManager) {
         List<String> playerOrder = getPlayerOrder(draftManager);
         PublicDraftInfoService.send(
-                draftManager, playerOrder, getCurrentPlayer(playerOrder), getNextPlayer(playerOrder),
+                draftManager,
+                playerOrder,
+                getCurrentPlayer(playerOrder),
+                getNextPlayer(playerOrder),
                 List.of(getReprintDraftButton()));
     }
 
@@ -89,13 +92,16 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             return "It's not your turn to draft.";
         }
         // Ensure no one else has picked this choice
-        if (draftManager.getPlayersWithChoiceKey(choice.getType(), choice.getChoiceKey()).size() > 0) {
+        if (draftManager
+                        .getPlayersWithChoiceKey(choice.getType(), choice.getChoiceKey())
+                        .size()
+                > 0) {
             return "That choice has already been taken.";
         }
 
         // Persist the choice in Player State.
-        Map<DraftableType, List<DraftChoice>> playerChoices = draftManager.getPlayerStates().get(playerUserId)
-                .getPicks();
+        Map<DraftableType, List<DraftChoice>> playerChoices =
+                draftManager.getPlayerStates().get(playerUserId).getPicks();
         playerChoices.computeIfAbsent(choice.getType(), k -> new ArrayList<>()).add(choice);
 
         Player player = draftManager.getGame().getPlayer(playerUserId);
@@ -112,31 +118,37 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
         // Can the next player be auto-picked?
         int simultaneousPicks = 1;
-        if (currentPlayerIndex == 0 && isReversing)
-            simultaneousPicks = 2;
-        else if (currentPlayerIndex == playerOrder.size() - 1 && !isReversing)
-            simultaneousPicks = 2;
+        if (currentPlayerIndex == 0 && isReversing) simultaneousPicks = 2;
+        else if (currentPlayerIndex == playerOrder.size() - 1 && !isReversing) simultaneousPicks = 2;
         List<DraftChoice> totalPossiblePicks = new ArrayList<>();
         for (Draftable draftable : draftManager.getDraftables()) {
-            List<DraftChoice> deterministicPicks = draftable.getDeterministicPick(draftManager,
-                    getCurrentPlayer(playerOrder), simultaneousPicks);
+            List<DraftChoice> deterministicPicks =
+                    draftable.getDeterministicPick(draftManager, getCurrentPlayer(playerOrder), simultaneousPicks);
             if (deterministicPicks != null) {
                 totalPossiblePicks.addAll(deterministicPicks);
             }
-            if (totalPossiblePicks.size() > simultaneousPicks)
-                break;
+            if (totalPossiblePicks.size() > simultaneousPicks) break;
         }
         if (totalPossiblePicks.size() <= simultaneousPicks) {
             Player nextPlayer = draftManager.getGame().getPlayer(getCurrentPlayer(playerOrder));
             DraftChoice forcedPick = totalPossiblePicks.get(0);
             Draftable forcedDraftable = draftManager.getDraftableByType(forcedPick.getType());
-            String status = draftManager.routeCommand(event, nextPlayer,
-                    forcedDraftable.makeButtonId(forcedPick.getChoiceKey()));
+            String status = draftManager.routeCommand(
+                    event, nextPlayer, forcedDraftable.makeButtonId(forcedPick.getChoiceKey()));
             DraftButtonService.handleButtonResult(event, status);
         } else {
-            PublicDraftInfoService.edit(event, draftManager, playerOrder, getCurrentPlayer(playerOrder),
-                    getNextPlayer(playerOrder), choice.getType());
-            PublicDraftInfoService.pingCurrentPlayer(draftManager, getCurrentPlayer(playerOrder), List.of(), List.of(),
+            PublicDraftInfoService.edit(
+                    event,
+                    draftManager,
+                    playerOrder,
+                    getCurrentPlayer(playerOrder),
+                    getNextPlayer(playerOrder),
+                    choice.getType());
+            PublicDraftInfoService.pingCurrentPlayer(
+                    draftManager,
+                    getCurrentPlayer(playerOrder),
+                    List.of(),
+                    List.of(),
                     List.of(getReprintDraftButton()));
         }
 
@@ -164,7 +176,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     public String[] savePlayerStates(DraftManager draftManager) {
         String[] playerStates = new String[draftManager.getPlayerStates().size()];
         int i = 0;
-        for (Map.Entry<String, PlayerDraftState> entry : draftManager.getPlayerStates().entrySet()) {
+        for (Map.Entry<String, PlayerDraftState> entry :
+                draftManager.getPlayerStates().entrySet()) {
             String playerUserId = entry.getKey();
             PlayerDraftState playerState = entry.getValue();
             OrchestratorState orchestratorState = playerState.getOrchestratorState();
@@ -193,7 +206,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         }
         // Ensure all players have a valid State, with unique and valid order indices.
         Set<Integer> distinctOrderIndices = new HashSet<>();
-        for (Map.Entry<String, PlayerDraftState> entry : draftManager.getPlayerStates().entrySet()) {
+        for (Map.Entry<String, PlayerDraftState> entry :
+                draftManager.getPlayerStates().entrySet()) {
             String playerUserId = entry.getKey();
             PlayerDraftState playerState = entry.getValue();
             OrchestratorState orchestratorState = playerState.getOrchestratorState();
@@ -223,7 +237,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     }
 
     private Button getReprintDraftButton() {
-        return Buttons.gray(DraftButtonService.DRAFT_BUTTON_SERVICE_PREFIX + getButtonPrefix() + "reprintdraft",
+        return Buttons.gray(
+                DraftButtonService.DRAFT_BUTTON_SERVICE_PREFIX + getButtonPrefix() + "reprintdraft",
                 "Show draft again");
     }
 
@@ -234,7 +249,10 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         if (buttonId.equals("reprintdraft")) {
             List<String> playerOrder = getPlayerOrder(draftManager);
             PublicDraftInfoService.send(
-                    draftManager, playerOrder, getCurrentPlayer(playerOrder), getNextPlayer(playerOrder),
+                    draftManager,
+                    playerOrder,
+                    getCurrentPlayer(playerOrder),
+                    getNextPlayer(playerOrder),
                     List.of(getReprintDraftButton()));
             return null;
         }
@@ -250,8 +268,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     }
 
     @Override
-    public Consumer<Player> setupPlayer(DraftManager draftManager, String playerUserId,
-            PlayerSetupState playerSetupState) {
+    public Consumer<Player> setupPlayer(
+            DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
         // This draft mode doesn't do any player setup itself, the draftables handle
         // everything.
         return null;
@@ -262,8 +280,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         int numPlayers = draftManager.getPlayerStates().size();
         for (int i = 0; i < numPlayers; i++) {
             for (String playerUserId : draftManager.getPlayerStates().keySet()) {
-                State orchestratorState = (State) draftManager.getPlayerStates().get(playerUserId)
-                        .getOrchestratorState();
+                State orchestratorState =
+                        (State) draftManager.getPlayerStates().get(playerUserId).getOrchestratorState();
                 if (orchestratorState.getOrderIndex() == i) {
                     playerOrder.add(playerUserId);
                     break;

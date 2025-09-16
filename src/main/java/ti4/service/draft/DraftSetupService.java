@@ -21,8 +21,7 @@ public class DraftSetupService {
 
         // Load the general game settings
         boolean success = game.loadGameSettingsFromSettings(event, settings);
-        if (!success)
-            return "Fix the game settings before continuing";
+        if (!success) return "Fix the game settings before continuing";
         if (game.isCompetitiveTIGLGame()) {
             TIGLHelper.sendTIGLSetupText(game);
         }
@@ -101,7 +100,8 @@ public class DraftSetupService {
         }
 
         String startMsg = "## Generating the milty draft!!";
-        startMsg += "\n - Also clearing out any tiles that may have already been on the map so that the draft will fill in tiles properly.";
+        startMsg +=
+                "\n - Also clearing out any tiles that may have already been on the map so that the draft will fill in tiles properly.";
         if (specs.numSlices == maxSlices) {
             startMsg += "\n - *You asked for the max number of slices, so this may take several seconds*";
         }

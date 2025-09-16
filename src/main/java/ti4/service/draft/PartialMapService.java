@@ -54,18 +54,17 @@ public class PartialMapService {
         // General map setup tasks
         for (MapTemplateTile templateTile : mapTemplateModel.getTemplateTiles()) {
             Tile gameTile = game.getTileByPosition(templateTile.getPos());
-            
-            if(gameTile == null && templateTile.getPos() != null) {
+
+            if (gameTile == null && templateTile.getPos() != null) {
                 Tile toAdd = MapTemplateHelper.getTileFromTemplateTile(templateTile);
-                if(toAdd != null) {
+                if (toAdd != null) {
                     game.setTile(toAdd);
                     updateMap = true;
                 }
             }
-            
+
             if (templateTile.getPos() != null && templateTile.getCustodians() != null && templateTile.getCustodians()) {
-                if (gameTile != null)
-                    AddTileService.addCustodianToken(gameTile, game); // only works on MR for now
+                if (gameTile != null) AddTileService.addCustodianToken(gameTile, game); // only works on MR for now
             }
         }
 
@@ -201,8 +200,8 @@ public class PartialMapService {
             MapTemplateModel mapTemplateModel = Mapper.getDefaultMapTemplateForPlayerCount(
                     draftManager.getPlayerStates().size());
             if (mapTemplateModel == null) {
-                throw new IllegalStateException(
-                        "No default map template for " + draftManager.getPlayerStates().size() + " players");
+                throw new IllegalStateException("No default map template for "
+                        + draftManager.getPlayerStates().size() + " players");
             }
             mapTemplateId = mapTemplateModel.getAlias();
         }

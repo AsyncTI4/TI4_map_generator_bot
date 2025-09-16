@@ -11,6 +11,7 @@ public class DraftChoice {
      * Used in commands.
      */
     private final String choiceKey;
+
     private final Button button;
     private final String displayName;
     /**

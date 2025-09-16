@@ -42,16 +42,15 @@ public abstract class Draftable extends DraftLifecycleHooks {
      * @return A button to be used to make the given choice.
      */
     protected Button makeChoiceButton(String choiceKey, String buttonText, String emoji) {
-        if(buttonText == null && emoji == null) {
+        if (buttonText == null && emoji == null) {
             throw new IllegalArgumentException("Must provide at least buttonText or emoji");
         }
-        if(buttonText != null) {
+        if (buttonText != null) {
             return Buttons.gray(makeButtonId(choiceKey), buttonText, emoji);
         } else {
             return Buttons.green(makeButtonId(choiceKey), null, emoji);
         }
     }
-
 
     /**
      * Draftables may provide buttons that go alongside their choices, but which are not
@@ -104,14 +103,14 @@ public abstract class Draftable extends DraftLifecycleHooks {
      *         Otherwise, return a list of DraftChoices that the player must pick from this draftable. The list can shorter than numberOfSimultaneousPicks,
      *         but not longer.
      */
-    public List<DraftChoice> getDeterministicPick(DraftManager draftManager, String playerUserId, int numberOfSimultaneousPicks) {
+    public List<DraftChoice> getDeterministicPick(
+            DraftManager draftManager, String playerUserId, int numberOfSimultaneousPicks) {
         // Default implementation for Draftables where each player only picks one choice.
         List<DraftChoice> allChoices = getAllDraftChoices();
         List<DraftChoice> allPicks = draftManager.getAllPicksOfType(getType());
-        List<DraftChoice> remainingChoices = allChoices.stream()
-                .filter(c -> !allPicks.contains(c))
-                .toList();
-        if(remainingChoices.size() <= numberOfSimultaneousPicks) {
+        List<DraftChoice> remainingChoices =
+                allChoices.stream().filter(c -> !allPicks.contains(c)).toList();
+        if (remainingChoices.size() <= numberOfSimultaneousPicks) {
             return remainingChoices;
         }
         return null;
@@ -141,7 +140,8 @@ public abstract class Draftable extends DraftLifecycleHooks {
      * @param restrictChoiceKeys If non-null, only include these choice keys in the image. If null, include all choices. Useful for private images showing only a player's own choices.
      * @return An image file upload representing the current state of this draftable, or null if no image is created.
      */
-    public FileUpload generateSummaryImage(DraftManager draftManager, String uniqueKey, List<String> restrictChoiceKeys) {
+    public FileUpload generateSummaryImage(
+            DraftManager draftManager, String uniqueKey, List<String> restrictChoiceKeys) {
         return null;
     }
 
@@ -179,8 +179,7 @@ public abstract class Draftable extends DraftLifecycleHooks {
     @Override
     public String getBlockingDraftEndReason(DraftManager draftManager) {
         for (String playerUserId : draftManager.getPlayerStates().keySet()) {
-            if (CommonDraftableValidators.hasRemainingChoices(
-                    draftManager, playerUserId, getType(), 1)) {
+            if (CommonDraftableValidators.hasRemainingChoices(draftManager, playerUserId, getType(), 1)) {
                 return "Player " + playerUserId + " has not made a pick for " + getDisplayName() + "!";
             }
         }

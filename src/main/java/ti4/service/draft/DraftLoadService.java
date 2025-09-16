@@ -14,10 +14,7 @@ import ti4.service.draft.orchestrators.PublicSnakeDraftOrchestrator;
 public class DraftLoadService {
     // For security reasons, make sure we only deserialize known types.
     private static final List<Class<? extends Draftable>> KNOWN_DRAFTABLE_TYPES = List.of(
-            FactionDraftable.class,
-            SliceDraftable.class,
-            SeatDraftable.class,
-            SpeakerOrderDraftable.class
+            FactionDraftable.class, SliceDraftable.class, SeatDraftable.class, SpeakerOrderDraftable.class
             // Add other Draftable subclasses here as they are created.
             );
     private static final List<Class<? extends DraftOrchestrator>> KNOWN_ORCHESTRATOR_TYPES = List.of(
@@ -61,13 +58,13 @@ public class DraftLoadService {
                         .computeIfAbsent(choice.getType(), k -> new ArrayList<>())
                         .add(choice);
             } else if (data.startsWith("playerorchestratorstate:")) {
-                String[] tokens = data.substring("playerorchestratorstate:".length()).split(",");
+                String[] tokens =
+                        data.substring("playerorchestratorstate:".length()).split(",");
                 String playerUserId = tokens[0];
                 String orchestratorStateData = tokens[1];
                 PlayerDraftState playerState = draftManager.getPlayerStates().get(playerUserId);
                 if (orchestrator != null) {
-                    OrchestratorState orchestratorState =
-                            orchestrator.loadPlayerState(orchestratorStateData);
+                    OrchestratorState orchestratorState = orchestrator.loadPlayerState(orchestratorStateData);
                     playerState.setOrchestratorState(orchestratorState);
                 }
             }

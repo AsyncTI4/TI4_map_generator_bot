@@ -42,8 +42,7 @@ public class PublicDraftInfoService {
 
         Game game = draftManager.getGame();
         MessageChannel channel = game.getMainGameChannel();
-        if (channel == null)
-            return;
+        if (channel == null) return;
 
         List<String> clearOldAttachments = new ArrayList<>();
 
@@ -84,8 +83,7 @@ public class PublicDraftInfoService {
 
         Game game = draftManager.getGame();
         MessageChannel channel = game.getMainGameChannel();
-        if (channel == null)
-            return;
+        if (channel == null) return;
 
         String draftSummary = getSummary(draftManager, playerOrder, currentPlayer, nextPlayer);
 
@@ -102,15 +100,13 @@ public class PublicDraftInfoService {
         Game game = draftManager.getGame();
         String msg = "Nobody is up to draft...";
         Player p = game.getPlayer(currentPlayerUserID);
-        if (p != null)
-            msg = "### " + p.getPing() + " is up to draft!";
+        if (p != null) msg = "### " + p.getPing() + " is up to draft!";
 
         List<Button> buttons = new ArrayList<>(extraButtons != null ? extraButtons : List.of());
         buttons = MessageHelper.addUndoButtonToList(buttons, game.getName());
 
         MessageChannel channel = game.getMainGameChannel();
-        if (channel == null)
-            return;
+        if (channel == null) return;
         MessageFunction clearOldFunc = clearOldPingsAndButtonsFunc(true, clearMessageHeaders, clearAttachments);
         MessageHelper.splitAndSentWithAction(msg, channel, buttons, clearOldFunc);
     }
@@ -122,7 +118,10 @@ public class PublicDraftInfoService {
         List<Button> buttons = new ArrayList<>();
         for (DraftChoice choice : allDraftChoices) {
             // Skip this choice if someone already has it.
-            if (draftManager.getPlayersWithChoiceKey(draftable.getType(), choice.getChoiceKey()).size() > 0) {
+            if (draftManager
+                            .getPlayersWithChoiceKey(draftable.getType(), choice.getChoiceKey())
+                            .size()
+                    > 0) {
                 continue;
             }
 
@@ -181,19 +180,13 @@ public class PublicDraftInfoService {
                 }
             }
 
-            if (nextPlayer != null && userId.equals(nextPlayer))
-                sb.append("*");
-            if (currentPlayer != null && userId.equals(currentPlayer))
-                sb.append("**__");
+            if (nextPlayer != null && userId.equals(nextPlayer)) sb.append("*");
+            if (currentPlayer != null && userId.equals(currentPlayer)) sb.append("**__");
             sb.append(player.getUserName());
-            if (currentPlayer != null && userId.equals(currentPlayer))
-                sb.append("   <- CURRENTLY DRAFTING");
-            if (nextPlayer != null && userId.equals(nextPlayer))
-                sb.append("   <- on deck");
-            if (currentPlayer != null && userId.equals(currentPlayer))
-                sb.append("__**");
-            if (nextPlayer != null && userId.equals(nextPlayer))
-                sb.append("*");
+            if (currentPlayer != null && userId.equals(currentPlayer)) sb.append("   <- CURRENTLY DRAFTING");
+            if (nextPlayer != null && userId.equals(nextPlayer)) sb.append("   <- on deck");
+            if (currentPlayer != null && userId.equals(currentPlayer)) sb.append("__**");
+            if (nextPlayer != null && userId.equals(nextPlayer)) sb.append("*");
 
             pickNum++;
         }
@@ -226,7 +219,8 @@ public class PublicDraftInfoService {
         // Assume they're not siloed to any draftable, and always try to do them all.
         Map<String, FileUpload> updateImageKeys = new HashMap<>();
         for (Draftable d : draftManager.getDraftables()) {
-            String key = draftManager.getGame().getName() + "_" + d.getType().toString().toLowerCase();
+            String key = draftManager.getGame().getName() + "_"
+                    + d.getType().toString().toLowerCase();
             FileUpload fileUpload = d.generateSummaryImage(draftManager, key, null);
             if (fileUpload != null) {
                 updateImageKeys.put(key, fileUpload);
@@ -236,8 +230,7 @@ public class PublicDraftInfoService {
         return hist -> {
             boolean summaryDone = false, categoryDone = false;
             for (Message msg : hist.getRetrievedHistory()) {
-                if (!msg.getAuthor().getId().equals(AsyncTI4DiscordBot.getBotId()))
-                    continue;
+                if (!msg.getAuthor().getId().equals(AsyncTI4DiscordBot.getBotId())) continue;
                 String txt = msg.getContentRaw();
 
                 if (!summaryDone && txt.startsWith(SUMMARY_START)) {
@@ -281,8 +274,7 @@ public class PublicDraftInfoService {
 
         if (newMessage != null && newButtons != null)
             msg.editMessage(newMessage).setComponents(newComponents).queue(Consumers.nop(), BotLogger::catchRestError);
-        else if (newMessage != null)
-            msg.editMessage(newMessage).queue(Consumers.nop(), BotLogger::catchRestError);
+        else if (newMessage != null) msg.editMessage(newMessage).queue(Consumers.nop(), BotLogger::catchRestError);
         else if (newButtons != null)
             msg.editMessageComponents(newComponents).queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -306,8 +298,7 @@ public class PublicDraftInfoService {
         for (Message msg : hist.getRetrievedHistory()) {
             String msgTxt = msg.getContentRaw();
             if (msgTxt.contains("is up to draft")) {
-                if (removePings)
-                    msg.delete().queue();
+                if (removePings) msg.delete().queue();
                 removePings = true;
             }
 

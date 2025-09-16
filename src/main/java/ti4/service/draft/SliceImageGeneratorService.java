@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
@@ -37,7 +36,8 @@ import ti4.service.milty.MiltyDraftTile;
 
 @UtilityClass
 public class SliceImageGeneratorService {
-    public static FileUpload tryGenerateImage(DraftManager draftManager, String uniqueKey, List<String> restrictChoiceKeys) {
+    public static FileUpload tryGenerateImage(
+            DraftManager draftManager, String uniqueKey, List<String> restrictChoiceKeys) {
         SliceDraftable sliceDraftable = (SliceDraftable) draftManager.getDraftableByType(SliceDraftable.TYPE);
         if (sliceDraftable == null) return null;
 
@@ -47,7 +47,7 @@ public class SliceImageGeneratorService {
                     .orElse(null);
         };
         Function<String, FactionModel> getFactionFromPlayer = (playerUserID) -> {
-            if(playerUserID == null) return null;
+            if (playerUserID == null) return null;
             List<DraftChoice> factionChoices = draftManager.getPlayerChoices(playerUserID, FactionDraftable.TYPE);
             if (!factionChoices.isEmpty()) {
                 return FactionDraftable.getFactionByChoice(factionChoices.get(0));
@@ -56,15 +56,14 @@ public class SliceImageGeneratorService {
         };
 
         List<MiltyDraftSlice> slices = sliceDraftable.getDraftSlices();
-        if(restrictChoiceKeys != null) {
+        if (restrictChoiceKeys != null) {
             slices = slices.stream()
                     .filter(slice -> restrictChoiceKeys.contains(slice.getName()))
                     .collect(Collectors.toList());
         }
-        if(slices.isEmpty()) return null;
+        if (slices.isEmpty()) return null;
 
-        return generateImage(
-                draftManager.getGame(), slices, getPlayerFromSlice, getFactionFromPlayer, uniqueKey);
+        return generateImage(draftManager.getGame(), slices, getPlayerFromSlice, getFactionFromPlayer, uniqueKey);
     }
 
     public static FileUpload generateImage(

@@ -618,12 +618,12 @@ class GameSaveService {
 
         DraftManager draftManager = game.getDraftManagerUnsafe();
         if (draftManager != null) {
-            for(String saveLine : DraftSaveService.saveDraftManager(draftManager)) {
+            for (String saveLine : DraftSaveService.saveDraftManager(draftManager)) {
                 writer.write(Constants.DRAFT_MANAGER + " " + saveLine);
                 writer.write(System.lineSeparator());
             }
         } else if (game.getDraftString() != null) {
-            for(String saveLine : game.getDraftString()) {
+            for (String saveLine : game.getDraftString()) {
                 writer.write(Constants.DRAFT_MANAGER + " " + saveLine);
                 writer.write(System.lineSeparator());
             }

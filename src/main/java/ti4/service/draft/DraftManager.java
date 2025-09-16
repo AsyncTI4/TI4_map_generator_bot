@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-
 import lombok.Data;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.map.Game;
@@ -202,7 +201,8 @@ public class DraftManager {
         }
 
         if (orchestrator != null && command.startsWith(orchestrator.getButtonPrefix())) {
-            String innerButtonID = command.substring(orchestrator.getButtonPrefix().length());
+            String innerButtonID =
+                    command.substring(orchestrator.getButtonPrefix().length());
             String status = orchestrator.handleCustomButtonPress(event, this, player.getUserID(), innerButtonID);
             return status;
         }
@@ -231,7 +231,7 @@ public class DraftManager {
 
         // Consider checking for minimal draftables here...something that provides a faction,
         // something that builds a map, etc.
-        
+
         return true;
     }
 
@@ -249,7 +249,7 @@ public class DraftManager {
      * should send buttons now.
      * If all components are ready to setup players, do so here. Otherwise call
      * trySetupPlayers() whenever something blocking is resolved.
-     * 
+     *
      * @param event
      */
     public String endDraft(GenericInteractionCreateEvent event) {
@@ -257,7 +257,8 @@ public class DraftManager {
         if (blockingReason != null) {
             // If you got this accidentally, it means you called endDraft() instead of tryEndDraft().
             // If there was an issue and someone used a slash command to force-end the draft, that's fine.
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "WARNING: Forcing the draft to end despite: " + blockingReason);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "WARNING: Forcing the draft to end despite: " + blockingReason);
         }
 
         for (Draftable draftable : draftables) {
@@ -271,7 +272,7 @@ public class DraftManager {
     /**
      * Determine whether all lifecycle components are ready to end the picking of draft
      * choices.
-     * 
+     *
      * @return Null if ready to end the draft, or a SPECIFIC message describing what is being waited on.
      */
     public String getBlockingDraftEndReason() {
@@ -287,7 +288,7 @@ public class DraftManager {
     /**
      * Attempt to do player setup and start the game. If any component is not ready,
      * return without doing anything.
-     * 
+     *
      * @param event
      */
     public void trySetupPlayers(GenericInteractionCreateEvent event) {
@@ -305,7 +306,7 @@ public class DraftManager {
                 }
             }
             Player player = game.getPlayer(userId);
-            if(playerSetupState.getColor() == null) {
+            if (playerSetupState.getColor() == null) {
                 String color = player.getNextAvailableColour();
                 playerSetupState.setColor(color);
             }
@@ -362,7 +363,7 @@ public class DraftManager {
         // TODO:
         // All DraftChoices and Draftables conform to stated requirements for their given strings,
         // e.g. getChoiceKey() is non-null, non-empty, lowercase alpha-numeric only, etc.
-        
+
         // TODO:
         // All DraftChoices across all Draftables have unique choice keys.
     }

@@ -40,8 +40,8 @@ public class SeatDraftable extends Draftable {
             String choiceKey = "seat" + i;
             String buttonEmoji = MiltyDraftEmojis.getSpeakerPickEmoji(i).toString();
             String displayName = "Seat " + i;
-            choices.add(new DraftChoice(getType(), choiceKey, makeChoiceButton(choiceKey, null, buttonEmoji),
-                    displayName, buttonEmoji));
+            choices.add(new DraftChoice(
+                    getType(), choiceKey, makeChoiceButton(choiceKey, null, buttonEmoji), displayName, buttonEmoji));
         }
         return choices;
     }
@@ -55,8 +55,7 @@ public class SeatDraftable extends Draftable {
 
     @Override
     public String isValidDraftChoice(DraftManager draftManager, String playerUserId, DraftChoice choice) {
-        if (!CommonDraftableValidators.hasRemainingChoices(
-                draftManager, playerUserId, getType(), 1)) {
+        if (!CommonDraftableValidators.hasRemainingChoices(draftManager, playerUserId, getType(), 1)) {
             return "You already have a Seat pick!";
         }
         List<String> choiceKeys =
@@ -70,7 +69,12 @@ public class SeatDraftable extends Draftable {
 
     @Override
     public DraftChoice getNothingPickedChoice() {
-        return new DraftChoice(getType(), null, null, "No seat picked", MiltyDraftEmojis.getSpeakerPickEmoji(-1).toString());
+        return new DraftChoice(
+                getType(),
+                null,
+                null,
+                "No seat picked",
+                MiltyDraftEmojis.getSpeakerPickEmoji(-1).toString());
     }
 
     @Override
@@ -101,8 +105,8 @@ public class SeatDraftable extends Draftable {
                     + draftManager.getGame().getMapTemplateID();
         }
         if (mapTemplate.getPlayerCount() < numSeats) {
-            return "Map template " + mapTemplate.getAlias() + " only supports "
-                    + mapTemplate.getPlayerCount() + " players, but draft has " + numSeats + " seats.";
+            return "Map template " + mapTemplate.getAlias() + " only supports " + mapTemplate.getPlayerCount()
+                    + " players, but draft has " + numSeats + " seats.";
         }
 
         // Ensure no two players have picked the same seat.
@@ -119,7 +123,8 @@ public class SeatDraftable extends Draftable {
     }
 
     @Override
-    public Consumer<Player> setupPlayer(DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
+    public Consumer<Player> setupPlayer(
+            DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
         PlayerDraftState pState = draftManager.getPlayerStates().get(playerUserId);
         if (!pState.getPicks().containsKey(getType())
                 || pState.getPicks().get(getType()).isEmpty()) {

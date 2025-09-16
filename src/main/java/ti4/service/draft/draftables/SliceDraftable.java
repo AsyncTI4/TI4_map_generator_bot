@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.map.Player;
@@ -54,7 +53,8 @@ public class SliceDraftable extends Draftable {
             String choiceKey = slice.getName();
             String buttonEmoji = MiltyDraftEmojis.getMiltyDraftEmoji(choiceKey).toString();
             String displayName = "Slice " + slice.getName();
-            choices.add(new DraftChoice(getType(), choiceKey, makeChoiceButton(choiceKey, null, buttonEmoji), displayName, buttonEmoji));
+            choices.add(new DraftChoice(
+                    getType(), choiceKey, makeChoiceButton(choiceKey, null, buttonEmoji), displayName, buttonEmoji));
         }
         return choices;
     }
@@ -72,8 +72,7 @@ public class SliceDraftable extends Draftable {
                 choice, slices.stream().map(MiltyDraftSlice::getName).toList())) {
             return "That slice is not recognized.";
         }
-        if (!CommonDraftableValidators.hasRemainingChoices(
-                draftManager, playerUserId, getType(), 1)) {
+        if (!CommonDraftableValidators.hasRemainingChoices(draftManager, playerUserId, getType(), 1)) {
             return "You have already picked your slice.";
         }
 
@@ -82,11 +81,17 @@ public class SliceDraftable extends Draftable {
 
     @Override
     public DraftChoice getNothingPickedChoice() {
-        return new DraftChoice(getType(), null, null, "No slice picked", MiltyDraftEmojis.getMiltyDraftEmoji(null).toString());
+        return new DraftChoice(
+                getType(),
+                null,
+                null,
+                "No slice picked",
+                MiltyDraftEmojis.getMiltyDraftEmoji(null).toString());
     }
 
     @Override
-    public FileUpload generateSummaryImage(DraftManager draftManager, String uniqueKey, List<String> restrictChoiceKeys) {
+    public FileUpload generateSummaryImage(
+            DraftManager draftManager, String uniqueKey, List<String> restrictChoiceKeys) {
         return SliceImageGeneratorService.tryGenerateImage(draftManager, uniqueKey, restrictChoiceKeys);
     }
 
@@ -120,7 +125,8 @@ public class SliceDraftable extends Draftable {
     }
 
     @Override
-    public Consumer<Player> setupPlayer(DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
+    public Consumer<Player> setupPlayer(
+            DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
         // Map is built as a side effect of slice drafting.
         return null;
     }

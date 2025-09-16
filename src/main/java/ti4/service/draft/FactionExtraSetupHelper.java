@@ -3,7 +3,6 @@ package ti4.service.draft;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;

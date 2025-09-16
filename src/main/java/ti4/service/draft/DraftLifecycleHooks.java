@@ -1,7 +1,6 @@
 package ti4.service.draft;
 
 import java.util.function.Consumer;
-
 import ti4.map.Player;
 
 /**
@@ -9,9 +8,9 @@ import ti4.map.Player;
  * should allow draft components to do extra work and control the flow
  * as needed, hopefully without being overbearing. More hooks should
  * be added only as really needed, and with default noop implementations.
- * 
+ *
  * The draft manager is responsible for executing the lifecycle.
- * 
+ *
  * Draft stages:
  * 1. Initialization - Draftables generate their choices, etc.
  * 2. Drafting - Players make choices from draftables.

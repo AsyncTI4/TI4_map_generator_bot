@@ -13,7 +13,6 @@ import ti4.model.MapTemplateModel;
 import ti4.model.Source;
 import ti4.service.milty.MiltyDraftSlice;
 
-
 /**
  * This DraftSpec represents the conversion of draft settings -> draft.
  * To ensure the new system is compatible with the previous, this should

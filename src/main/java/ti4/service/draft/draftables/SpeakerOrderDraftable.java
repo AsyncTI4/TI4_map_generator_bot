@@ -40,8 +40,8 @@ public class SpeakerOrderDraftable extends Draftable {
             String choiceKey = "pick" + i;
             String buttonEmoji = MiltyDraftEmojis.getSpeakerPickEmoji(i).toString();
             String displayName = StringHelper.ordinal(i) + " Pick";
-            choices.add(new DraftChoice(getType(), choiceKey, makeChoiceButton(choiceKey, null, buttonEmoji),
-                    displayName, buttonEmoji));
+            choices.add(new DraftChoice(
+                    getType(), choiceKey, makeChoiceButton(choiceKey, null, buttonEmoji), displayName, buttonEmoji));
         }
         return choices;
     }
@@ -60,8 +60,7 @@ public class SpeakerOrderDraftable extends Draftable {
 
     @Override
     public String isValidDraftChoice(DraftManager draftManager, String playerUserId, DraftChoice choice) {
-        if (!CommonDraftableValidators.hasRemainingChoices(
-                draftManager, playerUserId, getType(), 1)) {
+        if (!CommonDraftableValidators.hasRemainingChoices(draftManager, playerUserId, getType(), 1)) {
             return "You already have a Speaker order pick!";
         }
         List<String> choiceKeys = IntStream.rangeClosed(1, numPlayers)
@@ -77,7 +76,11 @@ public class SpeakerOrderDraftable extends Draftable {
 
     @Override
     public DraftChoice getNothingPickedChoice() {
-        return new DraftChoice(getType(), null, null, "No speaker position",
+        return new DraftChoice(
+                getType(),
+                null,
+                null,
+                "No speaker position",
                 MiltyDraftEmojis.getSpeakerPickEmoji(-1).toString());
     }
 
@@ -98,8 +101,8 @@ public class SpeakerOrderDraftable extends Draftable {
         }
         int numDraftPlayers = draftManager.getPlayerStates().size();
         if (numPlayers < numDraftPlayers) {
-            return "Number of speaker positions (" + numPlayers
-                    + ") is less than number of players drafting (" + numDraftPlayers + ")";
+            return "Number of speaker positions (" + numPlayers + ") is less than number of players drafting ("
+                    + numDraftPlayers + ")";
         }
 
         // Ensure no two players have picked the same speaker position.
@@ -115,8 +118,8 @@ public class SpeakerOrderDraftable extends Draftable {
     }
 
     @Override
-    public Consumer<Player> setupPlayer(DraftManager draftManager, String playerUserId,
-            PlayerSetupState playerSetupState) {
+    public Consumer<Player> setupPlayer(
+            DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
         PlayerDraftState pState = draftManager.getPlayerStates().get(playerUserId);
         if (!pState.getPicks().containsKey(getType())
                 || pState.getPicks().get(getType()).isEmpty()) {

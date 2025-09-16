@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -47,12 +46,10 @@ public class FactionDraftable extends Draftable {
         int i = 0;
         List<String> output = new ArrayList<>();
         while (output.size() < numFactions) {
-            if (i >= randomOrder.size())
-                break;
+            if (i >= randomOrder.size()) break;
             String f = randomOrder.get(i);
             i++;
-            if (output.contains(f))
-                continue;
+            if (output.contains(f)) continue;
             output.add(f);
         }
 
@@ -60,8 +57,7 @@ public class FactionDraftable extends Draftable {
     }
 
     public static FactionModel getFactionByChoice(DraftChoice choice) {
-        if (choice == null || choice.getChoiceKey() == null)
-            return null;
+        if (choice == null || choice.getChoiceKey() == null) return null;
         return Mapper.getFaction(choice.getChoiceKey());
     }
 
@@ -84,8 +80,12 @@ public class FactionDraftable extends Draftable {
             String buttonText = faction.getFactionName();
             String buttonEmoji = faction.getFactionEmoji();
             String formattedName = faction.getFactionEmoji() + " **" + faction.getFactionName() + "**";
-            DraftChoice choice = new DraftChoice(getType(), choiceKey, makeChoiceButton(choiceKey, buttonText, buttonEmoji),
-                    formattedName, buttonEmoji);
+            DraftChoice choice = new DraftChoice(
+                    getType(),
+                    choiceKey,
+                    makeChoiceButton(choiceKey, buttonText, buttonEmoji),
+                    formattedName,
+                    buttonEmoji);
             choices.add(choice);
         }
         return choices;
@@ -99,8 +99,8 @@ public class FactionDraftable extends Draftable {
             buttons.add(Buttons.blue(makeButtonId("pickedinfo"), "Picked faction info"));
             buttons.add(Buttons.blue(makeButtonId("allinfo"), "All faction info"));
         } else {
-            buttons.add(Buttons.blue(makeButtonId("info_" + String.join("_", restrictChoiceKeys)),
-                    "Available faction info"));
+            buttons.add(Buttons.blue(
+                    makeButtonId("info_" + String.join("_", restrictChoiceKeys)), "Available faction info"));
         }
         return buttons;
     }
@@ -112,7 +112,8 @@ public class FactionDraftable extends Draftable {
         if (buttonId.equals("remaininginfo")) {
             factionsToInfo = new ArrayList<>(draftFactions);
             for (String pId : draftManager.getPlayerStates().keySet()) {
-                List<DraftChoice> playerChoices = draftManager.getPlayerStates().get(pId).getPicks().get(getType());
+                List<DraftChoice> playerChoices =
+                        draftManager.getPlayerStates().get(pId).getPicks().get(getType());
                 if (playerChoices != null) {
                     for (DraftChoice choice : playerChoices) {
                         factionsToInfo.remove(choice.getChoiceKey());
@@ -125,7 +126,8 @@ public class FactionDraftable extends Draftable {
         } else if (buttonId.equals("pickedinfo")) {
             factionsToInfo = new ArrayList<>();
             for (String pId : draftManager.getPlayerStates().keySet()) {
-                List<DraftChoice> playerChoices = draftManager.getPlayerStates().get(pId).getPicks().get(getType());
+                List<DraftChoice> playerChoices =
+                        draftManager.getPlayerStates().get(pId).getPicks().get(getType());
                 if (playerChoices != null) {
                     for (DraftChoice choice : playerChoices) {
                         if (!factionsToInfo.contains(choice.getChoiceKey())) {
@@ -157,11 +159,11 @@ public class FactionDraftable extends Draftable {
             }
 
             boolean first = true;
-            List<MessageEmbed> embeds = factions.stream().map(FactionModel::fancyEmbed).toList();
+            List<MessageEmbed> embeds =
+                    factions.stream().map(FactionModel::fancyEmbed).toList();
             for (MessageEmbed e : embeds) {
                 String message = "";
-                if (first)
-                    message = player.getRepresentationUnfogged() + " Here's an overview of the factions:";
+                if (first) message = player.getRepresentationUnfogged() + " Here's an overview of the factions:";
                 MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
                 first = false;
             }
@@ -175,8 +177,7 @@ public class FactionDraftable extends Draftable {
         if (!CommonDraftableValidators.isChoiceKeyInList(choice, draftFactions)) {
             return "That faction is not available in this draft.";
         }
-        if (!CommonDraftableValidators.hasRemainingChoices(
-                draftManager, playerUserId, getType(), 1)) {
+        if (!CommonDraftableValidators.hasRemainingChoices(draftManager, playerUserId, getType(), 1)) {
             return "You have already picked your faction.";
         }
 
@@ -194,19 +195,24 @@ public class FactionDraftable extends Draftable {
             Predicate<String> isInDraft = f -> {
                 return draftFactions.contains(f);
             };
-            FactionExtraSetupHelper.offerKeleresSetupButtons(draftManager.getGame().getPlayer(playerUserId),
-                    isFactionTaken, isInDraft);
+            FactionExtraSetupHelper.offerKeleresSetupButtons(
+                    draftManager.getGame().getPlayer(playerUserId), isFactionTaken, isInDraft);
         }
     }
 
     @Override
     public DraftChoice getNothingPickedChoice() {
-        return new DraftChoice(getType(), null, null, "No faction picked", TI4Emoji.getRandomGoodDog().toString());
+        return new DraftChoice(
+                getType(),
+                null,
+                null,
+                "No faction picked",
+                TI4Emoji.getRandomGoodDog().toString());
     }
 
     @Override
-    public Consumer<Player> setupPlayer(DraftManager draftManager, String playerUserId,
-            PlayerSetupState playerSetupState) {
+    public Consumer<Player> setupPlayer(
+            DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
         List<DraftChoice> playerPicks = draftManager.getPlayerChoices(playerUserId, TYPE);
         if (playerPicks.isEmpty()) {
             playerSetupState.setFaction(null);
@@ -237,8 +243,8 @@ public class FactionDraftable extends Draftable {
     public String validateState(DraftManager draftManager) {
         int numPlayers = draftManager.getPlayerStates().size();
         if (draftFactions.size() < numPlayers) {
-            return "Number of factions (" + draftFactions.size()
-                    + ") is less than number of players (" + numPlayers + ")";
+            return "Number of factions (" + draftFactions.size() + ") is less than number of players (" + numPlayers
+                    + ")";
         }
 
         // Ensure all factions in draftFactions are valid
