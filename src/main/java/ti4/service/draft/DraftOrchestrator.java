@@ -13,7 +13,7 @@ public abstract class DraftOrchestrator extends DraftLifecycleHooks {
     public abstract String handleCustomButtonPress(
             GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId);
 
-    public abstract String handleDraftChoice(
+    public abstract String applyDraftChoice(
             GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice);
 
     // Persistence
@@ -24,7 +24,7 @@ public abstract class DraftOrchestrator extends DraftLifecycleHooks {
 
     public abstract String[] savePlayerStates(DraftManager draftManager);
 
-    public abstract PlayerDraftState.OrchestratorState loadPlayerState(String data);
+    public abstract OrchestratorState loadPlayerState(String data);
 
-    public abstract void validateState(DraftManager draftManager);
+    public abstract String validateState(DraftManager draftManager);
 }

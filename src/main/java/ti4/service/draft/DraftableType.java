@@ -5,7 +5,7 @@ import java.util.Objects;
 public class DraftableType {
     private final String name;
 
-    public DraftableType(String name) {
+    private DraftableType(String name) {
         this.name = Objects.requireNonNull(name);
     }
 
@@ -25,5 +25,9 @@ public class DraftableType {
     @Override
     public String toString() {
         return name;
+    }
+
+    public static DraftableType of(String name) {
+        return new DraftableType(name);
     }
 }

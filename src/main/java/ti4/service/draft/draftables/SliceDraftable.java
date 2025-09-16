@@ -4,15 +4,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
+import ti4.map.Player;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftSliceHelper;
 import ti4.service.draft.Draftable;
 import ti4.service.draft.DraftableType;
-import ti4.service.draft.PartialMapService;
-import ti4.service.draft.PlayerDraftState;
 import ti4.service.draft.PlayerSetupService.PlayerSetupState;
 import ti4.service.draft.SliceImageGeneratorService;
 import ti4.service.emoji.MiltyDraftEmojis;
@@ -39,7 +40,7 @@ public class SliceDraftable extends Draftable {
         return slices;
     }
 
-    public static final DraftableType TYPE = new DraftableType("Slice");
+    public static final DraftableType TYPE = DraftableType.of("Slice");
 
     @Override
     public DraftableType getType() {
@@ -51,30 +52,15 @@ public class SliceDraftable extends Draftable {
         List<DraftChoice> choices = new ArrayList<>();
         for (MiltyDraftSlice slice : slices) {
             String choiceKey = slice.getName();
-            String buttonText = null;
             String buttonEmoji = MiltyDraftEmojis.getMiltyDraftEmoji(choiceKey).toString();
-            String simpleName = slice.getName();
-            String formattedName = "Slice " + slice.getName();
-            String inlineSummary =
-                    MiltyDraftEmojis.getMiltyDraftEmoji(choiceKey).toString();
-            String buttonSuffix = choiceKey;
-            choices.add(new DraftChoice(getType(), choiceKey, buttonText, buttonEmoji, simpleName, formattedName, inlineSummary, buttonSuffix));
+            String displayName = "Slice " + slice.getName();
+            choices.add(new DraftChoice(getType(), choiceKey, makeChoiceButton(choiceKey, null, buttonEmoji), displayName, buttonEmoji));
         }
         return choices;
     }
 
     @Override
-    public int getNumChoicesPerPlayer() {
-        return 1;
-    }
-
-    @Override
-    public String getButtonPrefix() {
-        return "slice_";
-    }
-
-    @Override
-    public String handleCustomButtonPress(
+    public String handleCustomCommand(
             GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId) {
 
         return "Unknown button press: " + buttonId;
@@ -87,7 +73,7 @@ public class SliceDraftable extends Draftable {
             return "That slice is not recognized.";
         }
         if (!CommonDraftableValidators.hasRemainingChoices(
-                draftManager, playerUserId, getType(), getNumChoicesPerPlayer())) {
+                draftManager, playerUserId, getType(), 1)) {
             return "You have already picked your slice.";
         }
 
@@ -95,29 +81,13 @@ public class SliceDraftable extends Draftable {
     }
 
     @Override
-    public void draftChoiceSideEffects(
-            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice) {
-        PartialMapService.tryUpdateMap(event, draftManager);
+    public DraftChoice getNothingPickedChoice() {
+        return new DraftChoice(getType(), null, null, "No slice picked", MiltyDraftEmojis.getMiltyDraftEmoji(null).toString());
     }
 
     @Override
-    public String getChoiceHeader() {
-        return "**__Slices:__**";
-    }
-
-    @Override
-    public boolean hasInlineSummary() {
-        return true;
-    }
-
-    @Override
-    public String getDefaultInlineSummary() {
-        return MiltyDraftEmojis.getMiltyDraftEmoji(null).toString();
-    }
-
-    @Override
-    public FileUpload generateDraftImage(DraftManager draftManager, String uniqueKey) {
-        return SliceImageGeneratorService.tryGenerateImage(draftManager, uniqueKey);
+    public FileUpload generateSummaryImage(DraftManager draftManager, String uniqueKey, List<String> restrictChoiceKeys) {
+        return SliceImageGeneratorService.tryGenerateImage(draftManager, uniqueKey, restrictChoiceKeys);
     }
 
     @Override
@@ -131,11 +101,10 @@ public class SliceDraftable extends Draftable {
     }
 
     @Override
-    public void validateState(DraftManager draftManager) {
+    public String validateState(DraftManager draftManager) {
         int numPlayers = draftManager.getPlayerStates().size();
         if (slices.size() < numPlayers) {
-            throw new IllegalStateException(
-                    "Number of slices (" + slices.size() + ") is less than number of players (" + numPlayers + ")");
+            return "Number of slices (" + slices.size() + ") is less than number of players (" + numPlayers + ")";
         }
 
         // Ensure no two players have picked the same slice.
@@ -143,20 +112,16 @@ public class SliceDraftable extends Draftable {
         Set<String> chosenSlices = new HashSet<>();
         for (DraftChoice choice : sliceChoices) {
             if (chosenSlices.contains(choice.getChoiceKey())) {
-                throw new IllegalStateException("Multiple players have chosen slice " + choice.getChoiceKey());
+                return "Multiple players have chosen slice " + choice.getChoiceKey();
             }
             chosenSlices.add(choice.getChoiceKey());
         }
+        return null;
     }
 
     @Override
-    public void setupPlayer(DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
-        PlayerDraftState pState = draftManager.getPlayerStates().get(playerUserId);
-        if (!pState.getPicks().containsKey(getType())
-                || pState.getPicks().get(getType()).isEmpty()) {
-            throw new IllegalStateException("Player " + playerUserId + " has not picked a slice");
-        }
-
-        // Do nothing; slice tiles get placed during choice side effects
+    public Consumer<Player> setupPlayer(DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
+        // Map is built as a side effect of slice drafting.
+        return null;
     }
 }

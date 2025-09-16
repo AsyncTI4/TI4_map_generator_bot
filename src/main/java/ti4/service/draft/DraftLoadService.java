@@ -52,7 +52,7 @@ public class DraftLoadService {
             if (data.startsWith("playerchoice:")) {
                 String[] tokens = data.substring("playerchoice:".length()).split(",");
                 String playerUserId = tokens[0];
-                DraftableType draftableType = new DraftableType(tokens[1]);
+                DraftableType draftableType = DraftableType.of(tokens[1]);
                 String choiceKey = tokens[2];
                 DraftChoice choice = loadDraftChoice(draftables, draftableType, choiceKey);
                 PlayerDraftState playerState = draftManager.getPlayerStates().get(playerUserId);
@@ -66,7 +66,7 @@ public class DraftLoadService {
                 String orchestratorStateData = tokens[1];
                 PlayerDraftState playerState = draftManager.getPlayerStates().get(playerUserId);
                 if (orchestrator != null) {
-                    PlayerDraftState.OrchestratorState orchestratorState =
+                    OrchestratorState orchestratorState =
                             orchestrator.loadPlayerState(orchestratorStateData);
                     playerState.setOrchestratorState(orchestratorState);
                 }

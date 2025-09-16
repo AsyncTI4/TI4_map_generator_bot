@@ -1,34 +1,61 @@
 package ti4.service.draft;
 
+import java.util.function.Consumer;
+
+import ti4.map.Player;
+
+/**
+ * The draft lifecycle goes through several stages. These hooks
+ * should allow draft components to do extra work and control the flow
+ * as needed, hopefully without being overbearing. More hooks should
+ * be added only as really needed, and with default noop implementations.
+ * 
+ * The draft manager is responsible for executing the lifecycle.
+ * 
+ * Draft stages:
+ * 1. Initialization - Draftables generate their choices, etc.
+ * 2. Drafting - Players make choices from draftables.
+ *   - Moving on from this stage is blocked until all components return true from canEndDraft.
+ * 3. Post-draft work - Draftables can do extra work, such as asking players for more input.
+ *   - Moving on from this stage is blocked until all components return true from canSetupPlayers.
+ * 4. Player setup - Draftables apply their DraftChoices to players.
+ */
 public abstract class DraftLifecycleHooks {
-    // Do any work that is needed before the draft starts.
-    public void preDraftStart(DraftManager draftManager) {}
+    /**
+     * Check whether this component is ready to end the draft. Draftables should generally
+     * return false until all players have picked one of its choices.
+     * This is called after every choice pick automatically.
+     * @param draftManager The draft manager for the draft; also contains the Game object.
+     * @return Null if ready to end the draft, or a SPECIFIC message describing what is being waited on.
+     */
+    public abstract String getBlockingDraftEndReason(DraftManager draftManager);
 
-    // Return true if the draftable has completed all work needed to start the draft
-    public boolean canStartDraft(DraftManager draftManager) {
-        return true;
-    }
-
-    // Return true if players have made enough choices that this Draftable can
-    // finalize setup for whatever it controls.
-    // Ex. If a FactionDraftable has 5 choices for 4 players, this returns true once
-    // each player has 1 of FactionDraftable's Draft Choices in their state.
-    public abstract boolean canEndDraft(DraftManager draftManager);
-
-    // Inform the draftable that the draft is over, and it should begin any
-    // post-draft work it needs to do.
-    // Ex. Send the Keleres player a DM with buttons to choose their flavor.
+    /**
+     * Called once when the draft ends, after canEndDraft returns true for all components.
+     * This is where the draftable can begin any post-draft work.
+     * Ex. The MantisTileDraftable runs a map building sequence in the main game channel.
+     * @param draftManager The draft manager for the draft; also contains the Game object.
+     */
     public void onDraftEnd(DraftManager draftManager) {}
 
-    // Return true if all post-draft work is finished, and the player can now be set
-    // up. Ex. has the Keleres player chosen a flavor.
-    public boolean canSetupPlayers(DraftManager draftManager) {
-        return true;
+    /**
+     * Check whether this draftable is ready to set up the players. Draftables which send buttons in
+     * onDraftEnd may need to wait for player interaction. Anything which blocks this method from
+     * returning true MUST call the DraftManager's trySetupPlayers() method when it is resolved.
+     * @param draftManager The draft manager for the draft; also contains the Game object.
+     * @return Null if ready to set up players, or a SPECIFIC message describing what is being waited on.
+     */
+    public String getBlockingSetupReason(DraftManager draftManager) {
+        return null;
     }
 
-    // Perform any work needed to set up the player in the game. Ex. assign the
-    // chosen faction to the player.
-    // Can also do custom setup work, e.g. add starting trade goods, etc.
-    public abstract void setupPlayer(
+    /**
+     * Apply this draftable's choices to the given player, modifying the setup object as needed.
+     * @param draftManager The draft manager for the draft; also contains the Game object.
+     * @param playerUserId The user ID of the player to set up.
+     * @param playerSetupState The setup state object for the player.
+     * @return An optional consumer which will be invoked on this same player after setup, to do any additional work.
+     */
+    public abstract Consumer<Player> setupPlayer(
             DraftManager draftManager, String playerUserId, PlayerSetupService.PlayerSetupState playerSetupState);
 }

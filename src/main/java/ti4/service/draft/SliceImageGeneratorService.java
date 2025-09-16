@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
@@ -35,7 +37,7 @@ import ti4.service.milty.MiltyDraftTile;
 
 @UtilityClass
 public class SliceImageGeneratorService {
-    public static FileUpload tryGenerateImage(DraftManager draftManager, String uniqueKey) {
+    public static FileUpload tryGenerateImage(DraftManager draftManager, String uniqueKey, List<String> restrictChoiceKeys) {
         SliceDraftable sliceDraftable = (SliceDraftable) draftManager.getDraftableByType(SliceDraftable.TYPE);
         if (sliceDraftable == null) return null;
 
@@ -53,8 +55,16 @@ public class SliceImageGeneratorService {
             return null;
         };
 
+        List<MiltyDraftSlice> slices = sliceDraftable.getDraftSlices();
+        if(restrictChoiceKeys != null) {
+            slices = slices.stream()
+                    .filter(slice -> restrictChoiceKeys.contains(slice.getName()))
+                    .collect(Collectors.toList());
+        }
+        if(slices.isEmpty()) return null;
+
         return generateImage(
-                draftManager.getGame(), sliceDraftable.getDraftSlices(), getPlayerFromSlice, getFactionFromPlayer, uniqueKey);
+                draftManager.getGame(), slices, getPlayerFromSlice, getFactionFromPlayer, uniqueKey);
     }
 
     public static FileUpload generateImage(

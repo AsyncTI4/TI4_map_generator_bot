@@ -4,17 +4,18 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
+import ti4.map.Player;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
 import ti4.service.draft.Draftable;
 import ti4.service.draft.DraftableType;
-import ti4.service.draft.PartialMapService;
 import ti4.service.draft.PlayerDraftState;
 import ti4.service.draft.PlayerSetupService.PlayerSetupState;
 import ti4.service.emoji.MiltyDraftEmojis;
@@ -29,37 +30,29 @@ public class SpeakerOrderDraftable extends Draftable {
 
     @Override
     public DraftableType getType() {
-        return new DraftableType("SpeakerOrder");
+        return DraftableType.of("SpeakerOrder");
     }
 
     @Override
     public List<DraftChoice> getAllDraftChoices() {
         List<DraftChoice> choices = new ArrayList<>();
         for (int i = 1; i <= numPlayers; i++) {
-            String choiceKey = "" + i;
-            String buttonText = null;
+            String choiceKey = "pick" + i;
             String buttonEmoji = MiltyDraftEmojis.getSpeakerPickEmoji(i).toString();
-            String simpleName = StringHelper.ordinal(i) + " Pick";
-            String formattedName = StringHelper.ordinal(i) + " Pick";
-            String inlineSummary = MiltyDraftEmojis.getSpeakerPickEmoji(i).toString();
-            String buttonSuffix = "" + i;
-            choices.add(new DraftChoice(getType(), choiceKey, buttonText, buttonEmoji, simpleName, formattedName, inlineSummary, buttonSuffix));
+            String displayName = StringHelper.ordinal(i) + " Pick";
+            choices.add(new DraftChoice(getType(), choiceKey, makeChoiceButton(choiceKey, null, buttonEmoji),
+                    displayName, buttonEmoji));
         }
         return choices;
     }
 
     @Override
-    public int getNumChoicesPerPlayer() {
-        return 1;
+    public String getCommandKey() {
+        return "pickorder";
     }
 
     @Override
-    public String getButtonPrefix() {
-        return "pick_";
-    }
-
-    @Override
-    public String handleCustomButtonPress(
+    public String handleCustomCommand(
             GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId) {
 
         return "Unknown button press: " + buttonId;
@@ -68,7 +61,7 @@ public class SpeakerOrderDraftable extends Draftable {
     @Override
     public String isValidDraftChoice(DraftManager draftManager, String playerUserId, DraftChoice choice) {
         if (!CommonDraftableValidators.hasRemainingChoices(
-                draftManager, playerUserId, getType(), getNumChoicesPerPlayer())) {
+                draftManager, playerUserId, getType(), 1)) {
             return "You already have a Speaker order pick!";
         }
         List<String> choiceKeys = IntStream.rangeClosed(1, numPlayers)
@@ -83,24 +76,9 @@ public class SpeakerOrderDraftable extends Draftable {
     }
 
     @Override
-    public void draftChoiceSideEffects(
-            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice) {
-        PartialMapService.tryUpdateMap(event, draftManager);
-    }
-
-    @Override
-    public String getChoiceHeader() {
-        return "**__Speaker Order:__**";
-    }
-
-    @Override
-    public boolean hasInlineSummary() {
-        return true;
-    }
-
-    @Override
-    public String getDefaultInlineSummary() {
-        return MiltyDraftEmojis.getSpeakerPickEmoji(-1).toString();
+    public DraftChoice getNothingPickedChoice() {
+        return new DraftChoice(getType(), null, null, "No speaker position",
+                MiltyDraftEmojis.getSpeakerPickEmoji(-1).toString());
     }
 
     @Override
@@ -114,14 +92,14 @@ public class SpeakerOrderDraftable extends Draftable {
     }
 
     @Override
-    public void validateState(DraftManager draftManager) {
+    public String validateState(DraftManager draftManager) {
         if (numPlayers < 1) {
-            throw new IllegalStateException("Number of speaker positions must be at least 1, but is: " + numPlayers);
+            return "Number of speaker positions must be at least 1, but is: " + numPlayers;
         }
         int numDraftPlayers = draftManager.getPlayerStates().size();
         if (numPlayers < numDraftPlayers) {
-            throw new IllegalStateException("Number of speaker positions (" + numPlayers
-                    + ") is less than number of players drafting (" + numDraftPlayers + ")");
+            return "Number of speaker positions (" + numPlayers
+                    + ") is less than number of players drafting (" + numDraftPlayers + ")";
         }
 
         // Ensure no two players have picked the same speaker position.
@@ -129,15 +107,16 @@ public class SpeakerOrderDraftable extends Draftable {
         Set<String> chosenSpeakerPositions = new HashSet<>();
         for (DraftChoice choice : speakerChoices) {
             if (chosenSpeakerPositions.contains(choice.getChoiceKey())) {
-                throw new IllegalStateException(
-                        "Multiple players have chosen speaker position " + choice.getChoiceKey());
+                return "Multiple players have chosen speaker position " + choice.getChoiceKey();
             }
             chosenSpeakerPositions.add(choice.getChoiceKey());
         }
+        return null;
     }
 
     @Override
-    public void setupPlayer(DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
+    public Consumer<Player> setupPlayer(DraftManager draftManager, String playerUserId,
+            PlayerSetupState playerSetupState) {
         PlayerDraftState pState = draftManager.getPlayerStates().get(playerUserId);
         if (!pState.getPicks().containsKey(getType())
                 || pState.getPicks().get(getType()).isEmpty()) {
@@ -152,10 +131,14 @@ public class SpeakerOrderDraftable extends Draftable {
             String homeTilePosition = MapTemplateHelper.getPlayerHomeSystemLocation(
                     speakerNum, draftManager.getGame().getMapTemplateID());
             playerSetupState.setPositionHS(homeTilePosition);
-        } else {
-            draftManager.getGame().setPriorityTrackMode(PriorityTrackMode.THIS_ROUND_ONLY);
-            draftManager.getGame().getPlayer(playerUserId).setPriorityPosition(speakerNum);
         }
+
+        return (Player p) -> {
+            if (!shouldAlsoSetSeat(draftManager)) {
+                draftManager.getGame().setPriorityTrackMode(PriorityTrackMode.THIS_ROUND_ONLY);
+                draftManager.getGame().getPlayer(playerUserId).setPriorityPosition(speakerNum);
+            }
+        };
     }
 
     private boolean shouldAlsoSetSeat(DraftManager draftManager) {

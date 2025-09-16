@@ -40,7 +40,7 @@ public class DraftSetupService {
                 return "Not enough slices for the number of players. Please remove the preset slice string or include enough slices";
         }
 
-        // Milty Draft Manager Setup
+        // Draft Manager Setup
         // --------------------------------------------------------------
 
         // Setup managers and game state
@@ -114,18 +114,11 @@ public class DraftSetupService {
         }
 
         SliceDraftable sliceDraftable = new SliceDraftable();
+        draftManager.addDraftable(sliceDraftable);
 
         if (specs.presetSlices != null) {
             sliceDraftable.initialize(specs.presetSlices);
-            draftManager.addDraftable(sliceDraftable);
-            draftManager.preDraftStart();
-
-            // MessageHelper.sendMessageToChannel(
-            // event.getMessageChannel(), "### You are using preset slices!! Starting the
-            // draft right away!");
-
-            // specs.presetSlices.forEach(draftManager::addSlice);
-            // MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
+            draftManager.tryStartDraft();
         } else {
             event.getMessageChannel().sendMessage(startMsg).queue((ignore) -> {
                 boolean slicesCreated = SliceGeneratorService.generateSlices(event, sliceDraftable, tileManager, specs);
@@ -136,9 +129,7 @@ public class DraftSetupService {
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 } else {
-                    // MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
-                    draftManager.addDraftable(sliceDraftable);
-                    draftManager.preDraftStart();
+                    draftManager.tryStartDraft();
                     game.setPhaseOfGame("miltydraft");
                     GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
                 }

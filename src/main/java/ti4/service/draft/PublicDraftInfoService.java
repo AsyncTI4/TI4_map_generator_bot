@@ -22,7 +22,6 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.AsyncTI4DiscordBot;
-import ti4.buttons.Buttons;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -32,37 +31,6 @@ import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class PublicDraftInfoService {
-    // ui things...for snake draft, in order!
-    // generate and post and UPDATE slice image (requires slice draftable, template,
-    // and displays player name+faction emoji)
-    // uses...
-    // - slices to get tile info and positioning, planet holders, slice name, etc.
-    // - player that drafted it for their name, and potentially their faction name
-    // w/ emoji too
-    // -
-    // generate and post and UPDATE summary (includes all draftables, player order
-    // (orchestrator-specific), all choices made)
-    // uses...
-    // - highly specific to orchestrator what is public, how to order it, etc.
-    // - snake: orchestrator order of players, who's drafting, who's on deck
-    // - snake: what draftable choices are assigned to each player, by emoji
-    // generate and post and UPDATE buttons (specific draftables, who sees what
-    // buttons is orchestrator-specific)
-    // - highly specific to orchestrator WHERE the buttons go and which are
-    // available
-    // - snake: requires remaining draftable choices, to produce buttons labeled
-    // with text and/or emoji (faction: both, slice: emoji, position: emoji)
-
-    // ULTIMATELY, where to locate different rendering functions?
-    // - Slices: Special helper to accompany Summarizer. Functionally another
-    // summarizer, specific to the slices of the draft.
-    // - Summarizer: Orchestrator responsibility, on draft start and on every
-    // choice. May not need special methods...
-    // - Buttons: Draftables provide summary emojis/text, Draftables provide
-    // remaining choices as button text tied to button key to handle choice.
-    // Orchestrator delivers buttons associated with each choice as needed, and uses
-    // summary info as needed.
-
     private static final String SUMMARY_START = "# **__Draft Picks So Far__**:";
 
     public static void send(
@@ -79,25 +47,22 @@ public class PublicDraftInfoService {
 
         List<String> clearOldAttachments = new ArrayList<>();
 
-        // MiltyDraftHelper.generateAndPostSlices(game);
         for (Draftable d : draftManager.getDraftables()) {
             String uniqueKey = game.getName() + "_" + d.getType().toString().toLowerCase();
-            FileUpload uploadedImage = d.generateDraftImage(draftManager, uniqueKey);
+            FileUpload uploadedImage = d.generateSummaryImage(draftManager, uniqueKey, null);
             if (uploadedImage != null) {
                 clearOldAttachments.add(uniqueKey);
                 MessageHelper.sendFileUploadToChannel(channel, uploadedImage);
             }
         }
 
-        String draftSummary = draftManager.canInlineSummary()
-                ? getInlineSummary(draftManager, playerOrder, currentPlayer, nextPlayer)
-                : getBulletPointSummary(draftManager, playerOrder, currentPlayer, nextPlayer);
+        String draftSummary = getSummary(draftManager, playerOrder, currentPlayer, nextPlayer);
         MessageHelper.sendMessageToChannel(channel, draftSummary);
 
         List<String> clearOldHeaders = new ArrayList<>();
 
         for (Draftable d : draftManager.getDraftables()) {
-            String draftableHeader = d.getChoiceHeader();
+            String draftableHeader = d.getDisplayName();
             List<Button> buttons = new ArrayList<>(getDraftButtons(draftManager, d));
 
             clearOldHeaders.add(draftableHeader);
@@ -122,9 +87,7 @@ public class PublicDraftInfoService {
         if (channel == null)
             return;
 
-        String draftSummary = draftManager.canInlineSummary()
-                ? getInlineSummary(draftManager, playerOrder, currentPlayer, nextPlayer)
-                : getBulletPointSummary(draftManager, playerOrder, currentPlayer, nextPlayer);
+        String draftSummary = getSummary(draftManager, playerOrder, currentPlayer, nextPlayer);
 
         getMessageHistory(event, channel)
                 .queue(editDraftInfo(draftManager, draftableType, draftSummary), BotLogger::catchRestError);
@@ -142,12 +105,6 @@ public class PublicDraftInfoService {
         if (p != null)
             msg = "### " + p.getPing() + " is up to draft!";
 
-        // List<Button> buttons = new ArrayList<>();
-        // buttons.add(Buttons.gray("showMiltyDraft", "Show draft again"));
-        // buttons.add(Buttons.blue("miltyFactionInfo_remaining", "Remaining faction
-        // info"));
-        // buttons.add(Buttons.blue("miltyFactionInfo_picked", "Picked faction info"));
-        // buttons.add(Buttons.blue("miltyFactionInfo_all", "All faction info"));
         List<Button> buttons = new ArrayList<>(extraButtons != null ? extraButtons : List.of());
         buttons = MessageHelper.addUndoButtonToList(buttons, game.getName());
 
@@ -158,13 +115,6 @@ public class PublicDraftInfoService {
         MessageHelper.splitAndSentWithAction(msg, channel, buttons, clearOldFunc);
     }
 
-    /*
-     * Where does the game channel come from? The event object, and the game object.
-     * Do we want to have a concept of the game at this level? Or should it just be
-     * passed in whenever something is needed?
-     * Life is simpler with the Game object.
-     */
-
     // Produce button message
 
     private List<Button> getDraftButtons(DraftManager draftManager, Draftable draftable) {
@@ -172,44 +122,29 @@ public class PublicDraftInfoService {
         List<Button> buttons = new ArrayList<>();
         for (DraftChoice choice : allDraftChoices) {
             // Skip this choice if someone already has it.
-            if (draftManager.getPlayerStates().values().stream()
-                    .anyMatch(pState -> pState.getPicks().containsKey(choice.getType())
-                            && pState.getPicks().get(choice.getType()).contains(choice))) {
+            if (draftManager.getPlayersWithChoiceKey(draftable.getType(), choice.getChoiceKey()).size() > 0) {
                 continue;
             }
 
-            String buttonText = choice.getButtonText();
-            // If there's any writing on the button, use a gray background for readability.
-            boolean grayButton = buttonText != null && !buttonText.isBlank();
-            Button button = grayButton
-                    ? Buttons.gray(produceChoiceButton(draftable, choice), choice.getButtonText(),
-                            choice.getButtonEmoji())
-                    : Buttons.green(
-                            produceChoiceButton(draftable, choice), choice.getButtonText(), choice.getButtonEmoji());
-            buttons.add(button);
+            buttons.add(choice.getButton());
         }
 
         // Append custom buttons
-        buttons.addAll(draftable.getCustomButtons());
+        buttons.addAll(draftable.getCustomChoiceButtons(null));
 
         return buttons;
     }
 
-    private String produceChoiceButton(Draftable handler, DraftChoice choice) {
-        return DraftButtonService.DRAFT_BUTTON_PREFIX + handler.getButtonPrefix()
-                + choice.getButtonSuffix();
-    }
-
     // Summary generation
 
-    private static String getInlineSummary(
+    private static String getSummary(
             DraftManager draftManager, List<String> playerOrder, String currentPlayer, String nextPlayer) {
         Game game = draftManager.getGame();
         List<Draftable> draftables = draftManager.getDraftables();
         int padding = String.format("%s", playerOrder.size()).length() + 1;
 
-        Map<DraftableType, String> defaultSummaries = draftables.stream()
-                .collect(HashMap::new, (m, d) -> m.put(d.getType(), d.getDefaultInlineSummary()), Map::putAll);
+        Map<DraftableType, DraftChoice> defaultChoices = draftables.stream()
+                .collect(HashMap::new, (m, d) -> m.put(d.getType(), d.getNothingPickedChoice()), Map::putAll);
 
         StringBuilder sb = new StringBuilder(SUMMARY_START);
         int pickNum = 1;
@@ -220,14 +155,29 @@ public class PublicDraftInfoService {
                 throw new IllegalStateException("Player or picks missing for playerID " + userId);
 
             sb.append("\n> `").append(Helper.leftpad(pickNum + ".", padding)).append("` ");
+            StringBuilder bulletSummary = new StringBuilder();
             for (Draftable draftable : draftables) {
+                List<String> longChoiceNames = new ArrayList<>();
                 if (picks.getPicks().containsKey(draftable.getType())) {
                     List<DraftChoice> draftablePicks = picks.getPicks().get(draftable.getType());
                     for (DraftChoice choice : draftablePicks) {
-                        sb.append(choice.getInlineSummary());
+                        if (choice.getIdentifyingEmoji() != null) {
+                            sb.append(choice.getIdentifyingEmoji());
+                        } else {
+                            longChoiceNames.add(choice.getDisplayName());
+                        }
                     }
-                } else if (defaultSummaries.containsKey(draftable.getType())) {
-                    sb.append(defaultSummaries.get(draftable.getType()));
+                } else if (defaultChoices.containsKey(draftable.getType())) {
+                    DraftChoice noChoice = defaultChoices.get(draftable.getType());
+                    if (noChoice.getIdentifyingEmoji() != null) {
+                        sb.append(noChoice.getIdentifyingEmoji());
+                    }
+                    // Skip adding anything if no default emoji
+                }
+
+                if (longChoiceNames.size() > 0) {
+                    bulletSummary.append("- " + draftable.getDisplayName() + ": " + System.lineSeparator() + "  - ");
+                    bulletSummary.append(String.join(System.lineSeparator() + "  - ", longChoiceNames));
                 }
             }
 
@@ -250,25 +200,6 @@ public class PublicDraftInfoService {
         return sb.toString();
     }
 
-    // This kind of summary would be needed to support a public franken-draft.
-    // Instead of returning a String, it should probably return a Map<UserId,
-    // SummaryString>, so that each player's summary can be posted to a distinct
-    // message, thereby avoiding length limits.
-    // This would something like:
-    // Draft Picks So Far: <PlayerName>
-    // - **Faction Technology**
-    // - Valefor Assimilator X
-    // - Advanced Carrier 2
-    // - **Blue Tiles**
-    // - Rigels
-    // etc.
-    // The actual summary text could be the button text, and the parent list would
-    // be the Draftable Type.
-    private static String getBulletPointSummary(
-            DraftManager draftManager, List<String> playerOrder, String currentPlayer, String nextPlayer) {
-        throw new UnsupportedOperationException("Bullet point summary not implemented yet");
-    }
-
     // Edit previous messages
 
     private static MessageRetrieveAction getMessageHistory(
@@ -286,19 +217,19 @@ public class PublicDraftInfoService {
             throw new IllegalArgumentException("No draftable of type " + draftableType + " found");
         }
         Predicate<String> isDraftableType = txt -> {
-            String header = draftable.getChoiceHeader();
+            String header = draftable.getDisplayName();
             return txt.equals(header);
         };
         List<Button> draftableButtons = new ArrayList<>(getDraftButtons(draftManager, draftable));
 
         // Images are good place for representing several elements of the draft state.
         // Assume they're not siloed to any draftable, and always try to do them all.
-        Map<String, FileUpload> updateKeys = new HashMap<>();
+        Map<String, FileUpload> updateImageKeys = new HashMap<>();
         for (Draftable d : draftManager.getDraftables()) {
             String key = draftManager.getGame().getName() + "_" + d.getType().toString().toLowerCase();
-            FileUpload fileUpload = d.generateDraftImage(draftManager, key);
-            if(fileUpload != null) {
-                updateKeys.put(key, fileUpload);
+            FileUpload fileUpload = d.generateSummaryImage(draftManager, key, null);
+            if (fileUpload != null) {
+                updateImageKeys.put(key, fileUpload);
             }
         }
 
@@ -319,20 +250,20 @@ public class PublicDraftInfoService {
                     editMessage(msg, null, draftableButtons);
                 }
 
-                if (!updateKeys.isEmpty()) {
+                if (!updateImageKeys.isEmpty()) {
                     for (Attachment atch : msg.getAttachments()) {
                         String keyDone = null;
-                        for (Map.Entry<String, FileUpload> entry : updateKeys.entrySet()) {
+                        for (Map.Entry<String, FileUpload> entry : updateImageKeys.entrySet()) {
                             String uniqueKey = entry.getKey();
-                            FileUpload draftableImage = entry.getValue();
                             if (atch.getFileName().contains(uniqueKey)) {
                                 keyDone = uniqueKey;
+                                FileUpload draftableImage = entry.getValue();
                                 msg.editMessageAttachments(draftableImage).queue();
                                 break;
                             }
                         }
                         if (keyDone != null) {
-                            updateKeys.remove(keyDone);
+                            updateImageKeys.remove(keyDone);
                         }
                     }
                 }
@@ -411,27 +342,6 @@ public class PublicDraftInfoService {
                     }
                 }
             }
-
-            // if (clearOldDraftInfo && msgTxt.startsWith(SUMMARY_START)) {
-            // if (removeSummary) msg.delete().queue();
-            // removeSummary = true;
-            // }
-            // if (clearOldDraftInfo && msgTxt.equals(SLICES)) {
-            // if (removeSliceMsgs) msg.delete().queue();
-            // removeSliceMsgs = true;
-            // }
-            // if (clearOldDraftInfo && msgTxt.equals(FACTIONS)) {
-            // if (removeFactionMsgs) msg.delete().queue();
-            // removeFactionMsgs = true;
-            // }
-            // if (clearOldDraftInfo && msgTxt.equals(POSITION)) {
-            // if (removePositionMsgs) msg.delete().queue();
-            // removePositionMsgs = true;
-            // }
-            // if (clearOldDraftInfo && messageIsSliceImg(msg)) {
-            // if (removeImages) msg.delete().queue();
-            // removeImages = true;
-            // }
         }
     }
 

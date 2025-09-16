@@ -13,6 +13,12 @@ import ti4.model.MapTemplateModel;
 import ti4.model.Source;
 import ti4.service.milty.MiltyDraftSlice;
 
+
+/**
+ * This DraftSpec represents the conversion of draft settings -> draft.
+ * To ensure the new system is compatible with the previous, this should
+ * basically be a copy of MiltyDraftSpec for now.
+ */
 @Data
 public class DraftSpec {
     public Game game;

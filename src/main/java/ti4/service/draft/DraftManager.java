@@ -4,13 +4,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+
 import lombok.Data;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 import ti4.service.map.AddTileListService;
 
+/**
+ * Manages the state of the draft, including:
+ * - Players involved
+ * - Orchestrator
+ * - Draftables available
+ * - Routing interactions
+ * - Lifecycle management (starting draft, ending draft, setting up players, etc)
+ *   - This includes checking that all components are ready to proceed at each stage.
+ * - Validating state consistency
+ */
 @Data
 public class DraftManager {
     public DraftManager(Game game) {
@@ -107,15 +119,6 @@ public class DraftManager {
 
     // Information Access
 
-    public boolean canInlineSummary() {
-        for (Draftable d : draftables) {
-            if (!d.hasInlineSummary()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public List<DraftChoice> getPlayerChoices(String playerUserId, DraftableType type) {
         if (!playerStates.containsKey(playerUserId)) {
             throw new IllegalArgumentException("Player " + playerUserId + " is not in the draft");
@@ -164,61 +167,50 @@ public class DraftManager {
 
     // Interaction handling
 
-    public String routeButtonPress(ButtonInteractionEvent event, Player player, String buttonID) {
+    public String routeCommand(GenericInteractionCreateEvent event, Player player, String command) {
         for (Draftable d : draftables) {
-            if (buttonID.startsWith(d.getButtonPrefix())) {
-                String innerButtonID = buttonID.substring(d.getButtonPrefix().length());
+            String commandPrefix = d.getCommandKey() + "_";
+            if (command.startsWith(commandPrefix)) {
+                String innerCommand = command.substring(commandPrefix.length());
                 for (DraftChoice choice : d.getAllDraftChoices()) {
-                    if (innerButtonID.equals(choice.getButtonSuffix())) {
+                    if (innerCommand.equals(choice.getChoiceKey())) {
                         if (orchestrator == null) {
-                            throw new IllegalStateException("Draft choice button pressed, but no orchestrator is set");
+                            throw new IllegalStateException("Draft choice command issued, but no orchestrator is set");
                         }
                         String validationError = d.isValidDraftChoice(this, player.getUserID(), choice);
                         if (validationError != null) {
                             return validationError;
                         }
                         // More validation, and add the button to the player's state
-                        String status = orchestrator.handleDraftChoice(event, this, player.getUserID(), choice);
+                        String status = orchestrator.applyDraftChoice(event, this, player.getUserID(), choice);
                         if (DraftButtonService.isError(status)) {
                             return status;
                         }
                         // Side effects, if any
-                        d.draftChoiceSideEffects(event, this, player.getUserID(), choice);
+                        d.postApplyDraftChoice(event, this, player.getUserID(), choice);
+
+                        // After this choice, check if the draft is over.
+                        tryEndDraft(event);
+
                         return status;
                     }
                 }
 
-                String status = d.handleCustomButtonPress(event, this, player.getUserID(), innerButtonID);
+                String status = d.handleCustomCommand(event, this, player.getUserID(), innerCommand);
                 return status;
             }
         }
 
-        if (orchestrator != null && buttonID.startsWith(orchestrator.getButtonPrefix())) {
-            String innerButtonID = buttonID.substring(orchestrator.getButtonPrefix().length());
+        if (orchestrator != null && command.startsWith(orchestrator.getButtonPrefix())) {
+            String innerButtonID = command.substring(orchestrator.getButtonPrefix().length());
             String status = orchestrator.handleCustomButtonPress(event, this, player.getUserID(), innerButtonID);
             return status;
         }
 
-        throw new IllegalArgumentException("Button ID " + buttonID + " not recognized by draft manager");
+        throw new IllegalArgumentException("Button ID " + command + " not recognized by draft manager");
     }
 
     // Lifecycle management
-
-    /**
-     * Components should do any work needed before the draft starts.
-     * If that requires user interaction, this entails sending public/private
-     * buttons.
-     * If the draft cannot start immediately, anything blocking it should call
-     * tryStartDraft() once resolved.
-     */
-    public void preDraftStart() {
-        for (Draftable d : draftables) {
-            d.preDraftStart(this);
-        }
-        orchestrator.preDraftStart(this);
-
-        tryStartDraft();
-    }
 
     /**
      * Whenever something blocking the draft from starting is resolved, this should
@@ -236,12 +228,19 @@ public class DraftManager {
         if (draftables.isEmpty() || orchestrator == null) {
             return false;
         }
-        for (Draftable d : draftables) {
-            if (!d.canStartDraft(this)) {
-                return false;
-            }
+
+        // Consider checking for minimal draftables here...something that provides a faction,
+        // something that builds a map, etc.
+        
+        return true;
+    }
+
+    public void tryEndDraft(GenericInteractionCreateEvent event) {
+        if (getBlockingDraftEndReason() != null) {
+            return;
         }
-        return orchestrator.canStartDraft(this);
+
+        endDraft(event);
     }
 
     /**
@@ -253,9 +252,12 @@ public class DraftManager {
      * 
      * @param event
      */
-    public void endDraft(GenericInteractionCreateEvent event) {
-        if (!canEndDraft()) {
-            throw new IllegalStateException("Cannot end draft; not all draftables are ready");
+    public String endDraft(GenericInteractionCreateEvent event) {
+        String blockingReason = getBlockingDraftEndReason();
+        if (blockingReason != null) {
+            // If you got this accidentally, it means you called endDraft() instead of tryEndDraft().
+            // If there was an issue and someone used a slash command to force-end the draft, that's fine.
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "WARNING: Forcing the draft to end despite: " + blockingReason);
         }
 
         for (Draftable draftable : draftables) {
@@ -263,21 +265,23 @@ public class DraftManager {
         }
 
         trySetupPlayers(event);
+        return null;
     }
 
     /**
-     * Whether all lifecycle components are ready to end the picking of draft
+     * Determine whether all lifecycle components are ready to end the picking of draft
      * choices.
      * 
-     * @return true if all components can stop drafting picks, false otherwise.
+     * @return Null if ready to end the draft, or a SPECIFIC message describing what is being waited on.
      */
-    public boolean canEndDraft() {
+    public String getBlockingDraftEndReason() {
         for (Draftable d : draftables) {
-            if (!d.canEndDraft(this)) {
-                return false;
+            String reason = d.getBlockingDraftEndReason(this);
+            if (reason != null) {
+                return reason;
             }
         }
-        return orchestrator.canEndDraft(this);
+        return orchestrator.getBlockingDraftEndReason(this);
     }
 
     /**
@@ -287,14 +291,18 @@ public class DraftManager {
      * @param event
      */
     public void trySetupPlayers(GenericInteractionCreateEvent event) {
-        if (!canSetupPlayers()) {
+        if (getBlockingSetupReason() != null) {
             return;
         }
 
         for (String userId : playerStates.keySet()) {
             PlayerSetupService.PlayerSetupState playerSetupState = new PlayerSetupService.PlayerSetupState();
+            List<Consumer<Player>> postSetupActions = new ArrayList<>();
             for (Draftable draftable : draftables) {
-                draftable.setupPlayer(this, userId, playerSetupState);
+                Consumer<Player> postSetupAction = draftable.setupPlayer(this, userId, playerSetupState);
+                if (postSetupAction != null) {
+                    postSetupActions.add(postSetupAction);
+                }
             }
             Player player = game.getPlayer(userId);
             if(playerSetupState.getColor() == null) {
@@ -302,18 +310,23 @@ public class DraftManager {
                 playerSetupState.setColor(color);
             }
             PlayerSetupService.setupPlayer(playerSetupState, player, game, event);
+
+            for (Consumer<Player> action : postSetupActions) {
+                action.accept(player);
+            }
         }
 
         AddTileListService.finishSetup(game, event);
     }
 
-    private boolean canSetupPlayers() {
+    private String getBlockingSetupReason() {
         for (Draftable d : draftables) {
-            if (!d.canSetupPlayers(this)) {
-                return false;
+            String result = d.getBlockingSetupReason(this);
+            if (result != null) {
+                return result;
             }
         }
-        return orchestrator.canSetupPlayers(this);
+        return orchestrator.getBlockingSetupReason(this);
     }
 
     /**
@@ -345,11 +358,12 @@ public class DraftManager {
         for (Draftable d : draftables) {
             d.validateState(this);
         }
-    }
 
-    // Players involved
-    // Draft types w/ available choices (e.g. factions for this draft) and
-    // type-specific settings
-    // Orchestrator
-    // Current state (incl draft choices, orchestrator state, etc.)
+        // TODO:
+        // All DraftChoices and Draftables conform to stated requirements for their given strings,
+        // e.g. getChoiceKey() is non-null, non-empty, lowercase alpha-numeric only, etc.
+        
+        // TODO:
+        // All DraftChoices across all Draftables have unique choice keys.
+    }
 }

@@ -4,17 +4,18 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.MapTemplateHelper;
 import ti4.image.Mapper;
+import ti4.map.Player;
 import ti4.model.MapTemplateModel;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
 import ti4.service.draft.Draftable;
 import ti4.service.draft.DraftableType;
-import ti4.service.draft.PartialMapService;
 import ti4.service.draft.PlayerDraftState;
 import ti4.service.draft.PlayerSetupService.PlayerSetupState;
 import ti4.service.emoji.MiltyDraftEmojis;
@@ -29,37 +30,24 @@ public class SeatDraftable extends Draftable {
 
     @Override
     public DraftableType getType() {
-        return new DraftableType("Seat");
+        return DraftableType.of("Seat");
     }
 
     @Override
     public List<DraftChoice> getAllDraftChoices() {
         List<DraftChoice> choices = new ArrayList<>();
         for (int i = 1; i <= numSeats; i++) {
-            String choiceKey = "" + i;
-            String buttonText = null;
+            String choiceKey = "seat" + i;
             String buttonEmoji = MiltyDraftEmojis.getSpeakerPickEmoji(i).toString();
-            String simpleName = "Seat " + i;
-            String formattedName = simpleName;
-            String inlineSummary = MiltyDraftEmojis.getSpeakerPickEmoji(i).toString();
-            String buttonSuffix = "" + i;
-            choices.add(new DraftChoice(getType(), choiceKey, buttonText, buttonEmoji, simpleName, formattedName, inlineSummary, buttonSuffix));
+            String displayName = "Seat " + i;
+            choices.add(new DraftChoice(getType(), choiceKey, makeChoiceButton(choiceKey, null, buttonEmoji),
+                    displayName, buttonEmoji));
         }
         return choices;
     }
 
     @Override
-    public int getNumChoicesPerPlayer() {
-        return 1;
-    }
-
-    @Override
-    public String getButtonPrefix() {
-        return "seat_";
-    }
-
-    @Override
-    public String handleCustomButtonPress(
+    public String handleCustomCommand(
             GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId) {
 
         return "Unknown button press: " + buttonId;
@@ -68,7 +56,7 @@ public class SeatDraftable extends Draftable {
     @Override
     public String isValidDraftChoice(DraftManager draftManager, String playerUserId, DraftChoice choice) {
         if (!CommonDraftableValidators.hasRemainingChoices(
-                draftManager, playerUserId, getType(), getNumChoicesPerPlayer())) {
+                draftManager, playerUserId, getType(), 1)) {
             return "You already have a Seat pick!";
         }
         List<String> choiceKeys =
@@ -81,24 +69,8 @@ public class SeatDraftable extends Draftable {
     }
 
     @Override
-    public void draftChoiceSideEffects(
-            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice) {
-        PartialMapService.tryUpdateMap(event, draftManager);
-    }
-
-    @Override
-    public String getChoiceHeader() {
-        return "**__Seat:__**";
-    }
-
-    @Override
-    public boolean hasInlineSummary() {
-        return true;
-    }
-
-    @Override
-    public String getDefaultInlineSummary() {
-        return MiltyDraftEmojis.getSpeakerPickEmoji(-1).toString();
+    public DraftChoice getNothingPickedChoice() {
+        return new DraftChoice(getType(), null, null, "No seat picked", MiltyDraftEmojis.getSpeakerPickEmoji(-1).toString());
     }
 
     @Override
@@ -112,26 +84,25 @@ public class SeatDraftable extends Draftable {
     }
 
     @Override
-    public void validateState(DraftManager draftManager) {
+    public String validateState(DraftManager draftManager) {
         if (numSeats < 1) {
-            throw new IllegalStateException("Number of seats must be at least 1, but is: " + numSeats);
+            return "Number of seats must be at least 1, but is: " + numSeats;
         }
         int numPlayers = draftManager.getPlayerStates().size();
         if (numSeats < numPlayers) {
-            throw new IllegalStateException(
-                    "Number of seats (" + numSeats + ") is less than number of players (" + numPlayers + ")");
+            return "Number of seats (" + numSeats + ") is less than number of players (" + numPlayers + ")";
         }
 
         // Ensure seat count is consistent with map template
         MapTemplateModel mapTemplate =
                 Mapper.getMapTemplate(draftManager.getGame().getMapTemplateID());
         if (mapTemplate == null) {
-            throw new IllegalStateException("Map template ID is not set or invalid: "
-                    + draftManager.getGame().getMapTemplateID());
+            return "Map template ID is not set or invalid: "
+                    + draftManager.getGame().getMapTemplateID();
         }
         if (mapTemplate.getPlayerCount() < numSeats) {
-            throw new IllegalStateException("Map template " + mapTemplate.getAlias() + " only supports "
-                    + mapTemplate.getPlayerCount() + " players, but draft has " + numSeats + " seats.");
+            return "Map template " + mapTemplate.getAlias() + " only supports "
+                    + mapTemplate.getPlayerCount() + " players, but draft has " + numSeats + " seats.";
         }
 
         // Ensure no two players have picked the same seat.
@@ -139,14 +110,16 @@ public class SeatDraftable extends Draftable {
         Set<String> chosenSeats = new HashSet<>();
         for (DraftChoice choice : seatChoices) {
             if (chosenSeats.contains(choice.getChoiceKey())) {
-                throw new IllegalStateException("Multiple players have chosen seat " + choice.getChoiceKey());
+                return "Multiple players have chosen seat " + choice.getChoiceKey();
             }
             chosenSeats.add(choice.getChoiceKey());
         }
+
+        return null;
     }
 
     @Override
-    public void setupPlayer(DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
+    public Consumer<Player> setupPlayer(DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
         PlayerDraftState pState = draftManager.getPlayerStates().get(playerUserId);
         if (!pState.getPicks().containsKey(getType())
                 || pState.getPicks().get(getType()).isEmpty()) {
@@ -159,5 +132,7 @@ public class SeatDraftable extends Draftable {
         String homeTilePosition = MapTemplateHelper.getPlayerHomeSystemLocation(
                 seatNum, draftManager.getGame().getMapTemplateID());
         playerSetupState.setPositionHS(homeTilePosition);
+
+        return null;
     }
 }
