@@ -17,7 +17,7 @@
     {
         "alias": "dangerous_wilds",
         "name": "Dangerous Wilds",
-        "text": "- During setup, place neutral infantry on each hazardous planet equal to that planet's resource value.\n- At the end of each round, for each hazardous planet that is not controlled, replenish any neutral units that were destroyed during the game round.\n- When a player gains control of a hazardous planet, they may research 1 technology; they may ignore a number of pre-requisites equal to that planet's resource value.",
+        "text": "- During setup, place neutral infantry on each hazardous planet equal to that planet's resource value.\n- At the end of each round, for each hazardous planet that is not controlled, replenish any neutral units that were destroyed during the game round.\n- When a player gains control of a hazardous planet from the deck, they may research 1 technology; they may ignore a number of pre-requisites equal to that planet's resource value.",
         "complexity": 1,
         "flavorText": "A thundering crash signaled the arrival of a garach - two in fact - and the huntress gripped her rifle tight. No room for error now. She hoped the others had heard the commotion and were header her way, but deep down she knew. She was on her own.",
         "source": "thunders_edge"
@@ -67,7 +67,7 @@
     {
         "alias": "total_war",
         "name": "Total War",
-        "text": "- When a player destroys units, they place commodities from the supply equal to the combined cost of those units on a planet they control in their home system (infantry and fighters are worth 1 each).\n- When a player gains control of a planet that has commodities on it, they may move those commodities to a planet they control in their home system.\n- All players can perform the following action:\n> - ACTION: Discard 10 commodities from planets in your home system to gain 1 victory point.",
+        "text": "- When a player destroys another player's units [Note: neutral units count for this], they place commodities from the supply equal to the combined cost of those units on a planet they control in their home system (infantry and fighters are worth 1 each).\n- When a player gains control of a planet that has commodities on it, they may move those commodities to a planet they control in their home system.\n- All players can perform the following action:\n> - ACTION: Discard 10 commodities from planets in your home system to gain 1 victory point.",
         "complexity": 3,
         "source": "thunders_edge"
     }
