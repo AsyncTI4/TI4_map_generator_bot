@@ -2291,10 +2291,9 @@ public class Helper {
         StringBuilder representation = new StringBuilder();
         representation
                 .append(LeaderEmojis.getLeaderEmoji(leader))
-                .append(" __**")
-                .append(leaderName)
-                .append("**");
-        if (includeTitle) representation.append(" - ").append(leaderTitle).append("__"); // add title
+                .append(" ")
+                .append(leaderName);
+        if (includeTitle) representation.append(" - __").append(leaderTitle).append("__"); // add title
         if (includeAbility && Constants.HERO.equals(leader.getType()))
             representation.append("\n").append("**").append(heroAbilityName).append("**"); // add hero ability name
         if (includeAbility)
