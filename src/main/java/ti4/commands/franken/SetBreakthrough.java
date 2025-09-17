@@ -29,7 +29,7 @@ class SetBreakthrough extends GameStateSubcommand {
         player.setBreakthroughID(breakthrough);
         MessageHelper.sendMessageToEventChannel(
                 event,
-                player.getFactionEmojiOrColor() + " breakthrough set to: `"
-                        + Mapper.getBreakthrough(breakthrough).getName() + "`");
+                player.getFactionEmojiOrColor() + " breakthrough set to: _"
+                        + Mapper.getBreakthrough(breakthrough).getName() + "_.");
     }
 }

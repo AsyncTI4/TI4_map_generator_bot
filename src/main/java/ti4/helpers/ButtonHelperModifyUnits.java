@@ -1475,7 +1475,7 @@ public class ButtonHelperModifyUnits {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         player.getFactionEmoji()
-                                + " did not place a command token in system they retreated to due to the Eusosociality ability.");
+                                + " did not place a command token in system they retreated to due to their **Eusosociality** ability.");
             } else {
                 CommandCounterHelper.addCC(event, player, tile2, true);
                 Helper.isCCCountCorrect(player);
@@ -2059,7 +2059,7 @@ public class ButtonHelperModifyUnits {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation() + " readied the planet "
-                                + Helper.getPlanetRepresentation(planetName, game) + " per hero ability.");
+                                + Helper.getPlanetRepresentation(planetName, game) + " with _Planetary Defense Nexus_.");
                 PlanetService.refreshPlanet(player, planetName);
             }
         }

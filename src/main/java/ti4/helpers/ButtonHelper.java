@@ -4571,7 +4571,7 @@ public class ButtonHelper {
                             StringUtils.capitalize(Mapper.getUnitBaseTypeFromAsyncID(asyncID))));
                 }
                 String msg =
-                        player.getRepresentation() + " choose the ship type to use your phantom energy ability on.";
+                        player.getRepresentation() + ", please choose the ship type to use your **Phantom Energy** ability on.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
             }
         }
@@ -4583,7 +4583,7 @@ public class ButtonHelper {
         game.setStoredValue("phantomEnergy", game.getStoredValue("phantomEnergy") + asyncID);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " has used the phantom energy ability on the "
+                player.getRepresentation() + " has used their **Phantom Energy** ability on the "
                         + Mapper.getUnitBaseTypeFromAsyncID(asyncID) + " ship type.");
         deleteMessage(event);
     }

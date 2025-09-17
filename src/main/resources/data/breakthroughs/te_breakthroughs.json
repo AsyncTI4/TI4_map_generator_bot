@@ -59,7 +59,8 @@
     },
     {
         "alias": "ghostbt",
-        "name": "Unknown",
+        "name": "Now You're Thinking With Portals",
+        "displayName": "Thinking\nWith Portals",
         "faction": "ghost",
         "synergy": [
             "PROPULSION",

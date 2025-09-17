@@ -22,12 +22,12 @@ public class BreakthroughActivate extends GameStateSubcommand {
         Player player = getPlayer();
         BreakthroughModel bt = player.getBreakthroughModel();
         if (bt == null) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Player does not have a breakthrough");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Player does not have a breakthrough.");
         } else {
             boolean active = player.isBreakthroughActive();
             player.setBreakthroughActive(!active);
-            String message = player.getRepresentation() + (active ? " de-" : " ") + "activated their breakthrough "
-                    + bt.getName();
+            String message = player.getRepresentation() + (active ? " de-" : " ") + "activated their breakthrough _"
+                    + bt.getName() + "_.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         }
     }

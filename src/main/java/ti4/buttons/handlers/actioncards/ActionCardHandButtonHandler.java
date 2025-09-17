@@ -143,7 +143,7 @@ class ActionCardHandButtonHandler {
             ActionCardHelper.serveReverseEngineerButtons(game, player, List.of(acID));
             if (player.hasAbility("scrap_metal")) {
                 String message2 =
-                        player.getRepresentationUnfogged() + ", please resolve Scrap Metal ability using the buttons.";
+                        player.getRepresentationUnfogged() + ", please resolve your **Scrap Metal** ability using the buttons.";
                 List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, false);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
             }

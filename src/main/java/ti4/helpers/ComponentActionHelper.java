@@ -744,14 +744,14 @@ public class ComponentActionHelper {
             case "exhaustBT" -> {
                 BreakthroughModel btModel = Mapper.getBreakthrough(buttonID);
                 p1.setBreakthroughExhausted(true);
-                String message = p1.getRepresentation() + " exhausted " + btModel.getName();
+                String message = p1.getRepresentation() + " exhausted _" + btModel.getName() + "_.";
                 MessageHelper.sendMessageToChannelWithEmbed(
                         event.getMessageChannel(), message, btModel.getRepresentationEmbed());
                 boolean implemented = TeHelperBreakthroughs.handleBreakthroughExhaust(event, game, p1, buttonID);
 
                 if (!implemented) {
                     String unimplemented =
-                            "IDK how to do this yet. " + Constants.jazzPing() + " please implement this bt";
+                            "IDK how to do this yet. " + Constants.jazzPing() + " please implement this bt.";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), unimplemented);
                 }
             }

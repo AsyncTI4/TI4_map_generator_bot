@@ -1725,7 +1725,7 @@ public class UnfiledButtonHandlers {
             game.setStoredValue(player.getFaction() + "Round" + game.getRound() + "PreScored" + poOrSO, num);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "Successfully queued an objective to score (wont score it if you later become unable to score it).");
+                    "Successfully queued an objective to score (you won't score it if you later become unable to score it).");
         } else {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),

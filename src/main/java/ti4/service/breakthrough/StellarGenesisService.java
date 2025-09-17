@@ -40,7 +40,7 @@ public class StellarGenesisService {
         Predicate<Tile> nonHomeAndAdj = nonHome.and(tile -> adjToPlanetTiles.contains(tile));
         List<Button> avernusLocations =
                 ButtonHelper.getTilesWithPredicateForAction(player, game, "placeAvernus", nonHomeAndAdj, false);
-        String message = "Choose a tile to place Avernus:";
+        String message = "Please choose the system where you wish to place Avernus.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, avernusLocations);
     }
 

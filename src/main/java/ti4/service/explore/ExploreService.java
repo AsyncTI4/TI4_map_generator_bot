@@ -298,10 +298,10 @@ public class ExploreService {
                     buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
                     MessageHelper.sendMessageToChannel(
                             (MessageChannel) event.getChannel(),
-                            player.getRepresentation() + " can draw 1 AC via their ultimate authority ability");
+                            player.getRepresentation() + " draws 1 action card because of their **Ultimate Authority** ability.");
                     MessageHelper.sendMessageToChannel(
                             (MessageChannel) event.getChannel(),
-                            player.getRepresentation() + " use button to resolve",
+                            player.getRepresentation() + ", use button to resolve.",
                             buttons);
                 }
             }

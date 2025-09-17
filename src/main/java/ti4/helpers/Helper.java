@@ -153,7 +153,7 @@ public class Helper {
                     + " _Transparasteel Plating_, and all other players have passed.";
         }
         if (player.hasTech("baarvag")) {
-            return "Player has Unyielding Will and thus their ACs cannot be canceled.";
+            return "Player has **Unyielding Will** and thus their action cards cannot be canceled.";
         }
         return null;
     }

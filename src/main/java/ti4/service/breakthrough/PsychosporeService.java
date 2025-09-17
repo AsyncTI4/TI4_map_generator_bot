@@ -36,7 +36,7 @@ public class PsychosporeService {
 
     public void postInitialButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         List<Button> buttons = getPsychosporeButtons(game, player);
-        String message = "Choose a tile to use " + psychosporeRep() + " and remove your Command Token.";
+        String message = "Please choose which system you wish to use " + psychosporeRep() + " in (to remove your command token and place an infantry).";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
 
@@ -49,7 +49,7 @@ public class PsychosporeService {
 
             // Remove Token
             Tile tile = game.getTileByPosition(pos);
-            String msg = player.getRepresentationNoPing() + " removed their Command Token from ";
+            String msg = player.getRepresentationNoPing() + " removed their command token from ";
             msg += tile.getRepresentationForButtons(game, player) + " using " + psychosporeRep() + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             RemoveCommandCounterService.fromTile(event, player, tile);
@@ -62,9 +62,9 @@ public class PsychosporeService {
                 String label = Helper.getUnitHolderRepresentation(tile, planetOrSpace, game, player);
                 bonusInfantry.add(Buttons.green(id, label, PlanetEmojis.getPlanetEmoji(planetOrSpace)));
             }
-            bonusInfantry.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Skip placing an infantry"));
+            bonusInfantry.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Skip Placing An Infantry"));
             String postPsychosporeMsg =
-                    player.getRepresentationUnfogged() + " use the buttons to place an infantry in the system:";
+                    player.getRepresentationUnfogged() + " use the buttons to place an infantry in the system:\n-# This is mandatory, though may end up with no effect if you place in the space area without capacity.";
             MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
                     player.getCorrectChannel(), postPsychosporeMsg, bonusInfantry);
         });

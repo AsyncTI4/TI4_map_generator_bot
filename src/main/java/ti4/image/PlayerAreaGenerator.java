@@ -2231,7 +2231,6 @@ class PlayerAreaGenerator {
     private int breakthroughInfo(Player player, int x, int y, Game game) {
         BreakthroughModel bt = player.getBreakthroughModel();
         if (bt == null) return x;
-        String name = bt.getDisplayName() == null ? bt.getName() : bt.getDisplayName();
         String faction = bt.getFaction().orElse(null);
         boolean exh = player.isBreakthroughExhausted();
         boolean unl = player.isBreakthroughUnlocked();
@@ -2248,7 +2247,7 @@ class PlayerAreaGenerator {
 
             String resource = bt.getBackgroundResource();
 
-            BufferedImage btBox = createPABox(name, resource, faction, boxColor, textColor);
+            BufferedImage btBox = createPABox(bt.getDisplayName(), resource, faction, boxColor, textColor, bt.getShrinkText());
             graphics.drawImage(btBox, x, y - 3, null);
 
             if (player.getBreakthroughTGs() > 0) {
@@ -2268,7 +2267,7 @@ class PlayerAreaGenerator {
                         Color.black);
             }
         } catch (Exception e) {
-            BotLogger.error("Error displaying breakthrough: " + name, e);
+            BotLogger.error("Error displaying breakthrough: " + bt.getDisplayName(), e);
             return x;
         }
 
@@ -2276,7 +2275,7 @@ class PlayerAreaGenerator {
     }
 
     private BufferedImage createPABox(
-            String displayText, String resource, String faction, Color boxOutline, Color textColor) {
+            String displayText, String resource, String faction, Color boxOutline, Color textColor, boolean shrinkText) {
         BufferedImage output = new BufferedImage(44, 154, BufferedImage.TYPE_INT_ARGB);
         BufferedImage textAndBox = new BufferedImage(44, 154, BufferedImage.TYPE_INT_ARGB);
         Graphics g = output.getGraphics();
@@ -2286,7 +2285,7 @@ class PlayerAreaGenerator {
         Graphics2D g2 = textAndBox.createGraphics();
         AffineTransform orig = g2.getTransform();
         g2.setStroke(stroke2);
-        g2.setFont(Storage.getFont18());
+        g2.setFont(shrinkText ? Storage.getFont16() : Storage.getFont18());
         g2.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
 
         g2.setColor(textColor);
@@ -2295,6 +2294,7 @@ class PlayerAreaGenerator {
         String secondRow = StringUtils.left(StringUtils.substringAfter(displayText, "\n"), 20)
                 .toUpperCase();
         int xAlign = resource == null ? -4 : -35;
+        xAlign += shrinkText ? 2 : 0;
         if (StringUtils.isNotBlank(secondRow)) {
             DrawingUtil.superDrawString(
                     g2,
@@ -2328,6 +2328,7 @@ class PlayerAreaGenerator {
                     stroke3,
                     Color.black);
         }
+        
 
         g2.setColor(boxOutline);
         g2.setTransform(orig);

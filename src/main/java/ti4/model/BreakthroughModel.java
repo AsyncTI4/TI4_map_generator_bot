@@ -19,9 +19,11 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String displayName;
+    private Boolean shrinkName;
     private List<TechnologyType> synergy;
     private String faction;
     private String text;
+    private String homebrewReplacesID;
     private ComponentSource source;
 
     public boolean isValid() {
@@ -110,6 +112,26 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
         if (getFaction().isPresent()) sb.append(" (").append(getFaction().get()).append(")");
         sb.append(" [").append(getSource()).append("]");
         return sb.toString();
+    }
+
+    public Optional<String> getHomebrewReplacesID() {
+        return Optional.ofNullable(homebrewReplacesID);
+    }
+
+    public String getDisplayName() {
+        if (getHomebrewReplacesID().isEmpty()) {
+            return Optional.ofNullable(displayName).orElse(name);
+        }
+        return Optional.ofNullable(displayName)
+                .orElse(Mapper.getTech(getHomebrewReplacesID().get()).getShortName());
+    }
+
+    public boolean getShrinkName() {
+        if (getHomebrewReplacesID().isEmpty()) {
+            return Optional.ofNullable(shrinkName).orElse(false);
+        }
+        return Optional.ofNullable(shrinkName)
+                .orElse(Mapper.getTech(getHomebrewReplacesID().get()).getShrinkName());
     }
 
     @JsonIgnore

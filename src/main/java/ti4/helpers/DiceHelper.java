@@ -48,6 +48,11 @@ public class DiceHelper {
         public boolean isSuccess() {
             return result >= threshold;
         }
+
+        public String getRedGrayFractureDie() {
+            if (result == 1 || result == 10) return DiceEmojis.getRedDieEmoji(result);
+            else return DiceEmojis.getGrayDieEmoji(result);
+        }
     }
 
     private static Die rollDie(int threshold) {
@@ -99,4 +104,6 @@ public class DiceHelper {
         sb.append(String.format("Total: %d hits", countSuccesses(dice)));
         return sb.toString();
     }
+    
+    
 }

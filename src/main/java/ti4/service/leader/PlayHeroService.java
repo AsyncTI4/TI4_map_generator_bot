@@ -150,7 +150,7 @@ public class PlayHeroService {
                 buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " use buttons to resolve the hero ability",
+                        player.getRepresentation() + ", please resolve Grandmaster Xel'Kor.",
                         buttons);
             }
             case "xanhero" -> {
@@ -170,14 +170,14 @@ public class PlayHeroService {
                 if (amount > 0) {
                     String gainedTg = player.gainTG(amount, true);
                     ButtonHelperAgents.resolveArtunoCheck(player, amount);
-                    message = player.getRepresentation() + " gained " + amount + " tg " + gainedTg
-                            + ", equal to the amount of opposing damaged units.";
+                    message = player.getRepresentation() + " gained " + amount + " trade good" + (amount == 1 ? "" : "s") + " " + gainedTg
+                            + " (equal to the amount of opposing damaged units).";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 }
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation()
-                                + " can now repair opponent units near their space docks (not automated, use /remove_all_sustain_damage)");
+                                + " can now repair opponent units near their space docks (this is not currently automated; please use `/remove_all_sustain_damage`).");
             }
             case "mirvedahero" -> {
                 List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, "pds", "placeOneNDone_skipbuild");
@@ -187,7 +187,7 @@ public class PlayHeroService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        "You will unfortunately need to use dicecord to roll the PDS and bombardment of all your units against one system/planet. /roll");
+                        "You will unfortunately need to use Dicecord's `/roll` command to roll the SPACE CANNON and BOMBARDMENT of all your units against one system/planet.");
             }
             case "florzenhero" -> {
                 for (Tile tile : game.getTileMap().values()) {

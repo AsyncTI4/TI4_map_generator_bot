@@ -77,7 +77,7 @@ public class StatusHelper {
             if (!buttons.isEmpty() && Helper.canPlayerScorePOs(game, player)) {
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 String msg = player.getRepresentation()
-                        + " you can use these buttons to queue a public objective to score, to speed up the status phase";
+                        + ", you may use these buttons to queue a public objective to score, to speed up the status phase.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
             }
 
@@ -96,7 +96,7 @@ public class StatusHelper {
             if (!buttons.isEmpty()) {
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 String msg = player.getRepresentation()
-                        + " you can use these buttons to queue a secret objective to score, to speed up the status phase";
+                        + ", you may use these buttons to queue a secret objective to score, to speed up the status phase.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
             }
         }

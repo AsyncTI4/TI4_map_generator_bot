@@ -20,7 +20,7 @@ public class BreakthroughCommandHelper {
     private static void withBreakthrough(Player player, Consumer<BreakthroughModel> action) {
         BreakthroughModel bt = player.getBreakthroughModel();
         if (bt == null) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Player does not have a breakthrough");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Player does not have a breakthrough.");
         } else {
             action.accept(bt);
         }
@@ -42,7 +42,7 @@ public class BreakthroughCommandHelper {
     public static void exhaustBreakthrough(GenericInteractionCreateEvent event, Player player) {
         withBreakthrough(player, bt -> {
             player.setBreakthroughExhausted(true);
-            String message = player.getRepresentation() + " exhausted their breakthrough " + bt.getName() + ":";
+            String message = player.getRepresentation() + " exhausted their _" + bt.getName() + "_ breakthrough:";
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(), message, bt.getRepresentationEmbed());
         });
@@ -51,7 +51,7 @@ public class BreakthroughCommandHelper {
     public static void readyBreakthrough(Player player) {
         withBreakthrough(player, bt -> {
             player.setBreakthroughExhausted(false);
-            String message = player.getRepresentation() + " readied their breakthrough " + bt.getName() + ":";
+            String message = player.getRepresentation() + " readied their _" + bt.getName() + "_ breakthrough:";
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(), message, bt.getRepresentationEmbed());
         });
@@ -63,7 +63,15 @@ public class BreakthroughCommandHelper {
 
             player.setBreakthroughUnlocked(true);
             player.setBreakthroughExhausted(false);
-            String message = player.getRepresentation() + " unlocked their breakthrough " + bt.getName() + ".";
+            String message = player.getRepresentation() + " unlocked their _" + bt.getName() + "_ breakthrough.";
+            // once The Fracture is implemented, skip the next part once it's already in play
+            Die dice = new Die(-1);
+            message += "### Rolling to release The Fracture: " + dice.getRedGrayFractureDie();
+            if (dice.getResult() == 1 || dice.getResult() == 10) {
+                message += "# The Fracture is released!\n`I.O.U. one The Fracture - Dev.`";
+            } else {
+                message += "\nNothing happens (yet)...";
+            }
             List<MessageEmbed> embeds = Collections.singletonList(bt.getRepresentationEmbed());
             MessageHelper.sendMessageToChannelWithEmbeds(player.getCorrectChannel(), message, embeds);
             if ("yinbt".equalsIgnoreCase(bt.getID())) {
@@ -78,7 +86,7 @@ public class BreakthroughCommandHelper {
             if (!player.isBreakthroughUnlocked()) return;
 
             player.setBreakthroughUnlocked(false);
-            String message = player.getRepresentation() + " locked their breakthrough " + bt.getName() + ".";
+            String message = player.getRepresentation() + " locked their _" + bt.getName() + "_ breakthrough.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         });
     }
@@ -87,7 +95,7 @@ public class BreakthroughCommandHelper {
         withBreakthrough(player, bt -> {
             if (!player.isBreakthroughActive()) {
                 player.setBreakthroughActive(true);
-                String message = player.getRepresentation() + " activated their breakthrough: " + bt.getName();
+                String message = player.getRepresentation() + " activated their _" + bt.getName() + "_ breakthrough.";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             }
         });
@@ -97,7 +105,7 @@ public class BreakthroughCommandHelper {
         withBreakthrough(player, bt -> {
             if (player.isBreakthroughActive()) {
                 player.setBreakthroughActive(false);
-                String message = player.getRepresentation() + " de-activated their breakthrough: " + bt.getName();
+                String message = player.getRepresentation() + " de-activated their: _" + bt.getName() + "_ breakthrough.";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             }
         });
@@ -114,7 +122,7 @@ public class BreakthroughCommandHelper {
         } else {
             int initial = player.getBreakthroughTGs();
             player.setBreakthroughTGs(newTgs);
-            String msg = player.getRepresentation() + " set the TGs on their breakthrough to " + newTgs + ". ("
+            String msg = player.getRepresentation() + " set the trade goods on their breakthrough to " + newTgs + ". ("
                     + initial + "->" + newTgs + ")";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         }
