@@ -2957,7 +2957,7 @@ public class ButtonHelper {
 
     @ButtonHandler("deleteMessage_") // deleteMessage_{Optional String to send to the event channel after}
     public static void deleteMessage(GenericInteractionCreateEvent event) {
-        if (event instanceof ButtonInteractionEvent bevent) {
+        if (event != null && event instanceof ButtonInteractionEvent bevent) {
             bevent.getMessage().delete().queue();
         }
     }
@@ -6919,6 +6919,7 @@ public class ButtonHelper {
         String part2 = player.getFaction();
         if (messageID.toLowerCase().contains("pre pass")) {
             ButtonHelperActionCards.checkForPlayingBountyContracts(game, player);
+            StatusHelper.offerPreScoringButtons(game, player);
         }
         if (game.getStoredValue(messageID) != null
                 && !game.getStoredValue(messageID).isEmpty()) {
