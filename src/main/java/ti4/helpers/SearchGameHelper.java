@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -214,11 +215,11 @@ public class SearchGameHelper {
             if (managedGame.getTableTalkChannel() != null) {
                 String name = user.getName();
                 if (managedGame.getTableTalkChannel().getGuild().getMemberById(user.getId()) != null) {
-                    name = managedGame
-                            .getTableTalkChannel()
-                            .getGuild()
-                            .getMemberById(user.getId())
-                            .getNickname();
+                    Member mem = managedGame.getTableTalkChannel().getGuild().getMemberById(user.getId());
+                    name = mem.getNickname();
+                    if (name == null) {
+                        name = mem.getEffectiveName();
+                    }
                 }
                 String msg2 = "The player " + name + " sends the following msg:\n" + msg;
                 if (pingGame) {

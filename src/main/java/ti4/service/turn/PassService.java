@@ -13,6 +13,7 @@ import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.SecretObjectiveHelper;
+import ti4.helpers.StatusHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -40,6 +41,7 @@ public class PassService {
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Passed.");
 
         String text = player.getRepresentation(true, false) + " has passed" + (autoPass ? " (preset)." : ".");
+
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);
         if (player.hasTech("absol_aida")) {
             String msg = player.getRepresentation()
@@ -120,6 +122,9 @@ public class PassService {
         }
 
         EndTurnService.pingNextPlayer(event, game, player, true);
+        if (!autoPass) {
+            StatusHelper.offerPreScoringButtons(game, player);
+        }
         ButtonHelper.updateMap(
                 game,
                 event,

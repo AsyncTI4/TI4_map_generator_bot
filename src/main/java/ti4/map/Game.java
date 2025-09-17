@@ -3926,7 +3926,7 @@ public class Game extends GameProperties {
         if (player.hasLeaderUnlocked(leaderID)) return true;
         if (!leaderID.contains("commander")) return false;
 
-        if (leaderIsFake(leaderID)) {
+        if (leaderIsFake(leaderID) && !"gateteen".equalsIgnoreCase(getName())) {
             return false;
         }
 
