@@ -103,7 +103,7 @@ public class JdaService {
 
     @PostConstruct
     public void init() {
-        BotLogger.info("\n# STARTING JDA.");
+        BotLogger.info("STARTING JDA");
         String[] args = applicationArguments.getSourceArgs();
         jda = JDABuilder.createDefault(args[0])
                 // This is a privileged gateway intent that is used to update user information and join/leaves
@@ -125,6 +125,7 @@ public class JdaService {
                 .setEnableShutdownHook(false)
                 .build();
 
+        BotLogger.info("INITIALIZING LISTENERS");
         jda.addEventListener(
                 new BotRuntimeStatsListener(),
                 new MessageListener(),
@@ -138,6 +139,7 @@ public class JdaService {
                 new UserLeaveServerListener(),
                 new AutoCompleteListener());
 
+        BotLogger.info("AWAITING JDA READY");
         try {
             jda.awaitReady();
         } catch (InterruptedException e) {
