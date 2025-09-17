@@ -81,6 +81,7 @@ public class StatusCleanupService {
             player.setInRoundTurnCount(0);
             player.clearSCs();
             player.clearFollowedSCs();
+            player.setBreakthroughExhausted(false);
             RefreshCardsService.refreshPlayerCards(game, player, true);
             game.removeStoredValue("passOnAllWhensNAfters" + player.getFaction());
             game.removeStoredValue(player.getFaction() + "scpickqueue");

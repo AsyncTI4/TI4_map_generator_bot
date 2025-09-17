@@ -45,7 +45,7 @@
         "name": "Distinguished Admiral",
         "type": "Cultural",
         "resolution": "Instant",
-        "text": "Redistribute up to 1 command token, or spend 1 influence to gain 1 command token.",
+        "text": "Redistribute up to 1 command token, or spend 2 influence to gain 1 command token.",
         "flavorText": "*\"Very well,\" said the old Celdauri officer. \"Let's take a look at these plans.\"*",
         "source": "uncharted_space"
     },
