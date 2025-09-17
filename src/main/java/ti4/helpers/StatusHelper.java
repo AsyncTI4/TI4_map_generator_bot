@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import org.apache.commons.collections4.ListUtils;
+
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.collections4.ListUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.helpers.Units.UnitKey;
@@ -265,8 +267,9 @@ public class StatusHelper {
                                 + ", you cannot score public objectives because you do not control your home system.";
                     }
                 }
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), messageText);
             }
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), messageText);
+            
             if (scorables.isEmpty() || !Helper.canPlayerScorePOs(game, player)) {
                 String message = player.getRepresentation()
                         + " cannot score any public objectives according to the bot, and has been marked as not scoring a public objective.";

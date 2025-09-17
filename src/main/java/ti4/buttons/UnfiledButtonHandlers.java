@@ -13,6 +13,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
@@ -25,8 +29,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
@@ -1619,12 +1621,13 @@ public class UnfiledButtonHandlers {
             }
         }
         if (!game.getStoredValue("newStatusScoringMode").isEmpty()
-                && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
+                && !"action".equalsIgnoreCase(game.getPhaseOfGame())
+                && event != null) {
             String msg = "Please score objectives.";
             msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
         }
-        if ("action".equalsIgnoreCase(game.getPhaseOfGame())) {
+        if ("action".equalsIgnoreCase(game.getPhaseOfGame()) && event != null) {
             event.getMessage().delete().queue();
         }
     }
