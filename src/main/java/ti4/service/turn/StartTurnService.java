@@ -321,6 +321,10 @@ public class StartTurnService {
         game.setDominusOrb(false);
         List<Button> startButtons = new ArrayList<>();
         boolean hadAnyUnplayedSCs = false;
+
+        if (doneActionThisTurn && player.hasTech("fl")) {
+            confirmed2ndAction = true;
+        }
         if (!doneActionThisTurn || confirmed2ndAction) {
             Button tacticalAction =
                     Buttons.green(finChecker + "tacticalAction", "Tactical Action (" + player.getTacticalCC() + ")");

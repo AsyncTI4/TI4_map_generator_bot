@@ -680,8 +680,8 @@
         "type": "commander",
         "name": "Assault Machina",
         "title": "Delta Shield",
-        "abilityWindow": "During Movement:",
-        "abilityText": "For each infantry you transport, you may replace that unit with 1 fighter. \nYou may use the SPACE CANNON of 1 of your units against ships that are adjacent to that unit's system.",
+        "abilityWindow": "During movement [Note: any movement, not only the movement step]",
+        "abilityText": "For each infantry you transport, you may replace that unit with 1 fighter. \n\n [Note: not reliant on the first half of this ability] You may use the SPACE CANNON of 1 of your units against ships that are adjacent to that unit's system.",
         "unlockCondition": "Own 2 unit upgrade technologies.",
         "source": "ds"
     },

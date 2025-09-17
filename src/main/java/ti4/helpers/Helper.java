@@ -109,6 +109,15 @@ public class Helper {
         return acs;
     }
 
+    public static Player getPlayerFromUnlockedBreakthrough(Game game, String breakthrough) {
+        if (breakthrough != null) {
+            for (Player p : game.getRealPlayers()) {
+                if (p.hasUnlockedBreakthrough(breakthrough)) return p;
+            }
+        }
+        return null;
+    }
+
     public static boolean isSaboAllowed(Game game, Player player) {
         if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
             return false;
@@ -142,6 +151,9 @@ public class Helper {
             }
             return "Player has " + FactionEmojis.Yssaril
                     + " _Transparasteel Plating_, and all other players have passed.";
+        }
+        if (player.hasTech("baarvag")) {
+            return "Player has Unyielding Will and thus their ACs cannot be canceled.";
         }
         return null;
     }
@@ -586,6 +598,9 @@ public class Helper {
         Point position = new Point(tokenPlanetPos);
         if (tile.getTileModel().getNumPlanets() == 3) position = new Point(Constants.MIRAGE_TRIPLE_POSITION);
         position.translate(offset.x, offset.y);
+        if (tokenID.toLowerCase().contains("thundersedge")) {
+            return Constants.SPACE_CENTER_POSITION;
+        }
         return position;
     }
 
@@ -1634,7 +1649,13 @@ public class Helper {
             if (tile.isSupernova() && player.hasTech("mr") && FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 productionValueTotal += 5;
             }
+            if (player.hasUnlockedBreakthrough("ghostbt")
+                    && !tile.getWormholes().isEmpty()
+                    && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+                productionValueTotal += 1;
+            }
         }
+
         if (!player.getPlanets().contains(uH.getName())) {
             return productionValueTotal;
         }
@@ -1854,6 +1875,9 @@ public class Helper {
                     cost += (int) removedUnit.getCost() * entry.getValue();
                 }
                 totalUnits += entry.getValue();
+                if (player.hasUnit("arvaxi_mech") && removedUnit.getUnitType() == UnitType.Mech) {
+                    totalUnits -= entry.getValue();
+                }
             }
         }
         if (regulated) {

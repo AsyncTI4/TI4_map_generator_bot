@@ -60,6 +60,11 @@ class WeirdGameSetup extends GameStateSubcommand {
                 new OptionData(OptionType.STRING, Constants.PRIORITY_TRACK, "Enable the Priority Track for this game")
                         .setAutoComplete(true));
         addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.THUNDERS_EDGE_MODE,
+                        "True to enable the work in progress Thunders Edge Mode")
+                .setAutoComplete(true));
+        addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 FOWOption.FOW_PLUS.toString(),
                 "True to enable FoW+ Mode (only in Fog of War games)"));
@@ -139,6 +144,9 @@ class WeirdGameSetup extends GameStateSubcommand {
                 game.setPriorityTrackMode(priorityTrackMode);
             }
         }
+
+        Boolean thunderMode = event.getOption(Constants.THUNDERS_EDGE_MODE, null, OptionMapping::getAsBoolean);
+        if (thunderMode != null) game.setThundersEdge(thunderMode);
 
         Boolean fowPlus = event.getOption(FOWOption.FOW_PLUS.toString(), null, OptionMapping::getAsBoolean);
         if (fowPlus != null && game.isFowMode()) {

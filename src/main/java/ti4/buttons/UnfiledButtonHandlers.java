@@ -1555,16 +1555,20 @@ public class UnfiledButtonHandlers {
                 int poIndex = Integer.parseInt(poID);
                 ScorePublicObjectiveService.scorePO(event, privateChannel, game, player, poIndex);
                 ReactionService.addReaction(event, game, player);
-                if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
+                if (!game.getStoredValue("newStatusScoringMode").isEmpty() && event != null) {
                     String msg = "Please score objectives.";
                     msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
                     event.getMessage().editMessage(msg).queue();
                 }
             } catch (Exception e) {
-                BotLogger.error(new LogOrigin(event, player), "Could not parse PO ID: " + poID, e);
-                event.getChannel()
-                        .sendMessage("Could not parse public objective ID: " + poID + ". Please score manually.")
-                        .queue();
+                if (event != null) {
+                    BotLogger.error(new LogOrigin(event, player), "Could not parse PO ID: " + poID, e);
+                    event.getChannel()
+                            .sendMessage("Could not parse public objective ID: " + poID + ". Please score manually.")
+                            .queue();
+                } else {
+                    BotLogger.error("Hm", e);
+                }
             }
             return;
         }
@@ -1712,6 +1716,23 @@ public class UnfiledButtonHandlers {
                 buttons);
     }
 
+    @ButtonHandler("preScoreObbie_")
+    public static void preScoreObbie(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+        ButtonHelper.deleteMessage(event);
+        if (game.getPhaseOfGame().contains("action")) {
+            String poOrSO = buttonID.split("_")[1];
+            String num = buttonID.split("_")[2];
+            game.setStoredValue(player.getFaction() + "Round" + game.getRound() + "PreScored" + poOrSO, num);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Successfully queued an objective to score (wont score it if you later become unable to score it).");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "The game is not currently in the action phase, and so no scoring was queued. Go score normally.");
+        }
+    }
+
     @ButtonHandler(value = "get_so_score_buttons", save = false)
     public static void getSoScoreButtons(ButtonInteractionEvent event, Player player) {
         String secretScoreMsg = "Please choose the secret objective you wish to score.";
@@ -1796,9 +1817,11 @@ public class UnfiledButtonHandlers {
                 }
             }
         } else {
-            event.getChannel()
-                    .sendMessage("Could not find channel to play card. Please ping Bothelper.")
-                    .queue();
+            if (event != null) {
+                event.getChannel()
+                        .sendMessage("Could not find channel to play card. Please ping Bothelper.")
+                        .queue();
+            }
         }
         ButtonHelper.deleteMessage(event);
         checkForAllReactions(event, game);
@@ -2164,6 +2187,9 @@ public class UnfiledButtonHandlers {
     }
 
     public static void checkForAllReactions(@NotNull ButtonInteractionEvent event, Game game) {
+        if (event == null) {
+            return;
+        }
         String buttonID = event.getButton().getCustomId();
 
         String messageId = event.getInteraction().getMessage().getId();

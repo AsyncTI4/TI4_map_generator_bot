@@ -46,7 +46,6 @@ import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import ti4.AsyncTI4DiscordBot;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftItem;
@@ -100,6 +99,7 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.spring.jda.JdaService;
 
 public class Game extends GameProperties {
 
@@ -198,6 +198,9 @@ public class Game extends GameProperties {
     private Map<String, Integer> tileDistances = new HashMap<>();
 
     private MiltyDraftManager miltyDraftManager;
+
+    @Getter
+    private final Expeditions expeditions = new Expeditions(this);
 
     @Setter
     @Getter
@@ -676,6 +679,7 @@ public class Game extends GameProperties {
         Map<String, Boolean> gameModes = new HashMap<>();
         gameModes.put(SourceEmojis.TI4PoK + "Normal", isNormalGame);
         gameModes.put(SourceEmojis.TI4BaseGame + "Base Game", isBaseGameMode());
+        gameModes.put("Thunder's Edge", isThundersEdge());
         gameModes.put(SourceEmojis.MiltyMod + "MiltyMod", isMiltyModMode());
         gameModes.put(MiscEmojis.TIGL + "TIGL", isCompetitiveTIGLGame());
         gameModes.put("Community", isCommunityMode());
@@ -765,10 +769,10 @@ public class Game extends GameProperties {
     @Nullable
     public TextChannel getTableTalkChannel() {
         try {
-            return AsyncTI4DiscordBot.jda.getTextChannelById(getTableTalkChannelID());
+            return JdaService.jda.getTextChannelById(getTableTalkChannelID());
         } catch (Exception e) {
             TextChannel tableTalkChannel;
-            List<TextChannel> gameChannels = AsyncTI4DiscordBot.jda.getTextChannels().stream()
+            List<TextChannel> gameChannels = JdaService.jda.getTextChannels().stream()
                     .filter(c -> c.getName().startsWith(getName()))
                     .filter(not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
                     .toList();
@@ -784,10 +788,10 @@ public class Game extends GameProperties {
     @JsonIgnore
     public TextChannel getMainGameChannel() {
         try {
-            return AsyncTI4DiscordBot.jda.getTextChannelById(getMainChannelID());
+            return JdaService.jda.getTextChannelById(getMainChannelID());
         } catch (Exception e) {
             List<TextChannel> gameChannels =
-                    AsyncTI4DiscordBot.jda.getTextChannelsByName(getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
+                    JdaService.jda.getTextChannelsByName(getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
             if (gameChannels.size() == 1) {
                 TextChannel mainGameChannel = gameChannels.getFirst();
                 setMainChannelID(mainGameChannel.getId());
@@ -801,7 +805,7 @@ public class Game extends GameProperties {
     @JsonIgnore
     public TextChannel getSavedChannel() {
         try {
-            return AsyncTI4DiscordBot.jda.getTextChannelById(getSavedChannelID());
+            return JdaService.jda.getTextChannelById(getSavedChannelID());
         } catch (Exception e) {
             return getMainGameChannel();
         }
@@ -820,7 +824,7 @@ public class Game extends GameProperties {
 
         // FIND BY ID
         if (StringUtils.isNumeric(getBotMapUpdatesThreadID())) {
-            ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(getBotMapUpdatesThreadID());
+            ThreadChannel threadChannel = JdaService.jda.getThreadChannelById(getBotMapUpdatesThreadID());
             if (threadChannel != null) {
                 return threadChannel;
             }
@@ -828,7 +832,7 @@ public class Game extends GameProperties {
 
         // FIND BY NAME
         List<ThreadChannel> botChannels =
-                AsyncTI4DiscordBot.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
+                JdaService.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
         if (botChannels.size() == 1) {
             return botChannels.getFirst();
         } else if (botChannels.size() > 1) {
@@ -858,7 +862,7 @@ public class Game extends GameProperties {
 
     public ThreadChannel getLaunchPostThread() {
         if (StringUtils.isNumeric(getLaunchPostThreadID())) {
-            return AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(getLaunchPostThreadID());
+            return JdaService.guildPrimary.getThreadChannelById(getLaunchPostThreadID());
         }
         return null;
     }
@@ -957,6 +961,9 @@ public class Game extends GameProperties {
         String scText = playerSC + "";
         if (!scText.equalsIgnoreCase(getSCNumberIfNaaluInPlay(player, scText))) {
             playerSC = 0;
+            if (player.hasAbility("patience")) {
+                playerSC = 9;
+            }
         }
         for (int sc : orderedSCsBasic) {
             Player holder = getPlayerFromSC(sc);
@@ -964,6 +971,9 @@ public class Game extends GameProperties {
             int judger = sc;
             if (holder != null && !scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
                 judger = 0;
+                if (player.hasAbility("patience")) {
+                    judger = 9;
+                }
             }
             if (judger > playerSC) {
                 orderedSCs.add(sc);
@@ -975,8 +985,11 @@ public class Game extends GameProperties {
             int judger = sc;
             if (holder != null && !scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
                 judger = 0;
+                if (player.hasAbility("patience")) {
+                    judger = 9;
+                }
             }
-            if (judger == 0) {
+            if (judger == 0 || (player.hasAbility("patience") && judger == 9)) {
                 orderedSCs.add(sc);
             }
         }
@@ -986,8 +999,11 @@ public class Game extends GameProperties {
             int judger = sc;
             if (holder != null && !scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
                 judger = 0;
+                if (player.hasAbility("patience")) {
+                    judger = 9;
+                }
             }
-            if (judger < playerSC && judger != 0) {
+            if (judger < playerSC && judger != 0 && (!player.hasAbility("patience") || judger != 9)) {
                 orderedSCs.add(sc);
             }
         }
@@ -2620,7 +2636,15 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public List<String> getTechnologyDeck() {
-        return Mapper.getDecks().get(getTechnologyDeckID()).getNewDeck();
+        List<String> techDeck = Mapper.getDecks().get(getTechnologyDeckID()).getNewDeck();
+        for (Player player : getRealPlayers()) {
+            for (String tech : player.getFactionTechs()) {
+                if (!techDeck.contains(tech)) {
+                    techDeck.add(tech);
+                }
+            }
+        }
+        return techDeck;
     }
 
     @JsonIgnore
@@ -3230,7 +3254,7 @@ public class Game extends GameProperties {
         setStrategyCardSet(deckSettings.getStratCards().getChosenKey());
 
         // Setup peakable objectives
-        if (getPublicObjectives1Peakable().size() != 4) {
+        if (publicObjectives1Peakable.size() != 4) {
             setUpPeakableObjectives(miltySettings.getGameSettings().getStage1s().getVal(), 1);
             setUpPeakableObjectives(miltySettings.getGameSettings().getStage2s().getVal(), 2);
         }
@@ -3523,7 +3547,7 @@ public class Game extends GameProperties {
         }
         StringBuilder sb = new StringBuilder(getName()).append(" ");
         for (String playerID : getPlayerIDs()) {
-            User user = AsyncTI4DiscordBot.jda.getUserById(playerID);
+            User user = JdaService.jda.getUserById(playerID);
             if (user != null) sb.append(user.getAsMention()).append(" ");
         }
         return sb.toString();
@@ -3902,7 +3926,7 @@ public class Game extends GameProperties {
         if (player.hasLeaderUnlocked(leaderID)) return true;
         if (!leaderID.contains("commander")) return false;
 
-        if (leaderIsFake(leaderID)) {
+        if (leaderIsFake(leaderID) && !"gateteen".equalsIgnoreCase(getName())) {
             return false;
         }
 
@@ -4396,6 +4420,10 @@ public class Game extends GameProperties {
     public String getSCNumberIfNaaluInPlay(Player player, String scText) {
         if (player.hasTheZeroToken()) // naalu 0 token ability
         scText = "0/" + scText;
+        if (player.hasAbility("patience")) {
+            scText = "9/" + scText;
+        }
+
         return scText;
     }
 

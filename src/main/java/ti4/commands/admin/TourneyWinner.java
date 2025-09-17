@@ -11,7 +11,8 @@ import ti4.commands.CommandHelper;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
-import ti4.service.async.TourneyWinnersService;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.tournamentwinner.TourneyWinnerService;
 
 public class TourneyWinner extends Subcommand {
 
@@ -46,13 +47,18 @@ public class TourneyWinner extends Subcommand {
 
         String output;
         if (remove) {
-            TourneyWinnersService.removeTourneyWinner(selectedUser, tourneyName);
+            getTournamentWinnerService().remove(selectedUser.getId(), tourneyName);
             output = "Removed " + selectedUser.getAsMention() + " as a winner of `" + tourneyName + "`.";
         } else {
-            TourneyWinnersService.addTourneyWinner(selectedUser, tourneyName);
+            getTournamentWinnerService().add(selectedUser.getId(), selectedUser.getEffectiveName(), tourneyName);
             output = "Added " + selectedUser.getEffectiveName() + " as a winner of `" + tourneyName + "`.";
         }
         MessageHelper.sendMessageToEventChannel(event, output);
-        MessageHelper.sendMessageToEventChannel(event, TourneyWinnersService.tournamentWinnersOutputString());
+        MessageHelper.sendMessageToEventChannel(
+                event, getTournamentWinnerService().allWinnersToString());
+    }
+
+    private static TourneyWinnerService getTournamentWinnerService() {
+        return SpringContext.getBean(TourneyWinnerService.class);
     }
 }

@@ -36,7 +36,6 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
@@ -58,6 +57,7 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.AbilityModel;
+import ti4.model.BreakthroughModel;
 import ti4.model.ColorModel;
 import ti4.model.FactionModel;
 import ti4.model.GenericCardModel;
@@ -67,6 +67,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ColorEmojis;
@@ -81,6 +82,7 @@ import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.user.AFKService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.jda.JdaService;
 
 public class Player extends PlayerProperties {
 
@@ -166,6 +168,7 @@ public class Player extends PlayerProperties {
 
     public int getInitiative() {
         if (hasTheZeroToken()) return 0;
+        if (hasAbility("patience")) return 9;
         return getLowestSC();
     }
 
@@ -220,6 +223,45 @@ public class Player extends PlayerProperties {
 
     public void removeTransactionItem(String thing) {
         getTransactionItems().remove(thing);
+    }
+
+    public boolean hasBreakthrough(String bt) {
+        if (bt == null || getBreakthroughID() == null || getBreakthroughID().isEmpty()) return false;
+        return bt.equals(getBreakthroughID());
+    }
+
+    public boolean hasUnlockedBreakthrough(String bt) {
+        return hasBreakthrough(bt) && isBreakthroughUnlocked();
+    }
+
+    public boolean hasReadyBreakthrough(String bt) {
+        return hasUnlockedBreakthrough(bt) && !isBreakthroughExhausted();
+    }
+
+    public boolean hasActiveBreakthrough(String bt) {
+        return hasUnlockedBreakthrough(bt) && isBreakthroughActive();
+    }
+
+    @JsonIgnore
+    public BreakthroughModel getBreakthroughModel() {
+        if (getBreakthroughID() == null || getBreakthroughID().isEmpty()) return null;
+        return Mapper.getBreakthrough(getBreakthroughID());
+    }
+
+    @JsonIgnore
+    public Set<TechnologyType> getSynergies() {
+        Set<TechnologyType> synergies = new HashSet<>();
+        if (isBreakthroughUnlocked()) {
+            synergies.addAll(getBreakthroughModel().getSynergy());
+        }
+        if (hasRelic("quantumcore")) {
+            synergies.addAll(List.of(
+                    TechnologyType.BIOTIC,
+                    TechnologyType.WARFARE,
+                    TechnologyType.PROPULSION,
+                    TechnologyType.CYBERNETIC));
+        }
+        return Collections.unmodifiableSet(synergies);
     }
 
     @JsonIgnore
@@ -281,7 +323,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public Role getRoleForCommunity() {
         try {
-            return AsyncTI4DiscordBot.jda.getRoleById(getRoleIDForCommunity());
+            return JdaService.jda.getRoleById(getRoleIDForCommunity());
         } catch (Exception e) {
         }
         return null;
@@ -291,7 +333,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public MessageChannel getPrivateChannel() {
         try {
-            return AsyncTI4DiscordBot.jda.getTextChannelById(getPrivateChannelID());
+            return JdaService.jda.getTextChannelById(getPrivateChannelID());
         } catch (Exception e) {
             return null;
         }
@@ -371,27 +413,13 @@ public class Player extends PlayerProperties {
         return false;
     }
 
-    @NotNull
-    @JsonIgnore
-    public ThreadChannel getCardsInfoThread() {
-        return getCardsInfoThread(true, false);
-    }
-
     /**
-     * Will create new Player Cards-Info threads (even if they exist but are archived) unless they exist and are open
-     */
-    public void createCardsInfoThreadChannelsIfRequired() {
-        getCardsInfoThread(false, true);
-    }
-
-    /**
-     * @param useComplete if false, will skip the RestAction.complete() steps, which may cause new Cards Info threads to be created even if some already exist
-     * @param createWithQueue if true, will return null, and will create a new CardsInfo thread (if required) using a RestAction.queue() instead of a .complete()
-     * @return
+     * Searches for the Player's CardsInfo ThreadChannel, or will create a new one if an existing ThreadChannel cannot be retrieved.
+     * @return ThreadChannel for the player's cards info
      */
     @JsonIgnore
     @Nullable
-    private ThreadChannel getCardsInfoThread(boolean useComplete, boolean createWithQueue) {
+    public ThreadChannel getCardsInfoThread() {
         // ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild()); bot didn't like this!
         TextChannel actionsChannel = game.getMainGameChannel();
         if (game.isFowMode() || game.isCommunityMode()) {
@@ -440,15 +468,12 @@ public class Player extends PlayerProperties {
                 }
 
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                if (useComplete) {
-                    hiddenThreadChannels = actionsChannel
-                            .retrieveArchivedPrivateThreadChannels()
-                            .complete();
-                    for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                        if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
-                            setCardsInfoThreadID(threadChannel_.getId());
-                            return threadChannel_;
-                        }
+                hiddenThreadChannels =
+                        actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                    if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
+                        setCardsInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
                     }
                 }
             }
@@ -475,16 +500,13 @@ public class Player extends PlayerProperties {
             }
 
             // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-            if (useComplete) {
-                if (hiddenThreadChannels.isEmpty())
-                    hiddenThreadChannels = actionsChannel
-                            .retrieveArchivedPrivateThreadChannels()
-                            .complete();
-                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                    if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
-                        setCardsInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
+            if (hiddenThreadChannels.isEmpty())
+                hiddenThreadChannels =
+                        actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+            for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
+                    setCardsInfoThreadID(threadChannel_.getId());
+                    return threadChannel_;
                 }
             }
         } catch (Exception e) {
@@ -497,9 +519,6 @@ public class Player extends PlayerProperties {
         // CREATE NEW THREAD
         // Make card info thread a public thread in community mode
         boolean isPrivateChannel = !game.isFowMode();
-        if (game.getName().contains("pbd100") || game.getName().contains("pbd500")) {
-            isPrivateChannel = true;
-        }
         ThreadChannelAction threadAction = actionsChannel
                 .createThreadChannel(threadName, isPrivateChannel)
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK);
@@ -507,21 +526,9 @@ public class Player extends PlayerProperties {
             threadAction = threadAction.setInvitable(false);
         }
         String message = "Hello " + getPing() + "! This is your private channel.";
-        if (createWithQueue) {
-            threadAction.queue(
-                    c -> {
-                        setCardsInfoThreadID(c.getId());
-                        MessageHelper.sendMessageToChannel(c, message);
-                    },
-                    BotLogger::catchRestError);
-            return null;
-        }
-        ThreadChannel threadChannel = null;
-        if (useComplete) {
-            threadChannel = threadAction.complete();
-            setCardsInfoThreadID(threadChannel.getId());
-            MessageHelper.sendMessageToChannel(threadChannel, message);
-        }
+        ThreadChannel threadChannel = threadAction.complete();
+        setCardsInfoThreadID(threadChannel.getId());
+        MessageHelper.sendMessageToChannel(threadChannel, message);
         return threadChannel;
     }
 
@@ -1162,7 +1169,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public User getUser() {
         // TODO: This is to handle JDA being null during tests. We should think of a cleaner solution.
-        return AsyncTI4DiscordBot.jda == null ? null : AsyncTI4DiscordBot.jda.getUserById(getUserID());
+        return JdaService.jda == null ? null : JdaService.jda.getUserById(getUserID());
     }
 
     @Override
@@ -1170,7 +1177,7 @@ public class Player extends PlayerProperties {
         User userById = getUser();
         if (userById == null) return super.getUserName();
 
-        Member member = AsyncTI4DiscordBot.guildPrimary.getMemberById(getUserID());
+        Member member = JdaService.guildPrimary.getMemberById(getUserID());
         if (member == null) {
             setUserName(userById.getName());
         } else {
@@ -1245,7 +1252,7 @@ public class Player extends PlayerProperties {
             if (roleForCommunity == null && !getTeamMateIDs().isEmpty()) {
                 StringBuilder sb = new StringBuilder((noFactionIcon ? "" : getFactionEmoji()));
                 for (String userID : getTeamMateIDs()) {
-                    User userById = AsyncTI4DiscordBot.jda.getUserById(userID);
+                    User userById = JdaService.jda.getUserById(userID);
                     if (userById == null) {
                         continue;
                     }

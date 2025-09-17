@@ -239,7 +239,7 @@ public class ButtonHelperActionCards {
         }
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), p2.getColor());
         var parsedUnit = new ParsedUnit(unitKey);
-        RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
+        DestroyUnitService.destroyUnit(event, tile, game, parsedUnit, damaged);
         String msg = (damaged ? "A damaged " : "") + unitKey.unitEmoji() + " owned by "
                 + p2.getFactionEmojiOrColor() + " in tile " + tile.getRepresentationForButtons(game, player)
                 + " was removed via the _Lucky Shot_ action card. How lucky!";
@@ -2709,7 +2709,7 @@ public class ButtonHelperActionCards {
 
         for (String planet : player.getPlanets()) {
             Planet p = game.getPlanetsInfo().get(planet);
-            if (p != null && p.getResources() > count) {
+            if (p != null) {
                 if (game.getTileFromPlanet(planet) == player.getHomeSystemTile()) {
                     count += game.changeCommsOnPlanet(0, planet);
                 }

@@ -25,6 +25,7 @@ public class ManagedGame {
     private final boolean vpGoalReached;
     private final boolean fowMode;
     private final boolean factionReactMode;
+    private final boolean thundersEdgeMode;
     private final boolean colorReactMode;
     private final boolean stratReactMode;
     private final boolean fastScFollowMode;
@@ -52,6 +53,7 @@ public class ManagedGame {
                 game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
         fowMode = game.isFowMode();
         factionReactMode = game.isBotFactionReacts();
+        thundersEdgeMode = game.isThundersEdge();
         colorReactMode = game.isBotColorReacts();
         stratReactMode = game.isBotStratReacts();
         fastScFollowMode = game.isFastSCFollowMode();
@@ -75,7 +77,8 @@ public class ManagedGame {
                 .collect(toUnmodifiableSet());
         playerToIsReal = game.getPlayers().values().stream()
                 .collect(Collectors.toUnmodifiableMap(
-                        p -> getPlayer(p.getUserID()), p -> p.isRealPlayer() && !p.isNpc()));
+                        p -> getPlayer(p.getUserID()),
+                        p -> ((p.isRealPlayer() && !p.isNpc()) || (p.isEliminated() && game.isHasEnded()))));
 
         final long sixtyDays = 1000L * 60 * 60 * 24 * 60;
         stale = (System.currentTimeMillis() - game.getLastModifiedDate()) > sixtyDays;

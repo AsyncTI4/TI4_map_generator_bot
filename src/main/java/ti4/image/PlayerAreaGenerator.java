@@ -36,7 +36,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import org.apache.commons.lang3.StringUtils;
-import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -63,6 +62,7 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.AbilityModel;
+import ti4.model.BreakthroughModel;
 import ti4.model.ColorModel;
 import ti4.model.ExploreModel;
 import ti4.model.LeaderModel;
@@ -75,11 +75,21 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.user.AFKService;
+import ti4.spring.jda.JdaService;
 import ti4.website.model.WebsiteOverlay;
 
 class PlayerAreaGenerator {
+
+    private static final Stroke stroke1 = new BasicStroke(1.0f);
+    private static final Stroke stroke2 = new BasicStroke(2.0f);
+    private static final Stroke stroke3 = new BasicStroke(3.0f);
+    private static final Stroke stroke4 = new BasicStroke(4.0f);
+    private static final Stroke stroke5 = new BasicStroke(5.0f);
+    private static final Stroke stroke8 = new BasicStroke(8.0f);
+    private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -1.5707963267948966;
 
     private final Graphics graphics;
     private final Game game;
@@ -88,15 +98,8 @@ class PlayerAreaGenerator {
     private final List<WebsiteOverlay> websiteOverlays;
     private final int mapWidth;
     private final int scoreTokenSpacing;
-
     private final ResourceHelper resourceHelper = ResourceHelper.getInstance();
     private final Map<UnitKey, Integer> unitCount = new HashMap<>();
-
-    private static final Stroke stroke1 = new BasicStroke(1.0f);
-    private static final Stroke stroke2 = new BasicStroke(2.0f);
-    private static final Stroke stroke3 = new BasicStroke(3.0f);
-    private static final Stroke stroke4 = new BasicStroke(4.0f);
-    private static final Stroke stroke5 = new BasicStroke(5.0f);
 
     PlayerAreaGenerator(
             Graphics graphics,
@@ -200,7 +203,7 @@ class PlayerAreaGenerator {
 
         // Player/Teammate Names
         for (String teammateID : teammateIDs) {
-            User user = AsyncTI4DiscordBot.jda.getUserById(teammateID);
+            User user = JdaService.jda.getUserById(teammateID);
 
             int leftJustified = x;
             int topOfName = y + 10;
@@ -210,7 +213,7 @@ class PlayerAreaGenerator {
                 Guild guild = game.getGuild();
                 Member member = guild != null ? guild.getMemberById(teammateID) : null;
                 if (member == null) {
-                    member = AsyncTI4DiscordBot.guildPrimary.getMemberById(teammateID);
+                    member = JdaService.guildPrimary.getMemberById(teammateID);
                 }
                 userName.append(" ");
 
@@ -525,7 +528,7 @@ class PlayerAreaGenerator {
         if (!player.getPromissoryNotesInPlayArea().isEmpty()) {
             xDelta = pnInfo(player, xDelta, yPlayArea, game);
         }
-
+        xDelta = breakthroughInfo(player, xDelta, yPlayArea, game);
         xDelta = techInfo(player, xDelta, yPlayArea, game);
 
         if (!player.getNotResearchedFactionTechs().isEmpty()) {
@@ -558,8 +561,11 @@ class PlayerAreaGenerator {
         if (player.hasTheZeroToken()) {
             drawSC(0, center, true);
         }
+        if (player.hasAbility("patience")) {
+            drawSC(9, center, true);
+        }
 
-        boolean big = playerSCs.size() == 1 && !player.hasTheZeroToken();
+        boolean big = playerSCs.size() == 1 && !player.hasTheZeroToken() && !player.hasAbility("patience");
         List<Point> smallPoints = List.of(
                 new Point(center.x - 16, center.y - 16),
                 new Point(center.x + 16, center.y - 16),
@@ -2220,6 +2226,115 @@ class PlayerAreaGenerator {
         deltaX = techGenSynthesis(x, y, deltaX, player, techsFiltered.get(Constants.UNIT_UPGRADE));
         deltaX = techField(x, y, purgedTechs, Collections.emptyList(), deltaX, player);
         return x + deltaX + 20;
+    }
+
+    private int breakthroughInfo(Player player, int x, int y, Game game) {
+        BreakthroughModel bt = player.getBreakthroughModel();
+        if (bt == null) return x;
+        String name = bt.getDisplayName() == null ? bt.getName() : bt.getDisplayName();
+        String faction = bt.getFaction().orElse(null);
+        boolean exh = player.isBreakthroughExhausted();
+        boolean unl = player.isBreakthroughUnlocked();
+
+        // Draw something
+        try {
+            Color boxColor = Color.white;
+            if (!unl) boxColor = Color.red;
+            else if (exh) boxColor = Color.gray;
+            if (unl && player.isBreakthroughActive()) boxColor = new Color(19, 249, 236);
+
+            Color textColor = Color.white;
+            if (!unl || exh) textColor = Color.gray;
+
+            String resource = bt.getBackgroundResource();
+
+            BufferedImage btBox = createPABox(name, resource, faction, boxColor, textColor);
+            graphics.drawImage(btBox, x, y - 3, null);
+
+            if (player.getBreakthroughTGs() > 0) {
+                BufferedImage tg = ImageHelper.readEmojiImageScaled(MiscEmojis.tg, 40);
+                graphics.drawImage(tg, x + 2, y - 40, null);
+                String tgs = Integer.toString(player.getBreakthroughTGs());
+                graphics.setFont(Storage.getFont32());
+                DrawingUtil.superDrawString(
+                        graphics,
+                        tgs,
+                        x + 22,
+                        y - 20,
+                        Color.white,
+                        HorizontalAlign.Center,
+                        VerticalAlign.Center,
+                        stroke8,
+                        Color.black);
+            }
+        } catch (Exception e) {
+            BotLogger.error("Error displaying breakthrough: " + name, e);
+            return x;
+        }
+
+        return x + 60;
+    }
+
+    private BufferedImage createPABox(
+            String displayText, String resource, String faction, Color boxOutline, Color textColor) {
+        BufferedImage output = new BufferedImage(44, 154, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage textAndBox = new BufferedImage(44, 154, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = output.getGraphics();
+        if (resource != null) drawPAImage(g, 2, 2, resource);
+        if (faction != null) drawFactionIconImageOpaque(g, faction, 2, 109, 40, 40, 1.0f);
+
+        Graphics2D g2 = textAndBox.createGraphics();
+        AffineTransform orig = g2.getTransform();
+        g2.setStroke(stroke2);
+        g2.setFont(Storage.getFont18());
+        g2.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
+
+        g2.setColor(textColor);
+        String firstRow = StringUtils.left(StringUtils.substringBefore(displayText, "\n"), 20)
+                .toUpperCase();
+        String secondRow = StringUtils.left(StringUtils.substringAfter(displayText, "\n"), 20)
+                .toUpperCase();
+        int xAlign = resource == null ? -4 : -35;
+        if (StringUtils.isNotBlank(secondRow)) {
+            DrawingUtil.superDrawString(
+                    g2,
+                    firstRow,
+                    xAlign,
+                    12,
+                    textColor,
+                    HorizontalAlign.Right,
+                    VerticalAlign.Center,
+                    stroke3,
+                    Color.black);
+            DrawingUtil.superDrawString(
+                    g2,
+                    secondRow,
+                    xAlign,
+                    32,
+                    textColor,
+                    HorizontalAlign.Right,
+                    VerticalAlign.Center,
+                    stroke3,
+                    Color.black);
+        } else {
+            DrawingUtil.superDrawString(
+                    g2,
+                    firstRow,
+                    xAlign,
+                    21,
+                    textColor,
+                    HorizontalAlign.Right,
+                    VerticalAlign.Center,
+                    stroke3,
+                    Color.black);
+        }
+
+        g2.setColor(boxOutline);
+        g2.setTransform(orig);
+        g2.drawRect(1, 1, 42, 152);
+
+        g.drawImage(textAndBox, 0, 0, null);
+        return output;
     }
 
     private int factionTechInfo(Player player, int x, int y) {

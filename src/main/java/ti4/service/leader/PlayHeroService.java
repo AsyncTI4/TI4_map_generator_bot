@@ -23,6 +23,8 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -119,6 +121,9 @@ public class PlayHeroService {
             case "kollecchero" ->
                 RelicHelper.drawWithAdvantage(
                         player, game, game.getRealPlayers().size());
+            case "xxchahero-te" -> {
+                ButtonHelperHeroes.xxchaHeroTEStart(game, player);
+            }
             case "titanshero" -> {
                 Tile t = player.getHomeSystemTile();
                 if (game.getTileFromPlanet("elysium") != null && game.getTileFromPlanet("elysium") == t) {
@@ -131,6 +136,58 @@ public class PlayHeroService {
                             event.getMessageChannel(),
                             "Use the following command to add the attachment: `/add_token token:titanshero`");
                 }
+            }
+            case "onyxxahero" -> {
+                List<Button> buttons = new ArrayList<>();
+                for (Tile tile : game.getTileMap().values()) {
+                    if (FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+                        buttons.add(Buttons.green(
+                                "moveShipToAdjacentSystemStep2_" + tile.getPosition() + "_hero",
+                                tile.getRepresentationForButtons(game, player)));
+                    }
+                }
+
+                buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " use buttons to resolve the hero ability",
+                        buttons);
+            }
+            case "xanhero" -> {
+                game.getTileMap().values().stream()
+                        .flatMap(t -> t.getUnitHolders().values().stream())
+                        .forEach(uh -> uh.removeAllUnitDamage(player.getColorID()));
+                String message = player.getRepresentation() + " repaired all of their units.";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                int amount = 0;
+                for (Tile tile : game.getTileMap().values()) {
+                    for (UnitHolder uh : tile.getUnitHolders().values()) {
+                        for (UnitKey uk : uh.getUnitKeys()) {
+                            amount += uh.getUnitCountForState(uk, UnitState.dmg);
+                        }
+                    }
+                }
+                if (amount > 0) {
+                    String gainedTg = player.gainTG(amount, true);
+                    ButtonHelperAgents.resolveArtunoCheck(player, amount);
+                    message = player.getRepresentation() + " gained " + amount + " tg " + gainedTg
+                            + ", equal to the amount of opposing damaged units.";
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                }
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + " can now repair opponent units near their space docks (not automated, use /remove_all_sustain_damage)");
+            }
+            case "mirvedahero" -> {
+                List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, "pds", "placeOneNDone_skipbuild");
+                String message = "Please choose a planet to place a PDS";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "You will unfortunately need to use dicecord to roll the PDS and bombardment of all your units against one system/planet. /roll");
             }
             case "florzenhero" -> {
                 for (Tile tile : game.getTileMap().values()) {

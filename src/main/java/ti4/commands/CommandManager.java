@@ -8,6 +8,7 @@ import ti4.commands.admin.AdminCommand;
 import ti4.commands.agenda.AgendaCommand;
 import ti4.commands.async.AsyncCommand;
 import ti4.commands.bothelper.BothelperCommand;
+import ti4.commands.breakthrough.BreakthroughCommand;
 import ti4.commands.button.GenericButtonCommand;
 import ti4.commands.cardsac.ACCardsCommand;
 import ti4.commands.cardspn.PNCardsCommand;
@@ -31,6 +32,7 @@ import ti4.commands.planet.PlanetCommand;
 import ti4.commands.player.PlayerCommand;
 import ti4.commands.relic.RelicCommand;
 import ti4.commands.search.SearchCommand;
+import ti4.commands.search.SearchCommand2;
 import ti4.commands.special.Special2Command;
 import ti4.commands.special.SpecialCommand;
 import ti4.commands.statistics.StatisticsCommand;
@@ -73,6 +75,7 @@ public class CommandManager {
                     new AddCCCommand(),
                     new RemoveCCCommand(),
                     new RemoveAllCC(),
+                    new SearchCommand2(),
                     new AddFrontierTokensCommand(),
                     new MoveUnits(),
                     new ModifyUnitsButtons(),
@@ -112,6 +115,7 @@ public class CommandManager {
                     new DiscordantStarsCommand(),
                     new StatisticsCommand(),
                     new TechCommand(),
+                    new BreakthroughCommand(),
                     new PlanetCommand(),
                     new SelectionBoxDemoCommand(),
                     new UserCommand(),

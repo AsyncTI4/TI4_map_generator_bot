@@ -32,6 +32,7 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
+import ti4.service.PlanetService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -1470,8 +1471,15 @@ public class ButtonHelperModifyUnits {
                     player.getFactionEmoji()
                             + " did not place a command token in system they retreated to due to Kado S'mah-Qar, the Kollecc commander.");
         } else {
-            CommandCounterHelper.addCC(event, player, tile2, true);
-            Helper.isCCCountCorrect(player);
+            if (player.hasAbility("eusociality") && !CommandCounterHelper.hasCC(event, player.getColor(), tile1)) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getFactionEmoji()
+                                + " did not place a command token in system they retreated to due to the Eusosociality ability.");
+            } else {
+                CommandCounterHelper.addCC(event, player, tile2, true);
+                Helper.isCCCountCorrect(player);
+            }
         }
 
         for (Map.Entry<String, UnitHolder> entry : tile1.getUnitHolders().entrySet()) {
@@ -1888,6 +1896,7 @@ public class ButtonHelperModifyUnits {
         String producedOrPlaced = "Produced";
 
         boolean willSkipBuild = skipbuild.contains("skipbuild");
+        boolean xxchaTEhero = skipbuild.contains("xxcha");
         boolean orbitalDrop = skipbuild.contains("orbital");
         if (willSkipBuild) {
             producedOrPlaced = "Placed";
@@ -2045,6 +2054,13 @@ public class ButtonHelperModifyUnits {
                         player.getRepresentation()
                                 + ", you may pay 3 resources to DEPLOY a mech on the planet too (if applicable).",
                         orbFollowUp);
+            }
+            if (xxchaTEhero && player.getExhaustedPlanets().contains(planetName)) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " readied the planet "
+                                + Helper.getPlanetRepresentation(planetName, game) + " per hero ability.");
+                PlanetService.refreshPlanet(player, planetName);
             }
         }
 

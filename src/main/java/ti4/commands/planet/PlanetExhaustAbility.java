@@ -19,6 +19,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
+import ti4.service.turn.StartTurnService;
 
 public class PlanetExhaustAbility extends PlanetAddRemove {
 
@@ -85,6 +86,10 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = "Use buttons to drop 2 infantry on a planet.";
                 buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
             }
+            case "thundersedge" -> {
+                output = "Use buttons to do another action.";
+                buttons.addAll(StartTurnService.getStartOfTurnButtons(player, game, true, null));
+            }
             case "ordinianc4" -> {
                 ActionCardHelper.drawActionCards(game, player, 1, true);
                 String msg = "Your current command tokens are " + player.getCCRepresentation()
@@ -109,10 +114,10 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "2ff", "placeOneNDone_skipbuild"));
             }
             // Homebrew
-            case "mr" -> {
-                output = "Use buttons to destroy a ground force on a legendary or a planet adjacent to Mecatol Rex.";
-                buttons.addAll(ButtonHelper.customRexLegendary(player, game));
-            }
+            // case "mr" -> {
+            //     output = "Use buttons to destroy a ground force on a legendary or a planet adjacent to Mecatol Rex.";
+            //     buttons.addAll(ButtonHelper.customRexLegendary(player, game));
+            // }
             case "silence" -> {
                 output = "Use buttons to put 1 cruiser with your ships.";
                 buttons.addAll(

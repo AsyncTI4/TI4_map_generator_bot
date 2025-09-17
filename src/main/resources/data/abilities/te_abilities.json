@@ -1,0 +1,44 @@
+[
+    {
+        "id": "liberate",
+        "name": "Liberate",
+        "faction": "bastion",
+        "window": "When you gain control of a planet",
+        "windowEffect": "ready that planet if it contains a number of your infantry equal to or greater than that planet's resource value; otherwise, place 1 infantry on that planet.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "galvanize",
+        "name": "Galvanize",
+        "faction": "bastion",
+        "permanentEffect": "Galvanized units roll 1 additional die for combat rolls and unit abilities.",
+        "window": "When a game effect instructs a player to galvanize a unit",
+        "windowEffect": "they place a galvanize token beneath it if it does not have one. ",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "phoenixstandard",
+        "name": "Phoenix Standard",
+        "faction": "bastion",
+        "window": "At the end of combat",
+        "windowEffect": "you may galvanize 1 of your units that participated.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "survivalinstinct",
+        "name": "Survival Instinct",
+        "faction": "ralnel",
+        "window": "After a player activates a system that contains your ships",
+        "windowEffect": "you may move up to 2 of your ships into the active system from adjacent systems that do not contain your command tokens.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "miniaturization",
+        "name": "Miniaturization",
+        "faction": "ralnel",
+        "permanentEffect": "Your structures can be transported by any ship; this does not require or count against capacity. While your structures are in the space area, they cannot use their unit abilities.",
+        "window": "At the end of your tactical actions",
+        "windowEffect": "you may place your structures that are in space areas onto planets you control in their respective systems.",
+        "source": "thunders_edge"
+    }
+]

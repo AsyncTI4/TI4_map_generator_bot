@@ -44,6 +44,7 @@ import ti4.model.AbilityModel;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.AttachmentModel;
+import ti4.model.BreakthroughModel;
 import ti4.model.ColorModel;
 import ti4.model.ColorableModelInterface;
 import ti4.model.CombatModifierModel;
@@ -52,6 +53,7 @@ import ti4.model.DraftErrataModel;
 import ti4.model.EventModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
+import ti4.model.GalacticEventModel;
 import ti4.model.GenericCardModel;
 import ti4.model.GenericCardModel.CardType;
 import ti4.model.LeaderModel;
@@ -61,6 +63,7 @@ import ti4.model.PlanetModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.RelicModel;
+import ti4.model.RuleModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.SourceModel;
@@ -84,6 +87,7 @@ public class Mapper {
 
     // TODO: Finish moving all files over from properties to json
     private static final Map<String, AbilityModel> abilities = new HashMap<>();
+    private static final Map<String, RuleModel> rules = new HashMap<>();
     private static final Map<String, ActionCardModel> actionCards = new HashMap<>();
     private static final Map<String, AgendaModel> agendas = new HashMap<>();
     private static final Map<String, AttachmentModel> attachments = new HashMap<>();
@@ -106,7 +110,9 @@ public class Mapper {
     private static final Map<String, StrategyCardModel> strategyCards = new HashMap<>();
     private static final Map<String, TechnologyModel> technologies = new HashMap<>();
     private static final Map<String, TokenModel> tokens = new HashMap<>();
+    private static final Map<String, GalacticEventModel> galacticevents = new HashMap<>();
     private static final Map<String, UnitModel> units = new HashMap<>();
+    private static final Map<String, BreakthroughModel> breakthroughs = new HashMap<>();
 
     private static final Cache<String, ColorModel> colorToColorModelCache =
             Caffeine.newBuilder().maximumSize(1000).build();
@@ -130,6 +136,7 @@ public class Mapper {
         importJsonObjectsFromFolder("action_cards", actionCards, ActionCardModel.class);
         importJsonObjectsFromFolder("agendas", agendas, AgendaModel.class);
         importJsonObjectsFromFolder("attachments", attachments, AttachmentModel.class);
+        importJsonObjectsFromFolder("breakthroughs", breakthroughs, BreakthroughModel.class);
         importJsonObjectsFromFolder("colors", colors, ColorModel.class);
         importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class);
         importJsonObjectsFromFolder("decks", decks, DeckModel.class);
@@ -142,11 +149,14 @@ public class Mapper {
         importJsonObjectsFromFolder("promissory_notes", promissoryNotes, PromissoryNoteModel.class);
         importJsonObjectsFromFolder("public_objectives", publicObjectives, PublicObjectiveModel.class);
         importJsonObjectsFromFolder("relics", relics, RelicModel.class);
+        importJsonObjectsFromFolder("rules", rules, RuleModel.class);
         importJsonObjectsFromFolder("secret_objectives", secretObjectives, SecretObjectiveModel.class);
         importJsonObjectsFromFolder("sources", sources, SourceModel.class);
         importJsonObjectsFromFolder("strategy_card_sets", strategyCardSets, StrategyCardSetModel.class);
         importJsonObjectsFromFolder("strategy_cards", strategyCards, StrategyCardModel.class);
         importJsonObjectsFromFolder("technologies", technologies, TechnologyModel.class);
+        importJsonObjectsFromFolder("galactic_events", galacticevents, GalacticEventModel.class);
+
         importJsonObjectsFromFolder("tokens", tokens, TokenModel.class);
         importJsonObjectsFromFolder("units", units, UnitModel.class);
         readData("decals.properties", decals);
@@ -295,6 +305,30 @@ public class Mapper {
         return abilities.containsKey(abilityID);
     }
 
+    public static Map<String, GalacticEventModel> getGalacticEvents() {
+        return new HashMap<>(galacticevents);
+    }
+
+    public static GalacticEventModel getGalacticEvent(String id) {
+        return galacticevents.get(id);
+    }
+
+    public static Map<String, RuleModel> getRules() {
+        return new HashMap<>(rules);
+    }
+
+    public static RuleModel getRule(String ruleID) {
+        return getRules().getOrDefault(ruleID, null);
+    }
+
+    public static boolean isValidRule(String ruleID) {
+        return getRule(ruleID) != null;
+    }
+
+    public static boolean isValidGalacticEvent(String scenarioID) {
+        return getGalacticEvents().containsKey(scenarioID);
+    }
+
     public static List<String> getAbilitiesSources(ComponentSource CompSource) {
         return getAbilities().values().stream()
                 .filter(model -> model.searchSource(CompSource))
@@ -361,6 +395,19 @@ public class Mapper {
             acNameList.put(entry.getKey(), entry.getValue().getName());
         }
         return acNameList;
+    }
+    // breakthroughs
+
+    public static Map<String, BreakthroughModel> getBreakthroughs() {
+        return breakthroughs;
+    }
+
+    public static BreakthroughModel getBreakthrough(String id) {
+        return breakthroughs.get(id);
+    }
+
+    public static boolean isValidBreakthrough(String id) {
+        return breakthroughs.containsKey(id);
     }
 
     // ####################
@@ -1090,6 +1137,7 @@ public class Mapper {
     }
 
     public static String getTokenID(String tokenID) {
+
         return tokensFromProperties.getProperty(tokenID);
     }
 

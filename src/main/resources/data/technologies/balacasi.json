@@ -98,7 +98,7 @@
             "CYBERNETIC"
         ],
         "requirements": "YY",
-        "faction": "conclave",
+        "faction": "onyxxa",
         "source": "balacasi",
         "text": "Once per action, when you would spend a token from your strategy pool to resolve the primary or secondary ability of a strategy card, you may destroy 1 of your non-fighter ships in or adjacent to a system that contains the active player's units. If you do, spend that token from your reinforcements instead."
     },
@@ -109,7 +109,7 @@
             "BIOTIC"
         ],
         "requirements": "G",
-        "faction": "conclave",
+        "faction": "onyxxa",
         "source": "balacasi",
         "text": "When you perform a strategic action, you may gain 1 command token instead of resolving any ability. While you do not have any control tokens on your commander, apply +1 to your units' combat rolls."
     },

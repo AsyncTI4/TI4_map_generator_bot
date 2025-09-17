@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.AsyncTI4DiscordBot;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -30,6 +29,7 @@ import ti4.message.logging.BotLogger;
 import ti4.service.milty.DraftDisplayService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.jda.JdaService;
 
 class Replace extends GameStateSubcommand {
 
@@ -45,7 +45,7 @@ class Replace extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        boolean isBotHelper = CommandHelper.hasRole(event, AsyncTI4DiscordBot.bothelperRoles);
+        boolean isBotHelper = CommandHelper.hasRole(event, JdaService.bothelperRoles);
         Game game = getGame();
         if (game.getPlayer(event.getUser().getId()) == null && !isBotHelper) {
             MessageHelper.sendMessageToChannel(

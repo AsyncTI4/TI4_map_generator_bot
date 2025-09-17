@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
@@ -41,6 +40,7 @@ import ti4.service.statistics.game.WinningPathHelper;
 import ti4.service.statistics.game.WinningPathPersistenceService;
 import ti4.service.tigl.TiglGameReport;
 import ti4.service.tigl.TiglPlayerResult;
+import ti4.spring.jda.JdaService;
 import ti4.website.UltimateStatisticsWebsiteHelper;
 
 @UtilityClass
@@ -155,8 +155,7 @@ public class EndGameService {
         gameEndStuff(game, event, publish);
 
         // GET BOTHELPER LOUNGE
-        List<TextChannel> bothelperLoungeChannels =
-                AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true);
+        List<TextChannel> bothelperLoungeChannels = JdaService.guildPrimary.getTextChannelsByName("staff-lounge", true);
         TextChannel bothelperLoungeChannel =
                 !bothelperLoungeChannels.isEmpty() ? bothelperLoungeChannels.getFirst() : null;
         if (bothelperLoungeChannel != null) {
@@ -305,18 +304,18 @@ public class EndGameService {
 
     private static TextChannel getGameSummaryChannel(Game game) {
         List<TextChannel> textChannels;
-        if (game.isFowMode() && AsyncTI4DiscordBot.guildFogOfWar != null) {
-            ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildFogOfWar);
-            textChannels = AsyncTI4DiscordBot.guildFogOfWar.getTextChannelsByName("fow-war-stories", true);
+        if (game.isFowMode() && JdaService.guildFogOfWar != null) {
+            ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildFogOfWar);
+            textChannels = JdaService.guildFogOfWar.getTextChannelsByName("fow-war-stories", true);
         } else {
-            ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
-            textChannels = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true);
+            ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildPrimary);
+            textChannels = JdaService.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true);
         }
         return textChannels.isEmpty() ? null : textChannels.getFirst();
     }
 
     private static void appendUserName(StringBuilder sb, Player player) {
-        Optional<User> user = Optional.ofNullable(AsyncTI4DiscordBot.jda.getUserById(player.getUserID()));
+        Optional<User> user = Optional.ofNullable(JdaService.jda.getUserById(player.getUserID()));
         if (user.isPresent()) {
             sb.append(user.get().getAsMention());
         } else {

@@ -47,6 +47,7 @@ import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.function.Consumers;
+import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -1944,7 +1945,9 @@ public class ButtonHelper {
     }
 
     public static boolean nomadHeroAndDomOrbCheck(Player player, Game game) {
-        if (game.isDominusOrb() || game.isL1Hero()) {
+        if (game.isDominusOrb()
+                || game.isL1Hero()
+                || !game.getStoredValue("phantomEnergy").isEmpty()) {
             return true;
         }
         return player.getLeader("nomadhero").map(Leader::isActive).orElse(false);
@@ -2064,6 +2067,9 @@ public class ButtonHelper {
                     && Helper.getProductionValue(player, game, tile, false) > count) {
                 count = Helper.getProductionValue(player, game, tile, false);
             }
+        }
+        if (count > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "gledgecommander")) {
+            count -= ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd");
         }
         return count;
     }
@@ -2951,7 +2957,7 @@ public class ButtonHelper {
 
     @ButtonHandler("deleteMessage_") // deleteMessage_{Optional String to send to the event channel after}
     public static void deleteMessage(GenericInteractionCreateEvent event) {
-        if (event instanceof ButtonInteractionEvent bevent) {
+        if (event != null && event instanceof ButtonInteractionEvent bevent) {
             bevent.getMessage().delete().queue();
         }
     }
@@ -3067,7 +3073,7 @@ public class ButtonHelper {
 
                 remainingButtons.add(b);
                 newActionRow.add(b);
-                if (!b.getCustomId().contains("deleteButtons")
+                if (!b.getCustomId().equalsIgnoreCase("deleteButtons")
                         && !b.getCustomId().contains("ultimateUndo")) {
                     hasRealButton = true;
                 }
@@ -3344,6 +3350,10 @@ public class ButtonHelper {
                 UnitModel unit = entry.getKey();
                 if ("space".equalsIgnoreCase(capChecker.getName())) {
                     capacity += unit.getCapacityValue() * entry.getValue();
+                    if (unit.getUnitType() == UnitType.Carrier
+                            && (player.hasUnit("lunarium_carrier") || player.hasUnit("lunarium_carrier2"))) {
+                        capacity += player.getSoScored() * entry.getValue();
+                    }
                 }
                 // System.out.println(unit.getBaseType());
                 if ("spacedock".equalsIgnoreCase(unit.getBaseType())
@@ -3358,6 +3368,12 @@ public class ButtonHelper {
                     } else if (player.ownsUnit("absol_spacedock2")) {
                         fightersIgnored += 5;
                         fleetCap += 2;
+                    } else if (player.ownsUnit("xan_spacedock")) {
+                        fightersIgnored += 3;
+                        fleetCap += 1;
+                    } else if (player.ownsUnit("xan_spacedock2")) {
+                        fightersIgnored += 3;
+                        fleetCap += 3;
                     } else if (!player.hasUnit("mykomentori_spacedock") && !player.hasUnit("mykomentori_spacedock2")) {
                         fightersIgnored += 3;
                     }
@@ -3697,6 +3713,7 @@ public class ButtonHelper {
                 "prism",
                 "echo",
                 "domna",
+                "thundersedge",
                 "uikos", // DS
                 "illusion",
                 "phantasm"); // Other
@@ -3712,6 +3729,11 @@ public class ButtonHelper {
                 endButtons.add(Buttons.green(
                         id, "Use " + prettyPlanet + " Ability" + pass, PlanetEmojis.getPlanetEmojiOrNull(planet)));
             }
+        }
+        String expeditionText = game.getExpeditions().getTopLevelExpeditionButtonText();
+        boolean thundersEdgeOnBoard = game.getTileFromPlanet("thundersedge") != null;
+        if (expeditionText != null && !thundersEdgeOnBoard && game.isThundersEdge()) {
+            endButtons.add(Buttons.gray(player.finChecker() + "expeditionInfoAndButtons", expeditionText));
         }
 
         boolean hasStratCC =
@@ -4085,7 +4107,8 @@ public class ButtonHelper {
 
         if (!player.hasTech("fl")
                 && !player.hasTech("absol_fl")
-                && !game.playerHasLeaderUnlockedOrAlliance(player, "kelerescommander")) {
+                && !game.playerHasLeaderUnlockedOrAlliance(player, "kelerescommander")
+                && !player.hasAbility("arrow_of_time")) {
             MessageHelper.sendEphemeralMessageToEventChannel(
                     event,
                     "## " + player.getRepresentation()
@@ -4201,6 +4224,13 @@ public class ButtonHelper {
         if (tile == null || tile.getRepresentationForButtons(game, player).contains("Hyperlane")) return false;
         if (game.isNaaluAgent() && tile.isHomeSystem(game)) return false;
         if (!FOWPlusService.canActivatePosition(tile.getPosition(), player, game)) return false;
+        if (tile.isAsteroidField()) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.hasTech("cm") && p2 != player && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+                    return false;
+                }
+            }
+        }
 
         return !CommandCounterHelper.hasCC(null, player.getColor(), tile) || game.isL1Hero();
     }
@@ -4531,7 +4561,31 @@ public class ButtonHelper {
         if ((player.hasTech("det") || game.isCptiExploreMode())
                 && tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
             resolveFullFrontierExplore(game, player, tile, event);
+            if (player.hasAbility("phantom_energy")) {
+                List<Button> buttons = new ArrayList<>();
+                for (String asyncID : tile.getSpaceUnitHolder()
+                        .getUnitAsyncIdsOnHolder(player.getColorID())
+                        .keySet()) {
+                    buttons.add(Buttons.green(
+                            "resolvePhantomEnergy_" + asyncID,
+                            StringUtils.capitalize(Mapper.getUnitBaseTypeFromAsyncID(asyncID))));
+                }
+                String msg =
+                        player.getRepresentation() + " choose the ship type to use your phantom energy ability on.";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+            }
         }
+    }
+
+    @ButtonHandler("resolvePhantomEnergy_")
+    public static void resolvePhantomEnergy(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String asyncID = buttonID.split("_")[1];
+        game.setStoredValue("phantomEnergy", game.getStoredValue("phantomEnergy") + asyncID);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " has used the phantom energy ability on the "
+                        + Mapper.getUnitBaseTypeFromAsyncID(asyncID) + " ship type.");
+        deleteMessage(event);
     }
 
     public static void resolveFullFrontierExplore(
@@ -6865,6 +6919,7 @@ public class ButtonHelper {
         String part2 = player.getFaction();
         if (messageID.toLowerCase().contains("pre pass")) {
             ButtonHelperActionCards.checkForPlayingBountyContracts(game, player);
+            StatusHelper.offerPreScoringButtons(game, player);
         }
         if (game.getStoredValue(messageID) != null
                 && !game.getStoredValue(messageID).isEmpty()) {

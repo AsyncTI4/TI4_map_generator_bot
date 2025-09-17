@@ -30,7 +30,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
-import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -77,12 +76,13 @@ import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
+import ti4.spring.jda.JdaService;
 
 public class AgendaHelper {
 
     @Nullable
     public static String watchPartyPing(Game game) {
-        List<Role> roles = AsyncTI4DiscordBot.guildPrimary.getRolesByName("Ixthian Watch Party", true);
+        List<Role> roles = JdaService.guildPrimary.getRolesByName("Ixthian Watch Party", true);
         if (!game.isFowMode() && !roles.isEmpty()) {
             return roles.getFirst().getAsMention();
         }
@@ -91,7 +91,7 @@ public class AgendaHelper {
 
     @Nullable
     public static TextChannel watchPartyChannel(Game game) {
-        List<TextChannel> channels = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("ixthian-watch-party", true);
+        List<TextChannel> channels = JdaService.guildPrimary.getTextChannelsByName("ixthian-watch-party", true);
         if (!game.isFowMode() && !channels.isEmpty()) {
             return channels.getFirst();
         }
@@ -1859,6 +1859,15 @@ public class AgendaHelper {
                     + "since you have _Minister of Industry_, you may build in tile "
                     + tile.getRepresentationForButtons(game, player) + ". You have "
                     + Helper.getProductionValue(player, game, tile, false) + " PRODUCTION Value in the system.";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    msg,
+                    Helper.getPlaceUnitButtons(event, player, game, tile, "ministerBuild", "place"));
+        }
+        if (player.hasAbility("quantum_fabrication")) {
+            String msg = player.getRepresentationUnfogged()
+                    + "since you have the Quantum Fabrication ability, if you placed this space dock via construction, you may use its PRODUCTION ability immediately in "
+                    + tile.getRepresentationForButtons(game, player) + ".";
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     msg,
