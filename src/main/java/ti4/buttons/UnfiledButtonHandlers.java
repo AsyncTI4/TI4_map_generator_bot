@@ -1619,12 +1619,13 @@ public class UnfiledButtonHandlers {
             }
         }
         if (!game.getStoredValue("newStatusScoringMode").isEmpty()
-                && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
+                && !"action".equalsIgnoreCase(game.getPhaseOfGame())
+                && event != null) {
             String msg = "Please score objectives.";
             msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
         }
-        if ("action".equalsIgnoreCase(game.getPhaseOfGame())) {
+        if ("action".equalsIgnoreCase(game.getPhaseOfGame()) && event != null) {
             event.getMessage().delete().queue();
         }
     }

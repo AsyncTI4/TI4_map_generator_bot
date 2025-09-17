@@ -265,8 +265,9 @@ public class StatusHelper {
                                 + ", you cannot score public objectives because you do not control your home system.";
                     }
                 }
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), messageText);
             }
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), messageText);
+
             if (scorables.isEmpty() || !Helper.canPlayerScorePOs(game, player)) {
                 String message = player.getRepresentation()
                         + " cannot score any public objectives according to the bot, and has been marked as not scoring a public objective.";
