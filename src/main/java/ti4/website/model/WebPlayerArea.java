@@ -7,8 +7,10 @@ import java.util.Map;
 import java.util.Set;
 import lombok.Data;
 import ti4.helpers.Helper;
+import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
+import ti4.image.ResourceHelper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -26,6 +28,7 @@ public class WebPlayerArea {
     // Basic properties
     private String userName;
     private String faction;
+    private String factionImage;
     private String color;
     private String displayName;
     private String discordId;
@@ -152,6 +155,7 @@ public class WebPlayerArea {
         // Basic properties
         webPlayerArea.setUserName(player.getUserName());
         webPlayerArea.setFaction(player.getFaction());
+        webPlayerArea.setFactionImage(getFactionImagePath(player));
         webPlayerArea.setColor(player.getColor());
         webPlayerArea.setDisplayName(player.getDisplayName());
         webPlayerArea.setDiscordId(player.getUserID());
@@ -433,5 +437,60 @@ public class WebPlayerArea {
         int ccCount = Helper.getCCCount(game, playerColor);
         int remainingReinforcements = ccLimit - ccCount;
         return Math.max(0, remainingReinforcements);
+    }
+
+    /**
+     * Gets the appropriate faction image path for web interface.
+     * Returns Discord URLs for custom emojis, local paths for default factions.
+     */
+    private static String getFactionImagePath(Player player) {
+        // Check if player has a custom franken emoji (Discord URL)
+        if (player.hasCustomFactionEmoji()) {
+            String customEmoji = player.getFactionEmojiRaw();
+            if (StringUtils.isNotBlank(customEmoji) && !"null".equals(customEmoji)) {
+                try {
+                    Emoji factionEmoji = Emoji.fromFormatted(customEmoji);
+                    if (factionEmoji instanceof CustomEmoji customEmojiInstance) {
+                        return customEmojiInstance.getImageUrl();
+                    } else if (factionEmoji instanceof UnicodeEmoji) {
+                        // For Unicode emojis, we can't provide a local path, so return the Discord URL
+                        return customEmoji;
+                    }
+                } catch (Exception e) {
+                    // Fall through to regular faction handling
+                }
+            }
+        }
+
+        // Use existing ResourceHelper logic and convert to relative path
+        String factionFile = ResourceHelper.getInstance().getFactionFile(player.getFaction() + ".png");
+        if (factionFile == null) {
+            factionFile = ResourceHelper.getInstance()
+                    .getFactionFile(player.getFaction().substring(0, 1).toUpperCase()
+                            + player.getFaction().substring(1) + ".png");
+        }
+
+        if (factionFile != null) {
+            // Convert absolute path to relative path from resources
+            String resourcePath = Storage.getResourcePath();
+            if (factionFile.startsWith(resourcePath)) {
+                String relativePath = factionFile.substring(resourcePath.length());
+                // Ensure path starts with /
+                relativePath = relativePath.startsWith("/") ? relativePath : "/" + relativePath;
+
+                // Convert PNG to WebP and prepend web URL
+                // All web hosted assets were converted to WebP for better performance
+                if (relativePath.endsWith(".png")) {
+                    relativePath = relativePath.replace(".png", ".webp");
+                }
+
+                return "https://images.asyncti4.com" + relativePath;
+            } else {
+                // If path doesn't start with resource path, return as-is (shouldn't happen)
+                return factionFile;
+            }
+        }
+
+        return null;
     }
 }
