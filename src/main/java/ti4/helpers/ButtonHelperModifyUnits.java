@@ -2063,7 +2063,8 @@ public class ButtonHelperModifyUnits {
                                     + " Ground Forces and Fighters"));
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     String msg = player.getRepresentation()
-                            + " you have the opportunity to produce ground forces and fighters (a number up to the recently produced ships capacity value) using sol's breakthrough ability. Use buttons to resolve or decline. [Note: Finish your normal build first for best results.]";
+                            + ", you have the opportunity to produce ground forces and fighters (a number up to the recently produced ships' capacity values) using _Bellum Gloriosum_. Use buttons to resolve or decline."
+                            + "\-# Note: Finish your normal build first for best results.";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons2);
                 }
             }

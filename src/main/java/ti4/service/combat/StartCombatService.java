@@ -1290,7 +1290,7 @@ public class StartCombatService {
             }
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnlockedBreakthrough("sardakkbt")) {
                 buttons.add(Buttons.gray(
-                        finChecker + "sardakkbtRes", "Resolve Sardakk Breakthrough (Upon Win)", FactionEmojis.Sardakk));
+                        finChecker + "sardakkbtRes", "Resolve N'orr Breakthrough (Upon Win)", FactionEmojis.Sardakk));
             }
         }
 

@@ -34,9 +34,8 @@ public class FealtyUplinkService {
                 player.finChecker() + "fealtyUplink_" + planetName,
                 "Use Fealty Uplink on " + prettyPlanet,
                 FactionEmojis.L1Z1X));
-        String message = "When you gain control of a planet, you can use " + fealtyRep();
-        message +=
-                " to place infantry equal to that planet's influence.\n-# > You may choose to do this either before or after exploring.";
+        String message = "When you gain control of " + prettyPlanet + ", you place " + Helper.getPlanetInfluence(planetName, game) 
+            + " infantry (equal to its influence) using " + fealtyRep() + ".\n-# You may choose to do this either before or after exploring (which may change its influence value).";
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCorrectChannel(), message, buttons);
     }
 
@@ -56,7 +55,7 @@ public class FealtyUplinkService {
             int influence = planet.getInfluence();
             planet.addUnit(Units.getUnitKey(UnitType.Infantry, player.getColorID()), influence);
             String prettyPlanet = Helper.getPlanetRepresentationNoResInf(planet.getName(), player.getGame());
-            String message = player.getRepresentationNoPing() + " Added " + influence + " infantry to " + prettyPlanet
+            String message = player.getRepresentationNoPing() + " added " + influence + " infantry to " + prettyPlanet
                     + " using " + fealtyRep() + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }

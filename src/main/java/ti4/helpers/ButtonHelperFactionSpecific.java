@@ -380,11 +380,11 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation()
-                        + " is resolving the sardakk breakthrough to either research 1 unit upgrade or gain 1 command token");
+                        + " is resolving _N'orr Supremacy_ to either research 1 unit upgrade or gain 1 command token.");
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + " choose whether you want to research a unit upgrade (you need the pre-requistites) or gain a command token",
+                        + ", please choose whether you wish to research a unit upgrade (you need the pre-requistites) or gain a command token.",
                 buttons);
     }
 
@@ -396,8 +396,8 @@ public class ButtonHelperFactionSpecific {
         String message = player.getRepresentation() + " Use the buttons to produce units. ";
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " is resolving sol's breakthrough ability in "
-                        + game.getTileByPosition(pos).getRepresentationForButtons());
+                player.getRepresentation() + " is resolving _Bellum Gloriosum_ ability in "
+                        + game.getTileByPosition(pos).getRepresentationForButtons() + ".");
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
