@@ -1712,10 +1712,13 @@ public class ButtonHelperModifyUnits {
             if (player.hasUnlockedBreakthrough("solbt") && unitKey != null) {
                 if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0 && tile != null) {
                     List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(Buttons.red("solBtBuild_" + tile.getPosition(), "Build Ground Forces and Fighters"));
+                    buttons2.add(Buttons.green(
+                            "solBtBuild_" + tile.getPosition(),
+                            "Build Up To " + player.getUnitFromUnitKey(unitKey).getCapacityValue()
+                                    + " Ground Forces and Fighters"));
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     String msg = player.getRepresentation()
-                            + " you have the opportunity to produce ground forces and fighters up to the recently produced ships capacity using sol's breakthrough ability. Use buttons to resolve or decline,";
+                            + " you have the opportunity to produce ground forces and fighters (a number up to the recently produced ships capacity value) using sol's breakthrough ability. Use buttons to resolve or decline.  [Note: Finish your normal build first for best results.]";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons2);
                 }
             }
@@ -2058,10 +2061,13 @@ public class ButtonHelperModifyUnits {
             if (player.hasUnlockedBreakthrough("solbt") && unitKey != null) {
                 if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0) {
                     List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(Buttons.red("solBtBuild_" + tile.getPosition(), "Build Ground Forces and Fighters"));
+                    buttons2.add(Buttons.green(
+                            "solBtBuild_" + tile.getPosition(),
+                            "Build Up To " + player.getUnitFromUnitKey(unitKey).getCapacityValue()
+                                    + " Ground Forces and Fighters"));
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     String msg = player.getRepresentation()
-                            + " you have the opportunity to produce ground forces and fighters up to the recently produced ships capacity using sol's breakthrough ability. Use buttons to resolve or decline,";
+                            + " you have the opportunity to produce ground forces and fighters (a number up to the recently produced ships capacity value) using sol's breakthrough ability. Use buttons to resolve or decline. [Note: Finish your normal build first for best results.]";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons2);
                 }
             }
