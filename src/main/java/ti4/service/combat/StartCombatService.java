@@ -1288,6 +1288,12 @@ public class StartCombatService {
                         "Become Damaged Upon Win To Gain Command Token (Kortali Flagship)",
                         FactionEmojis.kortali));
             }
+            if ((!game.isFowMode() || agentHolder == p1)
+                    && agentHolder.hasUnlockedBreakthrough("sardakkbt")
+                    && isSpaceCombat) {
+                buttons.add(Buttons.gray(
+                        finChecker + "sardakkbtRes", "Resolve Sardakk Breakthrough (Upon Win)", FactionEmojis.Sardakk));
+            }
         }
 
         // Exo 2s

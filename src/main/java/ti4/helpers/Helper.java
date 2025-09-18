@@ -1967,88 +1967,90 @@ public class Helper {
                 ButtonHelper.isLawInPlay(game, "conscription") || ButtonHelper.isLawInPlay(game, "absol_conscription");
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String tp = tile.getPosition();
-        if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {
-            if (player.hasWarsunTech() && resourcelimit > 9) {
-                Button wsButton = Buttons.green(
-                        "FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp,
-                        "Produce War Sun",
-                        UnitEmojis.warsun);
-                if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun") > 1) {
-                    wsButton = Buttons.gray(
+        if (!"solbtbuild".equalsIgnoreCase(warfareNOtherstuff)) {
+            if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {
+                if (player.hasWarsunTech() && resourcelimit > 9) {
+                    Button wsButton = Buttons.green(
                             "FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp,
                             "Produce War Sun",
                             UnitEmojis.warsun);
+                    if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun") > 1) {
+                        wsButton = Buttons.gray(
+                                "FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp,
+                                "Produce War Sun",
+                                UnitEmojis.warsun);
+                    }
+                    unitButtons.add(wsButton);
                 }
-                unitButtons.add(wsButton);
-            }
-            if (player.ownsUnit("ghemina_flagship_lady") && resourcelimit > 7) {
-                Button wsButton = Buttons.green(
-                        "FFCC_" + player.getFaction() + "_" + placePrefix + "_lady_" + tp,
-                        "Produce The Lady",
-                        UnitEmojis.flagship);
-                unitButtons.add(wsButton);
-            }
-            Button fsButton = Buttons.green(
-                    "FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp,
-                    "Produce Flagship",
-                    UnitEmojis.flagship);
-            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship") > 0) {
-                fsButton = Buttons.gray(
+                if (player.ownsUnit("ghemina_flagship_lady") && resourcelimit > 7) {
+                    Button wsButton = Buttons.green(
+                            "FFCC_" + player.getFaction() + "_" + placePrefix + "_lady_" + tp,
+                            "Produce The Lady",
+                            UnitEmojis.flagship);
+                    unitButtons.add(wsButton);
+                }
+                Button fsButton = Buttons.green(
                         "FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp,
                         "Produce Flagship",
                         UnitEmojis.flagship);
+                if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship") > 0) {
+                    fsButton = Buttons.gray(
+                            "FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp,
+                            "Produce Flagship",
+                            UnitEmojis.flagship);
+                }
+                if (resourcelimit > 7) {
+                    unitButtons.add(fsButton);
+                }
             }
-            if (resourcelimit > 7) {
-                unitButtons.add(fsButton);
-            }
-        }
-        Button dnButton = Buttons.green(
-                "FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp,
-                "Produce Dreadnought",
-                UnitEmojis.dreadnought);
-        if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought") > 4) {
-            dnButton = Buttons.gray(
+            Button dnButton = Buttons.green(
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp,
                     "Produce Dreadnought",
                     UnitEmojis.dreadnought);
-        }
-        if (resourcelimit > 3) {
-            unitButtons.add(dnButton);
-        }
-        Button cvButton = Buttons.green(
-                "FFCC_" + player.getFaction() + "_" + placePrefix + "_carrier_" + tp,
-                "Produce Carrier",
-                UnitEmojis.carrier);
-        if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "carrier") > 3) {
-            cvButton = cvButton.withStyle(ButtonStyle.SECONDARY);
-        }
-        if (resourcelimit > 2) {
-            unitButtons.add(cvButton);
-        }
-        Button caButton = Buttons.green(
-                "FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp,
-                "Produce Cruiser",
-                UnitEmojis.cruiser);
-        if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser") > 7) {
-            caButton = Buttons.gray(
+            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought") > 4) {
+                dnButton = Buttons.gray(
+                        "FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp,
+                        "Produce Dreadnought",
+                        UnitEmojis.dreadnought);
+            }
+            if (resourcelimit > 3) {
+                unitButtons.add(dnButton);
+            }
+            Button cvButton = Buttons.green(
+                    "FFCC_" + player.getFaction() + "_" + placePrefix + "_carrier_" + tp,
+                    "Produce Carrier",
+                    UnitEmojis.carrier);
+            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "carrier") > 3) {
+                cvButton = cvButton.withStyle(ButtonStyle.SECONDARY);
+            }
+            if (resourcelimit > 2) {
+                unitButtons.add(cvButton);
+            }
+            Button caButton = Buttons.green(
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp,
                     "Produce Cruiser",
                     UnitEmojis.cruiser);
-        }
-        if (resourcelimit > 1) {
-            unitButtons.add(caButton);
-        }
-        Button ddButton = Buttons.green(
-                "FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp,
-                "Produce Destroyer",
-                UnitEmojis.destroyer);
-        if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer") > 7) {
-            ddButton = Buttons.gray(
+            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser") > 7) {
+                caButton = Buttons.gray(
+                        "FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp,
+                        "Produce Cruiser",
+                        UnitEmojis.cruiser);
+            }
+            if (resourcelimit > 1) {
+                unitButtons.add(caButton);
+            }
+            Button ddButton = Buttons.green(
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp,
                     "Produce Destroyer",
                     UnitEmojis.destroyer);
+            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer") > 7) {
+                ddButton = Buttons.gray(
+                        "FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp,
+                        "Produce Destroyer",
+                        UnitEmojis.destroyer);
+            }
+            unitButtons.add(ddButton);
         }
-        unitButtons.add(ddButton);
         unitButtons.add(Buttons.green(
                 "FFCC_" + player.getFaction() + "_" + placePrefix + "_fighter_" + tp,
                 "Produce 1 Fighter",
@@ -2070,6 +2072,7 @@ public class Helper {
 
         if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff)
                 && !"arboHeroBuild".equalsIgnoreCase(warfareNOtherstuff)
+                && !"solBtBuild".equalsIgnoreCase(warfareNOtherstuff)
                 && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
                 && !"sling".equalsIgnoreCase(warfareNOtherstuff)
                 && !"muaatagent".equalsIgnoreCase(warfareNOtherstuff)

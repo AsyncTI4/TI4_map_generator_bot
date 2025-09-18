@@ -874,7 +874,8 @@ public class ButtonHelper {
         if ("arboCommander".equalsIgnoreCase(kindOfBuild)
                 || "freelancers".equalsIgnoreCase(kindOfBuild)
                 || "genericBuild".equalsIgnoreCase(kindOfBuild)
-                || "muaatagent".equalsIgnoreCase(kindOfBuild)) {
+                || "muaatagent".equalsIgnoreCase(kindOfBuild)
+                || "solBtBuild".equalsIgnoreCase(kindOfBuild)) {
             return true;
         }
         boolean tileHasShips = tile.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip);
