@@ -3395,7 +3395,7 @@ public class UnfiledButtonHandlers {
         } else {
             Button ixthianButton =
                     Buttons.green("rollIxthianIgnoreSpeaker", "Roll Ixthian Artifact", PlanetEmojis.Mecatol);
-            String msg = "The speaker should roll for _Ixthain Artifact_. Click this button to roll anyway!";
+            String msg = "The speaker should roll for _Ixthian Artifact_. Click this button to roll anyway!";
             MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg, ixthianButton);
         }
         ButtonHelper.deleteMessage(event);
