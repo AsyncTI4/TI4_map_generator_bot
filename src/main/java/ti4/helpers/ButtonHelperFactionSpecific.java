@@ -369,6 +369,39 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
+    @ButtonHandler("sardakkbtRes")
+    public static void sardakkbtRes(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+
+        ButtonHelper.deleteTheOneButton(event);
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 CC"));
+        buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Research a Unit Upgrade"));
+
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + " is resolving the sardakk breakthrough to either research 1 unit upgrade or gain 1 command token");
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentation()
+                        + " choose whether you want to research a unit upgrade (you need the pre-requistites) or gain a command token",
+                buttons);
+    }
+
+    @ButtonHandler("solBtBuild_")
+    public static void resolveSolBtBuild(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        List<Button> buttons;
+        buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "solBtBuild", "place");
+        String message = player.getRepresentation() + " Use the buttons to produce units. ";
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " is resolving sol's breakthrough ability in "
+                        + game.getTileByPosition(pos).getRepresentationForButtons());
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("resolvePride_")
     public static void resolvePride(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String faction = buttonID.split("_")[1];
