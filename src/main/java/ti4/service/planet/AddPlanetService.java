@@ -34,6 +34,7 @@ import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.FealtyUplinkService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -474,6 +475,15 @@ public class AddPlanetService {
                 String message = player.getFactionEmoji() + " Click button to explore "
                         + Helper.getPlanetRepresentation(planet, game) + ".";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+            }
+        }
+
+        if (player.hasUnlockedBreakthrough("l1z1xbt") && tile != null && !setup) {
+            Planet p = tile.getUnitHolderFromPlanet(planet);
+            if (p == null) {
+                FealtyUplinkService.postInitialButtons(game, player, planet);
+            } else {
+                FealtyUplinkService.resolveAddInf(player, p);
             }
         }
 
