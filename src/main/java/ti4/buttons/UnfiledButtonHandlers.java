@@ -1619,12 +1619,13 @@ public class UnfiledButtonHandlers {
             }
         }
         if (!game.getStoredValue("newStatusScoringMode").isEmpty()
-                && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
+                && !"action".equalsIgnoreCase(game.getPhaseOfGame())
+                && event != null) {
             String msg = "Please score objectives.";
             msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
         }
-        if ("action".equalsIgnoreCase(game.getPhaseOfGame())) {
+        if ("action".equalsIgnoreCase(game.getPhaseOfGame()) && event != null) {
             event.getMessage().delete().queue();
         }
     }
@@ -1954,19 +1955,22 @@ public class UnfiledButtonHandlers {
                 // } //sar is handled elsewhere
                 if (player.hasTechReady("htp")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
+                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)) {
                     buttons.add(Buttons.red("exhaustTech_htp", "Exhaust Hegemonic Trade Policy", FactionEmojis.Winnu));
                 }
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("generic")) {
                     ButtonHelperCommanders.titansCommanderUsage(event, game, player);
                 }
                 if (player.hasTechReady("dsbenty")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.green("exhaustTech_dsbenty", "Use Merged Replicators", FactionEmojis.bentor));
                 }
@@ -1974,6 +1978,7 @@ public class UnfiledButtonHandlers {
                         && player.hasTechReady("aida")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red(
                             "exhaustTech_aida",
@@ -1983,6 +1988,7 @@ public class UnfiledButtonHandlers {
                 if (player.hasTechReady("st")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red("useTech_st", "Use Sarween Tools", TechEmojis.CyberneticTech));
                 }
@@ -1994,6 +2000,7 @@ public class UnfiledButtonHandlers {
                 }
                 if (player.hasUnexhaustedLeader("winnuagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red("exhaustAgent_winnuagent", "Use Winnu Agent", FactionEmojis.Winnu));
@@ -2001,6 +2008,7 @@ public class UnfiledButtonHandlers {
                 if (player.hasUnexhaustedLeader("gledgeagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red(
                             "exhaustAgent_gledgeagent_" + player.getFaction(),
@@ -2010,6 +2018,7 @@ public class UnfiledButtonHandlers {
                 if (player.hasUnexhaustedLeader("uydaiagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red(
                             "exhaustAgent_uydaiagent_" + player.getFaction(), "Use Uydai Agent", FactionEmojis.gledge));
@@ -2026,6 +2035,7 @@ public class UnfiledButtonHandlers {
                 }
                 if (player.hasUnexhaustedLeader("rohdhnaagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     buttons.add(Buttons.red(
                             "exhaustAgent_rohdhnaagent_" + player.getFaction(),
@@ -2035,6 +2045,7 @@ public class UnfiledButtonHandlers {
                 if (player.hasLeaderUnlocked("hacanhero")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red("purgeHacanHero", "Purge Hacan Hero", FactionEmojis.Hacan));
                 }
@@ -3384,7 +3395,7 @@ public class UnfiledButtonHandlers {
         } else {
             Button ixthianButton =
                     Buttons.green("rollIxthianIgnoreSpeaker", "Roll Ixthian Artifact", PlanetEmojis.Mecatol);
-            String msg = "The speaker should roll for _Ixthain Artifact_. Click this button to roll anyway!";
+            String msg = "The speaker should roll for _Ixthian Artifact_. Click this button to roll anyway!";
             MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg, ixthianButton);
         }
         ButtonHelper.deleteMessage(event);
