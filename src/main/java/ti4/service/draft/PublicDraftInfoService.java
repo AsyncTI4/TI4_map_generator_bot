@@ -61,7 +61,7 @@ public class PublicDraftInfoService {
         List<String> clearOldHeaders = new ArrayList<>();
 
         for (Draftable d : draftManager.getDraftables()) {
-            String draftableHeader = d.getDisplayName();
+            String draftableHeader = getSectionHeader(d.getDisplayName());
             List<Button> buttons = new ArrayList<>(getDraftButtons(draftManager, d));
 
             clearOldHeaders.add(draftableHeader);
@@ -193,6 +193,10 @@ public class PublicDraftInfoService {
         return sb.toString();
     }
 
+    private static String getSectionHeader(String displayName) {
+        return "__**" + displayName.toUpperCase() + ":**__";
+    }
+
     // Edit previous messages
 
     private static MessageRetrieveAction getMessageHistory(
@@ -210,7 +214,7 @@ public class PublicDraftInfoService {
             throw new IllegalArgumentException("No draftable of type " + draftableType + " found");
         }
         Predicate<String> isDraftableType = txt -> {
-            String header = draftable.getDisplayName();
+            String header = getSectionHeader(draftable.getDisplayName());
             return txt.equals(header);
         };
         List<Button> draftableButtons = new ArrayList<>(getDraftButtons(draftManager, draftable));

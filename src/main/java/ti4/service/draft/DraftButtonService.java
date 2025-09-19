@@ -36,7 +36,7 @@ public class DraftButtonService {
 
         String innerButtonID = buttonID.substring(DRAFT_BUTTON_SERVICE_PREFIX.length());
         DraftManager draftManager = game.getDraftManager();
-        String outcome = draftManager.routeCommand(event, player, innerButtonID);
+        String outcome = draftManager.routeCommand(event, player, innerButtonID, DraftManager.CommandSource.BUTTON);
         if (outcome != null) {
             if (outcome.equals(DELETE_BUTTON)) {
                 ButtonHelper.deleteTheOneButton(event);

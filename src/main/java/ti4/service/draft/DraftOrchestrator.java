@@ -3,7 +3,7 @@ package ti4.service.draft;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 
 public abstract class DraftOrchestrator extends DraftLifecycleHooks {
-    public abstract void startDraft(DraftManager draftManager);
+    public abstract void sendDraftButtons(DraftManager draftManager);
 
     // Interactions
 
@@ -18,13 +18,19 @@ public abstract class DraftOrchestrator extends DraftLifecycleHooks {
 
     // Persistence
 
+    public static final String SAVE_SEPARATOR = ",";
+
     public abstract String save();
 
     public abstract void load(String data);
 
     public abstract String[] savePlayerStates(DraftManager draftManager);
 
-    public abstract OrchestratorState loadPlayerState(String data);
+    public record PlayerOrchestratorState(String playerUserId, OrchestratorState state) {}
+
+    public abstract PlayerOrchestratorState loadPlayerState(String data);
 
     public abstract String validateState(DraftManager draftManager);
+
+    public abstract void initializePlayerStates(DraftPlayerManager draftManager);
 }

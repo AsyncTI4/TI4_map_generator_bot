@@ -70,8 +70,7 @@ public class PartialMapService {
 
         for (PlayerDraftState pState : draftManager.getPlayerStates().values()) {
             // Get their position, to see if we can do anything
-            Integer position = getPlayerPosition(
-                    pState, seatDraftable == null ? speakerOrderDraftable.getType() : seatDraftable.getType());
+            Integer position = getPlayerPosition(pState, seatDraftable, speakerOrderDraftable);
             if (position == null) {
                 // Player hasn't picked a position yet
                 continue;
@@ -127,14 +126,27 @@ public class PartialMapService {
         }
     }
 
-    private Integer getPlayerPosition(PlayerDraftState pState, DraftableType seatDraftable) {
+    private Integer getPlayerPosition(
+            PlayerDraftState pState, Draftable seatDraftable, Draftable speakerOrderDraftable) {
         Integer position = null;
 
         Map<DraftableType, List<DraftChoice>> choices = pState.getPicks();
-        if (choices.containsKey(seatDraftable) && !choices.get(seatDraftable).isEmpty()) {
-            String seatStr = choices.get(seatDraftable).get(0).getChoiceKey();
-            position = Integer.parseInt(seatStr);
+        if (seatDraftable != null) {
+            if (choices.containsKey(seatDraftable.getType())
+                    && !choices.get(seatDraftable.getType()).isEmpty()) {
+                String seatChoiceKey =
+                        choices.get(seatDraftable.getType()).get(0).getChoiceKey();
+                position = SeatDraftable.getSeatNumberFromChoiceKey(seatChoiceKey);
+            }
+        } else if (speakerOrderDraftable != null) {
+            if (choices.containsKey(speakerOrderDraftable.getType())
+                    && !choices.get(speakerOrderDraftable.getType()).isEmpty()) {
+                String pickChoiceKey =
+                        choices.get(speakerOrderDraftable.getType()).get(0).getChoiceKey();
+                position = SpeakerOrderDraftable.getSpeakerOrderFromChoiceKey(pickChoiceKey);
+            }
         }
+
         return position;
     }
 

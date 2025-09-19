@@ -27,7 +27,7 @@ public abstract class DraftLifecycleHooks {
      * @param draftManager The draft manager for the draft; also contains the Game object.
      * @return Null if ready to end the draft, or a SPECIFIC message describing what is being waited on.
      */
-    public abstract String getBlockingDraftEndReason(DraftManager draftManager);
+    public abstract String whatsStoppingDraftEnd(DraftManager draftManager);
 
     /**
      * Called once when the draft ends, after canEndDraft returns true for all components.
@@ -44,7 +44,7 @@ public abstract class DraftLifecycleHooks {
      * @param draftManager The draft manager for the draft; also contains the Game object.
      * @return Null if ready to set up players, or a SPECIFIC message describing what is being waited on.
      */
-    public String getBlockingSetupReason(DraftManager draftManager) {
+    public String whatsStoppingSetup(DraftManager draftManager) {
         return null;
     }
 

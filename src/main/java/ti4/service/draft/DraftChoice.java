@@ -14,6 +14,7 @@ public class DraftChoice {
 
     private final Button button;
     private final String displayName;
+    private final String unformattedName;
     /**
      * An optional emoji which should uniquely identify this choice to players.
      * Used to produce very shorthand summaries of player choices.

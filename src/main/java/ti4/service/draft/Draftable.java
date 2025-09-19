@@ -27,15 +27,23 @@ public abstract class Draftable extends DraftLifecycleHooks {
      * and used as a sub-command for the "/draft" command.
      * @return A lowercase alphabetical string.
      */
-    public String getCommandKey() {
+    public String getDraftableCommandKey() {
         return getType().toString().toLowerCase().replaceAll("[^a-z]", "");
     }
     /**
      * Make a button ID which the draft service will return to the draftable.
      * @return A button ID which will be picked up by the DraftButtonService
      */
-    public String makeButtonId(String buttonSuffix) {
-        return DraftButtonService.DRAFT_BUTTON_SERVICE_PREFIX + getCommandKey() + "_" + buttonSuffix;
+    public final String makeButtonId(String actionKey) {
+        return DraftButtonService.DRAFT_BUTTON_SERVICE_PREFIX + makeCommandKey(actionKey);
+    }
+    /**
+     * Make an action/choice command key, which routes to this draftable with a specific choice or action.
+     * @param actionKey The action or choice this draftable will recognize.
+     * @return A string which the DraftManager will route to this draftable, specifying the actionKey.
+     */
+    public final String makeCommandKey(String actionKey) {
+        return getDraftableCommandKey() + "_" + actionKey;
     }
     /**
      * Make a button for a given draft choice, which will be automatically routed to make this choice.
@@ -80,7 +88,16 @@ public abstract class Draftable extends DraftLifecycleHooks {
      * @param choice The draft choice to validate.
      * @return An error message if the choice is invalid, null if valid. No magic string support.
      */
-    public abstract String isValidDraftChoice(DraftManager draftManager, String playerUserId, DraftChoice choice);
+    public String isValidDraftChoice(DraftManager draftManager, String playerUserId, DraftChoice choice) {
+        List<DraftChoice> allChoices = getAllDraftChoices();
+        List<String> allChoiceKeys =
+                allChoices.stream().map(DraftChoice::getChoiceKey).toList();
+        if (!CommonDraftableValidators.isChoiceKeyInList(choice, allChoiceKeys)) {
+            return "The choiceKey " + choice.getChoiceKey() + " is not valid for draftable type " + getType();
+        }
+        return null;
+    }
+
     /**
      * Perform any side effects of a draft choice being made, such as updating the map.
      * @param event The interaction event, either from a slash-command or a button press.
@@ -88,7 +105,7 @@ public abstract class Draftable extends DraftLifecycleHooks {
      * @param playerUserId The user ID of the player who made the choice.
      * @param choice The draft choice that was made.
      */
-    public void postApplyDraftChoice(
+    public void postApplyDraftPick(
             GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice) {
         // Empty
     }
@@ -99,20 +116,13 @@ public abstract class Draftable extends DraftLifecycleHooks {
      * @param draftManager The draft manager for the draft; also contains the Game object.
      * @param playerUserId The user ID of the player to pick for.
      * @param numberOfSimultaneousPicks The number of choices the player can at once. Usually 1, but can be more (e.g. a player picking twice at the end of a draft-snake)
-     * @return null if the player could make more than exactly one choice with their total simultaneous picks. Or just null to skip automatic picking.
-     *         Otherwise, return a list of DraftChoices that the player must pick from this draftable. The list can shorter than numberOfSimultaneousPicks,
-     *         but not longer.
+     * @return null if the player could make more than exactly one set of choices with their total simultaneous picks. Or just null to disable automatic picking.
+     *         Otherwise, return the set of DraftChoices that the player must pick from this draftable. For most draftables, this will be a list of 1 thing (e.g. the only remaining slice).
+     *         If there are no remaining choices left to the player, return an empty list.
+     *         If this draftable supports multiple picks per player (e.g. franken faction tech), override this to be able to return up to numberOfSimultaneousPicks choices.
      */
     public List<DraftChoice> getDeterministicPick(
             DraftManager draftManager, String playerUserId, int numberOfSimultaneousPicks) {
-        // Default implementation for Draftables where each player only picks one choice.
-        List<DraftChoice> allChoices = getAllDraftChoices();
-        List<DraftChoice> allPicks = draftManager.getAllPicksOfType(getType());
-        List<DraftChoice> remainingChoices =
-                allChoices.stream().filter(c -> !allPicks.contains(c)).toList();
-        if (remainingChoices.size() <= numberOfSimultaneousPicks) {
-            return remainingChoices;
-        }
         return null;
     }
 
@@ -123,7 +133,7 @@ public abstract class Draftable extends DraftLifecycleHooks {
      * @return A human-friendly name for this draftable. Should also be friendly to formatting, such as bold+underline+uppercase.
      */
     public String getDisplayName() {
-        return "**__" + getType().toString() + ":__**";
+        return getType().toString();
     }
     /**
      * For rendering, get a DraftChoice appropriate for a player that hasn't made picks from this draftable.
@@ -169,20 +179,4 @@ public abstract class Draftable extends DraftLifecycleHooks {
      * @return An error message if the state is invalid, or null if valid. No magic string support.
      */
     public abstract String validateState(DraftManager draftManager);
-
-    // Common Lifecycle Logic
-
-    /**
-     * Default implementation for whether this draftable allows the draft to end.
-     * This implementation checks that all players have made at least one pick from this draftable.
-     */
-    @Override
-    public String getBlockingDraftEndReason(DraftManager draftManager) {
-        for (String playerUserId : draftManager.getPlayerStates().keySet()) {
-            if (CommonDraftableValidators.hasRemainingChoices(draftManager, playerUserId, getType(), 1)) {
-                return "Player " + playerUserId + " has not made a pick for " + getDisplayName() + "!";
-            }
-        }
-        return null;
-    }
 }

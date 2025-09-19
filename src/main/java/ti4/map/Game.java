@@ -405,6 +405,15 @@ public class Game extends GameProperties {
                 try {
                     draftManager = DraftLoadService.loadDraftManager(this, draftString);
                 } catch (Exception e) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Failed to load draft manager (and creating an empty new one instead): ")
+                            .append(e.getMessage())
+                            .append(System.lineSeparator())
+                            .append("With draft data: ")
+                            .append(System.lineSeparator())
+                            .append(String.join(System.lineSeparator(), draftString));
+
+                    BotLogger.warning(new LogOrigin(this), sb.toString(), e);
                     draftManager = new DraftManager(this);
                 }
             } else {

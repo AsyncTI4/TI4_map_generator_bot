@@ -48,7 +48,7 @@ public class SliceImageGeneratorService {
         };
         Function<String, FactionModel> getFactionFromPlayer = (playerUserID) -> {
             if (playerUserID == null) return null;
-            List<DraftChoice> factionChoices = draftManager.getPlayerChoices(playerUserID, FactionDraftable.TYPE);
+            List<DraftChoice> factionChoices = draftManager.getPlayerPicks(playerUserID, FactionDraftable.TYPE);
             if (!factionChoices.isEmpty()) {
                 return FactionDraftable.getFactionByChoice(factionChoices.get(0));
             }

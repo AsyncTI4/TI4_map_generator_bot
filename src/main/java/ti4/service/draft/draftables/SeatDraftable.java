@@ -1,12 +1,10 @@
 package ti4.service.draft.draftables;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.MapTemplateHelper;
 import ti4.image.Mapper;
@@ -14,23 +12,32 @@ import ti4.map.Player;
 import ti4.model.MapTemplateModel;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
-import ti4.service.draft.Draftable;
 import ti4.service.draft.DraftableType;
 import ti4.service.draft.PlayerDraftState;
 import ti4.service.draft.PlayerSetupService.PlayerSetupState;
 import ti4.service.emoji.MiltyDraftEmojis;
 
-public class SeatDraftable extends Draftable {
+public class SeatDraftable extends SinglePickDraftable {
 
+    @Getter
+    @Setter
     private int numSeats;
 
     public void initialize(int numSeats) {
         this.numSeats = numSeats;
     }
 
+    public static Integer getSeatNumberFromChoiceKey(String choiceKey) {
+        if (choiceKey == null) return null;
+        if (!choiceKey.startsWith("seat")) return null;
+        return Integer.parseInt(choiceKey.substring(4));
+    }
+
+    public static final DraftableType TYPE = DraftableType.of("Seat");
+
     @Override
     public DraftableType getType() {
-        return DraftableType.of("Seat");
+        return TYPE;
     }
 
     @Override
@@ -39,32 +46,19 @@ public class SeatDraftable extends Draftable {
         for (int i = 1; i <= numSeats; i++) {
             String choiceKey = "seat" + i;
             String buttonEmoji = MiltyDraftEmojis.getSpeakerPickEmoji(i).toString();
+            String unformattedName = "Seat " + i;
             String displayName = "Seat " + i;
             choices.add(new DraftChoice(
-                    getType(), choiceKey, makeChoiceButton(choiceKey, null, buttonEmoji), displayName, buttonEmoji));
+                    getType(), choiceKey, makeChoiceButton(choiceKey, null, buttonEmoji), displayName, unformattedName, buttonEmoji));
         }
         return choices;
     }
 
     @Override
     public String handleCustomCommand(
-            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId) {
+            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String commandKey) {
 
-        return "Unknown button press: " + buttonId;
-    }
-
-    @Override
-    public String isValidDraftChoice(DraftManager draftManager, String playerUserId, DraftChoice choice) {
-        if (!CommonDraftableValidators.hasRemainingChoices(draftManager, playerUserId, getType(), 1)) {
-            return "You already have a Seat pick!";
-        }
-        List<String> choiceKeys =
-                IntStream.rangeClosed(1, numSeats).boxed().map(Object::toString).collect(Collectors.toList());
-        if (!CommonDraftableValidators.isChoiceKeyInList(choice, choiceKeys)) {
-            return "That seat pick is not valid!";
-        }
-
-        return null;
+        return "Unknown command: " + commandKey;
     }
 
     @Override
@@ -73,6 +67,7 @@ public class SeatDraftable extends Draftable {
                 getType(),
                 null,
                 null,
+                "No seat picked",
                 "No seat picked",
                 MiltyDraftEmojis.getSpeakerPickEmoji(-1).toString());
     }
@@ -89,9 +84,6 @@ public class SeatDraftable extends Draftable {
 
     @Override
     public String validateState(DraftManager draftManager) {
-        if (numSeats < 1) {
-            return "Number of seats must be at least 1, but is: " + numSeats;
-        }
         int numPlayers = draftManager.getPlayerStates().size();
         if (numSeats < numPlayers) {
             return "Number of seats (" + numSeats + ") is less than number of players (" + numPlayers + ")";
@@ -109,17 +101,7 @@ public class SeatDraftable extends Draftable {
                     + " players, but draft has " + numSeats + " seats.";
         }
 
-        // Ensure no two players have picked the same seat.
-        List<DraftChoice> seatChoices = draftManager.getAllPicksOfType(getType());
-        Set<String> chosenSeats = new HashSet<>();
-        for (DraftChoice choice : seatChoices) {
-            if (chosenSeats.contains(choice.getChoiceKey())) {
-                return "Multiple players have chosen seat " + choice.getChoiceKey();
-            }
-            chosenSeats.add(choice.getChoiceKey());
-        }
-
-        return null;
+        return super.validateState(draftManager);
     }
 
     @Override
@@ -132,7 +114,10 @@ public class SeatDraftable extends Draftable {
         }
 
         String seat = pState.getPicks().get(getType()).get(0).getChoiceKey();
-        int seatNum = Integer.parseInt(seat);
+        Integer seatNum = getSeatNumberFromChoiceKey(seat);
+        if (seatNum == null) {
+            throw new IllegalStateException("Player " + playerUserId + " has an invalid seat choice key: " + seat);
+        }
 
         String homeTilePosition = MapTemplateHelper.getPlayerHomeSystemLocation(
                 seatNum, draftManager.getGame().getMapTemplateID());

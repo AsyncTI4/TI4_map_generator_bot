@@ -6,19 +6,29 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class DraftSaveService {
+    public static final String KEY_SEPARATOR = ":";
+    public static final String DATA_SEPARATOR = "|";
+
     public List<String> saveDraftManager(DraftManager draftManager) {
         List<String> lines = new ArrayList<>();
 
         // Save player user IDs
-        lines.add("players:" + String.join(",", draftManager.getPlayerStates().keySet()));
+        if (!draftManager.getPlayerStates().keySet().isEmpty()) {
+            lines.add("players" + KEY_SEPARATOR
+                    + String.join(DATA_SEPARATOR, draftManager.getPlayerStates().keySet()));
+        }
 
         // Save orchestrator
-        lines.add("orchestrator:" + draftManager.getOrchestrator().getClass().getName() + ":"
-                + draftManager.getOrchestrator().save());
+        if (draftManager.getOrchestrator() != null) {
+            lines.add("orchestrator" + KEY_SEPARATOR
+                    + draftManager.getOrchestrator().getClass().getSimpleName() + DATA_SEPARATOR
+                    + draftManager.getOrchestrator().save());
+        }
 
         // Save draftables
         for (Draftable draftable : draftManager.getDraftables()) {
-            lines.add("draftable:" + draftable.getClass().getName() + ":" + draftable.save());
+            lines.add("draftable" + KEY_SEPARATOR + draftable.getClass().getSimpleName() + DATA_SEPARATOR
+                    + draftable.save());
         }
 
         // Save player picks
@@ -29,13 +39,16 @@ public class DraftSaveService {
             // Save draft choices
             for (var choiceListValues : state.getPicks().values()) {
                 for (DraftChoice choice : choiceListValues) {
-                    lines.add("playerchoice:" + userId + "," + choice.getType() + "," + choice.getChoiceKey());
+                    lines.add("playerchoice" + KEY_SEPARATOR + userId + DATA_SEPARATOR + choice.getType()
+                            + DATA_SEPARATOR + choice.getChoiceKey());
                 }
             }
         }
-        String[] orchestratorPlayerStates = draftManager.getOrchestrator().savePlayerStates(draftManager);
-        for (String orchestratorState : orchestratorPlayerStates) {
-            lines.add("playerorchestratorstate:" + orchestratorState);
+        if (draftManager.getOrchestrator() != null) {
+            String[] orchestratorPlayerStates = draftManager.getOrchestrator().savePlayerStates(draftManager);
+            for (String orchestratorState : orchestratorPlayerStates) {
+                lines.add("playerorchestratorstate:" + orchestratorState);
+            }
         }
 
         return lines;

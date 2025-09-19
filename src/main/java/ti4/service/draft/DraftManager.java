@@ -1,11 +1,10 @@
 package ti4.service.draft;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
-import lombok.Data;
+import lombok.Getter;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -18,12 +17,13 @@ import ti4.service.map.AddTileListService;
  * - Orchestrator
  * - Draftables available
  * - Routing interactions
- * - Lifecycle management (starting draft, ending draft, setting up players, etc)
- *   - This includes checking that all components are ready to proceed at each stage.
+ * - Lifecycle management (starting draft, ending draft, setting up players,
+ * etc)
+ * - This includes checking that all components are ready to proceed at each
+ * stage.
  * - Validating state consistency
  */
-@Data
-public class DraftManager {
+public class DraftManager extends DraftPlayerManager {
     public DraftManager(Game game) {
         if (game == null) {
             throw new IllegalArgumentException("Game cannot be null");
@@ -39,24 +39,25 @@ public class DraftManager {
         // PlayerDraftState()), Map::putAll);
     }
 
+    @Getter
     private final Game game;
+
+    @Getter
     private DraftOrchestrator orchestrator = null;
     // The order of draftables is the correct order for summarizing, applying, etc.
+    @Getter
     private final List<Draftable> draftables = new ArrayList<>();
-    // Key: Player's UserID
-    private final Map<String, PlayerDraftState> playerStates = new HashMap<>();
 
     // Setup
 
-    public void setPlayers(List<String> players) {
-        if (players == null || players.isEmpty()) {
-            throw new IllegalArgumentException("Players cannot be null or empty");
+    @Override
+    public void addPlayer(String playerUserId) {
+        if (game.getPlayer(playerUserId) == null) {
+            throw new IllegalArgumentException("Player " + playerUserId + " is not in the game");
         }
-        for (String player : players) {
-            if (playerStates.containsKey(player)) {
-                throw new IllegalArgumentException("Duplicate player: " + player);
-            }
-            playerStates.put(player, new PlayerDraftState());
+        super.addPlayer(playerUserId);
+        if (this.orchestrator != null) {
+            this.orchestrator.initializePlayerStates(this);
         }
     }
 
@@ -68,6 +69,7 @@ public class DraftManager {
             throw new IllegalStateException("Orchestrator is already set");
         }
         this.orchestrator = orchestrator;
+        this.orchestrator.initializePlayerStates(this);
     }
 
     public void addDraftable(Draftable draftable) {
@@ -85,75 +87,10 @@ public class DraftManager {
     public void resetForNewDraft() {
         this.orchestrator = null;
         this.draftables.clear();
-        this.playerStates.clear();
-    }
-
-    // Player management
-
-    public void replacePlayer(String oldUserId, String newUserId) {
-        if (!playerStates.containsKey(oldUserId)) {
-            throw new IllegalArgumentException("Cannot replace player " + oldUserId + "; not in draft");
-        }
-        if (playerStates.containsKey(newUserId)) {
-            throw new IllegalArgumentException("Cannot replace player with " + newUserId + "; already in draft");
-        }
-
-        PlayerDraftState state = playerStates.remove(oldUserId);
-        playerStates.put(newUserId, state);
-    }
-
-    public void swapPlayers(String userId1, String userId2) {
-        if (!playerStates.containsKey(userId1)) {
-            throw new IllegalArgumentException("Cannot swap player " + userId1 + "; not in draft");
-        }
-        if (!playerStates.containsKey(userId2)) {
-            throw new IllegalArgumentException("Cannot swap player " + userId2 + "; not in draft");
-        }
-
-        PlayerDraftState state1 = playerStates.get(userId1);
-        PlayerDraftState state2 = playerStates.get(userId2);
-        playerStates.put(userId1, state2);
-        playerStates.put(userId2, state1);
+        super.resetForNewDraft();
     }
 
     // Information Access
-
-    public List<DraftChoice> getPlayerChoices(String playerUserId, DraftableType type) {
-        if (!playerStates.containsKey(playerUserId)) {
-            throw new IllegalArgumentException("Player " + playerUserId + " is not in the draft");
-        }
-        PlayerDraftState pState = playerStates.get(playerUserId);
-        if (!pState.getPicks().containsKey(type)) {
-            return List.of();
-        }
-        List<DraftChoice> choices = pState.getPicks().get(type);
-        return choices;
-    }
-
-    public List<String> getPlayersWithChoiceKey(DraftableType type, String choiceKey) {
-        List<String> playersWithChoice = new ArrayList<>();
-        for (String userId : playerStates.keySet()) {
-            List<DraftChoice> choices = getPlayerChoices(userId, type);
-            for (DraftChoice choice : choices) {
-                if (choice.getChoiceKey().equals(choiceKey)) {
-                    playersWithChoice.add(userId);
-                    break;
-                }
-            }
-        }
-        return playersWithChoice;
-    }
-
-    public List<DraftChoice> getAllPicksOfType(DraftableType type) {
-        List<DraftChoice> allChoices = new ArrayList<>();
-        for (String userId : playerStates.keySet()) {
-            PlayerDraftState pState = playerStates.get(userId);
-            if (pState.getPicks().containsKey(type)) {
-                allChoices.addAll(pState.getPicks().get(type));
-            }
-        }
-        return allChoices;
-    }
 
     public Draftable getDraftableByType(DraftableType type) {
         for (Draftable d : draftables) {
@@ -164,15 +101,30 @@ public class DraftManager {
         return null;
     }
 
+    public boolean hasBeenPicked(DraftableType type, String choiceKey) {
+        return getAllPicksOfType(type).stream().anyMatch(c -> c.getChoiceKey().equals(choiceKey));
+    }
+
     // Interaction handling
 
-    public String routeCommand(GenericInteractionCreateEvent event, Player player, String command) {
+    public enum CommandSource {
+        BUTTON,
+        SLASH_COMMAND,
+        AUTO_PICK
+    }
+
+    public String routeCommand(
+            GenericInteractionCreateEvent event, Player player, String command, CommandSource commandSource) {
         for (Draftable d : draftables) {
-            String commandPrefix = d.getCommandKey() + "_";
+            String commandPrefix = d.getDraftableCommandKey() + "_";
             if (command.startsWith(commandPrefix)) {
                 String innerCommand = command.substring(commandPrefix.length());
                 for (DraftChoice choice : d.getAllDraftChoices()) {
                     if (innerCommand.equals(choice.getChoiceKey())) {
+                        if (whatsStoppingDraftEnd() == null) {
+                            return "Cannot make draft picks after the draft has ended.";
+                        }
+
                         if (orchestrator == null) {
                             throw new IllegalStateException("Draft choice command issued, but no orchestrator is set");
                         }
@@ -186,10 +138,13 @@ public class DraftManager {
                             return status;
                         }
                         // Side effects, if any
-                        d.postApplyDraftChoice(event, this, player.getUserID(), choice);
+                        d.postApplyDraftPick(event, this, player.getUserID(), choice);
 
                         // After this choice, check if the draft is over.
-                        tryEndDraft(event);
+                        // (Auto picks will trigger this method in their own call stack)
+                        if (commandSource != CommandSource.AUTO_PICK) {
+                            tryEndDraft(event);
+                        }
 
                         return status;
                     }
@@ -221,7 +176,7 @@ public class DraftManager {
             return;
         }
 
-        orchestrator.startDraft(this);
+        orchestrator.sendDraftButtons(this);
     }
 
     public boolean canStartDraft() {
@@ -229,14 +184,15 @@ public class DraftManager {
             return false;
         }
 
-        // Consider checking for minimal draftables here...something that provides a faction,
+        // Consider checking for minimal draftables here...something that provides a
+        // faction,
         // something that builds a map, etc.
 
         return true;
     }
 
     public void tryEndDraft(GenericInteractionCreateEvent event) {
-        if (getBlockingDraftEndReason() != null) {
+        if (whatsStoppingDraftEnd() != null) {
             return;
         }
 
@@ -253,36 +209,50 @@ public class DraftManager {
      * @param event
      */
     public String endDraft(GenericInteractionCreateEvent event) {
-        String blockingReason = getBlockingDraftEndReason();
+        String blockingReason = whatsStoppingDraftEnd();
         if (blockingReason != null) {
-            // If you got this accidentally, it means you called endDraft() instead of tryEndDraft().
-            // If there was an issue and someone used a slash command to force-end the draft, that's fine.
+            // If you got this accidentally, it means you called endDraft() instead of
+            // tryEndDraft().
+            // If there was an issue and someone used a slash command to force-end the
+            // draft, that's fine.
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "WARNING: Forcing the draft to end despite: " + blockingReason);
         }
 
+        orchestrator.onDraftEnd(this);
         for (Draftable draftable : draftables) {
             draftable.onDraftEnd(this);
         }
 
-        trySetupPlayers(event);
+        String blockingSetup = whatsStoppingSetup();
+        if (blockingSetup != null) {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    "The draft has ended. Some additional setup needs to happen before the game can start: "
+                            + blockingSetup);
+        } else {
+            trySetupPlayers(event);
+        }
+
         return null;
     }
 
     /**
-     * Determine whether all lifecycle components are ready to end the picking of draft
+     * Determine whether all lifecycle components are ready to end the picking of
+     * draft
      * choices.
      *
-     * @return Null if ready to end the draft, or a SPECIFIC message describing what is being waited on.
+     * @return Null if ready to end the draft, or a SPECIFIC message describing what
+     *         is being waited on.
      */
-    public String getBlockingDraftEndReason() {
+    public String whatsStoppingDraftEnd() {
         for (Draftable d : draftables) {
-            String reason = d.getBlockingDraftEndReason(this);
+            String reason = d.whatsStoppingDraftEnd(this);
             if (reason != null) {
                 return reason;
             }
         }
-        return orchestrator.getBlockingDraftEndReason(this);
+        return orchestrator.whatsStoppingDraftEnd(this);
     }
 
     /**
@@ -292,8 +262,22 @@ public class DraftManager {
      * @param event
      */
     public void trySetupPlayers(GenericInteractionCreateEvent event) {
-        if (getBlockingSetupReason() != null) {
+        if (whatsStoppingSetup() != null) {
             return;
+        }
+
+        setupPlayers(event);
+    }
+
+    public void setupPlayers(GenericInteractionCreateEvent event) {
+        String blockingReason = whatsStoppingSetup();
+        if (blockingReason != null) {
+            // If you got this accidentally, it means you called setupPlayers() instead of
+            // trySetupPlayers().
+            // If there was an issue and someone used a slash command to force-setup the
+            // players, that's fine.
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "WARNING: Forcing player setup despite: " + blockingReason);
         }
 
         for (String userId : playerStates.keySet()) {
@@ -317,17 +301,18 @@ public class DraftManager {
             }
         }
 
+        game.setPhaseOfGame("playerSetup");
         AddTileListService.finishSetup(game, event);
     }
 
-    private String getBlockingSetupReason() {
+    public String whatsStoppingSetup() {
         for (Draftable d : draftables) {
-            String result = d.getBlockingSetupReason(this);
+            String result = d.whatsStoppingSetup(this);
             if (result != null) {
                 return result;
             }
         }
-        return orchestrator.getBlockingSetupReason(this);
+        return orchestrator.whatsStoppingSetup(this);
     }
 
     /**
@@ -335,34 +320,49 @@ public class DraftManager {
      * consistent.
      */
     public void validateState() {
+        // Errors that can't be fixed with slash commands, and should never happen
+        super.validateState();
         if (game == null) {
             throw new IllegalStateException("Game not set");
         }
-        if (draftables.isEmpty()) {
+        if (draftables == null) {
             throw new IllegalStateException("Draftables not set");
         }
-        if (orchestrator == null) {
-            throw new IllegalStateException("Orchestrator not set");
-        }
-        if (playerStates == null || playerStates.isEmpty()) {
-            throw new IllegalStateException("No players in draft");
-        }
-        // TODO: What could we do here instead, to confirm we have the correct number of players?
-        // if (playerStates.size() != game.getRealPlayers().size()) {
-        // throw new IllegalStateException("Number of players in draft does not match
-        // number of players in game");
-        // }
+
+        MessageChannel issueChannel = game.getMainGameChannel();
         if (draftables.isEmpty()) {
-            throw new IllegalStateException("No draftables in draft");
+            MessageHelper.sendMessageToChannel(
+                    issueChannel, "Draft problem: Nothing to draft (try `/draft add_draftable`)");
         }
-        orchestrator.validateState(this);
+        if (orchestrator == null) {
+            MessageHelper.sendMessageToChannel(
+                    issueChannel, "Draft problem: No way to draft (try `/draft set_orchestrator publicsnake`)");
+        }
+        if (playerStates.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    issueChannel, "Draft problem: No players in draft (try `/draft add_player <my-user-id>`)");
+        }
+        if(orchestrator != null) {
+            String validationError = orchestrator.validateState(this);
+            if (validationError != null) {
+                MessageHelper.sendMessageToChannel(
+                        issueChannel, "Draft problem: The orchestrator reports: " + validationError);
+            }
+        }
         for (Draftable d : draftables) {
-            d.validateState(this);
+            String validationError = d.validateState(this);
+            if (validationError != null) {
+                MessageHelper.sendMessageToChannel(
+                        issueChannel,
+                        "Draft problem: The draftable " + d.getDisplayName() + " reports: " + validationError);
+            }
         }
 
         // TODO:
-        // All DraftChoices and Draftables conform to stated requirements for their given strings,
-        // e.g. getChoiceKey() is non-null, non-empty, lowercase alpha-numeric only, etc.
+        // All DraftChoices and Draftables conform to stated requirements for their
+        // given strings,
+        // e.g. getChoiceKey() is non-null, non-empty, lowercase alpha-numeric only,
+        // etc.
 
         // TODO:
         // All DraftChoices across all Draftables have unique choice keys.

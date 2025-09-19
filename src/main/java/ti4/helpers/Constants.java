@@ -1007,6 +1007,79 @@ public class Constants {
     public static final String MILTY_DRAFT_MANAGER = "milty_draft_manager";
     public static final String MILTY_DRAFT_SETTINGS = "milty_draft_settings";
     public static final String DRAFT_MANAGER = "draft_manager";
+    public static final String DRAFT = "draft";
+
+    // groups
+    public static final String DRAFT_MANAGE = "manage";
+    public static final String DRAFT_FACTION = "faction";
+    public static final String DRAFT_PUBLIC_SNAKE = "public_snake";
+    public static final String DRAFT_SEAT = "seat";
+    public static final String DRAFT_SLICE = "slice";
+    public static final String DRAFT_SPEAKER_ORDER = "speaker_order";
+
+    // subcommands
+    public static final String DRAFT_MANAGE_DEBUG = "debug";
+    public static final String DRAFT_MANAGE_VALIDATE = "validate";
+    public static final String DRAFT_MANAGE_START = "start";
+    public static final String DRAFT_MANAGE_CAN_END = "can_end";
+    public static final String DRAFT_MANAGE_END = "end";
+    public static final String DRAFT_MANAGE_POST_DRAFT_WORK = "post_draft_work";
+    public static final String DRAFT_MANAGE_CAN_SETUP_PLAYERS = "can_setup_players";
+    public static final String DRAFT_MANAGE_SETUP_PLAYERS = "setup_players";
+    public static final String DRAFT_MANAGE_ADD_DRAFTABLE = "add_draftable";
+    public static final String DRAFT_MANAGE_SET_ORCHESTRATOR = "set_orchestrator";
+    public static final String DRAFT_MANAGE_ADD_PLAYER = "add_player";
+    public static final String DRAFT_MANAGE_REMOVE_PLAYER = "remove_player";
+    public static final String DRAFT_MANAGE_LIST_PLAYERS = "list_players";
+    public static final String DRAFT_MANAGE_CLEAR_MISSING_PLAYERS = "clear_missing_players";
+    public static final String DRAFT_MANAGE_ADD_ALL_GAME_PLAYERS = "add_all_game_players";
+    public static final String DRAFT_MANAGE_SWAP_PLAYERS = "swap_players";
+    public static final String DRAFT_MANAGE_REPLACE_PLAYER = "replace_player";
+    public static final String DRAFT_MANAGE_LIST_DRAFTABLES = "list_draftables";
+    public static final String DRAFT_MANAGE_DISPLAY_ORCHESTRATOR = "display_orchestrator";
+    public static final String DRAFT_MANAGE_MAKE_PICK = "make_pick";
+    public static final String DRAFT_MANAGE_CUSTOM_COMMAND = "custom_draftable_command";
+    public static final String DRAFT_MANAGE_CUSTOM_ORCHESTRATOR_COMMAND = "custom_orchestrator_command";
+    public static final String DRAFT_MANAGE_CONVERT_TO_MILTY = "convert_to_milty";
+    public static final String DRAFT_FACTION_ADD = "add";
+    public static final String DRAFT_FACTION_REMOVE = "remove";
+    public static final String DRAFT_FACTION_SET_KELERES_FLAVOR = "set_keleres_flavor";
+    public static final String DRAFT_PUBLIC_SNAKE_SET_ORDER = "set_order";
+    public static final String DRAFT_PUBLIC_SNAKE_SET_CURRENT_PLAYER = "set_current_player";
+    public static final String DRAFT_PUBLIC_SNAKE_SET_DRAFT_DIRECTION = "set_draft_direction";
+    public static final String DRAFT_PUBLIC_SNAKE_SEND_BUTTONS = "send_buttons";
+    public static final String DRAFT_SEAT_SET_SEAT_COUNT = "set_seat_count";
+    public static final String DRAFT_SEAT_SET_FOR_MAP = "set_for_map";
+    public static final String DRAFT_SLICE_MODIFY_SLICE = "modify_slice";
+    public static final String DRAFT_SLICE_ADD_SLICE = "add_slice";
+    public static final String DRAFT_SLICE_REMOVE_SLICE = "remove_slice";
+    public static final String DRAFT_SPEAKER_ORDER_SET_PICK_COUNT = "set_pick_count";
+
+    // options
+    public static final String FORCE_OPTION = "force";
+    public static final String ADD_DRAFTABLE_OPTION = "add_draftable_type";
+    public static final String SET_ORCHESTRATOR_OPTION = "set_orchestrator_type";
+    public static final String SAVE_DATA_OPTION = "save_data";
+    public static final String UNKNOWN_DRAFT_USER_ID_OPTION = "unknown_user_id";
+    public static final String DRAFTABLE_TYPE_OPTION = "draftable_type";
+    public static final String DRAFTABLE_CHOICE_KEY_OPTION = "draftable_choice_key";
+    public static final String DRAFT_COMMAND_OPTION = "command_key";
+    public static final String DRAFT_FACTION_OPTION = "draft_faction";
+    public static final String KELERES_FLAVOR_OPTION = "keleres_flavor";
+    public static final String DRAFT_DIRECTION_FORWARD_OPTION = "forward";
+    public static final String SEAT_COUNT_OPTION = "num_seats";
+    public static final String DRAFT_SLICE_OPTION = "slice_name";
+    public static final String DRAFT_TILE_1_OPTION = "tile_1";
+    public static final String DRAFT_TILE_2_OPTION = "tile_2";
+    public static final String DRAFT_TILE_3_OPTION = "tile_3";
+    public static final String DRAFT_TILE_4_OPTION = "tile_4";
+    public static final String DRAFT_TILE_5_OPTION = "tile_5";
+    public static final String DRAFT_TILE_6_OPTION = "tile_6";
+    public static final String DRAFT_TILE_7_OPTION = "tile_7";
+    public static final String DRAFT_TILE_8_OPTION = "tile_8";
+    public static final String DRAFT_TILE_9_OPTION = "tile_9";
+    public static final String DRAFT_NEW_SLICE_OPTION = "new_slice_name";
+    public static final String PICK_COUNT_OPTION = "pick_count";
 
     // ABILITY, TECH, AGENT, COMMANDER, HERO, MECH, FLAGSHIP, COMMODITIES, PN, HOMESYSTEM, STARTINGTECH, STARTINGFLEET,
     // BLUETILE, REDTILE, DRAFTORDER

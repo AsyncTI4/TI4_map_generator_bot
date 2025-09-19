@@ -4,23 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
-import ti4.service.draft.draftables.FactionDraftable;
-import ti4.service.draft.draftables.SeatDraftable;
-import ti4.service.draft.draftables.SliceDraftable;
-import ti4.service.draft.draftables.SpeakerOrderDraftable;
-import ti4.service.draft.orchestrators.PublicSnakeDraftOrchestrator;
+import ti4.service.draft.DraftOrchestrator.PlayerOrchestratorState;
 
 @UtilityClass
 public class DraftLoadService {
-    // For security reasons, make sure we only deserialize known types.
-    private static final List<Class<? extends Draftable>> KNOWN_DRAFTABLE_TYPES = List.of(
-            FactionDraftable.class, SliceDraftable.class, SeatDraftable.class, SpeakerOrderDraftable.class
-            // Add other Draftable subclasses here as they are created.
-            );
-    private static final List<Class<? extends DraftOrchestrator>> KNOWN_ORCHESTRATOR_TYPES = List.of(
-            PublicSnakeDraftOrchestrator.class
-            // Add DraftOrchestrator subclasses here as they are created.
-            );
 
     public DraftManager loadDraftManager(Game game, List<String> draftData) {
         DraftOrchestrator orchestrator = null;
@@ -28,26 +15,39 @@ public class DraftLoadService {
         List<String> playerUserIds = new ArrayList<>();
 
         // Re-initialize classes
+        String playersKey = "players" + DraftSaveService.KEY_SEPARATOR;
+        String orchestratorKey = "orchestrator" + DraftSaveService.KEY_SEPARATOR;
+        String draftableKey = "draftable" + DraftSaveService.KEY_SEPARATOR;
         for (String data : draftData) {
-            if (data.startsWith("players:")) {
-                playerUserIds = List.of(data.substring("players:".length()).split(","));
-            } else if (data.startsWith("orchestrator:")) {
-                orchestrator = loadOrchestrator(data);
-            } else if (data.startsWith("draftable:")) {
-                Draftable draftable = loadDraftable(data);
+            if (data.startsWith(playersKey)) {
+                playerUserIds =
+                        List.of(data.substring(playersKey.length()).split("\\" + DraftSaveService.DATA_SEPARATOR));
+            } else if (data.startsWith(orchestratorKey)) {
+                orchestrator = loadOrchestrator(data.substring(orchestratorKey.length()));
+            } else if (data.startsWith(draftableKey)) {
+                Draftable draftable = loadDraftable(data.substring(draftableKey.length()));
                 draftables.add(draftable);
             }
         }
 
         DraftManager draftManager = new DraftManager(game);
-        draftManager.setPlayers(playerUserIds);
-        draftManager.setOrchestrator(orchestrator);
-        draftManager.getDraftables().addAll(draftables);
+        if (!playerUserIds.isEmpty()) {
+            draftManager.setPlayers(playerUserIds);
+        }
+        if (orchestrator != null) {
+            draftManager.setOrchestrator(orchestrator);
+        }
+        if (!draftables.isEmpty()) {
+            draftManager.getDraftables().addAll(draftables);
+        }
 
         // Setup player states
+        String playerChoiceKey = "playerchoice" + DraftSaveService.KEY_SEPARATOR;
+        String playerOrchestratorStateKey = "playerorchestratorstate" + DraftSaveService.KEY_SEPARATOR;
         for (String data : draftData) {
-            if (data.startsWith("playerchoice:")) {
-                String[] tokens = data.substring("playerchoice:".length()).split(",");
+            if (data.startsWith(playerChoiceKey)) {
+                String[] tokens =
+                        data.substring(playerChoiceKey.length()).split("\\" + DraftSaveService.DATA_SEPARATOR, 3);
                 String playerUserId = tokens[0];
                 DraftableType draftableType = DraftableType.of(tokens[1]);
                 String choiceKey = tokens[2];
@@ -57,64 +57,54 @@ public class DraftLoadService {
                         .getPicks()
                         .computeIfAbsent(choice.getType(), k -> new ArrayList<>())
                         .add(choice);
-            } else if (data.startsWith("playerorchestratorstate:")) {
-                String[] tokens =
-                        data.substring("playerorchestratorstate:".length()).split(",");
-                String playerUserId = tokens[0];
-                String orchestratorStateData = tokens[1];
-                PlayerDraftState playerState = draftManager.getPlayerStates().get(playerUserId);
+            } else if (data.startsWith(playerOrchestratorStateKey)) {
                 if (orchestrator != null) {
-                    OrchestratorState orchestratorState = orchestrator.loadPlayerState(orchestratorStateData);
-                    playerState.setOrchestratorState(orchestratorState);
+                    PlayerOrchestratorState playerOrchestratorState =
+                            orchestrator.loadPlayerState(data.substring(playerOrchestratorStateKey.length()));
+                    PlayerDraftState playerState =
+                            draftManager.getPlayerStates().get(playerOrchestratorState.playerUserId());
+                    playerState.setOrchestratorState(playerOrchestratorState.state());
+                } else {
+                    throw new IllegalStateException(
+                            "Orchestrator must be set before loading player orchestrator states");
                 }
             }
         }
-
-        draftManager.validateState();
 
         return draftManager;
     }
 
     private DraftOrchestrator loadOrchestrator(String data) {
-        String[] orchestratorTokens = data.split(":");
-        if (orchestratorTokens.length != 3) {
+        String[] orchestratorTokens = data.split("\\" + DraftSaveService.DATA_SEPARATOR, 2);
+        if (orchestratorTokens.length != 2) {
             throw new IllegalArgumentException("Invalid orchestrator data: " + data);
         }
-        String className = orchestratorTokens[1];
-        String orchestratorData = orchestratorTokens[2];
-        for (Class<? extends DraftOrchestrator> knownClass : KNOWN_ORCHESTRATOR_TYPES) {
-            if (knownClass.getName().equals(className)) {
-                try {
-                    DraftOrchestrator orchestrator =
-                            knownClass.getDeclaredConstructor().newInstance();
-                    orchestrator.load(orchestratorData);
-                    return orchestrator;
-                } catch (Exception e) {
-                    throw new IllegalArgumentException("Failed to load orchestrator of type " + className, e);
-                }
-            }
+        String className = orchestratorTokens[0];
+        String orchestratorData = orchestratorTokens[1];
+
+        DraftOrchestrator orchestrator = DraftComponentFactory.createOrchestrator(className);
+        if (orchestrator != null) {
+            orchestrator.load(orchestratorData);
+            return orchestrator;
         }
+
         throw new IllegalArgumentException("Unknown orchestrator type: " + className);
     }
 
     private Draftable loadDraftable(String data) {
-        String[] draftableTokens = data.split(":", 3);
-        if (draftableTokens.length != 3) {
+        String[] draftableTokens = data.split("\\" + DraftSaveService.DATA_SEPARATOR, 2);
+        if (draftableTokens.length != 2) {
             throw new IllegalArgumentException("Invalid draftable data: " + data);
         }
-        String className = draftableTokens[1];
-        String draftableData = draftableTokens[2];
-        for (Class<? extends Draftable> knownClass : KNOWN_DRAFTABLE_TYPES) {
-            if (knownClass.getName().equals(className)) {
-                try {
-                    Draftable draftable = knownClass.getDeclaredConstructor().newInstance();
-                    draftable.load(draftableData);
-                    return draftable;
-                } catch (Exception e) {
-                    throw new IllegalArgumentException("Failed to load draftable of type " + className, e);
-                }
-            }
+        String className = draftableTokens[0];
+        String draftableData = draftableTokens[1];
+
+        Draftable draftable = DraftComponentFactory.createDraftable(className);
+        if (draftable != null) {
+            draftable.load(draftableData);
+            return draftable;
         }
+
         throw new IllegalArgumentException("Unknown draftable type: " + className);
     }
 
