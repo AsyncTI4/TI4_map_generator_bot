@@ -1,7 +1,6 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -538,16 +537,31 @@ public class CombatRollService {
 
             buttons.add(Buttons.red(
                     "getDamageButtons_" + tile.getPosition() + "_bombardment", "Assign Hit" + (h == 1 ? "" : "s")));
-            for (Player p2 : game.getRealPlayers()) {
+            for (Player p2 : game.getRealPlayersNNeutral()) {
                 if (p2 == player) {
                     continue;
                 }
                 if (!bombardPlanet.isEmpty()
                         && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(bombardPlanet))) {
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
-                            p2.getRepresentation() + ", please assign the BOMBARDMENT hit" + (h == 1 ? "" : "s") + ".",
-                            buttons);
+                    if (p2.isRealPlayer()) {
+                        MessageHelper.sendMessageToChannelWithButtons(
+                                game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
+                                p2.getRepresentation() + ", please assign the BOMBARDMENT hit" + (h == 1 ? "" : "s")
+                                        + ".",
+                                buttons);
+                    } else {
+                        List<Button> buttons2 = new ArrayList<>();
+                        buttons2.add(Buttons.green(
+                                p2.dummyPlayerSpoof() + "autoAssignGroundHits_"
+                                        + game.getUnitHolderFromPlanet(bombardPlanet)
+                                                .getName() + "_" + h,
+                                "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
+                        MessageHelper.sendMessageToChannelWithButtons(
+                                game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
+                                player.getRepresentation() + ", please assign the BOMBARDMENT hit" + (h == 1 ? "" : "s")
+                                        + " for the dummy player.",
+                                buttons2);
+                    }
                 }
             }
         }

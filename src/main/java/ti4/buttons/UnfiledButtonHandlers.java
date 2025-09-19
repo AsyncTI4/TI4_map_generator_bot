@@ -2269,6 +2269,47 @@ public class UnfiledButtonHandlers {
         }
     }
 
+    public static void respondAllHaveScored(Game game) {
+        String message2 =
+                "All players have indicated scoring. Flip the relevant public objective using the buttons. This will automatically run status clean-up if it has not been run already.";
+        Button draw2Stage2 = Buttons.green("reveal_stage_2x2", "Reveal 2 Stage 2");
+        Button drawStage2 = Buttons.green("reveal_stage_2", "Reveal Stage 2");
+        Button drawStage1 = Buttons.green("reveal_stage_1", "Reveal Stage 1");
+        List<Button> buttons = new ArrayList<>();
+        if (game.isRedTapeMode() || game.isCivilizedSocietyMode()) {
+            message2 = "All players have indicated scoring. In this game mode, no objective is revealed at this stage."
+                    + " Please press one of the buttons below anyways though - don't worry, it won't reveal anything, it will just run cleanup.";
+        }
+        if (game.getRound() < 4 || !game.getPublicObjectives1Peakable().isEmpty()) {
+            buttons.add(drawStage1);
+        }
+        if ((game.getRound() > 3 || game.getPublicObjectives1Peakable().isEmpty()) && !game.isOmegaPhaseMode()) {
+            if ("456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
+                buttons.add(draw2Stage2);
+            } else {
+                buttons.add(drawStage2);
+            }
+        }
+        var endGameDeck =
+                game.isOmegaPhaseMode() ? game.getPublicObjectives1Peakable() : game.getPublicObjectives2Peakable();
+        var endGameRound = game.isOmegaPhaseMode() ? 9 : 7;
+        if (game.getRound() > endGameRound || endGameDeck.isEmpty()) {
+            if (game.isFowMode()) {
+                message2 += "\n> - If there are no more objectives to reveal, use the button to continue as is.";
+                message2 += " Or end the game manually.";
+                buttons.add(Buttons.green("reveal_stage_none", "Continue without revealing"));
+            } else {
+                message2 += "\n> - If there are no more objectives to reveal, use the button to end the game.";
+                message2 +=
+                        " Whoever has the most points is crowned the winner, or whoever has the earliest initiative in the case of ties.";
+
+                buttons.add(Buttons.red("gameEnd", "End Game"));
+                buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message2, buttons);
+    }
+
     private static void respondAllPlayersReacted(ButtonInteractionEvent event, Game game) {
         String buttonID = event.getButton().getCustomId();
         if (game == null || buttonID == null) {
@@ -2314,48 +2355,7 @@ public class UnfiledButtonHandlers {
                 ReactionService.handleAllPlayersReactingNoSabotage(
                         event.getInteraction().getMessage(), game);
             case Constants.PO_SCORING, Constants.PO_NO_SCORING -> {
-                String message2 =
-                        "All players have indicated scoring. Flip the relevant public objective using the buttons. This will automatically run status clean-up if it has not been run already.";
-                Button draw2Stage2 = Buttons.green("reveal_stage_2x2", "Reveal 2 Stage 2");
-                Button drawStage2 = Buttons.green("reveal_stage_2", "Reveal Stage 2");
-                Button drawStage1 = Buttons.green("reveal_stage_1", "Reveal Stage 1");
-                List<Button> buttons = new ArrayList<>();
-                if (game.isRedTapeMode() || game.isCivilizedSocietyMode()) {
-                    message2 =
-                            "All players have indicated scoring. In this game mode, no objective is revealed at this stage."
-                                    + " Please press one of the buttons below anyways though - don't worry, it won't reveal anything, it will just run cleanup.";
-                }
-                if (game.getRound() < 4 || !game.getPublicObjectives1Peakable().isEmpty()) {
-                    buttons.add(drawStage1);
-                }
-                if ((game.getRound() > 3 || game.getPublicObjectives1Peakable().isEmpty())
-                        && !game.isOmegaPhaseMode()) {
-                    if ("456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
-                        buttons.add(draw2Stage2);
-                    } else {
-                        buttons.add(drawStage2);
-                    }
-                }
-                var endGameDeck = game.isOmegaPhaseMode()
-                        ? game.getPublicObjectives1Peakable()
-                        : game.getPublicObjectives2Peakable();
-                var endGameRound = game.isOmegaPhaseMode() ? 9 : 7;
-                if (game.getRound() > endGameRound || endGameDeck.isEmpty()) {
-                    if (game.isFowMode()) {
-                        message2 +=
-                                "\n> - If there are no more objectives to reveal, use the button to continue as is.";
-                        message2 += " Or end the game manually.";
-                        buttons.add(Buttons.green("reveal_stage_none", "Continue without revealing"));
-                    } else {
-                        message2 += "\n> - If there are no more objectives to reveal, use the button to end the game.";
-                        message2 +=
-                                " Whoever has the most points is crowned the winner, or whoever has the earliest initiative in the case of ties.";
-
-                        buttons.add(Buttons.red("gameEnd", "End Game"));
-                        buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
-                    }
-                }
-                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message2, buttons);
+                respondAllHaveScored(game);
             }
             case "pass_on_abilities" -> {
                 if (game.isCustodiansScored() || game.isOmegaPhaseMode()) {
