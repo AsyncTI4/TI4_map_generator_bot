@@ -342,7 +342,7 @@ public class DraftManager extends DraftPlayerManager {
             MessageHelper.sendMessageToChannel(
                     issueChannel, "Draft problem: No players in draft (try `/draft add_player <my-user-id>`)");
         }
-        if(orchestrator != null) {
+        if (orchestrator != null) {
             String validationError = orchestrator.validateState(this);
             if (validationError != null) {
                 MessageHelper.sendMessageToChannel(

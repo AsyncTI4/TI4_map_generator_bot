@@ -57,7 +57,7 @@ public class SliceDraftableSubcommands extends SubcommandGroup {
 
     public static String sliceWorksForTemplate(Game game, List<MiltyDraftTile> sliceTiles) {
         String mapTemplateId = game.getMapTemplateID();
-        if(mapTemplateId == null) {
+        if (mapTemplateId == null) {
             return null;
         }
         MapTemplateModel mapTemplate = Mapper.getMapTemplate(mapTemplateId);
@@ -174,10 +174,8 @@ public class SliceDraftableSubcommands extends SubcommandGroup {
             }
 
             String sliceTemplateError = sliceWorksForTemplate(getGame(), sliceTiles);
-            if(sliceTemplateError != null) {
-                MessageHelper.sendMessageToChannel(
-                        event.getChannel(),
-                        sliceTemplateError);
+            if (sliceTemplateError != null) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), sliceTemplateError);
                 return;
             }
 
@@ -191,9 +189,11 @@ public class SliceDraftableSubcommands extends SubcommandGroup {
 
             slice.setTiles(sliceTiles);
             draftable.validateState(getGame().getDraftManager());
-            FileUpload summaryImage = draftable.generateSummaryImage(getGame().getDraftManager(), "slice_update", List.of(slice.getName()));
+            FileUpload summaryImage = draftable.generateSummaryImage(
+                    getGame().getDraftManager(), "slice_update", List.of(slice.getName()));
             if (summaryImage != null) {
-                MessageHelper.sendMessageWithFile(event.getChannel(), summaryImage, "Added slice '" + sliceName + "'.", false, false);
+                MessageHelper.sendMessageWithFile(
+                        event.getChannel(), summaryImage, "Added slice '" + sliceName + "'.", false, false);
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Added slice '" + sliceName + "'.");
             }
@@ -307,10 +307,8 @@ public class SliceDraftableSubcommands extends SubcommandGroup {
             }
 
             String sliceTemplateError = sliceWorksForTemplate(getGame(), sliceTiles);
-            if(sliceTemplateError != null) {
-                MessageHelper.sendMessageToChannel(
-                        event.getChannel(),
-                        sliceTemplateError);
+            if (sliceTemplateError != null) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), sliceTemplateError);
                 return;
             }
 
@@ -319,9 +317,11 @@ public class SliceDraftableSubcommands extends SubcommandGroup {
             slice.setTiles(sliceTiles);
             draftable.getSlices().add(slice);
             draftable.validateState(getGame().getDraftManager());
-            FileUpload summaryImage = draftable.generateSummaryImage(getGame().getDraftManager(), "slice_update", List.of(slice.getName()));
+            FileUpload summaryImage = draftable.generateSummaryImage(
+                    getGame().getDraftManager(), "slice_update", List.of(slice.getName()));
             if (summaryImage != null) {
-                MessageHelper.sendMessageWithFile(event.getChannel(), summaryImage, "Added slice '" + sliceName + "'.", false, false);
+                MessageHelper.sendMessageWithFile(
+                        event.getChannel(), summaryImage, "Added slice '" + sliceName + "'.", false, false);
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Added slice '" + sliceName + "'.");
             }

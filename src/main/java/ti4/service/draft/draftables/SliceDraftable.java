@@ -54,7 +54,12 @@ public class SliceDraftable extends SinglePickDraftable {
             String unformattedName = "Slice " + slice.getName();
             String displayName = "Slice " + slice.getName();
             choices.add(new DraftChoice(
-                    getType(), choiceKey, makeChoiceButton(choiceKey, null, buttonEmoji), displayName, unformattedName, buttonEmoji));
+                    getType(),
+                    choiceKey,
+                    makeChoiceButton(choiceKey, null, buttonEmoji),
+                    displayName,
+                    unformattedName,
+                    buttonEmoji));
         }
         return choices;
     }

@@ -16,7 +16,6 @@ import ti4.image.PositionMapper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.MapTemplateModel;
-import ti4.service.milty.MiltyService.DraftSpec;
 import ti4.settings.GlobalSettings;
 import ti4.spring.jda.JdaService;
 
@@ -24,7 +23,7 @@ import ti4.spring.jda.JdaService;
 public class GenerateSlicesService {
 
     public static boolean generateSlices(
-            GenericInteractionCreateEvent event, MiltyDraftManager draftManager, DraftSpec specs) {
+            GenericInteractionCreateEvent event, MiltyDraftManager draftManager, MiltyDraftSpec specs) {
         int sliceCount = specs.numSlices;
         boolean anomaliesCanTouch = specs.anomaliesCanTouch;
 
@@ -184,7 +183,8 @@ public class GenerateSlicesService {
         return slice;
     }
 
-    private static boolean checkIfSliceIsGood(DraftSpec spec, MiltyDraftSlice slice, Map<String, Integer> failReasons) {
+    private static boolean checkIfSliceIsGood(
+            MiltyDraftSpec spec, MiltyDraftSlice slice, Map<String, Integer> failReasons) {
         Function<String, Integer> addReason =
                 reason -> failReasons.put(reason, failReasons.getOrDefault(reason, 0) + 1);
 

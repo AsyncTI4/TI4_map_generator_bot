@@ -213,8 +213,11 @@ public class FactionDraftable extends SinglePickDraftable {
             } else {
                 String flavoredKeleres = "keleres" + flavor.substring(0, 1);
                 FactionModel flavorFaction = Mapper.getFaction(flavoredKeleres);
-                MessageHelper.sendMessageToChannel(draftManager.getGame().getPlayer(playerUserId).getCardsInfoThread(),
-                    "Set Keleres flavor to " + flavorFaction.getFactionEmoji() + " **" + flavorFaction.getFactionName() + "**. You can update this any time until the draft ends.");
+                MessageHelper.sendMessageToChannel(
+                        draftManager.getGame().getPlayer(playerUserId).getCardsInfoThread(),
+                        "Set Keleres flavor to " + flavorFaction.getFactionEmoji() + " **"
+                                + flavorFaction.getFactionName()
+                                + "**. You can update this any time until the draft ends.");
                 sendKeleresButtons(draftManager, playerUserId, false);
             }
 

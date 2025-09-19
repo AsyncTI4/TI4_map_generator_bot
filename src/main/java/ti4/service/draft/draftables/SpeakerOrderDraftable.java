@@ -50,7 +50,12 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
             String displayName = StringHelper.ordinal(i) + " Pick";
             String unformattedName = StringHelper.ordinal(i) + " Pick";
             choices.add(new DraftChoice(
-                    getType(), choiceKey, makeChoiceButton(choiceKey, null, buttonEmoji), displayName, unformattedName, buttonEmoji));
+                    getType(),
+                    choiceKey,
+                    makeChoiceButton(choiceKey, null, buttonEmoji),
+                    displayName,
+                    unformattedName,
+                    buttonEmoji));
         }
         return choices;
     }

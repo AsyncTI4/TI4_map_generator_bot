@@ -356,7 +356,11 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             super(Constants.DRAFT_MANAGE_REMOVE_PLAYER, "Remove player from the draft", true, false);
             addOption(OptionType.USER, Constants.PLAYER, "Player to remove", false);
             addOption(
-                    OptionType.STRING, Constants.UNKNOWN_DRAFT_USER_ID_OPTION, "Player to remove (not in game)", false, true);
+                    OptionType.STRING,
+                    Constants.UNKNOWN_DRAFT_USER_ID_OPTION,
+                    "Player to remove (not in game)",
+                    false,
+                    true);
         }
 
         @Override
@@ -491,7 +495,10 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                     draftManager.getOrchestrator().sendDraftButtons(draftManager);
                 }
                 MessageHelper.sendMessageToChannel(
-                        event.getChannel(), "Swapped players in draft: " + game.getPlayer(playerUserId1).getPing() + " and " + game.getPlayer(playerUserId2).getPing());
+                        event.getChannel(),
+                        "Swapped players in draft: "
+                                + game.getPlayer(playerUserId1).getPing() + " and "
+                                + game.getPlayer(playerUserId2).getPing());
             } catch (IllegalArgumentException e) {
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(), "Could not swap players in draft: " + e.getMessage());
@@ -538,7 +545,8 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                 }
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(),
-                        "Replaced player in draft: " + oldPlayerUserId + " with " + game.getPlayer(newPlayerUserId).getPing());
+                        "Replaced player in draft: " + oldPlayerUserId + " with "
+                                + game.getPlayer(newPlayerUserId).getPing());
             } catch (IllegalArgumentException e) {
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(), "Could not replace player in draft: " + e.getMessage());
@@ -762,7 +770,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             MiltySettings settings = game.getMiltySettingsUnsafe();
             MiltyDraftSpec spec;
             if (settings != null) {
-                spec = MiltyDraftSpec.CreateFromMiltySettings(settings);
+                spec = MiltyDraftSpec.fromSettings(settings);
             } else {
                 spec = new MiltyDraftSpec(game);
             }
@@ -773,10 +781,10 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             spec.playerIDs = draftManager.getPlayerStates().keySet().stream().collect(Collectors.toList());
             String mapTemplateID = game.getMapTemplateID();
             MapTemplateModel mapTemplate = null;
-            if(mapTemplateID != null) {
+            if (mapTemplateID != null) {
                 mapTemplate = Mapper.getMapTemplate(mapTemplateID);
             }
-            if(mapTemplate == null) {
+            if (mapTemplate == null) {
                 mapTemplate = Mapper.getDefaultMapTemplateForPlayerCount(spec.playerIDs.size());
             }
             spec.setTemplate(mapTemplate);

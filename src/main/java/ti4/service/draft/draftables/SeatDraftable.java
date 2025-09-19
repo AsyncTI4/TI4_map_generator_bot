@@ -49,7 +49,12 @@ public class SeatDraftable extends SinglePickDraftable {
             String unformattedName = "Seat " + i;
             String displayName = "Seat " + i;
             choices.add(new DraftChoice(
-                    getType(), choiceKey, makeChoiceButton(choiceKey, null, buttonEmoji), displayName, unformattedName, buttonEmoji));
+                    getType(),
+                    choiceKey,
+                    makeChoiceButton(choiceKey, null, buttonEmoji),
+                    displayName,
+                    unformattedName,
+                    buttonEmoji));
         }
         return choices;
     }

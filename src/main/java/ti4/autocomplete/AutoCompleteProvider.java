@@ -948,7 +948,8 @@ public class AutoCompleteProvider {
                 DraftManager draftManager = game.getDraftManager();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 List<String> userIDs = draftManager.getPlayerStates().keySet().stream()
-                        .filter(id -> game.getPlayer(id) == null || event.getGuild().getMemberById(id) == null)
+                        .filter(id ->
+                                game.getPlayer(id) == null || event.getGuild().getMemberById(id) == null)
                         .toList();
 
                 List<Command.Choice> options = userIDs.stream()
@@ -1140,7 +1141,8 @@ public class AutoCompleteProvider {
                 event.replyChoices(tiles.stream()
                                 .map(t -> new Command.Choice(
                                         Mapper.getTileRepresentations()
-                                                .get(t.getTile().getTileID()) + " (" + t.getTile().getTileID() + ")",
+                                                        .get(t.getTile().getTileID()) + " ("
+                                                + t.getTile().getTileID() + ")",
                                         t.getTile().getTileID()))
                                 .toList())
                         .queue();

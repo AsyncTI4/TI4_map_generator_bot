@@ -21,13 +21,13 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.message.MessageHelper.MessageFunction;
 import ti4.message.logging.BotLogger;
+import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class PublicDraftInfoService {
@@ -234,7 +234,7 @@ public class PublicDraftInfoService {
         return hist -> {
             boolean summaryDone = false, categoryDone = false;
             for (Message msg : hist.getRetrievedHistory()) {
-                if (!msg.getAuthor().getId().equals(AsyncTI4DiscordBot.getBotId())) continue;
+                if (!msg.getAuthor().getId().equals(JdaService.getBotId())) continue;
                 String txt = msg.getContentRaw();
 
                 if (!summaryDone && txt.startsWith(SUMMARY_START)) {
