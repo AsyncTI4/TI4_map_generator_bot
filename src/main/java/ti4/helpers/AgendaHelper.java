@@ -1405,7 +1405,8 @@ public class AgendaHelper {
             int[] voteInfo = getVoteTotal(nextInLine, game);
             boolean willPrevote =
                     !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty()
-                            && !"0".equalsIgnoreCase(game.getStoredValue("preVoting" + nextInLine.getFaction()));
+                            && !"0".equalsIgnoreCase(game.getStoredValue("preVoting" + nextInLine.getFaction()))
+                            && voteInfo[0] > 0;
             while ((voteInfo[0] < 1 && !nextInLine.getColor().equalsIgnoreCase(player.getColor()))
                     || game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())
                     || willPrevote) {
@@ -1454,7 +1455,8 @@ public class AgendaHelper {
                 voteInfo = getVoteTotal(nextInLine, game);
                 willPrevote = !game.getStoredValue("preVoting" + nextInLine.getFaction())
                                 .isEmpty()
-                        && !"0".equalsIgnoreCase(game.getStoredValue("preVoting" + nextInLine.getFaction()));
+                        && !"0".equalsIgnoreCase(game.getStoredValue("preVoting" + nextInLine.getFaction()))
+                        && voteInfo[0] > 0;
             }
 
             if (!nextInLine.getColor().equalsIgnoreCase(player.getColor())) {

@@ -493,9 +493,15 @@ public class CombatRollService {
                         + (h == 1 ? "" : "s") + ".";
                 List<Button> buttons = new ArrayList<>();
                 String finChecker = "FFCC_" + opponent.getFaction() + "_";
-                buttons.add(Buttons.green(
-                        finChecker + "autoAssignAFBHits_" + tile.getPosition() + "_" + h,
-                        "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                if (opponent.isDummy() || opponent.isNpc()) {
+                    buttons.add(Buttons.green(
+                            opponent.dummyPlayerSpoof() + "autoAssignAFBHits_" + tile.getPosition() + "_" + h,
+                            "Auto-assign Hit" + (h == 1 ? "" : "s For Dummy")));
+                } else {
+                    buttons.add(Buttons.green(
+                            finChecker + "autoAssignAFBHits_" + tile.getPosition() + "_" + h,
+                            "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                }
                 buttons.add(Buttons.gray("cancelAFBHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
@@ -512,7 +518,7 @@ public class CombatRollService {
             MessageHelper.sendMessageToChannel(channel, msg);
             List<Button> buttons = new ArrayList<>();
             String finChecker = "FFCC_" + opponent.getFaction() + "_";
-            if (opponent.isDummy()) {
+            if (opponent.isDummy() || opponent.isNpc()) {
                 buttons.add(Buttons.green(
                         opponent.dummyPlayerSpoof() + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_"
                                 + h,
