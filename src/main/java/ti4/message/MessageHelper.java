@@ -253,6 +253,22 @@ public class MessageHelper {
         MessageFunction addFactionReact = (message) -> {
             StringTokenizer players =
                     switch (messageType) {
+                        case STATUS_SCORING -> {
+                            String scored = "";
+                            for (Player player : game.getRealPlayers()) {
+                                String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
+                                String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
+
+                                if (!po.isEmpty() && !so.isEmpty()) {
+                                    if (scored.isEmpty()) {
+                                        scored = player.getFaction();
+                                    } else {
+                                        scored += "_" + player.getFaction();
+                                    }
+                                }
+                            }
+                            yield new StringTokenizer(scored, "_");
+                        }
                         case AGENDA_WHEN -> {
                             String oldMessageId = GameMessageManager.replace(
                                     game.getName(),

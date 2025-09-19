@@ -894,6 +894,11 @@ public class AgendaHelper {
         offerPreVote(player);
         resolveAfterQueue(event, game);
         if (playerDoesNotHaveShenanigans(player)) {
+            String part2 = player.getFaction();
+            if (!game.getStoredValue("Pass On Shenanigans").isEmpty()) {
+                part2 = game.getStoredValue("Pass On Shenanigans") + "_" + player.getFaction();
+            }
+            game.setStoredValue("Pass On Shenanigans", part2);
             return;
         }
         String msg = player.getRepresentation() + " you have the option to pre-pass on agenda shenanigans here."
