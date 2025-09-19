@@ -133,7 +133,7 @@ public class DraftManager extends DraftPlayerManager {
                             return validationError;
                         }
                         // More validation, and add the button to the player's state
-                        String status = orchestrator.applyDraftChoice(event, this, player.getUserID(), choice);
+                        String status = orchestrator.applyDraftChoice(event, this, player.getUserID(), choice, commandSource);
                         if (DraftButtonService.isError(status)) {
                             return status;
                         }

@@ -26,6 +26,7 @@ import ti4.service.draft.PartialMapService;
 import ti4.service.draft.PlayerDraftState;
 import ti4.service.draft.PlayerSetupService.PlayerSetupState;
 import ti4.service.draft.PublicDraftInfoService;
+import ti4.service.draft.DraftManager.CommandSource;
 
 public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     public static class State extends OrchestratorState {
@@ -136,7 +137,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
     @Override
     public String applyDraftChoice(
-            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice) {
+            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice, CommandSource source) {
         List<String> playerOrder = getPlayerOrder(draftManager);
 
         // Picks are made one player at a time, with all buttons visible.
@@ -158,8 +159,18 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         playerChoices.computeIfAbsent(choice.getType(), k -> new ArrayList<>()).add(choice);
 
         Player player = draftManager.getGame().getPlayer(playerUserId);
+        StringBuilder sb = new StringBuilder();
+        sb.append(player.getPing())
+                .append(" drafted ");
+        if(source == CommandSource.AUTO_PICK) {
+            sb.append("(automatically) ");
+        } else if(source == CommandSource.SLASH_COMMAND) {
+            sb.append("(forcefully) ");
+        }
+        sb.append(choice.getDisplayName())
+                .append("!");
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), player.getPing() + " drafted " + choice.getDisplayName() + "!");
+                event.getMessageChannel(), sb.toString());
 
         // Move the draft to the next player
         advanceToNextPlayer(playerOrder);

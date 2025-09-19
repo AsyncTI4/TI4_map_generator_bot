@@ -1,6 +1,7 @@
 package ti4.service.draft;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.service.draft.DraftManager.CommandSource;
 
 public abstract class DraftOrchestrator extends DraftLifecycleHooks {
     public abstract void sendDraftButtons(DraftManager draftManager);
@@ -14,7 +15,7 @@ public abstract class DraftOrchestrator extends DraftLifecycleHooks {
             GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId);
 
     public abstract String applyDraftChoice(
-            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice);
+            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice, CommandSource source);
 
     // Persistence
 
