@@ -234,6 +234,11 @@ public class TacticalActionOutputService {
             } else {
                 output += ", __does not have _Gravity Drive___)";
             }
+            if (player.hasUnlockedBreakthrough("winnubt")
+                    && game.getTileByPosition(game.getActiveSystem()).hasLegendary()) {
+                maxBonus++;
+                output += " (has Winnu Breakthrough for +1 movement for one ship when moving to a legendary tile)";
+            }
             if (player.getTechs().contains("dsgledb")) {
                 maxBonus++;
                 output += " (has _Lightning Drives_ for +1 movement if not transporting)";

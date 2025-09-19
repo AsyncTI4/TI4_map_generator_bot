@@ -541,7 +541,8 @@ public class StartCombatService {
     }
 
     private static void offerRedGhostCommanderButtons(Player player, Game game, GenericInteractionCreateEvent event) {
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")) {
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")
+                || game.playerHasLeaderUnlockedOrAlliance(player, "crimsoncommander")) {
             String message = player.getRepresentation(true, true)
                     + ", you may, at the __end__ of combat, gain 1 commodity or convert 1 of your commodities to a trade good,"
                     + " with \"Total Mystery\", the Red Creuss commander."
@@ -1229,6 +1230,15 @@ public class StartCombatService {
                                 + "Letnev Agent",
                         FactionEmojis.Letnev));
             }
+            if ((!game.isFowMode() || agentHolder == p1)
+                    && agentHolder.hasUnexhaustedLeader("xanagent")
+                    && "space".equalsIgnoreCase(groundOrSpace)) {
+                buttons.add(Buttons.gray(
+                        finChecker + "getAgentSelection_xanagent",
+                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Xan Agent",
+                        FactionEmojis.xan));
+            }
 
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("nomadagentthundarian")) {
                 buttons.add(Buttons.gray(
@@ -1278,6 +1288,10 @@ public class StartCombatService {
                         finChecker + "becomeDamaged_" + pos + "_flagship",
                         "Become Damaged Upon Win To Gain Command Token (Kortali Flagship)",
                         FactionEmojis.kortali));
+            }
+            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnlockedBreakthrough("sardakkbt")) {
+                buttons.add(Buttons.gray(
+                        finChecker + "sardakkbtRes", "Resolve Sardakk Breakthrough (Upon Win)", FactionEmojis.Sardakk));
             }
         }
 

@@ -32,6 +32,7 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
+import ti4.service.PlanetService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -1470,8 +1471,15 @@ public class ButtonHelperModifyUnits {
                     player.getFactionEmoji()
                             + " did not place a command token in system they retreated to due to Kado S'mah-Qar, the Kollecc commander.");
         } else {
-            CommandCounterHelper.addCC(event, player, tile2, true);
-            Helper.isCCCountCorrect(player);
+            if (player.hasAbility("eusociality") && !CommandCounterHelper.hasCC(event, player.getColor(), tile1)) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getFactionEmoji()
+                                + " did not place a command token in system they retreated to due to the Eusosociality ability.");
+            } else {
+                CommandCounterHelper.addCC(event, player, tile2, true);
+                Helper.isCCCountCorrect(player);
+            }
         }
 
         for (Map.Entry<String, UnitHolder> entry : tile1.getUnitHolders().entrySet()) {
@@ -1701,6 +1709,19 @@ public class ButtonHelperModifyUnits {
                     }
                 }
             }
+            if (player.hasUnlockedBreakthrough("solbt") && unitKey != null) {
+                if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0 && tile != null) {
+                    List<Button> buttons2 = new ArrayList<>();
+                    buttons2.add(Buttons.green(
+                            "solBtBuild_" + tile.getPosition(),
+                            "Build Up To " + player.getUnitFromUnitKey(unitKey).getCapacityValue()
+                                    + " Ground Forces and Fighters"));
+                    buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                    String msg = player.getRepresentation()
+                            + " you have the opportunity to produce ground forces and fighters (a number up to the recently produced ships capacity value) using sol's breakthrough ability. Use buttons to resolve or decline.  [Note: Finish your normal build first for best results.]";
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons2);
+                }
+            }
         }
         if (("sd".equalsIgnoreCase(unitID) || "pds".equalsIgnoreCase(unitLong) || "monument".equalsIgnoreCase(unitLong))
                 && event.getMessage().getContentRaw().toLowerCase().contains("construction")) {
@@ -1820,6 +1841,7 @@ public class ButtonHelperModifyUnits {
         if ("warsun".equalsIgnoreCase(unitLong)) {
             CommanderUnlockCheckService.checkPlayer(player, "muaat");
         }
+
         CommanderUnlockCheckService.checkPlayer(
                 player, "mentak", "l1z1x", "tnelis", "cymiae", "kyro", "ghemina", "argent", "naaz", "arborec");
     }
@@ -1892,6 +1914,7 @@ public class ButtonHelperModifyUnits {
         String producedOrPlaced = "Produced";
 
         boolean willSkipBuild = skipbuild.contains("skipbuild");
+        boolean xxchaTEhero = skipbuild.contains("xxcha");
         boolean orbitalDrop = skipbuild.contains("orbital");
         if (willSkipBuild) {
             producedOrPlaced = "Placed";
@@ -2035,6 +2058,19 @@ public class ButtonHelperModifyUnits {
         buttons.add(DoneExhausting);
         if (!willSkipBuild) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+            if (player.hasUnlockedBreakthrough("solbt") && unitKey != null) {
+                if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0) {
+                    List<Button> buttons2 = new ArrayList<>();
+                    buttons2.add(Buttons.green(
+                            "solBtBuild_" + tile.getPosition(),
+                            "Build Up To " + player.getUnitFromUnitKey(unitKey).getCapacityValue()
+                                    + " Ground Forces and Fighters"));
+                    buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                    String msg = player.getRepresentation()
+                            + " you have the opportunity to produce ground forces and fighters (a number up to the recently produced ships capacity value) using sol's breakthrough ability. Use buttons to resolve or decline. [Note: Finish your normal build first for best results.]";
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons2);
+                }
+            }
         } else {
             if (orbitalDrop) {
                 List<Button> orbFollowUp = new ArrayList<>();
@@ -2049,6 +2085,13 @@ public class ButtonHelperModifyUnits {
                         player.getRepresentation()
                                 + ", you may pay 3 resources to DEPLOY a mech on the planet too (if applicable).",
                         orbFollowUp);
+            }
+            if (xxchaTEhero && player.getExhaustedPlanets().contains(planetName)) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " readied the planet "
+                                + Helper.getPlanetRepresentation(planetName, game) + " per hero ability.");
+                PlanetService.refreshPlanet(player, planetName);
             }
         }
 

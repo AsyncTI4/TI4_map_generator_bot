@@ -26,8 +26,8 @@ import ti4.map.Player;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
-import ti4.service.draft.PlayerSetupService;
 import ti4.service.game.SetOrderService;
+import ti4.service.milty.MiltyService;
 
 @UtilityClass
 public class FrankenDraftBagService {
@@ -364,7 +364,7 @@ public class FrankenDraftBagService {
             if (!Mapper.isValidFaction(faction) || !PositionMapper.isTilePositionValid(tempHomeSystemLocation)) {
                 continue;
             }
-            PlayerSetupService.secondHalfOfPlayerSetup(
+            MiltyService.secondHalfOfPlayerSetup(
                     player, game, player.getNextAvailableColour(), faction, tempHomeSystemLocation, event, false);
             sb.append("\n> ").append(player.getRepresentationNoPing());
             index++;

@@ -33,6 +33,7 @@ import ti4.commands.planet.PlanetCommand;
 import ti4.commands.player.PlayerCommand;
 import ti4.commands.relic.RelicCommand;
 import ti4.commands.search.SearchCommand;
+import ti4.commands.search.SearchCommand2;
 import ti4.commands.special.Special2Command;
 import ti4.commands.special.SpecialCommand;
 import ti4.commands.statistics.StatisticsCommand;
@@ -75,6 +76,7 @@ public class CommandManager {
                     new AddCCCommand(),
                     new RemoveCCCommand(),
                     new RemoveAllCC(),
+                    new SearchCommand2(),
                     new AddFrontierTokensCommand(),
                     new MoveUnits(),
                     new ModifyUnitsButtons(),

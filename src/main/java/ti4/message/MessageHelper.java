@@ -39,7 +39,6 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
-import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -56,6 +55,7 @@ import ti4.service.button.ReactionService;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.game.GameNameService;
 import ti4.service.game.GameUndoNameService;
+import ti4.spring.jda.JdaService;
 
 public class MessageHelper {
 
@@ -98,7 +98,7 @@ public class MessageHelper {
             botLogChannel = getBotLogChannel(event.getGuild().getTextChannels());
         }
         if (botLogChannel == null) {
-            botLogChannel = getBotLogChannel(AsyncTI4DiscordBot.guildPrimary.getTextChannels());
+            botLogChannel = getBotLogChannel(JdaService.guildPrimary.getTextChannels());
         }
         return botLogChannel;
     }
@@ -253,6 +253,22 @@ public class MessageHelper {
         MessageFunction addFactionReact = (message) -> {
             StringTokenizer players =
                     switch (messageType) {
+                        case STATUS_SCORING -> {
+                            String scored = "";
+                            for (Player player : game.getRealPlayers()) {
+                                String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
+                                String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
+
+                                if (!po.isEmpty() && !so.isEmpty()) {
+                                    if (scored.isEmpty()) {
+                                        scored = player.getFaction();
+                                    } else {
+                                        scored += "_" + player.getFaction();
+                                    }
+                                }
+                            }
+                            yield new StringTokenizer(scored, "_");
+                        }
                         case AGENDA_WHEN -> {
                             String oldMessageId = GameMessageManager.replace(
                                     game.getName(),
@@ -725,7 +741,7 @@ public class MessageHelper {
             String failText,
             String successText) {
         if (messageText == null || messageText.isEmpty()) return true; // blank message counts as a success
-        User user = player == null ? null : AsyncTI4DiscordBot.jda.getUserById(player.getUserID());
+        User user = player == null ? null : JdaService.jda.getUserById(player.getUserID());
         if (user == null) {
             sendMessageToChannel(feedbackChannel, failText);
             return false;
@@ -1069,7 +1085,7 @@ public class MessageHelper {
             // REMOVE EMOJIS IF BOT CAN'T SEE IT
             if (button.getEmoji() instanceof CustomEmoji emoji
                     && !ApplicationEmojiService.isValidAppEmoji(emoji)
-                    && AsyncTI4DiscordBot.jda.getEmojiById(emoji.getId()) == null) {
+                    && JdaService.jda.getEmojiById(emoji.getId()) == null) {
                 String label = button.getLabel();
                 if (label.isBlank()) {
                     label = String.format(":%s:", emoji.getName());

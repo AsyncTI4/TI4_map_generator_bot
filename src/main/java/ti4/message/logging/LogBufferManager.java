@@ -9,9 +9,9 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.ThreadGetter;
 import ti4.message.MessageHelper;
+import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class LogBufferManager {
@@ -71,8 +71,7 @@ public class LogBufferManager {
     }
 
     private static void sendByChannelOrThread(LogTarget target, StringBuilder message) {
-        List<TextChannel> logCandidates =
-                AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName(target.channelName(), false);
+        List<TextChannel> logCandidates = JdaService.guildPrimary.getTextChannelsByName(target.channelName(), false);
 
         if (logCandidates.isEmpty()) {
             BotLogger.error("Cannot log buffered logs because target channel not found in primary guild: "

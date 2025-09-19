@@ -1,4 +1,4 @@
-package ti4.spring.ws;
+package ti4.spring.websocket;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

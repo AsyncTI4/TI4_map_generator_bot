@@ -95,7 +95,6 @@ import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.decks.ShowActionCardsService;
-import ti4.service.draft.PlayerSetupService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -111,6 +110,7 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftTile;
+import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.regex.RegexService;
 import ti4.service.tech.ShowTechDeckService;
@@ -874,7 +874,8 @@ public class ButtonHelper {
         if ("arboCommander".equalsIgnoreCase(kindOfBuild)
                 || "freelancers".equalsIgnoreCase(kindOfBuild)
                 || "genericBuild".equalsIgnoreCase(kindOfBuild)
-                || "muaatagent".equalsIgnoreCase(kindOfBuild)) {
+                || "muaatagent".equalsIgnoreCase(kindOfBuild)
+                || "solBtBuild".equalsIgnoreCase(kindOfBuild)) {
             return true;
         }
         boolean tileHasShips = tile.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip);
@@ -2957,7 +2958,7 @@ public class ButtonHelper {
 
     @ButtonHandler("deleteMessage_") // deleteMessage_{Optional String to send to the event channel after}
     public static void deleteMessage(GenericInteractionCreateEvent event) {
-        if (event instanceof ButtonInteractionEvent bevent) {
+        if (event != null && event instanceof ButtonInteractionEvent bevent) {
             bevent.getMessage().delete().queue();
         }
     }
@@ -3073,7 +3074,7 @@ public class ButtonHelper {
 
                 remainingButtons.add(b);
                 newActionRow.add(b);
-                if (!b.getCustomId().contains("deleteButtons")
+                if (!b.getCustomId().equalsIgnoreCase("deleteButtons")
                         && !b.getCustomId().contains("ultimateUndo")) {
                     hasRealButton = true;
                 }
@@ -3350,6 +3351,10 @@ public class ButtonHelper {
                 UnitModel unit = entry.getKey();
                 if ("space".equalsIgnoreCase(capChecker.getName())) {
                     capacity += unit.getCapacityValue() * entry.getValue();
+                    if (unit.getUnitType() == UnitType.Carrier
+                            && (player.hasUnit("lunarium_carrier") || player.hasUnit("lunarium_carrier2"))) {
+                        capacity += player.getSoScored() * entry.getValue();
+                    }
                 }
                 // System.out.println(unit.getBaseType());
                 if ("spacedock".equalsIgnoreCase(unit.getBaseType())
@@ -3709,6 +3714,7 @@ public class ButtonHelper {
                 "prism",
                 "echo",
                 "domna",
+                "thundersedge",
                 "uikos", // DS
                 "illusion",
                 "phantasm"); // Other
@@ -4219,6 +4225,13 @@ public class ButtonHelper {
         if (tile == null || tile.getRepresentationForButtons(game, player).contains("Hyperlane")) return false;
         if (game.isNaaluAgent() && tile.isHomeSystem(game)) return false;
         if (!FOWPlusService.canActivatePosition(tile.getPosition(), player, game)) return false;
+        if (tile.isAsteroidField()) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.hasTech("cm") && p2 != player && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+                    return false;
+                }
+            }
+        }
 
         return !CommandCounterHelper.hasCC(null, player.getColor(), tile) || game.isL1Hero();
     }
@@ -5861,7 +5874,7 @@ public class ButtonHelper {
         }
         Collections.shuffle(colors);
         for (int i = 0; i < players.size() && i < 12; i++) {
-            PlayerSetupService.secondHalfOfPlayerSetup(
+            MiltyService.secondHalfOfPlayerSetup(
                     players.get(i), game, colors.get(i), "franken" + emojiNum.get(i), "20" + (i + 1), event, false);
         }
         MessageHelper.sendMessageToChannel(
@@ -6236,9 +6249,9 @@ public class ButtonHelper {
         if (game.getPlayerFromColorOrFaction(color) != null) color = player.getNextAvailableColour();
         if (buttonID.split("_").length == 6 || speaker != null) {
             if (speaker != null) {
-                PlayerSetupService.secondHalfOfPlayerSetup(player, game, color, factionId, pos, event, false);
+                MiltyService.secondHalfOfPlayerSetup(player, game, color, factionId, pos, event, false);
             } else {
-                PlayerSetupService.secondHalfOfPlayerSetup(
+                MiltyService.secondHalfOfPlayerSetup(
                         player, game, color, factionId, pos, event, "yes".equalsIgnoreCase(buttonID.split("_")[5]));
             }
         } else {
@@ -6907,6 +6920,7 @@ public class ButtonHelper {
         String part2 = player.getFaction();
         if (messageID.toLowerCase().contains("pre pass")) {
             ButtonHelperActionCards.checkForPlayingBountyContracts(game, player);
+            StatusHelper.offerPreScoringButtons(game, player);
         }
         if (game.getStoredValue(messageID) != null
                 && !game.getStoredValue(messageID).isEmpty()) {

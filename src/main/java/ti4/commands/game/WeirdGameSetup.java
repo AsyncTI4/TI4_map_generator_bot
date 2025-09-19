@@ -145,6 +145,9 @@ class WeirdGameSetup extends GameStateSubcommand {
             }
         }
 
+        Boolean thunderMode = event.getOption(Constants.THUNDERS_EDGE_MODE, null, OptionMapping::getAsBoolean);
+        if (thunderMode != null) game.setThundersEdge(thunderMode);
+
         Boolean fowPlus = event.getOption(FOWOption.FOW_PLUS.toString(), null, OptionMapping::getAsBoolean);
         if (fowPlus != null && game.isFowMode()) {
             FOWPlusService.setActive(game, fowPlus);

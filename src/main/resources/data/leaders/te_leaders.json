@@ -1,0 +1,151 @@
+[
+    {
+        "id": "bastionagent",
+        "faction": "bastion",
+        "type": "agent",
+        "name": "Unknown",
+        "title": "Unknown",
+        "abilityWindow": "Unknown",
+        "abilityText": "Unknown",
+        "unlockCondition": "Always Unlocked",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "bastioncommander",
+        "faction": "bastion",
+        "type": "commander",
+        "name": "Unknown",
+        "title": "Unknown",
+        "abilityWindow": "Unknown",
+        "abilityText": "Unknown",
+        "unlockCondition": "Unknown",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "bastionhero",
+        "faction": "bastion",
+        "type": "hero",
+        "name": "Unknown",
+        "title": "Unknown",
+        "abilityName": "Unknown",
+        "abilityWindow": "Unknown",
+        "abilityText": "Unknown",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "deepwroughtagent",
+        "faction": "deepwrought",
+        "type": "agent",
+        "name": "Unknown",
+        "title": "Unknown",
+        "abilityWindow": "Unknown",
+        "abilityText": "Unknown",
+        "unlockCondition": "Always Unlocked",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "deepwroughtcommander",
+        "faction": "deepwrought",
+        "type": "commander",
+        "name": "Unknown",
+        "title": "Unknown",
+        "abilityWindow": "Unknown",
+        "abilityText": "Unknown",
+        "unlockCondition": "Unknown",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "deepwroughthero",
+        "faction": "deepwrought",
+        "type": "hero",
+        "name": "Unknown",
+        "title": "Unknown",
+        "abilityName": "Unknown",
+        "abilityWindow": "Unknown",
+        "abilityText": "Unknown",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "crimsonagent",
+        "faction": "crimson",
+        "type": "agent",
+        "name": "Unknown",
+        "title": "Unknown",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Exhaust this card to choose 1 player. That player may swap the position of 2 of their ships in any systems; they may transport units when they swap.",
+        "unlockCondition": "Always Unlocked",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "crimsoncommander",
+        "faction": "crimson",
+        "type": "commander",
+        "name": "Unknown",
+        "title": "Unknown",
+        "abilityWindow": "At the end of a combat between any players:",
+        "abilityText": "Gain 1 commodity or convert 1 of your commodities to a trade good.",
+        "unlockCondition": "Unknown",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "crimsonhero",
+        "faction": "crimson",
+        "type": "hero",
+        "name": "Unknown",
+        "title": "Unknown",
+        "abilityName": "Fragment Reality - Dimensional Reflection",
+        "abilityWindow": "When you produce ships",
+        "abilityText": "You may place any of those ships onto this card. At the start of a space combat, you may purge this card to place all ships from this card into the active system.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "ralnelagent",
+        "faction": "ralnel",
+        "type": "agent",
+        "name": "Unknown",
+        "title": "Unknown",
+        "abilityWindow": "Unknown",
+        "abilityText": "Unknown",
+        "unlockCondition": "Always Unlocked",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "ralnelcommander",
+        "faction": "ralnel",
+        "type": "commander",
+        "name": "Unknown",
+        "title": "Unknown",
+        "abilityWindow": "Unknown",
+        "abilityText": "Unknown",
+        "unlockCondition": "Unknown",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "ralnelhero",
+        "faction": "ralnel",
+        "type": "hero",
+        "name": "Director Nel",
+        "title": "Acquisitive Mind",
+        "abilityName": "Signal Intrusion - Limit Break",
+        "abilityWindow": "After the last player passes",
+        "abilityText": "You may choose to no longer be passed; if you do, gain 2 command tokens, draw 1 action card, and purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "xxchahero-te",
+        "faction": "xxcha",
+        "type": "hero",
+        "name": "Xxekir Grom",
+        "title": "The Council's Heart",
+        "abilityName": "Planetary Defense Nexus - Aegis",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Place any combination of up to 4 PDS or mechs onto planets you control; ready each planet that you place a unit on. Then, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "homebrewReplacesID": "xxchahero",
+        "source": "thunders_edge"
+    }
+]

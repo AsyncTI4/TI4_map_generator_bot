@@ -205,6 +205,8 @@ public class Constants {
 
     /* From \data\ */
     public static final String SEARCH_ABILITIES = "abilities";
+    public static final String SEARCH_BREAKTHROUGHS = "breakthroughs";
+    public static final String SEARCH_GALACTIC_EVENTS = "galactic_events";
     public static final String SEARCH_ACTION_CARDS = "action_cards";
     public static final String SEARCH_AGENDAS = "agendas";
     public static final String SEARCH_ATTACHMENTS = "attachments";
@@ -1414,6 +1416,7 @@ public class Constants {
     public static final String SEARCH_NAMES = "search_names";
     public static final String SEARCH_TAGS = "search_tags";
     public static final String SEARCH_USERS = "search_users";
+    public static final String SEARCH_RULES = "rules";
     public static final String EXTRA_SECRET_MODE = "extra_secret_mode";
     public static final String VOTC_MODE = "votc_mode";
     public static final String OPTIONS = "options";

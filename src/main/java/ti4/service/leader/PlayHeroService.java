@@ -121,6 +121,9 @@ public class PlayHeroService {
             case "kollecchero" ->
                 RelicHelper.drawWithAdvantage(
                         player, game, game.getRealPlayers().size());
+            case "xxchahero-te" -> {
+                ButtonHelperHeroes.xxchaHeroTEStart(game, player);
+            }
             case "titanshero" -> {
                 Tile t = player.getHomeSystemTile();
                 if (game.getTileFromPlanet("elysium") != null && game.getTileFromPlanet("elysium") == t) {
@@ -134,7 +137,7 @@ public class PlayHeroService {
                             "Use the following command to add the attachment: `/add_token token:titanshero`");
                 }
             }
-            case "conclavehero" -> {
+            case "onyxxahero" -> {
                 List<Button> buttons = new ArrayList<>();
                 for (Tile tile : game.getTileMap().values()) {
                     if (FoWHelper.playerHasActualShipsInSystem(player, tile)) {
@@ -175,6 +178,16 @@ public class PlayHeroService {
                         player.getCorrectChannel(),
                         player.getRepresentation()
                                 + " can now repair opponent units near their space docks (not automated, use /remove_all_sustain_damage)");
+            }
+            case "mirvedahero" -> {
+                List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, "pds", "placeOneNDone_skipbuild");
+                String message = "Please choose a planet to place a PDS";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "You will unfortunately need to use dicecord to roll the PDS and bombardment of all your units against one system/planet. /roll");
             }
             case "florzenhero" -> {
                 for (Tile tile : game.getTileMap().values()) {

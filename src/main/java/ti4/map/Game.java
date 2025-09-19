@@ -46,7 +46,6 @@ import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import ti4.AsyncTI4DiscordBot;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftItem;
@@ -103,6 +102,7 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.spring.jda.JdaService;
 
 public class Game extends GameProperties {
 
@@ -205,7 +205,7 @@ public class Game extends GameProperties {
     private DraftManager draftManager;
 
     @Getter
-    private Expeditions expeditions = new Expeditions(this);
+    private final Expeditions expeditions = new Expeditions(this);
 
     @Setter
     @Getter
@@ -300,6 +300,9 @@ public class Game extends GameProperties {
         neutral.setUnitsOwned(playerOwnedUnits);
         neutral.addTech("ff2");
         neutral.addTech("dd2");
+        neutral.addTech("cv2");
+        neutral.addTech("ca2");
+        neutral.addTech("ws");
         return neutral;
     }
 
@@ -813,10 +816,10 @@ public class Game extends GameProperties {
     @Nullable
     public TextChannel getTableTalkChannel() {
         try {
-            return AsyncTI4DiscordBot.jda.getTextChannelById(getTableTalkChannelID());
+            return JdaService.jda.getTextChannelById(getTableTalkChannelID());
         } catch (Exception e) {
             TextChannel tableTalkChannel;
-            List<TextChannel> gameChannels = AsyncTI4DiscordBot.jda.getTextChannels().stream()
+            List<TextChannel> gameChannels = JdaService.jda.getTextChannels().stream()
                     .filter(c -> c.getName().startsWith(getName()))
                     .filter(not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
                     .toList();
@@ -832,10 +835,10 @@ public class Game extends GameProperties {
     @JsonIgnore
     public TextChannel getMainGameChannel() {
         try {
-            return AsyncTI4DiscordBot.jda.getTextChannelById(getMainChannelID());
+            return JdaService.jda.getTextChannelById(getMainChannelID());
         } catch (Exception e) {
             List<TextChannel> gameChannels =
-                    AsyncTI4DiscordBot.jda.getTextChannelsByName(getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
+                    JdaService.jda.getTextChannelsByName(getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
             if (gameChannels.size() == 1) {
                 TextChannel mainGameChannel = gameChannels.getFirst();
                 setMainChannelID(mainGameChannel.getId());
@@ -849,7 +852,7 @@ public class Game extends GameProperties {
     @JsonIgnore
     public TextChannel getSavedChannel() {
         try {
-            return AsyncTI4DiscordBot.jda.getTextChannelById(getSavedChannelID());
+            return JdaService.jda.getTextChannelById(getSavedChannelID());
         } catch (Exception e) {
             return getMainGameChannel();
         }
@@ -868,7 +871,7 @@ public class Game extends GameProperties {
 
         // FIND BY ID
         if (StringUtils.isNumeric(getBotMapUpdatesThreadID())) {
-            ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(getBotMapUpdatesThreadID());
+            ThreadChannel threadChannel = JdaService.jda.getThreadChannelById(getBotMapUpdatesThreadID());
             if (threadChannel != null) {
                 return threadChannel;
             }
@@ -876,7 +879,7 @@ public class Game extends GameProperties {
 
         // FIND BY NAME
         List<ThreadChannel> botChannels =
-                AsyncTI4DiscordBot.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
+                JdaService.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
         if (botChannels.size() == 1) {
             return botChannels.getFirst();
         } else if (botChannels.size() > 1) {
@@ -906,7 +909,7 @@ public class Game extends GameProperties {
 
     public ThreadChannel getLaunchPostThread() {
         if (StringUtils.isNumeric(getLaunchPostThreadID())) {
-            return AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(getLaunchPostThreadID());
+            return JdaService.guildPrimary.getThreadChannelById(getLaunchPostThreadID());
         }
         return null;
     }
@@ -1005,6 +1008,9 @@ public class Game extends GameProperties {
         String scText = playerSC + "";
         if (!scText.equalsIgnoreCase(getSCNumberIfNaaluInPlay(player, scText))) {
             playerSC = 0;
+            if (player.hasAbility("patience")) {
+                playerSC = 9;
+            }
         }
         for (int sc : orderedSCsBasic) {
             Player holder = getPlayerFromSC(sc);
@@ -1012,6 +1018,9 @@ public class Game extends GameProperties {
             int judger = sc;
             if (holder != null && !scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
                 judger = 0;
+                if (player.hasAbility("patience")) {
+                    judger = 9;
+                }
             }
             if (judger > playerSC) {
                 orderedSCs.add(sc);
@@ -1023,8 +1032,11 @@ public class Game extends GameProperties {
             int judger = sc;
             if (holder != null && !scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
                 judger = 0;
+                if (player.hasAbility("patience")) {
+                    judger = 9;
+                }
             }
-            if (judger == 0) {
+            if (judger == 0 || (player.hasAbility("patience") && judger == 9)) {
                 orderedSCs.add(sc);
             }
         }
@@ -1034,8 +1046,11 @@ public class Game extends GameProperties {
             int judger = sc;
             if (holder != null && !scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
                 judger = 0;
+                if (player.hasAbility("patience")) {
+                    judger = 9;
+                }
             }
-            if (judger < playerSC && judger != 0) {
+            if (judger < playerSC && judger != 0 && (!player.hasAbility("patience") || judger != 9)) {
                 orderedSCs.add(sc);
             }
         }
@@ -1930,8 +1945,7 @@ public class Game extends GameProperties {
     }
 
     /**
-     * @param soToPoList - a list of Secret Objective IDs that have been turned into
-     *                   Public Objectives (typically via Classified Document Leaks)
+     * @param soToPoList - a list of Secret Objective IDs that have been turned into Public Objectives (typically via Classified Document Leaks)
      */
     public void setSoToPoList(List<String> soToPoList) {
         this.soToPoList = soToPoList;
@@ -1946,8 +1960,7 @@ public class Game extends GameProperties {
     }
 
     /**
-     * @return Map of (ObjectiveModelID or ProperName if Custom, List of
-     *         ({@link Player#getUserID}))
+     * @return Map of (ObjectiveModelID or ProperName if Custom, List of ({@link Player#getUserID}))
      */
     public Map<String, List<String>> getScoredPublicObjectives() {
         return scoredPublicObjectives;
@@ -2670,7 +2683,15 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public List<String> getTechnologyDeck() {
-        return Mapper.getDecks().get(getTechnologyDeckID()).getNewDeck();
+        List<String> techDeck = Mapper.getDecks().get(getTechnologyDeckID()).getNewDeck();
+        for (Player player : getRealPlayers()) {
+            for (String tech : player.getFactionTechs()) {
+                if (!techDeck.contains(tech)) {
+                    techDeck.add(tech);
+                }
+            }
+        }
+        return techDeck;
     }
 
     @JsonIgnore
@@ -3265,8 +3286,7 @@ public class Game extends GameProperties {
         DeckSettings deckSettings = miltySettings.getGameSettings().getDecks();
 
         boolean success = true;
-        // &= is the "and operator". It will assign true to success iff success is true
-        // and the result is true.
+        // &= is the "and operator". It will assign true to success iff success is true and the result is true.
         // Otherwise it will propagate a false value to the end
         success &= validateAndSetPublicObjectivesStage1Deck(
                 event, deckSettings.getStage1().getValue());
@@ -3281,7 +3301,7 @@ public class Game extends GameProperties {
         setStrategyCardSet(deckSettings.getStratCards().getChosenKey());
 
         // Setup peakable objectives
-        if (getPublicObjectives1Peakable().size() != 4) {
+        if (publicObjectives1Peakable.size() != 4) {
             setUpPeakableObjectives(miltySettings.getGameSettings().getStage1s().getVal(), 1);
             setUpPeakableObjectives(miltySettings.getGameSettings().getStage2s().getVal(), 2);
         }
@@ -3574,7 +3594,7 @@ public class Game extends GameProperties {
         }
         StringBuilder sb = new StringBuilder(getName()).append(" ");
         for (String playerID : getPlayerIDs()) {
-            User user = AsyncTI4DiscordBot.jda.getUserById(playerID);
+            User user = JdaService.jda.getUserById(playerID);
             if (user != null) sb.append(user.getAsMention()).append(" ");
         }
         return sb.toString();
@@ -3953,7 +3973,7 @@ public class Game extends GameProperties {
         if (player.hasLeaderUnlocked(leaderID)) return true;
         if (!leaderID.contains("commander")) return false;
 
-        if (leaderIsFake(leaderID)) {
+        if (leaderIsFake(leaderID) && !"gateteen".equalsIgnoreCase(getName())) {
             return false;
         }
 
@@ -4065,8 +4085,7 @@ public class Game extends GameProperties {
 
     /**
      * @param scID
-     * @return true when the Game's SC Set contains a strategt card which uses a
-     *         certain automation
+     * @return true when the Game's SC Set contains a strategt card which uses a certain automation
      */
     public boolean usesStrategyCardAutomation(String scID) {
         return getStrategyCardSet().getStrategyCardModels().stream()
@@ -4448,6 +4467,10 @@ public class Game extends GameProperties {
     public String getSCNumberIfNaaluInPlay(Player player, String scText) {
         if (player.hasTheZeroToken()) // naalu 0 token ability
         scText = "0/" + scText;
+        if (player.hasAbility("patience")) {
+            scText = "9/" + scText;
+        }
+
         return scText;
     }
 
@@ -4535,12 +4558,10 @@ public class Game extends GameProperties {
                 .count();
         int round = getRound();
         String phaseOfGame = StringUtils.defaultString(getPhaseOfGame());
-        // if we're in action, we haven't revealed this round's public; can't filter on
-        // status because sometimes people
+        // if we're in action, we haven't revealed this round's public; can't filter on status because sometimes people
         // reveal despite game end
         int extraIfNotActionPhase = phaseOfGame.contains("action") ? 0 : 1;
-        // if neuraloop is in the deck, or we're not using Codex 4, we can make
-        // additional assumptions about number of
+        // if neuraloop is in the deck, or we're not using Codex 4, we can make additional assumptions about number of
         // publics
         if (relics.contains("neuraloop") || !isCodex4()) {
             // 5 revealed by round 5 and Incentive Program
@@ -4548,11 +4569,9 @@ public class Game extends GameProperties {
             if (round < 5) {
                 // We can't have less stage 1s than this
                 if (revealedStage1Count < round + 1) return true;
-                // Round + 1 revealed by this point, plus Incentive Program; 1 extra if we're
-                // not in action phase
+                // Round + 1 revealed by this point, plus Incentive Program; 1 extra if we're not in action phase
                 if (revealedStage1Count > round + 2 + extraIfNotActionPhase) return true;
-                // At most 1 Stage 2 can be revealed, by Incentive Program; 1 extra if we're not
-                // in action phase and its
+                // At most 1 Stage 2 can be revealed, by Incentive Program; 1 extra if we're not in action phase and its
                 // round 4
                 int extraIfRound4AndNotActionPhase = round != 4 ? 0 : extraIfNotActionPhase;
                 if (revealedStage2Count > 1 + extraIfRound4AndNotActionPhase) return true;
@@ -4561,14 +4580,12 @@ public class Game extends GameProperties {
                 // We can't have less stage 1s than this
                 if (revealedStage1Count < 5) return true;
                 if (revealedStage2Count < round - 4) return true;
-                // 1 revealed per round past round 4 and Incentive Program; 1 extra if we're not
-                // in action phase
+                // 1 revealed per round past round 4 and Incentive Program; 1 extra if we're not in action phase
                 if (revealedStage2Count > round - 3 + extraIfNotActionPhase) return true;
             }
         }
 
-        // Extra stage 1 on round 1, Incentive Program during agenda phase; 1 extra if
-        // we're not in action phase
+        // Extra stage 1 on round 1, Incentive Program during agenda phase; 1 extra if we're not in action phase
         return revealedStage1Count + revealedStage2Count > round + 2 + extraIfNotActionPhase;
     }
 

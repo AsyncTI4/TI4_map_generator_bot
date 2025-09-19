@@ -35,6 +35,54 @@
         "source": "thunders_edge"
     },
     {
+        "alias": "cabalbt",
+        "name": "Al'Raith Ix Ianovar",
+        "displayName": "Al'Raith\nIx Ianovar",
+        "faction": "cabal",
+        "synergy": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "text": "This breakthrough causes The Fracture to enter play without a roll, if it is not already in play. After this card enters play, move up to 2 ingress tokens into systems that contain gravity rifts.\nApply +1 to the MOVE value of each of your ships that start their movement in The Fracture.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "l1z1xbt",
+        "name": "Fealty Uplink",
+        "displayName": "Fealty\nUplink",
+        "faction": "l1z1x",
+        "synergy": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "text": "When you gain control of a planet, place infantry from your reinforcements equal to that planet's influence value on that planet.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "sardakkbt",
+        "name": "N'orr Supremacy",
+        "displayName": "N'orr\nSupremacy",
+        "faction": "sardakk",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "After you win a combat, either gain 1 command token or research a unit upgrade technology.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "solbt",
+        "name": "Bellum Gloriosum",
+        "displayName": "Bellum\nGloriosum",
+        "faction": "sol",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "When you produce a ship that has capacity, you may also produce any combination of ground forces or fighters up to that ship's capacity; they do not count against your PRODUCTION limit.",
+        "source": "thunders_edge"
+    },
+    {
         "alias": "winnubt",
         "name": "Imperator",
         "faction": "winnu",
@@ -65,7 +113,7 @@
             "PROPULSION",
             "CYBERNETIC"
         ],
-        "text": "[Note: Exact text unknown. Best guess is after this] Each system that contains a wormhole and one of your units gains PRODUCTION 1 as if it were 1 of your units.",
+        "text": "[Note: Exact text unknown. Best guess is after this] Each system that contains a wormhole and one of your ships gains PRODUCTION 1 as if it were 1 of your units.",
         "source": "thunders_edge"
     }
 ]

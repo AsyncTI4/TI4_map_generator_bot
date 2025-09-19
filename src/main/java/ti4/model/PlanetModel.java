@@ -1,7 +1,8 @@
 package ti4.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +12,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.sticker.Sticker;
 import org.apache.commons.lang3.StringUtils;
-import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Stickers;
 import ti4.image.TileHelper;
 import ti4.image.UnitTokenPosition;
@@ -23,6 +23,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
+import ti4.spring.jda.JdaService;
 
 @Data
 public class PlanetModel implements ModelInterface, EmbeddableModel {
@@ -253,7 +254,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (ident == -1) {
             cachedStickerUrl = getEmojiURL();
         } else {
-            cachedStickerUrl = AsyncTI4DiscordBot.jda
+            cachedStickerUrl = JdaService.jda
                     .retrieveSticker(Sticker.fromId(ident))
                     .complete()
                     .getIconUrl();

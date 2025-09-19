@@ -36,6 +36,23 @@ public enum FactionEmojis implements TI4Emoji {
     Keleres,
     RedCreuss,
 
+    // Thunder's Edge
+    Ralnel,
+    Crimson,
+    Bastion,
+    Deepwrought,
+
+    // Twilight's Fall
+
+    redtf,
+    greentf,
+    blacktf,
+    pinktf,
+    purpletf,
+    yellowtf,
+    bluetf,
+    orangetf,
+
     // Discordant Stars
     augers,
     axis,
@@ -83,7 +100,7 @@ public enum FactionEmojis implements TI4Emoji {
     xan,
     kalora,
     lunarium,
-    conclave,
+    onyxxa,
     tyris,
     vyserix,
     zephyrion,
@@ -210,6 +227,11 @@ public enum FactionEmojis implements TI4Emoji {
             case "keleres", "keleresx", "keleresm", "keleresa" -> Keleres;
             case "redcreuss", "redghost" -> RedCreuss;
 
+            case "ralnel" -> Ralnel;
+            case "bastion" -> Bastion;
+            case "crimson" -> Crimson;
+            case "deepwrought" -> Deepwrought;
+
             case "augers" -> augers;
             case "axis" -> axis;
             case "bentor" -> bentor;
@@ -249,7 +271,7 @@ public enum FactionEmojis implements TI4Emoji {
             case "xan" -> xan;
             case "kalora" -> kalora;
             case "lunarium" -> lunarium;
-            case "conclave" -> conclave;
+            case "onyxxa" -> onyxxa;
             case "tyris" -> tyris;
             case "vyserix" -> vyserix;
             case "zephyrion" -> zephyrion;
@@ -265,7 +287,14 @@ public enum FactionEmojis implements TI4Emoji {
             case "mechi" -> mechi;
             case "saera" -> saera;
             case "shadows" -> shadows;
-
+            case "redtf" -> redtf;
+            case "greentf" -> greentf;
+            case "blacktf" -> blacktf;
+            case "pinktf" -> pinktf;
+            case "purpletf" -> purpletf;
+            case "yellowtf" -> yellowtf;
+            case "bluetf" -> bluetf;
+            case "orangetf" -> orangetf;
             case "franken1" -> Franken1;
             case "franken2" -> Franken2;
             case "franken3" -> Franken3;

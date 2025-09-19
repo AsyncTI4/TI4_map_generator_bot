@@ -71,7 +71,6 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
-import ti4.service.draft.DraftTileManager;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -86,6 +85,7 @@ import ti4.service.fow.GMService;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.map.TokenPlanetService;
+import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
@@ -151,6 +151,9 @@ public class Helper {
             }
             return "Player has " + FactionEmojis.Yssaril
                     + " _Transparasteel Plating_, and all other players have passed.";
+        }
+        if (player.hasTech("baarvag")) {
+            return "Player has Unyielding Will and thus their ACs cannot be canceled.";
         }
         return null;
     }
@@ -223,10 +226,14 @@ public class Helper {
         return players;
     }
 
+    // TODO: (Jazz): This method *should* include base game + pok tiles (+ DS tiles if and only if DS mode is set)
+    //     - Once the bot is using milty draft settings, we can make this accurately pull in tiles
+    //     - from every source available to the active game
     public static List<MiltyDraftTile> getUnusedTiles(Game game) {
-        DraftTileManager draftTileManager = game.getDraftTileManager();
-        draftTileManager.reset(game);
-        List<MiltyDraftTile> allTiles = new ArrayList<>(draftTileManager.getAll())
+        MiltyDraftManager draftManager = game.getMiltyDraftManager();
+        draftManager.init(game);
+
+        List<MiltyDraftTile> allTiles = new ArrayList<>(draftManager.getAll())
                 .stream()
                         .filter(tile -> game.getTile(tile.getTile().getTileID()) == null)
                         .toList();
@@ -591,6 +598,9 @@ public class Helper {
         Point position = new Point(tokenPlanetPos);
         if (tile.getTileModel().getNumPlanets() == 3) position = new Point(Constants.MIRAGE_TRIPLE_POSITION);
         position.translate(offset.x, offset.y);
+        if (tokenID.toLowerCase().contains("thundersedge")) {
+            return Constants.SPACE_CENTER_POSITION;
+        }
         return position;
     }
 
@@ -1865,6 +1875,9 @@ public class Helper {
                     cost += (int) removedUnit.getCost() * entry.getValue();
                 }
                 totalUnits += entry.getValue();
+                if (player.hasUnit("arvaxi_mech") && removedUnit.getUnitType() == UnitType.Mech) {
+                    totalUnits -= entry.getValue();
+                }
             }
         }
         if (regulated) {
@@ -1954,88 +1967,90 @@ public class Helper {
                 ButtonHelper.isLawInPlay(game, "conscription") || ButtonHelper.isLawInPlay(game, "absol_conscription");
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String tp = tile.getPosition();
-        if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {
-            if (player.hasWarsunTech() && resourcelimit > 9) {
-                Button wsButton = Buttons.green(
-                        "FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp,
-                        "Produce War Sun",
-                        UnitEmojis.warsun);
-                if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun") > 1) {
-                    wsButton = Buttons.gray(
+        if (!"solbtbuild".equalsIgnoreCase(warfareNOtherstuff)) {
+            if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {
+                if (player.hasWarsunTech() && resourcelimit > 9) {
+                    Button wsButton = Buttons.green(
                             "FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp,
                             "Produce War Sun",
                             UnitEmojis.warsun);
+                    if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun") > 1) {
+                        wsButton = Buttons.gray(
+                                "FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp,
+                                "Produce War Sun",
+                                UnitEmojis.warsun);
+                    }
+                    unitButtons.add(wsButton);
                 }
-                unitButtons.add(wsButton);
-            }
-            if (player.ownsUnit("ghemina_flagship_lady") && resourcelimit > 7) {
-                Button wsButton = Buttons.green(
-                        "FFCC_" + player.getFaction() + "_" + placePrefix + "_lady_" + tp,
-                        "Produce The Lady",
-                        UnitEmojis.flagship);
-                unitButtons.add(wsButton);
-            }
-            Button fsButton = Buttons.green(
-                    "FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp,
-                    "Produce Flagship",
-                    UnitEmojis.flagship);
-            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship") > 0) {
-                fsButton = Buttons.gray(
+                if (player.ownsUnit("ghemina_flagship_lady") && resourcelimit > 7) {
+                    Button wsButton = Buttons.green(
+                            "FFCC_" + player.getFaction() + "_" + placePrefix + "_lady_" + tp,
+                            "Produce The Lady",
+                            UnitEmojis.flagship);
+                    unitButtons.add(wsButton);
+                }
+                Button fsButton = Buttons.green(
                         "FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp,
                         "Produce Flagship",
                         UnitEmojis.flagship);
+                if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship") > 0) {
+                    fsButton = Buttons.gray(
+                            "FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp,
+                            "Produce Flagship",
+                            UnitEmojis.flagship);
+                }
+                if (resourcelimit > 7) {
+                    unitButtons.add(fsButton);
+                }
             }
-            if (resourcelimit > 7) {
-                unitButtons.add(fsButton);
-            }
-        }
-        Button dnButton = Buttons.green(
-                "FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp,
-                "Produce Dreadnought",
-                UnitEmojis.dreadnought);
-        if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought") > 4) {
-            dnButton = Buttons.gray(
+            Button dnButton = Buttons.green(
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp,
                     "Produce Dreadnought",
                     UnitEmojis.dreadnought);
-        }
-        if (resourcelimit > 3) {
-            unitButtons.add(dnButton);
-        }
-        Button cvButton = Buttons.green(
-                "FFCC_" + player.getFaction() + "_" + placePrefix + "_carrier_" + tp,
-                "Produce Carrier",
-                UnitEmojis.carrier);
-        if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "carrier") > 3) {
-            cvButton = cvButton.withStyle(ButtonStyle.SECONDARY);
-        }
-        if (resourcelimit > 2) {
-            unitButtons.add(cvButton);
-        }
-        Button caButton = Buttons.green(
-                "FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp,
-                "Produce Cruiser",
-                UnitEmojis.cruiser);
-        if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser") > 7) {
-            caButton = Buttons.gray(
+            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought") > 4) {
+                dnButton = Buttons.gray(
+                        "FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp,
+                        "Produce Dreadnought",
+                        UnitEmojis.dreadnought);
+            }
+            if (resourcelimit > 3) {
+                unitButtons.add(dnButton);
+            }
+            Button cvButton = Buttons.green(
+                    "FFCC_" + player.getFaction() + "_" + placePrefix + "_carrier_" + tp,
+                    "Produce Carrier",
+                    UnitEmojis.carrier);
+            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "carrier") > 3) {
+                cvButton = cvButton.withStyle(ButtonStyle.SECONDARY);
+            }
+            if (resourcelimit > 2) {
+                unitButtons.add(cvButton);
+            }
+            Button caButton = Buttons.green(
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp,
                     "Produce Cruiser",
                     UnitEmojis.cruiser);
-        }
-        if (resourcelimit > 1) {
-            unitButtons.add(caButton);
-        }
-        Button ddButton = Buttons.green(
-                "FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp,
-                "Produce Destroyer",
-                UnitEmojis.destroyer);
-        if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer") > 7) {
-            ddButton = Buttons.gray(
+            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser") > 7) {
+                caButton = Buttons.gray(
+                        "FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp,
+                        "Produce Cruiser",
+                        UnitEmojis.cruiser);
+            }
+            if (resourcelimit > 1) {
+                unitButtons.add(caButton);
+            }
+            Button ddButton = Buttons.green(
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp,
                     "Produce Destroyer",
                     UnitEmojis.destroyer);
+            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer") > 7) {
+                ddButton = Buttons.gray(
+                        "FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp,
+                        "Produce Destroyer",
+                        UnitEmojis.destroyer);
+            }
+            unitButtons.add(ddButton);
         }
-        unitButtons.add(ddButton);
         unitButtons.add(Buttons.green(
                 "FFCC_" + player.getFaction() + "_" + placePrefix + "_fighter_" + tp,
                 "Produce 1 Fighter",
@@ -2057,6 +2072,7 @@ public class Helper {
 
         if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff)
                 && !"arboHeroBuild".equalsIgnoreCase(warfareNOtherstuff)
+                && !"solBtBuild".equalsIgnoreCase(warfareNOtherstuff)
                 && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
                 && !"sling".equalsIgnoreCase(warfareNOtherstuff)
                 && !"muaatagent".equalsIgnoreCase(warfareNOtherstuff)
@@ -2508,7 +2524,7 @@ public class Helper {
     }
 
     /**
-     * @param text   string to add spaces on the left
+     * @param text string to add spaces on the left
      * @param length minimum length of string
      * @return left padded string
      */
@@ -2520,7 +2536,7 @@ public class Helper {
     }
 
     /**
-     * @param text   string to add spaces on the right
+     * @param text string to add spaces on the right
      * @param length minimum length of string
      * @return right padded string
      */
@@ -2978,10 +2994,10 @@ public class Helper {
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(),
                         """
-                                ## Note about FoW
-                                When you press **End Game** all the game channels will be deleted immediately!
-                                A new thread will be generated under the **#fow-war-stories** channel.
-                                Round Summaries will be shared there. So it is advised to hold end-of-game chat until then.""");
+                        ## Note about FoW
+                        When you press **End Game** all the game channels will be deleted immediately!
+                        A new thread will be generated under the **#fow-war-stories** channel.
+                        Round Summaries will be shared there. So it is advised to hold end-of-game chat until then.""");
                 List<Button> titleButton = new ArrayList<>();
                 titleButton.add(Buttons.blue("offerToGiveTitles", "Offer to bestow a Title"));
                 titleButton.add(Buttons.gray("deleteButtons", "No titles for this game"));

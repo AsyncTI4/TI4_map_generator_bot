@@ -127,6 +127,32 @@ public class DiscordantStarsHelper {
         }
     }
 
+    public static void checkUltimateAuthority(Game activeMap) {
+        for (Player player : activeMap.getPlayers().values()) {
+            String tokenToAdd;
+            String tokenToRemove;
+            if (player.hasAbility("ultimate_authority")) {
+                tokenToAdd = Constants.OLRADIN_MECH_INF_PNG;
+                tokenToRemove = Constants.OLRADIN_MECH_INF_PNG;
+            } else {
+                continue;
+            }
+
+            for (Tile tile : activeMap.getTileMap().values()) {
+                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                    if (unitHolder instanceof Planet planet) {
+                        if (planet.getUnitCount(player.getColorID()) > 2
+                                && player.getPlanetsAllianceMode().contains(planet.getName())) {
+                            planet.addToken(tokenToAdd);
+                        } else {
+                            planet.removeToken(tokenToRemove);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public static void checkSaeraMech(Game activeMap) {
         for (Player player : activeMap.getPlayers().values()) {
             String tokenToAdd = Constants.OLRADIN_MECH_INF_PNG;
