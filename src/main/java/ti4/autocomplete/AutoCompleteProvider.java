@@ -1276,6 +1276,7 @@ public class AutoCompleteProvider {
         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
         return models.stream()
                 .filter(model -> model.search(enteredValue, source))
+                .filter(model -> model.getSource() != ComponentSource.miltymod)
                 .filter(model -> !(model instanceof ColorableModelInterface cm) || !cm.isDupe())
                 .limit(25)
                 .map(model -> new Command.Choice(model.getAutoCompleteName(), model.getAlias()))
