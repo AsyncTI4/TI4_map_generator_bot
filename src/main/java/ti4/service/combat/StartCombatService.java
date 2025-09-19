@@ -541,7 +541,8 @@ public class StartCombatService {
     }
 
     private static void offerRedGhostCommanderButtons(Player player, Game game, GenericInteractionCreateEvent event) {
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")) {
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")
+                || game.playerHasLeaderUnlockedOrAlliance(player, "crimsoncommander")) {
             String message = player.getRepresentation(true, true)
                     + ", you may, at the __end__ of combat, gain 1 commodity or convert 1 of your commodities to a trade good,"
                     + " with \"Total Mystery\", the Red Creuss commander."
