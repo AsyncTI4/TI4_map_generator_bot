@@ -1,0 +1,20 @@
+[
+    {
+        "id": "tf_warsun",
+        "baseType": "warsun",
+        "asyncId": "ws",
+        "name": "Twilight Fall War Sun",
+        "source": "twilights_fall",
+        "moveValue": 0,
+        "capacityValue": 6,
+        "capacityUsed": 1,
+        "cost": 12,
+        "combatHitsOn": 5,
+        "combatDieCount": 2,
+        "bombardHitsOn": 5,
+        "bombardDieCount": 3,
+        "sustainDamage": true,
+        "canBeDirectHit": true,
+        "isShip": true
+    }
+]

@@ -42,6 +42,17 @@ public enum FactionEmojis implements TI4Emoji {
     Bastion,
     Deepwrought,
 
+    // Twilight's Fall
+
+    redtf,
+    greentf,
+    blacktf,
+    pinktf,
+    purpletf,
+    yellowtf,
+    bluetf,
+    orangetf,
+
     // Discordant Stars
     augers,
     axis,
@@ -276,7 +287,14 @@ public enum FactionEmojis implements TI4Emoji {
             case "mechi" -> mechi;
             case "saera" -> saera;
             case "shadows" -> shadows;
-
+            case "redtf" -> redtf;
+            case "greentf" -> greentf;
+            case "blacktf" -> blacktf;
+            case "pinktf" -> pinktf;
+            case "purpletf" -> purpletf;
+            case "yellowtf" -> yellowtf;
+            case "bluetf" -> bluetf;
+            case "orangetf" -> orangetf;
             case "franken1" -> Franken1;
             case "franken2" -> Franken2;
             case "franken3" -> Franken3;
