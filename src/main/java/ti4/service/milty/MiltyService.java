@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
@@ -214,6 +215,13 @@ public class MiltyService {
 
     public static void miltySetup(GenericInteractionCreateEvent event, Game game) {
         MiltySettings menu = game.initializeMiltySettings();
+        if (event instanceof ButtonInteractionEvent buttonEvent) {
+            if (buttonEvent.getButton().getCustomId().endsWith("_newMilty")) {
+                menu.getDraftMode().setChosenKey("newMilty");
+            } else if (buttonEvent.getButton().getCustomId().endsWith("_nucleus")) {
+                menu.getDraftMode().setChosenKey("nucleus");
+            }
+        }
         menu.postMessageAndButtons(event);
         ButtonHelper.deleteMessage(event);
     }

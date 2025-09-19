@@ -16,6 +16,7 @@ import ti4.map.Game;
 import ti4.model.Source.ComponentSource;
 import ti4.service.draft.DraftSetupService;
 import ti4.service.emoji.MiltyDraftEmojis;
+import ti4.service.milty.MiltyService;
 
 @Getter
 public class MiltySettings extends SettingsMenu {
@@ -111,7 +112,7 @@ public class MiltySettings extends SettingsMenu {
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
         String error =
                 switch (action) {
-                    case "startMilty" -> startMilty(event);
+                    case "startMilty" -> startDraft(event);
                     default -> null;
                 };
         return (error == null ? "success" : error);
@@ -123,6 +124,8 @@ public class MiltySettings extends SettingsMenu {
     public enum DraftingMode {
         none,
         milty,
+        newMilty, // Slice, Speaker Order, Faction in Public Snake Draft
+        nucleus, // Slice, Speaker Order, Seat, Faction in Public Snake Draft (w/ Nucleus templates)
         franken;
 
         public String show() {
@@ -144,8 +147,20 @@ public class MiltySettings extends SettingsMenu {
         return draftCategories;
     }
 
-    private String startMilty(GenericInteractionCreateEvent event) {
-        // return MiltyService.startFromSettings(event, this);
-        return DraftSetupService.startFromSettings(event, this);
+    private String startDraft(GenericInteractionCreateEvent event) {
+        /*
+         * For compatibility, everything runs of these same Settings objects for now.
+         * TODO: Draft mode should establish which components to pass to the DraftSetupService,
+         * and those components should be configured in this settings framework.
+         */
+        if (draftMode.getValue() == DraftingMode.milty) {
+            return MiltyService.startFromSettings(event, this);
+        } else if (draftMode.getValue() == DraftingMode.newMilty) {
+            return DraftSetupService.startFromSettings(event, this);
+        } else if (draftMode.getValue() == DraftingMode.nucleus) {
+            return DraftSetupService.startFromSettings(event, this);
+        }
+
+        return "This draft mode isn't implemented yet!";
     }
 }
