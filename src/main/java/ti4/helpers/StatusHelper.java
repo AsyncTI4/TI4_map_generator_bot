@@ -4,13 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.collections4.ListUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.helpers.Units.UnitKey;
@@ -24,7 +20,6 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
@@ -105,11 +100,6 @@ public class StatusHelper {
     public static void BeginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
         String messageText = "Please score objectives, " + game.getPing() + ".";
 
-        if (!game.isFowMode()) {
-            game.setStoredValue("newStatusScoringMode", "Yes");
-            messageText += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
-        }
-
         if (game.isOmegaPhaseMode()) {
             // Show the effects of the Agendas while scoring
             ButtonHelper.updateMap(game, event, "After Agendas, Round " + game.getRound() + ".");
@@ -127,39 +117,6 @@ public class StatusHelper {
                 }
             }
         }
-
-        List<Button> poButtons = getScoreObjectiveButtons(game);
-        Button noPOScoring = Buttons.red(Constants.PO_NO_SCORING, "No Public Objective Scored");
-        Button noSOScoring = Buttons.red(Constants.SO_NO_SCORING, "No Secret Objective Scored");
-        Button scoreAnObjective = Buttons.blue("get_so_score_buttons", "Score A Secret Objective");
-        poButtons.add(noPOScoring);
-        poButtons.add(scoreAnObjective);
-        poButtons.add(noSOScoring);
-        if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
-            poButtons.add(Buttons.gray("refreshStatusSummary", "Refresh Summary"));
-        }
-        if (game.getActionCards().size() > 130
-                && game.getPlayerFromColorOrFaction("hacan") != null
-                && !ButtonHelper.getButtonsToSwitchWithAllianceMembers(
-                                game.getPlayerFromColorOrFaction("hacan"), game, false)
-                        .isEmpty()) {
-            poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
-        }
-        poButtons.removeIf(Objects::isNull);
-        List<List<Button>> partitions = ListUtils.partition(poButtons, 5);
-        List<ActionRow> actionRows = new ArrayList<>();
-        for (List<Button> partition : partitions) {
-            actionRows.add(ActionRow.of(partition));
-        }
-        MessageCreateData messageObject = new MessageCreateBuilder()
-                .addContent(messageText)
-                .addComponents(actionRows)
-                .build();
-
-        gameChannel
-                .sendMessage(messageObject)
-                .queue(message -> GameMessageManager.replace(
-                        game.getName(), message.getId(), GameMessageType.STATUS_SCORING, game.getLastModifiedDate()));
 
         int maxVP = 0;
         for (Player player : game.getRealPlayers()) {
@@ -340,6 +297,46 @@ public class StatusHelper {
                                     + ", the bot does not believe that you can score any of your secret objectives.");
                 }
             }
+        }
+
+        List<Button> poButtons = getScoreObjectiveButtons(game);
+        Button noPOScoring = Buttons.red(Constants.PO_NO_SCORING, "No Public Objective Scored");
+        Button noSOScoring = Buttons.red(Constants.SO_NO_SCORING, "No Secret Objective Scored");
+        Button scoreAnObjective = Buttons.blue("get_so_score_buttons", "Score A Secret Objective");
+        poButtons.add(noPOScoring);
+        poButtons.add(scoreAnObjective);
+        poButtons.add(noSOScoring);
+        if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
+            poButtons.add(Buttons.gray("refreshStatusSummary", "Refresh Summary"));
+        }
+        if (game.getActionCards().size() > 130
+                && game.getPlayerFromColorOrFaction("hacan") != null
+                && !ButtonHelper.getButtonsToSwitchWithAllianceMembers(
+                                game.getPlayerFromColorOrFaction("hacan"), game, false)
+                        .isEmpty()) {
+            poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
+        }
+        poButtons.removeIf(Objects::isNull);
+        if (!game.isFowMode()) {
+            game.setStoredValue("newStatusScoringMode", "Yes");
+            messageText += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
+        }
+        MessageHelper.sendMessageToChannelWithPersistentReacts(
+                gameChannel, messageText, game, poButtons, GameMessageType.STATUS_SCORING);
+
+        boolean allReacted = true;
+        for (Player player : game.getRealPlayers()) {
+            String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
+            String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
+            if (po.isEmpty()
+                    || so.isEmpty()
+                    || game.getPhaseOfGame().contains("action")
+                    || game.getPhaseOfGame().contains("agenda")) {
+                allReacted = false;
+            }
+        }
+        if (allReacted) {
+            UnfiledButtonHandlers.respondAllHaveScored(game);
         }
     }
 
