@@ -468,6 +468,14 @@ public class ButtonHelperTacticalAction {
                     player.getRepresentation() + ", you activated an anomaly, and so could now play _Harness Energy_.");
         }
 
+        if (FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
+                && player.getActionCards().containsKey("rally")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentation()
+                            + ", you activated another players ships, and so could now play _Rally_.");
+        }
+
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, tile, game);
         if ((player.getTechs().contains("sdn") || player.getTechs().contains("absol_sdn"))
                 && !button2.isEmpty()
