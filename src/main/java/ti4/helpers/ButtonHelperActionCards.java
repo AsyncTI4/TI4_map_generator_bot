@@ -1945,17 +1945,6 @@ public class ButtonHelperActionCards {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
-        if (player.getActionCards().containsKey("last_minute_deliberation")) {
-            String msg = player.getRepresentation()
-                    + ", you have the option to pre-play _Last Minute Deliberation_."
-                    + " End-of-agenda-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
-                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(
-                    Buttons.green("resolvePreassignment_LastMinuteDeliberation", "Pre-Play Last Minute Deliberation"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
-        }
         if (player.getActionCards().containsKey("special_session")) {
             String msg = player.getRepresentation()
                     + ", you have the option to pre-play _Special Session_."

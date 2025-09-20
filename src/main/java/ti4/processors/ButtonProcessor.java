@@ -177,8 +177,6 @@ public class ButtonProcessor {
                             game,
                             player,
                             " is " + event.getButton().getLabel().toLowerCase() + ".");
-                case "lastMinuteDeliberation" ->
-                    UnfiledButtonHandlers.lastMinuteDeliberation(event, player, game, actionsChannel);
                 case "searchMyGames" ->
                     SearchGameHelper.searchGames(
                             event.getUser(), event, false, false, false, true, false, true, false, false);
