@@ -73,7 +73,8 @@ public class ActionCardHelper {
             for (String id : superWeapons) {
                 sb.append(Mapper.getRelic(id).getSimpleRepresentation());
 
-                var location = ButtonHelperAbilities.getLocationOfSuperweapon(player.getGame(), id);
+                var location =
+                        ButtonHelperAbilities.getLocationOfSuperweapon(player.getGame(), id.replace("superweapon", ""));
                 if (location != null) {
                     sb.append("\nLOCATION: ").append(location.getRepresentationForButtons());
                 }

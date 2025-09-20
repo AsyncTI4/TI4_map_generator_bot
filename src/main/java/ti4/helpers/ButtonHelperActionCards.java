@@ -1389,8 +1389,8 @@ public class ButtonHelperActionCards {
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p2);
-        String message = p2.getRepresentationUnfogged()
-                + ", you are being forced to give a promissory note. Please choose which promissory note you wish to send.";
+        String message = p2.getRepresentationUnfogged() + ", you are being forced to give a promissory note to "
+                + player.getFactionEmojiOrColor() + ". Please choose which promissory note you wish to send.";
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
@@ -2698,7 +2698,7 @@ public class ButtonHelperActionCards {
 
         for (String planet : player.getPlanets()) {
             Planet p = game.getPlanetsInfo().get(planet);
-            if (p != null && p.getResources() > count) {
+            if (p != null) {
                 if (game.getTileFromPlanet(planet) == player.getHomeSystemTile()) {
                     count += game.changeCommsOnPlanet(0, planet);
                 }

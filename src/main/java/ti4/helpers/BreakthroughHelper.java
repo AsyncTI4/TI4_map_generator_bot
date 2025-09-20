@@ -46,7 +46,10 @@ public class BreakthroughHelper {
             if (game.getFactions().contains(faction.getAlias())
                     || (game.isMinorFactionsMode() && game.getTile(faction.getID()) != null)
                     || (Helper.getPlayerFromLeader(game, commanderName) != null)
-                    || commanders.contains(commanderName)) {
+                    || commanders.contains(commanderName)
+                    || Mapper.getLeader(commanderName) == null
+                    || "unknown"
+                            .equalsIgnoreCase(Mapper.getLeader(commanderName).getAbilityText())) {
                 continue;
             }
             commanders.add(commanderName);

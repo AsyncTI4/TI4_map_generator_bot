@@ -17,7 +17,7 @@
     {
         "alias": "dangerous_wilds",
         "name": "Dangerous Wilds",
-        "text": "- During setup, place neutral infantry on each hazardous planet equal to that planet's resource value.\n- At the end of each round, for each hazardous planet that is not controlled, replenish any neutral units that were destroyed during the game round.\n- When a player gains control of a hazardous planet, they may research 1 technology; they may ignore a number of pre-requisites equal to that planet's resource value.",
+        "text": "- During setup, place neutral infantry on each hazardous planet equal to that planet's resource value.\n- At the end of each round, for each hazardous planet that is not controlled, replenish any neutral units that were destroyed during the game round.\n- When a player gains control of a hazardous planet from the deck, they may research 1 technology; they may ignore a number of pre-requisites equal to that planet's resource value.",
         "complexity": 1,
         "flavorText": "A thundering crash signaled the arrival of a garach - two in fact - and the huntress gripped her rifle tight. No room for error now. She hoped the others had heard the commotion and were header her way, but deep down she knew. She was on her own.",
         "source": "thunders_edge"
@@ -25,7 +25,7 @@
     {
         "alias": "hidden_agenda",
         "name": "Hidden Agenda",
-        "text": "- During the agenda phase, only the speaker can talk; all other players must remain silent except when declaring action cards. Transactions cannot be performed during this phase.\n- When voting, players secretly and simultaneously write their desired outcome and number of votes and pass them to the speaker. After all players have voted, the speaker secretly tallys the results and reveals only the totals to the other players.\n- The Argent Flight's votes are public and are known before the other players vote.",
+        "text": "- During the agenda phase, only the speaker can talk; all other players must remain silent except when declaring action cards/abilities. Transactions cannot be performed during this phase.\n- When voting, players secretly and simultaneously write their desired outcome and number of votes and pass them to the speaker. After all players have voted, the speaker secretly tallys the results and reveals only the totals to the other players.\n- The Argent Flight's votes are public and are known before the other players vote.",
         "complexity": 2,
         "source": "thunders_edge"
     },
@@ -60,14 +60,14 @@
     {
         "alias": "age_fighters",
         "name": "Age of Fighters",
-        "text": "- During setup, all players gain the Fighter II unit upgrade technology; the Naalu Collective player gains Hybrid Crystal Fighter II technology instead.\n- All fighters gain CAPACITY 1 that cannot be used to support fighters.\n- Non-fighter ships are purged when they are destroyed",
+        "text": "- During setup, all players gain the Fighter II unit upgrade technology; the Naalu Collective player gains Hybrid Crystal Fighter II technology instead.\n- All fighters that are counting against fleet pool gain CAPACITY 1 that cannot be used to support fighters.\n- Non-fighter ships are purged when they are destroyed",
         "complexity": 3,
         "source": "thunders_edge"
     },
     {
         "alias": "total_war",
         "name": "Total War",
-        "text": "- When a player destroys units, they place commodities from the supply equal to the combined cost of those units on a planet they control in their home system (infantry and fighters are worth 1 each).\n- When a player gains control of a planet that has commodities on it, they may move those commodities to a planet they control in their home system.\n- All players can perform the following action:\n> - ACTION: Discard 10 commodities from planets in your home system to gain 1 victory point.",
+        "text": "- When a player destroys another player's units [Note: neutral units count for this], they place commodities from the supply equal to the combined cost of those units on a planet they control in their home system (infantry and fighters are worth 1 each).\n- When a player gains control of a planet that has commodities on it, they may move those commodities to a planet they control in their home system.\n- All players can perform the following action:\n> - ACTION: Discard 10 commodities from planets in your home system to gain 1 victory point.",
         "complexity": 3,
         "source": "thunders_edge"
     }

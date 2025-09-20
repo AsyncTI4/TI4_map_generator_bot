@@ -1555,16 +1555,20 @@ public class UnfiledButtonHandlers {
                 int poIndex = Integer.parseInt(poID);
                 ScorePublicObjectiveService.scorePO(event, privateChannel, game, player, poIndex);
                 ReactionService.addReaction(event, game, player);
-                if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
+                if (!game.getStoredValue("newStatusScoringMode").isEmpty() && event != null) {
                     String msg = "Please score objectives.";
                     msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
                     event.getMessage().editMessage(msg).queue();
                 }
             } catch (Exception e) {
-                BotLogger.error(new LogOrigin(event, player), "Could not parse PO ID: " + poID, e);
-                event.getChannel()
-                        .sendMessage("Could not parse public objective ID: " + poID + ". Please score manually.")
-                        .queue();
+                if (event != null) {
+                    BotLogger.error(new LogOrigin(event, player), "Could not parse PO ID: " + poID, e);
+                    event.getChannel()
+                            .sendMessage("Could not parse public objective ID: " + poID + ". Please score manually.")
+                            .queue();
+                } else {
+                    BotLogger.error("Hm", e);
+                }
             }
             return;
         }
@@ -1615,12 +1619,13 @@ public class UnfiledButtonHandlers {
             }
         }
         if (!game.getStoredValue("newStatusScoringMode").isEmpty()
-                && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
+                && !"action".equalsIgnoreCase(game.getPhaseOfGame())
+                && event != null) {
             String msg = "Please score objectives.";
             msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
         }
-        if ("action".equalsIgnoreCase(game.getPhaseOfGame())) {
+        if ("action".equalsIgnoreCase(game.getPhaseOfGame()) && event != null) {
             event.getMessage().delete().queue();
         }
     }
@@ -1712,6 +1717,23 @@ public class UnfiledButtonHandlers {
                 buttons);
     }
 
+    @ButtonHandler("preScoreObbie_")
+    public static void preScoreObbie(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+        ButtonHelper.deleteMessage(event);
+        if (game.getPhaseOfGame().contains("action")) {
+            String poOrSO = buttonID.split("_")[1];
+            String num = buttonID.split("_")[2];
+            game.setStoredValue(player.getFaction() + "Round" + game.getRound() + "PreScored" + poOrSO, num);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Successfully queued an objective to score (wont score it if you later become unable to score it).");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "The game is not currently in the action phase, and so no scoring was queued. Go score normally.");
+        }
+    }
+
     @ButtonHandler(value = "get_so_score_buttons", save = false)
     public static void getSoScoreButtons(ButtonInteractionEvent event, Player player) {
         String secretScoreMsg = "Please choose the secret objective you wish to score.";
@@ -1796,9 +1818,11 @@ public class UnfiledButtonHandlers {
                 }
             }
         } else {
-            event.getChannel()
-                    .sendMessage("Could not find channel to play card. Please ping Bothelper.")
-                    .queue();
+            if (event != null) {
+                event.getChannel()
+                        .sendMessage("Could not find channel to play card. Please ping Bothelper.")
+                        .queue();
+            }
         }
         ButtonHelper.deleteMessage(event);
         checkForAllReactions(event, game);
@@ -1931,19 +1955,22 @@ public class UnfiledButtonHandlers {
                 // } //sar is handled elsewhere
                 if (player.hasTechReady("htp")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
+                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)) {
                     buttons.add(Buttons.red("exhaustTech_htp", "Exhaust Hegemonic Trade Policy", FactionEmojis.Winnu));
                 }
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("generic")) {
                     ButtonHelperCommanders.titansCommanderUsage(event, game, player);
                 }
                 if (player.hasTechReady("dsbenty")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.green("exhaustTech_dsbenty", "Use Merged Replicators", FactionEmojis.bentor));
                 }
@@ -1951,6 +1978,7 @@ public class UnfiledButtonHandlers {
                         && player.hasTechReady("aida")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red(
                             "exhaustTech_aida",
@@ -1960,6 +1988,7 @@ public class UnfiledButtonHandlers {
                 if (player.hasTechReady("st")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red("useTech_st", "Use Sarween Tools", TechEmojis.CyberneticTech));
                 }
@@ -1971,6 +2000,7 @@ public class UnfiledButtonHandlers {
                 }
                 if (player.hasUnexhaustedLeader("winnuagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red("exhaustAgent_winnuagent", "Use Winnu Agent", FactionEmojis.Winnu));
@@ -1978,6 +2008,7 @@ public class UnfiledButtonHandlers {
                 if (player.hasUnexhaustedLeader("gledgeagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red(
                             "exhaustAgent_gledgeagent_" + player.getFaction(),
@@ -1987,6 +2018,7 @@ public class UnfiledButtonHandlers {
                 if (player.hasUnexhaustedLeader("uydaiagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red(
                             "exhaustAgent_uydaiagent_" + player.getFaction(), "Use Uydai Agent", FactionEmojis.gledge));
@@ -2003,6 +2035,7 @@ public class UnfiledButtonHandlers {
                 }
                 if (player.hasUnexhaustedLeader("rohdhnaagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     buttons.add(Buttons.red(
                             "exhaustAgent_rohdhnaagent_" + player.getFaction(),
@@ -2012,6 +2045,7 @@ public class UnfiledButtonHandlers {
                 if (player.hasLeaderUnlocked("hacanhero")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red("purgeHacanHero", "Purge Hacan Hero", FactionEmojis.Hacan));
                 }
@@ -2164,6 +2198,9 @@ public class UnfiledButtonHandlers {
     }
 
     public static void checkForAllReactions(@NotNull ButtonInteractionEvent event, Game game) {
+        if (event == null) {
+            return;
+        }
         String buttonID = event.getButton().getCustomId();
 
         String messageId = event.getInteraction().getMessage().getId();
@@ -2232,6 +2269,47 @@ public class UnfiledButtonHandlers {
         }
     }
 
+    public static void respondAllHaveScored(Game game) {
+        String message2 =
+                "All players have indicated scoring. Flip the relevant public objective using the buttons. This will automatically run status clean-up if it has not been run already.";
+        Button draw2Stage2 = Buttons.green("reveal_stage_2x2", "Reveal 2 Stage 2");
+        Button drawStage2 = Buttons.green("reveal_stage_2", "Reveal Stage 2");
+        Button drawStage1 = Buttons.green("reveal_stage_1", "Reveal Stage 1");
+        List<Button> buttons = new ArrayList<>();
+        if (game.isRedTapeMode() || game.isCivilizedSocietyMode()) {
+            message2 = "All players have indicated scoring. In this game mode, no objective is revealed at this stage."
+                    + " Please press one of the buttons below anyways though - don't worry, it won't reveal anything, it will just run cleanup.";
+        }
+        if (game.getRound() < 4 || !game.getPublicObjectives1Peakable().isEmpty()) {
+            buttons.add(drawStage1);
+        }
+        if ((game.getRound() > 3 || game.getPublicObjectives1Peakable().isEmpty()) && !game.isOmegaPhaseMode()) {
+            if ("456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
+                buttons.add(draw2Stage2);
+            } else {
+                buttons.add(drawStage2);
+            }
+        }
+        var endGameDeck =
+                game.isOmegaPhaseMode() ? game.getPublicObjectives1Peakable() : game.getPublicObjectives2Peakable();
+        var endGameRound = game.isOmegaPhaseMode() ? 9 : 7;
+        if (game.getRound() > endGameRound || endGameDeck.isEmpty()) {
+            if (game.isFowMode()) {
+                message2 += "\n> - If there are no more objectives to reveal, use the button to continue as is.";
+                message2 += " Or end the game manually.";
+                buttons.add(Buttons.green("reveal_stage_none", "Continue without revealing"));
+            } else {
+                message2 += "\n> - If there are no more objectives to reveal, use the button to end the game.";
+                message2 +=
+                        " Whoever has the most points is crowned the winner, or whoever has the earliest initiative in the case of ties.";
+
+                buttons.add(Buttons.red("gameEnd", "End Game"));
+                buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message2, buttons);
+    }
+
     private static void respondAllPlayersReacted(ButtonInteractionEvent event, Game game) {
         String buttonID = event.getButton().getCustomId();
         if (game == null || buttonID == null) {
@@ -2277,48 +2355,7 @@ public class UnfiledButtonHandlers {
                 ReactionService.handleAllPlayersReactingNoSabotage(
                         event.getInteraction().getMessage(), game);
             case Constants.PO_SCORING, Constants.PO_NO_SCORING -> {
-                String message2 =
-                        "All players have indicated scoring. Flip the relevant public objective using the buttons. This will automatically run status clean-up if it has not been run already.";
-                Button draw2Stage2 = Buttons.green("reveal_stage_2x2", "Reveal 2 Stage 2");
-                Button drawStage2 = Buttons.green("reveal_stage_2", "Reveal Stage 2");
-                Button drawStage1 = Buttons.green("reveal_stage_1", "Reveal Stage 1");
-                List<Button> buttons = new ArrayList<>();
-                if (game.isRedTapeMode() || game.isCivilizedSocietyMode()) {
-                    message2 =
-                            "All players have indicated scoring. In this game mode, no objective is revealed at this stage."
-                                    + " Please press one of the buttons below anyways though - don't worry, it won't reveal anything, it will just run cleanup.";
-                }
-                if (game.getRound() < 4 || !game.getPublicObjectives1Peakable().isEmpty()) {
-                    buttons.add(drawStage1);
-                }
-                if ((game.getRound() > 3 || game.getPublicObjectives1Peakable().isEmpty())
-                        && !game.isOmegaPhaseMode()) {
-                    if ("456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
-                        buttons.add(draw2Stage2);
-                    } else {
-                        buttons.add(drawStage2);
-                    }
-                }
-                var endGameDeck = game.isOmegaPhaseMode()
-                        ? game.getPublicObjectives1Peakable()
-                        : game.getPublicObjectives2Peakable();
-                var endGameRound = game.isOmegaPhaseMode() ? 9 : 7;
-                if (game.getRound() > endGameRound || endGameDeck.isEmpty()) {
-                    if (game.isFowMode()) {
-                        message2 +=
-                                "\n> - If there are no more objectives to reveal, use the button to continue as is.";
-                        message2 += " Or end the game manually.";
-                        buttons.add(Buttons.green("reveal_stage_none", "Continue without revealing"));
-                    } else {
-                        message2 += "\n> - If there are no more objectives to reveal, use the button to end the game.";
-                        message2 +=
-                                " Whoever has the most points is crowned the winner, or whoever has the earliest initiative in the case of ties.";
-
-                        buttons.add(Buttons.red("gameEnd", "End Game"));
-                        buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
-                    }
-                }
-                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message2, buttons);
+                respondAllHaveScored(game);
             }
             case "pass_on_abilities" -> {
                 if (game.isCustodiansScored() || game.isOmegaPhaseMode()) {
@@ -3346,7 +3383,7 @@ public class UnfiledButtonHandlers {
         } else {
             Button ixthianButton =
                     Buttons.green("rollIxthianIgnoreSpeaker", "Roll Ixthian Artifact", PlanetEmojis.Mecatol);
-            String msg = "The speaker should roll for _Ixthain Artifact_. Click this button to roll anyway!";
+            String msg = "The speaker should roll for _Ixthian Artifact_. Click this button to roll anyway!";
             MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg, ixthianButton);
         }
         ButtonHelper.deleteMessage(event);

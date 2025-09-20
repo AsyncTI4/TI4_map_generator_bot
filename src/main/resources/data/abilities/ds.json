@@ -925,7 +925,7 @@
         "id": "pride",
         "name": "Pride",
         "faction": "toldar",
-        "permanentEffect": "When you win a combat as the attacker against a player who has more victory points than you, gain 1 honor; if that player has fewer victory points than you, gain 1 dishonor.",
+        "permanentEffect": "When you win a combat as the attacker, gain 1 honor if your opponent has more victory points than you, or gain 1 dishonor if they have fewer victory points than you; otherwise, gain 1 honor or 1 dishonor and ignore this ability until the end of your turn.",
         "source": "ds"
     },
     {

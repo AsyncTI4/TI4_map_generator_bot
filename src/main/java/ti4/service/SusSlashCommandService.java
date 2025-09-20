@@ -24,6 +24,7 @@ public class SusSlashCommandService {
             Constants.BOTHELPER,
             Constants.DEVELOPER,
             Constants.SEARCH,
+            Constants.SEARCH + "2",
             Constants.USER,
             Constants.SHOW_GAME,
             Constants.CARDS_INFO,

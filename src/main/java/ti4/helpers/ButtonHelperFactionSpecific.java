@@ -369,16 +369,82 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
+    @ButtonHandler("sardakkbtRes")
+    public static void sardakkbtRes(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+
+        ButtonHelper.deleteTheOneButton(event);
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 CC"));
+        buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Research a Unit Upgrade"));
+
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + " is resolving the sardakk breakthrough to either research 1 unit upgrade or gain 1 command token");
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentation()
+                        + " choose whether you want to research a unit upgrade (you need the pre-requistites) or gain a command token",
+                buttons);
+    }
+
+    @ButtonHandler("solBtBuild_")
+    public static void resolveSolBtBuild(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        List<Button> buttons;
+        buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "solBtBuild", "place");
+        String message = player.getRepresentation() + " Use the buttons to produce units. ";
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " is resolving sol's breakthrough ability in "
+                        + game.getTileByPosition(pos).getRepresentationForButtons());
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveEvenPride_")
+    public static void resolveEvenPride(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String honor = buttonID.split("_")[1];
+        ButtonHelper.deleteMessage(event);
+
+        if ("honor".equalsIgnoreCase(honor)) {
+            player.setHonorCounter(Math.min(8, player.getHonorCounter() + 1));
+            player.setDishonorCounter(Math.min(8 - player.getHonorCounter(), player.getDishonorCounter()));
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " has gained an Honor by beating someonewith equal victory points than them in combat. They can do this max once per turn."
+                            + " You now have " + player.getHonorCounter() + " Honor and " + player.getDishonorCounter()
+                            + " Dishonor.");
+        }
+        if ("dishonor".equalsIgnoreCase(honor)) {
+            player.setDishonorCounter(Math.min(8, player.getDishonorCounter() + 1));
+            player.setHonorCounter(Math.min(8 - player.getDishonorCounter(), player.getHonorCounter()));
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " has gained 1 Dishonor by beating someone with equal victory points than them in combat. They can do this max once per turn."
+                            + " You now have " + player.getHonorCounter() + " Honor and " + player.getDishonorCounter()
+                            + " Dishonor.");
+        }
+        correctHonorAbilities(player, game);
+    }
+
     @ButtonHandler("resolvePride_")
     public static void resolvePride(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         ButtonHelper.deleteTheOneButton(event);
         if (p2.getTotalVictoryPoints() == player.getTotalVictoryPoints()) {
+
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("resolveEvenPride_honor", "Gain 1 honor"));
+            buttons.add(Buttons.red("resolveEvenPride_dishonor", "Gain 1 dishonor"));
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + ", you do not gain or lose Honor when beating someone who has the same number of victory points as yourself.");
+                            + ", you can gain 1 honor or 1 dishonor once per turn when beating someone with equal VPs. Use buttons to choose.",
+                    buttons);
         }
         if (p2.getTotalVictoryPoints() > player.getTotalVictoryPoints() && !player.hasAbility("scourge")) {
             player.setHonorCounter(Math.min(8, player.getHonorCounter() + 1));
