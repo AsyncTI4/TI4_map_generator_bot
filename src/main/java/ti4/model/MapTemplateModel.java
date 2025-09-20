@@ -27,6 +27,13 @@ public class MapTemplateModel implements ModelInterface {
 
         // This is the position the tile should be on the map
         private String pos;
+
+        // Nucleus specific
+        // This field indicates which nucleus pseudo-slices the tile belongs to.
+        // In a 6p standard layout, the tiles adjacent to mecatol rex are in one pseudo-slice,
+        // but the tiles in equidistants are in both of the nearest pseudo-slices.
+        // This field should be mutually exclusive with playerNumber, miltyTileIndex, home, staticTileId.
+        private List<Integer> nucleusNumbers;
     }
 
     private String alias;
@@ -39,11 +46,22 @@ public class MapTemplateModel implements ModelInterface {
     private boolean toroidal;
     private List<String> sliceEmulateTiles; // [homePos, tile0pos, tile1pos, ...]
     private List<MapTemplateTile> templateTiles; // MECATOL REX IS NOT INCLUDED BY DEFAULT
+    private Integer nucleusSliceCount;
+    private Integer tilesPerNucleusSlice;
 
     public boolean isValid() {
         return alias != null
                 && (tileDisplayCoords().size() == (1 + tilesPerPlayer()))
                 && ((bluePerPlayer() + redPerPlayer()) == tilesPerPlayer());
+    }
+
+    public boolean isNucleusTemplate() {
+        if (nucleusSliceCount == null) return false;
+        if (tilesPerNucleusSlice == null) return false;
+        for (MapTemplateTile t : templateTiles) {
+            if (t.nucleusNumbers != null && !t.nucleusNumbers.isEmpty()) {}
+        }
+        return false;
     }
 
     public String autoCompleteString() {

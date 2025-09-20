@@ -329,7 +329,7 @@ public class FactionDraftable extends SinglePickDraftable {
         int numPlayers = draftManager.getPlayerStates().size();
         if (draftFactions.size() < numPlayers) {
             return "Number of factions (" + draftFactions.size() + ") is less than number of players (" + numPlayers
-                    + ")";
+                    + "). Add more factions with `/draft faction add`.";
         }
 
         // Ensure all factions in draftFactions are valid
@@ -337,7 +337,8 @@ public class FactionDraftable extends SinglePickDraftable {
         for (String factionAlias : draftFactions) {
             FactionModel faction = Mapper.getFaction(factionAlias);
             if (faction == null) {
-                return "Unknown faction in draftFactions: " + factionAlias;
+                return "Unknown faction in draftFactions: " + factionAlias
+                        + ". Remove it with `/draft faction remove`.";
             }
 
             if (factionAlias.contains("keleres")) {
@@ -345,14 +346,16 @@ public class FactionDraftable extends SinglePickDraftable {
             }
 
             if (distinctFactions.contains(factionAlias)) {
-                return "Duplicate faction alias in draftFactions: " + factionAlias;
+                return "Duplicate faction alias in draftFactions: " + factionAlias
+                        + ". Remove it with `/draft faction remove`.";
             }
             distinctFactions.add(factionAlias);
         }
 
         if (keleresFlavor != null) {
             if (!keleresFlavors.contains(keleresFlavor)) {
-                return "Unknown keleres flavor: " + keleresFlavor;
+                return "Unknown keleres flavor: " + keleresFlavor
+                        + ". Fix it with `/draft faction set_keleres_flavor`.";
             }
         }
 

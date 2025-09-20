@@ -101,12 +101,13 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
     @Override
     public String validateState(DraftManager draftManager) {
         if (numPicks < 1) {
-            return "Number of speaker positions must be at least 1, but is: " + numPicks;
+            return "Number of speaker positions must be at least 1, but is: " + numPicks
+                    + ". Fix it with `/draft pickorder set_num_picks`.";
         }
         int numDraftPlayers = draftManager.getPlayerStates().size();
         if (numPicks < numDraftPlayers) {
             return "Number of speaker positions (" + numPicks + ") is less than number of players drafting ("
-                    + numDraftPlayers + ")";
+                    + numDraftPlayers + "). Fix it with `/draft pickorder set_num_picks`.";
         }
         return super.validateState(draftManager);
     }

@@ -105,7 +105,8 @@ public class SliceDraftable extends SinglePickDraftable {
     public String validateState(DraftManager draftManager) {
         int numPlayers = draftManager.getPlayerStates().size();
         if (slices.size() < numPlayers) {
-            return "Number of slices (" + slices.size() + ") is less than number of players (" + numPlayers + ")";
+            return "Number of slices (" + slices.size() + ") is less than number of players (" + numPlayers
+                    + "). Add more slices with `/draft slice add`.";
         }
 
         return super.validateState(draftManager);

@@ -9,10 +9,14 @@ import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.service.draft.draftables.FactionDraftable;
+import ti4.service.draft.draftables.SeatDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
 import ti4.service.draft.orchestrators.PublicSnakeDraftOrchestrator;
+import ti4.service.milty.MiltyDraftSlice;
 
 @UtilityClass
 public class DraftSetupService {
@@ -28,10 +32,14 @@ public class DraftSetupService {
 
         DraftSpec specs = DraftSpec.CreateFromMiltySettings(settings);
 
-        return startFromSpecs(event, specs);
+        if (specs.getTemplate().isNucleusTemplate()) {
+            return startNucleusFromSpecs(event, specs);
+        } else {
+            return startMiltyFromSpecs(event, specs);
+        }
     }
 
-    public static String startFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
+    public static String startMiltyFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
         Game game = specs.game;
 
         if (specs.presetSlices != null) {
@@ -71,20 +79,6 @@ public class DraftSetupService {
         // initDraftOrder(draftManager, players, staticOrder);
         orchestrator.initialize(draftManager, players);
         draftManager.setOrchestrator(orchestrator);
-
-        // initialize factions
-        // List<String> unbannedFactions = new
-        // ArrayList<>(Mapper.getFactionsValues().stream()
-        // .filter(f -> specs.factionSources.contains(f.getSource()))
-        // .filter(f -> !specs.bannedFactions.contains(f.getAlias()))
-        // .filter(f -> !f.getAlias().contains("keleres")
-        // || "keleresm".equals(f.getAlias())) // Limit the pool to only 1 keleres
-        // flavor
-        // .map(FactionModel::getAlias)
-        // .toList());
-        // List<String> factionDraft = createFactionDraft(specs.numFactions,
-        // unbannedFactions, specs.priorityFactions);
-        // draftManager.setFactionDraft(factionDraft);
 
         // validate slice count + sources
         int redTiles = tileManager.getRed().size();
@@ -135,6 +129,89 @@ public class DraftSetupService {
                 }
             });
         }
+        return null;
+    }
+
+    public static String startNucleusFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
+        Game game = specs.game;
+
+        // Setup managers and game state
+        DraftManager draftManager = game.getDraftManager();
+        draftManager.resetForNewDraft();
+        draftManager.setPlayers(specs.playerIDs);
+
+        game.setMapTemplateID(specs.template.getAlias());
+
+        FactionDraftable factionDraftable = new FactionDraftable();
+        factionDraftable.initialize(
+                specs.numFactions, specs.factionSources, specs.priorityFactions, specs.bannedFactions);
+        draftManager.addDraftable(factionDraftable);
+
+        SpeakerOrderDraftable speakerOrderDraftable = new SpeakerOrderDraftable();
+        speakerOrderDraftable.initialize(specs.playerIDs.size());
+        draftManager.addDraftable(speakerOrderDraftable);
+
+        SeatDraftable seatDraftable = new SeatDraftable();
+        seatDraftable.initialize(specs.getTemplate().getPlayerCount());
+        draftManager.addDraftable(seatDraftable);
+
+        // Setup Public Snake Draft Orchestrator
+        PublicSnakeDraftOrchestrator orchestrator = new PublicSnakeDraftOrchestrator();
+        List<String> setPlayerOrder = null;
+        boolean staticOrder = specs.playerDraftOrder != null && !specs.playerDraftOrder.isEmpty();
+        if (staticOrder) {
+            setPlayerOrder = new ArrayList<>(specs.playerDraftOrder)
+                    .stream().filter(p -> specs.playerIDs.contains(p)).toList();
+        }
+        orchestrator.initialize(draftManager, setPlayerOrder);
+        draftManager.setOrchestrator(orchestrator);
+
+        game.clearTileMap();
+        try {
+            PartialMapService.tryUpdateMap(event, draftManager);
+        } catch (Exception e) {
+            // Ignore
+        }
+
+        // TODO: Support this in the Nucleus generator, by factoring in to the nucleus generation
+        // if (specs.presetSlices != null) {
+        //     SliceDraftable sliceDraftable = new SliceDraftable();
+        //     draftManager.addDraftable(sliceDraftable);
+        //     sliceDraftable.initialize(specs.presetSlices);
+        //     draftManager.tryStartDraft();
+        // }
+
+        // TODO: Support presetting the Nucleus in the Settings object, maybe via modal w/ TTS string
+        String startMsg = "## Generating the nucleus and slices!!";
+        event.getMessageChannel().sendMessage(startMsg).queue((ignore) -> {
+            List<MiltyDraftSlice> slices = NucleusSliceGeneratorService.generateNucleusAndSlices(event, specs);
+            if (slices == null) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "Failed to generate nucleus and slices after many attempts! Ping bothelper to report this issue.");
+                BotLogger.warning(new LogOrigin(event), "Failed to generate nucleus and slices after many attempts.");
+            } else {
+                SliceDraftable sliceDraftable = new SliceDraftable();
+                sliceDraftable.initialize(slices);
+                draftManager.addDraftable(sliceDraftable);
+                draftManager.tryStartDraft();
+                game.setPhaseOfGame("miltydraft");
+                GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
+            }
+            // boolean slicesCreated = SliceGeneratorService.generateSlices(event, sliceDraftable, tileManager, specs);
+            // if (!slicesCreated) {
+            //     String msg = "Generating slices was too hard so I gave up.... Please try again.";
+            //     if (specs.numSlices == maxSlices) {
+            //         msg += "\n*...and maybe consider asking for fewer slices*";
+            //     }
+            //     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            // } else {
+            //     draftManager.tryStartDraft();
+            //     game.setPhaseOfGame("miltydraft");
+            //     GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
+            // }
+        });
+
         return null;
     }
 }

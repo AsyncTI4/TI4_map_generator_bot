@@ -17,6 +17,7 @@ import ti4.message.MessageHelper;
 import ti4.service.draft.DraftButtonService;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
+import ti4.service.draft.DraftManager.CommandSource;
 import ti4.service.draft.DraftOrchestrator;
 import ti4.service.draft.DraftPlayerManager;
 import ti4.service.draft.Draftable;
@@ -26,7 +27,6 @@ import ti4.service.draft.PartialMapService;
 import ti4.service.draft.PlayerDraftState;
 import ti4.service.draft.PlayerSetupService.PlayerSetupState;
 import ti4.service.draft.PublicDraftInfoService;
-import ti4.service.draft.DraftManager.CommandSource;
 
 public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     public static class State extends OrchestratorState {
@@ -127,17 +127,23 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     @Override
     public void sendDraftButtons(DraftManager draftManager) {
         List<String> playerOrder = getPlayerOrder(draftManager);
+        String currentPlayerUserId = getCurrentPlayer(playerOrder);
+        draftManager.getGame().setActivePlayerID(currentPlayerUserId);
         PublicDraftInfoService.send(
                 draftManager,
                 playerOrder,
-                getCurrentPlayer(playerOrder),
+                currentPlayerUserId,
                 getNextPlayer(playerOrder),
                 List.of(getReprintDraftButton()));
     }
 
     @Override
     public String applyDraftChoice(
-            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice, CommandSource source) {
+            GenericInteractionCreateEvent event,
+            DraftManager draftManager,
+            String playerUserId,
+            DraftChoice choice,
+            CommandSource source) {
         List<String> playerOrder = getPlayerOrder(draftManager);
 
         // Picks are made one player at a time, with all buttons visible.
@@ -160,17 +166,14 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
         Player player = draftManager.getGame().getPlayer(playerUserId);
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getPing())
-                .append(" drafted ");
-        if(source == CommandSource.AUTO_PICK) {
+        sb.append(player.getPing()).append(" drafted ");
+        if (source == CommandSource.AUTO_PICK) {
             sb.append("(automatically) ");
-        } else if(source == CommandSource.SLASH_COMMAND) {
+        } else if (source == CommandSource.SLASH_COMMAND) {
             sb.append("(forcefully) ");
         }
-        sb.append(choice.getDisplayName())
-                .append("!");
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), sb.toString());
+        sb.append(choice.getDisplayName()).append("!");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
 
         // Move the draft to the next player
         advanceToNextPlayer(playerOrder);
@@ -220,6 +223,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
                     List.of(),
                     List.of(),
                     List.of(getReprintDraftButton()));
+            draftManager.getGame().setActivePlayerID(getCurrentPlayer(playerOrder));
         }
 
         PartialMapService.tryUpdateMap(event, draftManager);
@@ -274,7 +278,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     public String validateState(DraftManager draftManager) {
         if (currentPlayerIndex < 0
                 || currentPlayerIndex >= draftManager.getPlayerStates().size()) {
-            return "Current player index is out of bounds: " + currentPlayerIndex;
+            return "Invalid 'current player' index: " + currentPlayerIndex
+                    + ". Fix it with `/draft public_snake set_current_player`.";
         }
         // Ensure all players have a valid State, with unique and valid order indices.
         Set<Integer> distinctOrderIndices = new HashSet<>();
@@ -284,20 +289,23 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             PlayerDraftState playerState = entry.getValue();
             OrchestratorState orchestratorState = playerState.getOrchestratorState();
             if (orchestratorState == null || !(orchestratorState instanceof State)) {
-                return "Player " + playerUserId + " has invalid orchestrator state (missing or unexpected)";
+                return "Player " + playerUserId
+                        + " has invalid draft state (missing or weird type). Try `/draft manage set_orchestrator public_snake` (this will reset the draft order).";
             }
             State state = (State) orchestratorState;
             if (state.getOrderIndex() < 0
                     || state.getOrderIndex() >= draftManager.getPlayerStates().size()) {
-                return "Player " + playerUserId + " has out of bounds order index: " + state.getOrderIndex();
+                return "Player " + playerUserId + " has out of bounds order index: " + state.getOrderIndex()
+                        + ". Fix it with `/draft public_snake set_order`.";
             }
             if (distinctOrderIndices.contains(state.getOrderIndex())) {
-                return "Duplicate order index found: " + state.getOrderIndex();
+                return "Duplicate order index found: " + state.getOrderIndex()
+                        + ". Fix it with `/draft public_snake set_order`.";
             }
             distinctOrderIndices.add(state.getOrderIndex());
         }
         if (distinctOrderIndices.size() != draftManager.getPlayerStates().size()) {
-            return "Player order indices are not unique";
+            return "Player order indices are not unique. Fix it with `/draft public_snake set_order`.";
         }
 
         return null;

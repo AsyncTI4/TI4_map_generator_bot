@@ -65,9 +65,6 @@ public class DraftManager extends DraftPlayerManager {
         if (orchestrator == null) {
             throw new IllegalArgumentException("Orchestrator cannot be null");
         }
-        if (this.orchestrator != null) {
-            throw new IllegalStateException("Orchestrator is already set");
-        }
         this.orchestrator = orchestrator;
         this.orchestrator.initializePlayerStates(this);
     }
@@ -133,7 +130,8 @@ public class DraftManager extends DraftPlayerManager {
                             return validationError;
                         }
                         // More validation, and add the button to the player's state
-                        String status = orchestrator.applyDraftChoice(event, this, player.getUserID(), choice, commandSource);
+                        String status =
+                                orchestrator.applyDraftChoice(event, this, player.getUserID(), choice, commandSource);
                         if (DraftButtonService.isError(status)) {
                             return status;
                         }
@@ -332,15 +330,15 @@ public class DraftManager extends DraftPlayerManager {
         MessageChannel issueChannel = game.getMainGameChannel();
         if (draftables.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    issueChannel, "Draft problem: Nothing to draft (try `/draft add_draftable`)");
+                    issueChannel, "Draft problem: Nothing to draft (try `/draft manage add_draftable`)");
         }
         if (orchestrator == null) {
             MessageHelper.sendMessageToChannel(
-                    issueChannel, "Draft problem: No way to draft (try `/draft set_orchestrator publicsnake`)");
+                    issueChannel, "Draft problem: No way to draft (try `/draft manage set_orchestrator`)");
         }
         if (playerStates.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    issueChannel, "Draft problem: No players in draft (try `/draft add_player <my-user-id>`)");
+                    issueChannel, "Draft problem: No players in draft (try `/draft manage add_all_game_players`)");
         }
         if (orchestrator != null) {
             String validationError = orchestrator.validateState(this);

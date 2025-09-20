@@ -99,11 +99,12 @@ public class SeatDraftable extends SinglePickDraftable {
                 Mapper.getMapTemplate(draftManager.getGame().getMapTemplateID());
         if (mapTemplate == null) {
             return "Map template ID is not set or invalid: "
-                    + draftManager.getGame().getMapTemplateID();
+                    + draftManager.getGame().getMapTemplateID() + ". Set it with `/game set_map_template`.";
         }
         if (mapTemplate.getPlayerCount() < numSeats) {
             return "Map template " + mapTemplate.getAlias() + " only supports " + mapTemplate.getPlayerCount()
-                    + " players, but draft has " + numSeats + " seats.";
+                    + " players, but draft has " + numSeats
+                    + " seats. Change the map template with `/game set_map_template` or reduce the number of seats with `/draft seat set_num_seats`.";
         }
 
         return super.validateState(draftManager);

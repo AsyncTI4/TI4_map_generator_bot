@@ -8,6 +8,7 @@ import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.PlayerFactionSettings;
 import ti4.helpers.settingsFramework.menus.SliceGenerationSettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source;
@@ -57,7 +58,12 @@ public class DraftSpec {
 
         // Load Game Specifications
         GameSettings gameSettings = settings.getGameSettings();
-        specs.setTemplate(gameSettings.getMapTemplate().getValue());
+        MapTemplateModel template = gameSettings.getMapTemplate().getValue();
+        if (template == null) {
+            template = Mapper.getDefaultMapTemplateForPlayerCount(specs.playerIDs.size());
+            game.setMapTemplateID(template.getID());
+        }
+        specs.setTemplate(template);
 
         // Load Slice Generation Specifications
         SliceGenerationSettings sliceSettings = settings.getSliceSettings();

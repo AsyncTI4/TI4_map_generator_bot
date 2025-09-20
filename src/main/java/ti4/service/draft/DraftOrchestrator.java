@@ -15,7 +15,11 @@ public abstract class DraftOrchestrator extends DraftLifecycleHooks {
             GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId);
 
     public abstract String applyDraftChoice(
-            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice, CommandSource source);
+            GenericInteractionCreateEvent event,
+            DraftManager draftManager,
+            String playerUserId,
+            DraftChoice choice,
+            CommandSource source);
 
     // Persistence
 

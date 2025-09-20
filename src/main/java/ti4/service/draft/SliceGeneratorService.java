@@ -35,6 +35,14 @@ public class SliceGeneratorService {
         boolean anomaliesCanTouch = specs.anomaliesCanTouch;
 
         MapTemplateModel mapTemplate = specs.template;
+        if (mapTemplate.isNucleusTemplate()) {
+            BotLogger.warning(
+                    new LogOrigin(event),
+                    "Map template " + mapTemplate.getAlias()
+                            + " is a nucleus template, but nucleus generation is not supported here.");
+            return false;
+        }
+
         List<List<Boolean>> adjMatrix = getAdjMatrix(mapTemplate);
         int bluePerPlayer = mapTemplate.bluePerPlayer();
         int redPerPlayer = mapTemplate.redPerPlayer();

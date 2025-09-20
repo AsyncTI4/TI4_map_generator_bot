@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import lombok.Data;
 import ti4.image.TileHelper;
 import ti4.map.Game;
@@ -42,6 +44,10 @@ public class DraftTileManager {
 
     public List<MiltyDraftTile> getRed() {
         return new ArrayList<>(red);
+    }
+
+    public List<MiltyDraftTile> filterAll(Predicate<MiltyDraftTile> predicate) {
+        return all.stream().filter(predicate).collect(Collectors.toList());
     }
 
     public void clear() {

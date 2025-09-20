@@ -56,6 +56,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.DistanceTool;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
@@ -203,6 +204,7 @@ public class Game extends GameProperties {
     private MiltyDraftManager miltyDraftManager;
     private DraftTileManager draftTileManager;
     private DraftManager draftManager;
+    private DistanceTool distanceTool;
 
     @Getter
     private final Expeditions expeditions = new Expeditions(this);
@@ -424,6 +426,17 @@ public class Game extends GameProperties {
             }
         }
         return draftManager;
+    }
+
+    public DistanceTool getDistanceTool() {
+        if (distanceTool == null) {
+            if (getMapTemplateID() == null) {
+                BotLogger.warning(new LogOrigin(this), "Map template ID is null, distance tool can not be created.");
+                return null;
+            }
+            distanceTool = new DistanceTool(this);
+        }
+        return distanceTool;
     }
 
     @Nullable

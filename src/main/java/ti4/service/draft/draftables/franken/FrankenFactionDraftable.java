@@ -1,4 +1,4 @@
 package ti4.service.draft.draftables.franken;
 
-// Because "getNumPerPlayer" is draftable-wide, we'll need one per type.
+// TODO: For franken. Can maybe just convert DraftItems?
 public class FrankenFactionDraftable {}
