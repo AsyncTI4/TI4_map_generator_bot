@@ -209,7 +209,6 @@ public class ActionCardHelper {
                 "disgrace",
                 "special_session",
                 "investments",
-                "last_minute_deliberation",
                 "revolution",
                 "deflection",
                 "summit",
@@ -627,12 +626,6 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("last_minute_deliberation".equals(automationID)) {
-                codedButtons.add(
-                        Buttons.green(player.getFinsFactionCheckerPrefix() + "lastMinuteDeliberation", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
-            }
-
             if ("professional_archeologists".equals(automationID)) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveProfessionalArcheologists", buttonLabel));
@@ -905,7 +898,7 @@ public class ActionCardHelper {
                 game.setStoredValue("flankspeedBoost", "1");
             }
 
-            if ("sister_ship".equals(automationID)) {
+            if ("refabrication".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveSisterShip", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -931,7 +924,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("rendezvous_point".equals(automationID) || "rendezvous".equals(automationID)) {
+            if ("rendezvous".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveRendezvousPoint", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);

@@ -191,12 +191,6 @@ public class StartPhaseService {
 
     public static void startStrategyPhase(GenericInteractionCreateEvent event, Game game) {
         for (Player player2 : game.getRealPlayers()) {
-            if (game.getStoredValue("LastMinuteDeliberation") != null
-                    && game.getStoredValue("LastMinuteDeliberation").contains(player2.getFaction())
-                    && player2.getActionCards().containsKey("last_minute_deliberation")) {
-                ActionCardHelper.playAC(event, game, player2, "last minute deliberation", game.getMainGameChannel());
-                return;
-            }
             if (game.getStoredValue("SpecialSession") != null
                     && game.getStoredValue("SpecialSession").contains(player2.getFaction())
                     && player2.getActionCards().containsKey("special_session")) {
