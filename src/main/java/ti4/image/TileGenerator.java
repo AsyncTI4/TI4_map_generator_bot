@@ -1583,7 +1583,7 @@ public class TileGenerator {
                         default -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
                     };
             float scale = 0.95f;
-            List<String> smallLegendaries = List.of("mirage", "mallice", "mallicelocked", "eko", "domna");
+            List<String> smallLegendaries = List.of("mirage", "mallice", "mallicelocked", "eko", "domna", "avernus");
             if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
                     && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
                 scale = 1.65f;
@@ -1608,7 +1608,8 @@ public class TileGenerator {
                     continue;
                 }
                 float scale = 0.85f;
-                List<String> smallLegendaries = List.of("mirage", "mallice", "mallicelocked", "eko", "domna");
+                List<String> smallLegendaries =
+                        List.of("mirage", "mallice", "mallicelocked", "eko", "domna", "avernus");
                 boolean isLegendary = Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null;
                 if (tokenPath.contains(Constants.DMZ_LARGE)) {
                     scale = 0.3f;
@@ -1691,7 +1692,8 @@ public class TileGenerator {
                             null);
                 } else if (tokenPath.contains(Constants.DMZ_LARGE)) {
                     float scale = 0.3f;
-                    List<String> smallLegendaries = List.of("mirage", "mallice", "mallicelocked", "eko", "domna");
+                    List<String> smallLegendaries =
+                            List.of("mirage", "mallice", "mallicelocked", "eko", "domna", "avernus");
                     if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
                             && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
                         scale = 0.53f;
