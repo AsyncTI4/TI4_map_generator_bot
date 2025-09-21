@@ -2,6 +2,7 @@ package ti4.service.draft;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.Data;
+import org.apache.commons.collections4.ListUtils;
 import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -28,6 +30,7 @@ public class DraftTileManager {
     private final List<MiltyDraftTile> all = new ArrayList<>();
     private final List<MiltyDraftTile> blue = new ArrayList<>();
     private final List<MiltyDraftTile> red = new ArrayList<>();
+    private final Map<TierList, List<MiltyDraftTile>> tilesByTier = new HashMap<>();
 
     public void addDraftTile(MiltyDraftTile draftTile) {
         TierList draftTileTier = draftTile.getTierList();
@@ -54,6 +57,7 @@ public class DraftTileManager {
         all.clear();
         blue.clear();
         red.clear();
+        tilesByTier.clear();
     }
 
     public void reset(Game game) {
@@ -71,6 +75,73 @@ public class DraftTileManager {
             MiltyDraftTile draftTile = getDraftTileFromModel(tileModel);
             addDraftTile(draftTile);
         }
+    }
+
+    /**
+     * Get the provided tiles broken into their tiers. The tiering calculation still uses ALL draft tiles.
+     * @param specificTiles
+     * @return A map of the specificTiles broken into tiers, with tier placement depending on all draft tiles.
+     */
+    public Map<TierList, List<MiltyDraftTile>> getTilesByTier(List<MiltyDraftTile> specificTiles) {
+        Map<TierList, List<MiltyDraftTile>> tierList = getTilesByTier();
+        Map<TierList, List<MiltyDraftTile>> result = new HashMap<>();
+        for (TierList tier : TierList.values()) {
+            List<MiltyDraftTile> tilesInTier = tierList.get(tier);
+            Set<String> tileIdsInTier =
+                    tilesInTier.stream().map(t -> t.getTile().getTileID()).collect(Collectors.toSet());
+            List<MiltyDraftTile> filteredTiles = specificTiles.stream()
+                    .filter(t -> tileIdsInTier.contains(t.getTile().getTileID()))
+                    .collect(Collectors.toList());
+            result.put(tier, filteredTiles);
+        }
+        return result;
+    }
+
+    /**
+     * Get all the tiles broken into their *relative* tiers. Because the quality of a tile depends on
+     * what you're comparing it to, tile tiers are dynamically populated based on the total available
+     * set.
+     * @return A map of tiers to the tiles in that tier.
+     */
+    public Map<TierList, List<MiltyDraftTile>> getTilesByTier() {
+        if (!tilesByTier.isEmpty()) {
+            return tilesByTier;
+        }
+
+        List<MiltyDraftTile> blue = getBlue();
+        blue.sort(Comparator.comparingDouble(MiltyDraftTile::abstractValue));
+        int bluePerPartition = Math.ceilDiv(blue.size(), 3);
+        List<List<MiltyDraftTile>> partitionedTiles = new ArrayList<>(ListUtils.partition(blue, bluePerPartition));
+        tilesByTier.put(TierList.low, partitionedTiles.size() > 0 ? partitionedTiles.get(0) : List.of());
+        tilesByTier.put(TierList.mid, partitionedTiles.size() > 1 ? partitionedTiles.get(1) : List.of());
+        tilesByTier.put(TierList.high, partitionedTiles.size() > 2 ? partitionedTiles.get(2) : List.of());
+
+        List<MiltyDraftTile> red = getRed();
+        tilesByTier.put(
+                TierList.anomaly,
+                red.stream().filter(tile -> tile.getTile().isAnomaly()).toList());
+        tilesByTier.put(
+                TierList.red,
+                red.stream().filter(tile -> !tile.getTile().isAnomaly()).toList());
+
+        return tilesByTier;
+    }
+
+    /**
+     * Get the tier of a specific draft tile, relative to all tiles available to this game.
+     * @param draftTile
+     * @return "high", "mid", "low", "red", or "anomaly", or null if the tile is not found.
+     */
+    public TierList getRelativeTier(MiltyDraftTile draftTile) {
+        Map<TierList, List<MiltyDraftTile>> tierMap = getTilesByTier();
+        for (var entry : tierMap.entrySet()) {
+            if (entry.getValue().stream()
+                    .anyMatch(t ->
+                            t.getTile().getTileID().equals(draftTile.getTile().getTileID()))) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
     public static void resetForGame(Game game) {

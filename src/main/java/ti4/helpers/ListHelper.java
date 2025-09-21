@@ -2,7 +2,7 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import lombok.experimental.UtilityClass;
@@ -11,8 +11,7 @@ import lombok.experimental.UtilityClass;
 public class ListHelper {
     public <T> T randomPick(List<T> list) {
         if (list == null || list.isEmpty()) return null;
-        Random random = new Random();
-        int randomIndex = random.nextInt(list.size());
+        int randomIndex = ThreadLocalRandom.current().nextInt(list.size());
         return list.get(randomIndex);
     }
 
@@ -29,7 +28,7 @@ public class ListHelper {
      * @return The list of the removed items.
      */
     public <T> List<T> removeByPredicate(List<T> list, Predicate<T> predicate, int limit) {
-        if (list == null || list.isEmpty() || predicate == null || limit <= 0) return list;
+        if (list == null || list.isEmpty() || predicate == null || limit <= 0) return List.of();
         List<T> toRemove = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             T item = list.get(i);

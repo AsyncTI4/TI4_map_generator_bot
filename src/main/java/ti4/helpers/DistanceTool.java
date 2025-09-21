@@ -11,6 +11,7 @@ import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.model.MapTemplateModel;
+import ti4.model.TileModel;
 
 /**
  * This will calculate the distance between two positions. It respects hyperlanes, but NOT wormholes.
@@ -37,8 +38,13 @@ public class DistanceTool {
         }
         legalPositions.clear();
         legalPositions.addAll(mapTemplate.getTemplateTiles().stream()
-                .filter(t -> t.getStaticTileId() == null
-                        || !TileHelper.getTileById(t.getStaticTileId()).isHyperlane())
+                .filter(t -> {
+                    if (t.getStaticTileId() == null) return true;
+                    String tileId = t.getStaticTileId();
+                    tileId = AliasHandler.resolveTile(tileId);
+                    TileModel tile = TileHelper.getTileById(tileId);
+                    return !tile.isHyperlane();
+                })
                 .map(t -> t.getPos())
                 .collect(HashSet::new, HashSet::add, HashSet::addAll));
     }

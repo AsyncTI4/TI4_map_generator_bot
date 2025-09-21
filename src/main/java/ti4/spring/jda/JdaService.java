@@ -416,6 +416,7 @@ public class JdaService {
         adminRoles.add(jda.getRoleById("1368344911103000728")); // gozer's server (marshmallow manosphere)
         adminRoles.add(jda.getRoleById("1378475691531567185")); // Hadouken's Server
         adminRoles.add(jda.getRoleById("1149705227625316352")); // Will's server
+        adminRoles.add(jda.getRoleById("1335330636935987343")); // Jabberwocky's server
         adminRoles.removeIf(Objects::isNull);
 
         // DEVELOPER ROLES
@@ -445,6 +446,7 @@ public class JdaService {
         developerRoles.add(jda.getRoleById("1368344979579338762")); // gozer's server (marshmallow manosphere)
         developerRoles.add(jda.getRoleById("1378475796301217792")); // Hadouken's Server
         developerRoles.add(jda.getRoleById("1406188584163213332")); // Will's server
+        developerRoles.add(jda.getRoleById("1335330959767375902")); // Jabberwocky's server
         developerRoles.removeIf(Objects::isNull);
 
         // BOTHELPER ROLES
@@ -477,6 +479,7 @@ public class JdaService {
         bothelperRoles.add(jda.getRoleById("1368345023745097898")); // gozer's server (marshmallow manosphere)
         bothelperRoles.add(jda.getRoleById("1378475822528204901")); // Hadouken's Server
         bothelperRoles.add(jda.getRoleById("1150031360610799676")); // Will's server
+        bothelperRoles.add(jda.getRoleById("1335331011147595929")); // Jabberwocky's Server
         bothelperRoles.removeIf(Objects::isNull);
     }
 

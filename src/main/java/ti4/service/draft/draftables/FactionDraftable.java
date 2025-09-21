@@ -125,7 +125,8 @@ public class FactionDraftable extends SinglePickDraftable {
             }
             String factionName = faction.getFactionName();
             if (factionName.toLowerCase().contains("keleres")) {
-                factionName = "Keleres";
+                // Chop off any suffix
+                factionName = factionName.replaceAll("eleres.*$", "eleres");
             }
             String choiceKey = factionAlias;
             String buttonText = factionName;
@@ -276,7 +277,7 @@ public class FactionDraftable extends SinglePickDraftable {
         List<String> keleresPlayers = draftManager.getPlayersWithChoiceKey(TYPE, "keleresm");
         if (!keleresPlayers.isEmpty() && keleresFlavor == null) {
             Player player = draftManager.getGame().getPlayer(keleresPlayers.get(0));
-            return "Waiting for " + player.getDisplayName() + " to choose a Keleres flavor.";
+            return "Waiting for " + player.getPing() + " to choose a Keleres flavor.";
         }
         return null;
     }

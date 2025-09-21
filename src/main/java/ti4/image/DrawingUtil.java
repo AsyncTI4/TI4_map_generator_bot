@@ -409,8 +409,12 @@ public class DrawingUtil {
         return "_wht.png";
     }
 
+    public BufferedImage hexBorder(String hexBorderStyle, ColorModel color, List<Integer> openSides, float widthScale) {
+        return hexBorder(color, openSides, "solid".equals(hexBorderStyle), widthScale);
+    }
+
     public BufferedImage hexBorder(String hexBorderStyle, ColorModel color, List<Integer> openSides) {
-        return hexBorder(color, openSides, "solid".equals(hexBorderStyle));
+        return hexBorder(color, openSides, "solid".equals(hexBorderStyle), 1.0f);
     }
 
     public BufferedImage tintedBackground(Color color, float alpha) {
@@ -429,13 +433,13 @@ public class DrawingUtil {
         return bgImg;
     }
 
-    private BufferedImage hexBorder(ColorModel color, List<Integer> openSides, boolean solidLines) {
+    private BufferedImage hexBorder(ColorModel color, List<Integer> openSides, boolean solidLines, float widthScale) {
         BufferedImage img = new BufferedImage(400, 400, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = img.createGraphics();
         boolean rainbow = color.getName().endsWith("rainbow");
 
-        float inlineSize = 3.0f;
-        float outlineSize = 6.0f;
+        float inlineSize = 3.0f * widthScale;
+        float outlineSize = inlineSize + 3.0f;
         // on, off, on, off, ....
         float[] dash = {solidLines ? 85.0f : 30.0f, solidLines ? 1000.0f : 17.0f, 30.0f, 1000.0f};
         float[] sparse = {11.0f, 1000.0f};

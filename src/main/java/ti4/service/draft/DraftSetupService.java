@@ -76,7 +76,6 @@ public class DraftSetupService {
             players = new ArrayList<>(specs.playerDraftOrder)
                     .stream().filter(p -> specs.playerIDs.contains(p)).toList();
         }
-        // initDraftOrder(draftManager, players, staticOrder);
         orchestrator.initialize(draftManager, players);
         draftManager.setOrchestrator(orchestrator);
 
@@ -102,7 +101,7 @@ public class DraftSetupService {
 
         game.clearTileMap();
         try {
-            PartialMapService.tryUpdateMap(event, draftManager);
+            PartialMapService.tryUpdateMap(event, draftManager, true);
         } catch (Exception e) {
             // Ignore
         }
@@ -168,7 +167,8 @@ public class DraftSetupService {
 
         game.clearTileMap();
         try {
-            PartialMapService.tryUpdateMap(event, draftManager);
+            // Very important...the distance tool needs tiles placed to calculate adjacencies
+            PartialMapService.tryUpdateMap(event, draftManager, false);
         } catch (Exception e) {
             // Ignore
         }
@@ -192,24 +192,20 @@ public class DraftSetupService {
                 BotLogger.warning(new LogOrigin(event), "Failed to generate nucleus and slices after many attempts.");
             } else {
                 SliceDraftable sliceDraftable = new SliceDraftable();
-                sliceDraftable.initialize(slices);
+                List<MiltyDraftSlice> sortedSlcies = slices.stream()
+                        .sorted((t1, t2) -> t1.getName().compareTo(t2.getName()))
+                        .toList();
+                sliceDraftable.initialize(sortedSlcies);
                 draftManager.addDraftable(sliceDraftable);
                 draftManager.tryStartDraft();
                 game.setPhaseOfGame("miltydraft");
                 GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
+                try {
+                    PartialMapService.tryUpdateMap(event, draftManager, true);
+                } catch (Exception e) {
+                    // Ignore
+                }
             }
-            // boolean slicesCreated = SliceGeneratorService.generateSlices(event, sliceDraftable, tileManager, specs);
-            // if (!slicesCreated) {
-            //     String msg = "Generating slices was too hard so I gave up.... Please try again.";
-            //     if (specs.numSlices == maxSlices) {
-            //         msg += "\n*...and maybe consider asking for fewer slices*";
-            //     }
-            //     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-            // } else {
-            //     draftManager.tryStartDraft();
-            //     game.setPhaseOfGame("miltydraft");
-            //     GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
-            // }
         });
 
         return null;

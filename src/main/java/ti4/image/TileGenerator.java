@@ -52,6 +52,8 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.MapTemplateModel;
+import ti4.model.MapTemplateModel.MapTemplateTile;
 import ti4.model.ShipPositionModel.ShipPosition;
 import ti4.model.UnitModel;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
@@ -82,7 +84,8 @@ public class TileGenerator {
     private final String focusTile;
     private final DisplayType displayType;
 
-    // Map to aggregate unit coordinates by faction from all UnitRenderGenerator calls
+    // Map to aggregate unit coordinates by faction from all UnitRenderGenerator
+    // calls
     private final Map<String, Map<String, List<Point>>> unitCoordinatesByFaction = new HashMap<>();
 
     public TileGenerator(@NotNull Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
@@ -127,15 +130,20 @@ public class TileGenerator {
     }
 
     /**
-     * Get the aggregated unit coordinates by faction from all UnitRenderGenerator calls
-     * @return Map where key is faction/player identifier, secondary key is unit ID, and value is list of coordinates
+     * Get the aggregated unit coordinates by faction from all UnitRenderGenerator
+     * calls
+     *
+     * @return Map where key is faction/player identifier, secondary key is unit ID,
+     *         and value is list of coordinates
      */
     public Map<String, Map<String, List<Point>>> getUnitCoordinatesByFaction() {
         return new HashMap<>(unitCoordinatesByFaction);
     }
 
     /**
-     * Helper method to aggregate unit coordinates from a UnitRenderGenerator into the main map
+     * Helper method to aggregate unit coordinates from a UnitRenderGenerator into
+     * the main map
+     *
      * @param unitRenderGenerator The UnitRenderGenerator to get coordinates from
      */
     private void aggregateUnitCoordinates(UnitRenderGenerator unitRenderGenerator) {
@@ -596,7 +604,8 @@ public class TileGenerator {
                         }
 
                         // g2d.setColor(new Color(128, 197, 222));
-                        // g2d.fillRect(gearX+43, gearY+64+18 -(int)(waterHeight), 25, (int)waterHeight);
+                        // g2d.fillRect(gearX+43, gearY+64+18 -(int)(waterHeight), 25,
+                        // (int)waterHeight);
                         // g2d.setColor(new Color(122, 127, 128));
 
                         // g2d.drawLine(gearX+40, gearY+64, gearX+40, gearY+64+20);
@@ -1371,6 +1380,105 @@ public class TileGenerator {
                         MapGenerator.VerticalAlign.Bottom,
                         stroke7,
                         Color.BLACK);
+            }
+            case Nucleus -> {
+                String mapTemplateId = game.getMapTemplateID();
+                MapTemplateModel mapTemplate = mapTemplateId != null ? Mapper.getMapTemplate(mapTemplateId) : null;
+
+                if (mapTemplate == null || !mapTemplate.isNucleusTemplate()) {
+                    throw new IllegalStateException("Cannot generate Nucleus display without a Nucleus map template");
+                }
+
+                MapTemplateTile mapTile = mapTemplate.getTemplateTiles().stream()
+                        .filter(t -> t.getPos().equals(tile.getPosition()))
+                        .findFirst()
+                        .orElse(null);
+                if (mapTile == null) {
+                    throw new IllegalStateException("Cannot find tile " + tile.getPosition()
+                            + " in Nucleus map template " + mapTemplate.getAlias());
+                }
+
+                BufferedImage image;
+                if (CustomHyperlaneService.isCustomHyperlaneTile(tile)) {
+                    image = HyperlaneTileGenerator.generateHyperlaneTile(tile, game);
+                } else if (game.isLiberationC4Mode() && "51".equals(tile.getTileID())) {
+                    image = ImageHelper.read(ResourceHelper.getInstance().getTileFile("51r_Creuss.png"));
+                } else if (game.isLiberationC4Mode() && "17".equals(tile.getTileID())) {
+                    image = ImageHelper.read(ResourceHelper.getInstance().getTileFile("17r_DeltaWH.png"));
+                } else {
+                    image = ImageHelper.read(tile.getTilePath());
+                }
+                tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
+
+                // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
+                if (tile.isAnomaly(game) && tileShipPositions != null) {
+                    BufferedImage anomalyImage =
+                            ImageHelper.read(ResourceHelper.getInstance().getTileFile("tile_anomaly.png"));
+                    switch (tileShipPositions.toString().toUpperCase()) {
+                        case "TYPE09":
+                        case "TYPE12":
+                        case "TYPE15":
+                            tileGraphics.drawImage(anomalyImage, TILE_PADDING + 36, TILE_PADDING + 43, null);
+                            break;
+                        default:
+                            tileGraphics.drawImage(anomalyImage, TILE_PADDING, TILE_PADDING, null);
+                    }
+                }
+
+                Map<Integer, String> nucleusNumberToColor = Map.of(
+                        1, "blue",
+                        2, "yellow",
+                        3, "green", // emerald
+                        4, "lavender",
+                        5, "petrol",
+                        6, "brown", // chocolate
+                        7, "ethereal",
+                        8, "forest");
+
+                // Use Hex borders to show which Nucleus slice a tile is a part of
+                // Remember they can be in more than 1!
+                if (mapTile.getNucleusNumbers() != null
+                        && !mapTile.getNucleusNumbers().isEmpty()) {
+                    int nucleusNumberIndex = 0;
+                    Map<Integer, List<Integer>> nucleusNumberToSides = new HashMap<>();
+                    for (int i = 0; i < 6; ++i) {
+                        Integer nucleusNumber = mapTile.getNucleusNumbers().get(nucleusNumberIndex);
+                        nucleusNumberIndex = (nucleusNumberIndex + 1)
+                                % mapTile.getNucleusNumbers().size();
+                        nucleusNumberToSides.putIfAbsent(nucleusNumber, new ArrayList<>());
+                        nucleusNumberToSides.get(nucleusNumber).add(i);
+                    }
+
+                    for (Map.Entry<Integer, List<Integer>> entry : nucleusNumberToSides.entrySet()) {
+                        Integer nucleusNumber = entry.getKey();
+                        List<Integer> sidesToColor = entry.getValue();
+                        String color = nucleusNumberToColor.getOrDefault(nucleusNumber, "black");
+                        String hexBorderStyle = "solid";
+                        List<Integer> openSides = new ArrayList<>(List.of(0, 1, 2, 3, 4, 5));
+                        openSides.removeAll(sidesToColor);
+                        BufferedImage border =
+                                DrawingUtil.hexBorder(hexBorderStyle, Mapper.getColor(color), openSides, 2.5f);
+                        tileGraphics.drawImage(border, TILE_PADDING, TILE_PADDING, null);
+                    }
+                }
+
+                // Draw fog tile on non-Nucleus game tiles
+                if (!tile.getTileModel().isHyperlane()
+                        && (mapTile.getNucleusNumbers() == null
+                                || mapTile.getNucleusNumbers().isEmpty())) {
+                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
+                    tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
+                }
+
+                // Also draw borders around the seats for a given Nucleus slice
+                if (mapTile.getHome() != null && mapTile.getHome() && mapTile.getPlayerNumber() != null) {
+                    Integer nucleusNumber = mapTile.getPlayerNumber();
+                    String color = nucleusNumberToColor.getOrDefault(nucleusNumber, "black");
+                    String hexBorderStyle = "solid";
+                    BufferedImage border =
+                            DrawingUtil.hexBorder(hexBorderStyle, Mapper.getColor(color), List.of(), 4.0f);
+                    tileGraphics.drawImage(border, TILE_PADDING, TILE_PADDING, null);
+                }
             }
         }
         return tileOutput;

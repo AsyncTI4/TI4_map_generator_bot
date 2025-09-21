@@ -79,6 +79,7 @@ public class GameSettings extends SettingsMenu {
         // Other initialization
         if (parent instanceof MiltySettings m && m.getDraftMode().getValue() == DraftingMode.nucleus) {
             mapTemplate.setDefaultKey("6pStandardNucleus");
+            mapTemplate.setChosenKey("6pStandardNucleus");
         }
         mapTemplate.setAllValues(Mapper.getMapTemplates().stream()
                 .filter(getNucleusTemplatePredicate())
@@ -164,6 +165,13 @@ public class GameSettings extends SettingsMenu {
             var defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
             if (defaultTemplate == null) {
                 return;
+            }
+            // TODO: IMPROVE THIS
+            if (m.getDraftMode().getValue() == DraftingMode.nucleus && !defaultTemplate.isNucleusTemplate()) {
+                defaultTemplate = Mapper.getMapTemplate(defaultTemplate.getAlias() + "Nucleus");
+                if (defaultTemplate == null) {
+                    return;
+                }
             }
             mapTemplate.setAllValues(allowed, defaultTemplate.getAlias());
         }

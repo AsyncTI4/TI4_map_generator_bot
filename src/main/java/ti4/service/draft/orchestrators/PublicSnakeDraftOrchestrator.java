@@ -210,6 +210,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
                     DraftManager.CommandSource.AUTO_PICK);
             DraftButtonService.handleButtonResult(event, status);
         } else {
+            PartialMapService.tryUpdateMap(event, draftManager, true);
             PublicDraftInfoService.edit(
                     event,
                     draftManager,
@@ -225,8 +226,6 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
                     List.of(getReprintDraftButton()));
             draftManager.getGame().setActivePlayerID(getCurrentPlayer(playerOrder));
         }
-
-        PartialMapService.tryUpdateMap(event, draftManager);
 
         return DraftButtonService.DELETE_BUTTON;
     }

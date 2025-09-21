@@ -151,6 +151,12 @@ public class MapTemplateHelper {
             } else if (tile.getHome() != null) {
                 tileID = color + "blank";
             }
+        } else if (tile.getNucleusNumbers() != null && !tile.getNucleusNumbers().isEmpty()) {
+            Integer nucleusSlice = tile.getNucleusNumbers().get(0);
+            // TODO: Get a better placeholder tile.
+            // For now, use the same color for all nucleus tiles.
+            String color = "rainbow";
+            tileID = color + nucleusSlice;
         }
         if (tileID != null) {
             tileID = AliasHandler.resolveTile(tileID);

@@ -12,7 +12,9 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
+import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.draft.DraftSetupService;
 import ti4.service.emoji.MiltyDraftEmojis;
@@ -48,6 +50,14 @@ public class MiltySettings extends SettingsMenu {
         draftMode.setAllValues(
                 Arrays.stream(DraftingMode.values()).collect(Collectors.toMap(DraftingMode::toString, x -> x)));
         draftMode.setShow(DraftingMode::toString);
+
+        // TODO: Need a REAL way to set this up
+        if (game.getMapTemplateID() != null) {
+            MapTemplateModel template = Mapper.getMapTemplate(game.getMapTemplateID());
+            if (template != null && template.isNucleusTemplate()) {
+                draftMode.setChosenKey(DraftingMode.nucleus.toString());
+            }
+        }
 
         // Get the correct JSON node for initialization if applicable.
         // Add additional names here to support new generated JSON as needed.
@@ -123,8 +133,7 @@ public class MiltySettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     public enum DraftingMode {
         none,
-        milty,
-        newMilty, // Slice, Speaker Order, Faction in Public Snake Draft
+        milty, // Slice, Speaker Order, Faction in Public Snake Draft
         nucleus, // Slice, Speaker Order, Seat, Faction in Public Snake Draft (w/ Nucleus templates)
         franken;
 
@@ -155,8 +164,6 @@ public class MiltySettings extends SettingsMenu {
          */
         if (draftMode.getValue() == DraftingMode.milty) {
             return MiltyService.startFromSettings(event, this);
-        } else if (draftMode.getValue() == DraftingMode.newMilty) {
-            return DraftSetupService.startFromSettings(event, this);
         } else if (draftMode.getValue() == DraftingMode.nucleus) {
             return DraftSetupService.startFromSettings(event, this);
         }

@@ -30,7 +30,14 @@ public class PartialMapService {
      *
      * @param draftManager
      */
-    public void tryUpdateMap(GenericInteractionCreateEvent event, DraftManager draftManager) {
+    public void tryUpdateMap(GenericInteractionCreateEvent event, DraftManager draftManager, boolean renderIfUpdated) {
+        boolean mapUpdated = placeTiles(event, draftManager);
+        if (mapUpdated && renderIfUpdated) {
+            ButtonHelper.updateMap(draftManager.getGame(), event);
+        }
+    }
+
+    private boolean placeTiles(GenericInteractionCreateEvent event, DraftManager draftManager) {
         Game game = draftManager.getGame();
         String mapTemplateId = getMapTemplateModelId(draftManager);
         SliceDraftable sliceDraftable = getSliceDraftable(draftManager);
@@ -41,12 +48,12 @@ public class PartialMapService {
 
         if (seatDraftable == null && speakerOrderDraftable == null) {
             // No way to place tiles on the map
-            return;
+            return false;
         }
 
         if (sliceDraftable == null && factionDraftable == null) {
             // Nothing of value to place on the map
-            return;
+            return false;
         }
 
         boolean updateMap = false;
@@ -121,9 +128,7 @@ public class PartialMapService {
             }
         }
 
-        if (updateMap) {
-            ButtonHelper.updateMap(game, event);
-        }
+        return updateMap;
     }
 
     private Integer getPlayerPosition(

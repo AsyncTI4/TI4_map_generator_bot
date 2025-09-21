@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.helpers.MapTemplateHelper;
 import ti4.image.Mapper;
 import ti4.map.Player;
@@ -13,9 +14,10 @@ import ti4.model.MapTemplateModel;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftableType;
+import ti4.service.draft.NucleusImageGeneratorService;
 import ti4.service.draft.PlayerDraftState;
 import ti4.service.draft.PlayerSetupService.PlayerSetupState;
-import ti4.service.emoji.MiltyDraftEmojis;
+import ti4.service.emoji.MiscEmojis;
 
 public class SeatDraftable extends SinglePickDraftable {
 
@@ -45,7 +47,7 @@ public class SeatDraftable extends SinglePickDraftable {
         List<DraftChoice> choices = new ArrayList<>();
         for (int i = 1; i <= numSeats; i++) {
             String choiceKey = "seat" + i;
-            String buttonEmoji = MiltyDraftEmojis.getSpeakerPickEmoji(i).toString();
+            String buttonEmoji = MiscEmojis.getResourceEmoji(i);
             String unformattedName = "Seat " + i;
             String displayName = "Seat " + i;
             choices.add(new DraftChoice(
@@ -69,12 +71,22 @@ public class SeatDraftable extends SinglePickDraftable {
     @Override
     public DraftChoice getNothingPickedChoice() {
         return new DraftChoice(
-                getType(),
-                null,
-                null,
-                "No seat picked",
-                "No seat picked",
-                MiltyDraftEmojis.getSpeakerPickEmoji(-1).toString());
+                getType(), null, null, "No seat picked", "No seat picked", MiscEmojis.resources.toString());
+    }
+
+    @Override
+    public FileUpload generateSummaryImage(
+            DraftManager draftManager, String uniqueKey, List<String> restrictChoiceKeys) {
+
+        if (draftManager.getGame().getMapTemplateID() != null) {
+            MapTemplateModel mapTemplate =
+                    Mapper.getMapTemplate(draftManager.getGame().getMapTemplateID());
+            if (mapTemplate != null && mapTemplate.isNucleusTemplate()) {
+                return NucleusImageGeneratorService.tryGenerateImage(draftManager, uniqueKey, restrictChoiceKeys);
+            }
+        }
+
+        return null;
     }
 
     @Override

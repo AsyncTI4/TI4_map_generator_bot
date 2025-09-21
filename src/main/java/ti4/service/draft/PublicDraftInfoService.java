@@ -202,7 +202,7 @@ public class PublicDraftInfoService {
     private static MessageRetrieveAction getMessageHistory(
             GenericInteractionCreateEvent event, MessageChannel channel) {
         if (event != null && event.getMessageChannel() == channel && event instanceof ButtonInteractionEvent bEvent) {
-            return channel.getHistoryAround(bEvent.getMessage(), 10);
+            return channel.getHistoryAround(bEvent.getMessage(), 15);
         }
         return channel.getHistoryAround(channel.getLatestMessageIdLong(), 100);
     }

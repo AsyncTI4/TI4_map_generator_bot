@@ -36,6 +36,10 @@ import ti4.service.milty.MiltyDraftTile;
 
 @UtilityClass
 public class SliceImageGeneratorService {
+
+    private static final BasicStroke innerStroke = new BasicStroke(4.0f);
+    private static final BasicStroke outlineStroke = new BasicStroke(9.0f);
+
     public static FileUpload tryGenerateImage(
             DraftManager draftManager, String uniqueKey, List<String> restrictChoiceKeys) {
         SliceDraftable sliceDraftable = (SliceDraftable) draftManager.getDraftableByType(SliceDraftable.TYPE);
@@ -123,9 +127,6 @@ public class SliceImageGeneratorService {
         fileUpload.setDescription(desc.toString());
         return fileUpload;
     }
-
-    private static final BasicStroke innerStroke = new BasicStroke(4.0f);
-    private static final BasicStroke outlineStroke = new BasicStroke(9.0f);
 
     private static BufferedImage partialSliceImage(MiltyDraftSlice slice, MapTemplateModel template, boolean taken) {
         List<Point> tilePositions = template.tileDisplayCoords();

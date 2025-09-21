@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.helpers.ButtonHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -301,6 +302,7 @@ public class DraftManager extends DraftPlayerManager {
 
         game.setPhaseOfGame("playerSetup");
         AddTileListService.finishSetup(game, event);
+        ButtonHelper.updateMap(game, event);
     }
 
     public String whatsStoppingSetup() {
