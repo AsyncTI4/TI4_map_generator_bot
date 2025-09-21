@@ -15,6 +15,27 @@
         "source": "ignis_aurora"
     },
     {
+        "id": "interstellar_string_walk",
+        "name": "Interstellar String Walk",
+        "faction": "arachian",
+        "permanentEffect": "When you activate a system, apply +1 to the move value of ships that move through a system that contains one of your Command Tokens. ",
+        "source": "other"
+    },
+    {
+        "id": "predatory_ambush",
+        "name": "Predatory Ambush",
+        "faction": "arachian",
+        "permanentEffect": "After a player moves ships into a system that contains one of your Command Tokens and your units: Choose up to 2 adjacent systems. Move 1 of your non-fighter ships from each of those systems into the activated system.",
+        "source": "other"
+    },
+    {
+        "id": "strong_webs",
+        "name": "Strong Webs",
+        "faction": "arachian",
+        "permanentEffect": "During the status phase, you may choose not to return up to 3 Command Tokens from the board to your reinforcements.",
+        "source": "other"
+    },
+    {
         "id": "voidmaker",
         "name": "Voidmaker",
         "faction": "raven",

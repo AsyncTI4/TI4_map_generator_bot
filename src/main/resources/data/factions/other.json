@@ -60,11 +60,24 @@
         "startingFleet": "3 inf t,2 ff,cv,2 dd,sd t",
         "commodities": 3,
         "factionTech": [],
-        "startingTech": ["sar", "gd"],
-        "homePlanets": ["somna", "tera", "hospoona"],
+        "startingTech": [
+            "sar",
+            "gd"
+        ],
+        "homePlanets": [
+            "somna",
+            "tera",
+            "hospoona"
+        ],
         "abilities": [],
-        "leaders": ["adminsagent", "adminscommander", "adminshero"],
-        "promissoryNotes": ["adminspn"],
+        "leaders": [
+            "adminsagent",
+            "adminscommander",
+            "adminshero"
+        ],
+        "promissoryNotes": [
+            "adminspn"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -78,5 +91,49 @@
             "admins_spacedock"
         ],
         "source": "admins"
+    },
+    {
+        "alias": "arachian",
+        "factionName": "Arachian Weave",
+        "homeSystem": "ar1",
+        "startingFleet": "1 cv, 1 dn, 1 dd, 1 inf a, 1 inf k, 3 ff, 1 sd a",
+        "commodities": 3,
+        "factionTech": [
+            "araracg",
+            "araracy"
+        ],
+        "startingTech": [
+            "td"
+        ],
+        "homePlanets": [
+            "arachia",
+            "keqo"
+        ],
+        "abilities": [
+            "interstellar_string_walk",
+            "predatory_ambush",
+            "strong_webs"
+        ],
+        "leaders": [
+            "arachianagent",
+            "arachiancommander",
+            "arachianhero"
+        ],
+        "promissoryNotes": [
+            "arachianpn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "arachian_flagship",
+            "infantry",
+            "arachian_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "other"
     }
 ]

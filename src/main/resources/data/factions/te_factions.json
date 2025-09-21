@@ -3,7 +3,7 @@
         "alias": "bastion",
         "factionName": "Last Bastion",
         "homeSystem": "",
-        "startingFleet": "",
+        "startingFleet": "1 dn, 1 cv, 1 cr, 2 ff, 3 inf, sd",
         "commodities": 1,
         "factionTech": [],
         "startingTech": [],
@@ -65,7 +65,7 @@
     },
     {
         "alias": "crimson",
-        "factionName": "The Crimson Something",
+        "factionName": "The Crimson Rebellion",
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 0,
