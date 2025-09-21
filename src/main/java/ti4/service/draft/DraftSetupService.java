@@ -139,6 +139,10 @@ public class DraftSetupService {
         draftManager.resetForNewDraft();
         draftManager.setPlayers(specs.playerIDs);
 
+        DraftTileManager tileManager = game.getDraftTileManager();
+        tileManager.clear();
+        tileManager.addAllDraftTiles(specs.getTileSources());
+
         game.setMapTemplateID(specs.template.getAlias());
 
         FactionDraftable factionDraftable = new FactionDraftable();
@@ -183,6 +187,11 @@ public class DraftSetupService {
 
         // TODO: Support presetting the Nucleus in the Settings object, maybe via modal w/ TTS string
         String startMsg = "## Generating the nucleus and slices!!";
+        if (specs.getPlayerIDs().size() > 7 && specs.numSlices < 10) {
+            startMsg +=
+                    "\n -# This process can fail if valid configurations are hard to find. If you get stuck, try adding a slice.";
+        }
+
         event.getMessageChannel().sendMessage(startMsg).queue((ignore) -> {
             List<MiltyDraftSlice> slices = NucleusSliceGeneratorService.generateNucleusAndSlices(event, specs);
             if (slices == null) {

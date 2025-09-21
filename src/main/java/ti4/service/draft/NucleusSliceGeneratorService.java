@@ -27,6 +27,9 @@ import ti4.service.milty.TierList;
 
 // "borrowed heavily" from https://github.com/heisenbugged/ti4-lab/blob/main/app/draft/heisen/generateMap.ts
 
+// WARNING: Don't change this file without making sure these pass pretty often:
+// - src\test\java\ti4\service\draft\NucleusSliceGeneratorServiceTest.java
+
 @UtilityClass
 public class NucleusSliceGeneratorService {
 
@@ -86,8 +89,7 @@ public class NucleusSliceGeneratorService {
         boolean strictMode = useStrictMode(mapTemplate);
 
         for (int i = 0; i < 5_000; i++) {
-            NucleusOutcome outcome =
-                    tryGenerateNucleusAndSlices(event, game, mapTemplate, specs.getNumSlices(), strictMode);
+            NucleusOutcome outcome = tryGenerateNucleusAndSlices(game, mapTemplate, specs.getNumSlices(), strictMode);
             if (outcome.slices != null) {
                 return outcome.slices;
             }
@@ -112,7 +114,10 @@ public class NucleusSliceGeneratorService {
         List<Integer> successAfterAttempts = new ArrayList<>();
 
         DraftTileManager tileManager = game.getDraftTileManager();
-        tileManager.reset(game);
+        if (tileManager.getAll().isEmpty()) {
+            tileManager.clear();
+            tileManager.addAllDraftTiles(specs.getTileSources());
+        }
         Map<String, Integer> tileOccurrenceInSuccessfulMaps = new HashMap<>();
         Map<String, Integer> tileOccurrenceInSuccessfulSlices = new HashMap<>();
 
@@ -122,8 +127,7 @@ public class NucleusSliceGeneratorService {
         boolean strictMode = useStrictMode(mapTemplate);
         for (int i = 0; i < numIterations; ++i) {
             long startTime = System.nanoTime();
-            NucleusOutcome outcome =
-                    tryGenerateNucleusAndSlices(event, game, mapTemplate, specs.getNumSlices(), strictMode);
+            NucleusOutcome outcome = tryGenerateNucleusAndSlices(game, mapTemplate, specs.getNumSlices(), strictMode);
             long endTime = System.nanoTime();
             if (outcome.slices != null) {
                 successAfterAttempts.add(i + 1);
@@ -235,18 +239,16 @@ public class NucleusSliceGeneratorService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), result.toString());
     }
 
-    private record NucleusOutcome(List<MiltyDraftSlice> slices, String failureReason) {}
+    public record NucleusOutcome(List<MiltyDraftSlice> slices, String failureReason) {}
 
-    private NucleusOutcome tryGenerateNucleusAndSlices(
-            GenericInteractionCreateEvent event,
-            Game game,
-            MapTemplateModel mapTemplate,
-            int numSlices,
-            boolean strictMode) {
+    public NucleusOutcome tryGenerateNucleusAndSlices(
+            Game game, MapTemplateModel mapTemplate, int numSlices, boolean strictMode) {
 
         // Reset map and draft tiles
         DraftTileManager tileManager = game.getDraftTileManager();
-        tileManager.reset(game);
+        if (tileManager.getAll().isEmpty()) {
+            return new NucleusOutcome(null, "No draft tiles available to generate nucleus and slices.");
+        }
 
         Integer numPlayerSlices = Math.max(mapTemplate.getPlayerCount(), numSlices);
         Integer numNucleusSlices = mapTemplate.getNucleusSliceCount();

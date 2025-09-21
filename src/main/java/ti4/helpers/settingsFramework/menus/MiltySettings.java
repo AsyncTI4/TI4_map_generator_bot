@@ -165,6 +165,10 @@ public class MiltySettings extends SettingsMenu {
         if (draftMode.getValue() == DraftingMode.milty) {
             return MiltyService.startFromSettings(event, this);
         } else if (draftMode.getValue() == DraftingMode.nucleus) {
+            if (gameSettings.getMapTemplate().getValue() == null
+                    || !gameSettings.getMapTemplate().getValue().isNucleusTemplate()) {
+                return "You must select a nucleus map template to use the nucleus draft mode!";
+            }
             return DraftSetupService.startFromSettings(event, this);
         }
 

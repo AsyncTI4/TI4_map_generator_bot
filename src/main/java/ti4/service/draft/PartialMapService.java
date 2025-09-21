@@ -40,21 +40,7 @@ public class PartialMapService {
     private boolean placeTiles(GenericInteractionCreateEvent event, DraftManager draftManager) {
         Game game = draftManager.getGame();
         String mapTemplateId = getMapTemplateModelId(draftManager);
-        SliceDraftable sliceDraftable = getSliceDraftable(draftManager);
-        SeatDraftable seatDraftable = getSeatDraftable(draftManager);
-        SpeakerOrderDraftable speakerOrderDraftable = getSpeakerOrderDraftable(draftManager);
-        FactionDraftable factionDraftable = getFactionDraftable(draftManager);
         MapTemplateModel mapTemplateModel = Mapper.getMapTemplate(mapTemplateId);
-
-        if (seatDraftable == null && speakerOrderDraftable == null) {
-            // No way to place tiles on the map
-            return false;
-        }
-
-        if (sliceDraftable == null && factionDraftable == null) {
-            // Nothing of value to place on the map
-            return false;
-        }
 
         boolean updateMap = false;
 
@@ -73,6 +59,19 @@ public class PartialMapService {
             if (templateTile.getPos() != null && templateTile.getCustodians() != null && templateTile.getCustodians()) {
                 if (gameTile != null) AddTileService.addCustodianToken(gameTile, game); // only works on MR for now
             }
+        }
+
+        SliceDraftable sliceDraftable = getSliceDraftable(draftManager);
+        SeatDraftable seatDraftable = getSeatDraftable(draftManager);
+        SpeakerOrderDraftable speakerOrderDraftable = getSpeakerOrderDraftable(draftManager);
+        FactionDraftable factionDraftable = getFactionDraftable(draftManager);
+        if (seatDraftable == null && speakerOrderDraftable == null) {
+            // No way to place tiles on the map
+            return updateMap;
+        }
+        if (sliceDraftable == null && factionDraftable == null) {
+            // Nothing of value to place on the map
+            return updateMap;
         }
 
         for (PlayerDraftState pState : draftManager.getPlayerStates().values()) {

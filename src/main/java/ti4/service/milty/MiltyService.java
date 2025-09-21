@@ -215,10 +215,10 @@ public class MiltyService {
 
     public static void miltySetup(GenericInteractionCreateEvent event, Game game) {
         MiltySettings menu = game.initializeMiltySettings();
+        // TODO: Settings should use a flag for nucleus generation.
+        // But for now, trying to keep our settings changes minimal.
         if (event instanceof ButtonInteractionEvent buttonEvent) {
-            if (buttonEvent.getButton().getCustomId().endsWith("_newMilty")) {
-                menu.getDraftMode().setChosenKey("newMilty");
-            } else if (buttonEvent.getButton().getCustomId().endsWith("_nucleus")) {
+            if (buttonEvent.getButton().getCustomId().endsWith("_nucleus")) {
                 menu.getDraftMode().setChosenKey("nucleus");
             }
         }
