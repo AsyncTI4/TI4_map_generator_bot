@@ -4,6 +4,4 @@ package ti4.service.draft.draftables;
 // during the draft pre-setup, players secretly pick their desired faction.
 // players who conflict have a random one chosen to lose, and who must select another faction.
 
-public class FactionTierDraftable {
-    
-}
+public class FactionTierDraftable {}

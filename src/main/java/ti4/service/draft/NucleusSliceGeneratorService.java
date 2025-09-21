@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -23,7 +25,7 @@ import ti4.service.milty.MiltyDraftSlice;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.milty.TierList;
 
-// "borrowed" from https://github.com/heisenbugged/ti4-lab/blob/main/app/draft/heisen/generateMap.ts
+// "borrowed heavily" from https://github.com/heisenbugged/ti4-lab/blob/main/app/draft/heisen/generateMap.ts
 
 @UtilityClass
 public class NucleusSliceGeneratorService {
@@ -32,6 +34,15 @@ public class NucleusSliceGeneratorService {
     // slice at least.
     private static final int CORE_SLICE_MIN_OPTIMAL = 4;
     private static final int CORE_SLICE_MAX_OPTIMAL = 8;
+
+    // Major known issues:
+    // - Because the Nucleus is made up of several slices which share some times (e.g. equidistants),
+    //   it's usually the case that the last placement was actually already done as the first placmeent.
+    //   This is not accounted for very well, and can result in bad tile counts even in otherwise good maps.
+    // - The above issue primarily happens in 212, because that is the equidistant between first and last seats.
+    //   It would be better if the issue was at least distributed randomly.
+    // - For 7+ player maps, we're allowing the nucleus to have +/- 1 red-backed tile than it should.
+    //   Due to insufficient tile options, this seems necessary.
 
     /**
      * Generates the 'nucleus' by placing map tiles according to MemePhilosopher's
@@ -69,14 +80,24 @@ public class NucleusSliceGeneratorService {
             return null;
         }
 
+        // Under certain conditions, we should be flexible about how tiles are selected.
+        // Drafts that use many available slices can fail very often if we don't allow some specific rules
+        // to be flexible.
+        boolean strictMode = useStrictMode(mapTemplate);
+
         for (int i = 0; i < 5_000; i++) {
-            NucleusOutcome outcome = tryGenerateNucleusAndSlices(event, game, mapTemplate, specs.getNumSlices());
+            NucleusOutcome outcome =
+                    tryGenerateNucleusAndSlices(event, game, mapTemplate, specs.getNumSlices(), strictMode);
             if (outcome.slices != null) {
                 return outcome.slices;
             }
         }
 
         return null;
+    }
+
+    private boolean useStrictMode(MapTemplateModel mapTemplate) {
+        return mapTemplate.getPlayerCount() + mapTemplate.getNucleusSliceCount() < 14;
     }
 
     public void runAndPrintData(GenericInteractionCreateEvent event, DraftSpec specs, int numIterations) {
@@ -98,9 +119,11 @@ public class NucleusSliceGeneratorService {
         List<Double> failRuntimes = new ArrayList<>();
         List<Double> successRuntimes = new ArrayList<>();
 
+        boolean strictMode = useStrictMode(mapTemplate);
         for (int i = 0; i < numIterations; ++i) {
             long startTime = System.nanoTime();
-            NucleusOutcome outcome = tryGenerateNucleusAndSlices(event, game, mapTemplate, specs.getNumSlices());
+            NucleusOutcome outcome =
+                    tryGenerateNucleusAndSlices(event, game, mapTemplate, specs.getNumSlices(), strictMode);
             long endTime = System.nanoTime();
             if (outcome.slices != null) {
                 successAfterAttempts.add(i + 1);
@@ -215,7 +238,11 @@ public class NucleusSliceGeneratorService {
     private record NucleusOutcome(List<MiltyDraftSlice> slices, String failureReason) {}
 
     private NucleusOutcome tryGenerateNucleusAndSlices(
-            GenericInteractionCreateEvent event, Game game, MapTemplateModel mapTemplate, int numSlices) {
+            GenericInteractionCreateEvent event,
+            Game game,
+            MapTemplateModel mapTemplate,
+            int numSlices,
+            boolean strictMode) {
 
         // Reset map and draft tiles
         DraftTileManager tileManager = game.getDraftTileManager();
@@ -282,7 +309,8 @@ public class NucleusSliceGeneratorService {
                 availableTiles,
                 remainingAlphaWormholes,
                 remainingBetaWormholes,
-                remainingLegendaryWormholes);
+                remainingLegendaryWormholes,
+                strictMode);
 
         if (playerSlices == null) {
             return new NucleusOutcome(null, "Failed to generate player slices; could not place all required tiles.");
@@ -303,15 +331,19 @@ public class NucleusSliceGeneratorService {
                             .toList());
         }
 
-        if (!fillNucleus(coreSliceLocations, tieredAvailableTiles, allPlacedTiles, tileManager, distanceTool)) {
+        if (!fillNucleus(
+                coreSliceLocations, tieredAvailableTiles, allPlacedTiles, tileManager, distanceTool, strictMode)) {
             return new NucleusOutcome(null, "Failed to fill Nucleus; could not find suitable tiles.");
         }
 
         // Make some attempts to rebalance traits. This will modify parameter objects.
+        Predicate<MiltyDraftTile> isNotPlaced = dt -> allPlacedTiles.stream().noneMatch(pt -> pt.draftTile.equals(dt));
+        availableTiles =
+                new ArrayList<>(availableTiles.stream().filter(isNotPlaced).toList());
         rebalanceTraits(playerSlices, allPlacedTiles, availableTiles);
 
         // Validate map and nucleus balance
-        String failureReason = validateMapAndSlices(allPlacedTiles, playerSlices, distanceTool);
+        String failureReason = validateMapAndSlices(allPlacedTiles, playerSlices, mapTemplate, distanceTool);
         if (failureReason != null) {
             return new NucleusOutcome(null, failureReason);
         }
@@ -324,7 +356,10 @@ public class NucleusSliceGeneratorService {
     }
 
     private String validateMapAndSlices(
-            List<PlacedTile> placedTiles, List<MiltyDraftSlice> playerSlices, DistanceTool distanceTool) {
+            List<PlacedTile> placedTiles,
+            List<MiltyDraftSlice> playerSlices,
+            MapTemplateModel mapTemplate,
+            DistanceTool distanceTool) {
         List<Integer> slicePlanetCounts = playerSlices.stream()
                 .map(slice -> slice.getTiles().stream()
                         .map(t -> t.getTile().getPlanetUnitHolders().size())
@@ -414,6 +449,44 @@ public class NucleusSliceGeneratorService {
         }
         if (anomaliesTouching) {
             return "Two or more anomalies are touching.";
+        }
+
+        // Check for errors just in case
+        // - No tile appears more than once
+        // - No position has more than one tile placed on it
+        // - Every position with a Nucleus number has a tile placed on it
+        Set<String> seenTileIds = new HashSet<>();
+        Set<String> seenPositions = new HashSet<>();
+        for (PlacedTile pt : placedTiles) {
+            if (seenTileIds.contains(pt.draftTile.getTile().getTileID())) {
+                BotLogger.warning("Tile " + pt.draftTile.getTile().getTileID() + " appears more than once.");
+                return "A tile (" + pt.draftTile.getTile().getTileID() + ") appears more than once on the map.";
+            }
+            seenTileIds.add(pt.draftTile.getTile().getTileID());
+            if (seenPositions.contains(pt.mapTile.getPos())) {
+                BotLogger.warning("Map position " + pt.mapTile.getPos() + " has more than one tile placed on it.");
+                return "A map position (" + pt.mapTile.getPos() + ") has more than one tile placed on it.";
+            }
+            seenPositions.add(pt.mapTile.getPos());
+        }
+        for (MiltyDraftSlice slice : playerSlices) {
+            for (MiltyDraftTile dt : slice.getTiles()) {
+                if (seenTileIds.contains(dt.getTile().getTileID())) {
+                    BotLogger.warning("Tile " + dt.getTile().getTileID()
+                            + " appears more than once (maybe once in map, once in slice).");
+                    return "A tile (" + dt.getTile().getTileID() + ") appears more than once on the map/slices.";
+                }
+                seenTileIds.add(dt.getTile().getTileID());
+            }
+        }
+        for (MapTemplateTile mapTile : mapTemplate.getTemplateTiles()) {
+            if (mapTile.getNucleusNumbers() == null
+                    || mapTile.getNucleusNumbers().isEmpty()) continue;
+            if (!seenPositions.contains(mapTile.getPos())) {
+                BotLogger.warning(
+                        "Map position " + mapTile.getPos() + " with a nucleus number has no tile placed on it.");
+                return "A map position (" + mapTile.getPos() + ") with a nucleus number has no tile placed on it.";
+            }
         }
 
         return null;
@@ -610,7 +683,8 @@ public class NucleusSliceGeneratorService {
             Map<TierList, List<MiltyDraftTile>> tieredAvailableTiles,
             List<PlacedTile> placedTiles,
             DraftTileManager draftTileManager,
-            DistanceTool distanceTool) {
+            DistanceTool distanceTool,
+            boolean strictMode) {
         for (int i = 0; i < coreSliceLocations.size(); i++) {
             List<MapTemplateTile> sliceLocations = coreSliceLocations.get(i);
             List<TierList> sliceTiers = getRandomTierPicks(sliceLocations.size());
@@ -622,46 +696,47 @@ public class NucleusSliceGeneratorService {
             }
             Collections.shuffle(sliceTiers);
 
-            // For each position in the slice
+            // First, iterate through each location to see what already has something placed
+            List<MapTemplateTile> unplacedLocations = new ArrayList<>();
             for (int j = 0; j < sliceLocations.size(); j++) {
                 MapTemplateTile location = sliceLocations.get(j);
-
-                // Skip if already occupied
                 MiltyDraftTile placedTile = placedTiles.stream()
                         .filter(pt -> pt.mapTile.equals(location))
                         .map(pt -> pt.draftTile)
                         .findFirst()
                         .orElse(null);
-                if (placedTile != null) {
+
+                if (placedTile == null) {
+                    unplacedLocations.add(location);
+                } else {
                     // Try to remove a sliceTier entry that matches the placed tile, if possible.
                     // If not possible, just try to get as close as we can.
                     TierList placedTier = draftTileManager.getRelativeTier(placedTile);
-                    if (sliceTiers.contains(placedTier)) {
-                        sliceTiers.remove(placedTier);
-                        // high -> mid
-                    } else if (placedTier == TierList.high && sliceTiers.contains(TierList.mid)) {
-                        sliceTiers.remove(TierList.mid);
-                        // mid -> high
-                    } else if (placedTier == TierList.mid && sliceTiers.contains(TierList.high)) {
-                        sliceTiers.remove(TierList.high);
-                        // mid -> low
-                    } else if (placedTier == TierList.mid && sliceTiers.contains(TierList.low)) {
-                        sliceTiers.remove(TierList.low);
-                        // low -> mid
-                    } else if (placedTier == TierList.low && sliceTiers.contains(TierList.mid)) {
-                        sliceTiers.remove(TierList.mid);
-                        // low -> red
-                    } else if (placedTier == TierList.low && sliceTiers.contains(TierList.red)) {
-                        sliceTiers.remove(TierList.red);
-                        // red -> low
-                    } else if (placedTier == TierList.red && sliceTiers.contains(TierList.low)) {
-                        sliceTiers.remove(TierList.low);
-                    } else {
-                        // Just remove a random one, we're not close
-                        sliceTiers.removeFirst();
+                    if (!popSimilarTier(sliceTiers, placedTier, strictMode)) {
+                        return false;
                     }
-                    continue;
                 }
+            }
+
+            // For each position in the slice
+            for (MapTemplateTile location : unplacedLocations) {
+                // MapTemplateTile location = sliceLocations.get(j);
+
+                // Skip if already occupied
+                // MiltyDraftTile placedTile = placedTiles.stream()
+                //         .filter(pt -> pt.mapTile.equals(location))
+                //         .map(pt -> pt.draftTile)
+                //         .findFirst()
+                //         .orElse(null);
+                // if (placedTile != null) {
+                //     // Try to remove a sliceTier entry that matches the placed tile, if possible.
+                //     // If not possible, just try to get as close as we can.
+                //     TierList placedTier = draftTileManager.getRelativeTier(placedTile);
+                //     if(!popSimilarTier(sliceTiers, placedTier, strictMode)) {
+                //         return false;
+                //     }
+                //     continue;
+                // }
 
                 // Get our preferred tier for this tile
                 TierList desiredTier = sliceTiers.removeFirst();
@@ -776,7 +851,11 @@ public class NucleusSliceGeneratorService {
             List<MiltyDraftTile> availableSystems,
             int numAlphas,
             int numBetas,
-            int numLegendaries) {
+            int numLegendaries,
+            boolean strictMode) {
+
+        // Generate a list of tiers to pick for each slice.
+        // The generation should go [blue, red, blue] then repeat that pattern.
         List<List<TierList>> slicesAsTierLists = new ArrayList<>();
         for (int i = 0; i < numPlayerSlices; i++) {
             List<TierList> sliceTiers = getRandomTierPicks(sliceSize);
@@ -784,6 +863,7 @@ public class NucleusSliceGeneratorService {
             slicesAsTierLists.add(sliceTiers);
         }
 
+        // Get a random selection of tiles to satisfy our required counts
         Collections.shuffle(availableSystems);
         List<MiltyDraftTile> alphaTiles =
                 ListHelper.removeByPredicate(availableSystems, tile -> tile.isHasAlphaWH(), numAlphas);
@@ -792,25 +872,23 @@ public class NucleusSliceGeneratorService {
         List<MiltyDraftTile> legendaryTiles =
                 ListHelper.removeByPredicate(availableSystems, tile -> tile.isLegendary(), numLegendaries);
 
+        // Prepare required tiles. Keeping similar tiles co-located is important;
+        // it means when we distribute them across slices, the e.g. alphas will be
+        // spread out. If 2+ required tiles land on one slice, they shouldn't be
+        // from the same category.
         List<MiltyDraftTile> requiredTiles = new ArrayList<>();
         requiredTiles.addAll(alphaTiles);
         requiredTiles.addAll(betaTiles);
         requiredTiles.addAll(legendaryTiles);
 
-        Map<TierList, List<MiltyDraftTile>> tieredRequiredTiles = tierTiles(tileManager, requiredTiles);
-        for (TierList tier : TierList.values()) {
-            if (tieredRequiredTiles.get(tier) != null
-                    && tieredRequiredTiles.get(tier).isEmpty()) {
-                tieredRequiredTiles.remove(tier);
-            }
-        }
+        // Prepare filler tiers by organizing them into tiers for easy selection
         Collections.shuffle(availableSystems);
         Map<TierList, List<MiltyDraftTile>> tieredFillerTiles = tierTiles(tileManager, availableSystems);
 
+        // Initialize slices
         List<MiltyDraftSlice> slices = new ArrayList<>();
         for (int i = 0; i < numPlayerSlices; ++i) {
             MiltyDraftSlice slice = new MiltyDraftSlice();
-            slice.setName(String.valueOf((char) ('A' + i)));
             slice.setTiles(new ArrayList<>());
             slices.add(slice);
         }
@@ -819,44 +897,111 @@ public class NucleusSliceGeneratorService {
         // they're empty
         for (int i = 0; i < sliceSize; ++i) {
             for (int sliceIndex = 0; sliceIndex < numPlayerSlices; ++sliceIndex) {
-                TierList tier = slicesAsTierLists.get(sliceIndex).get(i);
+
+                List<TierList> sliceTiers = slicesAsTierLists.get(sliceIndex);
                 MiltyDraftTile tile = null;
-                List<MiltyDraftTile> tierRequiredTiles = tieredRequiredTiles.get(tier);
-                if (tierRequiredTiles != null && !tierRequiredTiles.isEmpty()) {
-                    tile = tierRequiredTiles.remove(0);
-                    if (tierRequiredTiles.isEmpty()) {
-                        tieredRequiredTiles.remove(tier);
+
+                // If we have required tiles, they must be placed first.
+                // We always place required tiles asasp because we want to ensure they
+                // are distributed well across slices.
+                if (!requiredTiles.isEmpty()) {
+                    tile = requiredTiles.removeFirst();
+                    TierList requiredTier = tileManager.getRelativeTier(tile);
+                    // If this required tile can't be slotted into a similar tier, we fail
+                    // Player slices should always adhere to the tierlist restriction on red tiles.
+                    if (!popSimilarTier(sliceTiers, requiredTier, true)) {
+                        return null;
                     }
                 } else {
+                    TierList tier = sliceTiers.removeFirst();
                     List<MiltyDraftTile> tierFillerTiles = tieredFillerTiles.get(tier);
                     if (tierFillerTiles != null && !tierFillerTiles.isEmpty()) {
                         tile = tierFillerTiles.remove(0);
                     }
+
+                    if (tile == null) {
+                        // This indicates we ran out of required tiles, AND ran
+                        // out of tiles of our desired tier. For blue tiles, we
+                        // can try to pick a similar tier.
+                        List<TierList> blueTiers = List.of(TierList.high, TierList.mid, TierList.low);
+                        if (blueTiers.contains(tier)) {
+                            for (TierList altTier : blueTiers) {
+                                if (altTier == tier) continue;
+                                List<MiltyDraftTile> altTierFillerTiles = tieredFillerTiles.get(altTier);
+                                if (altTierFillerTiles != null && !altTierFillerTiles.isEmpty()) {
+                                    tile = altTierFillerTiles.removeFirst();
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
-                if (tile != null) {
-                    slices.get(sliceIndex).getTiles().add(tile);
-                } else {
-                    BotLogger.warning("Couldn't find a tile for slice " + (sliceIndex + 'A') + " of tier " + tier);
+
+                // At this point, not having a tile to place is a fail
+                if (tile == null) {
+                    return null;
                 }
+
+                slices.get(sliceIndex).getTiles().add(tile);
             }
         }
 
+        // Finish removing all of the selected tiles from available ones
         availableSystems.removeIf(
                 tile -> slices.stream().anyMatch(slice -> slice.getTiles().contains(tile)));
 
-        if (tieredRequiredTiles.isEmpty()) {
+        // Our success criteria is that we've placed all required tiles at this point.
+        if (requiredTiles.isEmpty()) {
+            int i = 0;
+            Collections.shuffle(slices);
             for (MiltyDraftSlice slice : slices) {
+                slice.setName(String.valueOf((char) ('A' + i++)));
                 Collections.shuffle(slice.getTiles());
             }
-            Collections.shuffle(slices);
 
             return slices;
         }
 
-        // TODO: Can we fix things up? Slice tiers are somewhat random. We could just
-        // replace optional blues with required ones...
-
         return null;
+    }
+
+    private boolean popSimilarTier(List<TierList> tiers, TierList desiredPopTier, boolean strict) {
+        if (tiers.contains(desiredPopTier)) {
+            tiers.remove(desiredPopTier);
+            // high -> mid
+        } else if (desiredPopTier == TierList.high && tiers.contains(TierList.mid)) {
+            tiers.remove(TierList.mid);
+            // mid -> high
+        } else if (desiredPopTier == TierList.mid && tiers.contains(TierList.high)) {
+            tiers.remove(TierList.high);
+            // mid -> low
+        } else if (desiredPopTier == TierList.mid && tiers.contains(TierList.low)) {
+            tiers.remove(TierList.low);
+            // low -> mid
+        } else if (desiredPopTier == TierList.low && tiers.contains(TierList.mid)) {
+            tiers.remove(TierList.mid);
+            // low -> high
+        } else if (desiredPopTier == TierList.low && tiers.contains(TierList.high)) {
+            tiers.remove(TierList.high);
+            // high -> low
+        } else if (desiredPopTier == TierList.high && tiers.contains(TierList.low)) {
+            tiers.remove(TierList.low);
+        } else {
+            // If we reach here, we'd be required to swap a blue for a red, which can
+            // mess up tile counts. I keep seeing multiple matching wormholes in player slices,
+            // and letting this happen is the likely cause.
+            if (strict) {
+                return false;
+            } else {
+                // Just pop the first tier and be done with it
+                // Drafts that use many available slices can fail
+                // very often if we don't allow some specific rules
+                // to be flexible.
+                tiers.removeFirst();
+            }
+        }
+
+        return true;
     }
 
     private Map<TierList, List<MiltyDraftTile>> tierTiles(DraftTileManager tileManager, List<MiltyDraftTile> tiles) {

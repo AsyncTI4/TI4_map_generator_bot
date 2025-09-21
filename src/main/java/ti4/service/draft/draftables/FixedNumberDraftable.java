@@ -11,7 +11,7 @@ import ti4.service.draft.Draftable;
  * Provide several implementations for common draftable methods which require
  * each player to pick exactly N of its choices.
  */
-public abstract class MultiPickDraftable extends Draftable {
+public abstract class FixedNumberDraftable extends Draftable {
 
     /**
      * Get the number of total picks each player is allowed and required to make for this
