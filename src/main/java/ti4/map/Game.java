@@ -215,7 +215,7 @@ public class Game extends GameProperties {
 
     @Setter
     @Getter
-    private List<String> draftString;
+    private String draftString;
 
     @Setter
     private MiltySettings miltySettings;
@@ -406,7 +406,7 @@ public class Game extends GameProperties {
     @NotNull
     public DraftManager getDraftManager() {
         if (draftManager == null) {
-            if (draftString != null && !draftString.isEmpty()) {
+            if (draftString != null) {
                 try {
                     draftManager = DraftLoadService.loadDraftManager(this, draftString);
                 } catch (Exception e) {

@@ -773,12 +773,7 @@ class GameLoadService {
                 }
                 case Constants.MILTY_DRAFT_MANAGER -> game.setMiltyDraftString(info); // We will parse this later
                 case Constants.MILTY_DRAFT_SETTINGS -> game.setMiltyJson(info); // We will parse this later
-                case Constants.DRAFT_MANAGER -> {
-                    if (game.getDraftString() == null) {
-                        game.setDraftString(new ArrayList<>());
-                    }
-                    game.getDraftString().add(info); // We will parse this later
-                }
+                case Constants.DRAFT_MANAGER -> game.setDraftString(info); // We will parse this later
                 case Constants.GAME_TAGS -> game.setTags(getCardList(info));
                 case Constants.TIGL_RANK -> {
                     TIGLHelper.TIGLRank rank = TIGLHelper.TIGLRank.fromString(info);

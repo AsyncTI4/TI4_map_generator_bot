@@ -618,15 +618,11 @@ class GameSaveService {
 
         DraftManager draftManager = game.getDraftManagerUnsafe();
         if (draftManager != null) {
-            for (String saveLine : DraftSaveService.saveDraftManager(draftManager)) {
-                writer.write(Constants.DRAFT_MANAGER + " " + saveLine);
-                writer.write(System.lineSeparator());
-            }
+            writer.write(Constants.DRAFT_MANAGER + " " + DraftSaveService.saveDraftManager(draftManager));
+            writer.write(System.lineSeparator());
         } else if (game.getDraftString() != null) {
-            for (String saveLine : game.getDraftString()) {
-                writer.write(Constants.DRAFT_MANAGER + " " + saveLine);
-                writer.write(System.lineSeparator());
-            }
+            writer.write(Constants.DRAFT_MANAGER + " " + game.getDraftString());
+            writer.write(System.lineSeparator());
         }
 
         MiltySettings miltySettings = game.getMiltySettingsUnsafe();

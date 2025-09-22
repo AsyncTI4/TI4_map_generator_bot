@@ -246,31 +246,21 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     }
 
     @Override
-    public String[] savePlayerStates(DraftManager draftManager) {
-        String[] playerStates = new String[draftManager.getPlayerStates().size()];
-        int i = 0;
-        for (Map.Entry<String, PlayerDraftState> entry :
-                draftManager.getPlayerStates().entrySet()) {
-            String playerUserId = entry.getKey();
-            PlayerDraftState playerState = entry.getValue();
-            OrchestratorState orchestratorState = playerState.getOrchestratorState();
-            if (!(orchestratorState instanceof State)) {
-                continue;
-            }
-            State state = (State) orchestratorState;
-            playerStates[i++] = playerUserId + DraftOrchestrator.SAVE_SEPARATOR + state.getOrderIndex();
+    public String savePlayerState(OrchestratorState state) {
+        if (!(state instanceof State)) {
+            throw new IllegalArgumentException("Invalid state type for PublicSnakeDraftOrchestrator: "
+                    + state.getClass().getSimpleName());
         }
-        return playerStates;
+        State psdState = (State) state;
+        return psdState.getOrderIndex() + "";
     }
 
     @Override
-    public PlayerOrchestratorState loadPlayerState(String data) {
-        String[] tokens = data.split(DraftOrchestrator.SAVE_SEPARATOR, 2);
-        String playerUserId = tokens[0];
-        int orderIndex = Integer.parseInt(tokens[1]);
+    public OrchestratorState loadPlayerState(String data) {
+        int orderIndex = Integer.parseInt(data);
         State state = new State();
         state.setOrderIndex(orderIndex);
-        return new PlayerOrchestratorState(playerUserId, state);
+        return state;
     }
 
     @Override

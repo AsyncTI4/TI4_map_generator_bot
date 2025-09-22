@@ -20,9 +20,14 @@ public class DraftPlayerManager {
         }
         for (String player : players) {
             if (playerStates.containsKey(player)) {
-                throw new IllegalArgumentException("Duplicate player: " + player);
+                continue;
             }
             playerStates.put(player, new PlayerDraftState());
+        }
+        for (String existingPlayer : new ArrayList<>(playerStates.keySet())) {
+            if (!players.contains(existingPlayer)) {
+                playerStates.remove(existingPlayer);
+            }
         }
     }
 

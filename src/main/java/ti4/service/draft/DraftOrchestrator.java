@@ -29,11 +29,9 @@ public abstract class DraftOrchestrator extends DraftLifecycleHooks {
 
     public abstract void load(String data);
 
-    public abstract String[] savePlayerStates(DraftManager draftManager);
+    public abstract String savePlayerState(OrchestratorState state);
 
-    public record PlayerOrchestratorState(String playerUserId, OrchestratorState state) {}
-
-    public abstract PlayerOrchestratorState loadPlayerState(String data);
+    public abstract OrchestratorState loadPlayerState(String data);
 
     public abstract String validateState(DraftManager draftManager);
 
