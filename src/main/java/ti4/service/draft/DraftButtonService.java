@@ -8,7 +8,6 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class DraftButtonService {
@@ -31,9 +30,6 @@ public class DraftButtonService {
 
     @ButtonHandler(DRAFT_BUTTON_SERVICE_PREFIX)
     public static void handleDraftButtonClick(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        // DEBUG
-        BotLogger.info("Handling draft button click: " + buttonID);
-
         String innerButtonID = buttonID.substring(DRAFT_BUTTON_SERVICE_PREFIX.length());
         DraftManager draftManager = game.getDraftManager();
         String outcome = draftManager.routeCommand(event, player, innerButtonID, DraftManager.CommandSource.BUTTON);
