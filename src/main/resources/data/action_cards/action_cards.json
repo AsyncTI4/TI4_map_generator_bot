@@ -1114,6 +1114,16 @@
         "source": "codex1"
     },
     {
+        "alias": "insider2",
+        "name": "Insider Information",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Look at the top 3 cards of the agenda deck. [Note: this effect was changed from 1 card to 3 based on revealed changes in the expansion announcement]",
+        "automationID": "insider",
+        "flavorText": "M'aban yawned. Another filibuster. Politics could be so flavorless at times. Besides, she already knew how this one was going to turn out. Not well. Not well at all...",
+        "source": "asteroid"
+    },
+    {
         "alias": "reflective",
         "name": "Reflective Shielding",
         "phase": "Action",
@@ -1207,7 +1217,7 @@
         "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control. gain any relic fragments that you reveal and discard the rest.",
         "automationID": "arch_expedition",
         "flavorText": "Hiari pressed the activation flyphs, and the ancient door hissed open. As she stepped into the pitch-black interior of the Mahact tomb, she felt a shiver of anticipation. Perhaps, finally, she would find the Codex.",
-        "source": "pok"
+        "source": "asteroid"
     },
     {
         "alias": "arch_expedition3",
@@ -1217,7 +1227,7 @@
         "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control. gain any relic fragments that you reveal and discard the rest.",
         "automationID": "arch_expedition",
         "flavorText": "Hiari pressed the activation flyphs, and the ancient door hissed open. As she stepped into the pitch-black interior of the Mahact tomb, she felt a shiver of anticipation. Perhaps, finally, she would find the Codex.",
-        "source": "pok"
+        "source": "asteroid"
     },
     {
         "alias": "arch_expedition4",
@@ -1227,7 +1237,7 @@
         "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control. gain any relic fragments that you reveal and discard the rest.",
         "automationID": "arch_expedition",
         "flavorText": "Hiari pressed the activation flyphs, and the ancient door hissed open. As she stepped into the pitch-black interior of the Mahact tomb, she felt a shiver of anticipation. Perhaps, finally, she would find the Codex.",
-        "source": "pok"
+        "source": "asteroid"
     },
     {
         "alias": "confounding",
@@ -1273,7 +1283,7 @@
         "text": "Remove up to 2 of your ground forces from the game board and place them on a planet you control in the active system.",
         "automationID": "decoy",
         "flavorText": "Enemy fire lashed the abandoned positions on the ridgeline as Trilossa's flock slipped unseen around their flanks.",
-        "source": "pok"
+        "source": "asteroid"
     },
     {
         "alias": "dp1",
@@ -1332,7 +1342,7 @@
         "text": "Return a non-unit upgrade, non-faction technology that you own to your technology deck. Then, research another technology.",
         "automationID": "divert_funding",
         "flavorText": "I am sorry, Academician, Arbiter Berekon shrugged. \"I am sure psychoarchaeology is an interesting subject, but the supreme leader feels your budget would be better spent on more militaristic research.\"",
-        "source": "pok"
+        "source": "asteroid"
     },
     {
         "alias": "probe",
@@ -1352,7 +1362,7 @@
         "text": "Explore a frontier token that is in or adjacent to a system that contains 1 or more of your ships.",
         "automationID": "probe",
         "flavorText": "With a dull thud, the probe shot from the cruiser and accelerated into the writhing maelstrom of the gravity rift. Admiral DeLouis paced on the bridge. Hopefully, this time the probe would return.",
-        "source": "pok"
+        "source": "asteroid"
     },
     {
         "alias": "probe3",
@@ -1362,7 +1372,7 @@
         "text": "Explore a frontier token that is in or adjacent to a system that contains 1 or more of your ships.",
         "automationID": "probe",
         "flavorText": "With a dull thud, the probe shot from the cruiser and accelerated into the writhing maelstrom of the gravity rift. Admiral DeLouis paced on the bridge. Hopefully, this time the probe would return.",
-        "source": "pok"
+        "source": "asteroid"
     },
     {
         "alias": "probe4",
@@ -1372,7 +1382,7 @@
         "text": "Explore a frontier token that is in or adjacent to a system that contains 1 or more of your ships.",
         "automationID": "probe",
         "flavorText": "With a dull thud, the probe shot from the cruiser and accelerated into the writhing maelstrom of the gravity rift. Admiral DeLouis paced on the bridge. Hopefully, this time the probe would return.",
-        "source": "pok"
+        "source": "asteroid"
     },
     {
         "alias": "investments",
@@ -1399,7 +1409,7 @@
         "window": "After you activate a system",
         "text": "During the 'Movement' step of this tactical action, ignore the effect of anomalies.",
         "flavorText": "The field is too thick! Sikosk gasped. Trrakan's plume flared. \"Not for me, and not for Iruth.\" A flick of his talon, and the destroyer flipped and dove for the asteroid field.",
-        "source": "pok"
+        "source": "asteroid"
     },
     {
         "alias": "refit",
@@ -1428,7 +1438,7 @@
         "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the prerequisites of the technology before you can research it.]",
         "automationID": "reveal_prototype",
         "flavorText": "Varish and Cole completed the final linkages, activating the field harvester. The cruiser's beams roared with renewed power, cutting through the enemy ship.",
-        "source": "pok"
+        "source": "asteroid"
     },
     {
         "alias": "reveal_prototype3",
@@ -1438,7 +1448,7 @@
         "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the prerequisites of the technology before you can research it.]",
         "automationID": "reveal_prototype",
         "flavorText": "Varish and Cole completed the final linkages, activating the field harvester. The cruiser's beams roared with renewed power, cutting through the enemy ship.",
-        "source": "pok"
+        "source": "asteroid"
     },
     {
         "alias": "reveal_prototype4",
@@ -1448,7 +1458,7 @@
         "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the prerequisites of the technology before you can research it.]",
         "automationID": "reveal_prototype",
         "flavorText": "Varish and Cole completed the final linkages, activating the field harvester. The cruiser's beams roared with renewed power, cutting through the enemy ship.",
-        "source": "pok"
+        "source": "asteroid"
     },
     {
         "alias": "reverse_engineer",
@@ -1475,7 +1485,7 @@
         "window": "At the start of the 'Announce Retreats' step of space combat, if you are the defender",
         "text": "Your opponent must announce a retreat, if able.",
         "flavorText": "Vuil'raith fleshships swarmed the weary defenders, sending unease and sweeping through the telepathic links. But Z'eu projected a powerful feeling of calm, and the Naalu fighters began to drive the Cabal back toward the rift.",
-        "source": "pok"
+        "source": "asteroid"
     },
     {
         "alias": "scuttle",
