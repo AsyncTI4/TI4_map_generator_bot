@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
 
@@ -28,9 +27,9 @@ public class DraftLoadService {
             if (data.startsWith(playersKey)) {
                 String playerIdsStr = data.substring(playersKey.length());
                 String[] playerIds = playerIdsStr.split("\\" + DraftSaveService.DATA_SEPARATOR);
-                for(String playerIdEntry : playerIds) {
+                for (String playerIdEntry : playerIds) {
                     String[] tokens = playerIdEntry.split(",", 2);
-                    if(tokens.length == 2) {
+                    if (tokens.length == 2) {
                         String userId = tokens[0];
                         String shortId = tokens[1];
                         playerUserIds.add(userId);
@@ -61,13 +60,14 @@ public class DraftLoadService {
 
         // Setup player states
         String playerChoiceKey = DraftSaveService.PLAYER_PICK_DATA + DraftSaveService.KEY_SEPARATOR;
-        String playerOrchestratorStateKey = DraftSaveService.PLAYER_ORCHESTRATOR_STATE_DATA + DraftSaveService.KEY_SEPARATOR;
+        String playerOrchestratorStateKey =
+                DraftSaveService.PLAYER_ORCHESTRATOR_STATE_DATA + DraftSaveService.KEY_SEPARATOR;
         for (String data : draftData) {
             if (data.startsWith(playerChoiceKey)) {
                 String[] tokens =
                         data.substring(playerChoiceKey.length()).split("\\" + DraftSaveService.DATA_SEPARATOR, 3);
                 String playerUserId = tokens[0];
-                if(shortIdTouserId.containsKey(playerUserId)) {
+                if (shortIdTouserId.containsKey(playerUserId)) {
                     playerUserId = shortIdTouserId.get(playerUserId);
                 }
                 DraftableType draftableType = DraftableType.of(tokens[1]);
@@ -84,10 +84,9 @@ public class DraftLoadService {
                             .split("\\" + DraftSaveService.DATA_SEPARATOR, 2);
 
                     String playerUserId = tokens[0];
-                    OrchestratorState playerOrchestratorState =
-                            orchestrator.loadPlayerState(tokens[1]);
-                    
-                    if(shortIdTouserId.containsKey(playerUserId)) {
+                    OrchestratorState playerOrchestratorState = orchestrator.loadPlayerState(tokens[1]);
+
+                    if (shortIdTouserId.containsKey(playerUserId)) {
                         playerUserId = shortIdTouserId.get(playerUserId);
                     }
                     PlayerDraftState playerState =

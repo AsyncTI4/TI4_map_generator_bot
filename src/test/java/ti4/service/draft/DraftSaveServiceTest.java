@@ -7,9 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
-
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.testUtils.BaseTi4Test;
@@ -65,23 +63,33 @@ public class DraftSaveServiceTest extends BaseTi4Test {
             }
 
             // Check that save data matches is the same for original and loaded managers
-            assertEquals(savedData, DraftSaveService.saveDraftManager(loadedManager),
-                    "Mismatch in save data when you save, then load, then save again a draft manager using orchestrator " + orchestratorClassName);
+            assertEquals(
+                    savedData,
+                    DraftSaveService.saveDraftManager(loadedManager),
+                    "Mismatch in save data when you save, then load, then save again a draft manager using orchestrator "
+                            + orchestratorClassName);
 
             // Check for choice key consistency
             for (Draftable draftable : draftManager.getDraftables()) {
                 List<DraftChoice> originalChoices = draftable.getAllDraftChoices();
-                List<DraftChoice> loadedDraftable = loadedManager.getDraftableByType(draftable.getType())
-                        .getAllDraftChoices();
-                assertArrayEquals(originalChoices.stream().map(DraftChoice::getChoiceKey).toArray(),
+                List<DraftChoice> loadedDraftable =
+                        loadedManager.getDraftableByType(draftable.getType()).getAllDraftChoices();
+                assertArrayEquals(
+                        originalChoices.stream().map(DraftChoice::getChoiceKey).toArray(),
                         loadedDraftable.stream().map(DraftChoice::getChoiceKey).toArray(),
-                        "Mismatch in choice keys for draftable type: " + draftable.getClass().getSimpleName());
+                        "Mismatch in choice keys for draftable type: "
+                                + draftable.getClass().getSimpleName());
 
                 for (String userId : draftManager.getPlayerStates().keySet()) {
                     List<DraftChoice> originalPlayerChoices = draftManager.getPlayerPicks(userId, draftable.getType());
                     List<DraftChoice> loadedPlayerChoices = loadedManager.getPlayerPicks(userId, draftable.getType());
-                    assertArrayEquals(originalPlayerChoices.stream().map(DraftChoice::getChoiceKey).toArray(),
-                            loadedPlayerChoices.stream().map(DraftChoice::getChoiceKey).toArray(),
+                    assertArrayEquals(
+                            originalPlayerChoices.stream()
+                                    .map(DraftChoice::getChoiceKey)
+                                    .toArray(),
+                            loadedPlayerChoices.stream()
+                                    .map(DraftChoice::getChoiceKey)
+                                    .toArray(),
                             "Mismatch in player " + userId + " choice keys for draftable type: "
                                     + draftable.getClass().getSimpleName());
                 }
@@ -94,7 +102,7 @@ public class DraftSaveServiceTest extends BaseTi4Test {
         beforeAll();
         Game game = createTestGame(6);
         DraftManager draftManager = DraftLoadService.loadDraftManager(game, TestData.SAVED_6P_FINISHED_DRAFT);
-        
+
         // Loaded state should be valid
         assertNull(draftManager.getOrchestrator().validateState(draftManager));
         for (Draftable draftable : draftManager.getDraftables()) {
@@ -102,7 +110,9 @@ public class DraftSaveServiceTest extends BaseTi4Test {
         }
 
         // Check that save data matches is the same for original and loaded managers
-        assertEquals(TestData.SAVED_6P_FINISHED_DRAFT, DraftSaveService.saveDraftManager(draftManager),
+        assertEquals(
+                TestData.SAVED_6P_FINISHED_DRAFT,
+                DraftSaveService.saveDraftManager(draftManager),
                 "Mismatch in save data when you save, then load, then save again a draft manager");
     }
 
@@ -136,7 +146,8 @@ public class DraftSaveServiceTest extends BaseTi4Test {
         for (int i = 0; i < playerCount; i++) {
             game.addPlayer("p" + (i + 1), "blue");
         }
-        game.setMapTemplateID(Mapper.getDefaultMapTemplateForPlayerCount(playerCount).getID());
+        game.setMapTemplateID(
+                Mapper.getDefaultMapTemplateForPlayerCount(playerCount).getID());
         return game;
     }
 }
