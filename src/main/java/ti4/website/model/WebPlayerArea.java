@@ -6,8 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.Data;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import ti4.helpers.Helper;
+import ti4.helpers.Storage;
 import ti4.helpers.Units;
+import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -17,6 +22,12 @@ import ti4.map.UnitHolder;
 
 @Data
 public class WebPlayerArea {
+    public enum FactionImageType {
+        DISCORD, // Discord custom emoji URL
+        EMOJI, // Unicode emoji character for NotoEmoji font
+        IMAGE // Local image converted to WebP URL
+    }
+
     @Data
     private static class UnitCountInfo {
         private final int unitCap;
@@ -26,6 +37,8 @@ public class WebPlayerArea {
     // Basic properties
     private String userName;
     private String faction;
+    private String factionImage;
+    private FactionImageType factionImageType;
     private String color;
     private String displayName;
     private String discordId;
@@ -152,6 +165,12 @@ public class WebPlayerArea {
         // Basic properties
         webPlayerArea.setUserName(player.getUserName());
         webPlayerArea.setFaction(player.getFaction());
+
+        // Set faction image and type
+        FactionImageResult factionImageResult = getFactionImagePathAndType(player);
+        webPlayerArea.setFactionImage(factionImageResult.path);
+        webPlayerArea.setFactionImageType(factionImageResult.type);
+
         webPlayerArea.setColor(player.getColor());
         webPlayerArea.setDisplayName(player.getDisplayName());
         webPlayerArea.setDiscordId(player.getUserID());
@@ -433,5 +452,64 @@ public class WebPlayerArea {
         int ccCount = Helper.getCCCount(game, playerColor);
         int remainingReinforcements = ccLimit - ccCount;
         return Math.max(0, remainingReinforcements);
+    }
+
+    /**
+     * Result class for faction image path and type
+     */
+    private static class FactionImageResult {
+        final String path;
+        final FactionImageType type;
+
+        FactionImageResult(String path, FactionImageType type) {
+            this.path = path;
+            this.type = type;
+        }
+    }
+
+    /**
+     * Gets the appropriate faction image path and type for web interface.
+     * Reuses logic from DrawingUtil.getPlayerFactionIconImageScaled to maintain consistency.
+     */
+    private static FactionImageResult getFactionImagePathAndType(Player player) {
+        if (player == null) {
+            return new FactionImageResult(null, FactionImageType.IMAGE);
+        }
+
+        // Reuse the same logic as DrawingUtil.getPlayerFactionIconImageScaled
+        Emoji factionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
+
+        // 1) Discord custom emoji - return Discord URL and DISCORD type
+        if (player.hasCustomFactionEmoji() && factionEmoji instanceof CustomEmoji factionCustomEmoji) {
+            return new FactionImageResult(factionCustomEmoji.getImageUrl(), FactionImageType.DISCORD);
+        }
+        // 2) Unicode emoji - return the formatted emoji string and EMOJI type
+        else if (player.hasCustomFactionEmoji() && factionEmoji instanceof UnicodeEmoji uni) {
+            return new FactionImageResult(uni.getFormatted(), FactionImageType.EMOJI);
+        }
+
+        // 3) Local faction image - use DrawingUtil.getFactionIconPath directly
+        String factionFile = DrawingUtil.getFactionIconPath(player.getFaction());
+        if (factionFile != null) {
+            // Convert absolute path to relative path from resources
+            String resourcePath = Storage.getResourcePath();
+            if (factionFile.startsWith(resourcePath)) {
+                String relativePath = factionFile.substring(resourcePath.length());
+                // Ensure path starts with /
+                relativePath = relativePath.startsWith("/") ? relativePath : "/" + relativePath;
+
+                // Convert PNG to WebP and prepend web URL
+                if (relativePath.endsWith(".png")) {
+                    relativePath = relativePath.replace(".png", ".webp");
+                }
+
+                return new FactionImageResult("https://images.asyncti4.com" + relativePath, FactionImageType.IMAGE);
+            } else {
+                // If path doesn't start with resource path, return as-is (shouldn't happen)
+                return new FactionImageResult(factionFile, FactionImageType.IMAGE);
+            }
+        }
+
+        return new FactionImageResult(null, FactionImageType.IMAGE);
     }
 }
