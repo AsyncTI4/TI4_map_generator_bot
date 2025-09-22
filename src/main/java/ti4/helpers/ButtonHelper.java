@@ -96,6 +96,7 @@ import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.decks.ShowActionCardsService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -2854,6 +2855,126 @@ public class ButtonHelper {
                         + " Use the buttons to resolve \"end of turn\" abilities and then end turn.",
                 conclusionButtons);
         deleteTheOneButton(event);
+    }
+
+    public static void appendFactionIcon(Game game, StringBuilder sb, String key, Boolean privateGame) {
+        // parse IDs like "control_blk.png" and "command_red.png"
+        String colorTokenRegex = "[a-z]+_" + RegexHelper.colorRegex(game) + "\\.png";
+        Matcher tokenMatch = Pattern.compile(colorTokenRegex).matcher(key);
+        if (tokenMatch.matches()) {
+            String colorID = tokenMatch.group("color");
+            String color = Mapper.getColorName(colorID);
+            Player player = game.getPlayerFromColorOrFaction(color);
+            if ((privateGame != null && privateGame) || player == null) {
+                sb.append(" (").append(color).append(") ");
+            } else {
+                sb.append(player.getFactionEmoji())
+                        .append(" ")
+                        .append(" (")
+                        .append(color)
+                        .append(") ");
+            }
+        }
+    }
+
+    public static String getTileSummaryMessage(
+            Game game, boolean justUnits, Tile tile, Player ogPlayer, GenericInteractionCreateEvent event) {
+        String tileName = tile.getTilePath();
+        tileName = tileName.substring(tileName.indexOf('_') + 1);
+        tileName = tileName.substring(0, tileName.indexOf(".png"));
+        tileName = " - " + tileName + "[" + tile.getTileID() + "]";
+        if (justUnits) {
+            tileName = tile.getRepresentationForButtons();
+        } else {
+            tileName = tile.getPosition() + tileName;
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("__**Tile: ").append(tileName).append("**__\n");
+        Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+        Boolean privateGame = FoWHelper.isPrivateGame(game, event);
+        for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
+            String name = entry.getKey();
+            String representation = planetRepresentations.get(name);
+            if (representation == null) {
+                representation = name;
+            }
+            UnitHolder unitHolder = entry.getValue();
+
+            if (unitHolder instanceof Planet planet) {
+                sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(representation, game));
+                if (!justUnits) {
+                    sb.append(" Resources: ")
+                            .append(planet.getResources())
+                            .append("/")
+                            .append(planet.getInfluence());
+                }
+            } else {
+                sb.append(StringUtils.capitalize(representation));
+            }
+            sb.append("\n");
+            if (!justUnits) {
+                boolean hasCC = false;
+                for (String cc : unitHolder.getCcList()) {
+                    if (!hasCC) {
+                        sb.append("Command Tokens: ");
+                        hasCC = true;
+                    }
+                    appendFactionIcon(game, sb, cc, privateGame);
+                }
+                if (hasCC) {
+                    sb.append("\n");
+                }
+                boolean hasToken = false;
+                Map<String, String> tokensToName = Mapper.getTokensToName();
+                for (String token : unitHolder.getTokenList()) {
+                    if (!hasToken) {
+                        sb.append("Tokens: ");
+                        hasToken = true;
+                    }
+                    for (Map.Entry<String, String> entry_ : tokensToName.entrySet()) {
+                        String key = entry_.getKey();
+                        String value = entry_.getValue();
+                        if (token.contains(key)) {
+                            sb.append(value).append(" ");
+                        }
+                    }
+                }
+                if (hasToken) {
+                    sb.append("\n");
+                }
+                boolean hasControl = false;
+                for (String control : unitHolder.getControlList()) {
+                    if (!hasControl) {
+                        sb.append("Control Counters: ");
+                        hasControl = true;
+                    }
+                    appendFactionIcon(game, sb, control, privateGame);
+                }
+                if (hasControl) {
+                    sb.append("\n");
+                }
+            }
+
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
+            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                UnitKey unitKey = unitEntry.getKey();
+                String color = AliasHandler.resolveColor(unitKey.getColorID());
+                Player player = game.getPlayerFromColorOrFaction(color);
+                if (player == null) continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                sb.append(player.getFactionEmojiOrColor()).append(ColorEmojis.getColorEmojiWithName(color));
+                sb.append(" `").append(unitEntry.getValue()).append("x` ");
+                if (unitModel != null) {
+                    sb.append(unitModel.getUnitEmoji()).append(" ");
+                    sb.append(privateGame ? unitModel.getBaseType() : unitModel.getName())
+                            .append("\n");
+                } else {
+                    sb.append(unitKey).append("\n");
+                }
+            }
+            sb.append("----------\n");
+        }
+        return sb.toString();
     }
 
     public static int checkNetGain(Player player, String ccs) {

@@ -341,6 +341,20 @@ public class AddPlanetService {
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
         }
+
+        if ((game.getPhaseOfGame().contains("agenda")
+                        || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
+                && player.hasAbility("veiled_ember_forge")
+                && !doubleCheck
+                && !setup
+                && !unitHolder.getTechSpecialities().isEmpty()) {
+            String fac = player.getFactionEmoji();
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    fac + " placed 1 PDS on " + Helper.getPlanetRepresentation(unitHolder.getName(), game)
+                            + " due to the Veiled Ember Forge ability. This is optional but was done automatically.");
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "pds " + unitHolder.getName());
+        }
         if ((game.getPhaseOfGame().contains("agenda")
                         || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
                 && player.hasTech("absol_dxa")
