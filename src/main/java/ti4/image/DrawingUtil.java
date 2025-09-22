@@ -308,7 +308,7 @@ public class DrawingUtil {
     }
 
     @Nullable
-    private static String getFactionIconPath(String factionID) {
+    public static String getFactionIconPath(String factionID) {
         if ("null".equals(factionID) || isBlank(factionID)) {
             return null;
         }
