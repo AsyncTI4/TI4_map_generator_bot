@@ -645,6 +645,16 @@ public class Tile {
     }
 
     @JsonIgnore
+    public int getNumberOfUnitsInSystem() {
+
+        int amount = 0;
+        for (UnitHolder uH : getUnitHolders().values()) {
+            amount += uH.getUnitCount();
+        }
+        return amount;
+    }
+
+    @JsonIgnore
     public boolean containsPlayersUnitsWithModelCondition(Player p, Predicate<? super UnitModel> condition) {
         return unitHolders.values().stream()
                 .flatMap(uh -> uh.getUnitKeys().stream())

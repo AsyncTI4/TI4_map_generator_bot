@@ -96,6 +96,7 @@ public class Constants {
     public static final String ABSOL_MODE = "absol_mode";
     public static final String PROMISES_PROMISES = "promises_promises";
     public static final String FLAGSHIPPING = "flagshipping";
+    public static final String JUST_UNITS = "just_units";
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
     public static final String UNCHARTED_SPACE_STUFF = "uncharted_space_stuff";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";

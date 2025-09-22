@@ -312,6 +312,16 @@ public class StartCombatService {
 
         message.append("\nImage of System:");
         MessageHelper.sendMessageWithFile(threadChannel, file, message.toString(), false);
+        int amount = 0;
+        for (Player p : game.getRealPlayers()) {
+            if (FoWHelper.playerHasUnitsInSystem(p, tile)) {
+                amount++;
+            }
+        }
+        if (amount > 2 || tile.getNumberOfUnitsInSystem() > 20) {
+            MessageHelper.sendMessageToChannel(
+                    threadChannel, ButtonHelper.getTileSummaryMessage(game, true, tile, player1, event));
+        }
 
         // Space Cannon Offense
         if (isSpaceCombat) {
