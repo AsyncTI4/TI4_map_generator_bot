@@ -89,6 +89,23 @@ public class DraftSaveServiceTest extends BaseTi4Test {
         }
     }
 
+    @Test
+    public void testSaveFormatUnchanged() {
+        beforeAll();
+        Game game = createTestGame(6);
+        DraftManager draftManager = DraftLoadService.loadDraftManager(game, TestData.SAVED_6P_FINISHED_DRAFT);
+        
+        // Loaded state should be valid
+        assertNull(draftManager.getOrchestrator().validateState(draftManager));
+        for (Draftable draftable : draftManager.getDraftables()) {
+            assertNull(draftable.validateState(draftManager));
+        }
+
+        // Check that save data matches is the same for original and loaded managers
+        assertEquals(TestData.SAVED_6P_FINISHED_DRAFT, DraftSaveService.saveDraftManager(draftManager),
+                "Mismatch in save data when you save, then load, then save again a draft manager");
+    }
+
     private Draftable getDraftableWithTestData(String className) {
         switch (className) {
             case "FactionDraftable":
