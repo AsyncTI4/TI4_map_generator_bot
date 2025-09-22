@@ -261,6 +261,7 @@ public class ButtonHelperTacticalAction {
             return;
         }
         resetStoredValuesForTacticalAction(game);
+        game.removeStoredValue("fortuneSeekers");
         beginTacticalAction(game, player);
     }
 
@@ -274,7 +275,6 @@ public class ButtonHelperTacticalAction {
             game.removeStoredValue("ASN" + player.getFaction());
         }
         game.removeStoredValue("planetsTakenThisRound");
-        game.removeStoredValue("fortuneSeekers");
         game.removeStoredValue("hiredGunsInPlay");
         game.removeStoredValue("allianceModeSimultaneousAction");
         game.removeStoredValue("absolLux");

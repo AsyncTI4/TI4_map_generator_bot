@@ -57,6 +57,7 @@ public class StartTurnService {
             }
         }
 
+        game.removeStoredValue("fortuneSeekers");
         ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
         game.setStoredValue(player.getFaction() + "planetsExplored", "");
         game.setStoredValue("lawsDisabled", "no");
