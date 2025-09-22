@@ -990,7 +990,7 @@
         "name": "Stasis Tomb",
         "phase": "Action",
         "window": "After you gain control of a planet",
-        "text": "You may discard 2 of your relic fragments to gain the alliance ability of a random, unused faction. If you do not, explore that planet.",
+        "text": "Explore that planet. Then, you may discard 2 of your relic fragments to gain the alliance ability of a random, unused faction.",
         "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—he'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "action_deck_2"
     },
