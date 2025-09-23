@@ -292,7 +292,7 @@ public class Game extends GameProperties {
         neutral.addTech("ff2");
         neutral.addTech("dd2");
         neutral.addTech("cv2");
-        neutral.addTech("ca2");
+        neutral.addTech("cr2");
         neutral.addTech("ws");
         return neutral;
     }
