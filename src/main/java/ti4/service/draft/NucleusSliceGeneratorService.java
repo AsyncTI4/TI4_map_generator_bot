@@ -357,9 +357,21 @@ public class NucleusSliceGeneratorService {
         return new NucleusOutcome(playerSlices, null);
     }
 
+    public record NucleusValidationSettings(
+            int minSliceRes,
+            int minSliceInf,
+            int minSlicePlanets,
+            int maxSlicePlanets,
+            int minSliceValue,
+            int maxSliceValue,
+            int minCoreValue,
+            int maxCoreValue,
+            int maxCoreBalance,
+            int expectedRedTiles) {}
     private String validateMapAndSlices(
             List<PlacedTile> placedTiles,
             List<MiltyDraftSlice> playerSlices,
+            NucleusValidationSettings validationSettings,
             MapTemplateModel mapTemplate,
             DistanceTool distanceTool) {
         List<Integer> slicePlanetCounts = playerSlices.stream()
@@ -371,6 +383,15 @@ public class NucleusSliceGeneratorService {
                 slicePlanetCounts.stream().min(Integer::compareTo).orElse(0);
         Integer maxSlicePlanets =
                 slicePlanetCounts.stream().max(Integer::compareTo).orElse(0);
+
+        Float minSliceRes = playerSlices.stream()
+                .map(slice -> slice.getTiles().stream().map(t -> t.getMiltyRes() + 0.5f * t.getMiltyFlex()).reduce(0.0f, Float::sum))
+                .min(Float::compareTo)
+                .orElse(0.0f);
+        Float minSliceInf = playerSlices.stream()
+                .map(slice -> slice.getTiles().stream().map(t -> t.getMiltyInf() + 0.5f * t.getMiltyFlex()).reduce(0.0f, Float::sum))
+                .min(Float::compareTo)
+                .orElse(0.0f);
 
         List<Integer> sliceSpends = playerSlices.stream()
                 .map(slice -> slice.getOptimalRes() + slice.getOptimalInf() + slice.getOptimalFlex())
@@ -424,30 +445,35 @@ public class NucleusSliceGeneratorService {
             if (anomaliesTouching) break;
         }
 
-        // TODO: Bake these numbers into the settings
-        if (minSliceSpend < 4) {
-            return "A player slice has less than 4 total optimal spend.";
+        if (minSliceRes < validationSettings.minSliceRes) {
+            return "A player slice has less than " + validationSettings.minSliceRes + " total optimal resource.";
         }
-        if (maxSliceSpend > 9) {
-            return "A player slice has more than 9 total optimal spend.";
+        if (minSliceInf < validationSettings.minSliceInf) {
+            return "A player slice has less than " + validationSettings.minSliceInf + " total optimal influence.";
         }
-        if (minSlicePlanets < 2) {
-            return "A player slice has less than 2 planets.";
+        if (minSliceSpend < validationSettings.minSliceValue) {
+            return "A player slice has less than " + validationSettings.minSliceValue + " total optimal spend.";
         }
-        if (maxSlicePlanets > 5) {
-            return "A player slice has more than 5 planets.";
+        if (maxSliceSpend > validationSettings.maxSliceValue) {
+            return "A player slice has more than " + validationSettings.maxSliceValue + " total optimal spend.";
+        }
+        if (minSlicePlanets < validationSettings.minSlicePlanets) {
+            return "A player slice has less than " + validationSettings.minSlicePlanets + " planets.";
+        }
+        if (maxSlicePlanets > validationSettings.maxSlicePlanets) {
+            return "A player slice has more than " + validationSettings.maxSlicePlanets + " planets.";
         }
         if (totalRedTiles < expectedRedTiles) {
             return "The map has less than the expected " + expectedRedTiles + " red/anomaly tiles total.";
         }
-        if (minCoreSpend < 4) {
-            return "A core slice has less than 4 total optimal spend.";
+        if (minCoreSpend < validationSettings.minCoreValue) {
+            return "A core slice has less than " + validationSettings.minCoreValue + " total optimal spend.";
         }
-        if (maxCoreSpend > 8) {
-            return "A core slice has more than 8 total optimal spend.";
+        if (maxCoreSpend > validationSettings.maxCoreValue) {
+            return "A core slice has more than " + validationSettings.maxCoreValue + " total optimal spend.";
         }
-        if (coreSliceBalance > 3) {
-            return "The core slices are imbalanced by more than 3 total optimal spend.";
+        if (coreSliceBalance > validationSettings.maxCoreBalance) {
+            return "The core slices are imbalanced by more than " + validationSettings.maxCoreBalance + " total optimal spend.";
         }
         if (anomaliesTouching) {
             return "Two or more anomalies are touching.";

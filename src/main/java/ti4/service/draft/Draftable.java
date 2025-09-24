@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.buttons.Buttons;
+import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.service.draft.draftables.CommonDraftableValidators;
 
 public abstract class Draftable extends DraftLifecycleHooks {
@@ -179,4 +180,14 @@ public abstract class Draftable extends DraftLifecycleHooks {
      * @return An error message if the state is invalid, or null if valid. No magic string support.
      */
     public abstract String validateState(DraftManager draftManager);
+
+    // Setup
+
+    public SettingsMenu getSetupMenu(DraftManager draftManager) {
+        return null;
+    }
+
+    public void applySetupMenuChoices(DraftManager draftManager, SettingsMenu menu) {
+        // Do nothing by default
+    }
 }

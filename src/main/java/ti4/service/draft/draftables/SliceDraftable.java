@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
+import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.map.Player;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
@@ -117,5 +118,27 @@ public class SliceDraftable extends SinglePickDraftable {
             DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
         // Map is built as a side effect of slice drafting.
         return null;
+    }
+
+    /**
+     * For SliceDraftable, we want to control:
+     * - Map template
+     *   - Implicitly (or explicitly?): Is Nucleus setup
+     *   - Possibly we just switch to having 2 different slice draftables?
+     * - Min/Max ranges, default choices
+     * - Number of slices
+     * - Special generation rules (e.g. min wormholes)
+     * - Acceptable legendary counts
+     */
+    @Override
+    public SettingsMenu getSetupMenu(DraftManager draftManager) {
+        
+
+        return null;
+    }
+
+    @Override
+    public void applySetupMenuChoices(DraftManager draftManager, SettingsMenu menu) {
+        // Do nothing by default
     }
 }

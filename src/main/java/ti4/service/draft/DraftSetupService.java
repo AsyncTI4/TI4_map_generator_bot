@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.TIGLHelper;
+import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
@@ -21,6 +22,25 @@ import ti4.service.milty.MiltyDraftSlice;
 @UtilityClass
 public class DraftSetupService {
     public static String startFromSettings(GenericInteractionCreateEvent event, MiltySettings settings) {
+        Game game = settings.getGame();
+
+        // Load the general game settings
+        boolean success = game.loadGameSettingsFromSettings(event, settings);
+        if (!success) return "Fix the game settings before continuing";
+        if (game.isCompetitiveTIGLGame()) {
+            TIGLHelper.sendTIGLSetupText(game);
+        }
+
+        DraftSpec specs = DraftSpec.CreateFromMiltySettings(settings);
+
+        if (specs.getTemplate().isNucleusTemplate()) {
+            return startNucleusFromSpecs(event, specs);
+        } else {
+            return startMiltyFromSpecs(event, specs);
+        }
+    }
+    
+    public static String startFromSettings(GenericInteractionCreateEvent event, DraftSystemSettings settings) {
         Game game = settings.getGame();
 
         // Load the general game settings
