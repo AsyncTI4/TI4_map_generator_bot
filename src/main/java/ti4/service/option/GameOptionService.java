@@ -36,6 +36,13 @@ public class GameOptionService {
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
                 channel, "Enable or Disable Galactic Events.", daneLinkButtons);
         StartPhaseService.postSurveyResults(game);
+
+        String msg =
+                "Thunder's Edge contains a new version of mecatol rex, which is legendary (it's ability allows you to discard and then draw a secret objective). If you want to play with this new version of mecatol rex in your game, press this button and it will be added to the map when secrets are dealt.";
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("addLegendaryMecatol", "Use Legendary Mecatol Rex"));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
     }
 
     public static final Button showOwnedPNs_ON = Buttons.green("showOwnedPNsInPlayerArea_turnOFF", "ON");

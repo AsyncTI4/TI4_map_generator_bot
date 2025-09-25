@@ -210,7 +210,7 @@ public class SecretObjectiveHelper {
         return getSODiscardButtonsWithSuffix(player, "");
     }
 
-    private static List<Button> getSODiscardButtonsWithSuffix(Player player, String suffix) {
+    public static List<Button> getSODiscardButtonsWithSuffix(Player player, String suffix) {
         Map<String, Integer> secretObjectives = player.getSecrets();
         List<Button> soButtons = new ArrayList<>();
         if (secretObjectives != null && !secretObjectives.isEmpty()) {
