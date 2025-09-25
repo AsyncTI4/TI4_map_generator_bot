@@ -2,7 +2,7 @@
     {
         "alias": "bastion",
         "factionName": "Last Bastion",
-        "homeSystem": "",
+        "homeSystem": [],
         "startingFleet": "1 dn, 1 cv, 1 cr, 2 ff, 3 inf, sd",
         "commodities": 1,
         "factionTech": [],
@@ -35,7 +35,7 @@
     {
         "alias": "deepwrought",
         "factionName": "The Deepwrought Scholarate",
-        "homeSystem": "",
+        "homeSystem": [],
         "startingFleet": "2 inf i, 1 inf o, sd i, 4 ff, cv, dn",
         "commodities": 3,
         "factionTech": [],
@@ -71,7 +71,7 @@
     {
         "alias": "firmament",
         "factionName": "The Firmament",
-        "homeSystem": "96a",
+        "homeSystem": [],
         "startingFleet": "1 inf c, 2 inf t, cv, 3 ff, ca, dd, sd t",
         "commodities": 3,
         "factionTech": [],
@@ -163,7 +163,10 @@
         "factionTech": [],
         "startingTech": [],
         "homePlanets": [],
-        "abilities": [],
+        "abilities": [
+            "sorrow",
+            "sundered"
+        ],
         "leaders": [
             "crimsonagent",
             "crimsoncommander",
