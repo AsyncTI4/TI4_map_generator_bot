@@ -24,7 +24,6 @@ public class TestData {
 
     // Filenames used in tests (extension is assumed to be .txt)
     public static final String FINISHED_6P_DRAFT_FILE = "finished-6p-draft";
-    
 
     public FactionDraftable createFactionDraftable() {
         FactionDraftable draftable = new FactionDraftable();
@@ -98,10 +97,12 @@ public class TestData {
         try {
 
             Path path = Paths.get(TEST_STORAGE_DIRECTORY, stringsTestFile + Constants.TXT);
-            if(!Files.exists(path)) {
-                throw new RuntimeException("Test data file for finished 6p draft is missing at path: " + path.toAbsolutePath());
+            if (!Files.exists(path)) {
+                throw new RuntimeException(
+                        "Test data file for finished 6p draft is missing at path: " + path.toAbsolutePath());
             }
-            String firstLine = Files.readAllLines(path, Charset.defaultCharset()).get(0);
+            String firstLine =
+                    Files.readAllLines(path, Charset.defaultCharset()).get(0);
             return firstLine;
         } catch (Exception e) {
             throw new RuntimeException("Failed to read finished 6p draft string from file", e);

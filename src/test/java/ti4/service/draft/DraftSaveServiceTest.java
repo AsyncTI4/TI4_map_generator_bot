@@ -97,8 +97,6 @@ public class DraftSaveServiceTest extends BaseTi4Test {
         }
     }
 
-    
-
     @Test
     public void testSaveFormatUnchanged() {
         beforeAll();

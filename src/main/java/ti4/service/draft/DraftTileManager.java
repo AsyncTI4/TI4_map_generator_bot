@@ -33,8 +33,9 @@ public class DraftTileManager {
     private final Map<TierList, List<MiltyDraftTile>> tilesByTier = new HashMap<>();
 
     // Any of these terms appearing in the tile's ID or image path indicate that it is not draftable.
-    private static final List<String> DISALLOWED_TERMS = List.of("corner", "lane", "mecatol", "blank", "border", "fow", "anomaly", "deltawh", "seed", "mr", "mallice",
-                "ethan", "prison", "kwon", "home", "hs", "red", "blue", "green", "gray", "gate", "setup");
+    private static final List<String> DISALLOWED_TERMS = List.of(
+            "corner", "lane", "mecatol", "blank", "border", "fow", "anomaly", "deltawh", "seed", "mr", "mallice",
+            "ethan", "prison", "kwon", "home", "hs", "red", "blue", "green", "gray", "gate", "setup");
 
     public void addDraftTile(MiltyDraftTile draftTile) {
         TierList draftTileTier = draftTile.getTierList();
