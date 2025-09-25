@@ -20,6 +20,21 @@ public abstract class Draftable extends DraftLifecycleHooks {
      */
     public abstract List<DraftChoice> getAllDraftChoices();
 
+    /**
+     * Get a specific, known draft choice by its key.
+     * @param choiceKey The unique key of the draft choice to get.
+     * @return The draft choice with the given key, or null if not found.
+     */
+    public final DraftChoice getDraftChoice(String choiceKey) {
+        List<DraftChoice> allChoices = getAllDraftChoices();
+        for (DraftChoice choice : allChoices) {
+            if (choice.getChoiceKey().equals(choiceKey)) {
+                return choice;
+            }
+        }
+        return null;
+    }
+
     // Interaction info
 
     /**

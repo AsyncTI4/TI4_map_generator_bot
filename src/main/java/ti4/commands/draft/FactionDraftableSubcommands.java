@@ -36,7 +36,7 @@ public class FactionDraftableSubcommands extends SubcommandGroup {
         if (draftManager == null) {
             return null;
         }
-        return (FactionDraftable) draftManager.getDraftableByType(FactionDraftable.TYPE);
+        return (FactionDraftable) draftManager.getDraftable(FactionDraftable.TYPE);
     }
 
     public static class FactionDraftableAddFaction extends GameStateSubcommand {
@@ -103,7 +103,7 @@ public class FactionDraftableSubcommands extends SubcommandGroup {
             addOption(
                     OptionType.STRING,
                     Constants.KELERES_FLAVOR_OPTION,
-                    "Either 'mentak', 'xxcha', or 'argent'",
+                    "One of 'mentak', 'xxcha', or 'argent'",
                     true,
                     true);
         }

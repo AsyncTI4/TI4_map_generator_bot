@@ -33,11 +33,6 @@ public class DraftManager extends DraftPlayerManager {
             throw new IllegalArgumentException("Draftables cannot be null");
         }
         this.game = game;
-        // this.orchestrator = orchestrator;
-        // this.draftables = new ArrayList<>(draftables);
-        // this.playerStates =
-        // players.stream().collect(HashMap::new, (m, p) -> m.put(p, new
-        // PlayerDraftState()), Map::putAll);
     }
 
     @Getter
@@ -45,9 +40,13 @@ public class DraftManager extends DraftPlayerManager {
 
     @Getter
     private DraftOrchestrator orchestrator = null;
-    // The order of draftables is the correct order for summarizing, applying, etc.
+    // The order of draftables is assumed to be the correct order for summarizing, applying, etc.
     @Getter
     private final List<Draftable> draftables = new ArrayList<>();
+
+    public static boolean hasDraftManager(Game game) {
+        return game.getDraftManagerUnsafe() != null || (game.getDraftString() != null && !game.getDraftString().isEmpty());
+    }
 
     // Setup
 
@@ -90,7 +89,7 @@ public class DraftManager extends DraftPlayerManager {
 
     // Information Access
 
-    public Draftable getDraftableByType(DraftableType type) {
+    public Draftable getDraftable(DraftableType type) {
         for (Draftable d : draftables) {
             if (d.getType().equals(type)) {
                 return d;
@@ -101,6 +100,10 @@ public class DraftManager extends DraftPlayerManager {
 
     public boolean hasBeenPicked(DraftableType type, String choiceKey) {
         return getAllPicksOfType(type).stream().anyMatch(c -> c.getChoiceKey().equals(choiceKey));
+    }
+
+    public List<String> getPlayerUserIds() {
+        return new ArrayList<>(playerStates.keySet());
     }
 
     // Interaction handling

@@ -36,7 +36,7 @@ public class SeatDraftableSubcommands extends SubcommandGroup {
         if (draftManager == null) {
             return null;
         }
-        return (SeatDraftable) draftManager.getDraftableByType(SeatDraftable.TYPE);
+        return (SeatDraftable) draftManager.getDraftable(SeatDraftable.TYPE);
     }
 
     public static class SeatDraftableSetSeatCount extends GameStateSubcommand {

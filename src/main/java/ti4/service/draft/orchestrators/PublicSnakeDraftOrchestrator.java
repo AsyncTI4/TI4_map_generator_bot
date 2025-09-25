@@ -202,7 +202,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         if (!undeterministicPicks && totalPossiblePicks.size() > 0 && totalPossiblePicks.size() <= simultaneousPicks) {
             Player nextPlayer = draftManager.getGame().getPlayer(getCurrentPlayer(playerOrder));
             DraftChoice forcedPick = totalPossiblePicks.get(0);
-            Draftable forcedDraftable = draftManager.getDraftableByType(forcedPick.getType());
+            Draftable forcedDraftable = draftManager.getDraftable(forcedPick.getType());
             String status = draftManager.routeCommand(
                     event,
                     nextPlayer,

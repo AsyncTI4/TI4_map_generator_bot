@@ -54,7 +54,7 @@ public class NucleusImageGeneratorService {
         Game game = draftManager.getGame();
         String mapTemplateId = game.getMapTemplateID();
         MapTemplateModel mapTemplate = Mapper.getMapTemplate(mapTemplateId);
-        if (!mapTemplate.isNucleusTemplate() || draftManager.getDraftableByType(SeatDraftable.TYPE) == null) {
+        if (!mapTemplate.isNucleusTemplate() || draftManager.getDraftable(SeatDraftable.TYPE) == null) {
             return null;
         }
 

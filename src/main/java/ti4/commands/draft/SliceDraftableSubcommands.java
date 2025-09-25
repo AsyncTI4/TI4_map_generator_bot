@@ -43,7 +43,7 @@ public class SliceDraftableSubcommands extends SubcommandGroup {
         if (draftManager == null) {
             return null;
         }
-        return (SliceDraftable) draftManager.getDraftableByType(SliceDraftable.TYPE);
+        return (SliceDraftable) draftManager.getDraftable(SliceDraftable.TYPE);
     }
 
     public static MiltyDraftTile getTileFromOption(SlashCommandInteractionEvent event, String optionName) {

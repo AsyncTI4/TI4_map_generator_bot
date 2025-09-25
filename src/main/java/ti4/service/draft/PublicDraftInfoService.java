@@ -209,7 +209,7 @@ public class PublicDraftInfoService {
 
     private Consumer<MessageHistory> editDraftInfo(
             DraftManager draftManager, DraftableType draftableType, String newSummary) {
-        Draftable draftable = draftManager.getDraftableByType(draftableType);
+        Draftable draftable = draftManager.getDraftable(draftableType);
         if (draftable == null) {
             throw new IllegalArgumentException("No draftable of type " + draftableType + " found");
         }

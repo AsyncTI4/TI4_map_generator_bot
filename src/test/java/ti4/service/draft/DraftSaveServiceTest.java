@@ -73,7 +73,7 @@ public class DraftSaveServiceTest extends BaseTi4Test {
             for (Draftable draftable : draftManager.getDraftables()) {
                 List<DraftChoice> originalChoices = draftable.getAllDraftChoices();
                 List<DraftChoice> loadedDraftable =
-                        loadedManager.getDraftableByType(draftable.getType()).getAllDraftChoices();
+                        loadedManager.getDraftable(draftable.getType()).getAllDraftChoices();
                 assertArrayEquals(
                         originalChoices.stream().map(DraftChoice::getChoiceKey).toArray(),
                         loadedDraftable.stream().map(DraftChoice::getChoiceKey).toArray(),
