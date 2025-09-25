@@ -74,10 +74,7 @@
         "homeSystem": "96a",
         "startingFleet": "1 inf c, 2 inf t, cv, 3 ff, ca, dd, sd t",
         "commodities": 3,
-        "factionTech": [
-            "planesplitter-firm",
-            "parasite-firm"
-        ],
+        "factionTech": [],
         "startingTechOptions": [
             "dxa",
             "bs",
@@ -118,13 +115,10 @@
     {
         "alias": "obsidian",
         "factionName": "The Obsidian",
-        "homeSystem": "96b",
+        "homeSystem": [],
         "startingFleet": "1 inf c, 2 inf t, cv, 3 ff, ca, dd, sd t",
         "commodities": 3,
-        "factionTech": [
-            "planesplitter-obs",
-            "parasite-obs"
-        ],
+        "factionTech": [],
         "startingTechOptions": [
             "dxa",
             "bs",
@@ -132,10 +126,7 @@
             "pi"
         ],
         "startingTechAmount": 1,
-        "homePlanets": [
-            "cronoshollow",
-            "tallinhollow"
-        ],
+        "homePlanets": [],
         "abilities": [
             "nocturne",
             "bladesorchestra",
