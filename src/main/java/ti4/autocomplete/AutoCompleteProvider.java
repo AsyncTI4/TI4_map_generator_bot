@@ -945,8 +945,8 @@ public class AutoCompleteProvider {
 
                 DraftManager draftManager = game.getDraftManager();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Predicate<String> isUnknownUserId = id ->
-                        game.getPlayer(id) == null || event.getGuild().getMemberById(id) == null;
+                Predicate<String> isUnknownUserId =
+                        id -> game.getPlayer(id) == null || event.getGuild().getMemberById(id) == null;
                 List<String> userIDs = draftManager.getPlayerUserIds().stream()
                         .filter(isUnknownUserId)
                         .toList();
@@ -986,18 +986,19 @@ public class AutoCompleteProvider {
                 String draftableTypeStr =
                         event.getOption(Constants.DRAFTABLE_TYPE_OPTION, null, OptionMapping::getAsString);
                 if (draftableTypeStr == null) return;
-                
+
                 DraftableType draftableType = DraftableType.of(draftableTypeStr);
                 Draftable draftable = draftManager.getDraftable(draftableType);
                 if (draftable == null) return;
-                
+
                 List<DraftChoice> choices = draftable.getAllDraftChoices();
                 List<DraftChoice> alreadyPicked = draftManager.getAllPicksOfType(draftableType);
                 Predicate<DraftChoice> notPicked = choice -> alreadyPicked.stream()
                         .noneMatch(picked -> picked.getChoiceKey().equals(choice.getChoiceKey()));
-                Predicate<DraftChoice> matchesEnteredText = choice -> choice.getChoiceKey().toLowerCase().contains(enteredValue)
-                        || choice.getUnformattedName().toLowerCase().contains(enteredValue);
-                
+                Predicate<DraftChoice> matchesEnteredText =
+                        choice -> choice.getChoiceKey().toLowerCase().contains(enteredValue)
+                                || choice.getUnformattedName().toLowerCase().contains(enteredValue);
+
                 List<Command.Choice> options = choices.stream()
                         .filter(notPicked)
                         .filter(matchesEnteredText)
@@ -1131,8 +1132,10 @@ public class AutoCompleteProvider {
                 }
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Predicate<MiltyDraftTile> matchesEnteredText = tile -> {
-                    String representation = Mapper.getTileRepresentations().get(tile.getTile().getTileID());
-                    return representation != null && representation.toLowerCase().contains(enteredValue);
+                    String representation =
+                            Mapper.getTileRepresentations().get(tile.getTile().getTileID());
+                    return representation != null
+                            && representation.toLowerCase().contains(enteredValue);
                 };
 
                 List<MiltyDraftTile> tiles = draftTileManager.getAll().stream()
@@ -1160,7 +1163,7 @@ public class AutoCompleteProvider {
                 SpeakerOrderDraftable draftable =
                         (SpeakerOrderDraftable) draftManager.getDraftable(SpeakerOrderDraftable.TYPE);
                 if (draftable == null) return;
-                
+
                 int playerCount = draftManager.getPlayerStates().size();
                 int maxSeats = Math.min(playerCount, 8);
                 event.replyChoice(maxSeats + " speaker order positions", (long) maxSeats)

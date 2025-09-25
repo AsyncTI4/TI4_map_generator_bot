@@ -282,8 +282,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
         public void execute(SlashCommandInteractionEvent event) {
             Game game = getGame();
             DraftManager draftManager = game.getDraftManager();
-            String draftableType =
-                    event.getOption(Constants.ADD_DRAFTABLE_OPTION, o -> o.getAsString());
+            String draftableType = event.getOption(Constants.ADD_DRAFTABLE_OPTION, o -> o.getAsString());
             Draftable draftable = DraftComponentFactory.createDraftable(draftableType);
             if (draftable == null) {
                 draftable = DraftComponentFactory.createDraftable(draftableType + "Draftable");
@@ -323,8 +322,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
         public void execute(SlashCommandInteractionEvent event) {
             Game game = getGame();
             DraftManager draftManager = game.getDraftManager();
-            String orchestratorType =
-                    event.getOption(Constants.SET_ORCHESTRATOR_OPTION, o -> o.getAsString());
+            String orchestratorType = event.getOption(Constants.SET_ORCHESTRATOR_OPTION, o -> o.getAsString());
             DraftOrchestrator orchestrator = DraftComponentFactory.createOrchestrator(orchestratorType);
             if (orchestrator == null) {
                 orchestrator = DraftComponentFactory.createOrchestrator(orchestratorType + "Orchestrator");
@@ -509,8 +507,10 @@ public class DraftManagerSubcommands extends SubcommandGroup {
         public void execute(SlashCommandInteractionEvent event) {
             Game game = getGame();
             DraftManager draftManager = game.getDraftManager();
-            String playerUserId1 = event.getOption(Constants.PLAYER1).getAsUser().getId();
-            String playerUserId2 = event.getOption(Constants.PLAYER2).getAsUser().getId();
+            String playerUserId1 =
+                    event.getOption(Constants.PLAYER1).getAsUser().getId();
+            String playerUserId2 =
+                    event.getOption(Constants.PLAYER2).getAsUser().getId();
             try {
                 draftManager.swapPlayers(playerUserId1, playerUserId2);
                 if (draftManager.getOrchestrator() != null) {
@@ -559,7 +559,8 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Must provide a player to remove");
                 return;
             }
-            String newPlayerUserId = event.getOption(Constants.PLAYER2).getAsUser().getId();
+            String newPlayerUserId =
+                    event.getOption(Constants.PLAYER2).getAsUser().getId();
             try {
                 draftManager.replacePlayer(oldPlayerUserId, newPlayerUserId);
                 if (draftManager.getOrchestrator() != null) {
@@ -809,8 +810,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             spec.setTemplate(mapTemplate);
 
             // Factions
-            FactionDraftable factionDraftable =
-                    (FactionDraftable) draftManager.getDraftable(FactionDraftable.TYPE);
+            FactionDraftable factionDraftable = (FactionDraftable) draftManager.getDraftable(FactionDraftable.TYPE);
             if (factionDraftable != null) {
                 spec.numFactions = factionDraftable.getAllDraftChoices().size();
                 spec.priorityFactions = factionDraftable.getAllDraftChoices().stream()

@@ -72,7 +72,8 @@ public class PartialMapService {
         // Check if we can derive any state
         SliceDraftable sliceDraftable = (SliceDraftable) draftManager.getDraftable(SliceDraftable.TYPE);
         SeatDraftable seatDraftable = (SeatDraftable) draftManager.getDraftable(SeatDraftable.TYPE);
-        SpeakerOrderDraftable speakerOrderDraftable = (SpeakerOrderDraftable) draftManager.getDraftable(SpeakerOrderDraftable.TYPE);
+        SpeakerOrderDraftable speakerOrderDraftable =
+                (SpeakerOrderDraftable) draftManager.getDraftable(SpeakerOrderDraftable.TYPE);
         FactionDraftable factionDraftable = (FactionDraftable) draftManager.getDraftable(FactionDraftable.TYPE);
         if (seatDraftable == null && speakerOrderDraftable == null) {
             // No way to place tiles on the map
@@ -125,7 +126,7 @@ public class PartialMapService {
                     Tile toAdd = new Tile(hsTileId, templateTile.getPos());
                     game.setTile(toAdd);
                     updateMap = true;
-                // Attempt to populate Slice tiles if a Slice was picked
+                    // Attempt to populate Slice tiles if a Slice was picked
                 } else if (templateTile.getMiltyTileIndex() != null && slice != null) {
                     String tileID = slice.getTiles()
                             .get(templateTile.getMiltyTileIndex())
@@ -154,7 +155,7 @@ public class PartialMapService {
                         pState.getPicks(seatDraftable.getType()).get(0).getChoiceKey();
                 position = SeatDraftable.getSeatNumberFromChoiceKey(seatChoiceKey);
             }
-        // If Seat Draftables are excluded from the draft, the Speaker Order is used instead
+            // If Seat Draftables are excluded from the draft, the Speaker Order is used instead
         } else if (speakerOrderDraftable != null) {
             if (pState.getPickCount(speakerOrderDraftable.getType()) > 0) {
                 String pickChoiceKey =

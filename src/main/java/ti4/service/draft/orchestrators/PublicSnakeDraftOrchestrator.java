@@ -205,7 +205,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         }
 
         // If 1+ deterministic picks are found amongst the draftables, AND there are no more deterministic picks
-        // than there are picks at this time, AND there are no non-deterministic picks available, apply the only possible picks automatically.
+        // than there are picks at this time, AND there are no non-deterministic picks available, apply the only
+        // possible picks automatically.
         if (!undeterministicPicks && totalPossiblePicks.size() > 0 && totalPossiblePicks.size() <= simultaneousPicks) {
             Player nextPlayer = draftManager.getGame().getPlayer(getCurrentPlayer(playerOrder));
             DraftChoice forcedPick = totalPossiblePicks.get(0);
@@ -216,7 +217,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
                     forcedDraftable.makeCommandKey(forcedPick.getChoiceKey()),
                     DraftManager.CommandSource.DETERMINISTIC_PICK);
             DraftButtonService.handleButtonResult(event, status);
-        // It is time to update the draft display and ping the next player in line.
+            // It is time to update the draft display and ping the next player in line.
         } else {
             PartialMapService.tryUpdateMap(draftManager, event, true);
             PublicDraftInfoService.edit(

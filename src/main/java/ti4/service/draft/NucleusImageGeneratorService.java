@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.helpers.DisplayType;
@@ -328,8 +327,8 @@ public class NucleusImageGeneratorService {
             MapTemplateTile sliceSeat = getSeatTileForPlayer(mapTemplate, playerNum);
             String sliceSeatPos = sliceSeat.getPos();
 
-            Predicate<MapTemplateTile> nucleusSliceFilter = t -> t.getNucleusNumbers() != null
-                    && t.getNucleusNumbers().contains(playerNum);
+            Predicate<MapTemplateTile> nucleusSliceFilter =
+                    t -> t.getNucleusNumbers() != null && t.getNucleusNumbers().contains(playerNum);
             List<MiltyDraftTile> nucleusSliceTiles = mapTemplate.getTemplateTiles().stream()
                     .filter(nucleusSliceFilter)
                     .map(MapTemplateTile::getPos)
@@ -346,14 +345,14 @@ public class NucleusImageGeneratorService {
     }
 
     private MapTemplateTile getSeatTileForPlayer(MapTemplateModel mapTemplateModel, int playerNumber) {
-            Predicate<MapTemplateTile> seatFilter = t -> t.getHome() != null
-                    && t.getHome()
-                    && t.getPlayerNumber() != null
-                    && t.getPlayerNumber() == playerNumber;
-            return mapTemplateModel.getTemplateTiles().stream()
-                    .filter(seatFilter)
-                    .findFirst()
-                    .orElse(null);
+        Predicate<MapTemplateTile> seatFilter = t -> t.getHome() != null
+                && t.getHome()
+                && t.getPlayerNumber() != null
+                && t.getPlayerNumber() == playerNumber;
+        return mapTemplateModel.getTemplateTiles().stream()
+                .filter(seatFilter)
+                .findFirst()
+                .orElse(null);
     }
 
     /**

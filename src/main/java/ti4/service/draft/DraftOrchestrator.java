@@ -13,7 +13,7 @@ public abstract class DraftOrchestrator extends DraftLifecycleHooks {
      * @param draftManager The draft manager holding the draft state.
      */
     public abstract void sendDraftButtons(DraftManager draftManager);
-    
+
     /**
      * Validate the current state of the draft for this orchestrator.
      * @param draftManager The draft manager to validate against.
@@ -94,10 +94,10 @@ public abstract class DraftOrchestrator extends DraftLifecycleHooks {
     public abstract void load(String data);
 
     /**
-    * Save this player-specific substate of the orchestrator to a string.
-    * @param state The player-specific substate to save.
-    * @return The saved state as a string.
-    */
+     * Save this player-specific substate of the orchestrator to a string.
+     * @param state The player-specific substate to save.
+     * @return The saved state as a string.
+     */
     public abstract String savePlayerState(OrchestratorState state);
 
     /**

@@ -121,7 +121,7 @@ public class DraftPlayerManager {
         }
         return allChoices;
     }
-    
+
     public List<String> getPlayerUserIds() {
         return new ArrayList<>(playerStates.keySet());
     }

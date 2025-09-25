@@ -3,7 +3,6 @@ package ti4.service.draft;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;

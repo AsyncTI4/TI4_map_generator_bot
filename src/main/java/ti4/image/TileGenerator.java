@@ -88,14 +88,14 @@ public class TileGenerator {
     // colors used in the MapTemplateHelper.getTileFromTemplateTile for draft tiles, given a player number.
     // And note that the "red" in the MapTemplateHelper is always skipped.
     private static final Map<Integer, String> NUCLEUS_SLICE_COLORS = Map.of(
-                        1, "blue",
-                        2, "yellow",
-                        3, "green", // draft tile color: emerald
-                        4, "lavender",
-                        5, "petrol",
-                        6, "brown", // draft tile color: chocolate
-                        7, "ethereal",
-                        8, "forest");
+            1, "blue",
+            2, "yellow",
+            3, "green", // draft tile color: emerald
+            4, "lavender",
+            5, "petrol",
+            6, "brown", // draft tile color: chocolate
+            7, "ethereal",
+            8, "forest");
 
     // Map to aggregate unit coordinates by faction from all UnitRenderGenerator
     // calls

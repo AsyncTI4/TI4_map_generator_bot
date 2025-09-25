@@ -51,7 +51,8 @@ public class DraftManager extends DraftPlayerManager {
     }
 
     public static boolean hasDraftManager(Game game) {
-        return game.getDraftManagerUnsafe() != null || (game.getDraftString() != null && !game.getDraftString().isEmpty());
+        return game.getDraftManagerUnsafe() != null
+                || (game.getDraftString() != null && !game.getDraftString().isEmpty());
     }
 
     // Setup
@@ -126,7 +127,8 @@ public class DraftManager extends DraftPlayerManager {
                             throw new IllegalStateException("Draft choice command issued, but no orchestrator is set");
                         }
 
-                        // TODO: Add a public method to handle draft picks, which orchestrators can also use for deterministic picks
+                        // TODO: Add a public method to handle draft picks, which orchestrators can also use for
+                        // deterministic picks
                         // It would pick up from this point, and continue right until the tryEndDraft() call.
 
                         String validationError = d.isValidDraftChoice(this, player.getUserID(), choice);
