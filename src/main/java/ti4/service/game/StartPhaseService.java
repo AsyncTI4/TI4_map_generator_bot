@@ -24,7 +24,6 @@ import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.DisplayType;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
@@ -968,7 +967,7 @@ public class StartPhaseService {
     }
 
     public static void startActionPhase(GenericInteractionCreateEvent event, Game game, boolean incrementTgs) {
-        boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
+        boolean isFowPrivateGame = game.isFowMode();
         game.setStoredValue("willRevolution", "");
         game.setPhaseOfGame("action");
         GMService.logActivity(game, "**Action** Phase for Round " + game.getRound() + " started.", true);

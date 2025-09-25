@@ -306,7 +306,7 @@ public class StatusHelper {
         poButtons.add(noPOScoring);
         poButtons.add(scoreAnObjective);
         poButtons.add(noSOScoring);
-        if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
+        if (!game.getStoredValue("newStatusScoringMode").isEmpty() && !game.isFowMode()) {
             poButtons.add(Buttons.gray("refreshStatusSummary", "Refresh Summary"));
         }
         if (game.getActionCards().size() > 130
@@ -317,6 +317,7 @@ public class StatusHelper {
             poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
         }
         poButtons.removeIf(Objects::isNull);
+        messageText = "Please score objectives, " + game.getPing() + ".";
         if (!game.isFowMode()) {
             game.setStoredValue("newStatusScoringMode", "Yes");
             messageText += "\n\n" + Helper.getNewStatusScoringRepresentation(game);

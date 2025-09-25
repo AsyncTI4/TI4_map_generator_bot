@@ -113,9 +113,9 @@ public class MiltyService {
         specs.bannedFactions.addAll(pfSettings.getBanFactions().getKeys());
         if (game.isThundersEdge()) {
             List<String> newKeys = new ArrayList<>();
-            newKeys.addAll(List.of("arborec", "sol", "letnev", "winnu", "sardakk", "yin", "l1z1x"));
+            newKeys.addAll(List.of("arborec", "sol", "letnev", "winnu", "sardakk", "yin", "l1z1x", "naalu"));
             specs.priorityFactions.addAll(newKeys);
-            specs.numFactions = Math.min(7, specs.numFactions);
+            specs.numFactions = Math.min(8, specs.numFactions);
         } else {
             specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
         }

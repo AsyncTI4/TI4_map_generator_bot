@@ -1,63 +1,135 @@
 [
     {
-        "alias": "bastion",
-        "factionName": "Last Bastion",
-        "homeSystem": "",
-        "startingFleet": "1 dn, 1 cv, 1 cr, 2 ff, 3 inf, sd",
-        "commodities": 1,
-        "factionTech": [],
-        "startingTech": [],
-        "homePlanets": [],
+        "alias": "deepwrought",
+        "factionName": "The Deepwrought Scholarate",
+        "homeSystem": "95",
+        "startingFleet": "2 inf i, 1 inf o, sd i, 4 ff, cv, dn",
+        "commodities": 3,
+        "factionTech": [
+            "hydrothermal",
+            "radical"
+        ],
+        "startingTechOptions": [],
+        "startingTechAmount": 2,
+        "homePlanets": [
+            "ikatena"
+        ],
         "abilities": [
-            "liberate",
-            "galvanize",
-            "phoenixstandard"
+            "researchteam",
+            "oceanbound"
         ],
         "leaders": [
-            "bastionagent",
-            "bastioncommander",
-            "bastionhero"
+            "deepwroughtagent",
+            "deepwroughtcommander",
+            "deepwroughthero"
         ],
-        "promissoryNotes": [],
+        "promissoryNotes": [
+            "shareknowledge"
+        ],
         "units": [
             "fighter",
             "destroyer",
             "cruiser",
             "carrier",
             "dreadnought",
-            "flagship",
+            "deepwrought_flagship",
             "infantry",
-            "mech",
+            "deepwrought_mech",
             "pds",
             "spacedock"
         ],
         "source": "thunders_edge"
     },
     {
-        "alias": "deepwrought",
-        "factionName": "The Deepwrought Scholarate",
-        "homeSystem": "",
-        "startingFleet": "",
-        "commodities": 0,
-        "factionTech": [],
-        "startingTech": [],
-        "homePlanets": [],
-        "abilities": [],
-        "leaders": [
-            "deepwroughtagent",
-            "deepwroughtcommander",
-            "deepwroughthero"
+        "alias": "firmament",
+        "factionName": "The Firmament",
+        "homeSystem": "96a",
+        "startingFleet": "1 inf c, 2 inf t, cv, 3 ff, ca, dd, sd t",
+        "commodities": 3,
+        "factionTech": [
+            "planesplitter-firm",
+            "parasite-firm"
         ],
-        "promissoryNotes": [],
+        "startingTechOptions": [
+            "dxa",
+            "bs",
+            "gls",
+            "pi"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "cronos",
+            "tallin"
+        ],
+        "abilities": [
+            "plotsplots",
+            "puppetsoftheblade"
+        ],
+        "leaders": [
+            "firmamentagent",
+            "firmamentcommander",
+            "firmamenthero"
+        ],
+        "promissoryNotes": [
+            "blackops"
+        ],
         "units": [
             "fighter",
             "destroyer",
             "cruiser",
             "carrier",
             "dreadnought",
-            "flagship",
+            "firmament_flagship",
             "infantry",
-            "mech",
+            "firmament_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "obsidian",
+        "factionName": "The Obsidian",
+        "homeSystem": "96b",
+        "startingFleet": "1 inf c, 2 inf t, cv, 3 ff, ca, dd, sd t",
+        "commodities": 3,
+        "factionTech": [
+            "planesplitter-obs",
+            "parasite-obs"
+        ],
+        "startingTechOptions": [
+            "dxa",
+            "bs",
+            "gls",
+            "pi"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "cronoshollow",
+            "tallinhollow"
+        ],
+        "abilities": [
+            "nocturne",
+            "bladesorchestra",
+            "marionettes"
+        ],
+        "leaders": [
+            "obsidianagent",
+            "obsidiancommander",
+            "obsidianhero"
+        ],
+        "promissoryNotes": [
+            "malevolency"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "obsidian_flagship",
+            "infantry",
+            "obsidian_mech",
             "pds",
             "spacedock"
         ],

@@ -49,7 +49,11 @@ public class BreakthroughHelper {
                     || commanders.contains(commanderName)
                     || Mapper.getLeader(commanderName) == null
                     || "unknown"
-                            .equalsIgnoreCase(Mapper.getLeader(commanderName).getAbilityText())) {
+                            .equalsIgnoreCase(Mapper.getLeader(commanderName).getAbilityText())
+                    || Mapper.getLeader(commanderName)
+                            .getAbilityText()
+                            .toLowerCase()
+                            .contains("fracture")) {
                 continue;
             }
             commanders.add(commanderName);

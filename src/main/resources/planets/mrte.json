@@ -1,0 +1,22 @@
+{
+    "id": "mrte",
+    "tileId": "112",
+    "name": "Mecatol Rex",
+    "shortNamePNAttach": "Mecatol R.",
+    "aliases": ["mecatolrexte", "mrte", "mr2"],
+    "resources": 1,
+    "influence": 6,
+    "planetTypes": ["MR"],
+    "legendaryAbilityName": "The Galactic Council",
+    "legendaryAbilityText": "You may exhaust this card at the end of your turn and discard 1 secret objective to draw 1 secret objective.",
+    "legendaryAbilityFlavourText": "Hic fiat opus galaxiae.",
+    "planetLayout": {
+        "unitHolderName": "mrte",
+        "resourcesLocation": "BottomLeft",
+        "extraIcons": 1,
+        "centerPosition": { "x": 170.0, "y": 150.0 },
+        "planetRadius": 120
+    },
+    "flavourText": "*Once a splendid place, now a sad devasted wasteland. Only the radiation-shielded Mecatol city, the seat of the powerful Galactic Council, remains habitable.*",
+    "source": "thunders_edge"
+}

@@ -1,6 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -1620,7 +1620,8 @@ public class UnfiledButtonHandlers {
         }
         if (!game.getStoredValue("newStatusScoringMode").isEmpty()
                 && !"action".equalsIgnoreCase(game.getPhaseOfGame())
-                && event != null) {
+                && event != null
+                && !game.isFowMode()) {
             String msg = "Please score objectives.";
             msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
