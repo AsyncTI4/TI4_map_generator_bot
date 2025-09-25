@@ -1,7 +1,9 @@
 package ti4.service.emoji;
 
 import java.util.Objects;
+
 import javax.annotation.Nullable;
+
 import org.jetbrains.annotations.NotNull;
 
 public enum FactionEmojis implements TI4Emoji {
@@ -236,7 +238,6 @@ public enum FactionEmojis implements TI4Emoji {
             case "deepwrought" -> Deepwrought;
             case "obsidian" -> Obsidian;
             case "firmament" -> Firmament;
-
             case "augers" -> augers;
             case "axis" -> axis;
             case "bentor" -> bentor;
