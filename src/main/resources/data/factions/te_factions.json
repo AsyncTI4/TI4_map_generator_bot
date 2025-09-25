@@ -8,6 +8,7 @@
         "factionTech": [],
         "startingTech": [],
         "homePlanets": [],
+        "promissoryNotes": [],
         "abilities": [
             "liberate",
             "galvanize",
