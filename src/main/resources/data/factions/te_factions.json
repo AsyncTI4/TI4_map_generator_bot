@@ -2,8 +2,8 @@
     {
         "alias": "bastion",
         "factionName": "Last Bastion",
-        "homeSystem": [],
-        "startingFleet": "1 dn, 1 cv, 1 cr, 2 ff, 3 inf, sd",
+        "homeSystem": "",
+        "startingFleet": "",
         "commodities": 1,
         "factionTech": [],
         "startingTech": [],
@@ -35,8 +35,8 @@
     {
         "alias": "deepwrought",
         "factionName": "The Deepwrought Scholarate",
-        "homeSystem": [],
-        "startingFleet": "2 inf i, 1 inf o, sd i, 4 ff, cv, dn",
+        "homeSystem": "",
+        "startingFleet": "",
         "commodities": 3,
         "factionTech": [],
         "startingTechOptions": [],
@@ -71,8 +71,8 @@
     {
         "alias": "firmament",
         "factionName": "The Firmament",
-        "homeSystem": [],
-        "startingFleet": "1 inf c, 2 inf t, cv, 3 ff, ca, dd, sd t",
+        "homeSystem": "",
+        "startingFleet": "",
         "commodities": 3,
         "factionTech": [],
         "startingTechOptions": [
@@ -115,8 +115,8 @@
     {
         "alias": "obsidian",
         "factionName": "The Obsidian",
-        "homeSystem": [],
-        "startingFleet": "1 inf c, 2 inf t, cv, 3 ff, ca, dd, sd t",
+        "homeSystem": "",
+        "startingFleet": "",
         "commodities": 3,
         "factionTech": [],
         "startingTechOptions": [
