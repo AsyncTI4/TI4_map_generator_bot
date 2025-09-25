@@ -184,10 +184,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
         // Do automated picking when there's only deterministic picks.
         int simultaneousPicks = 1;
-        // TODO: We can support doing multiple simultaneous picks, but there's a race condition in the
-        // "delete one button" method: it works by editing the whole message to be the same except that
-        // one button. If multiple picks happen at once, these operations coincide and whichever edit process
-        // resolves last is the only one that deletes its button, while re-adding the other deleted buttons.
+        // TODO: Support editing more than 1 draftable's buttons per button-press,
+        // so that we can support multiple deterministic picks at once.
         // if (currentPlayerIndex == 0 && isReversing) simultaneousPicks = 2;
         // else if (currentPlayerIndex == playerOrder.size() - 1 && !isReversing) simultaneousPicks = 2;
         List<DraftChoice> totalPossiblePicks = new ArrayList<>();
@@ -217,8 +215,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
                     forcedDraftable.makeCommandKey(forcedPick.getChoiceKey()),
                     DraftManager.CommandSource.DETERMINISTIC_PICK);
             DraftButtonService.handleButtonResult(event, status);
-            // It is time to update the draft display and ping the next player in line.
         } else {
+            // It is time to update the draft display and ping the next player in line.
             PartialMapService.tryUpdateMap(draftManager, event, true);
             PublicDraftInfoService.edit(
                     event,

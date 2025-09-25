@@ -73,6 +73,8 @@ public class PublicDraftInfoService {
         pingCurrentPlayer(draftManager, currentPlayer, clearOldHeaders, clearOldAttachments, extraButtons);
     }
 
+    // TODO: Support a version with no/null draftableType, which edits all draftables' buttons.
+    // This would be used when automatic picks happen.
     public static void edit(
             GenericInteractionCreateEvent event,
             DraftManager draftManager,
