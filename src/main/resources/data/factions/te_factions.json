@@ -3,11 +3,12 @@
         "alias": "bastion",
         "factionName": "Last Bastion",
         "homeSystem": "",
-        "startingFleet": "1 dn, 1 cv, 1 cr, 2 ff, 3 inf, sd",
+        "startingFleet": "",
         "commodities": 1,
         "factionTech": [],
         "startingTech": [],
         "homePlanets": [],
+        "promissoryNotes": [],
         "abilities": [
             "liberate",
             "galvanize",
@@ -18,7 +19,6 @@
             "bastioncommander",
             "bastionhero"
         ],
-        "promissoryNotes": [],
         "units": [
             "fighter",
             "destroyer",
@@ -38,17 +38,106 @@
         "factionName": "The Deepwrought Scholarate",
         "homeSystem": "",
         "startingFleet": "",
-        "commodities": 0,
+        "commodities": 3,
         "factionTech": [],
-        "startingTech": [],
+        "startingTechOptions": [],
+        "startingTechAmount": 2,
         "homePlanets": [],
-        "abilities": [],
+        "abilities": [
+            "researchteam",
+            "oceanbound"
+        ],
         "leaders": [
             "deepwroughtagent",
             "deepwroughtcommander",
             "deepwroughthero"
         ],
-        "promissoryNotes": [],
+        "promissoryNotes": [
+            "shareknowledge"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "flagship",
+            "infantry",
+            "mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "firmament",
+        "factionName": "The Firmament",
+        "homeSystem": "",
+        "startingFleet": "",
+        "commodities": 3,
+        "factionTech": [],
+        "startingTechOptions": [
+            "dxa",
+            "bs",
+            "gls",
+            "pi"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [],
+        "abilities": [
+            "plotsplots",
+            "puppetsoftheblade"
+        ],
+        "leaders": [
+            "firmamentagent",
+            "firmamentcommander",
+            "firmamenthero"
+        ],
+        "promissoryNotes": [
+            "blackops"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "flagship",
+            "infantry",
+            "mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "obsidian",
+        "factionName": "The Obsidian",
+        "homeSystem": "",
+        "startingFleet": "",
+        "commodities": 3,
+        "factionTech": [],
+        "startingTechOptions": [
+            "dxa",
+            "bs",
+            "gls",
+            "pi"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [],
+        "abilities": [
+            "nocturne",
+            "bladesorchestra",
+            "marionettes"
+        ],
+        "leaders": [
+            "obsidianagent",
+            "obsidiancommander",
+            "obsidianhero"
+        ],
+        "promissoryNotes": [
+            "malevolency"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -72,7 +161,10 @@
         "factionTech": [],
         "startingTech": [],
         "homePlanets": [],
-        "abilities": [],
+        "abilities": [
+            "sorrow",
+            "sundered"
+        ],
         "leaders": [
             "crimsonagent",
             "crimsoncommander",
