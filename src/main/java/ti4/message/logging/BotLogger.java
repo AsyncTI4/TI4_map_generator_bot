@@ -103,6 +103,10 @@ public class BotLogger {
         logToChannel(null, message, err, LogSeverity.Warning);
     }
 
+    public static void warning(@Nonnull LogOrigin logOrigin, @Nonnull String message, @Nullable Throwable err) {
+        logToChannel(logOrigin, message, err, LogSeverity.Warning);
+    }
+
     /**
      * Sends a message to the primary server's webhook.
      * <p>

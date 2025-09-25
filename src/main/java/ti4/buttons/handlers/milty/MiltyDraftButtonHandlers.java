@@ -13,7 +13,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
-import ti4.service.milty.DraftDisplayService;
+import ti4.service.milty.MiltyDraftDisplayService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyService;
 import ti4.service.regex.RegexService;
@@ -24,7 +24,7 @@ class MiltyDraftButtonHandlers {
     @ButtonHandler("showMiltyDraft")
     private void postDraftInfo(ButtonInteractionEvent event, Game game) {
         MiltyDraftManager manager = game.getMiltyDraftManager();
-        DraftDisplayService.repostDraftInformation(manager, game);
+        MiltyDraftDisplayService.repostDraftInformation(manager, game);
     }
 
     @ButtonHandler("milty_")
