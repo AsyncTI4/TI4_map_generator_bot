@@ -82,10 +82,7 @@
             "pi"
         ],
         "startingTechAmount": 1,
-        "homePlanets": [
-            "cronos",
-            "tallin"
-        ],
+        "homePlanets": [],
         "abilities": [
             "plotsplots",
             "puppetsoftheblade"
