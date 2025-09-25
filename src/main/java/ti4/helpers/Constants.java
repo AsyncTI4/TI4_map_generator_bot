@@ -359,8 +359,8 @@ public class Constants {
     public static final String SETUP8 = "setup8";
     public static final String MALLICE = "mallicelocked";
     public static final String MR = "mr";
-    public static final List<String> MECATOLS = List.of(MR, "nn", "ll", "rexatolmec", "ordinianc4");
-    public static final List<String> MECATOL_SYSTEMS = List.of("18", "fin1", "fin2", "rexmec");
+    public static final List<String> MECATOLS = List.of(MR, "nn", "ll", "rexatolmec", "ordinianc4", "mrte");
+    public static final List<String> MECATOL_SYSTEMS = List.of("18", "fin1", "fin2", "rexmec", "112");
 
     public static final int SPACE_RADIUS = 115;
     public static final int RADIUS = 45;

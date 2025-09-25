@@ -126,6 +126,15 @@ import ti4.website.AsyncTi4WebsiteHelper;
 
 public class ButtonHelper {
 
+    public static List<Tile> getTilesOfPlayersSpecificUnits(Game game, Player p1, Units.UnitType... type) {
+        var unitTypes = new ArrayList<Units.UnitType>();
+        Collections.addAll(unitTypes, type);
+
+        return game.getTileMap().values().stream()
+                .filter(t -> t.containsPlayersUnitsWithKeyCondition(p1, unit -> unitTypes.contains(unit.getUnitType())))
+                .toList();
+    }
+
     public static String getButtonRepresentation(Button button) {
         String id = button.getCustomId();
         String label = button.getLabel();
@@ -3835,6 +3844,7 @@ public class ButtonHelper {
                 "prism",
                 "echo",
                 "domna",
+                "mrte",
                 "thundersedge",
                 "uikos", // DS
                 "illusion",
@@ -5366,6 +5376,13 @@ public class ButtonHelper {
         }
 
         return actionRows;
+    }
+
+    @ButtonHandler("addLegendaryMecatol")
+    public static void addLegendaryMecatol(Game game, ButtonInteractionEvent event) {
+        game.setStoredValue("useNewRex", "Yes");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "This game will use the new Legendary Mecatol Rex");
+        event.getMessage().delete().queue();
     }
 
     @ButtonHandler("unflipMallice")

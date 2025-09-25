@@ -1013,7 +1013,7 @@ public class Game extends GameProperties {
         return orderedSCs;
     }
 
-    private Player getPlayerFromSC(int sc) {
+    public Player getPlayerFromSC(int sc) {
         for (Player player : getRealPlayersNDummies()) {
             if (player.getSCs().contains(sc)) {
                 return player;

@@ -818,7 +818,7 @@ public class Player extends PlayerProperties {
         }
     }
 
-    private void removePromissoryNoteFromPlayArea(String id) {
+    public void removePromissoryNoteFromPlayArea(String id) {
         getPromissoryNotesInPlayArea().remove(id);
     }
 
