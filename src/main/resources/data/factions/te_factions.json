@@ -1,14 +1,44 @@
 [
     {
+        "alias": "bastion",
+        "factionName": "Last Bastion",
+        "homeSystem": "",
+        "startingFleet": "1 dn, 1 cv, 1 cr, 2 ff, 3 inf, sd",
+        "commodities": 1,
+        "factionTech": [],
+        "startingTech": [],
+        "homePlanets": [],
+        "abilities": [
+            "liberate",
+            "galvanize",
+            "phoenixstandard"
+        ],
+        "leaders": [
+            "bastionagent",
+            "bastioncommander",
+            "bastionhero"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "flagship",
+            "infantry",
+            "mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "thunders_edge"
+    }
+    {
         "alias": "deepwrought",
         "factionName": "The Deepwrought Scholarate",
         "homeSystem": "95",
         "startingFleet": "2 inf i, 1 inf o, sd i, 4 ff, cv, dn",
         "commodities": 3,
-        "factionTech": [
-            "hydrothermal",
-            "radical"
-        ],
+        "factionTech": [],
         "startingTechOptions": [],
         "startingTechAmount": 2,
         "homePlanets": [
@@ -32,9 +62,9 @@
             "cruiser",
             "carrier",
             "dreadnought",
-            "deepwrought_flagship",
+            "flagship",
             "infantry",
-            "deepwrought_mech",
+            "mech",
             "pds",
             "spacedock"
         ],
@@ -79,9 +109,9 @@
             "cruiser",
             "carrier",
             "dreadnought",
-            "firmament_flagship",
+            "flagship",
             "infantry",
-            "firmament_mech",
+            "mech",
             "pds",
             "spacedock"
         ],
@@ -127,9 +157,9 @@
             "cruiser",
             "carrier",
             "dreadnought",
-            "obsidian_flagship",
+            "flagship",
             "infantry",
-            "obsidian_mech",
+            "mech",
             "pds",
             "spacedock"
         ],
