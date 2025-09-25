@@ -33,6 +33,8 @@ import ti4.service.milty.MiltyDraftSlice;
 
 public class MapTemplateHelper {
 
+    private static final String NUCLEUS_COLOR = "rainbow";
+
     public static void buildMapFromMiltyData(Game game, String mapTemplate) throws Exception {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         MapTemplateModel template = Mapper.getMapTemplate(mapTemplate);
@@ -155,8 +157,7 @@ public class MapTemplateHelper {
             Integer nucleusSlice = tile.getNucleusNumbers().get(0);
             // TODO: Get a better placeholder tile.
             // For now, use the same color for all nucleus tiles.
-            String color = "rainbow";
-            tileID = color + nucleusSlice;
+            tileID = NUCLEUS_COLOR + nucleusSlice;
         }
         if (tileID != null) {
             tileID = AliasHandler.resolveTile(tileID);

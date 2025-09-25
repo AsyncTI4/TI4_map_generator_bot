@@ -84,6 +84,19 @@ public class TileGenerator {
     private final String focusTile;
     private final DisplayType displayType;
 
+    // Map of nucleus slice number to border color. This should correspond to the
+    // colors used in the MapTemplateHelper.getTileFromTemplateTile for draft tiles, given a player number.
+    // And note that the "red" in the MapTemplateHelper is always skipped.
+    private static final Map<Integer, String> NUCLEUS_SLICE_COLORS = Map.of(
+                        1, "blue",
+                        2, "yellow",
+                        3, "green", // draft tile color: emerald
+                        4, "lavender",
+                        5, "petrol",
+                        6, "brown", // draft tile color: chocolate
+                        7, "ethereal",
+                        8, "forest");
+
     // Map to aggregate unit coordinates by faction from all UnitRenderGenerator
     // calls
     private final Map<String, Map<String, List<Point>>> unitCoordinatesByFaction = new HashMap<>();
@@ -1398,6 +1411,7 @@ public class TileGenerator {
                             + " in Nucleus map template " + mapTemplate.getAlias());
                 }
 
+                // COPY BASE TILE GEN
                 BufferedImage image;
                 if (CustomHyperlaneService.isCustomHyperlaneTile(tile)) {
                     image = HyperlaneTileGenerator.generateHyperlaneTile(tile, game);
@@ -1410,7 +1424,7 @@ public class TileGenerator {
                 }
                 tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
 
-                // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
+                // COPY BASE TILE GEN - ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
                 if (tile.isAnomaly(game) && tileShipPositions != null) {
                     BufferedImage anomalyImage =
                             ImageHelper.read(ResourceHelper.getInstance().getTileFile("tile_anomaly.png"));
@@ -1424,16 +1438,6 @@ public class TileGenerator {
                             tileGraphics.drawImage(anomalyImage, TILE_PADDING, TILE_PADDING, null);
                     }
                 }
-
-                Map<Integer, String> nucleusNumberToColor = Map.of(
-                        1, "blue",
-                        2, "yellow",
-                        3, "green", // emerald
-                        4, "lavender",
-                        5, "petrol",
-                        6, "brown", // chocolate
-                        7, "ethereal",
-                        8, "forest");
 
                 // Use Hex borders to show which Nucleus slice a tile is a part of
                 // Remember they can be in more than 1!
@@ -1452,7 +1456,7 @@ public class TileGenerator {
                     for (Map.Entry<Integer, List<Integer>> entry : nucleusNumberToSides.entrySet()) {
                         Integer nucleusNumber = entry.getKey();
                         List<Integer> sidesToColor = entry.getValue();
-                        String color = nucleusNumberToColor.getOrDefault(nucleusNumber, "black");
+                        String color = NUCLEUS_SLICE_COLORS.getOrDefault(nucleusNumber, "black");
                         String hexBorderStyle = "solid";
                         List<Integer> openSides = new ArrayList<>(List.of(0, 1, 2, 3, 4, 5));
                         openSides.removeAll(sidesToColor);
@@ -1473,7 +1477,7 @@ public class TileGenerator {
                 // Also draw borders around the seats for a given Nucleus slice
                 if (mapTile.getHome() != null && mapTile.getHome() && mapTile.getPlayerNumber() != null) {
                     Integer nucleusNumber = mapTile.getPlayerNumber();
-                    String color = nucleusNumberToColor.getOrDefault(nucleusNumber, "black");
+                    String color = NUCLEUS_SLICE_COLORS.getOrDefault(nucleusNumber, "black");
                     String hexBorderStyle = "solid";
                     BufferedImage border =
                             DrawingUtil.hexBorder(hexBorderStyle, Mapper.getColor(color), List.of(), 4.0f);

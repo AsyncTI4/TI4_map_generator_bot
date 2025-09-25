@@ -20,7 +20,7 @@ import ti4.settings.GlobalSettings;
 import ti4.spring.jda.JdaService;
 
 @UtilityClass
-public class GenerateSlicesService {
+class GenerateSlicesService {
 
     public static boolean generateSlices(
             GenericInteractionCreateEvent event, MiltyDraftManager draftManager, MiltyDraftSpec specs) {
