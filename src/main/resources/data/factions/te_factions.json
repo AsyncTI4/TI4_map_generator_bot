@@ -35,15 +35,13 @@
     {
         "alias": "deepwrought",
         "factionName": "The Deepwrought Scholarate",
-        "homeSystem": "95",
+        "homeSystem": "",
         "startingFleet": "2 inf i, 1 inf o, sd i, 4 ff, cv, dn",
         "commodities": 3,
         "factionTech": [],
         "startingTechOptions": [],
         "startingTechAmount": 2,
-        "homePlanets": [
-            "ikatena"
-        ],
+        "homePlanets": [],
         "abilities": [
             "researchteam",
             "oceanbound"
