@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.helpers.DisplayType;
@@ -141,14 +143,8 @@ public class NucleusImageGeneratorService {
                 continue;
             }
             DraftChoice seatChoice = seatChoices.get(0);
-            Integer seatNum = Integer.parseInt(seatChoice.getChoiceKey().substring("seat".length()));
-            MapTemplateTile homeTile = mapTemplateModel.getTemplateTiles().stream()
-                    .filter(t -> t.getHome() != null
-                            && t.getHome()
-                            && t.getPlayerNumber() != null
-                            && t.getPlayerNumber() == seatNum)
-                    .findFirst()
-                    .orElse(null);
+            Integer seatNum = SeatDraftable.getSeatNumberFromChoiceKey(seatChoice.getChoiceKey());
+            MapTemplateTile homeTile = getSeatTileForPlayer(mapTemplateModel, seatNum);
             if (homeTile == null) {
                 continue;
             }
@@ -328,21 +324,17 @@ public class NucleusImageGeneratorService {
         Map<String, MiltyDraftSlice> seatToNucleusTiles = new HashMap<>();
         for (int i = 1; i <= mapTemplate.getNucleusSliceCount(); ++i) {
             int playerNum = i;
-            MapTemplateTile sliceSeat = mapTemplate.getTemplateTiles().stream()
-                    .filter(t -> t.getHome() != null
-                            && t.getHome()
-                            && t.getPlayerNumber() != null
-                            && t.getPlayerNumber() == playerNum)
-                    .findFirst()
-                    .orElse(null);
+
+            MapTemplateTile sliceSeat = getSeatTileForPlayer(mapTemplate, playerNum);
             String sliceSeatPos = sliceSeat.getPos();
+
+            Predicate<MapTemplateTile> nucleusSliceFilter = t -> t.getNucleusNumbers() != null
+                    && t.getNucleusNumbers().contains(playerNum);
             List<MiltyDraftTile> nucleusSliceTiles = mapTemplate.getTemplateTiles().stream()
-                    .filter(t -> {
-                        List<Integer> nucleusNumbers = t.getNucleusNumbers();
-                        return nucleusNumbers != null && nucleusNumbers.contains(playerNum);
-                    })
-                    .map(tile -> DraftTileManager.findTile(
-                            gameTileMap.get(tile.getPos()).getTileID()))
+                    .filter(nucleusSliceFilter)
+                    .map(MapTemplateTile::getPos)
+                    .map(pos -> gameTileMap.get(pos).getTileID())
+                    .map(DraftTileManager::findTile)
                     .toList();
             MiltyDraftSlice pseudoSlice = new MiltyDraftSlice();
             pseudoSlice.setName("" + i);
@@ -353,13 +345,24 @@ public class NucleusImageGeneratorService {
         return seatToNucleusTiles;
     }
 
+    private MapTemplateTile getSeatTileForPlayer(MapTemplateModel mapTemplateModel, int playerNumber) {
+            Predicate<MapTemplateTile> seatFilter = t -> t.getHome() != null
+                    && t.getHome()
+                    && t.getPlayerNumber() != null
+                    && t.getPlayerNumber() == playerNumber;
+            return mapTemplateModel.getTemplateTiles().stream()
+                    .filter(seatFilter)
+                    .findFirst()
+                    .orElse(null);
+    }
+
     /**
      * Gives the number of rings of the map
      *
      * @param game
      * @return between 3 and 8 (bounds based on constants)
      */
-    private static int getRingCount(Game game) {
+    private int getRingCount(Game game) {
         return Math.max(Math.min(game.getRingCount(), RING_MAX_COUNT), RING_MIN_COUNT);
     }
 
@@ -369,7 +372,7 @@ public class NucleusImageGeneratorService {
      * @param game
      * @return space for the (number of rings + 1) + 2 * EXTRA_Y
      */
-    private static int getMapHeight(Game game) {
+    private int getMapHeight(Game game) {
         return (getRingCount(game) + 1) * SPACE_FOR_TILE_HEIGHT * 2 + EXTRA_Y * 2;
     }
 
@@ -382,7 +385,7 @@ public class NucleusImageGeneratorService {
      * @param game
      * @return space for ring count + 2 * EXTRA_X + potential EXTRA_X
      */
-    private static int getMapWidth(Game game) {
+    private int getMapWidth(Game game) {
         float ringCount = getRingCount(game);
         ringCount += ringCount == RING_MIN_COUNT ? 1.5f : 1;
         int mapWidth = (int) (ringCount * 520 + EXTRA_X * 2);
@@ -390,7 +393,7 @@ public class NucleusImageGeneratorService {
         return mapWidth;
     }
 
-    private static BufferedImage getEmojiImage(TI4Emoji emoji) {
+    private BufferedImage getEmojiImage(TI4Emoji emoji) {
         return ImageHelper.readEmojiImageScaled(emoji, 40);
     }
 }

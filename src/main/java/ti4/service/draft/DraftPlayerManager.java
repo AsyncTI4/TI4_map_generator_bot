@@ -121,6 +121,10 @@ public class DraftPlayerManager {
         }
         return allChoices;
     }
+    
+    public List<String> getPlayerUserIds() {
+        return new ArrayList<>(playerStates.keySet());
+    }
 
     /**
      * Check that all required fields are set and that all shared state is

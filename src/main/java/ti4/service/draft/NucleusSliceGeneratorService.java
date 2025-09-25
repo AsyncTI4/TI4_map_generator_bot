@@ -155,7 +155,7 @@ public class NucleusSliceGeneratorService {
                 // Reset map tiles for next attempt, but ensure draft tiles are out for the
                 // distance tool
                 game.clearTileMap();
-                PartialMapService.tryUpdateMap(event, game.getDraftManager(), false);
+                PartialMapService.tryUpdateMap(game.getDraftManager(), event, false);
             } else {
                 failRuntimes.add((endTime - startTime) / 1_000_000.0);
                 failureReasonCount.put(
@@ -687,11 +687,12 @@ public class NucleusSliceGeneratorService {
             DraftTileManager draftTileManager,
             DistanceTool distanceTool,
             boolean strictMode) {
+
         for (int i = 0; i < coreSliceLocations.size(); i++) {
             List<MapTemplateTile> sliceLocations = coreSliceLocations.get(i);
+            // Generate tierlist picks for this nucleus slice
             List<TierList> sliceTiers = getRandomTierPicks(sliceLocations.size());
 
-            // Generate tierlist picks for this nulceus slice
             if (sliceLocations.size() != sliceTiers.size()) {
                 BotLogger.warning("Mismatched slice location and tier list sizes in fillNucleus");
                 return false;
@@ -722,24 +723,6 @@ public class NucleusSliceGeneratorService {
 
             // For each position in the slice
             for (MapTemplateTile location : unplacedLocations) {
-                // MapTemplateTile location = sliceLocations.get(j);
-
-                // Skip if already occupied
-                // MiltyDraftTile placedTile = placedTiles.stream()
-                //         .filter(pt -> pt.mapTile.equals(location))
-                //         .map(pt -> pt.draftTile)
-                //         .findFirst()
-                //         .orElse(null);
-                // if (placedTile != null) {
-                //     // Try to remove a sliceTier entry that matches the placed tile, if possible.
-                //     // If not possible, just try to get as close as we can.
-                //     TierList placedTier = draftTileManager.getRelativeTier(placedTile);
-                //     if(!popSimilarTier(sliceTiers, placedTier, strictMode)) {
-                //         return false;
-                //     }
-                //     continue;
-                // }
-
                 // Get our preferred tier for this tile
                 TierList desiredTier = sliceTiers.removeFirst();
 

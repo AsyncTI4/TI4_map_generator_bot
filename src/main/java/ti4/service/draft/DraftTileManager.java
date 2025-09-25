@@ -176,6 +176,7 @@ public class DraftTileManager {
     }
 
     private static List<ComponentSource> getGameSources(Game game) {
+        // TODO: Game -> ComponentSources mapper service.
         List<ComponentSource> sources = new ArrayList<>(Arrays.asList(
                 ComponentSource.base,
                 ComponentSource.codex1,

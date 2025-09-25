@@ -18,9 +18,13 @@ import ti4.service.draft.draftables.SpeakerOrderDraftable;
 import ti4.service.draft.orchestrators.PublicSnakeDraftOrchestrator;
 import ti4.service.milty.MiltyDraftSlice;
 
+// TODO: The draftables+orchestrator+player list should be determined by a
+// draft settings process, and each component should just initialize itself
+// from those settings. This class will be greatly simplified (removed?) in the future.
+
 @UtilityClass
 public class DraftSetupService {
-    public static String startFromSettings(GenericInteractionCreateEvent event, MiltySettings settings) {
+    public String startFromSettings(GenericInteractionCreateEvent event, MiltySettings settings) {
         Game game = settings.getGame();
 
         // Load the general game settings
@@ -39,7 +43,7 @@ public class DraftSetupService {
         }
     }
 
-    public static String startMiltyFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
+    public String startMiltyFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
         Game game = specs.game;
 
         if (specs.presetSlices != null) {
@@ -101,7 +105,7 @@ public class DraftSetupService {
 
         game.clearTileMap();
         try {
-            PartialMapService.tryUpdateMap(event, draftManager, true);
+            PartialMapService.tryUpdateMap(draftManager, event, true);
         } catch (Exception e) {
             // Ignore
         }
@@ -172,7 +176,7 @@ public class DraftSetupService {
         game.clearTileMap();
         try {
             // Very important...the distance tool needs tiles placed to calculate adjacencies
-            PartialMapService.tryUpdateMap(event, draftManager, false);
+            PartialMapService.tryUpdateMap(draftManager, event, false);
         } catch (Exception e) {
             // Ignore
         }
@@ -210,7 +214,7 @@ public class DraftSetupService {
                 game.setPhaseOfGame("miltydraft");
                 GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
                 try {
-                    PartialMapService.tryUpdateMap(event, draftManager, true);
+                    PartialMapService.tryUpdateMap(draftManager, event, true);
                 } catch (Exception e) {
                     // Ignore
                 }

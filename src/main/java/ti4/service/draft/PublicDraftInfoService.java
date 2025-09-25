@@ -163,7 +163,7 @@ public class PublicDraftInfoService {
                         if (choice.getIdentifyingEmoji() != null) {
                             sb.append(choice.getIdentifyingEmoji());
                         } else {
-                            longChoiceNames.add(choice.getDisplayName());
+                            longChoiceNames.add(choice.getFormattedName());
                         }
                     }
                 } else if (defaultChoices.containsKey(draftable.getType())) {

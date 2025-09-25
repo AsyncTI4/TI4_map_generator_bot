@@ -163,7 +163,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
         boolean strictMode = useStrictMode(specs.getNumSlices() + nucleusTemplate.getPlayerCount());
 
         game.clearTileMap();
-        PartialMapService.tryUpdateMap(null, game.getDraftManager(), false);
+        PartialMapService.tryUpdateMap(game.getDraftManager(), null, false);
 
         for (int i = 0; i < MIN_SUCCESS_COUNT; ++i) {
             runTest(game, nucleusTemplate, specs, strictMode);

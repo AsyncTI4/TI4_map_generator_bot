@@ -833,7 +833,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             // Public Snake
             PublicSnakeDraftOrchestrator orchestrator = (PublicSnakeDraftOrchestrator) draftManager.getOrchestrator();
             if (orchestrator != null) {
-                spec.setPlayerDraftOrder(orchestrator.getPlayerOrder(draftManager));
+                spec.setPlayerDraftOrder(orchestrator.getDraftOrder(draftManager));
             }
 
             MiltyService.startFromSpecs(event, spec);
@@ -851,7 +851,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                     && factionDraftable != null
                     && speakerOrderDraftable != null
                     && sliceDraftable != null) {
-                List<String> playerOrder = orchestrator.getPlayerOrder(draftManager);
+                List<String> playerOrder = orchestrator.getDraftOrder(draftManager);
                 int pickIndex = 0;
                 boolean done = false;
                 while (!done && pickIndex < 100) { // safety to avoid infinite loops

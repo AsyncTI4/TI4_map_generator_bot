@@ -12,16 +12,16 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class DraftButtonService {
     // jwds: Jabberwocky's Draft System
-    public static final String DRAFT_BUTTON_SERVICE_PREFIX = "jwds_";
+    public final String DRAFT_BUTTON_SERVICE_PREFIX = "jwds_";
 
     // Button handlers may return this string to indicate that there was no error,
     // and that the button should be deleted.
-    public static final String DELETE_BUTTON = "@$!#deletebutton";
+    public final String DELETE_BUTTON = "@$!#deletebutton";
     // Button handlers may return this string to indicate that there was no error,
     // and that the message should be deleted.
-    public static final String DELETE_MESSAGE = "@$!#deletemessage";
+    public final String DELETE_MESSAGE = "@$!#deletemessage";
 
-    public static boolean isError(String outcome) {
+    public boolean isError(String outcome) {
         return outcome != null
                 && !outcome.isEmpty()
                 && !outcome.equals(DELETE_BUTTON)
@@ -29,7 +29,7 @@ public class DraftButtonService {
     }
 
     @ButtonHandler(DRAFT_BUTTON_SERVICE_PREFIX)
-    public static void handleDraftButtonClick(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public void handleDraftButtonClick(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String innerButtonID = buttonID.substring(DRAFT_BUTTON_SERVICE_PREFIX.length());
         DraftManager draftManager = game.getDraftManager();
         String outcome = draftManager.routeCommand(event, player, innerButtonID, DraftManager.CommandSource.BUTTON);
@@ -45,7 +45,7 @@ public class DraftButtonService {
         }
     }
 
-    public static void handleButtonResult(GenericInteractionCreateEvent event, String outcome) {
+    public void handleButtonResult(GenericInteractionCreateEvent event, String outcome) {
         if (outcome != null) {
             if (outcome.equals(DELETE_BUTTON)) {
                 ButtonHelper.deleteTheOneButton(event);

@@ -9,5 +9,16 @@ import lombok.Data;
 public class PlayerDraftState {
     private final Map<DraftableType, List<DraftChoice>> picks = new HashMap<>();
 
+    /// Helpers
+    
+    public Integer getPickCount(DraftableType type) {
+        List<DraftChoice> typePicks = picks.get(type);
+        return typePicks == null ? 0 : typePicks.size();
+    }
+
+    public List<DraftChoice> getPicks(DraftableType type) {
+        return picks.get(type);
+    }
+
     private OrchestratorState orchestratorState;
 }

@@ -12,10 +12,10 @@ import org.reflections.Reflections;
 
 @UtilityClass
 public class DraftComponentFactory {
-    private static final Map<String, Class<? extends Draftable>> KNOWN_DRAFTABLE_TYPES =
+    private final Map<String, Class<? extends Draftable>> KNOWN_DRAFTABLE_TYPES =
             findAllDerivedClasses(Draftable.class).stream().collect(Collectors.toMap(d -> d.getSimpleName(), d -> d));
 
-    private static final Map<String, Class<? extends DraftOrchestrator>> KNOWN_ORCHESTRATOR_TYPES =
+    private final Map<String, Class<? extends DraftOrchestrator>> KNOWN_ORCHESTRATOR_TYPES =
             findAllDerivedClasses(DraftOrchestrator.class).stream()
                     .collect(Collectors.toMap(o -> o.getSimpleName(), o -> o));
 
