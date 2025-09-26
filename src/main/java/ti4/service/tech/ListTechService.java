@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -56,7 +55,7 @@ public class ListTechService {
     public void acquireAUnitTechWithInf(ButtonInteractionEvent event, Game game, Player player) {
         boolean sc = false;
         boolean firstTime = true;
-        acquireATech(event, game, player, sc,false, List.of(TechnologyType.UNITUPGRADE), firstTime);
+        acquireATech(event, game, player, sc, false, List.of(TechnologyType.UNITUPGRADE), firstTime);
     }
 
     @ButtonHandler("entropicScar_")
@@ -66,17 +65,18 @@ public class ListTechService {
             String tech = matcher.group("tech");
             TechnologyModel model = Mapper.getTech(tech);
 
-
             String error = null;
             boolean scepter = player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter");
             if (player.getStrategicCC() < 1 && !scepter) {
-                error = player.getRepresentation() + " You seem to have misplaced your strategy tokens, and cannot use the Entropic Scar anomaly.";
+                error = player.getRepresentation()
+                        + " You seem to have misplaced your strategy tokens, and cannot use the Entropic Scar anomaly.";
             } else if (model == null) {
                 error = "Could not find tech: " + tech;
             } else if (player.hasTech(tech)) {
                 error = player.getRepresentation() + " You already have " + model.getName();
             } else {
-                String msg = player.getRepresentation() + " You gained " + model.getNameRepresentation() + " using the Entropic Scar anomaly.";
+                String msg = player.getRepresentation() + " You gained " + model.getNameRepresentation()
+                        + " using the Entropic Scar anomaly.";
                 if (scepter) {
                     msg += "\n> Exhausted the " + RelicHelper.sillySpelling();
                 } else {
@@ -89,26 +89,19 @@ public class ListTechService {
                 ButtonHelper.deleteMessage(event);
             }
 
-
             if (error != null) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), error);
             }
         });
     }
 
-
-
-
-
-
     @ButtonHandler("acquireATechWithDwsBt")
-        public void acquireATechWithDwsBt(ButtonInteractionEvent event, Game game, Player player) {
-            boolean sc = false;
-            boolean dws = true;
-            boolean firstTime = !event.getButton().getId().endsWith("_second");
-            acquireATech(event, game, player, sc, dws, TechnologyType.mainFour, firstTime);
-        }
-
+    public void acquireATechWithDwsBt(ButtonInteractionEvent event, Game game, Player player) {
+        boolean sc = false;
+        boolean dws = true;
+        boolean firstTime = !event.getButton().getId().endsWith("_second");
+        acquireATech(event, game, player, sc, dws, TechnologyType.mainFour, firstTime);
+    }
 
     public void acquireATech(
             ButtonInteractionEvent event,
@@ -145,7 +138,7 @@ public class ListTechService {
             if (first) {
                 ButtonHelperCommanders.yinCommanderSummary(player, game);
                 ButtonHelperCommanders.veldyrCommanderSummary(player, game);
-                String getAllButtonSpoof = "getAllTechOfType_allTechResearchable"+ techSuffix;
+                String getAllButtonSpoof = "getAllTechOfType_allTechResearchable" + techSuffix;
                 getAllTechOfType(event, player, getAllButtonSpoof, game, player.getCardsInfoThread());
                 return;
             }
