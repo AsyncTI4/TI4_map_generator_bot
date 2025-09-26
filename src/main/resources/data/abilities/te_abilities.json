@@ -53,7 +53,14 @@
         "id": "sundered",
         "name": "Sundered",
         "faction": "crimson",
-        "permanentEffect": "You cannot use wormholes other than epsilon wormholes. Epsilon wormholes do not exist for other players.",
+        "permanentEffect": "You cannot use wormholes other than epsilon wormholes. Other players' units that move or are placed into your home system are destroyed.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "incursion",
+        "name": "Incursion",
+        "faction": "crimson",
+        "permanentEffect": "When you activate a system that contains a breach, you may flip that breach; systems that contain active breaches are adjacent. at the end of the status phase, any player with ships in a system that contain an active breach may remove that breach.",
         "source": "thunders_edge"
     },
     {
@@ -69,7 +76,7 @@
         "id": "sorrow",
         "name": "Sorrow",
         "faction": "crimson",
-        "permanentEffect": "When you create the game board, place The Sorrow (tile 94) where your home system would be placed, and place a [REDACTED] in it. The Sorrow is not a home system. Then, place your home system (tile 118) in your play area.",
+        "permanentEffect": "When you create the game board, place the Sorrow (tile 94) where your home system would normally be placed, then place a inactive breach there. The Sorrow is not a home system. Then, place your home system (tile 118) in your play area.",
         "source": "thunders_edge"
     },
     {
