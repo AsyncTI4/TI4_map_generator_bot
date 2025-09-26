@@ -5385,6 +5385,14 @@ public class ButtonHelper {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("addEntropicScar")
+    public static void addEntropicScar(Game game, ButtonInteractionEvent event) {
+        game.setStoredValue("useEntropicScar", "Yes");
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(), "This game's milty may spit out a slice with an entropic scar");
+        event.getMessage().delete().queue();
+    }
+
     @ButtonHandler("unflipMallice")
     public static void unflipMallice(Game game, Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
