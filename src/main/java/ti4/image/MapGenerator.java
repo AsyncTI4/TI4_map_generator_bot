@@ -53,9 +53,11 @@ import ti4.model.AgendaModel;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.ColorModel;
 import ti4.model.EventModel;
+import ti4.model.GalacticEventModel;
 import ti4.model.ModelInterface;
 import ti4.model.PlanetModel;
 import ti4.model.StrategyCardModel;
+import ti4.service.emoji.CardEmojis;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -230,9 +232,10 @@ public class MapGenerator implements AutoCloseable {
         }
         final int columnsOfLaws = 2;
         final int lawHeight = 115;
+        int galEventHeight = totalGalEventHeight(game);
         int lawsY = (game.getLaws().size() / columnsOfLaws + 1) * lawHeight;
         lawsY += (game.getEventsInEffect().size() / columnsOfLaws + 1) * lawHeight;
-        return playersY + lawsY + objectivesY + EXTRA_Y * 3;
+        return playersY + galEventHeight + lawsY + objectivesY + EXTRA_Y * 3;
     }
 
     private DisplayType defaultIfNull(DisplayType displayType) {
@@ -548,6 +551,7 @@ public class MapGenerator implements AutoCloseable {
             tempY = drawPriorityTrack(tempY);
         }
         y = drawObjectives(tempY);
+        y = galacticEvents(y);
         y = laws(y);
         y = events(y);
         if (displayTypeBasic != DisplayType.stats
@@ -1494,7 +1498,7 @@ public class MapGenerator implements AutoCloseable {
                 }
             } else if (displayType == DisplayType.anomalies && player.ownsUnitSubstring("cabal_spacedock")) {
                 UnitKey unitKey = Mapper.getUnitKey("sd", player.getColor());
-                int unitNum = player.getUnitCap("sd") + player.getUnitCap("csd");
+                int unitNum = player.getUnitCap("sd");
                 unitNum = (unitNum == 0
                         ? PositionMapper.getReinforcementsPosition("sd").getPositionCount("sd")
                         : unitNum);
@@ -1996,10 +2000,6 @@ public class MapGenerator implements AutoCloseable {
         }
     }
 
-    private static void drawFleetCCOfPlayer(Graphics graphics, String ccID, int x, int y, Player player) {
-        drawFleetCCOfPlayer(graphics, ccID, x, y, player, true);
-    }
-
     private static void drawFleetCCOfPlayer(
             Graphics graphics, String ccID, int x, int y, Player player, boolean rightAlign) {
         String ccPath = Mapper.getCCPath(ccID);
@@ -2111,6 +2111,106 @@ public class MapGenerator implements AutoCloseable {
         }
 
         return maxY + 15;
+    }
+
+    private static int totalGalEventHeight(Game game) {
+        int column = 0, total = 0;
+        boolean col1 = true;
+        for (Integer h : galacticEventHeights(game)) {
+            if (col1)
+                column = h;
+            if (!col1)
+                total += Math.max(column, h);
+            col1 = !col1;
+        }
+        return total;
+    }
+
+    private static List<Integer> galacticEventHeights(Game game) {
+        BufferedImage tmp = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = tmp.createGraphics();
+        g2.setFont(Storage.getFont26());
+
+        List<String> galEvents = game.getGalacticEvents();
+        List<Integer> galEventHeights = new ArrayList<>();
+        if (galEvents == null || galEvents.isEmpty()) {
+            return galEventHeights;
+        }
+        for (String galEventID : galEvents) {
+            GalacticEventModel model = Mapper.getGalacticEvent(galEventID);
+            List<String> mapTextLines = DrawingUtil.layoutText(g2, model.getMapText(), 1075);
+            int height = 40 + 30 * mapTextLines.size() + 19;
+            galEventHeights.add(height);
+        }
+        return galEventHeights;
+    }
+
+    private int galEventRowHeight(List<Integer> heights, int row) {
+        List<List<Integer>> rows = ListUtils.partition(heights, 2);
+        if (row < rows.size())
+            return rows.get(row).stream().mapToInt(f -> f).max().orElse(0);
+        return 0;
+    }
+
+    private int galacticEvents(int deltaY) {
+        boolean secondColumn = false;
+        if (displayTypeBasic == DisplayType.map) {
+            return deltaY;
+        }
+        int x = 5 + (displayType == DisplayType.landscape ? mapWidth : 0);
+        int height = 0;
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(stroke4);
+
+        List<Integer> galEventHeights = galacticEventHeights(game);
+        List<String> galEvents = game.getGalacticEvents();
+        for (int i = 0; i < galEvents.size(); i++) {
+            GalacticEventModel model = Mapper.getGalacticEvent(galEvents.get(i));
+            height = galEventRowHeight(galEventHeights, i / 2);
+
+            g2.setFont(Storage.getFont26());
+            List<String> mapTextLines = DrawingUtil.layoutText(g2, model.getMapText(), 1075);
+
+            // Draw outline and event image
+            g2.setColor(new Color(34, 54, 238));
+            g2.drawRect(x, deltaY, 1178, height - 5);
+            if (model != null) {
+                addWebsiteOverlay(model, x, deltaY, 1178, 110);
+            }
+            BufferedImage galacticEvent = ImageHelper.readEmojiImageScaled(CardEmojis.Event, 95);
+            g2.drawImage(galacticEvent, x + 5, deltaY + 5, null);
+
+            // Draw complexity in top right
+            BufferedImage complexity = ImageHelper.read(model.complexityImagePath());
+            g2.drawImage(complexity, x + 940, deltaY + 6, null);
+
+            // Draw event name
+            g2.setFont(Storage.getFont35());
+            DrawingUtil.superDrawString(
+                g2, model.getName(), x + 100, deltaY + 34, g2.getColor(), null, null, stroke2,
+                Color.black);
+
+            // Draw event text
+            g2.setFont(Storage.getFont26());
+            g2.setColor(Color.WHITE);
+            int lineNum = 0;
+
+            for (String line : mapTextLines) {
+                DrawingUtil.superDrawString(
+                    g2, line, x + 100, deltaY + 70 + 30 * lineNum, Color.white, null, null,
+                    stroke2, Color.black);
+                lineNum++;
+            }
+
+            if (!secondColumn) {
+                x += 1188;
+            } else {
+                deltaY += height;
+                x -= 1188;
+            }
+            secondColumn = !secondColumn;
+        }
+        return secondColumn ? deltaY + height : deltaY;
     }
 
     private int laws(int y) {
@@ -2373,10 +2473,6 @@ public class MapGenerator implements AutoCloseable {
      * @return space for the (number of rings + 1) + 2 * EXTRA_Y
      */
     private static int getMapHeight(Game game) {
-        int topMost = PositionMapper.getTopMostTileOffsetInGame(game);
-        int bottomMost = PositionMapper.getBottomMostTileOffsetInGame(game);
-        int topToBottomDistance = bottomMost - topMost;
-        // return topToBottomDistance + SPACE_FOR_TILE_HEIGHT * 2 + EXTRA_Y * 2;
         return (getRingCount(game) + 1) * SPACE_FOR_TILE_HEIGHT * 2 + EXTRA_Y * 2;
     }
 
@@ -2398,14 +2494,9 @@ public class MapGenerator implements AutoCloseable {
      */
     private static int getMapWidth(Game game) {
         float ringCount = getRingCount(game);
-        ringCount += ringCount == RING_MIN_COUNT
-                ? 1.5f
-                : 1; // make it thick if it's a 3-ring? why? player areas? // also 1.5 * 3 > 1 * 4, weird! 1.5f ->
-        // 1.33f?
-        int leftMost = PositionMapper.getLeftMostTileOffsetInGame(game);
-        int rightMost = PositionMapper.getRightMostTileOffsetInGame(game);
-        int leftToRightDistance = rightMost - leftMost;
-        // int mapWidth = (int) (leftToRightDistance + EXTRA_X * 2);
+        ringCount += ringCount == RING_MIN_COUNT ? 1.5f : 1; 
+        // make it 1.5 tiles thicker if it's a 3-ring, otherwise just 1 tile thicker
+        
         int mapWidth = (int) (ringCount * 520 + EXTRA_X * 2);
         mapWidth += hasExtraRow(game) ? EXTRA_X : 0;
         return mapWidth;

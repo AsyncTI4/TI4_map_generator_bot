@@ -96,18 +96,9 @@ public class GameProperties {
     private @ExportableField boolean baseGameMode; // TODO: Make this obsolete
     private @ExportableField boolean thundersEdge;
     private @ExportableField boolean prophecyOfKings = true;
-    private @ExportableField boolean ageOfExplorationMode;
     private @ExportableField boolean facilitiesMode;
-    private @ExportableField boolean minorFactionsMode;
-    private @ExportableField boolean totalWarMode;
-    private @ExportableField boolean dangerousWildsMode;
-    private @ExportableField boolean civilizedSocietyMode;
-    private @ExportableField boolean ageOfFightersMode;
-    private @ExportableField boolean stellarAtomicsMode;
     private @ExportableField boolean noSwapMode;
     private @ExportableField boolean limitedWhispersMode;
-    private @ExportableField boolean ageOfCommerceMode;
-    private @ExportableField boolean hiddenAgendaMode;
     private @ExportableField boolean ordinianC1Mode;
     private @ExportableField boolean liberationC4Mode;
     private @ExportableField boolean allianceMode;
@@ -131,6 +122,17 @@ public class GameProperties {
     private @ExportableField boolean extraSecretMode;
     private @ExportableField boolean votcMode;
     private @ExportableField boolean reverseSpeakerOrder;
+
+    // Galactic Events
+    private @ExportableField boolean ageOfExplorationMode;
+    private @ExportableField boolean minorFactionsMode;
+    private @ExportableField boolean totalWarMode;
+    private @ExportableField boolean dangerousWildsMode;
+    private @ExportableField boolean civilizedSocietyMode;
+    private @ExportableField boolean ageOfFightersMode;
+    private @ExportableField boolean stellarAtomicsMode;
+    private @ExportableField boolean ageOfCommerceMode;
+    private @ExportableField boolean hiddenAgendaMode;
 
     // Discord Snowflakes
     private @ExportableField String guildID;
