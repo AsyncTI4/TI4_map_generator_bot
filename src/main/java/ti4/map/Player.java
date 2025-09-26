@@ -176,6 +176,42 @@ public class Player extends PlayerProperties {
         return Comparator.comparingInt(Player::getInitiative);
     }
 
+    public boolean is(Player p2) {
+        if (p2 == null) return false;
+        return getUserID().equals(p2.getUserID());
+    }
+
+    public UnitModel getUnitByType(UnitType unitType) {
+        return getActiveUnits().stream()
+                .map(Mapper::getUnit)
+                .filter(Objects::nonNull)
+                .filter(unit -> unitType == unit.getUnitType())
+                .findFirst()
+                .orElse(null);
+    }
+
+    @JsonIgnore
+    public Set<String> getActiveUnits() {
+        Set<String> activeUnits = new HashSet<>(getUnitsOwned());
+        if (hasActiveBreakthrough("naazbt")) {
+            activeUnits.removeIf(unit -> getUnitByID(unit).getAsyncId().equals("mf"));
+            activeUnits.add("naaz_voltron");
+        }
+        if (hasUnlockedBreakthrough("mentakbt")) {
+            for (String tech : getTechs()) {
+                TechnologyModel model = Mapper.getTech(tech);
+                if (model.getAlias().equals("cr2")
+                        || model.getBaseUpgrade().orElse("").equals("cr2")
+                        || model.getHomebrewReplacesID().orElse("").equals("cr2")) {
+                    activeUnits.removeIf(unit -> getUnitByID(unit).getAsyncId().equals("ca"));
+                    activeUnits.add("mentak_cruiser3");
+                    break;
+                }
+            }
+        }
+        return activeUnits;
+    }
+
     public int getSpentTgsThisWindow() {
         for (String thing : getSpentThingsThisWindow()) {
             if (thing.contains("tg_")) {
