@@ -348,7 +348,7 @@ public class MiltyDraftHelper {
         for (TileModel tileModel : allTiles) {
 
             if (isInvalid(tileModel)) continue;
-            //  System.out.println(tileModel.getSource() + tileModel.getName());
+
             if (!sources.contains(tileModel.getSource())) continue;
             if (tileModel.getTileBack() == TileBack.GREEN || tileModel.isHyperlane()) continue;
 

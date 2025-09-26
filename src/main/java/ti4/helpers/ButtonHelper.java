@@ -5389,7 +5389,8 @@ public class ButtonHelper {
     public static void addEntropicScar(Game game, ButtonInteractionEvent event) {
         game.setStoredValue("useEntropicScar", "Yes");
         MessageHelper.sendMessageToChannel(
-                event.getChannel(), "This game's milty may spit out a slice with an entropic scar");
+                event.getChannel(),
+                "This game's milty may spit out a slice with an entropic scar. It will be treated as equivalent to a 2 resource planet for the purposes of slice balancing.");
         event.getMessage().delete().queue();
     }
 
