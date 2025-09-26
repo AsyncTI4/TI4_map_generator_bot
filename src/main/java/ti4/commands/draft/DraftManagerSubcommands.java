@@ -178,25 +178,13 @@ public class DraftManagerSubcommands extends SubcommandGroup {
 
         public DraftManagerTryEndDraft() {
             super(Constants.DRAFT_MANAGE_END, "Try to end the draft", true, false);
-            addOption(
-                    OptionType.BOOLEAN,
-                    Constants.FORCE_OPTION,
-                    "Attempt to ignore any blocking reason and end anyway",
-                    false);
         }
 
         @Override
         public void execute(SlashCommandInteractionEvent event) {
             Game game = getGame();
             DraftManager draftManager = game.getDraftManager();
-            boolean force = event.getOption(Constants.FORCE_OPTION) != null
-                    ? event.getOption(Constants.FORCE_OPTION).getAsBoolean()
-                    : false;
-            if (force) {
-                draftManager.endDraft(event);
-            } else {
-                draftManager.tryEndDraft(event);
-            }
+            draftManager.tryEndDraft(event);
         }
     }
 
@@ -235,6 +223,12 @@ public class DraftManagerSubcommands extends SubcommandGroup {
         public void execute(SlashCommandInteractionEvent event) {
             Game game = getGame();
             DraftManager draftManager = game.getDraftManager();
+            String draftEndReason = draftManager.whatsStoppingDraftEnd();
+            if(draftEndReason != null) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "The draft isn't over yet: " + draftEndReason);
+                return;
+            }
+            
             String reason = draftManager.whatsStoppingSetup();
             if (reason == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "The draft should have set up players already.");
@@ -248,25 +242,13 @@ public class DraftManagerSubcommands extends SubcommandGroup {
 
         public DraftManagerSetupPlayers() {
             super(Constants.DRAFT_MANAGE_SETUP_PLAYERS, "Have the draft elements set up players", true, false);
-            addOption(
-                    OptionType.BOOLEAN,
-                    Constants.FORCE_OPTION,
-                    "Attempt to ignore any blocking reason and setup anyway",
-                    false);
         }
 
         @Override
         public void execute(SlashCommandInteractionEvent event) {
             Game game = getGame();
             DraftManager draftManager = game.getDraftManager();
-            boolean force = event.getOption(Constants.FORCE_OPTION) != null
-                    ? event.getOption(Constants.FORCE_OPTION).getAsBoolean()
-                    : false;
-            if (force) {
-                draftManager.setupPlayers(event);
-            } else {
-                draftManager.trySetupPlayers(event);
-            }
+            draftManager.trySetupPlayers(event);
         }
     }
 

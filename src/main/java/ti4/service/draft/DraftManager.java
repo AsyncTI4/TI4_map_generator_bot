@@ -207,7 +207,7 @@ public class DraftManager extends DraftPlayerManager {
      *
      * @param event
      */
-    public String endDraft(GenericInteractionCreateEvent event) {
+    private String endDraft(GenericInteractionCreateEvent event) {
         String blockingReason = whatsStoppingDraftEnd();
         if (blockingReason != null) {
             // If you got this accidentally, it means you called endDraft() instead of
@@ -268,7 +268,7 @@ public class DraftManager extends DraftPlayerManager {
         setupPlayers(event);
     }
 
-    public void setupPlayers(GenericInteractionCreateEvent event) {
+    private void setupPlayers(GenericInteractionCreateEvent event) {
         String blockingReason = whatsStoppingSetup();
         if (blockingReason != null) {
             // If you got this accidentally, it means you called setupPlayers() instead of
