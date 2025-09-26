@@ -1,0 +1,1 @@
+{"id":"revelation","tileId":"92","name":"Revelation","aliases":["revelation"],"resources":1,"influence":2,"factionHomeworld":"bastion","planetTypes":["FACTION","SPACESTATION"],"planetLayout":{"unitHolderName":"revelation","resourcesLocation":"TopLeft","centerPosition":{"x":225.0,"y":205.0}},"source":"thunders_edge"}
