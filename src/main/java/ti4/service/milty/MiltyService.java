@@ -7,13 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
@@ -115,7 +113,8 @@ public class MiltyService {
         specs.bannedFactions.addAll(pfSettings.getBanFactions().getKeys());
         if (game.isThundersEdge()) {
             List<String> newKeys = new ArrayList<>();
-            newKeys.addAll(List.of("arborec", "sol", "letnev", "winnu", "sardakk", "yin", "l1z1x", "naalu", "saar","naaz"));
+            newKeys.addAll(
+                    List.of("arborec", "sol", "letnev", "winnu", "sardakk", "yin", "l1z1x", "naalu", "saar", "naaz"));
             specs.priorityFactions.addAll(newKeys);
             specs.numFactions = Math.min(10, specs.numFactions);
         } else {
