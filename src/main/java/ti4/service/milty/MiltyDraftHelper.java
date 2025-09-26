@@ -300,6 +300,9 @@ public class MiltyDraftHelper {
             sources.add(ComponentSource.ds);
             sources.add(ComponentSource.uncharted_space);
         }
+        if (game.isThundersEdge() || !game.getStoredValue("useEntropicScar").isEmpty()) {
+            sources.add(ComponentSource.thunders_edge);
+        }
         initDraftTiles(manager, sources);
     }
 
@@ -345,7 +348,7 @@ public class MiltyDraftHelper {
         for (TileModel tileModel : allTiles) {
 
             if (isInvalid(tileModel)) continue;
-            //  System.out.println(tileModel.getSource() + tileModel.getName());
+
             if (!sources.contains(tileModel.getSource())) continue;
             if (tileModel.getTileBack() == TileBack.GREEN || tileModel.isHyperlane()) continue;
 

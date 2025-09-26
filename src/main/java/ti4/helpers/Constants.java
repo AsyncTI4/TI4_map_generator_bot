@@ -181,6 +181,11 @@ public class Constants {
     public static final String SETTING_VALUE = "setting_value";
     public static final String SETTING_TYPE = "setting_type";
 
+    public static final String TOKEN_INGRESS = "token_ingress.png";
+    public static final String TOKEN_BREACH_ACTIVE = "token_breachActive.png";
+    public static final String TOKEN_BREACH_INACTIVE = "token_breachInactive.png";
+    public static final String TOKEN_SEVER = "token_sever.png";
+
     public static final String ALPHA = "alpha";
     public static final String BETA = "beta";
     public static final String GAMMA = "gamma";

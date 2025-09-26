@@ -1,0 +1,26 @@
+{
+    "id": "ordinian",
+    "tileId": "92",
+    "name": "Ordinian",
+    "aliases": [
+        "ordinian"
+    ],
+    "resources": 0,
+    "influence": 0,
+    "factionHomeworld": "bastion",
+    "planetTypes": [
+        "FACTION"
+    ],
+    "legendaryAbilityName": "4X41D \"Hyperion\" V1",
+    "legendaryAbilityText": "You may exhaust this card when you pass to draw 1 action card and gain 1 command token.",
+    "legendaryAbilityFlavourText": "A shard of a greater whole, a part of a grand effort.",
+    "planetLayout": {
+        "unitHolderName": "ordinian",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135.0,
+            "y": 85.0
+        }
+    },
+    "source": "thunders_edge"
+}

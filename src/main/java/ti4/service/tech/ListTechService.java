@@ -13,6 +13,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperSCs;
+import ti4.helpers.RegexHelper;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -24,6 +26,7 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.button.ReactionService;
+import ti4.service.regex.RegexService;
 
 @UtilityClass
 public class ListTechService {
@@ -45,24 +48,74 @@ public class ListTechService {
 
     private void acquireATechWithResources(
             ButtonInteractionEvent event, Game game, Player player, boolean sc, boolean first) {
-        acquireATech(event, game, player, sc, TechnologyType.mainFive, first);
+        acquireATech(event, game, player, sc, false, TechnologyType.mainFive, first);
     }
 
     @ButtonHandler("acquireAUnitTechWithInf")
     public void acquireAUnitTechWithInf(ButtonInteractionEvent event, Game game, Player player) {
         boolean sc = false;
         boolean firstTime = true;
-        acquireATech(event, game, player, sc, List.of(TechnologyType.UNITUPGRADE), firstTime);
+        acquireATech(event, game, player, sc, false, List.of(TechnologyType.UNITUPGRADE), firstTime);
     }
 
-    private void acquireATech(
+    @ButtonHandler("entropicScar_")
+    private static void gainTechFromScar(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String regex = "entropicScar_" + RegexHelper.techRegex(game);
+        RegexService.runMatcher(regex, buttonID, matcher -> {
+            String tech = matcher.group("tech");
+            TechnologyModel model = Mapper.getTech(tech);
+
+            String error = null;
+            boolean scepter = player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter");
+            if (player.getStrategicCC() < 1 && !scepter) {
+                error = player.getRepresentation()
+                        + " You seem to have misplaced your strategy tokens, and cannot use the Entropic Scar anomaly.";
+            } else if (model == null) {
+                error = "Could not find tech: " + tech;
+            } else if (player.hasTech(tech)) {
+                error = player.getRepresentation() + " You already have " + model.getName();
+            } else {
+                String msg = player.getRepresentation() + " You gained " + model.getNameRepresentation()
+                        + " using the Entropic Scar anomaly.";
+                if (scepter) {
+                    msg += "\n> Exhausted the " + RelicHelper.sillySpelling();
+                } else {
+                    msg += "\n> Reduced Strategy CCs by 1 (" + player.getStrategicCC();
+                    player.setStrategicCC(player.getStrategicCC() - 1);
+                    msg += "->" + player.getStrategicCC() + ")";
+                }
+                player.addTech(tech);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                ButtonHelper.deleteMessage(event);
+            }
+
+            if (error != null) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), error);
+            }
+        });
+    }
+
+    @ButtonHandler("acquireATechWithDwsBt")
+    public void acquireATechWithDwsBt(ButtonInteractionEvent event, Game game, Player player) {
+        boolean sc = false;
+        boolean dws = true;
+        boolean firstTime = !event.getButton().getId().endsWith("_second");
+        acquireATech(event, game, player, sc, dws, TechnologyType.mainFour, firstTime);
+    }
+
+    public void acquireATech(
             ButtonInteractionEvent event,
             Game game,
             Player player,
             boolean sc,
+            boolean dwsBt,
             List<TechnologyType> techTypes,
             boolean first) {
         game.setComponentAction(!sc);
+        String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
+        game.setComponentAction(!sc);
+        String techPrefix = finsFactionCheckerPrefix + "getAllTechOfType_";
+        String techSuffix = dwsBt ? "_dwsbt" : "";
 
         if (sc) {
             boolean used = ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player);
@@ -85,16 +138,15 @@ public class ListTechService {
             if (first) {
                 ButtonHelperCommanders.yinCommanderSummary(player, game);
                 ButtonHelperCommanders.veldyrCommanderSummary(player, game);
-                String getAllButtonSpoof = "getAllTechOfType_allTechResearchable";
+                String getAllButtonSpoof = "getAllTechOfType_allTechResearchable" + techSuffix;
                 getAllTechOfType(event, player, getAllButtonSpoof, game, player.getCardsInfoThread());
                 return;
             }
         }
 
         List<Button> buttons = new ArrayList<>();
-        String techPrefix = player.finChecker() + "getAllTechOfType_";
         for (TechnologyType type : techTypes) {
-            String id = techPrefix + type.toString();
+            String id = techPrefix + type.toString() + techSuffix;
             if (techTypes.size() == 1 && type == TechnologyType.UNITUPGRADE) {
                 id += "_inf";
             }

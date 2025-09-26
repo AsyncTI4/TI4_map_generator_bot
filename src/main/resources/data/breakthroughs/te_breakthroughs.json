@@ -129,6 +129,29 @@
         "source": "thunders_edge"
     },
     {
+        "alias": "bastionbt",
+        "name": "The Icon",
+        "faction": "bastion",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "When you produce ships, you may exhaust this card to place those ships in a system that contains 1 of your command tokens, at least 1 of your ground forces, and no other player's ships.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "crimsonbt",
+        "name": "Resonance Generator",
+        "displayName": "Resonance\nGenerator",
+        "faction": "crimson",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "During your tactical actions, apply +1 to the move value of each of your ships that starts its movement in your home system or in a system that contains an active breach.\nACTION: Exhaust this card to flip any breach or to place an active breach in a non-home system that contains your units.",
+        "source": "thunders_edge"
+    },
+    {
         "alias": "naazbt",
         "name": "Absolute Synergy",
         "displayName": "Absolute\nSynergy",
@@ -184,6 +207,18 @@
             "CYBERNETIC"
         ],
         "text": "During the action phase, if you have not passed, when other players would discard action cards, they are placed on this card instead.\nWhen you pass, take 1 action card from this card and discard the rest.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "saarbt",
+        "name": "Deorbit Barrage",
+        "displayName": "Deorbit\nBarrage",
+        "faction": "saar",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "ACTION: Exhaust this card and spend any amount of resources to choose a planet up to 2 systems away from an asteroid field that contains your ships; roll a number of dice equal to the amount spent and assign 1 hit to a ground force on that planet for each roll of 4 or greater.",
         "source": "thunders_edge"
     }
 ]
