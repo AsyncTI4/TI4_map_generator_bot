@@ -1,23 +1,19 @@
 package ti4.model;
 
-import java.awt.Point;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-
+import java.awt.Point;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import javax.annotation.Nullable;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
@@ -168,8 +164,6 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     public boolean isScar() {
         return Optional.ofNullable(isScar).orElse(false);
     }
-
-
 
     @JsonIgnore
     public boolean isAnomaly() {

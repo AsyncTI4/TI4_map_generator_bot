@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -493,26 +492,31 @@ public class StatusHelper {
         for (Player player : scars.keySet()) {
             List<String> factionTechs = new ArrayList<>(player.getFactionTechs());
             player.getTechs().forEach(factionTechs::remove);
-            List<Button> buttons = new ArrayList<>(factionTechs.stream().map(tech -> {
-                TechnologyModel model = Mapper.getTech(tech);
-                return Buttons.green(player.getFinsFactionCheckerPrefix() + "entropicScar_" + tech, model.getName(), model.getCondensedReqsEmojis(true));
-            }).toList());
+            List<Button> buttons = new ArrayList<>(factionTechs.stream()
+                    .map(tech -> {
+                        TechnologyModel model = Mapper.getTech(tech);
+                        return Buttons.green(
+                                player.getFinsFactionCheckerPrefix() + "entropicScar_" + tech,
+                                model.getName(),
+                                model.getCondensedReqsEmojis(true));
+                    })
+                    .toList());
             buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
-
 
             int ccs = player.getStrategicCC();
             int techs = buttons.size() - 1;
-            String scarMessage = player.getRepresentation() + " You have ships in an Entropic Scar anomaly. Use the buttons to spend 1 strategy CC and gain a tech!";
+            String scarMessage = player.getRepresentation()
+                    + " You have ships in an Entropic Scar anomaly. Use the buttons to spend 1 strategy CC and gain a tech!";
             scarMessage += "\n> You currently have " + ccs + " Strategy CC(s)";
             if (player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter"))
-                scarMessage += "\n> You also have the " + RelicHelper.sillySpelling() + " available to exhaust (This will be spent first)";
+                scarMessage += "\n> You also have the " + RelicHelper.sillySpelling()
+                        + " available to exhaust (This will be spent first)";
             for (int i = 0; i < techs && i < scars.get(player); i++) {
                 if (i > 0) scarMessage = "Get another one!";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), scarMessage, buttons);
             }
         }
     }
-
 
     private static void sendHoldingCompanyButtons(Game game) {
         Player veldyr = Helper.getPlayerFromAbility(game, "holding_company");
