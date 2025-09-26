@@ -1314,6 +1314,7 @@ public class Constants {
     public static final String GAMES_WITH_FACTIONS = "games_with_factions";
     public static final String GAME_STATISTIC = "game_statistic";
     public static final String PLAYER_STATISTIC = "player_statistic";
+    public static final String COMMUNITY = "community";
     public static final String UNDO_TO_COMMAND = "undo_to_command";
     public static final String SHOW_GAME_MODES = "show_game_modes";
     public static final String MAX_SO_COUNT = "max_so_count";
