@@ -241,10 +241,7 @@
             "aida"
         ],
         "startingTechAmount": 1,
-        "homePlanets": [
-            "mez",
-            "rep"
-        ],
+        "homePlanets": [],
         "abilities": [
             "survivalinstinct",
             "miniaturization"
