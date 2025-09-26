@@ -300,6 +300,9 @@ public class MiltyDraftHelper {
             sources.add(ComponentSource.ds);
             sources.add(ComponentSource.uncharted_space);
         }
+        if (game.isThundersEdge() || !game.getStoredValue("useEntropicScar").isEmpty()) {
+            sources.add(ComponentSource.thunders_edge);
+        }
         initDraftTiles(manager, sources);
     }
 

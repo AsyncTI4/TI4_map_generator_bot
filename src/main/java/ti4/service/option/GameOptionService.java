@@ -43,6 +43,13 @@ public class GameOptionService {
         buttons.add(Buttons.green("addLegendaryMecatol", "Use Legendary Mecatol Rex"));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
+
+        String msg2 =
+                "Thunder's Edge contains a new anomaly, called an entropic scar, which gives faction tech in status phase at the cost of a strategy command token. If you want the bot's milty to potentially include this scar, press this button.";
+        List<Button> buttons2 = new ArrayList<>();
+        buttons.add(Buttons.green("addEntropicScar", "Use Entropic Scar"));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg2, buttons2);
     }
 
     public static final Button showOwnedPNs_ON = Buttons.green("showOwnedPNsInPlayerArea_turnOFF", "ON");

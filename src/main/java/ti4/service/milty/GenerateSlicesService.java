@@ -190,6 +190,9 @@ class GenerateSlicesService {
 
         int optInf = slice.getOptimalInf();
         int optRes = slice.getOptimalRes();
+        if (slice.getTiles().stream().filter(MiltyDraftTile::isHasScar).count() > 1) {
+            optRes += 3;
+        }
         int totalOptimal = slice.getOptimalTotalValue();
         if (optInf < spec.getMinInf()
                 || optRes < spec.getMinRes()
