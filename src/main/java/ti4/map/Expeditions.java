@@ -30,7 +30,7 @@ import ti4.service.emoji.TechEmojis;
 public class Expeditions {
 
     @JsonIgnore
-    private Game game = null;
+    private Game game;
 
     private Map<String, String> expeditionFactions = new LinkedHashMap<>();
 
@@ -98,7 +98,7 @@ public class Expeditions {
                 expeditionFactions.values().stream().collect(Collectors.groupingBy(x -> x, Collectors.counting()));
         long most = factionCounts.values().stream()
                 .max(Comparator.comparingLong(x -> x))
-                .orElse(0l);
+                .orElse(0L);
         return (int) most;
     }
 
@@ -108,7 +108,7 @@ public class Expeditions {
                 expeditionFactions.values().stream().collect(Collectors.groupingBy(x -> x, Collectors.counting()));
         long most = factionCounts.values().stream()
                 .max(Comparator.comparingLong(x -> x))
-                .orElse(0l);
+                .orElse(0L);
         return new ArrayList<>(factionCounts.entrySet().stream()
                 .filter(e -> e.getValue() == most)
                 .map(e -> e.getKey())
@@ -194,7 +194,7 @@ public class Expeditions {
         String expeditionType = buttonID.replace("TEexpedition_", "");
         Expeditions exp = game.getExpeditions();
         MessageChannel channel = player.getCorrectChannel();
-        String output = null;
+        String output;
         boolean success = false;
         String whichExp = "### __" + player.getRepresentation() + " completed the **%s** expedition!!__";
         switch (expeditionType) {
@@ -243,7 +243,7 @@ public class Expeditions {
                 success = true;
                 output = String.format(whichExp, "SECRET OBJECTIVE");
                 List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
-                if (soButtons != null && !soButtons.isEmpty()) {
+                if (!soButtons.isEmpty()) {
                     output += "\n-# Use the buttons in your private channel to discard an unscored secret.";
                     MessageHelper.sendMessageToChannel(channel, output);
                     MessageHelper.sendMessageToChannelWithButtons(
@@ -258,7 +258,7 @@ public class Expeditions {
                 success = true;
                 output = String.format(whichExp, "2 ACTION CARDS");
                 List<Button> acButtons = ActionCardHelper.getDiscardActionCardButtons(player, false);
-                if (acButtons != null && acButtons.size() >= 2) {
+                if (acButtons.size() >= 2) {
                     output += "\n-# Use the buttons in your private channel to discard 2 action cards.";
                     MessageHelper.sendMessageToChannel(channel, output);
                     MessageHelper.sendMessageToChannelWithButtons(
@@ -272,7 +272,7 @@ public class Expeditions {
 
         // The player clicked the button and succeeded
         if (success) {
-            exp.getExpeditionFactions().put(expeditionType, player.getFaction());
+            exp.expeditionFactions.put(expeditionType, player.getFaction());
             if (exp.getRemainingExpeditionCount() == 0) {
                 String message = "# ATTENTION " + game.getPing() + "\n";
                 message += player.getRepresentation()
