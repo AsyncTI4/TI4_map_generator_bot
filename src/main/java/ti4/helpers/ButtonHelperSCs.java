@@ -346,6 +346,14 @@ public class ButtonHelperSCs {
             return;
         }
 
+        if (player.getSCs().contains(5) && !game.isHomebrewSCMode()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + " since you have the **Trade** strategy card, and the primary is done automatically when you play trade, washing here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong");
+            return;
+        }
+
         if (!player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
