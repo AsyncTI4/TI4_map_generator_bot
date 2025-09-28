@@ -189,7 +189,7 @@ public class SourceSettings extends SettingsMenu {
             case "ThundersEdge" -> {
                 event.getHook()
                         .sendMessage(
-                                "This is only a demo of TE. Only the 6 factions that have revealed breakthroughs will be draftable. No Fracture.")
+                                "This is only a demo of TE. Only the factions that have revealed breakthroughs will be draftable. No Fracture.")
                         .setEphemeral(true)
                         .queue();
                 game.setThundersEdge(true);
