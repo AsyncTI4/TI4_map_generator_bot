@@ -2969,7 +2969,7 @@ public class ButtonHelper {
                 for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                     UnitKey unitKey = unitEntry.getKey();
                     String color = AliasHandler.resolveColor(unitKey.getColorID());
-                    if (color == null || !color.equalsIgnoreCase(playerColor)) continue;
+                    if (color == null || !unitKey.getColorID().equalsIgnoreCase(playerColor)) continue;
                     Player player = game.getPlayerFromColorOrFaction(color);
                     if (player == null) continue;
                     UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
