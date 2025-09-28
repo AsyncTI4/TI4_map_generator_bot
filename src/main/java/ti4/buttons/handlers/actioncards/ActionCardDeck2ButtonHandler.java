@@ -290,17 +290,16 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveTombRaiders(Player player, Game game, ButtonInteractionEvent event) {
         List<String> types = new ArrayList<>(List.of("hazardous", "cultural", "industrial", "frontier"));
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentationUnfogged())
-            .append(":");
+        sb.append(player.getRepresentationUnfogged()).append(":");
         for (String type : types) {
             String cardId = game.drawExplore(type);
             ExploreModel card = Mapper.getExplore(cardId);
             String cardType = card.getResolution();
             sb.append("\nRevealed '")
-                .append(card.getName())
-                .append("' from the top of the ")
-                .append(type)
-                .append(" deck and ");
+                    .append(card.getName())
+                    .append("' from the top of the ")
+                    .append(type)
+                    .append(" deck and ");
             if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
                 sb.append("gained it.");
                 player.addFragment(cardId);
