@@ -1,5 +1,6 @@
 package ti4.service.draft;
 
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,6 +14,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.DistanceTool;
 import ti4.helpers.ListHelper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Tile;
@@ -21,6 +23,8 @@ import ti4.message.logging.BotLogger;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
 import ti4.model.PlanetTypeModel.PlanetType;
+import ti4.model.Source.ComponentSource;
+import ti4.model.WormholeModel.Wormhole;
 import ti4.service.milty.MiltyDraftSlice;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.milty.TierList;
@@ -33,36 +37,32 @@ import ti4.service.milty.TierList;
 @UtilityClass
 public class NucleusSliceGeneratorService {
 
-    // TODO: These should be in a Settings object; they should adjust based on core
-    // slice at least.
-    private static final int CORE_SLICE_MIN_OPTIMAL = 4;
-    private static final int CORE_SLICE_MAX_OPTIMAL = 8;
+    private static final int NUM_ATTEMPTS = 5_000;
 
     // Major known issues:
-    // - Because the Nucleus is made up of several slices which share some times (e.g. equidistants),
-    //   it's usually the case that the last placement was actually already done as the first placmeent.
-    //   This is not accounted for very well, and can result in bad tile counts even in otherwise good maps.
-    // - The above issue primarily happens in 212, because that is the equidistant between first and last seats.
-    //   It would be better if the issue was at least distributed randomly.
-    // - For 7+ player maps, we're allowing the nucleus to have +/- 1 red-backed tile than it should.
-    //   Due to insufficient tile options, this seems necessary.
+    // - Because the Nucleus is made up of several slices which share some times
+    // (e.g. equidistants),
+    // it's usually the case that the last placement was actually already done as
+    // the first placmeent.
+    // This is not accounted for very well, and can result in bad tile counts even
+    // in otherwise good maps.
+    // - The above issue primarily happens in 212, because that is the equidistant
+    // between first and last seats.
+    // It would be better if the issue was at least distributed randomly.
+    // - For 7+ player maps, we're allowing the nucleus to have +/- 1 red-backed
+    // tile than it should.
+    // Due to insufficient tile options, this seems necessary.
 
     /**
      * Generates the 'nucleus' by placing map tiles according to MemePhilosopher's
      * work.
      * Simultaneously produce the draft slices that players will draft.
      * The nucleus is placed directly on the game map, so isn't returned here.
-     * TODO: Get flexible on wormhole types, legendaries, etc.
-     *
      * @return The slices that were generated for drafting.
      */
-    public List<MiltyDraftSlice> generateNucleusAndSlices(GenericInteractionCreateEvent event, DraftSpec specs) {
-
-        // TODO: Implement nucleus settings so we don't just have to flat out ignore the
-        // specs...
-
-        Game game = specs.getGame();
-        MapTemplateModel mapTemplate = specs.getTemplate();
+    public List<MiltyDraftSlice> generateNucleusAndSlices(GenericInteractionCreateEvent event, DraftSpec draftSpecs) {
+        Game game = draftSpecs.getGame();
+        MapTemplateModel mapTemplate = draftSpecs.getTemplate();
         if (!mapTemplate.isNucleusTemplate()) {
             String message = "Map template " + mapTemplate.getAlias()
                     + " is not a nucleus template, but nucleus generation was requested.";
@@ -70,26 +70,14 @@ public class NucleusSliceGeneratorService {
             return null;
         }
 
-        if (mapTemplate.getNucleusSliceCount() == 0) {
-            String message = "Map template " + mapTemplate.getAlias()
-                    + " has no nucleus slices defined, but nucleus generation was requested.";
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-            return null;
-        }
-        if (mapTemplate.getPlayerCount() == 0) {
-            String message = "Map template " + mapTemplate.getAlias()
-                    + " has no player count defined, but nucleus generation was requested.";
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-            return null;
-        }
-
         // Under certain conditions, we should be flexible about how tiles are selected.
-        // Drafts that use many available slices can fail very often if we don't allow some specific rules
+        // Drafts that use many available slices can fail very often if we don't allow
+        // some specific rules
         // to be flexible.
-        boolean strictMode = useStrictMode(mapTemplate);
-
-        for (int i = 0; i < 5_000; i++) {
-            NucleusOutcome outcome = tryGenerateNucleusAndSlices(game, mapTemplate, specs.getNumSlices(), strictMode);
+        boolean strictMode = useStrictMode(mapTemplate, draftSpecs.getNumSlices());
+        NucleusSpecs nucleusSpecs = new NucleusSpecs(draftSpecs);
+        for (int i = 0; i < NUM_ATTEMPTS; i++) {
+            NucleusOutcome outcome = tryGenerateNucleusAndSlices(game, mapTemplate, nucleusSpecs, strictMode);
             if (outcome.slices != null) {
                 return outcome.slices;
             }
@@ -98,17 +86,64 @@ public class NucleusSliceGeneratorService {
         return null;
     }
 
-    private boolean useStrictMode(MapTemplateModel mapTemplate) {
+    /**
+     * Generate the nucleus and slices, returning the outcome (success or failure
+     * reason).
+     * Will attempt to generate a successful outcome many times, and the problem
+     * returned
+     * is the most common failure reason.
+     * Pre-conditions:
+     * - game.getDraftTileManager() has been initialized with desired component sources
+     * - game.getTileMap() has been initialized with placeholder (draft/nucleus) tiles and hyperlanes
+     * @param event
+     * @param game
+     * @param nucleusSpecs
+     * @return
+     */
+    public NucleusOutcome generateNucleusAndSlices(GenericInteractionCreateEvent event, Game game,
+            NucleusSpecs nucleusSpecs) {
+        String mapTemplateId = game.getMapTemplateID();
+        MapTemplateModel mapTemplate = Mapper.getMapTemplate(mapTemplateId);
+        if (!mapTemplate.isNucleusTemplate()) {
+            String message = "Map template " + mapTemplate.getAlias()
+                    + " is not a nucleus template, but nucleus generation was requested.";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            return new NucleusOutcome(null, "Map template is not a nucleus template.");
+        }
+
+        // Under certain conditions, we should be flexible about how tiles are selected.
+        // Drafts that use many available slices can fail very often if we don't allow
+        // some specific rules
+        // to be flexible.
+        boolean strictMode = useStrictMode(mapTemplate, nucleusSpecs.numSlices());
+        Map<String, Integer> failureReasons = new HashMap<>();
+        for (int i = 0; i < NUM_ATTEMPTS; i++) {
+            NucleusOutcome outcome = tryGenerateNucleusAndSlices(game, mapTemplate, nucleusSpecs, strictMode);
+            if (outcome.slices != null) {
+                return new NucleusOutcome(outcome.slices, null);
+            }
+
+            failureReasons.put(outcome.failureReason(), failureReasons.getOrDefault(outcome.failureReason(), 0) + 1);
+        }
+
+        String mostCommonFailure = failureReasons.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry<String, Integer>::getKey)
+                .orElse("No registered failures");
+        return new NucleusOutcome(null, mostCommonFailure);
+    }
+
+    private boolean useStrictMode(MapTemplateModel mapTemplate, int numSlices) {
         return mapTemplate.getPlayerCount() + mapTemplate.getNucleusSliceCount() < 14;
     }
 
-    public void runAndPrintData(GenericInteractionCreateEvent event, DraftSpec specs, int numIterations) {
+    public void runAndPrintData(GenericInteractionCreateEvent event, DraftSpec draftSpecs, int numIterations) {
         if (numIterations > 10_000) {
             numIterations = 10_000;
         }
 
-        Game game = specs.getGame();
-        MapTemplateModel mapTemplate = specs.getTemplate();
+        Game game = draftSpecs.getGame();
+        MapTemplateModel mapTemplate = draftSpecs.getTemplate();
 
         Map<String, Integer> failureReasonCount = new HashMap<>();
         List<Integer> successAfterAttempts = new ArrayList<>();
@@ -116,7 +151,7 @@ public class NucleusSliceGeneratorService {
         DraftTileManager tileManager = game.getDraftTileManager();
         if (tileManager.getAll().isEmpty()) {
             tileManager.clear();
-            tileManager.addAllDraftTiles(specs.getTileSources());
+            tileManager.addAllDraftTiles(draftSpecs.getTileSources());
         }
         Map<String, Integer> tileOccurrenceInSuccessfulMaps = new HashMap<>();
         Map<String, Integer> tileOccurrenceInSuccessfulSlices = new HashMap<>();
@@ -124,10 +159,12 @@ public class NucleusSliceGeneratorService {
         List<Double> failRuntimes = new ArrayList<>();
         List<Double> successRuntimes = new ArrayList<>();
 
-        boolean strictMode = useStrictMode(mapTemplate);
+        NucleusSpecs nucleusSpecs = new NucleusSpecs(draftSpecs);
+
+        boolean strictMode = useStrictMode(mapTemplate, draftSpecs.getNumSlices());
         for (int i = 0; i < numIterations; ++i) {
             long startTime = System.nanoTime();
-            NucleusOutcome outcome = tryGenerateNucleusAndSlices(game, mapTemplate, specs.getNumSlices(), strictMode);
+            NucleusOutcome outcome = tryGenerateNucleusAndSlices(game, mapTemplate, nucleusSpecs, strictMode);
             long endTime = System.nanoTime();
             if (outcome.slices != null) {
                 successAfterAttempts.add(i + 1);
@@ -137,7 +174,7 @@ public class NucleusSliceGeneratorService {
                         tileOccurrenceInSuccessfulSlices.put(
                                 tile.getTile().getTileID(),
                                 tileOccurrenceInSuccessfulSlices.getOrDefault(
-                                                tile.getTile().getTileID(), 0)
+                                        tile.getTile().getTileID(), 0)
                                         + 1);
                     }
                 }
@@ -145,7 +182,8 @@ public class NucleusSliceGeneratorService {
 
                     if (tileManager
                             .filterAll(t -> t.getTile().getTileID().equals(placedTile.getTileID()))
-                            .isEmpty()) continue;
+                            .isEmpty())
+                        continue;
 
                     tileOccurrenceInSuccessfulMaps.put(
                             placedTile.getTileID(),
@@ -239,10 +277,83 @@ public class NucleusSliceGeneratorService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), result.toString());
     }
 
-    public record NucleusOutcome(List<MiltyDraftSlice> slices, String failureReason) {}
+    // TODO: Dangerous Wilds balance (1-2 hazardous planets per core slice, 0-2 per player slice)
+    public record NucleusSpecs(int numSlices, int minNucleusWormholes, int maxNucleusWormholes,
+            int minNucleusLegendaries,
+            int maxNucleusLegendaries, int minMapWormholes, int maxMapWormholes, int minMapLegendaries,
+            int maxMapLegendaries,
+            int minSliceValue, int maxSliceValue, int minNucleusValue,
+            int maxNucleusValue, int minSlicePlanets, int maxSlicePlanets, int minSliceRes,
+            int minSliceInf, int maxNucleusQualityDifference, int expectedRedTiles) {
+        NucleusSpecs(DraftSpec draftSpec) {
+            this(draftSpec.getTemplate().getPlayerCount(), draftSpec.getNumSlices());
+        }
+
+        NucleusSpecs(int players, int slices) {
+            this(
+                    slices,
+                    1, // min nucleus wormholes
+                    Math.min(6, players), // max nucleus wormholes
+                    0, // min nucleus legendaries
+                    Math.max(1, Math.round(players / 3.0f)), // max nucleus legendaries
+                    Math.max(2, players - 1), // min map wormholes
+                    Math.min(6, players), // max map wormholes
+                    1, // min map legendaries
+                    Math.max(1, Math.round(players / 3.0f)), // max map legendaries
+                    4, // min slice value
+                    9, // max slice value
+                    4, // min nucleus value
+                    8, // max nucleus value
+                    2, // min slice planets
+                    5, // max slice planets
+                    0, // min slice resources
+                    0, // min slice influence
+                    3, // max nucleus quality difference
+                    Math.round(11 * players / 6.0f) // expected red tiles
+            );
+        }
+    }
+
+    public String validateSpecsForGame(NucleusSpecs specs, Game game) {
+        String mapTemplateId = game.getMapTemplateID();
+        if(mapTemplateId == null || mapTemplateId.isBlank()) {
+            return "No map template is set on the game.";
+        }
+        MapTemplateModel mapTemplate = Mapper.getMapTemplate(mapTemplateId);
+        if (!mapTemplate.isNucleusTemplate()) {
+            return "Map template " + mapTemplate.getAlias()
+                    + " is not a nucleus template, but nucleus generation was requested.";
+        }
+        int players = mapTemplate.getPlayerCount();
+        if (specs.numSlices < players) {
+            return "Number of slices (" + specs.numSlices + ") must be at least the number of players (" + players + ").";
+        }
+        if (specs.minNucleusWormholes < 0 || specs.maxNucleusWormholes < 0 || specs.minNucleusWormholes > specs.maxNucleusWormholes) {
+            return "Nucleus wormhole counts must be non-negative and max >= min.";
+        }
+        if (specs.minNucleusLegendaries < 0 || specs.maxNucleusLegendaries < 0 || specs.minNucleusLegendaries > specs.maxNucleusLegendaries) {
+            return "Nucleus legendary counts must be non-negative and max >= min.";
+        }
+        if (specs.minMapWormholes < 0 || specs.maxMapWormholes < 0 || specs.minMapWormholes > specs.maxMapWormholes) {
+            return "Map wormhole counts must be non-negative and max >= min.";
+        }
+        if (specs.minMapLegendaries < 0 || specs.maxMapLegendaries < 0 || specs.minMapLegendaries > specs.maxMapLegendaries) {
+            return "Map legendary counts must be non-negative and max >= min.";
+        }
+        int nucleusTiles = mapTemplate.getTemplateTiles().stream()
+                .filter(tile -> tile.getNucleusNumbers() != null && !tile.getNucleusNumbers().isEmpty())
+                .toList().size();
+        if(specs.maxNucleusWormholes + specs.maxNucleusLegendaries > nucleusTiles) {
+            return "The maximum number of nucleus wormholes and legendaries ("+(specs.maxNucleusWormholes + specs.maxNucleusLegendaries)+") exceeds the number of nucleus tiles ("+nucleusTiles+").";
+        }
+        return null;
+    }
+
+    public record NucleusOutcome(List<MiltyDraftSlice> slices, String failureReason) {
+    }
 
     public NucleusOutcome tryGenerateNucleusAndSlices(
-            Game game, MapTemplateModel mapTemplate, int numSlices, boolean strictMode) {
+            Game game, MapTemplateModel mapTemplate, NucleusSpecs nucleusSpecs, boolean strictMode) {
 
         // Reset map and draft tiles
         DraftTileManager tileManager = game.getDraftTileManager();
@@ -250,55 +361,143 @@ public class NucleusSliceGeneratorService {
             return new NucleusOutcome(null, "No draft tiles available to generate nucleus and slices.");
         }
 
-        Integer numPlayerSlices = Math.max(mapTemplate.getPlayerCount(), numSlices);
+        Integer numPlayerSlices = Math.max(mapTemplate.getPlayerCount(), nucleusSpecs.numSlices);
         Integer numNucleusSlices = mapTemplate.getNucleusSliceCount();
-        List<Integer> nucleusWormholeOptions = ListHelper.listOfIntegers(0, numNucleusSlices / 2);
-        Integer numNucleusAlphaWormholes = ListHelper.randomPick(nucleusWormholeOptions);
-        Integer numNucleusBetaWormholes = ListHelper.randomPick(nucleusWormholeOptions);
-        List<Integer> nucleusLegendaryOptions = ListHelper.listOfIntegers(0, numNucleusSlices / 3);
+        List<Integer> mapWormholeOptions = ListHelper.listOfIntegers(nucleusSpecs.minMapWormholes,
+                nucleusSpecs.maxMapWormholes);
+        List<Integer> nucleusWormholeOptions = ListHelper.listOfIntegers(nucleusSpecs.minNucleusWormholes,
+                nucleusSpecs.maxNucleusWormholes);
+
+        Integer numTotalWormholes = ListHelper.randomPick(mapWormholeOptions);
+        Integer numNucleusWormholes = ListHelper.randomPick(nucleusWormholeOptions);
+        numNucleusWormholes = Math.min(numNucleusWormholes, numTotalWormholes);
+
+        Map<Wormhole, Integer> numMapWormholesByType = pickWormholesByType(tileManager.getAll(), numTotalWormholes);
+
+        // To get a subset of the map wormholes for the nucleus, we collect all map picks into a list, shuffle it, then take
+        // the first N items.
+        List<Wormhole> mapWormholeTypesList = new ArrayList<>();
+        for(Wormhole wh : numMapWormholesByType.keySet()) {
+            for(int i = 0; i < numMapWormholesByType.get(wh); i++) {
+                mapWormholeTypesList.add(wh);
+            }
+        }
+        Collections.shuffle(mapWormholeTypesList);
+        List<Wormhole> nucleusWormholeTypesList = mapWormholeTypesList.stream().limit(numNucleusWormholes).toList();
+        Map<Wormhole, Integer> numNucleusWormholesByType = new HashMap<>();
+        for(Wormhole wh : nucleusWormholeTypesList) {
+            numNucleusWormholesByType.put(wh, numNucleusWormholesByType.getOrDefault(wh, 0) + 1);
+        }
+
+        // while(numNucleusWormholesByType.values().stream().mapToInt(Integer::intValue).sum() != numNucleusWormholes) {
+        //     // Get the wormhole types that we haven't run out of
+        //     List<Wormhole> availableWormholes = numMapWormholesByType.entrySet().stream()
+        //         .filter(e -> e.getValue() > (numNucleusWormholesByType.getOrDefault(e.getKey(), 0)))
+        //         .map(Map.Entry::getKey)
+        //         .toList();
+        //     Wormhole addWormhole = ListHelper.randomPick(availableWormholes);
+        //     if(addWormhole == null) {
+        //         return new NucleusOutcome(null, "Failed to pick a wormhole type for nucleus; this should have been prevented in setup!");
+        //     }
+        //     numNucleusWormholesByType.put(addWormhole, numNucleusWormholesByType.getOrDefault(addWormhole, 0) + 1);
+        // }
+
+        // Integer numNucleusAlphaWormholes = ListHelper.randomPick(nucleusWormholeOptions);
+        // Integer numNucleusBetaWormholes = ListHelper.randomPick(nucleusWormholeOptions);
+        List<Integer> nucleusLegendaryOptions = ListHelper.listOfIntegers(nucleusSpecs.minNucleusLegendaries,
+                nucleusSpecs.maxNucleusLegendaries);
         Integer numNucleusLegendaries = ListHelper.randomPick(nucleusLegendaryOptions);
-        List<Integer> mapWormholeOptions = ListHelper.listOfIntegers(2, Math.max(numPlayerSlices / 2, 2));
-        Integer numMapAlphaWormholes = ListHelper.randomPick(mapWormholeOptions);
-        Integer numMapBetaWormholes = ListHelper.randomPick(mapWormholeOptions);
-        List<Integer> mapLegendaryOptions = List.of(1, 2, 2);
+        // Integer numMapAlphaWormholes = ListHelper.randomPick(mapWormholeOptions);
+        // Integer numMapBetaWormholes = ListHelper.randomPick(mapWormholeOptions);
+        List<Integer> mapLegendaryOptions = List.of(nucleusSpecs.minMapLegendaries, nucleusSpecs.maxMapLegendaries);
         Integer numMapLegendaries = ListHelper.randomPick(mapLegendaryOptions);
 
-        List<MiltyDraftTile> alphaTiles = tileManager.filterAll(tile -> tile.isHasAlphaWH());
-        List<MiltyDraftTile> betaTiles = tileManager.filterAll(tile -> tile.isHasBetaWH());
+        Map<Wormhole, List<MiltyDraftTile>> wormholeTiles = new HashMap<>();
+        for(Wormhole wh : numMapWormholesByType.keySet()) {
+            List<MiltyDraftTile> whTiles = tileManager.filterAll(t -> t.getTile().getWormholes().contains(wh));
+            Collections.shuffle(whTiles);
+            wormholeTiles.put(wh, whTiles);
+        }
+
+        // List<MiltyDraftTile> alphaTiles = tileManager.filterAll(tile -> tile.isHasAlphaWH());
+        // List<MiltyDraftTile> betaTiles = tileManager.filterAll(tile -> tile.isHasBetaWH());
         List<MiltyDraftTile> legendaryTiles = tileManager.filterAll(tile -> tile.isLegendary());
         List<MapTemplateTile> nucleusTiles = new ArrayList<>(mapTemplate.getTemplateTiles().stream()
                 .filter(tile -> tile.getNucleusNumbers() != null
                         && !tile.getNucleusNumbers().isEmpty())
                 .toList());
 
-        numNucleusAlphaWormholes = Math.min(numNucleusAlphaWormholes, alphaTiles.size());
-        numNucleusBetaWormholes = Math.min(numNucleusBetaWormholes, betaTiles.size());
+        for(Wormhole wh : numMapWormholesByType.keySet()) {
+            int available = wormholeTiles.get(wh).size();
+            numMapWormholesByType.put(wh, Math.min(numMapWormholesByType.get(wh), available));
+            if(numNucleusWormholesByType.containsKey(wh)) {
+                numNucleusWormholesByType.put(wh, Math.min(numNucleusWormholesByType.get(wh), available));
+            }
+        }
+
+        // numNucleusAlphaWormholes = Math.min(numNucleusAlphaWormholes, alphaTiles.size());
+        // numNucleusBetaWormholes = Math.min(numNucleusBetaWormholes, betaTiles.size());
         numNucleusLegendaries = Math.min(numNucleusLegendaries, legendaryTiles.size());
-        numMapAlphaWormholes = Math.min(numMapAlphaWormholes, alphaTiles.size());
-        numMapBetaWormholes = Math.min(numMapBetaWormholes, betaTiles.size());
+        // numMapAlphaWormholes = Math.min(numMapAlphaWormholes, alphaTiles.size());
+        // numMapBetaWormholes = Math.min(numMapBetaWormholes, betaTiles.size());
         numMapLegendaries = Math.min(numMapLegendaries, legendaryTiles.size());
 
-        Collections.shuffle(alphaTiles);
-        Collections.shuffle(betaTiles);
+        // MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Nucleus & Map Wormholes + Legendaries:\n"
+        //         + "- Nucleus Wormholes: "+numNucleusWormholes+" (by type: "+numNucleusWormholesByType.entrySet().stream().map(e -> e.getKey()+": "+e.getValue()).reduce((a,b) -> a+", "+b).orElse("none")+")\n"
+        //         + "- Nucleus Legendaries: "+numNucleusLegendaries+"\n"
+        //         + "- Map Wormholes: "+numMapWormholesByType.values().stream().mapToInt(Integer::intValue).sum()+" (by type: "+numMapWormholesByType.entrySet().stream().map(e -> e.getKey()+": "+e.getValue()).reduce((a,b) -> a+", "+b).orElse("none")+")\n"
+        //         + "- Map Legendaries: "+numMapLegendaries);
+
+        // Collections.shuffle(alphaTiles);
+        // Collections.shuffle(betaTiles);
         Collections.shuffle(legendaryTiles);
         Collections.shuffle(nucleusTiles);
 
+        List<PlacedTile> allPlacedTiles = new ArrayList<>();
         DistanceTool distanceTool = new DistanceTool(game);
+        
+        List<Wormhole> nucleusWormholeTypes = new ArrayList<>(numNucleusWormholesByType.keySet());
+        Collections.shuffle(nucleusWormholeTypes);
+        for(Wormhole wh : nucleusWormholeTypes) {
+            int numToPlace = numNucleusWormholesByType.get(wh);
+            List<MiltyDraftTile> whTiles = wormholeTiles.get(wh);
+            if(whTiles.size() < numToPlace) {
+                return new NucleusOutcome(null, "Failed to place "+numToPlace+" "+wh+" wormholes in nucleus; only "+whTiles.size()+" available. This should have been prevented in setup!");
+            }
+            List<PlacedTile> placedWhTiles = distributeByDistance(nucleusTiles, whTiles, numToPlace, distanceTool, null);
+            if(placedWhTiles.size() < numToPlace) {
+                return new NucleusOutcome(null, "Failed to place all "+wh+" wormholes in nucleus.");
+            }
 
-        List<PlacedTile> placedAlphaTiles =
-                distributeByDistance(nucleusTiles, alphaTiles, numNucleusAlphaWormholes, distanceTool, null);
-        List<PlacedTile> placedBetaTiles =
-                distributeByDistance(nucleusTiles, betaTiles, numNucleusBetaWormholes, distanceTool, null);
-        List<PlacedTile> placedLegendaryTiles =
-                distributeByDistance(nucleusTiles, legendaryTiles, numNucleusLegendaries, distanceTool, null);
+            // Reduce the number of total wormholes of this type that we still need
+            numMapWormholesByType.put(wh, Math.max(0, numMapWormholesByType.get(wh) - placedWhTiles.size()));
 
-        Integer remainingAlphaWormholes = Math.max(numMapAlphaWormholes - placedAlphaTiles.size(), 0);
-        Integer remainingBetaWormholes = Math.max(numMapBetaWormholes - placedBetaTiles.size(), 0);
+            // Because some tiles can have multiple wormholes, we need to remove all placed tiles from available tiles
+            for(PlacedTile pt : placedWhTiles) {
+                for(Wormhole wh2 : wormholeTiles.keySet()) {
+                    wormholeTiles.put(wh2, new ArrayList<>(wormholeTiles.get(wh2).stream()
+                        .filter(t -> !t.equals(pt.draftTile))
+                        .toList()));
+                }
+            }
+
+            // And track all placed tiles
+            allPlacedTiles.addAll(placedWhTiles);
+        }
+
+        // List<PlacedTile> placedAlphaTiles = distributeByDistance(nucleusTiles, alphaTiles, numNucleusAlphaWormholes,
+        //         distanceTool, null);
+        // List<PlacedTile> placedBetaTiles = distributeByDistance(nucleusTiles, betaTiles, numNucleusBetaWormholes,
+        //         distanceTool, null);
+        List<PlacedTile> placedLegendaryTiles = distributeByDistance(nucleusTiles, legendaryTiles,
+                numNucleusLegendaries, distanceTool, null);
+
+        // Integer remainingAlphaWormholes = Math.max(numMapAlphaWormholes - placedAlphaTiles.size(), 0);
+        // Integer remainingBetaWormholes = Math.max(numMapBetaWormholes - placedBetaTiles.size(), 0);
         Integer remainingLegendaryWormholes = Math.max(numMapLegendaries - placedLegendaryTiles.size(), 0);
 
-        List<PlacedTile> allPlacedTiles = new ArrayList<>();
-        allPlacedTiles.addAll(placedAlphaTiles);
-        allPlacedTiles.addAll(placedBetaTiles);
+        // allPlacedTiles.addAll(placedAlphaTiles);
+        // allPlacedTiles.addAll(placedBetaTiles);
         allPlacedTiles.addAll(placedLegendaryTiles);
 
         List<MiltyDraftTile> availableTiles = new ArrayList<>(
@@ -309,8 +508,9 @@ public class NucleusSliceGeneratorService {
                 numPlayerSlices,
                 mapTemplate.getTilesPerPlayer(),
                 availableTiles,
-                remainingAlphaWormholes,
-                remainingBetaWormholes,
+                numMapWormholesByType,
+                // remainingAlphaWormholes,
+                // remainingBetaWormholes,
                 remainingLegendaryWormholes,
                 strictMode);
 
@@ -319,8 +519,8 @@ public class NucleusSliceGeneratorService {
         }
 
         Collections.shuffle(availableTiles);
-        Map<TierList, List<MiltyDraftTile>> tieredAvailableTiles =
-                tierTiles(tileManager, new ArrayList<>(availableTiles));
+        Map<TierList, List<MiltyDraftTile>> tieredAvailableTiles = tierTiles(tileManager,
+                new ArrayList<>(availableTiles));
         List<List<MapTemplateTile>> coreSliceLocations = new ArrayList<>();
         for (int i = 0; i < numNucleusSlices; i++) {
             coreSliceLocations.add(new ArrayList<>());
@@ -334,21 +534,39 @@ public class NucleusSliceGeneratorService {
         }
 
         if (!fillNucleus(
-                coreSliceLocations, tieredAvailableTiles, allPlacedTiles, tileManager, distanceTool, strictMode)) {
+                nucleusSpecs, coreSliceLocations, tieredAvailableTiles, allPlacedTiles, tileManager, distanceTool,
+                strictMode)) {
             return new NucleusOutcome(null, "Failed to fill Nucleus; could not find suitable tiles.");
         }
 
         // Make some attempts to rebalance traits. This will modify parameter objects.
         Predicate<MiltyDraftTile> isNotPlaced = dt -> allPlacedTiles.stream().noneMatch(pt -> pt.draftTile.equals(dt));
-        availableTiles =
-                new ArrayList<>(availableTiles.stream().filter(isNotPlaced).toList());
+        availableTiles = new ArrayList<>(availableTiles.stream().filter(isNotPlaced).toList());
         rebalanceTraits(playerSlices, allPlacedTiles, availableTiles);
 
         // Validate map and nucleus balance
-        String failureReason = validateMapAndSlices(allPlacedTiles, playerSlices, mapTemplate, distanceTool);
+        String failureReason = validateMapAndSlices(nucleusSpecs, allPlacedTiles, playerSlices, mapTemplate,
+                distanceTool);
         if (failureReason != null) {
             return new NucleusOutcome(null, failureReason);
         }
+
+        // MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Wormhole and legendary picks:\n"
+        //         + "- Nucleus Wormholes: " + numNucleusWormholes + " (by type: "
+        //         + numNucleusWormholesByType.entrySet().stream()
+        //                 .map(e -> e.getKey() + ": " + e.getValue())
+        //                 .reduce((a, b) -> a + ", " + b)
+        //                 .orElse("none")
+        //         + ")\n"
+        //         + "- Nucleus Legendaries: " + numNucleusLegendaries + "\n"
+        //         + "- Map Wormholes: "
+        //         + numMapWormholesByType.values().stream().mapToInt(Integer::intValue).sum() + " (by type: "
+        //         + numMapWormholesByType.entrySet().stream()
+        //                 .map(e -> e.getKey() + ": " + e.getValue())
+        //                 .reduce((a, b) -> a + ", " + b)
+        //                 .orElse("none")
+        //         + ")\n"
+        //         + "- Map Legendaries: " + numMapLegendaries);
 
         for (PlacedTile pt : allPlacedTiles) {
             game.setTile(new Tile(pt.draftTile.getTile().getTileID(), pt.mapTile.getPos()));
@@ -357,21 +575,10 @@ public class NucleusSliceGeneratorService {
         return new NucleusOutcome(playerSlices, null);
     }
 
-    public record NucleusValidationSettings(
-            int minSliceRes,
-            int minSliceInf,
-            int minSlicePlanets,
-            int maxSlicePlanets,
-            int minSliceValue,
-            int maxSliceValue,
-            int minCoreValue,
-            int maxCoreValue,
-            int maxCoreBalance,
-            int expectedRedTiles) {}
     private String validateMapAndSlices(
+            NucleusSpecs nucleusSpecs,
             List<PlacedTile> placedTiles,
             List<MiltyDraftSlice> playerSlices,
-            NucleusValidationSettings validationSettings,
             MapTemplateModel mapTemplate,
             DistanceTool distanceTool) {
         List<Integer> slicePlanetCounts = playerSlices.stream()
@@ -379,17 +586,17 @@ public class NucleusSliceGeneratorService {
                         .map(t -> t.getTile().getPlanetUnitHolders().size())
                         .reduce(0, Integer::sum))
                 .toList();
-        Integer minSlicePlanets =
-                slicePlanetCounts.stream().min(Integer::compareTo).orElse(0);
-        Integer maxSlicePlanets =
-                slicePlanetCounts.stream().max(Integer::compareTo).orElse(0);
+        Integer minSlicePlanets = slicePlanetCounts.stream().min(Integer::compareTo).orElse(0);
+        Integer maxSlicePlanets = slicePlanetCounts.stream().max(Integer::compareTo).orElse(0);
 
         Float minSliceRes = playerSlices.stream()
-                .map(slice -> slice.getTiles().stream().map(t -> t.getMiltyRes() + 0.5f * t.getMiltyFlex()).reduce(0.0f, Float::sum))
+                .map(slice -> slice.getTiles().stream().map(t -> t.getMiltyRes() + 0.5f * t.getMiltyFlex()).reduce(0.0f,
+                        Float::sum))
                 .min(Float::compareTo)
                 .orElse(0.0f);
         Float minSliceInf = playerSlices.stream()
-                .map(slice -> slice.getTiles().stream().map(t -> t.getMiltyInf() + 0.5f * t.getMiltyFlex()).reduce(0.0f, Float::sum))
+                .map(slice -> slice.getTiles().stream().map(t -> t.getMiltyInf() + 0.5f * t.getMiltyFlex()).reduce(0.0f,
+                        Float::sum))
                 .min(Float::compareTo)
                 .orElse(0.0f);
 
@@ -402,7 +609,8 @@ public class NucleusSliceGeneratorService {
         Map<Integer, Integer> coreSpends = new HashMap<>();
         for (PlacedTile pt : placedTiles) {
             MapTemplateTile mapTile = pt.mapTile;
-            if (mapTile.getNucleusNumbers() == null) continue;
+            if (mapTile.getNucleusNumbers() == null)
+                continue;
 
             MiltyDraftTile draftTile = pt.draftTile;
             Integer tileSpend = draftTile.getMiltyRes() + draftTile.getMiltyInf() + draftTile.getMiltyFlex();
@@ -411,69 +619,70 @@ public class NucleusSliceGeneratorService {
                 coreSpends.put(nucleusNumber, coreSpends.getOrDefault(nucleusNumber, 0) + tileSpend);
             }
         }
-        Integer minCoreSpend =
-                coreSpends.values().stream().min(Integer::compareTo).orElse(0);
-        Integer maxCoreSpend =
-                coreSpends.values().stream().max(Integer::compareTo).orElse(0);
+        Integer minCoreSpend = coreSpends.values().stream().min(Integer::compareTo).orElse(0);
+        Integer maxCoreSpend = coreSpends.values().stream().max(Integer::compareTo).orElse(0);
         Integer coreSliceBalance = maxCoreSpend - minCoreSpend;
 
         Integer coreRedTiles = (int) placedTiles.stream()
-                .filter(pt ->
-                        pt.draftTile.getTierList() == TierList.red || pt.draftTile.getTierList() == TierList.anomaly)
+                .filter(pt -> pt.draftTile.getTierList() == TierList.red
+                        || pt.draftTile.getTierList() == TierList.anomaly)
                 .count();
         Integer sliceRedTiles = (int) playerSlices.stream()
                 .flatMap(slice -> slice.getTiles().stream())
                 .filter(t -> t.getTierList() == TierList.red || t.getTierList() == TierList.anomaly)
                 .count();
         Integer totalRedTiles = coreRedTiles + sliceRedTiles;
-        Integer expectedRedTiles = Math.round(11 * coreSpends.size() / 6.0f);
 
         boolean anomaliesTouching = false;
         for (int i = 0; i < placedTiles.size(); ++i) {
             PlacedTile tileA = placedTiles.get(i);
-            if (tileA.draftTile.getTile().isAnomaly() == false) continue;
+            if (tileA.draftTile.getTile().isAnomaly() == false)
+                continue;
 
             for (int j = i + 1; j < placedTiles.size(); ++j) {
                 PlacedTile tileB = placedTiles.get(j);
-                if (tileB.draftTile.getTile().isAnomaly() == false) continue;
+                if (tileB.draftTile.getTile().isAnomaly() == false)
+                    continue;
 
                 if (distanceTool.getNattyDistance(tileA.mapTile.getPos(), tileB.mapTile.getPos()) == 1) {
                     anomaliesTouching = true;
                     break;
                 }
             }
-            if (anomaliesTouching) break;
+            if (anomaliesTouching)
+                break;
         }
 
-        if (minSliceRes < validationSettings.minSliceRes) {
-            return "A player slice has less than " + validationSettings.minSliceRes + " total optimal resource.";
+        if (minSliceRes < nucleusSpecs.minSliceRes) {
+            return "A player slice has less than " + nucleusSpecs.minSliceRes + " total optimal resource.";
         }
-        if (minSliceInf < validationSettings.minSliceInf) {
-            return "A player slice has less than " + validationSettings.minSliceInf + " total optimal influence.";
+        if (minSliceInf < nucleusSpecs.minSliceInf) {
+            return "A player slice has less than " + nucleusSpecs.minSliceInf + " total optimal influence.";
         }
-        if (minSliceSpend < validationSettings.minSliceValue) {
-            return "A player slice has less than " + validationSettings.minSliceValue + " total optimal spend.";
+        if (minSliceSpend < nucleusSpecs.minSliceValue) {
+            return "A player slice has less than " + nucleusSpecs.minSliceValue + " total optimal spend.";
         }
-        if (maxSliceSpend > validationSettings.maxSliceValue) {
-            return "A player slice has more than " + validationSettings.maxSliceValue + " total optimal spend.";
+        if (maxSliceSpend > nucleusSpecs.maxSliceValue) {
+            return "A player slice has more than " + nucleusSpecs.maxSliceValue + " total optimal spend.";
         }
-        if (minSlicePlanets < validationSettings.minSlicePlanets) {
-            return "A player slice has less than " + validationSettings.minSlicePlanets + " planets.";
+        if (minSlicePlanets < nucleusSpecs.minSlicePlanets) {
+            return "A player slice has less than " + nucleusSpecs.minSlicePlanets + " planets.";
         }
-        if (maxSlicePlanets > validationSettings.maxSlicePlanets) {
-            return "A player slice has more than " + validationSettings.maxSlicePlanets + " planets.";
+        if (maxSlicePlanets > nucleusSpecs.maxSlicePlanets) {
+            return "A player slice has more than " + nucleusSpecs.maxSlicePlanets + " planets.";
         }
-        if (totalRedTiles < expectedRedTiles) {
-            return "The map has less than the expected " + expectedRedTiles + " red/anomaly tiles total.";
+        if (totalRedTiles < nucleusSpecs.expectedRedTiles) {
+            return "The map has less than the expected " + nucleusSpecs.expectedRedTiles + " red/anomaly tiles total.";
         }
-        if (minCoreSpend < validationSettings.minCoreValue) {
-            return "A core slice has less than " + validationSettings.minCoreValue + " total optimal spend.";
+        if (minCoreSpend < nucleusSpecs.minNucleusValue) {
+            return "A core slice has less than " + nucleusSpecs.minNucleusValue + " total optimal spend.";
         }
-        if (maxCoreSpend > validationSettings.maxCoreValue) {
-            return "A core slice has more than " + validationSettings.maxCoreValue + " total optimal spend.";
+        if (maxCoreSpend > nucleusSpecs.maxNucleusValue) {
+            return "A core slice has more than " + nucleusSpecs.maxNucleusValue + " total optimal spend.";
         }
-        if (coreSliceBalance > validationSettings.maxCoreBalance) {
-            return "The core slices are imbalanced by more than " + validationSettings.maxCoreBalance + " total optimal spend.";
+        if (coreSliceBalance > nucleusSpecs.maxNucleusQualityDifference) {
+            return "The core slices are imbalanced by more than " + nucleusSpecs.maxNucleusQualityDifference
+                    + " total optimal spend.";
         }
         if (anomaliesTouching) {
             return "Two or more anomalies are touching.";
@@ -509,7 +718,8 @@ public class NucleusSliceGeneratorService {
         }
         for (MapTemplateTile mapTile : mapTemplate.getTemplateTiles()) {
             if (mapTile.getNucleusNumbers() == null
-                    || mapTile.getNucleusNumbers().isEmpty()) continue;
+                    || mapTile.getNucleusNumbers().isEmpty())
+                continue;
             if (!seenPositions.contains(mapTile.getPos())) {
                 BotLogger.warning(
                         "Map position " + mapTile.getPos() + " with a nucleus number has no tile placed on it.");
@@ -526,7 +736,8 @@ public class NucleusSliceGeneratorService {
         // TODO: Is this number smart?
         for (int i = 0; i < 10; i++) {
             boolean changed = tryRebalanceTraits(slices, placedTiles, availableTiles);
-            if (!changed) break;
+            if (!changed)
+                break;
         }
     }
 
@@ -539,7 +750,8 @@ public class NucleusSliceGeneratorService {
         int spread = totalTraits.spread();
 
         // TODO: Should this number be a setting?
-        if (spread < 3) return false;
+        if (spread < 3)
+            return false;
 
         MiltyDraftTile toRemove = null;
         MiltyDraftTile toAdd = null;
@@ -559,17 +771,16 @@ public class NucleusSliceGeneratorService {
 
         // Sort by who has the most of the max trait
         Comparator<MiltyDraftTile> descendingTraitComparator = Comparator.comparing(
-                        (MiltyDraftTile draftTile) -> countTraits(draftTile).get(maxTrait))
+                (MiltyDraftTile draftTile) -> countTraits(draftTile).get(maxTrait))
                 .reversed();
         removeCandidates.sort(descendingTraitComparator);
 
         // Check for good adds vs each individual remove candidate
         for (MiltyDraftTile removeCandidate : removeCandidates) {
             Predicate<MiltyDraftTile> planetCountsSimilar = dt -> Math.abs(dt.getTile()
-                                    .getPlanetUnitHolders()
-                                    .size()
-                            - removeCandidate.getTile().getPlanetUnitHolders().size())
-                    <= 1;
+                    .getPlanetUnitHolders()
+                    .size()
+                    - removeCandidate.getTile().getPlanetUnitHolders().size()) <= 1;
             List<MiltyDraftTile> addCandidates = availableTiles.stream()
                     .filter(dt -> countTraits(dt).get(minTrait) > 0)
                     .filter(planetCountsSimilar)
@@ -589,7 +800,8 @@ public class NucleusSliceGeneratorService {
             }
         }
 
-        if (bestSpread == null || toAdd == null || toRemove == null) return false;
+        if (bestSpread == null || toAdd == null || toRemove == null)
+            return false;
 
         // Search for the remove tile on board and in slices, then swap when found
         for (PlacedTile pt : placedTiles) {
@@ -616,7 +828,8 @@ public class NucleusSliceGeneratorService {
     }
 
     private boolean isRemoveCandidate(MiltyDraftTile draftTile, PlanetType maxTrait, boolean isOnBoard) {
-        if (draftTile.getTile().getPlanetUnitHolders().isEmpty()) return false;
+        if (draftTile.getTile().getPlanetUnitHolders().isEmpty())
+            return false;
         List<Planet> planets = draftTile.getTile().getPlanetUnitHolders();
         boolean hasMax = planets.stream()
                 .anyMatch(p -> p.getPlanetModel().getPlanetTypes().contains(maxTrait));
@@ -684,7 +897,8 @@ public class NucleusSliceGeneratorService {
                     case CULTURAL -> cultural++;
                     case INDUSTRIAL -> industrial++;
                     case HAZARDOUS -> hazardous++;
-                    default -> {}
+                    default -> {
+                    }
                 }
             }
         }
@@ -707,6 +921,7 @@ public class NucleusSliceGeneratorService {
     }
 
     private boolean fillNucleus(
+            NucleusSpecs nucleusSpecs,
             List<List<MapTemplateTile>> coreSliceLocations,
             Map<TierList, List<MiltyDraftTile>> tieredAvailableTiles,
             List<PlacedTile> placedTiles,
@@ -752,18 +967,18 @@ public class NucleusSliceGeneratorService {
 
                 // Skip if already occupied
                 // MiltyDraftTile placedTile = placedTiles.stream()
-                //         .filter(pt -> pt.mapTile.equals(location))
-                //         .map(pt -> pt.draftTile)
-                //         .findFirst()
-                //         .orElse(null);
+                // .filter(pt -> pt.mapTile.equals(location))
+                // .map(pt -> pt.draftTile)
+                // .findFirst()
+                // .orElse(null);
                 // if (placedTile != null) {
-                //     // Try to remove a sliceTier entry that matches the placed tile, if possible.
-                //     // If not possible, just try to get as close as we can.
-                //     TierList placedTier = draftTileManager.getRelativeTier(placedTile);
-                //     if(!popSimilarTier(sliceTiers, placedTier, strictMode)) {
-                //         return false;
-                //     }
-                //     continue;
+                // // Try to remove a sliceTier entry that matches the placed tile, if possible.
+                // // If not possible, just try to get as close as we can.
+                // TierList placedTier = draftTileManager.getRelativeTier(placedTile);
+                // if(!popSimilarTier(sliceTiers, placedTier, strictMode)) {
+                // return false;
+                // }
+                // continue;
                 // }
 
                 // Get our preferred tier for this tile
@@ -799,8 +1014,7 @@ public class NucleusSliceGeneratorService {
                             // so this will check high -> mid -> low -> red / anomaly
                             .sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey()))
                             .map(e -> e.getValue())
-                            .map(tiles ->
-                                    tiles.stream().filter(anomalyPredicate).toList())
+                            .map(tiles -> tiles.stream().filter(anomalyPredicate).toList())
                             .filter(tiles -> !tiles.isEmpty())
                             .findFirst()
                             .orElse(List.of());
@@ -841,17 +1055,18 @@ public class NucleusSliceGeneratorService {
                                 int total1 = slice1.getOptimalRes() + slice1.getOptimalInf() + slice1.getOptimalFlex();
                                 int total2 = slice2.getOptimalRes() + slice2.getOptimalInf() + slice2.getOptimalFlex();
 
-                                boolean inOptimalRange1 =
-                                        total1 >= CORE_SLICE_MIN_OPTIMAL && total1 <= CORE_SLICE_MAX_OPTIMAL;
-                                boolean inOptimalRange2 =
-                                        total2 >= CORE_SLICE_MIN_OPTIMAL && total2 <= CORE_SLICE_MAX_OPTIMAL;
+                                boolean inOptimalRange1 = total1 >= nucleusSpecs.minNucleusValue
+                                        && total1 <= nucleusSpecs.maxNucleusValue;
+                                boolean inOptimalRange2 = total2 >= nucleusSpecs.minNucleusValue
+                                        && total2 <= nucleusSpecs.maxNucleusValue;
 
                                 if (inOptimalRange1 && !inOptimalRange2) {
                                     return -1;
                                 } else if (!inOptimalRange1 && inOptimalRange2) {
                                     return 1;
                                 } else {
-                                    int targetOptimal = (CORE_SLICE_MIN_OPTIMAL + CORE_SLICE_MAX_OPTIMAL) / 2;
+                                    int targetOptimal = (nucleusSpecs.minNucleusValue + nucleusSpecs.maxNucleusValue)
+                                            / 2;
                                     return Integer.compare(
                                             Math.abs(targetOptimal - total1), Math.abs(targetOptimal - total2));
                                 }
@@ -877,8 +1092,9 @@ public class NucleusSliceGeneratorService {
             int numPlayerSlices,
             int sliceSize,
             List<MiltyDraftTile> availableSystems,
-            int numAlphas,
-            int numBetas,
+            Map<Wormhole, Integer> numWormholesByType,
+            // int numAlphas,
+            // int numBetas,
             int numLegendaries,
             boolean strictMode) {
 
@@ -893,20 +1109,33 @@ public class NucleusSliceGeneratorService {
 
         // Get a random selection of tiles to satisfy our required counts
         Collections.shuffle(availableSystems);
-        List<MiltyDraftTile> alphaTiles =
-                ListHelper.removeByPredicate(availableSystems, tile -> tile.isHasAlphaWH(), numAlphas);
-        List<MiltyDraftTile> betaTiles =
-                ListHelper.removeByPredicate(availableSystems, tile -> tile.isHasBetaWH(), numBetas);
-        List<MiltyDraftTile> legendaryTiles =
-                ListHelper.removeByPredicate(availableSystems, tile -> tile.isLegendary(), numLegendaries);
+        Map<Wormhole, List<MiltyDraftTile>> requiredWormholeTiles = new HashMap<>();
+        for (Wormhole wh : numWormholesByType.keySet()) {
+            List<MiltyDraftTile> pickedWormholeTiles = ListHelper.removeByPredicate(availableSystems, tile -> tile.getTile().getWormholes().contains(wh),
+                    numWormholesByType.get(wh));
+            if(pickedWormholeTiles.size() < numWormholesByType.get(wh)) {
+                // We couldn't find enough wormholes of this type
+                return null;
+            }
+            requiredWormholeTiles.put(wh, pickedWormholeTiles);
+        }
+        // List<MiltyDraftTile> alphaTiles = ListHelper.removeByPredicate(availableSystems, tile -> tile.isHasAlphaWH(),
+        //         numAlphas);
+        // List<MiltyDraftTile> betaTiles = ListHelper.removeByPredicate(availableSystems, tile -> tile.isHasBetaWH(),
+        //         numBetas);
+        List<MiltyDraftTile> legendaryTiles = ListHelper.removeByPredicate(availableSystems, tile -> tile.isLegendary(),
+                numLegendaries);
 
         // Prepare required tiles. Keeping similar tiles co-located is important;
         // it means when we distribute them across slices, the e.g. alphas will be
         // spread out. If 2+ required tiles land on one slice, they shouldn't be
         // from the same category.
         List<MiltyDraftTile> requiredTiles = new ArrayList<>();
-        requiredTiles.addAll(alphaTiles);
-        requiredTiles.addAll(betaTiles);
+        for (Wormhole wh : requiredWormholeTiles.keySet()) {
+            requiredTiles.addAll(requiredWormholeTiles.get(wh));
+        }
+        // requiredTiles.addAll(alphaTiles);
+        // requiredTiles.addAll(betaTiles);
         requiredTiles.addAll(legendaryTiles);
 
         // Prepare filler tiers by organizing them into tiers for easy selection
@@ -954,7 +1183,8 @@ public class NucleusSliceGeneratorService {
                         List<TierList> blueTiers = List.of(TierList.high, TierList.mid, TierList.low);
                         if (blueTiers.contains(tier)) {
                             for (TierList altTier : blueTiers) {
-                                if (altTier == tier) continue;
+                                if (altTier == tier)
+                                    continue;
                                 List<MiltyDraftTile> altTierFillerTiles = tieredFillerTiles.get(altTier);
                                 if (altTierFillerTiles != null && !altTierFillerTiles.isEmpty()) {
                                     tile = altTierFillerTiles.removeFirst();
@@ -1016,7 +1246,8 @@ public class NucleusSliceGeneratorService {
             tiers.remove(TierList.low);
         } else {
             // If we reach here, we'd be required to swap a blue for a red, which can
-            // mess up tile counts. I keep seeing multiple matching wormholes in player slices,
+            // mess up tile counts. I keep seeing multiple matching wormholes in player
+            // slices,
             // and letting this happen is the likely cause.
             if (strict) {
                 return false;
@@ -1054,13 +1285,16 @@ public class NucleusSliceGeneratorService {
         List<TierList> tierPicks = new ArrayList<>();
         while (tierPicks.size() < count) {
             tierPicks.add(ListHelper.randomPick(blueTiers));
-            if (tierPicks.size() < count) tierPicks.add(TierList.red);
-            if (tierPicks.size() < count) tierPicks.add(ListHelper.randomPick(blueTiers));
+            if (tierPicks.size() < count)
+                tierPicks.add(TierList.red);
+            if (tierPicks.size() < count)
+                tierPicks.add(ListHelper.randomPick(blueTiers));
         }
         return tierPicks;
     }
 
-    private record PlacedTile(MapTemplateTile mapTile, MiltyDraftTile draftTile) {}
+    private record PlacedTile(MapTemplateTile mapTile, MiltyDraftTile draftTile) {
+    }
 
     /**
      * Distribute tiles to locations, trying to maximize the distance between all of
@@ -1087,8 +1321,10 @@ public class NucleusSliceGeneratorService {
             int numPicks,
             DistanceTool distanceTool,
             Integer iterations) {
-        if (numPicks == 0) return List.of();
-        if (iterations == null) iterations = 20;
+        if (numPicks == 0)
+            return List.of();
+        if (iterations == null)
+            iterations = 20;
 
         if (numPicks > availableLocations.size()) {
             throw new IllegalStateException(
@@ -1120,7 +1356,8 @@ public class NucleusSliceGeneratorService {
                 for (int j = i + 1; j < candidate.size(); j++) {
                     PlacedTile pt2 = candidate.get(j);
                     Integer distance = distanceTool.getNattyDistance(pt1.mapTile.getPos(), pt2.mapTile.getPos());
-                    if (distance == null) continue; // sanity check
+                    if (distance == null)
+                        continue; // sanity check
                     if (minDistance == null || distance < minDistance) {
                         minDistance = distance;
                     }
@@ -1138,5 +1375,60 @@ public class NucleusSliceGeneratorService {
         }
 
         return chosen;
+    }
+
+    private Map<Wormhole, Integer> pickWormholesByType(List<MiltyDraftTile> availableTiles, int numWormholes) {
+        if(numWormholes == 0) {
+            return Map.of();
+        }
+        Map<Wormhole, Integer> wormholeCounts = new HashMap<>();
+
+        for (MiltyDraftTile tile : availableTiles) {
+            Set<Wormhole> tileWormholes = tile.getTile().getWormholes();
+            for(Wormhole wh : tileWormholes) {
+                wormholeCounts.putIfAbsent(wh, 0);
+                wormholeCounts.put(wh, wormholeCounts.get(wh) + 1);
+            }
+        }
+
+        if(numWormholes < 4) {
+            // Only one type of wormhole desired
+            List<Wormhole> wormholes = wormholeCounts.entrySet().stream()
+                .filter(e -> e.getValue() >= numWormholes)
+                .map(e -> e.getKey())
+                .toList();
+            Wormhole chosen = ListHelper.randomPick(wormholes);
+            return new HashMap<>(Map.of(chosen, numWormholes));
+        }
+
+        // Only permit wormhole types that have at least 2 tiles
+        wormholeCounts.entrySet().removeIf(e -> e.getValue() < 2);
+
+        Map<Wormhole, Integer> pickedWormholes = new HashMap<>();
+        while(pickedWormholes.values().stream().mapToInt(i -> i).sum() < numWormholes) {
+            // Randomly pick an available wormhole type
+            Wormhole chosen = ListHelper.randomPick(wormholeCounts.keySet().stream().toList());
+
+            // If its our first time picking this type, add 2 so they'll link
+            pickedWormholes.putIfAbsent(chosen, 1);
+            pickedWormholes.put(chosen, pickedWormholes.get(chosen) + 1);
+
+            // If there are no more tiles of this type, don't pick it again
+            if(pickedWormholes.get(chosen) >= wormholeCounts.get(chosen)) {
+                wormholeCounts.remove(chosen);
+            }
+
+            // For the final pick, don't add a new wormhole type
+            int remainingPicks = numWormholes - pickedWormholes.values().stream().mapToInt(i -> i).sum();
+            if(remainingPicks < 2) {
+                wormholeCounts.entrySet().removeIf(e -> !pickedWormholes.containsKey(e.getKey()));
+            }
+
+            // If there are no more valid picks, break
+            if(wormholeCounts.isEmpty()) {
+                break;
+            }
+        }
+        return pickedWormholes;
     }
 }

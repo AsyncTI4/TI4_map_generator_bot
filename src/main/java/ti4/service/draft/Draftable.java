@@ -183,11 +183,17 @@ public abstract class Draftable extends DraftLifecycleHooks {
 
     // Setup
 
-    public SettingsMenu getSetupMenu(DraftManager draftManager) {
-        return null;
-    }
+    // public SettingsMenu getSetupMenu(DraftManager draftManager) {
+    //     return null;
+    // }
 
-    public void applySetupMenuChoices(DraftManager draftManager, SettingsMenu menu) {
-        // Do nothing by default
+    public abstract String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu);
+    //  {
+    //     // Do nothing by default
+    //     return null;
+    // }
+
+    public boolean createsMap() {
+        return false;
     }
 }

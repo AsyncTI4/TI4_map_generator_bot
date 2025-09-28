@@ -37,14 +37,8 @@ public class PartialMapService {
         }
     }
 
-    private boolean placeTiles(GenericInteractionCreateEvent event, DraftManager draftManager) {
-        Game game = draftManager.getGame();
-        String mapTemplateId = getMapTemplateModelId(draftManager);
-        MapTemplateModel mapTemplateModel = Mapper.getMapTemplate(mapTemplateId);
-
+    public boolean placeFromTemplate(MapTemplateModel mapTemplateModel, Game game) {
         boolean updateMap = false;
-
-        // General map setup tasks
         for (MapTemplateTile templateTile : mapTemplateModel.getTemplateTiles()) {
             Tile gameTile = game.getTileByPosition(templateTile.getPos());
 
@@ -60,6 +54,15 @@ public class PartialMapService {
                 if (gameTile != null) AddTileService.addCustodianToken(gameTile, game); // only works on MR for now
             }
         }
+        return updateMap;
+    }
+
+    private boolean placeTiles(GenericInteractionCreateEvent event, DraftManager draftManager) {
+        Game game = draftManager.getGame();
+        String mapTemplateId = getMapTemplateModelId(draftManager);
+        MapTemplateModel mapTemplateModel = Mapper.getMapTemplate(mapTemplateId);
+
+        boolean updateMap = placeFromTemplate(mapTemplateModel, game);
 
         SliceDraftable sliceDraftable = getSliceDraftable(draftManager);
         SeatDraftable seatDraftable = getSeatDraftable(draftManager);

@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
+import ti4.helpers.settingsFramework.menus.NucleusSliceDraftableSettings;
+import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
@@ -22,25 +24,6 @@ import ti4.service.milty.MiltyDraftSlice;
 @UtilityClass
 public class DraftSetupService {
     public static String startFromSettings(GenericInteractionCreateEvent event, MiltySettings settings) {
-        Game game = settings.getGame();
-
-        // Load the general game settings
-        boolean success = game.loadGameSettingsFromSettings(event, settings);
-        if (!success) return "Fix the game settings before continuing";
-        if (game.isCompetitiveTIGLGame()) {
-            TIGLHelper.sendTIGLSetupText(game);
-        }
-
-        DraftSpec specs = DraftSpec.CreateFromMiltySettings(settings);
-
-        if (specs.getTemplate().isNucleusTemplate()) {
-            return startNucleusFromSpecs(event, specs);
-        } else {
-            return startMiltyFromSpecs(event, specs);
-        }
-    }
-    
-    public static String startFromSettings(GenericInteractionCreateEvent event, DraftSystemSettings settings) {
         Game game = settings.getGame();
 
         // Load the general game settings
@@ -236,6 +219,105 @@ public class DraftSetupService {
                 }
             }
         });
+
+        return null;
+    }
+
+    public static String startFromSettings(GenericInteractionCreateEvent event, DraftSystemSettings settings) {
+        Game game = settings.getGame();
+
+        // Game object setup and validation
+        boolean success = game.loadGameSettingsFromSettings(event, settings);
+        if (!success) return "Fix the game settings before continuing";
+        if (game.isCompetitiveTIGLGame()) {
+            TIGLHelper.sendTIGLSetupText(game);
+        }
+
+        // Setup managers and game state
+        DraftManager draftManager = game.getDraftManager();
+        draftManager.resetForNewDraft();
+        draftManager.setPlayers(settings.getPlayerUserIds().stream().toList());
+
+        SourceSettings sourceSettings = settings.getSourceSettings();
+        if (sourceSettings == null) {
+            return "Error: Could not find source settings.";
+        }
+
+        DraftTileManager tileManager = game.getDraftTileManager();
+        tileManager.clear();
+        tileManager.addAllDraftTiles(sourceSettings.getTileSources());
+
+        for(String draftableKey : settings.getDraftablesList().getKeys()) {
+            Draftable draftable = DraftComponentFactory.createDraftable(draftableKey);
+        
+            String error = draftable.applySetupMenuChoices(event, settings);
+            if(error != null) {
+                return error;
+            }
+            draftManager.addDraftable(draftable);
+        }
+
+        // Setup Public Snake Draft Orchestrator
+        DraftOrchestrator orchestrator = DraftComponentFactory.createOrchestrator(settings.getDraftOrchestrator().getChosenKey());
+        if (orchestrator == null) {
+            return "Error: Could not find orchestrator.";
+        }
+        orchestrator.applySetupMenuChoices(event, settings);
+        // TODO from settings
+        // if(orchestrator instanceof PublicSnakeDraftOrchestrator psdo) {
+            // TODO settings
+            // List<String> setPlayerOrder = null;
+            // boolean staticOrder = specs.playerDraftOrder != null && !specs.playerDraftOrder.isEmpty();
+            // if (staticOrder) {
+            //     setPlayerOrder = new ArrayList<>(specs.playerDraftOrder)
+            //             .stream().filter(p -> specs.playerIDs.contains(p)).toList();
+            // }
+        //     psdo.initialize(draftManager, null /*setPlayerOrder*/);
+        // }
+        draftManager.setOrchestrator(orchestrator);       
+
+        // TODO: Support this in the Nucleus generator, by factoring in to the nucleus generation
+        // if (specs.presetSlices != null) {
+        //     SliceDraftable sliceDraftable = new SliceDraftable();
+        //     draftManager.addDraftable(sliceDraftable);
+        //     sliceDraftable.initialize(specs.presetSlices);
+        //     draftManager.tryStartDraft();
+        // }
+
+        // TODO: Support presetting the Nucleus in the Settings object, maybe via modal w/ TTS string
+        // String startMsg = "## Generating the nucleus and slices!!";
+        // if (specs.getPlayerIDs().size() > 7 && specs.numSlices < 10) {
+        //     startMsg +=
+        //             "\n -# This process can fail if valid configurations are hard to find. If you get stuck, try adding a slice.";
+        // }
+
+        // event.getMessageChannel().sendMessage(startMsg).queue((ignore) -> {
+        //     List<MiltyDraftSlice> slices = NucleusSliceGeneratorService.generateNucleusAndSlices(event, specs);
+        //     if (slices == null) {
+        //         MessageHelper.sendMessageToChannel(
+        //                 event.getMessageChannel(),
+        //                 "Failed to generate nucleus and slices after many attempts! Ping bothelper to report this issue.");
+        //         BotLogger.warning(new LogOrigin(event), "Failed to generate nucleus and slices after many attempts.");
+        //     } else {
+        //         SliceDraftable sliceDraftable = new SliceDraftable();
+        //         List<MiltyDraftSlice> sortedSlcies = slices.stream()
+        //                 .sorted((t1, t2) -> t1.getName().compareTo(t2.getName()))
+        //                 .toList();
+        //         sliceDraftable.initialize(sortedSlcies);
+        //         draftManager.addDraftable(sliceDraftable);
+        //         draftManager.tryStartDraft();
+        //         game.setPhaseOfGame("miltydraft");
+        //         GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
+        //         try {
+        //             PartialMapService.tryUpdateMap(event, draftManager, true);
+        //         } catch (Exception e) {
+        //             // Ignore
+        //         }
+        //     }
+        // });
+
+        game.setPhaseOfGame("miltydraft");
+        draftManager.tryStartDraft();
 
         return null;
     }

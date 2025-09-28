@@ -10,6 +10,9 @@ import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
+import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
+import ti4.helpers.settingsFramework.menus.SettingsMenu;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
@@ -142,6 +145,20 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
                 PriorityTrackHelper.AssignPlayerToPriority(draftManager.getGame(), p, speakerNum);
             }
         };
+    }
+
+    @Override
+    public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
+        if(menu == null || !(menu instanceof DraftSystemSettings)) {
+            return "Error: Could not find parent draft system settings.";
+        }
+        DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
+        Game game = draftSystemSettings.getGame();
+        if(game == null) {
+            return "Error: Could not find game instance.";
+        }
+        initialize(draftSystemSettings.getPlayerUserIds().size());
+        return null;
     }
 
     private boolean shouldAlsoSetSeat(DraftManager draftManager) {

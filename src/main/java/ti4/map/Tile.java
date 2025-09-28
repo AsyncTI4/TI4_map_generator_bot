@@ -537,7 +537,10 @@ public class Tile {
     @JsonIgnore
     public Set<WormholeModel.Wormhole> getWormholes() {
         Set<WormholeModel.Wormhole> whs = EnumSet.noneOf(WormholeModel.Wormhole.class);
-        if (getTileModel().getWormholes() != null) whs.addAll(getTileModel().getWormholes());
+        if (getTileModel().getWormholes() != null) {
+            Set<WormholeModel.Wormhole> tileWhs = getTileModel().getWormholes();
+            whs.addAll(tileWhs.stream().filter(Objects::nonNull).toList());
+        }
         for (String token : getSpaceUnitHolder().getTokenList()) {
             if (token.contains("alpha") || token.contains("sigma_weirdway")) whs.add(WormholeModel.Wormhole.ALPHA);
             if (token.contains("beta") || token.contains("sigma_weirdway")) whs.add(WormholeModel.Wormhole.BETA);

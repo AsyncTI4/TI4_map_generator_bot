@@ -67,7 +67,9 @@ import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 import ti4.helpers.settingsFramework.menus.DeckSettings;
+import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
+import ti4.helpers.settingsFramework.menus.GameSetupSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
@@ -215,10 +217,17 @@ public class Game extends GameProperties {
 
     @Setter
     @Getter
+    private String draftSystemSettingsJson;
+
+    @Setter
+    @Getter
     private String draftString;
 
     @Setter
     private MiltySettings miltySettings;
+    
+    @Setter
+    private DraftSystemSettings draftSystemSettings;
 
     @Getter
     @Setter
@@ -465,6 +474,32 @@ public class Game extends GameProperties {
             }
         }
         return miltySettings;
+    }
+
+    public DraftSystemSettings getDraftSystemSettingsUnsafe() {
+        return draftSystemSettings;
+    }
+
+    public DraftSystemSettings initializeDraftSystemSettings() {
+        if (draftSystemSettings == null) {
+            if (draftSystemSettingsJson != null) {
+                try {
+                    JsonNode json = ObjectMapperFactory.build().readTree(draftSystemSettingsJson);
+                    draftSystemSettings = new DraftSystemSettings(this, json);
+                } catch (Exception e) {
+                    BotLogger.error(
+                            new LogOrigin(this),
+                            "Failed loading draft system settings for `" + getName() + "` " + Constants.jabberwockyPing(),
+                            e);
+                    MessageHelper.sendMessageToChannel(
+                            getActionsChannel(), "Draft system settings failed to load. Resetting to default.");
+                    draftSystemSettings = new DraftSystemSettings(this, null);
+                }
+            } else {
+                draftSystemSettings = new DraftSystemSettings(this, null);
+            }
+        }
+        return draftSystemSettings;
     }
 
     public void setPurgedPN(String purgedPN) {
@@ -3292,11 +3327,39 @@ public class Game extends GameProperties {
             setStoredValue("IslandMode", "true");
         }
 
-        return validateAndSetAllDecks(event, miltySettings);
+        DeckSettings deckSettings = settings.getDecks();
+        return validateAndSetAllDecks(event, deckSettings, settings.getStage1s().getVal(),
+                settings.getStage2s().getVal());
     }
 
-    private boolean validateAndSetAllDecks(GenericInteractionCreateEvent event, MiltySettings miltySettings) {
-        DeckSettings deckSettings = miltySettings.getGameSettings().getDecks();
+    public boolean loadGameSettingsFromSettings(GenericInteractionCreateEvent event, DraftSystemSettings draftSettings) {
+        GameSetupSettings gameSetupSettings = draftSettings.getGameSetupSettings();
+        SourceSettings sources = draftSettings.getSourceSettings();
+        if (sources.getAbsol().isVal()) setAbsolMode(true);
+
+        setVp(gameSetupSettings.getPointTotal().getVal());
+
+        if (getMaxSOCountPerPlayer() != 4) {
+            setMaxSOCountPerPlayer(gameSetupSettings.getSecrets().getVal());
+        }
+        if (gameSetupSettings.getTigl().isVal()) {
+            TIGLHelper.initializeTIGLGame(this);
+        }
+        setAllianceMode(gameSetupSettings.getAlliance().isVal());
+
+        // TODO
+        // MiltySliceDraftableSettings miltySettings = draftSettings.getMiltySliceDraftableSettings();
+        // if ("1pIsland".equals(miltySettings.getMapTemplate().getValue().getAlias())) {
+        //     setStoredValue("IslandMode", "true");
+        // }
+
+        DeckSettings deckSettings = gameSetupSettings.getDecks();
+        return validateAndSetAllDecks(event, deckSettings, gameSetupSettings.getStage1s().getVal(),
+                gameSetupSettings.getStage2s().getVal());
+    }
+
+    private boolean validateAndSetAllDecks(GenericInteractionCreateEvent event, DeckSettings deckSettings, int stage1Count, int stage2Count) {
+        // DeckSettings deckSettings = miltySettings.getGameSettings().getDecks();
 
         boolean success = true;
         // &= is the "and operator". It will assign true to success iff success is true and the result is true.
@@ -3315,8 +3378,8 @@ public class Game extends GameProperties {
 
         // Setup peakable objectives
         if (publicObjectives1Peakable.size() != 4) {
-            setUpPeakableObjectives(miltySettings.getGameSettings().getStage1s().getVal(), 1);
-            setUpPeakableObjectives(miltySettings.getGameSettings().getStage2s().getVal(), 2);
+            setUpPeakableObjectives(stage1Count, 1);
+            setUpPeakableObjectives(stage2Count, 2);
         }
 
         if (isAbsolMode() && !deckSettings.getAgendas().getChosenKey().contains("absol")) {

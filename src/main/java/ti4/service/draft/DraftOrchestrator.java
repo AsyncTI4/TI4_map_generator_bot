@@ -1,6 +1,7 @@
 package ti4.service.draft;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.service.draft.DraftManager.CommandSource;
 
 public abstract class DraftOrchestrator extends DraftLifecycleHooks {
@@ -35,5 +36,12 @@ public abstract class DraftOrchestrator extends DraftLifecycleHooks {
 
     public abstract String validateState(DraftManager draftManager);
 
+    // Setup
+
     public abstract void initializePlayerStates(DraftPlayerManager draftManager);
+
+    public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
+        // Do nothing by default
+        return null;
+    }
 }

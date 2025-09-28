@@ -8,7 +8,10 @@ import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.helpers.MapTemplateHelper;
+import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
+import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.image.Mapper;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.MapTemplateModel;
 import ti4.service.draft.DraftChoice;
@@ -141,6 +144,35 @@ public class SeatDraftable extends SinglePickDraftable {
                 seatNum, draftManager.getGame().getMapTemplateID());
         playerSetupState.setPositionHS(homeTilePosition);
 
+        return null;
+    }
+
+    @Override
+    public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
+        if(menu == null || !(menu instanceof DraftSystemSettings)) {
+            return "Error: Could not find parent draft system settings.";
+        }
+        DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
+        Game game = draftSystemSettings.getGame();
+        if(game == null) {
+            return "Error: Could not find game instance.";
+        }
+
+        // Try get the map template from the draft settings, then the game, then just use player count.
+
+        MapTemplateModel mapTemplate = draftSystemSettings.getSliceSettings().getMapTemplate().getValue();
+        if(mapTemplate != null) {
+            initialize(mapTemplate.getPlayerCount());
+            return null;
+        }
+
+        mapTemplate = game.getMapTemplateID() != null ? Mapper.getMapTemplate(game.getMapTemplateID()) : null;
+        if(mapTemplate != null) {
+            initialize(mapTemplate.getPlayerCount());
+            return null;
+        }
+
+        initialize(draftSystemSettings.getPlayerUserIds().size());
         return null;
     }
 }

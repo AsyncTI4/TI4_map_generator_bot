@@ -11,6 +11,7 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.MapTemplateModel;
 import ti4.service.draft.NucleusSliceGeneratorService.NucleusOutcome;
+import ti4.service.draft.NucleusSliceGeneratorService.NucleusSpecs;
 import ti4.testUtils.BaseTi4Test;
 
 @Disabled("Inherently flaky tests; DEFINITELY run locally before changing nucleus generation.")
@@ -176,7 +177,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
         Map<String, Integer> failureReasons = new HashMap<>();
         for (int i = 0; i < REASONABLE_MAX_ATTEMPTS; ++i) {
             outcome = NucleusSliceGeneratorService.tryGenerateNucleusAndSlices(
-                    game, mapTemplate, specs.getNumSlices(), strictMode);
+                    game, mapTemplate, new NucleusSpecs(specs), strictMode);
             if (outcome.slices() != null) {
                 assert outcome.slices().size() == game.getPlayers().size() + 1 + EXTRA_SLICES;
                 return;

@@ -12,6 +12,10 @@ import lombok.Setter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.buttons.Buttons;
+import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
+import ti4.helpers.settingsFramework.menus.PublicSnakeDraftSettings;
+import ti4.helpers.settingsFramework.menus.SettingsMenu;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.draft.DraftButtonService;
@@ -341,6 +345,31 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
         // This draft mode doesn't do any player setup itself, the draftables handle
         // everything.
+        return null;
+    }
+
+    @Override
+    public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
+        if(menu == null || !(menu instanceof DraftSystemSettings)) {
+            return "Error: Could not find parent draft system settings.";
+        }
+        DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
+        Game game = draftSystemSettings.getGame();
+        if(game == null) {
+            return "Error: Could not find game instance.";
+        }
+        PublicSnakeDraftSettings snakeSettings = draftSystemSettings.getPublicSnakeDraftSettings();
+        if(snakeSettings.getPresetDraftOrder().isVal()) {
+            List<String> presetOrder = snakeSettings.getOrderedPlayerIds();
+            if(presetOrder == null || presetOrder.size() != draftSystemSettings.getPlayerUserIds().size()) {
+                return "Error: Preset draft order is enabled, but the order is incomplete.";
+            }
+            
+            initialize(game.getDraftManager(), presetOrder);
+        } else {
+            initialize(game.getDraftManager(), null);
+        }
+
         return null;
     }
 
