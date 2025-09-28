@@ -194,16 +194,16 @@ public class Player extends PlayerProperties {
     public Set<String> getActiveUnits() {
         Set<String> activeUnits = new HashSet<>(getUnitsOwned());
         if (hasActiveBreakthrough("naazbt")) {
-            activeUnits.removeIf(unit -> getUnitByID(unit).getAsyncId().equals("mf"));
+            activeUnits.removeIf(unit -> "mf".equals(getUnitByID(unit).getAsyncId()));
             activeUnits.add("naaz_voltron");
         }
         if (hasUnlockedBreakthrough("mentakbt")) {
             for (String tech : getTechs()) {
                 TechnologyModel model = Mapper.getTech(tech);
-                if (model.getAlias().equals("cr2")
-                        || model.getBaseUpgrade().orElse("").equals("cr2")
-                        || model.getHomebrewReplacesID().orElse("").equals("cr2")) {
-                    activeUnits.removeIf(unit -> getUnitByID(unit).getAsyncId().equals("ca"));
+                if ("cr2".equals(model.getAlias())
+                        || "cr2".equals(model.getBaseUpgrade().orElse(""))
+                        || "cr2".equals(model.getHomebrewReplacesID().orElse(""))) {
+                    activeUnits.removeIf(unit -> "ca".equals(getUnitByID(unit).getAsyncId()));
                     activeUnits.add("mentak_cruiser3");
                     break;
                 }
@@ -1836,6 +1836,10 @@ public class Player extends PlayerProperties {
         }
         super.setCommodities(num);
         if (getCommoditiesBase() + getCommoditiesBonus() == 0) super.setCommodities(comms);
+    }
+
+    public void gainCommodities(int commodities) {
+        setCommodities(getCommodities() + commodities);
     }
 
     @JsonIgnore

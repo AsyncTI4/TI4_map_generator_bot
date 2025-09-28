@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 
 class SendCommodities extends GameStateSubcommand {
 
-    public SendCommodities() {
+    SendCommodities() {
         super(Constants.SEND_COMMODITIES, "Sent Commodities to player/faction", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES, "Commodities count").setRequired(true));
         addOptions(new OptionData(

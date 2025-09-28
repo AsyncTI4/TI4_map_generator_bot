@@ -288,9 +288,10 @@ class ActionCardDeck2ButtonHandler {
 
     @ButtonHandler("resolveTombRaiders")
     public static void resolveTombRaiders(Player player, Game game, ButtonInteractionEvent event) {
+        player.gainCommodities(2);
         List<String> types = new ArrayList<>(List.of("hazardous", "cultural", "industrial", "frontier"));
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentationUnfogged()).append(":");
+        sb.append(player.getRepresentationUnfogged()).append(" gained 2 commodities and:");
         for (String type : types) {
             String cardId = game.drawExplore(type);
             ExploreModel card = Mapper.getExplore(cardId);
