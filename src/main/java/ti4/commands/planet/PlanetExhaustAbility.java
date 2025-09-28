@@ -13,6 +13,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -89,6 +90,11 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             case "thundersedge" -> {
                 output = "Use buttons to do another action.";
                 buttons.addAll(StartTurnService.getStartOfTurnButtons(player, game, true, null));
+            }
+            case "mrte" -> {
+                channel = player.getCardsInfoThread();
+                output = "Choose a secret to discard, the bot will automatically draw a replacement:";
+                buttons.addAll(SecretObjectiveHelper.getSODiscardButtonsWithSuffix(player, "redraw"));
             }
             case "ordinianc4" -> {
                 ActionCardHelper.drawActionCards(game, player, 1, true);

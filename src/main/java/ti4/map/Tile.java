@@ -202,6 +202,14 @@ public class Tile {
         }
     }
 
+    public static Predicate<Tile> tileHasBreach() {
+        return tile -> {
+            List<String> breaches = Arrays.asList("token_breachActive.png", "token_breachInactive.png");
+            Set<String> tokens = tile.getSpaceUnitHolder().getTokenList();
+            return CollectionUtils.containsAny(tokens, breaches);
+        };
+    }
+
     public void removeAllCC() {
         UnitHolder unitHolder = unitHolders.get(Constants.SPACE);
         if (unitHolder != null) {
@@ -575,8 +583,13 @@ public class Tile {
     }
 
     @JsonIgnore
+    public boolean isScar() {
+        return getTileModel().isScar();
+    }
+
+    @JsonIgnore
     public boolean isAnomaly() {
-        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift()) {
+        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift() || isScar()) {
             return true;
         }
         for (UnitHolder unitHolder : unitHolders.values()) {
@@ -615,7 +628,7 @@ public class Tile {
 
     @JsonIgnore
     public boolean isAnomaly(Game game) {
-        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift(game)) {
+        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift(game) || isScar()) {
             return true;
         }
         for (UnitHolder unitHolder : unitHolders.values()) {
@@ -642,6 +655,16 @@ public class Tile {
         return unitHolders.values().stream()
                 .flatMap(uh -> uh.getUnitKeys().stream())
                 .anyMatch(p::unitBelongsToPlayer);
+    }
+
+    @JsonIgnore
+    public int getNumberOfUnitsInSystem() {
+
+        int amount = 0;
+        for (UnitHolder uH : getUnitHolders().values()) {
+            amount += uH.getUnitCount();
+        }
+        return amount;
     }
 
     @JsonIgnore
@@ -709,7 +732,7 @@ public class Tile {
                 .sum();
     }
 
-    private static Predicate<Tile> tileHasPlayerShips(Player player) {
+    public static Predicate<Tile> tileHasPlayerShips(Player player) {
         return tile -> tile.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip);
     }
 

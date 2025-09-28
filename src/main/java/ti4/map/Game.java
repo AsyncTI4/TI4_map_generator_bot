@@ -303,7 +303,7 @@ public class Game extends GameProperties {
         neutral.addTech("ff2");
         neutral.addTech("dd2");
         neutral.addTech("cv2");
-        neutral.addTech("ca2");
+        neutral.addTech("cr2");
         neutral.addTech("ws");
         return neutral;
     }
@@ -1070,7 +1070,7 @@ public class Game extends GameProperties {
         return orderedSCs;
     }
 
-    private Player getPlayerFromSC(int sc) {
+    public Player getPlayerFromSC(int sc) {
         for (Player player : getRealPlayersNDummies()) {
             if (player.getSCs().contains(sc)) {
                 return player;

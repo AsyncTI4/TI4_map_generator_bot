@@ -1,24 +1,18 @@
 package ti4.commands.special;
 
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.GameStateSubcommand;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
-import ti4.helpers.RegexHelper;
-import ti4.helpers.Units.UnitKey;
-import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileHelper;
 import ti4.map.Game;
@@ -27,9 +21,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
-import ti4.service.emoji.ColorEmojis;
 
 class SystemInfo extends GameStateSubcommand {
 
@@ -42,6 +34,7 @@ class SystemInfo extends GameStateSubcommand {
                 OptionType.INTEGER,
                 Constants.EXTRA_RINGS,
                 "Show additional rings around the selected system for context (Max 2)"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.JUST_UNITS, "True to just get unit information."));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_2, "System/Tile name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_3, "System/Tile name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_4, "System/Tile name").setAutoComplete(true));
@@ -62,10 +55,15 @@ class SystemInfo extends GameStateSubcommand {
             if (context == 666) newContext = 6;
             context = newContext;
         }
+        boolean justUnits = false;
+        Boolean just = event.getOption(Constants.JUST_UNITS, null, OptionMapping::getAsBoolean);
+        if (just != null) justUnits = just;
 
         Game game = getGame();
         for (OptionMapping tileOption : event.getOptions()) {
-            if (tileOption == null || tileOption.getName().equals(Constants.EXTRA_RINGS)) {
+            if (tileOption == null
+                    || tileOption.getName().equals(Constants.EXTRA_RINGS)
+                    || tileOption.getName().equals(Constants.JUST_UNITS)) {
                 continue;
             }
             String tileID = tileOption.getAsString().toLowerCase();
@@ -75,105 +73,35 @@ class SystemInfo extends GameStateSubcommand {
                         event.getChannel(), "Tile " + tileOption.getAsString() + " not found");
                 continue;
             }
-            if (game.isFowMode()
-                    && !getPlayer().isGM()
-                    && !FoWHelper.getTilePositionsToShow(game, getPlayer()).contains(tile.getPosition())) {
-                MessageHelper.sendMessageToChannel(
-                        event.getChannel(), "You have no visibility to " + tile.getPosition() + ".");
-                continue;
-            }
-            String tileName = tile.getTilePath();
-            tileName = tileName.substring(tileName.indexOf('_') + 1);
-            tileName = tileName.substring(0, tileName.indexOf(".png"));
-            tileName = " - " + tileName + "[" + tile.getTileID() + "]";
-            StringBuilder sb = new StringBuilder();
-            sb.append("__**Tile: ").append(tile.getPosition()).append(tileName).append("**__\n");
-            Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
-            Boolean privateGame = FoWHelper.isPrivateGame(game, event);
-            for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
-                String name = entry.getKey();
-                String representation = planetRepresentations.get(name);
-                if (representation == null) {
-                    representation = name;
-                }
-                UnitHolder unitHolder = entry.getValue();
-                if (unitHolder instanceof Planet planet) {
-                    sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(representation, game));
-                    sb.append(" Resources: ")
-                            .append(planet.getResources())
-                            .append("/")
-                            .append(planet.getInfluence());
-                } else {
-                    sb.append(representation);
-                }
-                sb.append("\n");
-                boolean hasCC = false;
-                for (String cc : unitHolder.getCcList()) {
-                    if (!hasCC) {
-                        sb.append("Command Tokens: ");
-                        hasCC = true;
-                    }
-                    appendFactionIcon(game, sb, cc, privateGame);
-                }
-                if (hasCC) {
-                    sb.append("\n");
-                }
-                boolean hasToken = false;
-                Map<String, String> tokensToName = Mapper.getTokensToName();
-                for (String token : unitHolder.getTokenList()) {
-                    if (!hasToken) {
-                        sb.append("Tokens: ");
-                        hasToken = true;
-                    }
-                    for (Map.Entry<String, String> entry_ : tokensToName.entrySet()) {
-                        String key = entry_.getKey();
-                        String value = entry_.getValue();
-                        if (token.contains(key)) {
-                            sb.append(value).append(" ");
-                        }
-                    }
-                }
-                if (hasToken) {
-                    sb.append("\n");
-                }
-                boolean hasControl = false;
-                for (String control : unitHolder.getControlList()) {
-                    if (!hasControl) {
-                        sb.append("Control Counters: ");
-                        hasControl = true;
-                    }
-                    appendFactionIcon(game, sb, control, privateGame);
-                }
-                if (hasControl) {
-                    sb.append("\n");
-                }
+            secondHalfOfSystemInfo(game, justUnits, tile, getPlayer(), event.getChannel(), event, context);
+        }
+    }
 
-                Map<UnitKey, Integer> units = unitHolder.getUnits();
-                for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
-                    UnitKey unitKey = unitEntry.getKey();
-                    String color = AliasHandler.resolveColor(unitKey.getColorID());
-                    Player player = game.getPlayerFromColorOrFaction(color);
-                    if (player == null) continue;
-                    UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                    sb.append(player.getFactionEmojiOrColor()).append(ColorEmojis.getColorEmojiWithName(color));
-                    sb.append(" `").append(unitEntry.getValue()).append("x` ");
-                    if (unitModel != null) {
-                        sb.append(unitModel.getUnitEmoji()).append(" ");
-                        sb.append(privateGame ? unitModel.getBaseType() : unitModel.getName())
-                                .append("\n");
-                    } else {
-                        sb.append(unitKey).append("\n");
-                    }
-                }
-                sb.append("----------\n");
-            }
-            FileUpload systemWithContext =
-                    new TileGenerator(game, event, null, context, tile.getPosition()).createFileUpload();
-            MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
-            MessageHelper.sendMessageWithFile(event.getChannel(), systemWithContext, "System", false);
-            if (game.isFowMode()) {
-                return;
-            }
+    public static void secondHalfOfSystemInfo(
+            Game game,
+            boolean justUnits,
+            Tile tile,
+            Player ogPlayer,
+            MessageChannelUnion channel,
+            GenericInteractionCreateEvent event,
+            int context) {
+
+        if (game.isFowMode()
+                && !ogPlayer.isGM()
+                && !FoWHelper.getTilePositionsToShow(game, ogPlayer).contains(tile.getPosition())) {
+            MessageHelper.sendMessageToChannel(channel, "You have no visibility to " + tile.getPosition() + ".");
+            return;
+        }
+
+        FileUpload systemWithContext =
+                new TileGenerator(game, event, null, context, tile.getPosition()).createFileUpload();
+        MessageHelper.sendMessageToChannel(
+                channel, ButtonHelper.getTileSummaryMessage(game, justUnits, tile, ogPlayer, event));
+        MessageHelper.sendMessageWithFile(channel, systemWithContext, tile.getRepresentationForButtons(), false);
+        if (game.isFowMode()) {
+            return;
+        }
+        if (!justUnits) {
             for (Player player : game.getRealPlayers()) {
                 if (!FoWHelper.playerHasUnitsInSystem(player, tile)) {
                     continue;
@@ -206,26 +134,6 @@ class SystemInfo extends GameStateSubcommand {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    private static void appendFactionIcon(Game game, StringBuilder sb, String key, Boolean privateGame) {
-        // parse IDs like "control_blk.png" and "command_red.png"
-        String colorTokenRegex = "[a-z]+_" + RegexHelper.colorRegex(game) + "\\.png";
-        Matcher tokenMatch = Pattern.compile(colorTokenRegex).matcher(key);
-        if (tokenMatch.matches()) {
-            String colorID = tokenMatch.group("color");
-            String color = Mapper.getColorName(colorID);
-            Player player = game.getPlayerFromColorOrFaction(color);
-            if ((privateGame != null && privateGame) || player == null) {
-                sb.append(" (").append(color).append(") ");
-            } else {
-                sb.append(player.getFactionEmoji())
-                        .append(" ")
-                        .append(" (")
-                        .append(color)
-                        .append(") ");
             }
         }
     }

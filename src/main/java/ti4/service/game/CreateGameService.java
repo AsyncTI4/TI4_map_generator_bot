@@ -222,7 +222,9 @@ public class CreateGameService {
 
         // AUTOCLOSE LAUNCH THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread
-                && "making-new-games".equals(thread.getParentChannel().getName())) {
+                && ("making-new-games".equals(thread.getParentChannel().getName())
+                        || "making-private-games"
+                                .equals(thread.getParentChannel().getName()))) {
             newGame.setLaunchPostThreadID(thread.getId());
             ThreadChannelManager manager = thread.getManager()
                     .setName(StringUtils.left(newGame.getName() + "-launched [FULL] - " + thread.getName(), 100))

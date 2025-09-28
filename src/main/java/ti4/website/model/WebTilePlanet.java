@@ -10,6 +10,7 @@ class WebTilePlanet {
     private String controlledBy;
     private Map<String, List<WebEntityData>> entities;
     private Integer commodities; // Number of commodities on this planet (Discordant Stars feature)
+    private boolean planetaryShield; // Whether this planet has a planetary shield (from PDS, abilities, etc.)
 
     public WebTilePlanet() {
         entities = new HashMap<>();

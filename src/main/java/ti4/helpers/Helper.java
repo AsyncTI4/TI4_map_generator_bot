@@ -1624,6 +1624,11 @@ public class Helper {
                         } else {
                             productionValue = planet.getResources() + productionValue;
                         }
+                        if (player.hasUnit("axis_mech")
+                                && !ButtonHelper.isLawInPlay(game, "articles_war")
+                                && uH.getUnitCount(UnitType.Mech, player) > 0) {
+                            productionValue = Math.max(5, productionValue);
+                        }
                     }
                     if (IsPlayerElectedService.isPlayerElected(game, player, "absol_minsindus")) {
                         productionValue += 4;
@@ -1828,6 +1833,11 @@ public class Helper {
                                             Math.max(planet.getResources(), planet.getInfluence()) + productionValue;
                                 } else {
                                     productionValue = planet.getResources() + productionValue;
+                                }
+                                if (player.hasUnit("axis_mech")
+                                        && !ButtonHelper.isLawInPlay(game, "articles_war")
+                                        && uH.getUnitCount(UnitType.Mech, player) > 0) {
+                                    productionValue = Math.max(5, productionValue);
                                 }
                             }
                         }

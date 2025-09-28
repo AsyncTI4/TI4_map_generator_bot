@@ -1620,7 +1620,8 @@ public class UnfiledButtonHandlers {
         }
         if (!game.getStoredValue("newStatusScoringMode").isEmpty()
                 && !"action".equalsIgnoreCase(game.getPhaseOfGame())
-                && event != null) {
+                && event != null
+                && !game.isFowMode()) {
             String msg = "Please score objectives.";
             msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
@@ -2797,18 +2798,6 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
         game.setStoredValue("willRevolution", "active");
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Reversed strategy card picking order.");
-    }
-
-    public static void lastMinuteDeliberation(
-            ButtonInteractionEvent event, Player player, Game game, MessageChannel actionsChannel) {
-        ButtonHelper.deleteMessage(event);
-        String message = player.getRepresentation() + ", please choose the (up to) 2 planets you wish to ready.";
-        List<Button> buttons = Helper.getPlanetRefreshButtons(player, game);
-        buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Readying Planets")); // spitItOut
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
-        AgendaHelper.revealAgenda(event, false, game, actionsChannel);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), "Sent buttons to ready 2 planets to the player who pressed the button.");
     }
 
     @ButtonHandler("confirm_cc")

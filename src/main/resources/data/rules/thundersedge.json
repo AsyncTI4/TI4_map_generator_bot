@@ -94,5 +94,21 @@
             }
         ],
         "source": "thunders_edge"
+    },
+    {
+        "id": "entropicScar",
+        "title": "Entropic Scar Anomaly",
+        "description": [
+            "An __Entropic Scar__ is a new kind of anomaly. All unit abilities ",
+            "Sustain Damage, Production, Planetary Shield, Space Cannon, ",
+            "Bombardment, Deploy, and Anti-Fighter Barrage) ",
+            "cannot be used by or against units inside of an entropic scar. ",
+            "Text abilities are unaffected. ",
+            "Additionally, wormholes that would be placed inside of an entropic scar ",
+            "are discarded instead.",
+            "\n\nAt the start of the status phase, a player that has ships in an entropic scar",
+            " can spend a token from their strategy pool to gain one of their faction-specific technologies."
+        ],
+        "source": "thunders_edge"
     }
 ]

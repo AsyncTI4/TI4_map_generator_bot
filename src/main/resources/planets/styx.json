@@ -1,0 +1,28 @@
+{
+    "id": "styx",
+    "tileId": "fracture4",
+    "name": "Styx",
+    "aliases": [
+        "stic",
+        "stix",
+        "styx",
+        "sticks"
+    ],
+    "resources": 4,
+    "influence": 0,
+    "planetTypes": [
+        "NONE"
+    ],
+    "legendaryAbilityName": "A Song Like Marrow",
+    "legendaryAbilityText": "When you gain this card, gain 1 victory point. When you lose this card, lose 1 victory point.",
+    "legendaryAbilityFlavourText": "The last memory of the universe before.",
+    "planetLayout": {
+        "unitHolderName": "styx",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170.0,
+            "y": 150.0
+        }
+    },
+    "source": "thunders_edge"
+}

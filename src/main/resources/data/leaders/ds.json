@@ -547,7 +547,7 @@
         "type": "commander",
         "name": "Jarl Vel & Jarl Jotrun",
         "title": "Raid Leaders",
-        "abilityWindow": "After you win a space combat in a system that contains no planets or a planet with a structure",
+        "abilityWindow": "After you win a combat in a system that contains no planets or on a planet that contains a structure",
         "abilityText": "You may gain 1 trade good.",
         "unlockCondition": "Have 2 flagships on the game board.",
         "source": "ds",

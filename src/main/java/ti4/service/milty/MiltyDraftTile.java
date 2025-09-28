@@ -16,6 +16,7 @@ public class MiltyDraftTile {
     private boolean hasBetaWH;
     private boolean hasOtherWH;
     private boolean isLegendary;
+    private boolean hasScar;
 
     private int miltyRes;
     private int miltyInf;

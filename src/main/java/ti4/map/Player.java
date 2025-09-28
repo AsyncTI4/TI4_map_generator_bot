@@ -176,6 +176,42 @@ public class Player extends PlayerProperties {
         return Comparator.comparingInt(Player::getInitiative);
     }
 
+    public boolean is(Player p2) {
+        if (p2 == null) return false;
+        return getUserID().equals(p2.getUserID());
+    }
+
+    public UnitModel getUnitByType(UnitType unitType) {
+        return getActiveUnits().stream()
+                .map(Mapper::getUnit)
+                .filter(Objects::nonNull)
+                .filter(unit -> unitType == unit.getUnitType())
+                .findFirst()
+                .orElse(null);
+    }
+
+    @JsonIgnore
+    public Set<String> getActiveUnits() {
+        Set<String> activeUnits = new HashSet<>(getUnitsOwned());
+        if (hasActiveBreakthrough("naazbt")) {
+            activeUnits.removeIf(unit -> "mf".equals(getUnitByID(unit).getAsyncId()));
+            activeUnits.add("naaz_voltron");
+        }
+        if (hasUnlockedBreakthrough("mentakbt")) {
+            for (String tech : getTechs()) {
+                TechnologyModel model = Mapper.getTech(tech);
+                if ("cr2".equals(model.getAlias())
+                        || "cr2".equals(model.getBaseUpgrade().orElse(""))
+                        || "cr2".equals(model.getHomebrewReplacesID().orElse(""))) {
+                    activeUnits.removeIf(unit -> "ca".equals(getUnitByID(unit).getAsyncId()));
+                    activeUnits.add("mentak_cruiser3");
+                    break;
+                }
+            }
+        }
+        return activeUnits;
+    }
+
     public int getSpentTgsThisWindow() {
         for (String thing : getSpentThingsThisWindow()) {
             if (thing.contains("tg_")) {
@@ -818,7 +854,7 @@ public class Player extends PlayerProperties {
         }
     }
 
-    private void removePromissoryNoteFromPlayArea(String id) {
+    public void removePromissoryNoteFromPlayArea(String id) {
         getPromissoryNotesInPlayArea().remove(id);
     }
 
@@ -1800,6 +1836,10 @@ public class Player extends PlayerProperties {
         }
         super.setCommodities(num);
         if (getCommoditiesBase() + getCommoditiesBonus() == 0) super.setCommodities(comms);
+    }
+
+    public void gainCommodities(int commodities) {
+        setCommodities(getCommodities() + commodities);
     }
 
     @JsonIgnore

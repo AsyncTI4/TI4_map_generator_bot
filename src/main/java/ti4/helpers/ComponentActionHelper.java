@@ -89,8 +89,21 @@ public class ComponentActionHelper {
                                                 .filter(Tile.tileHasPlayersInfAndCC(p1))
                                                 .count()
                                         > 0;
+                            case "crimsonbt" ->
+                                game.getTileMap().values().stream()
+                                                .filter(Tile.tileHasBreach())
+                                                .count()
+                                        > 0;
+                            case "saarbt" ->
+                                game.getTileMap().values().stream()
+                                                .filter(Tile::isAsteroidField)
+                                                .filter(Tile.tileHasPlayerShips(p1))
+                                                .count()
+                                        > 0;
+                            case "deepwroughtbt" -> true;
                             default -> true;
                         };
+
                 if (validAction) {
                     TI4Emoji btEmoji = bt.getFactionEmoji();
                     Button btButton = Buttons.green(

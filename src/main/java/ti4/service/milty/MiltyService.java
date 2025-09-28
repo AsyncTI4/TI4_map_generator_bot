@@ -37,6 +37,7 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source;
+import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 import ti4.service.PlanetService;
 import ti4.service.emoji.MiscEmojis;
@@ -104,7 +105,16 @@ public class MiltyService {
 
         // Milty Draft Manager Setup --------------------------------------------------------------
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
-        draftManager.init(specs.tileSources);
+        List<ComponentSource> sources = new ArrayList<>(specs.tileSources);
+        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+            sources.add(ComponentSource.ds);
+            sources.add(ComponentSource.uncharted_space);
+        }
+        if (game.isThundersEdge() || !game.getStoredValue("useEntropicScar").isEmpty()) {
+            sources.add(ComponentSource.thunders_edge);
+        }
+
+        draftManager.init(sources);
         draftManager.setMapTemplate(specs.template.getAlias());
         game.setMapTemplateID(specs.template.getAlias());
         List<String> players = new ArrayList<>(specs.playerIDs);
