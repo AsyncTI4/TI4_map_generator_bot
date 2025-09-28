@@ -90,7 +90,8 @@ public class PickStrategyCardButtonHandler {
                                 + " preset for _Public Disgrace_ was removed due to you picking " + scpick
                                 + " yourself.");
                 game.setStoredValue("Public Disgrace", "");
-            } else if (pdOnly.isEmpty() || pdOnly.contains(player.getFaction())) {
+            } else if (pdOnly.isEmpty()
+                    || (pdOnly.equalsIgnoreCase(player.getFaction()) || pdOnly.equalsIgnoreCase(player.getColor()))) {
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2 == player) continue;
                     if (pdValue.contains(p2.getFaction()) && p2.getActionCards().containsKey("disgrace")) {

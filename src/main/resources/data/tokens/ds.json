@@ -38,7 +38,20 @@
         "id": "freesystems_raccoon",
         "imagePath": "token_raccoon.png",
         "spaceOrPlanet": "planet",
-        "aliasList": ["freesystems_raccoon", "raccoon", "coon"],
+        "aliasList": [
+            "freesystems_raccoon",
+            "raccoon",
+            "coon"
+        ],
+        "source": "ds"
+    },
+    {
+        "id": "freepeople",
+        "imagePath": "token_freepeople.png",
+        "spaceOrPlanet": "planet",
+        "aliasList": [
+            "freepeople"
+        ],
         "source": "ds"
     }
 ]
