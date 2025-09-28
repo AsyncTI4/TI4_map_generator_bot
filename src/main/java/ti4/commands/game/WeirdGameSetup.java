@@ -60,7 +60,7 @@ class WeirdGameSetup extends GameStateSubcommand {
                 new OptionData(OptionType.STRING, Constants.PRIORITY_TRACK, "Enable the Priority Track for this game")
                         .setAutoComplete(true));
         addOptions(new OptionData(
-                        OptionType.STRING,
+                        OptionType.BOOLEAN,
                         Constants.THUNDERS_EDGE_MODE,
                         "True to enable the work in progress Thunders Edge Mode")
                 .setAutoComplete(true));

@@ -2965,22 +2965,26 @@ public class ButtonHelper {
             }
 
             Map<UnitKey, Integer> units = unitHolder.getUnits();
-            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
-                UnitKey unitKey = unitEntry.getKey();
-                String color = AliasHandler.resolveColor(unitKey.getColorID());
-                Player player = game.getPlayerFromColorOrFaction(color);
-                if (player == null) continue;
-                UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                sb.append(player.getFactionEmojiOrColor()).append(ColorEmojis.getColorEmojiWithName(color));
-                sb.append(" `").append(unitEntry.getValue()).append("x` ");
-                if (unitModel != null) {
-                    sb.append(unitModel.getUnitEmoji()).append(" ");
-                    sb.append(privateGame ? unitModel.getBaseType() : unitModel.getName())
-                            .append("\n");
-                } else {
-                    sb.append(unitKey).append("\n");
+            for (String playerColor : unitHolder.getUnitColorsOnHolder()) {
+                for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                    UnitKey unitKey = unitEntry.getKey();
+                    String color = AliasHandler.resolveColor(unitKey.getColorID());
+                    if (color == null || !color.equalsIgnoreCase(playerColor)) continue;
+                    Player player = game.getPlayerFromColorOrFaction(color);
+                    if (player == null) continue;
+                    UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                    sb.append(player.getFactionEmojiOrColor()).append(ColorEmojis.getColorEmojiWithName(color));
+                    sb.append(" `").append(unitEntry.getValue()).append("x` ");
+                    if (unitModel != null) {
+                        sb.append(unitModel.getUnitEmoji()).append(" ");
+                        sb.append(privateGame ? unitModel.getBaseType() : unitModel.getName())
+                                .append("\n");
+                    } else {
+                        sb.append(unitKey).append("\n");
+                    }
                 }
             }
+
             sb.append("----------\n");
         }
         return sb.toString();
@@ -7119,8 +7123,8 @@ public class ButtonHelper {
                     buttons2.add(Buttons.gray(
                             "resolvePreassignment_Public Disgrace Only_" + p2.getFaction(), p2.getFaction()));
                 } else {
-                    buttons2.add(Buttons.gray(
-                            "resolvePreassignment_Public Disgrace Only_" + p2.getFaction(), p2.getColor()));
+                    buttons2.add(
+                            Buttons.gray("resolvePreassignment_Public Disgrace Only_" + p2.getColor(), p2.getColor()));
                 }
             }
             buttons2.add(Buttons.red("deleteButtons", "Decline"));

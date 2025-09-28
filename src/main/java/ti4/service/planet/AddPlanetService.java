@@ -66,7 +66,7 @@ public class AddPlanetService {
             BotLogger.error(new LogOrigin(event), "Unitholder found null in addPlanet for planet " + planet);
             unitHolder = game.getUnitHolderFromPlanet(planet);
         }
-        if (unitHolder.getTokenList().contains("token_freepeople.png")) {
+        if (player.isRealPlayer() && unitHolder.getTokenList().contains("token_freepeople.png")) {
             unitHolder.removeToken("token_freepeople.png");
         }
         if (unitHolder.getTokenList().contains("token_tomb.png") && player.hasAbility("ancient_empire")) {
@@ -494,7 +494,7 @@ public class AddPlanetService {
 
         if (player.hasUnlockedBreakthrough("l1z1xbt") && tile != null && !setup) {
             Planet p = tile.getUnitHolderFromPlanet(planet);
-            if (p == null) {
+            if (p != null && !alreadyOwned) {
                 FealtyUplinkService.postInitialButtons(game, player, planet);
             } else {
                 FealtyUplinkService.resolveAddInf(player, p);
