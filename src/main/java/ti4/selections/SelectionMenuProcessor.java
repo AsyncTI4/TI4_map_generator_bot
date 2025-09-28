@@ -89,12 +89,15 @@ public class SelectionMenuProcessor {
 
     @SelectionHandler("jmfA_")
     public static void handleJazzMiltyFrameworkAction(StringSelectInteractionEvent event, Game game) {
-        if(game.getDraftSystemSettingsUnsafe() != null || game.getDraftSystemSettingsJson() != null) {
+        if (game.getDraftSystemSettingsUnsafe() != null || game.getDraftSystemSettingsJson() != null) {
             game.initializeDraftSystemSettings().parseSelectionInput(event);
-        } else if(game.getMiltySettingsUnsafe() != null || game.getMiltyJson() != null) {
+        } else if (game.getMiltySettingsUnsafe() != null || game.getMiltyJson() != null) {
             game.initializeMiltySettings().parseSelectionInput(event);
         } else {
-            event.reply("No Milty or Draft System settings found for this game. Please set up Milty or Draft System first.").setEphemeral(true).queue();
+            event.reply(
+                            "No Milty or Draft System settings found for this game. Please set up Milty or Draft System first.")
+                    .setEphemeral(true)
+                    .queue();
         }
         deleteMsg(event);
     }

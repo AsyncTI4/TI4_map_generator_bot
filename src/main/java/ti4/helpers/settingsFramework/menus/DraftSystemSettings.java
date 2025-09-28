@@ -3,15 +3,8 @@ package ti4.helpers.settingsFramework.menus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Function;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,32 +12,19 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
-import ti4.helpers.StringHelper;
-import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
-import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.ReadOnlyTextSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.Player;
-import ti4.model.MapTemplateModel;
-import ti4.model.Source.ComponentSource;
 import ti4.service.draft.DraftComponentFactory;
-import ti4.service.draft.DraftOrchestrator;
 import ti4.service.draft.DraftSetupService;
-import ti4.service.draft.DraftableType;
 import ti4.service.draft.draftables.FactionDraftable;
 import ti4.service.draft.draftables.SeatDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
 import ti4.service.draft.orchestrators.PublicSnakeDraftOrchestrator;
-import ti4.service.emoji.CardEmojis;
-import ti4.service.emoji.MiltyDraftEmojis;
-import ti4.service.emoji.MiscEmojis;
-import ti4.service.emoji.SourceEmojis;
 import ti4.service.milty.MiltyDraftSlice;
 
 /*
@@ -65,8 +45,10 @@ import ti4.service.milty.MiltyDraftSlice;
 // TODO: Pick from a library of pre-made maps, then choose or draft seats. Print a preview of the selected map!
 // TODO: Maybe Draftables need a "builds map" property, so we can choose exactly 1 way of building the map, and
 //  that way nucleus vs milty vs premade vs star-by-star conflicts can be detected.
-//   ....Really, each Draftable needs a "sets X" method, which gives categories (map, faction, home system tile position, speaker token)
-//       and a singular description for whats set, e.g. "Create the map from smaller drafted slices and a central Nucleus."
+//   ....Really, each Draftable needs a "sets X" method, which gives categories (map, faction, home system tile
+// position, speaker token)
+//       and a singular description for whats set, e.g. "Create the map from smaller drafted slices and a central
+// Nucleus."
 
 @Getter
 public class DraftSystemSettings extends SettingsMenu {
@@ -86,10 +68,11 @@ public class DraftSystemSettings extends SettingsMenu {
     // Bonus Attributes
     @Setter
     private String preset = null;
+
     @JsonIgnore
     private final Game game;
 
-    private final static String MENU_ID = "draft";
+    private static final String MENU_ID = "draft";
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -97,7 +80,6 @@ public class DraftSystemSettings extends SettingsMenu {
     public DraftSystemSettings(Game game, JsonNode json) {
         super(MENU_ID, "Draft Settings", "Edit draft settings, then start the draft!", null);
         this.game = game;
-
 
         // Initialize values & keys for draft components
         List<String> draftables = DraftComponentFactory.getKnownDraftableTypes();
@@ -108,8 +90,14 @@ public class DraftSystemSettings extends SettingsMenu {
         //         .collect(Collectors.toMap(o -> o, o -> DraftComponentFactory.createOrchestrator(o)));
         draftOrchestrator = new ChoiceSetting<>("Orchestrator", "Draft Orchestrator", draftOrchestrators.getFirst());
         draftOrchestrator.setAllValues(draftOrchestrators.stream().collect(Collectors.toMap(o -> o, o -> o)));
-        draftablesList = new ListSetting<>("Draftables", "Draftable Types", "Add draftable", "Remove draftable",
-                draftables.stream().collect(Collectors.toMap(d -> d, d -> d)).entrySet(), Set.of(), Set.of());
+        draftablesList = new ListSetting<>(
+                "Draftables",
+                "Draftable Types",
+                "Add draftable",
+                "Remove draftable",
+                draftables.stream().collect(Collectors.toMap(d -> d, d -> d)).entrySet(),
+                Set.of(),
+                Set.of());
 
         // Other Initialization
         draftablesList.setShow(s -> s);
@@ -141,7 +129,8 @@ public class DraftSystemSettings extends SettingsMenu {
         sourceSettings = new SourceSettings(game, json, this);
         sliceSettings = new SliceDraftableSettings(game, json != null ? json.get("sliceSettings") : null, this);
         factionSettings = new FactionDraftableSettings(game, json != null ? json.get("factionSettings") : null, this);
-        publicSnakeDraftSettings = new PublicSnakeDraftSettings(game, json != null ? json.get("publicSnakeDraftSettings") : null, this);
+        publicSnakeDraftSettings =
+                new PublicSnakeDraftSettings(game, json != null ? json.get("publicSnakeDraftSettings") : null, this);
         // frankenSettings = new FrankenSettings(game, json, this);
         // playerSettings = new PlayerFactionSettings(game, json, this);
         // sliceSettings = new SliceGenerationSettings(game, json, this);
@@ -167,7 +156,7 @@ public class DraftSystemSettings extends SettingsMenu {
         if (draftablesList.getKeys().contains(FactionDraftable.class.getSimpleName())) {
             implemented.add(factionSettings);
         }
-        if(draftOrchestrator.getValue().equals(PublicSnakeDraftOrchestrator.class.getSimpleName())) {
+        if (draftOrchestrator.getValue().equals(PublicSnakeDraftOrchestrator.class.getSimpleName())) {
             implemented.add(publicSnakeDraftSettings);
         }
         implemented.add(sourceSettings);
@@ -178,7 +167,7 @@ public class DraftSystemSettings extends SettingsMenu {
     protected List<SettingInterface> settings() {
         // implemented.add(draftMode);
         List<SettingInterface> settings = new ArrayList<>();
-        if(preset == null) {
+        if (preset == null) {
             settings.add(draftOrchestrator);
             settings.add(draftablesList);
         } else {
@@ -206,10 +195,11 @@ public class DraftSystemSettings extends SettingsMenu {
 
     @Override
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error = switch (action) {
-            case "startSetup" -> startSetup(event);
-            default -> null;
-        };
+        String error =
+                switch (action) {
+                    case "startSetup" -> startSetup(event);
+                    default -> null;
+                };
         return (error == null ? "success" : error);
     }
 
@@ -262,8 +252,11 @@ public class DraftSystemSettings extends SettingsMenu {
         DraftSystemSettings settings = new DraftSystemSettings(game, null);
         if (preset.equals("_nucleusPreset")) {
             settings.getDraftablesList()
-                    .setKeys(List.of(FactionDraftable.class.getSimpleName(), SliceDraftable.class.getSimpleName(),
-                            SeatDraftable.class.getSimpleName(), SpeakerOrderDraftable.class.getSimpleName()));
+                    .setKeys(List.of(
+                            FactionDraftable.class.getSimpleName(),
+                            SliceDraftable.class.getSimpleName(),
+                            SeatDraftable.class.getSimpleName(),
+                            SpeakerOrderDraftable.class.getSimpleName()));
             settings.getDraftOrchestrator().setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
             settings.getSliceSettings().getMapGenerationMode().setChosenKey("Nucleus");
             settings.preset = "Nucleus Draft, publicly in a snaking order";

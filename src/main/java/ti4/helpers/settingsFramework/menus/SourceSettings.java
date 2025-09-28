@@ -165,7 +165,7 @@ public class SourceSettings extends SettingsMenu {
         if (parent instanceof MiltySettings ms) {
             game = ms.getGame();
             decks = ms.getGameSettings().getDecks();
-        } else if(parent instanceof DraftSystemSettings dss) {
+        } else if (parent instanceof DraftSystemSettings dss) {
             game = dss.getGame();
             decks = dss.getGameSetupSettings().getDecks();
         }

@@ -224,11 +224,11 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             Game game = getGame();
             DraftManager draftManager = game.getDraftManager();
             String draftEndReason = draftManager.whatsStoppingDraftEnd();
-            if(draftEndReason != null) {
+            if (draftEndReason != null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "The draft isn't over yet: " + draftEndReason);
                 return;
             }
-            
+
             String reason = draftManager.whatsStoppingSetup();
             if (reason == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "The draft should have set up players already.");

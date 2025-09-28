@@ -8,11 +8,9 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
@@ -44,7 +42,7 @@ public class GameSetupSettings extends SettingsMenu {
     @JsonIgnore
     private final Game game;
 
-    private final static String MENU_ID = "gameSetup";
+    private static final String MENU_ID = "gameSetup";
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -63,12 +61,12 @@ public class GameSetupSettings extends SettingsMenu {
         tigl = new BooleanSetting("TIGL", "TIGL Game", defaultTigl);
         alliance = new BooleanSetting("Alliance", "Alliance Mode", false);
 
-        
         // Initialize values & keys for gamePlayers
         Set<Entry<String, Player>> allPlayers = game.getPlayers().entrySet();
-        Set<String> defaultPlayers = game.getPlayers().values().stream().map(Player::getUserID)
-                .collect(Collectors.toSet());
-        Set<String> players = Optional.ofNullable(gamePlayers).map(ListSetting::getKeys).orElse(defaultPlayers);
+        Set<String> defaultPlayers =
+                game.getPlayers().values().stream().map(Player::getUserID).collect(Collectors.toSet());
+        Set<String> players =
+                Optional.ofNullable(gamePlayers).map(ListSetting::getKeys).orElse(defaultPlayers);
         gamePlayers = new ListSetting<>(
                 "Players", "Players playing", "Add player", "Remove player", allPlayers, players, defaultPlayers);
 
@@ -143,11 +141,10 @@ public class GameSetupSettings extends SettingsMenu {
         return (error == null ? "success" : error);
     }
 
-
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
-    
+
     private String preset444() {
         pointTotal.setVal(12);
         stage1s.setVal(4);

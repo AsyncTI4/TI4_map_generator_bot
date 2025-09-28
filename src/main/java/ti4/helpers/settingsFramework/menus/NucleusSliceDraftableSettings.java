@@ -1,39 +1,23 @@
 package ti4.helpers.settingsFramework.menus;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import ti4.helpers.StringHelper;
-import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
-import ti4.service.draft.DraftManager;
-import ti4.service.draft.Draftable;
-import ti4.service.draft.NucleusSliceGeneratorService;
-import ti4.service.draft.NucleusSliceGeneratorService.NucleusOutcome;
-import ti4.service.draft.NucleusSliceGeneratorService.NucleusSpecs;
-import ti4.service.draft.PartialMapService;
-import ti4.service.draft.draftables.SliceDraftable;
-import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TileEmojis;
-
 
 @Getter
 @JsonIgnoreProperties("messageId")
@@ -56,7 +40,7 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
 
     private boolean showAdvanced = false;
 
-    private final static Map<Integer, Integer> SEAT_COUNT_TO_MINIMUM_RED_TILES = Map.of(
+    private static final Map<Integer, Integer> SEAT_COUNT_TO_MINIMUM_RED_TILES = Map.of(
             3, 6,
             4, 7,
             5, 9,
@@ -64,32 +48,43 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
             7, 13,
             8, 15);
 
-    private final static String MENU_ID = "nucleusSlice";
+    private static final String MENU_ID = "nucleusSlice";
 
     public NucleusSliceDraftableSettings(Game game, JsonNode json, SettingsMenu parent) {
-        super(MENU_ID, "Nucleus & Slice value settings", "Advanced settings for map features and slice quality.", parent);
+        super(
+                MENU_ID,
+                "Nucleus & Slice value settings",
+                "Advanced settings for map features and slice quality.",
+                parent);
         this.description.add("Big changes here can cause the nucleus generation to fail.");
 
         // Initialize settings
         int players = game != null ? game.getPlayers().size() : 6;
         int suggestWormholesMax = players;
-        nucleusWormholes = new IntegerRangeSetting("NucleusWH", "Nucleus Wormholes", 1, 0, 4, suggestWormholesMax, 0, 4, 1);
+        nucleusWormholes =
+                new IntegerRangeSetting("NucleusWH", "Nucleus Wormholes", 1, 0, 4, suggestWormholesMax, 0, 4, 1);
         int suggestWormholesMin = players - 1;
-        totalWormholes = new IntegerRangeSetting("TotalWH", "Total Wormholes", suggestWormholesMin, 0, 6, suggestWormholesMax, 0, 6, 1);
+        totalWormholes = new IntegerRangeSetting(
+                "TotalWH", "Total Wormholes", suggestWormholesMin, 0, 6, suggestWormholesMax, 0, 6, 1);
         int suggestLegendariesMax = Math.round(players / 3.0f);
-        nucleusLegendaries = new IntegerRangeSetting("NucleusLeg", "Nucleus Legendaries", 0, 0, 3, suggestLegendariesMax, 0, 3, 1);
-        totalLegendaries = new IntegerRangeSetting("TotalLeg", "Total Legendaries", 1, 0, 5, suggestLegendariesMax, 0, 5, 1);
+        nucleusLegendaries =
+                new IntegerRangeSetting("NucleusLeg", "Nucleus Legendaries", 0, 0, 3, suggestLegendariesMax, 0, 3, 1);
+        totalLegendaries =
+                new IntegerRangeSetting("TotalLeg", "Total Legendaries", 1, 0, 5, suggestLegendariesMax, 0, 5, 1);
         minimumSliceRes = new IntegerSetting("MinSliceRes", "Min Slice Resources", 0, 0, 5, 1);
         minimumSliceInf = new IntegerSetting("MinSliceInf", "Min Slice Influence", 0, 0, 5, 1);
         sliceValue = new IntegerRangeSetting("SliceVal", "Slice Optimal Value", 4, 0, 8, 9, 3, 12, 1);
         slicePlanetCount = new IntegerRangeSetting("SlicePlanets", "Slice Planet Count", 2, 0, 7, 5, 0, 7, 1);
         nucleusValue = new IntegerRangeSetting("NucleusVal", "Nucleus Optimal Value", 4, 0, 8, 8, 3, 12, 1);
         maxNucleusQualityDifference = new IntegerSetting("MaxNucDiff", "Max Nucleus Quality Diff", 3, 0, 10, 1);
-        minimumRedTiles = new IntegerSetting("MinRed", "Minimum Red Tiles", SEAT_COUNT_TO_MINIMUM_RED_TILES.get(players), 0, 20, 1);
+        minimumRedTiles = new IntegerSetting(
+                "MinRed", "Minimum Red Tiles", SEAT_COUNT_TO_MINIMUM_RED_TILES.get(players), 0, 20, 1);
 
         // Add extra info
-        minimumSliceRes.setExtraInfo("Defaults to 0. A low res slice can be combined with a specific seat to balance out.");
-        minimumSliceInf.setExtraInfo("Defaults to 0. A low inf slice can be combined with a specific seat to balance out.");
+        minimumSliceRes.setExtraInfo(
+                "Defaults to 0. A low res slice can be combined with a specific seat to balance out.");
+        minimumSliceInf.setExtraInfo(
+                "Defaults to 0. A low inf slice can be combined with a specific seat to balance out.");
 
         // Emojis
         nucleusWormholes.setEmoji(MiscEmojis.WHalpha);
@@ -103,9 +98,11 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         nucleusValue.setEmoji(MiscEmojis.ResInf);
         maxNucleusQualityDifference.setEmoji(MiscEmojis.Resources_0);
         minimumRedTiles.setEmoji(TileEmojis.GravityRift_41);
-        
+
         // Load JSON if applicable
-        if (json == null || !json.has("menuId") || !MENU_ID.equals(json.get("menuId").asText(""))) {
+        if (json == null
+                || !json.has("menuId")
+                || !MENU_ID.equals(json.get("menuId").asText(""))) {
             return;
         }
 
@@ -120,7 +117,8 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         nucleusValue.initialize(json.get("nucleusValue"));
         maxNucleusQualityDifference.initialize(json.get("maxNucleusQualityDifference"));
         minimumRedTiles.initialize(json.get("minimumRedTiles"));
-        showAdvanced = json.get("showAdvanced") != null && json.get("showAdvanced").asBoolean(false);
+        showAdvanced =
+                json.get("showAdvanced") != null && json.get("showAdvanced").asBoolean(false);
     }
 
     @Override
@@ -130,7 +128,7 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         ls.add(totalWormholes);
         ls.add(nucleusLegendaries);
         ls.add(totalLegendaries);
-        if(showAdvanced) {
+        if (showAdvanced) {
             ls.add(minimumSliceRes);
             ls.add(minimumSliceInf);
             ls.add(sliceValue);
@@ -142,7 +140,6 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         return ls;
     }
 
-    
     @Override
     public List<Button> specialButtons() {
         String idPrefix = menuAction + "_" + navId() + "_";
@@ -169,8 +166,9 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
     private String toggleAdvanced(GenericInteractionCreateEvent event) {
         showAdvanced = !showAdvanced;
 
-        if(showAdvanced) {      
-            String msg = "Be careful with these settings; turn a couple of these knobs, and a valid map may not be possible.";
+        if (showAdvanced) {
+            String msg =
+                    "Be careful with these settings; turn a couple of these knobs, and a valid map may not be possible.";
             MessageHelper.sendMessageToEventChannel(event, msg);
         }
 
@@ -214,9 +212,9 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
     //     int playerCount = draftSystemSettings.getGamePlayers().getKeys().size();
     //     MapTemplateModel mapTemplate = this.mapTemplate.getValue();
     //     if(mapTemplate == null || mapTemplate.getPlayerCount() != playerCount) {
-    //         return "The selected map template "+mapTemplate.getAlias()+" is for a different number of players than " + playerCount;
+    //         return "The selected map template "+mapTemplate.getAlias()+" is for a different number of players than "
+    // + playerCount;
     //     }
-
 
     //     NucleusSpecs specs = new NucleusSpecs(
     //         numSlices.getVal(),

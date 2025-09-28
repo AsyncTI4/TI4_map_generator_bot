@@ -1,25 +1,14 @@
 package ti4.helpers.settingsFramework.menus;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-
-import org.springframework.data.domain.Slice;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.components.label.Label;
-import net.dv8tion.jda.api.components.textinput.TextInput;
-import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import net.dv8tion.jda.api.modals.Modal;
 import ti4.buttons.Buttons;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
@@ -28,11 +17,7 @@ import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
-import ti4.model.Source.ComponentSource;
-import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.emoji.MiscEmojis;
-import ti4.service.milty.MiltyDraftHelper;
-import ti4.service.milty.MiltyDraftSlice;
 
 // This is a sub-menu
 @Getter
@@ -84,8 +69,6 @@ public class MiltySliceDraftableSettings extends SettingsMenu {
             totalValue.initialize(json.get("totalValue"));
             extraWorms.initialize(json.get("extraWorms"));
             numLegends.initialize(json.get("numLegends"));
-
-            
         }
     }
 
@@ -128,7 +111,6 @@ public class MiltySliceDraftableSettings extends SettingsMenu {
         return (error == null ? "success" : error);
     }
 
-
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -158,7 +140,7 @@ public class MiltySliceDraftableSettings extends SettingsMenu {
             msg += "\nHave fun :)";
             MessageHelper.sendMessageToEventChannel(event, msg);
         }
-        if(parent instanceof SliceDraftableSettings sds) {
+        if (parent instanceof SliceDraftableSettings sds) {
             sds.getNumSlices().setVal(6);
             return sds.setPresetSlices(ttsString);
         }
@@ -166,7 +148,7 @@ public class MiltySliceDraftableSettings extends SettingsMenu {
     }
 
     private String richGalaxy() {
-        if(parent instanceof SliceDraftableSettings sds) {
+        if (parent instanceof SliceDraftableSettings sds) {
             sds.getNumSlices().setVal(6);
         }
         minimumRes.setVal(4);
@@ -180,7 +162,7 @@ public class MiltySliceDraftableSettings extends SettingsMenu {
     }
 
     private String poorGalaxy() {
-        if(parent instanceof SliceDraftableSettings sds) {
+        if (parent instanceof SliceDraftableSettings sds) {
             sds.getNumSlices().setVal(6);
         }
         minimumRes.setVal(0);

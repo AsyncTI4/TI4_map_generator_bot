@@ -14,7 +14,6 @@ import ti4.buttons.Buttons;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.FactionDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
-import ti4.helpers.settingsFramework.menus.SliceDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -371,18 +370,19 @@ public class FactionDraftable extends SinglePickDraftable {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if(menu == null || !(menu instanceof DraftSystemSettings)) {
+        if (menu == null || !(menu instanceof DraftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
         DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
         Game game = draftSystemSettings.getGame();
-        if(game == null) {
+        if (game == null) {
             return "Error: Could not find game instance.";
         }
         FactionDraftableSettings factionSettings = draftSystemSettings.getFactionSettings();
         SourceSettings sourceSettings = draftSystemSettings.getSourceSettings();
 
-        initialize(factionSettings.getNumFactions().getVal(),
+        initialize(
+                factionSettings.getNumFactions().getVal(),
                 sourceSettings.getFactionSources(),
                 factionSettings.getPriFactions().getKeys().stream().toList(),
                 factionSettings.getBanFactions().getKeys().stream().toList());

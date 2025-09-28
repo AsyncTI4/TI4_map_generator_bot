@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
-import ti4.helpers.settingsFramework.menus.NucleusSliceDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
@@ -247,34 +246,35 @@ public class DraftSetupService {
         tileManager.clear();
         tileManager.addAllDraftTiles(sourceSettings.getTileSources());
 
-        for(String draftableKey : settings.getDraftablesList().getKeys()) {
+        for (String draftableKey : settings.getDraftablesList().getKeys()) {
             Draftable draftable = DraftComponentFactory.createDraftable(draftableKey);
-        
+
             String error = draftable.applySetupMenuChoices(event, settings);
-            if(error != null) {
+            if (error != null) {
                 return error;
             }
             draftManager.addDraftable(draftable);
         }
 
         // Setup Public Snake Draft Orchestrator
-        DraftOrchestrator orchestrator = DraftComponentFactory.createOrchestrator(settings.getDraftOrchestrator().getChosenKey());
+        DraftOrchestrator orchestrator = DraftComponentFactory.createOrchestrator(
+                settings.getDraftOrchestrator().getChosenKey());
         if (orchestrator == null) {
             return "Error: Could not find orchestrator.";
         }
         orchestrator.applySetupMenuChoices(event, settings);
         // TODO from settings
         // if(orchestrator instanceof PublicSnakeDraftOrchestrator psdo) {
-            // TODO settings
-            // List<String> setPlayerOrder = null;
-            // boolean staticOrder = specs.playerDraftOrder != null && !specs.playerDraftOrder.isEmpty();
-            // if (staticOrder) {
-            //     setPlayerOrder = new ArrayList<>(specs.playerDraftOrder)
-            //             .stream().filter(p -> specs.playerIDs.contains(p)).toList();
-            // }
+        // TODO settings
+        // List<String> setPlayerOrder = null;
+        // boolean staticOrder = specs.playerDraftOrder != null && !specs.playerDraftOrder.isEmpty();
+        // if (staticOrder) {
+        //     setPlayerOrder = new ArrayList<>(specs.playerDraftOrder)
+        //             .stream().filter(p -> specs.playerIDs.contains(p)).toList();
+        // }
         //     psdo.initialize(draftManager, null /*setPlayerOrder*/);
         // }
-        draftManager.setOrchestrator(orchestrator);       
+        draftManager.setOrchestrator(orchestrator);
 
         // TODO: Support this in the Nucleus generator, by factoring in to the nucleus generation
         // if (specs.presetSlices != null) {
@@ -288,7 +288,8 @@ public class DraftSetupService {
         // String startMsg = "## Generating the nucleus and slices!!";
         // if (specs.getPlayerIDs().size() > 7 && specs.numSlices < 10) {
         //     startMsg +=
-        //             "\n -# This process can fail if valid configurations are hard to find. If you get stuck, try adding a slice.";
+        //             "\n -# This process can fail if valid configurations are hard to find. If you get stuck, try
+        // adding a slice.";
         // }
 
         // event.getMessageChannel().sendMessage(startMsg).queue((ignore) -> {
@@ -296,8 +297,10 @@ public class DraftSetupService {
         //     if (slices == null) {
         //         MessageHelper.sendMessageToChannel(
         //                 event.getMessageChannel(),
-        //                 "Failed to generate nucleus and slices after many attempts! Ping bothelper to report this issue.");
-        //         BotLogger.warning(new LogOrigin(event), "Failed to generate nucleus and slices after many attempts.");
+        //                 "Failed to generate nucleus and slices after many attempts! Ping bothelper to report this
+        // issue.");
+        //         BotLogger.warning(new LogOrigin(event), "Failed to generate nucleus and slices after many
+        // attempts.");
         //     } else {
         //         SliceDraftable sliceDraftable = new SliceDraftable();
         //         List<MiltyDraftSlice> sortedSlcies = slices.stream()

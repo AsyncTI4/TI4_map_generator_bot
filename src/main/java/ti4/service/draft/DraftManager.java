@@ -183,8 +183,6 @@ public class DraftManager extends DraftPlayerManager {
             return false;
         }
 
-        
-
         // Consider checking for minimal draftables here...something that provides a
         // faction,
         // something that builds a map, etc.
@@ -193,7 +191,7 @@ public class DraftManager extends DraftPlayerManager {
     }
 
     public String whatsStoppingDraftStart() {
-        if(draftables.isEmpty()) {
+        if (draftables.isEmpty()) {
             return "No draftables have been added to the draft. Try `/draft manage add_draftable`.";
         }
         for (Draftable d : draftables) {

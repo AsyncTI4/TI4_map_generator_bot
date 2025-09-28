@@ -149,25 +149,26 @@ public class SeatDraftable extends SinglePickDraftable {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if(menu == null || !(menu instanceof DraftSystemSettings)) {
+        if (menu == null || !(menu instanceof DraftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
         DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
         Game game = draftSystemSettings.getGame();
-        if(game == null) {
+        if (game == null) {
             return "Error: Could not find game instance.";
         }
 
         // Try get the map template from the draft settings, then the game, then just use player count.
 
-        MapTemplateModel mapTemplate = draftSystemSettings.getSliceSettings().getMapTemplate().getValue();
-        if(mapTemplate != null) {
+        MapTemplateModel mapTemplate =
+                draftSystemSettings.getSliceSettings().getMapTemplate().getValue();
+        if (mapTemplate != null) {
             initialize(mapTemplate.getPlayerCount());
             return null;
         }
 
         mapTemplate = game.getMapTemplateID() != null ? Mapper.getMapTemplate(game.getMapTemplateID()) : null;
-        if(mapTemplate != null) {
+        if (mapTemplate != null) {
             initialize(mapTemplate.getPlayerCount());
             return null;
         }

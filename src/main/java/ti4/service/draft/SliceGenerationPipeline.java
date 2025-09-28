@@ -31,10 +31,11 @@ public class SliceGenerationPipeline {
         }
         var timedRunnable = new TimedRunnable(
                 "Milty Generate event task for " + miltyEvent.specs.getGame().getName(),
-                EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
+                EXECUTION_TIME_SECONDS_WARNING_THRESHOLD,
+                () -> {
                     try {
-                        boolean outcome = SliceGeneratorService.generateSlices(miltyEvent.event,
-                                miltyEvent.sliceDraftable, miltyEvent.tileManager, miltyEvent.specs);
+                        boolean outcome = SliceGeneratorService.generateSlices(
+                                miltyEvent.event, miltyEvent.sliceDraftable, miltyEvent.tileManager, miltyEvent.specs);
                         miltyEvent.callback().accept(outcome);
                     } catch (Exception e) {
                         BotLogger.error(new LogOrigin(miltyEvent.specs.getGame()), "Failed to render event.", e);
@@ -50,9 +51,11 @@ public class SliceGenerationPipeline {
         }
         var timedRunnable = new TimedRunnable(
                 "Nucleus Generate event task for " + nucleusEvent.game.getName(),
-                EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
+                EXECUTION_TIME_SECONDS_WARNING_THRESHOLD,
+                () -> {
                     try {
-                        NucleusOutcome outcome = NucleusSliceGeneratorService.generateNucleusAndSlices(nucleusEvent.event, nucleusEvent.game, nucleusEvent.nucleusSpecs);
+                        NucleusOutcome outcome = NucleusSliceGeneratorService.generateNucleusAndSlices(
+                                nucleusEvent.event, nucleusEvent.game, nucleusEvent.nucleusSpecs);
                         nucleusEvent.callback().accept(outcome);
                     } catch (Exception e) {
                         BotLogger.error(new LogOrigin(nucleusEvent.game), "Failed to render event.", e);
@@ -101,13 +104,11 @@ public class SliceGenerationPipeline {
             SliceDraftable sliceDraftable,
             DraftTileManager tileManager,
             DraftSpec specs,
-            Consumer<Boolean> callback) {
-    }
+            Consumer<Boolean> callback) {}
 
     record NucleusGenerateEvent(
             GenericInteractionCreateEvent event,
             Game game,
             NucleusSpecs nucleusSpecs,
-            Consumer<NucleusOutcome> callback) {
-    }
+            Consumer<NucleusOutcome> callback) {}
 }

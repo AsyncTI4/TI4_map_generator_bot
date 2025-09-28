@@ -3,7 +3,6 @@ package ti4.service.draft.draftables;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import ti4.map.Player;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
@@ -72,8 +71,8 @@ public abstract class FixedNumberDraftable extends Draftable {
             int pickCount = draftManager.getPlayerPicks(playerUserId, getType()).size();
             if (pickCount < getNumPicksPerPlayer()) {
                 Player player = draftManager.getGame().getPlayer(playerUserId);
-                return "Player " + (player != null ? player.getRepresentation() : playerUserId) + " needs to make " + (getNumPicksPerPlayer() - pickCount)
-                        + " more pick(s) for " + getDisplayName() + "!";
+                return "Player " + (player != null ? player.getRepresentation() : playerUserId) + " needs to make "
+                        + (getNumPicksPerPlayer() - pickCount) + " more pick(s) for " + getDisplayName() + "!";
             }
         }
         return null;

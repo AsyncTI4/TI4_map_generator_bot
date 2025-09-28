@@ -149,12 +149,12 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if(menu == null || !(menu instanceof DraftSystemSettings)) {
+        if (menu == null || !(menu instanceof DraftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
         DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
         Game game = draftSystemSettings.getGame();
-        if(game == null) {
+        if (game == null) {
             return "Error: Could not find game instance.";
         }
         initialize(draftSystemSettings.getPlayerUserIds().size());

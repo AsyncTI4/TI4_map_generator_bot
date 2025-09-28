@@ -350,21 +350,23 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if(menu == null || !(menu instanceof DraftSystemSettings)) {
+        if (menu == null || !(menu instanceof DraftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
         DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
         Game game = draftSystemSettings.getGame();
-        if(game == null) {
+        if (game == null) {
             return "Error: Could not find game instance.";
         }
         PublicSnakeDraftSettings snakeSettings = draftSystemSettings.getPublicSnakeDraftSettings();
-        if(snakeSettings.getPresetDraftOrder().isVal()) {
+        if (snakeSettings.getPresetDraftOrder().isVal()) {
             List<String> presetOrder = snakeSettings.getOrderedPlayerIds();
-            if(presetOrder == null || presetOrder.size() != draftSystemSettings.getPlayerUserIds().size()) {
+            if (presetOrder == null
+                    || presetOrder.size()
+                            != draftSystemSettings.getPlayerUserIds().size()) {
                 return "Error: Preset draft order is enabled, but the order is incomplete.";
             }
-            
+
             initialize(game.getDraftManager(), presetOrder);
         } else {
             initialize(game.getDraftManager(), null);

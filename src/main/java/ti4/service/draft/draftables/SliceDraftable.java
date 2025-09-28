@@ -10,14 +10,12 @@ import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.NucleusSliceDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.helpers.settingsFramework.menus.SliceDraftableSettings;
-import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.MapTemplateModel;
-import ti4.model.Source.ComponentSource;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftSliceHelper;
@@ -27,9 +25,8 @@ import ti4.service.draft.NucleusSliceGeneratorService;
 import ti4.service.draft.NucleusSliceGeneratorService.NucleusOutcome;
 import ti4.service.draft.NucleusSliceGeneratorService.NucleusSpecs;
 import ti4.service.draft.PartialMapService;
-import ti4.service.draft.SliceGenerationPipeline;
-import ti4.service.draft.SliceGeneratorService;
 import ti4.service.draft.PlayerSetupService.PlayerSetupState;
+import ti4.service.draft.SliceGenerationPipeline;
 import ti4.service.draft.SliceImageGeneratorService;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.milty.MiltyDraftSlice;
@@ -149,60 +146,66 @@ public class SliceDraftable extends SinglePickDraftable {
      */
     // @Override
     // public SettingsMenu getSetupMenu(DraftManager draftManager) {
-        
 
     //     return null;
     // }
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if(menu == null || !(menu instanceof DraftSystemSettings)) {
+        if (menu == null || !(menu instanceof DraftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
         DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
         Game game = draftSystemSettings.getGame();
-        if(game == null) {
+        if (game == null) {
             return "Error: Could not find game instance.";
         }
         SliceDraftableSettings sliceSettings = draftSystemSettings.getSliceSettings();
 
-        if(sliceSettings.getMapGenerationMode().getValue().equals("Nucleus")) {
-            return doNucleusGeneration(event, game, sliceSettings, draftSystemSettings.getPlayerUserIds().size());
-        } else if(sliceSettings.getMapGenerationMode().getValue().equals("Milty")) {
+        if (sliceSettings.getMapGenerationMode().getValue().equals("Nucleus")) {
+            return doNucleusGeneration(
+                    event,
+                    game,
+                    sliceSettings,
+                    draftSystemSettings.getPlayerUserIds().size());
+        } else if (sliceSettings.getMapGenerationMode().getValue().equals("Milty")) {
             return doMiltyGeneration(event, game, draftSystemSettings);
         } else {
-            return "Error: Unknown map generation mode: " + sliceSettings.getMapGenerationMode().getValue();
+            return "Error: Unknown map generation mode: "
+                    + sliceSettings.getMapGenerationMode().getValue();
         }
     }
 
-    private String doNucleusGeneration(GenericInteractionCreateEvent event, Game game, SliceDraftableSettings sliceSettings, int playerCount) {
+    private String doNucleusGeneration(
+            GenericInteractionCreateEvent event, Game game, SliceDraftableSettings sliceSettings, int playerCount) {
         NucleusSliceDraftableSettings nucleusSettings = sliceSettings.getNucleusSettings();
         MapTemplateModel mapTemplate = sliceSettings.getMapTemplate().getValue();
-        if(mapTemplate == null || mapTemplate.getPlayerCount() != playerCount) {
-            return "The selected map template "+mapTemplate.getAlias()+" is for a different number of players than " + playerCount;
+        if (mapTemplate == null || mapTemplate.getPlayerCount() != playerCount) {
+            return "The selected map template " + mapTemplate.getAlias() + " is for a different number of players than "
+                    + playerCount;
         }
 
         NucleusSpecs specs = new NucleusSpecs(
-            sliceSettings.getNumSlices().getVal(),
-            nucleusSettings.getNucleusWormholes().getValLow(), // min nucleus wormholes
-            nucleusSettings.getNucleusWormholes().getValHigh(), // max nucleus wormholes
-            nucleusSettings.getNucleusLegendaries().getValLow(), // min nucleus legendaries
-            nucleusSettings.getNucleusLegendaries().getValHigh(), // max nucleus legendaries
-            nucleusSettings.getTotalWormholes().getValLow(), //min map wormholes
-            nucleusSettings.getTotalWormholes().getValHigh(), // max map wormholes
-            nucleusSettings.getTotalLegendaries().getValLow(), // min map legendaries
-            nucleusSettings.getTotalLegendaries().getValHigh(), // max map legendaries
-            nucleusSettings.getSliceValue().getValLow(), // min slice value
-            nucleusSettings.getSliceValue().getValHigh(), // max slice value
-            nucleusSettings.getNucleusValue().getValLow(), // min nucleus value
-            nucleusSettings.getNucleusValue().getValHigh(), // max nucleus value
-            nucleusSettings.getSlicePlanetCount().getValLow(), // min slice planets
-            nucleusSettings.getSlicePlanetCount().getValHigh(), // max slice planets
-            nucleusSettings.getMinimumSliceRes().getVal(), // min slice resources
-            nucleusSettings.getMinimumSliceInf().getVal(), // min slice influence
-            nucleusSettings.getMaxNucleusQualityDifference().getVal(), // max nucleus quality difference
-            nucleusSettings.getMinimumRedTiles().getVal() // expected red tiles
-        );
+                sliceSettings.getNumSlices().getVal(),
+                nucleusSettings.getNucleusWormholes().getValLow(), // min nucleus wormholes
+                nucleusSettings.getNucleusWormholes().getValHigh(), // max nucleus wormholes
+                nucleusSettings.getNucleusLegendaries().getValLow(), // min nucleus legendaries
+                nucleusSettings.getNucleusLegendaries().getValHigh(), // max nucleus legendaries
+                nucleusSettings.getTotalWormholes().getValLow(), // min map wormholes
+                nucleusSettings.getTotalWormholes().getValHigh(), // max map wormholes
+                nucleusSettings.getTotalLegendaries().getValLow(), // min map legendaries
+                nucleusSettings.getTotalLegendaries().getValHigh(), // max map legendaries
+                nucleusSettings.getSliceValue().getValLow(), // min slice value
+                nucleusSettings.getSliceValue().getValHigh(), // max slice value
+                nucleusSettings.getNucleusValue().getValLow(), // min nucleus value
+                nucleusSettings.getNucleusValue().getValHigh(), // max nucleus value
+                nucleusSettings.getSlicePlanetCount().getValLow(), // min slice planets
+                nucleusSettings.getSlicePlanetCount().getValHigh(), // max slice planets
+                nucleusSettings.getMinimumSliceRes().getVal(), // min slice resources
+                nucleusSettings.getMinimumSliceInf().getVal(), // min slice influence
+                nucleusSettings.getMaxNucleusQualityDifference().getVal(), // max nucleus quality difference
+                nucleusSettings.getMinimumRedTiles().getVal() // expected red tiles
+                );
 
         game.clearTileMap();
         // Very important...the distance tool needs hyperlane tiles placed to calculate adjacencies
@@ -211,22 +214,27 @@ public class SliceDraftable extends SinglePickDraftable {
         game.setMapTemplateID(mapTemplate.getAlias());
 
         String specError = NucleusSliceGeneratorService.validateSpecsForGame(specs, game);
-        if(specError != null) {
+        if (specError != null) {
             return "Error in nucleus/slice settings: " + specError;
         }
-        
+
         // Ensure we can't start yet
         slices = null;
 
         // Create a draftable, AND setup the nucleus directly onto the map!
         SliceGenerationPipeline.queue(event, game, specs, (NucleusOutcome outcome) -> {
-            if(outcome.failureReason() != null) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "We couldn't generate an acceptable map+slices. You can adjust and try again. The most common problem with the maps was: " + outcome.failureReason());
+            if (outcome.failureReason() != null) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "We couldn't generate an acceptable map+slices. You can adjust and try again. The most common problem with the maps was: "
+                                + outcome.failureReason());
                 BotLogger.info(new LogOrigin(game), "Nucleus generation failed: " + outcome.failureReason());
                 return;
             }
-            if(outcome.slices() == null) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "We couldn't generate an acceptable map+slices. You can adjust and try again.");
+            if (outcome.slices() == null) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "We couldn't generate an acceptable map+slices. You can adjust and try again.");
                 BotLogger.error(new LogOrigin(game), "Nucleus generation failed without giving a reason.");
                 return;
             }
@@ -238,30 +246,38 @@ public class SliceDraftable extends SinglePickDraftable {
         //     return "Could not generate nucleus and slices: " + outcome.failureReason();
         // }
 
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "## Generating nucleus and slices!\nThis may take a couple moments\n-# if it fails, you can try again, maybe adjusting settings to be more lax, or ping a bothelper.");
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                "## Generating nucleus and slices!\nThis may take a couple moments\n-# if it fails, you can try again, maybe adjusting settings to be more lax, or ping a bothelper.");
 
         // initialize(outcome.slices());
         return null;
     }
 
-    private String doMiltyGeneration(GenericInteractionCreateEvent event, Game game, DraftSystemSettings draftSystemSettings) {
+    private String doMiltyGeneration(
+            GenericInteractionCreateEvent event, Game game, DraftSystemSettings draftSystemSettings) {
         DraftSpec specs = DraftSpec.CreateFromDraftSystemSettings(draftSystemSettings);
-        //boolean outcome = SliceGeneratorService.generateSlices(event, this, game.getDraftTileManager(), specs);
+        // boolean outcome = SliceGeneratorService.generateSlices(event, this, game.getDraftTileManager(), specs);
 
         // Ensure we can't start yet
         slices = null;
 
         SliceGenerationPipeline.queue(event, this, game.getDraftTileManager(), specs, (Boolean success) -> {
-            if(success) {
+            if (success) {
                 game.getDraftManager().tryStartDraft();
             } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not generate slices with the current settings. Try adjusting the settings and generating again.");
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "Could not generate slices with the current settings. Try adjusting the settings and generating again.");
             }
         });
 
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "## Generating slices!\nThis may take a couple moments\n-# if it fails, you can try again, maybe adjusting settings to be more lax, or ping a bothelper.");
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                "## Generating slices!\nThis may take a couple moments\n-# if it fails, you can try again, maybe adjusting settings to be more lax, or ping a bothelper.");
         // if(!outcome) {
-        //     return "Could not generate slices with the current settings. Try adjusting the settings and generating again.";
+        //     return "Could not generate slices with the current settings. Try adjusting the settings and generating
+        // again.";
         // }
         return null;
     }

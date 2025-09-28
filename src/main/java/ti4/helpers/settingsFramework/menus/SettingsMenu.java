@@ -87,15 +87,12 @@ public abstract class SettingsMenu {
 
     /** Action Handler. Returns null on a success */
     String resetSettings() {
-        if (enabledSettings().isEmpty())
-            return "No settings to reset.";
-        for (SettingInterface setting : enabledSettings())
-            setting.reset();
+        if (enabledSettings().isEmpty()) return "No settings to reset.";
+        for (SettingInterface setting : enabledSettings()) setting.reset();
         return null;
     }
 
-    void updateTransientSettings() {
-    }
+    void updateTransientSettings() {}
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // "Static" methods:
@@ -108,8 +105,7 @@ public abstract class SettingsMenu {
 
     String menuSummaryString(String lastSettingTouched) {
         StringBuilder sb = new StringBuilder("# **__").append(menuName).append(":__**");
-        for (String line : description)
-            sb.append("\n- *").append(line).append("*");
+        for (String line : description) sb.append("\n- *").append(line).append("*");
         sb.append("\n");
 
         int pad = enabledSettings().stream()
@@ -121,8 +117,7 @@ public abstract class SettingsMenu {
             sb.append(setting.longSummary(pad, lastSettingTouched));
             sb.append("\n");
         }
-        if (!enabledSettings().isEmpty())
-            sb.append("\n"); // extra line for formatting
+        if (!enabledSettings().isEmpty()) sb.append("\n"); // extra line for formatting
 
         if (!categories().isEmpty()) {
             List<String> catStrings = new ArrayList<>();
@@ -136,8 +131,7 @@ public abstract class SettingsMenu {
                     shorterCatStrings.add(cat.shortSummaryString(true));
                 }
                 catStr = String.join("\n\n", shorterCatStrings);
-                if (sb.length() + catStr.length() > 1999)
-                    catStr = ""; // give up
+                if (sb.length() + catStr.length() > 1999) catStr = ""; // give up
             }
             sb.append(catStr);
         }
@@ -148,11 +142,9 @@ public abstract class SettingsMenu {
         StringBuilder sb = new StringBuilder("**__" + menuName + ":__**");
         for (String line : description) {
             sb.append("\n- *").append(line).append("*");
-            if (shortDescrOnly)
-                break;
+            if (shortDescrOnly) break;
         }
-        if (shortDescrOnly)
-            return sb.toString();
+        if (shortDescrOnly) return sb.toString();
 
         int maxlength = enabledSettings().stream()
                 .filter(s -> s.getId() != null)
@@ -226,8 +218,7 @@ public abstract class SettingsMenu {
     }
 
     void setMessageId(String messageId) {
-        if (Objects.equals(this.messageId, messageId))
-            return;
+        if (Objects.equals(this.messageId, messageId)) return;
         this.messageId = messageId;
         for (SettingsMenu cat : categories()) {
             if (cat != null) {
@@ -390,8 +381,7 @@ public abstract class SettingsMenu {
             buttons.add(parent.getNavButton(true));
         }
         for (SettingsMenu child : categories()) {
-            if (child != null)
-                buttons.add(child.getNavButton(false));
+            if (child != null) buttons.add(child.getNavButton(false));
         }
         return buttons;
     }
@@ -435,8 +425,8 @@ public abstract class SettingsMenu {
             }
             buttonsToUse.addAll(paginated.get(pageNum));
             if (pageNum < maxPage) {
-                Button nextPage = Button.of(ButtonStyle.PRIMARY, navString + (pageNum + 1), "Next Page",
-                        Emoji.fromUnicode("⏩"));
+                Button nextPage =
+                        Button.of(ButtonStyle.PRIMARY, navString + (pageNum + 1), "Next Page", Emoji.fromUnicode("⏩"));
                 buttonsToUse.add(nextPage);
             }
             return buttonsToUse;

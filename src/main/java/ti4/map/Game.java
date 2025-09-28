@@ -225,7 +225,7 @@ public class Game extends GameProperties {
 
     @Setter
     private MiltySettings miltySettings;
-    
+
     @Setter
     private DraftSystemSettings draftSystemSettings;
 
@@ -489,7 +489,8 @@ public class Game extends GameProperties {
                 } catch (Exception e) {
                     BotLogger.error(
                             new LogOrigin(this),
-                            "Failed loading draft system settings for `" + getName() + "` " + Constants.jabberwockyPing(),
+                            "Failed loading draft system settings for `" + getName() + "` "
+                                    + Constants.jabberwockyPing(),
                             e);
                     MessageHelper.sendMessageToChannel(
                             getActionsChannel(), "Draft system settings failed to load. Resetting to default.");
@@ -3328,11 +3329,15 @@ public class Game extends GameProperties {
         }
 
         DeckSettings deckSettings = settings.getDecks();
-        return validateAndSetAllDecks(event, deckSettings, settings.getStage1s().getVal(),
+        return validateAndSetAllDecks(
+                event,
+                deckSettings,
+                settings.getStage1s().getVal(),
                 settings.getStage2s().getVal());
     }
 
-    public boolean loadGameSettingsFromSettings(GenericInteractionCreateEvent event, DraftSystemSettings draftSettings) {
+    public boolean loadGameSettingsFromSettings(
+            GenericInteractionCreateEvent event, DraftSystemSettings draftSettings) {
         GameSetupSettings gameSetupSettings = draftSettings.getGameSetupSettings();
         SourceSettings sources = draftSettings.getSourceSettings();
         if (sources.getAbsol().isVal()) setAbsolMode(true);
@@ -3354,11 +3359,15 @@ public class Game extends GameProperties {
         // }
 
         DeckSettings deckSettings = gameSetupSettings.getDecks();
-        return validateAndSetAllDecks(event, deckSettings, gameSetupSettings.getStage1s().getVal(),
+        return validateAndSetAllDecks(
+                event,
+                deckSettings,
+                gameSetupSettings.getStage1s().getVal(),
                 gameSetupSettings.getStage2s().getVal());
     }
 
-    private boolean validateAndSetAllDecks(GenericInteractionCreateEvent event, DeckSettings deckSettings, int stage1Count, int stage2Count) {
+    private boolean validateAndSetAllDecks(
+            GenericInteractionCreateEvent event, DeckSettings deckSettings, int stage1Count, int stage2Count) {
         // DeckSettings deckSettings = miltySettings.getGameSettings().getDecks();
 
         boolean success = true;

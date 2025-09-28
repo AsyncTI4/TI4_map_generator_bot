@@ -1,64 +1,26 @@
 package ti4.helpers.settingsFramework.menus;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.errorprone.annotations.OverridingMethodsMustInvokeSuper;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.components.label.Label;
-import net.dv8tion.jda.api.components.textinput.TextInput;
-import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import net.dv8tion.jda.api.modals.Modal;
-import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.buttons.Buttons;
-import ti4.helpers.MapTemplateHelper;
-import ti4.helpers.StringHelper;
-import ti4.helpers.settingsFramework.menus.MiltySettings.DraftingMode;
-import ti4.helpers.settingsFramework.settings.BooleanSetting;
-import ti4.helpers.settingsFramework.settings.ChoiceSetting;
-import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.Player;
-import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
-import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
-import ti4.service.draft.DraftManager;
-import ti4.service.draft.Draftable;
-import ti4.service.draft.NucleusSliceGeneratorService;
-import ti4.service.draft.NucleusSliceGeneratorService.NucleusOutcome;
-import ti4.service.draft.NucleusSliceGeneratorService.NucleusSpecs;
-import ti4.service.draft.PartialMapService;
-import ti4.service.draft.draftables.SliceDraftable;
-import ti4.service.emoji.MiltyDraftEmojis;
-import ti4.service.emoji.MiscEmojis;
-import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.SourceEmojis;
-import ti4.service.emoji.TileEmojis;
-import ti4.service.milty.MiltyDraftHelper;
-import ti4.service.milty.MiltyDraftSlice;
-
 
 @Getter
 @JsonIgnoreProperties("messageId")
@@ -69,7 +31,7 @@ public class FactionDraftableSettings extends SettingsMenu {
     private final ListSetting<FactionModel> banFactions;
     private final ListSetting<FactionModel> priFactions;
 
-    private final static String MENU_ID = "dsFaction";
+    private static final String MENU_ID = "dsFaction";
 
     public FactionDraftableSettings(Game game, JsonNode json, DraftSystemSettings parent) {
         super(MENU_ID, "Faction Settings", "Control faction draft options.", parent);
@@ -101,9 +63,11 @@ public class FactionDraftableSettings extends SettingsMenu {
 
         // Finish initializing transient settings here
         updateTransientSettings();
-        
+
         // Load JSON if applicable
-        if (!(json == null || !json.has("menuId") || !MENU_ID.equals(json.get("menuId").asText("")))) {
+        if (!(json == null
+                || !json.has("menuId")
+                || !MENU_ID.equals(json.get("menuId").asText("")))) {
             numFactions.initialize(json.get("numFactions"));
             banFactions.initialize(json.get("banFactions"));
             priFactions.initialize(json.get("priFactions"));
@@ -119,8 +83,7 @@ public class FactionDraftableSettings extends SettingsMenu {
         return ls;
     }
 
-    
-   @Override
+    @Override
     public List<Button> specialButtons() {
         String idPrefix = menuAction + "_" + navId() + "_";
         List<Button> ls = new ArrayList<>(super.specialButtons());
@@ -173,7 +136,7 @@ public class FactionDraftableSettings extends SettingsMenu {
             sources.remove(ComponentSource.codex3);
             sources.remove(ComponentSource.codex4);
 
-            if(sources.isEmpty()) return "No homebrew faction sources are enabled";
+            if (sources.isEmpty()) return "No homebrew faction sources are enabled";
 
             List<String> newKeys = new ArrayList<>();
             for (FactionModel model : priFactions.getAllValues().values()) {
