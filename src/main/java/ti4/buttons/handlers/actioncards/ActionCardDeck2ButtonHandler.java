@@ -290,23 +290,22 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveTombRaiders(Player player, Game game, ButtonInteractionEvent event) {
         List<String> types = new ArrayList<>(List.of("hazardous", "cultural", "industrial", "frontier"));
         StringBuilder sb = new StringBuilder();
+        sb.append(player.getRepresentationUnfogged()).append(":");
         for (String type : types) {
-            List<String> deck = game.getExploreDeck(type);
-            String cardID = deck.getFirst();
-
-            ExploreModel card = Mapper.getExplore(cardID);
+            String cardId = game.drawExplore(type);
+            ExploreModel card = Mapper.getExplore(cardId);
             String cardType = card.getResolution();
+            sb.append("\nRevealed '")
+                    .append(card.getName())
+                    .append("' from the top of the ")
+                    .append(type)
+                    .append(" deck and ");
             if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
-                cardID = game.drawExplore(type);
-                sb.append(Mapper.getExplore(cardID).getName()).append(System.lineSeparator());
-                sb.append(player.getRepresentationUnfogged()).append(" Gained relic fragment\n");
-                player.addFragment(cardID);
-                game.purgeExplore(cardID);
+                sb.append("gained it.");
+                player.addFragment(cardId);
+                game.purgeExplore(cardId);
             } else {
-                sb.append("Looked at the top of the ")
-                        .append(type)
-                        .append(" deck and saw that it was not a relic fragment.\n");
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), card.getName());
+                sb.append("discarded it.");
             }
         }
         CommanderUnlockCheckService.checkPlayer(player, "kollecc");
