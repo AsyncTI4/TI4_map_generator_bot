@@ -56,7 +56,7 @@ class ExploreDiscardFragment extends GameStateSubcommand {
 
         for (String fragmentToDiscard : fragmentsToDiscard) {
             player.removeFragment(fragmentToDiscard);
-            getGame().addExplore(fragmentToDiscard);
+            getGame().discardExplore(fragmentToDiscard);
         }
 
         ExploreModel fragmentModel = Mapper.getExplore(fragmentsToDiscard.getFirst());
