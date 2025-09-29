@@ -38,6 +38,8 @@ public class NucleusSliceGeneratorService {
     private static final int CORE_SLICE_MIN_OPTIMAL = 4;
     private static final int CORE_SLICE_MAX_OPTIMAL = 8;
 
+    private static final int ATTEMPTS = 50_000;
+
     // Major known issues:
     // - Because the Nucleus is made up of several slices which share some times (e.g. equidistants),
     //   it's usually the case that the last placement was actually already done as the first placmeent.
@@ -88,7 +90,7 @@ public class NucleusSliceGeneratorService {
         // to be flexible.
         boolean strictMode = useStrictMode(mapTemplate);
 
-        for (int i = 0; i < 5_000; i++) {
+        for (int i = 0; i < ATTEMPTS; i++) {
             NucleusOutcome outcome = tryGenerateNucleusAndSlices(game, mapTemplate, specs.getNumSlices(), strictMode);
             if (outcome.slices != null) {
                 return outcome.slices;
@@ -995,6 +997,13 @@ public class NucleusSliceGeneratorService {
         // For our purposes, combine red and anomaly tiers
         result.get(TierList.red).addAll(result.get(TierList.anomaly));
         result.remove(TierList.anomaly);
+
+        // Other tiers go in shuffled, then come out shuffled. But since
+        // we append red and anomaly tiers together, we need to shuffle them now.
+        List<MiltyDraftTile> redTiles = new ArrayList<>(result.get(TierList.red));
+        Collections.shuffle(redTiles);
+        result.put(TierList.red, redTiles);
+
         return result;
     }
 

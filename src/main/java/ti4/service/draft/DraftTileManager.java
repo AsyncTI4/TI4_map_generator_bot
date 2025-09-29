@@ -228,6 +228,10 @@ public class DraftTileManager {
             draftTile.addPlanet(planet);
         }
 
+        if (tile.isScar()) {
+            draftTile.setHasScar(true);
+        }
+
         if (tile.isAnomaly()) {
             draftTile.setTierList(TierList.anomaly);
         } else if (tile.getPlanetUnitHolders().isEmpty()) {

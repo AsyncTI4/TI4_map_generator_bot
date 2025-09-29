@@ -16,14 +16,14 @@ import ti4.testUtils.BaseTi4Test;
 @Disabled("Inherently flaky tests; DEFINITELY run locally before changing nucleus generation.")
 public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
     // Note this is currently half what is actually used in game.
-    private static final int REASONABLE_MAX_ATTEMPTS = 2500;
+    private static final int REASONABLE_MAX_ATTEMPTS = 25_000;
     // Min is -1.
     // NOTE: These tests get flakey at FEWER slices.
     private static final int EXTRA_SLICES = 0;
 
     // If running this locally, try testing with this set to 10+
     // to really exercise the generator.
-    private static final int MIN_SUCCESS_COUNT = 1;
+    private static final int MIN_SUCCESS_COUNT = 10;
 
     private static boolean useStrictMode(int totalSlices) {
         return totalSlices < 14;

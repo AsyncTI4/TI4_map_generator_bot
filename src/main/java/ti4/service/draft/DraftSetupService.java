@@ -154,7 +154,15 @@ public class DraftSetupService {
 
         DraftTileManager tileManager = game.getDraftTileManager();
         tileManager.clear();
-        tileManager.addAllDraftTiles(specs.getTileSources());
+        List<ComponentSource> sources = new ArrayList<>(specs.tileSources);
+        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+            sources.add(ComponentSource.ds);
+            sources.add(ComponentSource.uncharted_space);
+        }
+        if (game.isThundersEdge() || !game.getStoredValue("useEntropicScar").isEmpty()) {
+            sources.add(ComponentSource.thunders_edge);
+        }
+        tileManager.addAllDraftTiles(sources);
 
         game.setMapTemplateID(specs.template.getAlias());
 
