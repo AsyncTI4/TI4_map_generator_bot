@@ -1113,6 +1113,9 @@ public class NucleusSliceGeneratorService {
                 }
 
                 if (!candidateTiles.isEmpty()) {
+                    // TODO: Taking the first biases us to the same high-impact tiles...instead
+                    // maybe introduce more randomness. E.g. for each tile in order, flip a coin
+                    // to see if we take it. Or maybe less often than 50/50, e.g. 20% to take it.
                     MiltyDraftTile chosenTile = candidateTiles.getFirst();
                     placedTiles.add(new PlacedTile(location, chosenTile));
                     for (var tier : tieredAvailableTiles.keySet()) {
