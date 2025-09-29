@@ -11,6 +11,7 @@ import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
+import ti4.model.Source.ComponentSource;
 import ti4.service.draft.draftables.FactionDraftable;
 import ti4.service.draft.draftables.SeatDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
@@ -54,10 +55,17 @@ public class DraftSetupService {
 
         // Draft Manager Setup
         // --------------------------------------------------------------
-
+        List<ComponentSource> sources = new ArrayList<>(specs.tileSources);
+        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+            sources.add(ComponentSource.ds);
+            sources.add(ComponentSource.uncharted_space);
+        }
+        if (game.isThundersEdge() || !game.getStoredValue("useEntropicScar").isEmpty()) {
+            sources.add(ComponentSource.thunders_edge);
+        }
         // Setup managers and game state
         DraftTileManager tileManager = game.getDraftTileManager();
-        tileManager.addAllDraftTiles(specs.tileSources);
+        tileManager.addAllDraftTiles(sources);
         DraftManager draftManager = game.getDraftManager();
         draftManager.resetForNewDraft();
         draftManager.setPlayers(specs.playerIDs);
