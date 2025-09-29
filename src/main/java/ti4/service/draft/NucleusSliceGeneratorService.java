@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1070,8 +1071,8 @@ public class NucleusSliceGeneratorService {
 
         for (int iteration = 0; iteration < iterations; iteration++) {
             List<PlacedTile> candidate = new ArrayList<>();
-            List<MapTemplateTile> locations = new ArrayList<>(availableLocations);
-            List<MiltyDraftTile> systems = new ArrayList<>(availableSystems);
+            List<MapTemplateTile> locations = new LinkedList<>(availableLocations);
+            List<MiltyDraftTile> systems = new LinkedList<>(availableSystems);
             Collections.shuffle(locations);
             Collections.shuffle(systems);
 

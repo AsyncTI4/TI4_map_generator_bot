@@ -87,7 +87,7 @@ public class DraftSpec {
             newKeys.addAll(
                     List.of("arborec", "sol", "letnev", "winnu", "sardakk", "yin", "l1z1x", "naalu", "saar", "naaz"));
             specs.priorityFactions.addAll(newKeys);
-            specs.numFactions = Math.min(6, specs.numFactions);
+            specs.numFactions = Math.min(10, specs.numFactions);
         } else {
             specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
         }

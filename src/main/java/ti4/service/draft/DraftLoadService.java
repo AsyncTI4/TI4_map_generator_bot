@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
+import ti4.helpers.StringHelper;
 import ti4.map.Game;
 
 @UtilityClass
@@ -13,7 +14,7 @@ public class DraftLoadService {
 
     public DraftManager loadDraftManager(Game game, String draftDataJoined) {
 
-        List<String> draftData = DraftSaveService.splitLines(draftDataJoined);
+        List<String> draftData = StringHelper.safeSplit(draftDataJoined, DraftSaveService.ENCODED_DATA_SEPARATOR);
 
         DraftOrchestrator orchestrator = null;
         List<Draftable> draftables = new ArrayList<>();

@@ -12,6 +12,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.commands.Subcommand;
 import ti4.commands.SubcommandGroup;
 import ti4.helpers.Constants;
+import ti4.helpers.StringHelper;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -89,7 +90,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             DraftManager draftManager = game.getDraftManager();
             String saveData = DraftSaveService.saveDraftManager(draftManager);
             StringBuilder sb = new StringBuilder();
-            for (String saveLine : DraftSaveService.splitLines(saveData)) {
+            for (String saveLine : StringHelper.safeSplit(saveData, DraftSaveService.ENCODED_DATA_SEPARATOR)) {
                 if (saveLine.startsWith(DraftSaveService.PLAYER_DATA + DraftSaveService.KEY_SEPARATOR)) {
                     saveLine = saveLine.replaceFirst(
                             DraftSaveService.PLAYER_DATA + DraftSaveService.KEY_SEPARATOR,
