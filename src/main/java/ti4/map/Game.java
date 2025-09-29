@@ -403,6 +403,11 @@ public class Game extends GameProperties {
         return draftManager;
     }
 
+    public void clearDraftManager() {
+        draftManager = null;
+        draftString = null;
+    }
+
     @NotNull
     public DraftManager getDraftManager() {
         if (draftManager != null) {
