@@ -104,7 +104,7 @@ public final class StringHelper {
      * escape character in the strings, then joins them with the separator.
      */
     public static String safeJoin(List<String> lines, char separator) {
-        if(separator == ESCAPE_CHARACTER) {
+        if (separator == ESCAPE_CHARACTER) {
             throw new IllegalArgumentException("Separator cannot be the escape character");
         }
         StringBuilder sb = new StringBuilder();
@@ -119,8 +119,7 @@ public final class StringHelper {
                     String.valueOf(ESCAPE_CHARACTER),
                     String.valueOf(ESCAPE_CHARACTER) + String.valueOf(ESCAPE_CHARACTER));
             line = line.replace(
-                    String.valueOf(separator),
-                    String.valueOf(ESCAPE_CHARACTER) + String.valueOf(separator));
+                    String.valueOf(separator), String.valueOf(ESCAPE_CHARACTER) + String.valueOf(separator));
             sb.append(line);
         }
         return sb.toString();
@@ -132,7 +131,7 @@ public final class StringHelper {
      * safeJoin.
      */
     public static List<String> safeSplit(String data, char separator) {
-        if(separator == ESCAPE_CHARACTER) {
+        if (separator == ESCAPE_CHARACTER) {
             throw new IllegalArgumentException("Separator cannot be the escape character");
         }
         List<String> lines = new ArrayList<>();
