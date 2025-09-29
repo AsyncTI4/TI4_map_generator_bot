@@ -17,17 +17,20 @@ import ti4.model.ExploreModel;
 class ExploreDiscardFragment extends GameStateSubcommand {
 
     private static final Map<String, String> TRAIT_TO_FRAGMENT_PREFIX = Map.of(
-        "cultural", "crf",
-        "industrial", "irf",
-        "hazardous", "hrf",
-        "frontier", "urf"
-    );
+            "cultural", "crf",
+            "industrial", "irf",
+            "hazardous", "hrf",
+            "frontier", "urf");
 
     ExploreDiscardFragment() {
         super("discard_fragment", "Discard a relic fragment.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Type of fragment.").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.COUNT, "Number of fragments to discard (default 1).").setMinValue(1));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Type of fragment.")
+                .setAutoComplete(true)
+                .setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.COUNT, "Number of fragments to discard (default 1).")
+                .setMinValue(1));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -46,8 +49,8 @@ class ExploreDiscardFragment extends GameStateSubcommand {
         }
 
         if (fragmentsToDiscard.size() < count) {
-            MessageHelper.sendMessageToEventChannel(event,
-                "Could not find " + count + " fragments to discard from " + player.getFaction());
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Could not find " + count + " fragments to discard from " + player.getFaction());
             return;
         }
 
