@@ -37,7 +37,8 @@ public class DraftSetupService {
         DraftSpec specs = DraftSpec.CreateFromMiltySettings(settings);
 
         if (specs.getTemplate().isNucleusTemplate()) {
-            return startNucleusFromSpecs(event, specs);
+            startNucleusFromSpecs(event, specs);
+            return null;
         } else {
             return startMiltyFromSpecs(event, specs);
         }
@@ -135,7 +136,7 @@ public class DraftSetupService {
         return null;
     }
 
-    public static String startNucleusFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
+    public static void startNucleusFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
         Game game = specs.game;
 
         // Setup managers and game state
@@ -220,7 +221,5 @@ public class DraftSetupService {
                 }
             }
         });
-
-        return null;
     }
 }

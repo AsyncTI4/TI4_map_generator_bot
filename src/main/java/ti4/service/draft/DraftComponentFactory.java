@@ -1,6 +1,5 @@
 package ti4.service.draft;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,10 +71,7 @@ public class DraftComponentFactory {
                 }
                 try {
                     // Ensure parameterless constructor
-                    Constructor<?> constructor = subtype.getDeclaredConstructor();
-                    if (constructor == null) {
-                        continue;
-                    }
+                    subtype.getDeclaredConstructor();
                 } catch (NoSuchMethodException e) {
                     continue;
                 }

@@ -29,9 +29,6 @@ public class DraftManager extends DraftPlayerManager {
         if (game == null) {
             throw new IllegalArgumentException("Game cannot be null");
         }
-        if (draftables == null) {
-            throw new IllegalArgumentException("Draftables cannot be null");
-        }
         this.game = game;
     }
 
@@ -212,7 +209,7 @@ public class DraftManager extends DraftPlayerManager {
      *
      * @param event
      */
-    public String endDraft(GenericInteractionCreateEvent event) {
+    public void endDraft(GenericInteractionCreateEvent event) {
         String blockingReason = whatsStoppingDraftEnd();
         if (blockingReason != null) {
             // If you got this accidentally, it means you called endDraft() instead of
@@ -237,8 +234,6 @@ public class DraftManager extends DraftPlayerManager {
         } else {
             trySetupPlayers(event);
         }
-
-        return null;
     }
 
     /**

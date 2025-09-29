@@ -14,11 +14,15 @@ public class DraftSaveService {
     private static final char ESCAPE_CHARACTER = '\\';
 
     public static String encodeLine(String line) {
-        return line.replace(ENCODED_DATA_SEPARATOR + "", ESCAPE_CHARACTER + "" + ENCODED_DATA_SEPARATOR);
+        return line.replace(
+                String.valueOf(ENCODED_DATA_SEPARATOR),
+                String.valueOf(ESCAPE_CHARACTER) + String.valueOf(ENCODED_DATA_SEPARATOR));
     }
 
     public static String decodeLine(String line) {
-        return line.replace(ESCAPE_CHARACTER + "" + ENCODED_DATA_SEPARATOR, ENCODED_DATA_SEPARATOR + "");
+        return line.replace(
+                String.valueOf(ESCAPE_CHARACTER) + String.valueOf(ENCODED_DATA_SEPARATOR),
+                String.valueOf(ENCODED_DATA_SEPARATOR));
     }
 
     public static String joinLines(List<String> lines) {
@@ -30,8 +34,12 @@ public class DraftSaveService {
             } else {
                 sb.append(ENCODED_DATA_SEPARATOR);
             }
-            line = line.replace(ESCAPE_CHARACTER + "", ESCAPE_CHARACTER + "" + ESCAPE_CHARACTER);
-            line = line.replace(ENCODED_DATA_SEPARATOR + "", ESCAPE_CHARACTER + "" + ENCODED_DATA_SEPARATOR);
+            line = line.replace(
+                    String.valueOf(ESCAPE_CHARACTER),
+                    String.valueOf(ESCAPE_CHARACTER) + String.valueOf(ESCAPE_CHARACTER));
+            line = line.replace(
+                    String.valueOf(ENCODED_DATA_SEPARATOR),
+                    String.valueOf(ESCAPE_CHARACTER) + String.valueOf(ENCODED_DATA_SEPARATOR));
             sb.append(line);
         }
         return sb.toString();

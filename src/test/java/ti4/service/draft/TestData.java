@@ -20,7 +20,8 @@ import ti4.service.milty.MiltyDraftTile;
 @UtilityClass
 public class TestData {
     // Constants to direct this class to the test resources directory
-    private static final String TEST_STORAGE_DIRECTORY = "src\\test\\resources\\strings\\";
+    private static final String TEST_STORAGE_DIRECTORY =
+            Path.of("src", "test", "resources", "strings").toString();
 
     // Filenames used in tests (extension is assumed to be .txt)
     public static final String FINISHED_6P_DRAFT_FILE = "finished-6p-draft";
