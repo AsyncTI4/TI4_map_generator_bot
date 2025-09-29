@@ -21,7 +21,8 @@ public class ExploreCommand implements ParentCommand {
                     new ExploreFrontier(),
                     new ExploreUse(),
                     new ExploreShuffle(),
-                    new ExploreLookAtTop())
+                    new ExploreLookAtTop(),
+                    new ExploreDiscardFragment())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
