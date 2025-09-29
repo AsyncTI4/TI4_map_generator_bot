@@ -22,6 +22,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.DisplayType;
 import ti4.helpers.GameLaunchThreadHelper;
@@ -269,6 +270,7 @@ public class StartPhaseService {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player2.getCorrectChannel(), msg + "the second technology.", buttons);
                 player2.removeLeader("zealotshero");
+                ButtonHelperHeroes.checkForMykoHero(game, "zealotshero", player2);
                 game.setStoredValue("zealotsHeroTechs", "");
                 game.setStoredValue("zealotsHeroPurged", "true");
             }

@@ -653,6 +653,8 @@ public class AgendaHelper {
                                         String message = player.getRepresentation() + " played "
                                                 + Helper.getLeaderFullRepresentation(playerLeader);
                                         player.removeLeader(playerLeader);
+
+                                        ButtonHelperHeroes.checkForMykoHero(game, playerLeader.getId(), player);
                                         MessageHelper.sendMessageToChannel(
                                                 player.getCorrectChannel(),
                                                 message + " - Odlynn Myrr, the Keleres (Xxcha) hero, has been purged.");
