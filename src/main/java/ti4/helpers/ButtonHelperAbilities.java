@@ -2006,31 +2006,36 @@ public class ButtonHelperAbilities {
     }
 
     @ButtonHandler("starforgeTile_")
+    @ButtonHandler("starforgeTileFree_")
     public static void starforgeTile(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        String pos = buttonID.replace("starforgeTile_", "");
+        boolean free = buttonID.contains("starforgeTileFree_");
+        String pos = buttonID.replace("starforgeTile_", "").replace("starforgeTileFree_", "");
 
-        String prefix = player.getFinsFactionCheckerPrefix() + "starforge_";
+        String prefix = player.getFinsFactionCheckerPrefix() + "starforge" + (free ? "Free" : "") + "_";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red(prefix + "destroyer_" + pos, "Starforge Destroyer", UnitEmojis.destroyer));
         buttons.add(Buttons.red(prefix + "fighters_" + pos, "Starforge 2 Fighters", UnitEmojis.fighter));
-        String message = "Please choose what units you wish to **Starforge**.";
+        String message = "Use the buttons to select what you would like to starforge.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("starforge_")
+    @ButtonHandler("starforgeFree_")
     public static void starforge(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        String unitNPlace = buttonID.replace("starforge_", "");
+        boolean free = buttonID.contains("starforgeFree_");
+        String unitNPlace = buttonID.replace("starforge_", "").replace("starforgeFree_", "");
         String unit = unitNPlace.split("_")[0];
         String pos = unitNPlace.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         String successMessage;
-        if (player.getStrategicCC() > 0) {
+        if (free) {
+            successMessage = null; // no spend message
+        } else if (player.getStrategicCC() > 0) {
             successMessage = player.getRepresentationUnfogged() + " spent 1 strategy token ("
                     + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ")";
             player.setStrategicCC(player.getStrategicCC() - 1);
-            ButtonHelperCommanders.resolveMuaatCommanderCheck(
-                    player, game, event, FactionEmojis.Muaat + " **Starforge**'d");
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, FactionEmojis.Muaat + "Starforge");
         } else {
             player.addExhaustedRelic("emelpar");
             successMessage =
