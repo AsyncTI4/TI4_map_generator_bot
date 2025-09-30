@@ -14,9 +14,11 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.SecretObjectiveHelper;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
@@ -124,6 +126,15 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             //     output = "Use buttons to destroy a ground force on a legendary or a planet adjacent to Mecatol Rex.";
             //     buttons.addAll(ButtonHelper.customRexLegendary(player, game));
             // }
+            case "avernus" -> {
+                output = "Select the tile you would like to starforge in:";
+                List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Warsun);
+                for (Tile tile : tiles) {
+                    buttons.add(Buttons.green(
+                            "starforgeTileFree_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+                }
+            }
+
             case "silence" -> {
                 output = "Use buttons to put 1 cruiser with your ships.";
                 buttons.addAll(
