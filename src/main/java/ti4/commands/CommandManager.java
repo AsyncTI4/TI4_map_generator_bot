@@ -16,6 +16,7 @@ import ti4.commands.cardsso.SOCardsCommand;
 import ti4.commands.combat.CombatCommand;
 import ti4.commands.custom.CustomCommand;
 import ti4.commands.developer.DeveloperCommand;
+import ti4.commands.draft.DraftCommand;
 import ti4.commands.ds.DiscordantStarsCommand;
 import ti4.commands.event.EventCommand;
 import ti4.commands.explore.ExploreCommand;
@@ -121,7 +122,8 @@ public class CommandManager {
                     new UserCommand(),
                     new TiglCommand(),
                     new AsyncCommand(),
-                    new OmegaPhaseCommand())
+                    new OmegaPhaseCommand(),
+                    new DraftCommand())
             .collect(Collectors.toMap(ParentCommand::getName, command -> command));
 
     public static ParentCommand getCommand(String name) {

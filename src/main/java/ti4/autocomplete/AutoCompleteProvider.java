@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.entities.Guild;
@@ -42,6 +43,7 @@ import ti4.model.ColorableModelInterface;
 import ti4.model.DeckModel;
 import ti4.model.EmbeddableModel;
 import ti4.model.ExploreModel;
+import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.ModelInterface;
 import ti4.model.PlanetTypeModel;
@@ -58,11 +60,23 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.UnitDecalService;
+import ti4.service.draft.DraftChoice;
+import ti4.service.draft.DraftComponentFactory;
+import ti4.service.draft.DraftManager;
+import ti4.service.draft.DraftOrchestrator;
+import ti4.service.draft.DraftTileManager;
+import ti4.service.draft.Draftable;
+import ti4.service.draft.DraftableType;
+import ti4.service.draft.draftables.FactionDraftable;
+import ti4.service.draft.draftables.SeatDraftable;
+import ti4.service.draft.draftables.SliceDraftable;
+import ti4.service.draft.draftables.SpeakerOrderDraftable;
 import ti4.service.franken.FrankenDraftMode;
 import ti4.service.game.GameNameService;
 import ti4.service.game.GameUndoNameService;
 import ti4.service.map.AddTileService.RandomOption;
 import ti4.service.map.MapPresetService;
+import ti4.service.milty.MiltyDraftTile;
 import ti4.service.statistics.PlayerStatTypes;
 import ti4.service.statistics.game.GameStatTypes;
 import ti4.settings.GlobalSettings;
@@ -883,6 +897,277 @@ public class AutoCompleteProvider {
                         .map(value -> new Command.Choice(value.getAutoCompleteName(), value.toString()))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
+            }
+            case Constants.ADD_DRAFTABLE_OPTION -> {
+                if (!GameManager.isValid(gameName)) return;
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                if (!DraftManager.hasDraftManager(game)) return;
+
+                DraftManager draftManager = game.getDraftManager();
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                List<String> draftableOptions = DraftComponentFactory.getKnownDraftableTypes();
+                List<Draftable> alreadyInDraft = draftManager.getDraftables();
+
+                List<Command.Choice> options = draftableOptions.stream()
+                        .filter(option -> option.toLowerCase().contains(enteredValue))
+                        .filter(option -> alreadyInDraft.stream()
+                                .noneMatch(draftable -> draftable.getType().equals(DraftableType.of(option))))
+                        .limit(25)
+                        .map(option -> new Command.Choice(option, option))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.SET_ORCHESTRATOR_OPTION -> {
+                if (!GameManager.isValid(gameName)) return;
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                if (!DraftManager.hasDraftManager(game)) return;
+
+                DraftManager draftManager = game.getDraftManager();
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                List<String> draftableOptions = DraftComponentFactory.getKnownOrchestratorTypes();
+                DraftOrchestrator alreadyInDraft = draftManager.getOrchestrator();
+
+                if (alreadyInDraft != null) {
+                    draftableOptions.remove(alreadyInDraft.getClass().getSimpleName());
+                }
+
+                List<Command.Choice> options = draftableOptions.stream()
+                        .filter(option -> option.toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(option -> new Command.Choice(option, option))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.UNKNOWN_DRAFT_USER_ID_OPTION -> {
+                if (!GameManager.isValid(gameName)) return;
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                if (!DraftManager.hasDraftManager(game)) return;
+
+                DraftManager draftManager = game.getDraftManager();
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                Predicate<String> isUnknownUserId =
+                        id -> game.getPlayer(id) == null || event.getGuild().getMemberById(id) == null;
+                List<String> userIDs = draftManager.getPlayerUserIds().stream()
+                        .filter(isUnknownUserId)
+                        .toList();
+
+                List<Command.Choice> options = userIDs.stream()
+                        .filter(option -> option.toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(option -> new Command.Choice(option, option))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.DRAFTABLE_TYPE_OPTION -> {
+                if (!GameManager.isValid(gameName)) return;
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                if (!DraftManager.hasDraftManager(game)) return;
+
+                DraftManager draftManager = game.getDraftManager();
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+
+                List<Command.Choice> options = draftManager.getDraftables().stream()
+                        .map(Draftable::getType)
+                        .map(DraftableType::toString)
+                        .distinct()
+                        .filter(option -> option.toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(option -> new Command.Choice(option, option))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.DRAFTABLE_CHOICE_KEY_OPTION -> {
+                if (!GameManager.isValid(gameName)) return;
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                if (!DraftManager.hasDraftManager(game)) return;
+
+                DraftManager draftManager = game.getDraftManager();
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                String draftableTypeStr =
+                        event.getOption(Constants.DRAFTABLE_TYPE_OPTION, null, OptionMapping::getAsString);
+                if (draftableTypeStr == null) return;
+
+                DraftableType draftableType = DraftableType.of(draftableTypeStr);
+                Draftable draftable = draftManager.getDraftable(draftableType);
+                if (draftable == null) return;
+
+                List<DraftChoice> choices = draftable.getAllDraftChoices();
+                List<DraftChoice> alreadyPicked = draftManager.getAllPicksOfType(draftableType);
+                Predicate<DraftChoice> notPicked = choice -> alreadyPicked.stream()
+                        .noneMatch(picked -> picked.getChoiceKey().equals(choice.getChoiceKey()));
+                Predicate<DraftChoice> matchesEnteredText =
+                        choice -> choice.getChoiceKey().toLowerCase().contains(enteredValue)
+                                || choice.getUnformattedName().toLowerCase().contains(enteredValue);
+
+                List<Command.Choice> options = choices.stream()
+                        .filter(notPicked)
+                        .filter(matchesEnteredText)
+                        .limit(25)
+                        .map(option -> new Command.Choice(option.getUnformattedName(), option.getChoiceKey()))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.DRAFT_FACTION_OPTION -> {
+                if (!GameManager.isValid(gameName)) return;
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                if (!DraftManager.hasDraftManager(game)) return;
+
+                DraftManager draftManager = game.getDraftManager();
+                FactionDraftable draftable = (FactionDraftable) draftManager.getDraftable(FactionDraftable.TYPE);
+                if (draftable == null) return;
+
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                List<DraftChoice> choices = draftable.getAllDraftChoices();
+                List<FactionModel> availableFactions = choices.stream()
+                        .map(choice -> Mapper.getFactions().get(choice.getChoiceKey()))
+                        .filter(Objects::nonNull)
+                        .toList();
+                List<Command.Choice> options = availableFactions.stream()
+                        .filter(faction ->
+                                faction.getAutoCompleteName().toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(faction -> new Command.Choice(faction.getFactionName(), faction.getAlias()))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.KELERES_FLAVOR_OPTION -> {
+                if (!GameManager.isValid(gameName)) return;
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                if (!DraftManager.hasDraftManager(game)) return;
+
+                DraftManager draftManager = game.getDraftManager();
+                FactionDraftable draftable = (FactionDraftable) draftManager.getDraftable(FactionDraftable.TYPE);
+                if (draftable == null) return;
+
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                List<DraftChoice> choices = draftable.getAllDraftChoices();
+                List<DraftChoice> pickedFactions = draftManager.getAllPicksOfType(FactionDraftable.TYPE);
+
+                List<String> keleresFlavors = FactionDraftable.getKeleresFlavors();
+                List<String> alreadyPickedFlavors = keleresFlavors.stream()
+                        .filter(faction -> pickedFactions.stream()
+                                .anyMatch(picked -> picked.getChoiceKey().equals(faction)))
+                        .toList();
+                List<String> possiblyPickedFlavors = keleresFlavors.stream()
+                        .filter(faction -> alreadyPickedFlavors.stream().noneMatch(picked -> picked.equals(faction)))
+                        .filter(faction -> choices.stream()
+                                .anyMatch(choice -> choice.getChoiceKey().equals(faction)))
+                        .toList();
+                List<String> safeFlavors = keleresFlavors.stream()
+                        .filter(faction -> possiblyPickedFlavors.stream().noneMatch(picked -> picked.equals(faction)))
+                        .toList();
+                List<Command.Choice> options = new ArrayList<>();
+                options.addAll(safeFlavors.stream()
+                        .filter(faction -> faction.toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(faction -> new Command.Choice(
+                                Mapper.getFactions().get(faction).getFactionName(), faction))
+                        .toList());
+                options.addAll(possiblyPickedFlavors.stream()
+                        .filter(faction -> faction.toLowerCase().contains(enteredValue))
+                        .limit(25 - options.size())
+                        .map(faction -> new Command.Choice(
+                                Mapper.getFactions().get(faction).getFactionName() + " (may be taken!!)", faction))
+                        .toList());
+                if (options.isEmpty()) {
+                    options.addAll(keleresFlavors.stream()
+                            .filter(faction -> faction.toLowerCase().contains(enteredValue))
+                            .limit(25)
+                            .map(faction -> new Command.Choice(
+                                    Mapper.getFactions().get(faction).getFactionName() + " (all playable)", faction))
+                            .toList());
+                }
+                event.replyChoices(options).queue();
+            }
+            case Constants.SEAT_COUNT_OPTION -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                if (enteredValue != null && !enteredValue.isBlank()) return;
+
+                if (!GameManager.isValid(gameName)) return;
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                if (!DraftManager.hasDraftManager(game)) return;
+
+                DraftManager draftManager = game.getDraftManager();
+                SeatDraftable draftable = (SeatDraftable) draftManager.getDraftable(SeatDraftable.TYPE);
+                if (draftable == null) return;
+                String mapTemplateId = game.getMapTemplateID();
+                if (mapTemplateId == null) return;
+                MapTemplateModel mapTemplate = Mapper.getMapTemplate(mapTemplateId);
+                if (mapTemplate == null) return;
+                int maxSeats = mapTemplate.getPlayerCount();
+                event.replyChoice(maxSeats + " seats", (long) maxSeats).queue();
+            }
+            case Constants.DRAFT_SLICE_OPTION -> {
+                if (!GameManager.isValid(gameName)) return;
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                if (!DraftManager.hasDraftManager(game)) return;
+
+                DraftManager draftManager = game.getDraftManager();
+                SliceDraftable draftable = (SliceDraftable) draftManager.getDraftable(SliceDraftable.TYPE);
+                if (draftable == null) return;
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+
+                event.replyChoices(draftable.getDraftSlices().stream()
+                                .filter(slice -> slice.getName().toLowerCase().contains(enteredValue))
+                                .map(slice -> new Command.Choice(slice.getName(), slice.getName()))
+                                .limit(25)
+                                .toList())
+                        .queue();
+            }
+            case Constants.DRAFT_TILE_1_OPTION,
+                    Constants.DRAFT_TILE_2_OPTION,
+                    Constants.DRAFT_TILE_3_OPTION,
+                    Constants.DRAFT_TILE_4_OPTION,
+                    Constants.DRAFT_TILE_5_OPTION,
+                    Constants.DRAFT_TILE_6_OPTION,
+                    Constants.DRAFT_TILE_7_OPTION,
+                    Constants.DRAFT_TILE_8_OPTION,
+                    Constants.DRAFT_TILE_9_OPTION -> {
+                if (!GameManager.isValid(gameName)) return;
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                DraftTileManager draftTileManager = game.getDraftTileManager();
+                if (draftTileManager == null) return;
+                if (draftTileManager.getAll().isEmpty()) {
+                    DraftTileManager.resetForGame(game);
+                }
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                Predicate<MiltyDraftTile> matchesEnteredText = tile -> {
+                    String representation =
+                            Mapper.getTileRepresentations().get(tile.getTile().getTileID());
+                    return representation != null
+                            && representation.toLowerCase().contains(enteredValue);
+                };
+
+                List<MiltyDraftTile> tiles = draftTileManager.getAll().stream()
+                        .filter(matchesEnteredText)
+                        .limit(25)
+                        .toList();
+                event.replyChoices(tiles.stream()
+                                .map(t -> new Command.Choice(
+                                        Mapper.getTileRepresentations()
+                                                        .get(t.getTile().getTileID()) + " ("
+                                                + t.getTile().getTileID() + ")",
+                                        t.getTile().getTileID()))
+                                .toList())
+                        .queue();
+            }
+            case Constants.PICK_COUNT_OPTION -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                if (enteredValue != null && !enteredValue.isBlank()) return;
+
+                if (!GameManager.isValid(gameName)) return;
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                if (!DraftManager.hasDraftManager(game)) return;
+
+                DraftManager draftManager = game.getDraftManager();
+                SpeakerOrderDraftable draftable =
+                        (SpeakerOrderDraftable) draftManager.getDraftable(SpeakerOrderDraftable.TYPE);
+                if (draftable == null) return;
+
+                int playerCount = draftManager.getPlayerStates().size();
+                int maxSeats = Math.min(playerCount, 8);
+                event.replyChoice(maxSeats + " speaker order positions", (long) maxSeats)
+                        .queue();
             }
         }
     }

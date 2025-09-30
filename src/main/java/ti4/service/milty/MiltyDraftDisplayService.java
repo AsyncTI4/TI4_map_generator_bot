@@ -28,7 +28,7 @@ import ti4.message.logging.BotLogger;
 import ti4.spring.jda.JdaService;
 
 @UtilityClass
-public class DraftDisplayService {
+public class MiltyDraftDisplayService {
     private static final String SLICES = "**__Slices:__**";
     private static final String FACTIONS = "**__Factions:__**";
     private static final String POSITION = "**__Speaker Order:__**";

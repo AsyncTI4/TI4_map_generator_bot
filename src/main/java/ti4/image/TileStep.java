@@ -15,5 +15,6 @@ public enum TileStep {
     Traits,
     TechSkips,
     Attachments,
-    TileNumber
+    TileNumber,
+    Nucleus
 }
