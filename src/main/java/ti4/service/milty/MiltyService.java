@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
@@ -25,11 +26,7 @@ import ti4.helpers.TIGLHelper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.TitlesHelper;
 import ti4.helpers.Units;
-import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
-import ti4.helpers.settingsFramework.menus.PlayerFactionSettings;
-import ti4.helpers.settingsFramework.menus.SliceGenerationSettings;
-import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.map.Game;
@@ -85,7 +82,6 @@ public class MiltyService {
 
     public static String startFromSettings(GenericInteractionCreateEvent event, MiltySettings settings) {
         Game game = settings.getGame();
-        DraftSpec specs = new DraftSpec(game);
 
         // Load the general game settings
         boolean success = game.loadGameSettingsFromSettings(event, settings);
@@ -94,54 +90,18 @@ public class MiltyService {
             TIGLHelper.sendTIGLSetupText(game);
         }
 
-        // Load Game Specifications
-        GameSettings gameSettings = settings.getGameSettings();
-        specs.setTemplate(gameSettings.getMapTemplate().getValue());
-
-        // Load Slice Generation Specifications
-        SliceGenerationSettings sliceSettings = settings.getSliceSettings();
-        specs.numFactions = sliceSettings.getNumFactions().getVal();
-        specs.numSlices = sliceSettings.getNumSlices().getVal();
-        specs.anomaliesCanTouch = false;
-        specs.extraWHs = sliceSettings.getExtraWorms().isVal();
-        specs.minLegend = sliceSettings.getNumLegends().getValLow();
-        specs.maxLegend = sliceSettings.getNumLegends().getValHigh();
-        specs.minTot = sliceSettings.getTotalValue().getValLow();
-        specs.maxTot = sliceSettings.getTotalValue().getValHigh();
-
-        // Load Player & Faction Ban Specifications
-        PlayerFactionSettings pfSettings = settings.getPlayerSettings();
-        specs.bannedFactions.addAll(pfSettings.getBanFactions().getKeys());
-        if (game.isThundersEdge()) {
-            List<String> newKeys = new ArrayList<>();
-            newKeys.addAll(
-                    List.of("arborec", "sol", "letnev", "winnu", "sardakk", "yin", "l1z1x", "naalu", "saar", "naaz"));
-            specs.priorityFactions.addAll(newKeys);
-            specs.numFactions = Math.min(10, specs.numFactions);
-        } else {
-            specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
-        }
-        specs.setPlayerIDs(new ArrayList<>(pfSettings.getGamePlayers().getKeys()));
-        if (pfSettings.getPresetDraftOrder().isVal()) {
-            specs.playerDraftOrder = new ArrayList<>(game.getPlayers().keySet());
-        }
-
-        // Load Sources Specifications
-        SourceSettings sources = settings.getSourceSettings();
-        specs.setTileSources(sources.getTileSources());
-        specs.setFactionSources(sources.getFactionSources());
-
-        if (sliceSettings.getParsedSlices() != null) {
-            if (sliceSettings.getParsedSlices().size() < specs.playerIDs.size())
-                return "Not enough slices for the number of players. Please remove the preset slice string or include enough slices";
-            specs.presetSlices = sliceSettings.getParsedSlices();
-        }
+        MiltyDraftSpec specs = MiltyDraftSpec.fromSettings(settings);
 
         return startFromSpecs(event, specs);
     }
 
-    public static String startFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
+    public static String startFromSpecs(GenericInteractionCreateEvent event, MiltyDraftSpec specs) {
         Game game = specs.game;
+
+        if (specs.presetSlices != null) {
+            if (specs.presetSlices.size() < specs.playerIDs.size())
+                return "Not enough slices for the number of players. Please remove the preset slice string or include enough slices";
+        }
 
         // Milty Draft Manager Setup --------------------------------------------------------------
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
@@ -207,7 +167,7 @@ public class MiltyService {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "### You are using preset slices!! Starting the draft right away!");
             specs.presetSlices.forEach(draftManager::addSlice);
-            DraftDisplayService.repostDraftInformation(draftManager, game);
+            MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
         } else {
             event.getMessageChannel().sendMessage(startMsg).queue((ignore) -> {
                 boolean slicesCreated = GenerateSlicesService.generateSlices(event, draftManager, specs);
@@ -218,7 +178,7 @@ public class MiltyService {
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 } else {
-                    DraftDisplayService.repostDraftInformation(draftManager, game);
+                    MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
                     game.setPhaseOfGame("miltydraft");
                     GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
                 }
@@ -265,6 +225,13 @@ public class MiltyService {
 
     public static void miltySetup(GenericInteractionCreateEvent event, Game game) {
         MiltySettings menu = game.initializeMiltySettings();
+        // TODO: Settings should use a flag for nucleus generation.
+        // But for now, trying to keep our settings changes minimal.
+        if (event instanceof ButtonInteractionEvent buttonEvent) {
+            if (buttonEvent.getButton().getCustomId().endsWith("_nucleus")) {
+                menu.getDraftMode().setChosenKey("nucleus");
+            }
+        }
         menu.postMessageAndButtons(event);
         ButtonHelper.deleteMessage(event);
     }

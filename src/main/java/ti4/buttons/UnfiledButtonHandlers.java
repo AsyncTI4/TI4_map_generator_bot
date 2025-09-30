@@ -3498,6 +3498,8 @@ public class UnfiledButtonHandlers {
         StartPhaseService.startStrategyPhase(event, game);
         PlayerPreferenceHelper.offerSetAutoPassOnSaboButtons(game, null);
         ButtonHelper.deleteMessage(event);
+        // Reduce file size by clearing draft info
+        game.clearDraftManager();
     }
 
     @ButtonHandler("dsdihmy_")

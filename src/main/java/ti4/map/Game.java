@@ -56,6 +56,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.DistanceTool;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
@@ -94,6 +95,9 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.draft.DraftLoadService;
+import ti4.service.draft.DraftManager;
+import ti4.service.draft.DraftTileManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -198,6 +202,9 @@ public class Game extends GameProperties {
     private Map<String, Integer> tileDistances = new HashMap<>();
 
     private MiltyDraftManager miltyDraftManager;
+    private DraftTileManager draftTileManager;
+    private DraftManager draftManager;
+    private DistanceTool distanceTool;
 
     @Getter
     private final Expeditions expeditions = new Expeditions(this);
@@ -205,6 +212,10 @@ public class Game extends GameProperties {
     @Setter
     @Getter
     private String miltyDraftString;
+
+    @Setter
+    @Getter
+    private String draftString;
 
     @Setter
     private MiltySettings miltySettings;
@@ -357,13 +368,11 @@ public class Game extends GameProperties {
         return returnValue;
     }
 
-    @JsonIgnore
     public MiltyDraftManager getMiltyDraftManagerUnsafe() {
         return miltyDraftManager;
     }
 
     @NotNull
-    @JsonIgnore
     public MiltyDraftManager getMiltyDraftManager() {
         if (miltyDraftManager == null) {
             miltyDraftManager = new MiltyDraftManager();
@@ -378,8 +387,63 @@ public class Game extends GameProperties {
         return miltyDraftManager;
     }
 
-    public void setMiltyDraftManager(MiltyDraftManager miltyDraftManager) {
-        this.miltyDraftManager = miltyDraftManager;
+    // public void setMiltyDraftManager(MiltyDraftManager miltyDraftManager) {
+    //     this.miltyDraftManager = miltyDraftManager;
+    // }
+
+    @NotNull
+    public DraftTileManager getDraftTileManager() {
+        if (draftTileManager == null) {
+            draftTileManager = new DraftTileManager();
+        }
+        return draftTileManager;
+    }
+
+    public DraftManager getDraftManagerUnsafe() {
+        return draftManager;
+    }
+
+    public void clearDraftManager() {
+        draftManager = null;
+        draftString = null;
+    }
+
+    @NotNull
+    public DraftManager getDraftManager() {
+        if (draftManager != null) {
+            return draftManager;
+        }
+        if (draftString != null) {
+            try {
+                draftManager = DraftLoadService.loadDraftManager(this, draftString);
+            } catch (Exception e) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Failed to load draft manager (and creating an empty new one instead): ")
+                        .append(e.getMessage())
+                        .append(System.lineSeparator())
+                        .append("With draft data: ")
+                        .append(System.lineSeparator())
+                        .append(String.join(System.lineSeparator(), draftString));
+
+                BotLogger.warning(new LogOrigin(this), sb.toString(), e);
+                draftManager = new DraftManager(this);
+            }
+        } else {
+            draftManager = new DraftManager(this);
+        }
+        return draftManager;
+    }
+
+    public DistanceTool getDistanceTool() {
+        if (distanceTool != null) {
+            return distanceTool;
+        }
+        if (getMapTemplateID() == null) {
+            BotLogger.warning(new LogOrigin(this), "Map template ID is null, distance tool can not be created.");
+            return null;
+        }
+        distanceTool = new DistanceTool(this);
+        return distanceTool;
     }
 
     @Nullable
