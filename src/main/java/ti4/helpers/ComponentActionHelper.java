@@ -112,6 +112,15 @@ public class ComponentActionHelper {
                 }
             }
         }
+        List<String> implementedLegendaryPlanets = new ArrayList<>(List.of("avernus"));
+        for (String planet : implementedLegendaryPlanets) {
+            String prettyPlanet = Mapper.getPlanet(planet).getName();
+            if (p1.getPlanets().contains(planet)
+                    && !p1.getExhaustedPlanetsAbilities().contains(planet)) {
+                compButtons.add(Buttons.green(
+                        finChecker + "planetAbilityExhaust_" + planet, "Use " + prettyPlanet + " Ability"));
+            }
+        }
 
         // Leaders
         for (Leader leader : p1.getLeaders()) {
