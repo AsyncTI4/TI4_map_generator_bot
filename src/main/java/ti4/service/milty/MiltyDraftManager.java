@@ -397,8 +397,8 @@ public class MiltyDraftManager {
             if (fauxPlayerPick != null) {
                 doMiltyPick(event, game, fauxPlayerPick, nextDrafter);
             } else {
-                DraftDisplayService.updateDraftInformation(event, this, game, category);
-                DraftDisplayService.pingCurrentDraftPlayer(this, game, false);
+                MiltyDraftDisplayService.updateDraftInformation(event, this, game, category);
+                MiltyDraftDisplayService.pingCurrentDraftPlayer(this, game, false);
             }
         } else {
             MessageHelper.sendMessageToChannel(
