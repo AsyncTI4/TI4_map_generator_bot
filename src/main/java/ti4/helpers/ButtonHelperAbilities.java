@@ -929,7 +929,7 @@ public class ButtonHelperAbilities {
                 if (unitHolder instanceof Planet) {
                     String planet = unitHolder.getName();
                     boolean alreadyOwned = false;
-                    for (Player player_ : game.getPlayers().values()) {
+                    for (Player player_ : game.getRealPlayers()) {
                         if (player_.getPlanets().contains(planet)) {
                             alreadyOwned = true;
                             break;
