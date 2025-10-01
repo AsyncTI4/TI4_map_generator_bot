@@ -327,6 +327,10 @@ public class MiltyDraftHelper {
         Tile tile = new Tile(tileID, "none");
         draftTile.setTile(tile);
 
+        if (tile.isScar()) {
+            draftTile.setHasScar(true);
+        }
+
         for (Planet planet : tile.getPlanetUnitHolders()) {
             draftTile.addPlanet(planet);
         }
