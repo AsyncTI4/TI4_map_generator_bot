@@ -1099,7 +1099,7 @@ public class Player extends PlayerProperties {
                 }
             }
             if (firstTime > 0) {
-                CommanderUnlockCheckService.checkConditionsAndUnlock(this, "bentor");
+                CommanderUnlockCheckService.checkPlayer(this, "bentor");
                 if (hasUnit("bentor_mech")) {
                     int mechsRemain = 4 - ButtonHelper.getNumberOfUnitsOnTheBoard(game, this, "mech", true);
                     List<Button> buttons = new ArrayList<>(
