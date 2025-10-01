@@ -23,7 +23,7 @@ public class UnlockLeaderService {
         }
 
         if (playerLeader == null) {
-            MessageHelper.sendMessageToChannel(channel, "Leader not found");
+            MessageHelper.sendMessageToChannel(channel, "Leader " + leaderID + " not found");
             return;
         }
         playerLeader.setLocked(false);

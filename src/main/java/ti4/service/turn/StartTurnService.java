@@ -136,7 +136,7 @@ public class StartTurnService {
         game.setPhaseOfGame("action");
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
         Helper.startOfTurnSaboWindowReminders(game, player);
-        boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
+        boolean isFowPrivateGame = game.isFowMode();
 
         if (game.isShowBanners()) {
             BannerGenerator.drawFactionBanner(player);
