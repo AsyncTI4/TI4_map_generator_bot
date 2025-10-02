@@ -1,0 +1,33 @@
+[
+    {
+        "id": "te4construction",
+        "initiative": 4,
+        "name": "Construction",
+        "botSCAutomationID": "te4construction",
+        "primaryTexts": [
+            "Either place 1 structure on a planet you control, or use the PRODUCTION ability of 1 of your space docks.",
+            "Place 1 structure on a planet you control."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to place 1 structure on a planet you control."
+        ],
+        "imageFileName": "te_4",
+        "colourHexCode": "#39b54a",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "te6warfare",
+        "initiative": 6,
+        "name": "Warfare",
+        "botSCAutomationID": "te6warfare",
+        "primaryTexts": [
+            "Perform a tactical action in any system without placing a command token, even if the system already has your command token in it: that system still counts as being activated. You may redistribute your command tokens before and after this action."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to use the Production abilities of the units in your home system. (This token is not placed in your home system)"
+        ],
+        "imageFileName": "te_6",
+        "colourHexCode": "#008ed4",
+        "source": "thunders_edge"
+    }
+]

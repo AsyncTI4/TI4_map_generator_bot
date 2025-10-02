@@ -50,6 +50,13 @@ public class GameOptionService {
         buttons2.add(Buttons.green("addEntropicScar", "Use Entropic Scar"));
         buttons2.add(Buttons.red("deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg2, buttons2);
+
+        String msg3 =
+                "Thunder's Edge contains two new strategy cards, Construction and Warfare. You can use them in this game by pressing the button below.";
+        List<Button> buttons3 = new ArrayList<>();
+        buttons3.add(Buttons.green("addNewSCs", "Use New Strategy Cards"));
+        buttons3.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg3, buttons3);
     }
 
     public static final Button showOwnedPNs_ON = Buttons.green("showOwnedPNsInPlayerArea_turnOFF", "ON");

@@ -364,7 +364,7 @@ public class PlayHeroService {
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
             case "vaylerianhero" -> {
-                if (!game.isNaaluAgent()) {
+                if (!game.isNaaluAgent() && !game.isWarfareAction()) {
                     player.setTacticalCC(player.getTacticalCC() - 1);
                     CommandCounterHelper.addCC(event, player, game.getTileByPosition(game.getActiveSystem()));
                     game.setStoredValue("vaylerianHeroActive", "true");
