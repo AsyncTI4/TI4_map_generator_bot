@@ -56,8 +56,8 @@ public class ButtonHelperSCs {
             tiles.forEach(t ->
                     buttons.add(Buttons.blue(prefix + t.getPosition(), t.getRepresentationForButtons(game, player))));
 
-            String message = "Choose a tile to resolve production using 1 space dock:";
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+            String message = player.getRepresentation() + " Choose a tile to resolve production using 1 space dock:";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         } else {
             event.getHook()
                     .sendMessage("You do not hold construction, so you can not use a primary ability")
