@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -42,6 +43,115 @@ import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
 
 public class ButtonHelperSCs {
+
+    @ButtonHandler("constructionPrimary_produce")
+    public static void resolveConstructionPrimaryTE(ButtonInteractionEvent event, Game game, Player player) {
+        StrategyCardModel scModel =
+                game.getStrategyCardModelByName("construction").orElse(null);
+        if (player.getSCs().contains(scModel.getInitiative())) {
+            List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock);
+
+            String prefix = player.getFinsFactionCheckerPrefix() + "constructionBuild_";
+            List<Button> buttons = new ArrayList<>();
+            tiles.forEach(t ->
+                    buttons.add(Buttons.blue(prefix + t.getPosition(), t.getRepresentationForButtons(game, player))));
+
+            String message = "Choose a tile to resolve production using 1 space dock:";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+        } else {
+            event.getHook()
+                    .sendMessage("You do not hold construction, so you can not use a primary ability")
+                    .setEphemeral(true)
+                    .queue();
+        }
+    }
+
+    @ButtonHandler("constructionBuild_")
+    public static void resolveConstructionBuild(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String pos = buttonID.replace("constructionBuild_", "");
+        Tile tile = game.getTileByPosition(pos);
+
+        String infomsg =
+                player.getFactionEmoji() + " is resolving Construction Primary in tile " + tile.getRepresentation();
+        ButtonHelper.sendMessageToRightStratThread(player, game, infomsg, "construction");
+
+        List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "construction", "place");
+        int productionVal = Helper.getProductionValue(player, game, tile, true);
+        String message = player.getRepresentation()
+                + " Use the buttons to produce. Reminder that when using construction primary, you can only use 1 dock. ";
+        message += ButtonHelper.getListOfStuffAvailableToSpend(player, game) + "\nYou have " + productionVal
+                + " PRODUCTION value in this system.";
+        if (productionVal > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander"))
+            message +=
+                    "\n> - You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit.";
+        if (productionVal > 0 && IsPlayerElectedService.isPlayerElected(game, player, "prophecy"))
+            message +=
+                    "\n> - Reminder that you have prophecy of Ixth and should produce 2 fighters if you want to keep it. Its removal is not automated.";
+
+        if (!game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Produce Units", buttons);
+        } else {
+            MessageHelper.sendMessageToChannel(player.getPrivateChannel(), message);
+            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), "Produce Units", buttons);
+        }
+    }
+
+    @ButtonHandler("warfareTeBuild")
+    private static void warfareSecondaryThundersEdge(ButtonInteractionEvent event, Game game, Player player) {
+        StrategyCardModel warfare = Mapper.getStrategyCard("te6warfare");
+        if (warfare == null) return;
+        String messageID = event.getMessageId();
+        boolean used = addUsedSCPlayer(messageID, game, player);
+        if (!used
+                && !player.getFollowedSCs().contains(warfare.getInitiative())
+                && game.getPlayedSCs().contains(warfare.getInitiative())) {
+            int scNum = warfare.getInitiative();
+            player.addFollowedSC(scNum, event);
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
+            if (player.getStrategicCC() > 0) {
+                ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Warfare**");
+            }
+            String message = deductCC(game, player, scNum);
+            ReactionService.addReaction(event, game, player, message);
+        }
+
+        sendWarfareButtons(event, game, player, warfare);
+    }
+
+    private static void sendWarfareButtons(
+            ButtonInteractionEvent event, Game game, Player player, StrategyCardModel model) {
+        boolean singleDock = !model.usesAutomationForSCID("te6warfare");
+
+        Tile tile = player.getHomeSystemTile();
+        List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "warfare", "place");
+        int productionValue = Helper.getProductionValue(player, game, tile, singleDock);
+
+        String message = player.getRepresentation() + " Use the buttons to produce.";
+        message += ButtonHelper.getListOfStuffAvailableToSpend(player, game, true);
+        message += "\nYou have " + productionValue + " PRODUCTION value in this system.";
+
+        if (singleDock) {
+            message +=
+                    "\n> - Reminder that when following **Warfare**, you may only use 1 space dock in your home system. ";
+        }
+        if (productionValue > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
+            message +=
+                    "\n> - You also have the That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 fighters/infantry that don't count towards PRODUCTION limit.";
+        }
+        if (productionValue > 0 && IsPlayerElectedService.isPlayerElected(game, player, "prophecy")) {
+            message +=
+                    "\n> - Reminder that you have _Prophecy of Ixth_ and should produce at least 2 fighters if you wish to keep it. Its removal is not automated.";
+        }
+        if (!game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Produce Units", buttons);
+        } else {
+            MessageHelper.sendMessageToChannel(player.getPrivateChannel(), message);
+            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), "Produce Units", buttons);
+        }
+    }
 
     @ButtonHandler("diploRefresh2")
     public static void diploRefresh2(Game game, Player player, ButtonInteractionEvent event) {
@@ -780,7 +890,9 @@ public class ButtonHelperSCs {
             scModel = game.getStrategyCardModelByName("construction").orElse(null);
         }
         int scNum = scModel.getInitiative();
-        boolean automationExists = scModel != null && scModel.usesAutomationForSCID("pok4construction");
+        boolean automationExists = scModel != null
+                && (scModel.usesAutomationForSCID("pok4construction")
+                        || scModel.usesAutomationForSCID("te4construction"));
         if (!used
                 && scModel != null
                 && !player.getFollowedSCs().contains(scNum)
@@ -798,7 +910,7 @@ public class ButtonHelperSCs {
         String unit = buttonID.replace("construction_", "");
         if ("facility".equalsIgnoreCase(unit)) {
             String message = player.getRepresentationUnfogged() + ", please choose the facility you wish to place.";
-            if (!player.getSCs().contains(4)) {
+            if (!player.getSCs().contains(4) && !scModel.getBotSCAutomationID().equals("te4construction")) {
                 message += "\n## __It will place a command token in the system as well.__ ";
             }
             List<Button> buttons = getPossibleFacilities(game, player);
@@ -807,7 +919,7 @@ public class ButtonHelperSCs {
             UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
             String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your "
                     + unitKey.unitName() + " on for **Construction**.";
-            if (!player.getSCs().contains(4)) {
+            if (!player.getSCs().contains(4) && !scModel.getBotSCAutomationID().equals("te4construction")) {
                 message += "\n-# It will place a command token in the system as well.";
             }
             List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");

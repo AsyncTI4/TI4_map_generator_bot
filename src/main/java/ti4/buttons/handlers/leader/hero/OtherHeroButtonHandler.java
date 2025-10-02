@@ -153,7 +153,7 @@ class OtherHeroButtonHandler {
     @ButtonHandler("purgeVaylerianHero")
     public static void purgeVaylerianHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
         purgeHeroPreamble(event, player, game, "vaylerianhero", "Dyln Harthuul, the Vaylerian hero");
-        if (!game.isNaaluAgent()) {
+        if (!game.isNaaluAgent() && !game.isWarfareAction()) {
             player.setTacticalCC(player.getTacticalCC() - 1);
             CommandCounterHelper.addCC(event, player, game.getTileByPosition(game.getActiveSystem()));
             game.setStoredValue("vaylerianHeroActive", "true");

@@ -662,6 +662,8 @@ public class PlayStrategyCardService {
             case "luminous9" -> getLuminous9Buttons(sc, player);
             case "luminous2" -> getLuminous2Buttons(sc, player);
             case "luminous7" -> getLuminous7Buttons(sc);
+            case "te4construction" -> getThundersEdgeConstructionButtons(sc);
+            case "te6warfare" -> getThundersEdgeWarfareButtons(sc);
             case "anarchy3" -> getAnarchy3Buttons(sc, player);
             case "anarchy7" -> getAnarchy7Buttons(sc);
             case "anarchy8" -> getAnarchy8Buttons(sc);
@@ -684,6 +686,23 @@ public class PlayStrategyCardService {
             // unhandled
             default -> getGenericButtons(sc);
         };
+    }
+
+    private static List<Button> getThundersEdgeConstructionButtons(int sc) {
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
+        Button buildButton = Buttons.green("constructionPrimary_produce", "[Primary] Use Production");
+        Button sdButton = Buttons.green("construction_spacedock", "Place A SD", UnitEmojis.spacedock);
+        Button pdsButton = Buttons.green("construction_pds", "Place a PDS", UnitEmojis.pds);
+        Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        return List.of(followButton, buildButton, sdButton, pdsButton, noFollowButton);
+    }
+
+    private static List<Button> getThundersEdgeWarfareButtons(int sc) {
+        Button warfarePrimary = Buttons.blue("primaryOfTeWarfare", "Warfare Tactical Action");
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
+        Button homeBuild = Buttons.green("warfareTeBuild", "Build At Home");
+        Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        return List.of(warfarePrimary, followButton, homeBuild, noFollowButton);
     }
 
     public static void handleSOQueueing(Game game, boolean winnuHero) {

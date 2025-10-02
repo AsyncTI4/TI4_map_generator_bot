@@ -782,7 +782,9 @@ public class ButtonHelperFactionSpecific {
         StrategyCardModel scModel =
                 game.getStrategyCardModelByName("construction").orElse(null);
         int scNum = scModel.getInitiative();
-        boolean construction = scModel != null && scModel.usesAutomationForSCID("pok4construction");
+        boolean construction = scModel != null
+                && (scModel.usesAutomationForSCID("pok4construction")
+                        || scModel.usesAutomationForSCID("te4construction"));
         if (!used
                 && scModel != null
                 && construction

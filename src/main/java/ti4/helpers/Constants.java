@@ -108,6 +108,7 @@ public class Constants {
     public static final String CONFIRM = "confirm";
     public static final String PUBLISH = "publish";
     public static final String NAALU_AGENT = "naalu_agent";
+    public static final String WARFARE_ACTION = "warfare_action";
     public static final String L1_HERO = "l1_hero";
     public static final String NOMAD_COIN = "nomad_coin";
     public static final String QUEUE_SO = "queue_so";
