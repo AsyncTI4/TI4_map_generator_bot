@@ -91,6 +91,14 @@ public class ButtonHelperTacticalAction {
         if (game.isNaaluAgent()) {
             player = game.getPlayer(game.getActivePlayerID());
         }
+        if (game.isWarfareAction()) {
+            Button redistro = Buttons.blue(
+                    player.finChecker() + "redistributeCCButtons_deleteThisButton", "Redistribute Command Tokens");
+            String warfareDone = player.getRepresentationUnfogged()
+                    + " your Warfare action is finished, you can redistribute your command tokens again.";
+            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), warfareDone, redistro);
+        }
+
         resetStoredValuesForTacticalAction(game);
         game.removeStoredValue("producedUnitCostFor" + player.getFaction());
         String message = player.getRepresentationUnfogged() + ", use buttons to end turn, or do another action.";
@@ -267,6 +275,7 @@ public class ButtonHelperTacticalAction {
 
     public static void resetStoredValuesForTacticalAction(Game game) {
         game.setNaaluAgent(false);
+        game.setWarfareAction(false);
         game.setL1Hero(false);
         game.removeStoredValue("violatedSystems");
         game.removeStoredValue("vaylerianHeroActive");
@@ -285,7 +294,7 @@ public class ButtonHelperTacticalAction {
         game.getTacticalActionDisplacement().clear();
     }
 
-    private static void beginTacticalAction(Game game, Player player) {
+    public static void beginTacticalAction(Game game, Player player) {
         boolean prefersDistanceBasedTacticalActions =
                 UserSettingsManager.get(player.getUserID()).isPrefersDistanceBasedTacticalActions();
         if (!game.isFowMode() && game.getRingCount() < 5 && prefersDistanceBasedTacticalActions) {

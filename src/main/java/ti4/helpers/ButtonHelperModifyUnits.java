@@ -1763,6 +1763,9 @@ public class ButtonHelperModifyUnits {
                 for (Integer sc : player.getSCs()) {
                     StrategyCardModel scModel =
                             game.getStrategyCardModelByInitiative(sc).orElse(null);
+                    if (scModel != null && scModel.getBotSCAutomationID().equalsIgnoreCase("te4construction")) {
+                        hasConstruction = true;
+                    }
                     if (scModel != null
                             && ("pok4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())
                                     || "monuments4construction".equalsIgnoreCase(scModel.getBotSCAutomationID()))

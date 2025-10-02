@@ -1391,6 +1391,10 @@ public class ButtonHelperActionCards {
         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p2);
         String message = p2.getRepresentationUnfogged() + ", you are being forced to give a promissory note to "
                 + player.getFactionEmojiOrColor() + ". Please choose which promissory note you wish to send.";
+        if (game.isFowMode()) {
+            message = p2.getRepresentationUnfogged()
+                    + ", you are being forced to give a promissory note to somebody. Please choose which promissory note you wish to send.";
+        }
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),

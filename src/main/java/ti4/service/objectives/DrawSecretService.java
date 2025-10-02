@@ -108,6 +108,9 @@ public class DrawSecretService {
                             game.getActionsChannel(), files, message.toString(), true, false);
                 }
             }
+            if (game.isThundersEdge() || !game.getStoredValue("useNewSCs").isEmpty()) {
+                game.setStrategyCardSet("te");
+            }
             if (game.isThundersEdge() || !game.getStoredValue("useNewRex").isEmpty()) {
                 Tile mr = game.getMecatolTile();
                 if (mr != null) {

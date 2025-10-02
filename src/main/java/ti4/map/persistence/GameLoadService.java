@@ -630,6 +630,7 @@ class GameLoadService {
                 case Constants.FOW_MODE -> game.setFowMode(loadBooleanOrDefault(info, false));
                 case Constants.REPLACEMENT_MADE -> game.setReplacementMade(loadBooleanOrDefault(info, false));
                 case Constants.NAALU_AGENT -> game.setNaaluAgent(loadBooleanOrDefault(info, false));
+                case Constants.WARFARE_ACTION -> game.setWarfareAction(loadBooleanOrDefault(info, false));
                 case Constants.L1_HERO -> game.setL1Hero(loadBooleanOrDefault(info, false));
                 case Constants.NOMAD_COIN -> game.setNomadCoin(loadBooleanOrDefault(info, false));
                 case Constants.FAST_SC_FOLLOW -> game.setFastSCFollowMode(loadBooleanOrDefault(info, false));

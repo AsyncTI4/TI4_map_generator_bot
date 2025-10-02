@@ -53,6 +53,7 @@ public class GameProperties {
     private String savedMessage;
     private boolean hasHadAStatusPhase;
     private boolean naaluAgent;
+    private boolean warfareAction;
     private boolean l1Hero;
     private boolean temporaryPingDisable;
     private boolean dominusOrb;

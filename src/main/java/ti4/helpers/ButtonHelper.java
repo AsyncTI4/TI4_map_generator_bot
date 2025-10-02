@@ -2737,7 +2737,7 @@ public class ButtonHelper {
     public static void resolveMahactMechAbilityUse(
             Player mahact, Player target, Game game, Tile tile, ButtonInteractionEvent event) {
         mahact.removeMahactCC(target.getColor());
-        if (!game.isNaaluAgent()) {
+        if (!game.isNaaluAgent() && !game.isWarfareAction()) {
             if (!game.getStoredValue("absolLux").isEmpty()) {
                 target.setTacticalCC(target.getTacticalCC() + 1);
             }
@@ -2782,7 +2782,7 @@ public class ButtonHelper {
         mahact.exhaustTech("nf");
         ButtonHelperCommanders.resolveMuaatCommanderCheck(
                 mahact, game, event, FactionEmojis.Xxcha + " " + TechEmojis.CyberneticTech + "Nullification Field");
-        if (!game.isNaaluAgent()) {
+        if (!game.isNaaluAgent() && !game.isWarfareAction()) {
             if (!game.getStoredValue("absolLux").isEmpty()) {
                 target.setTacticalCC(target.getTacticalCC() + 1);
             }
@@ -2834,7 +2834,7 @@ public class ButtonHelper {
             return;
         }
 
-        if (!game.isNaaluAgent()) {
+        if (!game.isNaaluAgent() && !game.isWarfareAction()) {
             if (!CommandCounterHelper.hasCC(target, tile)) {
                 if (!game.getStoredValue("absolLux").isEmpty()) {
                     target.setTacticalCC(target.getTacticalCC() + 1);
@@ -4362,11 +4362,12 @@ public class ButtonHelper {
         if (!FOWPlusService.canActivatePosition(tile.getPosition(), player, game)) return false;
         if (tile.isAsteroidField()) {
             for (Player p2 : game.getRealPlayers()) {
-                if (p2.hasTech("cm") && p2 != player && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+                if (p2.hasTech("cm") && p2 != player && FoWHelper.playerHasActualShipsInSystem(p2, tile)) {
                     return false;
                 }
             }
         }
+        if (game.isWarfareAction()) return true;
 
         return !CommandCounterHelper.hasCC(null, player.getColor(), tile) || game.isL1Hero();
     }
@@ -5386,6 +5387,14 @@ public class ButtonHelper {
     public static void addLegendaryMecatol(Game game, ButtonInteractionEvent event) {
         game.setStoredValue("useNewRex", "Yes");
         MessageHelper.sendMessageToChannel(event.getChannel(), "This game will use the new Legendary Mecatol Rex");
+        event.getMessage().delete().queue();
+    }
+
+    @ButtonHandler("addNewSCs")
+    public static void addNewSCs(Game game, ButtonInteractionEvent event) {
+        game.setStoredValue("useNewSCs", "Yes");
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(), "This game will use the new Construction and Warfare SCs");
         event.getMessage().delete().queue();
     }
 
