@@ -71,6 +71,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
+import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
@@ -2174,6 +2175,17 @@ public class UnfiledButtonHandlers {
                 if (game.isNaaluAgent()) {
                     player = game.getPlayer(game.getActivePlayerID());
                 }
+                if (game.isWarfareAction()) {
+                    List<Button> redistro = new ArrayList<>();
+                    redistro.add(Buttons.blue(
+                            player.finChecker() + "redistributeCCButtons_deleteThisButton",
+                            "Redistribute Command Tokens"));
+                    redistro.add(Buttons.DONE_DELETE_BUTTONS);
+                    String warfareDone = player.getRepresentationUnfogged()
+                            + " your Warfare action is finished, you can redistribute your command tokens again.";
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), warfareDone, redistro);
+                }
+
                 ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
                 game.removeStoredValue("producedUnitCostFor" + player.getFaction());
 
@@ -3429,6 +3441,33 @@ public class UnfiledButtonHandlers {
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannelWithButtons(
                 channel, "Please choose which system you wish to remove your command token from.", buttons);
+    }
+
+    @ButtonHandler("primaryOfTeWarfare")
+    public static void primaryOfTeWarfare(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        StrategyCardModel model = Mapper.getStrategyCard("te6warfare");
+        if (model == null) return;
+        if (!player.getSCs().contains(model.getInitiative()) && !buttonID.contains("overrule")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "You do not have the Warfare strategy card.");
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.blue(
+                player.finChecker() + "redistributeCCButtons_deleteThisButton", "Redistribute Command Tokens"));
+        buttons.add(Buttons.red(player.finChecker() + "beginTacticalTeWarfare", "Perform Tactical Action"));
+        String message =
+                "Use the buttons to resolve the primary of Warfare. Redistributing your Command Tokens is optional.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+    }
+
+    @ButtonHandler("beginTacticalTeWarfare")
+    public static void beginTacticalTeWarfare(ButtonInteractionEvent event, Game game, Player player) {
+        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
+        game.setWarfareAction(true);
+        ButtonHelperTacticalAction.beginTacticalAction(game, player);
     }
 
     @ButtonHandler("drawAgenda_2")

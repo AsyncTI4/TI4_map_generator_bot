@@ -369,6 +369,7 @@ public class TacticalActionService {
 
     private boolean shouldSkipPlacingAbilities(Game game, Player player) {
         return game.isNaaluAgent()
+                || game.isWarfareAction()
                 || game.isL1Hero()
                 || (!game.getStoredValue("hiredGunsInPlay").isEmpty() && player != game.getActivePlayer());
     }

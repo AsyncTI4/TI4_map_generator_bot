@@ -2111,7 +2111,13 @@ public class Helper {
         }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planet && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
-                boolean singleDock = "warfare".equalsIgnoreCase(warfareNOtherstuff) && !asn;
+                boolean singleDock = ("warfare".equalsIgnoreCase(warfareNOtherstuff)
+                                || "construction".equalsIgnoreCase(warfareNOtherstuff))
+                        && !asn;
+
+                StrategyCardModel model =
+                        game.getStrategyCardModelByName(warfareNOtherstuff).orElse(null);
+                if (model != null && model.usesAutomationForSCID("te6warfare")) singleDock = false;
                 if (singleDock) {
                     if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) < 1
                             && !player.hasUnit("saar_spacedock")
