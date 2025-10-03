@@ -61,12 +61,13 @@ public class SecretObjectiveHelper {
                 MessageHelper.sendMessageToChannel(
                         game.getActionsChannel(),
                         player.getRepresentation()
-                                + " also scored the 1 VP due to Zealous Orthodoxy. Everyone will gain their commander ability.");
+                                + " also scored 1 VP due to Zealous Orthodoxy. Everyone will gain their commander ability.");
                 for (Leader leaderP : player.getLeaders()) {
                     if (leaderP.getId().contains("commander")) {
                         leader = leaderP.getId();
                         if (leaderP.isLocked()) {
                             UnlockLeaderService.unlockLeader(leader, game, player);
+                            game.addFakeCommander(leader);
                         }
                         break;
                     }
@@ -77,9 +78,8 @@ public class SecretObjectiveHelper {
                     continue;
                 }
                 if (zealous && !leader.isEmpty()) {
-                    player.addLeader(leader);
-                    game.addFakeCommander(leader);
-                    UnlockLeaderService.unlockLeader(leader, game, player);
+                    p2.addLeader(leader);
+                    UnlockLeaderService.unlockLeader(leader, game, p2);
                 }
                 if (p2.hasLeaderUnlocked("tnelishero")) {
                     List<Button> buttons = new ArrayList<>();
