@@ -26,3 +26,4 @@ TI4_map_generator_discord_bot.iml
 runlocally clean.ps1
 runlocally.ps1
 *.tar
+src/main/webp/

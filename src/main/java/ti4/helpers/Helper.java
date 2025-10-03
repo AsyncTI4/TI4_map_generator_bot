@@ -688,7 +688,7 @@ public class Helper {
                 .getStrategyCardModelByInitiative(sc)
                 .map(StrategyCardModel::getImageFileName)
                 .orElse("sadFace.png");
-        return "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/strat_cards/"
+        return "/strat_cards/"
                 + scImagePath + ".png";
     }
 
