@@ -3322,8 +3322,17 @@ public class Game extends GameProperties {
 
         // Setup peakable objectives
         if (publicObjectives1Peakable.size() != 4) {
-            setUpPeakableObjectives(miltySettings.getGameSettings().getStage1s().getVal(), 1);
-            setUpPeakableObjectives(miltySettings.getGameSettings().getStage2s().getVal(), 2);
+            if (miltySettings.getGame().isOmegaPhaseMode()) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "This game is using Omega Phase, so the objective setup was ignored. If there's a problem with it, use `/omegaphase "
+                                + Constants.RESET_OMEGA_PHASE_OBJECTIVES + "`");
+            } else {
+                setUpPeakableObjectives(
+                        miltySettings.getGameSettings().getStage1s().getVal(), 1);
+                setUpPeakableObjectives(
+                        miltySettings.getGameSettings().getStage2s().getVal(), 2);
+            }
         }
 
         if (isAbsolMode() && !deckSettings.getAgendas().getChosenKey().contains("absol")) {
