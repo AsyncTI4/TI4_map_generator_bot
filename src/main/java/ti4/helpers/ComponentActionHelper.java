@@ -26,6 +26,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.service.BookOfLatviniaService;
+import ti4.service.SilverFlameService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -956,6 +957,7 @@ public class ComponentActionHelper {
                 // handled above
             }
             case "bookoflatvinia" -> BookOfLatviniaService.purgeBookOfLatvinia(event, game, player);
+            case "thesilverflame" -> SilverFlameService.rollSilverFlame(event, game, player);
             default ->
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(), "This relic is not tied to any automation. Please resolve manually.");

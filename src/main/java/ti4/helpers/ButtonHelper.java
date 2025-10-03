@@ -5687,6 +5687,10 @@ public class ButtonHelper {
                                 || doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)))
                 || (!player.isActivePlayer()
                         && game.playerHasLeaderUnlockedOrAlliance(player, "mortheuscommander")
+                        && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
+                || (doesPlayerHaveFSHere("khrask_flagship", player, tile)
+                        && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
+                || (player.hasRelic("metalivoidshielding")
                         && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()));
     }
 
