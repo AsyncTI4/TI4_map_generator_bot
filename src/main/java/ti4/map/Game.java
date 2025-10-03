@@ -3877,6 +3877,12 @@ public class Game extends GameProperties {
             if ("ghoti".equalsIgnoreCase(getStoredValue("terraformedPlanet"))) {
                 planets.get("ghoti").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
             }
+            planets.put("ocean1", new Planet("ocean1", new Point(0, 0)));
+            planets.put("ocean2", new Planet("ocean2", new Point(0, 0)));
+            planets.put("ocean3", new Planet("ocean3", new Point(0, 0)));
+            planets.put("ocean4", new Planet("ocean4", new Point(0, 0)));
+            planets.put("ocean5", new Planet("ocean5", new Point(0, 0)));
+            planets.put("triad", new Planet("triad", new Point(0, 0)));
         }
         return planets.keySet();
     }

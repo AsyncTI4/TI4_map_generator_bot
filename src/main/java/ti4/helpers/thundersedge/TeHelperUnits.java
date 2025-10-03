@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
@@ -61,7 +60,8 @@ public class TeHelperUnits {
             AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "1 mech " + planet);
             String planetRep = Helper.getPlanetRepresentation(planet, game);
             String boringMsg = player.getRepresentation(true, false) + " deployed a Revenant on " + planetRep;
-            String flavorMsg = "Out of the cold depths of the active breach a Crimson Revenant emerged, landing on " + planetRep + ".";
+            String flavorMsg = "Out of the cold depths of the active breach a Crimson Revenant emerged, landing on "
+                    + planetRep + ".";
 
             String msg = ThreadLocalRandom.current().nextInt(10) == 0 ? flavorMsg : boringMsg;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -91,7 +91,8 @@ public class TeHelperUnits {
             }
         }
 
-        // The nekro (bt) player has the crimson flagship, and has their flagship on a breach, and the player is not nekro
+        // The nekro (bt) player has the crimson flagship, and has their flagship on a breach, and the player is not
+        // nekro
         Player nekro = Helper.getPlayerFromUnlockedBreakthrough(game, "nekrobt");
         if (nekro != null && player.hasUnit("crimson_flagship")) {
             for (Tile fs : ButtonHelper.getTilesOfPlayersSpecificUnits(game, nekro, UnitType.Flagship)) {
@@ -108,19 +109,26 @@ public class TeHelperUnits {
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- RalNel Consortium -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
     /* ---------------------------------------------------------------------------|--------------------------------------------------------------------------- */
     @ButtonHandler("startForerunner_")
-    private static void chooseSystemForForerunner(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        HashMap<String, List<String>> forerunnerMap = TeHelperAbilities.readMoveMap(game.getStoredValue("forerunnerMovementMap"));
+    private static void chooseSystemForForerunner(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        HashMap<String, List<String>> forerunnerMap =
+                TeHelperAbilities.readMoveMap(game.getStoredValue("forerunnerMovementMap"));
 
         // Part 1 (no error)
         final String regex1 = "startForerunner_" + RegexHelper.posRegex();
         final Pattern part1 = Pattern.compile(regex1);
-        boolean succ = RegexService.runMatcher(part1, buttonID, matcher -> {
-            Tile tile = game.getTileByPosition(matcher.group("pos"));
-            List<Button> buttons = getForerunnerSystemButtons(game, player, tile, forerunnerMap);
-            String message = player.getRepresentation() + " Choose a system to move ground forces from using your Forerunner, or click DONE:";
-            message += TeHelperAbilities.unitSummary(game, player, forerunnerMap);
-            MessageHelper.editMessageWithButtons(event, message, buttons);
-        }, x -> {});
+        boolean succ = RegexService.runMatcher(
+                part1,
+                buttonID,
+                matcher -> {
+                    Tile tile = game.getTileByPosition(matcher.group("pos"));
+                    List<Button> buttons = getForerunnerSystemButtons(game, player, tile, forerunnerMap);
+                    String message = player.getRepresentation()
+                            + " Choose a system to move ground forces from using your Forerunner, or click DONE:";
+                    message += TeHelperAbilities.unitSummary(game, player, forerunnerMap);
+                    MessageHelper.editMessageWithButtons(event, message, buttons);
+                },
+                x -> {});
         if (succ) return;
 
         // Part 2
@@ -129,8 +137,10 @@ public class TeHelperUnits {
         RegexService.runMatcher(part2, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             Tile source = game.getTileByPosition(matcher.group("source"));
-            List<Button> buttons = getForerunnerUnitButtonsForSystem(game, player, tile, source, forerunnerMap.get(matcher.group("source")));
-            String message = player.getRepresentation() + " Choose ground forces to move from the system using your Forerunner, or click DONE to move from a different system:";
+            List<Button> buttons = getForerunnerUnitButtonsForSystem(
+                    game, player, tile, source, forerunnerMap.get(matcher.group("source")));
+            String message = player.getRepresentation()
+                    + " Choose ground forces to move from the system using your Forerunner, or click DONE to move from a different system:";
             message += TeHelperAbilities.unitSummary(game, player, forerunnerMap);
             MessageHelper.editMessageWithButtons(event, message, buttons);
         });
@@ -138,10 +148,13 @@ public class TeHelperUnits {
 
     @ButtonHandler("moveForerunner_")
     @ButtonHandler("undoForerunner_")
-    private static void moveUnitWithForerunner(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        HashMap<String, List<String>> forerunnerMap = TeHelperAbilities.readMoveMap(game.getStoredValue("forerunnerMovementMap"));
-        String regex = "(undo|move)Forerunner_" + RegexHelper.posRegex(game, "destination") + "_" + RegexHelper.posRegex(game, "source") +
-            "_" + RegexHelper.unitTypeRegex() + "_" + RegexHelper.unitHolderRegex(game, "planet");
+    private static void moveUnitWithForerunner(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        HashMap<String, List<String>> forerunnerMap =
+                TeHelperAbilities.readMoveMap(game.getStoredValue("forerunnerMovementMap"));
+        String regex = "(undo|move)Forerunner_" + RegexHelper.posRegex(game, "destination") + "_"
+                + RegexHelper.posRegex(game, "source") + "_" + RegexHelper.unitTypeRegex() + "_"
+                + RegexHelper.unitHolderRegex(game, "planet");
 
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile destination = game.getTileByPosition(matcher.group("destination"));
@@ -150,59 +163,72 @@ public class TeHelperUnits {
             String unitStr = matcher.group("unittype") + " " + matcher.group("planet");
 
             if (buttonID.startsWith("move")) {
-                if (!forerunnerMap.containsKey(pos))
-                    forerunnerMap.put(pos, new ArrayList<>());
+                if (!forerunnerMap.containsKey(pos)) forerunnerMap.put(pos, new ArrayList<>());
                 forerunnerMap.get(pos).add(unitStr);
             } else {
-                if (forerunnerMap.containsKey(pos))
-                    forerunnerMap.get(pos).remove(unitStr);
-                if (forerunnerMap.containsKey(pos) && forerunnerMap.get(pos).isEmpty())
-                    forerunnerMap.remove(pos);
+                if (forerunnerMap.containsKey(pos)) forerunnerMap.get(pos).remove(unitStr);
+                if (forerunnerMap.containsKey(pos) && forerunnerMap.get(pos).isEmpty()) forerunnerMap.remove(pos);
             }
             game.setStoredValue("forerunnerMovementMap", TeHelperAbilities.storeMovementMap(forerunnerMap));
 
-            List<Button> buttons = getForerunnerUnitButtonsForSystem(game, player, destination, source, forerunnerMap.get(pos));
-            String message = player.getRepresentation() + " Choose ground forces to move from the system using your Forerunner, or click DONE to move from a different system:";
+            List<Button> buttons =
+                    getForerunnerUnitButtonsForSystem(game, player, destination, source, forerunnerMap.get(pos));
+            String message = player.getRepresentation()
+                    + " Choose ground forces to move from the system using your Forerunner, or click DONE to move from a different system:";
             message += TeHelperAbilities.unitSummary(game, player, forerunnerMap);
             MessageHelper.editMessageWithButtons(event, message, buttons);
         });
     }
 
     @ButtonHandler("finishForerunner_")
-    private static void finishedWithForerunner(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String regex = "finishForerunner_" + RegexHelper.posRegex() + "_" + RegexHelper.unitHolderRegex(game, "combatPlanet");
+    private static void finishedWithForerunner(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String regex =
+                "finishForerunner_" + RegexHelper.posRegex() + "_" + RegexHelper.unitHolderRegex(game, "combatPlanet");
 
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
-            HashMap<String, List<String>> forerunnerMap = TeHelperAbilities.readMoveMap(game.getStoredValue("forerunnerMovementMap"));
+            HashMap<String, List<String>> forerunnerMap =
+                    TeHelperAbilities.readMoveMap(game.getStoredValue("forerunnerMovementMap"));
             for (String source : forerunnerMap.keySet()) {
-                List<String> units = forerunnerMap.get(source).stream()
-                    .collect(Collectors.groupingBy(s -> s)).entrySet().stream()
-                    .map(e -> e.getValue().size() + " " + e.getKey()).toList();
+                List<String> units =
+                        forerunnerMap.get(source).stream().collect(Collectors.groupingBy(s -> s)).entrySet().stream()
+                                .map(e -> e.getValue().size() + " " + e.getKey())
+                                .toList();
                 List<String> unitsTo = forerunnerMap.get(source).stream()
-                    .map(unit -> unit.substring(0, unit.indexOf(" ")) + " " + matcher.group("combatPlanet"))
-                    .collect(Collectors.groupingBy(s -> s)).entrySet().stream()
-                    .map(e -> e.getValue().size() + " " + e.getKey()).toList();
+                        .map(unit -> unit.substring(0, unit.indexOf(' ')) + " " + matcher.group("combatPlanet"))
+                        .collect(Collectors.groupingBy(s -> s))
+                        .entrySet()
+                        .stream()
+                        .map(e -> e.getValue().size() + " " + e.getKey())
+                        .toList();
                 String unitStrFrom = String.join(", ", units);
                 String unitStrTo = String.join(", ", unitsTo);
 
-                RemoveUnitService.removeUnits(event, game.getTileByPosition(source), game, player.getColor(), unitStrFrom);
+                RemoveUnitService.removeUnits(
+                        event, game.getTileByPosition(source), game, player.getColor(), unitStrFrom);
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitStrTo);
             }
             game.removeStoredValue("forerunnerMovementMap");
-            String msg = player.getRepresentation() + " Moved the following units onto the active system with the Forerunner mech:" + TeHelperAbilities.unitSummary(game, player, forerunnerMap);
+            String msg = player.getRepresentation()
+                    + " Moved the following units onto the active system with the Forerunner mech:"
+                    + TeHelperAbilities.unitSummary(game, player, forerunnerMap);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             ButtonHelper.deleteMessage(event);
         });
     }
 
-    public static List<Button> getForerunnerSystemButtons(Game game, Player player, Tile tile, HashMap<String, List<String>> forerunnerMap) {
+    public static List<Button> getForerunnerSystemButtons(
+            Game game, Player player, Tile tile, HashMap<String, List<String>> forerunnerMap) {
         // Get the tiles that are valid sources for Forerunner mech
         if (forerunnerMap == null) forerunnerMap = new HashMap<>();
         List<Button> buttons = new ArrayList<>();
         for (String adj : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
             Tile t = game.getTileByPosition(adj);
-            if (t != null && getForerunnerUnitButtonsForSystem(game, player, tile, t, forerunnerMap.get(adj)).size() > 1) {
+            if (t != null
+                    && getForerunnerUnitButtonsForSystem(game, player, tile, t, forerunnerMap.get(adj))
+                                    .size()
+                            > 1) {
                 String id = player.finChecker() + "startForerunner_" + tile.getPosition() + "_" + t.getPosition();
                 String label = t.getRepresentationForButtons(game, player);
                 buttons.add(Buttons.green(id, label));
@@ -212,7 +238,8 @@ public class TeHelperUnits {
         return buttons;
     }
 
-    private static List<Button> getForerunnerUnitButtonsForSystem(Game game, Player player, Tile destination, Tile source, List<String> movedUnits) {
+    private static List<Button> getForerunnerUnitButtonsForSystem(
+            Game game, Player player, Tile destination, Tile source, List<String> movedUnits) {
         // Get buttons to move units from this system
         if (movedUnits == null) movedUnits = new ArrayList<>();
         List<Button> buttons = new ArrayList<>();
@@ -220,13 +247,16 @@ public class TeHelperUnits {
             String uhName = Helper.getPlanetRepresentation(uh.getName(), game);
             for (UnitKey uk : uh.getUnitsByState().keySet()) {
                 if (!player.unitBelongsToPlayer(uk)) continue;
-                if (player.getUnitFromUnitKey(uk) == null || !player.getUnitFromUnitKey(uk).getIsGroundForce()) continue;
+                if (player.getUnitFromUnitKey(uk) == null
+                        || !player.getUnitFromUnitKey(uk).getIsGroundForce()) continue;
 
                 // moved all of this unit already from this unit holder
                 String unitStr = uk.asyncID() + " " + uh.getName();
-                if (movedUnits != null && movedUnits.stream().filter(s -> s.equals(unitStr)).count() >= uh.getUnitCount(uk)) continue;
+                if (movedUnits != null
+                        && movedUnits.stream().filter(s -> s.equals(unitStr)).count() >= uh.getUnitCount(uk)) continue;
 
-                String id = player.finChecker() + "moveForerunner_" + destination.getPosition() + "_" + source.getPosition() + "_" + uk.asyncID() + "_" + uh.getName();
+                String id = player.finChecker() + "moveForerunner_" + destination.getPosition() + "_"
+                        + source.getPosition() + "_" + uk.asyncID() + "_" + uh.getName();
                 String label = uk.getUnitType().humanReadableName() + " from " + uhName;
                 buttons.add(Buttons.green(id, label, uk.unitEmoji()));
             }
@@ -239,7 +269,8 @@ public class TeHelperUnits {
                 UnitType type = Units.findUnitType(data[0]);
                 String uhName = Helper.getPlanetRepresentation(data[1], game);
                 if (type != null) {
-                    String id = player.finChecker() + "undoForerunner_" + destination.getPosition() + "_" + source.getPosition() + "_" + type.toString() + "_" + data[1];
+                    String id = player.finChecker() + "undoForerunner_" + destination.getPosition() + "_"
+                            + source.getPosition() + "_" + type.toString() + "_" + data[1];
                     String label = "Return " + type.humanReadableName() + " to " + uhName;
                     buttons.add(Buttons.red(id, label, type.getUnitTypeEmoji()));
                 }
@@ -266,7 +297,8 @@ public class TeHelperUnits {
             UnitModel model = p2.getUnitFromUnitKey(uk);
             if (!model.getSustainDamage()) {
                 String id = prefixID + p2.getFaction() + "_" + uk.asyncID();
-                String label = "Destroy " + p2.getColor() + " " + uk.getUnitType().humanReadableName();
+                String label =
+                        "Destroy " + p2.getColor() + " " + uk.getUnitType().humanReadableName();
                 destroyable.add(Buttons.red(id, label, uk.unitEmoji()));
             }
         }
@@ -281,11 +313,13 @@ public class TeHelperUnits {
             if (!player.hasUnit("naalu_mech_te")) continue;
 
             if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
-                List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
+                List<Button> buttons = new ArrayList<>(
+                        Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
                 buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Decline to deploy mech"));
 
                 UnitModel icono = Mapper.getUnit("naalu_mech_te");
-                String msg = player.getRepresentationUnfogged() + " You have " + icono.getNameRepresentation() + " and someone pulled a relic.";
+                String msg = player.getRepresentationUnfogged() + " You have " + icono.getNameRepresentation()
+                        + " and someone pulled a relic.";
                 msg += " You can use the buttons to deploy 1 mech on a planet you control:";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }

@@ -11,8 +11,10 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
@@ -123,6 +125,20 @@ public class RelicHelper {
                         .append(player.getRepresentation())
                         .append(" scored _Shard of the Throne_.");
             }
+            case "quantumcore" -> {
+                if (player.getBreakthroughID() != null && !player.isBreakthroughUnlocked()) {
+                    BreakthroughCommandHelper.unlockBreakthrough(game, player);
+                }
+            }
+            case "thetriad" -> {
+                for (Player p : game.getPlayers().values()) p.removePlanet("triad");
+                player.addPlanet("triad");
+                Planet triad = game.getPlanetsInfo().get("triad");
+                if (triad != null) triad.updateTriadStats(player);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(), "Added the Triad \"planet card\" to your play area.");
+            }
+
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
                 int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
                 String customPOName = "Shard of the Throne (" + absolShardNum + ")";

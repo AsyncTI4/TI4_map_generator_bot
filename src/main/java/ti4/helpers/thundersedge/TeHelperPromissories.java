@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
@@ -41,16 +40,15 @@ public class TeHelperPromissories {
         List<TechnologyModel> techsToAdd = new ArrayList<>();
         for (String tech : dws.getTechs()) {
             TechnologyModel techModel = Mapper.getTech(tech);
-            if (techModel.getFaction().isPresent() && techModel.getFaction().orElse("").length() > 0)
-                continue; //no faction techs
-            if (techModel.isUnitUpgrade())
-                continue;
-            if (player.hasTech(tech))
-                continue;
+            if (techModel.getFaction().isPresent()
+                    && techModel.getFaction().orElse("").length() > 0) continue; // no faction techs
+            if (techModel.isUnitUpgrade()) continue;
+            if (player.hasTech(tech)) continue;
             techsToAdd.add(techModel);
         }
         List<Button> buttons = ListTechService.getTechButtons(techsToAdd, player, "shareKnowledge");
-        MessageHelper.sendMessageToChannelWithButtons(game.getActionsChannel(), "Choose a tech to copy until the end of status phase:", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                game.getActionsChannel(), "Choose a tech to copy until the end of status phase:", buttons);
     }
 
     @ButtonHandler("startCourierTransport_")
@@ -64,7 +62,7 @@ public class TeHelperPromissories {
 
             String msg = player.getRepresentation() + " Choose which structures to move with courier transport:";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
-        } 
+        }
     }
 
     @ButtonHandler("courierTransport_")
@@ -94,12 +92,13 @@ public class TeHelperPromissories {
             String destStr = Helper.getUnitHolderRepresentation(destination, matcher.group("destPlanet"), game, player);
 
             PromissoryNoteModel courier = Mapper.getPromissoryNote("couriertransport");
-            String msg = String.format("%s moved %s from %s to %s using %s.",
-                player.getRepresentation(),
-                unit.humanReadableName(),
-                srcStr,
-                destStr,
-                courier.getNameRepresentation());
+            String msg = String.format(
+                    "%s moved %s from %s to %s using %s.",
+                    player.getRepresentation(),
+                    unit.humanReadableName(),
+                    srcStr,
+                    destStr,
+                    courier.getNameRepresentation());
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             ButtonHelper.deleteTheOneButton(event);
         });
