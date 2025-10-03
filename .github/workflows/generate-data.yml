@@ -1,6 +1,9 @@
 name: Generate TypeScript Data Files
 
 on:
+  push:
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:
