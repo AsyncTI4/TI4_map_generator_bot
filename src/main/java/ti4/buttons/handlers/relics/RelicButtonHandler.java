@@ -45,7 +45,7 @@ class RelicButtonHandler {
         }
         player.addExhaustedRelic(relic);
         MessageHelper.sendMessageToChannel(
-                event.getChannel(),
+                player.getCorrectChannel(),
                 player.getFactionEmoji() + " exhausted "
                         + Mapper.getRelic(relic).getName());
         ButtonHelper.deleteTheOneButton(event);
