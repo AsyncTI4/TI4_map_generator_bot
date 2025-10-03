@@ -41,6 +41,8 @@ import ti4.service.statistics.game.WinningPathPersistenceService;
 import ti4.service.tigl.TiglGameReport;
 import ti4.service.tigl.TiglPlayerResult;
 import ti4.spring.jda.JdaService;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.achievement.PlayerAchievementService;
 import ti4.website.UltimateStatisticsWebsiteHelper;
 
 @UtilityClass
@@ -198,8 +200,29 @@ public class EndGameService {
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
 
+        recordEndGameAchievements(game);
+
         writeChronicle(game, event, publish);
         WinningPathPersistenceService.addGame(game);
+    }
+
+    private static void recordEndGameAchievements(Game game) {
+        if (!game.hasWinner()) {
+            return;
+        }
+
+        List<Player> winners = game.getWinners();
+        boolean hasDragonHoardWinner = winners.stream().anyMatch(winner -> winner.getTg() >= 40);
+        if (!hasDragonHoardWinner) {
+            return;
+        }
+
+        PlayerAchievementService achievementService = SpringContext.getBean(PlayerAchievementService.class);
+        for (Player winner : winners) {
+            if (winner.getTg() >= 40) {
+                achievementService.recordDragonHoard(winner, game);
+            }
+        }
     }
 
     private static void writeChronicle(Game game, GenericInteractionCreateEvent event, boolean publish) {
