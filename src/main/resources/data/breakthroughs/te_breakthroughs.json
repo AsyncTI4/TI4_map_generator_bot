@@ -11,6 +11,30 @@
         "source": "thunders_edge"
     },
     {
+        "alias": "argentbt",
+        "name": "Wing Transfer",
+        "displayName": "Wing\nTransfer",
+        "faction": "argent",
+        "synergy": [
+            "PROPULSION",
+            "CYBERNETIC"
+        ],
+        "text": "When you activate a system that contains only your units, you may place command tokens from your reinforcements into any systems adjacent to that system that contain only your units; at the end of this action, you may move ships among the active system and systems adjacent to it that contain your command tokens.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "empyreanbt",
+        "name": "Void Tether",
+        "displayName": "Void\nTether",
+        "faction": "empyrean",
+        "synergy": [
+            "PROPULSION",
+            "BIOTIC"
+        ],
+        "text": "When you activate a system that contains or is adjacent to a unit or planet you control, you may place or move 1 of your Void Tether tokens onto a border that system shares with another system; other players do not treat those systems as adjacent to each other unless you allow it.",
+        "source": "thunders_edge"
+    },
+    {
         "alias": "letnevbt",
         "name": "Gravleash Maneuvers",
         "displayName": "Gravleash\nManeuvers",
@@ -107,13 +131,109 @@
     },
     {
         "alias": "ghostbt",
-        "name": "Unknown",
+        "name": "Particle Synthesis",
+        "displayName": "Particle\nSynthesis",
         "faction": "ghost",
         "synergy": [
             "PROPULSION",
             "CYBERNETIC"
         ],
-        "text": "[Note: Exact text unknown. Best guess is after this] Each system that contains a wormhole and one of your ships gains PRODUCTION 1 as if it were 1 of your units.",
+        "text": "Each wormhole in a system that contains your ships gains PRODUCTION 1 as if it were a unit you control.\nReduce the combined cost of units you produce in systems that contain wormholes by 1 for each wormhole in that system.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "hacanbt",
+        "name": "Auto-Factories",
+        "displayName": "Auto-\nFactories",
+        "faction": "hacan",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "When you produce 3 or more non-fighter ships, place 1 command token from your reinforcements into your fleet pool.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "mahactbt",
+        "name": "Vaults of the Heir",
+        "displayName": "Vaults of\nthe Heir",
+        "faction": "mahact",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "ACTION: Exhaust this card and purge 1 of your technologies to gain 1 relic.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "mentakbt",
+        "name": "The Table's Grace",
+        "displayName": "Table's\nGrace",
+        "faction": "mentak",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "If you have the Cruiser II unit upgrade technology, flip this card and place it on top of cruiser II.\nCorsair [Cost 2, Combat 6, Move 3, Capacity 2] If the active system contains another player's non-fighter ships, this unit can move through systems that contain other players' ships.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "nekrobt",
+        "name": "Valefar Assimilator Z",
+        "displayName": "Valefar Z",
+        "faction": "nekro",
+        "synergy": [
+            "NONE"
+        ],
+        "text": "When you would gain another player's technology using one of your faction abilities, you may instead place one of your \"Z\" assimilator tokens on that player's faction sheet. Your flagship gains the text abilities of that faction's flagship in addition to its own.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "titansbt",
+        "name": "Slumberstate Computing",
+        "displayName": "Slumberstate\nComputing",
+        "faction": "titans",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "When COALESCENCE results in a ground combat, if you commit no other units, you may choose for your units to coexist instead. During the status phase, for each player you are coexisting with, you and that player each draw 1 additional action card. \nOther players may allow you to place a sleeper token on a planet they control.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "xxchabt",
+        "name": "Archon's Gift",
+        "displayName": "Archon's\nGift",
+        "faction": "xxcha",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "You can spend influence as if it were resources.\nYou can spend resources as if it were influence.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "nomadbt",
+        "name": "Thunder's Paradox",
+        "displayName": "Thunder's\nParadox",
+        "faction": "nomad",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "At the start of any player's turn, you may exhaust 1 of your agents to ready any other agent.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "jolnarbt",
+        "name": "Specialist Compounds",
+        "displayName": "Specialist\nCompounds",
+        "faction": "jolnar",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "When you research technology using the 'Technology' strategy card, you may exhaust a planet that has a technology specialty instead of spending resources; if you do, you must research a technology of that color.",
         "source": "thunders_edge"
     },
     {
@@ -219,6 +339,30 @@
             "WARFARE"
         ],
         "text": "ACTION: Exhaust this card and spend any amount of resources to choose a planet up to 2 systems away from an asteroid field that contains your ships; roll a number of dice equal to the amount spent and assign 1 hit to a ground force on that planet for each roll of 4 or greater.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "yssarilbt",
+        "name": "Deepgloom Executable",
+        "displayName": "Deepgloom\nExecutable",
+        "faction": "yssaril",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "You can allow other players to use your STALL TACTICS or SCHEMING faction abilities; when you do, you may resolve a transaction with that player. During the action phase, that transaction does not count against the once-per-player transaction limit for that turn.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "keleresbt",
+        "name": "I.I.H.Q. Modernization",
+        "displayName": "I.I.H.Q.",
+        "faction": "keleres",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "When you gain this card, gain the Custodia Vigilia planet card and its legendary planet ability card.\nYou are neighbors with all players that have units on Mecatol Rex or control planets in or adjacent to the Mecatol Rex system.",
         "source": "thunders_edge"
     }
 ]

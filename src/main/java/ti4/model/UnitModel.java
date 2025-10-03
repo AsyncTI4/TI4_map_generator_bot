@@ -189,6 +189,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getAfbDieCount(Player player, Game game) {
+        if (player.hasRelic("metalivoidarmaments") && getAfbDieCount() == 0) return 3;
         if (capacityValue > 0
                 && player.getFaction().equalsIgnoreCase(game.getStoredValue("ShrapnelTurretsFaction"))
                 && getExpectedAfbHits() < 0.6) {
@@ -230,6 +231,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getAfbHitsOn(Player player, Game game) {
+        if (player.hasRelic("metalivoidarmaments") && getAfbHitsOn() == 0) return 6;
         if (capacityValue > 0
                 && game.getStoredValue("ShrapnelTurretsFaction").equalsIgnoreCase(player.getFaction())
                 && getExpectedAfbHits() < 0.6) {

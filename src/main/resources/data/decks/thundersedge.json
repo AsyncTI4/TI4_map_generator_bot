@@ -1,9 +1,9 @@
 [
     {
         "alias": "relics_pok_te",
-        "name": "PoK & TE Relics",
+        "name": "TE Relics",
         "type": "relic",
-        "description": "All Relics in both official expansions game",
+        "description": "All Relics in a Thunder's Edge + PoK game.",
         "cardIDs": [
             "codex",
             "dominusorb",
@@ -18,11 +18,36 @@
             "stellarconverter",
             "thalnos",
             "titanprototype",
-            "neuraloop",
-            "circletofthevoid",
             "bookoflatvinia",
-            "quantumcore"
+            "circletofthevoid",
+            "heartofixth",
+            "lightrailordnance",
+            "metalivoidarmaments",
+            "metalivoidshielding",
+            "neuraloop",
+            "quantumcore",
+            "thesilverflame",
+            "thetriad"
         ],
-        "source": "pok"
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "relics_basete",
+        "name": "Base-TE Relics",
+        "type": "relic",
+        "description": "All Relics in a Thunder's Edge game, excluding Prophecy of Kings.",
+        "cardIDs": [
+            "bookoflatvinia",
+            "circletofthevoid",
+            "heartofixth",
+            "lightrailordnance",
+            "metalivoidarmaments",
+            "metalivoidshielding",
+            "neuraloop",
+            "quantumcore",
+            "thesilverflame",
+            "thetriad"
+        ],
+        "source": "thunders_edge"
     }
 ]

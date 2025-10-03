@@ -157,7 +157,8 @@ public class StatusHelper {
         game.setStoredValue(key3, "");
         game.setStoredValue(key2b, "");
         game.setStoredValue(key3b, "");
-        if (game.getHighestScore() + 4 > game.getVp() && !game.isCivilizedSocietyMode()) {
+        if (game.isZealousOrthodoxyMode()
+                || (game.getHighestScore() + 4 > game.getVp() && !game.isCivilizedSocietyMode())) {
             game.setStoredValue("forcedScoringOrder", "true");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.red("turnOffForcedScoring", "Turn Off Forced Scoring Order"));

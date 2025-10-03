@@ -102,7 +102,7 @@ public class RegexHelper {
     }
 
     /** @return group "unittype" */
-    private static String unitTypeRegex(String group) {
+    public static String unitTypeRegex(String group) {
         Set<String> types = new HashSet<>();
         Arrays.asList(UnitType.values()).forEach(x -> {
             types.add(x.getValue());
