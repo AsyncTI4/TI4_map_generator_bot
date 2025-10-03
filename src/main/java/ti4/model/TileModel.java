@@ -96,7 +96,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
             if (emoji.name().endsWith("Back") && !StringUtils.isEmpty(imagePath)) {
                 eb.setThumbnail(
                         "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tiles/"
-                                + imagePath + "");
+                                + imagePath + "?raw=true");
             } else {
                 eb.setThumbnail(customEmoji.getImageUrl());
             }
