@@ -8,10 +8,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -34,7 +33,8 @@ import ti4.service.unit.RemoveUnitService;
 
 public class TeHelperCommanders {
     @ButtonHandler("useDwsDiscount_")
-    public static void useDwsTechDiscount(Game game, Player eventPlayer, ButtonInteractionEvent event, String buttonID) {
+    public static void useDwsTechDiscount(
+            Game game, Player eventPlayer, ButtonInteractionEvent event, String buttonID) {
         String faction = buttonID.replace("useDwsDiscount_", "");
         Player player = game.getPlayerFromColorOrFaction(faction);
         if (player == null) return;
@@ -45,7 +45,8 @@ public class TeHelperCommanders {
             message += " " + eventPlayer.getRepresentation(true, false);
         }
         player.addSpentThing("dwsDiscount");
-        message += " has used your commander to get a discount on tech. Use the buttons to gain or convert 1 commodity.";
+        message +=
+                " has used your commander to get a discount on tech. Use the buttons to gain or convert 1 commodity.";
         message += "\n-# You have (" + player.getCommoditiesRepresentation() + ") commodities.";
         List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true);
         MessageHelper.sendMessageToChannelWithButtons(game.getActionsChannel(), message, buttons);
@@ -53,7 +54,8 @@ public class TeHelperCommanders {
 
     public static void offerCrimsonCommanderButtons(Player player, Game game, GenericInteractionCreateEvent event) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "crimsoncommander")) {
-            String message = player.getRepresentation(true, true) + " Resolve crimson commander using buttons\n> (note this is not available until the end of combat)";
+            String message = player.getRepresentation(true, true)
+                    + " Resolve crimson commander using buttons\n> (note this is not available until the end of combat)";
             message += "\n-# You have (" + player.getCommoditiesRepresentation() + ") commodities.";
             List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
@@ -73,7 +75,8 @@ public class TeHelperCommanders {
     @ButtonHandler("undoOjzRetreatS1_")
     private static void ojzRetreatStep1(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         HashMap<String, List<String>> ojzMap = TeHelperAbilities.readMoveMap(game.getStoredValue("OjzRetreatMap"));
-        String regex = "(undo|move)OjzRetreatS1_" + RegexHelper.posRegex(game, "source") + "_" + RegexHelper.unitTypeRegex() + "_" + RegexHelper.unitHolderRegex(game, "planet");
+        String regex = "(undo|move)OjzRetreatS1_" + RegexHelper.posRegex(game, "source") + "_"
+                + RegexHelper.unitTypeRegex() + "_" + RegexHelper.unitHolderRegex(game, "planet");
         Matcher matcher = Pattern.compile(regex).matcher(buttonID);
         if (matcher.matches()) {
             String pos = matcher.group("source");
@@ -81,19 +84,17 @@ public class TeHelperCommanders {
             String unitStr = matcher.group("unittype") + " " + matcher.group("planet");
 
             if (buttonID.startsWith("move")) {
-                if (!ojzMap.containsKey(pos))
-                    ojzMap.put(pos, new ArrayList<>());
+                if (!ojzMap.containsKey(pos)) ojzMap.put(pos, new ArrayList<>());
                 ojzMap.get(pos).add(unitStr);
             } else {
-                if (ojzMap.containsKey(pos))
-                    ojzMap.get(pos).remove(unitStr);
-                if (ojzMap.containsKey(pos) && ojzMap.get(pos).isEmpty())
-                    ojzMap.remove(pos);
+                if (ojzMap.containsKey(pos)) ojzMap.get(pos).remove(unitStr);
+                if (ojzMap.containsKey(pos) && ojzMap.get(pos).isEmpty()) ojzMap.remove(pos);
             }
             game.setStoredValue("OjzRetreatMap", TeHelperAbilities.storeMovementMap(ojzMap));
 
             List<Button> buttons = getWatchfulOjzUnitButtons(game, player, source, ojzMap.get(pos));
-            String message = player.getRepresentation() + " Choose up to 2 ships to retreat as well as anything they transport using Watchful Ojz, the Ral Nel commander:";
+            String message = player.getRepresentation()
+                    + " Choose up to 2 ships to retreat as well as anything they transport using Watchful Ojz, the Ral Nel commander:";
             message += TeHelperAbilities.unitSummary(game, player, ojzMap);
             MessageHelper.editMessageWithButtons(event, message, buttons);
         } else {
@@ -107,8 +108,7 @@ public class TeHelperCommanders {
         for (String pos : adj) {
             Tile tile = game.getTileByPosition(pos);
             if (tile == null) continue;
-            if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game))
-                valid.add(tile);
+            if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) valid.add(tile);
         }
         return valid;
     }
@@ -124,7 +124,9 @@ public class TeHelperCommanders {
             List<Button> buttons = new ArrayList<>();
             List<Tile> tiles = ojzDestinations(game, player, pos);
             for (Tile t : tiles) {
-                buttons.add(Buttons.green(player.finChecker() + "ojzRetreatS3_" + t.getPosition(), "Retreat to " + t.getRepresentationForButtons(game, player)));
+                buttons.add(Buttons.green(
+                        player.finChecker() + "ojzRetreatS3_" + t.getPosition(),
+                        "Retreat to " + t.getRepresentationForButtons(game, player)));
             }
 
             String message = player.getRepresentation() + " Choose a destination to send your retreating units:";
@@ -144,24 +146,29 @@ public class TeHelperCommanders {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             HashMap<String, List<String>> ojzMap = TeHelperAbilities.readMoveMap(game.getStoredValue("OjzRetreatMap"));
             for (String source : ojzMap.keySet()) {
-                if (ojzMap.get(source).contains("fs space"))
-                    movedFlagship = true;
-                List<String> units = ojzMap.get(source).stream()
-                    .collect(Collectors.groupingBy(s -> s)).entrySet().stream()
-                    .map(e -> e.getValue().size() + " " + e.getKey()).toList();
+                if (ojzMap.get(source).contains("fs space")) movedFlagship = true;
+                List<String> units =
+                        ojzMap.get(source).stream().collect(Collectors.groupingBy(s -> s)).entrySet().stream()
+                                .map(e -> e.getValue().size() + " " + e.getKey())
+                                .toList();
                 List<String> unitsTo = ojzMap.get(source).stream()
-                    .map(unit -> unit.substring(0, unit.indexOf(" ")))
-                    .collect(Collectors.groupingBy(s -> s)).entrySet().stream()
-                    .map(e -> e.getValue().size() + " " + e.getKey()).toList();
+                        .map(unit -> unit.substring(0, unit.indexOf(' ')))
+                        .collect(Collectors.groupingBy(s -> s))
+                        .entrySet()
+                        .stream()
+                        .map(e -> e.getValue().size() + " " + e.getKey())
+                        .toList();
                 String unitStrFrom = String.join(", ", units);
                 String unitStrTo = String.join(", ", unitsTo);
-                RemoveUnitService.removeUnits(event, game.getTileByPosition(source), game, player.getColor(), unitStrFrom);
+                RemoveUnitService.removeUnits(
+                        event, game.getTileByPosition(source), game, player.getColor(), unitStrFrom);
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitStrTo);
             }
             if (!player.hasUnit("ralnel_flagship")) movedFlagship = false;
             game.removeStoredValue("OjzRetreatMap");
 
-            String msg = player.getRepresentation() + " Retreated the following units to " + tile.getRepresentationForButtons(game, player);
+            String msg = player.getRepresentation() + " Retreated the following units to "
+                    + tile.getRepresentationForButtons(game, player);
             msg += " using Watchful Ojz, the Ral Nel commander:";
             msg += TeHelperAbilities.unitSummary(game, player, ojzMap);
 
@@ -175,22 +182,27 @@ public class TeHelperCommanders {
         }
     }
 
-    public static List<Button> getWatchfulOjzUnitButtons(Game game, Player player, Tile source, List<String> movedUnits) {
+    public static List<Button> getWatchfulOjzUnitButtons(
+            Game game, Player player, Tile source, List<String> movedUnits) {
         // Get buttons to move units from this system
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder uh : source.getUnitHolders().values()) {
             String uhName = uh.getName().equals("space") ? "Space" : Helper.getPlanetRepresentation(uh.getName(), game);
             for (UnitKey uk : uh.getUnitsByState().keySet()) {
                 // franken compat
-                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.getUnitType()) && !player.hasAbility("miniaturization")) continue;
+                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.getUnitType())
+                        && !player.hasAbility("miniaturization")) continue;
                 if (List.of(UnitType.PlenaryOrbital).contains(uk.getUnitType())) continue;
 
                 // moved all of this unit already from this unit holder
                 String unitStr = uk.asyncID() + " " + uh.getName();
-                if (movedUnits != null && movedUnits.stream().filter(s -> s.equals(unitStr)).count() >= uh.getUnits().get(uk)) continue;
+                if (movedUnits != null
+                        && movedUnits.stream().filter(s -> s.equals(unitStr)).count()
+                                >= uh.getUnits().get(uk)) continue;
 
                 // otherwise, add the button
-                String id = player.finChecker() + "moveOjzRetreatS1_" + source.getPosition() + "_" + uk.asyncID() + "_" + uh.getName();
+                String id = player.finChecker() + "moveOjzRetreatS1_" + source.getPosition() + "_" + uk.asyncID() + "_"
+                        + uh.getName();
                 String label = uk.getUnitType().humanReadableName() + " from " + uhName;
                 buttons.add(Buttons.green(id, label, uk.unitEmoji()));
             }
@@ -204,7 +216,8 @@ public class TeHelperCommanders {
                 UnitType type = Units.findUnitType(data[0]);
                 String uhName = data[1].equals("space") ? "Space" : Helper.getPlanetRepresentation(data[1], game);
                 if (type != null) {
-                    String id = player.finChecker() + "undoOjzRetreatS1_" + source.getPosition() + "_" + type.toString() + "_" + data[1];
+                    String id = player.finChecker() + "undoOjzRetreatS1_" + source.getPosition() + "_" + type.toString()
+                            + "_" + data[1];
                     String label = "Return " + type.humanReadableName() + " to " + uhName;
                     buttons.add(Buttons.red(id, label, type.getUnitTypeEmoji()));
                 }

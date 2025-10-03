@@ -1,7 +1,6 @@
 package ti4.service.breakthrough;
 
 import java.util.Map;
-
 import lombok.experimental.UtilityClass;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -41,9 +40,9 @@ public class AutoFactoriesService {
         int fleet = player.getFleetCC();
         player.setFleetCC(player.getFleetCC() + 1);
         BreakthroughModel model = player.getBreakthroughModel();
-        String autoFactoriesMsg = player.getPing() + " gained a fleet token from their breakthrough " + model.getNameRepresentation();
+        String autoFactoriesMsg =
+                player.getPing() + " gained a fleet token from their breakthrough " + model.getNameRepresentation();
         autoFactoriesMsg += "\n-# > Fleet tokens increased from (" + fleet + " -> " + (fleet + 1) + ")";
         ButtonHelper.sendMessageToRightStratThread(player, game, autoFactoriesMsg, buttonID);
     }
-
 }

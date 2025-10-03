@@ -1662,7 +1662,8 @@ public class ButtonHelper {
     public static String getTechSkipAttachments(Game game, String planetName) {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         if (tile == null) {
-            List<String> fakePlanets = new ArrayList<>(List.of("custodiavigilia", "ghoti"));
+            List<String> fakePlanets = new ArrayList<>(
+                    List.of("custodiavigilia", "ghoti", "ocean1", "ocean2", "ocean3", "ocean4", "ocean5", "triad"));
             if (!fakePlanets.contains(planetName))
                 BotLogger.warning(
                         new LogOrigin(game), "Couldn't find tile for " + planetName + " in game " + game.getName());
@@ -7160,7 +7161,8 @@ public class ButtonHelper {
     }
 
     public static Tile getTileOfPlanetWithNoTrait(Player player, Game game) {
-        List<String> fakePlanets = new ArrayList<>(List.of("custodiavigilia", "ghoti"));
+        List<String> fakePlanets = new ArrayList<>(
+                List.of("custodiavigilia", "ghoti", "ocean1", "ocean2", "ocean3", "ocean4", "ocean5", "triad"));
         List<String> ignoredPlanets = new ArrayList<>(Constants.MECATOLS);
         ignoredPlanets.addAll(fakePlanets);
 

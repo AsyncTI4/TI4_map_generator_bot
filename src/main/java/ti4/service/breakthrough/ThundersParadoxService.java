@@ -3,7 +3,6 @@ package ti4.service.breakthrough;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -39,8 +38,11 @@ public class ThundersParadoxService {
                 if (leader.isExhausted() || !leader.getType().equals("agent")) continue;
 
                 String id = buttonPrefix + leader.getId();
-                String label = leader.getLeaderModel().map(lm -> "Exhaust " + lm.getName()).orElse("Exhaust " + leader.getId());
-                TI4Emoji emoji = leader.getLeaderModel().map(lm -> lm.getLeaderEmoji()).orElse(null);
+                String label = leader.getLeaderModel()
+                        .map(lm -> "Exhaust " + lm.getName())
+                        .orElse("Exhaust " + leader.getId());
+                TI4Emoji emoji =
+                        leader.getLeaderModel().map(lm -> lm.getLeaderEmoji()).orElse(null);
                 buttons.add(Buttons.blue(id, label, emoji));
             }
             if (player.hasRelicReady("titanprototype"))
@@ -48,15 +50,20 @@ public class ThundersParadoxService {
             if (player.hasRelicReady("absol_jr"))
                 buttons.add(Buttons.blue(buttonPrefix + "absol_jr", "Exhaust JR-XS455-O", ExploreEmojis.Relic));
 
-            MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), null, player.getBreakthroughModel().getRepresentationEmbed());
-            String message = player.getRepresentation() + " is using their breakthrough, " + paradoxRep() + ". Use the buttons to choose one of your agents to exhaust:";
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(),
+                    null,
+                    player.getBreakthroughModel().getRepresentationEmbed());
+            String message = player.getRepresentation() + " is using their breakthrough, " + paradoxRep()
+                    + ". Use the buttons to choose one of your agents to exhaust:";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             ButtonHelper.deleteTheOneButton(event);
 
         } else {
             Player nomad = Helper.getPlayerFromUnlockedBreakthrough(game, "nomadbt");
             if (nomad != null) {
-                String msg = "Attention " + nomad.getRepresentation() + ": " + player.getRepresentation(false, false) + " is requesting that you use your breakthrough" + paradoxRep() + ".";
+                String msg = "Attention " + nomad.getRepresentation() + ": " + player.getRepresentation(false, false)
+                        + " is requesting that you use your breakthrough" + paradoxRep() + ".";
                 MessageHelper.sendMessageToChannel(nomad.getCorrectChannel(), msg);
             }
         }
@@ -90,7 +97,9 @@ public class ThundersParadoxService {
                         found = true;
                     }
                 }
-                if (found || p.getExhaustedRelics().contains("titanprototype") || p.getExhaustedRelics().contains("absol_jr"))
+                if (found
+                        || p.getExhaustedRelics().contains("titanprototype")
+                        || p.getExhaustedRelics().contains("absol_jr"))
                     buttons.add(Buttons.green(buttonPrefix + p.getFaction(), null, p.fogSafeEmoji()));
             }
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons);
@@ -104,7 +113,8 @@ public class ThundersParadoxService {
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Player p2 = game.getPlayerFromColorOrFaction(matcher.group("faction"));
             if (p2 != null) {
-                String message = player.getRepresentation() + " choose an agent to refresh for " + p2.getRepresentation(false, false);
+                String message = player.getRepresentation() + " choose an agent to refresh for "
+                        + p2.getRepresentation(false, false);
 
                 List<Button> buttons = new ArrayList<>();
                 String buttonPrefix = player.finChecker() + "useThundersParadox_step4_" + p2.getFaction() + "_";
@@ -112,8 +122,12 @@ public class ThundersParadoxService {
                     if (!leader.isExhausted() || !leader.getType().equals("agent")) continue;
 
                     String id = buttonPrefix + leader.getId();
-                    String label = leader.getLeaderModel().map(lm -> "Ready " + lm.getName()).orElse("Ready " + leader.getId());
-                    TI4Emoji emoji = leader.getLeaderModel().map(lm -> lm.getLeaderEmoji()).orElse(null);
+                    String label = leader.getLeaderModel()
+                            .map(lm -> "Ready " + lm.getName())
+                            .orElse("Ready " + leader.getId());
+                    TI4Emoji emoji = leader.getLeaderModel()
+                            .map(lm -> lm.getLeaderEmoji())
+                            .orElse(null);
                     buttons.add(Buttons.blue(id, label, emoji));
                 }
                 if (p2.getExhaustedRelics().contains("titanprototype"))
@@ -129,14 +143,16 @@ public class ThundersParadoxService {
 
     @ButtonHandler("useThundersParadox_step4_")
     private void useThundersParadoxStep4(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String regex = "useThundersParadox_step4_" + RegexHelper.factionRegex(game) + "_" + RegexHelper.agentRegex(game);
+        String regex =
+                "useThundersParadox_step4_" + RegexHelper.factionRegex(game) + "_" + RegexHelper.agentRegex(game);
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Player p2 = game.getPlayerFromColorOrFaction(matcher.group("faction"));
             String leaderID = matcher.group("agent");
 
             if (p2 != null) {
                 String message = p2.getRepresentation() + " your agent, ";
-                if (p2.hasLeader(leaderID) && p2.getLeader(leaderID).map(Leader::isExhausted).orElse(true)) {
+                if (p2.hasLeader(leaderID)
+                        && p2.getLeader(leaderID).map(Leader::isExhausted).orElse(true)) {
                     Optional<Leader> leader = p2.getLeaderByID(leaderID);
                     Optional<LeaderModel> model = leader.flatMap(l -> l.getLeaderModel());
                     leader.ifPresent(l -> RefreshLeaderService.refreshLeader(p2, l, game));
@@ -144,7 +160,8 @@ public class ThundersParadoxService {
 
                 } else if (p2.hasRelic(leaderID) && p2.getExhaustedRelics().contains(leaderID)) {
                     p2.removeExhaustedRelic(leaderID);
-                    message += ExploreEmojis.Relic + " " + Mapper.getRelic(leaderID).getName();
+                    message += ExploreEmojis.Relic + " "
+                            + Mapper.getRelic(leaderID).getName();
                 }
                 message += ", has been readied by " + paradoxRep();
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);

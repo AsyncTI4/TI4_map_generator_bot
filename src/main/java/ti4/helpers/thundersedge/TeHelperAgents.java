@@ -9,7 +9,6 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -39,7 +38,8 @@ import ti4.service.unit.RemoveUnitService;
 
 public class TeHelperAgents {
 
-    public static boolean handleTeAgentExhaust(GenericInteractionCreateEvent event, Game game, Player player, String leaderID, String targetPlayer) {
+    public static boolean handleTeAgentExhaust(
+            GenericInteractionCreateEvent event, Game game, Player player, String leaderID, String targetPlayer) {
         Player target = game.getPlayerFromColorOrFaction(targetPlayer);
         if (target == null) target = player;
         switch (leaderID) {
@@ -59,7 +59,9 @@ public class TeHelperAgents {
         Map<String, Integer> acsAfter = new HashMap<>(player.getActionCards());
 
         List<Button> buttons = new ArrayList<>();
-        List<String> newACs = acsAfter.keySet().stream().filter(key -> !acsBefore.keySet().contains(key)).toList();
+        List<String> newACs = acsAfter.keySet().stream()
+                .filter(key -> !acsBefore.keySet().contains(key))
+                .toList();
         for (String ac : newACs) {
             ActionCardModel model = Mapper.getActionCard(ac);
             buttons.add(Buttons.red("handleRalNelAgent_" + ac, model.getName(), CardEmojis.ActionCard));
@@ -76,12 +78,15 @@ public class TeHelperAgents {
         String part1 = "handleRalNelAgent_" + RegexHelper.acRegex(game);
         RegexService.runMatcher(part1, buttonID, matcher -> {
             String acID = matcher.group("ac");
-            String msg = player.getRepresentation(true, true) + " Choose a player to give " + Mapper.getActionCard(acID).getName() + " to:";
+            String msg = player.getRepresentation(true, true) + " Choose a player to give "
+                    + Mapper.getActionCard(acID).getName() + " to:";
             List<Button> buttons = new ArrayList<>();
             String prefix = "handleRalNelAgentPt2_" + acID + "_";
             for (Player p2 : game.getRealPlayers()) {
                 String label = game.isFowMode() ? p2.getColor() : p2.getFlexibleDisplayName();
-                String emoji = game.isFowMode() ? ColorEmojis.getColorEmoji(p2.getColor()).toString() : p2.getFactionEmoji();
+                String emoji = game.isFowMode()
+                        ? ColorEmojis.getColorEmoji(p2.getColor()).toString()
+                        : p2.getFactionEmoji();
                 buttons.add(Buttons.gray(prefix + p2.getFaction(), label, emoji));
             }
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -90,7 +95,8 @@ public class TeHelperAgents {
     }
 
     @ButtonHandler("handleRalNelAgentPt2_")
-    private static void handleRalNelAgentPart2(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    private static void handleRalNelAgentPart2(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String regex = "handleRalNelAgentPt2_" + RegexHelper.acRegex(game) + "_" + RegexHelper.factionRegex(game);
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String acID = matcher.group("ac");
@@ -98,9 +104,13 @@ public class TeHelperAgents {
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 != null) {
                 ActionCardHelper.sendActionCard(event, game, player, game.getPlayerFromColorOrFaction(faction), acID);
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, true) + " sent an action card to " + p2.getRepresentation());
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation(true, true) + " sent an action card to " + p2.getRepresentation());
                 if (game.isFowMode())
-                    MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), player.getRepresentation() + " sent an action card to " + p2.getRepresentation(true, true));
+                    MessageHelper.sendMessageToChannel(
+                            p2.getCorrectChannel(),
+                            player.getRepresentation() + " sent an action card to " + p2.getRepresentation(true, true));
             } else {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Error, player2 is null");
             }
@@ -111,7 +121,8 @@ public class TeHelperAgents {
     private static void postCrimsonAgentStep1(Game game, Player player) {
         Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, um -> um.getIsShip());
         String message = player.getRepresentation() + " Choose the first tile to swap a unit from:";
-        List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(player, game, "handleCrimsonAgent", pred, false);
+        List<Button> buttons =
+                ButtonHelper.getTilesWithPredicateForAction(player, game, "handleCrimsonAgent", pred, false);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
@@ -131,21 +142,26 @@ public class TeHelperAgents {
         List<Button> newButtons = new ArrayList<>();
         if ((matcher = Pattern.compile(part2).matcher(buttonID)).matches()) {
             Tile from = game.getTileByPosition(matcher.group("tileA"));
-            newMessage = player.getRepresentation() + " You are swapping from " + from.getRepresentationForButtons(game, player) + ". Choose a ship you'd like to swap:";
+            newMessage = player.getRepresentation() + " You are swapping from "
+                    + from.getRepresentationForButtons(game, player) + ". Choose a ship you'd like to swap:";
 
             UnitHolder space = from.getSpaceUnitHolder();
             Set<UnitKey> keys = space.getUnitsByState().keySet().stream()
-                .filter(unit -> space.getUnitCount(unit) > 0)
-                .filter(player::unitBelongsToPlayer)
-                .filter(uk -> player.getUnitFromUnitKey(uk).getIsShip())
-                .collect(Collectors.toSet());
-            keys.stream().map(uk -> Buttons.blue(prefix + uk.asyncID(), uk.getUnitType().humanReadableName(), uk.unitEmoji())).forEach(newButtons::add);
+                    .filter(unit -> space.getUnitCount(unit) > 0)
+                    .filter(player::unitBelongsToPlayer)
+                    .filter(uk -> player.getUnitFromUnitKey(uk).getIsShip())
+                    .collect(Collectors.toSet());
+            keys.stream()
+                    .map(uk ->
+                            Buttons.blue(prefix + uk.asyncID(), uk.getUnitType().humanReadableName(), uk.unitEmoji()))
+                    .forEach(newButtons::add);
 
         } else if ((matcher = Pattern.compile(part3).matcher(buttonID)).matches()) {
             Tile from = game.getTileByPosition(matcher.group("tileA"));
             UnitType unitType = Units.findUnitType(matcher.group("unitA"));
 
-            newMessage = player.getRepresentation() + " You are swapping a " + unitType.humanReadableName() + " from " + from.getRepresentationForButtons(game, player) + ".";
+            newMessage = player.getRepresentation() + " You are swapping a " + unitType.humanReadableName() + " from "
+                    + from.getRepresentationForButtons(game, player) + ".";
             newMessage += "\nChoose your destination:";
             newButtons = ButtonHelper.getTilesWithPredicateForAction(player, game, buttonID, pred, false);
 
@@ -154,16 +170,21 @@ public class TeHelperAgents {
             UnitType unitType = Units.findUnitType(matcher.group("unitA"));
             Tile to = game.getTileByPosition(matcher.group("tileB"));
 
-            newMessage = player.getRepresentation() + " You are swapping a " + unitType.humanReadableName() + " from " + from.getRepresentationForButtons(game, player) + ".";
-            newMessage += "\nYour destination is " + to.getRepresentationForButtons(game, player) + ". Choose a ship to swap with:";
+            newMessage = player.getRepresentation() + " You are swapping a " + unitType.humanReadableName() + " from "
+                    + from.getRepresentationForButtons(game, player) + ".";
+            newMessage += "\nYour destination is " + to.getRepresentationForButtons(game, player)
+                    + ". Choose a ship to swap with:";
 
             UnitHolder space = to.getSpaceUnitHolder();
             Set<UnitKey> keys = space.getUnitsByState().keySet().stream()
-                .filter(unit -> space.getUnitCount(unit) > 0)
-                .filter(player::unitBelongsToPlayer)
-                .filter(uk -> player.getUnitFromUnitKey(uk).getIsShip())
-                .collect(Collectors.toSet());
-            keys.stream().map(uk -> Buttons.blue(prefix + uk.asyncID(), uk.getUnitType().humanReadableName(), uk.unitEmoji())).forEach(newButtons::add);
+                    .filter(unit -> space.getUnitCount(unit) > 0)
+                    .filter(player::unitBelongsToPlayer)
+                    .filter(uk -> player.getUnitFromUnitKey(uk).getIsShip())
+                    .collect(Collectors.toSet());
+            keys.stream()
+                    .map(uk ->
+                            Buttons.blue(prefix + uk.asyncID(), uk.getUnitType().humanReadableName(), uk.unitEmoji()))
+                    .forEach(newButtons::add);
 
         } else if ((matcher = Pattern.compile(part5).matcher(buttonID)).matches()) {
             Tile tileA = game.getTileByPosition(matcher.group("tileA"));
@@ -182,8 +203,10 @@ public class TeHelperAgents {
             AddUnitService.addUnits(event, tileA, game, player.getColor(), unitB);
 
             String message = player.getRepresentation() + " swapped two ships using <crimsonagent>";
-            message += "\n> " + unitTypeA.humanReadableName() + " at " + tileA.getRepresentationForButtons(game, player);
-            message += "\n> " + unitTypeB.humanReadableName() + " at " + tileB.getRepresentationForButtons(game, player);
+            message +=
+                    "\n> " + unitTypeA.humanReadableName() + " at " + tileA.getRepresentationForButtons(game, player);
+            message +=
+                    "\n> " + unitTypeB.humanReadableName() + " at " + tileB.getRepresentationForButtons(game, player);
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.deleteMessage(event);
@@ -191,7 +214,10 @@ public class TeHelperAgents {
 
         if (newMessage != null) {
             // edit the message with the new partX buttons
-            event.getMessage().editMessage(newMessage).setComponents(ButtonHelper.turnButtonListIntoActionRowList(newButtons)).queue();
+            event.getMessage()
+                    .editMessage(newMessage)
+                    .setComponents(ButtonHelper.turnButtonListIntoActionRowList(newButtons))
+                    .queue();
         }
     }
 
@@ -211,7 +237,8 @@ public class TeHelperAgents {
         buttons.add(Buttons.green(id, label, LeaderEmojis.NaaluAgent));
         buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
 
-        String msg = player.getRepresentation() + " You can use " + Mapper.getLeader("naaluagent-te").getNameRepresentation();
+        String msg = player.getRepresentation() + " You can use "
+                + Mapper.getLeader("naaluagent-te").getNameRepresentation();
         msg += " to remove your Command Token from " + tile.getRepresentationForButtons(game, player) + ".";
 
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCardsInfoThread(), msg, buttons);

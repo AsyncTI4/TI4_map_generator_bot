@@ -2,7 +2,6 @@ package ti4.service.breakthrough;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -30,15 +29,19 @@ public class VaultsOfTheHeirService {
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
             TechnologyModel model = Mapper.getTech(tech);
-            buttons.add(Buttons.red(player.finChecker() + "purgeTechVaults_" + tech, model.getName(), model.getCondensedReqsEmojis(true)));
+            buttons.add(Buttons.red(
+                    player.finChecker() + "purgeTechVaults_" + tech,
+                    model.getName(),
+                    model.getCondensedReqsEmojis(true)));
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
     @ButtonHandler("purgeTechVaults_")
-    private static void resolveVaultsOfTheHeir(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    private static void resolveVaultsOfTheHeir(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String tech = buttonID.replace("purgeTechVaults_", "");
-        ButtonHelperHeroes.purgeTech(player, game, event, tech); //deletes message
+        ButtonHelperHeroes.purgeTech(player, game, event, tech); // deletes message
         RelicHelper.drawRelicAndNotify(player, event, game);
         ButtonHelper.deleteMessage(event);
     }

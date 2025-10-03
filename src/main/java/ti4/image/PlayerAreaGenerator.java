@@ -2010,6 +2010,7 @@ class PlayerAreaGenerator {
                                 + ". Removing planet from player.");
                 return deltaX;
             }
+            planet.updateTriadStats(player);
             PlanetModel planetModel = planet.getPlanetModel();
             if (planetModel == null) return deltaX;
 

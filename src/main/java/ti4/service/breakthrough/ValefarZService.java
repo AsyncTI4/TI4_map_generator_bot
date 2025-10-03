@@ -2,7 +2,6 @@ package ti4.service.breakthrough;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
@@ -26,7 +25,8 @@ public class ValefarZService {
             return;
         }
         String ability = fs.getAbility().orElse(fs.getName() + " has no text ability, womp womp");
-        String msg = "Placed a Valefar Z token on " + faction + "'s flagship, " + fs.getNameRepresentation() + ", gaining the ability:\n> " + ability;
+        String msg = "Placed a Valefar Z token on " + faction + "'s flagship, " + fs.getNameRepresentation()
+                + ", gaining the ability:\n> " + ability;
 
         game.setStoredValue("valefarZ", game.getStoredValue("valefarZ") + faction + "|");
         MessageHelper.sendMessageToChannel(nekro.getCorrectChannel(), msg);
@@ -68,5 +68,4 @@ public class ValefarZService {
         }
         return players;
     }
-
 }

@@ -1,5 +1,3 @@
 package ti4.helpers.thundersedge;
 
-public class TeHelperRelics {
-
-}
+public class TeHelperRelics {}

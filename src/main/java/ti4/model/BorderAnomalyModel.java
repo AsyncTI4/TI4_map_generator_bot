@@ -3,7 +3,6 @@ package ti4.model;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import lombok.Getter;
 import ti4.ResourceHelper;
 
@@ -16,8 +15,8 @@ public class BorderAnomalyModel {
         NEBULA("Nebula", "nebula_border.png"), //
         MINEFIELD("Minefield", "minefield_border.png"), //
         ARROW("Arrow", "adjacency_arrow.png"), //
-        SPATIAL_TEAR("Spatial Tear", "spatial_tear_border.png"), 
-         VOID_TETHER("Void Tether", "void_tether.png"),//
+        SPATIAL_TEAR("Spatial Tear", "spatial_tear_border.png"),
+        VOID_TETHER("Void Tether", "void_tether.png"), //
 
         // PBD 100 two
         CORE_BORDER("Core border", "core_border.png"), //

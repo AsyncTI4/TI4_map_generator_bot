@@ -1182,6 +1182,9 @@ public class Player extends PlayerProperties {
     }
 
     public void removeRelic(String relicID) {
+        if ("thetriad".equals(relicID)) {
+            removePlanet("triad");
+        }
         getRelics().remove(relicID);
     }
 

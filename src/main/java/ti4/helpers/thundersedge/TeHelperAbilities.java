@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
@@ -64,7 +63,8 @@ public class TeHelperAbilities {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 ButtonHelper.deleteMessage(event);
             } else {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not find planet. Yell at jazz and resolve manually");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(), "Could not find planet. Yell at jazz and resolve manually");
             }
         });
     }
@@ -78,7 +78,8 @@ public class TeHelperAbilities {
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             tile.getSpaceUnitHolder().removeToken(Constants.TOKEN_BREACH_ACTIVE);
-            String msg = player.getRepresentation(false, false) + " removed active breach from " + tile.getRepresentationForButtons(game, player);
+            String msg = player.getRepresentation(false, false) + " removed active breach from "
+                    + tile.getRepresentationForButtons(game, player);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             ButtonHelper.deleteTheOneButton(event);
         });
@@ -93,7 +94,9 @@ public class TeHelperAbilities {
         StringBuilder sb = new StringBuilder();
         for (Entry<String, List<String>> system : moveMap.entrySet()) {
             Tile systemFrom = game.getTileByPosition(system.getKey());
-            sb.append("\n> Moving units from ").append(systemFrom.getRepresentationForButtons()).append(":");
+            sb.append("\n> Moving units from ")
+                    .append(systemFrom.getRepresentationForButtons())
+                    .append(":");
             for (String unit : system.getValue()) {
                 String[] data = unit.split(" ");
                 UnitType type = Units.findUnitType(data[0]);
@@ -129,7 +132,8 @@ public class TeHelperAbilities {
 
     @ButtonHandler("miniLanding_")
     private static void handleMiniLanding(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String regex = "miniLanding_" + RegexHelper.posRegex() + "_" + RegexHelper.intRegex("count") + RegexHelper.unitTypeRegex() + "_" + RegexHelper.unitHolderRegex(game, "planet");
+        String regex = "miniLanding_" + RegexHelper.posRegex() + "_" + RegexHelper.intRegex("count")
+                + RegexHelper.unitTypeRegex() + "_" + RegexHelper.unitHolderRegex(game, "planet");
         Matcher matcher = Pattern.compile(regex).matcher(buttonID);
         if (matcher.matches()) {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
@@ -139,7 +143,8 @@ public class TeHelperAbilities {
 
             String unitName = uk.getUnitType().humanReadableName();
             String planetName = Helper.getPlanetRepresentation(planet, game);
-            String message = player.getRepresentation(false, false) + " landed " + count + " " + unitName + " on " + planetName;
+            String message =
+                    player.getRepresentation(false, false) + " landed " + count + " " + unitName + " on " + planetName;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
 
             UnitHolder space = tile.getSpaceUnitHolder();
@@ -160,30 +165,38 @@ public class TeHelperAbilities {
         List<Button> buttons = new ArrayList<>();
         Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
         if (activeSystem != null) {
-            int dmgDocks = activeSystem.getSpaceUnitHolder().getDamagedUnitCount(UnitType.Spacedock, player.getColorID());
+            int dmgDocks =
+                    activeSystem.getSpaceUnitHolder().getDamagedUnitCount(UnitType.Spacedock, player.getColorID());
             int docks = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Spacedock, player) - dmgDocks;
             int dmgPds = activeSystem.getSpaceUnitHolder().getDamagedUnitCount(UnitType.Pds, player.getColorID());
             int pds = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Pds, player) - dmgPds;
 
             for (Planet planet : activeSystem.getPlanetUnitHolders()) {
                 for (int x = 1; x <= Math.min(2, pds); x++) {
-                    String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "pd_" + planet.getName();
+                    String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "pd_"
+                            + planet.getName();
                     String label = "Land " + x + " PDS on " + Helper.getPlanetRepresentation(planet.getName(), game);
                     buttons.add(Buttons.red(id, label, UnitEmojis.pds));
                 }
                 for (int x = 1; x <= Math.min(2, dmgPds); x++) {
-                    String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "pd_" + planet.getName();
-                    String label = "Land " + x + " damaged PDS on " + Helper.getPlanetRepresentation(planet.getName(), game);
+                    String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "pd_"
+                            + planet.getName();
+                    String label =
+                            "Land " + x + " damaged PDS on " + Helper.getPlanetRepresentation(planet.getName(), game);
                     buttons.add(Buttons.red(id, label, UnitEmojis.pds));
                 }
                 for (int x = 1; x <= Math.min(1, docks); x++) {
-                    String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "sd_" + planet.getName();
-                    String label = "Land " + x + " Space Dock on " + Helper.getPlanetRepresentation(planet.getName(), game);
+                    String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "sd_"
+                            + planet.getName();
+                    String label =
+                            "Land " + x + " Space Dock on " + Helper.getPlanetRepresentation(planet.getName(), game);
                     buttons.add(Buttons.red(id, label, UnitEmojis.spacedock));
                 }
                 for (int x = 1; x <= Math.min(1, dmgDocks); x++) {
-                    String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "sd_" + planet.getName();
-                    String label = "Land " + x + " damaged Space Dock on " + Helper.getPlanetRepresentation(planet.getName(), game);
+                    String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "sd_"
+                            + planet.getName();
+                    String label = "Land " + x + " damaged Space Dock on "
+                            + Helper.getPlanetRepresentation(planet.getName(), game);
                     buttons.add(Buttons.red(id, label, UnitEmojis.spacedock));
                 }
             }
@@ -193,7 +206,8 @@ public class TeHelperAbilities {
     }
 
     @ButtonHandler("startSurvival_")
-    private static void chooseSystemForSurvival(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    private static void chooseSystemForSurvival(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         HashMap<String, List<String>> survivalMap = readMoveMap(game.getStoredValue("survivalInstinctMap"));
         Matcher matcher;
         String regex1 = "startSurvival_" + RegexHelper.posRegex(); // start_activeSystem
@@ -209,8 +223,10 @@ public class TeHelperAbilities {
         } else if ((matcher = Pattern.compile(regex2).matcher(buttonID)).matches()) {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             Tile source = game.getTileByPosition(matcher.group("source"));
-            List<Button> buttons = getSurvivalInstinctUnitButtonsForSystem(game, player, tile, source, survivalMap.get(matcher.group("source")));
-            String message = player.getRepresentation() + " Choose units to move from the system using Survival Instinct, or click DONE to move from a different system:";
+            List<Button> buttons = getSurvivalInstinctUnitButtonsForSystem(
+                    game, player, tile, source, survivalMap.get(matcher.group("source")));
+            String message = player.getRepresentation()
+                    + " Choose units to move from the system using Survival Instinct, or click DONE to move from a different system:";
             message += unitSummary(game, player, survivalMap);
             MessageHelper.editMessageWithButtons(event, message, buttons);
 
@@ -223,8 +239,9 @@ public class TeHelperAbilities {
     @ButtonHandler("undoSurvival_")
     private static void moveUnitWithSurvival(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         HashMap<String, List<String>> survivalMap = readMoveMap(game.getStoredValue("survivalInstinctMap"));
-        String regex = "(undo|move)Survival_" + RegexHelper.posRegex(game, "destination") + "_" + RegexHelper.posRegex(game, "source") +
-            "_" + RegexHelper.unitTypeRegex() + "_" + RegexHelper.unitHolderRegex(game, "planet");
+        String regex = "(undo|move)Survival_" + RegexHelper.posRegex(game, "destination") + "_"
+                + RegexHelper.posRegex(game, "source") + "_" + RegexHelper.unitTypeRegex() + "_"
+                + RegexHelper.unitHolderRegex(game, "planet");
         Matcher matcher = Pattern.compile(regex).matcher(buttonID);
         if (matcher.matches()) {
             Tile destination = game.getTileByPosition(matcher.group("destination"));
@@ -233,19 +250,18 @@ public class TeHelperAbilities {
             String unitStr = matcher.group("unittype") + " " + matcher.group("planet");
 
             if (buttonID.startsWith("move")) {
-                if (!survivalMap.containsKey(pos))
-                    survivalMap.put(pos, new ArrayList<>());
+                if (!survivalMap.containsKey(pos)) survivalMap.put(pos, new ArrayList<>());
                 survivalMap.get(pos).add(unitStr);
             } else {
-                if (survivalMap.containsKey(pos))
-                    survivalMap.get(pos).remove(unitStr);
-                if (survivalMap.containsKey(pos) && survivalMap.get(pos).isEmpty())
-                    survivalMap.remove(pos);
+                if (survivalMap.containsKey(pos)) survivalMap.get(pos).remove(unitStr);
+                if (survivalMap.containsKey(pos) && survivalMap.get(pos).isEmpty()) survivalMap.remove(pos);
             }
             game.setStoredValue("survivalInstinctMap", storeMovementMap(survivalMap));
 
-            List<Button> buttons = getSurvivalInstinctUnitButtonsForSystem(game, player, destination, source, survivalMap.get(pos));
-            String message = player.getRepresentation() + " Choose units to move from the system using Survival Instinct, or click DONE to move from a different system:";
+            List<Button> buttons =
+                    getSurvivalInstinctUnitButtonsForSystem(game, player, destination, source, survivalMap.get(pos));
+            String message = player.getRepresentation()
+                    + " Choose units to move from the system using Survival Instinct, or click DONE to move from a different system:";
             message += unitSummary(game, player, survivalMap);
             MessageHelper.editMessageWithButtons(event, message, buttons);
         } else {
@@ -261,20 +277,26 @@ public class TeHelperAbilities {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             HashMap<String, List<String>> survivalMap = readMoveMap(game.getStoredValue("survivalInstinctMap"));
             for (String source : survivalMap.keySet()) {
-                List<String> units = survivalMap.get(source).stream()
-                    .collect(Collectors.groupingBy(s -> s)).entrySet().stream()
-                    .map(e -> e.getValue().size() + " " + e.getKey()).toList();
+                List<String> units =
+                        survivalMap.get(source).stream().collect(Collectors.groupingBy(s -> s)).entrySet().stream()
+                                .map(e -> e.getValue().size() + " " + e.getKey())
+                                .toList();
                 List<String> unitsTo = survivalMap.get(source).stream()
-                    .map(unit -> unit.substring(0, unit.indexOf(" ")))
-                    .collect(Collectors.groupingBy(s -> s)).entrySet().stream()
-                    .map(e -> e.getValue().size() + " " + e.getKey()).toList();
+                        .map(unit -> unit.substring(0, unit.indexOf(' ')))
+                        .collect(Collectors.groupingBy(s -> s))
+                        .entrySet()
+                        .stream()
+                        .map(e -> e.getValue().size() + " " + e.getKey())
+                        .toList();
                 String unitStrFrom = String.join(", ", units);
                 String unitStrTo = String.join(", ", unitsTo);
                 RemoveUnitService.removeUnits(event, tile, game, player.getColor(), unitStrFrom);
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitStrTo);
             }
             game.removeStoredValue("survivalInstinctMap");
-            String msg = player.getRepresentation() + " Moved the following units into the active system with Survival Instinct:" + unitSummary(game, player, survivalMap);
+            String msg = player.getRepresentation()
+                    + " Moved the following units into the active system with Survival Instinct:"
+                    + unitSummary(game, player, survivalMap);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             ButtonHelper.deleteMessage(event);
         } else {
@@ -282,7 +304,8 @@ public class TeHelperAbilities {
         }
     }
 
-    public static List<Button> getSurvivalInstinctSystemButtons(Game game, Player player, Tile tile, HashMap<String, List<String>> survivalMap) {
+    public static List<Button> getSurvivalInstinctSystemButtons(
+            Game game, Player player, Tile tile, HashMap<String, List<String>> survivalMap) {
         // Get the tiles that are valid sources for Survival Instinct
         if (survivalMap == null) survivalMap = new HashMap<>();
         List<Button> buttons = new ArrayList<>();
@@ -300,7 +323,8 @@ public class TeHelperAbilities {
         return buttons;
     }
 
-    private static List<Button> getSurvivalInstinctUnitButtonsForSystem(Game game, Player player, Tile destination, Tile source, List<String> movedUnits) {
+    private static List<Button> getSurvivalInstinctUnitButtonsForSystem(
+            Game game, Player player, Tile destination, Tile source, List<String> movedUnits) {
         // Get buttons to move units from this system
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder uh : source.getUnitHolders().values()) {
@@ -309,15 +333,19 @@ public class TeHelperAbilities {
                 if (!player.unitBelongsToPlayer(uk)) continue;
 
                 // franken compat
-                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.getUnitType()) && !player.hasAbility("miniaturization")) continue;
+                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.getUnitType())
+                        && !player.hasAbility("miniaturization")) continue;
                 if (List.of(UnitType.PlenaryOrbital).contains(uk.getUnitType())) continue;
 
                 // moved all of this unit already from this unit holder
                 String unitStr = uk.asyncID() + " " + uh.getName();
-                if (movedUnits != null && movedUnits.stream().filter(s -> s.equals(unitStr)).count() >= uh.getUnits().get(uk)) continue;
+                if (movedUnits != null
+                        && movedUnits.stream().filter(s -> s.equals(unitStr)).count()
+                                >= uh.getUnits().get(uk)) continue;
 
                 // otherwise, add the button
-                String id = player.finChecker() + "moveSurvival_" + destination.getPosition() + "_" + source.getPosition() + "_" + uk.asyncID() + "_" + uh.getName();
+                String id = player.finChecker() + "moveSurvival_" + destination.getPosition() + "_"
+                        + source.getPosition() + "_" + uk.asyncID() + "_" + uh.getName();
                 String label = uk.getUnitType().humanReadableName() + " from " + uhName;
                 buttons.add(Buttons.green(id, label, uk.unitEmoji()));
             }
@@ -330,15 +358,16 @@ public class TeHelperAbilities {
                 UnitType type = Units.findUnitType(data[0]);
                 String uhName = data[1].equals("space") ? "Space" : Helper.getPlanetRepresentation(data[1], game);
                 if (type != null) {
-                    String id = player.finChecker() + "undoSurvival_" + destination.getPosition() + "_" + source.getPosition() + "_" + type.toString() + "_" + data[1];
+                    String id = player.finChecker() + "undoSurvival_" + destination.getPosition() + "_"
+                            + source.getPosition() + "_" + type.toString() + "_" + data[1];
                     String label = "Return " + type.humanReadableName() + " to " + uhName;
                     buttons.add(Buttons.red(id, label, type.getUnitTypeEmoji()));
                 }
             }
         }
         // Choose another system button
-        buttons.add(Buttons.gray(player.finChecker() + "startSurvival_" + destination.getPosition(), "Done with this system"));
+        buttons.add(Buttons.gray(
+                player.finChecker() + "startSurvival_" + destination.getPosition(), "Done with this system"));
         return buttons;
     }
-
 }
