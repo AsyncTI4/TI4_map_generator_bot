@@ -961,7 +961,7 @@ public class MessageHelper {
         return getMessageCreateDataObjects(message, null, buttons);
     }
 
-    private static List<List<ActionRow>> getPartitionedButtonLists(List<Button> buttons) {
+    public static List<List<ActionRow>> getPartitionedButtonLists(List<Button> buttons) {
         List<List<ActionRow>> partitionedButtonRows = new ArrayList<>();
         try {
             buttons.removeIf(Objects::isNull);
