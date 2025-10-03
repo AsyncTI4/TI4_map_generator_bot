@@ -96,7 +96,7 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
 
         eb.setThumbnail(
                 "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/attachment_token/"
-                        + imagePath + "?raw=true");
+                        + imagePath + "");
 
         return eb.build();
     }
