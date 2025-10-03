@@ -1662,7 +1662,8 @@ public class ButtonHelper {
     public static String getTechSkipAttachments(Game game, String planetName) {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         if (tile == null) {
-            List<String> fakePlanets = new ArrayList<>(List.of("custodiavigilia", "ghoti"));
+            List<String> fakePlanets = new ArrayList<>(
+                    List.of("custodiavigilia", "ghoti", "ocean1", "ocean2", "ocean3", "ocean4", "ocean5", "triad"));
             if (!fakePlanets.contains(planetName))
                 BotLogger.warning(
                         new LogOrigin(game), "Couldn't find tile for " + planetName + " in game " + game.getName());
@@ -5398,6 +5399,13 @@ public class ButtonHelper {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("addNewRelics")
+    public static void addNewRelics(Game game, ButtonInteractionEvent event) {
+        game.setStoredValue("useNewRelics", "Yes");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "This game will use the new TE Relics");
+        event.getMessage().delete().queue();
+    }
+
     @ButtonHandler("addEntropicScar")
     public static void addEntropicScar(Game game, ButtonInteractionEvent event) {
         game.setStoredValue("useEntropicScar", "Yes");
@@ -5686,6 +5694,10 @@ public class ButtonHelper {
                                 || doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)))
                 || (!player.isActivePlayer()
                         && game.playerHasLeaderUnlockedOrAlliance(player, "mortheuscommander")
+                        && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
+                || (doesPlayerHaveFSHere("khrask_flagship", player, tile)
+                        && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
+                || (player.hasRelic("metalivoidshielding")
                         && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()));
     }
 
@@ -6518,6 +6530,15 @@ public class ButtonHelper {
             Tile mr = game.getMecatolTile();
             tilesWithProduction.add(mr);
         }
+        if (player.hasUnlockedBreakthrough("ghostbt")) {
+            for (Tile t : game.getTileMap().values()) {
+                if (t.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip)
+                        && !t.getWormholes().isEmpty()) {
+                    tilesWithProduction.add(t);
+                }
+            }
+        }
+
         return tilesWithProduction;
     }
 
@@ -7160,7 +7181,8 @@ public class ButtonHelper {
     }
 
     public static Tile getTileOfPlanetWithNoTrait(Player player, Game game) {
-        List<String> fakePlanets = new ArrayList<>(List.of("custodiavigilia", "ghoti"));
+        List<String> fakePlanets = new ArrayList<>(
+                List.of("custodiavigilia", "ghoti", "ocean1", "ocean2", "ocean3", "ocean4", "ocean5", "triad"));
         List<String> ignoredPlanets = new ArrayList<>(Constants.MECATOLS);
         ignoredPlanets.addAll(fakePlanets);
 

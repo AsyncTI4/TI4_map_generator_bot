@@ -17,9 +17,14 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.service.TriadService;
 import ti4.service.unit.AddUnitService;
 
 public class TeHelperGeneral {
+
+    public static void checkTransientInfo(Game game) {
+        TriadService.checkAndUpdateTriad(game);
+    }
 
     @ButtonHandler("expeditionInfo")
     private static void expeditionInfo(ButtonInteractionEvent event, Game game, Player player) {

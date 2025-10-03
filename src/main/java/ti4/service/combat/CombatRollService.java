@@ -653,6 +653,7 @@ public class CombatRollService {
                     unitHolder.getName(), Mapper.getUnitKey(AliasHandler.resolveUnit("fs"), player.getColorID()), 1);
         }
         StringBuilder resultBuilder = new StringBuilder(result);
+        boolean metaliVoidCounted = false;
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unitModel = entry.getKey();
             int numOfUnit = entry.getValue();
@@ -700,6 +701,16 @@ public class CombatRollService {
                 numOfUnit = 1;
                 game.setStoredValue("TnelisAgentFaction", "");
             }
+            boolean usingMetali = unitModel.getAfbDieCount() == 0 && unitModel.getAfbDieCount(player, game) == 3;
+            if (rollType == CombatRollType.AFB && usingMetali) {
+                numOfUnit = 1;
+                if (!metaliVoidCounted) {
+                    metaliVoidCounted = true;
+                } else {
+                    continue;
+                }
+            }
+
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
             List<DiceHelper.Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
             int mult = 1;

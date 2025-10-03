@@ -448,6 +448,15 @@ public class StartTurnService {
             }
         } else {
             game.setJustPlayedComponentAC(false);
+            Player nomad = Helper.getPlayerFromUnlockedBreakthrough(game, "nomadbt");
+            if (nomad != null && (!game.isFowMode() || player.hasUnlockedBreakthrough("nomadbt"))) {
+                String label = (player == nomad ? "Use" : "Use/Request") + " Thunder's Paradox";
+                startButtons.add(Buttons.gray("startThundersParadox", label, FactionEmojis.Nomad));
+            }
+            if (player.getTechs().contains("parasite-obs")) {
+                startButtons.add(Buttons.gray("startNeuralParasite", "Use Neural Parasite", FactionEmojis.Obsidian));
+            }
+
             if (player.getTechs().contains("cm")) {
                 startButtons.add(
                         Buttons.gray(finChecker + "startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));

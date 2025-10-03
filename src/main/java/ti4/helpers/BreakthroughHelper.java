@@ -20,7 +20,7 @@ public class BreakthroughHelper {
             game.addFakeCommander(leaderID);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " utilized the Yin breakthrough to acquire a new commander, "
+                    player.getRepresentation() + " acquired a new commander, "
                             + Mapper.getLeader(leaderID).getName() + "!");
             UnlockLeaderService.unlockLeader(leaderID, game, player);
         } else {

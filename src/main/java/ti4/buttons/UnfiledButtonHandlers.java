@@ -78,6 +78,7 @@ import ti4.model.UnitModel;
 import ti4.service.PlanetService;
 import ti4.service.StatusCleanupService;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.AutoFactoriesService;
 import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -212,6 +213,25 @@ public class UnfiledButtonHandlers {
         if ("CivilizedSociety".equalsIgnoreCase(mode)) {
             game.setCivilizedSocietyMode(enable);
             message += "Civilized Society Mode. Nothing more needs to be done.";
+        }
+        if ("ZealousOrthodoxy".equalsIgnoreCase(mode)) {
+            game.setZealousOrthodoxyMode(enable);
+            message += "Zealous Orthodoxy Mode. Nothing more needs to be done.";
+        }
+        if ("AdventOfTheWarsun".equalsIgnoreCase(mode)) {
+            game.setAdventOfTheWarsunMode(enable);
+            message += "Advent of the Warsun Mode. Nothing more needs to be done.";
+        }
+        if ("MercenariesForHire".equalsIgnoreCase(mode)) {
+            game.setMercenariesForHireMode(enable);
+            message += "Mercenaries For Hire Mode. Nothing more needs to be done.";
+        }
+        if ("CulturalExchangeProgram".equalsIgnoreCase(mode)) {
+            game.setCulturalExchangeProgramMode(enable);
+            message += "Cultural Exchange Program Mode. Nothing more needs to be done.";
+            if (enable) {
+                message += " Leaders will be exchanged when secrets are dealt.";
+            }
         }
         if ("AgeOfFighters".equalsIgnoreCase(mode)) {
             game.setAgeOfFightersMode(enable);
@@ -1940,6 +1960,7 @@ public class UnfiledButtonHandlers {
                         previousMessage.delete().queue();
                     }
                 });
+                AutoFactoriesService.resolveAutoFactories(game, player, buttonID);
 
                 int cost = Helper.calculateCostOfProducedUnits(player, game, true);
                 game.setStoredValue("producedUnitCostFor" + player.getFaction(), "" + cost);
@@ -2059,6 +2080,11 @@ public class UnfiledButtonHandlers {
                 }
                 if (warM) {
                     player.addSpentThing("warmachine");
+                }
+                if (player.hasUnlockedBreakthrough("ghostbt")
+                        && tile != null
+                        && tile.getWormholes().size() > 0) {
+                    player.addSpentThing("ghostbt" + tile.getWormholes().size());
                 }
                 // ButtonHelper.updateMap(game, event,
                 // "Result of build on turn " + player.getInRoundTurnCount() + " for " +

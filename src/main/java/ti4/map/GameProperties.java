@@ -104,6 +104,10 @@ public class GameProperties {
     private @ExportableField boolean dangerousWildsMode;
     private @ExportableField boolean civilizedSocietyMode;
     private @ExportableField boolean ageOfFightersMode;
+    private @ExportableField boolean mercenariesForHireMode;
+    private @ExportableField boolean adventOfTheWarsunMode;
+    private @ExportableField boolean culturalExchangeProgramMode;
+    private @ExportableField boolean zealousOrthodoxyMode;
     private @ExportableField boolean stellarAtomicsMode;
     private @ExportableField boolean noSwapMode;
     private @ExportableField boolean limitedWhispersMode;

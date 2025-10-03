@@ -22,6 +22,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.VoidTetherService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -583,6 +584,10 @@ public class ButtonHelperTacticalAction {
                         player.getCorrectChannel(), "You can place down the _Plenary Orbital_.", buttons4);
             }
         }
+        if (VoidTetherService.meetsCriteria(game, player, tile)) {
+            VoidTetherService.postInitialButtons(game, player, tile);
+        }
+
         if (!game.isFowMode()) {
             if (!game.isL1Hero()) {
                 ButtonHelper.resolveOnActivationEnemyAbilities(game, tile, player, false, event);

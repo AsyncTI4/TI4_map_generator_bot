@@ -38,7 +38,7 @@ public class RegexService {
         throwFailure("Unknown error");
     }
 
-    private static void throwFailure(String error) throws Exception {
+    public static void throwFailure(String error) throws Exception {
         throw new Exception(error);
     }
 
