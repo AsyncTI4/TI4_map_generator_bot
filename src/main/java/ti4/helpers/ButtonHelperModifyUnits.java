@@ -1742,8 +1742,27 @@ public class ButtonHelperModifyUnits {
                                         .replace("Place", " place"),
                         "construction");
             }
+            boolean hasConstruction = false;
+            for (Integer sc : player.getSCs()) {
+                StrategyCardModel scModel =
+                        game.getStrategyCardModelByInitiative(sc).orElse(null);
+                if (scModel != null && scModel.getBotSCAutomationID().equalsIgnoreCase("te4construction")) {
+                    hasConstruction = true;
+                }
+                if (scModel != null
+                        && ("pok4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())
+                                || "monuments4construction".equalsIgnoreCase(scModel.getBotSCAutomationID()))
+                        && game.getScPlayed().containsKey(sc)) {
+                    hasConstruction = true;
+                    break;
+                }
+            }
+            if (game.getStrategyCardSet().getAlias().equalsIgnoreCase("te")) {
+                hasConstruction = true;
+            }
 
-            if (player.hasLeader("mahactagent") || player.hasExternalAccessToLeader("mahactagent")) {
+            if (!hasConstruction
+                    && (player.hasLeader("mahactagent") || player.hasExternalAccessToLeader("mahactagent"))) {
                 String message = playerRep
                         + ", please choose if you used Mahact's agent and thus should place the active player's (**Construction** holder) command token"
                         + " or if you followed normally and should place your own command token from reinforcements.";
@@ -1759,21 +1778,7 @@ public class ButtonHelperModifyUnits {
                 MessageHelper.sendMessageToChannelWithButtons(
                         game.isFowMode() ? player.getCorrectChannel() : event.getChannel(), message, buttons);
             } else {
-                boolean hasConstruction = false;
-                for (Integer sc : player.getSCs()) {
-                    StrategyCardModel scModel =
-                            game.getStrategyCardModelByInitiative(sc).orElse(null);
-                    if (scModel != null && scModel.getBotSCAutomationID().equalsIgnoreCase("te4construction")) {
-                        hasConstruction = true;
-                    }
-                    if (scModel != null
-                            && ("pok4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())
-                                    || "monuments4construction".equalsIgnoreCase(scModel.getBotSCAutomationID()))
-                            && game.getScPlayed().containsKey(sc)) {
-                        hasConstruction = true;
-                        break;
-                    }
-                }
+
                 if (!hasConstruction
                         && ("action".equalsIgnoreCase(game.getPhaseOfGame())
                                 || game.getCurrentAgendaInfo().contains("Strategy"))

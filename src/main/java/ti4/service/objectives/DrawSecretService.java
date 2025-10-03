@@ -137,13 +137,14 @@ public class DrawSecretService {
                     String faction = factions.removeFirst();
                     player.initLeadersForFaction(faction);
                     for (Leader leader : player.getLeaders()) {
-                        if (leader.getId().contains("commmander")) {
+                        if (leader.getId().contains("commander")) {
                             UnlockLeaderService.unlockLeader(leader.getId(), game, player);
                         }
                     }
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            "Due to **Cultural Exchange Program**, you have received the leaders of "
+                            player.getRepresentation()
+                                    + " Due to **Cultural Exchange Program**, you have received the leaders of "
                                     + Mapper.getFaction(faction).getFactionName() + " this game.");
                 }
             }
