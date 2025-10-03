@@ -852,6 +852,14 @@ public class ButtonHelperFactionSpecific {
         game.setComponentAction(true);
         potentialTech = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, potentialTech, game);
         List<Button> buttons = ButtonHelperAbilities.getButtonsForPossibleTechForNekro(player, potentialTech, game);
+        if (player.hasUnlockedBreakthrough("nekrobt")
+                && !game.playerHasLeaderUnlockedOrAlliance(p2, "bastioncommander")) {
+            if (!game.getStoredValue("valefarZ").contains(p2.getFaction())) {
+                String vfzID = player.finChecker() + "valefarZ_" + p2.getFaction();
+                buttons.add(Buttons.blue(vfzID, "Copy Flagship", p2.getFactionEmoji()));
+            }
+        }
+
         if (p2.getPromissoryNotesInPlayArea().contains("antivirus")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

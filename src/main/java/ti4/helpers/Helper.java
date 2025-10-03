@@ -1257,6 +1257,7 @@ public class Helper {
         }
         int tg = player.getSpentTgsThisWindow();
         boolean xxchaHero = player.hasLeaderUnlocked("xxchahero");
+        boolean xxchaBt = player.hasUnlockedBreakthrough("xxchabt");
         int bestRes = 0;
         int keleresAgent = 0;
         for (String thing : spentThings) {
@@ -1280,6 +1281,7 @@ public class Helper {
                     && !thing.contains("tg_")
                     && !thing.contains("boon")
                     && !thing.contains("warmachine")
+                    && !thing.contains("ghostbt")
                     && !thing.contains("aida")
                     && !thing.contains("commander")
                     && !thing.contains("agent")
@@ -1306,7 +1308,7 @@ public class Helper {
                         }
                     }
                     int gledgeMech = 0;
-                    if (player.hasUnit("gledge_mech") && !xxchaHero) {
+                    if (player.hasUnit("gledge_mech") && !xxchaHero && !xxchaBt) {
                         gledgeMech = planet.getUnitCount(UnitType.Mech, player);
                         res += Math.min(gledgeMech, planet.getInfluence());
                     }
@@ -1315,6 +1317,8 @@ public class Helper {
                             msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
                                     .append("\n");
                             res += planet.getSumResourcesInfluence();
+                        } else if (xxchaBt) {
+                            res += planet.getMaxResInf();
                         } else {
                             if (Math.min(gledgeMech, planet.getInfluence()) > 0) {
                                 msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
@@ -1330,6 +1334,8 @@ public class Helper {
                             msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
                                     .append("\n");
                             inf += planet.getSumResourcesInfluence();
+                        } else if (xxchaBt) {
+                            inf += planet.getMaxResInf();
                         } else {
                             msg.append(getPlanetRepresentationPlusEmojiPlusInfluence(thing, game))
                                     .append("\n");
@@ -1340,6 +1346,8 @@ public class Helper {
                                 .append("\n");
                         if (xxchaHero) {
                             res += planet.getSumResourcesInfluence();
+                        } else if (xxchaBt) {
+                            res += planet.getMaxResInf();
                         } else {
                             res += planet.getMaxResInf();
                         }
@@ -1349,6 +1357,9 @@ public class Helper {
                         if (xxchaHero) {
                             inf += planet.getSumResourcesInfluence();
                             res += planet.getSumResourcesInfluence();
+                        } else if (xxchaBt) {
+                            inf += planet.getMaxResInf();
+                            res += planet.getMaxResInf();
                         } else {
                             inf += planet.getInfluence();
                             res += planet.getResources();
@@ -1365,6 +1376,15 @@ public class Helper {
                     msg.append("> Used _War Machine_ ")
                             .append(CardEmojis.ActionCard)
                             .append("\n");
+                    res += 1;
+                }
+                if (thing.contains("ghostbt")) {
+                    int wormholes =
+                            thing.replace("ghostbt", "").isEmpty() ? 0 : Integer.parseInt(thing.replace("ghostbt", ""));
+                    res += wormholes;
+                    msg.append("> Used Ghost Breakthrough ");
+                    msg.append("for ").append(wormholes).append(" resource").append(wormholes == 1 ? "" : "s");
+                    msg.append(". ").append(FactionEmojis.Ghost).append("\n");
                     res += 1;
                 }
                 if (thing.contains("aida")) {
@@ -1657,7 +1677,7 @@ public class Helper {
             if (player.hasUnlockedBreakthrough("ghostbt")
                     && !tile.getWormholes().isEmpty()
                     && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
-                productionValueTotal += 1;
+                productionValueTotal += tile.getWormholes().size();
             }
         }
 
@@ -2459,6 +2479,8 @@ public class Helper {
 
         if (player.hasLeaderUnlocked("xxchahero")) {
             valueFunction = p -> p.getResources() + p.getInfluence();
+        } else if (player.hasUnlockedBreakthrough("xxchabt")) {
+            valueFunction = p -> Math.max(p.getResources(), p.getInfluence());
         }
 
         return planets.stream()
@@ -2477,6 +2499,8 @@ public class Helper {
 
         if (player.hasLeaderUnlocked("xxchahero")) {
             valueFunction = p -> p.getResources() + p.getInfluence();
+        } else if (player.hasUnlockedBreakthrough("xxchabt")) {
+            valueFunction = p -> Math.max(p.getResources(), p.getInfluence());
         }
 
         return planets.stream()

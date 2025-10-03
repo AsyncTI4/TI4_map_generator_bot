@@ -2074,6 +2074,11 @@ public class ButtonHelperModifyUnits {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons2);
                 }
             }
+            if (player.hasUnlockedBreakthrough("ghostbt")
+                    && tile != null
+                    && tile.getWormholes().size() > 0) {
+                player.addSpentThing("ghostbt" + tile.getWormholes().size());
+            }
         } else {
             if (orbitalDrop) {
                 List<Button> orbFollowUp = new ArrayList<>();

@@ -47,8 +47,10 @@ import ti4.service.info.LeaderInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.info.TechInfoService;
 import ti4.service.info.UnitInfoService;
+import ti4.service.leader.UnlockLeaderService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.tech.ListTechService;
+import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class MiltyService {
@@ -589,6 +591,34 @@ public class MiltyService {
                     player.getRepresentation() + " gained the "
                             + Mapper.getTech(tech).getNameRepresentation()
                             + " technology due to the _Age of Fighters_ galactic event.");
+        }
+        if (game.isAdventOfTheWarsunMode()) {
+            if (player.getFaction().equalsIgnoreCase("muaat")) {
+                player.removeOwnedPromissoryNoteByID("fires");
+                UnlockLeaderService.unlockLeader("muaatcommander", game, player);
+                AddUnitService.addUnits(event, tile, game, color, "ws");
+            } else {
+                String tech = "ws";
+                for (String factionTech : player.getNotResearchedFactionTechs()) {
+                    TechnologyModel fTech = Mapper.getTech(factionTech);
+                    if (fTech != null
+                            && !fTech.getAlias()
+                                    .equalsIgnoreCase(Mapper.getTech(tech).getAlias())
+                            && fTech.isUnitUpgrade()
+                            && fTech.getBaseUpgrade()
+                                    .orElse("bleh")
+                                    .equalsIgnoreCase(Mapper.getTech(tech).getAlias())) {
+                        tech = fTech.getAlias();
+                        break;
+                    }
+                }
+                player.addTech(tech);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " gained the "
+                                + Mapper.getTech(tech).getNameRepresentation()
+                                + " technology due to the _Advent of the Warsun_ galactic event.");
+            }
         }
         if (game.isStellarAtomicsMode()) {
             if (game.getRevealedPublicObjectives().get("Stellar Atomics") != null) {

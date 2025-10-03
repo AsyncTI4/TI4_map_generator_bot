@@ -48,6 +48,14 @@ class GalacticEventsSetup extends GameStateSubcommand {
                 OptionType.BOOLEAN,
                 Constants.DANGEROUS_WILDS_MODE,
                 "True to enable Dangerous Wilds, per Thunders Edge."));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.ADVENT_OF_THE_WARSUN_MODE, "True to enable, per Thunders Edge."));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.MERCENARIES_FOR_HIRE_MODE, "True to enable, per Thunders Edge."));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.ZEALOUS_ORTHODOXY_MODE, "True to enable, per Thunders Edge."));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.CULTURAL_EXCHANGE_PROGRAM_MODE, "True to enable, per Thunders Edge."));
     }
 
     @Override
@@ -84,6 +92,18 @@ class GalacticEventsSetup extends GameStateSubcommand {
 
         Boolean fighterMode = event.getOption(Constants.AGE_OF_FIGHTERS_MODE, null, OptionMapping::getAsBoolean);
         if (fighterMode != null) game.setAgeOfFightersMode(fighterMode);
+
+        Boolean advent = event.getOption(Constants.ADVENT_OF_THE_WARSUN_MODE, null, OptionMapping::getAsBoolean);
+        if (advent != null) game.setAdventOfTheWarsunMode(advent);
+
+        Boolean merc = event.getOption(Constants.MERCENARIES_FOR_HIRE_MODE, null, OptionMapping::getAsBoolean);
+        if (merc != null) game.setMercenariesForHireMode(merc);
+
+        Boolean zeal = event.getOption(Constants.ZEALOUS_ORTHODOXY_MODE, null, OptionMapping::getAsBoolean);
+        if (zeal != null) game.setZealousOrthodoxyMode(zeal);
+
+        Boolean cult = event.getOption(Constants.CULTURAL_EXCHANGE_PROGRAM_MODE, null, OptionMapping::getAsBoolean);
+        if (cult != null) game.setCulturalExchangeProgramMode(cult);
 
         Boolean dangerousWildsMode = event.getOption(Constants.DANGEROUS_WILDS_MODE, null, OptionMapping::getAsBoolean);
         if (dangerousWildsMode != null) game.setDangerousWildsMode(dangerousWildsMode);
