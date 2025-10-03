@@ -4654,6 +4654,9 @@ public class Game extends GameProperties {
 
     public void setStrategyCardSet(String scSetID) {
         StrategyCardSetModel strategyCardModel = Mapper.getStrategyCardSets().get(scSetID);
+        if (strategyCardModel == null) {
+            throw new IllegalArgumentException("Strategy card set not found for ID: " + scSetID);
+        };
         setHomebrewSCMode(!"pok".equals(scSetID) && !"base_game".equals(scSetID));
 
         Map<Integer, Integer> oldTGs = getScTradeGoods();
