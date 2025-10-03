@@ -22,9 +22,9 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.DisplayType;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
@@ -191,12 +191,6 @@ public class StartPhaseService {
 
     public static void startStrategyPhase(GenericInteractionCreateEvent event, Game game) {
         for (Player player2 : game.getRealPlayers()) {
-            if (game.getStoredValue("LastMinuteDeliberation") != null
-                    && game.getStoredValue("LastMinuteDeliberation").contains(player2.getFaction())
-                    && player2.getActionCards().containsKey("last_minute_deliberation")) {
-                ActionCardHelper.playAC(event, game, player2, "last minute deliberation", game.getMainGameChannel());
-                return;
-            }
             if (game.getStoredValue("SpecialSession") != null
                     && game.getStoredValue("SpecialSession").contains(player2.getFaction())
                     && player2.getActionCards().containsKey("special_session")) {
@@ -276,6 +270,7 @@ public class StartPhaseService {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player2.getCorrectChannel(), msg + "the second technology.", buttons);
                 player2.removeLeader("zealotshero");
+                ButtonHelperHeroes.checkForMykoHero(game, "zealotshero", player2);
                 game.setStoredValue("zealotsHeroTechs", "");
                 game.setStoredValue("zealotsHeroPurged", "true");
             }
@@ -974,7 +969,7 @@ public class StartPhaseService {
     }
 
     public static void startActionPhase(GenericInteractionCreateEvent event, Game game, boolean incrementTgs) {
-        boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
+        boolean isFowPrivateGame = game.isFowMode();
         game.setStoredValue("willRevolution", "");
         game.setPhaseOfGame("action");
         GMService.logActivity(game, "**Action** Phase for Round " + game.getRound() + " started.", true);

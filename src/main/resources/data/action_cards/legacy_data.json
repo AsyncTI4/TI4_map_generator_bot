@@ -1,5 +1,33 @@
 [
     {
+        "alias": "sister_ship",
+        "name": "Sister Ship",
+        "automationID": "refabrication",
+        "phase": "Any",
+        "window": "After 1 of your non-fighter ships is destroyed",
+        "text": "Produce 1 ship of that type in a different system that contains 1 of your units with PRODUCTION; reduce the cost of that ship by up to 4.",
+        "flavorText": "The production of the Van Hauge VI was completed in record time. As it left the docking bay, Dannel smiled—a rare occurrence these days. \"Glory to the Yin, my brothers. You have done us all proud.\"",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "blackmail",
+        "name": "Blackmail",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Choose another player. That player may give you 1 random promissory note from their hand; otherwise, they must cast at least 1 vote for an outcome of your choice during this agenda, if able.",
+        "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother Milor,\" they said in unison.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "mass_transference",
+        "name": "Mass Transference",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "Remove up to 4 of your units from that system and place them on any planets you control or in any space areas that contain your ships.",
+        "flavorText": "The Mentak crew handed out brochures, recruiting with promises of a grand new life on a distant world. In truth, we traded our quiet colony for a desperate land-grab on the front lines.",
+        "source": "action_deck_2_old"
+    },
+    {
         "alias": "adrenaline_shots",
         "name": "Adrenaline Shots",
         "phase": "Action",
@@ -843,48 +871,12 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "sister_ship",
-        "name": "Sister Ship",
-        "phase": "Any",
-        "window": "After 1 of your non-fighter ships is destroyed",
-        "text": "Produce 1 ship of that type in a different system that contains 1 of your units with PRODUCTION; reduce the cost of that ship by up to 4.",
-        "flavorText": "The production of the Van Hauge VI was completed in record time. As it left the docking bay, Dannel smiled—a rare occurrence these days. \"Glory to the Yin, my brothers. You have done us all proud.\"",
-        "source": "action_deck_2_old"
-    },
-    {
-        "alias": "blackmail",
-        "name": "Blackmail",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "Choose another player. That player may give you 1 random promissory note from their hand; otherwise, they must cast at least 1 vote for an outcome of your choice during this agenda, if able.",
-        "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother Milor,\" they said in unison.",
-        "source": "action_deck_2_old"
-    },
-    {
-        "alias": "energy_pulse",
-        "name": "Energy Pulse",
-        "phase": "Action",
-        "window": "After the \"Move Ships\" substep of a tactical action in a system that contains your units",
-        "text": "Choose 1 non-flagship unit in that system. That unit loses its printed abilities during this tactical action.",
-        "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "smuggler_routes_acd2",
         "name": "Smuggler Routes",
         "phase": "Action",
         "window": "Action",
         "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this action. [Note: You can transport units during this movement.]",
         "flavorText": "Greg closed his book, a tale of the Passage of Tears, with a sigh. As he looked to the sky and imagined the space beyond—a place he had never been—he quietly sang in tune with the Symphony, \"I wanna be where the Mentak are. I wanna see—wanna see 'em raidin'.\"",
-        "source": "action_deck_2_old"
-    },
-    {
-        "alias": "spatial_collapse",
-        "name": "Spatial Collapse",
-        "phase": "Action",
-        "window": "Action",
-        "text": "Swap the positions of 2 adjacent, non-home systems, other than the Mecatol Rex system and the Wormhole Nexus; one of the chosen systems must contain your ships.",
-        "flavorText": "The reports were so incredible that Rin demanded a firsthand view. Defying all she knew, the spatial dimension was a twisted mockery of itself, the nearby systems perfectly mirrored in position.",
         "source": "action_deck_2_old"
     },
     {
@@ -904,33 +896,6 @@
         "text": "Exhaust 1 planet that player controls and ready 1 planet you control.",
         "automationID": "renegotiation",
         "flavorText": "The Creuss merchants were overwhelmed by the bazaar's wares: wonders from every corner of the galaxy, akin to magic for these curious folk. Gila knew her claws had dug in. She would ensure their every desire was fulfilled, even if they could not afford the price.",
-        "source": "action_deck_2_old"
-    },
-    {
-        "alias": "corruption",
-        "name": "Corruption",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome reveals 1 random action card from their hand; take 1 of those cards and discard the rest.",
-        "flavorText": "As they placed the noose around her neck, Menda wailed. Suffi, who was next in line, gave her a confident smile. \"First time?\"",
-        "source": "action_deck_2_old"
-    },
-    {
-        "alias": "early_voting",
-        "name": "Early Voting",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "Choose another player. That player votes first on this agenda. If you and that player cast votes for the same outcome of this agenda, cast 5 additional votes for that outcome. [Note: This ability works like Argent Zeal. Argent votes before the chosen player.]",
-        "flavorText": "Ciel slowly covered his mouth in horror as he realized his mistake. \"Damn these galactic time zones!\"",
-        "source": "action_deck_2_old"
-    },
-    {
-        "alias": "discord",
-        "name": "Discord",
-        "phase": "Action",
-        "window": "When a player performs a strategic action",
-        "text": "Choose 1 player. If that player spends a command token during this strategic action, they must spend 1 additional token from their command sheet, if able.",
-        "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Their human minions had done well.",
         "source": "action_deck_2_old"
     },
     {
@@ -958,15 +923,6 @@
         "window": "Action",
         "text": "Discard between 1 and 3 action cards from your hand to draw an equal number of action cards.",
         "flavorText": "\"We must not become stagnant. Stagnation is what broke this galaxy,\" I48S said, barely hesitating at his patient's screams. \"Pain? Let's remove that.\"",
-        "source": "action_deck_2_old"
-    },
-    {
-        "alias": "virulent_gas",
-        "name": "Virulent Gas",
-        "phase": "Action",
-        "window": "After you produce a hit against units on a planet",
-        "text": "Produce 1 additional hit. Then, roll 1 die; on a result of 7-10, apply -1 to the result of each of your die rolls during this ability and repeat its effect.",
-        "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—and Dart ran.",
         "source": "action_deck_2_old"
     },
     {
@@ -1006,6 +962,60 @@
         "source": "action_deck_2_old"
     },
     {
+        "alias": "energy_pulse",
+        "name": "Energy Pulse",
+        "phase": "Action",
+        "window": "After the \"Move Ships\" substep of a tactical action in a system that contains your units",
+        "text": "Choose 1 non-flagship unit in that system. That unit loses its printed abilities during this tactical action.",
+        "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "spatial_collapse",
+        "name": "Spatial Collapse",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Swap the positions of 2 adjacent, non-home systems, other than the Mecatol Rex system and the Wormhole Nexus; one of the chosen systems must contain your ships.",
+        "flavorText": "The reports were so incredible that Rin demanded a firsthand view. Defying all she knew, the spatial dimension was a twisted mockery of itself, the nearby systems perfectly mirrored in position.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "corruption",
+        "name": "Corruption",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome reveals 1 random action card from their hand; take 1 of those cards and discard the rest.",
+        "flavorText": "As they placed the noose around her neck, Menda wailed. Suffi, who was next in line, gave her a confident smile. \"First time?\"",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "early_voting",
+        "name": "Early Voting",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Choose another player. That player votes first on this agenda. If you and that player cast votes for the same outcome of this agenda, cast 5 additional votes for that outcome. [Note: This ability works like Argent Zeal. Argent votes before the chosen player.]",
+        "flavorText": "Ciel slowly covered his mouth in horror as he realized his mistake. \"Damn these galactic time zones!\"",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "discord",
+        "name": "Discord",
+        "phase": "Action",
+        "window": "When a player performs a strategic action",
+        "text": "Choose 1 player. If that player spends a command token during this strategic action, they must spend 1 additional token from their command sheet, if able.",
+        "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Their human minions had done well.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "virulent_gas",
+        "name": "Virulent Gas",
+        "phase": "Action",
+        "window": "After you produce a hit against units on a planet",
+        "text": "Produce 1 additional hit. Then, roll 1 die; on a result of 7-10, apply -1 to the result of each of your die rolls during this ability and repeat its effect.",
+        "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—and Dart ran.",
+        "source": "action_deck_2_old"
+    },
+    {
         "alias": "lazax_cache",
         "name": "Cache",
         "phase": "Action",
@@ -1015,21 +1025,21 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "mass_transference",
-        "name": "Mass Transference",
-        "phase": "Action",
-        "window": "After you activate a system",
-        "text": "Remove up to 4 of your units from that system and place them on any planets you control or in any space areas that contain your ships.",
-        "flavorText": "The Mentak crew handed out brochures, recruiting with promises of a grand new life on a distant world. In truth, we traded our quiet colony for a desperate land-grab on the front lines.",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "final_mission",
         "name": "Final Mission",
         "phase": "Action",
         "window": "After 1 of your non-fighter ships is destroyed",
         "text": "Choose 1 planet in that unit's system. Destroy 1 of another player's ground forces or PDS on that planet.",
         "flavorText": "The Exotrireme became a guide missile in its death-throes, transforming the Sol base into a burning crater of steel and death.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "stasis_tomb",
+        "name": "Stasis Tomb",
+        "phase": "Action",
+        "window": "After you gain control of a planet",
+        "text": "Explore that planet. Then, you may discard 2 of your relic fragments to gain the alliance ability of a random, unused faction.",
+        "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—he'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "action_deck_2_old"
     }
 ]

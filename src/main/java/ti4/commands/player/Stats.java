@@ -303,6 +303,13 @@ class Stats extends GameStateSubcommand {
                     Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), game.getName());
                 }
 
+                var userSettings = UserSettingsManager.get(player.getUserID());
+
+                userSettings.setTrackRecord(
+                        userSettings.getTrackRecord() + " was set as an NPC in " + game.getName() + ". ");
+
+                UserSettingsManager.save(userSettings);
+
                 Guild guild = event.getGuild();
                 Member removedMember = guild.getMemberById(player.getUserID());
                 List<Role> roles = guild.getRolesByName(game.getName(), true);

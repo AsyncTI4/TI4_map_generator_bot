@@ -71,6 +71,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
+import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
@@ -1620,7 +1621,8 @@ public class UnfiledButtonHandlers {
         }
         if (!game.getStoredValue("newStatusScoringMode").isEmpty()
                 && !"action".equalsIgnoreCase(game.getPhaseOfGame())
-                && event != null) {
+                && event != null
+                && !game.isFowMode()) {
             String msg = "Please score objectives.";
             msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
@@ -2173,6 +2175,17 @@ public class UnfiledButtonHandlers {
                 if (game.isNaaluAgent()) {
                     player = game.getPlayer(game.getActivePlayerID());
                 }
+                if (game.isWarfareAction()) {
+                    List<Button> redistro = new ArrayList<>();
+                    redistro.add(Buttons.blue(
+                            player.finChecker() + "redistributeCCButtons_deleteThisButton",
+                            "Redistribute Command Tokens"));
+                    redistro.add(Buttons.DONE_DELETE_BUTTONS);
+                    String warfareDone = player.getRepresentationUnfogged()
+                            + " your Warfare action is finished, you can redistribute your command tokens again.";
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), warfareDone, redistro);
+                }
+
                 ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
                 game.removeStoredValue("producedUnitCostFor" + player.getFaction());
 
@@ -2797,18 +2810,6 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
         game.setStoredValue("willRevolution", "active");
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Reversed strategy card picking order.");
-    }
-
-    public static void lastMinuteDeliberation(
-            ButtonInteractionEvent event, Player player, Game game, MessageChannel actionsChannel) {
-        ButtonHelper.deleteMessage(event);
-        String message = player.getRepresentation() + ", please choose the (up to) 2 planets you wish to ready.";
-        List<Button> buttons = Helper.getPlanetRefreshButtons(player, game);
-        buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Readying Planets")); // spitItOut
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
-        AgendaHelper.revealAgenda(event, false, game, actionsChannel);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), "Sent buttons to ready 2 planets to the player who pressed the button.");
     }
 
     @ButtonHandler("confirm_cc")
@@ -3442,6 +3443,33 @@ public class UnfiledButtonHandlers {
                 channel, "Please choose which system you wish to remove your command token from.", buttons);
     }
 
+    @ButtonHandler("primaryOfTeWarfare")
+    public static void primaryOfTeWarfare(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        StrategyCardModel model = Mapper.getStrategyCard("te6warfare");
+        if (model == null) return;
+        if (!player.getSCs().contains(model.getInitiative()) && !buttonID.contains("overrule")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "You do not have the Warfare strategy card.");
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.blue(
+                player.finChecker() + "redistributeCCButtons_deleteThisButton", "Redistribute Command Tokens"));
+        buttons.add(Buttons.red(player.finChecker() + "beginTacticalTeWarfare", "Perform Tactical Action"));
+        String message =
+                "Use the buttons to resolve the primary of Warfare. Redistributing your Command Tokens is optional.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+    }
+
+    @ButtonHandler("beginTacticalTeWarfare")
+    public static void beginTacticalTeWarfare(ButtonInteractionEvent event, Game game, Player player) {
+        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
+        game.setWarfareAction(true);
+        ButtonHelperTacticalAction.beginTacticalAction(game, player);
+    }
+
     @ButtonHandler("drawAgenda_2")
     public static void drawAgenda2(ButtonInteractionEvent event, Game game, Player player) {
         if (!game.getStoredValue("hasntSetSpeaker").isEmpty() && !game.isHomebrewSCMode()) {
@@ -3509,6 +3537,8 @@ public class UnfiledButtonHandlers {
         StartPhaseService.startStrategyPhase(event, game);
         PlayerPreferenceHelper.offerSetAutoPassOnSaboButtons(game, null);
         ButtonHelper.deleteMessage(event);
+        // Reduce file size by clearing draft info
+        game.clearDraftManager();
     }
 
     @ButtonHandler("dsdihmy_")

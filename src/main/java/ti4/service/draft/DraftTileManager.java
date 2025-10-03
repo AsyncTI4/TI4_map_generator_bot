@@ -32,6 +32,11 @@ public class DraftTileManager {
     private final List<MiltyDraftTile> red = new ArrayList<>();
     private final Map<TierList, List<MiltyDraftTile>> tilesByTier = new HashMap<>();
 
+    // Any of these terms appearing in the tile's ID or image path indicate that it is not draftable.
+    private static final List<String> DISALLOWED_TERMS = List.of(
+            "corner", "lane", "mecatol", "blank", "border", "fow", "anomaly", "deltawh", "seed", "mr", "mallice",
+            "ethan", "prison", "kwon", "home", "hs", "red", "blue", "green", "gray", "gate", "setup");
+
     public void addDraftTile(MiltyDraftTile draftTile) {
         TierList draftTileTier = draftTile.getTierList();
         switch (draftTileTier) {
@@ -171,6 +176,7 @@ public class DraftTileManager {
     }
 
     private static List<ComponentSource> getGameSources(Game game) {
+        // TODO: Game -> ComponentSources mapper service.
         List<ComponentSource> sources = new ArrayList<>(Arrays.asList(
                 ComponentSource.base,
                 ComponentSource.codex1,
@@ -194,10 +200,7 @@ public class DraftTileManager {
         String id = tileModel.getId().toLowerCase();
         String path =
                 tileModel.getImagePath() == null ? "" : tileModel.getImagePath().toLowerCase();
-        List<String> disallowedTerms = List.of(
-                "corner", "lane", "mecatol", "blank", "border", "fow", "anomaly", "deltawh", "seed", "mr", "mallice",
-                "ethan", "prison", "kwon", "home", "hs", "red", "blue", "green", "gray", "gate", "setup");
-        return disallowedTerms.stream().anyMatch(term -> id.contains(term) || path.contains(term));
+        return DISALLOWED_TERMS.stream().anyMatch(term -> id.contains(term) || path.contains(term));
     }
 
     private static MiltyDraftTile getDraftTileFromModel(TileModel tileModel) {
@@ -223,6 +226,10 @@ public class DraftTileManager {
 
         for (Planet planet : tile.getPlanetUnitHolders()) {
             draftTile.addPlanet(planet);
+        }
+
+        if (tile.isScar()) {
+            draftTile.setHasScar(true);
         }
 
         if (tile.isAnomaly()) {

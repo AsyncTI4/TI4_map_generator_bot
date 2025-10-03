@@ -1,7 +1,6 @@
 package ti4.service.draft;
 
 import java.util.List;
-import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.AliasHandler;
@@ -24,13 +23,14 @@ import ti4.service.milty.MiltyDraftSlice;
 @UtilityClass
 public class PartialMapService {
     /**
-     * This function depends on knowing which class types have the required
-     * information,
-     * so it kinda breaks the abstraction a bit, but oh well.
-     *
-     * @param draftManager
+     * Attempt to update the Game's map by placing tiles as the draft state allows.
+     * This service uses known Draftables to try and derive tile positions. For example,
+     * a SliceDraftable and a SeatDraftable can be used to place slice tiles on the map.
+     * @param draftManager the draft manager containing the game and draft state
+     * @param event the event that triggered this update; required if renderIfUpdated is true
+     * @param renderIfUpdated if true, the map image will be re-rendered if any tiles were placed
      */
-    public void tryUpdateMap(GenericInteractionCreateEvent event, DraftManager draftManager, boolean renderIfUpdated) {
+    public void tryUpdateMap(DraftManager draftManager, GenericInteractionCreateEvent event, boolean renderIfUpdated) {
         boolean mapUpdated = placeTiles(event, draftManager);
         if (mapUpdated && renderIfUpdated) {
             ButtonHelper.updateMap(draftManager.getGame(), event);
@@ -50,6 +50,7 @@ public class PartialMapService {
                 }
             }
 
+            // Place items onto certain tiles
             if (templateTile.getPos() != null && templateTile.getCustodians() != null && templateTile.getCustodians()) {
                 if (gameTile != null) AddTileService.addCustodianToken(gameTile, game); // only works on MR for now
             }
@@ -64,10 +65,12 @@ public class PartialMapService {
 
         boolean updateMap = placeFromTemplate(mapTemplateModel, game);
 
-        SliceDraftable sliceDraftable = getSliceDraftable(draftManager);
-        SeatDraftable seatDraftable = getSeatDraftable(draftManager);
-        SpeakerOrderDraftable speakerOrderDraftable = getSpeakerOrderDraftable(draftManager);
-        FactionDraftable factionDraftable = getFactionDraftable(draftManager);
+        // Check if we can derive any state
+        SliceDraftable sliceDraftable = (SliceDraftable) draftManager.getDraftable(SliceDraftable.TYPE);
+        SeatDraftable seatDraftable = (SeatDraftable) draftManager.getDraftable(SeatDraftable.TYPE);
+        SpeakerOrderDraftable speakerOrderDraftable =
+                (SpeakerOrderDraftable) draftManager.getDraftable(SpeakerOrderDraftable.TYPE);
+        FactionDraftable factionDraftable = (FactionDraftable) draftManager.getDraftable(FactionDraftable.TYPE);
         if (seatDraftable == null && speakerOrderDraftable == null) {
             // No way to place tiles on the map
             return updateMap;
@@ -77,6 +80,7 @@ public class PartialMapService {
             return updateMap;
         }
 
+        // For each player, see if they've made enough picks to place some things on the map.
         for (PlayerDraftState pState : draftManager.getPlayerStates().values()) {
             // Get their position, to see if we can do anything
             Integer position = getPlayerPosition(pState, seatDraftable, speakerOrderDraftable);
@@ -107,6 +111,8 @@ public class PartialMapService {
                     // Doesn't pertain to this player
                     continue;
                 }
+
+                // Attempt to place a Home System tile if a Faction was picked
                 if (templateTile.getHome() != null
                         && templateTile.getHome()
                         && factionModel != null
@@ -116,6 +122,7 @@ public class PartialMapService {
                     Tile toAdd = new Tile(hsTileId, templateTile.getPos());
                     game.setTile(toAdd);
                     updateMap = true;
+                    // Attempt to populate Slice tiles if a Slice was picked
                 } else if (templateTile.getMiltyTileIndex() != null && slice != null) {
                     String tileID = slice.getTiles()
                             .get(templateTile.getMiltyTileIndex())
@@ -137,19 +144,18 @@ public class PartialMapService {
             PlayerDraftState pState, Draftable seatDraftable, Draftable speakerOrderDraftable) {
         Integer position = null;
 
-        Map<DraftableType, List<DraftChoice>> choices = pState.getPicks();
+        // Seat Draftables take priority for determining where a player sits
         if (seatDraftable != null) {
-            if (choices.containsKey(seatDraftable.getType())
-                    && !choices.get(seatDraftable.getType()).isEmpty()) {
+            if (pState.getPickCount(seatDraftable.getType()) > 0) {
                 String seatChoiceKey =
-                        choices.get(seatDraftable.getType()).get(0).getChoiceKey();
+                        pState.getPicks(seatDraftable.getType()).get(0).getChoiceKey();
                 position = SeatDraftable.getSeatNumberFromChoiceKey(seatChoiceKey);
             }
+            // If Seat Draftables are excluded from the draft, the Speaker Order is used instead
         } else if (speakerOrderDraftable != null) {
-            if (choices.containsKey(speakerOrderDraftable.getType())
-                    && !choices.get(speakerOrderDraftable.getType()).isEmpty()) {
+            if (pState.getPickCount(speakerOrderDraftable.getType()) > 0) {
                 String pickChoiceKey =
-                        choices.get(speakerOrderDraftable.getType()).get(0).getChoiceKey();
+                        pState.getPicks(speakerOrderDraftable.getType()).get(0).getChoiceKey();
                 position = SpeakerOrderDraftable.getSpeakerOrderFromChoiceKey(pickChoiceKey);
             }
         }
@@ -158,57 +164,17 @@ public class PartialMapService {
     }
 
     private FactionModel getPlayerFactionModel(PlayerDraftState pState) {
-        Map<DraftableType, List<DraftChoice>> choices = pState.getPicks();
-        if (choices.containsKey(FactionDraftable.TYPE)
-                && !choices.get(FactionDraftable.TYPE).isEmpty()) {
-            String factionId = choices.get(FactionDraftable.TYPE).get(0).getChoiceKey();
+        if (pState.getPickCount(FactionDraftable.TYPE) > 0) {
+            String factionId = pState.getPicks(FactionDraftable.TYPE).get(0).getChoiceKey();
             return Mapper.getFaction(factionId);
         }
         return null;
     }
 
     private MiltyDraftSlice getPlayerSlice(PlayerDraftState pState, SliceDraftable sliceDraftable) {
-        Map<DraftableType, List<DraftChoice>> choices = pState.getPicks();
-        if (choices.containsKey(SliceDraftable.TYPE)
-                && !choices.get(SliceDraftable.TYPE).isEmpty()) {
-            String sliceName = choices.get(SliceDraftable.TYPE).get(0).getChoiceKey();
+        if (pState.getPickCount(SliceDraftable.TYPE) > 0) {
+            String sliceName = pState.getPicks(SliceDraftable.TYPE).get(0).getChoiceKey();
             return sliceDraftable.getSliceByName(sliceName);
-        }
-        return null;
-    }
-
-    private SliceDraftable getSliceDraftable(DraftManager draftManager) {
-        for (Draftable draftable : draftManager.getDraftables()) {
-            if (draftable instanceof SliceDraftable) {
-                return (SliceDraftable) draftable;
-            }
-        }
-        return null;
-    }
-
-    private SeatDraftable getSeatDraftable(DraftManager draftManager) {
-        for (Draftable draftable : draftManager.getDraftables()) {
-            if (draftable instanceof SeatDraftable) {
-                return (SeatDraftable) draftable;
-            }
-        }
-        return null;
-    }
-
-    private SpeakerOrderDraftable getSpeakerOrderDraftable(DraftManager draftManager) {
-        for (Draftable draftable : draftManager.getDraftables()) {
-            if (draftable instanceof SpeakerOrderDraftable) {
-                return (SpeakerOrderDraftable) draftable;
-            }
-        }
-        return null;
-    }
-
-    private FactionDraftable getFactionDraftable(DraftManager draftManager) {
-        for (Draftable draftable : draftManager.getDraftables()) {
-            if (draftable instanceof FactionDraftable) {
-                return (FactionDraftable) draftable;
-            }
         }
         return null;
     }

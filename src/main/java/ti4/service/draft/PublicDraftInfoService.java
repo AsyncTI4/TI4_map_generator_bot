@@ -73,6 +73,8 @@ public class PublicDraftInfoService {
         pingCurrentPlayer(draftManager, currentPlayer, clearOldHeaders, clearOldAttachments, extraButtons);
     }
 
+    // TODO: Support a version with no/null draftableType, which edits all draftables' buttons.
+    // This would be used when automatic picks happen.
     public static void edit(
             GenericInteractionCreateEvent event,
             DraftManager draftManager,
@@ -163,7 +165,7 @@ public class PublicDraftInfoService {
                         if (choice.getIdentifyingEmoji() != null) {
                             sb.append(choice.getIdentifyingEmoji());
                         } else {
-                            longChoiceNames.add(choice.getDisplayName());
+                            longChoiceNames.add(choice.getFormattedName());
                         }
                     }
                 } else if (defaultChoices.containsKey(draftable.getType())) {
@@ -209,7 +211,7 @@ public class PublicDraftInfoService {
 
     private Consumer<MessageHistory> editDraftInfo(
             DraftManager draftManager, DraftableType draftableType, String newSummary) {
-        Draftable draftable = draftManager.getDraftableByType(draftableType);
+        Draftable draftable = draftManager.getDraftable(draftableType);
         if (draftable == null) {
             throw new IllegalArgumentException("No draftable of type " + draftableType + " found");
         }

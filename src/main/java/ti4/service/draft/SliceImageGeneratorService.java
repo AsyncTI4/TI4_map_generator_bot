@@ -42,7 +42,7 @@ public class SliceImageGeneratorService {
 
     public static FileUpload tryGenerateImage(
             DraftManager draftManager, String uniqueKey, List<String> restrictChoiceKeys) {
-        SliceDraftable sliceDraftable = (SliceDraftable) draftManager.getDraftableByType(SliceDraftable.TYPE);
+        SliceDraftable sliceDraftable = (SliceDraftable) draftManager.getDraftable(SliceDraftable.TYPE);
         if (sliceDraftable == null) return null;
 
         Function<String, String> getPlayerFromSlice = (sliceName) -> {

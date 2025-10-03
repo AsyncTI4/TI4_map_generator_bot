@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.entities.Guild;
@@ -900,9 +901,8 @@ public class AutoCompleteProvider {
             case Constants.ADD_DRAFTABLE_OPTION -> {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
-                if (game.getDraftManagerUnsafe() == null
-                        && (game.getDraftString() == null
-                                || game.getDraftString().isEmpty())) return;
+                if (!DraftManager.hasDraftManager(game)) return;
+
                 DraftManager draftManager = game.getDraftManager();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 List<String> draftableOptions = DraftComponentFactory.getKnownDraftableTypes();
@@ -920,9 +920,8 @@ public class AutoCompleteProvider {
             case Constants.SET_ORCHESTRATOR_OPTION -> {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
-                if (game.getDraftManagerUnsafe() == null
-                        && (game.getDraftString() == null
-                                || game.getDraftString().isEmpty())) return;
+                if (!DraftManager.hasDraftManager(game)) return;
+
                 DraftManager draftManager = game.getDraftManager();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 List<String> draftableOptions = DraftComponentFactory.getKnownOrchestratorTypes();
@@ -942,14 +941,14 @@ public class AutoCompleteProvider {
             case Constants.UNKNOWN_DRAFT_USER_ID_OPTION -> {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
-                if (game.getDraftManagerUnsafe() == null
-                        && (game.getDraftString() == null
-                                || game.getDraftString().isEmpty())) return;
+                if (!DraftManager.hasDraftManager(game)) return;
+
                 DraftManager draftManager = game.getDraftManager();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                List<String> userIDs = draftManager.getPlayerStates().keySet().stream()
-                        .filter(id ->
-                                game.getPlayer(id) == null || event.getGuild().getMemberById(id) == null)
+                Predicate<String> isUnknownUserId =
+                        id -> game.getPlayer(id) == null || event.getGuild().getMemberById(id) == null;
+                List<String> userIDs = draftManager.getPlayerUserIds().stream()
+                        .filter(isUnknownUserId)
                         .toList();
 
                 List<Command.Choice> options = userIDs.stream()
@@ -962,9 +961,8 @@ public class AutoCompleteProvider {
             case Constants.DRAFTABLE_TYPE_OPTION -> {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
-                if (game.getDraftManagerUnsafe() == null
-                        && (game.getDraftString() == null
-                                || game.getDraftString().isEmpty())) return;
+                if (!DraftManager.hasDraftManager(game)) return;
+
                 DraftManager draftManager = game.getDraftManager();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
 
@@ -981,24 +979,29 @@ public class AutoCompleteProvider {
             case Constants.DRAFTABLE_CHOICE_KEY_OPTION -> {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
-                if (game.getDraftManagerUnsafe() == null
-                        && (game.getDraftString() == null
-                                || game.getDraftString().isEmpty())) return;
+                if (!DraftManager.hasDraftManager(game)) return;
+
                 DraftManager draftManager = game.getDraftManager();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 String draftableTypeStr =
                         event.getOption(Constants.DRAFTABLE_TYPE_OPTION, null, OptionMapping::getAsString);
                 if (draftableTypeStr == null) return;
+
                 DraftableType draftableType = DraftableType.of(draftableTypeStr);
-                Draftable draftable = draftManager.getDraftableByType(draftableType);
+                Draftable draftable = draftManager.getDraftable(draftableType);
                 if (draftable == null) return;
+
                 List<DraftChoice> choices = draftable.getAllDraftChoices();
                 List<DraftChoice> alreadyPicked = draftManager.getAllPicksOfType(draftableType);
+                Predicate<DraftChoice> notPicked = choice -> alreadyPicked.stream()
+                        .noneMatch(picked -> picked.getChoiceKey().equals(choice.getChoiceKey()));
+                Predicate<DraftChoice> matchesEnteredText =
+                        choice -> choice.getChoiceKey().toLowerCase().contains(enteredValue)
+                                || choice.getUnformattedName().toLowerCase().contains(enteredValue);
+
                 List<Command.Choice> options = choices.stream()
-                        .filter(choice -> alreadyPicked.stream()
-                                .noneMatch(picked -> picked.getChoiceKey().equals(choice.getChoiceKey())))
-                        .filter(option -> option.getChoiceKey().toLowerCase().contains(enteredValue)
-                                || option.getDisplayName().toLowerCase().contains(enteredValue))
+                        .filter(notPicked)
+                        .filter(matchesEnteredText)
                         .limit(25)
                         .map(option -> new Command.Choice(option.getUnformattedName(), option.getChoiceKey()))
                         .collect(Collectors.toList());
@@ -1007,12 +1010,12 @@ public class AutoCompleteProvider {
             case Constants.DRAFT_FACTION_OPTION -> {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
-                if (game.getDraftManagerUnsafe() == null
-                        && (game.getDraftString() == null
-                                || game.getDraftString().isEmpty())) return;
+                if (!DraftManager.hasDraftManager(game)) return;
+
                 DraftManager draftManager = game.getDraftManager();
-                FactionDraftable draftable = (FactionDraftable) draftManager.getDraftableByType(FactionDraftable.TYPE);
+                FactionDraftable draftable = (FactionDraftable) draftManager.getDraftable(FactionDraftable.TYPE);
                 if (draftable == null) return;
+
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 List<DraftChoice> choices = draftable.getAllDraftChoices();
                 List<FactionModel> availableFactions = choices.stream()
@@ -1030,12 +1033,12 @@ public class AutoCompleteProvider {
             case Constants.KELERES_FLAVOR_OPTION -> {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
-                if (game.getDraftManagerUnsafe() == null
-                        && (game.getDraftString() == null
-                                || game.getDraftString().isEmpty())) return;
+                if (!DraftManager.hasDraftManager(game)) return;
+
                 DraftManager draftManager = game.getDraftManager();
-                FactionDraftable draftable = (FactionDraftable) draftManager.getDraftableByType(FactionDraftable.TYPE);
+                FactionDraftable draftable = (FactionDraftable) draftManager.getDraftable(FactionDraftable.TYPE);
                 if (draftable == null) return;
+
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 List<DraftChoice> choices = draftable.getAllDraftChoices();
                 List<DraftChoice> pickedFactions = draftManager.getAllPicksOfType(FactionDraftable.TYPE);
@@ -1082,11 +1085,10 @@ public class AutoCompleteProvider {
 
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
-                if (game.getDraftManagerUnsafe() == null
-                        && (game.getDraftString() == null
-                                || game.getDraftString().isEmpty())) return;
+                if (!DraftManager.hasDraftManager(game)) return;
+
                 DraftManager draftManager = game.getDraftManager();
-                SeatDraftable draftable = (SeatDraftable) draftManager.getDraftableByType(SeatDraftable.TYPE);
+                SeatDraftable draftable = (SeatDraftable) draftManager.getDraftable(SeatDraftable.TYPE);
                 if (draftable == null) return;
                 String mapTemplateId = game.getMapTemplateID();
                 if (mapTemplateId == null) return;
@@ -1098,11 +1100,10 @@ public class AutoCompleteProvider {
             case Constants.DRAFT_SLICE_OPTION -> {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
-                if (game.getDraftManagerUnsafe() == null
-                        && (game.getDraftString() == null
-                                || game.getDraftString().isEmpty())) return;
+                if (!DraftManager.hasDraftManager(game)) return;
+
                 DraftManager draftManager = game.getDraftManager();
-                SliceDraftable draftable = (SliceDraftable) draftManager.getDraftableByType(SliceDraftable.TYPE);
+                SliceDraftable draftable = (SliceDraftable) draftManager.getDraftable(SliceDraftable.TYPE);
                 if (draftable == null) return;
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
 
@@ -1130,12 +1131,15 @@ public class AutoCompleteProvider {
                     DraftTileManager.resetForGame(game);
                 }
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                Predicate<MiltyDraftTile> matchesEnteredText = tile -> {
+                    String representation =
+                            Mapper.getTileRepresentations().get(tile.getTile().getTileID());
+                    return representation != null
+                            && representation.toLowerCase().contains(enteredValue);
+                };
 
                 List<MiltyDraftTile> tiles = draftTileManager.getAll().stream()
-                        .filter(t -> Mapper.getTileRepresentations()
-                                .get(t.getTile().getTileID())
-                                .toLowerCase()
-                                .contains(enteredValue))
+                        .filter(matchesEnteredText)
                         .limit(25)
                         .toList();
                 event.replyChoices(tiles.stream()
@@ -1153,13 +1157,13 @@ public class AutoCompleteProvider {
 
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
-                if (game.getDraftManagerUnsafe() == null
-                        && (game.getDraftString() == null
-                                || game.getDraftString().isEmpty())) return;
+                if (!DraftManager.hasDraftManager(game)) return;
+
                 DraftManager draftManager = game.getDraftManager();
                 SpeakerOrderDraftable draftable =
-                        (SpeakerOrderDraftable) draftManager.getDraftableByType(SpeakerOrderDraftable.TYPE);
+                        (SpeakerOrderDraftable) draftManager.getDraftable(SpeakerOrderDraftable.TYPE);
                 if (draftable == null) return;
+
                 int playerCount = draftManager.getPlayerStates().size();
                 int maxSeats = Math.min(playerCount, 8);
                 event.replyChoice(maxSeats + " speaker order positions", (long) maxSeats)
@@ -1558,7 +1562,8 @@ public class AutoCompleteProvider {
         return models.stream()
                 .filter(model -> model.search(enteredValue, source))
                 .filter(model -> model.getSource() != ComponentSource.miltymod
-                        && model.getSource() != ComponentSource.project_pi)
+                        && model.getSource() != ComponentSource.project_pi
+                        && model.getSource() != ComponentSource.asteroid)
                 .filter(model -> !(model instanceof ColorableModelInterface cm) || !cm.isDupe())
                 .limit(25)
                 .map(model -> new Command.Choice(model.getAutoCompleteName(), model.getAlias()))

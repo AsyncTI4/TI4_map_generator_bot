@@ -5,64 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
+import ti4.helpers.StringHelper;
 
 @UtilityClass
 public class DraftSaveService {
     public static final String KEY_SEPARATOR = ":";
     public static final String DATA_SEPARATOR = "|";
     public static final char ENCODED_DATA_SEPARATOR = '&';
-    private static final char ESCAPE_CHARACTER = '\\';
-
-    public static String encodeLine(String line) {
-        return line.replace(ENCODED_DATA_SEPARATOR + "", ESCAPE_CHARACTER + "" + ENCODED_DATA_SEPARATOR);
-    }
-
-    public static String decodeLine(String line) {
-        return line.replace(ESCAPE_CHARACTER + "" + ENCODED_DATA_SEPARATOR, ENCODED_DATA_SEPARATOR + "");
-    }
-
-    public static String joinLines(List<String> lines) {
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (String line : lines) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(ENCODED_DATA_SEPARATOR);
-            }
-            line = line.replace(ESCAPE_CHARACTER + "", ESCAPE_CHARACTER + "" + ESCAPE_CHARACTER);
-            line = line.replace(ENCODED_DATA_SEPARATOR + "", ESCAPE_CHARACTER + "" + ENCODED_DATA_SEPARATOR);
-            sb.append(line);
-        }
-        return sb.toString();
-    }
-
-    public static List<String> splitLines(String data) {
-        List<String> lines = new ArrayList<>();
-        StringBuilder currentLine = new StringBuilder();
-        boolean escapeNext = false;
-
-        for (char c : data.toCharArray()) {
-            if (escapeNext) {
-                currentLine.append(c);
-                escapeNext = false;
-            } else if (c == ESCAPE_CHARACTER) {
-                escapeNext = true;
-            } else if (c == ENCODED_DATA_SEPARATOR) {
-                lines.add(currentLine.toString());
-                currentLine = new StringBuilder();
-            } else {
-                currentLine.append(c);
-            }
-        }
-        // Add the last line if there's any content
-        if (currentLine.length() > 0) {
-            lines.add(currentLine.toString());
-        }
-
-        return lines;
-    }
-
     public static final String PLAYER_DATA = "p";
     public static final String ORCHESTRATOR_DATA = "o";
     public static final String DRAFTABLE_DATA = "d";
@@ -145,7 +94,7 @@ public class DraftSaveService {
         }
 
         // Reduce footprint of save data by concatenating lines into a single line
-        String joinedLines = joinLines(lines);
+        String joinedLines = StringHelper.safeJoin(lines, ENCODED_DATA_SEPARATOR);
 
         return joinedLines;
     }

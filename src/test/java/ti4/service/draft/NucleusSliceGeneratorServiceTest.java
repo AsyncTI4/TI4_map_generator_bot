@@ -17,7 +17,7 @@ import ti4.testUtils.BaseTi4Test;
 @Disabled("Inherently flaky tests; DEFINITELY run locally before changing nucleus generation.")
 public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
     // Note this is currently half what is actually used in game.
-    private static final int REASONABLE_MAX_ATTEMPTS = 1;
+    private static final int REASONABLE_MAX_ATTEMPTS = 25_000;
     // Min is -1.
     // NOTE: These tests get flakey at FEWER slices.
     private static final int EXTRA_SLICES = 0;
@@ -164,7 +164,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
         boolean strictMode = useStrictMode(specs.getNumSlices() + nucleusTemplate.getPlayerCount());
 
         game.clearTileMap();
-        PartialMapService.tryUpdateMap(null, game.getDraftManager(), false);
+        PartialMapService.tryUpdateMap(game.getDraftManager(), null, false);
 
         for (int i = 0; i < MIN_SUCCESS_COUNT; ++i) {
             runTest(game, nucleusTemplate, specs, strictMode);

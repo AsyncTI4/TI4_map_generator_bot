@@ -12,6 +12,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.commands.Subcommand;
 import ti4.commands.SubcommandGroup;
 import ti4.helpers.Constants;
+import ti4.helpers.StringHelper;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -89,7 +90,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             DraftManager draftManager = game.getDraftManager();
             String saveData = DraftSaveService.saveDraftManager(draftManager);
             StringBuilder sb = new StringBuilder();
-            for (String saveLine : DraftSaveService.splitLines(saveData)) {
+            for (String saveLine : StringHelper.safeSplit(saveData, DraftSaveService.ENCODED_DATA_SEPARATOR)) {
                 if (saveLine.startsWith(DraftSaveService.PLAYER_DATA + DraftSaveService.KEY_SEPARATOR)) {
                     saveLine = saveLine.replaceFirst(
                             DraftSaveService.PLAYER_DATA + DraftSaveService.KEY_SEPARATOR,
@@ -167,7 +168,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             DraftManager draftManager = game.getDraftManager();
             String reason = draftManager.whatsStoppingDraftEnd();
             if (reason == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "The draft has ended.");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Nothing! Ergo, the draft has ended.");
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), reason);
             }
@@ -178,13 +179,23 @@ public class DraftManagerSubcommands extends SubcommandGroup {
 
         public DraftManagerTryEndDraft() {
             super(Constants.DRAFT_MANAGE_END, "Try to end the draft", true, false);
+            addOption(
+                    OptionType.BOOLEAN,
+                    Constants.FORCE_OPTION,
+                    "Attempt to ignore any blocking reason and end anyway",
+                    false);
         }
 
         @Override
         public void execute(SlashCommandInteractionEvent event) {
             Game game = getGame();
             DraftManager draftManager = game.getDraftManager();
-            draftManager.tryEndDraft(event);
+            boolean force = event.getOption(Constants.FORCE_OPTION, false, o -> o.getAsBoolean());
+            if (force) {
+                draftManager.endDraft(event);
+            } else {
+                draftManager.tryEndDraft(event);
+            }
         }
     }
 
@@ -193,7 +204,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
         public DraftManagerPostDraftWork() {
             super(
                     Constants.DRAFT_MANAGE_POST_DRAFT_WORK,
-                    "Have the draft elements do (or redo) the post-draft work",
+                    "Have the draft components do (or redo) the post-draft work",
                     true,
                     false);
         }
@@ -223,12 +234,6 @@ public class DraftManagerSubcommands extends SubcommandGroup {
         public void execute(SlashCommandInteractionEvent event) {
             Game game = getGame();
             DraftManager draftManager = game.getDraftManager();
-            String draftEndReason = draftManager.whatsStoppingDraftEnd();
-            if (draftEndReason != null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "The draft isn't over yet: " + draftEndReason);
-                return;
-            }
-
             String reason = draftManager.whatsStoppingSetup();
             if (reason == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "The draft should have set up players already.");
@@ -242,13 +247,23 @@ public class DraftManagerSubcommands extends SubcommandGroup {
 
         public DraftManagerSetupPlayers() {
             super(Constants.DRAFT_MANAGE_SETUP_PLAYERS, "Have the draft elements set up players", true, false);
+            addOption(
+                    OptionType.BOOLEAN,
+                    Constants.FORCE_OPTION,
+                    "Attempt to ignore any blocking reason and setup anyway",
+                    false);
         }
 
         @Override
         public void execute(SlashCommandInteractionEvent event) {
             Game game = getGame();
             DraftManager draftManager = game.getDraftManager();
-            draftManager.trySetupPlayers(event);
+            boolean force = event.getOption(Constants.FORCE_OPTION, false, o -> o.getAsBoolean());
+            if (force) {
+                draftManager.setupPlayers(event);
+            } else {
+                draftManager.trySetupPlayers(event);
+            }
         }
     }
 
@@ -268,8 +283,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
         public void execute(SlashCommandInteractionEvent event) {
             Game game = getGame();
             DraftManager draftManager = game.getDraftManager();
-            String draftableType =
-                    event.getOption(Constants.ADD_DRAFTABLE_OPTION).getAsString();
+            String draftableType = event.getOption(Constants.ADD_DRAFTABLE_OPTION, o -> o.getAsString());
             Draftable draftable = DraftComponentFactory.createDraftable(draftableType);
             if (draftable == null) {
                 draftable = DraftComponentFactory.createDraftable(draftableType + "Draftable");
@@ -280,9 +294,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                 return;
             }
             draftManager.addDraftable(draftable);
-            String saveData = event.getOption(Constants.SAVE_DATA_OPTION) != null
-                    ? event.getOption(Constants.SAVE_DATA_OPTION).getAsString()
-                    : null;
+            String saveData = event.getOption(Constants.SAVE_DATA_OPTION, null, o -> o.getAsString());
             if (saveData != null) {
                 draftable.load(saveData);
                 draftable.validateState(draftManager);
@@ -311,8 +323,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
         public void execute(SlashCommandInteractionEvent event) {
             Game game = getGame();
             DraftManager draftManager = game.getDraftManager();
-            String orchestratorType =
-                    event.getOption(Constants.SET_ORCHESTRATOR_OPTION).getAsString();
+            String orchestratorType = event.getOption(Constants.SET_ORCHESTRATOR_OPTION, o -> o.getAsString());
             DraftOrchestrator orchestrator = DraftComponentFactory.createOrchestrator(orchestratorType);
             if (orchestrator == null) {
                 orchestrator = DraftComponentFactory.createOrchestrator(orchestratorType + "Orchestrator");
@@ -323,9 +334,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                 return;
             }
             draftManager.setOrchestrator(orchestrator);
-            String saveData = event.getOption(Constants.SAVE_DATA_OPTION) != null
-                    ? event.getOption(Constants.SAVE_DATA_OPTION).getAsString()
-                    : null;
+            String saveData = event.getOption(Constants.SAVE_DATA_OPTION, null, o -> o.getAsString());
             if (saveData != null) {
                 orchestrator.load(saveData);
                 orchestrator.validateState(draftManager);
@@ -370,7 +379,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             addOption(
                     OptionType.STRING,
                     Constants.UNKNOWN_DRAFT_USER_ID_OPTION,
-                    "Player to remove (not in game)",
+                    "Player to remove (if not in game)",
                     false,
                     true);
         }
@@ -410,7 +419,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             DraftManager draftManager = game.getDraftManager();
             StringBuilder sb = new StringBuilder();
             sb.append("Players in draft:\n");
-            for (String playerUserId : draftManager.getPlayerStates().keySet()) {
+            for (String playerUserId : draftManager.getPlayerUserIds()) {
                 sb.append("- ");
                 if (game.getPlayer(playerUserId) != null) {
                     sb.append(game.getPlayer(playerUserId).getPing());
@@ -438,7 +447,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             Game game = getGame();
             DraftManager draftManager = game.getDraftManager();
             List<String> removed = new ArrayList<>();
-            for (String playerUserId : draftManager.getPlayerStates().keySet()) {
+            for (String playerUserId : draftManager.getPlayerUserIds()) {
                 if (game.getPlayer(playerUserId) == null) {
                     removed.add(playerUserId);
                     draftManager.removePlayer(playerUserId);
@@ -499,8 +508,10 @@ public class DraftManagerSubcommands extends SubcommandGroup {
         public void execute(SlashCommandInteractionEvent event) {
             Game game = getGame();
             DraftManager draftManager = game.getDraftManager();
-            String playerUserId1 = event.getOption(Constants.PLAYER1).getAsString();
-            String playerUserId2 = event.getOption(Constants.PLAYER2).getAsString();
+            String playerUserId1 =
+                    event.getOption(Constants.PLAYER1).getAsUser().getId();
+            String playerUserId2 =
+                    event.getOption(Constants.PLAYER2).getAsUser().getId();
             try {
                 draftManager.swapPlayers(playerUserId1, playerUserId2);
                 if (draftManager.getOrchestrator() != null) {
@@ -549,7 +560,8 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Must provide a player to remove");
                 return;
             }
-            String newPlayerUserId = event.getOption(Constants.PLAYER2).getAsString();
+            String newPlayerUserId =
+                    event.getOption(Constants.PLAYER2).getAsUser().getId();
             try {
                 draftManager.replacePlayer(oldPlayerUserId, newPlayerUserId);
                 if (draftManager.getOrchestrator() != null) {
@@ -636,16 +648,13 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                     event.getOption(Constants.DRAFTABLE_TYPE_OPTION).getAsString());
             String choiceKey =
                     event.getOption(Constants.DRAFTABLE_CHOICE_KEY_OPTION).getAsString();
-            Draftable draftable = draftManager.getDraftableByType(draftableType);
+            Draftable draftable = draftManager.getDraftable(draftableType);
             if (draftable == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "No draftable of type: " + draftableType);
                 return;
             }
             try {
-                DraftChoice choice = draftable.getAllDraftChoices().stream()
-                        .filter(c -> c.getChoiceKey().equals(choiceKey))
-                        .findFirst()
-                        .orElse(null);
+                DraftChoice choice = draftable.getDraftChoice(choiceKey);
                 if (choice == null) {
                     MessageHelper.sendMessageToChannel(
                             event.getChannel(),
@@ -693,7 +702,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             DraftableType draftableType = DraftableType.of(
                     event.getOption(Constants.DRAFTABLE_TYPE_OPTION).getAsString());
             String commandKey = event.getOption(Constants.DRAFT_COMMAND_OPTION).getAsString();
-            Draftable draftable = draftManager.getDraftableByType(draftableType);
+            Draftable draftable = draftManager.getDraftable(draftableType);
             if (draftable == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "No draftable of type: " + draftableType);
                 return;
@@ -705,7 +714,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                         draftable.makeCommandKey(commandKey),
                         CommandSource.SLASH_COMMAND);
                 if (DraftButtonService.isError(outcome)) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "Could not make pick: " + outcome);
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Could not deliver command: " + outcome);
                     return;
                 }
                 MessageHelper.sendMessageToChannel(
@@ -718,7 +727,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                                 + draftable.getDisplayName());
                 // TODO: Handle magic strings from routeCommand, such as "delete button"
             } catch (IllegalArgumentException e) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Could not make pick: " + e.getMessage());
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Could not deliver command: " + e.getMessage());
             }
         }
     }
@@ -738,7 +747,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
         public void execute(SlashCommandInteractionEvent event) {
             Game game = getGame();
             DraftManager draftManager = game.getDraftManager();
-            String playerUserId = event.getOption(Constants.PLAYER).getAsString();
+            String playerUserId = event.getOption(Constants.PLAYER).getAsUser().getId();
             String commandKey = event.getOption(Constants.DRAFT_COMMAND_OPTION).getAsString();
             DraftOrchestrator orchestrator = draftManager.getOrchestrator();
             if (orchestrator == null) {
@@ -752,7 +761,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                         orchestrator.getButtonPrefix() + "_" + commandKey,
                         CommandSource.SLASH_COMMAND);
                 if (DraftButtonService.isError(outcome)) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "Could not make pick: " + outcome);
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Could not deliver command: " + outcome);
                     return;
                 }
                 MessageHelper.sendMessageToChannel(
@@ -765,7 +774,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                                 + orchestrator.getClass().getSimpleName());
                 // TODO: Handle magic strings from routeCommand, such as "delete button"
             } catch (IllegalArgumentException e) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Could not make pick: " + e.getMessage());
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Could not deliver command: " + e.getMessage());
             }
         }
     }
@@ -790,7 +799,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             // SETUP SPEC
 
             // General
-            spec.playerIDs = draftManager.getPlayerStates().keySet().stream().collect(Collectors.toList());
+            spec.playerIDs = draftManager.getPlayerUserIds();
             String mapTemplateID = game.getMapTemplateID();
             MapTemplateModel mapTemplate = null;
             if (mapTemplateID != null) {
@@ -802,8 +811,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             spec.setTemplate(mapTemplate);
 
             // Factions
-            FactionDraftable factionDraftable =
-                    (FactionDraftable) draftManager.getDraftableByType(FactionDraftable.TYPE);
+            FactionDraftable factionDraftable = (FactionDraftable) draftManager.getDraftable(FactionDraftable.TYPE);
             if (factionDraftable != null) {
                 spec.numFactions = factionDraftable.getAllDraftChoices().size();
                 spec.priorityFactions = factionDraftable.getAllDraftChoices().stream()
@@ -813,11 +821,11 @@ public class DraftManagerSubcommands extends SubcommandGroup {
 
             // Speaker Position
             SpeakerOrderDraftable speakerOrderDraftable =
-                    (SpeakerOrderDraftable) draftManager.getDraftableByType(SpeakerOrderDraftable.TYPE);
+                    (SpeakerOrderDraftable) draftManager.getDraftable(SpeakerOrderDraftable.TYPE);
             // no setup
 
             // Slices
-            SliceDraftable sliceDraftable = (SliceDraftable) draftManager.getDraftableByType(SliceDraftable.TYPE);
+            SliceDraftable sliceDraftable = (SliceDraftable) draftManager.getDraftable(SliceDraftable.TYPE);
             if (sliceDraftable != null) {
                 spec.numSlices = sliceDraftable.getAllDraftChoices().size();
                 spec.presetSlices = sliceDraftable.getSlices();
@@ -826,7 +834,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             // Public Snake
             PublicSnakeDraftOrchestrator orchestrator = (PublicSnakeDraftOrchestrator) draftManager.getOrchestrator();
             if (orchestrator != null) {
-                spec.setPlayerDraftOrder(orchestrator.getPlayerOrder(draftManager));
+                spec.setPlayerDraftOrder(orchestrator.getDraftOrder(draftManager));
             }
 
             MiltyService.startFromSpecs(event, spec);
@@ -844,7 +852,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                     && factionDraftable != null
                     && speakerOrderDraftable != null
                     && sliceDraftable != null) {
-                List<String> playerOrder = orchestrator.getPlayerOrder(draftManager);
+                List<String> playerOrder = orchestrator.getDraftOrder(draftManager);
                 int pickIndex = 0;
                 boolean done = false;
                 while (!done && pickIndex < 100) { // safety to avoid infinite loops

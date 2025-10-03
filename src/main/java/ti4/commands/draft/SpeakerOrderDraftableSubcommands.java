@@ -34,7 +34,7 @@ public class SpeakerOrderDraftableSubcommands extends SubcommandGroup {
         if (draftManager == null) {
             return null;
         }
-        return (SpeakerOrderDraftable) draftManager.getDraftableByType(SpeakerOrderDraftable.TYPE);
+        return (SpeakerOrderDraftable) draftManager.getDraftable(SpeakerOrderDraftable.TYPE);
     }
 
     public static class SpeakerOrderDraftableSetPickCount extends GameStateSubcommand {

@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -23,6 +24,7 @@ import ti4.map.UnitHolder;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.TechnologyModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.fow.GMService;
@@ -306,7 +308,7 @@ public class StatusHelper {
         poButtons.add(noPOScoring);
         poButtons.add(scoreAnObjective);
         poButtons.add(noSOScoring);
-        if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
+        if (!game.getStoredValue("newStatusScoringMode").isEmpty() && !game.isFowMode()) {
             poButtons.add(Buttons.gray("refreshStatusSummary", "Refresh Summary"));
         }
         if (game.getActionCards().size() > 130
@@ -317,6 +319,7 @@ public class StatusHelper {
             poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
         }
         poButtons.removeIf(Objects::isNull);
+        messageText = "Please score objectives, " + game.getPing() + ".";
         if (!game.isFowMode()) {
             game.setStoredValue("newStatusScoringMode", "Yes");
             messageText += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
@@ -460,6 +463,7 @@ public class StatusHelper {
         // Optional abilities
         sendMitosisButtons(game);
         sendHoldingCompanyButtons(game);
+        sendEntropicScarButtons(game);
 
         // Obligatory abilities
         resolveSolFlagship(game);
@@ -472,6 +476,46 @@ public class StatusHelper {
         String mitosisMessage = arborec.getRepresentationUnfogged() + ", a reminder to do **Mitosis**.";
         MessageHelper.sendMessageToChannelWithButtons(
                 arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(game, arborec));
+    }
+
+    public static void sendEntropicScarButtons(Game game) {
+        Map<Player, Integer> scars = new HashMap<>();
+        for (Tile t : game.getTileMap().values()) {
+            if (t.getTileModel().isScar()) {
+                for (Player p : game.getRealPlayers()) {
+                    if (Tile.tileHasPlayerShips(p).test(t)) {
+                        scars.put(p, scars.getOrDefault(p, 0) + 1);
+                    }
+                }
+            }
+        }
+        for (Player player : scars.keySet()) {
+            List<String> factionTechs = new ArrayList<>(player.getFactionTechs());
+            player.getTechs().forEach(factionTechs::remove);
+            List<Button> buttons = new ArrayList<>(factionTechs.stream()
+                    .map(tech -> {
+                        TechnologyModel model = Mapper.getTech(tech);
+                        return Buttons.green(
+                                player.getFinsFactionCheckerPrefix() + "entropicScar_" + tech,
+                                model.getName(),
+                                model.getCondensedReqsEmojis(true));
+                    })
+                    .toList());
+            buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+
+            int ccs = player.getStrategicCC();
+            int techs = buttons.size() - 1;
+            String scarMessage = player.getRepresentation()
+                    + " You have ships in an Entropic Scar anomaly. Use the buttons to spend 1 strategy CC and gain a tech!";
+            scarMessage += "\n> You currently have " + ccs + " Strategy CC(s)";
+            if (player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter"))
+                scarMessage += "\n> You also have the " + RelicHelper.sillySpelling()
+                        + " available to exhaust (This will be spent first)";
+            for (int i = 0; i < techs && i < scars.get(player); i++) {
+                if (i > 0) scarMessage = "Get another one!";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), scarMessage, buttons);
+            }
+        }
     }
 
     private static void sendHoldingCompanyButtons(Game game) {

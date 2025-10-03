@@ -29,15 +29,7 @@ public class DraftManager extends DraftPlayerManager {
         if (game == null) {
             throw new IllegalArgumentException("Game cannot be null");
         }
-        if (draftables == null) {
-            throw new IllegalArgumentException("Draftables cannot be null");
-        }
         this.game = game;
-        // this.orchestrator = orchestrator;
-        // this.draftables = new ArrayList<>(draftables);
-        // this.playerStates =
-        // players.stream().collect(HashMap::new, (m, p) -> m.put(p, new
-        // PlayerDraftState()), Map::putAll);
     }
 
     @Getter
@@ -45,9 +37,20 @@ public class DraftManager extends DraftPlayerManager {
 
     @Getter
     private DraftOrchestrator orchestrator = null;
-    // The order of draftables is the correct order for summarizing, applying, etc.
+    // The order of draftables is assumed to be the correct order for summarizing, applying, etc.
     @Getter
     private final List<Draftable> draftables = new ArrayList<>();
+
+    public enum CommandSource {
+        BUTTON,
+        SLASH_COMMAND,
+        DETERMINISTIC_PICK
+    }
+
+    public static boolean hasDraftManager(Game game) {
+        return game.getDraftManagerUnsafe() != null
+                || (game.getDraftString() != null && !game.getDraftString().isEmpty());
+    }
 
     // Setup
 
@@ -90,7 +93,7 @@ public class DraftManager extends DraftPlayerManager {
 
     // Information Access
 
-    public Draftable getDraftableByType(DraftableType type) {
+    public Draftable getDraftable(DraftableType type) {
         for (Draftable d : draftables) {
             if (d.getType().equals(type)) {
                 return d;
@@ -104,12 +107,6 @@ public class DraftManager extends DraftPlayerManager {
     }
 
     // Interaction handling
-
-    public enum CommandSource {
-        BUTTON,
-        SLASH_COMMAND,
-        AUTO_PICK
-    }
 
     public String routeCommand(
             GenericInteractionCreateEvent event, Player player, String command, CommandSource commandSource) {
@@ -126,6 +123,11 @@ public class DraftManager extends DraftPlayerManager {
                         if (orchestrator == null) {
                             throw new IllegalStateException("Draft choice command issued, but no orchestrator is set");
                         }
+
+                        // TODO: Add a public method to handle draft picks, which orchestrators can also use for
+                        // deterministic picks
+                        // It would pick up from this point, and continue right until the tryEndDraft() call.
+
                         String validationError = d.isValidDraftChoice(this, player.getUserID(), choice);
                         if (validationError != null) {
                             return validationError;
@@ -141,7 +143,7 @@ public class DraftManager extends DraftPlayerManager {
 
                         // After this choice, check if the draft is over.
                         // (Auto picks will trigger this method in their own call stack)
-                        if (commandSource != CommandSource.AUTO_PICK) {
+                        if (commandSource != CommandSource.DETERMINISTIC_PICK) {
                             tryEndDraft(event);
                         }
 
@@ -227,7 +229,7 @@ public class DraftManager extends DraftPlayerManager {
      *
      * @param event
      */
-    private String endDraft(GenericInteractionCreateEvent event) {
+    public void endDraft(GenericInteractionCreateEvent event) {
         String blockingReason = whatsStoppingDraftEnd();
         if (blockingReason != null) {
             // If you got this accidentally, it means you called endDraft() instead of
@@ -252,8 +254,6 @@ public class DraftManager extends DraftPlayerManager {
         } else {
             trySetupPlayers(event);
         }
-
-        return null;
     }
 
     /**
@@ -288,7 +288,7 @@ public class DraftManager extends DraftPlayerManager {
         setupPlayers(event);
     }
 
-    private void setupPlayers(GenericInteractionCreateEvent event) {
+    public void setupPlayers(GenericInteractionCreateEvent event) {
         String blockingReason = whatsStoppingSetup();
         if (blockingReason != null) {
             // If you got this accidentally, it means you called setupPlayers() instead of
@@ -300,6 +300,8 @@ public class DraftManager extends DraftPlayerManager {
         }
 
         for (String userId : playerStates.keySet()) {
+
+            // Collect all the setup decisions in a common object
             PlayerSetupService.PlayerSetupState playerSetupState = new PlayerSetupService.PlayerSetupState();
             List<Consumer<Player>> postSetupActions = new ArrayList<>();
             for (Draftable draftable : draftables) {
@@ -308,18 +310,25 @@ public class DraftManager extends DraftPlayerManager {
                     postSetupActions.add(postSetupAction);
                 }
             }
+
             Player player = game.getPlayer(userId);
+
+            // Default color if not set
             if (playerSetupState.getColor() == null) {
                 String color = player.getNextAvailableColour();
                 playerSetupState.setColor(color);
             }
+
+            // Do common setup chores
             PlayerSetupService.setupPlayer(playerSetupState, player, game, event);
 
+            // Do special setup chores from each component
             for (Consumer<Player> action : postSetupActions) {
                 action.accept(player);
             }
         }
 
+        // Transition to end of setup
         game.setPhaseOfGame("playerSetup");
         AddTileListService.finishSetup(game, event);
         ButtonHelper.updateMap(game, event);

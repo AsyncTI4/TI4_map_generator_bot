@@ -846,8 +846,18 @@ public class ListPlayerInfoService {
             }
             case "mlp" -> { // 4 techs of a color
                 int maxNum = 0;
-                for (TechnologyType type : TechnologyType.mainFour)
-                    maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, type));
+                Set<TechnologyType> synergies = player.getSynergies();
+                int synergyTotal = 0;
+                for (TechnologyType type : synergies)
+                    synergyTotal += ButtonHelper.getNumberOfCertainTypeOfTech(player, type);
+
+                for (TechnologyType type : TechnologyType.mainFour) {
+                    if (synergies.contains(type)) {
+                        maxNum = Math.max(maxNum, synergyTotal);
+                    } else {
+                        maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, type));
+                    }
+                }
                 return maxNum;
             }
             case "mp" -> {

@@ -13,6 +13,7 @@ import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
+import ti4.model.Source.ComponentSource;
 import ti4.service.draft.draftables.FactionDraftable;
 import ti4.service.draft.draftables.SeatDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
@@ -20,9 +21,13 @@ import ti4.service.draft.draftables.SpeakerOrderDraftable;
 import ti4.service.draft.orchestrators.PublicSnakeDraftOrchestrator;
 import ti4.service.milty.MiltyDraftSlice;
 
+// TODO: The draftables+orchestrator+player list should be determined by a
+// draft settings process, and each component should just initialize itself
+// from those settings. This class will be greatly simplified (removed?) in the future.
+
 @UtilityClass
 public class DraftSetupService {
-    public static String startFromSettings(GenericInteractionCreateEvent event, MiltySettings settings) {
+    public String startFromSettings(GenericInteractionCreateEvent event, MiltySettings settings) {
         Game game = settings.getGame();
 
         // Load the general game settings
@@ -35,13 +40,14 @@ public class DraftSetupService {
         DraftSpec specs = DraftSpec.CreateFromMiltySettings(settings);
 
         if (specs.getTemplate().isNucleusTemplate()) {
-            return startNucleusFromSpecs(event, specs);
+            startNucleusFromSpecs(event, specs);
+            return null;
         } else {
             return startMiltyFromSpecs(event, specs);
         }
     }
 
-    public static String startMiltyFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
+    public String startMiltyFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
         Game game = specs.game;
 
         if (specs.presetSlices != null) {
@@ -51,10 +57,17 @@ public class DraftSetupService {
 
         // Draft Manager Setup
         // --------------------------------------------------------------
-
+        List<ComponentSource> sources = new ArrayList<>(specs.tileSources);
+        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+            sources.add(ComponentSource.ds);
+            sources.add(ComponentSource.uncharted_space);
+        }
+        if (game.isThundersEdge() || !game.getStoredValue("useEntropicScar").isEmpty()) {
+            sources.add(ComponentSource.thunders_edge);
+        }
         // Setup managers and game state
         DraftTileManager tileManager = game.getDraftTileManager();
-        tileManager.addAllDraftTiles(specs.tileSources);
+        tileManager.addAllDraftTiles(sources);
         DraftManager draftManager = game.getDraftManager();
         draftManager.resetForNewDraft();
         draftManager.setPlayers(specs.playerIDs);
@@ -103,7 +116,7 @@ public class DraftSetupService {
 
         game.clearTileMap();
         try {
-            PartialMapService.tryUpdateMap(event, draftManager, true);
+            PartialMapService.tryUpdateMap(draftManager, event, true);
         } catch (Exception e) {
             // Ignore
         }
@@ -133,7 +146,7 @@ public class DraftSetupService {
         return null;
     }
 
-    public static String startNucleusFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
+    public static void startNucleusFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
         Game game = specs.game;
 
         // Setup managers and game state
@@ -143,7 +156,15 @@ public class DraftSetupService {
 
         DraftTileManager tileManager = game.getDraftTileManager();
         tileManager.clear();
-        tileManager.addAllDraftTiles(specs.getTileSources());
+        List<ComponentSource> sources = new ArrayList<>(specs.tileSources);
+        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+            sources.add(ComponentSource.ds);
+            sources.add(ComponentSource.uncharted_space);
+        }
+        if (game.isThundersEdge() || !game.getStoredValue("useEntropicScar").isEmpty()) {
+            sources.add(ComponentSource.thunders_edge);
+        }
+        tileManager.addAllDraftTiles(sources);
 
         game.setMapTemplateID(specs.template.getAlias());
 
@@ -174,7 +195,7 @@ public class DraftSetupService {
         game.clearTileMap();
         try {
             // Very important...the distance tool needs tiles placed to calculate adjacencies
-            PartialMapService.tryUpdateMap(event, draftManager, false);
+            PartialMapService.tryUpdateMap(draftManager, event, false);
         } catch (Exception e) {
             // Ignore
         }
@@ -212,7 +233,7 @@ public class DraftSetupService {
                 game.setPhaseOfGame("miltydraft");
                 GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
                 try {
-                    PartialMapService.tryUpdateMap(event, draftManager, true);
+                    PartialMapService.tryUpdateMap(draftManager, event, true);
                 } catch (Exception e) {
                     // Ignore
                 }

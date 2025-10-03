@@ -2753,10 +2753,18 @@ public class ButtonHelperHeroes {
         String position2 = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(position);
         Tile tile2 = game.getTileByPosition(position2);
+
         tile.setPosition(position2);
         tile2.setPosition(position);
         game.setTile(tile);
         game.setTile(tile2);
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2.getHomeSystemPosition().equals(tile2.getPosition())) {
+                p2.setHomeSystemPosition(tile.getPosition());
+            } else if (p2.getHomeSystemPosition().equals(tile.getPosition())) {
+                p2.setHomeSystemPosition(tile2.getPosition());
+            }
+        }
         game.rebuildTilePositionAutoCompleteList();
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),

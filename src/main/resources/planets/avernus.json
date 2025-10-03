@@ -12,9 +12,9 @@
     "planetTypes": [
         "HAZARDOUS"
     ],
-    "legendaryAbilityName": "Unknown",
-    "legendaryAbilityText": "Unknown",
-    "legendaryAbilityFlavourText": "Unknown",
+    "legendaryAbilityName": "The Nucleus",
+    "legendaryAbilityText": "ACTION: Exhaust this card to use the Embers of Muaat's **STAR FORGE** faction ability without spending a command token.",
+    "legendaryAbilityFlavourText": "Gashlai energy/matter conversion has many uses.",
     "planetLayout": {
         "unitHolderName": "avernus",
         "resourcesLocation": "BottomRight",
@@ -22,7 +22,7 @@
             "x": 90,
             "y": 67
         },
-        "planetRadius": 60,
+        "planetRadius": 45,
         "extraIcons": 1
     },
     "source": "thunders_edge"

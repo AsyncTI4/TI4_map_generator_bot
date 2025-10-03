@@ -41,6 +41,8 @@ public enum FactionEmojis implements TI4Emoji {
     Crimson,
     Bastion,
     Deepwrought,
+    Firmament,
+    Obsidian,
 
     // Twilight's Fall
 
@@ -104,6 +106,7 @@ public enum FactionEmojis implements TI4Emoji {
     tyris,
     vyserix,
     zephyrion,
+    arachian,
 
     // Franken
     Franken1,
@@ -231,7 +234,8 @@ public enum FactionEmojis implements TI4Emoji {
             case "bastion" -> Bastion;
             case "crimson" -> Crimson;
             case "deepwrought" -> Deepwrought;
-
+            case "obsidian" -> Obsidian;
+            case "firmament" -> Firmament;
             case "augers" -> augers;
             case "axis" -> axis;
             case "bentor" -> bentor;
@@ -273,6 +277,7 @@ public enum FactionEmojis implements TI4Emoji {
             case "lunarium" -> lunarium;
             case "onyxxa" -> onyxxa;
             case "tyris" -> tyris;
+            case "arachian" -> arachian;
             case "vyserix" -> vyserix;
             case "zephyrion" -> zephyrion;
             case "pharadn" -> pharadn;

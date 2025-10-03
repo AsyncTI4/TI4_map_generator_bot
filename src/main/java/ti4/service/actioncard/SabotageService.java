@@ -24,6 +24,12 @@ public class SabotageService {
             return false;
         }
 
+        if (player.isPassed()
+                && game.getActivePlayer() != null
+                && game.getActivePlayer().hasTech("tp")) {
+            return false;
+        }
+
         return !allSabotagesAreDiscarded(game) && !allAcd2SabotagesAreDiscarded(game);
     }
 

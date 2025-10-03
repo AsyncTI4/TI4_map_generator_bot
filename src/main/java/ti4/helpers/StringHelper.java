@@ -101,6 +101,68 @@ public final class StringHelper {
         return "a".repeat(id.length() + 1);
     }
 
+    private static final char ESCAPE_CHARACTER = '\\';
+
+    /**
+     * For use in conjunction with safeSplit. First escapes any instance of the separator or
+     * escape character in the strings, then joins them with the separator.
+     */
+    public static String safeJoin(List<String> lines, char separator) {
+        if (separator == ESCAPE_CHARACTER) {
+            throw new IllegalArgumentException("Separator cannot be the escape character");
+        }
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (String line : lines) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(separator);
+            }
+            line = line.replace(
+                    String.valueOf(ESCAPE_CHARACTER),
+                    String.valueOf(ESCAPE_CHARACTER) + String.valueOf(ESCAPE_CHARACTER));
+            line = line.replace(
+                    String.valueOf(separator), String.valueOf(ESCAPE_CHARACTER) + String.valueOf(separator));
+            sb.append(line);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Splits a string on the given separator, and un-escapes any instance of the separator or
+     * escape character that was escaped with an escape character. Use on strings joined via
+     * safeJoin.
+     */
+    public static List<String> safeSplit(String data, char separator) {
+        if (separator == ESCAPE_CHARACTER) {
+            throw new IllegalArgumentException("Separator cannot be the escape character");
+        }
+        List<String> lines = new ArrayList<>();
+        StringBuilder currentLine = new StringBuilder();
+        boolean escapeNext = false;
+
+        for (char c : data.toCharArray()) {
+            if (escapeNext) {
+                currentLine.append(c);
+                escapeNext = false;
+            } else if (c == ESCAPE_CHARACTER) {
+                escapeNext = true;
+            } else if (c == separator) {
+                lines.add(currentLine.toString());
+                currentLine = new StringBuilder();
+            } else {
+                currentLine.append(c);
+            }
+        }
+        // Add the last line if there's any content
+        if (currentLine.length() > 0) {
+            lines.add(currentLine.toString());
+        }
+
+        return lines;
+    }
+
     public static String stripEmojis(String initial) {
         return replaceWithEmojis(initial, true);
     }

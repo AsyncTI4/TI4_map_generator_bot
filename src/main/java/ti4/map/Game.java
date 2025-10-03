@@ -312,7 +312,7 @@ public class Game extends GameProperties {
         neutral.addTech("ff2");
         neutral.addTech("dd2");
         neutral.addTech("cv2");
-        neutral.addTech("ca2");
+        neutral.addTech("cr2");
         neutral.addTech("ws");
         return neutral;
     }
@@ -396,8 +396,63 @@ public class Game extends GameProperties {
         return miltyDraftManager;
     }
 
-    public void setMiltyDraftManager(MiltyDraftManager miltyDraftManager) {
-        this.miltyDraftManager = miltyDraftManager;
+    // public void setMiltyDraftManager(MiltyDraftManager miltyDraftManager) {
+    //     this.miltyDraftManager = miltyDraftManager;
+    // }
+
+    @NotNull
+    public DraftTileManager getDraftTileManager() {
+        if (draftTileManager == null) {
+            draftTileManager = new DraftTileManager();
+        }
+        return draftTileManager;
+    }
+
+    public DraftManager getDraftManagerUnsafe() {
+        return draftManager;
+    }
+
+    public void clearDraftManager() {
+        draftManager = null;
+        draftString = null;
+    }
+
+    @NotNull
+    public DraftManager getDraftManager() {
+        if (draftManager != null) {
+            return draftManager;
+        }
+        if (draftString != null) {
+            try {
+                draftManager = DraftLoadService.loadDraftManager(this, draftString);
+            } catch (Exception e) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Failed to load draft manager (and creating an empty new one instead): ")
+                        .append(e.getMessage())
+                        .append(System.lineSeparator())
+                        .append("With draft data: ")
+                        .append(System.lineSeparator())
+                        .append(String.join(System.lineSeparator(), draftString));
+
+                BotLogger.warning(new LogOrigin(this), sb.toString(), e);
+                draftManager = new DraftManager(this);
+            }
+        } else {
+            draftManager = new DraftManager(this);
+        }
+        return draftManager;
+    }
+
+    public DistanceTool getDistanceTool() {
+        if (distanceTool != null) {
+            return distanceTool;
+        }
+        if (getMapTemplateID() == null) {
+            BotLogger.warning(new LogOrigin(this), "Map template ID is null, distance tool can not be created.");
+            return null;
+        }
+        distanceTool = new DistanceTool(this);
+        return distanceTool;
     }
 
     @NotNull
@@ -1106,7 +1161,7 @@ public class Game extends GameProperties {
         return orderedSCs;
     }
 
-    private Player getPlayerFromSC(int sc) {
+    public Player getPlayerFromSC(int sc) {
         for (Player player : getRealPlayersNDummies()) {
             if (player.getSCs().contains(sc)) {
                 return player;

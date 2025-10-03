@@ -73,7 +73,7 @@ public class DraftSaveServiceTest extends BaseTi4Test {
             for (Draftable draftable : draftManager.getDraftables()) {
                 List<DraftChoice> originalChoices = draftable.getAllDraftChoices();
                 List<DraftChoice> loadedDraftable =
-                        loadedManager.getDraftableByType(draftable.getType()).getAllDraftChoices();
+                        loadedManager.getDraftable(draftable.getType()).getAllDraftChoices();
                 assertArrayEquals(
                         originalChoices.stream().map(DraftChoice::getChoiceKey).toArray(),
                         loadedDraftable.stream().map(DraftChoice::getChoiceKey).toArray(),
@@ -100,8 +100,10 @@ public class DraftSaveServiceTest extends BaseTi4Test {
     @Test
     public void testSaveFormatUnchanged() {
         beforeAll();
+        String draftSave = TestData.getTestFile(TestData.FINISHED_6P_DRAFT_FILE);
+        assertNotNull(draftSave, "Test data for finished 6p draft is missing or empty");
         Game game = createTestGame(6);
-        DraftManager draftManager = DraftLoadService.loadDraftManager(game, TestData.SAVED_6P_FINISHED_DRAFT);
+        DraftManager draftManager = DraftLoadService.loadDraftManager(game, draftSave);
 
         // Loaded state should be valid
         assertNull(draftManager.getOrchestrator().validateState(draftManager));
@@ -111,7 +113,7 @@ public class DraftSaveServiceTest extends BaseTi4Test {
 
         // Check that save data matches is the same for original and loaded managers
         assertEquals(
-                TestData.SAVED_6P_FINISHED_DRAFT,
+                draftSave,
                 DraftSaveService.saveDraftManager(draftManager),
                 "Mismatch in save data when you save, then load, then save again a draft manager");
     }

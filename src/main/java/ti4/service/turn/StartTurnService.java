@@ -57,6 +57,7 @@ public class StartTurnService {
             }
         }
 
+        game.removeStoredValue("fortuneSeekers");
         ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
         game.setStoredValue(player.getFaction() + "planetsExplored", "");
         game.setStoredValue("lawsDisabled", "no");
@@ -135,7 +136,7 @@ public class StartTurnService {
         game.setPhaseOfGame("action");
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
         Helper.startOfTurnSaboWindowReminders(game, player);
-        boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
+        boolean isFowPrivateGame = game.isFowMode();
 
         if (game.isShowBanners()) {
             BannerGenerator.drawFactionBanner(player);

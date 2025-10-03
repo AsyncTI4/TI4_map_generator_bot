@@ -13,6 +13,7 @@ public class StatisticsCommand implements ParentCommand {
                     new OptIn(),
                     new OptOut(),
                     new SurveyResults(),
+                    new CommunityStatistics(),
                     new GameStatistics(),
                     new PlayerStatistics(),
                     new AverageTurnTime(),

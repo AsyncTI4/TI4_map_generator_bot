@@ -20,6 +20,8 @@ import ti4.service.milty.MiltyDraftSlice;
  * This DraftSpec represents the conversion of draft settings -> draft.
  * To ensure the new system is compatible with the previous, this should
  * basically be a copy of MiltyDraftSpec for now.
+ * TODO: This shouldn't be needed. In the future, settings should be
+ * directly applicable to each desired draftable/orchestrator.
  */
 @Data
 public class DraftSpec {
@@ -44,6 +46,7 @@ public class DraftSpec {
         bannedFactions = new ArrayList<>();
         priorityFactions = new ArrayList<>();
 
+        // TODO: These should be derived from game settings.
         tileSources = new ArrayList<>();
         tileSources.add(Source.ComponentSource.base);
         tileSources.add(Source.ComponentSource.pok);
@@ -83,9 +86,10 @@ public class DraftSpec {
         specs.bannedFactions.addAll(pfSettings.getBanFactions().getKeys());
         if (game.isThundersEdge()) {
             List<String> newKeys = new ArrayList<>();
-            newKeys.addAll(List.of("arborec", "ghost", "letnev", "winnu", "muaat", "yin"));
+            newKeys.addAll(
+                    List.of("arborec", "sol", "letnev", "winnu", "sardakk", "yin", "l1z1x", "naalu", "saar", "naaz"));
             specs.priorityFactions.addAll(newKeys);
-            specs.numFactions = Math.min(6, specs.numFactions);
+            specs.numFactions = Math.min(10, specs.numFactions);
         } else {
             specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
         }
@@ -95,6 +99,7 @@ public class DraftSpec {
         }
 
         // Load Sources Specifications
+        // TODO: These should be derived from game settings.
         SourceSettings sources = settings.getSourceSettings();
         specs.setTileSources(sources.getTileSources());
         specs.setFactionSources(sources.getFactionSources());

@@ -101,6 +101,7 @@ public class Constants {
     public static final String ABSOL_MODE = "absol_mode";
     public static final String PROMISES_PROMISES = "promises_promises";
     public static final String FLAGSHIPPING = "flagshipping";
+    public static final String JUST_UNITS = "just_units";
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
     public static final String UNCHARTED_SPACE_STUFF = "uncharted_space_stuff";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
@@ -112,6 +113,7 @@ public class Constants {
     public static final String CONFIRM = "confirm";
     public static final String PUBLISH = "publish";
     public static final String NAALU_AGENT = "naalu_agent";
+    public static final String WARFARE_ACTION = "warfare_action";
     public static final String L1_HERO = "l1_hero";
     public static final String NOMAD_COIN = "nomad_coin";
     public static final String QUEUE_SO = "queue_so";
@@ -184,6 +186,11 @@ public class Constants {
     public static final String SETTING_NAME = "setting_name";
     public static final String SETTING_VALUE = "setting_value";
     public static final String SETTING_TYPE = "setting_type";
+
+    public static final String TOKEN_INGRESS = "token_ingress.png";
+    public static final String TOKEN_BREACH_ACTIVE = "token_breachActive.png";
+    public static final String TOKEN_BREACH_INACTIVE = "token_breachInactive.png";
+    public static final String TOKEN_SEVER = "token_sever.png";
 
     public static final String ALPHA = "alpha";
     public static final String BETA = "beta";
@@ -363,8 +370,8 @@ public class Constants {
     public static final String SETUP8 = "setup8";
     public static final String MALLICE = "mallicelocked";
     public static final String MR = "mr";
-    public static final List<String> MECATOLS = List.of(MR, "nn", "ll", "rexatolmec", "ordinianc4");
-    public static final List<String> MECATOL_SYSTEMS = List.of("18", "fin1", "fin2", "rexmec");
+    public static final List<String> MECATOLS = List.of(MR, "nn", "ll", "rexatolmec", "ordinianc4", "mrte");
+    public static final List<String> MECATOL_SYSTEMS = List.of("18", "fin1", "fin2", "rexmec", "112");
 
     public static final int SPACE_RADIUS = 115;
     public static final int RADIUS = 45;
@@ -1388,6 +1395,7 @@ public class Constants {
     public static final String GAMES_WITH_FACTIONS = "games_with_factions";
     public static final String GAME_STATISTIC = "game_statistic";
     public static final String PLAYER_STATISTIC = "player_statistic";
+    public static final String COMMUNITY = "community";
     public static final String UNDO_TO_COMMAND = "undo_to_command";
     public static final String SHOW_GAME_MODES = "show_game_modes";
     public static final String MAX_SO_COUNT = "max_so_count";

@@ -1624,6 +1624,11 @@ public class Helper {
                         } else {
                             productionValue = planet.getResources() + productionValue;
                         }
+                        if (player.hasUnit("axis_mech")
+                                && !ButtonHelper.isLawInPlay(game, "articles_war")
+                                && uH.getUnitCount(UnitType.Mech, player) > 0) {
+                            productionValue = Math.max(5, productionValue);
+                        }
                     }
                     if (IsPlayerElectedService.isPlayerElected(game, player, "absol_minsindus")) {
                         productionValue += 4;
@@ -1828,6 +1833,11 @@ public class Helper {
                                             Math.max(planet.getResources(), planet.getInfluence()) + productionValue;
                                 } else {
                                     productionValue = planet.getResources() + productionValue;
+                                }
+                                if (player.hasUnit("axis_mech")
+                                        && !ButtonHelper.isLawInPlay(game, "articles_war")
+                                        && uH.getUnitCount(UnitType.Mech, player) > 0) {
+                                    productionValue = Math.max(5, productionValue);
                                 }
                             }
                         }
@@ -2101,7 +2111,13 @@ public class Helper {
         }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planet && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
-                boolean singleDock = "warfare".equalsIgnoreCase(warfareNOtherstuff) && !asn;
+                boolean singleDock = ("warfare".equalsIgnoreCase(warfareNOtherstuff)
+                                || "construction".equalsIgnoreCase(warfareNOtherstuff))
+                        && !asn;
+
+                StrategyCardModel model =
+                        game.getStrategyCardModelByName(warfareNOtherstuff).orElse(null);
+                if (model != null && model.usesAutomationForSCID("te6warfare")) singleDock = false;
                 if (singleDock) {
                     if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) < 1
                             && !player.hasUnit("saar_spacedock")

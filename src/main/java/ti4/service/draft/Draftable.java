@@ -1,12 +1,13 @@
 package ti4.service.draft;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.buttons.Buttons;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
-import ti4.service.draft.draftables.CommonDraftableValidators;
 
 public abstract class Draftable extends DraftLifecycleHooks {
     /**
@@ -20,6 +21,30 @@ public abstract class Draftable extends DraftLifecycleHooks {
      * @return A list of all draft choices, with unique choiceKey values.
      */
     public abstract List<DraftChoice> getAllDraftChoices();
+
+    /**
+     * Get a specific, known draft choice by its key.
+     * @param choiceKey The unique key of the draft choice to get.
+     * @return The draft choice with the given key, or null if not found.
+     */
+    public final DraftChoice getDraftChoice(String choiceKey) {
+        List<DraftChoice> allChoices = getAllDraftChoices();
+        for (DraftChoice choice : allChoices) {
+            if (choice.getChoiceKey().equals(choiceKey)) {
+                return choice;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get all the draft choices that are available to this draft, just they keys.
+     * @return A list of all draft choice keys.
+     */
+    public final Set<String> getAllDraftChoiceKeys() {
+        List<DraftChoice> allChoices = getAllDraftChoices();
+        return allChoices.stream().map(DraftChoice::getChoiceKey).collect(Collectors.toSet());
+    }
 
     // Interaction info
 
@@ -90,10 +115,8 @@ public abstract class Draftable extends DraftLifecycleHooks {
      * @return An error message if the choice is invalid, null if valid. No magic string support.
      */
     public String isValidDraftChoice(DraftManager draftManager, String playerUserId, DraftChoice choice) {
-        List<DraftChoice> allChoices = getAllDraftChoices();
-        List<String> allChoiceKeys =
-                allChoices.stream().map(DraftChoice::getChoiceKey).toList();
-        if (!CommonDraftableValidators.isChoiceKeyInList(choice, allChoiceKeys)) {
+        Set<String> allChoiceKeys = getAllDraftChoiceKeys();
+        if (!allChoiceKeys.contains(choice.getChoiceKey())) {
             return "The choiceKey " + choice.getChoiceKey() + " is not valid for draftable type " + getType();
         }
         return null;

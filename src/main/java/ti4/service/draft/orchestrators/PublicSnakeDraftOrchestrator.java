@@ -32,7 +32,18 @@ import ti4.service.draft.PlayerDraftState;
 import ti4.service.draft.PlayerSetupService.PlayerSetupState;
 import ti4.service.draft.PublicDraftInfoService;
 
+/**
+ * This draft orchestrator implements a public snake draft.
+ * Players take turns picking one item at a time in a particular order.
+ * All choices are visible to all player at all time, as well as all picks.
+ * The picks are made in order, but that order "snakes" or reverses direction
+ * after each player has made a pick.
+ */
 public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
+    /**
+     * The per-player state for PublicSnakeDraftOrchestrator.
+     * Stores the player's position in the draft order.
+     */
     public static class State extends OrchestratorState {
         private int orderIndex;
 
@@ -119,8 +130,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
     @Override
     public void initializePlayerStates(DraftPlayerManager draftManager) {
-        for (String playerUserId : draftManager.getPlayerStates().keySet()) {
-            PlayerDraftState playerState = draftManager.getPlayerStates().get(playerUserId);
+        for (PlayerDraftState playerState : draftManager.getPlayerStates().values()) {
             if (playerState.getOrchestratorState() == null || !(playerState.getOrchestratorState() instanceof State)) {
                 State orchestratorState = new State();
                 playerState.setOrchestratorState(orchestratorState);
@@ -130,7 +140,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
     @Override
     public void sendDraftButtons(DraftManager draftManager) {
-        List<String> playerOrder = getPlayerOrder(draftManager);
+        List<String> playerOrder = getDraftOrder(draftManager);
         String currentPlayerUserId = getCurrentPlayer(playerOrder);
         draftManager.getGame().setActivePlayerID(currentPlayerUserId);
         PublicDraftInfoService.send(
@@ -148,7 +158,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             String playerUserId,
             DraftChoice choice,
             CommandSource source) {
-        List<String> playerOrder = getPlayerOrder(draftManager);
+        List<String> playerOrder = getDraftOrder(draftManager);
 
         // Picks are made one player at a time, with all buttons visible.
         // Ensure this is the current player
@@ -168,15 +178,16 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
                 draftManager.getPlayerStates().get(playerUserId).getPicks();
         playerChoices.computeIfAbsent(choice.getType(), k -> new ArrayList<>()).add(choice);
 
+        // Send announcement of pick
         Player player = draftManager.getGame().getPlayer(playerUserId);
         StringBuilder sb = new StringBuilder();
         sb.append(player.getPing()).append(" drafted ");
-        if (source == CommandSource.AUTO_PICK) {
+        if (source == CommandSource.DETERMINISTIC_PICK) {
             sb.append("(automatically) ");
         } else if (source == CommandSource.SLASH_COMMAND) {
             sb.append("(forcefully) ");
         }
-        sb.append(choice.getDisplayName()).append("!");
+        sb.append(choice.getFormattedName()).append("!");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
 
         // Move the draft to the next player
@@ -184,10 +195,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
         // Do automated picking when there's only deterministic picks.
         int simultaneousPicks = 1;
-        // TODO: We can support doing multiple simultaneous picks, but there's a race condition in the
-        // "delete one button" method: it works by editing the whole message to be the same except that
-        // one button. If multiple picks happen at once, these operations coincide and whichever edit process
-        // resolves last is the only one that deletes its button, while re-adding the other deleted buttons.
+        // TODO: Support editing more than 1 draftable's buttons per button-press,
+        // so that we can support multiple deterministic picks at once.
         // if (currentPlayerIndex == 0 && isReversing) simultaneousPicks = 2;
         // else if (currentPlayerIndex == playerOrder.size() - 1 && !isReversing) simultaneousPicks = 2;
         List<DraftChoice> totalPossiblePicks = new ArrayList<>();
@@ -203,18 +212,23 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             totalPossiblePicks.addAll(deterministicPicks);
             if (totalPossiblePicks.size() > simultaneousPicks) break;
         }
+
+        // If 1+ deterministic picks are found amongst the draftables, AND there are no more deterministic picks
+        // than there are picks at this time, AND there are no non-deterministic picks available, apply the only
+        // possible picks automatically.
         if (!undeterministicPicks && totalPossiblePicks.size() > 0 && totalPossiblePicks.size() <= simultaneousPicks) {
             Player nextPlayer = draftManager.getGame().getPlayer(getCurrentPlayer(playerOrder));
             DraftChoice forcedPick = totalPossiblePicks.get(0);
-            Draftable forcedDraftable = draftManager.getDraftableByType(forcedPick.getType());
+            Draftable forcedDraftable = draftManager.getDraftable(forcedPick.getType());
             String status = draftManager.routeCommand(
                     event,
                     nextPlayer,
                     forcedDraftable.makeCommandKey(forcedPick.getChoiceKey()),
-                    DraftManager.CommandSource.AUTO_PICK);
+                    DraftManager.CommandSource.DETERMINISTIC_PICK);
             DraftButtonService.handleButtonResult(event, status);
         } else {
-            PartialMapService.tryUpdateMap(event, draftManager, true);
+            // It is time to update the draft display and ping the next player in line.
+            PartialMapService.tryUpdateMap(draftManager, event, true);
             PublicDraftInfoService.edit(
                     event,
                     draftManager,
@@ -231,6 +245,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             draftManager.getGame().setActivePlayerID(getCurrentPlayer(playerOrder));
         }
 
+        // Delete buttons when they're picked.
         return DraftButtonService.DELETE_BUTTON;
     }
 
@@ -320,7 +335,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId) {
 
         if (buttonId.equals("reprintdraft")) {
-            List<String> playerOrder = getPlayerOrder(draftManager);
+            List<String> playerOrder = getDraftOrder(draftManager);
             PublicDraftInfoService.send(
                     draftManager,
                     playerOrder,
@@ -375,7 +390,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         return null;
     }
 
-    public List<String> getPlayerOrder(DraftManager draftManager) {
+    public List<String> getDraftOrder(DraftManager draftManager) {
         List<String> playerOrder = new ArrayList<>();
         int numPlayers = draftManager.getPlayerStates().size();
         for (int i = 0; i < numPlayers; i++) {

@@ -89,14 +89,36 @@ public class ComponentActionHelper {
                                                 .filter(Tile.tileHasPlayersInfAndCC(p1))
                                                 .count()
                                         > 0;
+                            case "crimsonbt" ->
+                                game.getTileMap().values().stream()
+                                                .filter(Tile.tileHasBreach())
+                                                .count()
+                                        > 0;
+                            case "saarbt" ->
+                                game.getTileMap().values().stream()
+                                                .filter(Tile::isAsteroidField)
+                                                .filter(Tile.tileHasPlayerShips(p1))
+                                                .count()
+                                        > 0;
+                            case "deepwroughtbt" -> true;
                             default -> true;
                         };
+
                 if (validAction) {
                     TI4Emoji btEmoji = bt.getFactionEmoji();
                     Button btButton = Buttons.green(
                             finChecker + prefix + "exhaustBT_" + bt.getAlias(), "Exhaust " + bt.getName(), btEmoji);
                     compButtons.add(btButton);
                 }
+            }
+        }
+        List<String> implementedLegendaryPlanets = new ArrayList<>(List.of("avernus"));
+        for (String planet : implementedLegendaryPlanets) {
+            String prettyPlanet = Mapper.getPlanet(planet).getName();
+            if (p1.getPlanets().contains(planet)
+                    && !p1.getExhaustedPlanetsAbilities().contains(planet)) {
+                compButtons.add(Buttons.green(
+                        finChecker + "planetAbilityExhaust_" + planet, "Use " + prettyPlanet + " Ability"));
             }
         }
 

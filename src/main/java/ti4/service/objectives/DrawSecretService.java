@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
+import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StringHelper;
@@ -19,6 +20,7 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
 import ti4.service.emoji.CardEmojis;
@@ -106,9 +108,19 @@ public class DrawSecretService {
                             game.getActionsChannel(), files, message.toString(), true, false);
                 }
             }
-            if (game.isThundersEdge()) {
-                Planet uH = game.getUnitHolderFromPlanet("mr");
-                uH.addToken("attachment_legendary.png");
+            if (game.isThundersEdge() || !game.getStoredValue("useNewSCs").isEmpty()) {
+                game.setStrategyCardSet("te");
+            }
+            if (game.isThundersEdge() || !game.getStoredValue("useNewRex").isEmpty()) {
+                Tile mr = game.getMecatolTile();
+                if (mr != null) {
+                    String pos = mr.getPosition();
+                    game.removeTile(pos);
+                    Tile tile = new Tile("112", pos);
+                    Planet rex = tile.getUnitHolderFromPlanet("mrte");
+                    rex.addToken(Constants.CUSTODIAN_TOKEN_PNG);
+                    game.setTile(tile);
+                }
             }
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("startOfGameObjReveal", "Reveal Objectives and Start Strategy Phase"));

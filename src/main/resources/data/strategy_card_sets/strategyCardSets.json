@@ -103,6 +103,22 @@
         "source": "asteroid"
     },
     {
+        "name": "TE Strategy Cards",
+        "alias": "te",
+        "scIDs": [
+            "pok1leadership",
+            "pok2diplomacy",
+            "pok3politics",
+            "te4construction",
+            "pok5trade",
+            "te6warfare",
+            "pok7technology",
+            "pok8imperial"
+        ],
+        "description": "The \"default\" set of strategy cards, used in TE",
+        "source": "thunders_edge"
+    },
+    {
         "name": "PBD #100 Strategy Cards",
         "alias": "pbd100",
         "scIDs": [

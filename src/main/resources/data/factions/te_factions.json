@@ -2,12 +2,24 @@
     {
         "alias": "bastion",
         "factionName": "Last Bastion",
-        "homeSystem": "",
-        "startingFleet": "",
+        "homeSystem": "92",
+        "startingFleet": "3 inf o, sd o, 2 ff, cv, dn, ca",
         "commodities": 1,
-        "factionTech": [],
-        "startingTech": [],
-        "homePlanets": [],
+        "factionTech": [
+            "proxima",
+            "helios2"
+        ],
+        "startingTechOptions": [
+            "amd",
+            "det",
+            "st",
+            "sdn"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "ordinian",
+            "revelation"
+        ],
         "abilities": [
             "liberate",
             "galvanize",
@@ -18,46 +30,154 @@
             "bastioncommander",
             "bastionhero"
         ],
-        "promissoryNotes": [],
+        "promissoryNotes": [
+            "raisethestandard"
+        ],
         "units": [
             "fighter",
             "destroyer",
             "cruiser",
             "carrier",
             "dreadnought",
-            "flagship",
+            "bastion_flagship",
             "infantry",
-            "mech",
+            "bastion_mech",
             "pds",
-            "spacedock"
+            "bastion_spacedock"
         ],
         "source": "thunders_edge"
     },
     {
         "alias": "deepwrought",
         "factionName": "The Deepwrought Scholarate",
-        "homeSystem": "",
-        "startingFleet": "",
-        "commodities": 0,
-        "factionTech": [],
-        "startingTech": [],
-        "homePlanets": [],
-        "abilities": [],
+        "homeSystem": "95",
+        "startingFleet": "2 inf i, 1 inf o, sd i, 4 ff, cv, dn",
+        "commodities": 3,
+        "factionTech": [
+            "hydrothermal",
+            "radical"
+        ],
+        "startingTechOptions": [],
+        "startingTechAmount": 2,
+        "homePlanets": [
+            "ikatena"
+        ],
+        "abilities": [
+            "researchteam",
+            "oceanbound"
+        ],
         "leaders": [
             "deepwroughtagent",
             "deepwroughtcommander",
             "deepwroughthero"
         ],
-        "promissoryNotes": [],
+        "promissoryNotes": [
+            "shareknowledge"
+        ],
         "units": [
             "fighter",
             "destroyer",
             "cruiser",
             "carrier",
             "dreadnought",
-            "flagship",
+            "deepwrought_flagship",
             "infantry",
-            "mech",
+            "deepwrought_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "firmament",
+        "factionName": "The Firmament",
+        "homeSystem": "96a",
+        "startingFleet": "1 inf c, 2 inf t, cv, 3 ff, ca, dd, sd t",
+        "commodities": 3,
+        "factionTech": [
+            "planesplitter-firm",
+            "parasite-firm"
+        ],
+        "startingTechOptions": [
+            "dxa",
+            "bs",
+            "gls",
+            "pi"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "cronos",
+            "tallin"
+        ],
+        "abilities": [
+            "plotsplots",
+            "puppetsoftheblade"
+        ],
+        "leaders": [
+            "firmamentagent",
+            "firmamentcommander",
+            "firmamenthero"
+        ],
+        "promissoryNotes": [
+            "blackops"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "firmament_flagship",
+            "infantry",
+            "firmament_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "obsidian",
+        "factionName": "The Obsidian",
+        "homeSystem": "96b",
+        "startingFleet": "1 inf c, 2 inf t, cv, 3 ff, ca, dd, sd t",
+        "commodities": 3,
+        "factionTech": [
+            "planesplitter-obs",
+            "parasite-obs"
+        ],
+        "startingTechOptions": [
+            "dxa",
+            "bs",
+            "gls",
+            "pi"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "cronoshollow",
+            "tallinhollow"
+        ],
+        "abilities": [
+            "nocturne",
+            "bladesorchestra",
+            "marionettes"
+        ],
+        "leaders": [
+            "obsidianagent",
+            "obsidiancommander",
+            "obsidianhero"
+        ],
+        "promissoryNotes": [
+            "malevolency"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "obsidian_flagship",
+            "infantry",
+            "obsidian_mech",
             "pds",
             "spacedock"
         ],
@@ -65,29 +185,40 @@
     },
     {
         "alias": "crimson",
-        "factionName": "The Crimson Something",
-        "homeSystem": "",
-        "startingFleet": "",
-        "commodities": 0,
-        "factionTech": [],
+        "factionName": "The Crimson Rebellion",
+        "homeSystem": "94",
+        "startingFleet": "4 inf a, sd a, 3 ff, cv, 2 dd",
+        "commodities": 2,
+        "factionTech": [
+            "subatomic",
+            "exile2"
+        ],
         "startingTech": [],
-        "homePlanets": [],
-        "abilities": [],
+        "homePlanets": [
+            "ahkcreuxx"
+        ],
+        "abilities": [
+            "sundered",
+            "incursion",
+            "sorrow"
+        ],
         "leaders": [
             "crimsonagent",
             "crimsoncommander",
             "crimsonhero"
         ],
-        "promissoryNotes": [],
+        "promissoryNotes": [
+            "sever"
+        ],
         "units": [
             "fighter",
-            "destroyer",
+            "crimson_destroyer",
             "cruiser",
             "carrier",
             "dreadnought",
-            "flagship",
+            "crimson_flagship",
             "infantry",
-            "mech",
+            "crimson_mech",
             "pds",
             "spacedock"
         ],
@@ -99,8 +230,17 @@
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 4,
-        "factionTech": [],
-        "startingTech": [],
+        "factionTech": [
+            "nanomachines",
+            "linkship2"
+        ],
+        "startingTechOptions": [
+            "nm",
+            "pa",
+            "ps",
+            "aida"
+        ],
+        "startingTechAmount": 1,
         "homePlanets": [],
         "abilities": [
             "survivalinstinct",
@@ -111,16 +251,18 @@
             "ralnelcommander",
             "ralnelhero"
         ],
-        "promissoryNotes": [],
+        "promissoryNotes": [
+            "nanolink"
+        ],
         "units": [
             "fighter",
-            "destroyer",
+            "ralnel_destroyer",
             "cruiser",
             "carrier",
             "dreadnought",
-            "flagship",
+            "ralnel_flagship",
             "infantry",
-            "mech",
+            "ralnel_mech",
             "pds",
             "spacedock"
         ],

@@ -9,7 +9,7 @@ import ti4.map.Player;
  * as needed, hopefully without being overbearing. More hooks should
  * be added only as really needed, and with default noop implementations.
  *
- * The draft manager is responsible for executing the lifecycle.
+ * The draft manager is responsible for checking and progressing through the lifecycle.
  *
  * Draft stages:
  * 1. Initialization - Draftables generate their choices, etc.
@@ -51,7 +51,7 @@ public abstract class DraftLifecycleHooks {
     /**
      * Check whether this draftable is ready to set up the players. Draftables which send buttons in
      * onDraftEnd may need to wait for player interaction. Anything which blocks this method from
-     * returning true MUST call the DraftManager's trySetupPlayers() method when it is resolved.
+     * returning null MUST call the DraftManager's trySetupPlayers() method when it is resolved.
      * @param draftManager The draft manager for the draft; also contains the Game object.
      * @return Null if ready to set up players, or a SPECIFIC message describing what is being waited on.
      */

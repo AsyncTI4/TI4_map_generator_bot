@@ -33,6 +33,7 @@ public class ScorePublicObjectiveService {
             GenericInteractionCreateEvent event, MessageChannel channel, Game game, Player player, int poID) {
         String both = getNameNEMoji(game, poID);
         String poName = both.split("_")[0];
+        channel = player.getCorrectChannel();
         String id = "";
         Map<String, Integer> revealedPublicObjectives = game.getRevealedPublicObjectives();
         for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
@@ -125,7 +126,8 @@ public class ScorePublicObjectiveService {
                     + player.getCCRepresentation() + ". Use buttons to gain 1 command token.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
-        if (player.hasAbility("yin_breakthrough") || player.hasUnlockedBreakthrough("yinbt")) {
+        if (!poName.toLowerCase().contains("custodian")
+                && (player.hasAbility("yin_breakthrough") || player.hasUnlockedBreakthrough("yinbt"))) {
             BreakthroughHelper.resolveYinBreakthroughAbility(game, player);
         }
         String idC = "";

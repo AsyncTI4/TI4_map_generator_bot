@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
+import ti4.helpers.StringHelper;
 import ti4.map.Game;
 
 @UtilityClass
@@ -12,7 +14,7 @@ public class DraftLoadService {
 
     public DraftManager loadDraftManager(Game game, String draftDataJoined) {
 
-        List<String> draftData = DraftSaveService.splitLines(draftDataJoined);
+        List<String> draftData = StringHelper.safeSplit(draftDataJoined, DraftSaveService.ENCODED_DATA_SEPARATOR);
 
         DraftOrchestrator orchestrator = null;
         List<Draftable> draftables = new ArrayList<>();
@@ -26,7 +28,7 @@ public class DraftLoadService {
         for (String data : draftData) {
             if (data.startsWith(playersKey)) {
                 String playerIdsStr = data.substring(playersKey.length());
-                String[] playerIds = playerIdsStr.split("\\" + DraftSaveService.DATA_SEPARATOR);
+                String[] playerIds = playerIdsStr.split(Pattern.quote(DraftSaveService.DATA_SEPARATOR));
                 for (String playerIdEntry : playerIds) {
                     String[] tokens = playerIdEntry.split(",", 2);
                     if (tokens.length == 2) {
@@ -64,8 +66,8 @@ public class DraftLoadService {
                 DraftSaveService.PLAYER_ORCHESTRATOR_STATE_DATA + DraftSaveService.KEY_SEPARATOR;
         for (String data : draftData) {
             if (data.startsWith(playerChoiceKey)) {
-                String[] tokens =
-                        data.substring(playerChoiceKey.length()).split("\\" + DraftSaveService.DATA_SEPARATOR, 3);
+                String[] tokens = data.substring(playerChoiceKey.length())
+                        .split(Pattern.quote(DraftSaveService.DATA_SEPARATOR), 3);
                 String playerUserId = tokens[0];
                 if (shortIdTouserId.containsKey(playerUserId)) {
                     playerUserId = shortIdTouserId.get(playerUserId);
@@ -81,7 +83,7 @@ public class DraftLoadService {
             } else if (data.startsWith(playerOrchestratorStateKey)) {
                 if (orchestrator != null) {
                     String[] tokens = data.substring(playerOrchestratorStateKey.length())
-                            .split("\\" + DraftSaveService.DATA_SEPARATOR, 2);
+                            .split(Pattern.quote(DraftSaveService.DATA_SEPARATOR), 2);
 
                     String playerUserId = tokens[0];
                     OrchestratorState playerOrchestratorState = orchestrator.loadPlayerState(tokens[1]);
@@ -103,7 +105,7 @@ public class DraftLoadService {
     }
 
     private DraftOrchestrator loadOrchestrator(String data) {
-        String[] orchestratorTokens = data.split("\\" + DraftSaveService.DATA_SEPARATOR, 2);
+        String[] orchestratorTokens = data.split(Pattern.quote(DraftSaveService.DATA_SEPARATOR), 2);
         if (orchestratorTokens.length != 2) {
             throw new IllegalArgumentException("Invalid orchestrator data: " + data);
         }
@@ -120,7 +122,7 @@ public class DraftLoadService {
     }
 
     private Draftable loadDraftable(String data) {
-        String[] draftableTokens = data.split("\\" + DraftSaveService.DATA_SEPARATOR, 2);
+        String[] draftableTokens = data.split(Pattern.quote(DraftSaveService.DATA_SEPARATOR), 2);
         if (draftableTokens.length != 2) {
             throw new IllegalArgumentException("Invalid draftable data: " + data);
         }

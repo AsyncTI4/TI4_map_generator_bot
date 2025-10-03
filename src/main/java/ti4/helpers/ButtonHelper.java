@@ -96,6 +96,7 @@ import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.decks.ShowActionCardsService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -124,6 +125,15 @@ import ti4.settings.users.UserSettingsManager;
 import ti4.website.AsyncTi4WebsiteHelper;
 
 public class ButtonHelper {
+
+    public static List<Tile> getTilesOfPlayersSpecificUnits(Game game, Player p1, Units.UnitType... type) {
+        var unitTypes = new ArrayList<Units.UnitType>();
+        Collections.addAll(unitTypes, type);
+
+        return game.getTileMap().values().stream()
+                .filter(t -> t.containsPlayersUnitsWithKeyCondition(p1, unit -> unitTypes.contains(unit.getUnitType())))
+                .toList();
+    }
 
     public static String getButtonRepresentation(Button button) {
         String id = button.getCustomId();
@@ -2727,7 +2737,7 @@ public class ButtonHelper {
     public static void resolveMahactMechAbilityUse(
             Player mahact, Player target, Game game, Tile tile, ButtonInteractionEvent event) {
         mahact.removeMahactCC(target.getColor());
-        if (!game.isNaaluAgent()) {
+        if (!game.isNaaluAgent() && !game.isWarfareAction()) {
             if (!game.getStoredValue("absolLux").isEmpty()) {
                 target.setTacticalCC(target.getTacticalCC() + 1);
             }
@@ -2772,7 +2782,7 @@ public class ButtonHelper {
         mahact.exhaustTech("nf");
         ButtonHelperCommanders.resolveMuaatCommanderCheck(
                 mahact, game, event, FactionEmojis.Xxcha + " " + TechEmojis.CyberneticTech + "Nullification Field");
-        if (!game.isNaaluAgent()) {
+        if (!game.isNaaluAgent() && !game.isWarfareAction()) {
             if (!game.getStoredValue("absolLux").isEmpty()) {
                 target.setTacticalCC(target.getTacticalCC() + 1);
             }
@@ -2824,7 +2834,7 @@ public class ButtonHelper {
             return;
         }
 
-        if (!game.isNaaluAgent()) {
+        if (!game.isNaaluAgent() && !game.isWarfareAction()) {
             if (!CommandCounterHelper.hasCC(target, tile)) {
                 if (!game.getStoredValue("absolLux").isEmpty()) {
                     target.setTacticalCC(target.getTacticalCC() + 1);
@@ -2854,6 +2864,130 @@ public class ButtonHelper {
                         + " Use the buttons to resolve \"end of turn\" abilities and then end turn.",
                 conclusionButtons);
         deleteTheOneButton(event);
+    }
+
+    public static void appendFactionIcon(Game game, StringBuilder sb, String key, Boolean privateGame) {
+        // parse IDs like "control_blk.png" and "command_red.png"
+        String colorTokenRegex = "[a-z]+_" + RegexHelper.colorRegex(game) + "\\.png";
+        Matcher tokenMatch = Pattern.compile(colorTokenRegex).matcher(key);
+        if (tokenMatch.matches()) {
+            String colorID = tokenMatch.group("color");
+            String color = Mapper.getColorName(colorID);
+            Player player = game.getPlayerFromColorOrFaction(color);
+            if ((privateGame != null && privateGame) || player == null) {
+                sb.append(" (").append(color).append(") ");
+            } else {
+                sb.append(player.getFactionEmoji())
+                        .append(" ")
+                        .append(" (")
+                        .append(color)
+                        .append(") ");
+            }
+        }
+    }
+
+    public static String getTileSummaryMessage(
+            Game game, boolean justUnits, Tile tile, Player ogPlayer, GenericInteractionCreateEvent event) {
+        String tileName = tile.getTilePath();
+        tileName = tileName.substring(tileName.indexOf('_') + 1);
+        tileName = tileName.substring(0, tileName.indexOf(".png"));
+        tileName = " - " + tileName + "[" + tile.getTileID() + "]";
+        if (justUnits) {
+            tileName = tile.getRepresentationForButtons();
+        } else {
+            tileName = tile.getPosition() + tileName;
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("__**Tile: ").append(tileName).append("**__\n");
+        Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+        Boolean privateGame = FoWHelper.isPrivateGame(game, event);
+        for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
+            String name = entry.getKey();
+            String representation = planetRepresentations.get(name);
+            if (representation == null) {
+                representation = name;
+            }
+            UnitHolder unitHolder = entry.getValue();
+
+            if (unitHolder instanceof Planet planet) {
+                sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(representation, game));
+                if (!justUnits) {
+                    sb.append(" Resources: ")
+                            .append(planet.getResources())
+                            .append("/")
+                            .append(planet.getInfluence());
+                }
+            } else {
+                sb.append(StringUtils.capitalize(representation));
+            }
+            sb.append("\n");
+            if (!justUnits) {
+                boolean hasCC = false;
+                for (String cc : unitHolder.getCcList()) {
+                    if (!hasCC) {
+                        sb.append("Command Tokens: ");
+                        hasCC = true;
+                    }
+                    appendFactionIcon(game, sb, cc, privateGame);
+                }
+                if (hasCC) {
+                    sb.append("\n");
+                }
+                boolean hasToken = false;
+                Map<String, String> tokensToName = Mapper.getTokensToName();
+                for (String token : unitHolder.getTokenList()) {
+                    if (!hasToken) {
+                        sb.append("Tokens: ");
+                        hasToken = true;
+                    }
+                    for (Map.Entry<String, String> entry_ : tokensToName.entrySet()) {
+                        String key = entry_.getKey();
+                        String value = entry_.getValue();
+                        if (token.contains(key)) {
+                            sb.append(value).append(" ");
+                        }
+                    }
+                }
+                if (hasToken) {
+                    sb.append("\n");
+                }
+                boolean hasControl = false;
+                for (String control : unitHolder.getControlList()) {
+                    if (!hasControl) {
+                        sb.append("Control Counters: ");
+                        hasControl = true;
+                    }
+                    appendFactionIcon(game, sb, control, privateGame);
+                }
+                if (hasControl) {
+                    sb.append("\n");
+                }
+            }
+
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
+            for (String playerColor : unitHolder.getUnitColorsOnHolder()) {
+                for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                    UnitKey unitKey = unitEntry.getKey();
+                    String color = AliasHandler.resolveColor(unitKey.getColorID());
+                    if (color == null || !unitKey.getColorID().equalsIgnoreCase(playerColor)) continue;
+                    Player player = game.getPlayerFromColorOrFaction(color);
+                    if (player == null) continue;
+                    UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                    sb.append(player.getFactionEmojiOrColor()).append(ColorEmojis.getColorEmojiWithName(color));
+                    sb.append(" `").append(unitEntry.getValue()).append("x` ");
+                    if (unitModel != null) {
+                        sb.append(unitModel.getUnitEmoji()).append(" ");
+                        sb.append(privateGame ? unitModel.getBaseType() : unitModel.getName())
+                                .append("\n");
+                    } else {
+                        sb.append(unitKey).append("\n");
+                    }
+                }
+            }
+
+            sb.append("----------\n");
+        }
+        return sb.toString();
     }
 
     public static int checkNetGain(Player player, String ccs) {
@@ -3714,6 +3848,7 @@ public class ButtonHelper {
                 "prism",
                 "echo",
                 "domna",
+                "mrte",
                 "thundersedge",
                 "uikos", // DS
                 "illusion",
@@ -4227,11 +4362,12 @@ public class ButtonHelper {
         if (!FOWPlusService.canActivatePosition(tile.getPosition(), player, game)) return false;
         if (tile.isAsteroidField()) {
             for (Player p2 : game.getRealPlayers()) {
-                if (p2.hasTech("cm") && p2 != player && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+                if (p2.hasTech("cm") && p2 != player && FoWHelper.playerHasActualShipsInSystem(p2, tile)) {
                     return false;
                 }
             }
         }
+        if (game.isWarfareAction()) return true;
 
         return !CommandCounterHelper.hasCC(null, player.getColor(), tile) || game.isL1Hero();
     }
@@ -5245,6 +5381,30 @@ public class ButtonHelper {
         }
 
         return actionRows;
+    }
+
+    @ButtonHandler("addLegendaryMecatol")
+    public static void addLegendaryMecatol(Game game, ButtonInteractionEvent event) {
+        game.setStoredValue("useNewRex", "Yes");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "This game will use the new Legendary Mecatol Rex");
+        event.getMessage().delete().queue();
+    }
+
+    @ButtonHandler("addNewSCs")
+    public static void addNewSCs(Game game, ButtonInteractionEvent event) {
+        game.setStoredValue("useNewSCs", "Yes");
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(), "This game will use the new Construction and Warfare SCs");
+        event.getMessage().delete().queue();
+    }
+
+    @ButtonHandler("addEntropicScar")
+    public static void addEntropicScar(Game game, ButtonInteractionEvent event) {
+        game.setStoredValue("useEntropicScar", "Yes");
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                "This game's milty may spit out a slice with an entropic scar. It will be treated as equivalent to a 2 resource planet for the purposes of slice balancing.");
+        event.getMessage().delete().queue();
     }
 
     @ButtonHandler("unflipMallice")
@@ -6972,8 +7132,8 @@ public class ButtonHelper {
                     buttons2.add(Buttons.gray(
                             "resolvePreassignment_Public Disgrace Only_" + p2.getFaction(), p2.getFaction()));
                 } else {
-                    buttons2.add(Buttons.gray(
-                            "resolvePreassignment_Public Disgrace Only_" + p2.getFaction(), p2.getColor()));
+                    buttons2.add(
+                            Buttons.gray("resolvePreassignment_Public Disgrace Only_" + p2.getColor(), p2.getColor()));
                 }
             }
             buttons2.add(Buttons.red("deleteButtons", "Decline"));

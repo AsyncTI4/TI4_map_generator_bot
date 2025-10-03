@@ -115,5 +115,110 @@
         ],
         "text": "[Note: Exact text unknown. Best guess is after this] Each system that contains a wormhole and one of your ships gains PRODUCTION 1 as if it were 1 of your units.",
         "source": "thunders_edge"
+    },
+    {
+        "alias": "naalubt",
+        "name": "Mindsieve",
+        "displayName": "Mindsieve",
+        "faction": "naalu",
+        "synergy": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "text": "When you would resolve the secondary ability of another player's strategy card, you may give them a promissory note to resolve it without spending a command token.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "bastionbt",
+        "name": "The Icon",
+        "faction": "bastion",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "When you produce ships, you may exhaust this card to place those ships in a system that contains 1 of your command tokens, at least 1 of your ground forces, and no other player's ships.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "crimsonbt",
+        "name": "Resonance Generator",
+        "displayName": "Resonance\nGenerator",
+        "faction": "crimson",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "During your tactical actions, apply +1 to the move value of each of your ships that starts its movement in your home system or in a system that contains an active breach.\nACTION: Exhaust this card to flip any breach or to place an active breach in a non-home system that contains your units.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "naazbt",
+        "name": "Absolute Synergy",
+        "displayName": "Absolute\nSynergy",
+        "faction": "naaz",
+        "synergy": [
+            "PROPULSION",
+            "BIOTIC"
+        ],
+        "text": "When you have 4 mechs in the same system, you may return 3 of those mechs to your reinforcements to flip this card and place it on top of your mech card.\nEidolon Maximum: [Combat 4 (x4), Move 3, Sustain Damage] This unit is both a ship and ground force. It cannot be assigned hits from unit abilities. Repair it at the start of every combat round. Game effects cannot place or produce your mechs. When this unit is destroyed or removed, flip this card and return it to your play area.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "firmamentbt",
+        "name": "The Sowing",
+        "faction": "firmament",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "When you gain this card and at the start of the status phase, you may place up to 3 of your trade goods on this card.\nFlip this card if you become The Obsidian faction.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "deepwroughtbt",
+        "name": "Visionaria Select",
+        "displayName": "Visionaria\nSelect",
+        "faction": "deepwrought",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "ACTION: Exhaust this card to allow each other player to spend 3 trade goods and give you 1 promissory note. Each player that does may research a non-faction, non-unit upgrade technology. You also gain each technology researched in this way.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "obsidianbt",
+        "name": "The Reaping",
+        "faction": "obsidian",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "Place 1 trade good from the supply onto this card each time you win a combat against a puppeted player.\nAt the start of the status phase, gain all trade goods on this card, then gain an equal number of trade goods from the supply.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "ralnelbt",
+        "name": "Data Skimmer",
+        "displayName": "Data\nSkimmer",
+        "faction": "ralnel",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "During the action phase, if you have not passed, when other players would discard action cards, they are placed on this card instead.\nWhen you pass, take 1 action card from this card and discard the rest.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "saarbt",
+        "name": "Deorbit Barrage",
+        "displayName": "Deorbit\nBarrage",
+        "faction": "saar",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "ACTION: Exhaust this card and spend any amount of resources to choose a planet up to 2 systems away from an asteroid field that contains your ships; roll a number of dice equal to the amount spent and assign 1 hit to a ground force on that planet for each roll of 4 or greater.",
+        "source": "thunders_edge"
     }
 ]

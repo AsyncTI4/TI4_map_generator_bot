@@ -653,6 +653,8 @@ public class AgendaHelper {
                                         String message = player.getRepresentation() + " played "
                                                 + Helper.getLeaderFullRepresentation(playerLeader);
                                         player.removeLeader(playerLeader);
+
+                                        ButtonHelperHeroes.checkForMykoHero(game, playerLeader.getId(), player);
                                         MessageHelper.sendMessageToChannel(
                                                 player.getCorrectChannel(),
                                                 message + " - Odlynn Myrr, the Keleres (Xxcha) hero, has been purged.");
@@ -2842,7 +2844,7 @@ public class AgendaHelper {
         }
         if (game.getLaws().containsKey("absol_government")) {
             voteAmount = 1;
-            if ("mr".equalsIgnoreCase(planet)) {
+            if ("mr".equalsIgnoreCase(planet) || "mrte".equalsIgnoreCase(planet)) {
                 voteAmount++;
             }
         }
@@ -3446,7 +3448,7 @@ public class AgendaHelper {
 
         if (game.getLaws().containsKey("absol_government")) {
             voteCount = planets.size();
-            if (planets.contains("mr")) {
+            if (planets.contains("mr") || planets.contains("mrte")) {
                 voteCount++;
             }
         }

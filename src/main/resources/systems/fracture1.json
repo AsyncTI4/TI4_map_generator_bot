@@ -1,0 +1,18 @@
+{
+    "id": "fracture1",
+    "name": "Cocytus",
+    "aliases": [
+        "fracture1",
+        "cocytus",
+        "cocy",
+        "cody",
+        "codytct"
+    ],
+    "imagePath": "fracture1.png",
+    "planets": [
+        "cocytus"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "source": "thunders_edge"
+}

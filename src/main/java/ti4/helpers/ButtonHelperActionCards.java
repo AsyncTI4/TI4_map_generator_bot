@@ -1391,6 +1391,10 @@ public class ButtonHelperActionCards {
         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p2);
         String message = p2.getRepresentationUnfogged() + ", you are being forced to give a promissory note to "
                 + player.getFactionEmojiOrColor() + ". Please choose which promissory note you wish to send.";
+        if (game.isFowMode()) {
+            message = p2.getRepresentationUnfogged()
+                    + ", you are being forced to give a promissory note to somebody. Please choose which promissory note you wish to send.";
+        }
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
@@ -1942,17 +1946,6 @@ public class ButtonHelperActionCards {
                     + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("resolvePreassignment_Investments", "Pre-Play Manipulate Investments"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
-        }
-        if (player.getActionCards().containsKey("last_minute_deliberation")) {
-            String msg = player.getRepresentation()
-                    + ", you have the option to pre-play _Last Minute Deliberation_."
-                    + " End-of-agenda-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
-                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(
-                    Buttons.green("resolvePreassignment_LastMinuteDeliberation", "Pre-Play Last Minute Deliberation"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }

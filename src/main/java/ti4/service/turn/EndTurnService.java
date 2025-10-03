@@ -73,6 +73,7 @@ public class EndTurnService {
                 }
             }
         }
+        game.removeStoredValue("fortuneSeekers");
         game.setStoredValue("lawsDisabled", "no");
         game.removeStoredValue("endTurnWhenSCFinished");
         game.removeStoredValue("fleetLogWhenSCFinished");

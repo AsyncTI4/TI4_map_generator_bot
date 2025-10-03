@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,31 +35,31 @@ import ti4.service.milty.TierList;
 
 @UtilityClass
 public class NucleusSliceGeneratorService {
-
-    private static final int NUM_ATTEMPTS = 5_000;
+    private static final int ATTEMPTS = 50_000;
 
     // Major known issues:
-    // - Because the Nucleus is made up of several slices which share some times
-    // (e.g. equidistants),
-    // it's usually the case that the last placement was actually already done as
-    // the first placmeent.
-    // This is not accounted for very well, and can result in bad tile counts even
-    // in otherwise good maps.
-    // - The above issue primarily happens in 212, because that is the equidistant
-    // between first and last seats.
-    // It would be better if the issue was at least distributed randomly.
-    // - For 7+ player maps, we're allowing the nucleus to have +/- 1 red-backed
-    // tile than it should.
-    // Due to insufficient tile options, this seems necessary.
+    // - Because the Nucleus is made up of several slices which share some times (e.g. equidistants),
+    //   it's usually the case that the last placement was actually already done as the first placmeent.
+    //   This is not accounted for very well, and can result in bad tile counts even in otherwise good maps.
+    // - The above issue primarily happens in 212, because that is the equidistant between first and last seats.
+    //   It would be better if the issue was at least distributed randomly.
+    // - For 7+ player maps, we're allowing the nucleus to have +/- 1 red-backed tile than it should.
+    //   Due to insufficient tile options, this seems necessary.
 
     /**
      * Generates the 'nucleus' by placing map tiles according to MemePhilosopher's
      * work.
      * Simultaneously produce the draft slices that players will draft.
      * The nucleus is placed directly on the game map, so isn't returned here.
+     * TODO: Get flexible on wormhole types, legendaries, etc.
+     *
      * @return The slices that were generated for drafting.
      */
     public List<MiltyDraftSlice> generateNucleusAndSlices(GenericInteractionCreateEvent event, DraftSpec draftSpecs) {
+
+        // TODO: Implement nucleus settings so we don't just have to flat out ignore the
+        // specs...
+
         Game game = draftSpecs.getGame();
         MapTemplateModel mapTemplate = draftSpecs.getTemplate();
         if (!mapTemplate.isNucleusTemplate()) {
@@ -72,9 +73,9 @@ public class NucleusSliceGeneratorService {
         // Drafts that use many available slices can fail very often if we don't allow
         // some specific rules
         // to be flexible.
-        boolean strictMode = useStrictMode(mapTemplate, draftSpecs.getNumSlices());
+        boolean strictMode = useStrictMode(mapTemplate);
         NucleusSpecs nucleusSpecs = new NucleusSpecs(draftSpecs);
-        for (int i = 0; i < NUM_ATTEMPTS; i++) {
+        for (int i = 0; i < ATTEMPTS; i++) {
             NucleusOutcome outcome = tryGenerateNucleusAndSlices(game, mapTemplate, nucleusSpecs, strictMode);
             if (outcome.slices != null) {
                 return outcome.slices;
@@ -113,9 +114,9 @@ public class NucleusSliceGeneratorService {
         // Drafts that use many available slices can fail very often if we don't allow
         // some specific rules
         // to be flexible.
-        boolean strictMode = useStrictMode(mapTemplate, nucleusSpecs.numSlices());
+        boolean strictMode = useStrictMode(mapTemplate);
         Map<String, Integer> failureReasons = new HashMap<>();
-        for (int i = 0; i < NUM_ATTEMPTS; i++) {
+        for (int i = 0; i < ATTEMPTS; i++) {
             NucleusOutcome outcome = tryGenerateNucleusAndSlices(game, mapTemplate, nucleusSpecs, strictMode);
             if (outcome.slices != null) {
                 return new NucleusOutcome(outcome.slices, null);
@@ -131,7 +132,7 @@ public class NucleusSliceGeneratorService {
         return new NucleusOutcome(null, mostCommonFailure);
     }
 
-    private boolean useStrictMode(MapTemplateModel mapTemplate, int numSlices) {
+    private boolean useStrictMode(MapTemplateModel mapTemplate) {
         return mapTemplate.getPlayerCount() + mapTemplate.getNucleusSliceCount() < 14;
     }
 
@@ -159,7 +160,7 @@ public class NucleusSliceGeneratorService {
 
         NucleusSpecs nucleusSpecs = new NucleusSpecs(draftSpecs);
 
-        boolean strictMode = useStrictMode(mapTemplate, draftSpecs.getNumSlices());
+        boolean strictMode = useStrictMode(mapTemplate);
         for (int i = 0; i < numIterations; ++i) {
             long startTime = System.nanoTime();
             NucleusOutcome outcome = tryGenerateNucleusAndSlices(game, mapTemplate, nucleusSpecs, strictMode);
@@ -190,7 +191,7 @@ public class NucleusSliceGeneratorService {
                 // Reset map tiles for next attempt, but ensure draft tiles are out for the
                 // distance tool
                 game.clearTileMap();
-                PartialMapService.tryUpdateMap(event, game.getDraftManager(), false);
+                PartialMapService.tryUpdateMap(game.getDraftManager(), event, false);
             } else {
                 failRuntimes.add((endTime - startTime) / 1_000_000.0);
                 failureReasonCount.put(
@@ -1309,6 +1310,13 @@ public class NucleusSliceGeneratorService {
         // For our purposes, combine red and anomaly tiers
         result.get(TierList.red).addAll(result.get(TierList.anomaly));
         result.remove(TierList.anomaly);
+
+        // Other tiers go in shuffled, then come out shuffled. But since
+        // we append red and anomaly tiers together, we need to shuffle them now.
+        List<MiltyDraftTile> redTiles = new ArrayList<>(result.get(TierList.red));
+        Collections.shuffle(redTiles);
+        result.put(TierList.red, redTiles);
+
         return result;
     }
 
@@ -1375,8 +1383,8 @@ public class NucleusSliceGeneratorService {
 
         for (int iteration = 0; iteration < iterations; iteration++) {
             List<PlacedTile> candidate = new ArrayList<>();
-            List<MapTemplateTile> locations = new ArrayList<>(availableLocations);
-            List<MiltyDraftTile> systems = new ArrayList<>(availableSystems);
+            List<MapTemplateTile> locations = new LinkedList<>(availableLocations);
+            List<MiltyDraftTile> systems = new LinkedList<>(availableSystems);
             Collections.shuffle(locations);
             Collections.shuffle(systems);
 

@@ -521,8 +521,8 @@
         "id": "facsimile",
         "name": "Facsimile",
         "faction": "mortheus",
-        "window": "At the start of a space combat while you are not the active player",
-        "windowEffect": "Choose 1 of your opponent's ships in the active system, you may produce 1 unit of that type in that system, spending influence instead of resources.",
+        "window": "At the start of a space combat while you are the defender",
+        "windowEffect": "You may spend influence equal to the cost value of 1 of your opponent's ships in the active system to place 1 unit of that type from your reinforcements in that system.",
         "source": "ds"
     },
     {
