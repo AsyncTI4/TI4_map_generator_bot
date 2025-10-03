@@ -718,6 +718,10 @@ public class Player extends PlayerProperties {
 
     private Integer getUnitModelPriority(UnitModel unit, UnitHolder unitHolder) {
         int score = 0;
+        if (unit.getAlias().equals("naaz_voltron")) // Always, ALWAYS use voltron, if available
+        score += 99;
+        if (unit.getAlias().equals("mentak_cruiser3")) // Always, ALWAYS use corsair, if available
+        score += 99;
         if (StringUtils.isNotBlank(unit.getFaction().orElse(""))
                 && StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse(""))) score += 4;
         if (StringUtils.isNotBlank(unit.getFaction().orElse(""))) score += 3;
@@ -1446,6 +1450,16 @@ public class Player extends PlayerProperties {
         leaders.clear();
         if (game != null && game.isBaseGameMode()) return;
         for (String leaderID : getFactionStartingLeaders()) {
+            Leader leader = new Leader(leaderID);
+            leaders.add(leader);
+        }
+    }
+
+    public void initLeadersForFaction(String faction) {
+        leaders.clear();
+        FactionModel factionSetupInfo = Mapper.getFaction(faction);
+        if (game != null && game.isBaseGameMode()) return;
+        for (String leaderID : factionSetupInfo.getLeaders()) {
             Leader leader = new Leader(leaderID);
             leaders.add(leader);
         }

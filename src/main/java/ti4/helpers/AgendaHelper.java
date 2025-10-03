@@ -3417,6 +3417,11 @@ public class AgendaHelper {
             voteCount = baseResourceCount + baseInfluenceCount;
         }
 
+        boolean executive = player.getFaction().equals(game.getStoredValue("executiveOrder"));
+        if (player.hasUnlockedBreakthrough("xxchabt") || executive) {
+            voteCount = Math.max(baseResourceCount, baseInfluenceCount);
+        }
+
         // Xxcha Alliance - +1 vote for each planet
         if (game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
             int readyPlanetCount = planets.size();

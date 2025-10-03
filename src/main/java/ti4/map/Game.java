@@ -758,6 +758,11 @@ public class Game extends GameProperties {
         gameModes.put("Stellar Atomics", isStellarAtomicsMode());
         gameModes.put("Civilized Society", isCivilizedSocietyMode());
         gameModes.put("Age Of Fighters", isAgeOfFightersMode());
+
+        gameModes.put("Advent of the Warsun", isAdventOfTheWarsunMode());
+        gameModes.put("Cultural Exchange Program", isCulturalExchangeProgramMode());
+        gameModes.put("Zealous Orthoxy", isZealousOrthodoxyMode());
+        gameModes.put("Mercenaries For Hire", isMercenariesForHireMode());
         gameModes.put("No Support Swaps", isNoSwapMode());
         gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
         gameModes.put("Liberation", isLiberationC4Mode());
@@ -3767,6 +3772,11 @@ public class Game extends GameProperties {
         return getRealAndEliminatedAndDummyPlayers().stream()
                 .map(Player::getFaction)
                 .collect(Collectors.toSet());
+    }
+
+    @JsonIgnore
+    public Set<String> getRealFactions() {
+        return getRealPlayers().stream().map(Player::getFaction).collect(Collectors.toSet());
     }
 
     public void setPlayers(Map<String, Player> players) {

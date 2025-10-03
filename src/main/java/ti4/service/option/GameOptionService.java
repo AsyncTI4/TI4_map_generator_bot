@@ -44,19 +44,25 @@ public class GameOptionService {
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
 
-        String msg2 =
+        msg =
                 "Thunder's Edge contains a new anomaly, called an entropic scar, which gives faction tech in status phase at the cost of a strategy command token. If you want the bot's milty to potentially include this scar, press this button.";
-        List<Button> buttons2 = new ArrayList<>();
-        buttons2.add(Buttons.green("addEntropicScar", "Use Entropic Scar"));
-        buttons2.add(Buttons.red("deleteButtons", "Decline"));
-        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg2, buttons2);
+        buttons = new ArrayList<>();
+        buttons.add(Buttons.green("addEntropicScar", "Use Entropic Scar"));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
 
-        String msg3 =
+        msg =
                 "Thunder's Edge contains two new strategy cards, Construction and Warfare. You can use them in this game by pressing the button below.";
-        List<Button> buttons3 = new ArrayList<>();
-        buttons3.add(Buttons.green("addNewSCs", "Use New Strategy Cards"));
-        buttons3.add(Buttons.red("deleteButtons", "Decline"));
-        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg3, buttons3);
+        buttons = new ArrayList<>();
+        buttons.add(Buttons.green("addNewSCs", "Use New Strategy Cards"));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
+
+        msg = "Thunder's Edge contains 7 new relics. You can use them in this game by pressing the button below.";
+        buttons = new ArrayList<>();
+        buttons.add(Buttons.green("addNewRelics", "Use New Relics"));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
     }
 
     public static final Button showOwnedPNs_ON = Buttons.green("showOwnedPNsInPlayerArea_turnOFF", "ON");
@@ -94,6 +100,32 @@ public class GameOptionService {
             daneLinkButtons.add(Buttons.red("enableDaneMode_AgeOfFighters_disable", "Disable Age Of Fighters"));
         } else {
             daneLinkButtons.add(Buttons.green("enableDaneMode_AgeOfFighters_enable", "Enable Age Of Fighters"));
+        }
+        if (game.isMercenariesForHireMode()) {
+            daneLinkButtons.add(
+                    Buttons.red("enableDaneMode_MercenariesForHire_disable", "Disable Mercenaries For Hire"));
+        } else {
+            daneLinkButtons.add(
+                    Buttons.green("enableDaneMode_MercenariesForHire_enable", "Enable Mercenaries For Hire"));
+        }
+        if (game.isZealousOrthodoxyMode()) {
+            daneLinkButtons.add(Buttons.red("enableDaneMode_ZealousOrthodoxy_disable", "Disable Zealous Orthodoxy"));
+        } else {
+            daneLinkButtons.add(Buttons.green("enableDaneMode_ZealousOrthodoxy_enable", "Enable Zealous Orthodoxy"));
+        }
+        if (game.isCulturalExchangeProgramMode()) {
+            daneLinkButtons.add(
+                    Buttons.red("enableDaneMode_CulturalExchangeProgram_disable", "Disable Cultural Exchange Program"));
+        } else {
+            daneLinkButtons.add(
+                    Buttons.green("enableDaneMode_CulturalExchangeProgram_enable", "Enable Cultural Exchange Program"));
+        }
+        if (game.isAdventOfTheWarsunMode()) {
+            daneLinkButtons.add(
+                    Buttons.red("enableDaneMode_AdventOfTheWarsun_disable", "Disable Advent of the Warsun"));
+        } else {
+            daneLinkButtons.add(
+                    Buttons.green("enableDaneMode_AdventOfTheWarsun_enable", "Enable Advent of the Warsun"));
         }
         if (game.isCivilizedSocietyMode()) {
             daneLinkButtons.add(Buttons.red("enableDaneMode_CivilizedSociety_disable", "Disable Civilized Society"));

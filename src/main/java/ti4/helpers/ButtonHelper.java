@@ -5399,6 +5399,13 @@ public class ButtonHelper {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("addNewRelics")
+    public static void addNewRelics(Game game, ButtonInteractionEvent event) {
+        game.setStoredValue("useNewRelics", "Yes");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "This game will use the new TE Relics");
+        event.getMessage().delete().queue();
+    }
+
     @ButtonHandler("addEntropicScar")
     public static void addEntropicScar(Game game, ButtonInteractionEvent event) {
         game.setStoredValue("useEntropicScar", "Yes");
@@ -6523,6 +6530,15 @@ public class ButtonHelper {
             Tile mr = game.getMecatolTile();
             tilesWithProduction.add(mr);
         }
+        if (player.hasUnlockedBreakthrough("ghostbt")) {
+            for (Tile t : game.getTileMap().values()) {
+                if (t.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip)
+                        && !t.getWormholes().isEmpty()) {
+                    tilesWithProduction.add(t);
+                }
+            }
+        }
+
         return tilesWithProduction;
     }
 
