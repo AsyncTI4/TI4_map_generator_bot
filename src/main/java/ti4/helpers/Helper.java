@@ -688,8 +688,7 @@ public class Helper {
                 .getStrategyCardModelByInitiative(sc)
                 .map(StrategyCardModel::getImageFileName)
                 .orElse("sadFace.png");
-        return "/strat_cards/"
-                + scImagePath + ".png";
+        return "/strat_cards/" + scImagePath + ".png";
     }
 
     public static Emoji getPlayerReactionEmoji(Game game, Player player, Message message) {
