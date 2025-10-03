@@ -14,7 +14,8 @@ public class OmegaPhaseCommand implements ParentCommand {
                     new ClearPriorityTrack(),
                     new PrintPriorityTrack(),
                     new ElectVoiceOfTheCouncil(),
-                    new ResetVoiceOfTheCouncil())
+                    new ResetVoiceOfTheCouncil(),
+                    new ResetObjectives())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

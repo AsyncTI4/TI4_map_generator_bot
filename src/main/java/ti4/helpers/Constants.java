@@ -782,6 +782,7 @@ public class Constants {
     public static final String RESET_VOICE_OF_THE_COUNCIL = "reset_voice_of_the_council";
     public static final String ELECT_VOICE_OF_THE_COUNCIL = "elect_voice_of_the_council";
     public static final String IMPERIUM_REX_ID = "imperium_rex_omegaphase";
+    public static final String RESET_OMEGA_PHASE_OBJECTIVES = "reset_objectives";
     // Omega Phase state keys
     public static final String PRIORITY_TRACK = "priority_track";
     public static final String OMEGA_PHASE_MODE = "omega_phase_mode";
