@@ -12,8 +12,8 @@ class SettingMenuButtonHandlers {
     @ButtonHandler("jmfN_")
     private void handleSettingMenuButton(ButtonInteractionEvent event, Game game) {
         // Detect new settings menu navId() to route to the correct handler.
-        String draftSystemNavPart = "_draft.";
-        if (event.getCustomId().contains(draftSystemNavPart)) {
+        String draftSystemNavPart = ".*_draft[._].*";
+        if (event.getCustomId().matches(draftSystemNavPart)) {
             game.initializeDraftSystemSettings().parseButtonInput(event);
             return;
         }
