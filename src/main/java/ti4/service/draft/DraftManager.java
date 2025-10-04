@@ -189,7 +189,27 @@ public class DraftManager extends DraftPlayerManager {
         // faction,
         // something that builds a map, etc.
 
-        return true;
+        return whatsStoppingDraftStart() == null;
+    }
+
+    public String whatsStoppingDraftStart() {
+        if (draftables.isEmpty()) {
+            return "No draftables have been added to the draft. Try `/draft manage add_draftable`.";
+        }
+        for (Draftable d : draftables) {
+            String reason = d.whatsStoppingDraftStart(this);
+            if (reason != null) {
+                return reason;
+            }
+        }
+        if (orchestrator == null) {
+            return "No orchestrator has been set for the draft. Try `/draft manage set_orchestrator`.";
+        }
+        String reason = orchestrator.whatsStoppingDraftStart(this);
+        if (reason != null) {
+            return reason;
+        }
+        return null;
     }
 
     public void tryEndDraft(GenericInteractionCreateEvent event) {

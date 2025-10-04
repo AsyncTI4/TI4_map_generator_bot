@@ -89,6 +89,14 @@ public class SelectionMenuProcessor {
 
     @SelectionHandler("jmfA_")
     public static void handleJazzMiltyFrameworkAction(StringSelectInteractionEvent event, Game game) {
+        // Detect new settings menu navId() to route to the correct handler.
+        String draftSystemNavPart = ".*_draft[._].*";
+        if (event.getCustomId().matches(draftSystemNavPart)) {
+            game.initializeDraftSystemSettings().parseSelectionInput(event);
+            deleteMsg(event);
+            return;
+        }
+
         game.initializeMiltySettings().parseSelectionInput(event);
         deleteMsg(event);
     }

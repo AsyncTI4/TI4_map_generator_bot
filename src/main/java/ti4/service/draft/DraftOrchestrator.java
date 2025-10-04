@@ -1,6 +1,7 @@
 package ti4.service.draft;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.service.draft.DraftManager.CommandSource;
 
 public abstract class DraftOrchestrator extends DraftLifecycleHooks {
@@ -13,22 +14,6 @@ public abstract class DraftOrchestrator extends DraftLifecycleHooks {
      * @param draftManager The draft manager holding the draft state.
      */
     public abstract void sendDraftButtons(DraftManager draftManager);
-
-    /**
-     * Validate the current state of the draft for this orchestrator.
-     * @param draftManager The draft manager to validate against.
-     * @return null if valid, or an error message if invalid.
-     */
-    public abstract String validateState(DraftManager draftManager);
-
-    /**
-     * Draft orchestrators should NOT keep per-player state themselves, in
-     * case the players change or get swapped. Instead, PlayerDraftState has
-     * a generic field for orchestrator state. This function should initialize
-     * it for an arbitrary player.
-     * @param draftManager The draft manager to initialize player states for.
-     */
-    public abstract void initializePlayerStates(DraftPlayerManager draftManager);
 
     // Interactions
 
@@ -106,4 +91,27 @@ public abstract class DraftOrchestrator extends DraftLifecycleHooks {
      * @return The loaded player-specific substate.
      */
     public abstract OrchestratorState loadPlayerState(String data);
+
+    /**
+     * Validate the current state of the draft for this orchestrator.
+     * @param draftManager The draft manager to validate against.
+     * @return null if valid, or an error message if invalid.
+     */
+    public abstract String validateState(DraftManager draftManager);
+
+    // Setup
+
+    /**
+     * Draft orchestrators should NOT keep per-player state themselves, in
+     * case the players change or get swapped. Instead, PlayerDraftState has
+     * a generic field for orchestrator state. This function should initialize
+     * it for an arbitrary player.
+     * @param draftManager The draft manager to initialize player states for.
+     */
+    public abstract void initializePlayerStates(DraftPlayerManager draftManager);
+
+    public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
+        // Do nothing by default
+        return null;
+    }
 }

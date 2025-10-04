@@ -11,7 +11,12 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.buttons.Buttons;
+import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
+import ti4.helpers.settingsFramework.menus.FactionDraftableSettings;
+import ti4.helpers.settingsFramework.menus.SettingsMenu;
+import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -361,6 +366,28 @@ public class FactionDraftable extends SinglePickDraftable {
         }
 
         return super.validateState(draftManager);
+    }
+
+    @Override
+    public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
+        if (menu == null || !(menu instanceof DraftSystemSettings)) {
+            return "Error: Could not find parent draft system settings.";
+        }
+        DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
+        Game game = draftSystemSettings.getGame();
+        if (game == null) {
+            return "Error: Could not find game instance.";
+        }
+        FactionDraftableSettings factionSettings = draftSystemSettings.getFactionSettings();
+        SourceSettings sourceSettings = draftSystemSettings.getSourceSettings();
+
+        initialize(
+                factionSettings.getNumFactions().getVal(),
+                sourceSettings.getFactionSources(),
+                factionSettings.getPriFactions().getKeys().stream().toList(),
+                factionSettings.getBanFactions().getKeys().stream().toList());
+
+        return null;
     }
 
     private void sendKeleresButtons(DraftManager draftManager, String playerUserId, boolean draftEnded) {
