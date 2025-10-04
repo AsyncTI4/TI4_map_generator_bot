@@ -16,7 +16,7 @@ import ti4.service.draft.NucleusSliceGeneratorService.NucleusOutcome;
 import ti4.service.draft.NucleusSliceGeneratorService.NucleusSpecs;
 import ti4.service.draft.draftables.SliceDraftable;
 
-// I have no clue if this is a helpful thing. Hopefully?
+// TODO: This affects game state, and should lock buttons for a given game while working.
 
 @UtilityClass
 public class SliceGenerationPipeline {

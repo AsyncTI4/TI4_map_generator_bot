@@ -240,7 +240,7 @@ public class SliceDraftable extends SinglePickDraftable {
 
     private String doMiltyGeneration(
             GenericInteractionCreateEvent event, Game game, DraftSystemSettings draftSystemSettings) {
-        DraftSpec specs = DraftSpec.CreateFromDraftSystemSettings(draftSystemSettings);
+        DraftSpec specs = DraftSpec.SliceSpecsFromDraftSystemSettings(draftSystemSettings);
 
         // Ensure we can't start yet
         slices = null;

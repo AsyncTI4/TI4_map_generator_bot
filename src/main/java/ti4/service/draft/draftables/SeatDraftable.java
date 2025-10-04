@@ -158,7 +158,7 @@ public class SeatDraftable extends SinglePickDraftable {
             return "Error: Could not find game instance.";
         }
 
-        // Try get the map template from the draft settings, then the game, then just use player count.
+        // Seat count comes from map template on the draft settings, falling back to map template on the game, then just use player count.
 
         MapTemplateModel mapTemplate =
                 draftSystemSettings.getSliceSettings().getMapTemplate().getValue();

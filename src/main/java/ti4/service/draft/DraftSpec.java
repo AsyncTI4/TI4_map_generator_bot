@@ -111,13 +111,11 @@ public class DraftSpec {
         return specs;
     }
 
-    // TODO: Add the non-Tile stuff just in case
-    public static DraftSpec CreateFromDraftSystemSettings(DraftSystemSettings settings) {
+    public static DraftSpec SliceSpecsFromDraftSystemSettings(DraftSystemSettings settings) {
         Game game = settings.getGame();
         DraftSpec specs = new DraftSpec(game);
 
         // Load Game Specifications
-        // GameSettings gameSettings = settings.getGameSettings();
         MapTemplateModel template = settings.getSliceSettings().getMapTemplate().getValue();
         if (template == null) {
             template = Mapper.getDefaultMapTemplateForPlayerCount(specs.playerIDs.size());
@@ -127,7 +125,6 @@ public class DraftSpec {
 
         // Load Slice Generation Specifications
         MiltySliceDraftableSettings sliceSettings = settings.getSliceSettings().getMiltySettings();
-        // specs.numFactions = sliceSettings.getNumFactions().getVal();
         specs.numSlices = settings.getSliceSettings().getNumSlices().getVal();
         specs.anomaliesCanTouch = false;
         specs.extraWHs = sliceSettings.getExtraWorms().isVal();
@@ -135,22 +132,7 @@ public class DraftSpec {
         specs.maxLegend = sliceSettings.getNumLegends().getValHigh();
         specs.minTot = sliceSettings.getTotalValue().getValLow();
         specs.maxTot = sliceSettings.getTotalValue().getValHigh();
-
-        // Load Player & Faction Ban Specifications
-        // PlayerFactionSettings pfSettings = settings.getPlayerSettings();
-        // specs.bannedFactions.addAll(pfSettings.getBanFactions().getKeys());
-        // if (game.isThundersEdge()) {
-        //     List<String> newKeys = new ArrayList<>();
-        //     newKeys.addAll(List.of("arborec", "ghost", "letnev", "winnu", "muaat", "yin"));
-        //     specs.priorityFactions.addAll(newKeys);
-        //     specs.numFactions = Math.min(6, specs.numFactions);
-        // } else {
-        //     specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
-        // }
         specs.setPlayerIDs(new ArrayList<>(settings.getPlayerUserIds()));
-        // if (pfSettings.getPresetDraftOrder().isVal()) {
-        //     specs.playerDraftOrder = new ArrayList<>(game.getPlayers().keySet());
-        // }
 
         // Load Sources Specifications
         SourceSettings sources = settings.getSourceSettings();

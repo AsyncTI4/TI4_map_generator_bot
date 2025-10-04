@@ -14,10 +14,10 @@ import ti4.map.Player;
  * Draft stages:
  * 1. Initialization - Draftables generate their choices, etc.
  * 2. Drafting - Players make choices from draftables.
- *   - Moving on from this stage is blocked until all components return true from canEndDraft.
- * 3. Post-draft work - Draftables can do extra work, such as asking players for more input.
- *   - Moving on from this stage is blocked until all components return true from canSetupPlayers.
- * 4. Player setup - Draftables apply their DraftChoices to players.
+ *   - Moving on from this stage is blocked until all components return 'null' from 'whatsStoppingDraftEnd'.
+ * 3. Post-draft work - Draftables can do extra work, such as asking players to select a Keleres flavor.
+ *   - Moving on from this stage is blocked until all components return 'null' from 'whatsStoppingSetup'.
+ * 4. Player setup - Draftables apply their DraftChoices to players that picked them.
  */
 public abstract class DraftLifecycleHooks {
     /**
@@ -33,8 +33,8 @@ public abstract class DraftLifecycleHooks {
 
     /**
      * Check whether this component is ready to end the draft. Draftables should generally
-     * return false until all players have picked one of its choices.
-     * This is called after every choice pick automatically.
+     * return a blocking reason until all players have picked one of its choices.
+     * This is called after every pick automatically.
      * @param draftManager The draft manager for the draft; also contains the Game object.
      * @return Null if ready to end the draft, or a SPECIFIC message describing what is being waited on.
      */
