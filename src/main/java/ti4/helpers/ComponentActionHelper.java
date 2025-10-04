@@ -26,6 +26,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.service.BookOfLatviniaService;
+import ti4.service.SilverFlameService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -70,6 +71,10 @@ public class ComponentActionHelper {
                 && game.getScoredPublicObjectives().get("Stellar Atomics").contains(p1.getUserID())) {
             compButtons.add(Buttons.red(finChecker + prefix + "stellarAtomicsAction_", "Use Stellar Atomics"));
         }
+        if (game.isMercenariesForHireMode()) {
+            compButtons.add(
+                    Buttons.red(finChecker + prefix + "mercenariesForHireAction_", "Spend 3tg on Mercenries For Hire"));
+        }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 1) {
             compButtons.add(Buttons.red(finChecker + prefix + "doStarCharts_", "Purge 2 Star Charts"));
         }
@@ -94,6 +99,7 @@ public class ComponentActionHelper {
                                                 .filter(Tile.tileHasBreach())
                                                 .count()
                                         > 0;
+                            case "mahactbt" -> p1.getTechs().size() > 0;
                             case "saarbt" ->
                                 game.getTileMap().values().stream()
                                                 .filter(Tile::isAsteroidField)
@@ -763,6 +769,18 @@ public class ComponentActionHelper {
                                 + ", please choose which player owns the soon-to-be nuked planet.",
                         buttons);
             }
+            case "mercenariesForHireAction" -> {
+                if (p1.getTg() < 2) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(), "You don't have enough TG (3) to hire mercenaries.");
+                    return;
+                }
+                p1.setTg(p1.getTg() - 3);
+                MessageHelper.sendMessageToChannel(
+                        p1.getCorrectChannel(),
+                        p1.getRepresentationUnfogged() + " has spent 3 TG to hire mercenaries.");
+                BreakthroughHelper.resolveYinBreakthroughAbility(game, p1);
+            }
             case "exhaustBT" -> {
                 BreakthroughModel btModel = Mapper.getBreakthrough(buttonID);
                 p1.setBreakthroughExhausted(true);
@@ -956,6 +974,7 @@ public class ComponentActionHelper {
                 // handled above
             }
             case "bookoflatvinia" -> BookOfLatviniaService.purgeBookOfLatvinia(event, game, player);
+            case "thesilverflame" -> SilverFlameService.rollSilverFlame(event, game, player);
             default ->
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(), "This relic is not tied to any automation. Please resolve manually.");

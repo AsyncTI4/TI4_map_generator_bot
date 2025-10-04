@@ -227,6 +227,10 @@ public class CardsInfoService {
             buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On Whens"));
         }
 
+        if (player.hasRelicReady("heartofixth")) {
+            buttons.add(Buttons.blue("exhaustRelic_heartofixth", "Exhaust Heart of Ixth"));
+        }
+
         if (player.hasAbility("divination")
                 && !ButtonHelperAbilities.getAllOmenDie(game).isEmpty()) {
             StringBuilder omenDice = new StringBuilder();

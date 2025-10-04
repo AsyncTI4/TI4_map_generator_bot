@@ -705,6 +705,14 @@ class GameLoadService {
                 case Constants.STELLAR_ATOMICS_MODE -> game.setStellarAtomicsMode(loadBooleanOrDefault(info, false));
                 case Constants.DANGEROUS_WILDS_MODE -> game.setDangerousWildsMode(loadBooleanOrDefault(info, false));
                 case Constants.AGE_OF_FIGHTERS_MODE -> game.setAgeOfFightersMode(loadBooleanOrDefault(info, false));
+                case Constants.ZEALOUS_ORTHODOXY_MODE ->
+                    game.setZealousOrthodoxyMode(loadBooleanOrDefault(info, false));
+                case Constants.ADVENT_OF_THE_WARSUN_MODE ->
+                    game.setAdventOfTheWarsunMode(loadBooleanOrDefault(info, false));
+                case Constants.MERCENARIES_FOR_HIRE_MODE ->
+                    game.setMercenariesForHireMode(loadBooleanOrDefault(info, false));
+                case Constants.CULTURAL_EXCHANGE_PROGRAM_MODE ->
+                    game.setCulturalExchangeProgramMode(loadBooleanOrDefault(info, false));
                 case Constants.CIVILIZED_SOCIETY_MODE ->
                     game.setCivilizedSocietyMode(loadBooleanOrDefault(info, false));
                 case Constants.NO_SWAP_MODE -> game.setNoSwapMode(loadBooleanOrDefault(info, false));

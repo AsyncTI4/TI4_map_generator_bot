@@ -70,7 +70,27 @@ public class MiltyDraftSpec {
         if (game.isThundersEdge()) {
             List<String> newKeys = new ArrayList<>();
             newKeys.addAll(List.of(
-                    "arborec", "sol", "letnev", "winnu", "sardakk", "yin", "l1z1x", "naalu", "saar", "naaz", "muaat"));
+                    "arborec",
+                    "sol",
+                    "letnev",
+                    "winnu",
+                    "sardakk",
+                    "yin",
+                    "l1z1x",
+                    "naalu",
+                    "saar",
+                    "naaz",
+                    "muaat",
+                    "jolnar",
+                    "nekro",
+                    "hacan",
+                    "empyrean",
+                    "nomad",
+                    "ghost",
+                    "mentak",
+                    "mahact",
+                    "xxcha",
+                    "yssaril"));
             specs.priorityFactions.addAll(newKeys);
             specs.numFactions = Math.min(newKeys.size(), specs.numFactions);
         } else {
