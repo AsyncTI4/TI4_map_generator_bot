@@ -412,9 +412,11 @@ public class Game extends GameProperties {
         return draftManager;
     }
 
-    public void clearDraftManager() {
+    public void clearAllDraftInfo() {
         draftManager = null;
         draftString = null;
+        draftSystemSettings = null;
+        draftSystemSettingsJson = null;
     }
 
     @NotNull
