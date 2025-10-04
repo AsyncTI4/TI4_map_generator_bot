@@ -206,17 +206,11 @@ public abstract class Draftable extends DraftLifecycleHooks {
 
     // Setup
 
-    // public SettingsMenu getSetupMenu(DraftManager draftManager) {
-    //     return null;
-    // }
-
+    /**
+     * Setup this draftable using the settings menu choices.
+     * @param event The interaction event, either from a slash-command or a button press.
+     * @param menu A SettingsMenu containing applicable choices; draftables need to cast it to a known subclass.
+     * @return An error message if the setup couldn't be done, otherwise null.
+     */
     public abstract String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu);
-    //  {
-    //     // Do nothing by default
-    //     return null;
-    // }
-
-    public boolean createsMap() {
-        return false;
-    }
 }

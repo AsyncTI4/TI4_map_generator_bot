@@ -101,8 +101,6 @@ public class GameSetupSettings extends SettingsMenu {
     @Override
     protected List<SettingsMenu> categories() {
         List<SettingsMenu> implemented = new ArrayList<>();
-        // If there is no draft mode selected, then don't return any settings
-        // if (draftMode.getValue() == DraftingMode.none) return implemented;
         implemented.add(decks);
         return implemented;
     }

@@ -146,7 +146,7 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         List<Button> ls = new ArrayList<>(super.specialButtons());
         String toggleText = showAdvanced ? "Hide Advanced" : "Show Advanced";
         ls.add(Button.primary(idPrefix + "toggleAdvanced", toggleText));
-        // TODO: Preset map and slices
+        // TODO: Presets
         // TODO: Rich galaxy (rich nucleus? rich slices?)
         // TODO: Poor galaxy (poor nucleus? poor slices?)
         return ls;
@@ -179,78 +179,30 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         if (mapTemplateModel == null) {
             return;
         }
-        // TODO
-        // int players = mapTemplateModel.getPlayerCount();
-        // int suggestWormholesMax = players;
-        // nucleusWormholes.setVal(1);
-        // nucleusWormholes.setMax(suggestWormholesMax);
-        // int suggestWormholesMin = players - 1;
-        // totalWormholes.setVal(suggestWormholesMin);
-        // totalWormholes.setMax(suggestWormholesMax);
-        // int suggestLegendariesMax = Math.round(players / 3.0f);
-        // nucleusLegendaries.setVal(0);
-        // nucleusLegendaries.setMax(suggestLegendariesMax);
-        // totalLegendaries.setVal(1);
-        // totalLegendaries.setMax(suggestLegendariesMax);
-        // minimumRedTiles.setVal(SEAT_COUNT_TO_MINIMUM_RED_TILES.get(players));
+        int players = mapTemplateModel.getPlayerCount();
+        int suggestWormholesMax = players;
+        nucleusWormholes.setValLow(1);
+        nucleusWormholes.setValHigh(suggestWormholesMax);
+        int suggestWormholesMin = players - 1;
+        totalWormholes.setValLow(suggestWormholesMin);
+        totalWormholes.setValHigh(suggestWormholesMax);
+        int suggestLegendariesMax = Math.round(players / 3.0f);
+        nucleusLegendaries.setValLow(0);
+        nucleusLegendaries.setValHigh(suggestLegendariesMax);
+        totalLegendaries.setValLow(1);
+        totalLegendaries.setValHigh(suggestLegendariesMax);
+        minimumRedTiles.setVal(SEAT_COUNT_TO_MINIMUM_RED_TILES.get(players));
+        minimumSliceRes.setVal(0);
+        minimumSliceInf.setVal(0);
+        int bpp = mapTemplateModel.bluePerPlayer();
+        
+        // Scale slice values from 2bpp using default values
+        sliceValue.setValLow(bpp * 2); //2 * 2 = 4
+        sliceValue.setValHigh(Math.round(bpp * 4.5f)); //2 * 4.5 = 9
+        slicePlanetCount.setValLow(bpp); //2 * 1 = 2
+        slicePlanetCount.setValHigh(Math.round(bpp * 2.5f)); //2 * 2.5 = 5
+        nucleusValue.setValLow(bpp * 2); //2 * 2 = 4
+        nucleusValue.setValHigh(bpp * 4); //2 * 4 = 8
+        maxNucleusQualityDifference.setVal(3);
     }
-
-    // public String applyToDraftable(Draftable draftable, GenericInteractionCreateEvent event) {
-    //     if(parent == null || !(parent instanceof DraftSystemSettings)) {
-    //         return "Error: Could not find parent draft system settings.";
-    //     }
-    //     if(draftable == null || !(draftable instanceof SliceDraftable)) {
-    //         return "Error: Could not find slice draftable to apply settings to.";
-    //     }
-    //     DraftSystemSettings draftSystemSettings = (DraftSystemSettings) parent;
-    //     SliceDraftable sliceDraftable = (SliceDraftable) draftable;
-    //     Game game = draftSystemSettings.getGame();
-    //     if(game == null) {
-    //         return "Error: Could not find game instance.";
-    //     }
-
-    //     int playerCount = draftSystemSettings.getGamePlayers().getKeys().size();
-    //     MapTemplateModel mapTemplate = this.mapTemplate.getValue();
-    //     if(mapTemplate == null || mapTemplate.getPlayerCount() != playerCount) {
-    //         return "The selected map template "+mapTemplate.getAlias()+" is for a different number of players than "
-    // + playerCount;
-    //     }
-
-    //     NucleusSpecs specs = new NucleusSpecs(
-    //         numSlices.getVal(),
-    //         nucleusWormholes.getValLow(), // min nucleus wormholes
-    //         nucleusWormholes.getValHigh(), // max nucleus wormholes
-    //         nucleusLegendaries.getValLow(), // min nucleus legendaries
-    //         nucleusLegendaries.getValHigh(), // max nucleus legendaries
-    //         totalWormholes.getValLow(), //min map wormholes
-    //         totalWormholes.getValHigh(), // max map wormholes
-    //         totalLegendaries.getValLow(), // min map legendaries
-    //         totalLegendaries.getValHigh(), // max map legendaries
-    //         sliceValue.getValLow(), // min slice value
-    //         sliceValue.getValHigh(), // max slice value
-    //         nucleusValue.getValLow(), // min nucleus value
-    //         nucleusValue.getValHigh(), // max nucleus value
-    //         slicePlanetCount.getValLow(), // min slice planets
-    //         slicePlanetCount.getValHigh(), // max slice planets
-    //         minimumSliceRes.getVal(), // min slice resources
-    //         minimumSliceInf.getVal(), // min slice influence
-    //         maxNucleusQualityDifference.getVal(), // max nucleus quality difference
-    //         SEAT_COUNT_TO_MINIMUM_RED_TILES.get(mapTemplate.getPlayerCount()) // expected red tiles
-    //     );
-
-    //     game.clearTileMap();
-    //     // Very important...the distance tool needs hyperlane tiles placed to calculate adjacencies
-    //     PartialMapService.placeFromTemplate(mapTemplate, game);
-
-    //     // Create a draftable, AND setup the nucleus directly onto the map!
-    //     // TODO: Does slice generation need its own executor?
-    //     NucleusOutcome outcome = NucleusSliceGeneratorService.generateNucleusAndSlices(event, game, specs);
-    //     if(outcome.failureReason() != null) {
-    //         return "Could not generate nucleus and slices: " + outcome.failureReason();
-    //     }
-
-    //     game.setMapTemplateID(mapTemplate.getAlias());
-    //     sliceDraftable.initialize(outcome.slices());
-    //     return null;
-    // }
 }

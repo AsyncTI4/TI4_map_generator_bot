@@ -10,6 +10,7 @@ import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.NucleusSliceDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.helpers.settingsFramework.menus.SliceDraftableSettings;
+import ti4.helpers.settingsFramework.menus.SliceDraftableSettings.MapGenerationMode;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
@@ -135,22 +136,6 @@ public class SliceDraftable extends SinglePickDraftable {
         return null;
     }
 
-    /**
-     * For SliceDraftable, we want to control:
-     * - Map template
-     *   - Implicitly (or explicitly?): Is Nucleus setup
-     *   - Possibly we just switch to having 2 different slice draftables?
-     * - Min/Max ranges, default choices
-     * - Number of slices
-     * - Special generation rules (e.g. min wormholes)
-     * - Acceptable legendary counts
-     */
-    // @Override
-    // public SettingsMenu getSetupMenu(DraftManager draftManager) {
-
-    //     return null;
-    // }
-
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
         if (menu == null || !(menu instanceof DraftSystemSettings)) {
@@ -163,13 +148,13 @@ public class SliceDraftable extends SinglePickDraftable {
         }
         SliceDraftableSettings sliceSettings = draftSystemSettings.getSliceSettings();
 
-        if (sliceSettings.getMapGenerationMode().getValue().equals("Nucleus")) {
+        if (MapGenerationMode.Nucleus.equals(sliceSettings.getMapGenerationMode().getValue())) {
             return doNucleusGeneration(
                     event,
                     game,
                     sliceSettings,
                     draftSystemSettings.getPlayerUserIds().size());
-        } else if (sliceSettings.getMapGenerationMode().getValue().equals("Milty")) {
+        } else if (MapGenerationMode.Milty.equals(sliceSettings.getMapGenerationMode().getValue())) {
             return doMiltyGeneration(event, game, draftSystemSettings);
         } else {
             return "Error: Unknown map generation mode: "
@@ -243,23 +228,17 @@ public class SliceDraftable extends SinglePickDraftable {
             game.getDraftManager().tryStartDraft();
             GameManager.save(game, "Nucleus generation");
         });
-        // NucleusOutcome outcome = NucleusSliceGeneratorService.generateNucleusAndSlices(event, game, specs);
-        // if(outcome.failureReason() != null) {
-        //     return "Could not generate nucleus and slices: " + outcome.failureReason();
-        // }
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 "## Generating nucleus and slices!\nThis may take a couple moments\n-# if it fails, you can try again, maybe adjusting settings to be more lax, or ping a bothelper.");
 
-        // initialize(outcome.slices());
         return null;
     }
 
     private String doMiltyGeneration(
             GenericInteractionCreateEvent event, Game game, DraftSystemSettings draftSystemSettings) {
         DraftSpec specs = DraftSpec.CreateFromDraftSystemSettings(draftSystemSettings);
-        // boolean outcome = SliceGeneratorService.generateSlices(event, this, game.getDraftTileManager(), specs);
 
         // Ensure we can't start yet
         slices = null;
@@ -277,10 +256,6 @@ public class SliceDraftable extends SinglePickDraftable {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 "## Generating slices!\nThis may take a couple moments\n-# if it fails, you can try again, maybe adjusting settings to be more lax, or ping a bothelper.");
-        // if(!outcome) {
-        //     return "Could not generate slices with the current settings. Try adjusting the settings and generating
-        // again.";
-        // }
         return null;
     }
 
@@ -290,10 +265,5 @@ public class SliceDraftable extends SinglePickDraftable {
             return "No slices have been defined. Use `/draft slice add` to add slices (or wait for generation to finish).";
         }
         return super.whatsStoppingDraftStart(draftManager);
-    }
-
-    @Override
-    public boolean createsMap() {
-        return true;
     }
 }

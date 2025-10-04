@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -38,10 +37,16 @@ import ti4.service.milty.MiltyDraftSlice;
 @JsonIgnoreProperties("messageId")
 public class SliceDraftableSettings extends SettingsMenu {
 
+    // TODO: Pre-made maps would be cool.
+    public enum MapGenerationMode {
+        Milty,
+        Nucleus
+    }
+
     // Setting
     private final IntegerSetting numSlices;
     private final ChoiceSetting<MapTemplateModel> mapTemplate;
-    private final ChoiceSetting<String> mapGenerationMode;
+    private final ChoiceSetting<MapGenerationMode> mapGenerationMode;
     // Categories
     private final NucleusSliceDraftableSettings nucleusSettings;
     private final MiltySliceDraftableSettings miltySettings;
@@ -80,8 +85,8 @@ public class SliceDraftableSettings extends SettingsMenu {
 
         mapTemplate.setShow(MapTemplateModel::getAlias);
         mapTemplate.setGetExtraInfo(MapTemplateModel::getDescr);
-        mapGenerationMode.setShow(Function.identity());
-        mapGenerationMode.setAllValues(Map.of("Milty", "Milty", "Nucleus", "Nucleus"), "Milty");
+        mapGenerationMode.setShow(MapGenerationMode::toString);
+        mapGenerationMode.setAllValues(Map.of("Milty", MapGenerationMode.Milty, "Nucleus", MapGenerationMode.Nucleus), "Milty");
 
         // Emojis
         mapTemplate.setEmoji(MiltyDraftEmojis.sliceA);
@@ -266,11 +271,6 @@ public class SliceDraftableSettings extends SettingsMenu {
         return (t -> !t.isNucleusTemplate());
     }
 
-    private boolean isNucleusMode() {
-        return mapGenerationMode.getValue() != null
-                && mapGenerationMode.getValue().equals("Nucleus");
-    }
-
     private SettingsMenu getCurrentModeSettings() {
         return isNucleusMode() ? nucleusSettings : miltySettings;
     }
@@ -333,5 +333,9 @@ public class SliceDraftableSettings extends SettingsMenu {
             return "Not enough slices for the number of players.";
         }
         return null;
+    }
+
+    private boolean isNucleusMode() {
+        return MapGenerationMode.Nucleus.equals(mapGenerationMode.getValue());
     }
 }
