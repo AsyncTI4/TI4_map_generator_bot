@@ -886,6 +886,9 @@ public class NucleusSliceGeneratorService {
     }
 
     private boolean popSimilarTier(List<TierList> tiers, TierList desiredPopTier, boolean strict) {
+
+        desiredPopTier = desiredPopTier == TierList.anomaly ? TierList.red : desiredPopTier;
+
         if (tiers.contains(desiredPopTier)) {
             tiers.remove(desiredPopTier);
             // high -> mid
