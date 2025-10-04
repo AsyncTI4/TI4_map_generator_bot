@@ -86,7 +86,8 @@ public class SliceDraftableSettings extends SettingsMenu {
         mapTemplate.setShow(MapTemplateModel::getAlias);
         mapTemplate.setGetExtraInfo(MapTemplateModel::getDescr);
         mapGenerationMode.setShow(MapGenerationMode::toString);
-        mapGenerationMode.setAllValues(Map.of("Milty", MapGenerationMode.Milty, "Nucleus", MapGenerationMode.Nucleus), "Milty");
+        mapGenerationMode.setAllValues(
+                Map.of("Milty", MapGenerationMode.Milty, "Nucleus", MapGenerationMode.Nucleus), "Milty");
 
         // Emojis
         mapTemplate.setEmoji(MiltyDraftEmojis.sliceA);

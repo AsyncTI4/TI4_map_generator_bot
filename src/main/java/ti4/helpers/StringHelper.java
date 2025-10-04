@@ -8,9 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.commons.collections4.ListUtils;
-
 import ti4.service.emoji.TI4Emoji;
 
 public final class StringHelper {
@@ -215,7 +213,7 @@ public final class StringHelper {
 
     public static List<String> chunkMessage(String input, int maxLength) {
         if (input == null || maxLength <= 0) return Collections.emptyList();
-        if(input.length() <= maxLength) return List.of(input);
+        if (input.length() <= maxLength) return List.of(input);
 
         // Try each of these separators in sequence, trying to find the first one that works.
         List<String> chunkSeparators = List.of("\r\n\r\n", "\n\n", "\r\n", "\n", ". ", " ");
@@ -253,9 +251,7 @@ public final class StringHelper {
         }
 
         // Nothing good worked, just do the crappy character-by-character split
-        List<List<String>> partitioned = ListUtils.partition(
-                List.of(input.split("")),
-                maxLength);
+        List<List<String>> partitioned = ListUtils.partition(List.of(input.split("")), maxLength);
         List<String> messages = new ArrayList<>();
         for (List<String> part : partitioned) {
             messages.add(String.join("", part));

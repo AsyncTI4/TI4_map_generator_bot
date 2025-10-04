@@ -90,8 +90,8 @@ public class DraftSystemSettings extends SettingsMenu {
         sourceSettings = new SourceSettings(game, json, this);
         sliceSettings = new SliceDraftableSettings(game, json != null ? json.get("sliceSettings") : null, this);
         factionSettings = new FactionDraftableSettings(game, json != null ? json.get("factionSettings") : null, this);
-        publicSnakeDraftSettings = new PublicSnakeDraftSettings(game,
-                json != null ? json.get("publicSnakeDraftSettings") : null, this);
+        publicSnakeDraftSettings =
+                new PublicSnakeDraftSettings(game, json != null ? json.get("publicSnakeDraftSettings") : null, this);
 
         if (json != null && json.has("messageId")) {
             setMessageId(json.get("messageId").asText(null));
@@ -144,10 +144,11 @@ public class DraftSystemSettings extends SettingsMenu {
 
     @Override
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error = switch (action) {
-            case "startSetup" -> startSetup(event);
-            default -> null;
-        };
+        String error =
+                switch (action) {
+                    case "startSetup" -> startSetup(event);
+                    default -> null;
+                };
         return (error == null ? "success" : error);
     }
 

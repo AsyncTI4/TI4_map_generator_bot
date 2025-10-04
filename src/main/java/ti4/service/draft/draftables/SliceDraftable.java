@@ -148,13 +148,15 @@ public class SliceDraftable extends SinglePickDraftable {
         }
         SliceDraftableSettings sliceSettings = draftSystemSettings.getSliceSettings();
 
-        if (MapGenerationMode.Nucleus.equals(sliceSettings.getMapGenerationMode().getValue())) {
+        if (MapGenerationMode.Nucleus.equals(
+                sliceSettings.getMapGenerationMode().getValue())) {
             return doNucleusGeneration(
                     event,
                     game,
                     sliceSettings,
                     draftSystemSettings.getPlayerUserIds().size());
-        } else if (MapGenerationMode.Milty.equals(sliceSettings.getMapGenerationMode().getValue())) {
+        } else if (MapGenerationMode.Milty.equals(
+                sliceSettings.getMapGenerationMode().getValue())) {
             return doMiltyGeneration(event, game, draftSystemSettings);
         } else {
             return "Error: Unknown map generation mode: "

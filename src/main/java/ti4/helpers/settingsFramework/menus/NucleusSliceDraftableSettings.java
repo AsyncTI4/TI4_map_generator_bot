@@ -195,14 +195,14 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         minimumSliceRes.setVal(0);
         minimumSliceInf.setVal(0);
         int bpp = mapTemplateModel.bluePerPlayer();
-        
+
         // Scale slice values from 2bpp using default values
-        sliceValue.setValLow(bpp * 2); //2 * 2 = 4
-        sliceValue.setValHigh(Math.round(bpp * 4.5f)); //2 * 4.5 = 9
-        slicePlanetCount.setValLow(bpp); //2 * 1 = 2
-        slicePlanetCount.setValHigh(Math.round(bpp * 2.5f)); //2 * 2.5 = 5
-        nucleusValue.setValLow(bpp * 2); //2 * 2 = 4
-        nucleusValue.setValHigh(bpp * 4); //2 * 4 = 8
+        sliceValue.setValLow(bpp * 2); // 2 * 2 = 4
+        sliceValue.setValHigh(Math.round(bpp * 4.5f)); // 2 * 4.5 = 9
+        slicePlanetCount.setValLow(bpp); // 2 * 1 = 2
+        slicePlanetCount.setValHigh(Math.round(bpp * 2.5f)); // 2 * 2.5 = 5
+        nucleusValue.setValLow(bpp * 2); // 2 * 2 = 4
+        nucleusValue.setValHigh(bpp * 4); // 2 * 4 = 8
         maxNucleusQualityDifference.setVal(3);
     }
 }
