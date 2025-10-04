@@ -23,9 +23,8 @@ import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftSliceHelper;
 import ti4.service.draft.DraftSpec;
 import ti4.service.draft.DraftableType;
-import ti4.service.draft.NucleusSliceGeneratorService;
 import ti4.service.draft.NucleusSliceGeneratorService.NucleusOutcome;
-import ti4.service.draft.NucleusSliceGeneratorService.NucleusSpecs;
+import ti4.service.draft.NucleusSpecs;
 import ti4.service.draft.PartialMapService;
 import ti4.service.draft.PlayerSetupService.PlayerSetupState;
 import ti4.service.draft.SliceGenerationPipeline;
@@ -201,7 +200,7 @@ public class SliceDraftable extends SinglePickDraftable {
         // Nucleus generation expects the map template to be set on the game
         game.setMapTemplateID(mapTemplate.getAlias());
 
-        String specError = NucleusSliceGeneratorService.validateSpecsForGame(specs, game);
+        String specError = NucleusSpecs.validateSpecsForGame(specs, game);
         if (specError != null) {
             return "Error in nucleus/slice settings: " + specError;
         }

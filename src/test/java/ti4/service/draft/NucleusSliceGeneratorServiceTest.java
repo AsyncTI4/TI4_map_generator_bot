@@ -11,7 +11,6 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.MapTemplateModel;
 import ti4.service.draft.NucleusSliceGeneratorService.NucleusOutcome;
-import ti4.service.draft.NucleusSliceGeneratorService.NucleusSpecs;
 import ti4.testUtils.BaseTi4Test;
 
 @Disabled("Inherently flaky tests; DEFINITELY run locally before changing nucleus generation.")

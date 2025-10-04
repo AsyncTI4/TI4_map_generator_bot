@@ -132,243 +132,8 @@ public class NucleusSliceGeneratorService {
         return new NucleusOutcome(null, mostCommonFailure);
     }
 
-    private boolean useStrictMode(MapTemplateModel mapTemplate) {
+    public static boolean useStrictMode(MapTemplateModel mapTemplate) {
         return mapTemplate.getPlayerCount() + mapTemplate.getNucleusSliceCount() < 14;
-    }
-
-    public void runAndPrintData(GenericInteractionCreateEvent event, DraftSpec draftSpecs, int numIterations) {
-        if (numIterations > 10_000) {
-            numIterations = 10_000;
-        }
-
-        Game game = draftSpecs.getGame();
-        MapTemplateModel mapTemplate = draftSpecs.getTemplate();
-
-        Map<String, Integer> failureReasonCount = new HashMap<>();
-        List<Integer> successAfterAttempts = new ArrayList<>();
-
-        DraftTileManager tileManager = game.getDraftTileManager();
-        if (tileManager.getAll().isEmpty()) {
-            tileManager.clear();
-            tileManager.addAllDraftTiles(draftSpecs.getTileSources());
-        }
-        Map<String, Integer> tileOccurrenceInSuccessfulMaps = new HashMap<>();
-        Map<String, Integer> tileOccurrenceInSuccessfulSlices = new HashMap<>();
-
-        List<Double> failRuntimes = new ArrayList<>();
-        List<Double> successRuntimes = new ArrayList<>();
-
-        NucleusSpecs nucleusSpecs = new NucleusSpecs(draftSpecs);
-
-        boolean strictMode = useStrictMode(mapTemplate);
-        for (int i = 0; i < numIterations; ++i) {
-            long startTime = System.nanoTime();
-            NucleusOutcome outcome = tryGenerateNucleusAndSlices(game, mapTemplate, nucleusSpecs, strictMode);
-            long endTime = System.nanoTime();
-            if (outcome.slices != null) {
-                successAfterAttempts.add(i + 1);
-                successRuntimes.add((endTime - startTime) / 1_000_000.0);
-                for (MiltyDraftSlice slice : outcome.slices) {
-                    for (MiltyDraftTile tile : slice.getTiles()) {
-                        tileOccurrenceInSuccessfulSlices.put(
-                                tile.getTile().getTileID(),
-                                tileOccurrenceInSuccessfulSlices.getOrDefault(
-                                                tile.getTile().getTileID(), 0)
-                                        + 1);
-                    }
-                }
-                for (Tile placedTile : game.getTileMap().values()) {
-
-                    if (tileManager
-                            .filterAll(t -> t.getTile().getTileID().equals(placedTile.getTileID()))
-                            .isEmpty()) continue;
-
-                    tileOccurrenceInSuccessfulMaps.put(
-                            placedTile.getTileID(),
-                            tileOccurrenceInSuccessfulMaps.getOrDefault(placedTile.getTileID(), 0) + 1);
-                }
-
-                // Reset map tiles for next attempt, but ensure draft tiles are out for the
-                // distance tool
-                game.clearTileMap();
-                PartialMapService.tryUpdateMap(game.getDraftManager(), event, false);
-            } else {
-                failRuntimes.add((endTime - startTime) / 1_000_000.0);
-                failureReasonCount.put(
-                        outcome.failureReason, failureReasonCount.getOrDefault(outcome.failureReason, 0) + 1);
-            }
-        }
-
-        StringBuilder result = new StringBuilder();
-        result.append("Out of ").append(numIterations).append(" attempts:\n");
-        result.append("- Successes: ").append(successAfterAttempts.size()).append("\n");
-        if (!successRuntimes.isEmpty()) {
-            result.append("- Average Success Runtime: ")
-                    .append(successRuntimes.stream()
-                            .mapToDouble(Double::doubleValue)
-                            .average()
-                            .orElse(0))
-                    .append(" ms\n");
-        }
-        if (!failRuntimes.isEmpty()) {
-            result.append("- Average Failure Runtime: ")
-                    .append(failRuntimes.stream()
-                            .mapToDouble(Double::doubleValue)
-                            .average()
-                            .orElse(0))
-                    .append(" ms\n");
-        }
-        result.append("- Failures: ").append(failureReasonCount.size()).append(" distinct:\n");
-        List<Map.Entry<String, Integer>> failureReasonCounts = new ArrayList<>(failureReasonCount.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
-                .toList());
-        Collections.reverse(failureReasonCounts);
-        failureReasonCounts.forEach((entry) -> result.append("  - ")
-                .append(entry.getKey())
-                .append(": ")
-                .append(entry.getValue())
-                .append("\n"));
-
-        var tilesByOccurrence = tileManager.getAll().stream()
-                .sorted(Comparator.comparing(t -> {
-                    Integer occurrenceInMaps = tileOccurrenceInSuccessfulMaps.getOrDefault(
-                            t.getTile().getTileID(), 0);
-                    Integer occurrenceInSlices = tileOccurrenceInSuccessfulSlices.getOrDefault(
-                            t.getTile().getTileID(), 0);
-                    return occurrenceInMaps + occurrenceInSlices;
-                }))
-                .toList();
-        tilesByOccurrence = new ArrayList<>(tilesByOccurrence);
-        Collections.reverse(tilesByOccurrence);
-
-        result.append("Tile usage stats breakdown:\n");
-        for (MiltyDraftTile draftTile : tilesByOccurrence) {
-            String tileId = draftTile.getTile().getTileID();
-            int inMaps = tileOccurrenceInSuccessfulMaps.getOrDefault(tileId, 0);
-            int inSlices = tileOccurrenceInSuccessfulSlices.getOrDefault(tileId, 0);
-            int inTotal = inMaps + inSlices;
-            result.append("- (")
-                    .append(draftTile.getTile().getTileID())
-                    .append(") ")
-                    .append(draftTile.getTile().getRepresentation());
-            float inSlicesPercent = (inSlices * 100.0f) / Math.max(1, successAfterAttempts.size());
-            float inMapsPercent = (inMaps * 100.0f) / Math.max(1, successAfterAttempts.size());
-            float inTotalPercent = (inTotal * 100.0f) / Math.max(1, successAfterAttempts.size());
-            result.append(": ")
-                    .append(inTotal)
-                    .append(" (")
-                    .append(String.format("%.1f", inTotalPercent))
-                    .append("%)");
-            result.append("\n  - in nucleus=")
-                    .append(inMaps)
-                    .append(" (")
-                    .append(String.format("%.1f", inMapsPercent))
-                    .append("%)");
-            result.append("\n  - in slices=")
-                    .append(inSlices)
-                    .append(" (")
-                    .append(String.format("%.1f", inSlicesPercent))
-                    .append("%)");
-            result.append("\n");
-        }
-
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), result.toString());
-    }
-
-    // TODO: Dangerous Wilds balance (1-2 hazardous planets per core slice, 0-2 per player slice)
-    public record NucleusSpecs(
-            int numSlices,
-            int minNucleusWormholes,
-            int maxNucleusWormholes,
-            int minNucleusLegendaries,
-            int maxNucleusLegendaries,
-            int minMapWormholes,
-            int maxMapWormholes,
-            int minMapLegendaries,
-            int maxMapLegendaries,
-            int minSliceValue,
-            int maxSliceValue,
-            int minNucleusValue,
-            int maxNucleusValue,
-            int minSlicePlanets,
-            int maxSlicePlanets,
-            int minSliceRes,
-            int minSliceInf,
-            int maxNucleusQualityDifference,
-            int expectedRedTiles) {
-        NucleusSpecs(DraftSpec draftSpec) {
-            this(draftSpec.getTemplate().getPlayerCount(), draftSpec.getNumSlices());
-        }
-
-        NucleusSpecs(int players, int slices) {
-            this(
-                    slices,
-                    1, // min nucleus wormholes
-                    Math.min(6, players), // max nucleus wormholes
-                    0, // min nucleus legendaries
-                    Math.max(1, Math.round(players / 3.0f)), // max nucleus legendaries
-                    Math.max(2, players - 1), // min map wormholes
-                    Math.min(6, players), // max map wormholes
-                    1, // min map legendaries
-                    Math.max(1, Math.round(players / 3.0f)), // max map legendaries
-                    4, // min slice value
-                    9, // max slice value
-                    4, // min nucleus value
-                    8, // max nucleus value
-                    2, // min slice planets
-                    5, // max slice planets
-                    0, // min slice resources
-                    0, // min slice influence
-                    3, // max nucleus quality difference
-                    Math.round(11 * players / 6.0f) // expected red tiles
-                    );
-        }
-    }
-
-    public String validateSpecsForGame(NucleusSpecs specs, Game game) {
-        String mapTemplateId = game.getMapTemplateID();
-        if (mapTemplateId == null || mapTemplateId.isBlank()) {
-            return "No map template is set on the game.";
-        }
-        MapTemplateModel mapTemplate = Mapper.getMapTemplate(mapTemplateId);
-        if (!mapTemplate.isNucleusTemplate()) {
-            return "Map template " + mapTemplate.getAlias()
-                    + " is not a nucleus template, but nucleus generation was requested.";
-        }
-        int players = mapTemplate.getPlayerCount();
-        if (specs.numSlices < players) {
-            return "Number of slices (" + specs.numSlices + ") must be at least the number of players (" + players
-                    + ").";
-        }
-        if (specs.minNucleusWormholes < 0
-                || specs.maxNucleusWormholes < 0
-                || specs.minNucleusWormholes > specs.maxNucleusWormholes) {
-            return "Nucleus wormhole counts must be non-negative and max >= min.";
-        }
-        if (specs.minNucleusLegendaries < 0
-                || specs.maxNucleusLegendaries < 0
-                || specs.minNucleusLegendaries > specs.maxNucleusLegendaries) {
-            return "Nucleus legendary counts must be non-negative and max >= min.";
-        }
-        if (specs.minMapWormholes < 0 || specs.maxMapWormholes < 0 || specs.minMapWormholes > specs.maxMapWormholes) {
-            return "Map wormhole counts must be non-negative and max >= min.";
-        }
-        if (specs.minMapLegendaries < 0
-                || specs.maxMapLegendaries < 0
-                || specs.minMapLegendaries > specs.maxMapLegendaries) {
-            return "Map legendary counts must be non-negative and max >= min.";
-        }
-        int nucleusTiles = mapTemplate.getTemplateTiles().stream()
-                .filter(tile -> tile.getNucleusNumbers() != null
-                        && !tile.getNucleusNumbers().isEmpty())
-                .toList()
-                .size();
-        if (specs.maxNucleusWormholes + specs.maxNucleusLegendaries > nucleusTiles) {
-            return "The maximum number of nucleus wormholes and legendaries ("
-                    + (specs.maxNucleusWormholes + specs.maxNucleusLegendaries)
-                    + ") exceeds the number of nucleus tiles (" + nucleusTiles + ").";
-        }
-        return null;
     }
 
     public record NucleusOutcome(List<MiltyDraftSlice> slices, String failureReason) {}
@@ -382,12 +147,12 @@ public class NucleusSliceGeneratorService {
             return new NucleusOutcome(null, "No draft tiles available to generate nucleus and slices.");
         }
 
-        Integer numPlayerSlices = Math.max(mapTemplate.getPlayerCount(), nucleusSpecs.numSlices);
+        Integer numPlayerSlices = Math.max(mapTemplate.getPlayerCount(), nucleusSpecs.numSlices());
         Integer numNucleusSlices = mapTemplate.getNucleusSliceCount();
         List<Integer> mapWormholeOptions =
-                ListHelper.listOfIntegers(nucleusSpecs.minMapWormholes, nucleusSpecs.maxMapWormholes);
+                ListHelper.listOfIntegers(nucleusSpecs.minMapWormholes(), nucleusSpecs.maxMapWormholes());
         List<Integer> nucleusWormholeOptions =
-                ListHelper.listOfIntegers(nucleusSpecs.minNucleusWormholes, nucleusSpecs.maxNucleusWormholes);
+                ListHelper.listOfIntegers(nucleusSpecs.minNucleusWormholes(), nucleusSpecs.maxNucleusWormholes());
 
         Integer numTotalWormholes = ListHelper.randomPick(mapWormholeOptions);
         Integer numNucleusWormholes = ListHelper.randomPick(nucleusWormholeOptions);
@@ -411,29 +176,10 @@ public class NucleusSliceGeneratorService {
         for (Wormhole wh : nucleusWormholeTypesList) {
             numNucleusWormholesByType.put(wh, numNucleusWormholesByType.getOrDefault(wh, 0) + 1);
         }
-
-        // while(numNucleusWormholesByType.values().stream().mapToInt(Integer::intValue).sum() != numNucleusWormholes) {
-        //     // Get the wormhole types that we haven't run out of
-        //     List<Wormhole> availableWormholes = numMapWormholesByType.entrySet().stream()
-        //         .filter(e -> e.getValue() > (numNucleusWormholesByType.getOrDefault(e.getKey(), 0)))
-        //         .map(Map.Entry::getKey)
-        //         .toList();
-        //     Wormhole addWormhole = ListHelper.randomPick(availableWormholes);
-        //     if(addWormhole == null) {
-        //         return new NucleusOutcome(null, "Failed to pick a wormhole type for nucleus; this should have been
-        // prevented in setup!");
-        //     }
-        //     numNucleusWormholesByType.put(addWormhole, numNucleusWormholesByType.getOrDefault(addWormhole, 0) + 1);
-        // }
-
-        // Integer numNucleusAlphaWormholes = ListHelper.randomPick(nucleusWormholeOptions);
-        // Integer numNucleusBetaWormholes = ListHelper.randomPick(nucleusWormholeOptions);
         List<Integer> nucleusLegendaryOptions =
-                ListHelper.listOfIntegers(nucleusSpecs.minNucleusLegendaries, nucleusSpecs.maxNucleusLegendaries);
+                ListHelper.listOfIntegers(nucleusSpecs.minNucleusLegendaries(), nucleusSpecs.maxNucleusLegendaries());
         Integer numNucleusLegendaries = ListHelper.randomPick(nucleusLegendaryOptions);
-        // Integer numMapAlphaWormholes = ListHelper.randomPick(mapWormholeOptions);
-        // Integer numMapBetaWormholes = ListHelper.randomPick(mapWormholeOptions);
-        List<Integer> mapLegendaryOptions = List.of(nucleusSpecs.minMapLegendaries, nucleusSpecs.maxMapLegendaries);
+        List<Integer> mapLegendaryOptions = List.of(nucleusSpecs.minMapLegendaries(), nucleusSpecs.maxMapLegendaries());
         Integer numMapLegendaries = ListHelper.randomPick(mapLegendaryOptions);
 
         Map<Wormhole, List<MiltyDraftTile>> wormholeTiles = new HashMap<>();
@@ -444,8 +190,6 @@ public class NucleusSliceGeneratorService {
             wormholeTiles.put(wh, whTiles);
         }
 
-        // List<MiltyDraftTile> alphaTiles = tileManager.filterAll(tile -> tile.isHasAlphaWH());
-        // List<MiltyDraftTile> betaTiles = tileManager.filterAll(tile -> tile.isHasBetaWH());
         List<MiltyDraftTile> legendaryTiles = tileManager.filterAll(tile -> tile.isLegendary());
         List<MapTemplateTile> nucleusTiles = new ArrayList<>(mapTemplate.getTemplateTiles().stream()
                 .filter(tile -> tile.getNucleusNumbers() != null
@@ -460,25 +204,9 @@ public class NucleusSliceGeneratorService {
             }
         }
 
-        // numNucleusAlphaWormholes = Math.min(numNucleusAlphaWormholes, alphaTiles.size());
-        // numNucleusBetaWormholes = Math.min(numNucleusBetaWormholes, betaTiles.size());
         numNucleusLegendaries = Math.min(numNucleusLegendaries, legendaryTiles.size());
-        // numMapAlphaWormholes = Math.min(numMapAlphaWormholes, alphaTiles.size());
-        // numMapBetaWormholes = Math.min(numMapBetaWormholes, betaTiles.size());
         numMapLegendaries = Math.min(numMapLegendaries, legendaryTiles.size());
 
-        // MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Nucleus & Map Wormholes + Legendaries:\n"
-        //         + "- Nucleus Wormholes: "+numNucleusWormholes+" (by type:
-        // "+numNucleusWormholesByType.entrySet().stream().map(e -> e.getKey()+": "+e.getValue()).reduce((a,b) -> a+",
-        // "+b).orElse("none")+")\n"
-        //         + "- Nucleus Legendaries: "+numNucleusLegendaries+"\n"
-        //         + "- Map Wormholes: "+numMapWormholesByType.values().stream().mapToInt(Integer::intValue).sum()+" (by
-        // type: "+numMapWormholesByType.entrySet().stream().map(e -> e.getKey()+": "+e.getValue()).reduce((a,b) -> a+",
-        // "+b).orElse("none")+")\n"
-        //         + "- Map Legendaries: "+numMapLegendaries);
-
-        // Collections.shuffle(alphaTiles);
-        // Collections.shuffle(betaTiles);
         Collections.shuffle(legendaryTiles);
         Collections.shuffle(nucleusTiles);
 
@@ -520,19 +248,11 @@ public class NucleusSliceGeneratorService {
             allPlacedTiles.addAll(placedWhTiles);
         }
 
-        // List<PlacedTile> placedAlphaTiles = distributeByDistance(nucleusTiles, alphaTiles, numNucleusAlphaWormholes,
-        //         distanceTool, null);
-        // List<PlacedTile> placedBetaTiles = distributeByDistance(nucleusTiles, betaTiles, numNucleusBetaWormholes,
-        //         distanceTool, null);
         List<PlacedTile> placedLegendaryTiles =
                 distributeByDistance(nucleusTiles, legendaryTiles, numNucleusLegendaries, distanceTool, null);
 
-        // Integer remainingAlphaWormholes = Math.max(numMapAlphaWormholes - placedAlphaTiles.size(), 0);
-        // Integer remainingBetaWormholes = Math.max(numMapBetaWormholes - placedBetaTiles.size(), 0);
-        Integer remainingLegendaryWormholes = Math.max(numMapLegendaries - placedLegendaryTiles.size(), 0);
+        Integer requiredLegendaries = Math.max(numMapLegendaries - placedLegendaryTiles.size(), 0);
 
-        // allPlacedTiles.addAll(placedAlphaTiles);
-        // allPlacedTiles.addAll(placedBetaTiles);
         allPlacedTiles.addAll(placedLegendaryTiles);
 
         List<MiltyDraftTile> availableTiles = new ArrayList<>(
@@ -544,9 +264,7 @@ public class NucleusSliceGeneratorService {
                 mapTemplate.getTilesPerPlayer(),
                 availableTiles,
                 numMapWormholesByType,
-                // remainingAlphaWormholes,
-                // remainingBetaWormholes,
-                remainingLegendaryWormholes,
+                requiredLegendaries,
                 strictMode);
 
         if (playerSlices == null) {
@@ -591,23 +309,6 @@ public class NucleusSliceGeneratorService {
         if (failureReason != null) {
             return new NucleusOutcome(null, failureReason);
         }
-
-        // MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Wormhole and legendary picks:\n"
-        //         + "- Nucleus Wormholes: " + numNucleusWormholes + " (by type: "
-        //         + numNucleusWormholesByType.entrySet().stream()
-        //                 .map(e -> e.getKey() + ": " + e.getValue())
-        //                 .reduce((a, b) -> a + ", " + b)
-        //                 .orElse("none")
-        //         + ")\n"
-        //         + "- Nucleus Legendaries: " + numNucleusLegendaries + "\n"
-        //         + "- Map Wormholes: "
-        //         + numMapWormholesByType.values().stream().mapToInt(Integer::intValue).sum() + " (by type: "
-        //         + numMapWormholesByType.entrySet().stream()
-        //                 .map(e -> e.getKey() + ": " + e.getValue())
-        //                 .reduce((a, b) -> a + ", " + b)
-        //                 .orElse("none")
-        //         + ")\n"
-        //         + "- Map Legendaries: " + numMapLegendaries);
 
         for (PlacedTile pt : allPlacedTiles) {
             game.setTile(new Tile(pt.draftTile.getTile().getTileID(), pt.mapTile.getPos()));
@@ -696,35 +397,35 @@ public class NucleusSliceGeneratorService {
             if (anomaliesTouching) break;
         }
 
-        if (minSliceRes < nucleusSpecs.minSliceRes) {
-            return "A player slice has less than " + nucleusSpecs.minSliceRes + " total optimal resource.";
+        if (minSliceRes < nucleusSpecs.minSliceRes()) {
+            return "A player slice has less than " + nucleusSpecs.minSliceRes() + " total optimal resource.";
         }
-        if (minSliceInf < nucleusSpecs.minSliceInf) {
-            return "A player slice has less than " + nucleusSpecs.minSliceInf + " total optimal influence.";
+        if (minSliceInf < nucleusSpecs.minSliceInf()) {
+            return "A player slice has less than " + nucleusSpecs.minSliceInf() + " total optimal influence.";
         }
-        if (minSliceSpend < nucleusSpecs.minSliceValue) {
-            return "A player slice has less than " + nucleusSpecs.minSliceValue + " total optimal spend.";
+        if (minSliceSpend < nucleusSpecs.minSliceValue()) {
+            return "A player slice has less than " + nucleusSpecs.minSliceValue() + " total optimal spend.";
         }
-        if (maxSliceSpend > nucleusSpecs.maxSliceValue) {
-            return "A player slice has more than " + nucleusSpecs.maxSliceValue + " total optimal spend.";
+        if (maxSliceSpend > nucleusSpecs.maxSliceValue()) {
+            return "A player slice has more than " + nucleusSpecs.maxSliceValue() + " total optimal spend.";
         }
-        if (minSlicePlanets < nucleusSpecs.minSlicePlanets) {
-            return "A player slice has less than " + nucleusSpecs.minSlicePlanets + " planets.";
+        if (minSlicePlanets < nucleusSpecs.minSlicePlanets()) {
+            return "A player slice has less than " + nucleusSpecs.minSlicePlanets() + " planets.";
         }
-        if (maxSlicePlanets > nucleusSpecs.maxSlicePlanets) {
-            return "A player slice has more than " + nucleusSpecs.maxSlicePlanets + " planets.";
+        if (maxSlicePlanets > nucleusSpecs.maxSlicePlanets()) {
+            return "A player slice has more than " + nucleusSpecs.maxSlicePlanets() + " planets.";
         }
-        if (totalRedTiles < nucleusSpecs.expectedRedTiles) {
-            return "The map has less than the expected " + nucleusSpecs.expectedRedTiles + " red/anomaly tiles total.";
+        if (totalRedTiles < nucleusSpecs.expectedRedTiles()) {
+            return "The map has less than the expected " + nucleusSpecs.expectedRedTiles() + " red/anomaly tiles total.";
         }
-        if (minCoreSpend < nucleusSpecs.minNucleusValue) {
-            return "A core slice has less than " + nucleusSpecs.minNucleusValue + " total optimal spend.";
+        if (minCoreSpend < nucleusSpecs.minNucleusValue()) {
+            return "A core slice has less than " + nucleusSpecs.minNucleusValue() + " total optimal spend.";
         }
-        if (maxCoreSpend > nucleusSpecs.maxNucleusValue) {
-            return "A core slice has more than " + nucleusSpecs.maxNucleusValue + " total optimal spend.";
+        if (maxCoreSpend > nucleusSpecs.maxNucleusValue()) {
+            return "A core slice has more than " + nucleusSpecs.maxNucleusValue() + " total optimal spend.";
         }
-        if (coreSliceBalance > nucleusSpecs.maxNucleusQualityDifference) {
-            return "The core slices are imbalanced by more than " + nucleusSpecs.maxNucleusQualityDifference
+        if (coreSliceBalance > nucleusSpecs.maxNucleusQualityDifference()) {
+            return "The core slices are imbalanced by more than " + nucleusSpecs.maxNucleusQualityDifference()
                     + " total optimal spend.";
         }
         if (anomaliesTouching) {
@@ -1001,24 +702,6 @@ public class NucleusSliceGeneratorService {
 
             // For each position in the slice
             for (MapTemplateTile location : unplacedLocations) {
-                // MapTemplateTile location = sliceLocations.get(j);
-
-                // Skip if already occupied
-                // MiltyDraftTile placedTile = placedTiles.stream()
-                // .filter(pt -> pt.mapTile.equals(location))
-                // .map(pt -> pt.draftTile)
-                // .findFirst()
-                // .orElse(null);
-                // if (placedTile != null) {
-                // // Try to remove a sliceTier entry that matches the placed tile, if possible.
-                // // If not possible, just try to get as close as we can.
-                // TierList placedTier = draftTileManager.getRelativeTier(placedTile);
-                // if(!popSimilarTier(sliceTiers, placedTier, strictMode)) {
-                // return false;
-                // }
-                // continue;
-                // }
-
                 // Get our preferred tier for this tile
                 TierList desiredTier = sliceTiers.removeFirst();
 
@@ -1094,10 +777,10 @@ public class NucleusSliceGeneratorService {
                                 int total1 = slice1.getOptimalRes() + slice1.getOptimalInf() + slice1.getOptimalFlex();
                                 int total2 = slice2.getOptimalRes() + slice2.getOptimalInf() + slice2.getOptimalFlex();
 
-                                boolean inOptimalRange1 = total1 >= nucleusSpecs.minNucleusValue
-                                        && total1 <= nucleusSpecs.maxNucleusValue;
-                                boolean inOptimalRange2 = total2 >= nucleusSpecs.minNucleusValue
-                                        && total2 <= nucleusSpecs.maxNucleusValue;
+                                boolean inOptimalRange1 = total1 >= nucleusSpecs.minNucleusValue()
+                                        && total1 <= nucleusSpecs.maxNucleusValue();
+                                boolean inOptimalRange2 = total2 >= nucleusSpecs.minNucleusValue()
+                                        && total2 <= nucleusSpecs.maxNucleusValue();
 
                                 if (inOptimalRange1 && !inOptimalRange2) {
                                     return -1;
@@ -1105,7 +788,7 @@ public class NucleusSliceGeneratorService {
                                     return 1;
                                 } else {
                                     int targetOptimal =
-                                            (nucleusSpecs.minNucleusValue + nucleusSpecs.maxNucleusValue) / 2;
+                                            (nucleusSpecs.minNucleusValue() + nucleusSpecs.maxNucleusValue()) / 2;
                                     return Integer.compare(
                                             Math.abs(targetOptimal - total1), Math.abs(targetOptimal - total2));
                                 }
@@ -1161,10 +844,6 @@ public class NucleusSliceGeneratorService {
             }
             requiredWormholeTiles.put(wh, pickedWormholeTiles);
         }
-        // List<MiltyDraftTile> alphaTiles = ListHelper.removeByPredicate(availableSystems, tile -> tile.isHasAlphaWH(),
-        //         numAlphas);
-        // List<MiltyDraftTile> betaTiles = ListHelper.removeByPredicate(availableSystems, tile -> tile.isHasBetaWH(),
-        //         numBetas);
         List<MiltyDraftTile> legendaryTiles =
                 ListHelper.removeByPredicate(availableSystems, tile -> tile.isLegendary(), numLegendaries);
 
@@ -1176,8 +855,6 @@ public class NucleusSliceGeneratorService {
         for (Wormhole wh : requiredWormholeTiles.keySet()) {
             requiredTiles.addAll(requiredWormholeTiles.get(wh));
         }
-        // requiredTiles.addAll(alphaTiles);
-        // requiredTiles.addAll(betaTiles);
         requiredTiles.addAll(legendaryTiles);
 
         // Prepare filler tiers by organizing them into tiers for easy selection

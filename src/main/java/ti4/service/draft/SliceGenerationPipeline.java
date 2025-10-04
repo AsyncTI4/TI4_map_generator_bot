@@ -13,7 +13,6 @@ import ti4.map.Game;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.draft.NucleusSliceGeneratorService.NucleusOutcome;
-import ti4.service.draft.NucleusSliceGeneratorService.NucleusSpecs;
 import ti4.service.draft.draftables.SliceDraftable;
 
 // TODO: This affects game state, and should lock buttons for a given game while working.
