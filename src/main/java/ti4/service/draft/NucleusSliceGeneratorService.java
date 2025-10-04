@@ -23,7 +23,6 @@ import ti4.message.logging.BotLogger;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
 import ti4.model.PlanetTypeModel.PlanetType;
-import ti4.model.WormholeModel.Wormhole;
 import ti4.service.milty.MiltyDraftSlice;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.milty.TierList;
@@ -153,42 +152,20 @@ public class NucleusSliceGeneratorService {
                 ListHelper.listOfIntegers(nucleusSpecs.minMapWormholes(), nucleusSpecs.maxMapWormholes());
         List<Integer> nucleusWormholeOptions =
                 ListHelper.listOfIntegers(nucleusSpecs.minNucleusWormholes(), nucleusSpecs.maxNucleusWormholes());
+        
+        Integer numNucleusAlphaWormholes = ListHelper.randomPick(nucleusWormholeOptions);
+        Integer numNucleusBetaWormholes = ListHelper.randomPick(nucleusWormholeOptions);
+        Integer numMapAlphaWormholes = ListHelper.randomPick(mapWormholeOptions);
+        Integer numMapBetaWormholes = ListHelper.randomPick(mapWormholeOptions);
 
-        Integer numTotalWormholes = ListHelper.randomPick(mapWormholeOptions);
-        Integer numNucleusWormholes = ListHelper.randomPick(nucleusWormholeOptions);
-        numNucleusWormholes = Math.min(numNucleusWormholes, numTotalWormholes);
-
-        Map<Wormhole, Integer> numMapWormholesByType = pickWormholesByType(tileManager.getAll(), numTotalWormholes);
-
-        // To get a subset of the map wormholes for the nucleus, we collect all map picks into a list, shuffle it, then
-        // take
-        // the first N items.
-        List<Wormhole> mapWormholeTypesList = new ArrayList<>();
-        for (Wormhole wh : numMapWormholesByType.keySet()) {
-            for (int i = 0; i < numMapWormholesByType.get(wh); i++) {
-                mapWormholeTypesList.add(wh);
-            }
-        }
-        Collections.shuffle(mapWormholeTypesList);
-        List<Wormhole> nucleusWormholeTypesList =
-                mapWormholeTypesList.stream().limit(numNucleusWormholes).toList();
-        Map<Wormhole, Integer> numNucleusWormholesByType = new HashMap<>();
-        for (Wormhole wh : nucleusWormholeTypesList) {
-            numNucleusWormholesByType.put(wh, numNucleusWormholesByType.getOrDefault(wh, 0) + 1);
-        }
         List<Integer> nucleusLegendaryOptions =
                 ListHelper.listOfIntegers(nucleusSpecs.minNucleusLegendaries(), nucleusSpecs.maxNucleusLegendaries());
         Integer numNucleusLegendaries = ListHelper.randomPick(nucleusLegendaryOptions);
         List<Integer> mapLegendaryOptions = List.of(nucleusSpecs.minMapLegendaries(), nucleusSpecs.maxMapLegendaries());
         Integer numMapLegendaries = ListHelper.randomPick(mapLegendaryOptions);
 
-        Map<Wormhole, List<MiltyDraftTile>> wormholeTiles = new HashMap<>();
-        for (Wormhole wh : numMapWormholesByType.keySet()) {
-            List<MiltyDraftTile> whTiles =
-                    tileManager.filterAll(t -> t.getTile().getWormholes().contains(wh));
-            Collections.shuffle(whTiles);
-            wormholeTiles.put(wh, whTiles);
-        }
+        List<MiltyDraftTile> alphaTiles = tileManager.filterAll(tile -> tile.isHasAlphaWH());
+        List<MiltyDraftTile> betaTiles = tileManager.filterAll(tile -> tile.isHasBetaWH());
 
         List<MiltyDraftTile> legendaryTiles = tileManager.filterAll(tile -> tile.isLegendary());
         List<MapTemplateTile> nucleusTiles = new ArrayList<>(mapTemplate.getTemplateTiles().stream()
@@ -196,63 +173,37 @@ public class NucleusSliceGeneratorService {
                         && !tile.getNucleusNumbers().isEmpty())
                 .toList());
 
-        for (Wormhole wh : numMapWormholesByType.keySet()) {
-            int available = wormholeTiles.get(wh).size();
-            numMapWormholesByType.put(wh, Math.min(numMapWormholesByType.get(wh), available));
-            if (numNucleusWormholesByType.containsKey(wh)) {
-                numNucleusWormholesByType.put(wh, Math.min(numNucleusWormholesByType.get(wh), available));
-            }
-        }
-
-        numNucleusLegendaries = Math.min(numNucleusLegendaries, legendaryTiles.size());
+        numMapAlphaWormholes = Math.min(numMapAlphaWormholes, alphaTiles.size());
+        numMapBetaWormholes = Math.min(numMapBetaWormholes, betaTiles.size());
+        numNucleusAlphaWormholes = Math.min(numNucleusAlphaWormholes, alphaTiles.size());
+        numNucleusBetaWormholes = Math.min(numNucleusBetaWormholes, betaTiles.size());
+        
         numMapLegendaries = Math.min(numMapLegendaries, legendaryTiles.size());
+        numNucleusLegendaries = Math.min(numNucleusLegendaries, numMapLegendaries);
 
+        Collections.shuffle(alphaTiles);
+        Collections.shuffle(betaTiles);
         Collections.shuffle(legendaryTiles);
         Collections.shuffle(nucleusTiles);
 
-        List<PlacedTile> allPlacedTiles = new ArrayList<>();
         DistanceTool distanceTool = new DistanceTool(game);
 
-        List<Wormhole> nucleusWormholeTypes = new ArrayList<>(numNucleusWormholesByType.keySet());
-        Collections.shuffle(nucleusWormholeTypes);
-        for (Wormhole wh : nucleusWormholeTypes) {
-            int numToPlace = numNucleusWormholesByType.get(wh);
-            List<MiltyDraftTile> whTiles = wormholeTiles.get(wh);
-            if (whTiles.size() < numToPlace) {
-                return new NucleusOutcome(
-                        null,
-                        "Failed to place " + numToPlace + " " + wh + " wormholes in nucleus; only " + whTiles.size()
-                                + " available. This should have been prevented in setup!");
-            }
-            List<PlacedTile> placedWhTiles =
-                    distributeByDistance(nucleusTiles, whTiles, numToPlace, distanceTool, null);
-            if (placedWhTiles.size() < numToPlace) {
-                return new NucleusOutcome(null, "Failed to place all " + wh + " wormholes in nucleus.");
-            }
-
-            // Reduce the number of total wormholes of this type that we still need
-            numMapWormholesByType.put(wh, Math.max(0, numMapWormholesByType.get(wh) - placedWhTiles.size()));
-
-            // Because some tiles can have multiple wormholes, we need to remove all placed tiles from available tiles
-            for (PlacedTile pt : placedWhTiles) {
-                for (Wormhole wh2 : wormholeTiles.keySet()) {
-                    wormholeTiles.put(
-                            wh2,
-                            new ArrayList<>(wormholeTiles.get(wh2).stream()
-                                    .filter(t -> !t.equals(pt.draftTile))
-                                    .toList()));
-                }
-            }
-
-            // And track all placed tiles
-            allPlacedTiles.addAll(placedWhTiles);
-        }
-
+        
+        List<PlacedTile> placedAlphaTiles =
+                distributeByDistance(nucleusTiles, alphaTiles, numNucleusAlphaWormholes, distanceTool, null);
+        List<PlacedTile> placedBetaTiles =
+                distributeByDistance(nucleusTiles, betaTiles, numNucleusBetaWormholes, distanceTool, null);
         List<PlacedTile> placedLegendaryTiles =
                 distributeByDistance(nucleusTiles, legendaryTiles, numNucleusLegendaries, distanceTool, null);
 
+                
+        Integer remainingAlphaWormholes = Math.max(numMapAlphaWormholes - placedAlphaTiles.size(), 0);
+        Integer remainingBetaWormholes = Math.max(numMapBetaWormholes - placedBetaTiles.size(), 0);
         Integer requiredLegendaries = Math.max(numMapLegendaries - placedLegendaryTiles.size(), 0);
 
+        List<PlacedTile> allPlacedTiles = new ArrayList<>();
+        allPlacedTiles.addAll(placedAlphaTiles);
+        allPlacedTiles.addAll(placedBetaTiles);
         allPlacedTiles.addAll(placedLegendaryTiles);
 
         List<MiltyDraftTile> availableTiles = new ArrayList<>(
@@ -263,7 +214,8 @@ public class NucleusSliceGeneratorService {
                 numPlayerSlices,
                 mapTemplate.getTilesPerPlayer(),
                 availableTiles,
-                numMapWormholesByType,
+                remainingAlphaWormholes,
+                remainingBetaWormholes,
                 requiredLegendaries,
                 strictMode);
 
@@ -817,9 +769,8 @@ public class NucleusSliceGeneratorService {
             int numPlayerSlices,
             int sliceSize,
             List<MiltyDraftTile> availableSystems,
-            Map<Wormhole, Integer> numWormholesByType,
-            // int numAlphas,
-            // int numBetas,
+            int numAlphas,
+            int numBetas,
             int numLegendaries,
             boolean strictMode) {
 
@@ -834,27 +785,20 @@ public class NucleusSliceGeneratorService {
 
         // Get a random selection of tiles to satisfy our required counts
         Collections.shuffle(availableSystems);
-        Map<Wormhole, List<MiltyDraftTile>> requiredWormholeTiles = new HashMap<>();
-        for (Wormhole wh : numWormholesByType.keySet()) {
-            List<MiltyDraftTile> pickedWormholeTiles = ListHelper.removeByPredicate(
-                    availableSystems, tile -> tile.getTile().getWormholes().contains(wh), numWormholesByType.get(wh));
-            if (pickedWormholeTiles.size() < numWormholesByType.get(wh)) {
-                // We couldn't find enough wormholes of this type
-                return null;
-            }
-            requiredWormholeTiles.put(wh, pickedWormholeTiles);
-        }
+        List<MiltyDraftTile> alphaTiles =
+                ListHelper.removeByPredicate(availableSystems, tile -> tile.isHasAlphaWH(), numAlphas);
+        List<MiltyDraftTile> betaTiles =
+                ListHelper.removeByPredicate(availableSystems, tile -> tile.isHasBetaWH(), numBetas);
         List<MiltyDraftTile> legendaryTiles =
                 ListHelper.removeByPredicate(availableSystems, tile -> tile.isLegendary(), numLegendaries);
 
-        // Prepare required tiles. Keeping similar tiles co-located is important;
-        // it means when we distribute them across slices, the e.g. alphas will be
+        // Prepare required tiles. Placing required tiles sequentially is important;
+        // it results in distributing them across slices, the e.g. alphas will be
         // spread out. If 2+ required tiles land on one slice, they shouldn't be
         // from the same category.
         List<MiltyDraftTile> requiredTiles = new ArrayList<>();
-        for (Wormhole wh : requiredWormholeTiles.keySet()) {
-            requiredTiles.addAll(requiredWormholeTiles.get(wh));
-        }
+        requiredTiles.addAll(alphaTiles);
+        requiredTiles.addAll(betaTiles);
         requiredTiles.addAll(legendaryTiles);
 
         // Prepare filler tiers by organizing them into tiers for easy selection
@@ -1094,62 +1038,5 @@ public class NucleusSliceGeneratorService {
         }
 
         return chosen;
-    }
-
-    private Map<Wormhole, Integer> pickWormholesByType(List<MiltyDraftTile> availableTiles, int numWormholes) {
-        if (numWormholes == 0) {
-            return Map.of();
-        }
-        Map<Wormhole, Integer> wormholeCounts = new HashMap<>();
-
-        for (MiltyDraftTile tile : availableTiles) {
-            Set<Wormhole> tileWormholes = tile.getTile().getWormholes();
-            for (Wormhole wh : tileWormholes) {
-                wormholeCounts.putIfAbsent(wh, 0);
-                wormholeCounts.put(wh, wormholeCounts.get(wh) + 1);
-            }
-        }
-
-        if (numWormholes < 4) {
-            // Only one type of wormhole desired
-            List<Wormhole> wormholes = wormholeCounts.entrySet().stream()
-                    .filter(e -> e.getValue() >= numWormholes)
-                    .map(e -> e.getKey())
-                    .toList();
-            Wormhole chosen = ListHelper.randomPick(wormholes);
-            return new HashMap<>(Map.of(chosen, numWormholes));
-        }
-
-        // Only permit wormhole types that have at least 2 tiles
-        wormholeCounts.entrySet().removeIf(e -> e.getValue() < 2);
-
-        Map<Wormhole, Integer> pickedWormholes = new HashMap<>();
-        while (pickedWormholes.values().stream().mapToInt(i -> i).sum() < numWormholes) {
-            // Randomly pick an available wormhole type
-            Wormhole chosen =
-                    ListHelper.randomPick(wormholeCounts.keySet().stream().toList());
-
-            // If its our first time picking this type, add 2 so they'll link
-            pickedWormholes.putIfAbsent(chosen, 1);
-            pickedWormholes.put(chosen, pickedWormholes.get(chosen) + 1);
-
-            // If there are no more tiles of this type, don't pick it again
-            if (pickedWormholes.get(chosen) >= wormholeCounts.get(chosen)) {
-                wormholeCounts.remove(chosen);
-            }
-
-            // For the final pick, don't add a new wormhole type
-            int remainingPicks = numWormholes
-                    - pickedWormholes.values().stream().mapToInt(i -> i).sum();
-            if (remainingPicks < 2) {
-                wormholeCounts.entrySet().removeIf(e -> !pickedWormholes.containsKey(e.getKey()));
-            }
-
-            // If there are no more valid picks, break
-            if (wormholeCounts.isEmpty()) {
-                break;
-            }
-        }
-        return pickedWormholes;
     }
 }

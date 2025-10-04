@@ -32,12 +32,12 @@ public record NucleusSpecs(
     public NucleusSpecs(int players, int slices) {
         this(
                 slices,
-                1, // min nucleus wormholes
-                Math.min(6, players), // max nucleus wormholes
+                0, // min nucleus wormholes
+                Math.min(3, Math.round(players / 2.0f)), // max nucleus wormholes
                 0, // min nucleus legendaries
                 Math.max(1, Math.round(players / 3.0f)), // max nucleus legendaries
-                Math.max(2, players - 1), // min map wormholes
-                Math.min(6, players), // max map wormholes
+                Math.max(2, Math.round(players / 4.0f)), // min map wormholes
+                Math.min(3, Math.round(players / 2.0f)), // max map wormholes
                 1, // min map legendaries
                 Math.max(1, Math.round(players / 3.0f)), // max map legendaries
                 4, // min slice value

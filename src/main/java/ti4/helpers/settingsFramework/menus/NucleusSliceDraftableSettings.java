@@ -60,12 +60,12 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
 
         // Initialize settings
         int players = game != null ? game.getPlayers().size() : 6;
-        int suggestWormholesMax = players;
+        int suggestWormholesMax = Math.round(players / 2.0f);
         nucleusWormholes =
-                new IntegerRangeSetting("NucleusWH", "Nucleus Wormholes", 1, 0, 4, suggestWormholesMax, 0, 4, 1);
-        int suggestWormholesMin = players - 1;
+                new IntegerRangeSetting("NucleusWH", "Nucleus Wormholes", 0, 0, 3, suggestWormholesMax, 0, 3, 1);
+        int suggestWormholesMin = 2;
         totalWormholes = new IntegerRangeSetting(
-                "TotalWH", "Total Wormholes", suggestWormholesMin, 0, 6, suggestWormholesMax, 0, 6, 1);
+                "TotalWH", "Max Wormholes", suggestWormholesMin, 0, 3, suggestWormholesMax, 0, 3, 1);
         int suggestLegendariesMax = Math.round(players / 3.0f);
         nucleusLegendaries =
                 new IntegerRangeSetting("NucleusLeg", "Nucleus Legendaries", 0, 0, 3, suggestLegendariesMax, 0, 3, 1);
@@ -85,6 +85,8 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
                 "Defaults to 0. A low res slice can be combined with a specific seat to balance out.");
         minimumSliceInf.setExtraInfo(
                 "Defaults to 0. A low inf slice can be combined with a specific seat to balance out.");
+        nucleusWormholes.setExtraInfo("Applies to each type of wormhole separately.");
+        totalWormholes.setExtraInfo("Applies to each type of wormhole separately.");
 
         // Emojis
         nucleusWormholes.setEmoji(MiscEmojis.WHalpha);
