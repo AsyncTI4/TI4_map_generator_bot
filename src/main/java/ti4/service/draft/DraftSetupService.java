@@ -239,8 +239,6 @@ public class DraftSetupService {
                 }
             }
         });
-
-        return null;
     }
 
     public static String startFromSettings(GenericInteractionCreateEvent event, DraftSystemSettings settings) {
