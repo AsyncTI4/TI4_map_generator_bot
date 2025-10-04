@@ -523,6 +523,14 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.AGE_OF_FIGHTERS_MODE + " " + game.isAgeOfFightersMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.ZEALOUS_ORTHODOXY_MODE + " " + game.isZealousOrthodoxyMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.ADVENT_OF_THE_WARSUN_MODE + " " + game.isAdventOfTheWarsunMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.CULTURAL_EXCHANGE_PROGRAM_MODE + " " + game.isCulturalExchangeProgramMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.MERCENARIES_FOR_HIRE_MODE + " " + game.isMercenariesForHireMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.CIVILIZED_SOCIETY_MODE + " " + game.isCivilizedSocietyMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.NO_SWAP_MODE + " " + game.isNoSwapMode());

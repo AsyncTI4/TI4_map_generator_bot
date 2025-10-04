@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -507,6 +508,7 @@ class PlayerAreaGenerator {
         xDeltaBottom = honorOrPathTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = sleeperTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = creussWormholeTokens(player, xDeltaBottom, yPlayAreaSecondRow);
+        xDeltaBottom = valefarZTokens(player, xDeltaBottom, yPlayAreaSecondRow);
 
         if (player.hasAbility("ancient_blueprints")) {
             xDelta = bentorBluePrintInfo(player, xDelta, yPlayArea);
@@ -650,6 +652,21 @@ class PlayerAreaGenerator {
             }
         }
         return xDeltaFromRight;
+    }
+
+    private int valefarZTokens(Player player, int xDeltaFromRightSide, int yDelta) {
+        if (player.hasReadyBreakthrough("nekrobt")) {
+            String tokenFile = ResourceHelper.getResourceFromFolder("extra/", "marker_valefarZ.png");
+            BufferedImage bufferedImage = ImageHelper.read(tokenFile);
+            int maxTokens = 7;
+            List<Point> points = new ArrayList<>();
+            IntStream.range(0, maxTokens).forEach(i -> points.add(new Point(i * 35, 25 * ((i + 1) % 2))));
+
+            int tokensUsed =
+                    Arrays.asList(game.getStoredValue("valefarZ").split("\\|")).size();
+            return displayRemainingFactionTokens(points, bufferedImage, 7 - tokensUsed, xDeltaFromRightSide, yDelta);
+        }
+        return xDeltaFromRightSide;
     }
 
     private int sleeperTokens(Player player, int xDeltaFromRightSide, int yDelta) {
@@ -1811,7 +1828,8 @@ class PlayerAreaGenerator {
                 152,
                 "Resource & Influence Summary",
                 "This is an overview of your resources and influence. The left side is resources, and the right side is influence.\nThe top number how many you have available\nThe middle number is the total\nThe bottom number is the 'optimal' available\nThe bottom-centre number is the flex 'optimal' available");
-        if (player.hasLeaderUnlocked("xxchahero")) { // XXCHA WITH UNLOCKED HERO
+        if (player.hasUnlockedBreakthrough("xxchabt")
+                || player.hasLeaderUnlocked("xxchahero")) { // XXCHA WITH UNLOCKED HERO
             int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, game);
             int totalPlayerResources = Helper.getPlayerResourcesTotal(player, game);
             if (Constants.gedsDeadId.equals(player.getUserID()) || RandomHelper.isOneInX(100)) {
@@ -2010,6 +2028,7 @@ class PlayerAreaGenerator {
                                 + ". Removing planet from player.");
                 return deltaX;
             }
+            planet.updateTriadStats(player);
             PlanetModel planetModel = planet.getPlanetModel();
             if (planetModel == null) return deltaX;
 
@@ -2786,7 +2805,9 @@ class PlayerAreaGenerator {
             if (unit.getFaction().isPresent()) {
                 boolean unitHasUpgrade = unit.getUpgradesFromUnitId().isPresent()
                         || unit.getUpgradesToUnitId().isPresent();
+                boolean corsair = unit.getAlias().equals("mentak_cruiser3");
                 if (game.isFrankenGame()
+                        || corsair
                         || unitHasUpgrade
                         || "echoes".equals(player.getFactionModel().getAlias())) {
                     // Always paint the faction icon in franken

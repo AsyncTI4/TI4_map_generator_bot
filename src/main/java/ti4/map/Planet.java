@@ -107,6 +107,17 @@ public class Planet extends UnitHolder {
         });
     }
 
+    public void updateTriadStats(Player player) {
+        if (getName().equals("triad")) {
+            resourcesModifier = 0;
+            if (player.getHrf() > 0) resourcesModifier++;
+            if (player.getIrf() > 0) resourcesModifier++;
+            if (player.getCrf() > 0) resourcesModifier++;
+            if (player.getUrf() > 0) resourcesModifier++;
+            influenceModifier = resourcesModifier;
+        }
+    }
+
     @JsonIgnore
     @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
     public List<String> getAttachments() {

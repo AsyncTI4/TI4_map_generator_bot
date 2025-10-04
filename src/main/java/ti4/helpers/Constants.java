@@ -1188,6 +1188,10 @@ public class Constants {
     public static final String DANGEROUS_WILDS_MODE = "dangerous_wilds_mode";
     public static final String CIVILIZED_SOCIETY_MODE = "civilized_society_mode";
     public static final String AGE_OF_FIGHTERS_MODE = "age_of_fighters_mode";
+    public static final String MERCENARIES_FOR_HIRE_MODE = "mercenaries_for_hire_mode";
+    public static final String ADVENT_OF_THE_WARSUN_MODE = "advent_of_the_warsun_mode";
+    public static final String ZEALOUS_ORTHODOXY_MODE = "zealous_orthodoxy_mode";
+    public static final String CULTURAL_EXCHANGE_PROGRAM_MODE = "cultural_exchange_program_mode";
     public static final String STELLAR_ATOMICS_MODE = "stellar_atomics_mode";
     public static final String NO_SWAP_MODE = "no_swap_mode";
     public static final String LIMITED_WHISPERS_MODE = "limited_whispers_mode";

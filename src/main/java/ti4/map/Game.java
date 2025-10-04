@@ -758,6 +758,11 @@ public class Game extends GameProperties {
         gameModes.put("Stellar Atomics", isStellarAtomicsMode());
         gameModes.put("Civilized Society", isCivilizedSocietyMode());
         gameModes.put("Age Of Fighters", isAgeOfFightersMode());
+
+        gameModes.put("Advent of the Warsun", isAdventOfTheWarsunMode());
+        gameModes.put("Cultural Exchange Program", isCulturalExchangeProgramMode());
+        gameModes.put("Zealous Orthoxy", isZealousOrthodoxyMode());
+        gameModes.put("Mercenaries For Hire", isMercenariesForHireMode());
         gameModes.put("No Support Swaps", isNoSwapMode());
         gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
         gameModes.put("Liberation", isLiberationC4Mode());
@@ -3778,6 +3783,11 @@ public class Game extends GameProperties {
                 .collect(Collectors.toSet());
     }
 
+    @JsonIgnore
+    public Set<String> getRealFactions() {
+        return getRealPlayers().stream().map(Player::getFaction).collect(Collectors.toSet());
+    }
+
     public void setPlayers(Map<String, Player> players) {
         this.players = players;
     }
@@ -3886,6 +3896,12 @@ public class Game extends GameProperties {
             if ("ghoti".equalsIgnoreCase(getStoredValue("terraformedPlanet"))) {
                 planets.get("ghoti").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
             }
+            planets.put("ocean1", new Planet("ocean1", new Point(0, 0)));
+            planets.put("ocean2", new Planet("ocean2", new Point(0, 0)));
+            planets.put("ocean3", new Planet("ocean3", new Point(0, 0)));
+            planets.put("ocean4", new Planet("ocean4", new Point(0, 0)));
+            planets.put("ocean5", new Planet("ocean5", new Point(0, 0)));
+            planets.put("triad", new Planet("triad", new Point(0, 0)));
         }
         return planets.keySet();
     }
