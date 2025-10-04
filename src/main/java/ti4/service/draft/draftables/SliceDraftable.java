@@ -12,6 +12,7 @@ import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.helpers.settingsFramework.menus.SliceDraftableSettings;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
@@ -240,6 +241,7 @@ public class SliceDraftable extends SinglePickDraftable {
             }
             initialize(outcome.slices());
             game.getDraftManager().tryStartDraft();
+            GameManager.save(game, "Nucleus generation");
         });
         // NucleusOutcome outcome = NucleusSliceGeneratorService.generateNucleusAndSlices(event, game, specs);
         // if(outcome.failureReason() != null) {
