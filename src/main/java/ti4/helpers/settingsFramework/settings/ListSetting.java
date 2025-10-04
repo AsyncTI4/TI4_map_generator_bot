@@ -4,9 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,9 +31,9 @@ import ti4.message.logging.BotLogger;
 @Setter
 @JsonIncludeProperties({"id", "keys"})
 public class ListSetting<T> extends SettingInterface {
-    private Set<String> keys = new LinkedHashSet<>();
-    private Set<String> defaultKeys = new LinkedHashSet<>();
-    private Map<String, T> allValues = new LinkedHashMap<>();
+    private Set<String> keys = new HashSet<>();
+    private Set<String> defaultKeys = new HashSet<>();
+    private Map<String, T> allValues = new HashMap<>();
     private Function<T, String> show;
     private Function<T, String> getEmoji;
     private String includeLang;
