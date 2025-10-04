@@ -6,7 +6,7 @@
         "startingFleet": "2 inf t,3 ff,cv,1 dd,sd t, 1 dn",
         "commodities": 2,
         "factionTech": ["cantoy", "cantor"],
-        "startingTech": ["dxa", "st"],
+        "startingTech": ["bs", "st"],
         "homePlanets": ["thyolcian"],
         "abilities": ["enslave","dominate","seamless_integration"],
         "leaders": ["cantoagent", "cantocommander", "cantohero"],

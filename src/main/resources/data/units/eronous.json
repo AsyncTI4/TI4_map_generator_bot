@@ -32,7 +32,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "After you gain control of this planet, you may ready this planet."
+        "ability": "After you gain control of a planet that contains this unit, you may ready that planet."
     },
     {
         "id": "eidolon_flagship",
@@ -45,12 +45,12 @@
         "capacityValue": 3,
         "capacityUsed": 1,
         "cost": 8,
-        "combatHitsOn": 7,
+        "combatHitsOn": 5,
         "combatDieCount": 2,
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You may treat this system as if it contains no planets. This unit cannot be captured."
+        "ability": "You may ignore the movement effects of anomalies in the system that contains this unit."
     },
     {
         "id": "eidolon_mech",
@@ -114,7 +114,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "DEPLOY: After another player activates a system that contains a “Silenced” token and no other player's ships, you may spend 4 influence to place this unit in that system."
+        "ability": "DEPLOY: After another player activates a system that contains 1 of your structures and no other player's ships, you may spend 4 influence to place this unit in that system."
     },
     {
         "id": "shadows_mech",
