@@ -324,7 +324,8 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             String draftableTypeStr = event.getOption(Constants.DRAFTABLE_TYPE_OPTION, o -> o.getAsString());
             DraftableType draftableType = DraftableType.of(draftableTypeStr);
 
-            boolean removed = draftManager.getDraftables().removeIf(d -> d.getType().equals(draftableType));
+            boolean removed =
+                    draftManager.getDraftables().removeIf(d -> d.getType().equals(draftableType));
 
             if (removed) {
                 MessageHelper.sendMessageToChannel(
@@ -715,8 +716,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                     "Type of draftable to remove the pick from",
                     true,
                     true);
-            addOption(
-                    OptionType.STRING, Constants.PLAYER_PICKS_OPTION, "Key of the choice to unpick", true, true);
+            addOption(OptionType.STRING, Constants.PLAYER_PICKS_OPTION, "Key of the choice to unpick", true, true);
         }
 
         @Override
@@ -725,8 +725,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             DraftManager draftManager = game.getDraftManager();
             DraftableType draftableType = DraftableType.of(
                     event.getOption(Constants.DRAFTABLE_TYPE_OPTION).getAsString());
-            String choiceKey =
-                    event.getOption(Constants.PLAYER_PICKS_OPTION).getAsString();
+            String choiceKey = event.getOption(Constants.PLAYER_PICKS_OPTION).getAsString();
             Draftable draftable = draftManager.getDraftable(draftableType);
             if (draftable == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "No draftable of type: " + draftableType);
@@ -742,7 +741,11 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             }
 
             for (String playerUserId : playerIds) {
-                draftManager.getPlayerStates().get(playerUserId).getPicks(draftableType).removeIf(choice -> choice.getChoiceKey().equals(choiceKey));
+                draftManager
+                        .getPlayerStates()
+                        .get(playerUserId)
+                        .getPicks(draftableType)
+                        .removeIf(choice -> choice.getChoiceKey().equals(choiceKey));
             }
 
             List<String> players = playerIds.stream()

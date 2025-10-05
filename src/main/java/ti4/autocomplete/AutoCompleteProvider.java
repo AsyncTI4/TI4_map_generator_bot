@@ -1188,11 +1188,13 @@ public class AutoCompleteProvider {
 
                 List<DraftChoice> allPicks = draftManager.getAllPicksOfType(draftableType);
                 event.replyChoices(allPicks.stream()
-                        .filter(option -> option.getUnformattedName().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(option -> new Command.Choice(option.getUnformattedName(), option.getChoiceKey()))
-                        .collect(Collectors.toList())
-                ).queue();
+                                .filter(option -> option.getUnformattedName()
+                                        .toLowerCase()
+                                        .contains(enteredValue))
+                                .limit(25)
+                                .map(option -> new Command.Choice(option.getUnformattedName(), option.getChoiceKey()))
+                                .collect(Collectors.toList()))
+                        .queue();
             }
         }
     }

@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -82,12 +81,14 @@ class ProduceNucleusGenStats extends GameStateSubcommand {
         List<Double> failRuntimes = new ArrayList<>();
         List<Double> successRuntimes = new ArrayList<>();
 
-        NucleusSpecs nucleusSpecs = new NucleusSpecs(draftSpecs.getTemplate().getPlayerCount(), draftSpecs.getNumSlices());
+        NucleusSpecs nucleusSpecs =
+                new NucleusSpecs(draftSpecs.getTemplate().getPlayerCount(), draftSpecs.getNumSlices());
 
         boolean strictMode = NucleusSliceGeneratorService.useStrictMode(mapTemplate);
         for (int i = 0; i < numIterations; ++i) {
             long startTime = System.nanoTime();
-            NucleusOutcome outcome = NucleusSliceGeneratorService.tryGenerateNucleusAndSlices(game, mapTemplate, nucleusSpecs, strictMode);
+            NucleusOutcome outcome = NucleusSliceGeneratorService.tryGenerateNucleusAndSlices(
+                    game, mapTemplate, nucleusSpecs, strictMode);
             long endTime = System.nanoTime();
             if (outcome.slices() != null) {
                 successAfterAttempts.add(i + 1);

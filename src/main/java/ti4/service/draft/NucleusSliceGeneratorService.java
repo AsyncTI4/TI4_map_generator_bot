@@ -152,7 +152,7 @@ public class NucleusSliceGeneratorService {
                 ListHelper.listOfIntegers(nucleusSpecs.minMapWormholes(), nucleusSpecs.maxMapWormholes());
         List<Integer> nucleusWormholeOptions =
                 ListHelper.listOfIntegers(nucleusSpecs.minNucleusWormholes(), nucleusSpecs.maxNucleusWormholes());
-        
+
         Integer numNucleusAlphaWormholes = ListHelper.randomPick(nucleusWormholeOptions);
         Integer numNucleusBetaWormholes = ListHelper.randomPick(nucleusWormholeOptions);
         Integer numMapAlphaWormholes = ListHelper.randomPick(mapWormholeOptions);
@@ -177,7 +177,7 @@ public class NucleusSliceGeneratorService {
         numMapBetaWormholes = Math.min(numMapBetaWormholes, betaTiles.size());
         numNucleusAlphaWormholes = Math.min(numNucleusAlphaWormholes, alphaTiles.size());
         numNucleusBetaWormholes = Math.min(numNucleusBetaWormholes, betaTiles.size());
-        
+
         numMapLegendaries = Math.min(numMapLegendaries, legendaryTiles.size());
         numNucleusLegendaries = Math.min(numNucleusLegendaries, numMapLegendaries);
 
@@ -188,7 +188,6 @@ public class NucleusSliceGeneratorService {
 
         DistanceTool distanceTool = new DistanceTool(game);
 
-        
         List<PlacedTile> placedAlphaTiles =
                 distributeByDistance(nucleusTiles, alphaTiles, numNucleusAlphaWormholes, distanceTool, null);
         List<PlacedTile> placedBetaTiles =
@@ -196,7 +195,6 @@ public class NucleusSliceGeneratorService {
         List<PlacedTile> placedLegendaryTiles =
                 distributeByDistance(nucleusTiles, legendaryTiles, numNucleusLegendaries, distanceTool, null);
 
-                
         Integer remainingAlphaWormholes = Math.max(numMapAlphaWormholes - placedAlphaTiles.size(), 0);
         Integer remainingBetaWormholes = Math.max(numMapBetaWormholes - placedBetaTiles.size(), 0);
         Integer requiredLegendaries = Math.max(numMapLegendaries - placedLegendaryTiles.size(), 0);
@@ -368,7 +366,8 @@ public class NucleusSliceGeneratorService {
             return "A player slice has more than " + nucleusSpecs.maxSlicePlanets() + " planets.";
         }
         if (totalRedTiles < nucleusSpecs.expectedRedTiles()) {
-            return "The map has less than the expected " + nucleusSpecs.expectedRedTiles() + " red/anomaly tiles total.";
+            return "The map has less than the expected " + nucleusSpecs.expectedRedTiles()
+                    + " red/anomaly tiles total.";
         }
         if (minCoreSpend < nucleusSpecs.minNucleusValue()) {
             return "A core slice has less than " + nucleusSpecs.minNucleusValue() + " total optimal spend.";

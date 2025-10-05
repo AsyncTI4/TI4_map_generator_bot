@@ -1,6 +1,5 @@
 package ti4.commands.draft;
 
-
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,15 +35,10 @@ public class MantisTileDraftableSubcommands extends SubcommandGroup {
         }
         return (MantisTileDraftable) draftManager.getDraftable(MantisTileDraftable.TYPE);
     }
-    
-    public static class MantisTileDraftableStartBuilding extends GameStateSubcommand
-    {
+
+    public static class MantisTileDraftableStartBuilding extends GameStateSubcommand {
         protected MantisTileDraftableStartBuilding() {
-            super(
-                    Constants.DRAFT_MANTIS_TILE_START_BUILDING,
-                    "Send the buttons to build the map",
-                    true,
-                    false);
+            super(Constants.DRAFT_MANTIS_TILE_START_BUILDING, "Send the buttons to build the map", true, false);
         }
 
         @Override

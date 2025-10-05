@@ -3,40 +3,26 @@ package ti4.service.draft;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
-import ti4.image.ImageHelper;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileStep;
 import ti4.map.Game;
-import ti4.map.Planet;
 import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.logging.BotLogger;
 import ti4.model.MapTemplateModel;
-import ti4.model.MapTemplateModel.MapTemplateTile;
-import ti4.service.draft.draftables.SeatDraftable;
-import ti4.service.emoji.MiscEmojis;
-import ti4.service.emoji.TI4Emoji;
-import ti4.service.emoji.TechEmojis;
 import ti4.service.image.FileUploadService;
-import ti4.service.milty.MiltyDraftSlice;
-import ti4.service.milty.MiltyDraftTile;
 
 @UtilityClass
 public class MantisBuildImageGeneratorService {
@@ -61,7 +47,8 @@ public class MantisBuildImageGeneratorService {
      * @param pendingTileId A Tile ID to draw separately as pending placement by the current player.
      * @return A FileUpload containing the image, or null if the image could not be generated.
      */
-    public FileUpload tryGenerateImage(DraftManager draftManager, String uniqueKey, List<String> currentPositions, String pendingTileId) {
+    public FileUpload tryGenerateImage(
+            DraftManager draftManager, String uniqueKey, List<String> currentPositions, String pendingTileId) {
 
         Game game = draftManager.getGame();
         String mapTemplateId = game.getMapTemplateID();
@@ -80,7 +67,11 @@ public class MantisBuildImageGeneratorService {
         return fileUpload;
     }
 
-    private BufferedImage generateImage(DraftManager draftManager, MapTemplateModel mapTemplate, List<String> currentPositions, String pendingTileId) {
+    private BufferedImage generateImage(
+            DraftManager draftManager,
+            MapTemplateModel mapTemplate,
+            List<String> currentPositions,
+            String pendingTileId) {
         int width = getMapWidth(draftManager.getGame());
         int height = getMapHeight(draftManager.getGame());
         BufferedImage mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -111,7 +102,8 @@ public class MantisBuildImageGeneratorService {
             try {
                 Tile tile = tileMap.get(tilePos);
                 if (tile == null) {
-                    BotLogger.warning("MantisBuildImageGeneratorService: Could not find tile at position " + tilePos + " to highlight.");
+                    BotLogger.warning("MantisBuildImageGeneratorService: Could not find tile at position " + tilePos
+                            + " to highlight.");
                     continue;
                 }
                 Point tilePoint = tileImagePoints.get(tile.getPosition());
@@ -121,11 +113,13 @@ public class MantisBuildImageGeneratorService {
                 return null;
             }
         }
-        if(pendingTileId != null) {
+        if (pendingTileId != null) {
             try {
                 Tile tile = tileMap.get(PENDING_TILE_POS);
-                if(tile != null) {
-                    BotLogger.warning("MantisBuildImageGeneratorService: There is already a tile at the pending tile position " + PENDING_TILE_POS + "; cannot draw pending tile.");
+                if (tile != null) {
+                    BotLogger.warning(
+                            "MantisBuildImageGeneratorService: There is already a tile at the pending tile position "
+                                    + PENDING_TILE_POS + "; cannot draw pending tile.");
                     return mainImage;
                 }
                 tile = new Tile(pendingTileId, PENDING_TILE_POS);
@@ -136,7 +130,7 @@ public class MantisBuildImageGeneratorService {
                 // BufferedImage tileImage = tileGenerator.draw(tile, TileStep.Tile);
                 // graphicsMain.drawImage(tileImage, tilePoint.x, tilePoint.y, null);
             } catch (Exception e) {
-                BotLogger.error("Failed to draw tile OPTION "+pendingTileId+" at " + PENDING_TILE_POS, e);
+                BotLogger.error("Failed to draw tile OPTION " + pendingTileId + " at " + PENDING_TILE_POS, e);
                 return null;
             }
         }
@@ -186,15 +180,7 @@ public class MantisBuildImageGeneratorService {
         graphics.setColor(Color.white);
         graphics.setFont(Storage.getFont64());
         DrawingUtil.superDrawString(
-                graphics,
-                "PLACE?",
-                base.x + 172,
-                base.y + 150,
-                Color.white,
-                hCenter,
-                null,
-                outlineStroke,
-                Color.black);
+                graphics, "PLACE?", base.x + 172, base.y + 150, Color.white, hCenter, null, outlineStroke, Color.black);
 
         // List<TI4Emoji> whs = new ArrayList<>();
         // List<TI4Emoji> legendary = new ArrayList<>();
@@ -286,7 +272,7 @@ public class MantisBuildImageGeneratorService {
 
     private void drawPendingTile(Graphics graphics, Point positionPoint, Game game, Tile tile) {
         Point base = new Point(positionPoint.x + TILE_PADDING, positionPoint.y + TILE_PADDING + 20);
-        
+
         Point tilePoint = getTilePosition(game, PENDING_TILE_POS);
         TileGenerator tileGenerator = new TileGenerator(game, null, DisplayType.map);
         BufferedImage tileImage = tileGenerator.draw(tile, TileStep.Tile);
