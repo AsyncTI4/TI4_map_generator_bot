@@ -623,7 +623,7 @@ public class NucleusSliceGeneratorService {
             List<MapTemplateTile> sliceLocations = coreSliceLocations.get(i);
             List<TierList> sliceTiers = getRandomTierPicks(sliceLocations.size());
 
-            // Generate tierlist picks for this nulceus slice
+            // Generate tierlist picks for this nucleus slice
             if (sliceLocations.size() != sliceTiers.size()) {
                 BotLogger.warning("Mismatched slice location and tier list sizes in fillNucleus");
                 return false;
