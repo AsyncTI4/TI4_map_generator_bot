@@ -1,10 +1,10 @@
 package ti4.service.draft.draftables;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import lombok.Getter;
@@ -18,12 +18,14 @@ import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.logging.BotLogger;
 import ti4.model.DraftErrataModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
@@ -50,6 +52,7 @@ public class MantisTileDraftable extends Draftable {
     private final List<String> mulliganTileIDs = new ArrayList<>();
 
     public static final DraftableType TYPE = DraftableType.of("MantisTile");
+    private static final String ChoiceKeyPrefix = "tile";
 
     public Category getItemCategory(String choiceKey) {
         if (choiceKey == null) return null;
@@ -68,10 +71,10 @@ public class MantisTileDraftable extends Draftable {
         return null;
     }
 
-    public String getItemId(String choiceKey) {
+    public static String getItemId(String choiceKey) {
         if (choiceKey == null) return null;
-        if (!choiceKey.startsWith("tile")) return null;
-        return choiceKey.substring("tile".length());
+        if (!choiceKey.startsWith(ChoiceKeyPrefix)) return null;
+        return choiceKey.substring(ChoiceKeyPrefix.length());
     }
 
     public DraftItem getDraftItem(String choiceKey) {
@@ -88,6 +91,11 @@ public class MantisTileDraftable extends Draftable {
             }
         }
         return null;
+    }
+
+    public static String getChoiceKeyFromTileId(String tileId) {
+        if(tileId == null) return null;
+        return ChoiceKeyPrefix + tileId;
     }
 
     @Override
@@ -109,7 +117,7 @@ public class MantisTileDraftable extends Draftable {
 
     private DraftChoice produceChoice(DraftItem tile) {
         String tileID = tile.ItemId;
-        String choiceKey = "tile" + tileID;
+        String choiceKey = MantisTileDraftable.getChoiceKeyFromTileId(tileID);
         String representation = Mapper.getTileRepresentations().get(tileID);
         if(representation == null) {
             representation = tileID;
@@ -123,9 +131,101 @@ public class MantisTileDraftable extends Draftable {
 	public String handleCustomCommand(GenericInteractionCreateEvent event, DraftManager draftManager,
 			String playerUserId, String commandKey) {
 		
-        // TODO: Will need to handle map building...
-        return null;
+        if(commandKey == null) {
+            return "Error: Command key is missing.";
+        }
+
+        if(commandKey.startsWith(MantisMapBuildService.ACTION_PREFIX)) {
+            return MantisMapBuildService.handleAction(event, draftManager, commandKey);
+        }
+        
+        return "Unknown command: " + commandKey;
 	}
+
+    @Override
+    public String isValidDraftChoice(DraftManager draftManager, String playerUserId, DraftChoice choice) {
+        String superError = super.isValidDraftChoice(draftManager, playerUserId, choice);
+        if (superError != null) {
+            return superError;
+        }
+        
+        Game game = draftManager.getGame();
+        MapTemplateModel mapTemplate = game.getMapTemplateID() != null ? Mapper.getMapTemplate(game.getMapTemplateID()) : null;
+        if (mapTemplate == null) {
+            return "Error: Could not find map template for game.";
+        }
+
+        List<DraftChoice> playerPicks = draftManager.getPlayerPicks(playerUserId, TYPE);
+        int bpp = mapTemplate.bluePerPlayer();
+        int rpp = mapTemplate.redPerPlayer();
+        int bluePicked = 0;
+        int redPicked = 0;
+        for(DraftChoice pick : playerPicks) {
+            Category category = getItemCategory(pick.getChoiceKey());
+            if(category == Category.BLUETILE) {
+                bluePicked++;
+            }
+            else if(category == Category.REDTILE) {
+                redPicked++;
+            }
+        }
+
+        Category choiceCategory = getItemCategory(choice.getChoiceKey());
+        if(choiceCategory == null) {
+            return "Error: Could not find category for choice: " + choice.getUnformattedName() + " (" + choice.getChoiceKey() + ").";
+        }
+        if(choiceCategory == Category.BLUETILE) {
+            if(bluePicked >= bpp) {
+                return "You have already picked the maximum number of blue tiles (" + bpp + ").";
+            }
+        }
+        else if(choiceCategory == Category.REDTILE) {
+            if(redPicked >= rpp) {
+                return "You have already picked the maximum number of red tiles (" + rpp + ").";
+            }
+        }
+        else {
+            return "Error: Choice " + choice.getUnformattedName() + " (" + choice.getChoiceKey() + ") is not a blue or red tile.";
+        }
+
+        return null;
+    }
+
+    @Override
+    public void postApplyDraftPick(
+            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice) {
+        
+        // TODO: Send rendering of all tile picks to private info thread, as a summary for the player.
+
+        Player player = draftManager.getGame().getPlayer(playerUserId);
+        if (player == null) {
+            BotLogger.warning("MantisTileDraftable.postApplyDraftPick: Could not find player with user ID " + playerUserId);
+            return;
+        }
+
+        StringBuilder summary = new StringBuilder("You picked the tiles: ");
+        List<DraftChoice> picks = draftManager.getPlayerStates().get(playerUserId).getPicks(TYPE);
+        if(picks == null || picks.isEmpty()) {
+            summary.append("None");
+        }
+        else {
+            List<String> pickNames = new ArrayList<>();
+            for(DraftChoice pick : picks) {
+                pickNames.add(pick.getFormattedName());
+            }
+            summary.append(String.join(", ", pickNames));
+        }
+
+        if(player.getCardsInfoThread() == null) {
+            return; //Not sure this needs to be logged anywhere
+        }
+
+        player.getCardsInfoThread().getHistory().retrievePast(10).complete().stream()
+            .filter(msg -> !msg.isUsingComponentsV2())
+            .filter(msg -> msg.getContentRaw().startsWith("You picked the tiles: "))
+            .findFirst()
+            .ifPresentOrElse(msg -> msg.editMessage(summary.toString()).queue(), () -> player.getCardsInfoThread().sendMessage(summary.toString()).queue());
+    }
 
 	@Override
 	public DraftChoice getNothingPickedChoice() {
@@ -136,13 +236,18 @@ public class MantisTileDraftable extends Draftable {
 	public String save() {
         List<String> allTileIDs = new ArrayList<>();
         for (BlueTileDraftItem tile : blueTiles) {
-            allTileIDs.add(tile.ItemId);
+            allTileIDs.add("b" + tile.ItemId);
         }
         for (RedTileDraftItem tile : redTiles) {
-            allTileIDs.add(tile.ItemId);
+            allTileIDs.add("r" + tile.ItemId);
         }
-        allTileIDs.add("DISCARDS");
-        allTileIDs.addAll(discardedTileIDs);
+        for(String tileID : discardedTileIDs) {
+            allTileIDs.add("d" + tileID);
+        }
+        for(String tileId : mulliganTileIDs) {
+            allTileIDs.add("m" + tileId);
+        }
+        
         return String.join(Draftable.SAVE_SEPARATOR, allTileIDs);
 	}
 
@@ -155,43 +260,91 @@ public class MantisTileDraftable extends Draftable {
         if (data == null || data.isEmpty()) {
             return;
         }
-        String[] tileIDs = data.split(",");
-        boolean discards = false;
-        boolean mulligans = false;
-        for (String tileID : tileIDs) {
-            if(tileID.equals("DISCARDS")) {
-                discards = true;
-                continue;
-            }
-            if(tileID.equals("MULLIGANS")) {
-                mulligans = true;
-                continue;
-            }
-            if(mulligans) {
-                mulliganTileIDs.add(tileID);
-                continue;
-            }
-            if(discards) {
-                discardedTileIDs.add(tileID);
-                continue;
-            }
+        String[] labeledTileIDs = data.split(",");
+        for (String labeledTileId : labeledTileIDs) {
+            Character label = labeledTileId.charAt(0);
+            String tileId = labeledTileId.length() > 1 ? labeledTileId.substring(1) : "";
 
-            MiltyDraftTile tile = DraftTileManager.findTile(tileID);
-            if (tile != null) {
-                if (tile.getTile().getTileModel().getTileBack().equals(TileBack.BLUE)) {
-                    blueTiles.add((BlueTileDraftItem) DraftItem.generate(Category.BLUETILE, tileID));
-                } else if (tile.getTile().getTileModel().getTileBack().equals(TileBack.RED)) {
-                    redTiles.add((RedTileDraftItem) DraftItem.generate(Category.REDTILE, tileID));
+            // If there is no label, infer the label from the tile back
+            if(!Character.isAlphabetic(labeledTileId.charAt(0))) {
+                tileId = labeledTileId;
+                TileModel tileModel = TileHelper.getTileById(tileId);
+                if(tileModel == null || tileModel.getTileBack() == null) {
+                    BotLogger.warning("MantisTileDraftable.load: Could not find tile with ID '" + tileId + "' in data: " + data);
                 }
-                else {
-                    BotLogger.warning("MantisTileDraftable.load: Tile " + tileID + " is not blue or red, shouldn't be in save data.");
+                if(tileModel.getTileBack() == TileBack.BLUE) {
+                    label = 'b';
                 }
+                else if(tileModel.getTileBack() == TileBack.RED) {
+                    label = 'r';
+                }
+            }
+            // String label = labeledTileId.length() > 0 ? labeledTileId.substring(0, 1) : "";
+            // String tileId = labeledTileId.length() > 1 ? labeledTileId.substring(1) : "";
+            if (label.equals('b')) {
+                blueTiles.add((BlueTileDraftItem) DraftItem.generate(Category.BLUETILE, tileId));
+            } else if (label.equals('r')) {
+                redTiles.add((RedTileDraftItem) DraftItem.generate(Category.REDTILE, tileId));
+            } else if (label.equals('d')) {
+                discardedTileIDs.add(tileId);
+            } else if (label.equals('m')) {
+                mulliganTileIDs.add(tileId);
+            } else {
+                BotLogger.warning("MantisTileDraftable.load: Unknown tile label '" + label + "' in data: " + data);
             }
         }
 	}
 
 	@Override
 	public String validateState(DraftManager draftManager) {
+        Set<String> tileIDs = new HashSet<>();
+        for(BlueTileDraftItem tile : blueTiles) {
+            if(tile == null || tile.ItemId == null || tile.ItemId.isEmpty()) {
+                return "One of the blue tiles is missing a tile ID.";
+            }
+            if(TileHelper.getTileById(tile.ItemId) == null) {
+                return "Blue tile ID " + tile.ItemId + " is not known as a tile.";
+            }
+            if(TileHelper.getTileById(tile.ItemId).getTileBack() != TileBack.BLUE) {
+                return "Tile ID " + tile.ItemId + " is not a blue tile.";
+            }
+            if(tileIDs.contains(tile.ItemId)) {
+                return "Tile ID " + tile.ItemId + " is duplicated in blue tiles.";
+            }
+            tileIDs.add(tile.ItemId);
+        }
+        for(RedTileDraftItem tile : redTiles) {
+            if(tile == null || tile.ItemId == null || tile.ItemId.isEmpty()) {
+                return "One of the red tiles is missing a tile ID.";
+            }
+            if(TileHelper.getTileById(tile.ItemId) == null) {
+                return "Red tile ID " + tile.ItemId + " is not known as a tile.";
+            }
+            if(TileHelper.getTileById(tile.ItemId).getTileBack() != TileBack.RED) {
+                return "Tile ID " + tile.ItemId + " is not a red tile.";
+            }
+            if(tileIDs.contains(tile.ItemId)) {
+                return "Tile ID " + tile.ItemId + " is duplicated in red tiles.";
+            }
+            tileIDs.add(tile.ItemId);
+        }
+        for(String tileID : discardedTileIDs) {
+            if(tileID == null || tileID.isEmpty()) {
+                return "One of the discarded tiles is missing a tile ID.";
+            }
+            if(!tileIDs.contains(tileID)) {
+                return "Discarded tile ID " + tileID + " is not found in blue or red tiles.";
+            }
+        }
+        for(String tileID : mulliganTileIDs) {
+            if(tileID == null || tileID.isEmpty()) {
+                return "One of the mulligan tiles is missing a tile ID.";
+            }
+            if(!tileIDs.contains(tileID)) {
+                return "Mulligan tile ID " + tileID + " is not found in blue or red tiles.";
+            }
+        }
+
         String mapTemplateID = draftManager.getGame().getMapTemplateID();
         if (mapTemplateID == null) {
             return "Map template ID is missing. Try `/map set_map_template`";
@@ -208,6 +361,10 @@ public class MantisTileDraftable extends Draftable {
             Player player = draftManager.getGame().getPlayer(playerUserId);
             PlayerDraftState pState = entry.getValue();
             List<DraftChoice> mantisPicks = pState.getPicks(TYPE);
+            if(mantisPicks == null) {
+                continue; // Player hasn't picked anything yet
+            }
+
             int bluePicked = 0;
             int redPicked = 0;
             for(DraftChoice choice : mantisPicks) {
@@ -315,6 +472,9 @@ public class MantisTileDraftable extends Draftable {
             Player player = draftManager.getGame().getPlayer(playerUserId);
             PlayerDraftState pState = entry.getValue();
             List<DraftChoice> mantisPicks = pState.getPicks(TYPE);
+            if(mantisPicks == null) {
+                return "Player " + player.getRepresentation() + " has not picked any tiles.";
+            }
             int bluePicked = 0;
             int redPicked = 0;
             for(DraftChoice choice : mantisPicks) {

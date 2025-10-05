@@ -3,12 +3,13 @@ package ti4.service.draft;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+// import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Predicate;
+// import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -30,9 +31,7 @@ import ti4.message.logging.LogOrigin;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
 import ti4.service.draft.draftables.MantisTileDraftable;
-import ti4.service.draft.draftables.SeatDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
-import ti4.service.milty.MiltyDraftTile;
 
 @UtilityClass
 public class MantisMapBuildService {
@@ -96,8 +95,8 @@ public class MantisMapBuildService {
         String actionType = actionParts[0];
         String outcome = switch(actionType) {
             case "place" -> handlePlaceTile(event, game, mapTemplateModel, actionParts[1]);
-            case "mulligan" -> handleMulliganTile();
-            case "repost" -> handleRepost();
+            case "mulligan" -> handleMulliganTile(event, game, mapTemplateModel, actionParts[1]);
+            case "repost" -> handleRepost(game, mapTemplateModel);
             default -> "Error: Unknown map build action type: " + actionType;
         };
 
@@ -110,25 +109,78 @@ public class MantisMapBuildService {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Error: Invalid parameters for place tile action: " + actionParams);
             return "Error: Invalid parameters for place tile action: " + actionParams;
         }
+        
+        DraftManager draftManager = game.getDraftManager();
+        MantisTileDraftable mantisTileDraftable = (MantisTileDraftable) draftManager.getDraftable(MantisTileDraftable.TYPE);
+        if(mantisTileDraftable == null) {
+            return "Error: Could not find mantis tile draftable to continue map building.";
+        }
 
         String position = params[0];
         String tileId = params[1];
 
+        String playerUserId = getPlayerUserIdForTilePosition(draftManager, mapTemplateModel, position);
+        if(event instanceof ButtonInteractionEvent buttonEvent && !buttonEvent.getUser().getId().equals(playerUserId)) {
+            return "It's not your turn to place a tile";
+        }
+        List<String> playersWithTilePick = draftManager.getPlayersWithChoiceKey(MantisTileDraftable.TYPE, MantisTileDraftable.getChoiceKeyFromTileId(tileId));
+        if(playersWithTilePick.isEmpty()) {
+            return "Error: Could not find any player that has tile " + tileId + " drafted.";
+        }
+        if(!playersWithTilePick.contains(playerUserId)) {
+            return "Error: You do not have tile " + tileId + " drafted.";
+        }
+
+        // TODO: Other validation before locking it in?
+
+        if(!placeTile(game, position, tileId)) {
+            return "Unable to place tile " + tileId + " at " + position + ".";
+        }
+
+        List<PlayerRemainingTiles> allPlayerRemainingTiles = getPlayerRemainingTiles(draftManager, mantisTileDraftable);
+
+        updateMapBuild(event, game, mantisTileDraftable, mapTemplateModel, allPlayerRemainingTiles);
+        return null;
+    }
+
+    public String handleMulliganTile(GenericInteractionCreateEvent event, Game game, MapTemplateModel mapTemplateModel, String actionParams) {
         DraftManager draftManager = game.getDraftManager();
-        String playerUserId = getPlayerUserIdForPosition(draftManager, mapTemplateModel, position);
+        MantisTileDraftable mantisTileDraftable = (MantisTileDraftable) draftManager.getDraftable(MantisTileDraftable.TYPE);
+        if(mantisTileDraftable == null) {
+            return "Error: Could not find mantis tile draftable to continue map building.";
+        }
+
+        String tileId = actionParams;
+
+        List<String> playersWithTilePick = draftManager.getPlayersWithChoiceKey(MantisTileDraftable.TYPE, MantisTileDraftable.getChoiceKeyFromTileId(tileId));
+        if(playersWithTilePick.isEmpty()) {
+            return "Error: Could not find any player that has tile " + tileId + " drafted.";
+        }
+
+        String playerUserId = playersWithTilePick.get(0);
         if(event instanceof ButtonInteractionEvent buttonEvent && !buttonEvent.getUser().getId().equals(playerUserId)) {
             return "It's not your turn to place a tile";
         }
 
-        // TODO: Other validation before locking it in?
+        List<PlayerRemainingTiles> allPlayerRemainingTiles = getPlayerRemainingTiles(draftManager, mantisTileDraftable);
+
+        mantisTileDraftable.getMulliganTileIDs().add(tileId);
+        updateMapBuild(event, game, mantisTileDraftable, mapTemplateModel, allPlayerRemainingTiles, tileId);
+        return null;
     }
 
-    public String handleMulliganTile() {
+    public String handleRepost(Game game, MapTemplateModel mapTemplateModel) {
+        DraftManager draftManager = game.getDraftManager();
+        MantisTileDraftable mantisTileDraftable = (MantisTileDraftable) draftManager.getDraftable(MantisTileDraftable.TYPE);
+        if(mantisTileDraftable == null) {
+            return "Error: Could not find mantis tile draftable to continue map building.";
+        }
 
-    }
+        List<PlayerRemainingTiles> allPlayerRemainingTiles = getPlayerRemainingTiles(draftManager, mantisTileDraftable);
 
-    public String handleRepost() {
-
+        // Calling this without an event should cause an update, instead of an edit
+        updateMapBuild(null, game, mantisTileDraftable, mapTemplateModel, allPlayerRemainingTiles);
+        return null;
     }
 
     private boolean placeTile(Game game, String position, String tileId) {
@@ -144,10 +196,15 @@ public class MantisMapBuildService {
     }
 
     private void updateMapBuild(GenericInteractionCreateEvent event, Game game, MantisTileDraftable mantisDraftable, MapTemplateModel mapTemplateModel, List<PlayerRemainingTiles> allPlayerRemainingTiles) {
+        updateMapBuild(event, game, mantisDraftable, mapTemplateModel, allPlayerRemainingTiles, null);
+    }
+
+    private void updateMapBuild(GenericInteractionCreateEvent event, Game game, MantisTileDraftable mantisDraftable, MapTemplateModel mapTemplateModel, List<PlayerRemainingTiles> allPlayerRemainingTiles, String mulliganTileId) {
+        MessageChannel responseChannel = event == null ? game.getMainGameChannel() : event.getMessageChannel();
 
         DraftManager draftManager = game.getDraftManager();
         if(draftManager == null) {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Error: Could not find draft manager to continue map building.");
+            MessageHelper.sendMessageToChannel(responseChannel, "Error: Could not find draft manager to continue map building.");
             return;
         }
         
@@ -164,7 +221,6 @@ public class MantisMapBuildService {
             Map<Integer, List<String>> playerNumToTiles = placementGroups.get(groupKey);
             List<Entry<Integer, List<String>>> orderedPlayerPositions = playerNumToTiles.entrySet().stream().sorted(Entry.comparingByKey()).toList();
             for(Entry<Integer, List<String>> entry : orderedPlayerPositions) {
-                Integer playerNum = entry.getKey();
                 List<String> positions = entry.getValue();
                 List<String> currentUnplacedPositions = new ArrayList<>();
                 for(String pos : positions) {
@@ -172,7 +228,7 @@ public class MantisMapBuildService {
                     if(tileAtPos == null || TileHelper.isDraftTile(tileAtPos.getTileModel())) {
                         // This position needs a tile placed
                         currentUnplacedPositions.add(pos);
-                        break;
+                        // break;
                     }
                 }
 
@@ -195,63 +251,65 @@ public class MantisMapBuildService {
         }
         if(nextGroup == null || nextGroup.isEmpty()) {
             // All done!
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map building complete!");
+            MessageHelper.sendMessageToChannel(responseChannel, "Map building complete!");
             // NOTE: This currently doesn't block anything, so there's nothing to unblock. But if it did, this is
             // where the unblocking would happen.
             return;
         }
 
         // Use the first position in the group to determine which player is placing next.
-        String playerUserId = getPlayerUserIdForPosition(draftManager, mapTemplateModel, nextGroup.get(0));
+        String playerUserId = getPlayerUserIdForTilePosition(draftManager, mapTemplateModel, nextGroup.get(0));
         if(playerUserId == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Error: Could not determine player for next tile placement position at " + nextGroup.get(0) + ".");
+            MessageHelper.sendMessageToChannel(responseChannel, "Error: Could not determine player for next tile placement position at " + nextGroup.get(0) + ".");
             return;
         }
 
         Player player = game.getPlayer(playerUserId);
         if(player == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Error: Could not find player with ID " + playerUserId + " to place next tile.");
+            MessageHelper.sendMessageToChannel(responseChannel, "Error: Could not find player with ID " + playerUserId + " to place next tile.");
             return;
         }
 
         PlayerRemainingTiles playerRemainingTiles = allPlayerRemainingTiles.stream().filter(prt -> prt.playerUserId().equals(playerUserId)).findFirst().orElse(null);
         if(playerRemainingTiles == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Error: Could not find remaining tiles for player " + player.getRepresentation() + " to place next tile.");
+            MessageHelper.sendMessageToChannel(responseChannel, "Error: Could not find remaining tiles for player " + player.getRepresentation() + " to place next tile.");
             return;
         }
 
         DraftItem nextTile = drawTile(event, player, playerRemainingTiles, null);
         if(nextTile == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Error: Could not draw next tile for player " + player.getRepresentation() + ".");
+            MessageHelper.sendMessageToChannel(responseChannel, "Error: Could not draw next tile for player " + player.getRepresentation() + ".");
             return;
         }
         sendDraftButtons(event, game, mantisDraftable, player, nextTile, nextGroup);
     }
 
     private void sendDraftButtons(GenericInteractionCreateEvent event, Game game, MantisTileDraftable mantisDraftable, Player player, DraftItem nextTile, List<String> openPositions) {
+        MessageChannel responseChannel = event == null ? game.getMainGameChannel() : event.getMessageChannel();
+
         if(nextTile == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Error: Could not find any available tiles for player " + player.getRepresentation() + " to place next tile.");
+            MessageHelper.sendMessageToChannel(responseChannel, "Error: Could not find any available tiles for player " + player.getRepresentation() + " to place next tile.");
             return;
         }
         
         // Get the number of mulligans used by this player so far
         List<DraftChoice> playerPicks = game.getDraftManager().getPlayerPicks(player.getUserID(), MantisTileDraftable.TYPE);
         int mulligansUsed = (int) mantisDraftable.getMulliganTileIDs().stream()
-                .filter(mulliganId -> playerPicks.stream().anyMatch(pick -> mantisDraftable.getItemId(pick.getChoiceKey()).equals(mulliganId)))
+                .filter(mulliganId -> playerPicks.stream().anyMatch(pick -> MantisTileDraftable.getItemId(pick.getChoiceKey()).equals(mulliganId)))
                 .count();
 
         // TODO: Handle option to block adjacent anomalies when alternatives exist
         List<Button> buttons = new ArrayList<>();
         for(String pos : openPositions) {
-            String buttonId = mantisDraftable.makeButtonId("build_place_" + pos + "_" + nextTile.ItemId);
+            String buttonId = mantisDraftable.makeButtonId(ACTION_PREFIX + "place_" + pos + "_" + nextTile.ItemId);
             buttons.add(Buttons.blue(buttonId, pos));
         }
         // TODO: Handle option to adjust max mulligans
         if(mulligansUsed < 1) {
-            String buttonId = mantisDraftable.makeButtonId("build_mulligan_" + nextTile.ItemId);
+            String buttonId = mantisDraftable.makeButtonId(ACTION_PREFIX + "mulligan_" + nextTile.ItemId);
             buttons.add(Buttons.gray(buttonId, "Mulligan"));
         }
-        buttons.add(Buttons.gray(mantisDraftable.makeButtonId("build_repost"), "Repost build info"));
+        buttons.add(Buttons.gray(mantisDraftable.makeButtonId(ACTION_PREFIX + "repost"), "Repost build info"));
 
         // Build message text
         StringBuilder sb = new StringBuilder(player.getRepresentation() + " can pick a position to place " + nextTile.getLongDescription());
@@ -263,7 +321,7 @@ public class MantisMapBuildService {
 
         // If no event, just re-post
         if(event == null || !(event instanceof ButtonInteractionEvent)) {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb.toString());
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb.toString(), buttons);
         } else {
             ButtonInteractionEvent buttonEvent = (ButtonInteractionEvent) event;
             buttonEvent.getHook().editOriginal(sb.toString()).setComponents(ActionRow.partitionOf(buttons)).queue();
@@ -271,6 +329,8 @@ public class MantisMapBuildService {
     }
 
     private DraftItem drawTile(GenericInteractionCreateEvent event, Player player, PlayerRemainingTiles playerRemainingTiles, String mulliganTileId) {
+        MessageChannel responseChannel = event == null ? player.getGame().getMainGameChannel() : event.getMessageChannel();
+
         List<String> availableTileIDs = new ArrayList<>();
         availableTileIDs.addAll(playerRemainingTiles.blueTileIds());
         availableTileIDs.addAll(playerRemainingTiles.redTileIds());
@@ -278,7 +338,7 @@ public class MantisMapBuildService {
             availableTileIDs.remove(mulliganTileId);
         }
         if(availableTileIDs.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Error: Could not find any available tiles for player " + player.getRepresentation() + " to place next tile.");
+            MessageHelper.sendMessageToChannel(responseChannel, "Error: Could not find any available tiles for player " + player.getRepresentation() + " to place next tile.");
             return null;
         }
         Collections.shuffle(availableTileIDs);
@@ -293,7 +353,13 @@ public class MantisMapBuildService {
      * @param position 0-based position in the list of the map's player numbers
      * @return The user ID of the player at that position, or null if not found
      */
-    private String getPlayerUserIdBySpeakerOrderPosition(DraftManager draftManager, int position) {
+    private String getPlayerUserIdBySpeakerOrder(DraftManager draftManager, int position) {
+
+        if(draftManager.getDraftable(SpeakerOrderDraftable.TYPE) == null) {
+            MessageHelper.sendMessageToChannel(draftManager.getGame().getMainGameChannel(), "Error: Speaker order draftable is not enabled, cannot determine player order.");
+            return null;
+        }
+
         // Find the player with the given speaker order position
         for(Entry<String, PlayerDraftState> entry : draftManager.getPlayerStates().entrySet()) {
             String playerId = entry.getKey();
@@ -311,7 +377,7 @@ public class MantisMapBuildService {
         return null;
     }
 
-    private String getPlayerUserIdForPosition(DraftManager draftManager, MapTemplateModel mapTemplateModel, String position) {
+    private String getPlayerUserIdForTilePosition(DraftManager draftManager, MapTemplateModel mapTemplateModel, String position) {
         // Get the template tile at that position
         MapTemplateTile templateTile = mapTemplateModel.getTemplateTiles().stream()
                 .filter(t -> t.getPos().equals(position))
@@ -337,7 +403,7 @@ public class MantisMapBuildService {
         }
 
         // Get the user ID of the current group's player, based on speaker order
-        String playerUserId = getPlayerUserIdBySpeakerOrderPosition(draftManager, playerIndex);
+        String playerUserId = getPlayerUserIdBySpeakerOrder(draftManager, playerIndex);
         return playerUserId;
     }
 
@@ -363,56 +429,91 @@ public class MantisMapBuildService {
         // on those to get the tile indexes to group together. An alternative could be to use the DistanceTool
         // to group tiles by their distance from the center tile, but that seems excessive and flakey.
 
-        List<String> emulatedPositions = mapTemplateModel.emulatedTiles();
+        List<String> emulatedPositions = new ArrayList<>(mapTemplateModel.emulatedTiles());
         // Remove the Home Position
-        Predicate<MapTemplateTile> isHome = t -> t.getHome() != null && t.getHome();
-        Set<String> homePositions = new HashSet<>(mapTemplateModel.getTemplateTiles().stream().filter(isHome).map(MapTemplateTile::getPos).toList());
-        emulatedPositions.removeIf(homePositions::contains);
+        // Predicate<MapTemplateTile> isHome = t -> t.getHome() != null && t.getHome();
+        // Set<String> homePositions = new HashSet<>(mapTemplateModel.getTemplateTiles().stream().filter(isHome).map(MapTemplateTile::getPos).toList());
+        // emulatedPositions.removeIf(homePositions::contains);
+        // Remove the home position, which by convention seems to be the first one in the list
+        emulatedPositions.removeFirst();
 
         // It weirds me out that playerNums start at 1, so get a list of ACTUAL player numbers used in the template
         // Just in case someone uses 0 or skips a number or something I dunno
-        List<Integer> playerNums = mapTemplateModel.getTemplateTiles().stream()
-                .filter(t -> t.getPlayerNumber() != null)
-                .map(MapTemplateTile::getPlayerNumber)
-                .distinct()
-                .sorted()
-                .toList();
+        // List<Integer> playerNums = mapTemplateModel.getTemplateTiles().stream()
+        //         .filter(t -> t.getPlayerNumber() != null)
+        //         .map(MapTemplateTile::getPlayerNumber)
+        //         .distinct()
+        //         .sorted()
+        //         .toList();
 
-        // For each emulated position, add each player's equivalent position to the correct group and add that group to the list.
+        // For each tile position, record it's player number and it's milty tile index separately.
+        // Map<String, Integer> posToPlayerNum = new HashMap<>();
+        // Map<String, Integer> posToTileIndex = new HashMap<>();
+        // Map<String, Integer> posToGroup = new HashMap<>();
         Map<Integer, Map<Integer, List<String>>> groupToPlayerNumToTiles = new HashMap<>();
-        for(String pos : emulatedPositions) {
-            // Get the actual template tile for the emulated position
-            MapTemplateTile baseTile = mapTemplateModel.getTemplateTiles().stream().filter(t -> t.getPos().equals(pos)).findFirst().orElse(null);
-            if(baseTile == null) {
-                BotLogger.warning(new LogOrigin(game), "Could not find template tile for position " + pos + " in map template " + mapTemplateModel.getAlias() + ".");
-                continue;
+        for(MapTemplateTile tile : mapTemplateModel.getTemplateTiles()) {
+            Integer playerNumber = tile.getPlayerNumber();
+            // if(playerNumber != null) {
+            //     posToPlayerNum.put(tile.getPos(), playerNumber);
+            // }
+            Integer tileIndex = tile.getMiltyTileIndex();
+            Integer group = null;
+            if(tileIndex != null) {
+                // posToTileIndex.put(tile.getPos(), tileIndex);
+
+                // Milty Tile Index seems to be 0-based, ordering tiles from relative-left to clockwise then out.
+                // This seems to correspond to emulated tile positions AFTER removing the emulated home system.
+                // TODO: Unit test that fails when the mapper loads a template that violates this assumption.
+                String equivEmulatedPos = emulatedPositions.get(tileIndex);
+                group = getTileGroup(equivEmulatedPos);
+                // if(group != null) {
+                //     posToGroup.put(tile.getPos(), group);
+                // }
             }
 
-            // Get the tile index this emulated position represents
-            Integer tileIndex = baseTile.getMiltyTileIndex();
-            // Get the grouping for this tile index
-            Integer group = getTileGroup(baseTile);
-
-            // For each player, find their equivalent position for this emulated tile
-            // and add that position to the correct group for that player.
-            for(int playerNum : playerNums) {
-                String playerTilePos = mapTemplateModel.getTemplateTiles().stream()
-                        .filter(t -> t.getPlayerNumber() != null && t.getPlayerNumber() == playerNum)
-                        .filter(t -> t.getMiltyTileIndex() != null && t.getMiltyTileIndex().equals(tileIndex))
-                        .map(MapTemplateTile::getPos)
-                        .findFirst()
-                        .orElse(null);
-                if(playerTilePos == null) {
-                    BotLogger.warning(new LogOrigin(game), "Could not find player tile for player " + playerNum + " and tile " + tileIndex + " in map template " + mapTemplateModel.getAlias() + ".");
-                    continue;
-                }
-
+            if(playerNumber != null && group != null) {
                 groupToPlayerNumToTiles.putIfAbsent(group, new HashMap<>());
                 Map<Integer, List<String>> playerNumToTiles = groupToPlayerNumToTiles.get(group);
-                playerNumToTiles.putIfAbsent(playerNum, new ArrayList<>());
-                playerNumToTiles.get(playerNum).add(playerTilePos);
+                playerNumToTiles.putIfAbsent(playerNumber, new ArrayList<>());
+                playerNumToTiles.get(playerNumber).add(tile.getPos());
             }
         }
+
+        // For each emulated position, add each player's equivalent position to the correct group and add that group to the list.
+        // Map<Integer, Map<Integer, List<String>>> groupToPlayerNumToTiles = new HashMap<>();
+        // for(String emulatedPos : emulatedPositions) {
+        //     // Get the actual template tile for the emulated position
+        //     MapTemplateTile baseTile = mapTemplateModel.getTemplateTiles().stream().filter(t -> t.getPos().equals(emulatedPos)).findFirst().orElse(null);
+        //     if(baseTile == null) {
+        //         BotLogger.warning(new LogOrigin(game), "Could not find template tile for position " + emulatedPos + " in map template " + mapTemplateModel.getAlias() + ".");
+        //         continue;
+        //     }
+
+        //     // Get the tile index this emulated position represents
+        //     Integer tileIndex = baseTile.getMiltyTileIndex();
+        //     // Get the grouping for this tile index
+        //     Integer group = getTileGroup(baseTile);
+
+        //     // For each player, find their equivalent position for this emulated tile
+        //     // and add that position to the correct group for that player.
+        //     for(int playerNum : playerNums) {
+        //         String playerTilePos = mapTemplateModel.getTemplateTiles().stream()
+        //                 .filter(t -> t.getPlayerNumber() != null && t.getPlayerNumber() == playerNum)
+        //                 .filter(t -> t.getMiltyTileIndex() != null && t.getMiltyTileIndex().equals(tileIndex))
+        //                 .map(MapTemplateTile::getPos)
+        //                 .findFirst()
+        //                 .orElse(null);
+        //         if(playerTilePos == null) {
+        //             BotLogger.warning(new LogOrigin(game), "Could not find player tile for player " + playerNum + " and tile " + tileIndex + " in map template " + mapTemplateModel.getAlias() + ".");
+        //             continue;
+        //         }
+
+        //         groupToPlayerNumToTiles.putIfAbsent(group, new HashMap<>());
+        //         Map<Integer, List<String>> playerNumToTiles = groupToPlayerNumToTiles.get(group);
+        //         playerNumToTiles.putIfAbsent(playerNum, new ArrayList<>());
+        //         playerNumToTiles.get(playerNum).add(playerTilePos);
+        //     }
+        // }
 
         // For the groups that were found, get their group number in order
         // List<Integer> groupNumbers = new ArrayList<>(groupToPlayerNumToTiles.keySet());
@@ -437,10 +538,16 @@ public class MantisMapBuildService {
      * tile positions like we do in a standard map. Basically, just use the ring number
      * on the equivalent emulated tile to determine the group.
      */
-    private Integer getTileGroup(MapTemplateTile emulatedTile) {
-        String pos = emulatedTile.getPos();
+    // private Integer getTileGroup(MapTemplateTile emulatedTile) {
+    //     String pos = emulatedTile.getPos();
+    //     return getTileGroup(pos);
+    // }
+    private Integer getTileGroup(String emulatedTilePos) {
         // Position 101 = group 1; Position 1304 = group 13
-        return Integer.valueOf(pos.substring(0, pos.length() - 2));
+        if(emulatedTilePos.length() < 3) {
+            return null;
+        }
+        return Integer.valueOf(emulatedTilePos.substring(0, emulatedTilePos.length() - 2));
     }
 
     // TODO: Implement over-drafting support, then will need this to discard down. These are untested.
@@ -496,9 +603,15 @@ public class MantisMapBuildService {
 
     private List<PlayerRemainingTiles> getPlayerRemainingTiles(DraftManager draftManager, MantisTileDraftable mantisDraftable) {
         List<PlayerRemainingTiles> result = new ArrayList<>();
+        Set<String> placedTiles = draftManager.getGame().getTileMap().values().stream().map(t -> t.getTileID()).collect(Collectors.toSet());
         for(Entry<String, PlayerDraftState> entry : draftManager.getPlayerStates().entrySet()) {
             String playerId = entry.getKey();
-            List<DraftChoice> mantisPicks = entry.getValue().getPicks(MantisTileDraftable.TYPE);
+            List<DraftChoice> mantisPicks = new ArrayList<>(entry.getValue().getPicks(MantisTileDraftable.TYPE));
+
+            // Remove tiles that are placed on the game board
+            mantisPicks.removeIf(pick -> placedTiles.contains(MantisTileDraftable.getItemId(pick.getChoiceKey())));
+
+            // Collect unplaced picks as separate lists of BlueTileDraftItems and RedTileDraftItems
             result.add(PlayerRemainingTiles.create(playerId, mantisDraftable, mantisPicks));
         }
         return result;
@@ -510,7 +623,7 @@ public class MantisMapBuildService {
             List<String> redTileIds = new ArrayList<>();
             for(DraftChoice choice : playerPicks) {
                 Category category = mantisDraftable.getItemCategory(choice.getChoiceKey());
-                String tileId = mantisDraftable.getItemId(choice.getChoiceKey());
+                String tileId = MantisTileDraftable.getItemId(choice.getChoiceKey());
                 if(category == Category.BLUETILE) {
                     blueTileIds.add(tileId);
                 } else if(category == Category.REDTILE) {

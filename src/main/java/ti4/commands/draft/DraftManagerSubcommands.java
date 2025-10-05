@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -51,6 +52,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                     new DraftManagerAddDraftable(),
                     new DraftManagerAddOrchestrator(),
                     new DraftManagerAddPlayer(),
+                    new DraftManagerRemoveDraftable(),
                     new DraftManagerRemovePlayer(),
                     new DraftManagerListPlayers(),
                     new DraftManagerClearMissingPlayers(),
@@ -60,6 +62,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                     new DraftManagerSwapDraftingPlayers(),
                     new DraftManagerReplacePlayer(),
                     new DraftManagerMakePick(),
+                    new DraftManagerUnpick(),
                     new DraftManagerSendCustomDraftableCommand(),
                     new DraftManagerSendCustomOrchestratorCommand(),
                     new DraftManagerConvertToMilty())
@@ -303,6 +306,32 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             } else {
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(), "Added draftable of type: " + draftableType + "; be sure to configure it!");
+            }
+        }
+    }
+
+    public static class DraftManagerRemoveDraftable extends GameStateSubcommand {
+
+        public DraftManagerRemoveDraftable() {
+            super(Constants.DRAFT_MANAGE_REMOVE_DRAFTABLE, "Remove a draftable from the draft manager", true, false);
+            addOption(OptionType.STRING, Constants.DRAFTABLE_TYPE_OPTION, "Type of draftable to remove", true, true);
+        }
+
+        @Override
+        public void execute(SlashCommandInteractionEvent event) {
+            Game game = getGame();
+            DraftManager draftManager = game.getDraftManager();
+            String draftableTypeStr = event.getOption(Constants.DRAFTABLE_TYPE_OPTION, o -> o.getAsString());
+            DraftableType draftableType = DraftableType.of(draftableTypeStr);
+
+            boolean removed = draftManager.getDraftables().removeIf(d -> d.getType().equals(draftableType));
+
+            if (removed) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), "Removed draftable of type: " + draftableTypeStr);
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), "No draftable of type: " + draftableTypeStr + " found to remove.");
             }
         }
     }
@@ -674,6 +703,57 @@ public class DraftManagerSubcommands extends SubcommandGroup {
             } catch (IllegalArgumentException e) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Could not make pick: " + e.getMessage());
             }
+        }
+    }
+
+    public static class DraftManagerUnpick extends GameStateSubcommand {
+        public DraftManagerUnpick() {
+            super(Constants.DRAFT_MANAGE_UNPICK, "Unpick a choice for any player that drafted it", true, false);
+            addOption(
+                    OptionType.STRING,
+                    Constants.DRAFTABLE_TYPE_OPTION,
+                    "Type of draftable to remove the pick from",
+                    true,
+                    true);
+            addOption(
+                    OptionType.STRING, Constants.PLAYER_PICKS_OPTION, "Key of the choice to unpick", true, true);
+        }
+
+        @Override
+        public void execute(SlashCommandInteractionEvent event) {
+            Game game = getGame();
+            DraftManager draftManager = game.getDraftManager();
+            DraftableType draftableType = DraftableType.of(
+                    event.getOption(Constants.DRAFTABLE_TYPE_OPTION).getAsString());
+            String choiceKey =
+                    event.getOption(Constants.PLAYER_PICKS_OPTION).getAsString();
+            Draftable draftable = draftManager.getDraftable(draftableType);
+            if (draftable == null) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "No draftable of type: " + draftableType);
+                return;
+            }
+            List<String> playerIds = draftManager.getPlayersWithChoiceKey(draftableType, choiceKey);
+            if (playerIds.isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        "No players have picked choice with key: " + choiceKey + " in draftable of type: "
+                                + draftableType);
+                return;
+            }
+
+            for (String playerUserId : playerIds) {
+                draftManager.getPlayerStates().get(playerUserId).getPicks(draftableType).removeIf(choice -> choice.getChoiceKey().equals(choiceKey));
+            }
+
+            List<String> players = playerIds.stream()
+                    .map(game::getPlayer)
+                    .filter(Objects::nonNull)
+                    .map(p -> p.getRepresentation())
+                    .collect(Collectors.toList());
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Unpicked choice with key: " + choiceKey + " in draftable of type: " + draftableType
+                            + " for players: " + String.join(", ", players));
         }
     }
 

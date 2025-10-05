@@ -1169,6 +1169,31 @@ public class AutoCompleteProvider {
                 event.replyChoice(maxSeats + " speaker order positions", (long) maxSeats)
                         .queue();
             }
+            case Constants.PLAYER_PICKS_OPTION -> {
+                if (!GameManager.isValid(gameName)) return;
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                if (!DraftManager.hasDraftManager(game)) return;
+                DraftManager draftManager = game.getDraftManager();
+
+                String draftableTypeStr =
+                        event.getOption(Constants.DRAFTABLE_TYPE_OPTION, null, OptionMapping::getAsString);
+                if (draftableTypeStr == null) return;
+
+                DraftableType draftableType = DraftableType.of(draftableTypeStr);
+                // Verify type is in draft
+                Draftable draftable = draftManager.getDraftable(draftableType);
+                if (draftable == null) return;
+
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+
+                List<DraftChoice> allPicks = draftManager.getAllPicksOfType(draftableType);
+                event.replyChoices(allPicks.stream()
+                        .filter(option -> option.getUnformattedName().toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(option -> new Command.Choice(option.getUnformattedName(), option.getChoiceKey()))
+                        .collect(Collectors.toList())
+                ).queue();
+            }
         }
     }
 
