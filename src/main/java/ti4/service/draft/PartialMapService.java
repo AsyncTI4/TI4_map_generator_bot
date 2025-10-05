@@ -31,30 +31,17 @@ public class PartialMapService {
      * @param renderIfUpdated if true, the map image will be re-rendered if any tiles were placed
      */
     public void tryUpdateMap(DraftManager draftManager, GenericInteractionCreateEvent event, boolean renderIfUpdated) {
-        boolean mapUpdated = placeTiles(draftManager);
+        boolean mapUpdated = placeTiles(event, draftManager);
         if (mapUpdated && renderIfUpdated) {
             ButtonHelper.updateMap(draftManager.getGame(), event);
         }
     }
 
-    /**
-     * Attempt to place tiles
-     * @param draftManager
-     * @return true if any tiles were placed, indicating map images may be re-rendered
-     */
-    private boolean placeTiles(DraftManager draftManager) {
-        Game game = draftManager.getGame();
-        String mapTemplateId = getMapTemplateModelId(draftManager);
-        MapTemplateModel mapTemplateModel = Mapper.getMapTemplate(mapTemplateId);
-
+    public boolean placeFromTemplate(MapTemplateModel mapTemplateModel, Game game) {
         boolean updateMap = false;
-
-        // General map setup tasks
         for (MapTemplateTile templateTile : mapTemplateModel.getTemplateTiles()) {
             Tile gameTile = game.getTileByPosition(templateTile.getPos());
 
-            // Attempt to place tiles specified in the map template, and
-            // things like Slice placeholders and Nucleus placeholders.
             if (gameTile == null && templateTile.getPos() != null) {
                 Tile toAdd = MapTemplateHelper.getTileFromTemplateTile(templateTile);
                 if (toAdd != null) {
@@ -68,6 +55,15 @@ public class PartialMapService {
                 if (gameTile != null) AddTileService.addCustodianToken(gameTile, game); // only works on MR for now
             }
         }
+        return updateMap;
+    }
+
+    private boolean placeTiles(GenericInteractionCreateEvent event, DraftManager draftManager) {
+        Game game = draftManager.getGame();
+        String mapTemplateId = getMapTemplateModelId(draftManager);
+        MapTemplateModel mapTemplateModel = Mapper.getMapTemplate(mapTemplateId);
+
+        boolean updateMap = placeFromTemplate(mapTemplateModel, game);
 
         // Check if we can derive any state
         SliceDraftable sliceDraftable = (SliceDraftable) draftManager.getDraftable(SliceDraftable.TYPE);

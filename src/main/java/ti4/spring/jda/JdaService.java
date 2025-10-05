@@ -63,6 +63,7 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogBufferManager;
 import ti4.migration.DataMigrationManager;
 import ti4.selections.SelectionManager;
+import ti4.service.draft.SliceGenerationPipeline;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
@@ -519,6 +520,11 @@ public class JdaService {
                 BotLogger.info("FINISHED RENDERING MAPS");
             } else {
                 BotLogger.info("DID NOT FINISH RENDERING MAPS");
+            }
+            if (SliceGenerationPipeline.shutdown()) { // will wait for up to an additional 20 seconds
+                BotLogger.info("FINISHED RENDERING SLICE DRAFTS");
+            } else {
+                BotLogger.info("DID NOT FINISH RENDERING SLICE DRAFTS");
             }
             if (StatisticsPipeline.shutdown()) { // will wait for up to an additional 20 seconds
                 BotLogger.info("FINISHED PROCESSING STATISTICS");

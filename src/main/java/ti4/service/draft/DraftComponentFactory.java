@@ -18,7 +18,7 @@ public class DraftComponentFactory {
             findAllDerivedClasses(DraftOrchestrator.class).stream()
                     .collect(Collectors.toMap(o -> o.getSimpleName(), o -> o));
 
-    public List<String> getKnownDraftableTypes() {
+    public List<String> getKnownDraftableClasses() {
         return KNOWN_DRAFTABLE_TYPES.keySet().stream().sorted().collect(Collectors.toList());
     }
 
@@ -39,7 +39,7 @@ public class DraftComponentFactory {
         return null;
     }
 
-    public List<String> getKnownOrchestratorTypes() {
+    public List<String> getKnownOrchestratorClasses() {
         return KNOWN_ORCHESTRATOR_TYPES.keySet().stream().sorted().collect(Collectors.toList());
     }
 

@@ -17,12 +17,17 @@ public class Constants {
     public static final String sigmaId = "214326507458396161";
     public static final String bambamId = "487030345812672523";
     public static final List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
+    public static final String jabberwockyId = "455013002953883651";
 
     // Server IDs
     public static final String ASYNCTI4_HUB_SERVER_ID = "943410040369479690";
 
     public static String jazzPing() {
         return "<@" + jazzId + ">";
+    }
+
+    public static String jabberwockyPing() {
+        return "<@" + jabberwockyId + ">";
     }
 
     public static String bltPing() {
@@ -1017,6 +1022,7 @@ public class Constants {
     public static final String MILTY_DRAFT_MANAGER = "milty_draft_manager";
     public static final String MILTY_DRAFT_SETTINGS = "milty_draft_settings";
     public static final String DRAFT_MANAGER = "draft_manager";
+    public static final String DRAFT_SYSTEM_SETTINGS = "draft_system_settings";
     public static final String DRAFT = "draft";
 
     // groups
