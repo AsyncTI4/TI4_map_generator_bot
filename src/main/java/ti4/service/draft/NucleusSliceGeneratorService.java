@@ -161,7 +161,7 @@ public class NucleusSliceGeneratorService {
         List<Integer> nucleusLegendaryOptions =
                 ListHelper.listOfIntegers(nucleusSpecs.minNucleusLegendaries(), nucleusSpecs.maxNucleusLegendaries());
         Integer numNucleusLegendaries = ListHelper.randomPick(nucleusLegendaryOptions);
-        List<Integer> mapLegendaryOptions = List.of(nucleusSpecs.minMapLegendaries(), nucleusSpecs.maxMapLegendaries());
+        List<Integer> mapLegendaryOptions = ListHelper.listOfIntegers(nucleusSpecs.minMapLegendaries(), nucleusSpecs.maxMapLegendaries());
         Integer numMapLegendaries = ListHelper.randomPick(mapLegendaryOptions);
 
         List<MiltyDraftTile> alphaTiles = tileManager.filterAll(tile -> tile.isHasAlphaWH());
