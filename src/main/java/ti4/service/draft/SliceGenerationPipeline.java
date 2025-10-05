@@ -71,7 +71,7 @@ public class SliceGenerationPipeline {
             DraftSpec specs,
             Consumer<Boolean> callback) {
         if (specs == null || specs.getGame() == null) {
-            throw new IllegalArgumentException("specs nor game cannot be null in render pipeline");
+            throw new IllegalArgumentException("Neither specs nor specs.getGame() can be null in generation pipeline");
         }
         generate(new MiltyGenerateEvent(event, sliceDraftable, tileManager, specs, callback));
     }
