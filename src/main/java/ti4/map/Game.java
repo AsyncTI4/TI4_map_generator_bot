@@ -3405,10 +3405,8 @@ public class Game extends GameProperties {
                         "This game is using Omega Phase, so the objective setup was ignored. If there's a problem with it, use `/omegaphase "
                                 + Constants.RESET_OMEGA_PHASE_OBJECTIVES + "`");
             } else {
-                setUpPeakableObjectives(
-                        stage1Count, 1);
-                setUpPeakableObjectives(
-                        stage2Count, 2);
+                setUpPeakableObjectives(stage1Count, 1);
+                setUpPeakableObjectives(stage2Count, 2);
             }
         }
 
