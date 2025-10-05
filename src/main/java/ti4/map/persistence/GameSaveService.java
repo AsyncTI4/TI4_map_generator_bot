@@ -26,6 +26,7 @@ import ti4.helpers.PatternHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
 import ti4.json.ObjectMapperFactory;
@@ -625,6 +626,16 @@ class GameSaveService {
         } else if (game.getMiltyJson() != null) {
             // default to the already stored value, if we failed to read it previously
             writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + game.getMiltyJson());
+            writer.write(System.lineSeparator());
+        }
+
+        DraftSystemSettings draftSettings = game.getDraftSystemSettingsUnsafe();
+        if (draftSettings != null) {
+            writer.write(Constants.DRAFT_SYSTEM_SETTINGS + " " + draftSettings.json());
+            writer.write(System.lineSeparator());
+        } else if (game.getDraftSystemSettingsJson() != null) {
+            // default to the already stored value, if we failed to read it previously
+            writer.write(Constants.DRAFT_SYSTEM_SETTINGS + " " + game.getDraftSystemSettingsJson());
             writer.write(System.lineSeparator());
         }
 

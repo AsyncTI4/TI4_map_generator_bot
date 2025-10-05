@@ -250,7 +250,7 @@ public class CreateGameService {
         MessageChannel actionsChannel = game.getActionsChannel();
 
         Button miltyButton = Buttons.green("miltySetup", "Start Milty Setup");
-        Button nucleusButton = Buttons.green("miltySetup_nucleus", "Start Nucleus Setup");
+        Button nucleusButton = Buttons.green("startDraftSystem_nucleusPreset", "Start Nucleus Setup");
         Button addMapString = Buttons.green("addMapString~MDL", "Add Prebuilt Map String");
         MessageHelper.sendMessageToChannelWithButtons(
                 actionsChannel,

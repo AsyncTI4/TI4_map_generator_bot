@@ -790,6 +790,16 @@ public class Mapper {
                         .toList();
     }
 
+    public static MapTemplateModel getDefaultNucleusTemplate(int playerCount) {
+        List<MapTemplateModel> templates = getMapTemplatesForPlayerCount(playerCount);
+        for (MapTemplateModel model : templates) {
+            if (model.isNucleusTemplate() && model.getPlayerCount() == playerCount) {
+                return model;
+            }
+        }
+        return null;
+    }
+
     public static MapTemplateModel getDefaultMapTemplateForPlayerCount(int players) {
         MapTemplateModel mapTemplate = null;
         List<MapTemplateModel> templates = getMapTemplatesForPlayerCount(players);

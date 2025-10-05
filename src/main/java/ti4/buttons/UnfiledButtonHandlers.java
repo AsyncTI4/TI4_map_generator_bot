@@ -3564,7 +3564,7 @@ public class UnfiledButtonHandlers {
         PlayerPreferenceHelper.offerSetAutoPassOnSaboButtons(game, null);
         ButtonHelper.deleteMessage(event);
         // Reduce file size by clearing draft info
-        game.clearDraftManager();
+        game.clearAllDraftInfo();
     }
 
     @ButtonHandler("dsdihmy_")

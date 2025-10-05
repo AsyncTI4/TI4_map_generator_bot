@@ -36,7 +36,8 @@ import ti4.message.logging.LogOrigin;
  * <p>
  * <b>Menu Button Layout:</b>
  * <p>
- * - [[navigation buttons]] [[special buttons]] [reset settings button*] [prev page*] [[all settings buttons*]] [next page*]
+ * - [[navigation buttons]] [[special buttons]] [reset settings button*] [prev
+ * page*] [[all settings buttons*]] [next page*]
  * <p>
  * <i>- *no buttons added if there are no settings in this menu</i>
  */
@@ -62,7 +63,7 @@ public abstract class SettingsMenu {
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Overridable Methods:
-    //  - Override these as needed
+    // - Override these as needed
     // ---------------------------------------------------------------------------------------------------------------------------------
     List<SettingInterface> settings() {
         return Collections.emptyList();
@@ -76,7 +77,10 @@ public abstract class SettingsMenu {
         return Collections.emptyList();
     }
 
-    /** Action Handler. Returns "success" on a success, returns null if the action was not found */
+    /**
+     * Action Handler. Returns "success" on a success, returns null if the action
+     * was not found
+     */
     String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
         return null;
     }
@@ -92,7 +96,7 @@ public abstract class SettingsMenu {
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // "Static" methods:
-    //  - These methods should only rarely need to be overridden
+    // - These methods should only rarely need to be overridden
     // ---------------------------------------------------------------------------------------------------------------------------------
     List<SettingInterface> enabledSettings() {
         updateTransientSettings();
@@ -323,12 +327,24 @@ public abstract class SettingsMenu {
 
         // Edit the existing message, if able
         if (event instanceof ButtonInteractionEvent buttonEvent) {
-            setMessageId(buttonEvent.getMessage());
-            buttonEvent
-                    .getHook()
-                    .editOriginal(newSummary)
-                    .setComponents(actionRows)
-                    .queue();
+            if (buttonEvent.getMessage().isEphemeral()) {
+                if (messageId == null) {
+                    return;
+                }
+                buttonEvent
+                        .getGuildChannel()
+                        .editMessageById(messageId, newSummary)
+                        .setComponents(actionRows)
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
+            } else {
+                setMessageId(buttonEvent.getMessage());
+                buttonEvent
+                        .getHook()
+                        .editOriginal(newSummary)
+                        .setComponents(actionRows)
+                        .queue();
+            }
+
         } else if (event instanceof ModalInteractionEvent modalEvent) {
             if (modalEvent.getMessage() != null) {
                 modalEvent
@@ -380,7 +396,9 @@ public abstract class SettingsMenu {
     }
 
     /**
-     * @param allottedSpace Number of navigation buttons already included in this menu. If there are too many, settings buttons will be split into pages
+     * @param allottedSpace Number of navigation buttons already included in this
+     *                      menu. If there are too many, settings buttons will be
+     *                      split into pages
      * @param pageNum
      * @return
      */
@@ -388,7 +406,8 @@ public abstract class SettingsMenu {
         List<Button> allButtons = allSettingsButtons();
         if (allottedSpace < allButtons.size()) {
             if (allottedSpace < 3) {
-                // This shouldn't ever happen as I don't really expect to ever see more than 7 other buttons,
+                // This shouldn't ever happen as I don't really expect to ever see more than 7
+                // other buttons,
                 // which means allotted space should always be >= 18
                 BotLogger.error("NOT ENOUGH SPACE FOR BUTTONS IN MENU: " + navId());
                 return Collections.emptyList();

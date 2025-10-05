@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.buttons.Buttons;
+import ti4.helpers.settingsFramework.menus.SettingsMenu;
 
 public abstract class Draftable extends DraftLifecycleHooks {
     /**
@@ -202,4 +203,14 @@ public abstract class Draftable extends DraftLifecycleHooks {
      * @return An error message if the state is invalid, or null if valid. No magic string support.
      */
     public abstract String validateState(DraftManager draftManager);
+
+    // Setup
+
+    /**
+     * Setup this draftable using the settings menu choices.
+     * @param event The interaction event, either from a slash-command or a button press.
+     * @param menu A SettingsMenu containing applicable choices; draftables need to cast it to a known subclass.
+     * @return An error message if the setup couldn't be done, otherwise null.
+     */
+    public abstract String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu);
 }
