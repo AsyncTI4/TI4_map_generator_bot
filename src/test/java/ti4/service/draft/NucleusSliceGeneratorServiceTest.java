@@ -176,7 +176,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
         Map<String, Integer> failureReasons = new HashMap<>();
         for (int i = 0; i < REASONABLE_MAX_ATTEMPTS; ++i) {
             outcome = NucleusSliceGeneratorService.tryGenerateNucleusAndSlices(
-                    game, mapTemplate, specs.getNumSlices(), strictMode);
+                    game, mapTemplate, new NucleusSpecs(specs), strictMode);
             if (outcome.slices() != null) {
                 assert outcome.slices().size() == game.getPlayers().size() + 1 + EXTRA_SLICES;
                 return;

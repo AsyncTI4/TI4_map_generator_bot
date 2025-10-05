@@ -905,7 +905,7 @@ public class AutoCompleteProvider {
 
                 DraftManager draftManager = game.getDraftManager();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                List<String> draftableOptions = DraftComponentFactory.getKnownDraftableTypes();
+                List<String> draftableOptions = DraftComponentFactory.getKnownDraftableClasses();
                 List<Draftable> alreadyInDraft = draftManager.getDraftables();
 
                 List<Command.Choice> options = draftableOptions.stream()
@@ -924,7 +924,7 @@ public class AutoCompleteProvider {
 
                 DraftManager draftManager = game.getDraftManager();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                List<String> draftableOptions = DraftComponentFactory.getKnownOrchestratorTypes();
+                List<String> draftableOptions = DraftComponentFactory.getKnownOrchestratorClasses();
                 DraftOrchestrator alreadyInDraft = draftManager.getOrchestrator();
 
                 if (alreadyInDraft != null) {

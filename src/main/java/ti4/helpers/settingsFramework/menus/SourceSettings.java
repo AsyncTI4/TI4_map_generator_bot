@@ -88,8 +88,10 @@ public class SourceSettings extends SettingsMenu {
             pok.initialize(json.get("pok"));
             codexes.initialize(json.get("codexes"));
             discoStars.initialize(json.get("discoStars"));
+            teDemo.initialize(json.get("teDemo"));
             unchartedSpace.initialize(json.get("unchartedSpace"));
             absol.initialize(json.get("absol"));
+            ignis.initialize(json.get("ignis"));
             eronous.initialize(json.get("eronous"));
             actionCardDeck2.initialize(json.get("actionCardDeck2"));
         }
@@ -163,6 +165,9 @@ public class SourceSettings extends SettingsMenu {
         if (parent instanceof MiltySettings ms) {
             game = ms.getGame();
             decks = ms.getGameSettings().getDecks();
+        } else if (parent instanceof DraftSystemSettings dss) {
+            game = dss.getGame();
+            decks = dss.getGameSetupSettings().getDecks();
         }
         if (game == null || decks == null) return;
 
