@@ -50,7 +50,7 @@ public record NucleusSpecs(
                 0, // min slice influence
                 3, // max nucleus quality difference
                 Math.round(11 * players / 6.0f) // expected red tiles
-        );
+                );
     }
 
     public static String validateSpecsForGame(NucleusSpecs specs, Game game) {

@@ -170,7 +170,8 @@ public class SliceDraftable extends SinglePickDraftable {
         if (mapTemplate == null) {
             return "Error: No map template selected.";
         } else if (mapTemplate.getPlayerCount() != playerCount) {
-            return "The selected map template " + mapTemplate.getAlias() + " is for a different number of players than " + playerCount;
+            return "The selected map template " + mapTemplate.getAlias() + " is for a different number of players than "
+                    + playerCount;
         }
 
         NucleusSpecs specs = new NucleusSpecs(
