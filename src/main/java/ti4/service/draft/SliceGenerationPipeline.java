@@ -82,7 +82,7 @@ public class SliceGenerationPipeline {
             NucleusSpecs nucleusSpecs,
             Consumer<NucleusOutcome> callback) {
         if (game == null || nucleusSpecs == null) {
-            throw new IllegalArgumentException("game nor nucleusSpecs cannot be null in render pipeline");
+            throw new IllegalArgumentException("Neither game nor nucleusSpecs can be null in generation pipeline");
         }
         generate(new NucleusGenerateEvent(event, game, nucleusSpecs, callback));
     }
