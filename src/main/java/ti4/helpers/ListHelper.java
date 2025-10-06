@@ -44,10 +44,10 @@ public class ListHelper {
         List<T> toRemove = new ArrayList<>();
         for (T item : list) {
             if (predicate.test(item)) {
-              toRemove.add(item);
-              if (toRemove.size() >= limit) {
-                break;
-              }
+                toRemove.add(item);
+                if (toRemove.size() >= limit) {
+                    break;
+                }
             }
         }
         list.removeAll(toRemove);
