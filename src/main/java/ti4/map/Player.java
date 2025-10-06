@@ -1170,7 +1170,11 @@ public class Player extends PlayerProperties {
         if (getRelics().contains("dynamiscore") || getRelics().contains("absol_dynamiscore")) {
             bonus += 2;
         }
-        bonus += numberOfSpaceStations();
+        for (String planet : getPlanets()) {
+            if (Mapper.getPlanet(planet).isSpaceStation()) {
+                bonus++;
+            }
+        }
         if (game.isFacilitiesMode()) {
             for (String planet : getPlanets()) {
                 UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
