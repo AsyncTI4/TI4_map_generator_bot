@@ -142,6 +142,19 @@ public class Player extends PlayerProperties {
         return String.format("%s_%s%s", getDecalSet(), unitType, DrawingUtil.getBlackWhiteFileSuffix(getColorID()));
     }
 
+    public boolean hasSpaceStation() {
+        return getPlanets().stream()
+                .map(planet -> game.getPlanetsInfo().get(planet))
+                .anyMatch(Planet::isSpaceStation);
+    }
+
+    public int numberOfSpaceStations() {
+        return (int) getPlanets().stream()
+                .map(planet -> game.getPlanetsInfo().get(planet))
+                .filter(Planet::isSpaceStation)
+                .count();
+    }
+
     public Tile getNomboxTile() {
         return nomboxTile;
     }
@@ -1157,6 +1170,7 @@ public class Player extends PlayerProperties {
         if (getRelics().contains("dynamiscore") || getRelics().contains("absol_dynamiscore")) {
             bonus += 2;
         }
+        bonus += numberOfSpaceStations();
         if (game.isFacilitiesMode()) {
             for (String planet : getPlanets()) {
                 UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);

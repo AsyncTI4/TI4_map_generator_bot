@@ -233,6 +233,33 @@ public class UnfiledButtonHandlers {
                 message += " Leaders will be exchanged when secrets are dealt.";
             }
         }
+        if ("Conventions".equalsIgnoreCase(mode)) {
+            game.setConventionsOfWarAbandonedMode(enable);
+            message += "Conventions of War Abandoned Mode. Nothing more needs to be done.";
+        }
+        if ("Cosmic".equalsIgnoreCase(mode)) {
+            game.setCosmicPhenomenaeMode(enable);
+            message += "Cosmic Phenomenae Mode. Nothing more needs to be done.";
+        }
+        if ("WildGalaxy".equalsIgnoreCase(mode)) {
+            game.setWildWildGalaxyMode(enable);
+            message += "Wild Wild Galaxy Mode. Nothing more needs to be done.";
+        }
+        if ("WeirdWormholes".equalsIgnoreCase(mode)) {
+            game.setWeirdWormholesMode(enable);
+            message += "Weird Wormholes Mode. Nothing more needs to be done.";
+        }
+        if ("Monument".equalsIgnoreCase(mode)) {
+            game.setMonumentToTheAgesMode(enable);
+            message += "Monuments to the Ages Mode. Nothing more needs to be done.";
+        }
+        if ("RapidMobilization".equalsIgnoreCase(mode)) {
+            game.setRapidMobilizationMode(enable);
+            message += "Rapid Mobilization Mode. Nothing more needs to be done.";
+            if (enable) {
+                message += " make sure to set up players after the map is set up.";
+            }
+        }
         if ("AgeOfFighters".equalsIgnoreCase(mode)) {
             game.setAgeOfFightersMode(enable);
             message += "Age Of Fighters Mode. Nothing more needs to be done.";
@@ -3208,6 +3235,7 @@ public class UnfiledButtonHandlers {
                                 + ButtonHelper.checkFleetInEveryTile(player, game)
                                 + ". That's how many command tokens you'll need to retain in your fleet pool to avoid removing ships.");
             }
+            StartPhaseService.sendStatusReminders(event, game, player);
         }
     }
 

@@ -84,7 +84,7 @@ public class ButtonHelperStats {
         String message = player.getRepresentationNoPing();
         String fogMessage;
         int initComm = player.getCommodities();
-        if (player.getCommodities() + amt > player.getCommoditiesTotal()) {
+        if (player.getCommodities() + amt > player.getCommoditiesTotal() && !game.isAgeOfCommerceMode()) {
             player.setCommodities(player.getCommoditiesTotal());
             int gained = player.getCommodities() - initComm;
             message += " gained " + gained + " commodit" + (gained == 1 ? "y" : "ies") + " (" + initComm + "->"

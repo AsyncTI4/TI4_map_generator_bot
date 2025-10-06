@@ -419,6 +419,14 @@ public class PlayerTechService {
                 ButtonHelper.starChartStep1(game, player, "unknown");
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
+            case "x89", "x89c4" -> {
+                deleteIfButtonEvent(event);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(),
+                        player.getRepresentationUnfogged() + " please choose the planet you wish to annihilate.",
+                        ButtonHelper.getButtonsForConventions(player, game));
+                sendNextActionButtonsIfButtonEvent(event, game, player);
+            }
             case "sr", "absol_sar" -> { // Sling Relay or Absol Self Assembley Routines
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();

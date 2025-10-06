@@ -1,0 +1,1 @@
+{"id":"oluzstation","tileId":"111","name":"Oluz Station","aliases":["oluz","oluzstation","station"],"resources":2,"influence":2,"planetTypes":["SPACESTATION"],"planetLayout":{"unitHolderName":"oluzstation","resourcesLocation":"BottomRight","centerPosition":{"x":200.0,"y":210.0}},"source":"thunders_edge"}

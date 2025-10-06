@@ -62,6 +62,9 @@ public class AddPlanetService {
         }
         Tile tile = game.getTileFromPlanet(planet);
         Planet unitHolder = game.getPlanetsInfo().get(planet);
+        if (game.getRevealedPublicObjectives().size() < 2 || unitHolder.isSpaceStation()) {
+            setup = true;
+        }
         if (unitHolder == null) {
             BotLogger.error(new LogOrigin(event), "Unitholder found null in addPlanet for planet " + planet);
             unitHolder = game.getUnitHolderFromPlanet(planet);
@@ -483,6 +486,7 @@ public class AddPlanetService {
                 && !doubleCheck
                 && (!"mirage".equals(planet))
                 && !game.isBaseGameMode()
+                && !setup
                 && player.isRealPlayer()) {
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);
             if (buttons != null && !buttons.isEmpty()) {

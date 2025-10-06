@@ -400,15 +400,34 @@ public class Tile {
         return unitHolders;
     }
 
+    public List<Planet> getSpaceStations() {
+        List<Planet> planets = new ArrayList<>();
+        for (UnitHolder uH : unitHolders.values()) {
+            if (uH instanceof Planet p
+                    && uH.getTokenList().stream().noneMatch(token -> token.contains(Constants.WORLD_DESTROYED))) {
+                if (!p.isSpaceStation()) continue;
+
+                planets.add(p);
+            }
+        }
+        return planets;
+    }
+
     public List<Planet> getPlanetUnitHolders() {
         List<Planet> planets = new ArrayList<>();
         for (UnitHolder uH : unitHolders.values()) {
             if (uH instanceof Planet p
                     && uH.getTokenList().stream().noneMatch(token -> token.contains(Constants.WORLD_DESTROYED))) {
+                if (p.isSpaceStation()) continue;
                 planets.add(p);
             }
         }
         return planets;
+    }
+
+    public boolean hasSpaceStation() {
+        for (UnitHolder uh : unitHolders.values()) if (uh instanceof Planet p && p.isSpaceStation()) return true;
+        return false;
     }
 
     @JsonIgnore

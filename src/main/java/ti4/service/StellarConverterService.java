@@ -41,9 +41,10 @@ public class StellarConverterService {
         DisasterWatchHelper.postTileInDisasterWatch(
                 game, event, tile, 1, "Moments before disaster in game " + game.getName() + ".");
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message1);
-
+        Player p = null;
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getPlanets().contains(planetName)) {
+                p = p2;
                 MessageHelper.sendMessageToChannel(
                         p2.getCorrectChannel(),
                         p2.getRepresentationUnfogged() + " we regret to inform you but "
@@ -63,5 +64,13 @@ public class StellarConverterService {
         message2.append(" by ");
         message2.append(game.getPlayer(event.getUser().getId()).getRepresentation());
         DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 0, message2 + ".");
+        if (game.isConventionsOfWarAbandonedMode()
+                && tile.isHomeSystem(game)
+                && tile.getPlanetUnitHolders().isEmpty()
+                && p != null) {
+            if (event instanceof ButtonInteractionEvent buttonEvent) {
+                ButtonHelper.eliminatePlayer(game, buttonEvent, "eliminatePlayer_" + p.getFaction());
+            }
+        }
     }
 }

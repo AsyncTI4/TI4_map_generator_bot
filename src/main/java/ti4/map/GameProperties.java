@@ -107,6 +107,12 @@ public class GameProperties {
     private @ExportableField boolean mercenariesForHireMode;
     private @ExportableField boolean adventOfTheWarsunMode;
     private @ExportableField boolean culturalExchangeProgramMode;
+    private @ExportableField boolean conventionsOfWarAbandonedMode;
+    private @ExportableField boolean rapidMobilizationMode;
+    private @ExportableField boolean weirdWormholesMode;
+    private @ExportableField boolean cosmicPhenomenaeMode;
+    private @ExportableField boolean monumentToTheAgesMode;
+    private @ExportableField boolean wildWildGalaxyMode;
     private @ExportableField boolean zealousOrthodoxyMode;
     private @ExportableField boolean stellarAtomicsMode;
     private @ExportableField boolean noSwapMode;
