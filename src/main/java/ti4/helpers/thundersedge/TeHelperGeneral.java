@@ -2,22 +2,27 @@ package ti4.helpers.thundersedge;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.RegexHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Expeditions;
 import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.TriadService;
+import ti4.service.planet.AddPlanetService;
 import ti4.service.unit.AddUnitService;
 
 public class TeHelperGeneral {
@@ -38,6 +43,22 @@ public class TeHelperGeneral {
         List<Button> butts = game.getExpeditions().getRemainingExpeditionButtons(player);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), info, butts);
         ButtonHelper.deleteTheOneButton(event);
+    }
+
+    public static void addStationsToPlayArea(GenericInteractionCreateEvent event, Game game, Tile tile) {
+        List<Player> playersInSpace = tile.getSpaceUnitHolder().getUnitColorsOnHolder().stream()
+                .map(game::getPlayerFromColorOrFaction)
+                .filter(Objects::nonNull)
+                .toList();
+        if (playersInSpace.isEmpty()) return;
+
+        Player newOwner = game.getPlayerThatControlsTile(tile);
+        for (Planet station : tile.getSpaceStations()) {
+            Player prevOwner = game.getPlayerThatControlsPlanet(station.getName());
+            if (FoWHelper.playerHasActualShipsInSystem(prevOwner, tile)) continue;
+
+            AddPlanetService.addPlanet(newOwner, station.getName(), game, event, false);
+        }
     }
 
     @ButtonHandler("placeThundersEdge")

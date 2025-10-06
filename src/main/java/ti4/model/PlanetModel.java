@@ -64,6 +64,11 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
+    public boolean isSpaceStation() {
+        return getPlanetTypes().contains(PlanetType.SPACESTATION);
+    }
+
+    @JsonIgnore
     public String getAlias() {
         return id;
     }
@@ -78,6 +83,11 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     public String getShortNamePNAttach() {
         return Optional.ofNullable(shortNamePNAttach).orElse(getShortName());
+    }
+
+    @JsonIgnore
+    public String getLegendaryNameRepresentation() {
+        return MiscEmojis.LegendaryPlanet + " __" + getLegendaryAbilityName() + "__";
     }
 
     public boolean getShrinkNamePNAttach() {

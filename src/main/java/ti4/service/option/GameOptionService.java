@@ -45,9 +45,9 @@ public class GameOptionService {
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
 
         msg =
-                "Thunder's Edge contains a new anomaly, called an entropic scar, which gives faction tech in status phase at the cost of a strategy command token. If you want the bot's milty to potentially include this scar, press this button.";
+                "Thunder's Edge contains a new anomaly, called an entropic scar, which gives faction tech in status phase at the cost of a strategy command token. If you want the bot's milty to potentially include this scar (and other TE tiles), press this button.";
         buttons = new ArrayList<>();
-        buttons.add(Buttons.green("addEntropicScar", "Use Entropic Scar"));
+        buttons.add(Buttons.green("addEntropicScar", "Use Entropic Scar & Other Tiles"));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
 
@@ -119,6 +119,38 @@ public class GameOptionService {
         } else {
             daneLinkButtons.add(
                     Buttons.green("enableDaneMode_CulturalExchangeProgram_enable", "Enable Cultural Exchange Program"));
+        }
+        if (game.isRapidMobilizationMode()) {
+            daneLinkButtons.add(Buttons.red("enableDaneMode_RapidMobilization_disable", "Disable Rapid Mobilization"));
+        } else {
+            daneLinkButtons.add(Buttons.green("enableDaneMode_RapidMobilization_enable", "Enable Rapid Mobilization"));
+        }
+        // if (game.isCosmicPhenomenaeMode()) {
+        //     daneLinkButtons.add(Buttons.red("enableDaneMode_Cosmic_disable", "Disable Cosmic Phenomenae"));
+        // } else {
+        //     daneLinkButtons.add(Buttons.green("enableDaneMode_Cosmic_enable", "Enable Cosmic Phenomenae"));
+        // }
+        // if (game.isMonumentToTheAgesMode()) {
+        //     daneLinkButtons.add(Buttons.red("enableDaneMode_Monument_disable", "Disable Monuments to the Ages"));
+        // } else {
+        //     daneLinkButtons.add(Buttons.green("enableDaneMode_Monument_enable", "Enable Monuments to the Ages"));
+        // }
+        if (game.isWeirdWormholesMode()) {
+            daneLinkButtons.add(Buttons.red("enableDaneMode_WeirdWormholes_disable", "Disable Weird Wormholes"));
+        } else {
+            daneLinkButtons.add(Buttons.green("enableDaneMode_WeirdWormholes_enable", "Enable Weird Wormholes"));
+        }
+        // if (game.isWildWildGalaxyMode()) {
+        //     daneLinkButtons.add(Buttons.red("enableDaneMode_WildGalaxy_disable", "Disable Wild Wild Galaxy"));
+        // } else {
+        //     daneLinkButtons.add(Buttons.green("enableDaneMode_WildGalaxy_enable", "Enable Wild Wild Galaxy"));
+        // }
+        if (game.isConventionsOfWarAbandonedMode()) {
+            daneLinkButtons.add(
+                    Buttons.red("enableDaneMode_Conventions_disable", "Disable Conventions of War Abandoned"));
+        } else {
+            daneLinkButtons.add(
+                    Buttons.green("enableDaneMode_Conventions_enable", "Enable Conventions of War Abandoned"));
         }
         if (game.isAdventOfTheWarsunMode()) {
             daneLinkButtons.add(
