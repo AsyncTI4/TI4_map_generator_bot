@@ -3928,6 +3928,8 @@ public class ButtonHelper {
                 "hopesend",
                 "primor", // PoK
                 "ordinianc4", // Codex 4
+                "ordinian",
+                "faunus",
                 "silence",
                 "prism",
                 "echo",
@@ -3940,7 +3942,7 @@ public class ButtonHelper {
         for (String planet : implementedLegendaryPlanets) {
             String prettyPlanet = Mapper.getPlanet(planet).getName();
             String pass = "";
-            if (planet.contains("ordinian")) {
+            if (planet.contains("ordinian") || planet.contains("faunus") || planet.contains("industrex")) {
                 pass = " (Upon Pass Turn)";
             }
             if (player.getPlanets().contains(planet)
