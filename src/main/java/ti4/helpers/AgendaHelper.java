@@ -2994,7 +2994,9 @@ public class AgendaHelper {
         proceedButtons.add(Buttons.blue("pingNonresponders", "Ping Non-Responders"));
 
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, proceedButtons);
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), getSummaryOfVotes(game, true));
+        if (!game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), getSummaryOfVotes(game, true));
+        }
     }
 
     @ButtonHandler("proceedToFinalizingVote")
