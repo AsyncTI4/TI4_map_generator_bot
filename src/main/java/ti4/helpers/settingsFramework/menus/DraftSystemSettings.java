@@ -91,7 +91,8 @@ public class DraftSystemSettings extends SettingsMenu {
         gameSetupSettings = new GameSetupSettings(game, json != null ? json.get("gameSetupSettings") : null, this);
         sourceSettings = new SourceSettings(game, json, this);
         sliceSettings = new SliceDraftableSettings(game, json != null ? json.get("sliceSettings") : null, this);
-        mantisTileSettings = new MantisTileDraftableSettings(game, json != null ? json.get("mantisTileSettings") : null, this);
+        mantisTileSettings =
+                new MantisTileDraftableSettings(game, json != null ? json.get("mantisTileSettings") : null, this);
         factionSettings = new FactionDraftableSettings(game, json != null ? json.get("factionSettings") : null, this);
         publicSnakeDraftSettings =
                 new PublicSnakeDraftSettings(game, json != null ? json.get("publicSnakeDraftSettings") : null, this);

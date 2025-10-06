@@ -137,7 +137,15 @@ public class MantisBuildImageGeneratorService {
         graphics.setColor(Color.white);
         graphics.setFont(Storage.getFont64());
         DrawingUtil.superDrawString(
-                graphics, positionName, base.x + 172, base.y + 150, Color.white, hCenter, null, outlineStroke, Color.black);
+                graphics,
+                positionName,
+                base.x + 172,
+                base.y + 150,
+                Color.white,
+                hCenter,
+                null,
+                outlineStroke,
+                Color.black);
     }
 
     private void drawPendingTile(Graphics graphics, Game game, Tile tile) {
@@ -151,15 +159,7 @@ public class MantisBuildImageGeneratorService {
         graphics.setColor(new Color(184, 141, 42));
         graphics.setFont(Storage.getFont64());
         DrawingUtil.superDrawString(
-                graphics,
-                "CURRENT",
-                base.x + 172,
-                base.y - 80,
-                Color.white,
-                hCenter,
-                null,
-                outlineStroke,
-                Color.black);
+                graphics, "CURRENT", base.x + 172, base.y - 80, Color.white, hCenter, null, outlineStroke, Color.black);
     }
 
     private Point getTilePosition(Game game, String position) {

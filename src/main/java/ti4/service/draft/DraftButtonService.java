@@ -1,10 +1,9 @@
 package ti4.service.draft;
 
-import org.apache.commons.lang3.function.Consumers;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.ButtonHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -44,7 +43,7 @@ public class DraftButtonService {
     }
 
     public void handleButtonResult(GenericInteractionCreateEvent event, String outcome) {
-        if(outcome == null) {
+        if (outcome == null) {
             return;
         }
         if (outcome.equals(DELETE_BUTTON)) {

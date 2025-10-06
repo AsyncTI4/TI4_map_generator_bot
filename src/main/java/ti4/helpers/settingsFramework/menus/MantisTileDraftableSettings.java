@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import lombok.Getter;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
@@ -31,11 +30,7 @@ public class MantisTileDraftableSettings extends SettingsMenu {
     private static final String MENU_ID = "mantisTile";
 
     public MantisTileDraftableSettings(Game game, JsonNode json, SettingsMenu parent) {
-        super(
-                MENU_ID,
-                "Mantis Tile settings",
-                "Advanced settings for map features and slice quality.",
-                parent);
+        super(MENU_ID, "Mantis Tile settings", "Advanced settings for map features and slice quality.", parent);
         this.description.add("Big changes here can cause the nucleus generation to fail.");
 
         // Initialize settings
@@ -43,7 +38,7 @@ public class MantisTileDraftableSettings extends SettingsMenu {
         extraBlues = new IntegerSetting("ExtraBlues", "Extra Blue Tiles", 0, 0, 2, 1);
         extraReds = new IntegerSetting("ExtraReds", "Extra Red Tiles", 0, 0, 2, 1);
         mapTemplate = new ChoiceSetting<>("Template", "Map Template", "6pStandard");
-        
+
         int players = game != null ? game.getPlayers().size() : 6;
         Map<String, MapTemplateModel> templates = Mapper.getMapTemplatesForPlayerCount(players).stream()
                 .filter(t -> !t.isNucleusTemplate())

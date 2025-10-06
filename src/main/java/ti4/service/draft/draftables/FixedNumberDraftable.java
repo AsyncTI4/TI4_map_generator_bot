@@ -27,7 +27,8 @@ public abstract class FixedNumberDraftable extends Draftable {
     public String isValidDraftChoice(DraftManager draftManager, String playerUserId, DraftChoice choice) {
         if (!CommonDraftableValidators.hasRemainingChoices(
                 draftManager, playerUserId, getType(), getNumPicksPerPlayer())) {
-            return DraftButtonService.USER_MISTAKE_PREFIX + "You already have picked " + getNumPicksPerPlayer() + " " + getDisplayName() + "!";
+            return DraftButtonService.USER_MISTAKE_PREFIX + "You already have picked " + getNumPicksPerPlayer() + " "
+                    + getDisplayName() + "!";
         }
 
         return super.isValidDraftChoice(draftManager, playerUserId, choice);

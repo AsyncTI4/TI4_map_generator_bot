@@ -54,11 +54,14 @@ public class MantisTileDraftable extends Draftable {
     // Used in map building
     @Getter
     private Integer mulligans;
+
     @Getter
     private final List<String> discardedTileIDs = new ArrayList<>();
+
     @Getter
     @Setter
     private String drawnTileId = null;
+
     @Getter
     private final List<String> mulliganTileIDs = new ArrayList<>();
 
@@ -66,11 +69,9 @@ public class MantisTileDraftable extends Draftable {
     private static final String ChoiceKeyPrefix = "tile";
 
     public Category getItemCategory(String choiceKey) {
-        if (choiceKey == null)
-            return null;
+        if (choiceKey == null) return null;
         String tileID = getItemId(choiceKey);
-        if (tileID == null)
-            return null;
+        if (tileID == null) return null;
         for (BlueTileDraftItem tile : blueTiles) {
             if (tile.ItemId.equals(tileID)) {
                 return tile.ItemCategory;
@@ -85,17 +86,14 @@ public class MantisTileDraftable extends Draftable {
     }
 
     public static String getItemId(String choiceKey) {
-        if (choiceKey == null)
-            return null;
-        if (!choiceKey.startsWith(ChoiceKeyPrefix))
-            return null;
+        if (choiceKey == null) return null;
+        if (!choiceKey.startsWith(ChoiceKeyPrefix)) return null;
         return choiceKey.substring(ChoiceKeyPrefix.length());
     }
 
     public DraftItem getDraftItem(String choiceKey) {
         String tileID = getItemId(choiceKey);
-        if (tileID == null)
-            return null;
+        if (tileID == null) return null;
         for (BlueTileDraftItem tile : blueTiles) {
             if (tile.ItemId.equals(tileID)) {
                 return tile;
@@ -110,8 +108,7 @@ public class MantisTileDraftable extends Draftable {
     }
 
     public static String makeChoiceKey(String tileId) {
-        if (tileId == null)
-            return null;
+        if (tileId == null) return null;
         return ChoiceKeyPrefix + tileId;
     }
 
@@ -145,7 +142,8 @@ public class MantisTileDraftable extends Draftable {
             representation = tileID;
         }
         TI4Emoji emoji = TileEmojis.getTileEmojiFromTileID(tileID);
-        Button button = Button.secondary(makeButtonId(choiceKey), representation).withEmoji(emoji.asEmoji());
+        Button button =
+                Button.secondary(makeButtonId(choiceKey), representation).withEmoji(emoji.asEmoji());
         return new DraftChoice(TYPE, choiceKey, button, representation, representation, emoji.emojiString());
     }
 
@@ -172,8 +170,8 @@ public class MantisTileDraftable extends Draftable {
         }
 
         Game game = draftManager.getGame();
-        MapTemplateModel mapTemplate = game.getMapTemplateID() != null ? Mapper.getMapTemplate(game.getMapTemplateID())
-                : null;
+        MapTemplateModel mapTemplate =
+                game.getMapTemplateID() != null ? Mapper.getMapTemplate(game.getMapTemplateID()) : null;
         if (mapTemplate == null) {
             return "Error: Could not find map template for game.";
         }
@@ -230,7 +228,8 @@ public class MantisTileDraftable extends Draftable {
         }
 
         StringBuilder summary = new StringBuilder("You picked the tiles: ");
-        List<DraftChoice> picks = draftManager.getPlayerStates().get(playerUserId).getPicks(TYPE);
+        List<DraftChoice> picks =
+                draftManager.getPlayerStates().get(playerUserId).getPicks(TYPE);
         if (picks == null || picks.isEmpty()) {
             summary.append("None");
         } else {
@@ -402,7 +401,8 @@ public class MantisTileDraftable extends Draftable {
         int bpp = mapTemplate.bluePerPlayer() + extraBlues;
         int rpp = mapTemplate.redPerPlayer() + extraReds;
 
-        for (Entry<String, PlayerDraftState> entry : draftManager.getPlayerStates().entrySet()) {
+        for (Entry<String, PlayerDraftState> entry :
+                draftManager.getPlayerStates().entrySet()) {
             String playerUserId = entry.getKey();
             Player player = draftManager.getGame().getPlayer(playerUserId);
             PlayerDraftState pState = entry.getValue();
@@ -492,7 +492,8 @@ public class MantisTileDraftable extends Draftable {
                     DraftItem.Category.BLUETILE, tile.getTile().getTileID()));
         }
         DraftErrataModel.filterUndraftablesAndShuffle(blueTileItems, DraftItem.Category.BLUETILE);
-        List<DraftItem> selectedBlueTiles = blueTileItems.stream().limit(totalBluesNeeded).toList();
+        List<DraftItem> selectedBlueTiles =
+                blueTileItems.stream().limit(totalBluesNeeded).toList();
         if (selectedBlueTiles.size() < totalBluesNeeded) {
             return "Error: Could only find " + selectedBlueTiles.size() + " blue tiles to add, needed "
                     + totalBluesNeeded + ".";
@@ -506,7 +507,8 @@ public class MantisTileDraftable extends Draftable {
                     DraftItem.Category.REDTILE, tile.getTile().getTileID()));
         }
         DraftErrataModel.filterUndraftablesAndShuffle(redTileItems, DraftItem.Category.REDTILE);
-        List<DraftItem> selectedRedTiles = redTileItems.stream().limit(totalRedsNeeded).toList();
+        List<DraftItem> selectedRedTiles =
+                redTileItems.stream().limit(totalRedsNeeded).toList();
         if (selectedRedTiles.size() < totalRedsNeeded) {
             return "Error: Could only find " + selectedRedTiles.size() + " red tiles to add, needed " + totalRedsNeeded
                     + ".";
@@ -530,7 +532,8 @@ public class MantisTileDraftable extends Draftable {
         int bpp = mapTemplate.bluePerPlayer() + extraBlues;
         int rpp = mapTemplate.redPerPlayer() + extraReds;
 
-        for (Entry<String, PlayerDraftState> entry : draftManager.getPlayerStates().entrySet()) {
+        for (Entry<String, PlayerDraftState> entry :
+                draftManager.getPlayerStates().entrySet()) {
             String playerUserId = entry.getKey();
             Player player = draftManager.getGame().getPlayer(playerUserId);
             PlayerDraftState pState = entry.getValue();
@@ -563,7 +566,7 @@ public class MantisTileDraftable extends Draftable {
 
         return null;
     }
-    
+
     @Override
     public void onDraftEnd(DraftManager draftManager) {
         // Start the map building process
@@ -574,8 +577,7 @@ public class MantisTileDraftable extends Draftable {
     }
 
     @Override
-    public String whatsStoppingSetup(
-            DraftManager draftManager) {
+    public String whatsStoppingSetup(DraftManager draftManager) {
 
         Game game = draftManager.getGame();
         String mapTemplateID = game.getMapTemplateID();
@@ -584,21 +586,20 @@ public class MantisTileDraftable extends Draftable {
             return "Map template ID is missing or invalid. Try `/map set_map_template`";
         }
 
-        for(MapTemplateTile templateTile : mapTemplate.getTemplateTiles()) {
-            if(templateTile.getMiltyTileIndex() == null)
-                continue;
-            if(templateTile.getPlayerNumber() == null)
-                continue;
-            if(templateTile.getHome() != null && templateTile.getHome()) {
+        for (MapTemplateTile templateTile : mapTemplate.getTemplateTiles()) {
+            if (templateTile.getMiltyTileIndex() == null) continue;
+            if (templateTile.getPlayerNumber() == null) continue;
+            if (templateTile.getHome() != null && templateTile.getHome()) {
                 continue; // Home system, no tile needed
             }
-            
+
             // If a template position has a tile index and a player number,
             // ensure that the game has an actual tile placed there.
             String tilePosition = templateTile.getPos();
             Tile tile = game.getTileMap().get(tilePosition);
-            if(tile == null || TileHelper.isDraftTile(tile.getTileModel())) {
-                return "Map template position " + tilePosition + " needs a tile placed on it. If the map build gets stuck, try `/draft mantis_tile start_building` OR `/map add_tile` to do it manually.";
+            if (tile == null || TileHelper.isDraftTile(tile.getTileModel())) {
+                return "Map template position " + tilePosition
+                        + " needs a tile placed on it. If the map build gets stuck, try `/draft mantis_tile start_building` OR `/map add_tile` to do it manually.";
             }
         }
 

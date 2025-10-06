@@ -45,13 +45,13 @@ public class MantisMapBuildService {
      * for that work.
      * If players have too many tiles, will send private discard buttons first.
      * Otherwise, will publicly post map building buttons.
-     * 
+     *
      * @param draftManager
      */
     public void initializeMapBuilding(DraftManager draftManager) {
         Game game = draftManager.getGame();
-        MantisTileDraftable mantisTileDraftable = (MantisTileDraftable) draftManager
-                .getDraftable(MantisTileDraftable.TYPE);
+        MantisTileDraftable mantisTileDraftable =
+                (MantisTileDraftable) draftManager.getDraftable(MantisTileDraftable.TYPE);
         if (mantisTileDraftable == null) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "Error: Could not find mantis tile draftable to start map building.");
@@ -68,7 +68,8 @@ public class MantisMapBuildService {
 
         List<PlayerRemainingTiles> playerRemainingTiles = getPlayerRemainingTiles(draftManager, mantisTileDraftable);
         if (anyNeedsToDiscard(playerRemainingTiles, mapTemplateModel)) {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Starting the map building by having players discard excess tiles.");
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(), "Starting the map building by having players discard excess tiles.");
             sendDiscardButtons(game, mantisTileDraftable, mapTemplateModel, playerRemainingTiles);
         } else {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Starting map building!");
@@ -78,8 +79,8 @@ public class MantisMapBuildService {
 
     public String handleAction(GenericInteractionCreateEvent event, DraftManager draftManager, String action) {
         Game game = draftManager.getGame();
-        MantisTileDraftable mantisTileDraftable = (MantisTileDraftable) draftManager
-                .getDraftable(MantisTileDraftable.TYPE);
+        MantisTileDraftable mantisTileDraftable =
+                (MantisTileDraftable) draftManager.getDraftable(MantisTileDraftable.TYPE);
         if (mantisTileDraftable == null) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "Error: Could not find mantis tile draftable to start map building.");
@@ -99,13 +100,14 @@ public class MantisMapBuildService {
         }
         String[] actionParts = action.split("_", 2);
         String actionType = actionParts[0];
-        String outcome = switch (actionType) {
-            case "place" -> handlePlaceTile(event, game, mapTemplateModel, actionParts[1]);
-            case "mulligan" -> handleMulliganTile(event, game, mapTemplateModel, actionParts[1]);
-            case "repost" -> handleRepost(game, mapTemplateModel);
-            case "discard" -> handleDiscardTile(event, game, mapTemplateModel, actionParts[1]);
-            default -> "Error: Unknown map build action type: " + actionType;
-        };
+        String outcome =
+                switch (actionType) {
+                    case "place" -> handlePlaceTile(event, game, mapTemplateModel, actionParts[1]);
+                    case "mulligan" -> handleMulliganTile(event, game, mapTemplateModel, actionParts[1]);
+                    case "repost" -> handleRepost(game, mapTemplateModel);
+                    case "discard" -> handleDiscardTile(event, game, mapTemplateModel, actionParts[1]);
+                    default -> "Error: Unknown map build action type: " + actionType;
+                };
 
         return outcome;
     }
@@ -118,8 +120,8 @@ public class MantisMapBuildService {
         }
 
         DraftManager draftManager = game.getDraftManager();
-        MantisTileDraftable mantisTileDraftable = (MantisTileDraftable) draftManager
-                .getDraftable(MantisTileDraftable.TYPE);
+        MantisTileDraftable mantisTileDraftable =
+                (MantisTileDraftable) draftManager.getDraftable(MantisTileDraftable.TYPE);
         if (mantisTileDraftable == null) {
             return "Error: Could not find mantis tile draftable to continue map building.";
         }
@@ -153,8 +155,10 @@ public class MantisMapBuildService {
         String tileChoiceKey = MantisTileDraftable.makeChoiceKey(tileId);
         Category tileCategory = mantisTileDraftable.getItemCategory(tileChoiceKey);
         DraftItem placedTile = DraftItem.generate(tileCategory, tileId);
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), player.getRepresentation() + " placed "
-                + placedTile.getShortDescription() + " at Position " + position + ".");
+        MessageHelper.sendMessageToChannel(
+                game.getMainGameChannel(),
+                player.getRepresentation() + " placed " + placedTile.getShortDescription() + " at Position " + position
+                        + ".");
 
         List<PlayerRemainingTiles> allPlayerRemainingTiles = getPlayerRemainingTiles(draftManager, mantisTileDraftable);
         updateMapBuild(event, game, mantisTileDraftable, mapTemplateModel, allPlayerRemainingTiles);
@@ -164,8 +168,8 @@ public class MantisMapBuildService {
     public String handleMulliganTile(
             GenericInteractionCreateEvent event, Game game, MapTemplateModel mapTemplateModel, String actionParams) {
         DraftManager draftManager = game.getDraftManager();
-        MantisTileDraftable mantisTileDraftable = (MantisTileDraftable) draftManager
-                .getDraftable(MantisTileDraftable.TYPE);
+        MantisTileDraftable mantisTileDraftable =
+                (MantisTileDraftable) draftManager.getDraftable(MantisTileDraftable.TYPE);
         if (mantisTileDraftable == null) {
             return "Error: Could not find mantis tile draftable to continue map building.";
         }
@@ -194,8 +198,8 @@ public class MantisMapBuildService {
 
     public String handleRepost(Game game, MapTemplateModel mapTemplateModel) {
         DraftManager draftManager = game.getDraftManager();
-        MantisTileDraftable mantisTileDraftable = (MantisTileDraftable) draftManager
-                .getDraftable(MantisTileDraftable.TYPE);
+        MantisTileDraftable mantisTileDraftable =
+                (MantisTileDraftable) draftManager.getDraftable(MantisTileDraftable.TYPE);
         if (mantisTileDraftable == null) {
             return "Error: Could not find mantis tile draftable to continue map building.";
         }
@@ -207,10 +211,11 @@ public class MantisMapBuildService {
         return DraftButtonService.DELETE_MESSAGE;
     }
 
-    public String handleDiscardTile(GenericInteractionCreateEvent event, Game game, MapTemplateModel mapTemplateModel, String actionParams) {
+    public String handleDiscardTile(
+            GenericInteractionCreateEvent event, Game game, MapTemplateModel mapTemplateModel, String actionParams) {
         DraftManager draftManager = game.getDraftManager();
-        MantisTileDraftable mantisTileDraftable = (MantisTileDraftable) draftManager
-                .getDraftable(MantisTileDraftable.TYPE);
+        MantisTileDraftable mantisTileDraftable =
+                (MantisTileDraftable) draftManager.getDraftable(MantisTileDraftable.TYPE);
         if (mantisTileDraftable == null) {
             return "Error: Could not find mantis tile draftable to continue map building.";
         }
@@ -234,12 +239,12 @@ public class MantisMapBuildService {
                 .filter(pr -> pr.playerUserId().equals(playerUserId))
                 .findFirst()
                 .orElse(null);
-        if(!(playerRemainingTiles.blueTileIds().contains(tileId) || playerRemainingTiles.redTileIds().contains(tileId))) {
+        if (!(playerRemainingTiles.blueTileIds().contains(tileId)
+                || playerRemainingTiles.redTileIds().contains(tileId))) {
             return "Error: You do not have tile " + tileId + " drafted.";
         }
 
-        Category tileCategory = mantisTileDraftable.getItemCategory(
-                MantisTileDraftable.makeChoiceKey(tileId));
+        Category tileCategory = mantisTileDraftable.getItemCategory(MantisTileDraftable.makeChoiceKey(tileId));
 
         mantisTileDraftable.getDiscardedTileIDs().add(tileId);
 
@@ -255,16 +260,18 @@ public class MantisMapBuildService {
                 ? playerRemainingTiles.blueTileIds().size() > mapTemplateModel.bluePerPlayer()
                 : playerRemainingTiles.redTileIds().size() > mapTemplateModel.redPerPlayer();
 
-        if(!anyNeedToDiscard) {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have discarded excess tiles. Continuing map building!");
+        if (!anyNeedToDiscard) {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(), "All players have discarded excess tiles. Continuing map building!");
             mantisTileDraftable.setDrawnTileId(null);
             // Start building with a null event to force new messaging in the main thread
             updateMapBuild(null, game, mantisTileDraftable, mapTemplateModel, allPlayerRemainingTiles);
             return DraftButtonService.DELETE_MESSAGE;
-        } else if(!categoryNeedsDiscard) {
+        } else if (!categoryNeedsDiscard) {
             // This player is done discarding this one type
             String tileType = tileCategory == Category.BLUETILE ? "blue" : "red";
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You've finished discarding " + tileType + " tiles.");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "You've finished discarding " + tileType + " tiles.");
             return DraftButtonService.DELETE_MESSAGE;
         } else {
             // Only remove this one button
@@ -355,8 +362,7 @@ public class MantisMapBuildService {
             }
 
             // If this group had any players with unplaced positions, we're done searching.
-            if (nextGroup != null)
-                break;
+            if (nextGroup != null) break;
         }
         if (nextGroup == null || nextGroup.isEmpty()) {
             // All done!
@@ -403,8 +409,8 @@ public class MantisMapBuildService {
         }
 
         // Get the number of mulligans used by this player so far
-        List<DraftChoice> playerPicks = game.getDraftManager().getPlayerPicks(player.getUserID(),
-                MantisTileDraftable.TYPE);
+        List<DraftChoice> playerPicks =
+                game.getDraftManager().getPlayerPicks(player.getUserID(), MantisTileDraftable.TYPE);
         int mulligansUsed = (int) mantisDraftable.getMulliganTileIDs().stream()
                 .filter(mulliganId -> playerPicks.stream()
                         .anyMatch(pick -> MantisTileDraftable.getItemId(pick.getChoiceKey())
@@ -413,7 +419,9 @@ public class MantisMapBuildService {
 
         int mulliganLimit = mantisDraftable.getMulligans() != null ? mantisDraftable.getMulligans() : 0;
         boolean canMulligan = mulligansUsed < mulliganLimit;
-        if (playerRemainingTiles.blueTileIds().size() + playerRemainingTiles.redTileIds().size() <= 1) {
+        if (playerRemainingTiles.blueTileIds().size()
+                        + playerRemainingTiles.redTileIds().size()
+                <= 1) {
             // No more tiles to draw
             canMulligan = false;
         }
@@ -421,12 +429,13 @@ public class MantisMapBuildService {
         // If only one position, do it now and call this recursively
         if (nextGroup.size() == 1 && !canMulligan) {
             boolean success = placeTile(game, mantisDraftable, nextGroup.get(0), nextTile.ItemId);
-            if (!success)
-                return;
+            if (!success) return;
 
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), player.getRepresentation() + " placed "
-                    + nextTile.getShortDescription() + " at Position " + nextGroup.get(0)
-                    + " (automatically; no alternatives).");
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    player.getRepresentation() + " placed "
+                            + nextTile.getShortDescription() + " at Position " + nextGroup.get(0)
+                            + " (automatically; no alternatives).");
 
             // Regenerate possible tiles
             allPlayerRemainingTiles = getPlayerRemainingTiles(draftManager, mantisDraftable);
@@ -440,9 +449,8 @@ public class MantisMapBuildService {
                 ? " You can mulligan to draw a different tile (used " + mulligansUsed + " of " + mulliganLimit + ")."
                 : " (No mulligans remaining.)";
 
-        FileUpload mapImage = MantisBuildImageGeneratorService.tryGenerateImage(draftManager, IMAGE_UNIQUE_STRING,
-                nextGroup,
-                nextTile.ItemId);
+        FileUpload mapImage = MantisBuildImageGeneratorService.tryGenerateImage(
+                draftManager, IMAGE_UNIQUE_STRING, nextGroup, nextTile.ItemId);
         if (mapImage != null) {
             sendMapImage(event, responseChannel, mapImage);
         }
@@ -487,33 +495,36 @@ public class MantisMapBuildService {
         MessageHelper.sendMessageToChannel(responseChannel, sb.toString(), buttons);
     }
 
-    private void sendMapImage(GenericInteractionCreateEvent event, MessageChannel fallbackChannel,
-            FileUpload mapImage) {
+    private void sendMapImage(
+            GenericInteractionCreateEvent event, MessageChannel fallbackChannel, FileUpload mapImage) {
         if (event != null && event instanceof ButtonInteractionEvent buttonEvent) {
             // Attempt replace
-            buttonEvent.getChannel().getHistoryAround(buttonEvent.getMessage(), 20).queue(history -> {
-                boolean replaced = false;
-                for (Message msg : history.getRetrievedHistory()) {
-                    if (!msg.getAuthor().getId().equals(JdaService.getBotId())) {
-                        continue;
-                    }
-                    if (msg.getAttachments().isEmpty()) {
-                        continue;
-                    }
-                    for (Attachment attachment : msg.getAttachments()) {
-                        if (attachment.getFileName().startsWith(IMAGE_UNIQUE_STRING) && attachment.isImage()) {
-                            msg.editMessageAttachments(mapImage).queue();
-                            replaced = true;
-                            break;
+            buttonEvent
+                    .getChannel()
+                    .getHistoryAround(buttonEvent.getMessage(), 20)
+                    .queue(history -> {
+                        boolean replaced = false;
+                        for (Message msg : history.getRetrievedHistory()) {
+                            if (!msg.getAuthor().getId().equals(JdaService.getBotId())) {
+                                continue;
+                            }
+                            if (msg.getAttachments().isEmpty()) {
+                                continue;
+                            }
+                            for (Attachment attachment : msg.getAttachments()) {
+                                if (attachment.getFileName().startsWith(IMAGE_UNIQUE_STRING) && attachment.isImage()) {
+                                    msg.editMessageAttachments(mapImage).queue();
+                                    replaced = true;
+                                    break;
+                                }
+                            }
                         }
-                    }
-                }
 
-                // Fallback to just sending the image again
-                if (!replaced) {
-                    MessageHelper.sendFileUploadToChannel(buttonEvent.getMessageChannel(), mapImage);
-                }
-            });
+                        // Fallback to just sending the image again
+                        if (!replaced) {
+                            MessageHelper.sendFileUploadToChannel(buttonEvent.getMessageChannel(), mapImage);
+                        }
+                    });
         } else {
             MessageHelper.sendFileUploadToChannel(fallbackChannel, mapImage);
         }
@@ -525,8 +536,8 @@ public class MantisMapBuildService {
             MantisTileDraftable mantisTileDraftable,
             PlayerRemainingTiles playerRemainingTiles,
             String mulliganTileId) {
-        MessageChannel responseChannel = event == null ? player.getGame().getMainGameChannel()
-                : event.getMessageChannel();
+        MessageChannel responseChannel =
+                event == null ? player.getGame().getMainGameChannel() : event.getMessageChannel();
 
         // Gather all possible tiles
         List<String> availableTileIDs = new ArrayList<>();
@@ -544,7 +555,8 @@ public class MantisMapBuildService {
         }
 
         // If there's already a drawn tile, use that one.
-        if (mantisTileDraftable.getDrawnTileId() != null && !mantisTileDraftable.getDrawnTileId().isEmpty()) {
+        if (mantisTileDraftable.getDrawnTileId() != null
+                && !mantisTileDraftable.getDrawnTileId().isEmpty()) {
             String selectedTileId = mantisTileDraftable.getDrawnTileId();
             if (playerRemainingTiles.blueTileIds.contains(selectedTileId)) {
                 return DraftItem.generate(Category.BLUETILE, selectedTileId);
@@ -563,15 +575,15 @@ public class MantisMapBuildService {
         Collections.shuffle(availableTileIDs);
         String selectedTileId = availableTileIDs.get(0);
         mantisTileDraftable.setDrawnTileId(selectedTileId);
-        Category category = playerRemainingTiles.blueTileIds().contains(selectedTileId) ? Category.BLUETILE
-                : Category.REDTILE;
+        Category category =
+                playerRemainingTiles.blueTileIds().contains(selectedTileId) ? Category.BLUETILE : Category.REDTILE;
         return DraftItem.generate(category, selectedTileId);
     }
 
     /**
      * Get the user ID of the player at a given map position, based on speaker
      * order.
-     * 
+     *
      * @param draftManager
      * @param position     0-based position in the list of the map's player numbers
      * @return The user ID of the player at that position, or null if not found
@@ -586,7 +598,8 @@ public class MantisMapBuildService {
         }
 
         // Find the player with the given speaker order position
-        for (Entry<String, PlayerDraftState> entry : draftManager.getPlayerStates().entrySet()) {
+        for (Entry<String, PlayerDraftState> entry :
+                draftManager.getPlayerStates().entrySet()) {
             String playerId = entry.getKey();
             PlayerDraftState pState = entry.getValue();
             List<DraftChoice> picks = pState.getPicks(SpeakerOrderDraftable.TYPE);
@@ -648,7 +661,7 @@ public class MantisMapBuildService {
      * Here's an example from a 3-player standard map:
      * [[101], [103], [105], [201, 203], [205, 207], [209, 211], [318, 302], [306,
      * 308], [312, 314]]
-     * 
+     *
      * @param game
      * @param mapTemplateModel
      * @return A map of group number (arbitrary, but can be used for ordering), to a
@@ -707,54 +720,70 @@ public class MantisMapBuildService {
         return Integer.valueOf(emulatedTilePos.substring(0, emulatedTilePos.length() - 2));
     }
 
-    private void sendDiscardButtons(Game game, MantisTileDraftable mantisDraftable, MapTemplateModel mapTemplate,
+    private void sendDiscardButtons(
+            Game game,
+            MantisTileDraftable mantisDraftable,
+            MapTemplateModel mapTemplate,
             List<PlayerRemainingTiles> playerRemainingTiles) {
         for (PlayerRemainingTiles prt : playerRemainingTiles) {
             Player player = game.getPlayer(prt.playerUserId());
             if (player == null) {
-                BotLogger.warning(new LogOrigin(game), "Could not find player with ID " +
-                        prt.playerUserId() + " to send mantis discard buttons.");
+                BotLogger.warning(
+                        new LogOrigin(game),
+                        "Could not find player with ID " + prt.playerUserId() + " to send mantis discard buttons.");
                 continue;
             }
 
             int blueToDiscard = prt.blueTileIds().size() - mapTemplate.bluePerPlayer();
             if (blueToDiscard > 0) {
-                sendDiscardButtons(game, mantisDraftable, player,
+                sendDiscardButtons(
+                        game,
+                        mantisDraftable,
+                        player,
                         Category.BLUETILE,
-                        prt.blueTileIds(), blueToDiscard, mapTemplate.bluePerPlayer());
+                        prt.blueTileIds(),
+                        blueToDiscard,
+                        mapTemplate.bluePerPlayer());
             }
 
             int redToDiscard = prt.redTileIds().size() - mapTemplate.redPerPlayer();
             if (redToDiscard > 0) {
-                sendDiscardButtons(game, mantisDraftable, player,
-                        Category.REDTILE, prt.redTileIds(),
-                        redToDiscard, mapTemplate.redPerPlayer());
+                sendDiscardButtons(
+                        game,
+                        mantisDraftable,
+                        player,
+                        Category.REDTILE,
+                        prt.redTileIds(),
+                        redToDiscard,
+                        mapTemplate.redPerPlayer());
             }
         }
     }
 
-    private void sendDiscardButtons(Game game, MantisTileDraftable mantisDraftable, Player player,
-            Category category, List<String> tileIds, int toDiscard, int desiredAmount) {
-        if (toDiscard <= 0)
-            return;
-        if (tileIds == null || tileIds.isEmpty())
-            return;
-        if (toDiscard > tileIds.size())
-            toDiscard = tileIds.size();
+    private void sendDiscardButtons(
+            Game game,
+            MantisTileDraftable mantisDraftable,
+            Player player,
+            Category category,
+            List<String> tileIds,
+            int toDiscard,
+            int desiredAmount) {
+        if (toDiscard <= 0) return;
+        if (tileIds == null || tileIds.isEmpty()) return;
+        if (toDiscard > tileIds.size()) toDiscard = tileIds.size();
         List<Button> discardButtons = new ArrayList<>();
         for (String tileId : tileIds) {
             String buttonId = mantisDraftable.makeButtonId(ACTION_PREFIX + "discard_" + tileId);
             DraftItem item = DraftItem.generate(category, tileId);
             if (category == Category.BLUETILE) {
-                discardButtons.add(Buttons.blue(buttonId, item.getShortDescription(),
-                        item.getItemEmoji()));
+                discardButtons.add(Buttons.blue(buttonId, item.getShortDescription(), item.getItemEmoji()));
             } else if (category == Category.REDTILE) {
-                discardButtons.add(Buttons.red(buttonId, item.getShortDescription(),
-                        item.getItemEmoji()));
+                discardButtons.add(Buttons.red(buttonId, item.getShortDescription(), item.getItemEmoji()));
             }
         }
 
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), 
+        MessageHelper.sendMessageToChannel(
+                player.getCardsInfoThread(),
                 "You need to discard down to " + desiredAmount + " of these tiles",
                 discardButtons);
     }
@@ -769,7 +798,8 @@ public class MantisMapBuildService {
     }
 
     private boolean playerNeedsToDiscard(PlayerRemainingTiles prt, MapTemplateModel mapTemplate) {
-        return prt.blueTileIds().size() > mapTemplate.bluePerPlayer() || prt.redTileIds().size() > mapTemplate.redPerPlayer();
+        return prt.blueTileIds().size() > mapTemplate.bluePerPlayer()
+                || prt.redTileIds().size() > mapTemplate.redPerPlayer();
     }
 
     private List<PlayerRemainingTiles> getPlayerRemainingTiles(
@@ -778,14 +808,16 @@ public class MantisMapBuildService {
         Set<String> placedTiles = draftManager.getGame().getTileMap().values().stream()
                 .map(t -> t.getTileID())
                 .collect(Collectors.toSet());
-        Set<String> discardedTiles = mantisDraftable.getDiscardedTileIDs().stream().collect(Collectors.toSet());
-        for (Entry<String, PlayerDraftState> entry : draftManager.getPlayerStates().entrySet()) {
+        Set<String> discardedTiles =
+                mantisDraftable.getDiscardedTileIDs().stream().collect(Collectors.toSet());
+        for (Entry<String, PlayerDraftState> entry :
+                draftManager.getPlayerStates().entrySet()) {
             String playerId = entry.getKey();
             List<DraftChoice> mantisPicks = new ArrayList<>(entry.getValue().getPicks(MantisTileDraftable.TYPE));
 
             // Remove tiles that are placed on the game board
             mantisPicks.removeIf(pick -> placedTiles.contains(MantisTileDraftable.getItemId(pick.getChoiceKey())));
-            
+
             // Remove tiles that are discarded
             mantisPicks.removeIf(pick -> discardedTiles.contains(MantisTileDraftable.getItemId(pick.getChoiceKey())));
 
