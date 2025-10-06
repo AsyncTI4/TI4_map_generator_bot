@@ -301,6 +301,7 @@ public class AgendaHelper {
                 + "'. You can use this button to unqueue it and pass on \"when\"s.";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"When\"s"));
+        GMService.addForcePassWhenButtonForFowGM(game, player, buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         resolveWhenQueue(event, game);
     }
@@ -341,6 +342,7 @@ public class AgendaHelper {
                 + "'. You can use this button to unqueue it and pass on \"afters\".";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
+        GMService.addForcePassAfterButtonForFowGM(game, player, buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
 
         msg =
@@ -489,6 +491,7 @@ public class AgendaHelper {
 
             buttons.add(Buttons.gray("queueAWhen", "Play A \"When\""));
             buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"When\"s"));
+            GMService.addForcePassWhenButtonForFowGM(game, player, buttons);
             buttons.add(Buttons.gray("explainQueue", "How Does This Work?"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg.toString(), buttons);
         }
@@ -719,6 +722,7 @@ public class AgendaHelper {
 
                                 buttons.add(Buttons.gray("queueAnAfter", "Play An \"After\""));
                                 buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
+                                GMService.addForcePassAfterButtonForFowGM(game, player, buttons);
                                 MessageHelper.sendMessageToChannelWithButtons(
                                         p2.getCardsInfoThread(), msg.toString(), buttons);
                             }
@@ -803,6 +807,7 @@ public class AgendaHelper {
             return;
         }
         buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"When\"s"));
+        GMService.addForcePassWhenButtonForFowGM(game, player, buttons);
         game.setStoredValue(
                 "declinedWhens", game.getStoredValue("declinedWhens").replace(player.getFaction() + "_", ""));
         event.getMessage().delete().queue();
@@ -841,6 +846,7 @@ public class AgendaHelper {
 
         buttons.add(Buttons.gray("queueAnAfter", "Play An \"After\""));
         buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
+        GMService.addForcePassAfterButtonForFowGM(game, player, buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg.toString(), buttons);
     }
 
@@ -855,6 +861,7 @@ public class AgendaHelper {
             return;
         }
         buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
+        GMService.addForcePassAfterButtonForFowGM(game, player, buttons);
         game.setStoredValue("queuedAftersLockedFor" + player.getFaction(), "");
         game.setStoredValue(
                 "declinedAfters", game.getStoredValue("declinedAfters").replace(player.getFaction() + "_", ""));
