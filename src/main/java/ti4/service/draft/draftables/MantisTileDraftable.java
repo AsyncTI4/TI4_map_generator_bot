@@ -566,6 +566,15 @@ public class MantisTileDraftable extends Draftable {
 
         return null;
     }
+    
+    @Override
+    public void onDraftEnd(DraftManager draftManager) {
+        // Start the map building process
+        discardedTileIDs.clear();
+        mulliganTileIDs.clear();
+        drawnTileId = null;
+        MantisMapBuildService.initializeMapBuilding(draftManager);
+    }
 
     @Override
     public String whatsStoppingSetup(
@@ -605,12 +614,5 @@ public class MantisTileDraftable extends Draftable {
 
         // Do nothing, this is a map generation item
         return null;
-    }
-
-    @Override
-    public void onDraftEnd(DraftManager draftManager) {
-        // Start the map building process
-        discardedTileIDs.clear();
-        MantisMapBuildService.initializeMapBuilding(draftManager);
     }
 }

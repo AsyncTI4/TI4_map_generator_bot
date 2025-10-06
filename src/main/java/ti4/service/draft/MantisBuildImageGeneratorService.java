@@ -21,7 +21,6 @@ import ti4.image.TileStep;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.logging.BotLogger;
-import ti4.model.ColorModel;
 import ti4.model.MapTemplateModel;
 import ti4.service.image.FileUploadService;
 
@@ -34,7 +33,6 @@ public class MantisBuildImageGeneratorService {
     private static final int EXTRA_X = 0; // padding at left/right of map
     private static final int EXTRA_Y = 0; // padding at top/bottom of map
     private static final int SPACE_FOR_TILE_HEIGHT = 300; // space to calculate tile image height with
-    // private static final BasicStroke innerStroke = new BasicStroke(4.0f);
     private static final BasicStroke outlineStroke = new BasicStroke(12.0f);
 
     private static final String PENDING_TILE_POS = "br"; // bottom right corner
@@ -81,8 +79,6 @@ public class MantisBuildImageGeneratorService {
         Game game = draftManager.getGame();
 
         Map<String, Tile> tileMap = getRelevantTiles(draftManager);
-        // Map<String, MiltyDraftSlice> seatPosToNucleusTiles = getSeatToNucleusTiles(mapTemplate, tileMap);
-        // Map<String, String> seatPosToUserName = getSeatToPlayer(mapTemplate, draftManager);
 
         TileGenerator tileGenerator = new TileGenerator(game, null, DisplayType.map);
         Map<String, Point> tileImagePoints = new HashMap<>();
@@ -125,53 +121,14 @@ public class MantisBuildImageGeneratorService {
                 }
                 tile = new Tile(pendingTileId, PENDING_TILE_POS);
                 drawPendingTile(graphicsMain, game, tile);
-
-                // TileGenerator tileGenerator = new TileGenerator(game, null, DisplayType.map);
-                // BufferedImage tileImage = tileGenerator.draw(tile, TileStep.Tile);
-                // graphicsMain.drawImage(tileImage, tilePoint.x, tilePoint.y, null);
             } catch (Exception e) {
                 BotLogger.error("Failed to draw tile OPTION " + pendingTileId + " at " + PENDING_TILE_POS, e);
                 return null;
             }
         }
 
-        // for (Tile tile : tileMap.values()) {
-        //     try {
-        //         Point tilePoint = tileImagePoints.get(tile.getPosition());
-        //         if (seatPosToUserName.containsKey(tile.getPosition())) {
-        //             drawPlayerInfo(graphicsMain, tilePoint, seatPosToUserName.get(tile.getPosition()));
-        //         }
-        //     } catch (Exception e) {
-        //         BotLogger.error("Failed to draw tile PLAYER " + tile.getTileID() + " at " + tile.getPosition(), e);
-        //         return null;
-        //     }
-        // }
-
         return mainImage;
     }
-
-    // private Map<String, String> getSeatToPlayer(MapTemplateModel mapTemplateModel, DraftManager draftManager) {
-    //     Map<String, String> seatNumToPlayerInfo = new HashMap<>();
-
-    //     for (Map.Entry<String, PlayerDraftState> playerState :
-    //             draftManager.getPlayerStates().entrySet()) {
-    //         List<DraftChoice> seatChoices = playerState.getValue().getPicks().get(SeatDraftable.TYPE);
-    //         if (seatChoices == null || seatChoices.isEmpty()) {
-    //             continue;
-    //         }
-    //         DraftChoice seatChoice = seatChoices.get(0);
-    //         Integer seatNum = SeatDraftable.getSeatNumberFromChoiceKey(seatChoice.getChoiceKey());
-    //         MapTemplateTile homeTile = getSeatTileForPlayer(mapTemplateModel, seatNum);
-    //         if (homeTile == null) {
-    //             continue;
-    //         }
-    //         String playerUserName =
-    //                 draftManager.getGame().getPlayer(playerState.getKey()).getUserName();
-    //         seatNumToPlayerInfo.put(homeTile.getPos(), playerUserName);
-    //     }
-
-    //     return seatNumToPlayerInfo;
-    // }
 
     private void drawAvailability(Graphics graphics, String positionName, Point positionPoint, Game game) {
         Point base = new Point(positionPoint.x + TILE_PADDING, positionPoint.y + TILE_PADDING + 20);
@@ -181,105 +138,14 @@ public class MantisBuildImageGeneratorService {
         graphics.setFont(Storage.getFont64());
         DrawingUtil.superDrawString(
                 graphics, positionName, base.x + 172, base.y + 150, Color.white, hCenter, null, outlineStroke, Color.black);
-
-        // List<TI4Emoji> whs = new ArrayList<>();
-        // List<TI4Emoji> legendary = new ArrayList<>();
-        // List<TI4Emoji> blueSkips = new ArrayList<>();
-        // List<TI4Emoji> greenSkips = new ArrayList<>();
-        // List<TI4Emoji> yellowSkips = new ArrayList<>();
-        // List<TI4Emoji> redSkips = new ArrayList<>();
-        // for (MiltyDraftTile tile : pseudoSlice.getTiles()) {
-        //     if (tile.isHasAlphaWH()) whs.add(MiscEmojis.WHalpha);
-        //     if (tile.isHasBetaWH()) whs.add(MiscEmojis.WHbeta);
-        //     if (tile.isHasOtherWH()) whs.add(MiscEmojis.WHgamma);
-        //     if (tile.isLegendary()) legendary.add(MiscEmojis.LegendaryPlanet);
-
-        //     for (UnitHolder uh : tile.getTile().getPlanetUnitHolders()) {
-        //         if (uh instanceof Planet p) {
-        //             for (String spec : p.getTechSpecialities()) {
-        //                 switch (spec) {
-        //                     case "propulsion" -> blueSkips.add(TechEmojis.PropulsionTech);
-        //                     case "biotic" -> greenSkips.add(TechEmojis.BioticTech);
-        //                     case "cybernetic" -> yellowSkips.add(TechEmojis.CyberneticTech);
-        //                     case "warfare" -> redSkips.add(TechEmojis.WarfareTech);
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-        // List<TI4Emoji> featureEmojis = new ArrayList<>();
-        // featureEmojis.addAll(yellowSkips);
-        // featureEmojis.addAll(blueSkips);
-        // featureEmojis.addAll(greenSkips);
-        // featureEmojis.addAll(redSkips);
-        // featureEmojis.addAll(whs);
-        // featureEmojis.addAll(legendary);
-
-        // List<Point> featurePoints = Arrays.asList(
-        //         new Point(83, 3), new Point(220, 3),
-        //         new Point(60, 43), new Point(243, 43),
-        //         new Point(37, 83), new Point(266, 83),
-        //         new Point(14, 123), new Point(289, 123));
-
-        // int resources = pseudoSlice.getTotalRes();
-        // int influence = pseudoSlice.getTotalInf();
-        // String totalsString = resources + "/" + influence;
-
-        // int resourcesMilty = pseudoSlice.getOptimalRes();
-        // int influenceMilty = pseudoSlice.getOptimalInf();
-        // int flexMilty = pseudoSlice.getOptimalFlex();
-        // String optimalString = "(" + resourcesMilty + "/" + influenceMilty + "+" + flexMilty + ")";
-
-        // ((Graphics2D) graphics).setStroke(innerStroke);
-
-        // int index = 0;
-        // graphics.setColor(Color.black);
-        // for (TI4Emoji feature : featureEmojis) {
-        //     Point fPoint = featurePoints.get(index);
-        //     BufferedImage featureImage = getEmojiImage(feature);
-        //     featureImage.getGraphics();
-        //     graphics.setColor(Color.black);
-        //     graphics.fillRoundRect(fPoint.x + base.x, fPoint.y + base.y, 40, 40, 40, 40);
-
-        //     graphics.drawImage(featureImage, fPoint.x + base.x, fPoint.y + base.y, null);
-        //     index++;
-        //     if (index >= featurePoints.size()) break;
-        // }
-
-        // graphics.setColor(Color.white);
-        // graphics.setFont(Storage.getFont50());
-        // DrawingUtil.superDrawString(
-        //         graphics,
-        //         totalsString,
-        //         base.x + 172,
-        //         base.y + 110,
-        //         Color.white,
-        //         hCenter,
-        //         null,
-        //         outlineStroke,
-        //         Color.black);
-        // DrawingUtil.superDrawString(
-        //         graphics,
-        //         optimalString,
-        //         base.x + 172,
-        //         base.y + 165,
-        //         Color.white,
-        //         hCenter,
-        //         null,
-        //         outlineStroke,
-        //         Color.black);
     }
 
     private void drawPendingTile(Graphics graphics, Game game, Tile tile) {
-        // I'm not sure how point is calculated/scaled, but this "- 130" seems to put the
-        // pending tile in the right spot.
-
         Point tilePoint = getTilePosition(game, PENDING_TILE_POS);
         Point base = new Point(tilePoint.x + TILE_PADDING, tilePoint.y + TILE_PADDING + 20 - 150);
         TileGenerator tileGenerator = new TileGenerator(game, null, DisplayType.map);
         BufferedImage tileImage = tileGenerator.draw(tile, TileStep.Tile);
         graphics.drawImage(tileImage, base.x - 100, base.y - 200, null);
-        // TileGenerator tileGenerator = new TileGenerator(game, null, DisplayType.map);
 
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(new Color(184, 141, 42));
@@ -295,29 +161,6 @@ public class MantisBuildImageGeneratorService {
                 outlineStroke,
                 Color.black);
     }
-
-    // private void drawPlayerInfo(Graphics graphics, Point positionPoint, String playerUserName) {
-    //     if (playerUserName == null || playerUserName.isBlank()) {
-    //         return;
-    //     }
-
-    //     Point base = new Point(positionPoint.x + TILE_PADDING, positionPoint.y + TILE_PADDING + 20);
-
-    //     HorizontalAlign hCenter = HorizontalAlign.Center;
-    //     graphics.setColor(Color.white);
-    //     graphics.setFont(Storage.getFont50());
-
-    //     DrawingUtil.superDrawString(
-    //             graphics,
-    //             playerUserName,
-    //             base.x + 172,
-    //             base.y + 230,
-    //             Color.red,
-    //             hCenter,
-    //             null,
-    //             outlineStroke,
-    //             Color.black);
-    // }
 
     private Point getTilePosition(Game game, String position) {
         Point positionPoint = PositionMapper.getTilePosition(position);
@@ -349,43 +192,6 @@ public class MantisBuildImageGeneratorService {
 
         return tileMap;
     }
-
-    // private Map<String, MiltyDraftSlice> getSeatToNucleusTiles(
-    //         MapTemplateModel mapTemplate, Map<String, Tile> gameTileMap) {
-    //     Map<String, MiltyDraftSlice> seatToNucleusTiles = new HashMap<>();
-    //     for (int i = 1; i <= mapTemplate.getNucleusSliceCount(); ++i) {
-    //         int playerNum = i;
-
-    //         MapTemplateTile sliceSeat = getSeatTileForPlayer(mapTemplate, playerNum);
-    //         String sliceSeatPos = sliceSeat.getPos();
-
-    //         Predicate<MapTemplateTile> nucleusSliceFilter =
-    //                 t -> t.getNucleusNumbers() != null && t.getNucleusNumbers().contains(playerNum);
-    //         List<MiltyDraftTile> nucleusSliceTiles = mapTemplate.getTemplateTiles().stream()
-    //                 .filter(nucleusSliceFilter)
-    //                 .map(MapTemplateTile::getPos)
-    //                 .map(pos -> gameTileMap.get(pos).getTileID())
-    //                 .map(DraftTileManager::findTile)
-    //                 .toList();
-    //         MiltyDraftSlice pseudoSlice = new MiltyDraftSlice();
-    //         pseudoSlice.setName("" + i);
-    //         pseudoSlice.setTiles(new ArrayList<>(nucleusSliceTiles));
-
-    //         seatToNucleusTiles.put(sliceSeatPos, pseudoSlice);
-    //     }
-    //     return seatToNucleusTiles;
-    // }
-
-    // private MapTemplateTile getSeatTileForPlayer(MapTemplateModel mapTemplateModel, int playerNumber) {
-    //     Predicate<MapTemplateTile> seatFilter = t -> t.getHome() != null
-    //             && t.getHome()
-    //             && t.getPlayerNumber() != null
-    //             && t.getPlayerNumber() == playerNumber;
-    //     return mapTemplateModel.getTemplateTiles().stream()
-    //             .filter(seatFilter)
-    //             .findFirst()
-    //             .orElse(null);
-    // }
 
     /**
      * Gives the number of rings of the map
@@ -423,8 +229,4 @@ public class MantisBuildImageGeneratorService {
         // mapWidth += hasExtraRow(game) ? EXTRA_X : 0;
         return mapWidth;
     }
-
-    // private BufferedImage getEmojiImage(TI4Emoji emoji) {
-    //     return ImageHelper.readEmojiImageScaled(emoji, 40);
-    // }
 }

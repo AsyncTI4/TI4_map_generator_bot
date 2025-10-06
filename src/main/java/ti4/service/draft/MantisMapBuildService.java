@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
@@ -337,7 +336,6 @@ public class MantisMapBuildService {
                     if (tileAtPos == null || TileHelper.isDraftTile(tileAtPos.getTileModel())) {
                         // This position needs a tile placed
                         currentUnplacedPositions.add(pos);
-                        // break;
                     }
                 }
 
@@ -468,9 +466,6 @@ public class MantisMapBuildService {
                     "Error: Could not find any available tiles for player " + player.getRepresentation()
                             + " to place next tile.");
             return;
-            // return "Error: Could not find any available tiles for player " +
-            // player.getRepresentation()
-            // + " to place next tile.";
         }
 
         // TODO: Handle option to block adjacent anomalies when alternatives exist
@@ -479,7 +474,6 @@ public class MantisMapBuildService {
             String buttonId = mantisDraftable.makeButtonId(ACTION_PREFIX + "place_" + pos + "_" + nextTile.ItemId);
             buttons.add(Buttons.blue(buttonId, pos));
         }
-        // TODO: Handle option to adjust max mulligans
         if (canMulligan) {
             String buttonId = mantisDraftable.makeButtonId(ACTION_PREFIX + "mulligan_" + nextTile.ItemId);
             buttons.add(Buttons.gray(buttonId, "Mulligan"));
@@ -491,25 +485,13 @@ public class MantisMapBuildService {
                 player.getRepresentation() + " can pick a position to place " + nextTile.getLongDescription() + ".");
         sb.append(mulliganString);
         MessageHelper.sendMessageToChannel(responseChannel, sb.toString(), buttons);
-        // If no event, just re-post
-        // if (event == null || !(event instanceof ButtonInteractionEvent)) {
-        // MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb.toString(),
-        // buttons);
-        // } else {
-        // ButtonInteractionEvent buttonEvent = (ButtonInteractionEvent) event;
-        // buttonEvent
-        // .getHook()
-        // .editOriginal(sb.toString())
-        // .setComponents(ActionRow.partitionOf(buttons))
-        // .queue();
-        // }
     }
 
     private void sendMapImage(GenericInteractionCreateEvent event, MessageChannel fallbackChannel,
             FileUpload mapImage) {
         if (event != null && event instanceof ButtonInteractionEvent buttonEvent) {
             // Attempt replace
-            buttonEvent.getChannel().getHistoryAround(buttonEvent.getMessage(), 10).queue(history -> {
+            buttonEvent.getChannel().getHistoryAround(buttonEvent.getMessage(), 20).queue(history -> {
                 boolean replaced = false;
                 for (Message msg : history.getRetrievedHistory()) {
                     if (!msg.getAuthor().getId().equals(JdaService.getBotId())) {
@@ -522,6 +504,7 @@ public class MantisMapBuildService {
                         if (attachment.getFileName().startsWith(IMAGE_UNIQUE_STRING) && attachment.isImage()) {
                             msg.editMessageAttachments(mapImage).queue();
                             replaced = true;
+                            break;
                         }
                     }
                 }
@@ -655,7 +638,7 @@ public class MantisMapBuildService {
     }
 
     /**
-     * Gets all of the map tile positions in which a tile must be placed, grouped
+     * Gets all of the template tile positions in which a tile must be placed, grouped
      * with the other positions
      * that could receive a tile at the same time. For example, the tile positions
      * adjacent to Mecatol Rex
@@ -674,52 +657,15 @@ public class MantisMapBuildService {
      *         that player in that group.
      */
     private Map<Integer, Map<Integer, List<String>>> getGroupedPositions(Game game, MapTemplateModel mapTemplateModel) {
-
-        // I'm not sure the best way to generically group tiles that players can place
-        // in any order.
-        // (for example, the two tiles on either side of your HS in a standard map; how
-        // are those logically
-        // identified as a group, and how does that logic exclude the tile in front of
-        // the HS in ring 2?)
-
-        // I think the best way right now is to take the template's emulated tile list,
-        // and use the ring number
-        // on those to get the tile indexes to group together. An alternative could be
-        // to use the DistanceTool
-        // to group tiles by their distance from the center tile, but that seems
-        // excessive and flakey.
-
         List<String> emulatedPositions = new ArrayList<>(mapTemplateModel.emulatedTiles());
-        // Remove the Home Position
-        // Predicate<MapTemplateTile> isHome = t -> t.getHome() != null && t.getHome();
-        // Set<String> homePositions = new
-        // HashSet<>(mapTemplateModel.getTemplateTiles().stream().filter(isHome).map(MapTemplateTile::getPos).toList());
-        // emulatedPositions.removeIf(homePositions::contains);
+
         // Remove the home position, which by convention seems to be the first one in
         // the list
         emulatedPositions.removeFirst();
 
-        // It weirds me out that playerNums start at 1, so get a list of ACTUAL player
-        // numbers used in the template
-        // Just in case someone uses 0 or skips a number or something I dunno
-        // List<Integer> playerNums = mapTemplateModel.getTemplateTiles().stream()
-        // .filter(t -> t.getPlayerNumber() != null)
-        // .map(MapTemplateTile::getPlayerNumber)
-        // .distinct()
-        // .sorted()
-        // .toList();
-
-        // For each tile position, record it's player number and it's milty tile index
-        // separately.
-        // Map<String, Integer> posToPlayerNum = new HashMap<>();
-        // Map<String, Integer> posToTileIndex = new HashMap<>();
-        // Map<String, Integer> posToGroup = new HashMap<>();
         Map<Integer, Map<Integer, List<String>>> groupToPlayerNumToTiles = new HashMap<>();
         for (MapTemplateTile tile : mapTemplateModel.getTemplateTiles()) {
             Integer playerNumber = tile.getPlayerNumber();
-            // if(playerNumber != null) {
-            // posToPlayerNum.put(tile.getPos(), playerNumber);
-            // }
             Integer tileIndex = tile.getMiltyTileIndex();
             Integer group = null;
             if (tileIndex != null) {
@@ -733,9 +679,6 @@ public class MantisMapBuildService {
                 // this assumption.
                 String equivEmulatedPos = emulatedPositions.get(tileIndex);
                 group = getTileGroup(equivEmulatedPos);
-                // if(group != null) {
-                // posToGroup.put(tile.getPos(), group);
-                // }
             }
 
             if (playerNumber != null && group != null) {
@@ -745,71 +688,6 @@ public class MantisMapBuildService {
                 playerNumToTiles.get(playerNumber).add(tile.getPos());
             }
         }
-
-        // For each emulated position, add each player's equivalent position to the
-        // correct group and add that group to
-        // the list.
-        // Map<Integer, Map<Integer, List<String>>> groupToPlayerNumToTiles = new
-        // HashMap<>();
-        // for(String emulatedPos : emulatedPositions) {
-        // // Get the actual template tile for the emulated position
-        // MapTemplateTile baseTile =
-        // mapTemplateModel.getTemplateTiles().stream().filter(t ->
-        // t.getPos().equals(emulatedPos)).findFirst().orElse(null);
-        // if(baseTile == null) {
-        // BotLogger.warning(new LogOrigin(game), "Could not find template tile for
-        // position " + emulatedPos + "
-        // in map template " + mapTemplateModel.getAlias() + ".");
-        // continue;
-        // }
-
-        // // Get the tile index this emulated position represents
-        // Integer tileIndex = baseTile.getMiltyTileIndex();
-        // // Get the grouping for this tile index
-        // Integer group = getTileGroup(baseTile);
-
-        // // For each player, find their equivalent position for this emulated tile
-        // // and add that position to the correct group for that player.
-        // for(int playerNum : playerNums) {
-        // String playerTilePos = mapTemplateModel.getTemplateTiles().stream()
-        // .filter(t -> t.getPlayerNumber() != null && t.getPlayerNumber() == playerNum)
-        // .filter(t -> t.getMiltyTileIndex() != null &&
-        // t.getMiltyTileIndex().equals(tileIndex))
-        // .map(MapTemplateTile::getPos)
-        // .findFirst()
-        // .orElse(null);
-        // if(playerTilePos == null) {
-        // BotLogger.warning(new LogOrigin(game), "Could not find player tile for player
-        // " + playerNum + "
-        // and tile " + tileIndex + " in map template " + mapTemplateModel.getAlias() +
-        // ".");
-        // continue;
-        // }
-
-        // groupToPlayerNumToTiles.putIfAbsent(group, new HashMap<>());
-        // Map<Integer, List<String>> playerNumToTiles =
-        // groupToPlayerNumToTiles.get(group);
-        // playerNumToTiles.putIfAbsent(playerNum, new ArrayList<>());
-        // playerNumToTiles.get(playerNum).add(playerTilePos);
-        // }
-        // }
-
-        // For the groups that were found, get their group number in order
-        // List<Integer> groupNumbers = new
-        // ArrayList<>(groupToPlayerNumToTiles.keySet());
-        // groupNumbers.sort(Integer::compareTo);
-
-        // Iterate through each group in order, and for each:
-        // iterate through each player in order, and for each:
-        // add that player's tiles for that group to the final ordered list of groups.
-        // List<List<String>> groups = new ArrayList<>();
-        // for(Integer groupNum : groupNumbers) {
-        // Map<Integer, List<String>> playerNumToTiles =
-        // groupToPlayerNumToTiles.get(groupNum);
-        // for(Integer playerNum : playerNums) {
-        // groups.add(playerNumToTiles.get(playerNum));
-        // }
-        // }
 
         return groupToPlayerNumToTiles;
     }
@@ -821,10 +699,6 @@ public class MantisMapBuildService {
      * number
      * on the equivalent emulated tile to determine the group.
      */
-    // private Integer getTileGroup(MapTemplateTile emulatedTile) {
-    // String pos = emulatedTile.getPos();
-    // return getTileGroup(pos);
-    // }
     private Integer getTileGroup(String emulatedTilePos) {
         // Position 101 = group 1; Position 1304 = group 13
         if (emulatedTilePos.length() < 3) {
