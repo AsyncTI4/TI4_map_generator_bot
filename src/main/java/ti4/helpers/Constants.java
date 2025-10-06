@@ -1053,8 +1053,6 @@ public class Constants {
     public static final String DRAFT_MANAGE_ADD_ALL_GAME_PLAYERS = "add_all_game_players";
     public static final String DRAFT_MANAGE_SWAP_PLAYERS = "swap_players";
     public static final String DRAFT_MANAGE_REPLACE_PLAYER = "replace_player";
-    public static final String DRAFT_MANAGE_LIST_DRAFTABLES = "list_draftables";
-    public static final String DRAFT_MANAGE_DISPLAY_ORCHESTRATOR = "display_orchestrator";
     public static final String DRAFT_MANAGE_MAKE_PICK = "make_pick";
     public static final String DRAFT_MANAGE_UNPICK = "unpick";
     public static final String DRAFT_MANAGE_CUSTOM_COMMAND = "custom_draftable_command";

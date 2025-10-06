@@ -319,9 +319,6 @@ public class MantisTileDraftable extends Draftable {
                     label = 'r';
                 }
             }
-            // String label = labeledTileId.length() > 0 ? labeledTileId.substring(0, 1) :
-            // "";
-            // String tileId = labeledTileId.length() > 1 ? labeledTileId.substring(1) : "";
             if (label.equals('b')) {
                 blueTiles.add((BlueTileDraftItem) DraftItem.generate(Category.BLUETILE, datum));
             } else if (label.equals('r')) {
