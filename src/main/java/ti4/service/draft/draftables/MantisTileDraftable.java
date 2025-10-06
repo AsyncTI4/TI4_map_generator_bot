@@ -46,13 +46,21 @@ import ti4.service.milty.MiltyDraftTile;
 public class MantisTileDraftable extends Draftable {
 
     // Used in drafting
+    @Getter
     private final List<BlueTileDraftItem> blueTiles = new ArrayList<>();
+
+    @Getter
     private final List<RedTileDraftItem> redTiles = new ArrayList<>();
+
+    @Setter
     private Integer extraBlues;
+
+    @Setter
     private Integer extraReds;
 
     // Used in map building
     @Getter
+    @Setter
     private Integer mulligans;
 
     @Getter

@@ -1073,6 +1073,8 @@ public class Constants {
     public static final String DRAFT_SLICE_REMOVE_SLICE = "remove_slice";
     public static final String DRAFT_SPEAKER_ORDER_SET_PICK_COUNT = "set_pick_count";
     public static final String DRAFT_MANTIS_TILE_START_BUILDING = "start_building";
+    public static final String DRAFT_MANTIS_TILE_CONFIGURE = "configure";
+    public static final String DRAFT_MANTIS_TILE_SET_TILES = "set_tiles";
 
     // options
     public static final String FORCE_OPTION = "force";
