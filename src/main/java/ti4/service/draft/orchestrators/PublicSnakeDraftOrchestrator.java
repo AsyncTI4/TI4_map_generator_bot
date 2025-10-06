@@ -163,14 +163,14 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         // Picks are made one player at a time, with all buttons visible.
         // Ensure this is the current player
         if (!playerUserId.equals(getCurrentPlayer(playerOrder))) {
-            return "It's not your turn to draft.";
+            return DraftButtonService.USER_MISTAKE_PREFIX + "It's not your turn to draft.";
         }
         // Ensure no one else has picked this choice
         if (draftManager
                         .getPlayersWithChoiceKey(choice.getType(), choice.getChoiceKey())
                         .size()
                 > 0) {
-            return "That choice has already been taken.";
+            return DraftButtonService.USER_MISTAKE_PREFIX + "That choice has already been taken.";
         }
 
         // Persist the choice in Player State.

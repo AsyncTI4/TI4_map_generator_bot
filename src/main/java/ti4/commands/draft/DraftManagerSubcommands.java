@@ -14,6 +14,7 @@ import ti4.commands.Subcommand;
 import ti4.commands.SubcommandGroup;
 import ti4.helpers.Constants;
 import ti4.helpers.StringHelper;
+import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -57,15 +58,14 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                     new DraftManagerListPlayers(),
                     new DraftManagerClearMissingPlayers(),
                     new DraftManagerAddAllGamePlayers(),
-                    new DraftManagerListDraftables(),
-                    new DraftManagerGetOrchestrator(),
                     new DraftManagerSwapDraftingPlayers(),
                     new DraftManagerReplacePlayer(),
                     new DraftManagerMakePick(),
                     new DraftManagerUnpick(),
                     new DraftManagerSendCustomDraftableCommand(),
                     new DraftManagerSendCustomOrchestratorCommand(),
-                    new DraftManagerConvertToMilty())
+                    new DraftManagerConvertToMilty(),
+                    new DraftManagerSetupDraft())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     protected DraftManagerSubcommands() {
@@ -608,53 +608,6 @@ public class DraftManagerSubcommands extends SubcommandGroup {
         }
     }
 
-    public static class DraftManagerListDraftables extends GameStateSubcommand {
-        public DraftManagerListDraftables() {
-            super(Constants.DRAFT_MANAGE_LIST_DRAFTABLES, "List the draftables in the draft manager", false, false);
-        }
-
-        @Override
-        public void execute(SlashCommandInteractionEvent event) {
-            Game game = getGame();
-            DraftManager draftManager = game.getDraftManager();
-            StringBuilder sb = new StringBuilder();
-            sb.append("Draftables in draft manager (in order):\n");
-            int index = 1;
-            for (Draftable draftable : draftManager.getDraftables()) {
-                sb.append(index++);
-                sb.append(". ");
-                sb.append(draftable.getDisplayName());
-                sb.append(System.lineSeparator());
-            }
-            MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
-        }
-    }
-
-    public static class DraftManagerGetOrchestrator extends GameStateSubcommand {
-        public DraftManagerGetOrchestrator() {
-            super(
-                    Constants.DRAFT_MANAGE_DISPLAY_ORCHESTRATOR,
-                    "Display the orchestrator in the draft manager",
-                    false,
-                    false);
-        }
-
-        @Override
-        public void execute(SlashCommandInteractionEvent event) {
-            Game game = getGame();
-            DraftManager draftManager = game.getDraftManager();
-            DraftOrchestrator orchestrator = draftManager.getOrchestrator();
-            if (orchestrator == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "No orchestrator set in the draft manager.");
-            } else {
-                MessageHelper.sendMessageToChannel(
-                        event.getChannel(),
-                        "Orchestrator in draft manager: "
-                                + orchestrator.getClass().getSimpleName());
-            }
-        }
-    }
-
     public static class DraftManagerMakePick extends GameStateSubcommand {
         public DraftManagerMakePick() {
             super(Constants.DRAFT_MANAGE_MAKE_PICK, "Make a pick for a player in the draft", true, false);
@@ -975,6 +928,20 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(), "Could not apply picks to Milty settings, missing draft elements");
             }
+        }
+    }
+
+    public static class DraftManagerSetupDraft extends GameStateSubcommand {
+        public DraftManagerSetupDraft() {
+            super(Constants.DRAFT_MANAGE_SETUP_DRAFT, "Setup a new draft, with nothing preset", true, false);
+        }
+
+        @Override
+        public void execute(SlashCommandInteractionEvent event) {
+            Game game = getGame();
+            DraftSystemSettings settings = new DraftSystemSettings(game, null);
+            game.setDraftSystemSettings(settings);
+            settings.postMessageAndButtons(event);
         }
     }
 }

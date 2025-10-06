@@ -21,6 +21,7 @@ import ti4.image.TileStep;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.logging.BotLogger;
+import ti4.model.ColorModel;
 import ti4.model.MapTemplateModel;
 import ti4.service.image.FileUploadService;
 
@@ -34,7 +35,7 @@ public class MantisBuildImageGeneratorService {
     private static final int EXTRA_Y = 0; // padding at top/bottom of map
     private static final int SPACE_FOR_TILE_HEIGHT = 300; // space to calculate tile image height with
     // private static final BasicStroke innerStroke = new BasicStroke(4.0f);
-    private static final BasicStroke outlineStroke = new BasicStroke(9.0f);
+    private static final BasicStroke outlineStroke = new BasicStroke(12.0f);
 
     private static final String PENDING_TILE_POS = "br"; // bottom right corner
 
@@ -107,7 +108,7 @@ public class MantisBuildImageGeneratorService {
                     continue;
                 }
                 Point tilePoint = tileImagePoints.get(tile.getPosition());
-                drawAvailability(graphicsMain, tilePoint, game);
+                drawAvailability(graphicsMain, tile.getPosition(), tilePoint, game);
             } catch (Exception e) {
                 BotLogger.error("Failed to draw tile AVAILABILITY at " + tilePos, e);
                 return null;
@@ -123,8 +124,7 @@ public class MantisBuildImageGeneratorService {
                     return mainImage;
                 }
                 tile = new Tile(pendingTileId, PENDING_TILE_POS);
-                Point tilePoint = getTilePosition(game, PENDING_TILE_POS);
-                drawPendingTile(graphicsMain, tilePoint, game, tile);
+                drawPendingTile(graphicsMain, game, tile);
 
                 // TileGenerator tileGenerator = new TileGenerator(game, null, DisplayType.map);
                 // BufferedImage tileImage = tileGenerator.draw(tile, TileStep.Tile);
@@ -173,14 +173,14 @@ public class MantisBuildImageGeneratorService {
     //     return seatNumToPlayerInfo;
     // }
 
-    private void drawAvailability(Graphics graphics, Point positionPoint, Game game) {
+    private void drawAvailability(Graphics graphics, String positionName, Point positionPoint, Game game) {
         Point base = new Point(positionPoint.x + TILE_PADDING, positionPoint.y + TILE_PADDING + 20);
 
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(Color.white);
         graphics.setFont(Storage.getFont64());
         DrawingUtil.superDrawString(
-                graphics, "PLACE?", base.x + 172, base.y + 150, Color.white, hCenter, null, outlineStroke, Color.black);
+                graphics, positionName, base.x + 172, base.y + 150, Color.white, hCenter, null, outlineStroke, Color.black);
 
         // List<TI4Emoji> whs = new ArrayList<>();
         // List<TI4Emoji> legendary = new ArrayList<>();
@@ -270,23 +270,25 @@ public class MantisBuildImageGeneratorService {
         //         Color.black);
     }
 
-    private void drawPendingTile(Graphics graphics, Point positionPoint, Game game, Tile tile) {
-        Point base = new Point(positionPoint.x + TILE_PADDING, positionPoint.y + TILE_PADDING + 20);
+    private void drawPendingTile(Graphics graphics, Game game, Tile tile) {
+        // I'm not sure how point is calculated/scaled, but this "- 130" seems to put the
+        // pending tile in the right spot.
 
         Point tilePoint = getTilePosition(game, PENDING_TILE_POS);
+        Point base = new Point(tilePoint.x + TILE_PADDING, tilePoint.y + TILE_PADDING + 20 - 150);
         TileGenerator tileGenerator = new TileGenerator(game, null, DisplayType.map);
         BufferedImage tileImage = tileGenerator.draw(tile, TileStep.Tile);
-        graphics.drawImage(tileImage, tilePoint.x, tilePoint.y, null);
+        graphics.drawImage(tileImage, base.x - 100, base.y - 200, null);
         // TileGenerator tileGenerator = new TileGenerator(game, null, DisplayType.map);
 
         HorizontalAlign hCenter = HorizontalAlign.Center;
-        graphics.setColor(Color.white);
+        graphics.setColor(new Color(184, 141, 42));
         graphics.setFont(Storage.getFont64());
         DrawingUtil.superDrawString(
                 graphics,
                 "CURRENT",
                 base.x + 172,
-                base.y - 150,
+                base.y - 80,
                 Color.white,
                 hCenter,
                 null,

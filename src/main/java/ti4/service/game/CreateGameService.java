@@ -252,10 +252,11 @@ public class CreateGameService {
         Button miltyButton = Buttons.green("miltySetup", "Start Milty Setup");
         Button nucleusButton = Buttons.green("startDraftSystem_nucleusPreset", "Start Nucleus Setup");
         Button addMapString = Buttons.green("addMapString~MDL", "Add Prebuilt Map String");
+        Button customDraft = Buttons.green("startDraftSystem", "Start Custom Draft Setup");
         MessageHelper.sendMessageToChannelWithButtons(
                 actionsChannel,
                 "How would you like to set up the players and map?",
-                List.of(miltyButton, nucleusButton, addMapString));
+                List.of(miltyButton, nucleusButton, addMapString, customDraft));
 
         // Button offerOptions = Buttons.green("offerGameOptionButtons", "Options");
         GameOptionService.offerGameOptionButtons(game, actionsChannel);

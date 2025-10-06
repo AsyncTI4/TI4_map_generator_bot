@@ -54,4 +54,6 @@ public class MantisTileDraftableSubcommands extends SubcommandGroup {
             MantisMapBuildService.initializeMapBuilding(getGame().getDraftManager());
         }
     }
+
+    // TODO: Commands to setup (extra tiles, mulligans, etc)
 }
