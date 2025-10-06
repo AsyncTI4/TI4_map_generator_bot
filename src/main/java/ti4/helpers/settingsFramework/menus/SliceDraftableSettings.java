@@ -259,8 +259,10 @@ public class SliceDraftableSettings extends SettingsMenu {
         if (mapTemplate.getValue() != null && mapTemplate.getValue().bluePerPlayer() != bpp) {
             if (isNucleusMode()) {
                 nucleusSettings.setDefaultsForTemplate(event, mapTemplate.getValue());
+                bpp = mapTemplate.getValue().bluePerPlayer();
             } else {
                 miltySettings.setDefaultsForTemplate(event, mapTemplate.getValue());
+                bpp = mapTemplate.getValue().bluePerPlayer();
             }
         }
     }

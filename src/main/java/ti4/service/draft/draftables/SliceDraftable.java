@@ -167,7 +167,9 @@ public class SliceDraftable extends SinglePickDraftable {
             GenericInteractionCreateEvent event, Game game, SliceDraftableSettings sliceSettings, int playerCount) {
         NucleusSliceDraftableSettings nucleusSettings = sliceSettings.getNucleusSettings();
         MapTemplateModel mapTemplate = sliceSettings.getMapTemplate().getValue();
-        if (mapTemplate == null || mapTemplate.getPlayerCount() != playerCount) {
+        if (mapTemplate == null) {
+            return "Error: No map template selected.";
+        } else if (mapTemplate.getPlayerCount() != playerCount) {
             return "The selected map template " + mapTemplate.getAlias() + " is for a different number of players than "
                     + playerCount;
         }

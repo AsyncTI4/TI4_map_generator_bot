@@ -161,7 +161,8 @@ public class NucleusSliceGeneratorService {
         List<Integer> nucleusLegendaryOptions =
                 ListHelper.listOfIntegers(nucleusSpecs.minNucleusLegendaries(), nucleusSpecs.maxNucleusLegendaries());
         Integer numNucleusLegendaries = ListHelper.randomPick(nucleusLegendaryOptions);
-        List<Integer> mapLegendaryOptions = List.of(nucleusSpecs.minMapLegendaries(), nucleusSpecs.maxMapLegendaries());
+        List<Integer> mapLegendaryOptions =
+                ListHelper.listOfIntegers(nucleusSpecs.minMapLegendaries(), nucleusSpecs.maxMapLegendaries());
         Integer numMapLegendaries = ListHelper.randomPick(mapLegendaryOptions);
 
         List<MiltyDraftTile> alphaTiles = tileManager.filterAll(tile -> tile.isHasAlphaWH());
@@ -622,7 +623,7 @@ public class NucleusSliceGeneratorService {
             List<MapTemplateTile> sliceLocations = coreSliceLocations.get(i);
             List<TierList> sliceTiers = getRandomTierPicks(sliceLocations.size());
 
-            // Generate tierlist picks for this nulceus slice
+            // Generate tierlist picks for this nucleus slice
             if (sliceLocations.size() != sliceTiers.size()) {
                 BotLogger.warning("Mismatched slice location and tier list sizes in fillNucleus");
                 return false;
