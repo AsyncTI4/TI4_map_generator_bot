@@ -30,7 +30,8 @@ public class BothelperCommand implements ParentCommand {
                     new EditTrackRecord(),
                     new CheckNextPingTime(),
                     new ListSlashCommandsUsed(),
-                    new ReserveGame())
+                    new ReserveGame(),
+                    new DeleteFOWCommThreads())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

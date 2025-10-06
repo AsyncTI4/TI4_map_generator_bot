@@ -19,6 +19,7 @@ import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.fow.GMService;
 
 @UtilityClass
 public class CardsInfoService {
@@ -225,6 +226,7 @@ public class CardsInfoService {
         }
         if (game.getPhaseOfGame().toLowerCase().contains("agendawaiting")) {
             buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On Whens"));
+            GMService.addForcePassWhenButtonForFowGM(game, player, buttons);
         }
 
         if (player.hasRelicReady("heartofixth")) {
