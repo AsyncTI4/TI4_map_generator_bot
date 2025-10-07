@@ -2385,9 +2385,15 @@ public class ButtonHelper {
                             || ("space".equalsIgnoreCase(type) && removedUnit.getIsGroundForce())) {
                         continue;
                     }
-                    count += removedUnit.getCombatDieCount()
+                    float combatValue = removedUnit.getCombatDieCount()
                             * ((11.0f - removedUnit.getCombatHitsOn()) / 10 + unrelententing)
                             * uh.getUnitCount(unit);
+
+                    if ("ground".equalsIgnoreCase(type) && player.hasTech("x89c4")) {
+                        combatValue *= 2.0f;
+                    }
+
+                    count += combatValue;
                 }
             }
         }
