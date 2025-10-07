@@ -490,7 +490,11 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveBrutalOccupationStep2(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
+        Tile tile = game.getTileFromPlanet(planet);
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "2 inf " + planet);
+
         player.refreshPlanet(planet);
+
         List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(
                 game, ButtonHelper.getUnitHolderFromPlanetName(planet, game), player);
         if (!buttons.isEmpty()) {
@@ -498,6 +502,7 @@ class ActionCardDeck2ButtonHandler {
                     + Helper.getPlanetRepresentation(planet, game) + ".";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
+
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
