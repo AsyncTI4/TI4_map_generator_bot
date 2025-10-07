@@ -2359,7 +2359,11 @@ public class ButtonHelper {
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")) {
                         hitChance = 1 - ((1 - hitChance) * (1 - hitChance));
                     }
-                    count += removedUnit.getBombardDieCount() * hitChance * uh.getUnitCount(unit);
+                    float combatValue = removedUnit.getBombardDieCount() * hitChance * uh.getUnitCount(unit);
+                    if(player.hasTech("x89c4")) {
+                        combatValue *= 2.0f;
+                    }
+                    count += combatValue;
                 }
             }
         }
