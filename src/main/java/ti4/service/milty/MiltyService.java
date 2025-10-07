@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -37,7 +36,6 @@ import ti4.map.Tile;
 import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
-import ti4.model.MapTemplateModel;
 import ti4.model.Source;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
@@ -239,40 +237,6 @@ public class MiltyService {
         }
         menu.postMessageAndButtons(event);
         ButtonHelper.deleteMessage(event);
-    }
-
-    @Data
-    public static class DraftSpec {
-        Game game;
-        List<String> playerIDs, bannedFactions, priorityFactions, playerDraftOrder;
-        MapTemplateModel template;
-        List<Source.ComponentSource> tileSources, factionSources;
-        Integer numSlices, numFactions;
-
-        // slice generation settings
-        Boolean anomaliesCanTouch = false, extraWHs = true;
-        Double minRes = 2.0, minInf = 3.0;
-        Integer minTot = 9, maxTot = 13;
-        Integer minLegend = 1, maxLegend = 2;
-
-        // other
-        List<MiltyDraftSlice> presetSlices;
-
-        public DraftSpec(Game game) {
-            this.game = game;
-            playerIDs = new ArrayList<>(game.getPlayerIDs());
-            bannedFactions = new ArrayList<>();
-            priorityFactions = new ArrayList<>();
-
-            tileSources = new ArrayList<>();
-            tileSources.add(Source.ComponentSource.base);
-            tileSources.add(Source.ComponentSource.pok);
-            tileSources.add(Source.ComponentSource.codex1);
-            tileSources.add(Source.ComponentSource.codex2);
-            tileSources.add(Source.ComponentSource.codex3);
-            tileSources.add(Source.ComponentSource.codex4);
-            factionSources = new ArrayList<>(tileSources);
-        }
     }
 
     public static void secondHalfOfPlayerSetup(
