@@ -61,9 +61,9 @@ class CombatButtonHandler {
         if (game.isFowMode()) {
             String targetFaction = buttonID.split("_")[2];
             Player target = game.getPlayerFromColorOrFaction(targetFaction);
-            if (target != null) {
+            if (target != null && target.getPrivateChannel() != null) {
                 MessageHelper.sendMessageToChannel(
-                        target.getCorrectChannel(), target.getRepresentationUnfogged() + " " + msg);
+                        target.getPrivateChannel(), target.getRepresentationUnfogged() + " " + msg);
             }
         }
         MessageHelper.sendMessageToChannel(

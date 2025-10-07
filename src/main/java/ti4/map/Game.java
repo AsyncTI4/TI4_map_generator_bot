@@ -3398,8 +3398,6 @@ public class Game extends GameProperties {
 
     private boolean validateAndSetAllDecks(
             GenericInteractionCreateEvent event, DeckSettings deckSettings, int stage1Count, int stage2Count) {
-        // DeckSettings deckSettings = miltySettings.getGameSettings().getDecks();
-
         boolean success = true;
         // &= is the "and operator". It will assign true to success iff success is true and the result is true.
         // Otherwise it will propagate a false value to the end
@@ -3417,8 +3415,15 @@ public class Game extends GameProperties {
 
         // Setup peakable objectives
         if (publicObjectives1Peakable.size() != 4) {
-            setUpPeakableObjectives(stage1Count, 1);
-            setUpPeakableObjectives(stage2Count, 2);
+            if (isOmegaPhaseMode()) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "This game is using Omega Phase, so the objective setup was ignored. If there's a problem with it, use `/omegaphase "
+                                + Constants.RESET_OMEGA_PHASE_OBJECTIVES + "`");
+            } else {
+                setUpPeakableObjectives(stage1Count, 1);
+                setUpPeakableObjectives(stage2Count, 2);
+            }
         }
 
         if (isAbsolMode() && !deckSettings.getAgendas().getChosenKey().contains("absol")) {

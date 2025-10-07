@@ -20,7 +20,6 @@ public class CustomCommand implements ParentCommand {
                     new PoSetDeck(),
                     new DiscardSpecificAgenda(),
                     new SetThreadName(),
-                    new PeekAtObjectiveDeck(),
                     new PeekAtSecretDeck(),
                     new PeekAtStage1(),
                     new PeekAtStage2(),
