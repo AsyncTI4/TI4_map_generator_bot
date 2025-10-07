@@ -15,6 +15,7 @@ import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.FactionDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
+import ti4.helpers.thundersedge.TeHelperDemo;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -37,11 +38,23 @@ public class FactionDraftable extends SinglePickDraftable {
     private static final List<String> keleresFlavors = List.of("mentak", "xxcha", "argent");
 
     public void initialize(
-            int numFactions, List<ComponentSource> sources, List<String> presetFactions, List<String> bannedFactions) {
+            int numFactions,
+            List<ComponentSource> sources,
+            List<String> presetFactions,
+            List<String> bannedFactions,
+            boolean isThundersEdgeDemo) {
+
+        List<String> effBannedFactions = new ArrayList<>(bannedFactions);
+        if (isThundersEdgeDemo) {
+            effBannedFactions.addAll(TeHelperDemo.getExcludedFactions());
+            numFactions = Math.min(25 - TeHelperDemo.getExcludedFactions().size(), numFactions);
+        }
 
         List<String> availableFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
-                .filter(f -> !bannedFactions.contains(f.getAlias()))
+                .filter(f -> !effBannedFactions.contains(f.getAlias()))
                 .filter(f -> sources.contains(f.getSource()))
+                .filter(f -> !f.getAlias().contains("keleres")
+                        || "keleresm".equals(f.getAlias())) // Limit the pool to only 1 keleres flavor
                 .map(FactionModel::getAlias)
                 .toList());
         List<String> randomOrder = new ArrayList<>(presetFactions);
@@ -55,7 +68,6 @@ public class FactionDraftable extends SinglePickDraftable {
             if (i >= randomOrder.size()) break;
             String f = randomOrder.get(i);
             i++;
-            if (f.startsWith("keleres")) f = "keleresm";
             if (output.contains(f)) continue;
             output.add(f);
         }
@@ -385,7 +397,8 @@ public class FactionDraftable extends SinglePickDraftable {
                 factionSettings.getNumFactions().getVal(),
                 sourceSettings.getFactionSources(),
                 factionSettings.getPriFactions().getKeys().stream().toList(),
-                factionSettings.getBanFactions().getKeys().stream().toList());
+                factionSettings.getBanFactions().getKeys().stream().toList(),
+                game.isThundersEdge());
 
         return null;
     }
