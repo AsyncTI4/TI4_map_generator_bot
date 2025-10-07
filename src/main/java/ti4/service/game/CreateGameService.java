@@ -357,7 +357,7 @@ public class CreateGameService {
         }
 
         chatChannel
-                .createThreadChannel("Info for Players new to AsyncTI4")
+                .createThreadChannel(Constants.NEW_PLAYER_THREAD_NAME)
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
                 .queue(
                         introThread -> {
