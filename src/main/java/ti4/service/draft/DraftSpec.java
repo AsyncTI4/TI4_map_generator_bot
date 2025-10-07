@@ -84,8 +84,7 @@ public class DraftSpec {
         specs.bannedFactions.addAll(pfSettings.getBanFactions().getKeys());
         if (game.isThundersEdge()) {
             List<String> newKeys = new ArrayList<>();
-            newKeys.addAll(
-                    TeDemoHelper.getDemoFactions());
+            newKeys.addAll(TeDemoHelper.getDemoFactions());
             specs.priorityFactions.addAll(newKeys);
             specs.numFactions = Math.min(TeDemoHelper.getDemoFactions().size(), specs.numFactions);
         } else {

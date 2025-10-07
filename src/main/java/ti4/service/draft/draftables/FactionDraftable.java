@@ -38,7 +38,11 @@ public class FactionDraftable extends SinglePickDraftable {
     private static final List<String> keleresFlavors = List.of("mentak", "xxcha", "argent");
 
     public void initialize(
-            int numFactions, List<ComponentSource> sources, List<String> presetFactions, List<String> bannedFactions, boolean isThundersEdgeDemo) {
+            int numFactions,
+            List<ComponentSource> sources,
+            List<String> presetFactions,
+            List<String> bannedFactions,
+            boolean isThundersEdgeDemo) {
 
         // Thunder's Edge demo factions
         if (isThundersEdgeDemo) {

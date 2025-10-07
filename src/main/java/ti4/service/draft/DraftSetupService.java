@@ -67,7 +67,11 @@ public class DraftSetupService {
 
         FactionDraftable factionDraftable = new FactionDraftable();
         factionDraftable.initialize(
-                specs.numFactions, specs.factionSources, specs.priorityFactions, specs.bannedFactions, game.isThundersEdge());
+                specs.numFactions,
+                specs.factionSources,
+                specs.priorityFactions,
+                specs.bannedFactions,
+                game.isThundersEdge());
         draftManager.addDraftable(factionDraftable);
 
         SpeakerOrderDraftable speakerOrderDraftable = new SpeakerOrderDraftable();
@@ -158,8 +162,8 @@ public class DraftSetupService {
         }
 
         List<ComponentSource> tileSources = sourceSettings.getTileSources();
-        if(game.isThundersEdge() || !game.getStoredValue("useEntropicScar").isEmpty()) {
-            if(!tileSources.contains(ComponentSource.thunders_edge)) {
+        if (game.isThundersEdge() || !game.getStoredValue("useEntropicScar").isEmpty()) {
+            if (!tileSources.contains(ComponentSource.thunders_edge)) {
                 tileSources.add(ComponentSource.thunders_edge);
             }
         }
