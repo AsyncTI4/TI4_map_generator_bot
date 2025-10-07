@@ -103,7 +103,7 @@
         "name": "Brutal Occupation",
         "phase": "Any",
         "window": "After you gain control of a planet",
-        "text": "Ready and explore that planet.",
+        "text": "Place 2 infantry on that planet. Then, ready and explore that planet.",
         "flavorText": "The harvest of Ordinian was so complete that even the planet's core was depleted. The Nekro left nothing usable. Only its lifeless shell remained.",
         "source": "action_deck_2"
     },
@@ -185,7 +185,7 @@
         "name": "Defectors",
         "phase": "Action",
         "window": "After another player produces ships",
-        "text": "Remove up to 2 of those ships that do not have a capacity value; place matching ships from your reinforcements in any system that contains your ships.",
+        "text": "Remove up to 2 of those ships that do not have a capacity value; place matching ships from your reinforcements in any system that does not contain another player's ships.",
         "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Their minions had done well.",
         "source": "action_deck_2"
     },
@@ -1062,7 +1062,7 @@
         "name": "Void Path",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Choose 1 system that does not contain planets. During this turn, you treat that system as if it contains each non-delta wormhole.",
+        "text": "Choose 1 system that does not contain planets. During this turn, you treat that system as if it contains an alpha, beta, and gamma wormhole.",
         "flavorText": "\"As we lack the form of your world, you will lack that of ours,\" Taivra said without tone. \"Let us hope you are better prepared for your first pilgrimage than we for ours.\"",
         "source": "action_deck_2"
     },
