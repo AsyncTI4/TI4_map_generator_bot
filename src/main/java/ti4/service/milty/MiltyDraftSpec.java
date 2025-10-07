@@ -69,37 +69,16 @@ public class MiltyDraftSpec {
         specs.bannedFactions.addAll(pfSettings.getBanFactions().getKeys());
         if (game.isThundersEdge()) {
             List<String> newKeys = new ArrayList<>();
-            newKeys.addAll(List.of(
-                    "arborec",
-                    "sol",
-                    "letnev",
-                    "winnu",
-                    "sardakk",
-                    "yin",
-                    "l1z1x",
-                    "naalu",
-                    "saar",
-                    "naaz",
-                    "muaat",
-                    "jolnar",
-                    "nekro",
-                    "hacan",
-                    "empyrean",
-                    "nomad",
-                    "ghost",
-                    "mentak",
-                    "mahact",
-                    "xxcha",
-                    "yssaril"));
-            specs.priorityFactions.addAll(newKeys);
-            specs.numFactions = Math.min(newKeys.size(), specs.numFactions);
-        } else {
-            specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
+            newKeys.addAll(List.of("titans", "keleres", "cabal", "argent"));
+            specs.bannedFactions.addAll(newKeys);
+            specs.numFactions = Math.min(25 - newKeys.size(), specs.numFactions);
         }
+        specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
         specs.setPlayerIDs(new ArrayList<>(pfSettings.getGamePlayers().getKeys()));
         if (pfSettings.getPresetDraftOrder().isVal()) {
             specs.playerDraftOrder = new ArrayList<>(game.getPlayers().keySet());
         }
+        specs.priorityFactions.removeAll(specs.bannedFactions);
 
         // Load Sources Specifications
         SourceSettings sources = settings.getSourceSettings();

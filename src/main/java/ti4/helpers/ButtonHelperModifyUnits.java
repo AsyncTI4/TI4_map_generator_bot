@@ -18,6 +18,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileHelper;
@@ -1083,8 +1084,9 @@ public class ButtonHelperModifyUnits {
         if (buttonID.contains("_")) {
             tile = game.getTileByPosition(buttonID.split("_")[1]);
         } else {
-            game.getTileByPosition(game.getActiveSystem());
+            tile = game.getTileByPosition(game.getActiveSystem());
         }
+        TeHelperGeneral.addStationsToPlayArea(event, game, tile);
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if ("space".equalsIgnoreCase(unitHolder.getName())) {
                 continue;
