@@ -38,11 +38,6 @@ class AddTileRandom extends GameStateSubcommand {
         boolean drawOnly = event.getOption(Constants.DRAW_ONLY, false, OptionMapping::getAsBoolean);
 
         Game game = getGame();
-        boolean isFowPrivate = game.isFowMode() && event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL);
-        if (isFowPrivate && !game.isAgeOfExplorationMode()) {
-            MessageHelper.replyToMessage(event, "Cannot run this command in a private channel.");
-            return;
-        }
 
         if (!RandomOption.isValid(randomType)) {
             MessageHelper.replyToMessage(event, "Invalid type: " + randomType);
