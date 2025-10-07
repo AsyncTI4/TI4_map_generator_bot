@@ -2,7 +2,6 @@ package ti4.service.draft;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.Data;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
