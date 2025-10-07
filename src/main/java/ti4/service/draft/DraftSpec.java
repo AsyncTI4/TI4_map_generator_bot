@@ -2,6 +2,7 @@ package ti4.service.draft;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.Data;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
@@ -86,7 +87,7 @@ public class DraftSpec {
         specs.bannedFactions.addAll(pfSettings.getBanFactions().getKeys());
         if (game.isThundersEdge()) {
             List<String> newKeys = new ArrayList<>();
-            newKeys.addAll(List.of("titans", "keleres", "cabal", "argent"));
+            newKeys.addAll(List.of("titans", "keleresm", "cabal", "argent"));
             specs.bannedFactions.addAll(newKeys);
             specs.numFactions = Math.min(25 - newKeys.size(), specs.numFactions);
         }
