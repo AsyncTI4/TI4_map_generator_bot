@@ -42,8 +42,7 @@ public class ListHelper {
     public <T> List<T> removeByPredicate(List<T> list, Predicate<T> predicate, int limit) {
         if (list == null || list.isEmpty() || predicate == null || limit <= 0) return List.of();
         List<T> toRemove = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++) {
-            T item = list.get(i);
+        for (T item : list) {
             if (predicate.test(item)) {
                 toRemove.add(item);
                 if (toRemove.size() >= limit) {
