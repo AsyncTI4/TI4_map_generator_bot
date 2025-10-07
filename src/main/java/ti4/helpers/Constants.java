@@ -34,6 +34,9 @@ public class Constants {
         return "<@" + bltId + ">";
     }
 
+    // Standard Thread Names
+    public static final String NEW_PLAYER_THREAD_NAME = "Info for Players new to AsyncTI4";
+
     // Other People IDs
     public static final String cagesId = "203608548440014848";
     public static final String bortId = "154000388121559040";

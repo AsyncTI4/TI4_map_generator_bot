@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -107,7 +108,7 @@ public class UserJoinServerListener extends ListenerAdapter {
         String msg = user.getAsMention() + " ping here";
         List<ThreadChannel> threadChannels = game.getTableTalkChannel().getThreadChannels();
         for (ThreadChannel threadChannel_ : threadChannels) {
-            if ("Info for new players".equalsIgnoreCase(threadChannel_.getName())) {
+            if (Constants.NEW_PLAYER_THREAD_NAME.equalsIgnoreCase(threadChannel_.getName())) {
                 MessageHelper.sendMessageToChannel(threadChannel_, msg);
             }
         }
