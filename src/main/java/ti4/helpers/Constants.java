@@ -1198,6 +1198,12 @@ public class Constants {
     public static final String ADVENT_OF_THE_WARSUN_MODE = "advent_of_the_warsun_mode";
     public static final String ZEALOUS_ORTHODOXY_MODE = "zealous_orthodoxy_mode";
     public static final String CULTURAL_EXCHANGE_PROGRAM_MODE = "cultural_exchange_program_mode";
+    public static final String CONVENTIONS_OF_WAR_ABANDONED_MODE = "conventions_of_war_abandoned_mode";
+    public static final String RAPID_MOBILIZATION_MODE = "rapid_mobilization_mode";
+    public static final String MONUMENTS_TO_THE_AGES_MODE = "monuments_to_the_ages_mode";
+    public static final String COSMIC_PHENOMENAE_MODE = "cosmic_phenomenae_mode";
+    public static final String WEIRD_WORMHOLES_MODE = "weird_wormholes_mode";
+    public static final String WILD_WILD_GALAXY_MODE = "wild_wild_galaxy_mode";
     public static final String STELLAR_ATOMICS_MODE = "stellar_atomics_mode";
     public static final String NO_SWAP_MODE = "no_swap_mode";
     public static final String LIMITED_WHISPERS_MODE = "limited_whispers_mode";

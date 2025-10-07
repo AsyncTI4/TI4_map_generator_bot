@@ -294,6 +294,16 @@ public class Game extends GameProperties {
                         + getNumberOfSOsInPlayersHands());
     }
 
+    public Player getPlayerThatControlsPlanet(String planet) {
+        for (Player p : getRealPlayers()) {
+            if (p.getPlanets().contains(planet)) {
+                return p;
+            }
+        }
+
+        return null;
+    }
+
     @JsonIgnore
     public Player setupNeutralPlayer(String color) {
         Player neutral = players.get(Constants.dicecordId);
@@ -799,6 +809,12 @@ public class Game extends GameProperties {
 
         gameModes.put("Advent of the Warsun", isAdventOfTheWarsunMode());
         gameModes.put("Cultural Exchange Program", isCulturalExchangeProgramMode());
+        gameModes.put("Conventions of War Abandoned", isConventionsOfWarAbandonedMode());
+        gameModes.put("Rapid Mobilization", isRapidMobilizationMode());
+        gameModes.put("Monuments to the Ages", isMonumentToTheAgesMode());
+        gameModes.put("Weird Wormholes", isWeirdWormholesMode());
+        gameModes.put("Cosmic Phenomenae", isCosmicPhenomenaeMode());
+        gameModes.put("Wild wild Galaxy", isWildWildGalaxyMode());
         gameModes.put("Zealous Orthoxy", isZealousOrthodoxyMode());
         gameModes.put("Mercenaries For Hire", isMercenariesForHireMode());
         gameModes.put("No Support Swaps", isNoSwapMode());

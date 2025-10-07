@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
+import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -94,6 +95,7 @@ public class RelicHelper {
         MessageHelper.sendMessageToChannelWithEmbed(
                 player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
         resolveRelicEffects(event, game, player, relicID);
+        TeHelperUnits.serveIconoclastDeployAbility(game, player);
 
         if (checked) game.shuffleRelics();
     }

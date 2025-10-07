@@ -16,6 +16,7 @@ import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
@@ -282,6 +283,8 @@ public class VoteButtonHandler {
         List<Button> planetOutcomeButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
         for (String planet : planets) {
+            Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            if (p != null && p.isSpaceStation()) continue;
             Button button;
             TI4Emoji planetEmoji = PlanetEmojis.getPlanetEmoji(planet);
             if (rider == null) {

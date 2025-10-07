@@ -660,7 +660,7 @@ public class ButtonHelper {
                 || "".equalsIgnoreCase(player.getFaction())) {
             game.removePlayer(player.getUserID());
         } else {
-            if (!player.getPlanetsAllianceMode().isEmpty()) {
+            if (!player.getPlanetsAllianceMode().isEmpty() && !game.isConventionsOfWarAbandonedMode()) {
                 String msg =
                         "This player doesn't meet the elimination conditions. If you wish to replace a player, run `/game replace`. Ping a bothelper for assistance if you need it.";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
@@ -783,6 +783,89 @@ public class ButtonHelper {
         Helper.fixGameChannelPermissions(event.getGuild(), game);
         deleteMessage(event);
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), stringBuilder.toString());
+    }
+
+    @ButtonHandler("rapidMobilizationSetup_")
+    public static void rapidMobilization(Game game, ButtonInteractionEvent event, String buttonID) {
+        Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (event != null) {
+            deleteMessage(event);
+        }
+        Tile tile = game.getTileByPosition(player.getPlayerStatsAnchorPosition());
+        if (tile == null) {
+            tile = player.getHomeSystemTile();
+        }
+        if (tile != null) {
+            for (String pos2 : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+                Tile tile2 = game.getTileByPosition(pos2);
+                if (tile2 != null && !tile2.getUnitHolders().isEmpty()) {
+                    for (UnitHolder unitHolder : tile2.getPlanetUnitHolders()) {
+                        AddUnitService.addUnits(
+                                null, tile2, game, player.getColor(), "1 infantry " + unitHolder.getName());
+                    }
+                }
+            }
+            player.clearExhaustedPlanets(false);
+        }
+        if (game.isThundersEdge()) {
+            player.setBreakthroughUnlocked(true);
+        }
+
+        List<Button> buttons2 = new ArrayList<>();
+        for (String planet : player.getPlanets()) {
+            buttons2.add(Buttons.gray("rapidMobilizationSD_" + planet, Helper.getPlanetRepresentation(planet, game)));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + ", use the button to place 1 spacedock on a planet you control. Your flagship and 3 fighters will also be placed in the system.",
+                buttons2);
+
+        if (player.hasAbility("propagation")) {
+            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+            String message = player.getRepresentation()
+                    + ", you would research a technology, but because of **Propagation**, you instead gain 3 command tokens."
+                    + " Your current command tokens are " + player.getCCRepresentation()
+                    + ". Use buttons to gain command tokens.";
+            game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " resolve research (with **Propagation**) by using the button to gain 3 command tokens.");
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        } else {
+            MessageHelper.sendMessageToChannelWithButton(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", use the button to research a technology.",
+                    Buttons.GET_A_FREE_TECH);
+            if (player.getFaction().equalsIgnoreCase("nomad")) {
+                MessageHelper.sendMessageToChannelWithButton(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + ", use the button to get a second technology.",
+                        Buttons.GET_A_FREE_TECH);
+            }
+        }
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                "Finished rapid mobilization setup for " + player.getRepresentation() + ".");
+    }
+
+    @ButtonHandler("rapidMobilizationSD_")
+    public static void rapidMobilizationSD(Game game, ButtonInteractionEvent event, String buttonID, Player player) {
+        deleteMessage(event);
+        String planet = buttonID.split("_")[1];
+        Tile tile = game.getTileFromPlanet(planet);
+        if (player.hasUnit("saar_spacedock")) {
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "1 spacedock");
+        } else {
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "1 spacedock " + planet);
+        }
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 flagship, 3 fighter");
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " placed 1 spacedock on "
+                        + Helper.getPlanetRepresentation(planet, game)
+                        + " and placed their flagship and 3 fighters in the system.");
     }
 
     @ButtonHandler("removePlayerPermissions_")
@@ -3845,8 +3928,11 @@ public class ButtonHelper {
                 "hopesend",
                 "primor", // PoK
                 "ordinianc4", // Codex 4
+                "ordinian",
+                "faunus",
                 "silence",
                 "prism",
+                "emelpar",
                 "echo",
                 "domna",
                 "mrte",
@@ -3857,7 +3943,7 @@ public class ButtonHelper {
         for (String planet : implementedLegendaryPlanets) {
             String prettyPlanet = Mapper.getPlanet(planet).getName();
             String pass = "";
-            if (planet.contains("ordinian")) {
+            if (planet.contains("ordinian") || planet.contains("faunus") || planet.contains("industrex")) {
                 pass = " (Upon Pass Turn)";
             }
             if (player.getPlanets().contains(planet)
@@ -5411,7 +5497,7 @@ public class ButtonHelper {
         game.setStoredValue("useEntropicScar", "Yes");
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                "This game's milty may spit out a slice with an entropic scar. It will be treated as equivalent to a 2 resource planet for the purposes of slice balancing.");
+                "This game's milty may spit out a slice with an entropic scar. It will be treated as equivalent to a 2 resource planet for the purposes of slice balancing. It may also include tiles from Thunder's Edge");
         event.getMessage().delete().queue();
     }
 
@@ -6578,6 +6664,27 @@ public class ButtonHelper {
                         buttons.add(Buttons.green(
                                 finChecker + "stellarConvert_" + planet.getName(),
                                 "Stellar Convert " + Helper.getPlanetRepresentation(planet.getName(), game)));
+                    }
+                }
+            }
+        }
+        return buttons;
+    }
+
+    public static List<Button> getButtonsForConventions(Player player, Game game) {
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+        List<Tile> tilesWithBombard = getTilesOfUnitsWithBombard(player, game);
+        Set<String> adjacentTiles = FoWHelper.getAdjacentTilesAndNotThisTile(
+                game, tilesWithBombard.getFirst().getPosition(), player, false);
+        for (String pos : adjacentTiles) {
+            Tile tile = game.getTileByPosition(pos);
+            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                if (unitHolder instanceof Planet planet) {
+                    if (!player.getPlanetsAllianceMode().contains(planet.getName())) {
+                        buttons.add(Buttons.green(
+                                finChecker + "stellarConvert_" + planet.getName(),
+                                "Purge " + Helper.getPlanetRepresentation(planet.getName(), game)));
                     }
                 }
             }

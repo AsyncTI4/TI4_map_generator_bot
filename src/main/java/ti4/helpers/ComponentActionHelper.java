@@ -57,7 +57,11 @@ public class ComponentActionHelper {
 
             boolean detAgeOfExp = ("det".equalsIgnoreCase(tech) || "absol_det".equalsIgnoreCase(tech))
                     && game.isAgeOfExplorationMode();
-            if (techText.contains("ACTION") || detAgeOfExp) {
+
+            boolean x89Conventions = ("x89".equalsIgnoreCase(tech) || "x89c4".equalsIgnoreCase(tech))
+                    && game.isConventionsOfWarAbandonedMode()
+                    && ButtonHelper.getButtonsForConventions(p1, game).size() > 0;
+            if (techText.contains("ACTION") || detAgeOfExp || x89Conventions) {
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
                     continue;
                 }

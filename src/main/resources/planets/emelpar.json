@@ -1,0 +1,20 @@
+{
+    "id": "emelpar",
+    "tileId": "99",
+    "name": "Emelpar",
+    "aliases": ["emelpar", "emplar", "sillyspelling"],
+    "resources": 0,
+    "influence": 2,
+    "planetTypes": ["CULTURAL"],
+    "legendaryAbilityName": "The Acropolis",
+    "legendaryAbilityText": "You may exhaust this card at the end of your turn to ready another component that isn't a strategy card.",
+    "legendaryAbilityFlavourText": "Grandeur unrivaled, yet nothing but grandeur remains.",
+    "planetLayout": {
+        "unitHolderName": "emelpar",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": { "x": 170.0, "y": 150.0 },
+        "extraIcons": 1,
+        "planetRadius": 95
+    },
+    "source": "thunders_edge"
+}

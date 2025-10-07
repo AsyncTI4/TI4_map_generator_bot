@@ -1,0 +1,17 @@
+{
+    "id": "olergodt",
+    "tileId": "101",
+    "name": "Olergodt",
+    "aliases": ["olergodt", "oldergoat"],
+    "resources": 2,
+    "influence": 1,
+    "planetTypes": ["HAZARDOUS", "CULTURAL"],
+    "techSpecialties": ["WARFARE", "CYBERNETIC"],
+    "planetLayout": {
+        "unitHolderName": "olergodt",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": { "x": 170.0, "y": 150.0 },
+        "extraIcons": 2
+    },
+    "source": "thunders_edge"
+}

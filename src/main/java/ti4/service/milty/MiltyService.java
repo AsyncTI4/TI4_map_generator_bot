@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
+import ti4.commands.CommandHelper;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -21,6 +22,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.ThreadArchiveHelper;
@@ -51,6 +53,7 @@ import ti4.service.leader.UnlockLeaderService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
+import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class MiltyService {
@@ -336,6 +339,16 @@ public class MiltyService {
                     event.getMessageChannel(),
                     "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
             return;
+        }
+
+        if (factionModel.getSource() == Source.ComponentSource.thunders_edge
+                || factionModel.getSource() == Source.ComponentSource.twilights_fall) {
+            if (!CommandHelper.hasRole(event, JdaService.bothelperRoles)) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "Thunder's Edge and Twilight Fall Factions Will Not be Ready til October 31st");
+                return;
+            }
         }
 
         // BREAKTHROUGH
@@ -675,6 +688,23 @@ public class MiltyService {
         if ("true".equalsIgnoreCase(game.getStoredValue("removeSupports"))) {
             player.removeOwnedPromissoryNoteByID(player.getColor() + "_sftt");
             player.removePromissoryNote(player.getColor() + "_sftt");
+        }
+        if (game.isRapidMobilizationMode()) {
+            Tile tile2 = player.getHomeSystemTile();
+            if (tile2 != null
+                    && !FoWHelper.getAdjacentTilesAndNotThisTile(game, tile2.getPosition(), player, false)
+                            .isEmpty()) {
+                ButtonHelper.rapidMobilization(game, null, "rapid_" + player.getFaction());
+            } else {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green(
+                        "rapidMobilization_" + player.getFaction(),
+                        "Do Rapid Mobilization For " + player.getFaction()));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        "You cannot do Rapid Mobilization now, but once the map is setup, you can click this button to do so.",
+                        buttons);
+            }
         }
     }
 

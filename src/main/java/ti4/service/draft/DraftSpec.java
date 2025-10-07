@@ -86,13 +86,13 @@ public class DraftSpec {
         specs.bannedFactions.addAll(pfSettings.getBanFactions().getKeys());
         if (game.isThundersEdge()) {
             List<String> newKeys = new ArrayList<>();
-            newKeys.addAll(
-                    List.of("arborec", "sol", "letnev", "winnu", "sardakk", "yin", "l1z1x", "naalu", "saar", "naaz"));
-            specs.priorityFactions.addAll(newKeys);
-            specs.numFactions = Math.min(10, specs.numFactions);
-        } else {
-            specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
+            newKeys.addAll(List.of("titans", "keleresm", "cabal", "argent"));
+            specs.bannedFactions.addAll(newKeys);
+            specs.numFactions = Math.min(25 - newKeys.size(), specs.numFactions);
         }
+
+        specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
+        specs.priorityFactions.removeAll(specs.bannedFactions);
         specs.setPlayerIDs(new ArrayList<>(pfSettings.getGamePlayers().getKeys()));
         if (pfSettings.getPresetDraftOrder().isVal()) {
             specs.playerDraftOrder = new ArrayList<>(game.getPlayers().keySet());
