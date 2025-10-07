@@ -15,6 +15,7 @@ import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.FactionDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
+import ti4.helpers.thundersedge.TeDemoHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -37,7 +38,14 @@ public class FactionDraftable extends SinglePickDraftable {
     private static final List<String> keleresFlavors = List.of("mentak", "xxcha", "argent");
 
     public void initialize(
-            int numFactions, List<ComponentSource> sources, List<String> presetFactions, List<String> bannedFactions) {
+            int numFactions, List<ComponentSource> sources, List<String> presetFactions, List<String> bannedFactions, boolean isThundersEdgeDemo) {
+
+        // Thunder's Edge demo factions
+        if (isThundersEdgeDemo) {
+            presetFactions = new ArrayList<>(presetFactions);
+            presetFactions.addAll(TeDemoHelper.getDemoFactions());
+            numFactions = Math.min(TeDemoHelper.getDemoFactions().size(), numFactions);
+        }
 
         List<String> availableFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
                 .filter(f -> !bannedFactions.contains(f.getAlias()))
@@ -385,7 +393,8 @@ public class FactionDraftable extends SinglePickDraftable {
                 factionSettings.getNumFactions().getVal(),
                 sourceSettings.getFactionSources(),
                 factionSettings.getPriFactions().getKeys().stream().toList(),
-                factionSettings.getBanFactions().getKeys().stream().toList());
+                factionSettings.getBanFactions().getKeys().stream().toList(),
+                game.isThundersEdge());
 
         return null;
     }
