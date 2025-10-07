@@ -69,8 +69,7 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         nucleusValue = new IntegerRangeSetting("NucleusVal", "Nucleus Optimal Value", 4, 0, 8, 8, 3, 12, 1);
         maxNucleusQualityDifference = new IntegerSetting("MaxNucDiff", "Max Nucleus Quality Diff", 3, 0, 10, 1);
         int minRedTiles = Math.min(20, Math.max(Math.round((11.0f / 6.0f) * players), 0));
-        minimumRedTiles = new IntegerSetting(
-                "MinRed", "Minimum Red Tiles", minRedTiles, 0, 20, 1);
+        minimumRedTiles = new IntegerSetting("MinRed", "Minimum Red Tiles", minRedTiles, 0, 20, 1);
 
         // Add extra info
         minimumSliceRes.setExtraInfo(

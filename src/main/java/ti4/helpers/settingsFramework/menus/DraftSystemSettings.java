@@ -170,12 +170,14 @@ public class DraftSystemSettings extends SettingsMenu {
         String preset = event.getButton().getCustomId().replace("startDraftSystem", "");
         DraftSystemSettings settings = new DraftSystemSettings(game, null);
         if (preset.equals("_nucleusPreset")) {
-            if(game.getPlayers().size() < 3) {
+            if (game.getPlayers().size() < 3) {
                 MessageHelper.sendEphemeralMessageToEventChannel(event, "Nucleus draft requires at least 3 players");
                 return;
             }
-            if(game.getPlayers().size() > 8) {
-                MessageHelper.sendMessageToEventChannel(event, "Nucleus draft supports at most 8 players; you'll need to remove excess players from the draft.");
+            if (game.getPlayers().size() > 8) {
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        "Nucleus draft supports at most 8 players; you'll need to remove excess players from the draft.");
             }
             settings.setupNucleusPreset();
         }
