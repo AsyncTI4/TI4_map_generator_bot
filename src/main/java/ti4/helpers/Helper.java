@@ -972,7 +972,8 @@ public class Helper {
             if (uh == null) continue; // custodia, ghoti, etc.
 
             boolean containsDMZ = uh.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
-            if (containsDMZ) {
+
+            if (containsDMZ || ((Planet) uh).isSpaceStation()) {
                 continue;
             }
             if ("spacedock".equalsIgnoreCase(unit)) {

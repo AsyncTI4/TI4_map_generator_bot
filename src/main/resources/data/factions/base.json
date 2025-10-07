@@ -5,12 +5,27 @@
         "homeSystem": "05",
         "startingFleet": "cv, cr,2 ff, 4 inf n,pds n, sd n",
         "commodities": 3,
-        "factionTech": ["bio", "lw2"],
-        "startingTech": ["md"],
-        "homePlanets": ["nestphar"],
-        "abilities": ["mitosis"],
-        "leaders": ["arborecagent", "arboreccommander", "arborechero"],
-        "promissoryNotes": ["stymie"],
+        "factionTech": [
+            "bio",
+            "lw2"
+        ],
+        "startingTech": [
+            "md"
+        ],
+        "homePlanets": [
+            "nestphar"
+        ],
+        "abilities": [
+            "mitosis"
+        ],
+        "leaders": [
+            "arborecagent",
+            "arboreccommander",
+            "arborechero"
+        ],
+        "promissoryNotes": [
+            "stymie"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -27,7 +42,11 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheArborec_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheArborec_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheArborec",
-        "preferredColours": ["frs", "grn", "ptr"],
+        "preferredColours": [
+            "frs",
+            "grn",
+            "ptr"
+        ],
         "source": "base"
     },
     {
@@ -38,12 +57,29 @@
         "homeSystem": "17",
         "startingFleet": "cv,2 dd,2 ff,4 inf c,sd c",
         "commodities": 4,
-        "factionTech": ["ds", "wg"],
-        "startingTech": ["gd"],
-        "homePlanets": ["creuss"],
-        "abilities": ["quantum_entanglement", "slipstream", "creuss_gate"],
-        "leaders": ["ghostagent", "ghostcommander", "ghosthero"],
-        "promissoryNotes": ["iff"],
+        "factionTech": [
+            "ds",
+            "wg"
+        ],
+        "startingTech": [
+            "gd"
+        ],
+        "homePlanets": [
+            "creuss"
+        ],
+        "abilities": [
+            "quantum_entanglement",
+            "slipstream",
+            "creuss_gate"
+        ],
+        "leaders": [
+            "ghostagent",
+            "ghostcommander",
+            "ghosthero"
+        ],
+        "promissoryNotes": [
+            "iff"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -60,7 +96,11 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheGhostsOfCreuss_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheGhostsOfCreuss_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheGhostsOfCreuss",
-        "preferredColours": ["eth", "blu", "gcr"],
+        "preferredColours": [
+            "eth",
+            "blu",
+            "gcr"
+        ],
         "source": "base"
     },
     {
@@ -69,12 +109,32 @@
         "homeSystem": "16",
         "startingFleet": "2 cv,cr,2 ff,2 inf h,sd a, inf a, inf k",
         "commodities": 6,
-        "factionTech": ["qdn", "pm"],
-        "startingTech": ["st", "amd"],
-        "homePlanets": ["arretze", "hercant", "kamdorn"],
-        "abilities": ["master_of_trade", "guild_ships", "arbiters"],
-        "leaders": ["hacanagent", "hacancommander", "hacanhero"],
-        "promissoryNotes": ["convoys"],
+        "factionTech": [
+            "qdn",
+            "pm"
+        ],
+        "startingTech": [
+            "st",
+            "amd"
+        ],
+        "homePlanets": [
+            "arretze",
+            "hercant",
+            "kamdorn"
+        ],
+        "abilities": [
+            "master_of_trade",
+            "guild_ships",
+            "arbiters"
+        ],
+        "leaders": [
+            "hacanagent",
+            "hacancommander",
+            "hacanhero"
+        ],
+        "promissoryNotes": [
+            "convoys"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -91,7 +151,11 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmiratesOfHacan_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmiratesOfHacan_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheEmiratesOfHacan",
-        "preferredColours": ["gld", "ylw", "crm"],
+        "preferredColours": [
+            "gld",
+            "ylw",
+            "crm"
+        ],
         "source": "base"
     },
     {
@@ -102,12 +166,33 @@
         "homeSystem": "12",
         "startingFleet": "dn,2 cv,ff,2 inf j,sd n,pds j,pds n",
         "commodities": 4,
-        "factionTech": ["ers", "scc"],
-        "startingTech": ["amd", "st", "nm", "ps"],
-        "homePlanets": ["jol", "nar"],
-        "abilities": ["fragile", "brilliant", "analytical"],
-        "leaders": ["jolnaragent", "jolnarcommander", "jolnarhero"],
-        "promissoryNotes": ["ra"],
+        "factionTech": [
+            "ers",
+            "scc"
+        ],
+        "startingTech": [
+            "amd",
+            "st",
+            "nm",
+            "ps"
+        ],
+        "homePlanets": [
+            "jol",
+            "nar"
+        ],
+        "abilities": [
+            "fragile",
+            "brilliant",
+            "analytical"
+        ],
+        "leaders": [
+            "jolnaragent",
+            "jolnarcommander",
+            "jolnarhero"
+        ],
+        "promissoryNotes": [
+            "ra"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -124,7 +209,11 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheUniversitiesOfJolNar_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheUniversitiesOfJolNar_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheUniversitiesOfJolNar",
-        "preferredColours": ["nvy", "ppl", "lgy"],
+        "preferredColours": [
+            "nvy",
+            "ppl",
+            "lgy"
+        ],
         "source": "base"
     },
     {
@@ -135,12 +224,29 @@
         "homeSystem": "06",
         "startingFleet": "dn, cv, 3 ff, 5 inf 0,sd 0,pds 0",
         "commodities": 2,
-        "factionTech": ["is", "sdn2"],
-        "startingTech": ["ps", "nm"],
-        "homePlanets": ["0.0.0"],
-        "abilities": ["assimilate", "harrow"],
-        "leaders": ["l1z1xagent", "l1z1xcommander", "l1z1xhero"],
-        "promissoryNotes": ["ce"],
+        "factionTech": [
+            "is",
+            "sdn2"
+        ],
+        "startingTech": [
+            "ps",
+            "nm"
+        ],
+        "homePlanets": [
+            "0.0.0"
+        ],
+        "abilities": [
+            "assimilate",
+            "harrow"
+        ],
+        "leaders": [
+            "l1z1xagent",
+            "l1z1xcommander",
+            "l1z1xhero"
+        ],
+        "promissoryNotes": [
+            "ce"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -157,7 +263,11 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheL1z1xMindnet_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheL1z1xMindnet_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheL1z1xMindnet",
-        "preferredColours": ["bld", "red", "rby"],
+        "preferredColours": [
+            "bld",
+            "red",
+            "rby"
+        ],
         "source": "base"
     },
     {
@@ -166,12 +276,30 @@
         "homeSystem": "10",
         "startingFleet": "dn,cv,dd,ff, 3 inf w,sd a",
         "commodities": 2,
-        "factionTech": ["l4", "nes"],
-        "startingTech": ["amd", "ps"],
-        "homePlanets": ["arcprime", "wrenterra"],
-        "abilities": ["munitions", "armada"],
-        "leaders": ["letnevagent", "letnevcommander", "letnevhero"],
-        "promissoryNotes": ["war_funding"],
+        "factionTech": [
+            "l4",
+            "nes"
+        ],
+        "startingTech": [
+            "amd",
+            "ps"
+        ],
+        "homePlanets": [
+            "arcprime",
+            "wrenterra"
+        ],
+        "abilities": [
+            "munitions",
+            "armada"
+        ],
+        "leaders": [
+            "letnevagent",
+            "letnevcommander",
+            "letnevhero"
+        ],
+        "promissoryNotes": [
+            "war_funding"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -188,7 +316,11 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheBaronyOfLetnev_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheBaronyOfLetnev_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheBaronyOfLetnev",
-        "preferredColours": ["pld", "red", "blk"],
+        "preferredColours": [
+            "pld",
+            "red",
+            "blk"
+        ],
         "source": "base"
     },
     {
@@ -198,12 +330,29 @@
         "homeSystem": "02",
         "startingFleet": "cv,2 cr,3 ff,4 inf m,pds m,sd m",
         "commodities": 2,
-        "factionTech": ["mc", "so"],
-        "startingTech": ["ps", "st"],
-        "homePlanets": ["mollprimus"],
-        "abilities": ["ambush", "pillage"],
-        "leaders": ["mentakagent", "mentakcommander", "mentakhero"],
-        "promissoryNotes": ["pop"],
+        "factionTech": [
+            "mc",
+            "so"
+        ],
+        "startingTech": [
+            "ps",
+            "st"
+        ],
+        "homePlanets": [
+            "mollprimus"
+        ],
+        "abilities": [
+            "ambush",
+            "pillage"
+        ],
+        "leaders": [
+            "mentakagent",
+            "mentakcommander",
+            "mentakhero"
+        ],
+        "promissoryNotes": [
+            "pop"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -220,7 +369,11 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMentakCoalition_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMentakCoalition_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheMentakCoalition",
-        "preferredColours": ["dw", "org", "gld"],
+        "preferredColours": [
+            "dw",
+            "org",
+            "gld"
+        ],
         "source": "base"
     },
     {
@@ -229,12 +382,28 @@
         "homeSystem": "04",
         "startingFleet": "ws,2 ff,4 inf m,sd m",
         "commodities": 4,
-        "factionTech": ["pws2", "mr"],
-        "startingTech": ["ps"],
-        "homePlanets": ["muaat"],
-        "abilities": ["star_forge", "gashlai_physiology"],
-        "leaders": ["muaatagent", "muaatcommander", "muaathero"],
-        "promissoryNotes": ["fires"],
+        "factionTech": [
+            "pws2",
+            "mr"
+        ],
+        "startingTech": [
+            "ps"
+        ],
+        "homePlanets": [
+            "muaat"
+        ],
+        "abilities": [
+            "star_forge",
+            "gashlai_physiology"
+        ],
+        "leaders": [
+            "muaatagent",
+            "muaatcommander",
+            "muaathero"
+        ],
+        "promissoryNotes": [
+            "fires"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -252,7 +421,11 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmbersOfMuaat_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmbersOfMuaat_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheEmbersOfMuaat",
-        "preferredColours": ["cpr", "org", "mgm"],
+        "preferredColours": [
+            "cpr",
+            "org",
+            "mgm"
+        ],
         "source": "base"
     },
     {
@@ -261,12 +434,30 @@
         "homeSystem": "09",
         "startingFleet": "cv,cr,dd,3 ff,2 inf m,2 inf d,pds m,sd d",
         "commodities": 3,
-        "factionTech": ["ng", "hcf2"],
-        "startingTech": ["st", "nm"],
-        "homePlanets": ["maaluuk", "druaa"],
-        "abilities": ["telepathic", "foresight"],
-        "leaders": ["naaluagent", "naalucommander", "naaluhero"],
-        "promissoryNotes": ["gift"],
+        "factionTech": [
+            "ng",
+            "hcf2"
+        ],
+        "startingTech": [
+            "st",
+            "nm"
+        ],
+        "homePlanets": [
+            "maaluuk",
+            "druaa"
+        ],
+        "abilities": [
+            "telepathic",
+            "foresight"
+        ],
+        "leaders": [
+            "naaluagent-te",
+            "naalucommander",
+            "naaluhero"
+        ],
+        "promissoryNotes": [
+            "gift"
+        ],
         "units": [
             "naalu_fighter",
             "destroyer",
@@ -275,7 +466,7 @@
             "dreadnought",
             "naalu_flagship",
             "infantry",
-            "naalu_mech_omega",
+            "naalu_mech_te",
             "pds",
             "spacedock"
         ],
@@ -283,7 +474,11 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNaaluCollective_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNaaluCollective_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheNaaluCollective",
-        "preferredColours": ["tqs", "grn", "wtm"],
+        "preferredColours": [
+            "tqs",
+            "grn",
+            "wtm"
+        ],
         "source": "base"
     },
     {
@@ -293,16 +488,29 @@
         "homeSystem": "08",
         "startingFleet": "dn,cv,cr,2 ff,2 inf m,sd m",
         "commodities": 3,
-        "factionTech": ["vax", "vay"],
-        "startingTech": ["dxa"],
-        "homePlanets": ["mordaiii"],
+        "factionTech": [
+            "vax",
+            "vay"
+        ],
+        "startingTech": [
+            "dxa"
+        ],
+        "homePlanets": [
+            "mordaiii"
+        ],
         "abilities": [
             "galactic_threat",
             "technological_singularity",
             "propagation"
         ],
-        "leaders": ["nekroagent", "nekrocommander", "nekrohero"],
-        "promissoryNotes": ["antivirus"],
+        "leaders": [
+            "nekroagent",
+            "nekrocommander",
+            "nekrohero"
+        ],
+        "promissoryNotes": [
+            "antivirus"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -319,7 +527,11 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNekroVirus_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNekroVirus_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheNekroVirus",
-        "preferredColours": ["bld", "red", "pld"],
+        "preferredColours": [
+            "bld",
+            "red",
+            "pld"
+        ],
         "source": "base"
     },
     {
@@ -328,12 +540,29 @@
         "homeSystem": "11",
         "startingFleet": "2 cv,1 cr,2 ff,4 inf, sd",
         "commodities": 3,
-        "factionTech": ["ffac2", "cm"],
-        "startingTech": ["amd"],
-        "homePlanets": ["ragh", "lisisii"],
-        "abilities": ["scavenge", "nomadic"],
-        "leaders": ["saaragent", "saarcommander", "saarhero"],
-        "promissoryNotes": ["ragh"],
+        "factionTech": [
+            "ffac2",
+            "cm"
+        ],
+        "startingTech": [
+            "amd"
+        ],
+        "homePlanets": [
+            "ragh",
+            "lisisii"
+        ],
+        "abilities": [
+            "scavenge",
+            "nomadic"
+        ],
+        "leaders": [
+            "saaragent",
+            "saarcommander",
+            "saarhero"
+        ],
+        "promissoryNotes": [
+            "ragh"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -350,7 +579,11 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheClanOfSaar_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheClanOfSaar_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheClanOfSaar",
-        "preferredColours": ["rst", "org", "tan"],
+        "preferredColours": [
+            "rst",
+            "org",
+            "tan"
+        ],
         "source": "base"
     },
     {
@@ -361,13 +594,27 @@
         "homeSystem": "13",
         "startingFleet": "2 cv,cr,3 inf q,2 inf t,sd q,pds t",
         "commodities": 3,
-        "factionTech": ["exo2", "vpw"],
+        "factionTech": [
+            "exo2",
+            "vpw"
+        ],
         "startingTechOptions": [],
         "startingTechAmount": 0,
-        "homePlanets": ["quinarra", "trenlak"],
-        "abilities": ["unrelenting"],
-        "leaders": ["sardakkagent", "sardakkcommander", "sardakkhero"],
-        "promissoryNotes": ["tekklar"],
+        "homePlanets": [
+            "quinarra",
+            "trenlak"
+        ],
+        "abilities": [
+            "unrelenting"
+        ],
+        "leaders": [
+            "sardakkagent",
+            "sardakkcommander",
+            "sardakkhero"
+        ],
+        "promissoryNotes": [
+            "tekklar"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -384,7 +631,11 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/SardakkNorr_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/SardakkNorr_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=SardakkNorr",
-        "preferredColours": ["red", "wtm", "psn"],
+        "preferredColours": [
+            "red",
+            "wtm",
+            "psn"
+        ],
         "source": "base"
     },
     {
@@ -393,12 +644,29 @@
         "homeSystem": "01",
         "startingFleet": "2 cv, dd, 3 ff,5 inf j, sd j",
         "commodities": 4,
-        "factionTech": ["so2", "ac2"],
-        "startingTech": ["amd", "nm"],
-        "homePlanets": ["jord"],
-        "abilities": ["orbital_drop", "versatile"],
-        "leaders": ["solagent", "solcommander", "solhero"],
-        "promissoryNotes": ["ms"],
+        "factionTech": [
+            "so2",
+            "ac2"
+        ],
+        "startingTech": [
+            "amd",
+            "nm"
+        ],
+        "homePlanets": [
+            "jord"
+        ],
+        "abilities": [
+            "orbital_drop",
+            "versatile"
+        ],
+        "leaders": [
+            "solagent",
+            "solcommander",
+            "solhero"
+        ],
+        "promissoryNotes": [
+            "ms"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -415,7 +683,11 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheFederationOfSol_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheFederationOfSol_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheFederationOfSol",
-        "preferredColours": ["blu", "spr", "gry"],
+        "preferredColours": [
+            "blu",
+            "spr",
+            "gry"
+        ],
         "source": "base"
     },
     {
@@ -424,7 +696,10 @@
         "homeSystem": "07",
         "startingFleet": "cv,cr,2 ff,2 inf w,pds w, sd w",
         "commodities": 3,
-        "factionTech": ["lgf", "htp"],
+        "factionTech": [
+            "lgf",
+            "htp"
+        ],
         "startingTechOptions": [
             "amd",
             "det",
@@ -436,10 +711,21 @@
             "aida"
         ],
         "startingTechAmount": 1,
-        "homePlanets": ["winnu"],
-        "abilities": ["blood_ties", "reclamation"],
-        "leaders": ["winnuagent", "winnucommander", "winnuhero"],
-        "promissoryNotes": ["acq"],
+        "homePlanets": [
+            "winnu"
+        ],
+        "abilities": [
+            "blood_ties",
+            "reclamation"
+        ],
+        "leaders": [
+            "winnuagent",
+            "winnucommander",
+            "winnuhero"
+        ],
+        "promissoryNotes": [
+            "acq"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -456,7 +742,11 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheWinnu_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheWinnu_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheWinnu",
-        "preferredColours": ["ppl", "sns", "crm"],
+        "preferredColours": [
+            "ppl",
+            "sns",
+            "crm"
+        ],
         "source": "base"
     },
     {
@@ -465,12 +755,29 @@
         "homeSystem": "14",
         "startingFleet": "cv,2 cr,3 ff,2 inf at,2 inf ar,pds at,sd ar",
         "commodities": 4,
-        "factionTech": ["it", "nf"],
-        "startingTech": ["gls"],
-        "homePlanets": ["archonren", "archontau"],
-        "abilities": ["peace_accords", "quash"],
-        "leaders": ["xxchaagent", "xxchacommander", "xxchahero"],
-        "promissoryNotes": ["favor"],
+        "factionTech": [
+            "it",
+            "nf"
+        ],
+        "startingTech": [
+            "gls"
+        ],
+        "homePlanets": [
+            "archonren",
+            "archontau"
+        ],
+        "abilities": [
+            "peace_accords",
+            "quash"
+        ],
+        "leaders": [
+            "xxchaagent",
+            "xxchacommander",
+            "xxchahero"
+        ],
+        "promissoryNotes": [
+            "favor"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -487,7 +794,11 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheXxchaKingdom_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheXxchaKingdom_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheXxchaKingdom",
-        "preferredColours": ["lme", "grn", "hqn"],
+        "preferredColours": [
+            "lme",
+            "grn",
+            "hqn"
+        ],
         "source": "base"
     },
     {
@@ -496,12 +807,28 @@
         "homeSystem": "03",
         "startingFleet": "2 cv,dd,4 ff,4 inf d,sd d",
         "commodities": 2,
-        "factionTech": ["yso", "ic"],
-        "startingTech": ["st"],
-        "homePlanets": ["darien"],
-        "abilities": ["indoctrination", "devotion"],
-        "leaders": ["yinagent", "yincommander", "yinhero"],
-        "promissoryNotes": ["greyfire"],
+        "factionTech": [
+            "yso",
+            "ic"
+        ],
+        "startingTech": [
+            "st"
+        ],
+        "homePlanets": [
+            "darien"
+        ],
+        "abilities": [
+            "indoctrination",
+            "devotion"
+        ],
+        "leaders": [
+            "yinagent",
+            "yincommander",
+            "yinhero"
+        ],
+        "promissoryNotes": [
+            "greyfire"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -518,7 +845,11 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYinBrotherhood_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYinBrotherhood_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheYinBrotherhood",
-        "preferredColours": ["plm", "ppl", "rby"],
+        "preferredColours": [
+            "plm",
+            "ppl",
+            "rby"
+        ],
         "source": "base"
     },
     {
@@ -527,12 +858,30 @@
         "homeSystem": "15",
         "startingFleet": "2 cv,cr, 2 ff, 2 inf s,3 inf r,pds s,sd r",
         "commodities": 3,
-        "factionTech": ["tp", "mi"],
-        "startingTech": ["nm"],
-        "homePlanets": ["retillion", "shalloq"],
-        "abilities": ["stall_tactics", "scheming", "crafty"],
-        "leaders": ["yssarilagent", "yssarilcommander", "yssarilhero"],
-        "promissoryNotes": ["spynet"],
+        "factionTech": [
+            "tp",
+            "mi"
+        ],
+        "startingTech": [
+            "nm"
+        ],
+        "homePlanets": [
+            "retillion",
+            "shalloq"
+        ],
+        "abilities": [
+            "stall_tactics",
+            "scheming",
+            "crafty"
+        ],
+        "leaders": [
+            "yssarilagent",
+            "yssarilcommander",
+            "yssarilhero"
+        ],
+        "promissoryNotes": [
+            "spynet"
+        ],
         "units": [
             "fighter",
             "destroyer",
@@ -549,7 +898,11 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYssarilTribes_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYssarilTribes_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheYssarilTribes",
-        "preferredColours": ["tqs", "grn", "cqr"],
+        "preferredColours": [
+            "tqs",
+            "grn",
+            "cqr"
+        ],
         "source": "base"
     }
 ]

@@ -1,0 +1,19 @@
+{
+    "id": "industrex",
+    "tileId": "115",
+    "name": "Industrex",
+    "aliases": ["industrex"],
+    "resources": 2,
+    "influence": 0,
+    "planetTypes": ["INDUSTRIAL"],
+    "techSpecialties": ["WARFARE"],
+    "legendaryAbilityName": "Aurex Mechanica",
+    "legendaryAbilityText": "You may exhaust this card when you pass to place 1 unit that matches a unit upgrade technology you own from your reinforcements into a system that contains your ships.",
+    "legendaryAbilityFlavourText": "The Mechanica have refined their prototyping facilities for generations.",
+    "planetLayout": {
+        "unitHolderName": "industrex",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": { "x": 170.0, "y": 150.0 }
+    },
+    "source": "thunders_edge"
+}

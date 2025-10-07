@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.RelicHelper;
+import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -47,5 +48,6 @@ class RelicDrawSpecific extends GameStateSubcommand {
         MessageHelper.sendMessageToChannelWithEmbed(
                 event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
         RelicHelper.resolveRelicEffects(event, game, player, relicID);
+        TeHelperUnits.serveIconoclastDeployAbility(game, player);
     }
 }

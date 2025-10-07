@@ -284,6 +284,11 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
+    public boolean isSpaceStation() {
+        return getPlanetModel().isSpaceStation();
+    }
+
+    @JsonIgnore
     public Set<String> getPlanetTypes() {
         Set<String> types = new HashSet<>();
         List<String> three = List.of("hazardous", "cultural", "industrial");

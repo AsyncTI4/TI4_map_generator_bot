@@ -22,6 +22,9 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
+import ti4.service.planet.EmelparService;
+import ti4.service.planet.FaunusService;
+import ti4.service.planet.IndustrexService;
 import ti4.service.turn.StartTurnService;
 
 public class PlanetExhaustAbility extends PlanetAddRemove {
@@ -98,12 +101,33 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = "Choose a secret to discard, the bot will automatically draw a replacement:";
                 buttons.addAll(SecretObjectiveHelper.getSODiscardButtonsWithSuffix(player, "redraw"));
             }
-            case "ordinianc4" -> {
+            case "ordinianc4", "oridinian" -> {
                 ActionCardHelper.drawActionCards(game, player, 1, true);
                 String msg = "Your current command tokens are " + player.getCCRepresentation()
                         + ". Use buttons to gain 1 command token.";
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(), msg, ButtonHelper.getGainCCButtons(player));
+            }
+            case "faunus" -> {
+                output = player.getRepresentationUnfogged() + " Select a planet to gain control of:";
+                output += "\n> Non-home, non-legendary planet, with no units, and no attachments";
+                if (game.isFowMode()) output += "\n> Additionally, in Fog of War, you need vision of the planet";
+                buttons = FaunusService.getFaunusButtons(game, player);
+            }
+            case "emelpar" -> {
+                output = player.getRepresentationUnfogged() + " select a component to ready:";
+                buttons = EmelparService.getReadyComponentButtons(game, player);
+            }
+
+            case "industrex" -> {
+                output = "Choose a unit type to place:";
+                buttons.addAll(IndustrexService.getIndustrexButtonsPart1(game, player));
+            }
+            case "tempesta" -> {
+                PlanetModel tempesta = Mapper.getPlanet("tempesta");
+                output = player.getFactionEmojiOrColor() + " is using _" + tempesta.getLegendaryAbilityName()
+                        + "_ to apply +1 movement to a single ship.";
+                game.setStoredValue("tempestaUsed", player.getFaction());
             }
 
             case "uikos" -> {
