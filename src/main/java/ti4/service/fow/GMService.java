@@ -307,4 +307,34 @@ public class GMService {
                     RelicHelper.showRemaining(threadChannel, true, game, null);
                 });
     }
+
+    public static void addForcePassWhenButtonForFowGM(Game game, Player player, List<Button> buttons) {
+        if (!game.isFowMode()) return;
+        buttons.add(Buttons.gray("declineToQueueAWhenFowGM_" + player.getFaction(), "Force Pass as GM"));
+    }
+
+    public static void addForcePassAfterButtonForFowGM(Game game, Player player, List<Button> buttons) {
+        if (!game.isFowMode()) return;
+        buttons.add(Buttons.gray("declineToQueueAnAfterFowGM_" + player.getFaction(), "Force Pass as GM"));
+    }
+
+    @ButtonHandler("declineToQueueAWhenFowGM_")
+    public static void declineToQueueAWhenFowGM(Game game, ButtonInteractionEvent event, Player gm, String buttonID) {
+        if (!gm.isGM()) return;
+        Player player = game.getPlayerFromColorOrFaction(buttonID.replace("declineToQueueAWhenFowGM_", ""));
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " GM has forced you to pass on \"when\"s.");
+        AgendaHelper.declineToQueueAWhen(game, event, player);
+    }
+
+    @ButtonHandler("declineToQueueAnAfterFowGM_")
+    public static void declineToQueueAnAfterFowGM(Game game, ButtonInteractionEvent event, Player gm, String buttonID) {
+        if (!gm.isGM()) return;
+        Player player = game.getPlayerFromColorOrFaction(buttonID.replace("declineToQueueAnAfterFowGM_", ""));
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " GM has forced you to pass on \"after\"s.");
+        AgendaHelper.declineToQueueAnAfter(game, event, player);
+    }
 }

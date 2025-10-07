@@ -1499,6 +1499,7 @@ public class TransactionHelper {
         // }
         return player == player2
                 || !"action".equalsIgnoreCase(game.getPhaseOfGame())
+                || (player.hasSpaceStation() && player2.hasSpaceStation())
                 || game.isAgeOfCommerceMode()
                 || player.hasAbility("guild_ships")
                 || player.getPromissoryNotesInPlayArea().contains("convoys")

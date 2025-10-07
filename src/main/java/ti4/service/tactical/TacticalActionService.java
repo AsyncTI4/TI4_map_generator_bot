@@ -265,6 +265,12 @@ public class TacticalActionService {
                     "Units Travelled Through Gravity Rift",
                     MiscEmojis.GravityRift));
         }
+        if (game.isWeirdWormholesMode()) {
+            buttons.add(Buttons.green(
+                    player.finChecker() + "getWeirdWormholeButtons_" + tile.getPosition(),
+                    "Units Travelled Through Weird Wormhole",
+                    MiscEmojis.WHalpha));
+        }
         if (player.hasUnexhaustedLeader("sardakkagent")) {
             buttons.addAll(ButtonHelperAgents.getSardakkAgentButtons(game));
         }
