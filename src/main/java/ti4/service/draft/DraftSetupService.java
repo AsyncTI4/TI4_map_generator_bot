@@ -157,9 +157,15 @@ public class DraftSetupService {
             return "Error: Could not find source settings.";
         }
 
+        List<ComponentSource> tileSources = sourceSettings.getTileSources();
+        if(game.isThundersEdge() || !game.getStoredValue("useEntropicScar").isEmpty()) {
+            if(!tileSources.contains(ComponentSource.thunders_edge)) {
+                tileSources.add(ComponentSource.thunders_edge);
+            }
+        }
         DraftTileManager tileManager = game.getDraftTileManager();
         tileManager.clear();
-        tileManager.addAllDraftTiles(sourceSettings.getTileSources());
+        tileManager.addAllDraftTiles(tileSources);
 
         for (String draftableKey : settings.getDraftablesList().getKeys()) {
             Draftable draftable = DraftComponentFactory.createDraftable(draftableKey);
