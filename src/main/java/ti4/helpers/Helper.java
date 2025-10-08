@@ -1386,7 +1386,6 @@ public class Helper {
                     msg.append("> Used Ghost Breakthrough ");
                     msg.append("for ").append(wormholes).append(" resource").append(wormholes == 1 ? "" : "s");
                     msg.append(". ").append(FactionEmojis.Ghost).append("\n");
-                    res += 1;
                 }
                 if (thing.contains("aida")) {
                     msg.append("Exhausted ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ ");
