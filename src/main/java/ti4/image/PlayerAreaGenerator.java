@@ -707,7 +707,7 @@ class PlayerAreaGenerator {
         if (player.getDishonorCounter() > 0) {
             DrawingUtil.superDrawStringCenteredDefault(
                     graphics,
-                    "Dishonor Count: " + player.getHonorCounter(),
+                    "Dishonor Count: " + player.getDishonorCounter(),
                     mapWidth - xDeltaFromRightSide - 300,
                     yDelta + 100);
         }

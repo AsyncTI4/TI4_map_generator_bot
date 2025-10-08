@@ -65,6 +65,9 @@ public class AddPlanetService {
         if (game.getRevealedPublicObjectives().size() < 2 || unitHolder.isSpaceStation()) {
             setup = true;
         }
+        if (planet.equalsIgnoreCase("avernus")) {
+            setup = false;
+        }
         if (unitHolder == null) {
             BotLogger.error(new LogOrigin(event), "Unitholder found null in addPlanet for planet " + planet);
             unitHolder = game.getUnitHolderFromPlanet(planet);

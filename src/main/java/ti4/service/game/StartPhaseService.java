@@ -793,6 +793,7 @@ public class StartPhaseService {
                 - _Ancient Burial Sites_\s
                 - _Maw of Worlds_\s
                 - The Oracle, the Naalu hero
+                - Neuraloop purging to redraw an objective
                 - _The Crown of Emphidia_
                 Please click the "Ready For Agenda" button once you are done resolving these or if you decline to do so.""";
         } else {
