@@ -51,6 +51,6 @@ public class GameOptionService {
         }
         buttons.add(Buttons.gray("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
-                channel, "Show Owned Promissory Notes in Player Area?", buttons);
+                channel, "Show Owned Promissory Notes in Player Area?\n-# Click to toggle.", buttons);
     }
 }
