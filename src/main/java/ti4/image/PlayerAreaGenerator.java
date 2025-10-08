@@ -1262,7 +1262,7 @@ class PlayerAreaGenerator {
                     isFoWPrivate && debtPlayer != null && !FoWHelper.canSeeStatsOfPlayer(game, debtPlayer, frogPlayer);
 
             int tokenDeltaX = 0;
-            String controlID = hideFactionIcon ? Mapper.getControlID("gray") : Mapper.getControlID(debtToken.getKey());
+            String controlID = Mapper.getControlID(debtToken.getKey());
             if (controlID.contains("null")) {
                 continue;
             }
