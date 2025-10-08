@@ -59,6 +59,7 @@ public class LoreService {
     private static final String LORE_EXPORT_FILENAME = "_lore_export.txt";
     private static final int MAX_IMPORT_SIZE = 500_000; // 500kB
     private static final int LORE_TEXT_MAX_LENGTH = 1000;
+    private static final int FOOTER_TEXT_MAX_LENGTH = 200;
 
     @ButtonHandler("gmLoreRefresh")
     private static void refreshLoreButtons(ButtonInteractionEvent event, String buttonID, Game game) {
@@ -137,7 +138,8 @@ public class LoreService {
         Map<String, String[]> importedLore = readLore(loreString);
         // Validate
         for (Map.Entry<String, String[]> entry : importedLore.entrySet()) {
-            String validatedTarget = validateLore(entry.getKey(), entry.getValue()[0], importedLore, game);
+            String validatedTarget =
+                    validateLore(entry.getKey(), entry.getValue()[0], entry.getValue()[1], importedLore, game);
             if (validatedTarget == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), entry.getKey() + " is invalid to import lore");
                 return;
@@ -214,7 +216,7 @@ public class LoreService {
                 if (splitLore.length == 2 || splitLore.length == 3) {
                     savedLoreMap.put(
                             splitLore[0].trim(),
-                            new String[] {splitLore[1].trim(), splitLore.length == 3 ? splitLore[2].trim() : ""});
+                            new String[] {clean(splitLore[1]), splitLore.length == 3 ? clean(splitLore[2]) : ""});
                 }
             }
         }
@@ -234,7 +236,8 @@ public class LoreService {
                 .setMaxLength(LORE_TEXT_MAX_LENGTH);
         TextInput.Builder footer = TextInput.create("footer", TextInputStyle.SHORT)
                 .setRequired(false)
-                .setPlaceholder("Please use `/add_token token:gravityrift` on this system.");
+                .setPlaceholder("Please use `/add_token token:gravityrift` on this system.")
+                .setMaxLength(FOOTER_TEXT_MAX_LENGTH);
 
         if (!"NEW".equals(target)) {
             position.setValue(target);
@@ -263,7 +266,7 @@ public class LoreService {
 
         // Validate
         for (int i = 0; i < targets.length; i++) {
-            String validatedTarget = validateLore(targets[i], loreText, savedLoreMap, game);
+            String validatedTarget = validateLore(targets[i], loreText, footerText, savedLoreMap, game);
             if (validatedTarget == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), targets[i] + " is invalid to save lore");
                 return;
@@ -281,13 +284,14 @@ public class LoreService {
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
 
-    private static String validateLore(String target, String loreText, Map<String, String[]> savedLoreMap, Game game) {
+    private static String validateLore(
+            String target, String loreText, String footerText, Map<String, String[]> savedLoreMap, Game game) {
         target = target.trim();
         if (savedLoreMap.containsKey(target) && StringUtils.isBlank(loreText)) {
             return target; // Deleting existing lore is always valid
         }
 
-        if (loreText.length() > LORE_TEXT_MAX_LENGTH) {
+        if (loreText.length() > LORE_TEXT_MAX_LENGTH || footerText.length() > FOOTER_TEXT_MAX_LENGTH) {
             return null; // Too long
         }
 
@@ -318,12 +322,13 @@ public class LoreService {
             savedLoreMap.remove(target);
             sb.append("Removed Lore from ").append(target).append("\n");
         } else {
-            savedLoreMap.put(target, new String[] {
-                loreText.replace(";", "").replace("|", ""),
-                footerText.replace(";", "").replace("|", "")
-            });
+            savedLoreMap.put(target, new String[] {clean(loreText), clean(footerText)});
             sb.append("Set Lore to ").append(target).append("\n");
         }
+    }
+
+    private static String clean(String input) {
+        return input.trim().replace(";", "").replace("|", "");
     }
 
     private static void saveLore(Game game, Map<String, String[]> lore) {
