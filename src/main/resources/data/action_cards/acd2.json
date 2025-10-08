@@ -1026,7 +1026,7 @@
         "name": "Syndicate",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Draw and reveal a number of action cards from the deck equal to the number of neighbors you have; give 1 of those cards to each of those players and keep the rest.",
+        "text": "Draw and reveal a number of action cards from the deck equal to the number of players; give 1 of those cards to each of those players and keep the rest.",
         "flavorText": "\"What if I'm not ready?\" the operative asked, looking away. Harka squeezed her hand. \"Believe in me, who believes in you.\"",
         "source": "action_deck_2"
     },
