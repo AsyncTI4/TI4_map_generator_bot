@@ -17,7 +17,9 @@ public class TEOptionService {
     public static void offerTEOptionButtons(Game game, MessageChannel channel) {
         List<Button> daneLinkButtons = getDaneLeakModeButtons(game);
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
-                channel, "Enable or Disable Galactic Events.", daneLinkButtons);
+                channel,
+                "Enable or Disable Galactic Events\nSee [here](https://twilight-imperium.fandom.com/wiki/Galactic_Events) for details",
+                daneLinkButtons);
 
         String msg =
                 "Thunder's Edge contains a new version of mecatol rex, which is legendary (it's ability allows you to discard and then draw a secret objective). If you want to play with this new version of mecatol rex in your game, press this button and it will be added to the map when secrets are dealt.";
