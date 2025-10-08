@@ -55,7 +55,7 @@ public class AddPlanetService {
             Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setup) {
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
         player.addPlanet(planet);
-
+        EronousPlanetService.resolveCantrisPO(game, planet, player);
         player.exhaustPlanet(planet);
         if ("mirage".equals(planet) || "avernus".equals(planet) || "thundersedge".equals(planet)) {
             game.clearPlanetsCache();

@@ -1,6 +1,15 @@
 package ti4.service.fow;
 
 import java.awt.Color;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,6 +26,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
@@ -31,24 +41,114 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.model.PlanetModel;
 
 public class LoreService {
 
     private static final List<Button> LORE_BUTTONS = Arrays.asList(
-            Buttons.blue("gmLoreEdit_System~MDL", "Add to System"),
-            Buttons.blue("gmLoreEdit_Planet~MDL", "Add to Planet"),
-            Buttons.gray("gmLoreRefresh", "Refresh"),
+            Buttons.blue("gmLoreEdit_NEW~MDL", "Add Lore"),
+            Buttons.gray("gmLoreExportImportButtons", "Export/Import"),
+            Buttons.gray("gmLoreRefresh", "Refresh"));
+
+    private static final List<Button> LORE_EXPORT_IMPORT_BUTTONS = Arrays.asList(
+            Buttons.gray("gmLoreExport", "Export"),
+            Buttons.gray("gmLoreImport~MDL", "Import"),
             Buttons.DONE_DELETE_BUTTONS);
 
     private static final String SYSTEM_LORE_KEY = "fowSystemLore";
+    private static final String LORE_EXPORT_FILENAME = "_lore_export.txt";
+    private static final int MAX_IMPORT_SIZE = 500_000; // 500kB
+    private static final int LORE_TEXT_MAX_LENGTH = 1000;
+    private static final int FOOTER_TEXT_MAX_LENGTH = 200;
 
     @ButtonHandler("gmLoreRefresh")
     private static void refreshLoreButtons(ButtonInteractionEvent event, String buttonID, Game game) {
         showLoreButtons(event, buttonID, game);
         event.getMessage().delete().queue();
+    }
+
+    @ButtonHandler("gmLoreExportImportButtons")
+    private static void gmLoreExportImportButtons(ButtonInteractionEvent event, Game game) {
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", LORE_EXPORT_IMPORT_BUTTONS);
+    }
+
+    @ButtonHandler("gmLoreExport")
+    private static void exportLore(ButtonInteractionEvent event, Game game) {
+        File exportFile = new File(game.getName() + LORE_EXPORT_FILENAME);
+        try (FileWriter writer = new FileWriter(exportFile)) {
+            writer.write(game.getStoredValue(SYSTEM_LORE_KEY));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        event.getChannel()
+                .sendFiles(FileUpload.fromData(exportFile))
+                .setContent("### Export of " + game.getName() + " Lore:")
+                .queue();
+    }
+
+    @ButtonHandler("gmLoreImport~MDL")
+    public static void importLore(ButtonInteractionEvent event, Game game) {
+        TextInput.Builder url = TextInput.create("url", TextInputStyle.SHORT)
+                .setRequired(true)
+                .setPlaceholder("http://your.url/fow123_lore_export.txt");
+
+        Modal importLoreModal = Modal.create("gmLoreImportFromURL", "Import lore from URL")
+                .addComponents(Label.of("URL", url.build()))
+                .build();
+        event.replyModal(importLoreModal).queue();
+    }
+
+    @ModalHandler("gmLoreImportFromURL")
+    public static void importLoreFromURL(ModalInteractionEvent event, Game game) {
+        String url = event.getValue("url").getAsString();
+        String loreString = null;
+
+        try {
+            HttpClient client = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(5))
+                    .build();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .timeout(Duration.ofSeconds(5))
+                    .GET()
+                    .build();
+
+            HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+
+            if (response.statusCode() != 200) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "HTTP error: " + response.statusCode());
+                return;
+            }
+
+            byte[] body = response.body();
+            if (body.length > MAX_IMPORT_SIZE) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), "File exceeds max allowed size (" + MAX_IMPORT_SIZE + " bytes)");
+                return;
+            }
+
+            loreString = new String(body, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Error fetching URL: " + e.getMessage());
+            return;
+        }
+
+        Map<String, String[]> importedLore = readLore(loreString);
+        // Validate
+        for (Map.Entry<String, String[]> entry : importedLore.entrySet()) {
+            String validatedTarget =
+                    validateLore(entry.getKey(), entry.getValue()[0], entry.getValue()[1], importedLore, game);
+            if (validatedTarget == null) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), entry.getKey() + " is invalid to import lore");
+                return;
+            }
+        }
+
+        // Construct
+        saveLore(game, importedLore);
+        MessageHelper.sendMessageToChannel(event.getChannel(), importedLore.size() + " lore entries imported.");
     }
 
     @ButtonHandler("gmLore")
@@ -105,16 +205,18 @@ public class LoreService {
     }
 
     private static Map<String, String[]> getSavedLore(Game game) {
+        return readLore(game.getStoredValue(SYSTEM_LORE_KEY));
+    }
+
+    private static Map<String, String[]> readLore(String loreString) {
         Map<String, String[]> savedLoreMap = new HashMap<>();
-        String savedLoreString = game.getStoredValue(SYSTEM_LORE_KEY);
-        if (StringUtils.isNotBlank(savedLoreString)) {
-            for (String savedLore : savedLoreString.split("\\|")) {
+        if (StringUtils.isNotBlank(loreString)) {
+            for (String savedLore : loreString.split("\\|")) {
                 String[] splitLore = savedLore.split(";");
                 if (splitLore.length == 2 || splitLore.length == 3) {
                     savedLoreMap.put(
-                            splitLore[0], new String[] {splitLore[1], splitLore.length == 3 ? splitLore[2] : ""});
-                } else {
-                    BotLogger.warning(new LogOrigin(game), "Invalid lore string: " + savedLore);
+                            splitLore[0].trim(),
+                            new String[] {clean(splitLore[1]), splitLore.length == 3 ? clean(splitLore[2]) : ""});
                 }
             }
         }
@@ -124,21 +226,20 @@ public class LoreService {
     @ButtonHandler("gmLoreEdit")
     public static void editLore(ButtonInteractionEvent event, String buttonID, Game game) {
         String target = StringUtils.substringBetween(buttonID, "gmLoreEdit_", "~MDL");
-        boolean systemLore = "System".equals(target) || PositionMapper.isTilePositionValid(target);
-        String addingTo = systemLore ? "System" : "Planet";
 
         TextInput.Builder position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
                 .setRequired(true)
-                .setPlaceholder(systemLore ? "000" : "Sem-Lore");
+                .setPlaceholder("000, Sem-Lore");
         TextInput.Builder lore = TextInput.create(Constants.MESSAGE, TextInputStyle.PARAGRAPH)
                 .setRequired(false)
                 .setPlaceholder("Once upon a time...")
-                .setMaxLength(1000);
+                .setMaxLength(LORE_TEXT_MAX_LENGTH);
         TextInput.Builder footer = TextInput.create("footer", TextInputStyle.SHORT)
                 .setRequired(false)
-                .setPlaceholder("Please use `/add_token token:gravityrift` on this system.");
+                .setPlaceholder("Please use `/add_token token:gravityrift` on this system.")
+                .setMaxLength(FOOTER_TEXT_MAX_LENGTH);
 
-        if (!"System".equals(target) && !"Planet".equals(target)) {
+        if (!"NEW".equals(target)) {
             position.setValue(target);
             String[] savedLore = getSavedLore(game).get(target);
             lore.setValue(savedLore[0]);
@@ -147,9 +248,9 @@ public class LoreService {
             }
         }
 
-        Modal editLoreModal = Modal.create("gmLoreSave" + addingTo, "Add Lore to " + addingTo)
+        Modal editLoreModal = Modal.create("gmLoreSave", "Add Lore")
                 .addComponents(
-                        Label.of(addingTo, position.build()),
+                        Label.of("Target", position.build()),
                         Label.of("Lore (clear to delete)", lore.build()),
                         Label.of("Other info", footer.build()))
                 .build();
@@ -157,47 +258,80 @@ public class LoreService {
     }
 
     @ModalHandler("gmLoreSave")
-    public static void saveLore(ModalInteractionEvent event, Game game) {
-        String target = event.getValue(Constants.POSITION).getAsString();
+    public static void saveLoreFromModal(ModalInteractionEvent event, Game game) {
+        String[] targets = event.getValue(Constants.POSITION).getAsString().split(",");
         String loreText = event.getValue(Constants.MESSAGE).getAsString();
         String footerText = event.getValue("footer").getAsString();
-        boolean systemLore = "System".equals(event.getModalId().replace("gmLoreSave", ""));
-        PlanetModel planet = null;
-
-        if (systemLore) {
-            if (!PositionMapper.isTilePositionValid(target) || game.getTileByPosition(target) == null) {
-                MessageHelper.sendMessageToChannel(
-                        event.getChannel(), "Position " + target + " is invalid to save lore `" + loreText + "`");
-                return;
-            }
-        } else {
-            planet = Mapper.getPlanet(AliasHandler.resolvePlanet(target));
-            if (planet == null || !game.getPlanets().contains(planet.getID())) {
-                MessageHelper.sendMessageToChannel(
-                        event.getChannel(), "Planet " + target + " is invalid to save lore `" + loreText + "`");
-                return;
-            }
-            target = planet.getID();
-        }
-
         Map<String, String[]> savedLoreMap = getSavedLore(game);
-        if (StringUtils.isBlank(loreText)) {
-            savedLoreMap.remove(target);
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Removed Lore from " + (planet != null ? planet.getName() : target));
-        } else {
-            savedLoreMap.put(target, new String[] {
-                loreText.replace(";", "").replace("|", ""),
-                footerText.replace(";", "").replace("|", "")
-            });
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Saved Lore to " + (planet != null ? planet.getName() : target));
+
+        // Validate
+        for (int i = 0; i < targets.length; i++) {
+            String validatedTarget = validateLore(targets[i], loreText, footerText, savedLoreMap, game);
+            if (validatedTarget == null) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), targets[i] + " is invalid to save lore");
+                return;
+            }
+            targets[i] = validatedTarget;
         }
 
-        setLore(game, savedLoreMap);
+        // Construct
+        StringBuilder sb = new StringBuilder();
+        for (String target : targets) {
+            setLore(target, loreText, footerText, savedLoreMap, game, sb);
+        }
+
+        saveLore(game, savedLoreMap);
+        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
 
-    private static void setLore(Game game, Map<String, String[]> lore) {
+    private static String validateLore(
+            String target, String loreText, String footerText, Map<String, String[]> savedLoreMap, Game game) {
+        target = target.trim();
+        if (savedLoreMap.containsKey(target) && StringUtils.isBlank(loreText)) {
+            return target; // Deleting existing lore is always valid
+        }
+
+        if (loreText.length() > LORE_TEXT_MAX_LENGTH || footerText.length() > FOOTER_TEXT_MAX_LENGTH) {
+            return null; // Too long
+        }
+
+        if (PositionMapper.isTilePositionValid(target)) {
+            if (game.getTileByPosition(target) == null) {
+                return null;
+            }
+
+            return target;
+        } else {
+            PlanetModel planet = Mapper.getPlanet(AliasHandler.resolvePlanet(target));
+            if (planet == null || !game.getPlanets().contains(planet.getID())) {
+                return null;
+            }
+
+            return planet.getID();
+        }
+    }
+
+    private static void setLore(
+            String target,
+            String loreText,
+            String footerText,
+            Map<String, String[]> savedLoreMap,
+            Game game,
+            StringBuilder sb) {
+        if (StringUtils.isBlank(loreText)) {
+            savedLoreMap.remove(target);
+            sb.append("Removed Lore from ").append(target).append("\n");
+        } else {
+            savedLoreMap.put(target, new String[] {clean(loreText), clean(footerText)});
+            sb.append("Set Lore to ").append(target).append("\n");
+        }
+    }
+
+    private static String clean(String input) {
+        return input.trim().replace(";", "").replace("|", "");
+    }
+
+    private static void saveLore(Game game, Map<String, String[]> lore) {
         String loreString = lore.entrySet().stream()
                 .map(entry -> entry.getKey() + ";" + entry.getValue()[0] + ";" + entry.getValue()[1])
                 .collect(Collectors.joining("|"));
@@ -268,6 +402,6 @@ public class LoreService {
                 game, player, player.getRepresentationUnfoggedNoPing() + " was shown the lore of " + target);
 
         lore.remove(target);
-        setLore(game, lore);
+        saveLore(game, lore);
     }
 }

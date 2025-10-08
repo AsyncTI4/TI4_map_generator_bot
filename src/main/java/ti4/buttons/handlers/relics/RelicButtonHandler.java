@@ -114,6 +114,10 @@ class RelicButtonHandler {
                 + ("neuraloop".equals(relic) ? "itself" : Mapper.getRelic(relic).getName())
                 + ", to replace the recently revealed objective with a random " + type + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(), game.getPing() + " Revealed objective `" + poID + "` was replaced.");
+        }
         if ("stage1".equalsIgnoreCase(type)) {
             RevealPublicObjectiveService.revealS1(game, event, true);
         } else if ("stage2".equalsIgnoreCase(type)) {
