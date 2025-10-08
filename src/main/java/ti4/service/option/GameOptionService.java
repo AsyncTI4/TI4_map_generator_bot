@@ -13,6 +13,12 @@ import ti4.message.MessageHelper;
 public class GameOptionService {
 
     public static void offerGameOptionButtons(Game game, MessageChannel channel) {
+        sendFactionReactOptionButtons(channel);
+        sendHexBorderOptionButtons(channel);
+        sendShowOwnedPNsInPlayerAreaButton(game, channel);
+    }
+
+    private static void sendFactionReactOptionButtons(MessageChannel channel) {
         List<Button> factionReactButtons = new ArrayList<>();
         factionReactButtons.add(Buttons.green("enableAidReacts", "Enable Faction Reactions"));
         factionReactButtons.add(Buttons.red("disableAidReacts", "No Faction Reactions"));
@@ -21,7 +27,9 @@ public class GameOptionService {
                 channel,
                 "Enable to have the bot react to player messages with their faction emoji.",
                 factionReactButtons);
+    }
 
+    private static void sendHexBorderOptionButtons(MessageChannel channel) {
         List<Button> hexBorderButtons = new ArrayList<>();
         hexBorderButtons.add(Buttons.green("showHexBorders_dash", "Dashed line"));
         hexBorderButtons.add(Buttons.blue("showHexBorders_solid", "Solid line"));
