@@ -2683,7 +2683,7 @@ public class ButtonHelper {
 
     public static List<Player> getPlayersWithShipsInTheSystem(Game game, Tile tile) {
         List<Player> playersWithShips = new ArrayList<>();
-        for (Player player : game.getRealPlayersNNeutral()) {
+        for (Player player : game.getRealPlayersNDummies()) {
             if (FoWHelper.playerHasShipsInSystem(player, tile)) {
                 playersWithShips.add(player);
             }
@@ -2704,7 +2704,7 @@ public class ButtonHelper {
 
     public static List<Player> getPlayersWithUnitsInTheSystem(Game game, Tile tile) {
         List<Player> playersWithShips = new ArrayList<>();
-        for (Player player : game.getRealPlayersNNeutral()) {
+        for (Player player : game.getRealPlayersNDummies()) {
             if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 playersWithShips.add(player);
             }

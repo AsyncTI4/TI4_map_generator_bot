@@ -188,6 +188,11 @@ public class Expeditions {
         return buttons;
     }
 
+    public static void setExpedition(Game game, String expedition, String faction) {
+        Expeditions exp = game.getExpeditions();
+        exp.expeditionFactions.put(expedition, faction);
+    }
+
     @ButtonHandler("TEexpedition_")
     private static void handleExpeditionButtonPress(
             String buttonID, ButtonInteractionEvent event, Game game, Player player) {

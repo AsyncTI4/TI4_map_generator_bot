@@ -1171,7 +1171,7 @@ public class Player extends PlayerProperties {
             bonus += 2;
         }
         for (String planet : getPlanets()) {
-            if (Mapper.getPlanet(planet).isSpaceStation()) {
+            if (Mapper.getPlanet(planet) != null && Mapper.getPlanet(planet).isSpaceStation()) {
                 bonus++;
             }
         }

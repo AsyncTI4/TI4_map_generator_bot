@@ -58,6 +58,10 @@ public class TeHelperGeneral {
             if (prevOwner != null && FoWHelper.playerHasActualShipsInSystem(prevOwner, tile)) continue;
 
             AddPlanetService.addPlanet(newOwner, station.getName(), game, event, false);
+            MessageHelper.sendMessageToChannel(
+                    newOwner.getCorrectChannel(),
+                    newOwner.getRepresentation() + " acquired control of the " + station.getRepresentation(game)
+                            + " trade station.");
         }
     }
 
