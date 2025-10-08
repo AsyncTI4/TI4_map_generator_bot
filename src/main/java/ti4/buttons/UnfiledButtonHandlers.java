@@ -168,7 +168,7 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler("enableDaneMode_")
-    public static void enableDaneMode(ButtonInteractionEvent event, String buttonID, Game game) {
+    public static void enableGalacticEvent(ButtonInteractionEvent event, String buttonID, Game game) {
         String mode = buttonID.split("_")[1];
         boolean enable = "enable".equalsIgnoreCase(buttonID.split("_")[2]);
         String message = "Successfully " + buttonID.split("_")[2] + "d the ";
@@ -299,7 +299,7 @@ public class UnfiledButtonHandlers {
             message += "Stellar Atomics Mode. Nothing more needs to be done.";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
-        List<Button> buttons = TEOptionService.getDaneLeakModeButtons(game);
+        List<Button> buttons = TEOptionService.getGalacticEventButtons(game);
         event.getMessage()
                 .editMessage(event.getMessage().getContentRaw())
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
