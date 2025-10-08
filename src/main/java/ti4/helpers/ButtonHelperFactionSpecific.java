@@ -1398,7 +1398,7 @@ public class ButtonHelperFactionSpecific {
                 player.getRepresentationUnfogged()
                         + ", please choose which planet to relocate the Saar ground forces to.",
                 buttons);
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("hacanMechTradeStepOne_")

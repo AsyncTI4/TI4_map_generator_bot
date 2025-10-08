@@ -10,7 +10,10 @@ import ti4.helpers.Constants;
 public class Special2Command implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new SetupNeutralPlayer(), new GeneratePainBoxMapString(), new SearchWinningPath())
+                    new SetupNeutralPlayer(),
+                    new GeneratePainBoxMapString(),
+                    new SearchWinningPath(),
+                    new SetExpedition())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
