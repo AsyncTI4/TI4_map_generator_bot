@@ -19,11 +19,18 @@ public class EronousPlanetService {
         Integer cantrisPOId = game.getRevealedPublicObjectives().get(CANTRIS_PO);
         if (cantrisPOId != null) {
             game.unscorePublicObjective(previousOwner.getUserID(), cantrisPOId);
-            MessageHelper.sendMessageToChannel(
-                    previousOwner.getCorrectChannel(),
-                    previousOwner.getRepresentationUnfogged() + " lost Cantris and " + CANTRIS_PO + " victory point.");
-        } else {
+            if (previousOwner.isRealPlayer()) {
+                MessageHelper.sendMessageToChannel(
+                        previousOwner.getCorrectChannel(),
+                        previousOwner.getRepresentationUnfogged() + " lost Cantris and " + CANTRIS_PO
+                                + " victory point.");
+            }
+        } else if (player.isRealPlayer()) {
             cantrisPOId = game.addCustomPO(CANTRIS_PO, 1);
+        }
+
+        if (!player.isRealPlayer()) {
+            return;
         }
 
         game.scorePublicObjective(player.getUserID(), cantrisPOId);
