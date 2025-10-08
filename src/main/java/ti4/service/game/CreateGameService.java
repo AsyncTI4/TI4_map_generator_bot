@@ -258,9 +258,7 @@ public class CreateGameService {
 
         Button offerOptions = Buttons.green("offerGameOptionButtons", "Options");
         MessageHelper.sendMessageToChannelWithButton(
-                actionsChannel,
-                "Want to change Game options?\n> This menu is accessible anytime with `/game options`",
-                offerOptions);
+                actionsChannel, "Want to change Game options?\n-# `/game options`", offerOptions);
 
         Button teOptions = Buttons.green("offerTEOptionButtons", "Thunder's Edge Settings");
         MessageHelper.sendMessageToChannelWithButton(
