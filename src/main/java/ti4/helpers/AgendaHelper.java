@@ -1400,8 +1400,10 @@ public class AgendaHelper {
                     existingData += ";" + identifier + "_" + votes;
                 }
                 game.setCurrentAgendaVote(winner, existingData);
-                MessageHelper.sendMessageToChannel(
+                if ( !game.isHiddenAgendaMode() ) {
+                    MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(), Helper.buildSpentThingsMessageForVoting(player, game, false));
+                }
             }
 
             String message = " up to vote! Please use the buttons to choose the outcome you wish to vote for.";
@@ -1447,7 +1449,9 @@ public class AgendaHelper {
                     }
                     ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
                     CryypterHelper.checkForMentakEnvoy(nextInLine, game);
-                    MessageHelper.sendMessageToChannel(nextInLine.getCorrectChannel(), skippedMessage);
+                    if ( !game.isHiddenAgendaMode() ) {
+                        MessageHelper.sendMessageToChannel(nextInLine.getCorrectChannel(), skippedMessage);
+                    }
                     resolvingAnAgendaVote("resolveAgendaVote_" + votes, event, game, nextInLine);
                     return;
                 }
@@ -3231,7 +3235,6 @@ public class AgendaHelper {
                                     .append(" voted ")
                                     .append(vote)
                                     .append(" votes. ");
-
                         } else {
                             outcomeSummaryBuilder
                                     .append(faction)
@@ -3261,10 +3264,16 @@ public class AgendaHelper {
                                 .append(" ")
                                 .append(outcome)
                                 .append(": ")
-                                .append(totalVotes)
+                                .append(totalVotes);
+                        if ( !game.isHiddenAgendaMode() ) {
+                            summaryBuilder
                                 .append(". (")
                                 .append(outcomeSummary)
                                 .append(")\n");
+                        } else {
+                            summaryBuilder
+                                .append("\n");
+                        }
 
                     } else if (!game.isHomebrewSCMode()
                             && game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
@@ -3274,29 +3283,47 @@ public class AgendaHelper {
                                 .append(" **")
                                 .append(Helper.getSCName(Integer.parseInt(outcome), game))
                                 .append("**: ")
-                                .append(totalVotes)
+                                .append(totalVotes);
+                        if ( !game.isHiddenAgendaMode() ) {
+                            summaryBuilder
                                 .append(". (")
                                 .append(outcomeSummary)
                                 .append(")\n");
+                        } else {
+                            summaryBuilder
+                                .append("\n");
+                        }
                     } else {
                         summaryBuilder
                                 .append("- ")
                                 .append(outcome)
                                 .append(": ")
-                                .append(totalVotes)
+                                .append(totalVotes);
+                        if ( !game.isHiddenAgendaMode() ) {
+                            summaryBuilder
                                 .append(". (")
                                 .append(outcomeSummary)
                                 .append(")\n");
+                        } else {
+                            summaryBuilder
+                                .append("\n");
+                        }
                     }
                 } else {
                     summaryBuilder
                             .append("- ")
                             .append(outcome)
                             .append(": Total votes ")
-                            .append(totalVotes)
-                            .append(". ")
+                            .append(totalVotes);
+                    if ( !game.isHiddenAgendaMode() ) {
+                            summaryBuilder
+                                .append(". ")
                             .append(outcomeSummary)
+                                .append("\n");
+                    } else {
+                        summaryBuilder
                             .append("\n");
+                    }
                 }
             }
             summary = summaryBuilder.toString();
