@@ -15,6 +15,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.RiftSetModeService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 class WeirdGameSetup extends GameStateSubcommand {
@@ -63,6 +64,10 @@ class WeirdGameSetup extends GameStateSubcommand {
                 OptionType.BOOLEAN,
                 Constants.THUNDERS_EDGE_MODE,
                 "True to enable the work in progress Thunders Edge Mode"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                FOWOption.RIFTSET_MODE.toString(),
+                "True to enable RiftSet mode (only for Eronous)"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 FOWOption.FOW_PLUS.toString(),
@@ -147,6 +152,11 @@ class WeirdGameSetup extends GameStateSubcommand {
         Boolean thunderMode = event.getOption(Constants.THUNDERS_EDGE_MODE, null, OptionMapping::getAsBoolean);
         if (thunderMode != null) game.setThundersEdge(thunderMode);
 
+        Boolean riftsetMode = event.getOption(FOWOption.RIFTSET_MODE.toString(), null, OptionMapping::getAsBoolean);
+        if (riftsetMode != null && game.isFowMode()) {
+            RiftSetModeService.activate(event, game);
+        }
+
         Boolean fowPlus = event.getOption(FOWOption.FOW_PLUS.toString(), null, OptionMapping::getAsBoolean);
         if (fowPlus != null && game.isFowMode()) {
             FOWPlusService.setActive(game, fowPlus);
@@ -159,8 +169,7 @@ class WeirdGameSetup extends GameStateSubcommand {
                 && event.getOption(Constants.DISCORDANT_STARS_MODE) == null
                 && event.getOption(Constants.BASE_GAME_MODE) == null
                 && event.getOption(Constants.MILTYMOD_MODE) == null
-                && event.getOption(Constants.VOTC_MODE) == null
-                && event.getOption(FOWOption.RIFTSET_MODE.toString()) == null) {
+                && event.getOption(Constants.VOTC_MODE) == null) {
             return true; // no changes were made
         }
         boolean isTIGLGame =
