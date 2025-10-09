@@ -1556,9 +1556,13 @@ public class AgendaHelper {
         if (winner == null) {
             winner = getWinner(game);
         }
-        String summary2 = getSummaryOfVotes(game, true);
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), summary2 + "\n \n");
-        GMService.logActivity(game, getSummaryOfVotes(game, true, true), false);
+        if ( !game.isHiddenAgendaMode() ) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), getSummaryOfVotes(game, true) + "\n \n");
+        } else {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), getSummaryOfVotes(game, true, false, true) + "\n \n");
+            MessageHelper.sendMessageToChannel(game.getSpeaker().getCardsInfoThread(), getSummaryOfVotes(game, true) + "\n \n");
+        }
+        GMService.logActivity(game, getSummaryOfVotes(game, true, true, false), false);
         game.setPhaseOfGame("agendaEnd");
         game.setActivePlayerID(null);
         StringBuilder message = new StringBuilder();
@@ -3152,10 +3156,10 @@ public class AgendaHelper {
     }
 
     public static String getSummaryOfVotes(Game game, boolean capitalize) {
-        return getSummaryOfVotes(game, capitalize, false);
+        return getSummaryOfVotes(game, capitalize, false, false);
     }
 
-    private static String getSummaryOfVotes(Game game, boolean capitalize, boolean overwriteFog) {
+    private static String getSummaryOfVotes(Game game, boolean capitalize, boolean overwriteFog, boolean redactFactionInfo) {
         String summary;
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
         String agendaDetails = game.getCurrentAgendaInfo();
@@ -3265,7 +3269,7 @@ public class AgendaHelper {
                                 .append(outcome)
                                 .append(": ")
                                 .append(totalVotes);
-                        if ( !game.isHiddenAgendaMode() ) {
+                        if ( !redactFactionInfo ) {
                             summaryBuilder
                                 .append(". (")
                                 .append(outcomeSummary)
@@ -3284,7 +3288,7 @@ public class AgendaHelper {
                                 .append(Helper.getSCName(Integer.parseInt(outcome), game))
                                 .append("**: ")
                                 .append(totalVotes);
-                        if ( !game.isHiddenAgendaMode() ) {
+                        if ( !redactFactionInfo ) {
                             summaryBuilder
                                 .append(". (")
                                 .append(outcomeSummary)
@@ -3299,7 +3303,7 @@ public class AgendaHelper {
                                 .append(outcome)
                                 .append(": ")
                                 .append(totalVotes);
-                        if ( !game.isHiddenAgendaMode() ) {
+                        if ( !redactFactionInfo ) {
                             summaryBuilder
                                 .append(". (")
                                 .append(outcomeSummary)
@@ -3315,7 +3319,7 @@ public class AgendaHelper {
                             .append(outcome)
                             .append(": Total votes ")
                             .append(totalVotes);
-                    if ( !game.isHiddenAgendaMode() ) {
+                    if ( !redactFactionInfo ) {
                             summaryBuilder
                                 .append(". ")
                             .append(outcomeSummary)
