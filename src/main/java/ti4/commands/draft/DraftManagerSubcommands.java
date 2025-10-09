@@ -1,7 +1,6 @@
 package ti4.commands.draft;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -13,12 +12,10 @@ import ti4.commands.Subcommand;
 import ti4.commands.SubcommandGroup;
 import ti4.helpers.Constants;
 import ti4.helpers.StringHelper;
-import ti4.helpers.settingsFramework.menus.MiltySettings;
-import ti4.image.Mapper;
+import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.model.MapTemplateModel;
 import ti4.service.draft.DraftButtonService;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftComponentFactory;
@@ -28,14 +25,6 @@ import ti4.service.draft.DraftOrchestrator;
 import ti4.service.draft.DraftSaveService;
 import ti4.service.draft.Draftable;
 import ti4.service.draft.DraftableType;
-import ti4.service.draft.PlayerDraftState;
-import ti4.service.draft.draftables.FactionDraftable;
-import ti4.service.draft.draftables.SliceDraftable;
-import ti4.service.draft.draftables.SpeakerOrderDraftable;
-import ti4.service.draft.orchestrators.PublicSnakeDraftOrchestrator;
-import ti4.service.milty.MiltyDraftManager;
-import ti4.service.milty.MiltyDraftSpec;
-import ti4.service.milty.MiltyService;
 
 public class DraftManagerSubcommands extends SubcommandGroup {
 
@@ -62,7 +51,7 @@ public class DraftManagerSubcommands extends SubcommandGroup {
                     new DraftManagerMakePick(),
                     new DraftManagerSendCustomDraftableCommand(),
                     new DraftManagerSendCustomOrchestratorCommand(),
-                    new DraftManagerConvertToMilty())
+                    new DraftManagerSetupNucleusCommand())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     protected DraftManagerSubcommands() {
@@ -779,119 +768,22 @@ public class DraftManagerSubcommands extends SubcommandGroup {
         }
     }
 
-    public static class DraftManagerConvertToMilty extends GameStateSubcommand {
-        public DraftManagerConvertToMilty() {
-            super(Constants.DRAFT_MANAGE_CONVERT_TO_MILTY, "Convert the draft to a Milty draft", true, false);
+    public static class DraftManagerSetupNucleusCommand extends GameStateSubcommand {
+        public DraftManagerSetupNucleusCommand() {
+            super(
+                    Constants.DRAFT_MANAGE_SETUP_NUCLEUS,
+                    "Setup a Nucleus draft, throwing out any current draft settings",
+                    true,
+                    false);
         }
 
         @Override
         public void execute(SlashCommandInteractionEvent event) {
             Game game = getGame();
-            DraftManager draftManager = game.getDraftManager();
-            MiltySettings settings = game.getMiltySettingsUnsafe();
-            MiltyDraftSpec spec;
-            if (settings != null) {
-                spec = MiltyDraftSpec.fromSettings(settings);
-            } else {
-                spec = new MiltyDraftSpec(game);
-            }
-
-            // SETUP SPEC
-
-            // General
-            spec.playerIDs = draftManager.getPlayerUserIds();
-            String mapTemplateID = game.getMapTemplateID();
-            MapTemplateModel mapTemplate = null;
-            if (mapTemplateID != null) {
-                mapTemplate = Mapper.getMapTemplate(mapTemplateID);
-            }
-            if (mapTemplate == null) {
-                mapTemplate = Mapper.getDefaultMapTemplateForPlayerCount(spec.playerIDs.size());
-            }
-            spec.setTemplate(mapTemplate);
-
-            // Factions
-            FactionDraftable factionDraftable = (FactionDraftable) draftManager.getDraftable(FactionDraftable.TYPE);
-            if (factionDraftable != null) {
-                spec.numFactions = factionDraftable.getAllDraftChoices().size();
-                spec.priorityFactions = factionDraftable.getAllDraftChoices().stream()
-                        .map(DraftChoice::getChoiceKey)
-                        .collect(Collectors.toList());
-            }
-
-            // Speaker Position
-            SpeakerOrderDraftable speakerOrderDraftable =
-                    (SpeakerOrderDraftable) draftManager.getDraftable(SpeakerOrderDraftable.TYPE);
-            // no setup
-
-            // Slices
-            SliceDraftable sliceDraftable = (SliceDraftable) draftManager.getDraftable(SliceDraftable.TYPE);
-            if (sliceDraftable != null) {
-                spec.numSlices = sliceDraftable.getAllDraftChoices().size();
-                spec.presetSlices = sliceDraftable.getSlices();
-            }
-
-            // Public Snake
-            PublicSnakeDraftOrchestrator orchestrator = (PublicSnakeDraftOrchestrator) draftManager.getOrchestrator();
-            if (orchestrator != null) {
-                spec.setPlayerDraftOrder(orchestrator.getDraftOrder(draftManager));
-            }
-
-            MiltyService.startFromSpecs(event, spec);
-            game.setPhaseOfGame("miltydraft");
-
-            MiltyDraftManager miltyManager = game.getMiltyDraftManager();
-            if (miltyManager == null) {
-                MessageHelper.sendMessageToChannel(
-                        event.getChannel(), "Could not find Milty draft manager after starting Milty draft");
-                return;
-            }
-
-            // APPLY PICKS
-            if (orchestrator != null
-                    && factionDraftable != null
-                    && speakerOrderDraftable != null
-                    && sliceDraftable != null) {
-                List<String> playerOrder = orchestrator.getDraftOrder(draftManager);
-                int pickIndex = 0;
-                boolean done = false;
-                while (!done && pickIndex < 100) { // safety to avoid infinite loops
-                    for (String playerID : playerOrder) {
-                        PlayerDraftState state = draftManager.getPlayerStates().get(playerID);
-                        if (state == null) {
-                            continue;
-                        }
-
-                        List<DraftChoice> picks = state.getPicks().values().stream()
-                                .flatMap(List::stream)
-                                .collect(Collectors.toList());
-                        if (picks.size() <= pickIndex) {
-                            done = true;
-                            break;
-                        }
-
-                        DraftChoice pick = picks.get(pickIndex);
-                        if (pick.getType() == FactionDraftable.TYPE) {
-                            miltyManager.doMiltyPick(
-                                    event, game, "miltyForce_faction_" + pick.getChoiceKey(), game.getPlayer(playerID));
-                        } else if (pick.getType() == SpeakerOrderDraftable.TYPE) {
-                            miltyManager.doMiltyPick(
-                                    event,
-                                    game,
-                                    "miltyForce_order_" + pick.getChoiceKey().substring("pick".length()),
-                                    game.getPlayer(playerID));
-                        } else if (pick.getType() == SliceDraftable.TYPE) {
-                            miltyManager.doMiltyPick(
-                                    event, game, "miltyForce_slice_" + pick.getChoiceKey(), game.getPlayer(playerID));
-                        }
-                    }
-                    pickIndex++;
-                    Collections.reverse(playerOrder);
-                }
-            } else {
-                MessageHelper.sendMessageToChannel(
-                        event.getChannel(), "Could not apply picks to Milty settings, missing draft elements");
-            }
+            DraftSystemSettings settings = new DraftSystemSettings(game, null);
+            settings.setupNucleusPreset();
+            game.setDraftSystemSettings(settings);
+            settings.postMessageAndButtons(event);
         }
     }
 }
