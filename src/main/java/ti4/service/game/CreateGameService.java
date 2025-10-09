@@ -46,6 +46,7 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.async.ReserveGameNumberService;
 import ti4.service.image.FileUploadService;
+import ti4.service.option.TEOptionService;
 import ti4.settings.GlobalSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.jda.JdaService;
@@ -260,9 +261,21 @@ public class CreateGameService {
         MessageHelper.sendMessageToChannelWithButton(
                 actionsChannel, "Want to change Game options?\n-# `/game options`", offerOptions);
 
-        Button teOptions = Buttons.green("offerTEOptionButtons", "Thunder's Edge Settings");
-        MessageHelper.sendMessageToChannelWithButton(
-                actionsChannel, "Want to demo some of Thunder's Edge features?", teOptions);
+        boolean abbreviateTE = false;
+        for (Player player : game.getPlayers().values()) {
+            if (ButtonHelper.isPlayerNew(player.getUserID())
+                    || player.getUserID().equalsIgnoreCase("481860200169472030")) {
+                abbreviateTE = true;
+                break;
+            }
+        }
+        if (abbreviateTE) {
+            Button teOptions = Buttons.green("offerTEOptionButtons", "Thunder's Edge Settings");
+            MessageHelper.sendMessageToChannelWithButton(
+                    actionsChannel, "Want to demo some of Thunder's Edge features?", teOptions);
+        } else {
+            TEOptionService.offerTEOptionButtons(game, actionsChannel);
+        }
 
         HomebrewService.offerGameHomebrewButtons(actionsChannel);
         ButtonHelper.offerPlayerSetupButtons(actionsChannel, game);
