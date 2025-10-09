@@ -317,7 +317,11 @@ public class MiltyService {
 
         // BREAKTHROUGH
         if (game.isThundersEdge() && Mapper.getBreakthrough(factionModel.getAlias() + "bt") != null) {
-            player.setBreakthroughID(factionModel.getAlias() + "bt");
+            String breakthrough = factionModel.getAlias() + "bt";
+            if (breakthrough.contains("keleres")) {
+                breakthrough = "keleresbt";
+            }
+            player.setBreakthroughID(breakthrough);
             player.setBreakthroughUnlocked(false);
             player.setBreakthroughExhausted(false);
             player.setBreakthroughActive(false);
@@ -395,8 +399,11 @@ public class MiltyService {
 
         for (String tech : factionModel.getFactionTech()) {
             if (tech.trim().isEmpty()) continue;
-
+            if (tech.equalsIgnoreCase("iihq") && game.isThundersEdge()) {
+                tech = "executiveorder";
+            }
             TechnologyModel factionTech = techReplacements.getOrDefault(tech, Mapper.getTech(tech));
+
             player.addFactionTech(factionTech.getAlias());
         }
 
@@ -446,6 +453,10 @@ public class MiltyService {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, factionModel.getFactionSheetMessage());
         AbilityInfoService.sendAbilityInfo(player, event);
         TechInfoService.sendTechInfo(game, player, event);
+        if (game.isThundersEdge() && player.hasLeader("xxchahero")) {
+            player.removeLeader("xxchahero");
+            player.addLeader("xxchahero-te");
+        }
         LeaderInfoService.sendLeadersInfo(game, player, event);
         UnitInfoService.sendUnitInfo(game, player, event, false);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false, event);
@@ -653,6 +664,7 @@ public class MiltyService {
             player.removeOwnedPromissoryNoteByID(player.getColor() + "_sftt");
             player.removePromissoryNote(player.getColor() + "_sftt");
         }
+
         if (game.isRapidMobilizationMode()) {
             Tile tile2 = player.getHomeSystemTile();
             if (tile2 != null

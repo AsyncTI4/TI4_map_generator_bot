@@ -325,21 +325,22 @@ public class TeHelperTechs {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 
-    @ButtonHandler("useExecutiveOrder_top")
-    private static void executiveOrderTop(ButtonInteractionEvent event, Game game, Player player) {
+    @ButtonHandler("useExecutiveOrder_")
+    private static void executiveOrder(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         game.setStoredValue("executiveOrder", player.getFaction());
-        String msg = game.getPing() + " the top agenda has been revealed with Executive Order:";
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
-        AgendaHelper.revealAgenda(event, false, game, event.getChannel());
-        ButtonHelper.deleteMessage(event);
-    }
+        game.setPhaseOfGame("agenda");
+        boolean top = buttonID.contains("top");
 
-    @ButtonHandler("useExecutiveOrder_bottom")
-    private static void executiveOrderBottom(ButtonInteractionEvent event, Game game, Player player) {
-        game.setStoredValue("executiveOrder", player.getFaction());
-        String msg = game.getPing() + " the bottom agenda has been revealed with Executive Order:";
+        String msg =
+                game.getPing() + " the " + buttonID.split("_")[1] + " agenda has been revealed with Executive Order. ";
+
+        msg += player.getRepresentation()
+                + " has been temporarily made speaker to simulate the effect of the technology";
+        game.setStoredValue("oldSpeakerExecutiveOrder", game.getSpeakerUserID());
+        game.setSpeaker(player);
+
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
-        AgendaHelper.revealAgenda(event, true, game, event.getChannel());
+        AgendaHelper.revealAgenda(event, !top, game, event.getChannel());
         ButtonHelper.deleteMessage(event);
     }
 }
