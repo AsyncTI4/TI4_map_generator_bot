@@ -58,6 +58,7 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
@@ -808,7 +809,7 @@ public class ButtonHelper {
             player.clearExhaustedPlanets(false);
         }
         if (game.isThundersEdge()) {
-            player.setBreakthroughUnlocked(true);
+            BreakthroughCommandHelper.unlockBreakthrough(game, player);
         }
 
         List<Button> buttons2 = new ArrayList<>();

@@ -1776,10 +1776,25 @@ public class UnfiledButtonHandlers {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Successfully queued an objective to score (wont score it if you later become unable to score it).");
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.gray("reverse" + buttonID, "Unqueue it"));
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "You can use this to unqueue it and queue something else.", buttons);
         } else {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "The game is not currently in the action phase, and so no scoring was queued. Go score normally.");
+        }
+    }
+
+    @ButtonHandler("reversepreScoreObbie_")
+    public static void reversepreScoreObbie(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+        ButtonHelper.deleteMessage(event);
+        if (game.getPhaseOfGame().contains("action")) {
+            String poOrSO = buttonID.split("_")[1];
+            game.setStoredValue(player.getFaction() + "Round" + game.getRound() + "PreScored" + poOrSO, "");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Successfully unqueued an objective.");
+            StatusHelper.offerPreScoringButtons(game, player);
         }
     }
 

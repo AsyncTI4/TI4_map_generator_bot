@@ -1935,7 +1935,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public boolean hasIIHQ() {
-        return hasTech("iihq");
+        return hasTech("iihq") || hasUnlockedBreakthrough("keleresbt");
     }
 
     public boolean hasTech(String techID) {
@@ -2057,7 +2057,7 @@ public class Player extends PlayerProperties {
         doAdditionalThingsWhenAddingTech(techID);
     }
 
-    private void gainCustodiaVigilia() {
+    public void gainCustodiaVigilia() {
         addPlanet("custodiavigilia");
         exhaustPlanet("custodiavigilia");
 

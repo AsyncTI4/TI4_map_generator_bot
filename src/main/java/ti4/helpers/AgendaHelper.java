@@ -2832,6 +2832,11 @@ public class AgendaHelper {
             voteAmount = 1;
         }
 
+        boolean executive = player.getFaction().equals(game.getStoredValue("executiveOrder"));
+        if (player.hasUnlockedBreakthrough("xxchabt") || executive) {
+            voteAmount = Math.max(p.getResources(), p.getInfluence());
+        }
+
         if (voteInfo[1] != 0) {
             voteAmount += p.getResources();
         }
