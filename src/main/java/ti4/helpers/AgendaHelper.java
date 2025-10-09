@@ -1400,8 +1400,10 @@ public class AgendaHelper {
                     existingData += ";" + identifier + "_" + votes;
                 }
                 game.setCurrentAgendaVote(winner, existingData);
-                MessageHelper.sendMessageToChannel(
+                if ( !game.isHiddenAgendaMode() ) {
+                    MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(), Helper.buildSpentThingsMessageForVoting(player, game, false));
+                }
             }
 
             String message = " up to vote! Please use the buttons to choose the outcome you wish to vote for.";
@@ -1447,7 +1449,9 @@ public class AgendaHelper {
                     }
                     ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
                     CryypterHelper.checkForMentakEnvoy(nextInLine, game);
-                    MessageHelper.sendMessageToChannel(nextInLine.getCorrectChannel(), skippedMessage);
+                    if ( !game.isHiddenAgendaMode() ) {
+                        MessageHelper.sendMessageToChannel(nextInLine.getCorrectChannel(), skippedMessage);
+                    }
                     resolvingAnAgendaVote("resolveAgendaVote_" + votes, event, game, nextInLine);
                     return;
                 }
