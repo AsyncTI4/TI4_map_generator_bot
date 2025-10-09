@@ -104,8 +104,6 @@ public class BlindSelectionService {
         Button actionButton = null;
         String msg = "### 👎 " + target + " was not valid for this action.";
         String validTargets = game.getStoredValue(VALIDATION_KEY);
-        System.out.println("Valid targets: " + validTargets);
-        System.out.println("Chosen target: " + target);
         if (validTargets != null && validTargets.contains(VALID_SEPARATOR + target + VALID_SEPARATOR)) {
             msg = "### 👍 " + target + " is valid for this action.";
             actionButton = Buttons.green(

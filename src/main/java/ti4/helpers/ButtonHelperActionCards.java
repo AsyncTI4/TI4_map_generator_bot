@@ -2545,6 +2545,7 @@ public class ButtonHelperActionCards {
                 }
             }
         }
+        BlindSelectionService.filterForBlindPositionSelection(game, player, buttons, "ghostShipStep2");
         return buttons;
     }
 
