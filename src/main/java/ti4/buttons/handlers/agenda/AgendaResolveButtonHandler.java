@@ -66,6 +66,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
+import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
@@ -144,6 +145,7 @@ class AgendaResolveButtonHandler {
         if (handler != null) {
             handler.handle(game, event, aID, winner);
         }
+        RiftSetModeService.resolveRiftSetCrucible(agID, game.getPlayerFromColorOrFaction(winner), game);
 
         // Post-resolution
         if (game.getCurrentAgendaInfo().contains("Secret")) {
@@ -378,6 +380,7 @@ class AgendaResolveButtonHandler {
     private static List<Button> buildNextButtons(Game game, int aCount) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.blue("flip_agenda", "Flip Agenda #" + aCount));
+        RiftSetModeService.includeCrucibleAgendaButton(buttons, game);
 
         if (!game.isOmegaPhaseMode()) {
             buttons.add(Buttons.green(
