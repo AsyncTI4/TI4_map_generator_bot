@@ -1,6 +1,7 @@
 package ti4.commands.draft;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -780,6 +781,20 @@ public class DraftManagerSubcommands extends SubcommandGroup {
         @Override
         public void execute(SlashCommandInteractionEvent event) {
             Game game = getGame();
+            Collection<Player> players = game.getPlayers().values();
+            if (players.size() < 3) {
+                String msg = "Need at least 3 players in the game to setup a Nucleus draft, only found "
+                        + String.join(
+                                ", ",
+                                players.stream().map(Player::getRepresentation).toArray(String[]::new)) + ".";
+                MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+                return;
+            }
+            if (players.size() > 8) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        "Nucleus templates only go up to 8 players; you'll need to remove some people from the draft and then select a template.");
+            }
             DraftSystemSettings settings = new DraftSystemSettings(game, null);
             settings.setupNucleusPreset();
             game.setDraftSystemSettings(settings);
