@@ -58,6 +58,7 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
@@ -808,7 +809,7 @@ public class ButtonHelper {
             player.clearExhaustedPlanets(false);
         }
         if (game.isThundersEdge()) {
-            player.setBreakthroughUnlocked(true);
+            BreakthroughCommandHelper.unlockBreakthrough(game, player);
         }
 
         List<Button> buttons2 = new ArrayList<>();
@@ -2683,7 +2684,7 @@ public class ButtonHelper {
 
     public static List<Player> getPlayersWithShipsInTheSystem(Game game, Tile tile) {
         List<Player> playersWithShips = new ArrayList<>();
-        for (Player player : game.getRealPlayersNNeutral()) {
+        for (Player player : game.getRealPlayersNDummies()) {
             if (FoWHelper.playerHasShipsInSystem(player, tile)) {
                 playersWithShips.add(player);
             }
@@ -2704,7 +2705,7 @@ public class ButtonHelper {
 
     public static List<Player> getPlayersWithUnitsInTheSystem(Game game, Tile tile) {
         List<Player> playersWithShips = new ArrayList<>();
-        for (Player player : game.getRealPlayersNNeutral()) {
+        for (Player player : game.getRealPlayersNDummies()) {
             if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 playersWithShips.add(player);
             }

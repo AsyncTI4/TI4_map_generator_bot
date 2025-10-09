@@ -55,7 +55,7 @@ public class AddPlanetService {
             Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setup) {
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
         player.addPlanet(planet);
-
+        EronousPlanetService.resolveCantrisPO(game, planet, player);
         player.exhaustPlanet(planet);
         if ("mirage".equals(planet) || "avernus".equals(planet) || "thundersedge".equals(planet)) {
             game.clearPlanetsCache();
@@ -64,6 +64,9 @@ public class AddPlanetService {
         Planet unitHolder = game.getPlanetsInfo().get(planet);
         if (game.getRevealedPublicObjectives().size() < 2 || unitHolder.isSpaceStation()) {
             setup = true;
+        }
+        if (planet.equalsIgnoreCase("avernus")) {
+            setup = false;
         }
         if (unitHolder == null) {
             BotLogger.error(new LogOrigin(event), "Unitholder found null in addPlanet for planet " + planet);

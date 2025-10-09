@@ -74,6 +74,7 @@ import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.GMService;
 import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.EndTurnService;
@@ -1171,7 +1172,7 @@ public class Player extends PlayerProperties {
             bonus += 2;
         }
         for (String planet : getPlanets()) {
-            if (Mapper.getPlanet(planet).isSpaceStation()) {
+            if (Mapper.getPlanet(planet) != null && Mapper.getPlanet(planet).isSpaceStation()) {
                 bonus++;
             }
         }
@@ -1934,7 +1935,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public boolean hasIIHQ() {
-        return hasTech("iihq");
+        return hasTech("iihq") || hasUnlockedBreakthrough("keleresbt");
     }
 
     public boolean hasTech(String techID) {
@@ -2056,7 +2057,7 @@ public class Player extends PlayerProperties {
         doAdditionalThingsWhenAddingTech(techID);
     }
 
-    private void gainCustodiaVigilia() {
+    public void gainCustodiaVigilia() {
         addPlanet("custodiavigilia");
         exhaustPlanet("custodiavigilia");
 
@@ -2562,8 +2563,7 @@ public class Player extends PlayerProperties {
     }
 
     /**
-     * @return Player's private channel if Fog of War game, otherwise the main
-     *         (action) game channel
+     * @return Player's private channel if Fog of War game, otherwise the GM channel
      */
     @JsonIgnore
     public MessageChannel getCorrectChannel() {
@@ -2571,7 +2571,7 @@ public class Player extends PlayerProperties {
             if (getPrivateChannel() != null) {
                 return getPrivateChannel();
             } else {
-                return game.getMainGameChannel();
+                return GMService.getGMChannel(game);
             }
         }
         return game.getMainGameChannel();

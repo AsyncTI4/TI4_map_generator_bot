@@ -856,7 +856,7 @@ public class MapGenerator implements AutoCloseable {
     private void drawExpeditionTracker(int x, int y) {
         Expeditions exp = game.getExpeditions();
         boolean thundersEdgeOnBoard = game.getTileFromPlanet("thundersedge") != null;
-        if (exp.getRemainingExpeditionCount() == 6 || thundersEdgeOnBoard) return;
+        if (!game.isThundersEdge() || exp.getRemainingExpeditionCount() == 0 || thundersEdgeOnBoard) return;
 
         drawGeneralImage(x, y, "Expeditions.png");
         if (exp.getTradeGoods() != null) {

@@ -34,6 +34,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.BlindSelectionService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
@@ -2544,6 +2545,7 @@ public class ButtonHelperActionCards {
                 }
             }
         }
+        BlindSelectionService.filterForBlindPositionSelection(game, player, buttons, "ghostShipStep2");
         return buttons;
     }
 
@@ -2589,6 +2591,7 @@ public class ButtonHelperActionCards {
                 }
             }
         }
+        BlindSelectionService.filterForBlindPositionSelection(game, player, buttons, "probeStep2");
         return buttons;
     }
 

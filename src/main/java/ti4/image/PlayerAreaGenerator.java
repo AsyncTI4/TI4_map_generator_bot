@@ -707,7 +707,7 @@ class PlayerAreaGenerator {
         if (player.getDishonorCounter() > 0) {
             DrawingUtil.superDrawStringCenteredDefault(
                     graphics,
-                    "Dishonor Count: " + player.getHonorCounter(),
+                    "Dishonor Count: " + player.getDishonorCounter(),
                     mapWidth - xDeltaFromRightSide - 300,
                     yDelta + 100);
         }
@@ -1262,7 +1262,7 @@ class PlayerAreaGenerator {
                     isFoWPrivate && debtPlayer != null && !FoWHelper.canSeeStatsOfPlayer(game, debtPlayer, frogPlayer);
 
             int tokenDeltaX = 0;
-            String controlID = hideFactionIcon ? Mapper.getControlID("gray") : Mapper.getControlID(debtToken.getKey());
+            String controlID = Mapper.getControlID(debtToken.getKey());
             if (controlID.contains("null")) {
                 continue;
             }

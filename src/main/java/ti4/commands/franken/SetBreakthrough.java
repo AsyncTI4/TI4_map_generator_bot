@@ -26,6 +26,9 @@ class SetBreakthrough extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
         String breakthrough = event.getOption(Constants.FACTION, null, OptionMapping::getAsString) + "bt";
+        if (breakthrough.contains("keleres")) {
+            breakthrough = "keleresbt";
+        }
         player.setBreakthroughID(breakthrough);
         MessageHelper.sendMessageToEventChannel(
                 event,

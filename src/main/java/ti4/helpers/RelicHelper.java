@@ -214,7 +214,7 @@ public class RelicHelper {
                         name = poID;
                     }
                 }
-                String msg = player.getRepresentation()
+                String msg = player.getRepresentationUnfogged()
                         + " you have the opportunity to use the _Neuraloop_ relic to replace the objective " + name
                         + " with a random objective from __any__ of the objective decks. Doing so will cause you to purge one of your relics."
                         + " Use buttons to decide which objective deck, if any, you wish to draw the new objective from..";
