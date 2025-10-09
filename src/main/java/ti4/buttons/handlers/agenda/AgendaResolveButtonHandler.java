@@ -68,6 +68,7 @@ import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.turn.StartTurnService;
 
 @UtilityClass
 class AgendaResolveButtonHandler {
@@ -441,6 +442,18 @@ class AgendaResolveButtonHandler {
     private static void sendNextStepUi(
             Game game, ButtonInteractionEvent event, String resMes, String voteMessage, List<Button> buttons) {
         MessageHelper.sendMessageToChannel(event.getChannel(), resMes);
+        Player executiveOrderPlayer = game.getPlayerFromColorOrFaction(game.getStoredValue("executiveOrder"));
+        if (executiveOrderPlayer != null) {
+            voteMessage = executiveOrderPlayer.getRepresentation()
+                    + " use the buttons to proceed after fully resolving the agenda:";
+            buttons = StartTurnService.getStartOfTurnButtons(executiveOrderPlayer, game, true, event);
+            game.removeStoredValue("executiveOrder");
+            game.updateActivePlayer(executiveOrderPlayer);
+            Player oldSpeaker = game.getPlayer(game.getStoredValue("oldSpeakerExecutiveOrder"));
+            game.setSpeaker(oldSpeaker);
+            game.setPhaseOfGame("action");
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, buttons);
+        }
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, buttons);
         }

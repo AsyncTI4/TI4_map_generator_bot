@@ -70,6 +70,7 @@ public class BreakthroughCommandHelper {
                 BreakthroughHelper.resolveYinBreakthroughAbility(player.getGame(), player);
             }
             if (bt.getAlias().equals("muaatbt")) StellarGenesisService.serveAvernusButtons(game, player);
+            if (bt.getAlias().equals("keleresbt")) player.gainCustodiaVigilia();
         });
     }
 

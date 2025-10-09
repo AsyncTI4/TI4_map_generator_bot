@@ -121,7 +121,7 @@ class Replace extends GameStateSubcommand {
             game.setSpeakerUserID(replacementUser.getId());
         }
         if (oldPlayerUserId.equals(game.getActivePlayerID())) {
-            // do not update stats for this action
+            game.setTemporaryPingDisable(true);
             game.setActivePlayerID(replacementUser.getId());
         }
         Map<String, Player> playersById = game.getPlayers();
