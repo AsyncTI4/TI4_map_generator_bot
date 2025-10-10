@@ -29,6 +29,7 @@ import ti4.helpers.PatternHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
+import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -63,6 +64,12 @@ public class PlayerTechService {
                 + Mapper.getTech(techID).getRepresentation(false) + ".";
         if ("iihq".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             message += "\nAutomatically added the Custodia Vigilia planet.";
+        }
+        if ("cr2".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
+            if (player.hasUnlockedBreakthrough("mentakbt")) {
+                player.addOwnedUnitByID("mentak_cruiser3");
+                message += "\nAutomatically added Mentak's cruiser 3.";
+            }
         }
         CommanderUnlockCheckService.checkPlayer(player, "mirveda", "jolnar", "nekro", "dihmohn");
         MessageHelper.sendMessageToEventChannel(event, message);
@@ -324,7 +331,8 @@ public class PlayerTechService {
                         "Purging a frag or spending a CC (and exhausting tech) is not automated at this time");
                 ButtonHelperAgents.moveShipToAdjacentSystemStep1(game, player, null);
             }
-            case "nekroc4r" -> {
+            case "executiveorder" -> TeHelperTechs.postExecutiveOrderButtons(event, game, player);
+            case "nekroc4r", "nanomachines" -> {
                 List<Button> buttons = ButtonHelperFactionSpecific.getc4RedTechButtons(player);
                 String message = player.getRepresentation() + ", please choose one of the options for this technology:";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);

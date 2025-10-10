@@ -89,6 +89,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
+import ti4.service.fow.LoreService;
 import ti4.service.game.EndGameService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.game.SwapFactionService;
@@ -97,7 +98,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.objectives.ScorePublicObjectiveService;
-import ti4.service.option.GameOptionService;
+import ti4.service.option.TEOptionService;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 import ti4.service.player.RefreshCardsService;
 import ti4.service.strategycard.PlayStrategyCardService;
@@ -168,7 +169,7 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler("enableDaneMode_")
-    public static void enableDaneMode(ButtonInteractionEvent event, String buttonID, Game game) {
+    public static void enableGalacticEvent(ButtonInteractionEvent event, String buttonID, Game game) {
         String mode = buttonID.split("_")[1];
         boolean enable = "enable".equalsIgnoreCase(buttonID.split("_")[2]);
         String message = "Successfully " + buttonID.split("_")[2] + "d the ";
@@ -299,7 +300,7 @@ public class UnfiledButtonHandlers {
             message += "Stellar Atomics Mode. Nothing more needs to be done.";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
-        List<Button> buttons = GameOptionService.getDaneLeakModeButtons(game);
+        List<Button> buttons = TEOptionService.getGalacticEventButtons(game);
         event.getMessage()
                 .editMessage(event.getMessage().getContentRaw())
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
@@ -1776,10 +1777,25 @@ public class UnfiledButtonHandlers {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Successfully queued an objective to score (wont score it if you later become unable to score it).");
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.gray("reverse" + buttonID, "Unqueue it"));
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "You can use this to unqueue it and queue something else.", buttons);
         } else {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "The game is not currently in the action phase, and so no scoring was queued. Go score normally.");
+        }
+    }
+
+    @ButtonHandler("reversepreScoreObbie_")
+    public static void reversepreScoreObbie(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+        ButtonHelper.deleteMessage(event);
+        if (game.getPhaseOfGame().contains("action")) {
+            String poOrSO = buttonID.split("_")[1];
+            game.setStoredValue(player.getFaction() + "Round" + game.getRound() + "PreScored" + poOrSO, "");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Successfully unqueued an objective.");
+            StatusHelper.offerPreScoringButtons(game, player);
         }
     }
 
@@ -2239,6 +2255,9 @@ public class UnfiledButtonHandlers {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), warfareDone, redistro);
                 }
 
+                if (game.isFowMode()) {
+                    LoreService.showSystemLore(player, game, game.getActiveSystem());
+                }
                 ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
                 game.removeStoredValue("producedUnitCostFor" + player.getFaction());
 

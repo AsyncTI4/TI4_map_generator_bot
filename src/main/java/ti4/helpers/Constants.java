@@ -34,6 +34,9 @@ public class Constants {
         return "<@" + bltId + ">";
     }
 
+    // Standard Thread Names
+    public static final String NEW_PLAYER_THREAD_NAME = "Info for Players new to AsyncTI4";
+
     // Other People IDs
     public static final String cagesId = "203608548440014848";
     public static final String bortId = "154000388121559040";
@@ -618,6 +621,7 @@ public class Constants {
     public static final String SO_NO_SCORING = "so_no_scoring";
     public static final String PLAYER_FACTION = "player_or_faction";
     public static final String FACTION_COLOR = "faction_or_color";
+    public static final String EXPEDITION = "expedition";
     public static final String TARGET_FACTION_OR_COLOR = "target_faction_or_color";
     public static final String TARGET_PLAYER = "target_player";
     public static final String TECH_TYPE = "tech_type";

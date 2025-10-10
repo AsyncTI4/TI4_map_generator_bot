@@ -707,7 +707,7 @@ class PlayerAreaGenerator {
         if (player.getDishonorCounter() > 0) {
             DrawingUtil.superDrawStringCenteredDefault(
                     graphics,
-                    "Dishonor Count: " + player.getHonorCounter(),
+                    "Dishonor Count: " + player.getDishonorCounter(),
                     mapWidth - xDeltaFromRightSide - 300,
                     yDelta + 100);
         }
@@ -1262,7 +1262,7 @@ class PlayerAreaGenerator {
                     isFoWPrivate && debtPlayer != null && !FoWHelper.canSeeStatsOfPlayer(game, debtPlayer, frogPlayer);
 
             int tokenDeltaX = 0;
-            String controlID = hideFactionIcon ? Mapper.getControlID("gray") : Mapper.getControlID(debtToken.getKey());
+            String controlID = Mapper.getControlID(debtToken.getKey());
             if (controlID.contains("null")) {
                 continue;
             }
@@ -2003,9 +2003,17 @@ class PlayerAreaGenerator {
                 deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
             }
         }
+
         if (!fakePlanets.isEmpty()) {
             deltaX += 30;
             for (String planet : fakePlanets) {
+                deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
+            }
+        }
+        List<String> coexistingPlanets = game.getPlanetsPlayerIsCoexistingOn(player);
+        if (!coexistingPlanets.isEmpty()) {
+            deltaX += 30;
+            for (String planet : coexistingPlanets) {
                 deltaX = drawPlanetInfo(player, planet, x, y, deltaX);
             }
         }
@@ -2031,8 +2039,19 @@ class PlayerAreaGenerator {
             planet.updateTriadStats(player);
             PlanetModel planetModel = planet.getPlanetModel();
             if (planetModel == null) return deltaX;
-
+            boolean coexist = false;
+            String coexistFaction = "";
             boolean isExhausted = exhaustedPlanets.contains(planetName);
+            for (Player p2 : player.getGame().getRealPlayers()) {
+                if (p2 != player && p2.getPlanets().contains(planetName)) {
+                    isExhausted = true;
+                    coexistFaction = p2.getFaction();
+                    coexist = true;
+                    if (coexistFaction.contains("keleres")) {
+                        coexistFaction = "keleres";
+                    }
+                }
+            }
             graphics.setColor(isExhausted ? Color.GRAY : Color.WHITE);
 
             String statusOfPlanet = isExhausted ? "_exh" : "_rdy";
@@ -2075,6 +2094,9 @@ class PlayerAreaGenerator {
                 } else {
                     String planetTypeName = "pc_attribute_" + planetDisplayIcon + ".png";
                     drawPlanetCardDetail(x + deltaX + 1, y + 2, planetTypeName);
+                    if (coexist && Mapper.isValidFaction(coexistFaction)) {
+                        drawFactionIconImage(graphics, coexistFaction, x + deltaX - 2 + 20, y - 2 + 40, 30, 30);
+                    }
                 }
             }
 

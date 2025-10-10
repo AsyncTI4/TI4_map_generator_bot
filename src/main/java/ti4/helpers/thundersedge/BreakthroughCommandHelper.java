@@ -69,7 +69,13 @@ public class BreakthroughCommandHelper {
             if ("yinbt".equalsIgnoreCase(bt.getID())) {
                 BreakthroughHelper.resolveYinBreakthroughAbility(player.getGame(), player);
             }
+            if ("mentakbt".equalsIgnoreCase(bt.getID())) {
+                if (player.hasTech("cr2")) {
+                    player.addOwnedUnitByID("mentak_cruiser3");
+                }
+            }
             if (bt.getAlias().equals("muaatbt")) StellarGenesisService.serveAvernusButtons(game, player);
+            if (bt.getAlias().equals("keleresbt")) player.gainCustodiaVigilia();
         });
     }
 

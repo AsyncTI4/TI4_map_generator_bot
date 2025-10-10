@@ -23,6 +23,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.fow.RiftSetModeService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
@@ -226,6 +227,8 @@ public class RiftUnitsHelper {
                     && cabal != player
                     && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, game, cabal)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, 1, unit, event);
+            } else if (RiftSetModeService.isActive(game)) {
+                msg = RiftSetModeService.riftSetCabalEatsUnit(msg, player, game, unit, event);
             }
         }
 
@@ -233,7 +236,7 @@ public class RiftUnitsHelper {
     }
 
     public static String getWormholeUnit(String unit, boolean over5roll, Player player, Game game) {
-        List<String> wormholeUnits = new ArrayList();
+        List<String> wormholeUnits = new ArrayList<String>();
 
         wormholeUnits.addAll(List.of("ff", "dd", "ca", "dn", "cv", "fs", "ws"));
         if (!over5roll) {
