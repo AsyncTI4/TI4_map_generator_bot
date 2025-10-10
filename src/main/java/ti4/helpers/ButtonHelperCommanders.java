@@ -905,10 +905,8 @@ public class ButtonHelperCommanders {
             Game game, Player player, GenericInteractionCreateEvent event) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         List<Button> buttons = new ArrayList<>();
-        for (UnitHolder planetUnit : tile.getUnitHolders().values()) {
-            if ("space".equalsIgnoreCase(planetUnit.getName())) {
-                continue;
-            }
+        for (UnitHolder planetUnit : tile.getPlanetUnitHolders()) {
+
             Planet planetReal = (Planet) planetUnit;
             String planetId = planetReal.getName();
             String planetName = Helper.getPlanetName(planetId);
@@ -920,10 +918,7 @@ public class ButtonHelperCommanders {
                         && tile2 != tile) {
                     continue;
                 }
-                for (UnitHolder planetUnit2 : tile2.getUnitHolders().values()) {
-                    if ("space".equalsIgnoreCase(planetUnit2.getName())) {
-                        continue;
-                    }
+                for (UnitHolder planetUnit2 : tile2.getPlanetUnitHolders()) {
                     Planet planetReal2 = (Planet) planetUnit2;
                     int numMechs = 0;
                     int numInf = 0;
