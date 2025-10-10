@@ -243,7 +243,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
                     List.of(),
                     List.of(),
                     List.of(getReprintDraftButton()));
-                    
+
             Player activePlayer = draftManager.getGame().getPlayer(getCurrentPlayer(playerOrder));
             draftManager.getGame().updateActivePlayer(activePlayer);
         }
