@@ -142,7 +142,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     public void sendDraftButtons(DraftManager draftManager) {
         List<String> playerOrder = getDraftOrder(draftManager);
         String currentPlayerUserId = getCurrentPlayer(playerOrder);
-        draftManager.getGame().setActivePlayerID(currentPlayerUserId);
+        Player activePlayer = draftManager.getGame().getPlayer(currentPlayerUserId);
+        draftManager.getGame().updateActivePlayer(activePlayer);
         PublicDraftInfoService.send(
                 draftManager,
                 playerOrder,
@@ -242,7 +243,9 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
                     List.of(),
                     List.of(),
                     List.of(getReprintDraftButton()));
-            draftManager.getGame().setActivePlayerID(getCurrentPlayer(playerOrder));
+                    
+            Player activePlayer = draftManager.getGame().getPlayer(getCurrentPlayer(playerOrder));
+            draftManager.getGame().updateActivePlayer(activePlayer);
         }
 
         // Delete buttons when they're picked.
