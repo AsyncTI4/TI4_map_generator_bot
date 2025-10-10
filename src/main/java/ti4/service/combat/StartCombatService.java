@@ -749,7 +749,8 @@ public class StartCombatService {
             }
 
             if ((player.hasAbility("edict") || player.hasAbility("imperia"))
-                    && !player.getMahactCC().contains(otherPlayer.getColor())) {
+                    && !player.getMahactCC().contains(otherPlayer.getColor())
+                    && !otherPlayer.getFaction().equalsIgnoreCase("neutral")) {
                 buttons = new ArrayList<>();
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons.add(Buttons.gray(

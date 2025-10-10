@@ -65,6 +65,12 @@ public class PlayerTechService {
         if ("iihq".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             message += "\nAutomatically added the Custodia Vigilia planet.";
         }
+        if ("cr2".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
+            if (player.hasUnlockedBreakthrough("mentakbt")) {
+                player.addOwnedUnitByID("mentak_cruiser3");
+                message += "\nAutomatically added Mentak's cruiser 3.";
+            }
+        }
         CommanderUnlockCheckService.checkPlayer(player, "mirveda", "jolnar", "nekro", "dihmohn");
         MessageHelper.sendMessageToEventChannel(event, message);
     }

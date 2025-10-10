@@ -210,6 +210,9 @@ public class Player extends PlayerProperties {
         if (hasActiveBreakthrough("naazbt")) {
             activeUnits.removeIf(unit -> "mf".equals(getUnitByID(unit).getAsyncId()));
             activeUnits.add("naaz_voltron");
+            if (!getUnitsOwned().contains("naaz_voltron")) {
+                addOwnedUnitByID("naaz_voltron");
+            }
         }
         if (hasUnlockedBreakthrough("mentakbt")) {
             for (String tech : getTechs()) {
@@ -219,6 +222,9 @@ public class Player extends PlayerProperties {
                         || "cr2".equals(model.getHomebrewReplacesID().orElse(""))) {
                     activeUnits.removeIf(unit -> "ca".equals(getUnitByID(unit).getAsyncId()));
                     activeUnits.add("mentak_cruiser3");
+                    if (!getUnitsOwned().contains("mentak_cruiser3")) {
+                        addOwnedUnitByID("mentak_cruiser3");
+                    }
                     break;
                 }
             }

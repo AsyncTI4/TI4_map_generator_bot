@@ -1265,6 +1265,11 @@ public class Game extends GameProperties {
         displacedUnitsFrom1System.put(unit, count);
     }
 
+    @Override
+    public boolean isHomebrewSCMode() {
+        return !"pok".equals(getScSetID()) && !"base_game".equals(getScSetID()) && !"te".equals(getScSetID());
+    }
+
     public void setSpecificThalnosUnit(String unit, int count) {
         thalnosUnits.put(unit, count);
     }
@@ -1325,6 +1330,9 @@ public class Game extends GameProperties {
         String prevFaction =
                 (prevPlayer != null && prevPlayer.getFaction() != null) ? prevPlayer.getFaction() : "jazzwuzhere&p1too";
         long elapsedTime = newTime.getTime() - lastActivePlayerChange.getTime();
+        if (lastActivePlayerChange.getTime() < 1000000) {
+            elapsedTime = 60000; // if for some reason the last Active player change was never set, ignore the time
+        }
         if (prevPlayer != null) {
             if (!factionsInCombat.contains(prevFaction) && !isTemporaryPingDisable()) {
                 prevPlayer.updateTurnStats(elapsedTime);
@@ -4451,6 +4459,41 @@ public class Game extends GameProperties {
         return null;
     }
 
+    public List<String> getPlanetsPlayerIsCoexistingOn(Player player) {
+        List<String> coexistPlanets = new ArrayList<>();
+
+        for (Player p2 : getRealPlayers()) {
+            if (p2.getFaction().equalsIgnoreCase(player.getFaction())
+                    || player.getAllianceMembers().contains(p2.getFaction())) {
+                continue;
+            }
+            for (String planet : p2.getPlanets()) {
+                UnitHolder uH = getUnitHolderFromPlanet(planet);
+                if (uH != null && FoWHelper.playerHasUnitsOnPlanet(player, uH)) {
+                    coexistPlanets.add(planet);
+                }
+            }
+        }
+        return coexistPlanets;
+    }
+
+    public List<String> getPlayersPlanetsThatOthersAreCoexistingOn(Player player) {
+        List<String> coexistPlanets = new ArrayList<>();
+
+        for (Player p2 : getRealPlayers()) {
+            if (p2.getFaction().equalsIgnoreCase(player.getFaction())) {
+                continue;
+            }
+            for (String planet : player.getPlanets()) {
+                UnitHolder uH = getUnitHolderFromPlanet(planet);
+                if (uH != null && FoWHelper.playerHasUnitsOnPlanet(p2, uH) && !coexistPlanets.contains(planet)) {
+                    coexistPlanets.add(planet);
+                }
+            }
+        }
+        return coexistPlanets;
+    }
+
     @Nullable
     public Planet getUnitHolderFromPlanet(String planetName) {
         Tile tile_ = getTileFromPlanet(planetName);
@@ -4458,6 +4501,11 @@ public class Game extends GameProperties {
             return null;
         }
         return tile_.getUnitHolderFromPlanet(planetName);
+    }
+
+    public boolean isPlanetSpaceStation(String planet) {
+        return getUnitHolderFromPlanet(planet) != null
+                && getUnitHolderFromPlanet(planet).isSpaceStation();
     }
 
     @Nullable
@@ -4765,7 +4813,7 @@ public class Game extends GameProperties {
 
     public void setStrategyCardSet(String scSetID) {
         StrategyCardSetModel strategyCardModel = Mapper.getStrategyCardSets().get(scSetID);
-        setHomebrewSCMode(!"pok".equals(scSetID) && !"base_game".equals(scSetID));
+        setHomebrewSCMode(!"pok".equals(scSetID) && !"base_game".equals(scSetID) && !"te".equals(scSetID));
 
         Map<Integer, Integer> oldTGs = getScTradeGoods();
         setScTradeGoods(new LinkedHashMap<>());
