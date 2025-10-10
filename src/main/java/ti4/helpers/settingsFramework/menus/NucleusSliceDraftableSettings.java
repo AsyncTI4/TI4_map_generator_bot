@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -40,14 +39,6 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
 
     private boolean showAdvanced = false;
 
-    private static final Map<Integer, Integer> SEAT_COUNT_TO_MINIMUM_RED_TILES = Map.of(
-            3, 6,
-            4, 7,
-            5, 9,
-            6, 11,
-            7, 13,
-            8, 15);
-
     private static final String MENU_ID = "nucleusSlice";
 
     public NucleusSliceDraftableSettings(Game game, JsonNode json, SettingsMenu parent) {
@@ -77,8 +68,8 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         slicePlanetCount = new IntegerRangeSetting("SlicePlanets", "Slice Planet Count", 2, 0, 7, 5, 0, 7, 1);
         nucleusValue = new IntegerRangeSetting("NucleusVal", "Nucleus Optimal Value", 4, 0, 8, 8, 3, 12, 1);
         maxNucleusQualityDifference = new IntegerSetting("MaxNucDiff", "Max Nucleus Quality Diff", 3, 0, 10, 1);
-        minimumRedTiles = new IntegerSetting(
-                "MinRed", "Minimum Red Tiles", SEAT_COUNT_TO_MINIMUM_RED_TILES.get(players), 0, 20, 1);
+        int minRedTiles = Math.min(20, Math.max(Math.round((11.0f / 6.0f) * players), 0));
+        minimumRedTiles = new IntegerSetting("MinRed", "Minimum Red Tiles", minRedTiles, 0, 20, 1);
 
         // Add extra info
         minimumSliceRes.setExtraInfo(
@@ -193,7 +184,8 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         nucleusLegendaries.setValHigh(suggestLegendariesMax);
         totalLegendaries.setValLow(1);
         totalLegendaries.setValHigh(suggestLegendariesMax);
-        minimumRedTiles.setVal(SEAT_COUNT_TO_MINIMUM_RED_TILES.get(players));
+        int minRedTiles = Math.min(20, Math.max(Math.round((11.0f / 6.0f) * players), 0));
+        minimumRedTiles.setVal(minRedTiles);
         minimumSliceRes.setVal(0);
         minimumSliceInf.setVal(0);
         int bpp = mapTemplateModel.bluePerPlayer();
