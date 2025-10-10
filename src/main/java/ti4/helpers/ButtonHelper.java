@@ -1259,7 +1259,8 @@ public class ButtonHelper {
         resolveTACheck(game, player);
         for (String law : game.getLaws().keySet()) {
             if ("minister_commrece".equalsIgnoreCase(law) || "absol_minscomm".equalsIgnoreCase(law)) {
-                if (game.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())) {
+                if (game.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())
+                        || game.getLawsInfo().get(law).equalsIgnoreCase(player.getColor())) {
                     MessageChannel channel = event.getMessageChannel();
                     if (game.isFowMode()) {
                         channel = player.getPrivateChannel();
@@ -3822,10 +3823,7 @@ public class ButtonHelper {
         List<String> planets = new ArrayList<>();
         for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)) {
             Tile tile2 = game.getTileByPosition(pos2);
-            for (UnitHolder planetUnit2 : tile2.getUnitHolders().values()) {
-                if ("space".equalsIgnoreCase(planetUnit2.getName())) {
-                    continue;
-                }
+            for (UnitHolder planetUnit2 : tile2.getPlanetUnitHolders()) {
                 Planet planetReal2 = (Planet) planetUnit2;
                 String planet2 = planetReal2.getName();
                 if (!player.getPlanetsAllianceMode().contains(planet2)) {
@@ -4690,10 +4688,7 @@ public class ButtonHelper {
             String msg = player.getRepresentation()
                     + ", you may use your **Secret Maps** ability to explore a planet with a PRODUCTION unit that you did not explore this turn.";
             List<Button> buttons = new ArrayList<>();
-            for (UnitHolder planetUnit : tile.getUnitHolders().values()) {
-                if ("space".equalsIgnoreCase(planetUnit.getName())) {
-                    continue;
-                }
+            for (UnitHolder planetUnit : tile.getPlanetUnitHolders()) {
                 Planet planetReal = (Planet) planetUnit;
                 String planet = planetReal.getName();
                 if (isNotBlank(planetReal.getOriginalPlanetType())
@@ -5016,10 +5011,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         if (tile == null) return buttons;
 
-        for (UnitHolder planetUnit : tile.getUnitHolders().values()) {
-            if ("space".equalsIgnoreCase(planetUnit.getName())) {
-                continue;
-            }
+        for (UnitHolder planetUnit : tile.getPlanetUnitHolders()) {
             Planet planetReal = (Planet) planetUnit;
             String planet = planetReal.getName();
             if (player.getPlanetsAllianceMode().contains(planet)
@@ -5052,10 +5044,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         if (tile == null) return buttons;
 
-        for (UnitHolder planetUnit : tile.getUnitHolders().values()) {
-            if ("space".equalsIgnoreCase(planetUnit.getName())) {
-                continue;
-            }
+        for (UnitHolder planetUnit : tile.getPlanetUnitHolders()) {
             Planet planetReal = (Planet) planetUnit;
             String planet = planetReal.getName();
             if (isNotBlank(planetReal.getOriginalPlanetType())
@@ -7155,9 +7144,6 @@ public class ButtonHelper {
     public static void resolveTwilightMirror(Game game, Player player, ButtonInteractionEvent event) {
         player.removeRelic("twilight_mirror");
         player.removeExhaustedRelic("twilight_mirror");
-        for (String planet : player.getPlanets()) {
-            player.exhaustPlanet(planet);
-        }
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " purged _Twilight Mirror_ to take one action.");

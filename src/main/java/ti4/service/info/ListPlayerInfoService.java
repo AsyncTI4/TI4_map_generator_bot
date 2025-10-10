@@ -453,8 +453,12 @@ public class ListPlayerInfoService {
             case "push_boundaries", "push_boundaries_omegaphase" -> {
                 int aboveN = 0;
                 for (Player p2 : player.getNeighbouringPlayers(true)) {
-                    int p1count = player.getPlanets().size();
-                    int p2count = p2.getPlanets().size();
+                    int p1count = player.getPlanets().size()
+                            + game.getPlanetsPlayerIsCoexistingOn(player).size()
+                            - player.numberOfSpaceStations();
+                    int p2count = p2.getPlanets().size()
+                            + game.getPlanetsPlayerIsCoexistingOn(p2).size()
+                            - p2.numberOfSpaceStations();
                     if (p1count > p2count) {
                         aboveN++;
                     }
@@ -485,7 +489,9 @@ public class ListPlayerInfoService {
             case "infrastructure", "protect_border" -> {
                 int counter = 0;
                 int maxPlanets = counter;
-                for (String planet : player.getPlanetsAllianceMode()) {
+                List<String> planets = player.getPlanetsAllianceMode();
+                planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
+                for (String planet : planets) {
                     UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                     if (uH != null && game.getTileFromPlanet(planet) != player.getHomeSystemTile()) {
                         if (uH.getUnitCount(Units.UnitType.Spacedock, player) > 0
@@ -552,17 +558,21 @@ public class ListPlayerInfoService {
             }
             case "expand_borders", "subdue", "subdue_omegaphase" -> {
                 int count = 0;
-                for (String p : player.getPlanets()) {
+                List<String> planets = player.getPlanets();
+                planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
+                for (String p : planets) {
                     Tile tile = game.getTileFromPlanet(p);
                     if (tile != null && !tile.isHomeSystem(game)) {
                         count++;
                     }
                 }
-                return count;
+                return count - player.numberOfSpaceStations();
             }
             case "research_outposts", "brain_trust", "brain_trust_omegaphase" -> {
                 int count = 0;
-                for (String planet : player.getPlanets()) {
+                List<String> planets = player.getPlanets();
+                planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
+                for (String planet : planets) {
                     if (ButtonHelper.checkForTechSkips(game, planet)) {
                         count++;
                     }
@@ -630,7 +640,9 @@ public class ListPlayerInfoService {
             }
             case "lost_outposts", "ancient_monuments", "ancient_monuments_omegaphase" -> {
                 int count = 0;
-                for (String p : player.getPlanets()) {
+                List<String> planets = player.getPlanets();
+                planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
+                for (String p : planets) {
                     Planet planet = game.getPlanetsInfo().get(p);
                     if (planet.hasAttachment()) {
                         count++;
@@ -676,7 +688,12 @@ public class ListPlayerInfoService {
             }
             case "conquer" -> {
                 int count = 0;
-                for (String planet : player.getPlanets()) {
+                List<String> planets = player.getPlanets();
+                planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
+                for (String planet : planets) {
+                    if (game.isPlanetSpaceStation(planet)) {
+                        continue;
+                    }
                     Tile tile = game.getTileFromPlanet(planet);
                     if (tile != null && tile.isHomeSystem(game) && tile != player.getHomeSystemTile()) {
                         count++;
@@ -717,7 +734,12 @@ public class ListPlayerInfoService {
                     if (p2 == player || tile == null) continue;
 
                     Set<String> adjPositions = FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false);
-                    for (String planet : player.getPlanets()) {
+                    List<String> planets = player.getPlanets();
+                    planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
+                    for (String planet : planets) {
+                        if (game.isPlanetSpaceStation(planet)) {
+                            continue;
+                        }
                         Tile planetTile = game.getTileFromPlanet(planet);
                         if (planetTile != null && adjPositions.contains(planetTile.getPosition())) {
                             planetsAdjToHomes.add(planet);
@@ -734,7 +756,9 @@ public class ListPlayerInfoService {
             }
             case "sai" -> {
                 int count = 0;
-                for (String p : player.getPlanets()) {
+                List<String> planets = player.getPlanets();
+                planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
+                for (String p : planets) {
                     Planet planet = game.getPlanetsInfo().get(p);
                     if (planet == null) {
                         BotLogger.warning(
@@ -747,8 +771,14 @@ public class ListPlayerInfoService {
             }
             case "syc" -> {
                 int count = 0;
-                for (String p : player.getPlanets()) {
+                List<String> planets = player.getPlanets();
+                planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
+                for (String p : planets) {
                     Tile tile = game.getTileFromPlanet(p);
+                    if (game.getUnitHolderFromPlanet(p) != null
+                            && game.getUnitHolderFromPlanet(p).isSpaceStation()) {
+                        continue;
+                    }
                     for (Player p2 : game.getRealPlayers()) {
                         if (p2 == player) {
                             continue;
@@ -766,7 +796,9 @@ public class ListPlayerInfoService {
             }
             case "otf" -> {
                 int count = 0;
-                for (String p : player.getPlanetsAllianceMode()) {
+                List<String> planets = player.getPlanetsAllianceMode();
+                planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
+                for (String p : planets) {
                     Planet planet = game.getPlanetsInfo().get(p);
                     if (planet != null && planet.getUnitCount(Units.UnitType.Spacedock, player) < 1) {
                         count = Math.max(count, ButtonHelper.getNumberOfGroundForces(player, planet));
@@ -776,7 +808,9 @@ public class ListPlayerInfoService {
             }
             case "mtm" -> {
                 int count = 0;
-                for (String planet : player.getPlanetsAllianceMode()) {
+                List<String> planets = player.getPlanetsAllianceMode();
+                planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
+                for (String planet : planets) {
                     UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                     if (uH != null && uH.getUnitCount(Units.UnitType.Mech, player) > 0) {
                         count++;
@@ -786,17 +820,25 @@ public class ListPlayerInfoService {
             }
             case "hrm" -> { // 12 resources
                 int resources = 0;
-                for (String planet : player.getPlanets()) {
+                List<String> planets = player.getPlanets();
+                planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
+                for (String planet : planets) {
                     resources += Helper.getPlanetResources(planet, game);
                 }
-                return resources;
+                return resources - player.numberOfSpaceStations();
             }
             case "eh" -> { // 12 influence
                 int influence = 0;
-                for (String planet : player.getPlanets()) {
+                List<String> planets = player.getPlanets();
+                planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
+                for (String planet : planets) {
                     influence += Helper.getPlanetInfluence(planet, game);
+                    if (planet.equalsIgnoreCase("revelation")) {
+                        influence--;
+                    }
                 }
-                return influence;
+
+                return influence - player.numberOfSpaceStations();
             }
             case "dp" -> {
                 return game.getLaws().size(); // 3 laws in play
@@ -815,8 +857,8 @@ public class ListPlayerInfoService {
             }
             case "te" -> {
                 int count = 0;
-                for (Player p2 : game.getRealPlayersNDummies()) {
-                    if (p2 == player) {
+                for (Player p2 : game.getRealAndEliminatedPlayers()) {
+                    if (p2 == player || p2.getFaction().equalsIgnoreCase("neutral")) {
                         continue;
                     }
                     Tile tile = p2.getHomeSystemTile();

@@ -1087,10 +1087,7 @@ public class ButtonHelperModifyUnits {
             tile = game.getTileByPosition(game.getActiveSystem());
         }
         TeHelperGeneral.addStationsToPlayArea(event, game, tile);
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            if ("space".equalsIgnoreCase(unitHolder.getName())) {
-                continue;
-            }
+        for (UnitHolder unitHolder : tile.getPlanetUnitHolders()) {
             List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
             Player player2 = player;
             for (Player p2 : players) {
