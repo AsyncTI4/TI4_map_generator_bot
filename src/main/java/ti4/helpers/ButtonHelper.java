@@ -2361,7 +2361,11 @@ public class ButtonHelper {
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")) {
                         hitChance = 1 - ((1 - hitChance) * (1 - hitChance));
                     }
-                    count += removedUnit.getBombardDieCount() * hitChance * uh.getUnitCount(unit);
+                    float combatValue = removedUnit.getBombardDieCount() * hitChance * uh.getUnitCount(unit);
+                    if (player.hasTech("x89c4")) {
+                        combatValue *= 2.0f;
+                    }
+                    count += combatValue;
                 }
             }
         }
@@ -2387,9 +2391,15 @@ public class ButtonHelper {
                             || ("space".equalsIgnoreCase(type) && removedUnit.getIsGroundForce())) {
                         continue;
                     }
-                    count += removedUnit.getCombatDieCount()
+                    float combatValue = removedUnit.getCombatDieCount()
                             * ((11.0f - removedUnit.getCombatHitsOn()) / 10 + unrelententing)
                             * uh.getUnitCount(unit);
+
+                    if ("ground".equalsIgnoreCase(type) && player.hasTech("x89c4")) {
+                        combatValue *= 2.0f;
+                    }
+
+                    count += combatValue;
                 }
             }
         }

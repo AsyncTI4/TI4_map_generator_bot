@@ -1060,7 +1060,7 @@ public class Constants {
     public static final String DRAFT_MANAGE_MAKE_PICK = "make_pick";
     public static final String DRAFT_MANAGE_CUSTOM_COMMAND = "custom_draftable_command";
     public static final String DRAFT_MANAGE_CUSTOM_ORCHESTRATOR_COMMAND = "custom_orchestrator_command";
-    public static final String DRAFT_MANAGE_CONVERT_TO_MILTY = "convert_to_milty";
+    public static final String DRAFT_MANAGE_SETUP_NUCLEUS = "setup_nucleus";
     public static final String DRAFT_FACTION_ADD = "add";
     public static final String DRAFT_FACTION_REMOVE = "remove";
     public static final String DRAFT_FACTION_SET_KELERES_FLAVOR = "set_keleres_flavor";
