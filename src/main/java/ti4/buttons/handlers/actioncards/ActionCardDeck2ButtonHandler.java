@@ -11,12 +11,10 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
-import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -441,21 +439,7 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("sideProject")
-    public static void resolveSideProject(Player player, Game game, ButtonInteractionEvent event) {
-        String successMessage;
-        if (player.getStrategicCC() > 0) {
-            successMessage =
-                    player.getRepresentationNoPing() + ", 1 command token has been removed from your strategy pool ("
-                            + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ").";
-            player.setStrategicCC(player.getStrategicCC() - 1);
-            ButtonHelperCommanders.resolveMuaatCommanderCheck(
-                    player, game, event, CardEmojis.ActionCard + "played _Side Project_");
-        } else {
-            successMessage = player.getRepresentationNoPing() + " exhausted the _" + RelicHelper.sillySpelling() + "_.";
-            player.addExhaustedRelic("emelpar");
-        }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
-
+    public static void resolveSideProject(Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         ButtonHelperFactionSpecific.offerWinnuStartingTech(player);
     }
