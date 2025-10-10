@@ -702,7 +702,7 @@
         "alias": "ramming_speed",
         "name": "Ramming Speed",
         "phase": "Action",
-        "window": "After 1 of your units is destroyed during combat, if you are the attacker",
+        "window": "After 1 of your units is destroyed during combat",
         "text": "Choose and destroy 1 of your opponent's participating units that has a cost equal to or lower than your destroyed unit's cost.",
         "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
         "source": "action_deck_2"
@@ -882,8 +882,8 @@
         "alias": "side_project1",
         "name": "Side Project",
         "phase": "Action",
-        "window": "ACTION",
-        "text": "Spend 1 token from your strategy pool to research a technology that has no prerequisites.",
+        "window": "When you research a technology",
+        "text": "Gain a technology that has no prerequisites.",
         "automationID": "side_project",
         "flavorText": "As the council meeting drew to a close, Suffi stood up. \"Before we adjourn, I'd like to announce that our neural enhancement project has entered the final phase of clinical trials.\"",
         "source": "action_deck_2"
@@ -892,8 +892,8 @@
         "alias": "side_project2",
         "name": "Side Project",
         "phase": "Action",
-        "window": "ACTION",
-        "text": "Spend 1 token from your strategy pool to research a technology that has no prerequisites.",
+        "window": "When you research a technology",
+        "text": "Gain a technology that has no prerequisites.",
         "automationID": "side_project",
         "flavorText": "A projection showed four individuals competing in a task, with one participant fiercely outpacing the others as he interfaced with the device through thought alone. The council murmured approvingly.",
         "source": "action_deck_2"
@@ -902,8 +902,8 @@
         "alias": "side_project3",
         "name": "Side Project",
         "phase": "Action",
-        "window": "ACTION",
-        "text": "Spend 1 token from your strategy pool to research a technology that has no prerequisites.",
+        "window": "When you research a technology",
+        "text": "Gain a technology that has no prerequisites.",
         "automationID": "side_project",
         "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi, where did you even find the time to organize this project?\"",
         "source": "action_deck_2"
@@ -912,8 +912,8 @@
         "alias": "side_project4",
         "name": "Side Project",
         "phase": "Action",
-        "window": "ACTION",
-        "text": "Spend 1 token from your strategy pool to research a technology that has no prerequisites.",
+        "window": "When you research a technology",
+        "text": "Gain a technology that has no prerequisites.",
         "automationID": "side_project",
         "flavorText": "Suffi parted her hair, revealing a small metal plate indicative of a neural implant. Xander gasped, realizing she must have had the surgery long ago. \"You did this before the trials were completed?\" Suffi shrugged. \"Before the trials even began.\"",
         "source": "action_deck_2"
@@ -1026,7 +1026,7 @@
         "name": "Syndicate",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Draw and reveal a number of action cards from the deck equal to the number of players; give 1 of those cards to each of those players and keep the rest.",
+        "text": "Reveal a number of cards from the action card deck equal to the number of players. Each other player may draw 1 of those cards of your choice. Then, draw the rest.",
         "flavorText": "\"What if I'm not ready?\" the operative asked, looking away. Harka squeezed her hand. \"Believe in me, who believes in you.\"",
         "source": "action_deck_2"
     },
