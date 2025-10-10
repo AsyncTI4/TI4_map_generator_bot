@@ -240,11 +240,16 @@ public class DraftManager extends DraftPlayerManager {
                     event.getMessageChannel(), "WARNING: Forcing the draft to end despite: " + blockingReason);
         }
 
+        // Clear active player
+        game.updateActivePlayer(null);
+
+        // Make all the draft components do their end-of-draft work
         orchestrator.onDraftEnd(this);
         for (Draftable draftable : draftables) {
             draftable.onDraftEnd(this);
         }
 
+        // If nothing is blocking setup, do it now. Otherwise wait.
         String blockingSetup = whatsStoppingSetup();
         if (blockingSetup != null) {
             MessageHelper.sendMessageToChannel(
