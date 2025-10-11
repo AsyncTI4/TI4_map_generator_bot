@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -438,15 +438,13 @@ public class Game extends GameProperties {
             try {
                 draftManager = DraftLoadService.loadDraftManager(this, draftString);
             } catch (Exception e) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("Failed to load draft manager (and creating an empty new one instead): ")
-                        .append(e.getMessage())
-                        .append(System.lineSeparator())
-                        .append("With draft data: ")
-                        .append(System.lineSeparator())
-                        .append(String.join(System.lineSeparator(), draftString));
+                String sb = "Failed to load draft manager (and creating an empty new one instead): " + e.getMessage()
+                        + System.lineSeparator()
+                        + "With draft data: "
+                        + System.lineSeparator()
+                        + String.join(System.lineSeparator(), draftString);
 
-                BotLogger.warning(new LogOrigin(this), sb.toString(), e);
+                BotLogger.warning(new LogOrigin(this), sb, e);
                 draftManager = new DraftManager(this);
             }
         } else {
@@ -1776,6 +1774,14 @@ public class Game extends GameProperties {
             return true;
         }
         return false;
+    }
+
+    public void shuffleObjectiveDeck(int stage) {
+        if (stage == 1) {
+            Collections.shuffle(publicObjectives1);
+        } else if (stage == 2) {
+            Collections.shuffle(publicObjectives2);
+        }
     }
 
     public void removeRevealedObjective(String id) {
