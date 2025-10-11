@@ -667,13 +667,6 @@ public class ActionCardHelper {
                         codedButtons);
             }
 
-            if ("spatial_collapse".equals(automationID)) {
-                codedButtons.add(
-                        Buttons.green(player.getFinsFactionCheckerPrefix() + "spatialCollapseStep1", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        channel2, introMsg + String.format(targetMsg, "systems"), codedButtons);
-            }
-
             if ("side_project".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "sideProject", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -913,9 +906,9 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "destroyed ship"), codedButtons);
             }
 
-            if ("mercenary_contract".equals(automationID)) {
+            if ("rapid_fulfillment".equals(automationID)) {
                 codedButtons.add(
-                        Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveMercenaryContract", buttonLabel));
+                        Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveRapidFulfillment", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
