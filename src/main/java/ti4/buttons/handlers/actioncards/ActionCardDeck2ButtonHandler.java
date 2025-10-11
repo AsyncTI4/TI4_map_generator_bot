@@ -91,8 +91,8 @@ class ActionCardDeck2ButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
 
-    @ButtonHandler("resolveMercenaryContract")
-    public static void resolveMercenaryContract(Player player, Game game, ButtonInteractionEvent event) {
+    @ButtonHandler("resolveRapidFulfillment")
+    public static void resolveRapidFulfillment(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         String type = "sling";
         String pos = game.getActiveSystem();
@@ -349,17 +349,6 @@ class ActionCardDeck2ButtonHandler {
         // If Empyrean Commander is in game check if unlock condition exists
         Player p2 = game.getPlayerFromLeader("empyreancommander");
         CommanderUnlockCheckService.checkPlayer(p2, "empyrean");
-    }
-
-    @ButtonHandler("spatialCollapseStep1")
-    public static void resolveSpatialCollapseStep1(Player player, Game game, ButtonInteractionEvent event) {
-        List<Button> buttons = getSpatialCollapseTilesStep1(game, player);
-        event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + ", please choose which system (with your ships) you wish to swap with an adjacent system.",
-                buttons);
     }
 
     private static List<Button> getSpatialCollapseTilesStep1(Game game, Player player) {
