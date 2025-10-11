@@ -691,7 +691,7 @@
         "name": "Ramming Speed",
         "phase": "Action",
         "window": "After 1 of your units is destroyed during combat",
-        "text": "Choose and destroy 1 of your opponent's participating units that has a cost equal to or lower than your destroyed unit's cost.",
+        "text": "Destroy 1 of your opponent's participating units that has a cost equal to or lower than your destroyed unit's cost.",
         "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
         "source": "action_deck_2"
     },
