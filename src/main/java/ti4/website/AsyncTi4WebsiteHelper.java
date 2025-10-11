@@ -37,12 +37,14 @@ import ti4.website.model.WebStrategyCard;
 import ti4.website.model.WebTilePositions;
 import ti4.website.model.WebTileUnitData;
 import ti4.website.model.WebsiteOverlay;
+import ti4.website.model.stats.AbbreviatedGameDashboardPayload;
 import ti4.website.model.stats.GameStatsDashboardPayload;
 
 @UtilityClass
 public class AsyncTi4WebsiteHelper {
 
     private static final int STAT_BATCH_SIZE = 200;
+    private static final String ABBREVIATED_DASHBOARD_URLS_PROPERTY = "abbreviated.dashboard.api.urls";
 
     public static boolean uploadsEnabled() {
         return GlobalSettings.getSetting(
@@ -179,6 +181,58 @@ public class AsyncTi4WebsiteHelper {
                     null);
         } catch (Exception e) {
             BotLogger.error("Could not put overlay to web server", e);
+        }
+    }
+
+    public static void postAbbreviatedDashboardPayloads(List<ManagedGame> managedGames) {
+        if (!uploadsEnabled() || managedGames.isEmpty()) return;
+
+        List<String> urls = getConfiguredUrls(ABBREVIATED_DASHBOARD_URLS_PROPERTY);
+        if (urls.isEmpty()) {
+            BotLogger.info("No abbreviated dashboard API URLs configured. Skipping upload.");
+            return;
+        }
+
+        for (ManagedGame managedGame : managedGames) {
+            Game game = managedGame.getGame();
+            if (game == null) {
+                BotLogger.error(
+                        String.format(
+                                "Unable to load game `%s` while building abbreviated dashboard payload.",
+                                managedGame.getName()));
+                continue;
+            }
+
+            try {
+                String json = EgressClientManager.getObjectMapper()
+                        .writeValueAsString(new AbbreviatedGameDashboardPayload(game));
+
+                for (String urlTemplate : urls) {
+                    String url = urlTemplate.replace("{gameName}", managedGame.getName());
+
+                    HttpRequest request = HttpRequest.newBuilder()
+                            .uri(URI.create(url))
+                            .header("Content-Type", "application/json")
+                            .POST(HttpRequest.BodyPublishers.ofString(json))
+                            .build();
+
+                    EgressClientManager.getHttpClient()
+                            .sendAsync(request, HttpResponse.BodyHandlers.discarding())
+                            .exceptionally(e -> {
+                                BotLogger.error(
+                                        new LogOrigin(game),
+                                        "An exception occurred while performing an async send of abbreviated dashboard data to: "
+                                                + url,
+                                        e);
+                                return null;
+                            });
+                }
+            } catch (Exception e) {
+                BotLogger.error(
+                        new LogOrigin(game),
+                        "Could not put abbreviated dashboard data to web server",
+                        e);
+            }
         }
     }
 

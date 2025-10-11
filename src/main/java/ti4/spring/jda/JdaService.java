@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Service;
 import ti4.commands.CommandManager;
+import ti4.cron.AbbreviatedDashboardCron;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CloseLaunchThreadsCron;
 import ti4.cron.CronManager;
@@ -287,6 +288,7 @@ public class JdaService {
 
         // START CRONS
         AutoPingCron.register();
+        AbbreviatedDashboardCron.register();
         ReuploadStaleEmojisCron.register();
         LogCacheStatsCron.register();
         WinningPathCron.register();
