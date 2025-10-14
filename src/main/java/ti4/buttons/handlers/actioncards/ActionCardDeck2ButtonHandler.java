@@ -57,12 +57,13 @@ class ActionCardDeck2ButtonHandler {
     @ButtonHandler("resolveDefenseInstallation")
     public static void resolveDefenseInstallation(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = player.getPlanets().stream()
-            .map(planetName -> ButtonHelper.getUnitHolderFromPlanetName(planetName, game))
-            .filter(Objects::nonNull)
-            .filter(planet -> planet.getUnitCount(Units.UnitType.Pds, player.getColor()) == 0)
-            .map(planet ->
-                Buttons.green("defenseInstallationStep2_" + planet.getName(), Helper.getPlanetRepresentation(planet.getName(), game)))
-            .toList();
+                .map(planetName -> ButtonHelper.getUnitHolderFromPlanetName(planetName, game))
+                .filter(Objects::nonNull)
+                .filter(planet -> planet.getUnitCount(Units.UnitType.Pds, player.getColor()) == 0)
+                .map(planet -> Buttons.green(
+                        "defenseInstallationStep2_" + planet.getName(),
+                        Helper.getPlanetRepresentation(planet.getName(), game)))
+                .toList();
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
