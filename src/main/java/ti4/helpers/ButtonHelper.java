@@ -59,6 +59,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
+import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
@@ -3509,6 +3510,7 @@ public class ButtonHelper {
     public static int checkFleetInEveryTile(Player player, Game game) {
         int highest = 0;
         for (Tile tile : game.getTileMap().values()) {
+
             if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 highest = Math.max(highest, checkFleetAndCapacity(player, game, tile)[0]);
             }
@@ -3529,6 +3531,7 @@ public class ButtonHelper {
     public static int[] checkFleetAndCapacity(
             Player player, Game game, Tile tile, boolean ignoreFighters, boolean issuePing) {
         CommanderUnlockCheckService.checkPlayer(player, "naalu", "cabal");
+        TeHelperGeneral.addStationsToPlayArea(null, game, tile);
         String tileRepresentation = tile.getRepresentation();
         int[] values = {0, 0, 0, 0};
         if (tileRepresentation == null || "null".equalsIgnoreCase(tileRepresentation)) {
@@ -3665,6 +3668,9 @@ public class ButtonHelper {
                         if (numFighter2s < 0) {
                             numFighter2s = 0;
                         }
+                    }
+                    if (unit.getId().equalsIgnoreCase("naaz_voltron")) {
+                        numFighter2s++;
                     }
                     if ("fighter".equalsIgnoreCase(unit.getBaseType())) {
                         ignoredFs = Math.min(fightersIgnored, entry.getValue());
