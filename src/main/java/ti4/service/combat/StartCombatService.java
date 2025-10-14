@@ -96,6 +96,7 @@ public class StartCombatService {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.red("startCombatOn_" + unitHolder.getName(), "Engage in Combat"));
                 buttons.add(Buttons.green("deleteButtons", "They are coexisting"));
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
 
             } else {
                 startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
