@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -70,11 +71,12 @@ public class DeorbitBarrageService {
     @ButtonHandler("deorbitBarrageTarget_")
     private static void deorbitBarrageStep1(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String regex = "deorbitBarrageTarget_" + RegexHelper.factionRegex(game);
+        Player player2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String target = Mapper.getColorID(matcher.group("faction"));
             String prefixID = player.finChecker() + "deorbitBarragePlanet_";
             List<Button> buttons = getAllPlanetsInRange(game, player).stream()
-                    .filter(planet -> planet.getUnitCount(target) > 0)
+                    .filter(planet -> planet.getUnitCount(player2.getColorID()) > 0)
                     .map(pl -> Buttons.gray(prefixID + pl.getName(), "Target " + pl.getName()))
                     .toList();
 
@@ -88,7 +90,7 @@ public class DeorbitBarrageService {
     private static void deorbitBarrageStep2(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         String planet = buttonID.split("_")[1];
-        for (int x = 1; x < Helper.getPlayerResourcesAvailable(player, game) + player.getTg() + 1; x++) {
+        for (int x = 0; x < Helper.getPlayerResourcesAvailable(player, game) + player.getTg() + 1; x++) {
             buttons.add(Buttons.gray("deorbitBarrageResource_" + planet + "_" + x, "" + x));
         }
         MessageHelper.sendMessageToChannelWithButtons(
@@ -98,7 +100,7 @@ public class DeorbitBarrageService {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("deorbitBarragePlanet_")
+    @ButtonHandler("deorbitBarrageResource_")
     private static void deorbitBarrageStep3(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         String planet = buttonID.split("_")[1];
@@ -108,7 +110,7 @@ public class DeorbitBarrageService {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " will target " + planetRep + " and spend " + resources
-                        + " resources to roll " + resources + "dice hitting on a 4+.");
+                        + " resources to roll " + resources + " dice hitting on a 4+");
         ButtonHelper.deleteMessage(event);
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         int amount = resources;
