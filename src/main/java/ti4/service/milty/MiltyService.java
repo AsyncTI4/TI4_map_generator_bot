@@ -315,12 +315,13 @@ public class MiltyService {
             }
         }
 
+        String breakthrough = factionModel.getAlias() + "bt";
+        if (breakthrough.contains("keleres")) {
+            breakthrough = "keleresbt";
+        }
         // BREAKTHROUGH
-        if (game.isThundersEdge() && Mapper.getBreakthrough(factionModel.getAlias() + "bt") != null) {
-            String breakthrough = factionModel.getAlias() + "bt";
-            if (breakthrough.contains("keleres")) {
-                breakthrough = "keleresbt";
-            }
+        if (game.isThundersEdge() && Mapper.getBreakthrough(breakthrough) != null) {
+
             player.setBreakthroughID(breakthrough);
             player.setBreakthroughUnlocked(false);
             player.setBreakthroughExhausted(false);

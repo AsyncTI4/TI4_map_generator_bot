@@ -296,29 +296,9 @@ public class MessageHelper {
                             yield new StringTokenizer(game.getPlayersWhoHitPersistentNoAfter(), "_");
                         }
                         case AGENDA_CONFOUNDING_CONFUSING_LEGAL_TEXT -> {
-                            String oldMessageId = GameMessageManager.replace(
-                                    game.getName(),
-                                    message.getId(),
-                                    GameMessageType.AGENDA_CONFOUNDING_CONFUSING_LEGAL_TEXT,
-                                    game.getLastModifiedDate());
-                            if (oldMessageId != null) {
-                                game.getMainGameChannel()
-                                        .deleteMessageById(oldMessageId)
-                                        .queue(Consumers.nop(), BotLogger::catchRestError);
-                            }
                             yield new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
                         }
                         case AGENDA_DEADLY_PLOT -> {
-                            String oldMessageId = GameMessageManager.replace(
-                                    game.getName(),
-                                    message.getId(),
-                                    GameMessageType.AGENDA_DEADLY_PLOT,
-                                    game.getLastModifiedDate());
-                            if (oldMessageId != null) {
-                                game.getMainGameChannel()
-                                        .deleteMessageById(oldMessageId)
-                                        .queue(Consumers.nop(), BotLogger::catchRestError);
-                            }
                             yield new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
                         }
                         default -> {
