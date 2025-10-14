@@ -1189,9 +1189,40 @@ public class ButtonHelper {
             }
             if (player.hasAbility("scheming")) {
                 message +=
-                        " **Scheming** has been accounted for, please use blue button inside your `#cards-info` thread to discard 1 action card.";
+                        " **Scheming** has been accounted for, please use the blue buttons inside your `#cards-info` thread to discard 1 action card.";
                 game.drawActionCard(player.getUserID());
                 amount += 1;
+            }
+            Player titans = Helper.getPlayerFromUnlockedBreakthrough(game, "titansbt");
+            if (titans != null) {
+                int slumberBonus = 0;
+                Predicate<Planet> countPlanetForSlumber =
+                        p -> player.getPlanets().contains(p.getName());
+                if (player == titans) countPlanetForSlumber = countPlanetForSlumber.negate();
+
+                List<String> colorsCoexisting = game.getTileMap().values().stream()
+                        .flatMap(t -> t.getPlanetUnitHolders().stream())
+                        .filter(countPlanetForSlumber)
+                        .filter(p -> p.getUnitColorsOnHolder().contains(player.getColorID()))
+                        .flatMap(p -> p.getUnitColorsOnHolder().stream())
+                        .toList();
+
+                for (String col : colorsCoexisting) {
+                    Player p2 = game.getPlayerFromColorOrFaction(col);
+                    if (player == p2) {
+                        continue;
+                    } else if (player == titans) {
+                        slumberBonus++;
+                    } else if (p2 == titans) {
+                        slumberBonus++;
+                        break;
+                    }
+                }
+                if (slumberBonus > 0) {
+                    message += " Drew `" + slumberBonus + "` additional cards for " + FactionEmojis.Titans
+                            + " Slumberstate Computing.";
+                    amount += slumberBonus;
+                }
             }
         }
 

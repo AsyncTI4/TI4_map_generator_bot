@@ -284,9 +284,7 @@ public class Helper {
                 if (!game.isFowMode()) {
                     message = player.getRepresentationUnfogged()
                             + " is the one the game is currently waiting on before advancing to the next player, with regards to queued **Imperial** follows.";
-                }
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                if (!game.isFowMode()) {
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     ButtonHelper.sendMessageToRightStratThread(player, game, message, "imperial");
                 }
                 break;

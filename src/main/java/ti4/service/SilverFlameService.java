@@ -32,7 +32,7 @@ import ti4.service.emoji.TileEmojis;
 public class SilverFlameService {
 
     public String rep(boolean includeCardText) {
-        return Mapper.getRelic("silverflame").getSimpleRepresentation();
+        return Mapper.getRelic("thesilverflame").getSimpleRepresentation();
     }
 
     public void rollSilverFlame(ButtonInteractionEvent event, Game game, Player player) {
@@ -41,10 +41,12 @@ public class SilverFlameService {
 
     private List<Button> silverFlameResolveButtons(Game game, Player player, Die resultDie) {
         List<Button> resolveButtons = new ArrayList<>();
-        Button good = Buttons.green(
-                player.finChecker() + "resolveSilverFlamePoint", "Gain 1 Victory Point", CardEmojis.Public1alt);
-        Button bad = Buttons.red(
-                player.finChecker() + "resolveSilverFlamePurge", "Purge your Home System", TileEmojis.TileRedBack);
+        if (resultDie.getResult() > 8) {
+            resolveButtons.add(Buttons.green(
+                    player.finChecker() + "resolveSilverFlamePoint", "Gain 1 Victory Point", CardEmojis.Public1alt));
+        }
+        resolveButtons.add(Buttons.red(
+                player.finChecker() + "resolveSilverFlamePurge", "Purge your Home System", TileEmojis.TileRedBack));
 
         // TODO: other mykomentori related buttons
         // if (player.getPromissoryNotesInPlayArea().contains("dspnmyko") &&

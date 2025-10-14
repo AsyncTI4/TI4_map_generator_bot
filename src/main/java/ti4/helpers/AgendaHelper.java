@@ -905,14 +905,6 @@ public class AgendaHelper {
         event.getMessage().delete().queue();
         offerPreVote(player);
         resolveAfterQueue(event, game);
-        if (playerDoesNotHaveShenanigans(player)) {
-            String part2 = player.getFaction();
-            if (!game.getStoredValue("Pass On Shenanigans").isEmpty()) {
-                part2 = game.getStoredValue("Pass On Shenanigans") + "_" + player.getFaction();
-            }
-            game.setStoredValue("Pass On Shenanigans", part2);
-            return;
-        }
         String msg = player.getRepresentation() + " you have the option to pre-pass on agenda shenanigans here."
                 + " Agenda shenanigans are the action cards _Bribery_, _Confusing Legal Text_, _Confounding Legal Text_, and _Deadly Plot_."
                 + " Feel free not to pre-pass, this is simply an optional way to resolve agendas faster.";
@@ -4068,7 +4060,7 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, proceedButtons);
         eraseAgendaQueues(event, game);
         if (!action) {
-            // offerEveryonePrepassOnShenanigans(game);
+            offerEveryonePrepassOnShenanigans(game);
             // offerEveryonePreAbstain(game);
             offerEveryoneWhensQueue(game);
             checkForAssigningGeneticRecombination(game);
