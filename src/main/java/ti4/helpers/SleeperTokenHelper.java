@@ -1,10 +1,14 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.buttons.Buttons;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -52,5 +56,38 @@ public class SleeperTokenHelper {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
             }
         }
+    }
+
+    @ButtonHandler("selectPlayerToSleeper")
+    public static void selectPlayerToSleeper(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String msg =
+                "Choose the player who owns the planet that you wish to put a sleeper on. Note that you need their permission, but this is not a transaction.";
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            buttons.add(Buttons.gray("addSleeperViaBt_" + p2.getFaction(), p2.getFactionNameOrColor()));
+        }
+        buttons.add(Buttons.red("deleteButtons", "Don't Place Sleeper"));
+        MessageHelper.sendMessageToChannel(event.getChannel(), msg, buttons);
+    }
+
+    @ButtonHandler("addSleeperViaBt_")
+    public static void addSleeperViaBt(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String msg =
+                "Choose the planet that you wish to put a sleeper on. Note that you need their permission, but this is not a transaction.";
+        List<Button> buttons = new ArrayList<>();
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        for (String planet : p2.getPlanets()) {
+            if (game.getUnitHolderFromPlanet(planet) == null
+                    || game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
+                continue;
+            }
+            buttons.add(Buttons.gray("putSleeperOnPlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
+        }
+        buttons.add(Buttons.red("deleteButtons", "Don't Place Sleeper"));
+        MessageHelper.sendMessageToChannel(event.getChannel(), msg, buttons);
+        event.getMessage().delete().queue();
     }
 }

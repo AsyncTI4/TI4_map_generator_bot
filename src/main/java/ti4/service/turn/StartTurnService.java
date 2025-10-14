@@ -522,6 +522,9 @@ public class StartTurnService {
             startButtons.add(
                     Buttons.gray(finChecker + "exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
         }
+        if (player.hasUnlockedBreakthrough("titansbt")) {
+            startButtons.add(Buttons.gray("selectPlayerToSleeper", "Add a sleeper token", MiscEmojis.Sleeper));
+        }
         if (player.hasUnexhaustedLeader("pharadnagent")) {
             startButtons.add(
                     Buttons.gray(finChecker + "exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));
