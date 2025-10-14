@@ -89,7 +89,17 @@ public class StartCombatService {
                 .filter(p -> player != p && !player.isPlayerMemberOfAlliance(p))
                 .findFirst();
         if (enemyPlayer.isPresent()) {
-            startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
+            if (enemyPlayer.get().hasUnlockedBreakthrough("titansbt") || player.hasUnlockedBreakthrough("titansbt")) {
+                String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
+                String msg = player.getRepresentation() + " the game is unsure if a combat should occur on "
+                        + planetName + " or if you are coexisting. Please inform it with the buttons.";
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.red("startCombatOn_" + unitHolder.getName(), "Engage in Combat"));
+                buttons.add(Buttons.green("deleteButtons", "They are coexisting"));
+
+            } else {
+                startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
+            }
             return true;
         }
         return false;

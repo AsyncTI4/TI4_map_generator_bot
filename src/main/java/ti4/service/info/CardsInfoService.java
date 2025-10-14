@@ -18,6 +18,7 @@ import ti4.message.logging.BotLogger;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
@@ -75,6 +76,9 @@ public class CardsInfoService {
         }
         if (IsPlayerElectedService.isPlayerElected(game, player, "minister_peace")) {
             buttons.add(Buttons.gray("ministerOfPeace", "Use Minister of Peace", CardEmojis.Agenda));
+        }
+        if (player.hasUnlockedBreakthrough("titansbt")) {
+            buttons.add(Buttons.gray("selectPlayerToSleeper", "Add a sleeper token", MiscEmojis.Sleeper));
         }
         if (player.hasUnexhaustedLeader("vadenagent")) {
             buttons.add(Buttons.gray("getAgentSelection_vadenagent", "Use Vaden Agent", FactionEmojis.vaden));

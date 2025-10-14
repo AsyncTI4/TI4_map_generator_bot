@@ -256,5 +256,6 @@ public class TeHelperAgents {
                 RemoveCommandCounterService.fromTile(event, p2, tile);
             });
         });
+        ButtonHelper.deleteMessage(event);
     }
 }

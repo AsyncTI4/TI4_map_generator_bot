@@ -174,7 +174,7 @@ public class StatusHelper {
             }
         }
 
-        for (Player player : game.getRealPlayers()) {
+        for (Player player : game.getActionPhaseTurnOrder()) {
             List<String> scorables = new ArrayList<>();
             List<Integer> scorableInts = new ArrayList<>();
             String keyV = player.getFaction() + "Round" + game.getRound() + "PreScoredPO";
