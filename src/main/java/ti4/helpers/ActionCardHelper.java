@@ -510,6 +510,11 @@ public class ActionCardHelper {
             }
         }
         MessageEmbed acEmbed = actionCard.getRepresentationEmbed(false, true);
+        if (!game.isFowMode() && event instanceof ButtonInteractionEvent bEvent) {
+            if (bEvent.getChannel().getName().toLowerCase().contains("-vs-")) {
+                MessageHelper.sendMessageToChannelWithEmbed(bEvent.getChannel(), message, acEmbed);
+            }
+        }
         if (acID.contains("sabo")) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
         } else {
@@ -1194,7 +1199,8 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if (actionCardWindow.contains("After an agenda is revealed")) {
+            if (actionCardWindow.contains("After an agenda is revealed")
+                    || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
                 List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
                 // MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate \"No
                 // Afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
