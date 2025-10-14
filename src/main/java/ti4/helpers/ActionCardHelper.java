@@ -857,8 +857,6 @@ public class ActionCardHelper {
             if ("parley".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveParleyStep1", buttonLabel));
-                // MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + String.format(targetMsg,
-                // "player"), codedButtons);
             }
 
             if ("f_deployment".equals(automationID)) {
@@ -915,12 +913,6 @@ public class ActionCardHelper {
             if ("chain_reaction".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveChainReaction", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
-            }
-
-            if ("rendezvous".equals(automationID)) {
-                codedButtons.add(
-                        Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveRendezvousPoint", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
