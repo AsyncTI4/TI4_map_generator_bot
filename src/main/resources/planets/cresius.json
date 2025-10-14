@@ -2,15 +2,22 @@
     "id": "cresius",
     "tileId": "106",
     "name": "Cresius",
-    "aliases": ["cresius"],
+    "aliases": [
+        "cresius"
+    ],
     "resources": 0,
     "influence": 1,
-    "planetTypes": ["HAZARDOUS"],
-    "techSpecialties": ["PROPULSION"],
+    "planetTypes": [
+        "HAZARDOUS"
+    ],
+    "techSpecialties": null,
     "planetLayout": {
         "unitHolderName": "cresius",
         "resourcesLocation": "TopLeft",
-        "centerPosition": { "x": 135.0, "y": 85.0 },
+        "centerPosition": {
+            "x": 135.0,
+            "y": 85.0
+        },
         "extraIcons": 1
     },
     "source": "thunders_edge"
