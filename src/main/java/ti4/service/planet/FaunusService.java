@@ -41,8 +41,8 @@ public class FaunusService {
             // in fow, skip planets you can't see
             if (game.isFowMode() && !tiles.contains(t.getPosition())) continue;
 
-            // skip space stations where someone else controls space
-            if (p.isSpaceStation() && !player.is(game.getPlayerThatControlsTile(t))) continue;
+            // skip space stations
+            if (p.isSpaceStation()) continue;
 
             String id = player.finChecker() + "faunusTake_" + p.getName();
             String label = Helper.getPlanetRepresentation(p.getName(), game);
