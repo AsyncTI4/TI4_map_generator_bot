@@ -25,6 +25,6 @@ public class ShufflePublicDeck extends GameStateSubcommand {
 
         getGame().shuffleObjectiveDeck(stage);
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Public Objective shuffled.");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Stage " + stage + " Public Objective deck shuffled.");
     }
 }

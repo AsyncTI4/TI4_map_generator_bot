@@ -1231,6 +1231,15 @@ public class Game extends GameProperties {
         return getPlayer(getSpeakerUserID());
     }
 
+    public Player getPlanetOwner(String planet) {
+        for (Player player : getRealPlayers()) {
+            if (player.getPlanets().contains(planet)) {
+                return player;
+            }
+        }
+        return null;
+    }
+
     public void setSpeaker(Player speaker) {
         setSpeakerUserID(speaker.getUserID());
     }
