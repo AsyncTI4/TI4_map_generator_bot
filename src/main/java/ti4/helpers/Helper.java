@@ -1317,6 +1317,8 @@ public class Helper {
                                     .append("\n");
                             res += planet.getSumResourcesInfluence();
                         } else if (xxchaBt) {
+                            msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                    .append("\n");
                             res += planet.getMaxResInf();
                         } else {
                             if (Math.min(gledgeMech, planet.getInfluence()) > 0) {
@@ -1334,6 +1336,8 @@ public class Helper {
                                     .append("\n");
                             inf += planet.getSumResourcesInfluence();
                         } else if (xxchaBt) {
+                            msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                    .append("\n");
                             inf += planet.getMaxResInf();
                         } else {
                             msg.append(getPlanetRepresentationPlusEmojiPlusInfluence(thing, game))

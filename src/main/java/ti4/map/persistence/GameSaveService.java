@@ -848,7 +848,7 @@ class GameSaveService {
             writer.write(Constants.TECH_PURGED + " " + String.join(",", player.getPurgedTechs()));
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.PLANETS + " " + String.join(",", player.getPlanets()));
+            writer.write(Constants.PLANETS + " " + String.join(",", player.getUniquePlanets()));
             writer.write(System.lineSeparator());
             writer.write(Constants.PLANETS_EXHAUSTED + " " + String.join(",", player.getExhaustedPlanets()));
             writer.write(System.lineSeparator());
