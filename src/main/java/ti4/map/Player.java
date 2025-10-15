@@ -1984,6 +1984,17 @@ public class Player extends PlayerProperties {
         return newPlanets;
     }
 
+    public List<String> getUniquePlanets() {
+        List<String> uniquePlanets = new ArrayList<>();
+        for (String planet : getPlanets()) {
+            if (!uniquePlanets.contains(planet)) {
+                uniquePlanets.add(planet);
+            }
+        }
+
+        return uniquePlanets;
+    }
+
     public void loadDraftHand(List<String> saveString) {
         DraftBag newBag = new DraftBag();
         for (String item : saveString) {
