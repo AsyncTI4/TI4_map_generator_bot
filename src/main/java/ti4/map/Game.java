@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
