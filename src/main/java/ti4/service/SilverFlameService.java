@@ -57,7 +57,14 @@ public class SilverFlameService {
     }
 
     private void silverFlameDrumroll(Player prePlayer, int target) {
-        String gameName = prePlayer.getGame().getName();
+        Game gameS = prePlayer.getGame();
+        String gameName = gameS.getName();
+        String watchPartyMsg = prePlayer.getRepresentation() + " is rolling for the silver flame in " + gameS.getName()
+                + "! They are at " + prePlayer.getTotalVictoryPoints() + "/" + gameS.getVp() + " VP!";
+        if (prePlayer.hasRelicReady("heartofixth")) {
+            watchPartyMsg += " They have the heart of ixth, so only need an 8!";
+        }
+        DisasterWatchHelper.postTileInFlameWatch(gameS, null, prePlayer.getHomeSystemTile(), 0, watchPartyMsg);
         String drumrollMessage = prePlayer.getRepresentation() + " is rolling for " + rep(false) + "!";
         DrumrollService.doDrumroll(prePlayer.getCorrectChannel(), drumrollMessage, 5, gameName, game -> {
             Die result = new Die(target);
@@ -65,6 +72,7 @@ public class SilverFlameService {
 
             String resultMsg = "## " + player.getRepresentation() + " rolled a " + result.getResult() + " for "
                     + rep(false) + "! " + result.getGreenDieIfSuccessOrRedDieIfFailure();
+            DisasterWatchHelper.sendMessageInFlameWatch(game, resultMsg);
             resultMsg += "\nUse the button%s to resolve:";
             List<Button> buttons = silverFlameResolveButtons(game, player, result);
             resultMsg = String.format(resultMsg, buttons.size() > 1 ? "s" : "");
