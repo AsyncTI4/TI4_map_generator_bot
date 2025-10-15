@@ -352,7 +352,7 @@ public class StartCombatService {
             UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
             for (Units.UnitKey unit : space.getUnits().keySet()) {
                 Player player = game.getPlayerFromColorOrFaction(unit.getColor());
-                UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).getFirst();
+                UnitModel removedUnit = player.getPriorityUnitByAsyncID(unit.asyncID(), space);
                 if (removedUnit.getIsShip() && removedUnit.getSustainDamage()) {
                     sustain = true;
                     break;

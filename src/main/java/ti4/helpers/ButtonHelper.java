@@ -7657,19 +7657,15 @@ public class ButtonHelper {
         output = new HashMap<>(
                 unitsInCombat.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 
-        var duplicates = new HashSet<String>();
-        List<String> dupes = output.keySet().stream()
-                .filter(unit -> !duplicates.add(unit.getAsyncId()))
-                .map(UnitModel::getBaseType)
-                .toList();
-        for (String dupe : dupes) {
-            for (UnitModel mod : output.keySet()) {
-                if (mod.getBaseType().equalsIgnoreCase(dupe) && !mod.getId().contains("2")) {
-                    output.put(mod, 0);
-                    break;
-                }
+        for (UnitModel mod : output.keySet()) {
+            if (!player.getPriorityUnitByAsyncID(mod.getAsyncId(), unitHolder)
+                    .getAlias()
+                    .equalsIgnoreCase(mod.getAlias())) {
+                output.put(mod, 0);
+                break;
             }
         }
+
         return output;
     }
 
