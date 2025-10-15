@@ -32,7 +32,11 @@ import ti4.service.emoji.TileEmojis;
 public class SilverFlameService {
 
     public String rep(boolean includeCardText) {
-        return Mapper.getRelic("thesilverflame").getSimpleRepresentation();
+        if (includeCardText) {
+            return Mapper.getRelic("thesilverflame").getSimpleRepresentation();
+        } else {
+            return Mapper.getRelic("thesilverflame").getName();
+        }
     }
 
     public void rollSilverFlame(ButtonInteractionEvent event, Game game, Player player) {
@@ -130,7 +134,7 @@ public class SilverFlameService {
             if (owner == null) continue;
 
             int quantity = entry.getValue();
-            owner.setUnitCap(key.asyncID(), player.getUnitCap(key.getOldUnitID()) - quantity);
+            owner.setUnitCap(key.asyncID(), player.getUnitCap(key.asyncID()) - quantity);
             purgedUnitList
                     .append("\n> ")
                     .append(owner.fogSafeEmoji())
