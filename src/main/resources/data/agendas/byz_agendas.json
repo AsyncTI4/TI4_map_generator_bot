@@ -136,8 +136,8 @@
         "category": "agenda",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. The owner of this card applies +1 to the result of their fighter’s combat rolls. When 1 or more of their fighters make a combat roll, 1 of those units may roll one additional die. When the owner of this card uses PRODUCTION, they discard this card unless they produce 2 or more fighters.",
-        "mapText": "The owner of this card applies +1 to the result of their fighter’s combat rolls. When 1 or more of their fighters make a combat roll, 1 of those units may roll one additional die. When the owner of this card uses PRODUCTION, they discard this card unless they produce 2 or more fighters.",
+        "text1": "The elected player gains this card. The owner of this card applies +1 to the result of their fighter's combat rolls. When 1 or more of their fighters make a combat roll, 1 of those units may roll one additional die. When the owner of this card uses PRODUCTION, they discard this card unless they produce 2 or more fighters.",
+        "mapText": "The owner of this card applies +1 to the result of their fighter's combat rolls. When 1 or more of their fighters make a combat roll, 1 of those units may roll one additional die. When the owner of this card uses PRODUCTION, they discard this card unless they produce 2 or more fighters.",
         "source": "byz_agendas"
     },
     {
@@ -271,8 +271,8 @@
         "category": "agenda",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player’s may not receive commodities or trade goods from other players in a transaction.",
-        "mapText": "The elected player’s may not receive commodities or trade goods from other players in a transaction.",
+        "text1": "The elected player's may not receive commodities or trade goods from other players in a transaction.",
+        "mapText": "The elected player's may not receive commodities or trade goods from other players in a transaction.",
         "source": "byz_agendas"
     },
     {

@@ -29,7 +29,7 @@
         "title": "The Invincible",
         "abilityName": "Titles Are Silly",
         "abilityWindow": "At the start of a space combat that you are participating in:",
-        "abilityText": "You may purge this card. If you do, roll 1 die for each of your non-fighter ships in this system. For each result equal to or greater than that ship's combat value, produce 1 hit; your opponent must assign it to 1 of their ships. During this combat, both you and your opponent ignore all of your opponent’s non-warsun unit upgrade technologies.",
+        "abilityText": "You may purge this card. If you do, roll 1 die for each of your non-fighter ships in this system. For each result equal to or greater than that ship's combat value, produce 1 hit; your opponent must assign it to 1 of their ships. During this combat, both you and your opponent ignore all of your opponent's non-warsun unit upgrade technologies.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "balacasi"
     },
@@ -40,7 +40,7 @@
         "name": "Qekob",
         "title": "The Weaver",
         "abilityWindow": "Action",
-        "abilityText": "Choose a system with a player’s command token. That player may remove one of their ships from that system and place it in that player’s home system if it contains no other player’s ships.",
+        "abilityText": "Choose a system with a player's command token. That player may remove one of their ships from that system and place it in that player's home system if it contains no other player's ships.",
         "unlockCondition": "Always Unlocked",
         "source": "other"
     },
@@ -51,7 +51,7 @@
         "name": "Zraaqu",
         "title": "The Spinner",
         "abilityWindow": "At the start of a space combat in a system with your command token:",
-        "abilityText": "If you are the defender, you may choose up to 2 of your opponent’s units. Those units roll 1 less combat die during the first round of this combat.",
+        "abilityText": "If you are the defender, you may choose up to 2 of your opponent's units. Those units roll 1 less combat die during the first round of this combat.",
         "unlockCondition": "Have 6 of your Command Tokens on the game board",
         "source": "other"
     },
@@ -139,9 +139,9 @@
         "id": "lunariumagent",
         "faction": "lunarium",
         "type": "agent",
-        "name": "Gu’la Ma",
+        "name": "Gu'la Ma",
         "title": "The Wise",
-        "abilityWindow": "When 1 or more of a player’s units use PRODUCTION: ",
+        "abilityWindow": "When 1 or more of a player's units use PRODUCTION: ",
         "abilityText": "You may exhaust this card to apply +1 to the total PRODUCTION value of those units and reduce the combined cost of the produced units by 1.",
         "unlockCondition": "Always Unlocked",
         "source": "balacasi"
@@ -176,7 +176,7 @@
         "name": "Innovator Zeth",
         "title": "The Wise",
         "abilityWindow": "ACTION:",
-        "abilityText": "Exhaust this card to choose a player. That player may move 1 of their ships into an adjacent system that doesn’t contain any other player's ships. If the ship started this action in a system that contains that player's command token, they place a command token from their reinforcements into the target system.",
+        "abilityText": "Exhaust this card to choose a player. That player may move 1 of their ships into an adjacent system that doesn't contain any other player's ships. If the ship started this action in a system that contains that player's command token, they place a command token from their reinforcements into the target system.",
         "unlockCondition": "Always Unlocked",
         "source": "balacasi"
     },
@@ -199,7 +199,7 @@
         "title": "The Invincible",
         "abilityName": "Titles Are Silly",
         "abilityWindow": "ACTION:",
-        "abilityText": "For each system that contains 1 or more of your ships, you may move 1 ship in that system into an adjacent system that doesn’t contain another player's ships.",
+        "abilityText": "For each system that contains 1 or more of your ships, you may move 1 ship in that system into an adjacent system that doesn't contain another player's ships.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "balacasi"
     },
@@ -278,7 +278,7 @@
         "name": "Rhino the Adventurer",
         "title": "The Wise",
         "abilityWindow": "ACTION:",
-        "abilityText": " Exhaust this card and choose another player. Choose a ship type that has a bounty token on that player’s faction sheet with a cost of 4 or less; the chosen player must choose 1 of their ships of that type in a system that contains 1 of their command tokens, if able. The chosen ship is destroyed and that player gains trade goods equal to its cost.",
+        "abilityText": " Exhaust this card and choose another player. Choose a ship type that has a bounty token on that player's faction sheet with a cost of 4 or less; the chosen player must choose 1 of their ships of that type in a system that contains 1 of their command tokens, if able. The chosen ship is destroyed and that player gains trade goods equal to its cost.",
         "unlockCondition": "Always Unlocked",
         "source": "balacasi"
     },
@@ -300,7 +300,7 @@
         "name": "Monturak Homotol",
         "title": "The Invincible",
         "abilityName": "Titles Are Silly",
-        "abilityWindow": "After you destroy an opponent’s War Sun or Flagship that has a bounty token on its unit space: ",
+        "abilityWindow": "After you destroy an opponent's War Sun or Flagship that has a bounty token on its unit space: ",
         "abilityText": "If you have a War Sun or Flagship on the game board, you may place this card in your play area and place 1 bounty token on the unit space of one of those ships. Then, gain 1 victory point.\nIf one of your ships with a bounty token on its unit space is destroyed, lose 1 victory point and purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "balacasi"

@@ -12,7 +12,6 @@ import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -76,18 +75,18 @@ public class PickStrategyCardButtonHandler {
     @ButtonHandler("scPick_")
     public static boolean scPick(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String num = buttonID.replace("scPick_", "");
-        int scpick = Integer.parseInt(num);
+        int scPick = Integer.parseInt(num);
 
         String pdValue = game.getStoredValue("Public Disgrace");
         String pdOnly = game.getStoredValue("Public Disgrace Only");
 
-        if (pdValue != null && pdValue.contains("_" + scpick)) {
+        if (pdValue != null && pdValue.contains("_" + scPick)) {
             // If the player who picked is the one who set the preset, remove the preset and skip triggering
             if (pdValue.contains(player.getFaction())) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         player.getRepresentationUnfogged()
-                                + " preset for _Public Disgrace_ was removed due to you picking " + scpick
+                                + " preset for _Public Disgrace_ was removed due to you picking " + scPick
                                 + " yourself.");
                 game.setStoredValue("Public Disgrace", "");
             } else if (pdOnly.isEmpty()
@@ -98,14 +97,14 @@ public class PickStrategyCardButtonHandler {
                         ActionCardHelper.playAC(event, game, p2, "disgrace", game.getMainGameChannel());
                         game.setStoredValue("Public Disgrace", "");
                         String msg = player.getRepresentationUnfogged() + " picked "
-                                + Helper.getSCRepresentation(game, scpick) + ".";
+                                + Helper.getSCRepresentation(game, scPick) + ".";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),
                                 player.getRepresentation()
                                         + " you have been _Public Disgrace_'d because someone preset it to occur when the number "
-                                        + scpick
+                                        + scPick
                                         + " was chosen. If this is a mistake or the _Public Disgrace_ is Sabo'd, feel free to pick the strategy card again. Otherwise, pick a different strategy card.");
                         return false;
                     }
@@ -113,29 +112,29 @@ public class PickStrategyCardButtonHandler {
             }
         }
         if (game.getStoredValue("deflectedSC").equalsIgnoreCase(num)) {
-            if (player.getStrategicCC() < 1) {
+            int fleetCC = player.getFleetCC();
+            if (fleetCC < 1) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation()
-                                + ", you can't pick this strategy card because it has been targeted by _Deflection_, and you don't have a command token in your strategy pool to spend.");
+                                + ", you can't pick this strategy card because it has been targeted by _Deflection_, and you don't have a command token in your fleet pool to spend.");
                 return false;
             } else {
-                player.setStrategicCC(player.getStrategicCC() - 1);
-                ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
+                player.setFleetCC(fleetCC - 1);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation()
-                                + " spent 1 command token from their strategy pool to pick this strategy card due to _Deflection_.");
+                                + " spent 1 token from their fleet pool to pick this strategy card due to _Deflection_.");
             }
         }
 
         if (game.getLaws().containsKey("checks") || game.getLaws().containsKey("absol_checks")) {
-            secondHalfOfSCPickWhenChecksNBalances(event, player, game, scpick);
+            secondHalfOfSCPickWhenChecksNBalances(event, player, game, scPick);
             return true;
         } else {
-            boolean pickSuccessful = PlayerStatsService.secondHalfOfPickSC(event, game, player, scpick);
+            boolean pickSuccessful = PlayerStatsService.secondHalfOfPickSC(event, game, player, scPick);
             if (pickSuccessful) {
-                PickStrategyCardService.secondHalfOfSCPick(event, player, game, scpick);
+                PickStrategyCardService.secondHalfOfSCPick(event, player, game, scPick);
                 ButtonHelper.deleteMessage(event);
                 return true;
             }

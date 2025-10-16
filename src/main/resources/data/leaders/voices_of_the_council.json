@@ -6,7 +6,7 @@
         "name": "Dirzuga Ohao",
         "title": "Flaah Cultivator",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "Choose an outcome; if it is resolved and you predicted it or cast 5 or more votes for it, place 1 infantry from your reinforcements on a planet that does not contain other players’ units and is adjacent to 2 of your ground forces.",
+        "abilityText": "Choose an outcome; if it is resolved and you predicted it or cast 5 or more votes for it, place 1 infantry from your reinforcements on a planet that does not contain other players' units and is adjacent to 2 of your ground forces.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -94,7 +94,7 @@
         "name": "A6AH3",
         "title": "Calculated Presence",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "Choose an outcome; if it is not resolved and you predicted it or cast 5 or more votes for it, you may exhaust this card and remove 1 of your dreadnoughts in or adjacent to Mecatol Rex’s system from the board to discard the agenda instead; it is resolved with no effect and is not replaced.",
+        "abilityText": "Choose an outcome; if it is not resolved and you predicted it or cast 5 or more votes for it, you may exhaust this card and remove 1 of your dreadnoughts in or adjacent to Mecatol Rex's system from the board to discard the agenda instead; it is resolved with no effect and is not replaced.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -116,7 +116,7 @@
         "name": "Keer En Hanaan",
         "title": "Archon Of Unity",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "Choose an outcome; if it is resolved and you predicted it or cast 5 or more votes for it, you may exhaust this card to choose a player who voted for a different outcome. Replace 1 command token in your fleet pool with 1 from that player’s reinforcements if it does not already contain 1 of that player's tokens.",
+        "abilityText": "Choose an outcome; if it is resolved and you predicted it or cast 5 or more votes for it, you may exhaust this card to choose a player who voted for a different outcome. Replace 1 command token in your fleet pool with 1 from that player's reinforcements if it does not already contain 1 of that player's tokens.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -125,7 +125,7 @@
         "faction": "mentak",
         "type": "envoy",
         "name": "Cador Gim",
-        "title": "An Offer You Can’t Refuse",
+        "title": "An Offer You Can't Refuse",
         "abilityWindow": "Before a player casts votes:",
         "abilityText": "You may exhaust this card. If you do, that player must cast at least 1 vote for an outcome of your choice, if able, or give you 2 trade goods or 1 promissory note.",
         "unlockCondition": "At the start of the agenda phase",
@@ -259,7 +259,7 @@
         "name": "Brother Rhal",
         "title": "Evangelist",
         "abilityWindow": "When you cast votes:",
-        "abilityText": "You may remove 1 infantry from a planet you control to exhaust 1 adjacent planet controlled by another player and cast additional votes equal to that planet’s influence value.",
+        "abilityText": "You may remove 1 infantry from a planet you control to exhaust 1 adjacent planet controlled by another player and cast additional votes equal to that planet's influence value.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },

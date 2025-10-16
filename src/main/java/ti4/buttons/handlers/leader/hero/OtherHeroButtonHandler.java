@@ -147,7 +147,7 @@ class OtherHeroButtonHandler {
 
     @ButtonHandler("purgeRohdhnaHero")
     public static void purgeRohdhnaHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
-        purgeHeroPreamble(event, player, game, "rohdhnahero", "Roh’Vhin Dhna mk4, the Roh'Dhna hero");
+        purgeHeroPreamble(event, player, game, "rohdhnahero", "Roh'Vhin Dhna mk4, the Roh'Dhna hero");
     }
 
     @ButtonHandler("purgeVaylerianHero")

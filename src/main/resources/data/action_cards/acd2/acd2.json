@@ -122,7 +122,7 @@
         "phase": "Action",
         "window": "After you pass",
         "text": "Either draw 1 secret objective or gain commodities equal to the number of players that have passed.",
-        "flavorText": "There was a purr of excitement in the hall as the various executive members gathered to hear the latest earnings report. Behind the corporate sheen, the galaxy’s wealthiest aligned to carve up the stars among themselves.",
+        "flavorText": "There was a purr of excitement in the hall as the various executive members gathered to hear the latest earnings report. Behind the corporate sheen, the galaxy's wealthiest aligned to carve up the stars among themselves.",
         "source": "action_card_deck_2"
     },
     {
@@ -215,7 +215,7 @@
         "name": "Deflection",
         "phase": "Strategy",
         "window": "At the start of the strategy phase",
-        "text": "Choose 1 strategy card. During this strategy phase, other players must spend 1 token from their strategy pool to choose that strategy card, if able.",
+        "text": "Choose 1 strategy card. During this strategy phase, other players must spend 1 token from their fleet pool to choose that strategy card, if they have another choice.",
         "flavorText": "\"It was their idea,\" Zo Cou shrugged. \"Or so they believe. Their mistake was a poison I fed them. Now they choke on it.\"",
         "source": "action_card_deck_2"
     },
@@ -547,7 +547,7 @@
         "name": "Pivot",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Discard 1-3 action cards from your hand to draw an equal number of action cards.",
+        "text": "Discard 1-3 action cards from your hand to draw an equal number of action cards. Then, you may discard 2 action cards to draw 1 secret objective.",
         "flavorText": "\"We must not become stagnant. Stagnation is what broke this galaxy,\" I48S said, barely hesitating at his patient's screams. \"Pain? Let's remove that.\"",
         "source": "action_card_deck_2"
     },
@@ -639,6 +639,15 @@
         "window": "After 1 of your ships is destroyed",
         "text": "Produce 1 ship of that type in a different system that contains 1 of your units with PRODUCTION; reduce the cost of the produced ship by up to 4.",
         "flavorText": "The production of the Van Hauge VI was completed in record time. As it left the docking bay, Dannel smiled—a rare occurrence these days. \"Glory to the Yin, my brothers. You have done us all proud.\"",
+        "source": "action_card_deck_2"
+    },
+    {
+        "alias": "reflag",
+        "name": "Reflag",
+        "phase": "Any",
+        "window": "When you would remove a command token from a system that contains your ships",
+        "text": "Do not remove that token and place 1 dreadnought from your reinforcements in that system instead.",
+        "flavorText": "“Yeah, nah—we didn't nick that hull off the Baron,” Ipswitch cut in with a smirk. “We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork, and possession's nine-tenths.”",
         "source": "action_card_deck_2"
     },
     {

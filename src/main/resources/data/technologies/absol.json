@@ -180,7 +180,7 @@
         ],
         "requirements": "Y",
         "source": "absol",
-        "text": "When a player would resolve a retreat, your units may first use SPACE CANNON against the retreating player’s ships in the active system.\nYou may exhaust this card before 1 or more of your units use SPACE CANNON; hits produced by those units must be assigned to non-fighter ships if able.",
+        "text": "When a player would resolve a retreat, your units may first use SPACE CANNON against the retreating player's ships in the active system.\nYou may exhaust this card before 1 or more of your units use SPACE CANNON; hits produced by those units must be assigned to non-fighter ships if able.",
         "homebrewReplacesID": "gls",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/GravitonLaserSystems.png?raw=true"
     },
@@ -897,7 +897,7 @@
         "requirements": "R",
         "faction": "naaz",
         "source": "absol",
-        "text": "At the start of a combat round, you may exhaust a relic fragment in your play area to apply +1 to the results of each of your units’ combat rolls during this combat round.",
+        "text": "At the start of a combat round, you may exhaust a relic fragment in your play area to apply +1 to the results of each of your units' combat rolls during this combat round.",
         "homebrewReplacesID": "sc",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/Supercharge.png?raw=true"
     },
@@ -989,7 +989,7 @@
         "requirements": "G",
         "faction": "mahact",
         "source": "absol",
-        "text": "When you would cast votes during the agenda phase, you may exhaust 1 planet controlled by each other player whose command tokens are on the Mahact player’s command sheet. You may cast votes from these planets as if you controlled them, even if you would otherwise be prevented from voting.",
+        "text": "When you would cast votes during the agenda phase, you may exhaust 1 planet controlled by each other player whose command tokens are on the Mahact player's command sheet. You may cast votes from these planets as if you controlled them, even if you would otherwise be prevented from voting.",
         "homebrewReplacesID": "gr",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/GeneticRecombination.png?raw=true"
     },

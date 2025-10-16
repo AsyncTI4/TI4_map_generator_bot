@@ -11,12 +11,12 @@
     },
     {
         "alias": "bapnxan",
-        "name": "Warlord’s Decree",
+        "name": "Warlord's Decree",
         "faction": "xan",
         "color": "",
         "playArea": false,
         "source": "balacasi",
-        "text": "At the start of a space combat: You may choose up to 3 of your opponents’ ships that have SUSTAIN DAMAGE to become damaged. Then, return this card to the Xan player."
+        "text": "At the start of a space combat: You may choose up to 3 of your opponents' ships that have SUSTAIN DAMAGE to become damaged. Then, return this card to the Xan player."
     },
     {
         "alias": "bapnkalo",
@@ -25,7 +25,7 @@
         "color": "",
         "playArea": true,
         "source": "balacasi",
-        "text": "If you are not the Kalora player, place this card face up in your play area. You may use the Kalora’s PRIMORDIAL faction ability. Both you and the Kalora player consider yourself as first to score an objective if no player other than each other has scored that objective. If you activate a system containing 1 or more of Kalora’s units, return this card to the Kalora player."
+        "text": "If you are not the Kalora player, place this card face up in your play area. You may use the Kalora's PRIMORDIAL faction ability. Both you and the Kalora player consider yourself as first to score an objective if no player other than each other has scored that objective. If you activate a system containing 1 or more of Kalora's units, return this card to the Kalora player."
     },
     {
         "alias": "bapnconc",
@@ -47,7 +47,7 @@
     },
     {
         "alias": "bapntyri",
-        "name": "Fate’s Bargain",
+        "name": "Fate's Bargain",
         "faction": "tyris",
         "color": "",
         "playArea": false,

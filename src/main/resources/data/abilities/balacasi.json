@@ -82,7 +82,7 @@
         "id": "patience",
         "name": "Patience",
         "faction": "onyxxa",
-        "permanentEffect": "At the end of the strategy phase, place the Obsidian Infinity token on your strategy card. You are last in initiative order. When you perform a strategic action, resolve your strategy card’s secondary ability instead of its primary ability.",
+        "permanentEffect": "At the end of the strategy phase, place the Obsidian Infinity token on your strategy card. You are last in initiative order. When you perform a strategic action, resolve your strategy card's secondary ability instead of its primary ability.",
         "source": "balacasi"
     },
     {
@@ -138,7 +138,7 @@
         "id": "marked_prey",
         "name": "Marked Prey",
         "faction": "zephyrion",
-        "permanentEffect": "At the start of the strategy phase, place any number of your bounty tokens from your reinforcements on the unit space of non-fighter ships on other players’ factions sheets. You can have a maximum of 1 bounty token on each unit space.",
+        "permanentEffect": "At the start of the strategy phase, place any number of your bounty tokens from your reinforcements on the unit space of non-fighter ships on other players' factions sheets. You can have a maximum of 1 bounty token on each unit space.",
         "source": "balacasi"
     },
     {

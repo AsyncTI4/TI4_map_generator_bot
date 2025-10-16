@@ -226,7 +226,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "During the agenda phase, when an outcome you voted for is resolved:\nPlace up to 2 fighters from your reinforcements in this or an adjacent system. If that system contains another player’s ships, immediately resolve\na space combat."
+        "ability": "During the agenda phase, when an outcome you voted for is resolved:\nPlace up to 2 fighters from your reinforcements in this or an adjacent system. If that system contains another player's ships, immediately resolve\na space combat."
     },
     {
         "id": "naaz-rokha_monument",

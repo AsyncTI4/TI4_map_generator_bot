@@ -977,7 +977,7 @@
         "faction": "belkosea",
         "baseUpgrade": "ff2",
         "source": "ds",
-        "text": "You may commit this unit to a planet as if it were a ground force. When combat ends, return it to the space area. Fighters in excess of your ships’ capacity count against your fleet pool. 1(x2), 8, 2; ANTI-FIGHTER BARRAGE 9(x2)"
+        "text": "You may commit this unit to a planet as if it were a ground force. When combat ends, return it to the space area. Fighters in excess of your ships' capacity count against your fleet pool. 1(x2), 8, 2; ANTI-FIGHTER BARRAGE 9(x2)"
     },{
         "alias": "dstoldb",
         "name": "Emergency Modifications",
@@ -997,6 +997,6 @@
         "requirements": "R",
         "faction": "toldar",
         "source": "ds",
-        "text": "During each round of combat, you may cancel 1 hit your units produced to cancel up to 1 hit your opponent’s units produced."
+        "text": "During each round of combat, you may cancel 1 hit your units produced to cancel up to 1 hit your opponent's units produced."
     }
 ]

@@ -98,21 +98,21 @@
         "id": "protocol_command",
         "name": "(Protocol) Command",
         "faction": "mechi",
-        "permanentEffect":"Tier 1 - At the end of a player’s turn: You may exhaust this card to allow them to perform the secondary ability of the Leadership strategy card. \n\nTier 2 - Planets that contain your mechs have their influence value increased by +1 \n\nTier 3 - ACTION: Perform the primary ability of the leadership card. Then, refresh all planets you spent during that action.",
+        "permanentEffect":"Tier 1 - At the end of a player's turn: You may exhaust this card to allow them to perform the secondary ability of the Leadership strategy card. \n\nTier 2 - Planets that contain your mechs have their influence value increased by +1 \n\nTier 3 - ACTION: Perform the primary ability of the leadership card. Then, refresh all planets you spent during that action.",
         "source": "eronous"
     },
     {
         "id": "protocol_excavation",
         "name": "(Protocol) Excavation",
         "faction": "mechi",
-        "permanentEffect":"Tier 1 - At the end of a player’s turn: You may exhaust this card to allow that player to explore a planet that contains one of their mechs. \n\nTier 2 - When you explore a planet: Gain 1tg. \n\nTier 3 - ACTION: Explore each planet that contains one of your mechs. Then, ready each of those planets.",
+        "permanentEffect":"Tier 1 - At the end of a player's turn: You may exhaust this card to allow that player to explore a planet that contains one of their mechs. \n\nTier 2 - When you explore a planet: Gain 1tg. \n\nTier 3 - ACTION: Explore each planet that contains one of your mechs. Then, ready each of those planets.",
         "source": "eronous"
     },
     {
         "id": "protocol_espionage",
         "name": "(Protocol) Espionage",
         "faction": "mechi",
-        "permanentEffect":"Tier 1 - At the end of a player’s turn: You may exhaust this card to allow a player to discard one unscored secret objective. If they do so, they draw a new one. Then, shuffle the discarded secret objective into the deck. \n\nTier 2 - When you win a combat against another player: That player must show you one of their unscored secret objectives at random, if able. \n\nTier 3 - ACTION: Each of your neighbors must give you one of their unscored secret objectives. Then, give one unscored secret objective you are holding back to each of those players.",
+        "permanentEffect":"Tier 1 - At the end of a player's turn: You may exhaust this card to allow a player to discard one unscored secret objective. If they do so, they draw a new one. Then, shuffle the discarded secret objective into the deck. \n\nTier 2 - When you win a combat against another player: That player must show you one of their unscored secret objectives at random, if able. \n\nTier 3 - ACTION: Each of your neighbors must give you one of their unscored secret objectives. Then, give one unscored secret objective you are holding back to each of those players.",
         "source": "eronous"
     },
     {

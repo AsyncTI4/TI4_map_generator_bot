@@ -107,7 +107,7 @@
     {
         "alias": "superweaponglatison",
         "name": "Superweapon Glatison",
-        "text": "At any time, you may exhaust this card to repair all of your damaged units. Up to 5 fighters in this system do not count against your ships’ capacity.ANTI-FIGHTER BARRAGE 4(x2) [Note: the AFB is not automated]",
+        "text": "At any time, you may exhaust this card to repair all of your damaged units. Up to 5 fighters in this system do not count against your ships' capacity.ANTI-FIGHTER BARRAGE 4(x2) [Note: the AFB is not automated]",
         "isFakeRelic": true,
         "source": "ds"
     },

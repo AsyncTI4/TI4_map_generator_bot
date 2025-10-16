@@ -74,7 +74,7 @@
         "name": "That Which Gives",
         "title": "Shadow of Eccon V",
         "abilityWindow": "At the start of a space combat",
-        "abilityText": "You may exhaust this card to allow the defender to choose 1 of their opponent’s ships to place 1 ship of that type from their reinforcements in the active system.",
+        "abilityText": "You may exhaust this card to allow the defender to choose 1 of their opponent's ships to place 1 ship of that type from their reinforcements in the active system.",
         "unlockCondition": "Always Unlocked",
         "source": "eronous"
     },
@@ -86,7 +86,7 @@
         "title": "Shadow of Tyria Prime",
         "abilityWindow": "At any time:",
         "abilityText": "When you would exhaust a planet for its resources you may instead use its influence value.",
-        "unlockCondition": "Have 2 other players’ control tokens on your faction sheet.",
+        "unlockCondition": "Have 2 other players' control tokens on your faction sheet.",
         "source": "eronous"
     },
     {

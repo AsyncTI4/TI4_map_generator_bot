@@ -1,6 +1,8 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -856,7 +858,7 @@ public class ButtonHelperHeroes {
                         Buttons.green("freeSystemsHeroPlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
             }
         }
-        String message = "Please choose the planet on which to use Count Otto P’may, the Free Systems hero.";
+        String message = "Please choose the planet on which to use Count Otto P'may, the Free Systems hero.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
 

@@ -1204,7 +1204,7 @@ public class ButtonHelperAgents {
         }
         if ("tnelisagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
-                    + "Davish S’Norri, the Tnelis" + ssruuSlash + " agent.";
+                    + "Davish S'Norri, the Tnelis" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             game.setStoredValue("tnelisAgentFaction", player.getFaction());
             ButtonHelper.resolveCombatRoll(

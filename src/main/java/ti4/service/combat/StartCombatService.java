@@ -446,13 +446,13 @@ public class StartCombatService {
                     MessageHelper.sendMessageToChannel(
                             threadChannel,
                             player1.getRepresentation()
-                                    + ", a reminder that your opponent has the Man O’ War here, and so you (and all other players) cannot play action cards during this space combat.");
+                                    + ", a reminder that your opponent has the Man O' War here, and so you (and all other players) cannot play action cards during this space combat.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("florzen_flagship", player1, tile)) {
                     MessageHelper.sendMessageToChannel(
                             threadChannel,
                             player2.getRepresentation()
-                                    + ", a reminder that your opponent has the Man O’ War here, and so you (and all other players) cannot play action cards during this space combat.");
+                                    + ", a reminder that your opponent has the Man O' War here, and so you (and all other players) cannot play action cards during this space combat.");
                 }
             }
         }
@@ -761,7 +761,7 @@ public class StartCombatService {
 
             if ((player.hasAbility("edict") || player.hasAbility("imperia"))
                     && !player.getMahactCC().contains(otherPlayer.getColor())
-                    && !otherPlayer.getFaction().equalsIgnoreCase("neutral")) {
+                    && !"neutral".equalsIgnoreCase(otherPlayer.getFaction())) {
                 buttons = new ArrayList<>();
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons.add(Buttons.gray(

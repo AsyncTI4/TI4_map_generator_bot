@@ -404,7 +404,7 @@
         "type": "agent",
         "name": "Zhroth Khuvad",
         "title": "Khuvad Arms C.E.O.",
-        "abilityWindow": "After a player activates a non-home system that contains another player’s units",
+        "abilityWindow": "After a player activates a non-home system that contains another player's units",
         "abilityText": "You may exhaust this card to apply +2 to the move value of 1 of the active player's ships during this tactical action.",
         "unlockCondition": "Always Unlocked",
         "source": "ds"
@@ -868,7 +868,7 @@
         "name": " Ciphus Gault",
         "title": "Mercenary Demon",
         "abilityWindow": "When one of your units would make a combat roll:",
-        "abilityText": "You may use that unit’s ANTI-FIGHTER BARRAGE instead. You cannot use this ability during the first round of space combat.",
+        "abilityText": "You may use that unit's ANTI-FIGHTER BARRAGE instead. You cannot use this ability during the first round of space combat.",
         "unlockCondition": "Have 1 superweapon in your play area.",
         "source": "ds"
     },
@@ -1348,7 +1348,7 @@
         "title": "The Reaper",
         "abilityName": " Ace of Aces - Inspirational Pilot",
         "abilityWindow": "At the start of combat",
-        "abilityText": "You may exhaust this card; if you do, during this combat, hits produced by your fighters’ ANTI-FIGHTER BARRAGE are instead produced against all ships (not just fighters). After you lose a combat, ready this card. [Note: this hero does not purge]",
+        "abilityText": "You may exhaust this card; if you do, during this combat, hits produced by your fighters' ANTI-FIGHTER BARRAGE are instead produced against all ships (not just fighters). After you lose a combat, ready this card. [Note: this hero does not purge]",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     },

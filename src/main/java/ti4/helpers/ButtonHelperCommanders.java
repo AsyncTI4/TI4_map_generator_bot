@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -796,7 +796,7 @@ public class ButtonHelperCommanders {
         String planet = buttonID.split("_")[1];
         String message = player.getRepresentation() + " chose to destroy 2 infantry on "
                 + Helper.getPlanetRepresentation(planet, game)
-                + " in the process of unlocking Avhkan, the Pharad’n commander.";
+                + " in the process of unlocking Avhkan, the Pharad'n commander.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         int amountToKill = 2;
         DestroyUnitService.destroyUnits(
@@ -836,7 +836,7 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getFactionEmoji() + " destroyed 1 opposing infantry on "
-                        + Helper.getPlanetRepresentation(planet, game) + " using the Avhkan, the Pharad’n commander.");
+                        + Helper.getPlanetRepresentation(planet, game) + " using the Avhkan, the Pharad'n commander.");
     }
 
     @ButtonHandler("yssarilcommander_")

@@ -1309,7 +1309,7 @@
         "capacityValue": 0,
         "isStructure": true,
         "planetaryShield": true,
-        "ability": "This unit’s PRODUCTION value is equal to 2 more than the resource value of this planet.\nDEPLOY: When you gain control of a planet, you may replace 4 infantry on that planet with 1 space dock.",
+        "ability": "This unit's PRODUCTION value is equal to 2 more than the resource value of this planet.\nDEPLOY: When you gain control of a planet, you may replace 4 infantry on that planet with 1 space dock.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/ds/faction/mycelium_ring.jpg?raw=true"
     },
     {
@@ -1325,7 +1325,7 @@
         "basicProduction": "res",
         "isStructure": true,
         "planetaryShield": true,
-        "ability": "This unit’s PRODUCTION value is equal to 5 more than the resource value of this planet.\nDEPLOY: When you gain control of a planet, you may replace 3 infantry on that planet with 1 space dock.",
+        "ability": "This unit's PRODUCTION value is equal to 5 more than the resource value of this planet.\nDEPLOY: When you gain control of a planet, you may replace 3 infantry on that planet with 1 space dock.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/ds/mycelium_ring_2.jpg?raw=true"
     },
     {
@@ -1988,7 +1988,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "Apply +1 to this unit’s combat rolls for each round of combat that has been resolved this combat."
+        "ability": "Apply +1 to this unit's combat rolls for each round of combat that has been resolved this combat."
     },
     {
         "id": "uydai_flagship",
@@ -2278,7 +2278,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Your other units in this system also have the unit and text abilities of other players’ units of the same type in this system. [Note: not currently implemented by the bot]"
+        "ability": "Your other units in this system also have the unit and text abilities of other players' units of the same type in this system. [Note: not currently implemented by the bot]"
     },
     {
         "id": "belkosea_fighter",
@@ -2313,7 +2313,7 @@
         "afbHitsOn": 9,
         "afbDieCount": 2,
         "isShip": true,
-        "ability": "You may commit this unit to a planet as if it were a ground force. When combat ends, return it to the space area. Fighters in excess of your ships’ capacity count against your fleet pool."
+        "ability": "You may commit this unit to a planet as if it were a ground force. When combat ends, return it to the space area. Fighters in excess of your ships' capacity count against your fleet pool."
     },
     {
         "id": "belkosea_mech",
@@ -2346,6 +2346,6 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "During combat, you may have this ship become damaged to produce 1 hit against another player’s non-fighter ships in this system."
+        "ability": "During combat, you may have this ship become damaged to produce 1 hit against another player's non-fighter ships in this system."
     }
 ]

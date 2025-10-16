@@ -400,7 +400,7 @@
         "color": "",
         "playArea": true,
         "source": "ds",
-        "text": "When you receive this card, if you are not the Pharad'n player, you must place it face up in your play area.\nAfter 1 of your opponent’s infantry is destroyed during ground combat, you may exhaust this card to place 1 infantry from your reinforcements on that planet. Then, the Pharad'n player captures 1 infantry from their reinforcements."
+        "text": "When you receive this card, if you are not the Pharad'n player, you must place it face up in your play area.\nAfter 1 of your opponent's infantry is destroyed during ground combat, you may exhaust this card to place 1 infantry from your reinforcements on that planet. Then, the Pharad'n player captures 1 infantry from their reinforcements."
     },
     {
         "alias": "dspnqhet",
@@ -427,7 +427,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "At the start of combat: Roll 4 dice, for each result of 8 or greater, destroy up to 1 of your opponent’s fighters or infantry participating in that combat.Then, return this card to the Belkosea player."
+        "text": "At the start of combat: Roll 4 dice, for each result of 8 or greater, destroy up to 1 of your opponent's fighters or infantry participating in that combat.Then, return this card to the Belkosea player."
     },
     {
         "alias": "dspntold",

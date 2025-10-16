@@ -152,7 +152,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When this unit makes a BOMBARDMENT roll against another player’s units, if it rolls at least 1 result of 9 or 10, you may gain 1 trade good."
+        "ability": "When this unit makes a BOMBARDMENT roll against another player's units, if it rolls at least 1 result of 9 or 10, you may gain 1 trade good."
     },
     {
         "id": "kalora_dreadnought2",
@@ -173,7 +173,7 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards. When this unit makes a BOMBARDMENT roll against another player’s units, if it produces 1 or more hits, you may gain 1 trade good."
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards. When this unit makes a BOMBARDMENT roll against another player's units, if it produces 1 or more hits, you may gain 1 trade good."
     },
     {
         "id": "lunarium_flagship",
@@ -329,7 +329,7 @@
         "basicProduction": "res",
         "capacityValue": 3,
         "isStructure": true,
-        "ability": "Up to 1 non-fighter ship in this system does not count against your fleet limit. This unit’s PRODUCTION value is equal to 2 more than the resource value of this planet.Up to 3 fighters in this system do not count against your ships' capacity"
+        "ability": "Up to 1 non-fighter ship in this system does not count against your fleet limit. This unit's PRODUCTION value is equal to 2 more than the resource value of this planet.Up to 3 fighters in this system do not count against your ships' capacity"
     },
     {
         "id": "xan_spacedock2",
@@ -344,7 +344,7 @@
         "basicProduction": "res",
         "capacityValue": 3,
         "isStructure": true,
-        "ability": "Up to 3 non-fighter ships in this system do not count against your fleet limit. This unit’s PRODUCTION value is equal to 4 more than the resource value of this planet.Up to 3 fighters in this system do not count against your ships' capacity"
+        "ability": "Up to 3 non-fighter ships in this system do not count against your fleet limit. This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.Up to 3 fighters in this system do not count against your ships' capacity"
     },
     {
         "id": "tyris_flagship",
@@ -491,7 +491,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "During a space combat, if 1 or more of your opponent’s units participating in this combat has a bounty token on the unit space of that player’s faction sheet, apply +2 to this unit’s combat rolls."
+        "ability": "During a space combat, if 1 or more of your opponent's units participating in this combat has a bounty token on the unit space of that player's faction sheet, apply +2 to this unit's combat rolls."
     },
     {
         "id": "zephyrion_mech",

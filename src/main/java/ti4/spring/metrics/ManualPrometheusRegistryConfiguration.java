@@ -17,16 +17,16 @@ declare a concrete type instead? It works locally, but not in docker.
 > Root cause
 > Your code in MetricsConfiguration.java is correct. The failure to inject MeterRegistry
 > is almost certainly due to packaging: your build uses maven-jar-plugin + maven-assembly-plugin
-> to create a fat JAR. These tools do not merge Spring Boot’s auto-configuration resource
+> to create a fat JAR. These tools do not merge Spring Boot's auto-configuration resource
 > files (META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports)
-> by default. As a result, Spring Boot’s Micrometer auto-configuration classes are not discovered
+> by default. As a result, Spring Boot's Micrometer auto-configuration classes are not discovered
 > at runtime, and no MeterRegistry bean is created, causing the UnsatisfiedDependencyException.
 >
 > Why this happens
 >
 > Spring Boot 3 uses resource-based autoconfiguration discovery via AutoConfiguration.imports.
 > When you build an uber JAR with the assembly plugin, duplicate resource files are typically
-> overwritten rather than merged. That drops many auto-config entries (including Micrometer’s),
+> overwritten rather than merged. That drops many auto-config entries (including Micrometer's),
 > so @EnableAutoConfiguration does not import them.
 >
 > Locally in IDE (classpath run), it would work because individual JARs contribute their own
@@ -34,7 +34,7 @@ declare a concrete type instead? It works locally, but not in docker.
 >
 > Preferred fix (use Spring Boot packaging)
 >
-> Replace assembly-based fat jar with Spring Boot’s packaging. This correctly merges metadata
+> Replace assembly-based fat jar with Spring Boot's packaging. This correctly merges metadata
 > and produces an executable boot-jar.
 > In pom.xml, add the Spring Boot repackage plugin and remove the assembly fat-jar execution
 > for runtime distribution.
@@ -49,7 +49,7 @@ declare a concrete type instead? It works locally, but not in docker.
 >
 >     Alternative fix (if you must keep an uber JAR)
 >
-> Switch to maven-shade-plugin and add resource transformers that merge Boot 3’s metadata:
+> Switch to maven-shade-plugin and add resource transformers that merge Boot 3's metadata:
 > Merge META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports
 > Merge META-INF/spring/org.springframework.boot.actuate.autoconfigure/… if present
 > For any libs still using Spring Boot 2-style, also merge META-INF/spring.factories This
@@ -61,7 +61,7 @@ declare a concrete type instead? It works locally, but not in docker.
 >
 > Manually provide a registry bean so injection succeeds, e.g., define a PrometheusMeterRegistry
 > bean in a configuration class and keep the parameter type as MeterRegistry. This unblocks
-> startup but bypasses Boot’s CompositeMeterRegistry and can lead to double registration once
+> startup but bypasses Boot's CompositeMeterRegistry and can lead to double registration once
 > packaging is fixed. Use only while migrating packaging.
 
 Temporary manual Prometheus MeterRegistry wiring.

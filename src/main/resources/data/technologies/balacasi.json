@@ -21,7 +21,7 @@
         "faction": "xan",
         "baseUpgrade": "sd2",
         "source": "balacasi",
-        "text": "Up to 3 non-fighter ships in this system do not count against your fleet limit. This unit’s PRODUCTION value is equal to 4 more than the resource value of this planet.Up to 3 fighters in this system do not count against your ships' capacity"
+        "text": "Up to 3 non-fighter ships in this system do not count against your fleet limit. This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.Up to 3 fighters in this system do not count against your ships' capacity"
     },
     {
         "alias": "baarvag",
@@ -77,7 +77,7 @@
         "faction": "kalora",
         "baseUpgrade": "dn2",
         "source": "balacasi",
-        "text": "This unit cannot be destroyed by \"Direct Hit\" action cards. When this unit makes a BOMBARDMENT roll against another player’s units, if it produces 1 or more hits, you may gain 1 trade good. SUSTAIN DAMAGE BOMBARDMENT 5 Cost 4 Combat 5 Move 2 Capacity 1"
+        "text": "This unit cannot be destroyed by \"Direct Hit\" action cards. When this unit makes a BOMBARDMENT roll against another player's units, if it produces 1 or more hits, you may gain 1 trade good. SUSTAIN DAMAGE BOMBARDMENT 5 Cost 4 Combat 5 Move 2 Capacity 1"
     },
     {
         "alias": "bakalor",
@@ -88,7 +88,7 @@
         "requirements": "RR",
         "faction": "kalora",
         "source": "balacasi",
-        "text": "After you win a space combat in a non-home system, you may exhaust this card to place 1 command token from your opponent’s reinforcements into the active system."
+        "text": "After you win a space combat in a non-home system, you may exhaust this card to place 1 command token from your opponent's reinforcements into the active system."
     },
     {
         "alias": "balunacv",
