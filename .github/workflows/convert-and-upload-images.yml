@@ -1,0 +1,43 @@
+name: Convert and Upload Images to S3
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  convert-and-upload:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r scripts/requirements.txt
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::144233825305:role/GithubActionsRole
+          aws-region: us-east-1
+
+      - name: Convert and upload images to S3
+        run: |
+          python scripts/convert_and_upload_to_s3.py
+
+      - name: Report results
+        if: always()
+        run: |
+          echo "Image conversion and upload process completed"
+          echo "Check logs above for detailed conversion and upload statistics"
