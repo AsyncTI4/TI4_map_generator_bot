@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -28,9 +29,14 @@ import ti4.map.Planet;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.logging.BotLogger;
+import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
+import ti4.service.draft.draftables.FactionDraftable;
 import ti4.service.draft.draftables.SeatDraftable;
+import ti4.service.draft.draftables.SpeakerOrderDraftable;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
@@ -47,8 +53,9 @@ public class NucleusImageGeneratorService {
     private static final int EXTRA_X = 0; // padding at left/right of map
     private static final int EXTRA_Y = 0; // padding at top/bottom of map
     private static final int SPACE_FOR_TILE_HEIGHT = 300; // space to calculate tile image height with
-    private static final BasicStroke innerStroke = new BasicStroke(4.0f);
-    private static final BasicStroke outlineStroke = new BasicStroke(9.0f);
+    private static final BasicStroke INNER_STROKE = new BasicStroke(4.0f);
+    private static final BasicStroke OUTLINE_STROKE = new BasicStroke(9.0f);
+    private static final int EMOJI_SIZE = 40;
 
     public FileUpload tryGenerateImage(DraftManager draftManager, String uniqueKey, List<String> restrictChoiceKeys) {
 
@@ -88,7 +95,7 @@ public class NucleusImageGeneratorService {
 
         Map<String, Tile> tileMap = getRelevantTiles(draftManager);
         Map<String, MiltyDraftSlice> seatPosToNucleusTiles = getSeatToNucleusTiles(mapTemplate, tileMap);
-        Map<String, String> seatPosToUserName = getSeatToPlayer(mapTemplate, draftManager);
+        Map<String, PlayerInfo> seatToPlayerInfo = getSeatToPlayer(mapTemplate, draftManager);
 
         Map<String, Point> tileImagePoints = new HashMap<>();
 
@@ -120,8 +127,9 @@ public class NucleusImageGeneratorService {
         for (Tile tile : tileMap.values()) {
             try {
                 Point tilePos = tileImagePoints.get(tile.getPosition());
-                if (seatPosToUserName.containsKey(tile.getPosition())) {
-                    drawPlayerInfo(graphicsMain, tilePos, seatPosToUserName.get(tile.getPosition()));
+                if (seatToPlayerInfo.containsKey(tile.getPosition())) {
+                    PlayerInfo playerInfo = seatToPlayerInfo.get(tile.getPosition());
+                    drawPlayerInfo(graphicsMain, tilePos, playerInfo.userName(), playerInfo.summaryEmojis());
                 }
             } catch (Exception e) {
                 BotLogger.error("Failed to draw tile PLAYER " + tile.getTileID() + " at " + tile.getPosition(), e);
@@ -132,27 +140,97 @@ public class NucleusImageGeneratorService {
         return mainImage;
     }
 
-    private Map<String, String> getSeatToPlayer(MapTemplateModel mapTemplateModel, DraftManager draftManager) {
-        Map<String, String> seatNumToPlayerInfo = new HashMap<>();
+    private record PlayerInfo(String userName, List<TI4Emoji> summaryEmojis) {}
 
-        for (Map.Entry<String, PlayerDraftState> playerState :
-                draftManager.getPlayerStates().entrySet()) {
-            List<DraftChoice> seatChoices = playerState.getValue().getPicks().get(SeatDraftable.TYPE);
-            if (seatChoices == null || seatChoices.isEmpty()) {
+    private Map<String, PlayerInfo> getSeatToPlayer(MapTemplateModel mapTemplateModel, DraftManager draftManager) {
+        Map<String, PlayerInfo> seatNumToPlayerInfo = new HashMap<>();
+
+        Function<PlayerDraftState, Integer> getSeatNumber = null;
+        if (draftManager.getDraftable(SeatDraftable.TYPE) != null) {
+            getSeatNumber = state -> {
+                List<DraftChoice> seatChoices = state.getPicks(SeatDraftable.TYPE);
+                if (seatChoices == null || seatChoices.isEmpty()) {
+                    return null;
+                }
+                DraftChoice seatChoice = seatChoices.get(0);
+                Integer seatNum = SeatDraftable.getSeatNumberFromChoiceKey(seatChoice.getChoiceKey());
+                return seatNum;
+            };
+        } else if (draftManager.getDraftable(SpeakerOrderDraftable.TYPE) != null) {
+            getSeatNumber = state -> {
+                List<DraftChoice> speakerChoices = state.getPicks(SpeakerOrderDraftable.TYPE);
+                if (speakerChoices == null || speakerChoices.isEmpty()) {
+                    return null;
+                }
+                DraftChoice speakerChoice = speakerChoices.get(0);
+                Integer seatNum = SpeakerOrderDraftable.getSpeakerOrderFromChoiceKey(speakerChoice.getChoiceKey());
+                return seatNum;
+            };
+        }
+        if (getSeatNumber == null) {
+            return seatNumToPlayerInfo;
+        }
+
+        Map<String, PlayerDraftState> playerStates = draftManager.getPlayerStates();
+        for (Map.Entry<String, PlayerDraftState> playerState : playerStates.entrySet()) {
+            Integer seatNum = getSeatNumber.apply(playerState.getValue());
+            if (seatNum == null) {
                 continue;
             }
-            DraftChoice seatChoice = seatChoices.get(0);
-            Integer seatNum = SeatDraftable.getSeatNumberFromChoiceKey(seatChoice.getChoiceKey());
             MapTemplateTile homeTile = getSeatTileForPlayer(mapTemplateModel, seatNum);
             if (homeTile == null) {
                 continue;
             }
             String playerUserName =
                     draftManager.getGame().getPlayer(playerState.getKey()).getUserName();
-            seatNumToPlayerInfo.put(homeTile.getPos(), playerUserName);
+            List<TI4Emoji> summaryEmojis = getPlayerSummaryEmojis(draftManager, playerState.getKey());
+            seatNumToPlayerInfo.put(homeTile.getPos(), new PlayerInfo(playerUserName, summaryEmojis));
         }
 
         return seatNumToPlayerInfo;
+    }
+
+    private List<TI4Emoji> getPlayerSummaryEmojis(DraftManager draftManager, String playerUserId) {
+        if (draftManager == null
+                || playerUserId == null
+                || !draftManager.getPlayerStates().containsKey(playerUserId)) {
+            return List.of();
+        }
+
+        List<TI4Emoji> summaryEmojis = new ArrayList<>();
+
+        // When Seat and Speaker Order are drafted separately, provide the SpeakerOrder emoji
+        if (draftManager.getDraftable(SeatDraftable.TYPE) != null
+                && draftManager.getDraftable(SpeakerOrderDraftable.TYPE) != null) {
+            List<DraftChoice> speakerChoices = draftManager.getPlayerPicks(playerUserId, SpeakerOrderDraftable.TYPE);
+            if (speakerChoices != null && !speakerChoices.isEmpty()) {
+                DraftChoice speakerChoice = speakerChoices.get(0);
+                Integer speakerOrder = SpeakerOrderDraftable.getSpeakerOrderFromChoiceKey(speakerChoice.getChoiceKey());
+                TI4Emoji speakerEmoji = MiltyDraftEmojis.getSpeakerPickEmoji(speakerOrder);
+                if (speakerEmoji != null) {
+                    summaryEmojis.add(speakerEmoji);
+                }
+            }
+        }
+
+        // When a player has explicitly drafted Keleres, show the faction Emoji since the home system is unknown
+        if (draftManager.getDraftable(FactionDraftable.TYPE) != null) {
+            List<DraftChoice> playerPicks = draftManager.getPlayerPicks(playerUserId, FactionDraftable.TYPE);
+            if (playerPicks != null && playerPicks.size() == 1) {
+                DraftChoice factionChoice = playerPicks.get(0);
+                FactionModel faction = FactionDraftable.getFactionByChoice(factionChoice);
+                if (faction.getAlias().contains("keleres")) {
+                    TI4Emoji keleresEmoji = FactionEmojis.getFactionIcon(faction.getAlias());
+                    if (keleresEmoji != null) {
+                        summaryEmojis.add(keleresEmoji);
+                    }
+                }
+            }
+        }
+
+        // Add other draftable emojis as needed for new types
+
+        return summaryEmojis;
     }
 
     private void drawSliceStats(Graphics graphics, Point positionPoint, Game game, MiltyDraftSlice pseudoSlice) {
@@ -173,7 +251,7 @@ public class NucleusImageGeneratorService {
                 Color.white,
                 hCenter,
                 null,
-                outlineStroke,
+                OUTLINE_STROKE,
                 Color.black);
 
         List<TI4Emoji> whs = new ArrayList<>();
@@ -224,7 +302,7 @@ public class NucleusImageGeneratorService {
         int flexMilty = pseudoSlice.getOptimalFlex();
         String optimalString = "(" + resourcesMilty + "/" + influenceMilty + "+" + flexMilty + ")";
 
-        ((Graphics2D) graphics).setStroke(innerStroke);
+        ((Graphics2D) graphics).setStroke(INNER_STROKE);
 
         int index = 0;
         graphics.setColor(Color.black);
@@ -233,7 +311,8 @@ public class NucleusImageGeneratorService {
             BufferedImage featureImage = getEmojiImage(feature);
             featureImage.getGraphics();
             graphics.setColor(Color.black);
-            graphics.fillRoundRect(fPoint.x + base.x, fPoint.y + base.y, 40, 40, 40, 40);
+            graphics.fillRoundRect(
+                    fPoint.x + base.x, fPoint.y + base.y, EMOJI_SIZE, EMOJI_SIZE, EMOJI_SIZE, EMOJI_SIZE);
 
             graphics.drawImage(featureImage, fPoint.x + base.x, fPoint.y + base.y, null);
             index++;
@@ -250,7 +329,7 @@ public class NucleusImageGeneratorService {
                 Color.white,
                 hCenter,
                 null,
-                outlineStroke,
+                OUTLINE_STROKE,
                 Color.black);
         DrawingUtil.superDrawString(
                 graphics,
@@ -260,16 +339,18 @@ public class NucleusImageGeneratorService {
                 Color.white,
                 hCenter,
                 null,
-                outlineStroke,
+                OUTLINE_STROKE,
                 Color.black);
     }
 
-    private void drawPlayerInfo(Graphics graphics, Point positionPoint, String playerUserName) {
+    private void drawPlayerInfo(
+            Graphics graphics, Point positionPoint, String playerUserName, List<TI4Emoji> summaryEmojis) {
         if (playerUserName == null || playerUserName.isBlank()) {
             return;
         }
 
         Point base = new Point(positionPoint.x + TILE_PADDING, positionPoint.y + TILE_PADDING + 20);
+        Point playerNamePoint = new Point(base.x + 172, base.y + 220);
 
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(Color.white);
@@ -278,13 +359,39 @@ public class NucleusImageGeneratorService {
         DrawingUtil.superDrawString(
                 graphics,
                 playerUserName,
-                base.x + 172,
-                base.y + 230,
+                playerNamePoint.x,
+                playerNamePoint.y,
                 Color.red,
                 hCenter,
                 null,
-                outlineStroke,
+                OUTLINE_STROKE,
                 Color.black);
+
+        if (summaryEmojis == null || summaryEmojis.isEmpty()) return;
+
+        final int RIGHT_MARGIN = 10;
+        final int EMOJI_SIZE_FULL = EMOJI_SIZE + RIGHT_MARGIN;
+
+        // To draw summary emoji, (e.g. faction symbol, speaker order),
+        // start by finding the center point for the summary emoji line
+        Point summaryPoint = new Point(playerNamePoint.x - (EMOJI_SIZE / 2), playerNamePoint.y + 5);
+        // Shift the point right if we have an even number of emojis, so the line is centered
+        if (summaryEmojis.size() % 2 == 0) {
+            summaryPoint.translate(-EMOJI_SIZE_FULL / 2, 0);
+        }
+        // Now shift the point left by half the total width of the emoji line
+        if (summaryEmojis.size() > 2) {
+            summaryPoint.translate(-EMOJI_SIZE_FULL * (summaryEmojis.size() - 1) / 2, 0);
+        }
+
+        for (TI4Emoji summaryEmoji : summaryEmojis) {
+            BufferedImage summaryImage = getEmojiImage(summaryEmoji);
+            summaryImage.getGraphics();
+            graphics.setColor(Color.black);
+            graphics.drawImage(summaryImage, summaryPoint.x, summaryPoint.y, null);
+
+            summaryPoint.translate(EMOJI_SIZE_FULL, 0);
+        }
     }
 
     private Point getTilePosition(Game game, String position) {
@@ -393,6 +500,6 @@ public class NucleusImageGeneratorService {
     }
 
     private BufferedImage getEmojiImage(TI4Emoji emoji) {
-        return ImageHelper.readEmojiImageScaled(emoji, 40);
+        return ImageHelper.readEmojiImageScaled(emoji, EMOJI_SIZE);
     }
 }
