@@ -8,3 +8,4 @@ To get started with development, please read the following:
 
 1. [Code of Conduct](CODE_OF_CONDUCT.md)
 2. [Contribution Guide](CONTRIBUTING.md)
+3. [Website Integration](WEBSITE_INTEGRATION.md) - How the bot integrates with the AsyncTI4 website UI
