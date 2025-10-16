@@ -13,6 +13,7 @@ public class PlanetTypeModel {
         HAZARDOUS,
         INDUSTRIAL,
         FAKE,
+        SPACESTATION,
         FACTION,
         NONE,
         MR;
@@ -29,6 +30,7 @@ public class PlanetTypeModel {
                         case INDUSTRIAL -> ExploreEmojis.Industrial;
                         case MR -> PlanetEmojis.Mecatol;
                         case FACTION, NONE, FAKE -> TI4Emoji.getRandomGoodDog(toString());
+                        case SPACESTATION -> PlanetEmojis.SpaceStation;
                     })
                     .toString();
         }

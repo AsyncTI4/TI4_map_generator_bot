@@ -596,6 +596,135 @@ public class StartPhaseService {
         }
     }
 
+    public static void sendStatusReminders(GenericInteractionCreateEvent event, Game game, Player player) {
+
+        if (game.getRound() < 4) {
+            StringBuilder preferences = new StringBuilder();
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2 == player) {
+                    continue;
+                }
+                String old = game.getStoredValue(p2.getUserID() + "anonDeclare");
+                if (!old.isEmpty() && !old.toLowerCase().contains("strong")) {
+                    preferences.append(old).append("; ");
+                }
+            }
+            if (!preferences.isEmpty()) {
+                preferences = new StringBuilder(preferences.substring(0, preferences.length() - 2));
+                preferences = new StringBuilder(
+                        player.getRepresentationUnfogged()
+                                + " this is a reminder that at the start of the game, your fellow players stated a preference for the following environments:\n"
+                                + preferences
+                                + "\nYou are under no special obligation to abide by that preference, but it may be a nice thing to keep in mind as you play");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), preferences.toString());
+            }
+        }
+
+        Leader playerLeader = player.getLeader("naaluhero").orElse(null);
+        if (player.hasLeader("naaluhero")
+                && player.getLeaderByID("naaluhero").isPresent()
+                && playerLeader != null
+                && !playerLeader.isLocked()) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("naaluHeroInitiation", "Play Naalu Hero", LeaderEmojis.NaaluHero));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + ", a reminder this is the window to play The Oracle, the Naalu Hero. You may use the buttons to start the process.",
+                    buttons);
+        }
+        if (player.getRelics() != null && player.hasRelic("mawofworlds") && game.isCustodiansScored()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + ", a reminder this is the window to purge _Maw of Worlds_, after you do your status homework things."
+                            + " _Maw of Worlds_ is technically start of agenda, but can be done now for efficiency");
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + ", you may use these buttons to resolve _Maw Of Worlds_.",
+                    ButtonHelper.getMawButtons());
+        }
+        if (game.isCustodiansScored() && player.hasTech("dsrohdy")) {
+            TechnologyModel dsrohdy = Mapper.getTech("dsrohdy");
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + " you have " + dsrohdy.getRepresentation(false) + " and may choose a player.\n"
+                            + "They must produce 1 ship in a system that contains 1 or more of their space docks or war suns.");
+            for (String tech : player.getTechs()) {
+                if (Mapper.getTech(tech).isUnitUpgrade()) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(),
+                            "",
+                            ButtonHelperModifyUnits.getContractualObligationsButtons(game, player));
+                }
+            }
+        }
+        if (player.getRelics() != null && player.hasRelic("twilight_mirror") && game.isCustodiansScored()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + ", a reminder this is the window to purge _Twilight Mirror_.");
+            List<Button> playerButtons = new ArrayList<>();
+            playerButtons.add(Buttons.green("resolveTwilightMirror", "Purge Twilight Mirror", ExploreEmojis.Relic));
+            playerButtons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + " You may use these buttons to resolve _Twilight Mirror_.",
+                    playerButtons);
+        }
+        if (player.getRelics() != null && player.hasRelic("emphidia")) {
+            for (String pl : player.getPlanetsAllianceMode()) {
+                Tile tile = game.getTile(AliasHandler.resolveTile(pl));
+                if (tile == null) {
+                    continue;
+                }
+                UnitHolder unitHolder = tile.getUnitHolders().get(pl);
+                if (unitHolder != null
+                        && unitHolder.getTokenList() != null
+                        && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCardsInfoThread(),
+                            player.getRepresentationUnfogged()
+                                    + ", reminder this is the window to purge _The Crown of Emphidia_ if you wish to.");
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(),
+                            player.getRepresentationUnfogged()
+                                    + ", you may use these buttons to resolve _The Crown of Emphidia_.",
+                            ButtonHelper.getCrownButtons());
+                }
+            }
+        }
+
+        if (player.getActionCards() != null && player.getActionCards().containsKey("stability")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + ", a reminder that this is the window to play _Political Stability_.");
+        }
+
+        if (player.getActionCards() != null
+                && player.getActionCards().containsKey("abs")
+                && game.isCustodiansScored()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + ", a reminder that this is the window to play _Ancient Burial Sites_.");
+        }
+
+        for (String pn : player.getPromissoryNotes().keySet()) {
+            if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
+                String cyberMessage =
+                        player.getRepresentationUnfogged() + ", a reminder to use _Cybernetic Enhancements_.";
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), cyberMessage);
+            }
+            if (!player.ownsPromissoryNote("sigma_machinations") && "sigma_machinations".equalsIgnoreCase(pn)) {
+                String cyberMessage = player.getRepresentationUnfogged() + ", a reminder to use _Machinations_.";
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), cyberMessage);
+            }
+        }
+    }
+
     public static void startStatusHomework(GenericInteractionCreateEvent event, Game game) {
         game.setPhaseOfGame("statusHomework");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusHomework", System.currentTimeMillis() + "");
@@ -624,132 +753,7 @@ public class StartPhaseService {
         }
 
         for (Player player : game.getRealPlayers()) {
-            if (game.getRound() < 4) {
-                StringBuilder preferences = new StringBuilder();
-                for (Player p2 : game.getRealPlayers()) {
-                    if (p2 == player) {
-                        continue;
-                    }
-                    String old = game.getStoredValue(p2.getUserID() + "anonDeclare");
-                    if (!old.isEmpty() && !old.toLowerCase().contains("strong")) {
-                        preferences.append(old).append("; ");
-                    }
-                }
-                if (!preferences.isEmpty()) {
-                    preferences = new StringBuilder(preferences.substring(0, preferences.length() - 2));
-                    preferences = new StringBuilder(
-                            player.getRepresentationUnfogged()
-                                    + " this is a reminder that at the start of the game, your fellow players stated a preference for the following environments:\n"
-                                    + preferences
-                                    + "\nYou are under no special obligation to abide by that preference, but it may be a nice thing to keep in mind as you play");
-                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), preferences.toString());
-                }
-            }
-
-            Leader playerLeader = player.getLeader("naaluhero").orElse(null);
-            if (player.hasLeader("naaluhero")
-                    && player.getLeaderByID("naaluhero").isPresent()
-                    && playerLeader != null
-                    && !playerLeader.isLocked()) {
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("naaluHeroInitiation", "Play Naalu Hero", LeaderEmojis.NaaluHero));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged()
-                                + ", a reminder this is the window to play The Oracle, the Naalu Hero. You may use the buttons to start the process.",
-                        buttons);
-            }
-            if (player.getRelics() != null && player.hasRelic("mawofworlds") && game.isCustodiansScored()) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged()
-                                + ", a reminder this is the window to purge _Maw of Worlds_, after you do your status homework things."
-                                + " _Maw of Worlds_ is technically start of agenda, but can be done now for efficiency");
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged() + ", you may use these buttons to resolve _Maw Of Worlds_.",
-                        ButtonHelper.getMawButtons());
-            }
-            if (game.isCustodiansScored() && player.hasTech("dsrohdy")) {
-                TechnologyModel dsrohdy = Mapper.getTech("dsrohdy");
-                MessageHelper.sendMessageToChannel(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged()
-                                + " you have " + dsrohdy.getRepresentation(false) + " and may choose a player.\n"
-                                + "They must produce 1 ship in a system that contains 1 or more of their space docks or war suns.");
-                for (String tech : player.getTechs()) {
-                    if (Mapper.getTech(tech).isUnitUpgrade()) {
-                        MessageHelper.sendMessageToChannelWithButtons(
-                                player.getCardsInfoThread(),
-                                "",
-                                ButtonHelperModifyUnits.getContractualObligationsButtons(game, player));
-                    }
-                }
-            }
-            if (player.getRelics() != null && player.hasRelic("twilight_mirror") && game.isCustodiansScored()) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged()
-                                + ", a reminder this is the window to purge _Twilight Mirror_.");
-                List<Button> playerButtons = new ArrayList<>();
-                playerButtons.add(Buttons.green("resolveTwilightMirror", "Purge Twilight Mirror", ExploreEmojis.Relic));
-                playerButtons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged() + " You may use these buttons to resolve _Twilight Mirror_.",
-                        playerButtons);
-            }
-            if (player.getRelics() != null && player.hasRelic("emphidia")) {
-                for (String pl : player.getPlanetsAllianceMode()) {
-                    Tile tile = game.getTile(AliasHandler.resolveTile(pl));
-                    if (tile == null) {
-                        continue;
-                    }
-                    UnitHolder unitHolder = tile.getUnitHolders().get(pl);
-                    if (unitHolder != null
-                            && unitHolder.getTokenList() != null
-                            && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
-                        MessageHelper.sendMessageToChannel(
-                                player.getCardsInfoThread(),
-                                player.getRepresentationUnfogged()
-                                        + ", reminder this is the window to purge _The Crown of Emphidia_ if you wish to.");
-                        MessageHelper.sendMessageToChannelWithButtons(
-                                player.getCardsInfoThread(),
-                                player.getRepresentationUnfogged()
-                                        + ", you may use these buttons to resolve _The Crown of Emphidia_.",
-                                ButtonHelper.getCrownButtons());
-                    }
-                }
-            }
-
-            if (player.getActionCards() != null && player.getActionCards().containsKey("stability")) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged()
-                                + ", a reminder that this is the window to play _Political Stability_.");
-            }
-
-            if (player.getActionCards() != null
-                    && player.getActionCards().containsKey("abs")
-                    && game.isCustodiansScored()) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged()
-                                + ", a reminder that this is the window to play _Ancient Burial Sites_.");
-            }
-
-            for (String pn : player.getPromissoryNotes().keySet()) {
-                if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
-                    String cyberMessage =
-                            player.getRepresentationUnfogged() + ", a reminder to use _Cybernetic Enhancements_.";
-                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), cyberMessage);
-                }
-                if (!player.ownsPromissoryNote("sigma_machinations") && "sigma_machinations".equalsIgnoreCase(pn)) {
-                    String cyberMessage = player.getRepresentationUnfogged() + ", a reminder to use _Machinations_.";
-                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), cyberMessage);
-                }
-            }
+            sendStatusReminders(event, game, player);
         }
         String message2 = "Resolve status homework using the buttons. \n";
         game.setCurrentACDrawStatusInfo("");
@@ -789,6 +793,7 @@ public class StartPhaseService {
                 - _Ancient Burial Sites_\s
                 - _Maw of Worlds_\s
                 - The Oracle, the Naalu hero
+                - Neuraloop purging to redraw an objective
                 - _The Crown of Emphidia_
                 Please click the "Ready For Agenda" button once you are done resolving these or if you decline to do so.""";
         } else {
@@ -1024,8 +1029,8 @@ public class StartPhaseService {
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(
                             p2.getCorrectChannel(),
-                            p2.getRepresentationUnfogged()
-                                    + ", you have the opportunity to use _Quantum Datahub Node_.",
+                            "# " + p2.getRepresentationUnfogged()
+                                    + ", you have the opportunity to use _Quantum Datahub Node_. (Noone should take a turn until this is decided)",
                             buttons);
                 }
                 if (IsPlayerElectedService.isPlayerElected(game, p2, "arbiter")) {
@@ -1034,7 +1039,8 @@ public class StartPhaseService {
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(
                             p2.getCorrectChannel(),
-                            p2.getRepresentationUnfogged() + ", you have the opportunity to use _Imperial Arbiter_.",
+                            "# " + p2.getRepresentationUnfogged()
+                                    + ", you have the opportunity to use _Imperial Arbiter_. (Noone should take a turn until this is decided)",
                             buttons);
                 }
             }

@@ -284,9 +284,7 @@ public class Helper {
                 if (!game.isFowMode()) {
                     message = player.getRepresentationUnfogged()
                             + " is the one the game is currently waiting on before advancing to the next player, with regards to queued **Imperial** follows.";
-                }
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                if (!game.isFowMode()) {
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     ButtonHelper.sendMessageToRightStratThread(player, game, message, "imperial");
                 }
                 break;
@@ -972,7 +970,8 @@ public class Helper {
             if (uh == null) continue; // custodia, ghoti, etc.
 
             boolean containsDMZ = uh.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
-            if (containsDMZ) {
+
+            if (containsDMZ || ((Planet) uh).isSpaceStation()) {
                 continue;
             }
             if ("spacedock".equalsIgnoreCase(unit)) {
@@ -1318,6 +1317,8 @@ public class Helper {
                                     .append("\n");
                             res += planet.getSumResourcesInfluence();
                         } else if (xxchaBt) {
+                            msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                    .append("\n");
                             res += planet.getMaxResInf();
                         } else {
                             if (Math.min(gledgeMech, planet.getInfluence()) > 0) {
@@ -1335,6 +1336,8 @@ public class Helper {
                                     .append("\n");
                             inf += planet.getSumResourcesInfluence();
                         } else if (xxchaBt) {
+                            msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                    .append("\n");
                             inf += planet.getMaxResInf();
                         } else {
                             msg.append(getPlanetRepresentationPlusEmojiPlusInfluence(thing, game))
@@ -1385,7 +1388,6 @@ public class Helper {
                     msg.append("> Used Ghost Breakthrough ");
                     msg.append("for ").append(wormholes).append(" resource").append(wormholes == 1 ? "" : "s");
                     msg.append(". ").append(FactionEmojis.Ghost).append("\n");
-                    res += 1;
                 }
                 if (thing.contains("aida")) {
                     msg.append("Exhausted ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ ");
@@ -2163,7 +2165,8 @@ public class Helper {
                     continue;
                 }
                 if (!player.getPlanetsAllianceMode().contains(unitHolder.getName())
-                        && !"genericModifyAllTiles".equals(warfareNOtherstuff)) {
+                        && !"genericModifyAllTiles".equals(warfareNOtherstuff)
+                        && !"genericBuild".equals(warfareNOtherstuff)) {
                     continue;
                 }
 

@@ -30,6 +30,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.planet.EronousPlanetService;
 import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
 
@@ -173,7 +174,7 @@ public class StatusHelper {
             }
         }
 
-        for (Player player : game.getRealPlayers()) {
+        for (Player player : game.getActionPhaseTurnOrder()) {
             List<String> scorables = new ArrayList<>();
             List<Integer> scorableInts = new ArrayList<>();
             String keyV = player.getFaction() + "Round" + game.getRound() + "PreScoredPO";
@@ -349,9 +350,10 @@ public class StatusHelper {
             return PriorityTrackHelper.GetPriorityTrack(game).stream()
                     .filter(Objects::nonNull)
                     .toList();
-        } else {
-            return game.getActionPhaseTurnOrder();
+        } else if (game.getPlanets().contains(EronousPlanetService.CANTRIS_ID)) {
+            return EronousPlanetService.resolveCantrisScoringOrder(game);
         }
+        return game.getActionPhaseTurnOrder();
     }
 
     public static void HandleStatusPhaseMiddle(

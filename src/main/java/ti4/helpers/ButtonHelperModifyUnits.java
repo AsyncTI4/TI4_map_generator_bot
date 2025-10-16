@@ -18,6 +18,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileHelper;
@@ -1083,12 +1084,10 @@ public class ButtonHelperModifyUnits {
         if (buttonID.contains("_")) {
             tile = game.getTileByPosition(buttonID.split("_")[1]);
         } else {
-            game.getTileByPosition(game.getActiveSystem());
+            tile = game.getTileByPosition(game.getActiveSystem());
         }
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            if ("space".equalsIgnoreCase(unitHolder.getName())) {
-                continue;
-            }
+        TeHelperGeneral.addStationsToPlayArea(event, game, tile);
+        for (UnitHolder unitHolder : tile.getPlanetUnitHolders()) {
             List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
             Player player2 = player;
             for (Player p2 : players) {
@@ -1098,7 +1097,20 @@ public class ButtonHelperModifyUnits {
                 }
             }
             if (player != player2 && players.contains(player)) {
-                StartCombatService.startGroundCombat(player, player2, game, event, unitHolder, tile);
+                if (player2.hasUnlockedBreakthrough("titansbt") || player.hasUnlockedBreakthrough("titansbt")) {
+                    String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
+                    String msg = player.getRepresentation() + " the game is unsure if a combat should occur on "
+                            + planetName + " or if you are coexisting. Please inform it with the buttons.";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.red("startCombatOn_" + unitHolder.getName(), "Engage in Combat"));
+                    buttons.add(Buttons.green("deleteButtons", "They are coexisting"));
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+
+                } else {
+                    if (game.getStoredValue("coexistFlag").isEmpty()) {
+                        StartCombatService.startGroundCombat(player, player2, game, event, unitHolder, tile);
+                    }
+                }
                 int mechCount = unitHolder.getUnitCount(UnitType.Mech, player2.getColor());
                 if (player2.ownsUnit("keleres_mech") && mechCount > 0) {
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");

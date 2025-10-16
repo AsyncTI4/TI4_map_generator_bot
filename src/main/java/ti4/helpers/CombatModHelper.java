@@ -431,6 +431,11 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "opponent_has_sftt" -> {
+                if (player.hasUnlockedBreakthrough("winnubt") && getOpponentSfttCount(opponent) > 0) {
+                    meetsCondition = true;
+                }
+            }
             case "nivyn_commander_damaged" -> {
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "nivyncommander")) {
                     meetsCondition = true;

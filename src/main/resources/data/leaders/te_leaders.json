@@ -149,6 +149,17 @@
         "source": "thunders_edge"
     },
     {
+        "id": "naaluagent-te",
+        "faction": "naalu",
+        "type": "agent",
+        "name": "Z'eu",
+        "title": "Agent of the Nefishh",
+        "abilityWindow": "After any player's command token is placed in a system:",
+        "abilityText": "You may exhaust this card to return that token to that player's reinforcements.",
+        "unlockCondition": "Always Unlocked",
+        "source": "thunders_edge"
+    },
+    {
         "id": "firmamentagent",
         "faction": "firmament",
         "type": "agent",

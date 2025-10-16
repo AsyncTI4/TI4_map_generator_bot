@@ -42,6 +42,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.RiftSetModeService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -248,6 +249,10 @@ public class PlayStrategyCardService {
         // Red Tape Diplomacy
         if (scToPlay == 2 && game.isRedTapeMode()) {
             ButtonHelper.offerRedTapeButtons(game, player);
+        }
+
+        if (scToPlay == 9 && RiftSetModeService.isActive(game)) {
+            RiftSetModeService.resolveSacrifice(event, game, player);
         }
 
         if (scModel.usesAutomationForSCID("pok5trade")) {
@@ -682,6 +687,9 @@ public class PlayStrategyCardService {
 
             // monuments
             case "monuments4construction" -> getMonumentsConstructionButtons(sc, game);
+
+            // riftset
+            case "riftset_9" -> RiftSetModeService.getSacrificeButtons();
 
             // unhandled
             default -> getGenericButtons(sc);

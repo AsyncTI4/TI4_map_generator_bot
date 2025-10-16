@@ -133,5 +133,17 @@
         "faction": "obsidian",
         "text": "At the start of your turn, destroy 1 of another player's infantry in or adjacent to a system that contains your infantry.\nThis technology cannot be researched.",
         "source": "thunders_edge"
+    },
+    {
+        "alias": "executiveorder",
+        "name": "Executive Order",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "keleres",
+        "homebrewReplacesID": "iihq",
+        "text": "ACTION: Exhaust this card and draw the top or bottom card of the Agenda deck. Players immediately vote on this agenda as if you were the speaker; you can spend trade goods and resources on this agenda as if they were votes.",
+        "source": "thunders_edge"
     }
 ]

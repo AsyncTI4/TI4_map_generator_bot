@@ -714,12 +714,12 @@ public class CombatRollService {
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
             List<DiceHelper.Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
             int mult = 1;
+
+            player.setExpectedHitsTimes10(
+                    player.getExpectedHitsTimes10() + (numRolls * mult * (11 - toHit + modifierToHit)));
             if (usesX89c4) {
                 mult = 2;
             }
-            player.setExpectedHitsTimes10(
-                    player.getExpectedHitsTimes10() + (numRolls * mult * (11 - toHit + modifierToHit)));
-
             int hitRolls = DiceHelper.countSuccesses(resultRolls);
             if ("jolnar_flagship".equalsIgnoreCase(unitModel.getId())) {
                 for (DiceHelper.Die die : resultRolls) {
@@ -966,16 +966,19 @@ public class CombatRollService {
             }
         }
         result = resultBuilder.toString();
-
+        player.setActualHits(player.getActualHits() + totalHits);
         if (usesX89c4) {
             totalHits *= 2;
+        }
+        if (game.isConventionsOfWarAbandonedMode() && rollType == CombatRollType.bombardment) {
+            totalHits *= 3;
         }
         boolean x89applies = usesX89c4;
         if (totalHits < 1) {
             x89applies = false;
         }
         result += CombatMessageHelper.displayHitResults(totalHits, x89applies);
-        player.setActualHits(player.getActualHits() + totalHits);
+
         if (totalHits > 0 && usesX89c4) {
             result += "\n" + player.getFactionEmoji() + " produced " + (totalHits / 2) + " additional hit"
                     + ((totalHits / 2) == 1 ? "" : "s") + " using "

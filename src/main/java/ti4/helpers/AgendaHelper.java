@@ -70,6 +70,7 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
+import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -301,6 +302,7 @@ public class AgendaHelper {
                 + "'. You can use this button to unqueue it and pass on \"when\"s.";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"When\"s"));
+        GMService.addForcePassWhenButtonForFowGM(game, player, buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         resolveWhenQueue(event, game);
     }
@@ -341,6 +343,7 @@ public class AgendaHelper {
                 + "'. You can use this button to unqueue it and pass on \"afters\".";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
+        GMService.addForcePassAfterButtonForFowGM(game, player, buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
 
         msg =
@@ -377,7 +380,8 @@ public class AgendaHelper {
         for (String acId : player.getActionCards().keySet()) {
             ActionCardModel actionCard = Mapper.getActionCard(acId);
             String actionCardWindow = actionCard.getWindow();
-            if (actionCardWindow.contains("After an agenda is revealed")) {
+            if (actionCardWindow.contains("After an agenda is revealed")
+                    || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
                 names.add(actionCard.getName());
             }
         }
@@ -426,7 +430,8 @@ public class AgendaHelper {
         for (String acId : player.getActionCards().keySet()) {
             ActionCardModel actionCard = Mapper.getActionCard(acId);
             String actionCardWindow = actionCard.getWindow();
-            if (actionCardWindow.contains("After an agenda is revealed")) {
+            if (actionCardWindow.contains("After an agenda is revealed")
+                    || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
                 buttons.add(Buttons.green("queueAfter_ac_" + acId, actionCard.getName()));
             }
         }
@@ -489,6 +494,7 @@ public class AgendaHelper {
 
             buttons.add(Buttons.gray("queueAWhen", "Play A \"When\""));
             buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"When\"s"));
+            GMService.addForcePassWhenButtonForFowGM(game, player, buttons);
             buttons.add(Buttons.gray("explainQueue", "How Does This Work?"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg.toString(), buttons);
         }
@@ -719,6 +725,7 @@ public class AgendaHelper {
 
                                 buttons.add(Buttons.gray("queueAnAfter", "Play An \"After\""));
                                 buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
+                                GMService.addForcePassAfterButtonForFowGM(game, player, buttons);
                                 MessageHelper.sendMessageToChannelWithButtons(
                                         p2.getCardsInfoThread(), msg.toString(), buttons);
                             }
@@ -803,6 +810,7 @@ public class AgendaHelper {
             return;
         }
         buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"When\"s"));
+        GMService.addForcePassWhenButtonForFowGM(game, player, buttons);
         game.setStoredValue(
                 "declinedWhens", game.getStoredValue("declinedWhens").replace(player.getFaction() + "_", ""));
         event.getMessage().delete().queue();
@@ -841,6 +849,7 @@ public class AgendaHelper {
 
         buttons.add(Buttons.gray("queueAnAfter", "Play An \"After\""));
         buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
+        GMService.addForcePassAfterButtonForFowGM(game, player, buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg.toString(), buttons);
     }
 
@@ -855,6 +864,7 @@ public class AgendaHelper {
             return;
         }
         buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
+        GMService.addForcePassAfterButtonForFowGM(game, player, buttons);
         game.setStoredValue("queuedAftersLockedFor" + player.getFaction(), "");
         game.setStoredValue(
                 "declinedAfters", game.getStoredValue("declinedAfters").replace(player.getFaction() + "_", ""));
@@ -895,14 +905,6 @@ public class AgendaHelper {
         event.getMessage().delete().queue();
         offerPreVote(player);
         resolveAfterQueue(event, game);
-        if (playerDoesNotHaveShenanigans(player)) {
-            String part2 = player.getFaction();
-            if (!game.getStoredValue("Pass On Shenanigans").isEmpty()) {
-                part2 = game.getStoredValue("Pass On Shenanigans") + "_" + player.getFaction();
-            }
-            game.setStoredValue("Pass On Shenanigans", part2);
-            return;
-        }
         String msg = player.getRepresentation() + " you have the option to pre-pass on agenda shenanigans here."
                 + " Agenda shenanigans are the action cards _Bribery_, _Confusing Legal Text_, _Confounding Legal Text_, and _Deadly Plot_."
                 + " Feel free not to pre-pass, this is simply an optional way to resolve agendas faster.";
@@ -2825,6 +2827,11 @@ public class AgendaHelper {
             voteAmount = 1;
         }
 
+        boolean executive = player.getFaction().equals(game.getStoredValue("executiveOrder"));
+        if (player.hasUnlockedBreakthrough("xxchabt") || executive) {
+            voteAmount = Math.max(p.getResources(), p.getInfluence());
+        }
+
         if (voteInfo[1] != 0) {
             voteAmount += p.getResources();
         }
@@ -2994,7 +3001,9 @@ public class AgendaHelper {
         proceedButtons.add(Buttons.blue("pingNonresponders", "Ping Non-Responders"));
 
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, proceedButtons);
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), getSummaryOfVotes(game, true));
+        if (!game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), getSummaryOfVotes(game, true));
+        }
     }
 
     @ButtonHandler("proceedToFinalizingVote")
@@ -4051,7 +4060,7 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, proceedButtons);
         eraseAgendaQueues(event, game);
         if (!action) {
-            // offerEveryonePrepassOnShenanigans(game);
+            offerEveryonePrepassOnShenanigans(game);
             // offerEveryonePreAbstain(game);
             offerEveryoneWhensQueue(game);
             checkForAssigningGeneticRecombination(game);
@@ -4187,6 +4196,9 @@ public class AgendaHelper {
     }
 
     public static void showDiscards(Game game, GenericInteractionCreateEvent event) {
+        if (!RiftSetModeService.deckInfoAvailable(game.getPlayer(event.getUser().getId()), game)) {
+            return;
+        }
         StringBuilder sb2 = new StringBuilder();
         String sb = "### __**Discarded Agendas:**__";
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();

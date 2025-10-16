@@ -12,6 +12,7 @@ import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -30,6 +31,7 @@ import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.LoreService;
+import ti4.service.fow.RiftSetModeService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
@@ -41,6 +43,7 @@ public class ButtonHelperTacticalAction {
     @ButtonHandler("doneWithTacticalAction")
     public static void concludeTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
+            RiftSetModeService.concludeTacticalAction(player, game, event);
             ButtonHelper.exploreDET(player, game, event);
             ButtonHelperFactionSpecific.cleanCavUp(game, event);
             if (player.hasAbility("cunning")) {
@@ -220,6 +223,7 @@ public class ButtonHelperTacticalAction {
             ButtonHelper.resolveEmpyCommanderCheck(player, game, tile, event);
             ButtonHelper.sendEBSWarning(player, game, tile.getPosition());
             ButtonHelper.checkForIonStorm(tile, player);
+            TeHelperGeneral.addStationsToPlayArea(event, game, tile);
             ButtonHelperFactionSpecific.checkForStymie(game, player, tile);
             ButtonHelper.checkFleetInEveryTile(player, game);
             if (!game.isFowMode()) {

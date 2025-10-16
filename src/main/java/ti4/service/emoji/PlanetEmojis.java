@@ -47,7 +47,7 @@ public enum PlanetEmojis implements TI4Emoji {
     Darien, // Yin
     Retillion,
     Shalloq, // Yssaril
-
+    SpaceStation, // Space Station
     // Base/PoK non-home
     Ang,
     ArchonVail,

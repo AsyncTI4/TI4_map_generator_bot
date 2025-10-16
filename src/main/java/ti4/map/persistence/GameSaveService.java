@@ -530,6 +530,18 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.CULTURAL_EXCHANGE_PROGRAM_MODE + " " + game.isCulturalExchangeProgramMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.CONVENTIONS_OF_WAR_ABANDONED_MODE + " " + game.isConventionsOfWarAbandonedMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.RAPID_MOBILIZATION_MODE + " " + game.isRapidMobilizationMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.MONUMENTS_TO_THE_AGES_MODE + " " + game.isMonumentToTheAgesMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.WEIRD_WORMHOLES_MODE + " " + game.isWeirdWormholesMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.WILD_WILD_GALAXY_MODE + " " + game.isWildWildGalaxyMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.COSMIC_PHENOMENAE_MODE + " " + game.isCosmicPhenomenaeMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.MERCENARIES_FOR_HIRE_MODE + " " + game.isMercenariesForHireMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.CIVILIZED_SOCIETY_MODE + " " + game.isCivilizedSocietyMode());
@@ -763,6 +775,9 @@ class GameSaveService {
             writer.write(Constants.SARWEEN_COUNT + " " + player.getSarweenCounter());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.GHOST_COMMANDER_COUNT + " " + player.getGhostCommanderCounter());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.MAGEN_INFANTRY_COUNT + " " + player.getMagenInfantryCounter());
             writer.write(System.lineSeparator());
 
@@ -833,7 +848,7 @@ class GameSaveService {
             writer.write(Constants.TECH_PURGED + " " + String.join(",", player.getPurgedTechs()));
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.PLANETS + " " + String.join(",", player.getPlanets()));
+            writer.write(Constants.PLANETS + " " + String.join(",", player.getUniquePlanets()));
             writer.write(System.lineSeparator());
             writer.write(Constants.PLANETS_EXHAUSTED + " " + String.join(",", player.getExhaustedPlanets()));
             writer.write(System.lineSeparator());

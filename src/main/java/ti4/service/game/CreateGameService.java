@@ -46,7 +46,7 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.async.ReserveGameNumberService;
 import ti4.service.image.FileUploadService;
-import ti4.service.option.GameOptionService;
+import ti4.service.option.TEOptionService;
 import ti4.settings.GlobalSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.jda.JdaService;
@@ -257,10 +257,25 @@ public class CreateGameService {
                 "How would you like to set up the players and map?",
                 List.of(miltyButton, nucleusButton, addMapString));
 
-        // Button offerOptions = Buttons.green("offerGameOptionButtons", "Options");
-        GameOptionService.offerGameOptionButtons(game, actionsChannel);
-        // MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Want to change
-        // some options? ", offerOptions);
+        Button offerOptions = Buttons.green("offerGameOptionButtons", "Options");
+        MessageHelper.sendMessageToChannelWithButton(
+                actionsChannel, "Want to change Game options?\n-# `/game options`", offerOptions);
+
+        boolean abbreviateTE = false;
+        for (Player player : game.getPlayers().values()) {
+            if (ButtonHelper.isPlayerNew(player.getUserID())
+                    || player.getUserID().equalsIgnoreCase("481860200169472030")) {
+                abbreviateTE = true;
+                break;
+            }
+        }
+        if (abbreviateTE) {
+            Button teOptions = Buttons.green("offerTEOptionButtons", "Thunder's Edge Settings");
+            MessageHelper.sendMessageToChannelWithButton(
+                    actionsChannel, "Want to demo some of Thunder's Edge features?", teOptions);
+        } else {
+            TEOptionService.offerTEOptionButtons(game, actionsChannel);
+        }
 
         HomebrewService.offerGameHomebrewButtons(actionsChannel);
         ButtonHelper.offerPlayerSetupButtons(actionsChannel, game);
@@ -339,6 +354,7 @@ public class CreateGameService {
         // step away, and if you ever feel the need to leave a game permanently, we do have a replacement system that
         // gets a fair amount of use (ping a bothelper for specifics)";
         MessageHelper.sendMessageToChannelAndPin(chatChannel, tabletalkGetStartedMessage);
+        StartPhaseService.postSurveyResults(game);
     }
 
     private static void introductionForNewPlayers(Game game) {
@@ -357,7 +373,7 @@ public class CreateGameService {
         }
 
         chatChannel
-                .createThreadChannel("Info for Players new to AsyncTI4")
+                .createThreadChannel(Constants.NEW_PLAYER_THREAD_NAME)
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
                 .queue(
                         introThread -> {

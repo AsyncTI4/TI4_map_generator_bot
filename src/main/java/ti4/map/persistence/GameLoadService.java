@@ -713,6 +713,16 @@ class GameLoadService {
                     game.setMercenariesForHireMode(loadBooleanOrDefault(info, false));
                 case Constants.CULTURAL_EXCHANGE_PROGRAM_MODE ->
                     game.setCulturalExchangeProgramMode(loadBooleanOrDefault(info, false));
+                case Constants.CONVENTIONS_OF_WAR_ABANDONED_MODE ->
+                    game.setConventionsOfWarAbandonedMode(loadBooleanOrDefault(info, false));
+                case Constants.RAPID_MOBILIZATION_MODE ->
+                    game.setRapidMobilizationMode(loadBooleanOrDefault(info, false));
+                case Constants.WILD_WILD_GALAXY_MODE -> game.setWildWildGalaxyMode(loadBooleanOrDefault(info, false));
+                case Constants.WEIRD_WORMHOLES_MODE -> game.setWeirdWormholesMode(loadBooleanOrDefault(info, false));
+                case Constants.COSMIC_PHENOMENAE_MODE ->
+                    game.setCosmicPhenomenaeMode(loadBooleanOrDefault(info, false));
+                case Constants.MONUMENTS_TO_THE_AGES_MODE ->
+                    game.setMonumentToTheAgesMode(loadBooleanOrDefault(info, false));
                 case Constants.CIVILIZED_SOCIETY_MODE ->
                     game.setCivilizedSocietyMode(loadBooleanOrDefault(info, false));
                 case Constants.NO_SWAP_MODE -> game.setNoSwapMode(loadBooleanOrDefault(info, false));

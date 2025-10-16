@@ -18,7 +18,10 @@ import ti4.message.logging.BotLogger;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.fow.GMService;
+import ti4.service.fow.RiftSetModeService;
 
 @UtilityClass
 public class CardsInfoService {
@@ -73,6 +76,9 @@ public class CardsInfoService {
         }
         if (IsPlayerElectedService.isPlayerElected(game, player, "minister_peace")) {
             buttons.add(Buttons.gray("ministerOfPeace", "Use Minister of Peace", CardEmojis.Agenda));
+        }
+        if (player.hasUnlockedBreakthrough("titansbt")) {
+            buttons.add(Buttons.gray("selectPlayerToSleeper", "Add a sleeper token", MiscEmojis.Sleeper));
         }
         if (player.hasUnexhaustedLeader("vadenagent")) {
             buttons.add(Buttons.gray("getAgentSelection_vadenagent", "Use Vaden Agent", FactionEmojis.vaden));
@@ -225,6 +231,7 @@ public class CardsInfoService {
         }
         if (game.getPhaseOfGame().toLowerCase().contains("agendawaiting")) {
             buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On Whens"));
+            GMService.addForcePassWhenButtonForFowGM(game, player, buttons);
         }
 
         if (player.hasRelicReady("heartofixth")) {
@@ -269,6 +276,7 @@ public class CardsInfoService {
         buttons.add(Buttons.POST_NOTEPAD);
         buttons.add(Buttons.EDIT_NOTEPAD);
         buttons.add(Buttons.green("cardsInfo", "Cards Info Refresh"));
+        RiftSetModeService.addCapturedUnitsButton(buttons, game);
 
         String message = "You may use these buttons to do various things:";
 

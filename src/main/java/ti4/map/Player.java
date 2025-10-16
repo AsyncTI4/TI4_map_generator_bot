@@ -74,6 +74,7 @@ import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.GMService;
 import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.EndTurnService;
@@ -142,6 +143,19 @@ public class Player extends PlayerProperties {
         return String.format("%s_%s%s", getDecalSet(), unitType, DrawingUtil.getBlackWhiteFileSuffix(getColorID()));
     }
 
+    public boolean hasSpaceStation() {
+        return getPlanets().stream()
+                .map(planet -> game.getPlanetsInfo().get(planet))
+                .anyMatch(Planet::isSpaceStation);
+    }
+
+    public int numberOfSpaceStations() {
+        return (int) getPlanets().stream()
+                .map(planet -> game.getPlanetsInfo().get(planet))
+                .filter(Planet::isSpaceStation)
+                .count();
+    }
+
     public Tile getNomboxTile() {
         return nomboxTile;
     }
@@ -196,6 +210,9 @@ public class Player extends PlayerProperties {
         if (hasActiveBreakthrough("naazbt")) {
             activeUnits.removeIf(unit -> "mf".equals(getUnitByID(unit).getAsyncId()));
             activeUnits.add("naaz_voltron");
+            if (!getUnitsOwned().contains("naaz_voltron")) {
+                addOwnedUnitByID("naaz_voltron");
+            }
         }
         if (hasUnlockedBreakthrough("mentakbt")) {
             for (String tech : getTechs()) {
@@ -205,6 +222,9 @@ public class Player extends PlayerProperties {
                         || "cr2".equals(model.getHomebrewReplacesID().orElse(""))) {
                     activeUnits.removeIf(unit -> "ca".equals(getUnitByID(unit).getAsyncId()));
                     activeUnits.add("mentak_cruiser3");
+                    if (!getUnitsOwned().contains("mentak_cruiser3")) {
+                        addOwnedUnitByID("mentak_cruiser3");
+                    }
                     break;
                 }
             }
@@ -1157,6 +1177,11 @@ public class Player extends PlayerProperties {
         if (getRelics().contains("dynamiscore") || getRelics().contains("absol_dynamiscore")) {
             bonus += 2;
         }
+        for (String planet : getPlanets()) {
+            if (Mapper.getPlanet(planet) != null && Mapper.getPlanet(planet).isSpaceStation()) {
+                bonus++;
+            }
+        }
         if (game.isFacilitiesMode()) {
             for (String planet : getPlanets()) {
                 UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
@@ -1916,7 +1941,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public boolean hasIIHQ() {
-        return hasTech("iihq");
+        return hasTech("iihq") || hasUnlockedBreakthrough("keleresbt");
     }
 
     public boolean hasTech(String techID) {
@@ -1957,6 +1982,17 @@ public class Player extends PlayerProperties {
             }
         }
         return newPlanets;
+    }
+
+    public List<String> getUniquePlanets() {
+        List<String> uniquePlanets = new ArrayList<>();
+        for (String planet : getPlanets()) {
+            if (!uniquePlanets.contains(planet)) {
+                uniquePlanets.add(planet);
+            }
+        }
+
+        return uniquePlanets;
     }
 
     public void loadDraftHand(List<String> saveString) {
@@ -2038,7 +2074,7 @@ public class Player extends PlayerProperties {
         doAdditionalThingsWhenAddingTech(techID);
     }
 
-    private void gainCustodiaVigilia() {
+    public void gainCustodiaVigilia() {
         addPlanet("custodiavigilia");
         exhaustPlanet("custodiavigilia");
 
@@ -2544,8 +2580,7 @@ public class Player extends PlayerProperties {
     }
 
     /**
-     * @return Player's private channel if Fog of War game, otherwise the main
-     *         (action) game channel
+     * @return Player's private channel if Fog of War game, otherwise the GM channel
      */
     @JsonIgnore
     public MessageChannel getCorrectChannel() {
@@ -2553,7 +2588,7 @@ public class Player extends PlayerProperties {
             if (getPrivateChannel() != null) {
                 return getPrivateChannel();
             } else {
-                return game.getMainGameChannel();
+                return GMService.getGMChannel(game);
             }
         }
         return game.getMainGameChannel();

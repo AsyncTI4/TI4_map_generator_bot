@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -1677,10 +1678,13 @@ public class ButtonHelperAbilities {
         if (player.getPromissoryNotesInPlayArea().contains("sigma_promise_of_protection")) {
             return false;
         }
-        if (Helper.getPlayerFromAbility(game, "pillage") != null
-                && !Helper.getPlayerFromAbility(game, "pillage").getFaction().equalsIgnoreCase(player.getFaction())) {
-            Player pillager = Helper.getPlayerFromAbility(game, "pillage");
-            return tg > 2 && player.getNeighbouringPlayers(true).contains(pillager);
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2 == player || !p2.hasAbility("pillage")) {
+                continue;
+            }
+            if (tg > 2 && player.getNeighbouringPlayers(true).contains(p2)) {
+                return true;
+            }
         }
         return false;
     }
@@ -1766,24 +1770,29 @@ public class ButtonHelperAbilities {
 
     public static void pillageCheck(Player player, Game game) {
         if (canBePillaged(player, game, player.getTg())) {
-            Player pillager = Helper.getPlayerFromAbility(game, "pillage");
-            String finChecker = "FFCC_" + pillager.getFaction() + "_";
-            List<Button> buttons = new ArrayList<>();
-            String playerIdent = player.getRepresentationNoPing();
-            player.getDisplayName();
-            MessageChannel channel = game.getMainGameChannel();
-            if (game.isFowMode()) {
-                playerIdent = capitalize(player.getColor());
-                channel = pillager.getPrivateChannel();
+            for (Player neighbor : player.getNeighbouringPlayers(true)) {
+                if (!neighbor.hasAbility("pillage")) {
+                    continue;
+                }
+                Player pillager = neighbor;
+                String finChecker = "FFCC_" + pillager.getFaction() + "_";
+                List<Button> buttons = new ArrayList<>();
+                String playerIdent = player.getRepresentationNoPing();
+                player.getDisplayName();
+                MessageChannel channel = game.getMainGameChannel();
+                if (game.isFowMode()) {
+                    playerIdent = capitalize(player.getColor());
+                    channel = pillager.getPrivateChannel();
+                }
+                String message = pillager.getRepresentationUnfogged() + " you may have the opportunity to **Pillage** "
+                        + playerIdent
+                        + ". Please check this is a valid **Pillage** opportunity, and use buttons to resolve.";
+                buttons.add(Buttons.red(
+                        finChecker + "pillage_" + player.getColor() + "_unchecked",
+                        "Pillage " + (game.isFowMode() ? playerIdent : player.getFlexibleDisplayName())));
+                buttons.add(Buttons.green(finChecker + "deleteButtons", "Decline Pillage Window"));
+                MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
             }
-            String message = pillager.getRepresentationUnfogged() + " you may have the opportunity to **Pillage** "
-                    + playerIdent
-                    + ". Please check this is a valid **Pillage** opportunity, and use buttons to resolve.";
-            buttons.add(Buttons.red(
-                    finChecker + "pillage_" + player.getColor() + "_unchecked",
-                    "Pillage " + (game.isFowMode() ? playerIdent : player.getFlexibleDisplayName())));
-            buttons.add(Buttons.green(finChecker + "deleteButtons", "Decline Pillage Window"));
-            MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
     }
 
@@ -1841,6 +1850,19 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         SleeperTokenHelper.addOrRemoveSleeper(event, game, planet, player);
         event.getMessage().delete().queue();
+    }
+
+    @ButtonHandler("startCombatOn_")
+    public static void startCombatOn(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        event.getMessage().delete().queue();
+        String planet = buttonID.split("_")[1];
+        UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
+        Tile tile = game.getTileFromPlanet(planet);
+        List<Player> playersWithUnitsOnPlanet = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, unitHolder);
+        Optional<Player> enemyPlayer = playersWithUnitsOnPlanet.stream()
+                .filter(p -> player != p && !player.isPlayerMemberOfAlliance(p))
+                .findFirst();
+        StartCombatService.startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
     }
 
     @ButtonHandler("replaceSleeperWith_")

@@ -67,7 +67,11 @@ public class DraftSetupService {
 
         FactionDraftable factionDraftable = new FactionDraftable();
         factionDraftable.initialize(
-                specs.numFactions, specs.factionSources, specs.priorityFactions, specs.bannedFactions);
+                specs.numFactions,
+                specs.factionSources,
+                specs.priorityFactions,
+                specs.bannedFactions,
+                game.isThundersEdge());
         draftManager.addDraftable(factionDraftable);
 
         SpeakerOrderDraftable speakerOrderDraftable = new SpeakerOrderDraftable();
@@ -157,9 +161,17 @@ public class DraftSetupService {
             return "Error: Could not find source settings.";
         }
 
+        List<ComponentSource> tileSources = new ArrayList<>(sourceSettings.getTileSources());
+        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+            tileSources.add(ComponentSource.ds);
+            tileSources.add(ComponentSource.uncharted_space);
+        }
+        if (game.isThundersEdge() || !game.getStoredValue("useEntropicScar").isEmpty()) {
+            tileSources.add(ComponentSource.thunders_edge);
+        }
         DraftTileManager tileManager = game.getDraftTileManager();
         tileManager.clear();
-        tileManager.addAllDraftTiles(sourceSettings.getTileSources());
+        tileManager.addAllDraftTiles(tileSources);
 
         for (String draftableKey : settings.getDraftablesList().getKeys()) {
             Draftable draftable = DraftComponentFactory.createDraftable(draftableKey);
