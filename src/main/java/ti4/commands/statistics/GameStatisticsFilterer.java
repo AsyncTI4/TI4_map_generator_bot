@@ -40,12 +40,12 @@ public class GameStatisticsFilterer {
         filters.add(new OptionData(
                         OptionType.STRING,
                         GAME_TYPES_FILTER,
-                        "Filter games by game type, comma seperated, e.g. base, pok, absol, ds, action_deck_2")
+                        "Filter games by game type, comma seperated, e.g. base, pok, absol, ds, action_card_deck_2,")
                 .setAutoComplete(true));
         filters.add(new OptionData(
                         OptionType.STRING,
                         EXCLUDED_GAME_TYPES_FILTER,
-                        "Filter excluded games by game type, comma seperated, e.g. base, pok, absol, ds, action_deck_2")
+                        "Filter excluded games by game type, comma seperated, e.g. base, pok, absol, ds, action_card_deck_2")
                 .setAutoComplete(true));
         filters.add(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter games by if the game is a fog game"));
         filters.add(
@@ -146,7 +146,7 @@ public class GameStatisticsFilterer {
             case "absol" -> game.isAbsolMode();
             case "ds" -> isDiscordantStarsGame(game);
             case "pok" -> !game.isBaseGameMode();
-            case "action_deck_2" -> "action_deck_2".equals(game.getAcDeckID());
+            case "action_card_deck_2" -> isActionCardDeck2(game);
             case "little_omega" -> game.isLittleOmega();
             case "franken" -> game.isFrankenGame();
             case "milty_mod" -> isMiltyModGame(game);
@@ -161,6 +161,13 @@ public class GameStatisticsFilterer {
             case "ordinian" -> game.isOrdinianC1Mode();
             default -> false;
         };
+    }
+
+    public static boolean isActionCardDeck2(Game game) {
+        return "action_deck_2".equals(game.getAcDeckID()) || // legacy naming
+            "action_card_deck_2_base".equals(game.getAcDeckID()) ||
+            "action_card_deck_2_pok".equals(game.getAcDeckID()) ||
+            "action_card_deck_2_te".equals(game.getAcDeckID());
     }
 
     private static boolean filterOnExcludedGameTypes(String excludedGameTypesFilter, Game game) {

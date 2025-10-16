@@ -422,7 +422,7 @@ public class AutoCompleteProvider {
                         "pok",
                         "absol",
                         "ds",
-                        "action_deck_2",
+                        "action_card_deck_2",
                         "little_omega",
                         "franken",
                         "milty_mod",
@@ -1101,7 +1101,7 @@ public class AutoCompleteProvider {
                 MapTemplateModel mapTemplate = Mapper.getMapTemplate(mapTemplateId);
                 if (mapTemplate == null) return;
                 int maxSeats = mapTemplate.getPlayerCount();
-                event.replyChoice(maxSeats + " seats", (long) maxSeats).queue();
+                event.replyChoice(maxSeats + " seats", maxSeats).queue();
             }
             case Constants.DRAFT_SLICE_OPTION -> {
                 if (!GameManager.isValid(gameName)) return;
@@ -1172,7 +1172,7 @@ public class AutoCompleteProvider {
 
                 int playerCount = draftManager.getPlayerStates().size();
                 int maxSeats = Math.min(playerCount, 8);
-                event.replyChoice(maxSeats + " speaker order positions", (long) maxSeats)
+                event.replyChoice(maxSeats + " speaker order positions", maxSeats)
                         .queue();
             }
         }

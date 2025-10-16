@@ -47,6 +47,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.commands.planet.PlanetRemove;
+import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
@@ -827,7 +828,7 @@ public class Game extends GameProperties {
         gameModes.put(SourceEmojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
         gameModes.put("HomebrewSC", isHomebrewSCMode());
         gameModes.put("Little Omega", isLittleOmega());
-        gameModes.put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
+        gameModes.put("AC Deck 2", GameStatisticsFilterer.isActionCardDeck2(this));
         gameModes.put("Omega Phase", isOmegaPhaseMode());
         gameModes.put("Priority Track", hasAnyPriorityTrackMode());
         gameModes.put("Homebrew", isHomebrew());
@@ -2960,7 +2961,7 @@ public class Game extends GameProperties {
     }
 
     public void pbd1000decks() {
-        setActionCards(multiplyDeck(2, "action_cards_pok", "action_deck_2"));
+        setActionCards(multiplyDeck(2, "action_cards_pok", "action_card_deck_2_pok"));
         setSecretObjectives(multiplyDeck(3, "pbd100_secret_objectives"));
     }
 

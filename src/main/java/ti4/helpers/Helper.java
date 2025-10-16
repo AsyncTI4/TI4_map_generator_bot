@@ -42,6 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
+import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
@@ -166,20 +167,11 @@ public class Helper {
     }
 
     private static boolean checkAcd2ForAllSabotagesDiscarded(Game game) {
-        return "action_deck_2".equals(game.getAcDeckID())
+        return GameStatisticsFilterer.isActionCardDeck2(game)
                 && game.getDiscardActionCards().containsKey("sabotage1_acd2")
                 && game.getDiscardActionCards().containsKey("sabotage2_acd2")
                 && game.getDiscardActionCards().containsKey("sabotage3_acd2")
                 && game.getDiscardActionCards().containsKey("sabotage4_acd2");
-    }
-
-    public static boolean doesAnyoneOwnPlanet(Game game, String planet) {
-        for (Player player : game.getRealPlayers()) {
-            if (player.getPlanets().contains(planet)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public static boolean doesAllianceMemberOwnPlanet(Game game, String planet, Player p1) {

@@ -35,6 +35,7 @@ import ti4.buttons.UnfiledButtonHandlers;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
+import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.cron.AutoPingCron;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -1561,7 +1562,7 @@ public class AgendaHelper {
                 .append(", the current winner is \"")
                 .append(formattedWinner)
                 .append("\".\n");
-        if (!"action_deck_2".equals(game.getAcDeckID())) {
+        if (!GameStatisticsFilterer.isActionCardDeck2(game)) {
             handleShenanigans(game, winner);
             message.append(
                     "When shenanigans have concluded, please confirm resolution or discard the result and manually resolve it yourselves.");

@@ -1077,5 +1077,23 @@
         "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
         "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "opportunists",
+        "name": "Opportunists",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Choose 1 system that contains another player's ships and no planets. Place 1 cruiser and 1 destroyer from your reinforcements in that system and resolve a space combat.",
+        "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as a fleet of unmarked ships poured forth from the wormhole. Reports be damned, these were no mere pirates.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "miraculous_escape",
+        "name": "Miraculous Escape",
+        "phase": "Any",
+        "window": "When 1 of your units would be destroyed",
+        "text": "That unit is not destroyed instead. [Note: Combat hits are assigned simultaneously, and thus excess hits will not destroy this unit.]",
+        "flavorText": "The Memoria was known for miraculously surviving perilous situations, but Omar could not believe that it had managed to escape the Van Hauge. He was certain now - this 'Nomad' was not playing by the rules.",
+        "source": "action_deck_2_old"
     }
 ]

@@ -1,0 +1,168 @@
+[
+  {
+    "alias": "artifact_hunters",
+    "name": "Artifact Hunters",
+    "phase": "Action",
+    "window": "ACTION",
+    "text": "Explore 1 planet you control; if the resolved card is a relic fragment, you may spend 4 trade goods to purge that relic fragment and gain 1 relic.",
+    "flavorText": "\"This is...\" Dart let out a long whistle. \"I can't identify a single part of it. Can you?\"",
+    "source": "action_card_deck_2_pok"
+  },
+  {
+    "alias": "artifact_research",
+    "name": "Artifact Research",
+    "phase": "Action",
+    "window": "When you research a technology",
+    "text": "Discard 1 of your relic fragments to ignore 1 of that technology's prerequisites and reduce the resources spent by 4.",
+    "flavorText": "\"I don't feel any different,\" Dart said, his eyes blazing with the fire of a thousand dying worlds. \"What do you mean 'oh god your eyes'?\"",
+    "source": "action_card_deck_2_pok"
+  },
+  {
+    "alias": "black_market_raid",
+    "name": "Black Market Raid",
+    "phase": "Action",
+    "window": "ACTION",
+    "text": "Spend 3 tokens from your command sheet to gain 1 relic; you may purge any number of your relic fragments to reduce the tokens spent by an equal amount.",
+    "flavorText": "The black shard dripped with blood—some of it her own. What she had done, she did for the Federation. For all of humankind.",
+    "source": "action_card_deck_2_pok"
+  },
+  {
+    "alias": "data_archive",
+    "name": "Data Archive",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "Exhaust each of your readied planets to explore up to 2 of those planets.",
+    "flavorText": "Xuange was practically beaming with pleasure, though none would ever know it. Their research had paid off—the vault was exactly where they had expected it to be.",
+    "source": "action_card_deck_2_pok"
+  },
+  {
+    "alias": "derelict_station",
+    "name": "Derelict Station",
+    "phase": "Action",
+    "window": "After your ships move out of, into, or through a system that does not contain planets",
+    "text": "Explore a frontier token in that system or gain 2 commodities.",
+    "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, bespoke what they once were.",
+    "source": "action_card_deck_2_pok"
+  },
+  {
+    "alias": "exploration_rider",
+    "name": "Exploration Rider",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, explore up to 3 different non-cultural planets you control.",
+    "flavorText": "Harrugh gripped the straps of his pack tightly. Even in the blazing sun, he felt a chill run down his spine. Spirits roamed here. Why must the council disturb them?",
+    "source": "action_card_deck_2_pok"
+  },
+  {
+    "alias": "frontier_rider",
+    "name": "Frontier Rider",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, replenish your commodities and explore a frontier token on the game board.",
+    "flavorText": "Acamar held up the partial transcription of a legendary Lazax war treatise. With the return of their ancient enemy, finding the full document was imperative.",
+    "source": "action_card_deck_2_pok"
+  },
+  {
+    "alias": "heist",
+    "name": "Heist",
+    "phase": "Action",
+    "window": "After you gain control of a planet that was controlled by another player",
+    "text": "Take any combination of up to 2 of that player's relic fragments, trade goods, or commodities.",
+    "flavorText": "Mot awoke in a pool of his own blood. S'ula had the courtesy to let him live—just barely—but he was too weak to stand. So, he lay in front of the empty vault and wept.",
+    "source": "action_card_deck_2_pok"
+  },
+  {
+    "alias": "mysterious_brokers",
+    "name": "Mysterious Brokers",
+    "phase": "Action",
+    "window": "After you pass",
+    "text": "You may purge 1 of your relics to gain 1 relic. If you do not, gain trade goods equal to the number of neighbors you have that have not passed.",
+    "flavorText": "The broker sat unmoving. Its body, nearly stone, lent it to such an activity. However, this being was worth its weight in credits, for its memories stretched to the dawn of wonders, and its stories flowed to those who would fulfill its needs.",
+    "source": "action_card_deck_2_pok"
+  },
+  {
+    "alias": "reconstruction",
+    "name": "Reconstruction",
+    "phase": "Action",
+    "window": "ACTION",
+    "text": "Ready 1 of your planets that has a trait. Then, reveal the top 3 cards of an exploration deck that matches that planet; attach each attachment that you reveal to that planet and discard the rest.",
+    "flavorText": "Tungstantus collapsed mid-step as their energy depleted. The world was far from its former glory, and they would not rest until it was a paradise once more.",
+    "source": "action_card_deck_2_pok"
+  },
+  {
+    "alias": "relic_rider",
+    "name": "Relic Rider",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, gain 1 relic.",
+    "flavorText": "Qanoj watched the light reflect off of the shard and dance about his chambers. Such a pretty thing. And yet, so many had died for it.",
+    "source": "action_card_deck_2_pok"
+  },
+  {
+    "alias": "short-lived_clone",
+    "name": "Short-lived Clone",
+    "phase": "Action",
+    "window": "At the start of your turn",
+    "text": "Choose 1 agent. Ready or exhaust that agent.",
+    "flavorText": "\"Damn thing tried to kill me,\" Suffi grunted as she heaved the corpse onto the floor. \"Best we destroy that spinner after all. This galaxy can barely handle one of me.\"",
+    "source": "action_card_deck_2_pok"
+  },
+  {
+    "alias": "side_project1",
+    "name": "Side Project",
+    "phase": "Action",
+    "window": "When you research a technology",
+    "text": "Gain a technology that has no prerequisites.",
+    "automationID": "side_project",
+    "flavorText": "As the council meeting drew to a close, Suffi stood up. \"Before we adjourn, I'd like to announce that our neural enhancement project has entered the final phase of clinical trials.\"",
+    "source": "action_card_deck_2_pok"
+  },
+  {
+    "alias": "side_project2",
+    "name": "Side Project",
+    "phase": "Action",
+    "window": "When you research a technology",
+    "text": "Gain a technology that has no prerequisites.",
+    "automationID": "side_project",
+    "flavorText": "A projection showed four individuals competing in a task, with one participant fiercely outpacing the others as he interfaced with the device through thought alone. The council murmured approvingly.",
+    "source": "action_card_deck_2_pok"
+  },
+  {
+    "alias": "side_project3",
+    "name": "Side Project",
+    "phase": "Action",
+    "window": "When you research a technology",
+    "text": "Gain a technology that has no prerequisites.",
+    "automationID": "side_project",
+    "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi, where did you even find the time to organize this project?\"",
+    "source": "action_card_deck_2_pok"
+  },
+  {
+    "alias": "side_project4",
+    "name": "Side Project",
+    "phase": "Action",
+    "window": "When you research a technology",
+    "text": "Gain a technology that has no prerequisites.",
+    "automationID": "side_project",
+    "flavorText": "Suffi parted her hair, revealing a small metal plate indicative of a neural implant. Xander gasped, realizing she must have had the surgery long ago. \"You did this before the trials were completed?\" Suffi shrugged. \"Before the trials even began.\"",
+    "source": "action_card_deck_2_pok"
+  },
+  {
+    "alias": "tomb_raiders",
+    "name": "Tomb Raiders",
+    "phase": "Action",
+    "window": "ACTION",
+    "text": "Gain 2 commodities. Then, reveal the top card of each exploration deck; gain any relic fragments that you reveal and discard the rest.",
+    "flavorText": "As her hostages hurled insults, S'ula began to laugh. \"This artifact was the property of countless civilizations. You thought its journey would end with yours?\"",
+    "source": "action_card_deck_2_pok"
+  },
+  {
+    "alias": "void_path",
+    "name": "Void Path",
+    "phase": "Action",
+    "window": "At the start of your turn",
+    "text": "Choose 1 system that does not contain planets. During this turn, you treat that system as if it contains an alpha, beta, and gamma wormhole.",
+    "flavorText": "\"As we lack the form of your world, you will lack that of ours,\" Taivra said without tone. \"Let us hope you are better prepared for your first pilgrimage than we for ours.\"",
+    "source": "action_card_deck_2_pok"
+  }
+]

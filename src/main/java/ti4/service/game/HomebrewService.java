@@ -182,7 +182,7 @@ public class HomebrewService {
                         event.getMessageChannel(), "Set the explores/action cards/relics to Discordant Stars stuff.");
             }
             case HBACDECK2 -> {
-                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_deck_2"));
+                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_card_deck_2_pok"));
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(), "Set the action card deck to Action Card Deck 2.");
             }

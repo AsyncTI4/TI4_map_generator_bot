@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
+import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -560,7 +561,7 @@ public class StartPhaseService {
                             }
                         }));
 
-        if ("action_deck_2".equals(game.getAcDeckID()) && game.getRound() > 1) {
+        if (GameStatisticsFilterer.isActionCardDeck2(game) && game.getRound() > 1) {
             handleStartOfStrategyForAcd2(game);
         }
     }
