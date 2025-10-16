@@ -1,1 +1,17 @@
-{"id":"113","name":"Beta Rift","aliases":["te07","betarift"],"imagePath":"113_BetaRift.png","shipPositionsType":"TYPE08","wormholes":["BETA"],"tileBack":"red","isGravityRift":true,"source":"thunders_edge"}
+{
+    "id": "113",
+    "name": "Beta Rift",
+    "aliases": [
+        "te07",
+        "betarift"
+    ],
+    "imagePath": "113_BetaRift.png",
+    "shipPositionsType": "TYPE08",
+    "wormholes": [
+        "BETA"
+    ],
+    "planets": [],
+    "tileBack": "red",
+    "isGravityRift": true,
+    "source": "thunders_edge"
+}

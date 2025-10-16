@@ -2165,7 +2165,8 @@ public class Helper {
                     continue;
                 }
                 if (!player.getPlanetsAllianceMode().contains(unitHolder.getName())
-                        && !"genericModifyAllTiles".equals(warfareNOtherstuff)) {
+                        && !"genericModifyAllTiles".equals(warfareNOtherstuff)
+                        && !"genericBuild".equals(warfareNOtherstuff)) {
                     continue;
                 }
 

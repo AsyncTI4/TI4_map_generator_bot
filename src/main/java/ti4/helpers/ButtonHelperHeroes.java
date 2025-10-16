@@ -112,7 +112,7 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
-    static List<Button> getArgentHeroStep3Buttons(Game game, Player player, String buttonID) {
+    public static List<Button> getArgentHeroStep3Buttons(Game game, Player player, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         String pos1 = buttonID.split("_")[1];
         Tile destination = game.getTileByPosition(pos1);
@@ -1831,7 +1831,7 @@ public class ButtonHelperHeroes {
         }
         p1.removePromissoryNote(id);
         p2.setPromissoryNote(id);
-        if (id.contains("dspnveld")) {
+        if (id.contains("dspnveld") && !p2.getAllianceMembers().contains(p1.getFaction())) {
             PromissoryNoteHelper.resolvePNPlay(id, p2, game, event);
         }
         boolean sendSftT = false;
@@ -2538,17 +2538,24 @@ public class ButtonHelperHeroes {
     public static void resolveWinnuHeroSC(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         int sc = Integer.parseInt(buttonID.split("_")[1]);
         PlayStrategyCardService.playSC(event, sc, game, game.getMainGameChannel(), player, true);
-        if ("leadership".equalsIgnoreCase(Helper.getSCName(sc, game))) {
+        if (buttonID.contains("overrule")) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
                     game.getPing()
-                            + " reminder that the you must get the Winnu player's permission before you follow this.");
+                            + " reminder that the others cannot follow this. Only the Overrule player gets to do anything.");
         } else {
-            MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(),
-                    game.getPing()
-                            + " reminder that the you must get the Winnu player's permission before you follow this,"
-                            + " and that if you do follow, you must spend command tokens from your strategy pool like normal.");
+            if ("leadership".equalsIgnoreCase(Helper.getSCName(sc, game))) {
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        game.getPing()
+                                + " reminder that the you must get the Winnu player's permission before you follow this.");
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        game.getPing()
+                                + " reminder that the you must get the Winnu player's permission before you follow this,"
+                                + " and that if you do follow, you must spend command tokens from your strategy pool like normal.");
+            }
         }
         ButtonHelper.deleteMessage(event);
     }

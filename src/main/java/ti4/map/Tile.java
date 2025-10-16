@@ -130,6 +130,17 @@ public class Tile {
         return unitHolders.get(spaceHolder) != null;
     }
 
+    public static Predicate<Tile> tileHasNoPlayerShips(Game game) {
+        return tile -> {
+            for (Player p : game.getRealPlayers()) {
+                if (FoWHelper.playerHasActualShipsInSystem(p, tile)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+    }
+
     public void addUnit(String spaceHolder, UnitKey unitID, Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
