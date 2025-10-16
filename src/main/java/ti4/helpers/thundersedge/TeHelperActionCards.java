@@ -69,7 +69,8 @@ public class TeHelperActionCards {
     public static List<Button> getOverruleButtons(Game game) {
         List<Button> scButtons = new ArrayList<>();
         for (Integer sc : game.getSCList()) {
-            if (sc <= 0 || game.getScPlayed().get(sc)) continue;
+            if (sc <= 0
+                    || (game.getScPlayed().get(sc) != null && game.getScPlayed().get(sc))) continue;
             Button button;
             String label = Helper.getSCName(sc, game);
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
@@ -277,9 +278,9 @@ public class TeHelperActionCards {
 
         String prefix = player.finChecker() + "teMercenaryContract_";
         String message = player.getRepresentation() + " choose a planet to place 2 neutral infantry on:";
-        if (!NewStuffHelper.checkAndHandlePaginationChange(
-                event, player.getCorrectChannel(), buttons, message, prefix, buttonID))
-            ButtonHelper.deleteMessage(event);
+        NewStuffHelper.checkAndHandlePaginationChange(
+                event, player.getCorrectChannel(), buttons, message, prefix, buttonID);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("resolveTeMercenaryContract_")
@@ -290,8 +291,8 @@ public class TeHelperActionCards {
             String planet = matcher.group("planet");
             Tile tile = game.getTileFromPlanet(planet);
             resolvePiratesGeneric(event, game, player, tile, "2 inf " + planet);
-
-            String message = player.getRepresentation() + " paid some mercenaries to post up at "
+            player.setTg(player.getTg() - 2);
+            String message = player.getRepresentation() + " paid some mercenaries 2tg to post up at "
                     + Helper.getPlanetRepresentation(planet, game);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.deleteMessage(event);
@@ -333,13 +334,15 @@ public class TeHelperActionCards {
     }
 
     @ButtonHandler("pirateContract")
-    private static void beginPirateContract(Game game, Player player) {
+    private static void beginPirateContract(Game game, Player player, ButtonInteractionEvent event) {
         beginPirates(game, player, "resolvePirateContract", 0, false);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("pirateFleet")
-    private static void beginPirateFleet(Game game, Player player) {
+    private static void beginPirateFleet(Game game, Player player, ButtonInteractionEvent event) {
         beginPirates(game, player, "resolvePirateFleet", 3, true);
+        ButtonHelper.deleteMessage(event);
     }
 
     private static void beginPirates(Game game, Player player, String prefix, int cost, boolean allowRes) {
