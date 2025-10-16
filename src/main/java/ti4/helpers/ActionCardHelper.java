@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.CommandHelper;
+import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -1196,6 +1197,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, String.format(targetMsg, "ground forces"), codedButtons);
             }
+            TeHelperActionCards.resolveTeActionCard(actionCard, player, introMsg);
 
             TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(
                     Constants.AC, actionCard.getAlias(), player.getNumberOfTurns());

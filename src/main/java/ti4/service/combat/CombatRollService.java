@@ -714,12 +714,12 @@ public class CombatRollService {
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
             List<DiceHelper.Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
             int mult = 1;
+
+            player.setExpectedHitsTimes10(
+                    player.getExpectedHitsTimes10() + (numRolls * mult * (11 - toHit + modifierToHit)));
             if (usesX89c4) {
                 mult = 2;
             }
-            player.setExpectedHitsTimes10(
-                    player.getExpectedHitsTimes10() + (numRolls * mult * (11 - toHit + modifierToHit)));
-
             int hitRolls = DiceHelper.countSuccesses(resultRolls);
             if ("jolnar_flagship".equalsIgnoreCase(unitModel.getId())) {
                 for (DiceHelper.Die die : resultRolls) {
