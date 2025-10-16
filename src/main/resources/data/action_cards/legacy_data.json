@@ -1016,15 +1016,6 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "final_mission",
-        "name": "Final Mission",
-        "phase": "Action",
-        "window": "After 1 of your non-fighter ships is destroyed",
-        "text": "Choose 1 planet in that unit's system. Destroy 1 of another player's ground forces or PDS on that planet.",
-        "flavorText": "The Exotrireme became a guide missile in its death-throes, transforming the Sol base into a burning crater of steel and death.",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "stasis_tomb",
         "name": "Stasis Tomb",
         "phase": "Action",
@@ -1076,6 +1067,15 @@
         "window": "After the \"Movement\" step of your tactical action in a system that does not contain other players' units",
         "text": "Remove your command token from that system and end your turn.",
         "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair and finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "foreign_aid",
+        "name": "Foreign Aid",
+        "phase": "Action",
+        "window": "When you perform a strategic action",
+        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
+        "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
         "source": "action_deck_2_old"
     }
 ]
