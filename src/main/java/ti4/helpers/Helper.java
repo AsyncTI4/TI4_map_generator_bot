@@ -284,9 +284,7 @@ public class Helper {
                 if (!game.isFowMode()) {
                     message = player.getRepresentationUnfogged()
                             + " is the one the game is currently waiting on before advancing to the next player, with regards to queued **Imperial** follows.";
-                }
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                if (!game.isFowMode()) {
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     ButtonHelper.sendMessageToRightStratThread(player, game, message, "imperial");
                 }
                 break;
@@ -1319,6 +1317,8 @@ public class Helper {
                                     .append("\n");
                             res += planet.getSumResourcesInfluence();
                         } else if (xxchaBt) {
+                            msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                    .append("\n");
                             res += planet.getMaxResInf();
                         } else {
                             if (Math.min(gledgeMech, planet.getInfluence()) > 0) {
@@ -1336,6 +1336,8 @@ public class Helper {
                                     .append("\n");
                             inf += planet.getSumResourcesInfluence();
                         } else if (xxchaBt) {
+                            msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                    .append("\n");
                             inf += planet.getMaxResInf();
                         } else {
                             msg.append(getPlanetRepresentationPlusEmojiPlusInfluence(thing, game))
@@ -2163,7 +2165,8 @@ public class Helper {
                     continue;
                 }
                 if (!player.getPlanetsAllianceMode().contains(unitHolder.getName())
-                        && !"genericModifyAllTiles".equals(warfareNOtherstuff)) {
+                        && !"genericModifyAllTiles".equals(warfareNOtherstuff)
+                        && !"genericBuild".equals(warfareNOtherstuff)) {
                     continue;
                 }
 

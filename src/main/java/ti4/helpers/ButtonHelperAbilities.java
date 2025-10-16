@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -1849,6 +1850,19 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         SleeperTokenHelper.addOrRemoveSleeper(event, game, planet, player);
         event.getMessage().delete().queue();
+    }
+
+    @ButtonHandler("startCombatOn_")
+    public static void startCombatOn(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        event.getMessage().delete().queue();
+        String planet = buttonID.split("_")[1];
+        UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
+        Tile tile = game.getTileFromPlanet(planet);
+        List<Player> playersWithUnitsOnPlanet = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, unitHolder);
+        Optional<Player> enemyPlayer = playersWithUnitsOnPlanet.stream()
+                .filter(p -> player != p && !player.isPlayerMemberOfAlliance(p))
+                .findFirst();
+        StartCombatService.startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
     }
 
     @ButtonHandler("replaceSleeperWith_")
