@@ -7,6 +7,7 @@ import java.util.List;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
@@ -47,7 +48,6 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
                 "Nucleus & Slice value settings",
                 "Advanced settings for map features and slice quality.",
                 parent);
-        this.description.add("Big changes here can cause the nucleus generation to fail.");
 
         // Initialize settings
         int players = game != null ? game.getPlayers().size() : 6;
@@ -72,12 +72,9 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         minimumRedTiles = new IntegerSetting("MinRed", "Minimum Red Tiles", minRedTiles, 0, 20, 1);
 
         // Add extra info
-        minimumSliceRes.setExtraInfo(
-                "Defaults to 0. A low res slice can be combined with a specific seat to balance out.");
-        minimumSliceInf.setExtraInfo(
-                "Defaults to 0. A low inf slice can be combined with a specific seat to balance out.");
         nucleusWormholes.setExtraInfo("Applies to each type of wormhole separately.");
         totalWormholes.setExtraInfo("Applies to each type of wormhole separately.");
+        minimumRedTiles.setExtraInfo("Across all slices and the Nucleus");
 
         // Emojis
         nucleusWormholes.setEmoji(MiscEmojis.WHalpha);
@@ -159,10 +156,10 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
     private String toggleAdvanced(GenericInteractionCreateEvent event) {
         showAdvanced = !showAdvanced;
 
-        if (showAdvanced) {
+        if (showAdvanced && event instanceof ButtonInteractionEvent buttonEvent) {
             String msg =
-                    "Be careful with these settings; turn a couple of these knobs, and a valid map may not be possible.";
-            MessageHelper.sendMessageToEventChannel(event, msg);
+                    "Be careful with these settings. Nucleus + Slice generation is complex; an impossible configuration may not be obvious.";
+            MessageHelper.sendEphemeralMessageToEventChannel(buttonEvent, msg);
         }
 
         return "success";
