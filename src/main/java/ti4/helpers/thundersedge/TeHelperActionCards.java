@@ -134,7 +134,13 @@ public class TeHelperActionCards {
         }
         game.setStoredValue("coexistFlag", "yes");
         RemoveUnitService.removeUnit(
-                event, game.getTileFromPlanet(planet), game, player, game.getUnitHolderFromPlanet(planet), type, 1);
+                event,
+                game.getTileFromPlanet(planet),
+                game,
+                player,
+                game.getTileFromPlanet(planet).getSpaceUnitHolder(),
+                type,
+                1);
         AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), unit + " " + planet);
         game.removeStoredValue("coexistFlag");
 
