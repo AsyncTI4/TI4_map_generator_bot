@@ -254,7 +254,7 @@ public class SourceSettings extends SettingsMenu {
                 var inclusions = new ArrayList<String>();
                 if (abs) inclusions.add("Absol Mod");
                 if (ds) inclusions.add("Uncharted Space");
-                if (acd2) inclusions.add("Action Deck 2");
+                if (acd2) inclusions.add("Action Card Deck 2");
                 String message = inclusions.isEmpty()
                         ? "Reset your decks to include only PoK cards."
                         : "Reset your decks to include all of the " + String.join(" and ", inclusions) + " cards.";
