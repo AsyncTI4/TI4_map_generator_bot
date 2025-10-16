@@ -1107,7 +1107,9 @@ public class ButtonHelperModifyUnits {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
 
                 } else {
-                    StartCombatService.startGroundCombat(player, player2, game, event, unitHolder, tile);
+                    if (game.getStoredValue("coexistFlag").isEmpty()) {
+                        StartCombatService.startGroundCombat(player, player2, game, event, unitHolder, tile);
+                    }
                 }
                 int mechCount = unitHolder.getUnitCount(UnitType.Mech, player2.getColor());
                 if (player2.ownsUnit("keleres_mech") && mechCount > 0) {
