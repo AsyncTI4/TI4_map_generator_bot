@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.CommandHelper;
+import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -510,6 +511,11 @@ public class ActionCardHelper {
             }
         }
         MessageEmbed acEmbed = actionCard.getRepresentationEmbed(false, true);
+        if (!game.isFowMode() && event instanceof ButtonInteractionEvent bEvent) {
+            if (bEvent.getChannel().getName().toLowerCase().contains("-vs-")) {
+                MessageHelper.sendMessageToChannelWithEmbed(bEvent.getChannel(), message, acEmbed);
+            }
+        }
         if (acID.contains("sabo")) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
         } else {
@@ -665,13 +671,6 @@ public class ActionCardHelper {
                         introMsg + " A reminder that since you are researching,"
                                 + " you need not declare what technology you will get until after other players have chosen whether they will Sabo.",
                         codedButtons);
-            }
-
-            if ("spatial_collapse".equals(automationID)) {
-                codedButtons.add(
-                        Buttons.green(player.getFinsFactionCheckerPrefix() + "spatialCollapseStep1", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        channel2, introMsg + String.format(targetMsg, "systems"), codedButtons);
             }
 
             if ("side_project".equals(automationID)) {
@@ -864,8 +863,6 @@ public class ActionCardHelper {
             if ("parley".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveParleyStep1", buttonLabel));
-                // MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + String.format(targetMsg,
-                // "player"), codedButtons);
             }
 
             if ("f_deployment".equals(automationID)) {
@@ -913,21 +910,15 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "destroyed ship"), codedButtons);
             }
 
-            if ("mercenary_contract".equals(automationID)) {
+            if ("rapid_fulfillment".equals(automationID)) {
                 codedButtons.add(
-                        Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveMercenaryContract", buttonLabel));
+                        Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveRapidFulfillment", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
             if ("chain_reaction".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveChainReaction", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
-            }
-
-            if ("rendezvous".equals(automationID)) {
-                codedButtons.add(
-                        Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveRendezvousPoint", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -1198,6 +1189,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, String.format(targetMsg, "ground forces"), codedButtons);
             }
+            TeHelperActionCards.resolveTeActionCard(actionCard, player, introMsg);
 
             TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(
                     Constants.AC, actionCard.getAlias(), player.getNumberOfTurns());
@@ -1209,7 +1201,8 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if (actionCardWindow.contains("After an agenda is revealed")) {
+            if (actionCardWindow.contains("After an agenda is revealed")
+                    || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
                 List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
                 // MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate \"No
                 // Afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);

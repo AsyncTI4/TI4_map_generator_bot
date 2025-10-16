@@ -144,6 +144,15 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "compounding_interests",
+        "name": "Compounding Interests",
+        "phase": "Action",
+        "window": "After you pass",
+        "text": "Either draw 1 secret objective or gain commodities equal to the number of players that have passed.",
+        "flavorText": "There was a purr of excitement in the hall as the various executive members gathered to hear the latest earnings report. Behind the corporate sheen, the galaxy’s wealthiest aligned to carve up the stars among themselves.",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "corporate_lobbying",
         "name": "Corporate Lobbying",
         "phase": "Agenda",
@@ -167,7 +176,6 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Exhaust each of your readied planets to explore up to 2 of those planets.",
-        "automationID": "data_archive",
         "flavorText": "Xuange was practically beaming with pleasure, though none would ever know it. Their research had paid off—the vault was exactly where they had expected it to be.",
         "source": "action_deck_2"
     },
@@ -194,7 +202,7 @@
         "name": "Defense Installation",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Exhaust 1 planet you control to place 1 PDS from your reinforcements on that planet.",
+        "text": "Place 1 PDS from your reinforcements on a planet you control that does not contain 1 of your PDS.",
         "automationID": "defense_installation",
         "flavorText": "Tellurian had heard rumors of their kind roaming to the far corners of the galaxy. However, many such tales had led them to nothing more than decrepit defense systems. Alas, no stone could be left unturned.",
         "source": "action_deck_2"
@@ -204,7 +212,7 @@
         "name": "Defense Installation",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Exhaust 1 planet you control to place 1 PDS from your reinforcements on that planet.",
+        "text": "Place 1 PDS from your reinforcements on a planet you control that does not contain 1 of your PDS.",
         "automationID": "defense_installation",
         "flavorText": "The native folk had enshrined the ancient structure as if it were a deity. They called it a guardian, as the old texts described it, but they did not understand its true nature.",
         "source": "action_deck_2"
@@ -214,7 +222,7 @@
         "name": "Defense Installation",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Exhaust 1 planet you control to place 1 PDS from your reinforcements on that planet.",
+        "text": "Place 1 PDS from your reinforcements on a planet you control that does not contain 1 of your PDS.",
         "automationID": "defense_installation",
         "flavorText": "Tellurian raised their arms above their head and emitted a strange noise that the locals presumed to be joyous. In the near distance, one of its kind broke through the earth, shattering the landscape.",
         "source": "action_deck_2"
@@ -224,7 +232,7 @@
         "name": "Defense Installation",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Exhaust 1 planet you control to place 1 PDS from your reinforcements on that planet.",
+        "text": "Place 1 PDS from your reinforcements on a planet you control that does not contain 1 of your PDS.",
         "automationID": "defense_installation",
         "flavorText": "Tellurian declared that the planet was under the protection of Ul, for the sleepers had awoken and would not rest until peace was assured.",
         "source": "action_deck_2"
@@ -244,7 +252,6 @@
         "phase": "Strategy",
         "window": "At the start of the strategy phase",
         "text": "Choose 1 strategy card. During this strategy phase, other players must spend 1 token from their strategy pool to choose that strategy card, if able.",
-        "automationID": "deflection",
         "flavorText": "\"It was their idea,\" Zo Cou shrugged. \"Or so they believe. Their mistake was a poison I fed them. Now they choke on it.\"",
         "source": "action_deck_2"
     },
@@ -307,21 +314,21 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "espionage",
-        "name": "Espionage",
-        "phase": "Action",
-        "window": "ACTION",
-        "text": "Choose another player. That player shows you their action cards or 1 random secret objective from their hand. [Note: Their choice. If they have no secrets, they must show you their action cards.]",
-        "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "exploration_rider",
         "name": "Exploration Rider",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, explore up to 3 different non-cultural planets you control.",
         "flavorText": "Harrugh gripped the straps of his pack tightly. Even in the blazing sun, he felt a chill run down his spine. Spirits roamed here. Why must the council disturb them?",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "false_manifest",
+        "name": "False Manifest",
+        "phase": "Action",
+        "window": "When another player gains 3 or more trade goods",
+        "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods.",
+        "flavorText": "The deal was too good to be true. Every seal was genuine, every signature correct. Only Suffi and the cargo were amiss.",
         "source": "action_deck_2"
     },
     {
@@ -440,7 +447,7 @@
         "alias": "hijacked_signal",
         "name": "Hijacked Signal",
         "phase": "Any",
-        "window": "After another player moves ships into a system that contains your units",
+        "window": "After you resolve the secondary ability of another player's strategy card",
         "text": "Place 1 command token from that player's reinforcements in any non-home system.",
         "flavorText": "The Hacan paid heavily to contain the breach. 2RAM identified the culprit as Acidos and warned them that the worst was yet to come.",
         "source": "action_deck_2"
@@ -461,6 +468,15 @@
         "window": "When or after you research a technology",
         "text": "Ready up to 2 of your planets that have a technology specialty.",
         "flavorText": "The conference erupted in cheers as Doctor Sucaban announced his findings. Despite the countless sacrifices to reach these results, the wide range of applications made it difficult to feel regret.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "intelligible_mechanism",
+        "name": "Intelligible Mechanism",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Spend 6 resources to research 1 technology; for each neighbor that owns that technology, reduce this cost by 1 and ignore 1 prerequisite.",
+        "flavorText": "Once an enigmatic device plucked from the void, it had become nothing more than schematics—patented and traded to the rim of the galaxy.",
         "source": "action_deck_2"
     },
     {
@@ -509,12 +525,12 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "mercenary_contract",
-        "name": "Mercenary Contract",
+        "alias": "mass_transference",
+        "name": "Mass Transference",
         "phase": "Action",
-        "window": "After a player activates a system that contains your units",
-        "text": "Produce up to 2 ships in that system that have a combined cost of 4 or less.",
-        "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
+        "window": "After you activate a system",
+        "text": "Remove up to 4 of your units from that system and place them on any planets you control or in any space areas that contain your ships.",
+        "flavorText": "The Mentak crew handed out brochures, recruiting with promises of a grand new life on a distant world. In truth, we traded our quiet colony for a desperate land-grab on the front lines.",
         "source": "action_deck_2"
     },
     {
@@ -523,7 +539,6 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Choose 1 system that contains another player's fighters. Roll 1 die for each fighter in that system. For each result of 6 or greater, destroy 1 of those units.",
-        "automationID": "micrometeoroid_storm",
         "flavorText": "The disaster investigation unit could not determine whether it was an act of providence or the beginning stages of an incursion.",
         "source": "action_deck_2"
     },
@@ -531,8 +546,8 @@
         "alias": "miraculous_escape",
         "name": "Miraculous Escape",
         "phase": "Any",
-        "window": "When 1 of your non-fighter ships would be destroyed",
-        "text": "That ship is not destroyed. [Note: Combat hits are assigned simultaneously, and thus excess hits will not destroy this ship.]",
+        "window": "When 1 of your units would be destroyed",
+        "text": "That unit is not destroyed instead. [Note: Combat hits are assigned simultaneously, and thus excess hits will not destroy this unit.]",
         "flavorText": "The Memoria was known for miraculously surviving perilous situations, but Omar could not believe that it had managed to escape the Van Hauge. He was certain now - this 'Nomad' was not playing by the rules.",
         "source": "action_deck_2"
     },
@@ -636,21 +651,21 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "patronage",
-        "name": "Patronage",
-        "phase": "Any",
-        "window": "When a public objective is revealed",
-        "text": "Look at the top 2 cards of the deck that matches that objective; you may replace that objective with 1 of those cards. Then, shuffle that deck.",
-        "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, thinly veiled under the guise of tradition.",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "pivot",
         "name": "Pivot",
         "phase": "Action",
         "window": "ACTION",
         "text": "Discard 1-3 action cards from your hand to draw an equal number of action cards.",
         "flavorText": "\"We must not become stagnant. Stagnation is what broke this galaxy,\" I48S said, barely hesitating at his patient's screams. \"Pain? Let's remove that.\"",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "proclamation",
+        "name": "Proclamation",
+        "phase": "Any",
+        "window": "When a public objective is revealed",
+        "text": "Look at the top 2 cards of the deck that matches that objective; you may replace that objective with 1 of those cards. Then, shuffle that deck.",
+        "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, thinly veiled under the guise of tradition.",
         "source": "action_deck_2"
     },
     {
@@ -702,9 +717,18 @@
         "alias": "ramming_speed",
         "name": "Ramming Speed",
         "phase": "Action",
-        "window": "After 1 of your units is destroyed during combat, if you are the attacker",
-        "text": "Choose and destroy 1 of your opponent's participating units that has a cost equal to or lower than your destroyed unit's cost.",
+        "window": "After 1 of your units is destroyed during combat",
+        "text": "Destroy 1 of your opponent's participating units that has a cost equal to or lower than your destroyed unit's cost.",
         "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "rapid_fulfillment",
+        "name": "Rapid Fulfillment",
+        "phase": "Action",
+        "window": "After a player activates a system that contains your units",
+        "text": "Produce up to 2 ships in that system that have a combined cost of 4 or less.",
+        "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
         "source": "action_deck_2"
     },
     {
@@ -777,15 +801,6 @@
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, gain 1 relic.",
         "flavorText": "Qanoj watched the light reflect off of the shard and dance about his chambers. Such a pretty thing. And yet, so many had died for it.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "rendezvous",
-        "name": "Rendezvous",
-        "phase": "Action",
-        "window": "After the \"Movement\" step of your tactical action in a system that does not contain other players' units",
-        "text": "Remove your command token from that system and end your turn.",
-        "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair and finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
         "source": "action_deck_2"
     },
     {
@@ -882,8 +897,8 @@
         "alias": "side_project1",
         "name": "Side Project",
         "phase": "Action",
-        "window": "ACTION",
-        "text": "Spend 1 token from your strategy pool to research a technology that has no prerequisites.",
+        "window": "When you research a technology",
+        "text": "Gain a technology that has no prerequisites.",
         "automationID": "side_project",
         "flavorText": "As the council meeting drew to a close, Suffi stood up. \"Before we adjourn, I'd like to announce that our neural enhancement project has entered the final phase of clinical trials.\"",
         "source": "action_deck_2"
@@ -892,8 +907,8 @@
         "alias": "side_project2",
         "name": "Side Project",
         "phase": "Action",
-        "window": "ACTION",
-        "text": "Spend 1 token from your strategy pool to research a technology that has no prerequisites.",
+        "window": "When you research a technology",
+        "text": "Gain a technology that has no prerequisites.",
         "automationID": "side_project",
         "flavorText": "A projection showed four individuals competing in a task, with one participant fiercely outpacing the others as he interfaced with the device through thought alone. The council murmured approvingly.",
         "source": "action_deck_2"
@@ -902,8 +917,8 @@
         "alias": "side_project3",
         "name": "Side Project",
         "phase": "Action",
-        "window": "ACTION",
-        "text": "Spend 1 token from your strategy pool to research a technology that has no prerequisites.",
+        "window": "When you research a technology",
+        "text": "Gain a technology that has no prerequisites.",
         "automationID": "side_project",
         "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi, where did you even find the time to organize this project?\"",
         "source": "action_deck_2"
@@ -912,8 +927,8 @@
         "alias": "side_project4",
         "name": "Side Project",
         "phase": "Action",
-        "window": "ACTION",
-        "text": "Spend 1 token from your strategy pool to research a technology that has no prerequisites.",
+        "window": "When you research a technology",
+        "text": "Gain a technology that has no prerequisites.",
         "automationID": "side_project",
         "flavorText": "Suffi parted her hair, revealing a small metal plate indicative of a neural implant. Xander gasped, realizing she must have had the surgery long ago. \"You did this before the trials were completed?\" Suffi shrugged. \"Before the trials even began.\"",
         "source": "action_deck_2"
@@ -968,30 +983,12 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "special_considerations",
-        "name": "Special Considerations",
-        "phase": "Agenda",
-        "window": "When an agenda is revealed",
-        "text": "Game effects cannot prevent you from playing this card or voting on this agenda. Ready up to 3 planets you control.",
-        "flavorText": "\"It is our right to determine the future of this artifact,\" Mathis said calmly, flashing his imperial seal in a practiced motion. \"Are we not owed such respect?\"",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "stasis_haul",
         "name": "Stasis Haul",
         "phase": "Action",
         "window": "After you activate a system",
         "text": "Choose 1 of your ships that has a capacity value. During this tactical action, apply +2 to that ship's capacity value and gain 1 commodity for each different system it moves into or through.",
         "flavorText": "The cargo ships blasted out of the planet's gravity field. Vast space and time lay before them. For all, it meant the promise of new life; for some, it would mean death.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "unlikely_allies",
-        "name": "Unlikely Allies",
-        "phase": "Action",
-        "window": "After you gain control of a planet",
-        "text": "Explore that planet. Then, you may discard 2 of your relic fragments to gain the alliance ability of a random, unused faction.",
-        "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—he'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "action_deck_2"
     },
     {
@@ -1013,6 +1010,15 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "strategic_assistance",
+        "name": "Strategic Assistance",
+        "phase": "Action",
+        "window": "After another player resolves the secondary ability of your strategy card",
+        "text": "Return 1 of that player's command tokens from the game board to their command sheet. Then, you may perform a transaction with that player; action cards and unscored secret objectives can be included as part of this transaction.",
+        "flavorText": "\"With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Rinn sighed. \"We must remain focused. Steady.\"",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "strategic_focus",
         "name": "Strategic Focus",
         "phase": "Action",
@@ -1026,7 +1032,7 @@
         "name": "Syndicate",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Draw and reveal a number of action cards from the deck equal to the number of players; give 1 of those cards to each of those players and keep the rest.",
+        "text": "Reveal a number of cards from the action card deck equal to the number of players. Each other player may draw 1 of those cards of your choice. Then, draw the rest.",
         "flavorText": "\"What if I'm not ready?\" the operative asked, looking away. Harka squeezed her hand. \"Believe in me, who believes in you.\"",
         "source": "action_deck_2"
     },
@@ -1043,8 +1049,8 @@
         "alias": "unexpected_strategy",
         "name": "Unexpected Strategy",
         "phase": "Any",
-        "window": "When you would place a token from your strategy pool or reinforcements on the game board",
-        "text": "Gain that token instead.",
+        "window": "When you would spend a command token from your strategy pool",
+        "text": "Remove 1 of your command tokens from the game board instead.",
         "flavorText": "Jace was perplexed by Ahk-Syl Siven's decision to retreat deeper into Federation territory—until the once-routed fleet rallied into a devastating assault.",
         "source": "action_deck_2"
     },

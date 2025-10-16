@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 
 class ShufflePublicBack extends GameStateSubcommand {
 
-    public ShufflePublicBack() {
+    ShufflePublicBack() {
         super(Constants.SHUFFLE_OBJECTIVE_BACK, "Shuffle Public Objective back into deck", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.PO_ID, "Public Objective ID that is between ()")
                 .setRequired(true)

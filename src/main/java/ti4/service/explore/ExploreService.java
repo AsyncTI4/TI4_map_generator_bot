@@ -511,23 +511,31 @@ public class ExploreService {
                 if (tokenFilename == null || tile == null) {
                     message = "Invalid token or tile";
                 } else {
-                    if ("ionalpha".equalsIgnoreCase(token)) {
-                        message = player.getRepresentation()
-                                + ", please choose if the _Ion Storm_ is placed on its alpha or beta side.";
-                        List<Button> buttonIon = new ArrayList<>();
-                        buttonIon.add(Buttons.gray(
-                                "addIonStorm_alpha_" + tile.getPosition(), "Place an Alpha", MiscEmojis.CreussAlpha));
-                        buttonIon.add(Buttons.green(
-                                "addIonStorm_beta_" + tile.getPosition(), "Place a Beta", MiscEmojis.CreussBeta));
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttonIon);
+                    if (tile.isScar() && ("ionalpha".equalsIgnoreCase(token) || "gamma".equalsIgnoreCase(token))) {
+                        message = "Token `" + token + "` was not added to tile " + tile.getAutoCompleteName()
+                                + " because it is an entropic scar and cannot have wormholes.";
                     } else {
-                        tile.addToken(tokenFilename, Constants.SPACE);
-                        message = "Token `" + token + "` added to tile " + tile.getAutoCompleteName() + ".";
-                        if ("gamma".equalsIgnoreCase(token) && "mallice".equals(planetID) && !game.isFowMode()) {
-                            DisasterWatchHelper.sendMessageInDisasterWatch(
-                                    game,
-                                    player.getRepresentation() + " has explored Mallice in " + game.getName()
-                                            + ", and discovered the _Gamma Wormhole_.");
+                        if ("ionalpha".equalsIgnoreCase(token)) {
+                            message = player.getRepresentation()
+                                    + ", please choose if the _Ion Storm_ is placed on its alpha or beta side.";
+                            List<Button> buttonIon = new ArrayList<>();
+                            buttonIon.add(Buttons.gray(
+                                    "addIonStorm_alpha_" + tile.getPosition(),
+                                    "Place an Alpha",
+                                    MiscEmojis.CreussAlpha));
+                            buttonIon.add(Buttons.green(
+                                    "addIonStorm_beta_" + tile.getPosition(), "Place a Beta", MiscEmojis.CreussBeta));
+                            MessageHelper.sendMessageToChannelWithButtons(
+                                    player.getCorrectChannel(), message, buttonIon);
+                        } else {
+                            tile.addToken(tokenFilename, Constants.SPACE);
+                            message = "Token `" + token + "` added to tile " + tile.getAutoCompleteName() + ".";
+                            if ("gamma".equalsIgnoreCase(token) && "mallice".equals(planetID) && !game.isFowMode()) {
+                                DisasterWatchHelper.sendMessageInDisasterWatch(
+                                        game,
+                                        player.getRepresentation() + " has explored Mallice in " + game.getName()
+                                                + ", and discovered the _Gamma Wormhole_.");
+                            }
                         }
                     }
 

@@ -19,15 +19,6 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "mass_transference",
-        "name": "Mass Transference",
-        "phase": "Action",
-        "window": "After you activate a system",
-        "text": "Remove up to 4 of your units from that system and place them on any planets you control or in any space areas that contain your ships.",
-        "flavorText": "The Mentak crew handed out brochures, recruiting with promises of a grand new life on a distant world. In truth, we traded our quiet colony for a desperate land-grab on the front lines.",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "adrenaline_shots",
         "name": "Adrenaline Shots",
         "phase": "Action",
@@ -1040,6 +1031,51 @@
         "window": "After you gain control of a planet",
         "text": "Explore that planet. Then, you may discard 2 of your relic fragments to gain the alliance ability of a random, unused faction.",
         "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—he'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "mercenary_contract",
+        "name": "Mercenary Contract",
+        "phase": "Action",
+        "window": "After a player activates a system that contains your units",
+        "text": "Produce up to 2 ships in that system that have a combined cost of 4 or less.",
+        "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "patronage",
+        "name": "Patronage",
+        "phase": "Any",
+        "window": "When a public objective is revealed",
+        "text": "Look at the top 2 cards of the deck that matches that objective; you may replace that objective with 1 of those cards. Then, shuffle that deck.",
+        "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, thinly veiled under the guise of tradition.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "special_considerations",
+        "name": "Special Considerations",
+        "phase": "Agenda",
+        "window": "When an agenda is revealed",
+        "text": "Game effects cannot prevent you from playing this card or voting on this agenda. Ready up to 3 planets you control.",
+        "flavorText": "\"It is our right to determine the future of this artifact,\" Mathis said calmly, flashing his imperial seal in a practiced motion. \"Are we not owed such respect?\"",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "espionage",
+        "name": "Espionage",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Choose another player. That player shows you their action cards or 1 random secret objective from their hand. [Note: Their choice. If they have no secrets, they must show you their action cards.]",
+        "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "rendezvous",
+        "name": "Rendezvous",
+        "phase": "Action",
+        "window": "After the \"Movement\" step of your tactical action in a system that does not contain other players' units",
+        "text": "Remove your command token from that system and end your turn.",
+        "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair and finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
         "source": "action_deck_2_old"
     }
 ]

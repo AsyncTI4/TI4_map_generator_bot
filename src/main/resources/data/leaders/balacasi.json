@@ -18,7 +18,7 @@
         "title": "The Judicial",
         "abilityWindow": "After you win a space combat:",
         "abilityText": "You may force your opponent to give you 1 action card from their hand.",
-        "unlockCondition": "Play an action card during a combat",
+        "unlockCondition": "Discard an action card after you win a combat",
         "source": "balacasi"
     },
     {

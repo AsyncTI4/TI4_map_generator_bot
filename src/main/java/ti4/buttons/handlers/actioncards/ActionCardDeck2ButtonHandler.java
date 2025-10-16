@@ -2,21 +2,20 @@ package ti4.buttons.handlers.actioncards;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
-import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.RelicHelper;
+import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -57,15 +56,18 @@ class ActionCardDeck2ButtonHandler {
 
     @ButtonHandler("resolveDefenseInstallation")
     public static void resolveDefenseInstallation(Player player, Game game, ButtonInteractionEvent event) {
-        List<Button> buttons = new ArrayList<>();
-        for (String planet : player.getReadiedPlanets()) {
-            buttons.add(
-                    Buttons.green("defenseInstallationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
-        }
+        List<Button> buttons = player.getPlanets().stream()
+                .map(planetName -> ButtonHelper.getUnitHolderFromPlanetName(planetName, game))
+                .filter(Objects::nonNull)
+                .filter(planet -> planet.getUnitCount(Units.UnitType.Pds, player.getColor()) == 0)
+                .map(planet -> Buttons.green(
+                        "defenseInstallationStep2_" + planet.getName(),
+                        Helper.getPlanetRepresentation(planet.getName(), game)))
+                .toList();
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", please choose the planet you wish to exhaust and put 1 PDS on.",
+                player.getRepresentationUnfogged() + ", please choose the planet you wish to put 1 PDS on.",
                 buttons);
     }
 
@@ -73,13 +75,11 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveDefenseInstallationStep2(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        player.exhaustPlanet(planet);
         AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "pds " + planet);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " exhausted " + Helper.getPlanetRepresentation(planet, game)
-                        + " and put 1 PDS on it");
+                player.getRepresentationUnfogged() + " put 1 PDS on " + Helper.getPlanetRepresentation(planet, game));
     }
 
     @ButtonHandler("resolveBoardingParty")
@@ -93,8 +93,8 @@ class ActionCardDeck2ButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
 
-    @ButtonHandler("resolveMercenaryContract")
-    public static void resolveMercenaryContract(Player player, Game game, ButtonInteractionEvent event) {
+    @ButtonHandler("resolveRapidFulfillment")
+    public static void resolveRapidFulfillment(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         String type = "sling";
         String pos = game.getActiveSystem();
@@ -178,18 +178,6 @@ class ActionCardDeck2ButtonHandler {
         scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), player.getRepresentation() + ", use the buttons to resolve.", scButtons);
-    }
-
-    @ButtonHandler("resolveRendezvousPoint")
-    public static void resolveRendezvousPoint(Player player, Game game, ButtonInteractionEvent event) {
-        event.getMessage().delete().queue();
-        List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "rendezvous");
-        MessageChannel channel = player.getCorrectChannel();
-        MessageHelper.sendMessageToChannelWithButtons(
-                channel,
-                "Use the buttons to remove token from what was the active system when you played the card."
-                        + " Then end your turn after doing any end of turn abilities you wish to do.",
-                buttons);
     }
 
     @ButtonHandler("resolveAncientTradeRoutes")
@@ -353,17 +341,6 @@ class ActionCardDeck2ButtonHandler {
         CommanderUnlockCheckService.checkPlayer(p2, "empyrean");
     }
 
-    @ButtonHandler("spatialCollapseStep1")
-    public static void resolveSpatialCollapseStep1(Player player, Game game, ButtonInteractionEvent event) {
-        List<Button> buttons = getSpatialCollapseTilesStep1(game, player);
-        event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + ", please choose which system (with your ships) you wish to swap with an adjacent system.",
-                buttons);
-    }
-
     private static List<Button> getSpatialCollapseTilesStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
@@ -441,21 +418,7 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("sideProject")
-    public static void resolveSideProject(Player player, Game game, ButtonInteractionEvent event) {
-        String successMessage;
-        if (player.getStrategicCC() > 0) {
-            successMessage =
-                    player.getRepresentationNoPing() + ", 1 command token has been removed from your strategy pool ("
-                            + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ").";
-            player.setStrategicCC(player.getStrategicCC() - 1);
-            ButtonHelperCommanders.resolveMuaatCommanderCheck(
-                    player, game, event, CardEmojis.ActionCard + "played _Side Project_");
-        } else {
-            successMessage = player.getRepresentationNoPing() + " exhausted the _" + RelicHelper.sillySpelling() + "_.";
-            player.addExhaustedRelic("emelpar");
-        }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
-
+    public static void resolveSideProject(Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         ButtonHelperFactionSpecific.offerWinnuStartingTech(player);
     }

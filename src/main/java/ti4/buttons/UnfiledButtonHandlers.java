@@ -3520,11 +3520,6 @@ public class UnfiledButtonHandlers {
     public static void primaryOfTeWarfare(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         StrategyCardModel model = Mapper.getStrategyCard("te6warfare");
         if (model == null) return;
-        if (!player.getSCs().contains(model.getInitiative()) && !buttonID.contains("overrule")) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "You do not have the Warfare strategy card.");
-            return;
-        }
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.blue(
