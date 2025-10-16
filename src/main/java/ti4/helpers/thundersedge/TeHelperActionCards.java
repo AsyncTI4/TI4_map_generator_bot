@@ -150,7 +150,8 @@ public class TeHelperActionCards {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getPlanets()) {
-            if (game.getUnitHolderFromPlanet(planet) != null) {
+            if (game.getUnitHolderFromPlanet(planet) != null
+                    && game.getUnitHolderFromPlanet(planet).hasGroundForces(p2)) {
                 buttons.add(Buttons.gray(
                         player.getFinsFactionCheckerPrefix() + "exchangeProgramPart3_" + planet,
                         Helper.getPlanetRepresentation(planet, game)));
@@ -163,7 +164,8 @@ public class TeHelperActionCards {
 
         buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
-            if (game.getUnitHolderFromPlanet(planet) != null) {
+            if (game.getUnitHolderFromPlanet(planet) != null
+                    && game.getUnitHolderFromPlanet(planet).hasGroundForces(player)) {
                 buttons.add(Buttons.gray(
                         p2.getFinsFactionCheckerPrefix() + "exchangeProgramPart3_" + planet,
                         Helper.getPlanetRepresentation(planet, game)));
