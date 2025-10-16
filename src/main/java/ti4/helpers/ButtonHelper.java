@@ -3976,6 +3976,7 @@ public class ButtonHelper {
                 "ordinianc4", // Codex 4
                 "ordinian",
                 "faunus",
+                "industrex",
                 "silence",
                 "prism",
                 "emelpar",
@@ -5145,9 +5146,11 @@ public class ButtonHelper {
 
         for (String trait : explorationTraits) {
             if (List.of("cultural", "industrial", "hazardous").contains(trait)) {
-                String buttonId = "movedNExplored_filler_" + planetId + "_" + trait;
+                String buttonId =
+                        player.getFinsFactionCheckerPrefix() + "movedNExplored_filler_" + planetId + "_" + trait;
                 if (impressment) {
-                    buttonId = "movedNExplored_dsdihmy_" + planetId + "_" + trait;
+                    buttonId =
+                            player.getFinsFactionCheckerPrefix() + "movedNExplored_dsdihmy_" + planetId + "_" + trait;
                 }
                 String buttonMessage =
                         "Explore " + planetRepresentation + (explorationTraits.size() > 1 ? " as " + trait : "");

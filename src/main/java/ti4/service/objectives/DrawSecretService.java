@@ -117,6 +117,9 @@ public class DrawSecretService {
             if (game.isThundersEdge() || !game.getStoredValue("useNewRelics").isEmpty()) {
                 game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
             }
+            if (game.isThundersEdge()) {
+                game.validateAndSetRelicDeck(Mapper.getDeck("action_cards_te"));
+            }
             if (game.isThundersEdge() || !game.getStoredValue("useNewRex").isEmpty()) {
                 Tile mr = game.getMecatolTile();
                 if (mr != null) {
