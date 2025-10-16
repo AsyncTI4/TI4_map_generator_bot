@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -35,6 +36,16 @@ import ti4.service.milty.TierList;
 @UtilityClass
 public class NucleusSliceGeneratorService {
     private static final int ATTEMPTS = 50_000;
+    // Core slices are filled by the most suitable tile. This leads to certain tiles
+    // being used over and over.
+    // Ex. if a slice is just one empty tile, often rigels/devils will be the best fit.
+    // Volatility is the chance that we will skip the current best tile, and is applied recursively.
+    private static final float CORE_FILL_VOLATILITY = 0.2f;
+    // Up to 10 swaps should make a big difference for most map sizes.
+    private static final int MAX_REBALANCE_TRAITS = 10;
+    // Max spread of 2 is pretty reasonable for most map templates and player counts,
+    // regardless of other settings.
+    private static final int MAX_TRAIT_SPREAD = 2;
 
     // Major known issues:
     // - Because the Nucleus is made up of several slices which share some times (e.g. equidistants),
@@ -55,10 +66,6 @@ public class NucleusSliceGeneratorService {
      * @return The slices that were generated for drafting.
      */
     public List<MiltyDraftSlice> generateNucleusAndSlices(GenericInteractionCreateEvent event, DraftSpec draftSpecs) {
-
-        // TODO: Implement nucleus settings so we don't just have to flat out ignore the
-        // specs...
-
         Game game = draftSpecs.getGame();
         MapTemplateModel mapTemplate = draftSpecs.getTemplate();
         if (!mapTemplate.isNucleusTemplate()) {
@@ -221,6 +228,9 @@ public class NucleusSliceGeneratorService {
         if (playerSlices == null) {
             return new NucleusOutcome(null, "Failed to generate player slices; could not place all required tiles.");
         }
+
+        // Remove wormholes and legendaries that weren't placed as required tiles
+        availableTiles.removeIf(t -> t.isHasAlphaWH() || t.isHasBetaWH() || t.isLegendary());
 
         Collections.shuffle(availableTiles);
         Map<TierList, List<MiltyDraftTile>> tieredAvailableTiles =
@@ -428,8 +438,7 @@ public class NucleusSliceGeneratorService {
     private void rebalanceTraits(
             List<MiltyDraftSlice> slices, List<PlacedTile> placedTiles, List<MiltyDraftTile> availableTiles) {
 
-        // TODO: Is this number smart?
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < MAX_REBALANCE_TRAITS; i++) {
             boolean changed = tryRebalanceTraits(slices, placedTiles, availableTiles);
             if (!changed) break;
         }
@@ -442,9 +451,7 @@ public class NucleusSliceGeneratorService {
         PlanetType maxTrait = totalTraits.max();
         PlanetType minTrait = totalTraits.min();
         int spread = totalTraits.spread();
-
-        // TODO: Should this number be a setting?
-        if (spread < 3) return false;
+        if (spread <= MAX_TRAIT_SPREAD) return false;
 
         MiltyDraftTile toRemove = null;
         MiltyDraftTile toAdd = null;
@@ -749,12 +756,21 @@ public class NucleusSliceGeneratorService {
                 }
 
                 if (!candidateTiles.isEmpty()) {
-                    // TODO: Taking the first biases us to the same high-impact tiles...instead
-                    // maybe introduce more randomness. E.g. for each tile in order, flip a coin
-                    // to see if we take it. Or maybe less often than 50/50, e.g. 20% to take it.
-                    MiltyDraftTile chosenTile = candidateTiles.getFirst();
+                    MiltyDraftTile chosenTile = null;
+                    // Prefer tiles by suitability, but allow some randomness
+                    for (MiltyDraftTile candidate : candidateTiles) {
+                        if (ThreadLocalRandom.current().nextFloat() > CORE_FILL_VOLATILITY) {
+                            chosenTile = candidate;
+                            break;
+                        }
+                    }
+                    // If we didn't pick one randomly, just take the first
+                    if (chosenTile == null) {
+                        chosenTile = candidateTiles.getFirst();
+                    }
+                    // Place the chosen tile, then remove it from all candidacy lists
                     placedTiles.add(new PlacedTile(location, chosenTile));
-                    for (var tier : tieredAvailableTiles.keySet()) {
+                    for (TierList tier : tieredAvailableTiles.keySet()) {
                         tieredAvailableTiles.get(tier).remove(chosenTile);
                     }
                 }
@@ -801,9 +817,12 @@ public class NucleusSliceGeneratorService {
         requiredTiles.addAll(betaTiles);
         requiredTiles.addAll(legendaryTiles);
 
-        // Prepare filler tiers by organizing them into tiers for easy selection
-        Collections.shuffle(availableSystems);
-        Map<TierList, List<MiltyDraftTile>> tieredFillerTiles = tierTiles(tileManager, availableSystems);
+        // Prepare filler tiles by removing unused 'required' tiles and organizing them into tiers for easy selection
+        List<MiltyDraftTile> fillerTiles = new ArrayList<>(availableSystems);
+        // Remove any leftover 'required' tile types
+        fillerTiles.removeIf(t -> t.isHasAlphaWH() || t.isHasBetaWH() || t.isLegendary());
+        Collections.shuffle(fillerTiles);
+        Map<TierList, List<MiltyDraftTile>> tieredFillerTiles = tierTiles(tileManager, fillerTiles);
 
         // Initialize slices
         List<MiltyDraftSlice> slices = new ArrayList<>();
