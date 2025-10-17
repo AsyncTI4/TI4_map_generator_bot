@@ -12,7 +12,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
-import ti4.map.Player;
 import ti4.map.helper.GameHelper;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
@@ -22,34 +21,6 @@ import ti4.message.logging.BotLogger;
 public class DataMigrationManager {
 
     private static final DateTimeFormatter MIGRATION_DATE_FORMATTER = DateTimeFormatter.ofPattern("ddMMyy");
-
-    // Sept 29 2025
-    // We messed up how turn timers are tracked in Nucleus drafts, so
-    // we're going to zero-out the bad timer data for those players.
-    // Example of the kind of turn time we're trying to fix: 1759106912580
-    private static Boolean migrateLongTurnTimes_091025_withEnded(Game game) {
-        if (game == null) return false;
-
-        // The earliest date Nucleus drafts were available: Sept 29 2025
-        // In epoch-milliseconds: 1759104060000
-        long endedDate = 1759104060000L;
-        if (game.isHasEnded() && game.getEndedDate() < endedDate) return false;
-
-        boolean changesMade = false;
-
-        if (game.getPlayers() == null || game.getPlayers().isEmpty()) return false;
-        for (Player p : game.getPlayers().values()) {
-            if (p == null) continue;
-            long turnTimeMilliseconds = p.getTotalTurnTime();
-            long filtertime = 1000L * 60L * 60L * 1000L; // 1,000 hours
-            if (turnTimeMilliseconds < filtertime) continue;
-
-            p.setTotalTurnTime(0L);
-            p.setNumberOfTurns(1);
-            changesMade = true;
-        }
-        return changesMade;
-    }
 
     ///
     /// To add a new migration,
@@ -76,8 +47,6 @@ public class DataMigrationManager {
 
     static {
         migrations = new HashMap<>();
-        migrations.put(
-                "migrateLongTurnTimes_091025_withEnded", DataMigrationManager::migrateLongTurnTimes_091025_withEnded);
         // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
