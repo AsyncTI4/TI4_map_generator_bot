@@ -119,6 +119,22 @@
         "source": "thunders_edge"
     },
     {
+        "name": "Twilight Fall's Strategy Cards",
+        "alias": "twilights_fall_sc",
+        "scIDs": [
+            "tf1",
+            "tf2",
+            "tf3",
+            "tf4",
+            "tf5",
+            "tf6",
+            "tf7",
+            "tf8"
+        ],
+        "description": "The 8 strategy cards used in Twilight's Fall",
+        "source": "twilights_fall"
+    },
+    {
         "name": "PBD #100 Strategy Cards",
         "alias": "pbd100",
         "scIDs": [

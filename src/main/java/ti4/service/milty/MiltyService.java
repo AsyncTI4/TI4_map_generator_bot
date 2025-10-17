@@ -7,11 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.CommandHelper;
 import ti4.commands.tokens.AddTokenCommand;
@@ -388,24 +390,28 @@ public class MiltyService {
             }
         }
 
-        Map<String, TechnologyModel> techReplacements = Mapper.getHomebrewTechReplaceMap(game.getTechnologyDeckID());
-        List<String> playerTechs = new ArrayList<>(player.getTechs());
-        for (String tech : playerTechs) {
-            TechnologyModel model = techReplacements.getOrDefault(tech, Mapper.getTech(tech));
-            if (!playerTechs.contains(model.getAlias())) {
-                player.addTech(model.getAlias());
-                player.removeTech(tech);
-            }
-        }
+        if (!"techs_tf".equals(game.getTechnologyDeckID())) {
 
-        for (String tech : factionModel.getFactionTech()) {
-            if (tech.trim().isEmpty()) continue;
+            Map<String, TechnologyModel> techReplacements =
+                    Mapper.getHomebrewTechReplaceMap(game.getTechnologyDeckID());
+            List<String> playerTechs = new ArrayList<>(player.getTechs());
+            for (String tech : playerTechs) {
+                TechnologyModel model = techReplacements.getOrDefault(tech, Mapper.getTech(tech));
+                if (!playerTechs.contains(model.getAlias())) {
+                    player.addTech(model.getAlias());
+                    player.removeTech(tech);
+                }
+            }
+
+            for (String tech : factionModel.getFactionTech()) {
+                if (tech.trim().isEmpty()) continue;
             if (tech.equalsIgnoreCase("iihq") && game.isThundersEdge()) {
                 tech = "executiveorder";
             }
-            TechnologyModel factionTech = techReplacements.getOrDefault(tech, Mapper.getTech(tech));
+                TechnologyModel factionTech = techReplacements.getOrDefault(tech, Mapper.getTech(tech));
 
-            player.addFactionTech(factionTech.getAlias());
+                player.addFactionTech(factionTech.getAlias());
+            }
         }
 
         if (setSpeaker) {

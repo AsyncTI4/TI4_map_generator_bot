@@ -13,6 +13,7 @@ import ti4.draft.items.CommoditiesDraftItem;
 import ti4.draft.items.FlagshipDraftItem;
 import ti4.draft.items.HeroDraftItem;
 import ti4.draft.items.HomeSystemDraftItem;
+import ti4.draft.items.MahactKingDraftItem;
 import ti4.draft.items.MechDraftItem;
 import ti4.draft.items.PNDraftItem;
 import ti4.draft.items.RedTileDraftItem;
@@ -20,6 +21,7 @@ import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.draft.items.StartingFleetDraftItem;
 import ti4.draft.items.StartingTechDraftItem;
 import ti4.draft.items.TechDraftItem;
+import ti4.draft.items.UnitDraftItem;
 import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.model.DraftErrataModel;
@@ -53,7 +55,9 @@ public abstract class DraftItem implements ModelInterface {
         STARTINGFLEET,
         BLUETILE,
         REDTILE,
-        DRAFTORDER
+        DRAFTORDER,
+        MAHACTKING,
+        UNIT
     }
 
     public final Category ItemCategory;
@@ -81,6 +85,8 @@ public abstract class DraftItem implements ModelInterface {
                     case BLUETILE -> item = new BlueTileDraftItem(itemId);
                     case REDTILE -> item = new RedTileDraftItem(itemId);
                     case DRAFTORDER -> item = new SpeakerOrderDraftItem(itemId);
+                    case MAHACTKING -> item = new MahactKingDraftItem(itemId);
+                    case UNIT -> item = new UnitDraftItem(itemId);
                 };
 
         item.Errata = Mapper.getFrankenErrata().get(item.getAlias());
@@ -107,6 +113,8 @@ public abstract class DraftItem implements ModelInterface {
         items.addAll(StartingFleetDraftItem.buildAllDraftableItems(factions));
         items.addAll(FlagshipDraftItem.buildAllDraftableItems(factions));
         items.addAll(MechDraftItem.buildAllDraftableItems(factions));
+        items.addAll(UnitDraftItem.buildAllDraftableItems());
+        items.addAll(MahactKingDraftItem.buildAllDraftableItems());
         return items;
     }
 
@@ -125,6 +133,8 @@ public abstract class DraftItem implements ModelInterface {
         items.addAll(StartingFleetDraftItem.buildAllItems(factions));
         items.addAll(FlagshipDraftItem.buildAllItems(factions));
         items.addAll(MechDraftItem.buildAllItems(factions));
+        items.addAll(UnitDraftItem.buildAllItems());
+        items.addAll(MahactKingDraftItem.buildAllItems());
         return items;
     }
 

@@ -9,6 +9,7 @@ import ti4.draft.DraftItem;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.model.DeckModel;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
@@ -85,16 +86,23 @@ public class AgentDraftItem extends DraftItem {
     private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
         Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
-        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedLeaders"));
-        for (FactionModel faction : factions) {
-            List<String> agents = faction.getLeaders();
-            agents.removeIf(
-                    (String leader) -> !"agent".equals(allLeaders.get(leader).getType()));
-            for (String agent : agents) {
-                if (Arrays.asList(results).contains(agent)) {
-                    continue;
+        if (game.isTwilightsFallMode()) {
+            DeckModel deck = Mapper.getDeck("tf_genome");
+            for (String leader : deck.getNewShuffledDeck()) {
+                allItems.add(generate(Category.AGENT, leader));
+            }
+        } else {
+            String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedLeaders"));
+            for (FactionModel faction : factions) {
+                List<String> agents = faction.getLeaders();
+                agents.removeIf((String leader) ->
+                        !"agent".equals(allLeaders.get(leader).getType()));
+                for (String agent : agents) {
+                    if (Arrays.asList(results).contains(agent)) {
+                        continue;
+                    }
+                    allItems.add(generate(Category.AGENT, agent));
                 }
-                allItems.add(generate(Category.AGENT, agent));
             }
         }
         return allItems;

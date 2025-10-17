@@ -33,6 +33,9 @@ public abstract class BagDraft {
         if ("poweredonepick_franken".equals(draftType)) {
             return new PoweredOnePickFrankenDraft(game);
         }
+        if ("twilights_fall".equals(draftType)) {
+            return new TwilightsFallFrankenDraft(game);
+        }
         return null;
     }
 

@@ -1240,6 +1240,15 @@ public class Game extends GameProperties {
         return null;
     }
 
+    public void setTyrant(Player speaker) {
+        setTyrantUserID(speaker.getUserID());
+    }
+
+    @JsonIgnore
+    public Player getTyrant() {
+        return getPlayer(getTyrantUserID());
+    }
+
     public void setSpeaker(Player speaker) {
         setSpeakerUserID(speaker.getUserID());
     }

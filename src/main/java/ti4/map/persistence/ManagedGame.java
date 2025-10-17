@@ -26,6 +26,7 @@ public class ManagedGame {
     private final boolean fowMode;
     private final boolean factionReactMode;
     private final boolean thundersEdgeMode;
+    private final boolean twilightsFallMode;
     private final boolean colorReactMode;
     private final boolean stratReactMode;
     private final boolean fastScFollowMode;
@@ -54,6 +55,7 @@ public class ManagedGame {
         fowMode = game.isFowMode();
         factionReactMode = game.isBotFactionReacts();
         thundersEdgeMode = game.isThundersEdge();
+        twilightsFallMode = game.isTwilightsFallMode();
         colorReactMode = game.isBotColorReacts();
         stratReactMode = game.isBotStratReacts();
         fastScFollowMode = game.isFastSCFollowMode();
