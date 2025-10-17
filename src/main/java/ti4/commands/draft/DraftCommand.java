@@ -15,7 +15,8 @@ public class DraftCommand implements ParentCommand {
                     new SeatDraftableSubcommands(),
                     new SliceDraftableSubcommands(),
                     new SpeakerOrderDraftableSubcommands(),
-                    new PublicSnakeDraftOrchestratorSubcommands())
+                    new PublicSnakeDraftOrchestratorSubcommands(),
+                    new MantisTileDraftableSubcommands())
             .collect(Collectors.toMap(SubcommandGroup::getName, subcommandGroup -> subcommandGroup));
 
     @Override
