@@ -1,0 +1,78 @@
+[
+    {
+        "id": "tf1",
+        "initiative": 1,
+        "name": "Lux",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tf1",
+        "botSCAutomationID": "pok1leadership",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "tf2",
+        "initiative": 2,
+        "name": "Noctis",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tf2",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "tf3",
+        "initiative": 4,
+        "name": "Tyrannus",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tf3",
+        "botSCAutomationID": "pok3politics",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "tf4",
+        "initiative": 4,
+        "name": "Civitas",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tf4",
+        "botSCAutomationID": "pok4construction",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "tf5",
+        "initiative": 5,
+        "name": "Amicus",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tf5",
+        "botSCAutomationID": "pok5trade",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "tf6",
+        "initiative": 6,
+        "name": "Calamitas",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tf6",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "tf7",
+        "initiative": 7,
+        "name": "Magus",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tf7",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "tf8",
+        "initiative": 8,
+        "name": "Aeterna",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tf8",
+        "source": "twilights_fall"
+    }
+]
