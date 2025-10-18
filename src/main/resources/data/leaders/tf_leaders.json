@@ -12,7 +12,7 @@
     },
     {
         "id": "hyperagent",
-        "faction": "mental",
+        "faction": "mentak",
         "type": "agent",
         "name": "Hyper Genome",
         "title": "Energy",

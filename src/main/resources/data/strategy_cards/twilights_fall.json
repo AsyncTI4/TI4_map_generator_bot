@@ -20,7 +20,7 @@
     },
     {
         "id": "tf3",
-        "initiative": 4,
+        "initiative": 3,
         "name": "Tyrannus",
         "primaryTexts": [],
         "secondaryTexts": [],
@@ -35,7 +35,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tf4",
-        "botSCAutomationID": "pok4construction",
+        "botSCAutomationID": "te4construction",
         "source": "twilights_fall"
     },
     {
