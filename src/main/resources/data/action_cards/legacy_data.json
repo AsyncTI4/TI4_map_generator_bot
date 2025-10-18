@@ -1052,15 +1052,6 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "espionage",
-        "name": "Espionage",
-        "phase": "Action",
-        "window": "ACTION",
-        "text": "Choose another player. That player shows you their action cards or 1 random secret objective from their hand. [Note: Their choice. If they have no secrets, they must show you their action cards.]",
-        "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "rendezvous",
         "name": "Rendezvous",
         "phase": "Action",
@@ -1094,6 +1085,15 @@
         "window": "When 1 of your units would be destroyed",
         "text": "That unit is not destroyed instead. [Note: Combat hits are assigned simultaneously, and thus excess hits will not destroy this unit.]",
         "flavorText": "The Memoria was known for miraculously surviving perilous situations, but Omar could not believe that it had managed to escape the Van Hauge. He was certain now - this 'Nomad' was not playing by the rules.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "recusal",
+        "name": "Recusal",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "During this agenda, you are treated as the speaker.",
+        "flavorText": "\"In light of these revelations, I must recuse myself,\" Speaker Menda announced, her voice barely steady as she stepped down from the dais. In the stunned hush that followed, Junn rose to claim the speaker's gilded chair, a ghost of a smile betraying the victory he had labored years to secure.",
         "source": "action_deck_2_old"
     }
 ]

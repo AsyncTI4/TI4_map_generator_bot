@@ -121,8 +121,17 @@
         "name": "Compounding Interests",
         "phase": "Action",
         "window": "After you pass",
-        "text": "Either draw 1 secret objective or gain commodities equal to the number of players that have passed.",
+        "text": "Either draw 1 secret objective or gain trade goods equal to the number of your command tokens on the game board.",
         "flavorText": "There was a purr of excitement in the hall as the various executive members gathered to hear the latest earnings report. Behind the corporate sheen, the galaxy's wealthiest aligned to carve up the stars among themselves.",
+        "source": "action_card_deck_2"
+    },
+    {
+        "alias": "counterintelligence",
+        "name": "Counterintelligence",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Discard 1 or more action cards to choose an equal number of other players. Each of those players gives you 1 random action card.",
+        "flavorText": "The leaked documents brought a smile to Willard's face. Schemes upon schemes, none of which would ever reach fruition.",
         "source": "action_card_deck_2"
     },
     {
@@ -267,6 +276,15 @@
         "text": "Reduce the total PRODUCTION value of those units by up to 3 to gain an equal number of commodities and trade goods. [Note: These trade goods are available to be spent during this PRODUCTION.]",
         "flavorText": "I48S surveyed the new installation, noting several blocking routines. The new processes increased output by nearly 11%—and with a little work, he was sure the enhancers could achieve another 4%.",
         "source": "action_card_deck_2"
+    },
+    {
+        "alias": "espionage",
+        "name": "Espionage",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Look at another player's action cards. Then, that player gives you 1 action card, unscored secret objective, or promissory note from their hand.",
+        "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
+        "source": "action_deck_2"
     },
     {
         "alias": "false_manifest",
@@ -600,8 +618,8 @@
         "alias": "ramming_speed",
         "name": "Ramming Speed",
         "phase": "Action",
-        "window": "After 1 of your units is destroyed during combat",
-        "text": "Destroy 1 of your opponent's participating units that has a cost equal to or lower than your destroyed unit's cost.",
+        "window": "After 1 of your ships is destroyed during combat",
+        "text": "Destroy 1 of your opponent's participating ships that has a cost equal to or lower than your destroyed unit's cost.",
         "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
         "source": "action_card_deck_2"
     },
@@ -612,15 +630,6 @@
         "window": "After a player activates a system that contains your units",
         "text": "Produce up to 2 ships in that system that have a combined cost of 4 or less.",
         "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
-        "source": "action_card_deck_2"
-    },
-    {
-        "alias": "recusal",
-        "name": "Recusal",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "During this agenda, you are treated as the speaker.",
-        "flavorText": "\"In light of these revelations, I must recuse myself,\" Speaker Menda announced, her voice barely steady as she stepped down from the dais. In the stunned hush that followed, Junn rose to claim the speaker's gilded chair, a ghost of a smile betraying the victory he had labored years to secure.",
         "source": "action_card_deck_2"
     },
     {
@@ -642,15 +651,6 @@
         "source": "action_card_deck_2"
     },
     {
-        "alias": "reflag",
-        "name": "Reflag",
-        "phase": "Any",
-        "window": "When you would remove a command token from a system that contains your ships",
-        "text": "Do not remove that token and place 1 dreadnought from your reinforcements in that system instead.",
-        "flavorText": "“Yeah, nah—we didn't nick that hull off the Baron,” Ipswitch cut in with a smirk. “We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork, and possession's nine-tenths.”",
-        "source": "action_card_deck_2"
-    },
-    {
         "alias": "rehashed_debates",
         "name": "Rehashed Debates",
         "phase": "Agenda",
@@ -669,11 +669,38 @@
         "source": "action_card_deck_2"
     },
     {
-        "alias": "relay_connection",
+        "alias": "relay_connection1",
         "name": "Relay Connection",
         "phase": "Action",
         "window": "After you produce a ship in a system",
-        "text": "Produce 1 ship of that type in any number of other systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "text": "Produce 1 ship of that type in any number of  systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "",
+        "source": "action_card_deck_2"
+    },
+    {
+        "alias": "relay_connection2",
+        "name": "Relay Connection",
+        "phase": "Action",
+        "window": "After you produce a ship in a system",
+        "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "",
+        "source": "action_card_deck_2"
+    },
+    {
+        "alias": "relay_connection3",
+        "name": "Relay Connection",
+        "phase": "Action",
+        "window": "After you produce a ship in a system",
+        "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "",
+        "source": "action_card_deck_2"
+    },
+    {
+        "alias": "relay_connection4",
+        "name": "Relay Connection",
+        "phase": "Action",
+        "window": "After you produce a ship in a system",
+        "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
         "flavorText": "His engineers broke into celebration as Umbat called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
         "source": "action_card_deck_2"
     },
@@ -759,43 +786,43 @@
         "source": "action_card_deck_2"
     },
     {
-        "alias": "skilled_retreat1_acd2",
-        "name": "Skilled Retreat",
+        "alias": "diversion1",
+        "name": "Diversion",
         "phase": "Action",
-        "window": "At the start of a combat round",
-        "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
-        "automationID": "skilled_retreat",
-        "flavorText": "The armada followed the Hil Colish into the fading wormhole.",
+        "window": "When you announce a retreat, if you are the defender",
+        "text": "Your units immediately retreat to an eligible system; the combat ends in a draw and you do not place a command token in that system.",
+        "automationID": "diversion",
+        "flavorText": "Minutes before Jace’s arrival, the enigmatic fleet slid past; all that lingered was a crimson afterglow that betrayed no hint of their course.",
         "source": "action_card_deck_2"
     },
     {
-        "alias": "skilled_retreat2_acd2",
-        "name": "Skilled Retreat",
+        "alias": "diversion2",
+        "name": "Diversion",
         "phase": "Action",
-        "window": "At the start of a combat round",
-        "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
-        "automationID": "skilled_retreat",
-        "flavorText": "The Cabal Taskmaster bellowed, \"They are too practiced at fleeing!\"",
+        "window": "When you announce a retreat, if you are the defender",
+        "text": "Your units immediately retreat to an eligible system; the combat ends in a draw and you do not place a command token in that system.",
+        "automationID": "diversion",
+        "flavorText": "The devastation was no rumor. While Jace chased ghosts, a Federation world behind his lines lay ransacked—clever work, but the fools would soon be ringed inside Federation space.",
         "source": "action_card_deck_2"
     },
     {
-        "alias": "skilled_retreat3_acd2",
-        "name": "Skilled Retreat",
+        "alias": "diversion3",
+        "name": "Diversion",
         "phase": "Action",
-        "window": "At the start of a combat round",
-        "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
-        "automationID": "skilled_retreat",
-        "flavorText": "Sai's fleet had escaped with ease, but for how long?",
+        "window": "When you announce a retreat, if you are the defender",
+        "text": "Your units immediately retreat to an eligible system; the combat ends in a draw and you do not place a command token in that system.",
+        "automationID": "diversion",
+        "flavorText": "The enemy line “broke” in three directions at once—each retreat without casualty, each track evaporating a minute later—leaving Jace chasing phantoms through his own corridors of space.",
         "source": "action_card_deck_2"
     },
     {
-        "alias": "skilled_retreat4_acd2",
-        "name": "Skilled Retreat",
+        "alias": "diversion4",
+        "name": "Diversion",
         "phase": "Action",
-        "window": "At the start of a combat round",
-        "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
-        "automationID": "skilled_retreat",
-        "flavorText": "The Cabal left a parting message: \"Run, but you cannot hide.\"",
+        "window": "When you announce a retreat, if you are the defender",
+        "text": "Your units immediately retreat to an eligible system; the combat ends in a draw and you do not place a command token in that system.",
+        "automationID": "diversion",
+        "flavorText": "Jace was perplexed by the Legionnaires’ decision to retreat deeper into Federation territory—until the once-routed fleet rallied above Jord.",
         "source": "action_card_deck_2"
     },
     {
@@ -867,7 +894,7 @@
         "phase": "Any",
         "window": "When you would spend a command token from your strategy pool",
         "text": "Remove 1 of your command tokens from the game board instead.",
-        "flavorText": "Jace was perplexed by Ahk-Syl Siven's decision to retreat deeper into Federation territory—until the once-routed fleet rallied into a devastating assault.",
+        "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair and finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
         "source": "action_card_deck_2"
     },
     {

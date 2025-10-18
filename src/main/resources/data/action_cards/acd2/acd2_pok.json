@@ -27,15 +27,6 @@
     "source": "action_card_deck_2_pok"
   },
   {
-    "alias": "counterintelligence",
-    "name": "Counterintelligence",
-    "phase": "Action",
-    "window": "ACTION",
-    "text": "Discard 1 or more action cards to choose an equal number of other players. Each of those players gives you 1 random action card.",
-    "flavorText": "The leaked documents brought a smile to Willard's face. Schemes upon schemes, none of which would ever reach fruition.",
-    "source": "action_card_deck_2_pok"
-  },
-  {
     "alias": "data_archive",
     "name": "Data Archive",
     "phase": "Agenda",
