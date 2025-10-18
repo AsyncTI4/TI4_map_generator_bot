@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.service.breakthrough.EidolonMaximumService;
 import ti4.service.info.CardsInfoService;
 
 @UtilityClass
@@ -23,5 +24,6 @@ class CardsInfoButtonHandler {
                     .queue(); // archiving it to combat a common bug that is solved via archiving
         }
         CardsInfoService.sendCardsInfo(game, player, event);
+        EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
     }
 }

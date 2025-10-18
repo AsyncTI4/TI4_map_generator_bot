@@ -42,11 +42,11 @@ public class EidolonMaximumService {
     }
 
     public void sendEidolonMaximumFlipButtons(Game game, Player player) {
-        checkIfAbleToFlip(null, game, player);
+        checkIfAbleToFlip(game, player);
     }
 
     @ButtonHandler("checkEidolonMaximum")
-    private void checkIfAbleToFlip(ButtonInteractionEvent event, Game game, Player player) {
+    private void checkIfAbleToFlip(Game game, Player player) {
         if (!playerHasIdleMax(player)) return;
 
         for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)) {
@@ -110,9 +110,10 @@ public class EidolonMaximumService {
             }
             BreakthroughCommandHelper.activateBreakthrough(event, player);
         });
+        ButtonHelper.deleteMessage(event);
     }
 
     public void unflipEidolonMaximum(GenericInteractionCreateEvent event, Game game, Player player) {
-        if (playerHasActiveMax(player)) BreakthroughCommandHelper.deactivateBreakthrough(event, player);
+        if (playerHasActiveMax(player)) BreakthroughCommandHelper.deactivateBreakthrough(player);
     }
 }

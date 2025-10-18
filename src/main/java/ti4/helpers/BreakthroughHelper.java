@@ -35,7 +35,7 @@ public class BreakthroughHelper {
         List<String> commanders = new ArrayList<>();
         List<FactionModel> allFactions = Mapper.getFactionsValues().stream()
                 .filter(f -> game.isDiscordantStarsMode()
-                        ? f.getSource().isDs()
+                        ? f.getSource().isDs() || f.getSource().isOfficial()
                         : f.getSource().isOfficial())
                 .toList();
         for (FactionModel faction : allFactions) {
@@ -44,7 +44,7 @@ public class BreakthroughHelper {
                 commanderName = "kelerescommander";
             }
             if (game.getFactions().contains(faction.getAlias())
-                    || (game.isMinorFactionsMode() && game.getTile(faction.getID()) != null)
+                    || (game.isMinorFactionsMode() && game.getTile(faction.getHomeSystem()) != null)
                     || (Helper.getPlayerFromLeader(game, commanderName) != null)
                     || commanders.contains(commanderName)
                     || Mapper.getLeader(commanderName) == null

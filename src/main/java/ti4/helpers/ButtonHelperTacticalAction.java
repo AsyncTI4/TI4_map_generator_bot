@@ -23,6 +23,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.EidolonMaximumService;
 import ti4.service.breakthrough.VoidTetherService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
@@ -185,6 +186,7 @@ public class ButtonHelperTacticalAction {
                     + ", the Maximus (Dih-Mohn Flagship) moved into the active system, so you may produce up to 2 units with a combined cost of 4 or less.";
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), msg, produce);
         }
+        EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
         if (unitsWereMoved) {
             CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
@@ -491,7 +493,9 @@ public class ButtonHelperTacticalAction {
         }
 
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, tile, game);
-        if ((player.getTechs().contains("sdn") || player.getTechs().contains("absol_sdn"))
+        if ((player.getTechs().contains("sdn")
+                        || player.getTechs().contains("absol_sdn")
+                        || player.getTechs().contains("wavelength"))
                 && !button2.isEmpty()
                 && !game.isL1Hero()) {
             MessageHelper.sendMessageToChannelWithButtons(

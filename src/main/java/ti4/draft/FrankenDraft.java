@@ -12,6 +12,7 @@ import ti4.draft.items.CommoditiesDraftItem;
 import ti4.draft.items.FlagshipDraftItem;
 import ti4.draft.items.HeroDraftItem;
 import ti4.draft.items.HomeSystemDraftItem;
+import ti4.draft.items.MahactKingDraftItem;
 import ti4.draft.items.MechDraftItem;
 import ti4.draft.items.PNDraftItem;
 import ti4.draft.items.RedTileDraftItem;
@@ -19,6 +20,7 @@ import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.draft.items.StartingFleetDraftItem;
 import ti4.draft.items.StartingTechDraftItem;
 import ti4.draft.items.TechDraftItem;
+import ti4.draft.items.UnitDraftItem;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -58,53 +60,58 @@ public class FrankenDraft extends BagDraft {
 
     public static int getItemLimitForCategory(DraftItem.Category category, Game game) {
         int limit = 0;
-        switch (category) {
-            case ABILITY, BLUETILE -> {
-                if (!game.getStoredValue("frankenLimit" + category).isEmpty()) {
-                    limit = Integer.parseInt(game.getStoredValue("frankenLimit" + category));
-                } else {
-                    if (game.getActiveBagDraft() instanceof PoweredFrankenDraft
-                            || game.getActiveBagDraft() instanceof PoweredOnePickFrankenDraft) {
-                        if (category == DraftItem.Category.ABILITY) {
-                            limit = 4;
-                        } else {
-                            limit = 3;
-                        }
-                    } else {
-                        limit = 3;
-                    }
-                }
-            }
-            case TECH,
-                    REDTILE,
-                    STARTINGFLEET,
-                    STARTINGTECH,
-                    HOMESYSTEM,
-                    PN,
-                    COMMODITIES,
-                    FLAGSHIP,
-                    MECH,
-                    HERO,
-                    COMMANDER,
-                    AGENT -> {
-                if (!game.getStoredValue("frankenLimit" + category).isEmpty()) {
-                    limit = Integer.parseInt(game.getStoredValue("frankenLimit" + category));
-                } else {
-                    if (game.getActiveBagDraft() instanceof PoweredFrankenDraft
-                            || game.getActiveBagDraft() instanceof PoweredOnePickFrankenDraft) {
-                        if (category == DraftItem.Category.TECH) {
-                            limit = 3;
-                        } else {
-                            limit = 2;
-                        }
-                    } else {
-                        limit = 2;
-                    }
-                }
-            }
-            case DRAFTORDER -> limit = 1;
+        if (!game.getStoredValue("frankenLimit" + category).isEmpty()) {
+            return Integer.parseInt(game.getStoredValue("frankenLimit" + category));
+        } else {
+            return game.getActiveBagDraft().getItemLimitForCategory(category);
         }
-        return limit;
+        // switch (category) {
+        //     case ABILITY, BLUETILE -> {
+        //         if (!game.getStoredValue("frankenLimit" + category).isEmpty()) {
+        //             limit = Integer.parseInt(game.getStoredValue("frankenLimit" + category));
+        //         } else {
+        //             if (game.getActiveBagDraft() instanceof PoweredFrankenDraft
+        //                     || game.getActiveBagDraft() instanceof PoweredOnePickFrankenDraft) {
+        //                 if (category == DraftItem.Category.ABILITY) {
+        //                     limit = 4;
+        //                 } else {
+        //                     limit = 3;
+        //                 }
+        //             } else {
+        //                 limit = 3;
+        //             }
+        //         }
+        //     }
+        //     case TECH,
+        //             REDTILE,
+        //             STARTINGFLEET,
+        //             STARTINGTECH,
+        //             HOMESYSTEM,
+        //             PN,
+        //             COMMODITIES,
+        //             FLAGSHIP,
+        //             MECH,
+        //             HERO,
+        //             COMMANDER,
+        //             AGENT -> {
+        //         if (!game.getStoredValue("frankenLimit" + category).isEmpty()) {
+        //             limit = Integer.parseInt(game.getStoredValue("frankenLimit" + category));
+        //         } else {
+        //             if (game.getActiveBagDraft() instanceof PoweredFrankenDraft
+        //                     || game.getActiveBagDraft() instanceof PoweredOnePickFrankenDraft) {
+        //                 if (category == DraftItem.Category.TECH) {
+        //                     limit = 3;
+        //                 } else {
+        //                     limit = 2;
+        //                 }
+        //             } else {
+        //                 limit = 2;
+        //             }
+        //         }
+        //     }
+        //     case DRAFTORDER -> limit = 1;
+        // }
+        // return limit;
     }
 
     @Override
@@ -184,6 +191,9 @@ public class FrankenDraft extends BagDraft {
         allDraftableItems.put(
                 DraftItem.Category.STARTINGTECH,
                 StartingTechDraftItem.buildAllDraftableItems(allDraftableFactions, game));
+
+        allDraftableItems.put(DraftItem.Category.UNIT, UnitDraftItem.buildAllDraftableItems());
+        allDraftableItems.put(DraftItem.Category.MAHACTKING, MahactKingDraftItem.buildAllDraftableItems());
 
         allDraftableItems.put(DraftItem.Category.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(game));
 
