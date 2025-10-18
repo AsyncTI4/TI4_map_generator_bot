@@ -545,7 +545,12 @@ public class MapGenerator implements AutoCloseable {
         int tempY = y;
         tempY = drawScoreTrack(tempY + 20);
         if (game.hasAnyPriorityTrackMode()) {
-            tempY = drawPriorityTrack(tempY);
+            // NOTE: Label width is 360
+            String trackName = "SPEAKER:";
+            if (game.isOmegaPhaseMode()) {
+                trackName = "PRIORITY:";
+            }
+            tempY = drawPriorityTrack(trackName, tempY);
         }
         y = drawObjectives(tempY);
         y = laws(y);
@@ -692,7 +697,7 @@ public class MapGenerator implements AutoCloseable {
         return y;
     }
 
-    private int drawPriorityTrack(int y) {
+    private int drawPriorityTrack(String trackName, int y) {
         int landscapeShift = (displayType == DisplayType.landscape ? mapWidth : 0);
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke5);
@@ -703,7 +708,7 @@ public class MapGenerator implements AutoCloseable {
         int labelWidth = 360;
         var priorityTrack = PriorityTrackHelper.GetPriorityTrack(game);
         DrawingUtil.drawCenteredString(
-                g2, "PRIORITY:", new Rectangle(landscapeShift, y, labelWidth, boxHeight), Storage.getFont64());
+                g2, trackName, new Rectangle(landscapeShift, y, labelWidth, boxHeight), Storage.getFont64());
         int trackXShift = landscapeShift + labelWidth;
         for (int i = 0; i < priorityTrack.size(); i++) {
             graphics.setColor(Color.WHITE);

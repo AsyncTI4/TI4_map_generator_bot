@@ -2287,6 +2287,7 @@ public class ButtonHelperAgents {
 
             if ((tile.isAsteroidField()
                             && !player.getTechs().contains("amd")
+                            && !player.getTechs().contains("wavelength")
                             && !player.getRelics().contains("circletofthevoid")
                             && !player.hasAbility("celestial_being"))
                     || (tile.isSupernova()

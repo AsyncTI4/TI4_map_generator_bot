@@ -46,6 +46,7 @@ public class WebPlayerArea {
     private boolean passed;
     private boolean eliminated;
     private boolean active;
+    private boolean hasZeroToken;
 
     // Command counters
     private int tacticalCC;
@@ -178,6 +179,7 @@ public class WebPlayerArea {
         webPlayerArea.setPassed(player.isPassed());
         webPlayerArea.setEliminated(player.isEliminated());
         webPlayerArea.setActive(player.isActivePlayer());
+        webPlayerArea.setHasZeroToken(player.hasTheZeroToken());
 
         // Command counters
         webPlayerArea.setTacticalCC(player.getTacticalCC());

@@ -606,6 +606,9 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasAbility(String ability) {
+        if (getTechs().contains("tf-" + ability)) {
+            return true;
+        }
         return getAbilities().contains(ability);
     }
 
@@ -1950,6 +1953,9 @@ public class Player extends PlayerProperties {
                 return true;
             }
         }
+        if (getTechs().contains("tf-" + techID)) {
+            return true;
+        }
         return getTechs().contains(techID);
     }
 
@@ -2577,6 +2583,11 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public boolean isSpeaker() {
         return game.getSpeakerUserID().equals(getUserID());
+    }
+
+    @JsonIgnore
+    public boolean isTyrant() {
+        return game.getTyrantUserID().equals(getUserID());
     }
 
     /**

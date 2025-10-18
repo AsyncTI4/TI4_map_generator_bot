@@ -128,7 +128,7 @@ public class DrawSecretService {
                     String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
                     game.setupNeutralPlayer(color);
                 }
-                game.validateAndSetRelicDeck(Mapper.getDeck("action_cards_te"));
+                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
             }
             if (game.isThundersEdge() || !game.getStoredValue("useNewRex").isEmpty()) {
                 Tile mr = game.getMecatolTile();

@@ -2810,6 +2810,13 @@ public class ButtonHelperHeroes {
         Player target = game.getPlayerFromColorOrFaction(faction);
         if (target != null) {
             for (String planet : target.getPlanets()) {
+                if (game.getTileFromPlanet(planet) == null
+                        || game.getTileFromPlanet(planet).isHomeSystem(game)
+                        || Helper.getPlanetRepresentation(planet, game)
+                                .toLowerCase()
+                                .contains("dmz")) {
+                    continue;
+                }
                 buttons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "yinHeroPlanet_" + planet,
                         Helper.getPlanetRepresentation(planet, game)));

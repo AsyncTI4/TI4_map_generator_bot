@@ -2093,6 +2093,7 @@ public class Helper {
                     UnitEmojis.fighter);
             unitButtons.add(ff2Button);
         }
+        boolean greenMechd = false;
 
         if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff)
                 && !"arboHeroBuild".equalsIgnoreCase(warfareNOtherstuff)
@@ -2110,6 +2111,31 @@ public class Helper {
                         FactionEmojis.Argent));
             }
             if (player.hasTechReady("sar")) {
+                unitButtons.add(Buttons.green(
+                        "sarMechStep1_" + tile.getPosition() + "_" + warfareNOtherstuff,
+                        "Use Self-Assembly Routines",
+                        TechEmojis.WarfareTech));
+            }
+            if (player.ownsUnit("greentf_mech")) {
+                greenMechd = true;
+                for (String pp : player.getPlanets()) {
+                    if (game.getTileFromPlanet(pp) == null) {
+                        continue;
+                    }
+                    Button mfButton = Buttons.green(
+                            "FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp,
+                            "Produce Mech on " + getPlanetRepresentation(pp, game),
+                            UnitEmojis.mech);
+                    if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
+                        mfButton = Buttons.gray(
+                                "FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp,
+                                "Produce Mech on " + getPlanetRepresentation(pp, game),
+                                UnitEmojis.mech);
+                    }
+                    if (resourcelimit > 1) {
+                        unitButtons.add(mfButton);
+                    }
+                }
                 unitButtons.add(Buttons.green(
                         "sarMechStep1_" + tile.getPosition() + "_" + warfareNOtherstuff,
                         "Use Self-Assembly Routines",
@@ -2204,7 +2230,7 @@ public class Helper {
                             "Produce Mech on " + getPlanetRepresentation(pp, game),
                             UnitEmojis.mech);
                 }
-                if (resourcelimit > 1) {
+                if (resourcelimit > 1 && !greenMechd) {
                     unitButtons.add(mfButton);
                 }
 

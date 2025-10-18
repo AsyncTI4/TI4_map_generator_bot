@@ -44,7 +44,9 @@ public class FrankenDraftBagService {
             DraftItem.Category.FLAGSHIP,
             DraftItem.Category.COMMODITIES,
             DraftItem.Category.PN,
-            DraftItem.Category.STARTINGTECH);
+            DraftItem.Category.STARTINGTECH,
+            DraftItem.Category.UNIT,
+            DraftItem.Category.MAHACTKING);
 
     public static void applyDraftBags(GenericInteractionCreateEvent event, Game game) {
         BagDraft draft = game.getActiveBagDraft();
