@@ -110,6 +110,7 @@ public class EidolonMaximumService {
             }
             BreakthroughCommandHelper.activateBreakthrough(event, player);
         });
+        ButtonHelper.deleteMessage(event);
     }
 
     public void unflipEidolonMaximum(GenericInteractionCreateEvent event, Game game, Player player) {
