@@ -265,6 +265,6 @@ public class SourceSettings extends SettingsMenu {
     }
 
     private String getAcd2Version(BooleanSetting base, BooleanSetting pok, BooleanSetting teDemo) {
-        return "action_card_deck_2_" + (base.isVal() ? "base" : pok.isVal() ? "pok" : teDemo);
+        return "action_card_deck_2_" + (base.isVal() ? "base" : pok.isVal() ? "pok" : "te");
     }
 }
