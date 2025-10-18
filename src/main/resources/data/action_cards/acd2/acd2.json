@@ -844,15 +844,6 @@
         "source": "action_card_deck_2_base"
     },
     {
-        "alias": "split_vote",
-        "name": "Split Vote",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "No more than 2 players can vote for the same outcome of this agenda.",
-        "flavorText": "The Mahact envoy wore a mask of pity as she turned from Menda to the other councilors. \"Why do you lay these troubles on an already troubled mind? Can you not see that she is wearied by your malcontent, your warmongering?\"",
-        "source": "action_card_deck_2_base"
-    },
-    {
         "alias": "stasis_haul",
         "name": "Stasis Haul",
         "phase": "Action",

@@ -827,7 +827,6 @@ public class Game extends GameProperties {
         gameModes.put("VotC", isVotcMode());
         gameModes.put(SourceEmojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
         gameModes.put("HomebrewSC", isHomebrewSCMode());
-        gameModes.put("Little Omega", isLittleOmega());
         gameModes.put("AC Deck 2", GameStatisticsFilterer.isActionCardDeck2(this));
         gameModes.put("Omega Phase", isOmegaPhaseMode());
         gameModes.put("Priority Track", hasAnyPriorityTrackMode());
