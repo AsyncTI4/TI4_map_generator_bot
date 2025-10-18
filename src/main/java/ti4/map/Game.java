@@ -4806,8 +4806,8 @@ public class Game extends GameProperties {
             if (deck == null) return true;
             return deck.getSource().isOfficial();
         });
-        StrategyCardSetModel scset = Mapper.getStrategyCardSets().get(getScSetID());
-        if (scset == null || !scset.getSource().isOfficial()) {
+        StrategyCardSetModel scSet = Mapper.getStrategyCardSets().get(getScSetID());
+        if (scSet == null || !scSet.getSource().isOfficial()) {
             allDecksOfficial = false;
         }
         return allDecksOfficial;

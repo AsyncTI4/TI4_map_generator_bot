@@ -43,7 +43,6 @@ public class Source {
         action_card_deck_2_te,
         action_deck_2_old,
         keleresplus,
-        little_omega,
         project_pi,
         neutral,
         lost_star_charts_of_ixth,
