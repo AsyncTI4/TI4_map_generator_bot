@@ -147,7 +147,6 @@ public class GameStatisticsFilterer {
             case "ds" -> isDiscordantStarsGame(game);
             case "pok" -> !game.isBaseGameMode();
             case "acd2" -> isActionCardDeck2(game);
-            case "little_omega" -> game.isLittleOmega();
             case "franken" -> game.isFrankenGame();
             case "milty_mod" -> isMiltyModGame(game);
             case "red_tape" -> game.isRedTapeMode();

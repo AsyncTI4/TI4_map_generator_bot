@@ -4669,13 +4669,6 @@ public class Game extends GameProperties {
         return scText;
     }
 
-    @JsonIgnore
-    public boolean isLittleOmega() {
-        return getStage1PublicDeckID().contains("little_omega")
-                || getStage2PublicDeckID().contains("little_omega")
-                || getAgendaDeckID().contains("little_omega");
-    }
-
     // Currently unused
     // TODO (Jazz): parse this better
     public List<ComponentSource> getComponentSources() {
