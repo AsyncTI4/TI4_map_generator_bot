@@ -3,7 +3,7 @@
         "alias": "action_card_deck_2_base",
         "name": "Action Card Deck 2",
         "type": "action_card",
-        "description": "A homebrew collection of 100 action cards made to function with the base game, replacing the base action card deck. Direct Hit, Flank Speed, Sabotage, Skilled Retreat, and War Machine remain.\n[Spreadsheet & FAQ](https://docs.google.com/spreadsheets/d/1AapgrSMRePEgKOXffhkCqHU_8_SBiV5ONxiA3cjBt-Y/edit?usp=sharing) | [Card Sheet](https://i.imgur.com/uKOJd1y.jpeg) | [Homebrew Discord Channel](https://discord.com/channels/743629929484386395/1214775467123544134/1214775467123544134)",
+        "description": "A homebrew collection of 100 action cards made to function with the base game, replacing the base action card deck. Direct Hit, Flank Speed, and Sabotage remain.\n[Spreadsheet & FAQ](https://docs.google.com/spreadsheets/d/1AapgrSMRePEgKOXffhkCqHU_8_SBiV5ONxiA3cjBt-Y/edit?usp=sharing) | [Card Sheet](https://i.imgur.com/uKOJd1y.jpeg) | [Homebrew Discord Channel](https://discord.com/channels/743629929484386395/1214775467123544134/1214775467123544134)",
         "cardIDs": [
             "ancient_trade_routes",
             "anomalous_conditions",
