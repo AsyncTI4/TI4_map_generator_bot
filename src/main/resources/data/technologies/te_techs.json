@@ -142,7 +142,6 @@
         ],
         "requirements": "Y",
         "faction": "keleres",
-        "homebrewReplacesID": "iihq",
         "text": "ACTION: Exhaust this card and draw the top or bottom card of the Agenda deck. Players immediately vote on this agenda as if you were the speaker; you can spend trade goods and resources on this agenda as if they were votes.",
         "source": "thunders_edge"
     }

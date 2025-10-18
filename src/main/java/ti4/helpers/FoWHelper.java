@@ -784,7 +784,7 @@ public class FoWHelper {
             if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
                 continue;
             }
-            if (playerHasShipsInSystem(p2, tile)) {
+            if (playerHasActualShipsInSystem(p2, tile)) {
                 return true;
             }
         }

@@ -1013,6 +1013,7 @@ public class ButtonHelperModifyUnits {
     private static boolean canRetreatTo(Game game, Player player, Tile tile, boolean skilledRetreat) {
         if ((tile.isAsteroidField()
                         && !player.getTechs().contains("amd")
+                        && !player.getTechs().contains("wavelength")
                         && !player.getRelics().contains("circletofthevoid")
                         && !player.hasAbility("celestial_being"))
                 || (tile.isSupernova()
@@ -1029,7 +1030,7 @@ public class ButtonHelperModifyUnits {
             return true;
         }
         return !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)
-                && (player.hasTech("det") || player.hasTech("absol_det"));
+                && (player.hasTech("det") || player.hasTech("absol_det") || player.hasTech("antimatter"));
     }
 
     public static List<Button> getRetreatingGroundTroopsButtons(Player player, Game game, String pos1, String pos2) {

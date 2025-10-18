@@ -7,13 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.CommandHelper;
 import ti4.commands.tokens.AddTokenCommand;
@@ -405,9 +403,9 @@ public class MiltyService {
 
             for (String tech : factionModel.getFactionTech()) {
                 if (tech.trim().isEmpty()) continue;
-            if (tech.equalsIgnoreCase("iihq") && game.isThundersEdge()) {
-                tech = "executiveorder";
-            }
+                if (tech.equalsIgnoreCase("iihq") && game.isThundersEdge()) {
+                    tech = "executiveorder";
+                }
                 TechnologyModel factionTech = techReplacements.getOrDefault(tech, Mapper.getTech(tech));
 
                 player.addFactionTech(factionTech.getAlias());
