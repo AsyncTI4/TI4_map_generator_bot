@@ -1077,5 +1077,14 @@
         "text": "During this agenda, you are treated as the speaker.",
         "flavorText": "\"In light of these revelations, I must recuse myself,\" Speaker Menda announced, her voice barely steady as she stepped down from the dais. In the stunned hush that followed, Junn rose to claim the speaker's gilded chair, a ghost of a smile betraying the victory he had labored years to secure.",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "relay_connection",
+        "name": "Relay Connection",
+        "phase": "Action",
+        "window": "After you produce a ship in a system",
+        "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "His engineers broke into celebration as Umbat called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
+        "source": "action_deck_2_old"
     }
 ]
