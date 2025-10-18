@@ -333,7 +333,7 @@
     {
         "id": "tf-corsair",
         "baseType": "cruiser",
-        "asyncId": "cr",
+        "asyncId": "ca",
         "name": "Corsair",
         "source": "twilights_fall",
         "moveValue": 3,
@@ -349,7 +349,7 @@
     {
         "id": "tf-ahksylfier",
         "baseType": "cruiser",
-        "asyncId": "cr",
+        "asyncId": "ca",
         "faction": "ghost",
         "name": "Ahk Syl Fier",
         "source": "twilights_fall",
@@ -365,7 +365,7 @@
     {
         "id": "tf-saggitaria",
         "baseType": "cruiser",
-        "asyncId": "cr",
+        "asyncId": "ca",
         "name": "Saggitaria",
         "source": "twilights_fall",
         "faction": "keleresm",
