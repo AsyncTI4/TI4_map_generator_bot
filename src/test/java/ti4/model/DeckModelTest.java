@@ -1,10 +1,12 @@
 package ti4.model;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
+
 import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
@@ -29,6 +31,7 @@ class DeckModelTest extends BaseTi4Test {
             case PUBLIC_STAGE_1_OBJECTIVE, PUBLIC_STAGE_2_OBJECTIVE -> validatePublicObjectiveDecks(deckModel);
             case RELIC -> validateRelicDeck(deckModel);
             case EXPLORE -> validateExploreDecks(deckModel);
+            case OTHER -> true;
             default -> false;
         };
     }
