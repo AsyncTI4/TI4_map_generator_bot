@@ -160,6 +160,9 @@ class GameSaveService {
         writer.write(Constants.SPEAKER + " " + game.getSpeakerUserID());
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.TYRANT + " " + game.getTyrantUserID());
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.ACTIVE_PLAYER + " " + game.getActivePlayerID());
         writer.write(System.lineSeparator());
         writer.write(Constants.ACTIVE_SYSTEM + " " + game.getCurrentActiveSystem());
@@ -475,6 +478,8 @@ class GameSaveService {
         writer.write(Constants.BASE_GAME_MODE + " " + game.isBaseGameMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.THUNDERS_EDGE_MODE + " " + game.isThundersEdge());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.TWILIGHTS_FALL_MODE + " " + game.isTwilightsFallMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.LIGHT_FOG_MODE + " " + game.isLightFogMode());
         writer.write(System.lineSeparator());
@@ -848,7 +853,7 @@ class GameSaveService {
             writer.write(Constants.TECH_PURGED + " " + String.join(",", player.getPurgedTechs()));
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.PLANETS + " " + String.join(",", player.getPlanets()));
+            writer.write(Constants.PLANETS + " " + String.join(",", player.getUniquePlanets()));
             writer.write(System.lineSeparator());
             writer.write(Constants.PLANETS_EXHAUSTED + " " + String.join(",", player.getExhaustedPlanets()));
             writer.write(System.lineSeparator());

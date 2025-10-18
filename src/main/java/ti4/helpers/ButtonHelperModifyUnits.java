@@ -1013,6 +1013,7 @@ public class ButtonHelperModifyUnits {
     private static boolean canRetreatTo(Game game, Player player, Tile tile, boolean skilledRetreat) {
         if ((tile.isAsteroidField()
                         && !player.getTechs().contains("amd")
+                        && !player.getTechs().contains("wavelength")
                         && !player.getRelics().contains("circletofthevoid")
                         && !player.hasAbility("celestial_being"))
                 || (tile.isSupernova()
@@ -1029,7 +1030,7 @@ public class ButtonHelperModifyUnits {
             return true;
         }
         return !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)
-                && (player.hasTech("det") || player.hasTech("absol_det"));
+                && (player.hasTech("det") || player.hasTech("absol_det") || player.hasTech("antimatter"));
     }
 
     public static List<Button> getRetreatingGroundTroopsButtons(Player player, Game game, String pos1, String pos2) {
@@ -1087,10 +1088,7 @@ public class ButtonHelperModifyUnits {
             tile = game.getTileByPosition(game.getActiveSystem());
         }
         TeHelperGeneral.addStationsToPlayArea(event, game, tile);
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            if ("space".equalsIgnoreCase(unitHolder.getName())) {
-                continue;
-            }
+        for (UnitHolder unitHolder : tile.getPlanetUnitHolders()) {
             List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
             Player player2 = player;
             for (Player p2 : players) {
@@ -1100,7 +1098,20 @@ public class ButtonHelperModifyUnits {
                 }
             }
             if (player != player2 && players.contains(player)) {
-                StartCombatService.startGroundCombat(player, player2, game, event, unitHolder, tile);
+                if (player2.hasUnlockedBreakthrough("titansbt") || player.hasUnlockedBreakthrough("titansbt")) {
+                    String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
+                    String msg = player.getRepresentation() + " the game is unsure if a combat should occur on "
+                            + planetName + " or if you are coexisting. Please inform it with the buttons.";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.red("startCombatOn_" + unitHolder.getName(), "Engage in Combat"));
+                    buttons.add(Buttons.green("deleteButtons", "They are coexisting"));
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+
+                } else {
+                    if (game.getStoredValue("coexistFlag").isEmpty()) {
+                        StartCombatService.startGroundCombat(player, player2, game, event, unitHolder, tile);
+                    }
+                }
                 int mechCount = unitHolder.getUnitCount(UnitType.Mech, player2.getColor());
                 if (player2.ownsUnit("keleres_mech") && mechCount > 0) {
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");

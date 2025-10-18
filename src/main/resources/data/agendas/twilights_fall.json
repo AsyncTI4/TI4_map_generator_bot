@@ -1,0 +1,92 @@
+[
+    {
+        "alias": "tf-splice",
+        "name": "Splice",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Edict",
+        "text1": "Initiate a splice of any type, including all players.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-bless",
+        "name": "Bless",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Edict",
+        "text1": "Gain each of the following, then each other player chooses 1 of the following to gain: 1 command token; 2 action cads; 3 trade goods.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-execute",
+        "name": "Execute",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Edict",
+        "text1": "Choose up to 3 planets; destroy half of the infantry on each of those planets, rounded up.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-convene",
+        "name": "Convene",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Edict",
+        "text1": "Reveal abilities equal to the number of players. The speaker chooses 1 of them for you to gain. Then you choose 1 ability for each other player to gain.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-censure",
+        "name": "Censure",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Edict",
+        "text1": "Place any player's control marker on this card. That player cannot perform transactions during this game round. Discard this card at the end of the game round. ",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-foretell",
+        "name": "Foretell",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Edict",
+        "text1": "Look at up to 3 unrevealed public objectives.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-artifice",
+        "name": "Artifice",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Edict",
+        "text1": "Draw 1 relic and 1 paradigm; for each point behind the player with the most victory points you are, you may draw an additional card from either deck. Choose one of each type to keep and shuffle the rest back into their respective decks.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-arise",
+        "name": "Arise",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Edict",
+        "text1": "Either place 1 infantry on each planet you control or place 1 fighter from your reinforcements in each system that contains your ships",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-arbitrate",
+        "name": "Execute",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Edict",
+        "text1": "You may discard any of your spliced cards. For each card you discard, draw 1 card of that type. Then you may allow any other players to do the same.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-legacy_of_ixth",
+        "name": "Legacy of Ixth",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Edict",
+        "text1": "Roll 1 die: 10: Draw up to 2 spliced cards from any decks .6-9: Each player draws 1 spliced card from any deck. 1-5: Destroy each unit in the Mecatol Rex system, then each player with units in systems adjacent to Mecatol Rex's system destroys 3 of their units in each of those systems.",
+        "source": "twilights_fall"
+    }
+]

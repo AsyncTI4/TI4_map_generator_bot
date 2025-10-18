@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -438,15 +438,13 @@ public class Game extends GameProperties {
             try {
                 draftManager = DraftLoadService.loadDraftManager(this, draftString);
             } catch (Exception e) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("Failed to load draft manager (and creating an empty new one instead): ")
-                        .append(e.getMessage())
-                        .append(System.lineSeparator())
-                        .append("With draft data: ")
-                        .append(System.lineSeparator())
-                        .append(String.join(System.lineSeparator(), draftString));
+                String sb = "Failed to load draft manager (and creating an empty new one instead): " + e.getMessage()
+                        + System.lineSeparator()
+                        + "With draft data: "
+                        + System.lineSeparator()
+                        + String.join(System.lineSeparator(), draftString);
 
-                BotLogger.warning(new LogOrigin(this), sb.toString(), e);
+                BotLogger.warning(new LogOrigin(this), sb, e);
                 draftManager = new DraftManager(this);
             }
         } else {
@@ -1233,6 +1231,24 @@ public class Game extends GameProperties {
         return getPlayer(getSpeakerUserID());
     }
 
+    public Player getPlanetOwner(String planet) {
+        for (Player player : getRealPlayers()) {
+            if (player.getPlanets().contains(planet)) {
+                return player;
+            }
+        }
+        return null;
+    }
+
+    public void setTyrant(Player speaker) {
+        setTyrantUserID(speaker.getUserID());
+    }
+
+    @JsonIgnore
+    public Player getTyrant() {
+        return getPlayer(getTyrantUserID());
+    }
+
     public void setSpeaker(Player speaker) {
         setSpeakerUserID(speaker.getUserID());
     }
@@ -1263,6 +1279,11 @@ public class Game extends GameProperties {
 
     public void setSpecificCurrentMovedUnitsFrom1System(String unit, int count) {
         displacedUnitsFrom1System.put(unit, count);
+    }
+
+    @Override
+    public boolean isHomebrewSCMode() {
+        return !"pok".equals(getScSetID()) && !"base_game".equals(getScSetID()) && !"te".equals(getScSetID());
     }
 
     public void setSpecificThalnosUnit(String unit, int count) {
@@ -1325,6 +1346,9 @@ public class Game extends GameProperties {
         String prevFaction =
                 (prevPlayer != null && prevPlayer.getFaction() != null) ? prevPlayer.getFaction() : "jazzwuzhere&p1too";
         long elapsedTime = newTime.getTime() - lastActivePlayerChange.getTime();
+        if (lastActivePlayerChange.getTime() < 1000000) {
+            elapsedTime = 60000; // if for some reason the last Active player change was never set, ignore the time
+        }
         if (prevPlayer != null) {
             if (!factionsInCombat.contains(prevFaction) && !isTemporaryPingDisable()) {
                 prevPlayer.updateTurnStats(elapsedTime);
@@ -1768,6 +1792,14 @@ public class Game extends GameProperties {
             return true;
         }
         return false;
+    }
+
+    public void shuffleObjectiveDeck(int stage) {
+        if (stage == 1) {
+            Collections.shuffle(publicObjectives1);
+        } else if (stage == 2) {
+            Collections.shuffle(publicObjectives2);
+        }
     }
 
     public void removeRevealedObjective(String id) {
@@ -4451,6 +4483,41 @@ public class Game extends GameProperties {
         return null;
     }
 
+    public List<String> getPlanetsPlayerIsCoexistingOn(Player player) {
+        List<String> coexistPlanets = new ArrayList<>();
+
+        for (Player p2 : getRealPlayers()) {
+            if (p2.getFaction().equalsIgnoreCase(player.getFaction())
+                    || player.getAllianceMembers().contains(p2.getFaction())) {
+                continue;
+            }
+            for (String planet : p2.getPlanets()) {
+                UnitHolder uH = getUnitHolderFromPlanet(planet);
+                if (uH != null && FoWHelper.playerHasUnitsOnPlanet(player, uH)) {
+                    coexistPlanets.add(planet);
+                }
+            }
+        }
+        return coexistPlanets;
+    }
+
+    public List<String> getPlayersPlanetsThatOthersAreCoexistingOn(Player player) {
+        List<String> coexistPlanets = new ArrayList<>();
+
+        for (Player p2 : getRealPlayers()) {
+            if (p2.getFaction().equalsIgnoreCase(player.getFaction())) {
+                continue;
+            }
+            for (String planet : player.getPlanets()) {
+                UnitHolder uH = getUnitHolderFromPlanet(planet);
+                if (uH != null && FoWHelper.playerHasUnitsOnPlanet(p2, uH) && !coexistPlanets.contains(planet)) {
+                    coexistPlanets.add(planet);
+                }
+            }
+        }
+        return coexistPlanets;
+    }
+
     @Nullable
     public Planet getUnitHolderFromPlanet(String planetName) {
         Tile tile_ = getTileFromPlanet(planetName);
@@ -4458,6 +4525,11 @@ public class Game extends GameProperties {
             return null;
         }
         return tile_.getUnitHolderFromPlanet(planetName);
+    }
+
+    public boolean isPlanetSpaceStation(String planet) {
+        return getUnitHolderFromPlanet(planet) != null
+                && getUnitHolderFromPlanet(planet).isSpaceStation();
     }
 
     @Nullable
@@ -4765,7 +4837,7 @@ public class Game extends GameProperties {
 
     public void setStrategyCardSet(String scSetID) {
         StrategyCardSetModel strategyCardModel = Mapper.getStrategyCardSets().get(scSetID);
-        setHomebrewSCMode(!"pok".equals(scSetID) && !"base_game".equals(scSetID));
+        setHomebrewSCMode(!"pok".equals(scSetID) && !"base_game".equals(scSetID) && !"te".equals(scSetID));
 
         Map<Integer, Integer> oldTGs = getScTradeGoods();
         setScTradeGoods(new LinkedHashMap<>());

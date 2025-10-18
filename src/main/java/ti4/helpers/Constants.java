@@ -92,6 +92,7 @@ public class Constants {
     public static final String FOW_OPTIONS = "fow_options";
     public static final String BASE_GAME_MODE = "base_game_mode";
     public static final String THUNDERS_EDGE_MODE = "thunders_edge_mode";
+    public static final String TWILIGHTS_FALL_MODE = "twilights_fall_mode";
     public static final String LIGHT_FOG_MODE = "light_fog_mode";
     public static final String CPTI_EXPLORE_MODE = "cpti_explore_mode";
     public static final String RED_TAPE_MODE = "red_tape_mode";
@@ -578,6 +579,7 @@ public class Constants {
     public static final String TURN_END = "turn_end";
     public static final String TURN_START = "turn_start";
     public static final String SPEAKER = "speaker";
+    public static final String TYRANT = "tyrant";
     public static final String ACTIVE_PLAYER = "active_player";
     public static final String ACTIVE_SYSTEM = "active_system";
     public static final String LAST_ACTIVE_PLAYER_PING = "last_active_player_ping";
@@ -1060,7 +1062,7 @@ public class Constants {
     public static final String DRAFT_MANAGE_MAKE_PICK = "make_pick";
     public static final String DRAFT_MANAGE_CUSTOM_COMMAND = "custom_draftable_command";
     public static final String DRAFT_MANAGE_CUSTOM_ORCHESTRATOR_COMMAND = "custom_orchestrator_command";
-    public static final String DRAFT_MANAGE_CONVERT_TO_MILTY = "convert_to_milty";
+    public static final String DRAFT_MANAGE_SETUP_NUCLEUS = "setup_nucleus";
     public static final String DRAFT_FACTION_ADD = "add";
     public static final String DRAFT_FACTION_REMOVE = "remove";
     public static final String DRAFT_FACTION_SET_KELERES_FLAVOR = "set_keleres_flavor";

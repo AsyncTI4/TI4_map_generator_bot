@@ -210,6 +210,9 @@ public class Player extends PlayerProperties {
         if (hasActiveBreakthrough("naazbt")) {
             activeUnits.removeIf(unit -> "mf".equals(getUnitByID(unit).getAsyncId()));
             activeUnits.add("naaz_voltron");
+            if (!getUnitsOwned().contains("naaz_voltron")) {
+                addOwnedUnitByID("naaz_voltron");
+            }
         }
         if (hasUnlockedBreakthrough("mentakbt")) {
             for (String tech : getTechs()) {
@@ -219,6 +222,9 @@ public class Player extends PlayerProperties {
                         || "cr2".equals(model.getHomebrewReplacesID().orElse(""))) {
                     activeUnits.removeIf(unit -> "ca".equals(getUnitByID(unit).getAsyncId()));
                     activeUnits.add("mentak_cruiser3");
+                    if (!getUnitsOwned().contains("mentak_cruiser3")) {
+                        addOwnedUnitByID("mentak_cruiser3");
+                    }
                     break;
                 }
             }
@@ -600,6 +606,9 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasAbility(String ability) {
+        if (getTechs().contains("tf-" + ability)) {
+            return true;
+        }
         return getAbilities().contains(ability);
     }
 
@@ -1944,6 +1953,9 @@ public class Player extends PlayerProperties {
                 return true;
             }
         }
+        if (getTechs().contains("tf-" + techID)) {
+            return true;
+        }
         return getTechs().contains(techID);
     }
 
@@ -1976,6 +1988,17 @@ public class Player extends PlayerProperties {
             }
         }
         return newPlanets;
+    }
+
+    public List<String> getUniquePlanets() {
+        List<String> uniquePlanets = new ArrayList<>();
+        for (String planet : getPlanets()) {
+            if (!uniquePlanets.contains(planet)) {
+                uniquePlanets.add(planet);
+            }
+        }
+
+        return uniquePlanets;
     }
 
     public void loadDraftHand(List<String> saveString) {
@@ -2560,6 +2583,11 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public boolean isSpeaker() {
         return game.getSpeakerUserID().equals(getUserID());
+    }
+
+    @JsonIgnore
+    public boolean isTyrant() {
+        return game.getTyrantUserID().equals(getUserID());
     }
 
     /**

@@ -79,11 +79,13 @@ import ti4.service.PlanetService;
 import ti4.service.StatusCleanupService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.AutoFactoriesService;
+import ti4.service.breakthrough.EidolonMaximumService;
 import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
@@ -1594,6 +1596,59 @@ public class UnfiledButtonHandlers {
             }
         }
         ButtonHelper.deleteMessage(event);
+
+        if (game.isTwilightsFallMode()) {
+            String assignSpeakerMessage =
+                    player.getRepresentation() + ", please choose a faction below to receive the Tyrant token.";
+            List<Button> assignSpeakerActionRow = getTyrannusAssignTyrantButtons(game, player);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), assignSpeakerMessage, assignSpeakerActionRow);
+        }
+    }
+
+    @ButtonHandler("assignTyrant_")
+    public static void assignTyrant(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String faction = buttonID.replace("assignTyrant_", "");
+        for (Player player_ : game.getPlayers().values()) {
+            if (player_.getFaction().equals(faction)) {
+                game.setTyrantUserID(player_.getUserID());
+                String message =
+                        MiscEmojis.SpeakerToken + " Tyrant assigned to: " + player_.getRepresentation(false, true);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                if (game.isFowMode() && player != player_) {
+                    MessageHelper.sendMessageToChannel(player_.getPrivateChannel(), message);
+                }
+                if (!game.isFowMode()) {
+                    ButtonHelper.sendMessageToRightStratThread(player, game, message, "politics");
+                }
+            }
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static List<Button> getTyrannusAssignTyrantButtons(Game game, Player politicsHolder) {
+        List<Button> assignSpeakerButtons = new ArrayList<>();
+        for (Player player : game.getRealPlayers()) {
+            if (!player.isSpeaker() && !player.isTyrant()) {
+                String faction = player.getFaction();
+                if (Mapper.isValidFaction(faction)) {
+                    Button button;
+                    if (!game.isFowMode()) {
+                        button = Buttons.gray(
+                                politicsHolder.getFinsFactionCheckerPrefix() + "assignTyrant_" + faction,
+                                " ",
+                                player.getFactionEmoji());
+                    } else {
+                        button = Buttons.gray(
+                                politicsHolder.getFinsFactionCheckerPrefix() + "assignTyrant_" + faction,
+                                player.getColor(),
+                                ColorEmojis.getColorEmoji(player.getColor()));
+                    }
+                    assignSpeakerButtons.add(button);
+                }
+            }
+        }
+        return assignSpeakerButtons;
     }
 
     public static void poScoring(
@@ -2004,7 +2059,7 @@ public class UnfiledButtonHandlers {
                     }
                 });
                 AutoFactoriesService.resolveAutoFactories(game, player, buttonID);
-
+                EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
                 int cost = Helper.calculateCostOfProducedUnits(player, game, true);
                 game.setStoredValue("producedUnitCostFor" + player.getFaction(), "" + cost);
                 player.setTotalExpenses(
@@ -3520,11 +3575,6 @@ public class UnfiledButtonHandlers {
     public static void primaryOfTeWarfare(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         StrategyCardModel model = Mapper.getStrategyCard("te6warfare");
         if (model == null) return;
-        if (!player.getSCs().contains(model.getInitiative()) && !buttonID.contains("overrule")) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "You do not have the Warfare strategy card.");
-            return;
-        }
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.blue(

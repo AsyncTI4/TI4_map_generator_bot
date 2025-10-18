@@ -1411,7 +1411,7 @@ public class TransactionHelper {
                 }
                 p1.removePromissoryNote(id);
                 p2.setPromissoryNote(id);
-                if (id.contains("dspnveld")) {
+                if (id.contains("dspnveld") && !p2.getAllianceMembers().contains(p1.getFaction())) {
                     PromissoryNoteHelper.resolvePNPlay(id, p2, game, event);
                 }
                 boolean sendSftT = false;

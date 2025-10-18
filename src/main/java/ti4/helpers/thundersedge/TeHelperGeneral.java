@@ -53,6 +53,9 @@ public class TeHelperGeneral {
         if (playersInSpace.isEmpty()) return;
 
         Player newOwner = game.getPlayerThatControlsTile(tile);
+        if (newOwner == null) {
+            return;
+        }
         for (Planet station : tile.getSpaceStations()) {
             Player prevOwner = game.getPlayerThatControlsPlanet(station.getName());
             if (prevOwner != null && FoWHelper.playerHasActualShipsInSystem(prevOwner, tile)) continue;

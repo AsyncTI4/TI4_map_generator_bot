@@ -1398,7 +1398,10 @@ public class ButtonHelperFactionSpecific {
                 player.getRepresentationUnfogged()
                         + ", please choose which planet to relocate the Saar ground forces to.",
                 buttons);
-        ButtonHelper.deleteMessage(event);
+        ButtonHelper.deleteTheOneButton(event);
+        if (event.getButton().getLabel().toLowerCase().contains("please choose which planet to")) {
+            ButtonHelper.deleteMessage(event);
+        }
     }
 
     @ButtonHandler("hacanMechTradeStepOne_")
@@ -2546,6 +2549,43 @@ public class ButtonHelperFactionSpecific {
                 event.getMessageChannel(), p1.getFactionEmoji() + " has chosen to use _Chaos Mapping_.");
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Please choose which system you wish to Chaos Map in.", buttons);
+    }
+
+    @ButtonHandler("startRedTFDeploy")
+    public static void startRedTFDeploy(Game game, Player p1, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(p1, game, "fs", "placeOneNDone_skipbuild"));
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                p1.getFactionEmoji() + " has chosen to purge an ability or genome to deploy their flagship.");
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), "Please choose which system you wish to place the flagship in.", buttons);
+        if (p1.hasUnit("redtf_mech")
+                && !ButtonHelper.isLawInPlay(game, "articles_war")
+                && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p1, "mech", true) < 4) {
+            String message3 = "Use buttons to deploy a mech with the flagship or decline";
+            List<Button> buttons2 = new ArrayList<>(
+                    Helper.getTileWithShipsPlaceUnitButtons(p1, game, "mech", "placeOneNDone_skipbuild"));
+            buttons.add(Buttons.red("deleteButtons", "Decline to Drop Mech"));
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message3, buttons2);
+        }
+        List<Button> buttons3 = new ArrayList<>();
+        for (String tech : p1.getTechs()) {
+            if (tech.equalsIgnoreCase("wavelength") || tech.equalsIgnoreCase("antimatter")) {
+                continue;
+            }
+            buttons3.add(
+                    Buttons.blue("discardTech_" + tech, Mapper.getTech(tech).getName()));
+        }
+        for (String leaderID : p1.getLeaderIDs()) {
+            if (!leaderID.contains("agent")) {
+                continue;
+            }
+            buttons3.add(Buttons.green(
+                    "discardAgent_" + leaderID, Mapper.getLeader(leaderID).getName()));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), "Please discard an ability or genome.", buttons3);
     }
 
     public static boolean isCabalBlockadedByPlayer(Player player, Game game, Player cabal) {

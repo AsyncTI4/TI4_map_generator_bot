@@ -69,6 +69,11 @@ public class BreakthroughCommandHelper {
             if ("yinbt".equalsIgnoreCase(bt.getID())) {
                 BreakthroughHelper.resolveYinBreakthroughAbility(player.getGame(), player);
             }
+            if ("mentakbt".equalsIgnoreCase(bt.getID())) {
+                if (player.hasTech("cr2")) {
+                    player.addOwnedUnitByID("mentak_cruiser3");
+                }
+            }
             if (bt.getAlias().equals("muaatbt")) StellarGenesisService.serveAvernusButtons(game, player);
             if (bt.getAlias().equals("keleresbt")) player.gainCustodiaVigilia();
         });
@@ -89,17 +94,23 @@ public class BreakthroughCommandHelper {
             if (!player.isBreakthroughActive()) {
                 player.setBreakthroughActive(true);
                 String message = player.getRepresentation() + " activated their breakthrough: " + bt.getName();
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                if (bt.getName().equalsIgnoreCase("naazbt")) {
+                    player.addOwnedUnitByID("naaz_voltron");
+                }
             }
         });
     }
 
-    public static void deactivateBreakthrough(GenericInteractionCreateEvent event, Player player) {
+    public static void deactivateBreakthrough(Player player) {
         withBreakthrough(player, bt -> {
             if (player.isBreakthroughActive()) {
                 player.setBreakthroughActive(false);
                 String message = player.getRepresentation() + " de-activated their breakthrough: " + bt.getName();
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                if (bt.getName().equalsIgnoreCase("naazbt")) {
+                    player.removeOwnedUnitByID("naaz_voltron");
+                }
             }
         });
     }

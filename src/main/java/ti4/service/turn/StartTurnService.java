@@ -29,6 +29,7 @@ import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.EidolonMaximumService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -64,6 +65,7 @@ public class StartTurnService {
         game.removeStoredValue("audioSent");
         game.checkSOLimit(player);
         CardsInfoService.sendVariousAdditionalButtons(game, player);
+        EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
         boolean goingToPass = false;
         if (game.getStoredValue("Pre Pass " + player.getFaction()) != null
                 && game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
@@ -461,6 +463,10 @@ public class StartTurnService {
                 startButtons.add(
                         Buttons.gray(finChecker + "startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));
             }
+            if (player.hasUnit("redtf_flagship")
+                    && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", true) < 1) {
+                startButtons.add(Buttons.gray(finChecker + "startRedTFDeploy", "Deploy Flagship", FactionEmojis.redtf));
+            }
             if (game.isOrdinianC1Mode()
                     && !ButtonHelper.isCoatlHealed(game)
                     && player == ButtonHelper.getPlayerWhoControlsCoatl(game)) {
@@ -521,6 +527,9 @@ public class StartTurnService {
         if (player.hasUnexhaustedLeader("hacanagent")) {
             startButtons.add(
                     Buttons.gray(finChecker + "exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
+        }
+        if (player.hasUnlockedBreakthrough("titansbt")) {
+            startButtons.add(Buttons.gray("selectPlayerToSleeper", "Add a sleeper token", MiscEmojis.Sleeper));
         }
         if (player.hasUnexhaustedLeader("pharadnagent")) {
             startButtons.add(

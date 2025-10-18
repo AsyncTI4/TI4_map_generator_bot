@@ -501,10 +501,7 @@ public class ButtonHelperAgents {
         for (String pos : tiles) {
             Tile tile2 = game.getTileByPosition(pos);
 
-            for (UnitHolder unitHolder : tile2.getUnitHolders().values()) {
-                if ("space".equalsIgnoreCase(unitHolder.getName())) {
-                    continue;
-                }
+            for (UnitHolder unitHolder : tile2.getPlanetUnitHolders()) {
                 Planet planetReal = (Planet) unitHolder;
                 String planet = planetReal.getName();
                 if (player.getPlanetsAllianceMode().contains(planet)) {
@@ -2290,6 +2287,7 @@ public class ButtonHelperAgents {
 
             if ((tile.isAsteroidField()
                             && !player.getTechs().contains("amd")
+                            && !player.getTechs().contains("wavelength")
                             && !player.getRelics().contains("circletofthevoid")
                             && !player.hasAbility("celestial_being"))
                     || (tile.isSupernova()

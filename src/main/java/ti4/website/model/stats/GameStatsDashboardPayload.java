@@ -22,6 +22,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.helper.GameHelper;
+import ti4.map.pojo.PlayerProperties;
 import ti4.message.logging.BotLogger;
 import ti4.model.AgendaModel;
 import ti4.model.PublicObjectiveModel;
@@ -268,8 +269,8 @@ public class GameStatsDashboardPayload {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1));
     }
 
-    public String winner() {
-        return game.getWinner().isPresent() ? game.getWinner().get().getUserID() : null;
+    public List<String> getWinners() {
+        return game.getWinners().stream().map(PlayerProperties::getUserID).toList();
     }
 
     public boolean hasCompleted() {

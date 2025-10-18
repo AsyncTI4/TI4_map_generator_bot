@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
@@ -40,14 +40,6 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
 
     private boolean showAdvanced = false;
 
-    private static final Map<Integer, Integer> SEAT_COUNT_TO_MINIMUM_RED_TILES = Map.of(
-            3, 6,
-            4, 7,
-            5, 9,
-            6, 11,
-            7, 13,
-            8, 15);
-
     private static final String MENU_ID = "nucleusSlice";
 
     public NucleusSliceDraftableSettings(Game game, JsonNode json, SettingsMenu parent) {
@@ -56,7 +48,6 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
                 "Nucleus & Slice value settings",
                 "Advanced settings for map features and slice quality.",
                 parent);
-        this.description.add("Big changes here can cause the nucleus generation to fail.");
 
         // Initialize settings
         int players = game != null ? game.getPlayers().size() : 6;
@@ -77,16 +68,13 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         slicePlanetCount = new IntegerRangeSetting("SlicePlanets", "Slice Planet Count", 2, 0, 7, 5, 0, 7, 1);
         nucleusValue = new IntegerRangeSetting("NucleusVal", "Nucleus Optimal Value", 4, 0, 8, 8, 3, 12, 1);
         maxNucleusQualityDifference = new IntegerSetting("MaxNucDiff", "Max Nucleus Quality Diff", 3, 0, 10, 1);
-        minimumRedTiles = new IntegerSetting(
-                "MinRed", "Minimum Red Tiles", SEAT_COUNT_TO_MINIMUM_RED_TILES.get(players), 0, 20, 1);
+        int minRedTiles = Math.min(20, Math.max(Math.round((11.0f / 6.0f) * players), 0));
+        minimumRedTiles = new IntegerSetting("MinRed", "Minimum Red Tiles", minRedTiles, 0, 20, 1);
 
         // Add extra info
-        minimumSliceRes.setExtraInfo(
-                "Defaults to 0. A low res slice can be combined with a specific seat to balance out.");
-        minimumSliceInf.setExtraInfo(
-                "Defaults to 0. A low inf slice can be combined with a specific seat to balance out.");
         nucleusWormholes.setExtraInfo("Applies to each type of wormhole separately.");
         totalWormholes.setExtraInfo("Applies to each type of wormhole separately.");
+        minimumRedTiles.setExtraInfo("Across all slices and the Nucleus");
 
         // Emojis
         nucleusWormholes.setEmoji(MiscEmojis.WHalpha);
@@ -168,10 +156,10 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
     private String toggleAdvanced(GenericInteractionCreateEvent event) {
         showAdvanced = !showAdvanced;
 
-        if (showAdvanced) {
+        if (showAdvanced && event instanceof ButtonInteractionEvent buttonEvent) {
             String msg =
-                    "Be careful with these settings; turn a couple of these knobs, and a valid map may not be possible.";
-            MessageHelper.sendMessageToEventChannel(event, msg);
+                    "Be careful with these settings. Nucleus + Slice generation is complex; an impossible configuration may not be obvious.";
+            MessageHelper.sendEphemeralMessageToEventChannel(buttonEvent, msg);
         }
 
         return "success";
@@ -193,7 +181,8 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         nucleusLegendaries.setValHigh(suggestLegendariesMax);
         totalLegendaries.setValLow(1);
         totalLegendaries.setValHigh(suggestLegendariesMax);
-        minimumRedTiles.setVal(SEAT_COUNT_TO_MINIMUM_RED_TILES.get(players));
+        int minRedTiles = Math.min(20, Math.max(Math.round((11.0f / 6.0f) * players), 0));
+        minimumRedTiles.setVal(minRedTiles);
         minimumSliceRes.setVal(0);
         minimumSliceInf.setVal(0);
         int bpp = mapTemplateModel.bluePerPlayer();

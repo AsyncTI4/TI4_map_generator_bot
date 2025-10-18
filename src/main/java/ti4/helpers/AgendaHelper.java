@@ -380,7 +380,8 @@ public class AgendaHelper {
         for (String acId : player.getActionCards().keySet()) {
             ActionCardModel actionCard = Mapper.getActionCard(acId);
             String actionCardWindow = actionCard.getWindow();
-            if (actionCardWindow.contains("After an agenda is revealed")) {
+            if (actionCardWindow.contains("After an agenda is revealed")
+                    || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
                 names.add(actionCard.getName());
             }
         }
@@ -429,7 +430,8 @@ public class AgendaHelper {
         for (String acId : player.getActionCards().keySet()) {
             ActionCardModel actionCard = Mapper.getActionCard(acId);
             String actionCardWindow = actionCard.getWindow();
-            if (actionCardWindow.contains("After an agenda is revealed")) {
+            if (actionCardWindow.contains("After an agenda is revealed")
+                    || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
                 buttons.add(Buttons.green("queueAfter_ac_" + acId, actionCard.getName()));
             }
         }
@@ -903,14 +905,6 @@ public class AgendaHelper {
         event.getMessage().delete().queue();
         offerPreVote(player);
         resolveAfterQueue(event, game);
-        if (playerDoesNotHaveShenanigans(player)) {
-            String part2 = player.getFaction();
-            if (!game.getStoredValue("Pass On Shenanigans").isEmpty()) {
-                part2 = game.getStoredValue("Pass On Shenanigans") + "_" + player.getFaction();
-            }
-            game.setStoredValue("Pass On Shenanigans", part2);
-            return;
-        }
         String msg = player.getRepresentation() + " you have the option to pre-pass on agenda shenanigans here."
                 + " Agenda shenanigans are the action cards _Bribery_, _Confusing Legal Text_, _Confounding Legal Text_, and _Deadly Plot_."
                 + " Feel free not to pre-pass, this is simply an optional way to resolve agendas faster.";
@@ -2151,11 +2145,21 @@ public class AgendaHelper {
                                 potentialTech = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(
                                         winningR, techGiver, potentialTech, game);
                             }
+                            List<Button> nekroBs = ButtonHelperAbilities.getButtonsForPossibleTechForNekro(
+                                    winningR, potentialTech, game);
+                            for (Player techGiver : voters) {
+                                if (winningR.hasUnlockedBreakthrough("nekrobt")
+                                        && !game.playerHasLeaderUnlockedOrAlliance(techGiver, "bastioncommander")) {
+                                    if (!game.getStoredValue("valefarZ").contains(techGiver.getFaction())) {
+                                        String vfzID = winningR.finChecker() + "valefarZ_" + techGiver.getFaction();
+                                        nekroBs.add(Buttons.blue(vfzID, "Copy Flagship", techGiver.getFactionEmoji()));
+                                    }
+                                }
+                            }
                             MessageHelper.sendMessageToChannelWithButtons(
                                     channel,
                                     identity + ", please resolve **Galactic Threat** ability using the buttons.",
-                                    ButtonHelperAbilities.getButtonsForPossibleTechForNekro(
-                                            winningR, potentialTech, game));
+                                    nekroBs);
                         }
                         if (specificVote.contains("Technology Rider") && !winningR.hasAbility("propagation")) {
 
@@ -4097,7 +4101,7 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, proceedButtons);
         eraseAgendaQueues(event, game);
         if (!action) {
-            // offerEveryonePrepassOnShenanigans(game);
+            offerEveryonePrepassOnShenanigans(game);
             // offerEveryonePreAbstain(game);
             offerEveryoneWhensQueue(game);
             checkForAssigningGeneticRecombination(game);

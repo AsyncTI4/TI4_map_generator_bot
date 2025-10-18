@@ -284,9 +284,7 @@ public class Helper {
                 if (!game.isFowMode()) {
                     message = player.getRepresentationUnfogged()
                             + " is the one the game is currently waiting on before advancing to the next player, with regards to queued **Imperial** follows.";
-                }
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                if (!game.isFowMode()) {
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     ButtonHelper.sendMessageToRightStratThread(player, game, message, "imperial");
                 }
                 break;
@@ -1319,6 +1317,8 @@ public class Helper {
                                     .append("\n");
                             res += planet.getSumResourcesInfluence();
                         } else if (xxchaBt) {
+                            msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                    .append("\n");
                             res += planet.getMaxResInf();
                         } else {
                             if (Math.min(gledgeMech, planet.getInfluence()) > 0) {
@@ -1336,6 +1336,8 @@ public class Helper {
                                     .append("\n");
                             inf += planet.getSumResourcesInfluence();
                         } else if (xxchaBt) {
+                            msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                    .append("\n");
                             inf += planet.getMaxResInf();
                         } else {
                             msg.append(getPlanetRepresentationPlusEmojiPlusInfluence(thing, game))
@@ -2099,6 +2101,7 @@ public class Helper {
                     UnitEmojis.fighter);
             unitButtons.add(ff2Button);
         }
+        boolean greenMechd = false;
 
         if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff)
                 && !"arboHeroBuild".equalsIgnoreCase(warfareNOtherstuff)
@@ -2116,6 +2119,31 @@ public class Helper {
                         FactionEmojis.Argent));
             }
             if (player.hasTechReady("sar")) {
+                unitButtons.add(Buttons.green(
+                        "sarMechStep1_" + tile.getPosition() + "_" + warfareNOtherstuff,
+                        "Use Self-Assembly Routines",
+                        TechEmojis.WarfareTech));
+            }
+            if (player.ownsUnit("greentf_mech")) {
+                greenMechd = true;
+                for (String pp : player.getPlanets()) {
+                    if (game.getTileFromPlanet(pp) == null) {
+                        continue;
+                    }
+                    Button mfButton = Buttons.green(
+                            "FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp,
+                            "Produce Mech on " + getPlanetRepresentation(pp, game),
+                            UnitEmojis.mech);
+                    if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
+                        mfButton = Buttons.gray(
+                                "FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp,
+                                "Produce Mech on " + getPlanetRepresentation(pp, game),
+                                UnitEmojis.mech);
+                    }
+                    if (resourcelimit > 1) {
+                        unitButtons.add(mfButton);
+                    }
+                }
                 unitButtons.add(Buttons.green(
                         "sarMechStep1_" + tile.getPosition() + "_" + warfareNOtherstuff,
                         "Use Self-Assembly Routines",
@@ -2163,7 +2191,8 @@ public class Helper {
                     continue;
                 }
                 if (!player.getPlanetsAllianceMode().contains(unitHolder.getName())
-                        && !"genericModifyAllTiles".equals(warfareNOtherstuff)) {
+                        && !"genericModifyAllTiles".equals(warfareNOtherstuff)
+                        && !"genericBuild".equals(warfareNOtherstuff)) {
                     continue;
                 }
 
@@ -2209,7 +2238,7 @@ public class Helper {
                             "Produce Mech on " + getPlanetRepresentation(pp, game),
                             UnitEmojis.mech);
                 }
-                if (resourcelimit > 1) {
+                if (resourcelimit > 1 && !greenMechd) {
                     unitButtons.add(mfButton);
                 }
 

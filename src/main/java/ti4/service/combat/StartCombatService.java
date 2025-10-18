@@ -89,7 +89,18 @@ public class StartCombatService {
                 .filter(p -> player != p && !player.isPlayerMemberOfAlliance(p))
                 .findFirst();
         if (enemyPlayer.isPresent()) {
-            startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
+            if (enemyPlayer.get().hasUnlockedBreakthrough("titansbt") || player.hasUnlockedBreakthrough("titansbt")) {
+                String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
+                String msg = player.getRepresentation() + " the game is unsure if a combat should occur on "
+                        + planetName + " or if you are coexisting. Please inform it with the buttons.";
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.red("startCombatOn_" + unitHolder.getName(), "Engage in Combat"));
+                buttons.add(Buttons.green("deleteButtons", "They are coexisting"));
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+
+            } else {
+                startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
+            }
             return true;
         }
         return false;
@@ -341,7 +352,7 @@ public class StartCombatService {
             UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
             for (Units.UnitKey unit : space.getUnits().keySet()) {
                 Player player = game.getPlayerFromColorOrFaction(unit.getColor());
-                UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).getFirst();
+                UnitModel removedUnit = player.getPriorityUnitByAsyncID(unit.asyncID(), space);
                 if (removedUnit.getIsShip() && removedUnit.getSustainDamage()) {
                     sustain = true;
                     break;
@@ -749,7 +760,8 @@ public class StartCombatService {
             }
 
             if ((player.hasAbility("edict") || player.hasAbility("imperia"))
-                    && !player.getMahactCC().contains(otherPlayer.getColor())) {
+                    && !player.getMahactCC().contains(otherPlayer.getColor())
+                    && !otherPlayer.getFaction().equalsIgnoreCase("neutral")) {
                 buttons = new ArrayList<>();
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons.add(Buttons.gray(
