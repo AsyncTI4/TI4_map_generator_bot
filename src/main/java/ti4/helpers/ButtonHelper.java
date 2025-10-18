@@ -1352,6 +1352,7 @@ public class ButtonHelper {
         if (!game.isFowMode()
                 && activeSystem.isAsteroidField()
                 && !player.getTechs().contains("amd")
+                && !player.getTechs().contains("wavelength")
                 && !player.getTechs().contains("absol_amd")
                 && !player.getRelics().contains("circletofthevoid")
                 && !player.hasAbility("celestial_being")) {
@@ -3609,6 +3610,9 @@ public class ButtonHelper {
         if (player.getLeader("letnevhero").map(Leader::isActive).orElse(false)) {
             fleetCap += 1000;
         }
+        if (ButtonHelper.doesPlayerHaveFSHere("blacktf_flagship", player, tile)) {
+            capacity += 100;
+        }
         for (UnitHolder capChecker : tile.getUnitHolders().values()) {
             Map<UnitModel, Integer> unitsByQuantity = getAllUnits(capChecker, player);
             for (Map.Entry<UnitModel, Integer> entry : unitsByQuantity.entrySet()) {
@@ -4826,7 +4830,7 @@ public class ButtonHelper {
         if (!FoWHelper.playerHasShipsInSystem(player, tile)) {
             return;
         }
-        if ((player.hasTech("det") || game.isCptiExploreMode())
+        if ((player.hasTech("det") || game.isCptiExploreMode() || player.hasTech("antimatter"))
                 && tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
             resolveFullFrontierExplore(game, player, tile, event);
             if (player.hasAbility("phantom_energy")) {
@@ -6715,10 +6719,7 @@ public class ButtonHelper {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesWithBombard = getTilesOfUnitsWithBombard(player, game);
-        Set<String> adjacentTiles = FoWHelper.getAdjacentTilesAndNotThisTile(
-                game, tilesWithBombard.getFirst().getPosition(), player, false);
-        for (String pos : adjacentTiles) {
-            Tile tile = game.getTileByPosition(pos);
+        for (Tile tile : tilesWithBombard) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder instanceof Planet planet) {
                     if (!player.getPlanetsAllianceMode().contains(planet.getName())) {
