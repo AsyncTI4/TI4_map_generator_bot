@@ -102,7 +102,7 @@ public class BreakthroughCommandHelper {
         });
     }
 
-    public static void deactivateBreakthrough(GenericInteractionCreateEvent event, Player player) {
+    public static void deactivateBreakthrough(Player player) {
         withBreakthrough(player, bt -> {
             if (player.isBreakthroughActive()) {
                 player.setBreakthroughActive(false);
