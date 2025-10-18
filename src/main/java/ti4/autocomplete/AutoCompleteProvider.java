@@ -422,7 +422,7 @@ public class AutoCompleteProvider {
                         "pok",
                         "absol",
                         "ds",
-                        "action_card_deck_2",
+                        "acd2",
                         "franken",
                         "milty_mod",
                         "red_tape",
