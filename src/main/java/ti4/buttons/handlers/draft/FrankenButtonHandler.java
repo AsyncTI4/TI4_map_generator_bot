@@ -93,9 +93,23 @@ class FrankenButtonHandler {
         String itemID = draftItem.ItemId;
         switch (draftItem.ItemCategory) {
             case ABILITY -> FrankenAbilityService.addAbilities(event, player, List.of(itemID));
-            case TECH -> FrankenFactionTechService.addFactionTechs(event, player, List.of(itemID));
+            case TECH -> {
+                if (player.getGame().isTwilightsFallMode()) {
+                    player.addTech(itemID);
+                } else {
+                    FrankenFactionTechService.addFactionTechs(event, player, List.of(itemID));
+                }
+            }
+            case MAHACTKING -> {
+                FactionModel faction = Mapper.getFaction(itemID);
+                // add Mahact Faction tech
+                player.setFaction(itemID);
+                FrankenUnitService.addUnits(event, player, List.of(itemID + "_flagship", itemID + "_mech"), false);
+                PlayerStatsService.setTotalCommodities(
+                        event, player, (player.getCommoditiesTotal(true) + faction.getCommodities()));
+            }
             case AGENT, COMMANDER, HERO -> FrankenLeaderService.addLeaders(event, player, List.of(itemID));
-            case MECH, FLAGSHIP -> FrankenUnitService.addUnits(event, player, List.of(itemID), false);
+            case MECH, FLAGSHIP, UNIT -> FrankenUnitService.addUnits(event, player, List.of(itemID), false);
             case COMMODITIES ->
                 PlayerStatsService.setTotalCommodities(
                         event,

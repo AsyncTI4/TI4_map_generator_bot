@@ -388,24 +388,28 @@ public class MiltyService {
             }
         }
 
-        Map<String, TechnologyModel> techReplacements = Mapper.getHomebrewTechReplaceMap(game.getTechnologyDeckID());
-        List<String> playerTechs = new ArrayList<>(player.getTechs());
-        for (String tech : playerTechs) {
-            TechnologyModel model = techReplacements.getOrDefault(tech, Mapper.getTech(tech));
-            if (!playerTechs.contains(model.getAlias())) {
-                player.addTech(model.getAlias());
-                player.removeTech(tech);
-            }
-        }
+        if (!"techs_tf".equals(game.getTechnologyDeckID())) {
 
-        for (String tech : factionModel.getFactionTech()) {
-            if (tech.trim().isEmpty()) continue;
-            if (tech.equalsIgnoreCase("iihq") && game.isThundersEdge()) {
-                tech = "executiveorder";
+            Map<String, TechnologyModel> techReplacements =
+                    Mapper.getHomebrewTechReplaceMap(game.getTechnologyDeckID());
+            List<String> playerTechs = new ArrayList<>(player.getTechs());
+            for (String tech : playerTechs) {
+                TechnologyModel model = techReplacements.getOrDefault(tech, Mapper.getTech(tech));
+                if (!playerTechs.contains(model.getAlias())) {
+                    player.addTech(model.getAlias());
+                    player.removeTech(tech);
+                }
             }
-            TechnologyModel factionTech = techReplacements.getOrDefault(tech, Mapper.getTech(tech));
 
-            player.addFactionTech(factionTech.getAlias());
+            for (String tech : factionModel.getFactionTech()) {
+                if (tech.trim().isEmpty()) continue;
+                if (tech.equalsIgnoreCase("iihq") && game.isThundersEdge()) {
+                    tech = "executiveorder";
+                }
+                TechnologyModel factionTech = techReplacements.getOrDefault(tech, Mapper.getTech(tech));
+
+                player.addFactionTech(factionTech.getAlias());
+            }
         }
 
         if (setSpeaker) {

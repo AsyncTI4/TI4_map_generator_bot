@@ -2138,11 +2138,21 @@ public class AgendaHelper {
                                 potentialTech = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(
                                         winningR, techGiver, potentialTech, game);
                             }
+                            List<Button> nekroBs = ButtonHelperAbilities.getButtonsForPossibleTechForNekro(
+                                    winningR, potentialTech, game);
+                            for (Player techGiver : voters) {
+                                if (winningR.hasUnlockedBreakthrough("nekrobt")
+                                        && !game.playerHasLeaderUnlockedOrAlliance(techGiver, "bastioncommander")) {
+                                    if (!game.getStoredValue("valefarZ").contains(techGiver.getFaction())) {
+                                        String vfzID = winningR.finChecker() + "valefarZ_" + techGiver.getFaction();
+                                        nekroBs.add(Buttons.blue(vfzID, "Copy Flagship", techGiver.getFactionEmoji()));
+                                    }
+                                }
+                            }
                             MessageHelper.sendMessageToChannelWithButtons(
                                     channel,
                                     identity + ", please resolve **Galactic Threat** ability using the buttons.",
-                                    ButtonHelperAbilities.getButtonsForPossibleTechForNekro(
-                                            winningR, potentialTech, game));
+                                    nekroBs);
                         }
                         if (specificVote.contains("Technology Rider") && !winningR.hasAbility("propagation")) {
 

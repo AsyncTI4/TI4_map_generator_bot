@@ -1568,6 +1568,7 @@ public class AutoCompleteProvider {
                 .filter(model -> model.search(enteredValue, source))
                 .filter(model -> model.getSource() != ComponentSource.miltymod
                         && model.getSource() != ComponentSource.project_pi
+                        && model.getSource() != ComponentSource.twilights_fall
                         && model.getSource() != ComponentSource.asteroid)
                 .filter(model -> !(model instanceof ColorableModelInterface cm) || !cm.isDupe())
                 .limit(25)
