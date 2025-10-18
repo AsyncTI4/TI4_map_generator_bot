@@ -40,7 +40,7 @@ public class GameStatisticsFilterer {
         filters.add(new OptionData(
                         OptionType.STRING,
                         GAME_TYPES_FILTER,
-                        "Filter games by game type, comma seperated, e.g. base, pok, absol, ds, acd2,")
+                        "Filter games by game type, comma seperated, e.g. base, pok, absol, ds, acd2")
                 .setAutoComplete(true));
         filters.add(new OptionData(
                         OptionType.STRING,
