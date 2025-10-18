@@ -1113,5 +1113,45 @@
         "text": "Resolve the secondary ability of that strategy card; do not spend or place a command token to resolve that ability.",
         "flavorText": "PROTOCOL SUCCESSFUL<< [ID:NULL] DEFEAT INEVITABLE<< PEERLESS MANY<< INFINITE ONE<< [ID:NIITAKA]<< QUEUED1<< QUEUED2<< QUEUED3...",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "skilled_retreat1_acd2",
+        "name": "Skilled Retreat",
+        "phase": "Action",
+        "window": "At the start of a combat round",
+        "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
+        "automationID": "skilled_retreat",
+        "flavorText": "The armada followed the Hil Colish into the fading wormhole.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "skilled_retreat2_acd2",
+        "name": "Skilled Retreat",
+        "phase": "Action",
+        "window": "At the start of a combat round",
+        "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
+        "automationID": "skilled_retreat",
+        "flavorText": "The armada followed the Hil Colish into the fading wormhole.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "skilled_retreat3_acd2",
+        "name": "Skilled Retreat",
+        "phase": "Action",
+        "window": "At the start of a combat round",
+        "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
+        "automationID": "skilled_retreat",
+        "flavorText": "The armada followed the Hil Colish into the fading wormhole.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "skilled_retreat4_acd2",
+        "name": "Skilled Retreat",
+        "phase": "Action",
+        "window": "At the start of a combat round",
+        "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
+        "automationID": "skilled_retreat",
+        "flavorText": "The armada followed the Hil Colish into the fading wormhole.",
+        "source": "action_deck_2_old"
     }
 ]
