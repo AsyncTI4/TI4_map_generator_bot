@@ -150,7 +150,7 @@
         "window": "At the start of the status phase",
         "text": "Look at up to 3 unrevealed public objectives.",
         "flavorText": "Just as the charges went public, over half of the Council's Winnaran staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
-        "source": "action_deck_2_old"
+        "source": "action_card_deck_2_base"
     },
     {
         "alias": "covert_operation",
@@ -293,7 +293,7 @@
         "window": "ACTION",
         "text": "Look at another player's action cards. Then, that player gives you 1 action card, unscored secret objective, or promissory note from their hand.",
         "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
-        "source": "action_deck_2"
+        "source": "action_card_deck_2_base"
     },
     {
         "alias": "false_manifest",

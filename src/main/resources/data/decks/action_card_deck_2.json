@@ -106,7 +106,7 @@
             "unexpected_strategy",
             "unstable_gate"
         ],
-        "source": "action_deck_2_base"
+        "source": "action_card_deck_2_base"
     },
     {
         "alias": "action_card_deck_2_pok",
