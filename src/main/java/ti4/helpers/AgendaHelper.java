@@ -1395,9 +1395,9 @@ public class AgendaHelper {
                     existingData += ";" + identifier + "_" + votes;
                 }
                 game.setCurrentAgendaVote(winner, existingData);
-                if ( !game.isHiddenAgendaMode() ) {
+                if (!game.isHiddenAgendaMode()) {
                     MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(), Helper.buildSpentThingsMessageForVoting(player, game, false));
+                            player.getCorrectChannel(), Helper.buildSpentThingsMessageForVoting(player, game, false));
                 }
             }
 
@@ -1444,7 +1444,7 @@ public class AgendaHelper {
                     }
                     ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
                     CryypterHelper.checkForMentakEnvoy(nextInLine, game);
-                    if ( !game.isHiddenAgendaMode() ) {
+                    if (!game.isHiddenAgendaMode()) {
                         MessageHelper.sendMessageToChannel(nextInLine.getCorrectChannel(), skippedMessage);
                     }
                     resolvingAnAgendaVote("resolveAgendaVote_" + votes, event, game, nextInLine);
@@ -1551,11 +1551,13 @@ public class AgendaHelper {
         if (winner == null) {
             winner = getWinner(game);
         }
-        if ( !game.isHiddenAgendaMode() ) {
+        if (!game.isHiddenAgendaMode()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), getSummaryOfVotes(game, true) + "\n \n");
         } else {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), getSummaryOfVotes(game, true, false, true) + "\n \n");
-            MessageHelper.sendMessageToChannel(game.getSpeaker().getCardsInfoThread(), getSummaryOfVotes(game, true) + "\n \n");
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(), getSummaryOfVotes(game, true, false, true) + "\n \n");
+            MessageHelper.sendMessageToChannel(
+                    game.getSpeaker().getCardsInfoThread(), getSummaryOfVotes(game, true) + "\n \n");
         }
         GMService.logActivity(game, getSummaryOfVotes(game, true, true, false), false);
         game.setPhaseOfGame("agendaEnd");
@@ -3169,7 +3171,8 @@ public class AgendaHelper {
         return getSummaryOfVotes(game, capitalize, false, false);
     }
 
-    private static String getSummaryOfVotes(Game game, boolean capitalize, boolean overwriteFog, boolean redactFactionInfo) {
+    private static String getSummaryOfVotes(
+            Game game, boolean capitalize, boolean overwriteFog, boolean redactFactionInfo) {
         String summary;
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
         String agendaDetails = game.getCurrentAgendaInfo();
@@ -3279,14 +3282,10 @@ public class AgendaHelper {
                                 .append(outcome)
                                 .append(": ")
                                 .append(totalVotes);
-                        if ( !redactFactionInfo ) {
-                            summaryBuilder
-                                .append(". (")
-                                .append(outcomeSummary)
-                                .append(")\n");
+                        if (!redactFactionInfo) {
+                            summaryBuilder.append(". (").append(outcomeSummary).append(")\n");
                         } else {
-                            summaryBuilder
-                                .append("\n");
+                            summaryBuilder.append("\n");
                         }
 
                     } else if (!game.isHomebrewSCMode()
@@ -3298,29 +3297,17 @@ public class AgendaHelper {
                                 .append(Helper.getSCName(Integer.parseInt(outcome), game))
                                 .append("**: ")
                                 .append(totalVotes);
-                        if ( !redactFactionInfo ) {
-                            summaryBuilder
-                                .append(". (")
-                                .append(outcomeSummary)
-                                .append(")\n");
+                        if (!redactFactionInfo) {
+                            summaryBuilder.append(". (").append(outcomeSummary).append(")\n");
                         } else {
-                            summaryBuilder
-                                .append("\n");
+                            summaryBuilder.append("\n");
                         }
                     } else {
-                        summaryBuilder
-                                .append("- ")
-                                .append(outcome)
-                                .append(": ")
-                                .append(totalVotes);
-                        if ( !redactFactionInfo ) {
-                            summaryBuilder
-                                .append(". (")
-                                .append(outcomeSummary)
-                                .append(")\n");
+                        summaryBuilder.append("- ").append(outcome).append(": ").append(totalVotes);
+                        if (!redactFactionInfo) {
+                            summaryBuilder.append(". (").append(outcomeSummary).append(")\n");
                         } else {
-                            summaryBuilder
-                                .append("\n");
+                            summaryBuilder.append("\n");
                         }
                     }
                 } else {
@@ -3329,14 +3316,10 @@ public class AgendaHelper {
                             .append(outcome)
                             .append(": Total votes ")
                             .append(totalVotes);
-                    if ( !redactFactionInfo ) {
-                            summaryBuilder
-                                .append(". ")
-                            .append(outcomeSummary)
-                                .append("\n");
+                    if (!redactFactionInfo) {
+                        summaryBuilder.append(". ").append(outcomeSummary).append("\n");
                     } else {
-                        summaryBuilder
-                            .append("\n");
+                        summaryBuilder.append("\n");
                     }
                 }
             }
