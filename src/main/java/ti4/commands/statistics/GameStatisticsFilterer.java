@@ -165,8 +165,7 @@ public class GameStatisticsFilterer {
     public static boolean isActionCardDeck2(Game game) {
         return "action_deck_2".equals(game.getAcDeckID()) // legacy naming
                 || "action_card_deck_2_base".equals(game.getAcDeckID())
-                || "action_card_deck_2_pok".equals(game.getAcDeckID())
-                || "action_card_deck_2_te".equals(game.getAcDeckID());
+                || "action_card_deck_2_pok".equals(game.getAcDeckID());
     }
 
     private static boolean filterOnExcludedGameTypes(String excludedGameTypesFilter, Game game) {
