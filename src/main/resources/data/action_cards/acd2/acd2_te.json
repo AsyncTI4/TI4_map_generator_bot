@@ -63,7 +63,7 @@
     "source": "action_card_deck_2_te"
   },
   {
-    "alias": "opportunists",
+    "alias": "opportunists_acd2",
     "name": "Opportunists",
     "phase": "Action",
     "window": "After you lose a space combat",
