@@ -9,15 +9,6 @@
     "source": "action_card_deck_2_te"
   },
   {
-    "alias": "ambassadors",
-    "name": "Ambassadors",
-    "phase": "Agenda",
-    "window": "After an agenda is revealed",
-    "text": "Choose 1 non-home planet controlled by another player that contains their ground forces. Place 1 infantry from your reinforcements into coexistence on that planet and exhaust each planet in its system.",
-    "flavorText": "The pageantry and endless bandying of crooked words with these uncertain allies was yet another of their schemes.",
-    "source": "action_card_deck_2_te"
-  },
-  {
     "alias": "cache",
     "name": "Cache",
     "phase": "Action",
@@ -27,34 +18,7 @@
     "source": "action_card_deck_2_te"
   },
   {
-    "alias": "flawless_strategy1",
-    "name": "Flawless Strategy",
-    "phase": "Action",
-    "window": "After you exhaust your strategy card",
-    "text": "Resolve the secondary ability of that strategy card; do not spend a command token to resolve that ability.",
-    "flavorText": "",
-    "source": "action_card_deck_2_te"
-  },
-  {
-    "alias": "flawless_strategy2",
-    "name": "Flawless Strategy",
-    "phase": "Action",
-    "window": "After you exhaust your strategy card",
-    "text": "Resolve the secondary ability of that strategy card; do not spend a command token to resolve that ability.",
-    "flavorText": "",
-    "source": "action_card_deck_2_te"
-  },
-  {
-    "alias": "flawless_strategy3",
-    "name": "Flawless Strategy",
-    "phase": "Action",
-    "window": "After you exhaust your strategy card",
-    "text": "Resolve the secondary ability of that strategy card; do not spend a command token to resolve that ability.",
-    "flavorText": "",
-    "source": "action_card_deck_2_te"
-  },
-  {
-    "alias": "flawless_strategy4",
+    "alias": "flawless_strategy",
     "name": "Flawless Strategy",
     "phase": "Action",
     "window": "After you exhaust your strategy card",

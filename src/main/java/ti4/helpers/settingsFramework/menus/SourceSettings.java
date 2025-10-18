@@ -242,7 +242,7 @@ public class SourceSettings extends SettingsMenu {
 
                 // Decks for Uncharted Space
                 String explore = ds ? "explores_DS" : "explores_pok";
-                String acs = acd2 ? getAcd2Version(base, pok, teDemo) : (ds ? "action_cards_ds" : "action_cards_pok");
+                String acs = acd2 ? getAcd2Version(pok) : (ds ? "action_cards_ds" : "action_cards_pok");
 
                 // set 'em up
                 decks.getRelics().setChosenKey(relic);
@@ -264,7 +264,8 @@ public class SourceSettings extends SettingsMenu {
         }
     }
 
-    private String getAcd2Version(BooleanSetting base, BooleanSetting pok, BooleanSetting teDemo) {
-        return "action_card_deck_2_" + (base.isVal() ? "base" : pok.isVal() ? "pok" : "te");
+    private String getAcd2Version(BooleanSetting pok) {
+        // When TE cards are ready, should be isBase? base : isPoK? pok : isTe ? te : isPoKTe? pok_te
+        return "action_card_deck_2_" + (pok.isVal() ? "pok" : "base");
     }
 }
