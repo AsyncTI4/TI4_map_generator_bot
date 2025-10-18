@@ -94,7 +94,10 @@ public class BreakthroughCommandHelper {
             if (!player.isBreakthroughActive()) {
                 player.setBreakthroughActive(true);
                 String message = player.getRepresentation() + " activated their breakthrough: " + bt.getName();
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                if (bt.getName().equalsIgnoreCase("naazbt")) {
+                    player.addOwnedUnitByID("naaz_voltron");
+                }
             }
         });
     }
@@ -104,7 +107,10 @@ public class BreakthroughCommandHelper {
             if (player.isBreakthroughActive()) {
                 player.setBreakthroughActive(false);
                 String message = player.getRepresentation() + " de-activated their breakthrough: " + bt.getName();
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                if (bt.getName().equalsIgnoreCase("naazbt")) {
+                    player.removeOwnedUnitByID("naaz_voltron");
+                }
             }
         });
     }
