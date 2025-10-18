@@ -1086,5 +1086,32 @@
         "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
         "flavorText": "His engineers broke into celebration as Umbat called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "intelligible_mechanism",
+        "name": "Intelligible Mechanism",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Spend 6 resources to research 1 technology; for each neighbor that owns that technology, reduce this cost by 1 and ignore 1 prerequisite.",
+        "flavorText": "Once an enigmatic device plucked from the void, it had become nothing more than schematics—patented and traded to the rim of the galaxy.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "cache",
+        "name": "Cache",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Exhaust 1 non-home planet you control other than Mecatol Rex. Then, gain trade goods equal to that planet's combined resource and influence values.",
+        "flavorText": "The hoard of Lazax artifacts dated back to the dawn of the empire. The thought of selling these prized possessions cut him deeply, but Berekar knew they were the coin required to reclaim their home.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "flawless_strategy",
+        "name": "Flawless Strategy",
+        "phase": "Action",
+        "window": "After you exhaust your strategy card",
+        "text": "Resolve the secondary ability of that strategy card; do not spend or place a command token to resolve that ability.",
+        "flavorText": "PROTOCOL SUCCESSFUL<< [ID:NULL] DEFEAT INEVITABLE<< PEERLESS MANY<< INFINITE ONE<< [ID:NIITAKA]<< QUEUED1<< QUEUED2<< QUEUED3...",
+        "source": "action_deck_2_old"
     }
 ]
