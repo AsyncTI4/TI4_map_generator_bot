@@ -109,8 +109,8 @@
         "name": "Fleet Regulations",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: Each player cannot have more than 4 tokens in their fleet pool. Players that cast 5 or more votes “For” may redistribute any command tokens that would be lost when resolving this law.",
-        "text2": "Against: Each player that cast 5 or more votes “Against” places 1 command token from their reinforcements in their fleet pool.",
+        "text1": "For: Each player cannot have more than 4 tokens in their fleet pool. Players that cast 5 or more votes \"For\" may redistribute any command tokens that would be lost when resolving this law.",
+        "text2": "Against: Each player that cast 5 or more votes \"Against\" places 1 command token from their reinforcements in their fleet pool.",
         "mapText": "Each player cannot have more than 4 tokens in their fleet pool.",
         "source": "voices_of_the_council"
     },
@@ -119,7 +119,7 @@
         "name": "Homeland Defense Act",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: Each player can have any number of PDS units on planets they control. Each player that cast 5 or more votes “For” may place 1 PDS on a planet they control.",
+        "text1": "For: Each player can have any number of PDS units on planets they control. Each player that cast 5 or more votes \"For\" may place 1 PDS on a planet they control.",
         "text2": "Against: Each player destroys 1 PDS owned by a player that cast fewer votes \"Against\".",
         "mapText": "Each player can have any number of PDS units on planets they control.",
         "source": "voices_of_the_council"
@@ -302,8 +302,8 @@
         "name": "Seed of an Empire",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: The player with the most victory points gains 1 victory point. The player that cast the most votes “Against” draws 1 secret objective.",
-        "text2": "Against: The player with the fewest victory points gains 1 victory point. The player that cast the most votes “For” draws 1 secret objective.",
+        "text1": "For: The player with the most victory points gains 1 victory point. The player that cast the most votes \"Against\" draws 1 secret objective.",
+        "text2": "Against: The player with the fewest victory points gains 1 victory point. The player that cast the most votes \"For\" draws 1 secret objective.",
         "source": "voices_of_the_council"
     },
     {

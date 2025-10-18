@@ -411,7 +411,7 @@
         "type": "hero",
         "name": "Baronet Oran",
         "title": "Keleres Praefectus",
-        "abilityName": "Stellar Conscription: “Voluntary” Initiative",
+        "abilityName": "Stellar Conscription: \"Voluntary\" Initiative",
         "abilityWindow": "ACTION:",
         "abilityText": "Place up to 1 cruiser or 1 destroyer from your reinforcements in each system that contains a planet you control and your ships. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",

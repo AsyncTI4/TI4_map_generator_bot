@@ -82,7 +82,7 @@
         "type": "envoy",
         "name": "Elder Junn",
         "title": "Qualified Immunity",
-        "abilityWindow": "When a “Directive” agenda is resolved:",
+        "abilityWindow": "When a \"Directive\" agenda is resolved:",
         "abilityText": "You may exhaust this card and spend a command token from your strategy pool to ignore the effects of that agenda.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"

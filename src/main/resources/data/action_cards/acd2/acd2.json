@@ -801,7 +801,7 @@
         "window": "When you announce a retreat, if you are the defender",
         "text": "Your units immediately retreat to an eligible system; the combat ends in a draw and you do not place a command token in that system.",
         "automationID": "diversion",
-        "flavorText": "Minutes before Jace’s arrival, the enigmatic fleet slid past; all that lingered was a crimson afterglow that betrayed no hint of their course.",
+        "flavorText": "Minutes before Jace's arrival, the enigmatic fleet slid past; all that lingered was a crimson afterglow that betrayed no hint of their course.",
         "source": "action_card_deck_2_base"
     },
     {
@@ -821,7 +821,7 @@
         "window": "When you announce a retreat, if you are the defender",
         "text": "Your units immediately retreat to an eligible system; the combat ends in a draw and you do not place a command token in that system.",
         "automationID": "diversion",
-        "flavorText": "The enemy line “broke” in three directions at once—each retreat without casualty, each track evaporating a minute later—leaving Jace chasing phantoms through his own corridors of space.",
+        "flavorText": "The enemy line \"broke\" in three directions at once—each retreat without casualty, each track evaporating a minute later—leaving Jace chasing phantoms through his own corridors of space.",
         "source": "action_card_deck_2_base"
     },
     {
@@ -831,7 +831,7 @@
         "window": "When you announce a retreat, if you are the defender",
         "text": "Your units immediately retreat to an eligible system; the combat ends in a draw and you do not place a command token in that system.",
         "automationID": "diversion",
-        "flavorText": "Jace was perplexed by the Legionnaires’ decision to retreat deeper into Federation territory—until the once-routed fleet rallied above Jord.",
+        "flavorText": "Jace was perplexed by the Legionnaires' decision to retreat deeper into Federation territory—until the once-routed fleet rallied above Jord.",
         "source": "action_card_deck_2_base"
     },
     {

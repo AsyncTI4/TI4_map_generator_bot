@@ -5,7 +5,7 @@
         "type": "agent",
         "name": "Marik",
         "title": "the Wise",
-        "abilityWindow": "After a player discards an action card other than “Sabotage”:",
+        "abilityWindow": "After a player discards an action card other than \"Sabotage\":",
         "abilityText": "You may exhaust this card to allow a different player to spend 3 influence to take that action card from the discard pile.",
         "unlockCondition": "Always Unlocked",
         "source": "balacasi"

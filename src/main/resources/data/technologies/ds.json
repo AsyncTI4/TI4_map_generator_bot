@@ -86,7 +86,7 @@
         "faction": "cheiran",
         "baseUpgrade": "dn2",
         "source": "ds",
-        "text": "Cost 4, Combat 5, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 5\nThis unit cannot be destroyed by “Direct Hit” action cards.\nWhen this unit is destroyed, you may place 1 fighter or 1 destroyer from your reinforcements in this system's space area.",
+        "text": "Cost 4, Combat 5, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 5\nThis unit cannot be destroyed by \"Direct Hit\" action cards.\nWhen this unit is destroyed, you may place 1 fighter or 1 destroyer from your reinforcements in this system's space area.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/ds/chitin_hulk_2.png?raw=true"
     },
     {
@@ -836,7 +836,7 @@
         "faction": "veldyr",
         "baseUpgrade": "dn2",
         "source": "ds",
-        "text": "Cost 4, Combat 5, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 5, SPACE CANNON 5\nThis unit cannot be destroyed by “Direct Hit” action cards.",
+        "text": "Cost 4, Combat 5, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 5, SPACE CANNON 5\nThis unit cannot be destroyed by \"Direct Hit\" action cards.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/ds/lancer_dreadnought_2.jpg?raw=true"
     },
     {

@@ -97,7 +97,7 @@
         "title": "Second Shadow",
         "abilityName": "Silence - Hunting Shade",
         "abilityWindow": "ACTION:",
-        "abilityText": "Choose a non-home planet other than Mecatol Rex controlled by another player in a system that contains at least 1 or more of your units. Destroy all of that player's units on that planet. Place the “Grave World” token on that planet. Gain that planets' card and attach this card to that planet, you cannot lose this card.",
+        "abilityText": "Choose a non-home planet other than Mecatol Rex controlled by another player in a system that contains at least 1 or more of your units. Destroy all of that player's units on that planet. Place the \"Grave World\" token on that planet. Gain that planets' card and attach this card to that planet, you cannot lose this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "eronous"
     },

@@ -5,7 +5,7 @@
         "phase": "Action",
         "window": "After a player activates a system that contains 1 or more of your ships",
         "text": "Place up to 1 ship from your reinforcements whose cost is 4 or less in the active system",
-        "flavorText": "The Shipwrights were never late, though they had a habit of straining the meaning of “just in time” fulfillment.",
+        "flavorText": "The Shipwrights were never late, though they had a habit of straining the meaning of \"just in time\" fulfillment.",
         "source": "ds",
         "actualSource": "uncharted_space"
     },
@@ -15,7 +15,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Purge any 2 of your relic fragments to gain 1 relic.",
-        "flavorText": "C.O.O. Ranc laughed, packing up the artifacts. “Always a pleasure doing business.”",
+        "flavorText": "C.O.O. Ranc laughed, packing up the artifacts. \"Always a pleasure doing business.\"",
         "source": "ds",
         "actualSource": "uncharted_space"
     },
@@ -25,7 +25,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Purge any 2 of your relic fragments to gain 1 relic.",
-        "flavorText": "C.O.O. Ranc laughed, packing up the artifacts. “Always a pleasure doing business.”",
+        "flavorText": "C.O.O. Ranc laughed, packing up the artifacts. \"Always a pleasure doing business.\"",
         "source": "ds",
         "actualSource": "uncharted_space"
     },
@@ -75,7 +75,7 @@
         "phase": "Agenda",
         "window": "At the end of the agenda phase, after players ready planets:",
         "text": "Reveal the top card of the agenda deck and resolve that agenda. Then, players who voted on that agenda may ready up to 3 planets they control.",
-        "flavorText": "“What is it that you seek?” Kadryn asked the Council. “You yourselves cannot even say.”",
+        "flavorText": "\"What is it that you seek?\" Kadryn asked the Council. \"You yourselves cannot even say.\"",
         "source": "ds",
         "actualSource": "uncharted_space"
     },
@@ -86,7 +86,7 @@
         "window": "When an agenda is revealed",
         "text": "Choose another player; that player must give you 1 promissory note from their hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
         "automationID": "diplo_pressure",
-        "flavorText": "“There are more pressing matters for the session ahead.” The Florzen pulsed. “Much more pressing.”",
+        "flavorText": "\"There are more pressing matters for the session ahead.\" The Florzen pulsed. \"Much more pressing.\"",
         "source": "ds",
         "actualSource": "uncharted_space"
     },
@@ -169,7 +169,7 @@
         "phase": "Any",
         "window": "When another player purges a component:",
         "text": "That player must choose to allow you to either gain 2 trade goods or replenish your commodities.",
-        "flavorText": "Kado checked his firearm. “Yeah, I know what we did with it, but they don't. They brought the money, let's make this quick.”",
+        "flavorText": "Kado checked his firearm. \"Yeah, I know what we did with it, but they don't. They brought the money, let's make this quick.\"",
         "source": "ds",
         "actualSource": "uncharted_space"
     },
@@ -229,7 +229,7 @@
         "phase": "Action",
         "window": "After a player commits ground forces to land on a planet you control:",
         "text": "Roll a number of dice equal to that planet's resource value, for each result of 6 or greater, produce 1 hit against those ground forces.",
-        "flavorText": "“Y'ever fought the Khrask before, lad?” The commander cackled over the roar of the dropship's engines. “We're touching down on a world that wants us dead.”",
+        "flavorText": "\"Y'ever fought the Khrask before, lad?\" The commander cackled over the roar of the dropship's engines. \"We're touching down on a world that wants us dead.\"",
         "source": "ds",
         "actualSource": "uncharted_space"
     },
@@ -259,7 +259,7 @@
         "phase": "Any",
         "window": "After a die is rolled:",
         "text": "Apply +3 or -3 to the result before resolving the effects of that roll.",
-        "flavorText": "“No no no. That can't be right…” the ancient Myko-Mentori sighed, “Ah! Yes, now I remember.”",
+        "flavorText": "\"No no no. That can't be right…\" the ancient Myko-Mentori sighed, \"Ah! Yes, now I remember.\"",
         "source": "ds",
         "actualSource": "uncharted_space"
     },
@@ -289,7 +289,7 @@
         "phase": "Any",
         "window": "After a player resolves the effect of 1 of your faction promissory notes:",
         "text": "That player must give you 1 promissory note from their hand, if able.",
-        "flavorText": "“You made a deal with the old government.” Rapdr Ironclaw sneered. “If you want a deal, comrade, start talking.”",
+        "flavorText": "\"You made a deal with the old government.\" Rapdr Ironclaw sneered. \"If you want a deal, comrade, start talking.\"",
         "source": "ds",
         "actualSource": "uncharted_space"
     },
@@ -361,7 +361,7 @@
         "window": "Action",
         "text": "Choose 1 system that contains another player's ships. Roll 1 die for each fighter in that system. For each result of 6 or greater, destroy 1 of those units.",
         "automationID": "micrometeoroid_storm",
-        "flavorText": "“Invaders. Destruction. Pain.” The stone churned angrily. “Hatred. Judgment. Fear.”",
+        "flavorText": "\"Invaders. Destruction. Pain.\" The stone churned angrily. \"Hatred. Judgment. Fear.\"",
         "source": "ds",
         "actualSource": "uncharted_space"
     },
@@ -419,9 +419,9 @@
         "alias": "escape_clause",
         "name": "Escape Clause",
         "phase": "Any",
-        "window": "When another player would resolve your “Trade Agreement” promissory note:",
+        "window": "When another player would resolve your \"Trade Agreement\" promissory note:",
         "text": "You do not give that player your commodities; that player returns your Trade Agreement promissory note.",
-        "flavorText": "“What do you mean?” The Vaden smiled, baring rows upon rows of teeth. “You read the contract, right?”",
+        "flavorText": "\"What do you mean?\" The Vaden smiled, baring rows upon rows of teeth. \"You read the contract, right?\"",
         "source": "ds",
         "actualSource": "uncharted_space"
     },
@@ -451,7 +451,7 @@
         "phase": "Action",
         "window": "Before 1 or more of your units would make a roll for a unit ability:",
         "text": "Apply +4 to the result of each of those rolls. Hits produced by that roll cannot be canceled.",
-        "flavorText": "Dr. Morden stood still, in awe. “They're… beautiful.”",
+        "flavorText": "Dr. Morden stood still, in awe. \"They're… beautiful.\"",
         "source": "ds",
         "actualSource": "uncharted_space"
     }

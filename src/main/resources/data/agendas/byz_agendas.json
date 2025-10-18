@@ -24,8 +24,8 @@
         "category": "agenda",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: Each player who voted “For” gains one command token.",
-        "text2": "Against: Each player who voted “For” removes 2 command tokens from their fleet pool and returns those tokens to their reinforcements.",
+        "text1": "For: Each player who voted \"For\" gains one command token.",
+        "text2": "Against: Each player who voted \"For\" removes 2 command tokens from their fleet pool and returns those tokens to their reinforcements.",
         "source": "byz_agendas"
     },
     {
@@ -301,8 +301,8 @@
         "category": "agenda",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: Each player who voted “For” gains 3 Trade Goods.",
-        "text2": "Against: Each player who voted “For” loses all of their Trade Goods.",
+        "text1": "For: Each player who voted \"For\" gains 3 Trade Goods.",
+        "text2": "Against: Each player who voted \"For\" loses all of their Trade Goods.",
         "source": "byz_agendas"
     },
     {

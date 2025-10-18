@@ -757,7 +757,7 @@
         "type": "commander",
         "name": "B-Unit 205643a",
         "title": "Predominant Constructor",
-        "abilityWindow": "When you spend a command token to resolve the secondary ability of the “Construction” strategy card",
+        "abilityWindow": "When you spend a command token to resolve the secondary ability of the \"Construction\" strategy card",
         "abilityText": "You may resolve the primary ability instead.",
         "unlockCondition": "Have units with a combined PRODUCTION value of at least 7 in a single system.",
         "source": "ds"
