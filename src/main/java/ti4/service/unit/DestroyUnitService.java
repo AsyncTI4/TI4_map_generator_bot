@@ -22,6 +22,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -307,7 +308,7 @@ public class DestroyUnitService {
 
     private static void handleSelfAssemblyRoutines(Player player, int min, Game game) {
         if (player.hasActiveBreakthrough("naazbt")) {
-            player.setBreakthroughActive(false);
+            BreakthroughCommandHelper.deactivateBreakthrough(player);
         }
         if (player.hasTech("sar")) {
             MessageHelper.sendMessageToChannel(
