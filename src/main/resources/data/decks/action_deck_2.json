@@ -21,6 +21,7 @@
             "compounding_interests",
             "counterintelligence",
             "corporate_lobbying",
+            "corruption",
             "covert_operation",
             "decisive_victory",
             "defectors",
@@ -129,6 +130,8 @@
             "side_project2",
             "side_project3",
             "side_project4",
+            "split_vote",
+            "survey",
             "tomb_raiders",
             "void_path"
         ],

@@ -971,15 +971,6 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "corruption",
-        "name": "Corruption",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome reveals 1 random action card from their hand; take 1 of those cards and discard the rest.",
-        "flavorText": "As they placed the noose around her neck, Menda wailed. Suffi, who was next in line, gave her a confident smile. \"First time?\"",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "early_voting",
         "name": "Early Voting",
         "phase": "Agenda",
