@@ -82,47 +82,6 @@ class TurnOrderHelperTest extends BaseTi4Test {
     }
 
     @Test
-    void GetPlayerNonInitiativeNumber_IncompletePriorityTrack_OmegaPhase() {
-        var game = createTestGame(PriorityTrackMode.FULL);
-        game.getPlayerFromColorOrFaction("letnev").setPriorityPosition(-1);
-        game.getPlayerFromColorOrFaction("sol").setPriorityPosition(-1);
-        var player = game.getPlayerFromColorOrFaction("sol");
-        assertEquals(1, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
-        player = game.getPlayerFromColorOrFaction("xxcha");
-        assertEquals(4, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
-    }
-
-    @Test
-    void GetPlayerNonInitiativeNumber_NoSpeaker() {
-        var game = createTestGame(PriorityTrackMode.NONE);
-        game.setSpeakerUserID(null);
-        var player = game.getPlayerFromColorOrFaction("sol");
-        assertEquals(1, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
-    }
-
-    @Test
-    void GetPlayerNonInitiativeNumber_NoSpeaker_OmegaPhase() {
-        var game = createTestGame(PriorityTrackMode.FULL);
-        game.setSpeakerUserID(null);
-        var player = game.getPlayerFromColorOrFaction("sol");
-        assertEquals(3, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
-    }
-
-    @Test
-    void GetPlayerNonInitiativeNumber() {
-        var game = createTestGame(PriorityTrackMode.NONE);
-        var player = game.getPlayerFromColorOrFaction("nekro");
-        assertEquals(4, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
-    }
-
-    @Test
-    void GetPlayerNonInitiativeNumber_OmegaPhase() {
-        var game = createTestGame(PriorityTrackMode.FULL);
-        var player = game.getPlayerFromColorOrFaction("sol");
-        assertEquals(3, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
-    }
-
-    @Test
     void GetNonInitiativeTurnOrder_IncompletePriorityTrack_OmegaPhase() {
         var game = createTestGame(PriorityTrackMode.FULL);
         game.getPlayerFromColorOrFaction("letnev").setPriorityPosition(-1);

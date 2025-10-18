@@ -102,7 +102,7 @@ public class PriorityTrackHelper {
             player.setPriorityPosition(priority);
             messageOutput += player.getRepresentation() + " has been assigned to position " + priority
                     + " on the priority track.";
-        } else if (priority < 1 && player.hasPriorityPosition()) {
+        } else if (player.hasPriorityPosition()) {
             // If priority is -1, remove the player from the priority track
             player.setPriorityPosition(-1);
             messageOutput += player.getRepresentation() + " has been removed from the priority track.";

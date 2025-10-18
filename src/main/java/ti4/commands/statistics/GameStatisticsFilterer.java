@@ -40,12 +40,12 @@ public class GameStatisticsFilterer {
         filters.add(new OptionData(
                         OptionType.STRING,
                         GAME_TYPES_FILTER,
-                        "Filter games by game type, comma seperated, e.g. base, pok, absol, ds, acd2")
+                        "Filter games by game type, comma separated, e.g. base, pok, absol, ds, acd2")
                 .setAutoComplete(true));
         filters.add(new OptionData(
                         OptionType.STRING,
                         EXCLUDED_GAME_TYPES_FILTER,
-                        "Filter excluded games by game type, comma seperated, e.g. base, pok, absol, ds, acd2")
+                        "Filter excluded games by game type, comma separated, e.g. base, pok, absol, ds, acd2")
                 .setAutoComplete(true));
         filters.add(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter games by if the game is a fog game"));
         filters.add(

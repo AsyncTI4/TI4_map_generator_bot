@@ -453,10 +453,9 @@ public class Helper {
             return getSpeakerOrderFromThisPlayer(game.getSpeaker(), game);
         }
 
-        List<Player> arrayPlayers = new ArrayList<>(PriorityTrackHelper.GetPriorityTrack(game).stream()
-                .filter(Objects::nonNull)
-                .toList());
-        return arrayPlayers;
+      return new ArrayList<>(PriorityTrackHelper.GetPriorityTrack(game).stream()
+              .filter(Objects::nonNull)
+              .toList());
     }
 
     public static List<Player> getSpeakerOrFullPriorityOrderFromPlayer(Player player, Game game) {
@@ -465,16 +464,6 @@ public class Helper {
             Collections.rotate(players, -players.indexOf(player));
         }
         return players;
-    }
-
-    public static int getPlayerSpeakerOrFullPriorityNumber(Player player, Game game) {
-        if (!game.hasFullPriorityTrackMode() && game.getSpeaker() == null) {
-            return 1;
-        } else if (game.hasFullPriorityTrackMode() && player.getPriorityPosition() < 1) {
-            return 1;
-        }
-        var players = getSpeakerOrFullPriorityOrder(game);
-        return players.indexOf(player) + 1;
     }
 
     public static List<Player> getSpeakerOrderFromThisPlayer(Player player, Game game) {
