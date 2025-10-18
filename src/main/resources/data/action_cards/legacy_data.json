@@ -1043,6 +1043,15 @@
         "source": "action_deck_2_old"
     },
     {
+        "alias": "strategic_assistance",
+        "name": "Strategic Aid",
+        "phase": "Action",
+        "window": "When you perform a strategic action",
+        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
+        "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
+        "source": "action_deck_2_old"
+    },
+    {
         "alias": "opportunists",
         "name": "Opportunists",
         "phase": "Action",
