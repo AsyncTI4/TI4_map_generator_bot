@@ -38,9 +38,9 @@ public class Source {
 
         // lil homebrew
         lazax,
+        action_card_deck_2,
         action_card_deck_2_base,
         action_card_deck_2_pok,
-        action_card_deck_2_te,
         action_deck_2_old,
         keleresplus,
         project_pi,
