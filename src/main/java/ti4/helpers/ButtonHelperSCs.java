@@ -346,7 +346,8 @@ public class ButtonHelperSCs {
         boolean used = addUsedSCPlayer(messageID, game, player);
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
-            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok8imperial")) {
+            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok8imperial")
+                    || game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("tf8")) {
                 scModel = game.getStrategyCardModelByInitiative(scNum).get();
             }
         }
@@ -358,7 +359,7 @@ public class ButtonHelperSCs {
         }
         if (!game.getPhaseOfGame().contains("agenda")
                 && !used
-                && scModel.usesAutomationForSCID("pok8imperial")
+                && (scModel.usesAutomationForSCID("pok8imperial") || scModel.usesAutomationForSCID("tf8"))
                 && !player.getFollowedSCs().contains(scModel.getInitiative())
                 && game.getPlayedSCs().contains(scModel.getInitiative())) {
             int scNum = scModel.getInitiative();
