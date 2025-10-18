@@ -247,7 +247,7 @@
     {
         "id": "tf-heltitan",
         "baseType": "pds",
-        "asyncId": "pds",
+        "asyncId": "pd",
         "name": "Hel-Titan (TF)",
         "source": "twilights_fall",
         "faction": "titans",
@@ -267,7 +267,7 @@
     {
         "id": "tf-keepermatrix",
         "baseType": "pds",
-        "asyncId": "pds",
+        "asyncId": "pd",
         "name": "Keeper Matrix",
         "source": "twilights_fall",
         "faction": "xxcha",
@@ -281,7 +281,7 @@
     {
         "id": "tf-justicerrail",
         "baseType": "pds",
-        "asyncId": "pds",
+        "asyncId": "pd",
         "name": "Justicer Rail",
         "source": "twilights_fall",
         "faction": "winnu",
