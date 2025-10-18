@@ -186,7 +186,7 @@
     {
         "id": "tf-yssarilinfantry",
         "baseType": "infantry",
-        "asyncId": "inf",
+        "asyncId": "gf",
         "name": "Guild Agents",
         "faction": "yssaril",
         "source": "twilights_fall",
@@ -443,7 +443,7 @@
     {
         "id": "tf-yinclone",
         "baseType": "infantry",
-        "asyncId": "inf",
+        "asyncId": "gf",
         "faction": "yin",
         "name": "Yin Clone",
         "source": "twilights_fall",
