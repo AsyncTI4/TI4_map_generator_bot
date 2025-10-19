@@ -331,8 +331,10 @@ public class MiltyDraftHelper {
             draftTile.setHasScar(true);
         }
 
-        for (Planet planet : tile.getPlanetUnitHolders()) {
-            draftTile.addPlanet(planet);
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            if (unitHolder instanceof Planet planet) {
+                draftTile.addPlanet(planet);
+            }
         }
 
         if (tile.isAnomaly()) {
