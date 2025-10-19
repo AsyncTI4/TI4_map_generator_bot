@@ -32,10 +32,6 @@ def setup_s3_client():
     try:
         session = boto3.Session()
         s3_client = session.client("s3")
-
-        # Test credentials by listing buckets
-        s3_client.list_buckets()
-        logger.info("AWS credentials verified successfully")
         return s3_client
     except NoCredentialsError:
         logger.error("AWS credentials not found. Please configure your credentials.")
