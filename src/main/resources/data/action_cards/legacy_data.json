@@ -490,24 +490,6 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "corruption_legacy",
-        "name": "Corruption",
-        "phase": "Status",
-        "window": "After the speaker reveals a public objective",
-        "text": "Look at the top 2 cards of the corresponding public objective deck; you may reveal 1 of these cards and purge the objective the speaker revealed.",
-        "flavorText": "Just as the charges went public, over half of the Council's Winnaran staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
-        "source": "action_deck_2_old"
-    },
-    {
-        "alias": "corruption_acd2",
-        "name": "Corruption",
-        "phase": "Action",
-        "window": "Action",
-        "text": "Pass. Then, you may immediately score 1 of your unscored secret objectives if you fulfill its requirements and you were the first player to pass during this game round; otherwise, draw 2 action cards. [Note: You cannot play this card if you would not otherwise be eligible to pass.]",
-        "flavorText": "Just as the charges went public, over half of the Council's Winnaran staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "terraforming_initiative",
         "name": "Terraforming Initiative",
         "phase": "Action",
@@ -971,15 +953,6 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "corruption",
-        "name": "Corruption",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome reveals 1 random action card from their hand; take 1 of those cards and discard the rest.",
-        "flavorText": "As they placed the noose around her neck, Menda wailed. Suffi, who was next in line, gave her a confident smile. \"First time?\"",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "early_voting",
         "name": "Early Voting",
         "phase": "Agenda",
@@ -1013,15 +986,6 @@
         "window": "At the end of your turn",
         "text": "Exhaust 1 non-home planet you control other than Mecatol Rex. Then, gain trade goods equal to that planet's combined resource and influence values.",
         "flavorText": "The hoard of Lazax artifacts dated back to the dawn of the empire. The thought of selling these prized possessions cut him deeply, but Berekar knew they were the coin required to reclaim their home.",
-        "source": "action_deck_2_old"
-    },
-    {
-        "alias": "final_mission",
-        "name": "Final Mission",
-        "phase": "Action",
-        "window": "After 1 of your non-fighter ships is destroyed",
-        "text": "Choose 1 planet in that unit's system. Destroy 1 of another player's ground forces or PDS on that planet.",
-        "flavorText": "The Exotrireme became a guide missile in its death-throes, transforming the Sol base into a burning crater of steel and death.",
         "source": "action_deck_2_old"
     },
     {
@@ -1061,21 +1025,142 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "espionage",
-        "name": "Espionage",
-        "phase": "Action",
-        "window": "ACTION",
-        "text": "Choose another player. That player shows you their action cards or 1 random secret objective from their hand. [Note: Their choice. If they have no secrets, they must show you their action cards.]",
-        "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "rendezvous",
         "name": "Rendezvous",
         "phase": "Action",
         "window": "After the \"Movement\" step of your tactical action in a system that does not contain other players' units",
         "text": "Remove your command token from that system and end your turn.",
         "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair and finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "foreign_aid",
+        "name": "Foreign Aid",
+        "phase": "Action",
+        "window": "When you perform a strategic action",
+        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
+        "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "strategic_assistance",
+        "name": "Strategic Aid",
+        "phase": "Action",
+        "window": "When you perform a strategic action",
+        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
+        "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "opportunists",
+        "name": "Opportunists",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Choose 1 system that contains another player's ships and no planets. Place 1 cruiser and 1 destroyer from your reinforcements in that system and resolve a space combat.",
+        "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as a fleet of unmarked ships poured forth from the wormhole. Reports be damned, these were no mere pirates.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "miraculous_escape",
+        "name": "Miraculous Escape",
+        "phase": "Any",
+        "window": "When 1 of your units would be destroyed",
+        "text": "That unit is not destroyed instead. [Note: Combat hits are assigned simultaneously, and thus excess hits will not destroy this unit.]",
+        "flavorText": "The Memoria was known for miraculously surviving perilous situations, but Omar could not believe that it had managed to escape the Van Hauge. He was certain now - this 'Nomad' was not playing by the rules.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "recusal",
+        "name": "Recusal",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "During this agenda, you are treated as the speaker.",
+        "flavorText": "\"In light of these revelations, I must recuse myself,\" Speaker Menda announced, her voice barely steady as she stepped down from the dais. In the stunned hush that followed, Junn rose to claim the speaker's gilded chair, a ghost of a smile betraying the victory he had labored years to secure.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "relay_connection",
+        "name": "Relay Connection",
+        "phase": "Action",
+        "window": "After you produce a ship in a system",
+        "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "His engineers broke into celebration as Umbat called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "intelligible_mechanism",
+        "name": "Intelligible Mechanism",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Spend 6 resources to research 1 technology; for each neighbor that owns that technology, reduce this cost by 1 and ignore 1 prerequisite.",
+        "flavorText": "Once an enigmatic device plucked from the void, it had become nothing more than schematics—patented and traded to the rim of the galaxy.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "cache",
+        "name": "Cache",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Exhaust 1 non-home planet you control other than Mecatol Rex. Then, gain trade goods equal to that planet's combined resource and influence values.",
+        "flavorText": "The hoard of Lazax artifacts dated back to the dawn of the empire. The thought of selling these prized possessions cut him deeply, but Berekar knew they were the coin required to reclaim their home.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "flawless_strategy",
+        "name": "Flawless Strategy",
+        "phase": "Action",
+        "window": "After you exhaust your strategy card",
+        "text": "Resolve the secondary ability of that strategy card; do not spend or place a command token to resolve that ability.",
+        "flavorText": "PROTOCOL SUCCESSFUL<< [ID:NULL] DEFEAT INEVITABLE<< PEERLESS MANY<< INFINITE ONE<< [ID:NIITAKA]<< QUEUED1<< QUEUED2<< QUEUED3...",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "skilled_retreat1_acd2",
+        "name": "Skilled Retreat",
+        "phase": "Action",
+        "window": "At the start of a combat round",
+        "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
+        "automationID": "skilled_retreat",
+        "flavorText": "The armada followed the Hil Colish into the fading wormhole.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "skilled_retreat2_acd2",
+        "name": "Skilled Retreat",
+        "phase": "Action",
+        "window": "At the start of a combat round",
+        "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
+        "automationID": "skilled_retreat",
+        "flavorText": "The armada followed the Hil Colish into the fading wormhole.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "skilled_retreat3_acd2",
+        "name": "Skilled Retreat",
+        "phase": "Action",
+        "window": "At the start of a combat round",
+        "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
+        "automationID": "skilled_retreat",
+        "flavorText": "The armada followed the Hil Colish into the fading wormhole.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "skilled_retreat4_acd2",
+        "name": "Skilled Retreat",
+        "phase": "Action",
+        "window": "At the start of a combat round",
+        "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
+        "automationID": "skilled_retreat",
+        "flavorText": "The armada followed the Hil Colish into the fading wormhole.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "strategic_focus",
+        "name": "Strategic Focus",
+        "phase": "Action",
+        "window": "After you pass",
+        "text": "Resolve the secondary ability of 1 readied or unchosen strategy card; do not spend or place a command token to resolve that ability.",
+        "flavorText": "\"With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Rinn sighed. \"We must remain focused. Steady.\"",
         "source": "action_deck_2_old"
     }
 ]
