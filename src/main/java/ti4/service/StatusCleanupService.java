@@ -71,8 +71,11 @@ public class StatusCleanupService {
         closeRoundThreads(game);
 
         Map<String, Player> players = game.getPlayers();
-
+        if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
+            game.removeLaw("tf-censure");
+        }
         for (Player player : players.values()) {
+
             player.setPassed(false);
             Set<Integer> SCs = player.getSCs();
             for (int sc : SCs) {

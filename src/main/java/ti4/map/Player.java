@@ -2116,6 +2116,10 @@ public class Player extends PlayerProperties {
             gainCustodiaVigilia();
         }
 
+        if ("cr2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("mentakbt")) {
+            addOwnedUnitByID("mentak_cruiser3");
+        }
+
         // Update Owned Units when Researching a Unit Upgrade
         TechnologyModel techModel = Mapper.getTech(techID);
         if (techID == null) return;

@@ -6663,7 +6663,7 @@ public class ButtonHelper {
         if (player.hasUnlockedBreakthrough("ghostbt")) {
             for (Tile t : game.getTileMap().values()) {
                 if (t.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip)
-                        && !t.getWormholes().isEmpty()) {
+                        && !t.getWormholes(game).isEmpty()) {
                     tilesWithProduction.add(t);
                 }
             }

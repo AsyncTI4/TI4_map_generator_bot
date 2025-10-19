@@ -980,11 +980,10 @@ public class ButtonHelperActionCards {
                 buttons.add(button);
             }
         }
-        ButtonHelper.deleteMessage(event);
+        ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + ", please choose who controls the planet that you wish to _Plague_.",
+                player.getRepresentationUnfogged() + ", please choose who controls the planet that you wish to target.",
                 buttons);
     }
 
@@ -1794,7 +1793,7 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", please choose the planet you wish to _Plague_.",
+                player.getRepresentationUnfogged() + ", please choose the planet you wish to target.",
                 buttons);
     }
 
@@ -2243,14 +2242,20 @@ public class ButtonHelperActionCards {
         int hits = 0;
         if (amount > 0) {
             StringBuilder msg = new StringBuilder(UnitEmojis.infantry + " rolled ");
-            for (int x = 0; x < amount; x++) {
-                Die d1 = new Die(6);
-                msg.append(d1.getResult()).append(", ");
-                if (d1.isSuccess()) {
-                    hits++;
+            if (game.isTwilightsFallMode()) {
+                hits = (amount + 1) / 2;
+                msg = new StringBuilder(hits + " infantry were killed.");
+            } else {
+
+                for (int x = 0; x < amount; x++) {
+                    Die d1 = new Die(6);
+                    msg.append(d1.getResult()).append(", ");
+                    if (d1.isSuccess()) {
+                        hits++;
+                    }
                 }
+                msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
             }
-            msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
             UnitKey key = Units.getUnitKey(UnitType.Infantry, p2.getColor());
             DestroyUnitService.destroyUnit(event, game.getTileFromPlanet(planet), game, key, hits, uH, false);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());

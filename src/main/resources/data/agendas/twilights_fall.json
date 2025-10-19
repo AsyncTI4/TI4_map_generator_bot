@@ -39,8 +39,8 @@
         "alias": "tf-censure",
         "name": "Censure",
         "category": "agenda",
-        "type": "Directive",
-        "target": "Edict",
+        "type": "Law",
+        "target": "Elect Player",
         "text1": "Place any player's control marker on this card. That player cannot perform transactions during this game round. Discard this card at the end of the game round. ",
         "source": "twilights_fall"
     },
