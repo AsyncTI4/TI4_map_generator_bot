@@ -32,6 +32,7 @@ import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -1497,6 +1498,10 @@ public class TransactionHelper {
         // if(game.getRealPlayers().size() > 26){
         //     return true;
         // }
+        if (IsPlayerElectedService.isPlayerElected(game, player2, "tf-censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "tf-censure")) {
+            return false;
+        }
         return player == player2
                 || !"action".equalsIgnoreCase(game.getPhaseOfGame())
                 || (player.hasSpaceStation() && player2.hasSpaceStation())

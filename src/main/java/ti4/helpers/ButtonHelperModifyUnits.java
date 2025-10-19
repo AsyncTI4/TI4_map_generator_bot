@@ -2094,8 +2094,8 @@ public class ButtonHelperModifyUnits {
             }
             if (player.hasUnlockedBreakthrough("ghostbt")
                     && tile != null
-                    && tile.getWormholes().size() > 0) {
-                player.addSpentThing("ghostbt" + tile.getWormholes().size());
+                    && tile.getWormholes(game).size() > 0) {
+                player.addSpentThing("ghostbt" + tile.getWormholes(game).size());
             }
         } else {
             if (orbitalDrop) {

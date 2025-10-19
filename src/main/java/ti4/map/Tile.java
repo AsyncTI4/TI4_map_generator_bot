@@ -573,7 +573,7 @@ public class Tile {
     }
 
     @JsonIgnore
-    public Set<WormholeModel.Wormhole> getWormholes() {
+    public Set<WormholeModel.Wormhole> getWormholes(Game game) {
         Set<WormholeModel.Wormhole> whs = EnumSet.noneOf(WormholeModel.Wormhole.class);
         if (getTileModel().getWormholes() != null) {
             Set<WormholeModel.Wormhole> tileWhs = getTileModel().getWormholes();
@@ -583,6 +583,18 @@ public class Tile {
             if (token.contains("alpha") || token.contains("sigma_weirdway")) whs.add(WormholeModel.Wormhole.ALPHA);
             if (token.contains("beta") || token.contains("sigma_weirdway")) whs.add(WormholeModel.Wormhole.BETA);
             if (token.contains("gamma")) whs.add(WormholeModel.Wormhole.GAMMA);
+        }
+        String ghostFlagshipColor = null;
+        for (Player p : game.getPlayers().values()) {
+            if (p.ownsUnit("ghost_flagship")
+                    || p.ownsUnit("sigma_creuss_flagship_1")
+                    || p.ownsUnit("sigma_creuss_flagship_2")) {
+                ghostFlagshipColor = p.getColor();
+                break;
+            }
+        }
+        if (getSpaceUnitHolder().getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
+            whs.add(WormholeModel.Wormhole.DELTA);
         }
         return whs;
     }

@@ -1677,9 +1677,9 @@ public class Helper {
                 productionValueTotal += 5;
             }
             if (player.hasUnlockedBreakthrough("ghostbt")
-                    && !tile.getWormholes().isEmpty()
+                    && !tile.getWormholes(game).isEmpty()
                     && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
-                productionValueTotal += tile.getWormholes().size();
+                productionValueTotal += tile.getWormholes(game).size();
             }
         }
 
