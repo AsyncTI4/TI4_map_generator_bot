@@ -120,6 +120,20 @@ public class MantisTileDraftable extends Draftable {
         return ChoiceKeyPrefix + tileId;
     }
 
+    public int getTotalBluePerPlayer(MapTemplateModel mapTemplate) {
+        if (mapTemplate == null) {
+            return 0;
+        }
+        return mapTemplate.bluePerPlayer() + (extraBlues != null ? extraBlues : 0);
+    }
+
+    public int getTotalRedPerPlayer(MapTemplateModel mapTemplate) {
+        if (mapTemplate == null) {
+            return 0;
+        }
+        return mapTemplate.redPerPlayer() + (extraReds != null ? extraReds : 0);
+    }
+
     @Override
     public DraftableType getType() {
         return TYPE;
@@ -185,8 +199,8 @@ public class MantisTileDraftable extends Draftable {
         }
 
         List<DraftChoice> playerPicks = draftManager.getPlayerPicks(playerUserId, TYPE);
-        int bpp = mapTemplate.bluePerPlayer() + extraBlues;
-        int rpp = mapTemplate.redPerPlayer() + extraReds;
+        int bpp = getTotalBluePerPlayer(mapTemplate);
+        int rpp = getTotalRedPerPlayer(mapTemplate);
         int bluePicked = 0;
         int redPicked = 0;
         for (DraftChoice pick : playerPicks) {
@@ -252,13 +266,14 @@ public class MantisTileDraftable extends Draftable {
             return; // Not sure this needs to be logged anywhere
         }
 
-        player.getCardsInfoThread().getHistory().retrievePast(10).complete().stream()
-                .filter(msg -> !msg.isUsingComponentsV2())
+        player.getCardsInfoThread().getHistory().retrievePast(10).queue(messages -> {
+            messages.stream().filter(msg -> !msg.isUsingComponentsV2())
                 .filter(msg -> msg.getContentRaw().startsWith("You picked the tiles: "))
                 .findFirst()
                 .ifPresentOrElse(msg -> msg.editMessage(summary.toString()).queue(), () -> player.getCardsInfoThread()
                         .sendMessage(summary.toString())
                         .queue());
+        });
     }
 
     @Override
@@ -307,7 +322,7 @@ public class MantisTileDraftable extends Draftable {
         if (data == null || data.isEmpty()) {
             return;
         }
-        String[] labeledTileIDs = data.split(",");
+        String[] labeledTileIDs = data.split(Draftable.SAVE_SEPARATOR);
         for (String labeledTileId : labeledTileIDs) {
             Character label = labeledTileId.charAt(0);
             String datum = labeledTileId.length() > 1 ? labeledTileId.substring(1) : "";
@@ -319,6 +334,7 @@ public class MantisTileDraftable extends Draftable {
                 if (tileModel == null || tileModel.getTileBack() == null) {
                     BotLogger.warning(
                             "MantisTileDraftable.load: Could not find tile with ID '" + datum + "' in data: " + data);
+                    continue;
                 }
                 if (tileModel.getTileBack() == TileBack.BLUE) {
                     label = 'b';
@@ -406,8 +422,8 @@ public class MantisTileDraftable extends Draftable {
         if (mapTemplate == null) {
             return "Map template ID " + mapTemplateID + " is not valid.  Try `/map set_map_template`";
         }
-        int bpp = mapTemplate.bluePerPlayer() + extraBlues;
-        int rpp = mapTemplate.redPerPlayer() + extraReds;
+        int bpp = getTotalBluePerPlayer(mapTemplate);
+        int rpp = getTotalRedPerPlayer(mapTemplate);
 
         for (Entry<String, PlayerDraftState> entry :
                 draftManager.getPlayerStates().entrySet()) {
@@ -486,8 +502,8 @@ public class MantisTileDraftable extends Draftable {
         tileManager.addAllDraftTiles(sources);
 
         int numPlayers = draftSystemSettings.getPlayerUserIds().size();
-        int bpp = mapTemplate.bluePerPlayer() + extraBlues;
-        int rpp = mapTemplate.redPerPlayer() + extraReds;
+        int bpp = getTotalBluePerPlayer(mapTemplate);
+        int rpp = getTotalRedPerPlayer(mapTemplate);
         int totalBluesNeeded = bpp * numPlayers;
         int totalRedsNeeded = rpp * numPlayers;
 
@@ -537,8 +553,8 @@ public class MantisTileDraftable extends Draftable {
         if (mapTemplate == null) {
             return "Map template ID " + mapTemplateID + " is not valid.  Try `/map set_map_template`";
         }
-        int bpp = mapTemplate.bluePerPlayer() + extraBlues;
-        int rpp = mapTemplate.redPerPlayer() + extraReds;
+        int bpp = getTotalBluePerPlayer(mapTemplate);
+        int rpp = getTotalRedPerPlayer(mapTemplate);
 
         for (Entry<String, PlayerDraftState> entry :
                 draftManager.getPlayerStates().entrySet()) {

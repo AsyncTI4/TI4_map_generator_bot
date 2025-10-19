@@ -558,7 +558,7 @@ public class MantisMapBuildService {
         if (mantisTileDraftable.getDrawnTileId() != null
                 && !mantisTileDraftable.getDrawnTileId().isEmpty()) {
             String selectedTileId = mantisTileDraftable.getDrawnTileId();
-            if (playerRemainingTiles.blueTileIds.contains(selectedTileId)) {
+            if (playerRemainingTiles.blueTileIds().contains(selectedTileId)) {
                 return DraftItem.generate(Category.BLUETILE, selectedTileId);
             } else if (playerRemainingTiles.redTileIds().contains(selectedTileId)) {
                 return DraftItem.generate(Category.REDTILE, selectedTileId);
@@ -782,9 +782,13 @@ public class MantisMapBuildService {
             }
         }
 
+        MessageChannel playerChannel = player.getCardsInfoThread();
+        if(playerChannel == null) {
+            playerChannel = game.getMainGameChannel();
+        }
         MessageHelper.sendMessageToChannel(
-                player.getCardsInfoThread(),
-                "You need to discard down to " + desiredAmount + " of these tiles",
+                playerChannel,
+                player.getRepresentation() + "You need to discard down to " + desiredAmount + " of these tiles",
                 discardButtons);
     }
 

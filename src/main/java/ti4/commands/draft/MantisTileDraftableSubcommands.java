@@ -70,9 +70,9 @@ public class MantisTileDraftableSubcommands extends SubcommandGroup {
     public static class MantisTileDraftableConfigure extends GameStateSubcommand {
         protected MantisTileDraftableConfigure() {
             super(Constants.DRAFT_MANTIS_TILE_CONFIGURE, "Configure the mantis tile draftable", true, false);
-            addOption(OptionType.STRING, "mulligans", "Number of mulligans during map build", false);
-            addOption(OptionType.STRING, "extra_blues", "Number of extra blue tiles during map build", false);
-            addOption(OptionType.STRING, "extra_reds", "Number of extra red tiles during map build", false);
+            addOption(OptionType.INTEGER, "mulligans", "Number of mulligans during map build", false);
+            addOption(OptionType.INTEGER, "extra_blues", "Number of extra blue tiles during map build", false);
+            addOption(OptionType.INTEGER, "extra_reds", "Number of extra red tiles during map build", false);
             addOption(
                     OptionType.STRING, "mulliganed_tiles", "Which tiles have been mulliganed (comma-separated)", false);
             addOption(OptionType.STRING, "discarded_tiles", "Which tiles have been discarded (comma-separated)", false);
@@ -98,29 +98,27 @@ public class MantisTileDraftableSubcommands extends SubcommandGroup {
             }
             if (event.getOption("mulliganed_tiles") != null) {
                 String commaSeparatedTiles = event.getOption("mulliganed_tiles").getAsString();
-                if (commaSeparatedTiles != null && commaSeparatedTiles.trim().isEmpty()) {
-                    commaSeparatedTiles = null;
-                }
                 draftable.getMulliganTileIDs().clear();
-                draftable
-                        .getMulliganTileIDs()
-                        .addAll(List.of(commaSeparatedTiles.split(",")).stream()
-                                .map(String::trim)
-                                .filter(s -> !s.isEmpty())
-                                .collect(Collectors.toList()));
+                if (commaSeparatedTiles != null && commaSeparatedTiles.trim().isEmpty()) {
+                    draftable
+                            .getMulliganTileIDs()
+                            .addAll(List.of(commaSeparatedTiles.split(",")).stream()
+                                    .map(String::trim)
+                                    .filter(s -> !s.isEmpty())
+                                    .collect(Collectors.toList()));
+                }
             }
             if (event.getOption("discarded_tiles") != null) {
                 String commaSeparatedTiles = event.getOption("discarded_tiles").getAsString();
-                if (commaSeparatedTiles != null && commaSeparatedTiles.trim().isEmpty()) {
-                    commaSeparatedTiles = null;
-                }
                 draftable.getDiscardedTileIDs().clear();
-                draftable
-                        .getDiscardedTileIDs()
-                        .addAll(List.of(commaSeparatedTiles.split(",")).stream()
-                                .map(String::trim)
-                                .filter(s -> !s.isEmpty())
-                                .collect(Collectors.toList()));
+                if (commaSeparatedTiles != null && !commaSeparatedTiles.trim().isEmpty()) {
+                    draftable
+                            .getDiscardedTileIDs()
+                            .addAll(List.of(commaSeparatedTiles.split(",")).stream()
+                                    .map(String::trim)
+                                    .filter(s -> !s.isEmpty())
+                                    .collect(Collectors.toList()));
+                }
             }
         }
     }
@@ -144,9 +142,13 @@ public class MantisTileDraftableSubcommands extends SubcommandGroup {
                 return;
             }
             String commaSeparatedTiles = event.getOption("tiles").getAsString();
-            if (commaSeparatedTiles != null && commaSeparatedTiles.trim().isEmpty()) {
-                commaSeparatedTiles = null;
+            if (commaSeparatedTiles == null || commaSeparatedTiles.trim().isEmpty()) {
+                return;
             }
+
+            draftable.getBlueTiles().clear();
+            draftable.getRedTiles().clear();
+
             List<String> tileIDs = List.of(commaSeparatedTiles.split(",")).stream()
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())
