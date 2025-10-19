@@ -30,8 +30,7 @@ public class MantisTileDraftableSettings extends SettingsMenu {
     private static final String MENU_ID = "mantisTile";
 
     public MantisTileDraftableSettings(Game game, JsonNode json, SettingsMenu parent) {
-        super(MENU_ID, "Mantis Tile settings", "Advanced settings for map features and slice quality.", parent);
-        this.description.add("Big changes here can cause the nucleus generation to fail.");
+        super(MENU_ID, "Mantis Tile settings", "Tile drafting and map building.", parent);
 
         // Initialize settings
         mulligans = new IntegerSetting("Mulligans", "Max Mulligans", 1, 0, 3, 1);
