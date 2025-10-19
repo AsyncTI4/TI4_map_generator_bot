@@ -18,7 +18,7 @@
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": "Orbital Deep Space Observatory",
-    "legendaryAbilityText": "After you pass, you may place up to 2 frontier token in systems that do not contain a frontier token or a planet.",
+    "legendaryAbilityText": "After you pass, you may place frontier token in up to 2 systems that do not contain a frontier token or a planet.",
     "legendaryAbilityFlavourText": "The old orbital antenna array was dismissed as derelict space junk by federal agents. Acamar knew better.",
     "unitPositions": {
         "unitHolderName": "thigel",
