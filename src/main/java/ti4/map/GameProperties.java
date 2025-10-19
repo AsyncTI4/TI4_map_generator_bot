@@ -96,6 +96,7 @@ public class GameProperties {
     // Game modes / homebrew flags
     private @ExportableField boolean baseGameMode; // TODO: Make this obsolete
     private @ExportableField boolean thundersEdge;
+    private @ExportableField boolean twilightsFallMode;
     private @ExportableField boolean prophecyOfKings = true;
     private @ExportableField boolean ageOfExplorationMode;
     private @ExportableField boolean facilitiesMode;
@@ -146,6 +147,7 @@ public class GameProperties {
     // Discord Snowflakes
     private @ExportableField String guildID;
     private String speakerUserID = "";
+    private String tyrantUserID = "";
     private String activePlayerID;
     private String launchPostThreadID;
     private @ExportableField String botMapUpdatesThreadID;

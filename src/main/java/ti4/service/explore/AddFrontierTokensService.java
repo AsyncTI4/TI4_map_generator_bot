@@ -8,7 +8,6 @@ import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Tile;
-import ti4.map.UnitHolder;
 
 @UtilityClass
 public class AddFrontierTokensService {
@@ -19,14 +18,8 @@ public class AddFrontierTokensService {
             if (((tile.getPlanetUnitHolders().isEmpty() && tile.getUnitHolders().size() == 2)
                             || Mapper.getFrontierTileIds().contains(tile.getTileID()))
                     && !game.isBaseGameMode()) {
-                boolean hasMirage = false;
-                for (UnitHolder unitholder : tile.getUnitHolders().values()) {
-                    if (unitholder.getName().equals(Constants.MIRAGE)) {
-                        hasMirage = true;
-                        break;
-                    }
-                }
-                if (!hasMirage) AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
+                if (tile.getPlanetUnitHolders().isEmpty())
+                    AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
             }
         }
     }

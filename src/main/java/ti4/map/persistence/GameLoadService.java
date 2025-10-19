@@ -414,6 +414,7 @@ class GameLoadService {
                     game.setScTradeGoods(strategyCardToTradeGoodCount);
                 }
                 case Constants.SPEAKER -> game.setSpeakerUserID(info);
+                case Constants.TYRANT -> game.setTyrantUserID(info);
                 case Constants.ACTIVE_PLAYER -> game.setActivePlayerID(info);
                 case Constants.ACTIVE_SYSTEM -> game.setActiveSystem(info);
                 case Constants.AUTO_PING -> {
@@ -658,6 +659,7 @@ class GameLoadService {
                     game.setJustPlayedComponentAC(loadBooleanOrDefault(info, false));
                 case Constants.BASE_GAME_MODE -> game.setBaseGameMode(loadBooleanOrDefault(info, false));
                 case Constants.THUNDERS_EDGE_MODE -> game.setThundersEdge(loadBooleanOrDefault(info, false));
+                case Constants.TWILIGHTS_FALL_MODE -> game.setTwilightsFallMode(loadBooleanOrDefault(info, false));
                 case Constants.LIGHT_FOG_MODE -> game.setLightFogMode(loadBooleanOrDefault(info, false));
                 case Constants.CPTI_EXPLORE_MODE -> game.setCptiExploreMode(loadBooleanOrDefault(info, false));
                 case Constants.RED_TAPE_MODE -> game.setRedTapeMode(loadBooleanOrDefault(info, false));

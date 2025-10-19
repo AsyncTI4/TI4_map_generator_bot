@@ -524,10 +524,14 @@ public class ActionCardHelper {
 
             if (Helper.isSaboAllowed(game, player)) {
                 // Can be "sabotaged", basically every card
-                buttons.add(Buttons.blue("no_sabotage", "No Sabotage", MiscEmojis.NoSabo));
+                String sabo = "Sabotage";
+                if (game.isTwilightsFallMode()) {
+                    sabo = "Shatter";
+                }
+                buttons.add(Buttons.blue("no_sabotage", "No " + sabo, MiscEmojis.NoSabo));
                 buttons.add(Buttons.gray(
                         player.getFinsFactionCheckerPrefix() + "moveAlongAfterAllHaveReactedToAC_" + actionCardTitle,
-                        "Pause Timer While Waiting For Sabo"));
+                        "Pause Timer While Waiting For " + sabo));
                 MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(
                         mainGameChannel, message, game, player, Collections.singletonList(acEmbed), buttons, true);
             } else {
@@ -1670,16 +1674,23 @@ public class ActionCardHelper {
                     break;
                 }
             }
-
-            if (!blockaded && (hasCap || hasSD)) {
-                AddUnitService.addUnits(event, tile, game, player.getColor(), "ff");
-                tilesAffected.add(tile);
+            if (game.isTwilightsFallMode()) {
+                if (FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+                    AddUnitService.addUnits(event, tile, game, player.getColor(), "ff");
+                    tilesAffected.add(tile);
+                }
+            } else {
+                if (!blockaded && (hasCap || hasSD)) {
+                    AddUnitService.addUnits(event, tile, game, player.getColor(), "ff");
+                    tilesAffected.add(tile);
+                }
             }
         }
 
         String msg = "Added " + tilesAffected.size() + " fighter" + (tilesAffected.size() == 1 ? "" : "s") + ".";
         if (!tilesAffected.isEmpty()) {
             msg += " Please check fleet size and capacity in each of the systems: ";
+            ButtonHelper.checkFleetInEveryTile(player, game);
         }
         boolean first = true;
         StringBuilder msgBuilder = new StringBuilder(msg);
