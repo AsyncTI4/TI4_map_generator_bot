@@ -1078,8 +1078,7 @@
         "name": "Survey",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose 1 planet you control that has a trait. Resolve a card from the exploration deck discard pile of that trait.",
-        "automationID": "side_project",
+        "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may resolve a card from its discard pile instead.",
         "flavorText": "Carth breathed in the familiar air of Silver Sands. Home. Were it that she never had to leave.",
         "source": "action_deck_2"
     },
