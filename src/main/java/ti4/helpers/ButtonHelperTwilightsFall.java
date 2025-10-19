@@ -112,26 +112,33 @@ public class ButtonHelperTwilightsFall {
         if (splice == 6) {
             spliceType = "unit";
         }
-        for (Player p : game.getRealPlayers()) {
-            if (!p.getFollowedSCs().contains(splice) && !p.getFaction().equals(player.getFaction())) {
-                MessageHelper.sendEphemeralMessageToEventChannel(
-                        event,
-                        p.getRepresentation()
-                                + " has not yet chosen whether to participate in the splice, so the splice cannot proceed.");
-                return;
-            }
-        }
         List<Player> participants = new ArrayList<>();
         List<Player> fullOrder = Helper.getSpeakerOrFullPriorityOrderFromPlayer(player, game);
-
-        for (Player p : fullOrder) {
-            if (game.getStoredValue("willParticipateInSplice").contains(p.getFaction())
-                    || p.getFaction().equals(player.getFaction())) {
+        if (buttonID.contains("all")) {
+            for (Player p : fullOrder) {
                 participants.add(p);
+            }
+            ButtonHelper.deleteMessage(event);
+        } else {
+            for (Player p : game.getRealPlayers()) {
+                if (!p.getFollowedSCs().contains(splice) && !p.getFaction().equals(player.getFaction())) {
+                    MessageHelper.sendEphemeralMessageToEventChannel(
+                            event,
+                            p.getRepresentation()
+                                    + " has not yet chosen whether to participate in the splice, so the splice cannot proceed.");
+                    return;
+                }
+            }
+            for (Player p : fullOrder) {
+                if (game.getStoredValue("willParticipateInSplice").contains(p.getFaction())
+                        || p.getFaction().equals(player.getFaction())) {
+                    participants.add(p);
+                }
             }
         }
         if (splice == 7 && !game.getStoredValue("paid6ForSplice").isEmpty()) {
             participants.add(player);
+            game.removeStoredValue("paid6ForSplice");
         }
         initiateASplice(game, player, spliceType, participants);
     }
