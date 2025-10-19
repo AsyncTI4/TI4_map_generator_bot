@@ -783,7 +783,7 @@ public class MantisMapBuildService {
         }
 
         MessageChannel playerChannel = player.getCardsInfoThread();
-        if(playerChannel == null) {
+        if (playerChannel == null) {
             playerChannel = game.getMainGameChannel();
         }
         MessageHelper.sendMessageToChannel(

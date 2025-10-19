@@ -267,12 +267,14 @@ public class MantisTileDraftable extends Draftable {
         }
 
         player.getCardsInfoThread().getHistory().retrievePast(10).queue(messages -> {
-            messages.stream().filter(msg -> !msg.isUsingComponentsV2())
-                .filter(msg -> msg.getContentRaw().startsWith("You picked the tiles: "))
-                .findFirst()
-                .ifPresentOrElse(msg -> msg.editMessage(summary.toString()).queue(), () -> player.getCardsInfoThread()
-                        .sendMessage(summary.toString())
-                        .queue());
+            messages.stream()
+                    .filter(msg -> !msg.isUsingComponentsV2())
+                    .filter(msg -> msg.getContentRaw().startsWith("You picked the tiles: "))
+                    .findFirst()
+                    .ifPresentOrElse(
+                            msg -> msg.editMessage(summary.toString()).queue(), () -> player.getCardsInfoThread()
+                                    .sendMessage(summary.toString())
+                                    .queue());
         });
     }
 
