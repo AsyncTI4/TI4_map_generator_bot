@@ -2499,10 +2499,17 @@ public class UnfiledButtonHandlers {
             }
             case "pass_on_abilities" -> {
                 if (game.isCustodiansScored() || game.isOmegaPhaseMode()) {
-                    Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
-                    List<Button> buttons = List.of(flipAgenda);
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            event.getChannel(), "Please flip agenda now.", buttons);
+                    if (game.isTwilightsFallMode()) {
+                        Button flipAgenda = Buttons.blue("edictPhase", "Do Edict Phase");
+                        List<Button> buttons = List.of(flipAgenda);
+                        MessageHelper.sendMessageToChannelWithButtons(
+                                event.getChannel(), "Please proceed to edict phase now.", buttons);
+                    } else {
+                        Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
+                        List<Button> buttons = List.of(flipAgenda);
+                        MessageHelper.sendMessageToChannelWithButtons(
+                                event.getChannel(), "Please flip agenda now.", buttons);
+                    }
                 } else {
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
@@ -2517,13 +2524,23 @@ public class UnfiledButtonHandlers {
             case "redistributeCCButtons" -> {
                 if (game.isCustodiansScored() || game.isOmegaPhaseMode()) {
                     // new RevealAgenda().revealAgenda(event, false, map, event.getChannel());
-                    Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
-                    List<Button> buttons = List.of(flipAgenda);
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            event.getChannel(),
-                            "This message was triggered by the last player pressing \"Redistribute Command Tokens\"."
-                                    + " Please press the \"Flip Agenda\" button after they have finished redistributing tokens and you have fully resolved all other Status Phase effects.",
-                            buttons);
+                    if (game.isTwilightsFallMode()) {
+                        Button flipAgenda = Buttons.blue("edictPhase", "Do Edict Phase");
+                        List<Button> buttons = List.of(flipAgenda);
+                        MessageHelper.sendMessageToChannelWithButtons(
+                                event.getChannel(),
+                                "Please proceed to edict phase after the last person finishing doing CCs.",
+                                buttons);
+                    } else {
+                        Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
+                        List<Button> buttons = List.of(flipAgenda);
+                        MessageHelper.sendMessageToChannelWithButtons(
+                                event.getChannel(),
+                                "This message was triggered by the last player pressing \"Redistribute Command Tokens\"."
+                                        + " Please press the \"Flip Agenda\" button after they have finished redistributing tokens and you have fully resolved all other Status Phase effects.",
+                                buttons);
+                    }
+
                 } else {
                     Button flipAgenda = Buttons.blue("startStrategyPhase", "Start Strategy Phase");
                     List<Button> buttons = List.of(flipAgenda);

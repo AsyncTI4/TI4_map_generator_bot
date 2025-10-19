@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -1839,6 +1839,12 @@ public class Game extends GameProperties {
         boolean custodiansTaken = false;
         if (isOrdinianC1Mode()) {
             return ButtonHelper.isCoatlHealed(this);
+        }
+        if (isTwilightsFallMode()) {
+            if (getTyrant() == null) {
+                return false;
+            }
+            return true;
         }
         if (isLiberationC4Mode()) {
             return true;
