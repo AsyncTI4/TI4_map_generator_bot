@@ -80,6 +80,9 @@ public abstract class Draftable extends DraftLifecycleHooks {
             throw new IllegalArgumentException("Must provide at least buttonText or emoji");
         }
         if (buttonText != null) {
+            if (buttonText.toLowerCase().contains("naalu")) {
+                buttonText += " (Uses New Agent and Mech)";
+            }
             return Buttons.gray(makeButtonId(choiceKey), buttonText, emoji);
         } else {
             return Buttons.green(makeButtonId(choiceKey), null, emoji);
