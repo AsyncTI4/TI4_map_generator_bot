@@ -15,6 +15,7 @@ import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
@@ -224,8 +225,10 @@ public class DraftTileManager {
         Tile tile = new Tile(tileID, "none");
         draftTile.setTile(tile);
 
-        for (Planet planet : tile.getPlanetUnitHolders()) {
-            draftTile.addPlanet(planet);
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            if (unitHolder instanceof Planet planet) {
+                draftTile.addPlanet(planet);
+            }
         }
 
         if (tile.isScar()) {

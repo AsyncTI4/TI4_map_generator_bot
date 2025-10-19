@@ -473,6 +473,9 @@ public class MiltyDraftManager {
 
             String name = model.getFactionName();
             if (faction.startsWith("keleres")) name = "The Council Keleres";
+            if (name.toLowerCase().contains("naalu")) {
+                name += " (Uses New Agent and Mech)";
+            }
             factionButtons.add(Buttons.gray("milty_faction_" + faction, name, model.getFactionEmoji()));
         }
         return factionButtons;
