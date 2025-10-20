@@ -67,7 +67,6 @@ public class PlayerTechService {
         }
         if ("cr2".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             if (player.hasUnlockedBreakthrough("mentakbt")) {
-                player.addOwnedUnitByID("mentak_cruiser3");
                 message += "\nAutomatically added Mentak's cruiser 3.";
             }
         }

@@ -1,6 +1,6 @@
 package ti4.settings.users;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -29,6 +29,7 @@ public class UserSettings {
     private boolean hasAnsweredSurvey;
     private boolean prefersSarweenMsg = true;
     private boolean prefersPillageMsg = true;
+    private boolean prefersAutoDebtClearance = true;
     private boolean prefersPassOnWhensAfters;
     private boolean prefersPrePassOnSC = true;
     private int autoNoSaboInterval;

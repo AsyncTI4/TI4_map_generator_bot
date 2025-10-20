@@ -32,6 +32,7 @@ import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -926,10 +927,12 @@ public class TransactionHelper {
                 player.addTransactionItem(itemS);
             }
         }
+        var userSettings = UserSettingsManager.get(player.getUserID());
 
         if (("tgs".equalsIgnoreCase(item) || "Comms".equalsIgnoreCase(item))
                 && p2.getDebtTokenCount(p1.getColor()) > 0
                 && !p2.hasAbility("binding_debts")
+                && userSettings.isPrefersAutoDebtClearance()
                 && !p2.hasAbility("data_recovery")) {
             int amount = Math.min(p2.getDebtTokenCount(p1.getColor()), Integer.parseInt(extraDetail));
             String clear = "sending" + receiver + "_receiving" + sender + "_ClearDebt_" + amount;
@@ -1497,6 +1500,10 @@ public class TransactionHelper {
         // if(game.getRealPlayers().size() > 26){
         //     return true;
         // }
+        if (IsPlayerElectedService.isPlayerElected(game, player2, "tf-censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "tf-censure")) {
+            return false;
+        }
         return player == player2
                 || !"action".equalsIgnoreCase(game.getPhaseOfGame())
                 || (player.hasSpaceStation() && player2.hasSpaceStation())
