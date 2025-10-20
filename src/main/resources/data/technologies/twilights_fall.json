@@ -218,7 +218,7 @@
         "faction": "ghost"
     },
     {
-        "alias": "tf-dimensionalsplicer",
+        "alias": "tf-ds",
         "name": "Dimensional Splicer",
         "types": [
             "WARFARE"
@@ -648,7 +648,7 @@
         "faction": "cabal"
     },
     {
-        "alias": "tf-raidformation",
+        "alias": "tf-raid_formation",
         "name": "Raid Formation",
         "types": [
             "WARFARE"
@@ -658,7 +658,7 @@
         "faction": "argent"
     },
     {
-        "alias": "tf-aeriehololattice",
+        "alias": "tf-ahl",
         "name": "Aerie Hololattice",
         "types": [
             "CYBERNETIC"
@@ -678,7 +678,7 @@
         "faction": "argent"
     },
     {
-        "alias": "tf-aetherstream",
+        "alias": "tf-as",
         "name": "Aetherstream",
         "types": [
             "PROPULSION"
@@ -838,7 +838,7 @@
         "faction": "keleres"
     },
     {
-        "alias": "tf-agencysupplynetwork",
+        "alias": "tf-asn",
         "name": "Agency Supply Network",
         "types": [
             "CYBERNETIC"
@@ -848,7 +848,7 @@
         "faction": "keleres"
     },
     {
-        "alias": "tf-fleetlogistics",
+        "alias": "tf-fl",
         "name": "Fleet Logistics",
         "types": [
             "PROPULSION"

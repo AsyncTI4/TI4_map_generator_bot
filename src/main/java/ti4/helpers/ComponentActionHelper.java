@@ -234,14 +234,15 @@ public class ComponentActionHelper {
                                 factionEmoji);
                         compButtons.add(lButton);
                     }
-
-                } else if ("mahactcommander".equalsIgnoreCase(leaderID)
-                        && p1.getTacticalCC() > 0
-                        && !ButtonHelper.getTilesWithYourCC(p1, game, event).isEmpty()) {
-                    Button lButton = Buttons.gray(finChecker + "mahactCommander", "Use " + leaderName, factionEmoji);
-                    compButtons.add(lButton);
                 }
             }
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(p1, "mahactcommander")
+                && p1.getTacticalCC() > 0
+                && !ButtonHelper.getTilesWithYourCC(p1, game, event).isEmpty()) {
+
+            Button lButton = Buttons.gray(finChecker + "mahactCommander", "Use Mahact Commander", FactionEmojis.Mahact);
+            compButtons.add(lButton);
         }
 
         // Relics
