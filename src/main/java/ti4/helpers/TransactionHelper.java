@@ -927,10 +927,12 @@ public class TransactionHelper {
                 player.addTransactionItem(itemS);
             }
         }
+        var userSettings = UserSettingsManager.get(player.getUserID());
 
         if (("tgs".equalsIgnoreCase(item) || "Comms".equalsIgnoreCase(item))
                 && p2.getDebtTokenCount(p1.getColor()) > 0
                 && !p2.hasAbility("binding_debts")
+                && userSettings.isPrefersAutoDebtClearance()
                 && !p2.hasAbility("data_recovery")) {
             int amount = Math.min(p2.getDebtTokenCount(p1.getColor()), Integer.parseInt(extraDetail));
             String clear = "sending" + receiver + "_receiving" + sender + "_ClearDebt_" + amount;

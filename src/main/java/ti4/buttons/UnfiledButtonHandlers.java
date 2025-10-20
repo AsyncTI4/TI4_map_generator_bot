@@ -2080,7 +2080,8 @@ public class UnfiledButtonHandlers {
                         && !"solBtBuild".equalsIgnoreCase(buttonID)) {
                     buttons.add(Buttons.red("exhaustTech_htp", "Exhaust Hegemonic Trade Policy", FactionEmojis.Winnu));
                 }
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander")
+                if ((game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander")
+                                || player.hasTech("tf-abundance"))
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")

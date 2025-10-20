@@ -568,8 +568,8 @@
         "faction": "titans"
     },
     {
-        "alias": "tf-coalescence",
-        "name": "Coalescence",
+        "alias": "tf-abundance",
+        "name": "Abundance",
         "types": [
             "CYBERNETIC"
         ],
