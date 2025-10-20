@@ -1594,7 +1594,7 @@ public class ActionCardHelper {
                 .append(" to each of: ");
         int count = 0;
         for (Tile tile : game.getTileMap().values()) {
-            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            for (UnitHolder unitHolder : tile.getPlanetUnitHolders()) {
                 if (planets.contains(unitHolder.getName())) {
                     Set<String> tokenList = unitHolder.getTokenList();
                     boolean ignorePlanet = false;

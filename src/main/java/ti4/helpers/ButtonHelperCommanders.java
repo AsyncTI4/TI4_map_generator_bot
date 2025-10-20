@@ -685,7 +685,7 @@ public class ButtonHelperCommanders {
 
     public static void resolveMuaatCommanderCheck(
             Player player, Game game, GenericInteractionCreateEvent event, String reason) {
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander")) {
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander") || player.hasTech("tf-stellargenesis")) {
             if (!ButtonHelperAbilities.canBePillaged(player, game, player.getTg() + 1) || game.isFowMode()) {
                 String message = player.getRepresentationUnfogged()
                         + " you gained a trade good from Magmus, the Muaat Commander, " + player.gainTG(1)

@@ -193,7 +193,9 @@ public class FrankenDraft extends BagDraft {
                 StartingTechDraftItem.buildAllDraftableItems(allDraftableFactions, game));
 
         allDraftableItems.put(DraftItem.Category.UNIT, UnitDraftItem.buildAllDraftableItems());
-        allDraftableItems.put(DraftItem.Category.MAHACTKING, MahactKingDraftItem.buildAllDraftableItems());
+        if (game.isTwilightsFallMode()) {
+            allDraftableItems.put(DraftItem.Category.MAHACTKING, MahactKingDraftItem.buildAllDraftableItems());
+        }
 
         allDraftableItems.put(DraftItem.Category.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(game));
 

@@ -2080,7 +2080,8 @@ public class UnfiledButtonHandlers {
                         && !"solBtBuild".equalsIgnoreCase(buttonID)) {
                     buttons.add(Buttons.red("exhaustTech_htp", "Exhaust Hegemonic Trade Policy", FactionEmojis.Winnu));
                 }
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander")
+                if ((game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander")
+                                || player.hasTech("tf-abundance"))
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")
@@ -2181,8 +2182,8 @@ public class UnfiledButtonHandlers {
                 }
                 if (player.hasUnlockedBreakthrough("ghostbt")
                         && tile != null
-                        && tile.getWormholes().size() > 0) {
-                    player.addSpentThing("ghostbt" + tile.getWormholes().size());
+                        && tile.getWormholes(game).size() > 0) {
+                    player.addSpentThing("ghostbt" + tile.getWormholes(game).size());
                 }
                 // ButtonHelper.updateMap(game, event,
                 // "Result of build on turn " + player.getInRoundTurnCount() + " for " +

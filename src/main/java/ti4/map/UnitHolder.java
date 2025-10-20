@@ -285,6 +285,9 @@ public abstract class UnitHolder {
     }
 
     public int getUnitCount(UnitType unitType, String color) {
+        if (color == null) {
+            return 0;
+        }
         UnitKey uk = Units.getUnitKey(unitType, Mapper.getColorID(color));
         return getUnitCount(uk);
     }

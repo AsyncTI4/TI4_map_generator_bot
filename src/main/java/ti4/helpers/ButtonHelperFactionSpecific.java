@@ -2557,7 +2557,7 @@ public class ButtonHelperFactionSpecific {
         buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(p1, game, "fs", "placeOneNDone_skipbuild"));
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                p1.getFactionEmoji() + " has chosen to purge an ability or genome to deploy their flagship.");
+                p1.getFactionEmoji() + " has chosen to discard an ability or genome to deploy their flagship.");
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Please choose which system you wish to place the flagship in.", buttons);
         if (p1.hasUnit("redtf_mech")

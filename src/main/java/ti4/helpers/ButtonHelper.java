@@ -5169,7 +5169,8 @@ public class ButtonHelper {
         for (Player p2 : game.getRealPlayers()) {
             if (p2 != player
                     && CommandCounterHelper.hasCC(event, p2.getColor(), tile)
-                    && game.playerHasLeaderUnlockedOrAlliance(p2, "empyreancommander")) {
+                    && (game.playerHasLeaderUnlockedOrAlliance(p2, "empyreancommander")
+                            || player.hasTech("tf-overwatch"))) {
                 MessageChannel channel = game.getMainGameChannel();
                 if (game.isFowMode()) {
                     channel = p2.getPrivateChannel();
@@ -6663,7 +6664,7 @@ public class ButtonHelper {
         if (player.hasUnlockedBreakthrough("ghostbt")) {
             for (Tile t : game.getTileMap().values()) {
                 if (t.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip)
-                        && !t.getWormholes().isEmpty()) {
+                        && !t.getWormholes(game).isEmpty()) {
                     tilesWithProduction.add(t);
                 }
             }
@@ -7394,7 +7395,7 @@ public class ButtonHelper {
                 resourcesAvailable += getNumberOfUnitUpgrades(player);
             }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander")) {
-                youCanSpend.append(" You also have Titans commander..");
+                youCanSpend.append(" You also have Titans commander.");
                 resourcesAvailable += 1;
             }
             youCanSpend
