@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Unified script to convert images to WebP and upload to S3.
-Only converts local PNG/JPG files if their WebP equivalent doesn't already exist in S3.
+- Converts local PNG/JPG files to WebP if they don't already exist in S3
+- Copies existing WebP files if they don't already exist in S3
 This avoids unnecessary conversion work when the asset is already on the server.
 """
 
@@ -14,6 +15,7 @@ from botocore.exceptions import NoCredentialsError, ClientError
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import mimetypes
+import shutil
 from PIL import Image
 
 # Set up logging
@@ -93,8 +95,8 @@ def get_all_s3_keys(s3_client, bucket_name, prefix=""):
 
 
 def is_image_file(file_path):
-    """Check if file is a JPG or PNG image."""
-    return file_path.suffix.lower() in [".jpg", ".jpeg", ".png"]
+    """Check if file is a JPG, PNG, or WebP image."""
+    return file_path.suffix.lower() in [".jpg", ".jpeg", ".png", ".webp"]
 
 
 def convert_image_to_webp(source_file, dest_file):
@@ -121,7 +123,9 @@ def upload_file(s3_client, local_file, bucket_name, s3_key):
             "CacheControl": "max-age=31536000",  # Cache for 1 year
         }
 
-        s3_client.upload_file(str(local_file), bucket_name, s3_key, ExtraArgs=extra_args)
+        s3_client.upload_file(
+            str(local_file), bucket_name, s3_key, ExtraArgs=extra_args
+        )
         return True, None
     except Exception as e:
         return False, str(e)
@@ -129,16 +133,16 @@ def upload_file(s3_client, local_file, bucket_name, s3_key):
 
 def scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, prefix=""):
     """
-    Scan local images and convert only those that don't exist in S3.
+    Scan local images and convert/copy only those that don't exist in S3.
 
     Args:
-        source_dir: Local source directory with PNG/JPG files
-        dest_dir: Temporary directory for WebP conversion
+        source_dir: Local source directory with PNG/JPG/WebP files
+        dest_dir: Temporary directory for WebP conversion/copying
         existing_s3_keys: Set of S3 object keys already in bucket
         prefix: S3 prefix for key comparison
 
     Returns:
-        List of (local_webp_file, s3_key) tuples to upload
+        Tuple: (files_to_upload, converted_count, copied_count, skipped_count, error_count)
     """
     logger.info("=" * 50)
     logger.info("STAGE 1: SCANNING AND CONVERTING IMAGES")
@@ -146,6 +150,7 @@ def scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, prefix=""):
 
     files_to_upload = []
     converted_count = 0
+    copied_count = 0
     skipped_conversion_count = 0
     conversion_error_count = 0
 
@@ -177,22 +182,40 @@ def scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, prefix=""):
             # Need to convert - check if local WebP exists
             dest_file = dest_root / dest_filename
 
-            # Convert the image
-            logger.info(f"[CONVERT] {source_file.name} -> {dest_filename}")
-            if convert_image_to_webp(source_file, dest_file):
-                converted_count += 1
-                files_to_upload.append((dest_file, s3_key))
+            # If source is already WebP, just copy it
+            if source_file.suffix.lower() == ".webp":
+                logger.info(f"[COPY] {source_file.name} (already WebP)")
+                try:
+                    shutil.copy2(source_file, dest_file)
+                    copied_count += 1
+                    files_to_upload.append((dest_file, s3_key))
+                except Exception as e:
+                    logger.error(f"Failed to copy {source_file}: {e}")
+                    conversion_error_count += 1
             else:
-                conversion_error_count += 1
+                # Convert the image
+                logger.info(f"[CONVERT] {source_file.name} -> {dest_filename}")
+                if convert_image_to_webp(source_file, dest_file):
+                    converted_count += 1
+                    files_to_upload.append((dest_file, s3_key))
+                else:
+                    conversion_error_count += 1
 
     logger.info("=" * 50)
     logger.info("CONVERSION SUMMARY:")
     logger.info(f"Images converted: {converted_count}")
+    logger.info(f"WebP files copied: {copied_count}")
     logger.info(f"Conversions skipped (already in S3): {skipped_conversion_count}")
     logger.info(f"Conversion errors: {conversion_error_count}")
     logger.info("=" * 50)
 
-    return files_to_upload, converted_count, skipped_conversion_count, conversion_error_count
+    return (
+        files_to_upload,
+        converted_count,
+        copied_count,
+        skipped_conversion_count,
+        conversion_error_count,
+    )
 
 
 def upload_images(s3_client, files_to_upload, bucket_name):
@@ -268,11 +291,11 @@ def main():
     )
     parser.add_argument(
         "--source-dir",
-        help="Source directory with PNG/JPG images (default: src/main/resources)",
+        help="Source directory with PNG/JPG/WebP images (default: src/main/resources)",
     )
     parser.add_argument(
         "--dest-dir",
-        help="Destination directory for WebP conversion (default: src/main/webp)",
+        help="Destination directory for WebP conversion/copying (default: src/main/webp)",
     )
 
     args = parser.parse_args()
@@ -321,8 +344,8 @@ def main():
         logger.info(f"Found {len(existing_s3_keys)} existing objects in S3")
 
         # Scan local images and convert only new ones
-        files_to_upload, converted, skipped_conv, conv_errors = scan_and_convert_images(
-            source_dir, dest_dir, existing_s3_keys, args.prefix
+        files_to_upload, converted, copied, skipped_conv, conv_errors = (
+            scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, args.prefix)
         )
 
         if conv_errors > 0:
@@ -335,6 +358,7 @@ def main():
         logger.info("=" * 50)
         logger.info("FINAL SUMMARY:")
         logger.info(f"Images converted: {converted}")
+        logger.info(f"WebP files copied: {copied}")
         logger.info(f"Conversions skipped (already in S3): {skipped_conv}")
         logger.info(f"Files uploaded: {uploaded}")
         logger.info(f"Conversion errors: {conv_errors}")
