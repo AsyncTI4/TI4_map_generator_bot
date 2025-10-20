@@ -3333,7 +3333,11 @@ public class AgendaHelper {
         ButtonHelper.deleteTheOneButton(event);
         boolean success = game.removeLaw(game.getLaws().get("minister_war"));
         if (success) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "The _Minister of War_ law has been discarded.");
+            String msg = "The _Minister of War_ law has been discarded.";
+            MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "## " + game.getPing() + " " + msg);
+            }
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found");
         }
