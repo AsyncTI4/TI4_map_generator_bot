@@ -1162,5 +1162,45 @@
         "text": "Resolve the secondary ability of 1 readied or unchosen strategy card; do not spend or place a command token to resolve that ability.",
         "flavorText": "\"With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Rinn sighed. \"We must remain focused. Steady.\"",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "war_machine1_acd2",
+        "name": "War Machine",
+        "phase": "Action",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
+        "automationID": "war_machine",
+        "flavorText": "Warden Gim shuddered as one of the prisoners fell from exhaustion and was trampled by the others. The munitions were crucial to his alliance, but the price weighed heavily on his soul.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "war_machine2_acd2",
+        "name": "War Machine",
+        "phase": "Action",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
+        "automationID": "war_machine",
+        "flavorText": "Warden Gim shuddered as one of the prisoners fell from exhaustion and was trampled by the others. The munitions were crucial to his alliance, but the price weighed heavily on his soul.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "war_machine3_acd2",
+        "name": "War Machine",
+        "phase": "Action",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
+        "automationID": "war_machine",
+        "flavorText": "Warden Gim shuddered as one of the prisoners fell from exhaustion and was trampled by the others. The munitions were crucial to his alliance, but the price weighed heavily on his soul.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "war_machine4_acd2",
+        "name": "War Machine",
+        "phase": "Action",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
+        "automationID": "war_machine",
+        "flavorText": "Warden Gim shuddered as one of the prisoners fell from exhaustion and was trampled by the others. The munitions were crucial to his alliance, but the price weighed heavily on his soul.",
+        "source": "action_deck_2_old"
     }
 ]

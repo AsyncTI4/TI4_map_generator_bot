@@ -2304,6 +2304,7 @@ public class Helper {
                 || player.getActionCards().containsKey("war_machine3")
                 || player.getActionCards().containsKey("war_machine4")
                 || player.getActionCards().containsKey("war_machine_ds")
+                // deprecated, but needs to sit here for a while til those games finish
                 || player.getActionCards().containsKey("war_machine1_acd2")
                 || player.getActionCards().containsKey("war_machine2_acd2")
                 || player.getActionCards().containsKey("war_machine3_acd2")
