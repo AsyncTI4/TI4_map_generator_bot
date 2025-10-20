@@ -13,7 +13,7 @@ import argparse
 CONFIGS = {
     "tech": {
         "input_folder": "src/main/resources/data/technologies",
-        "output_file": "techs.ts",
+        "output_file": "tech.ts",
         "type_import": "Tech",
         "export_name": "techs",
         "sort_key": "alias",
@@ -217,7 +217,9 @@ def aggregate_data(config: Dict[str, Any]) -> List[Dict[str, Any]]:
     return all_data
 
 
-def write_typescript_file(data: List[Dict[str, Any]], config: Dict[str, Any], output_dir: Path):
+def write_typescript_file(
+    data: List[Dict[str, Any]], config: Dict[str, Any], output_dir: Path
+):
     """Write the aggregated data to a TypeScript file"""
     # Sort data by the configured key
     data.sort(key=lambda x: x.get(config["sort_key"], ""))
