@@ -1239,13 +1239,14 @@ public class ActionCardHelper {
                             player,
                             hackButtons);
                 }
-                //"tf-engineer", -- 2 extra cards
-                //"tf-thieve" -- take the last card
-                //"tf-helix"
-                //"tf-reverse"
-                //"alias": "tf-scarab", "name": "Scarab","Choose a spliced card you own; gain 2 trade goods for each card you own with a faction origin that matches that card",
-                //Discard 1 of your neighbor's genomes. tf-genophage
-                //"tf-mutate1" "tf-mutate2" discard and draw an ability
+                // "tf-engineer", -- 2 extra cards
+                // "tf-thieve" -- take the last card
+                // "tf-helix"
+                // "tf-reverse"
+                // "alias": "tf-scarab", "name": "Scarab","Choose a spliced card you own; gain 2 trade goods for each
+                // card you own with a faction origin that matches that card",
+                // Discard 1 of your neighbor's genomes. tf-genophage
+                // "tf-mutate1" "tf-mutate2" discard and draw an ability
                 if ("insider".equals(automationID)) {
                     codedButtons.add(Buttons.green(
                             player.getFinsFactionCheckerPrefix() + "resolveInsiderInformation", buttonLabel));
