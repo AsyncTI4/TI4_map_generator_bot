@@ -1,6 +1,8 @@
 package ti4.service.fow;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -50,24 +52,27 @@ public class BlindSelectionService {
             String[] parts = button.getCustomId().split("_");
             if (parts.length < 2) continue;
 
-            validTargets.append(parts[1]).append(VALID_SEPARATOR);
-            if (!visibleTilePositions.contains(parts[1])) {
+            String target = parts[parts.length - 1];
+            validTargets.append(target).append(VALID_SEPARATOR);
+            if (!visibleTilePositions.contains(target)) {
                 buttons.remove(button);
             }
         }
 
+        String encodedButtonPrefix =
+                Base64.getUrlEncoder().withoutPadding().encodeToString(buttonPrefix.getBytes(StandardCharsets.UTF_8));
         game.setStoredValue(VALIDATION_KEY, validTargets.toString());
-        buttons.add(Buttons.red("blindSelection~MDL_" + buttonPrefix, "Blind Selection"));
+        buttons.add(Buttons.red("blindSelection~MDL_" + encodedButtonPrefix, "Blind Selection"));
     }
 
     @ButtonHandler("blindSelection~MDL")
     public static void offerBlindSelection(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String buttonIdPrefix = buttonID.replace("blindSelection~MDL_", "");
+        String encodedButtonPrefix = buttonID.replace("blindSelection~MDL_", "");
         TextInput target =
                 TextInput.create(TARGET, TextInputStyle.SHORT).setRequired(true).build();
 
         Modal blindSelectionModal = Modal.create(
-                        "blindSelection_" + event.getMessageId() + "_" + buttonIdPrefix, "Blind Selection")
+                        "blindSelection_" + event.getMessageId() + "_" + encodedButtonPrefix, "Blind Selection")
                 .addComponents(Label.of("Target", target))
                 .build();
 
@@ -78,7 +83,7 @@ public class BlindSelectionService {
     public static void doBlindSelection(ModalInteractionEvent event, Player player, Game game) {
         String[] buttonData = event.getModalId().split("_");
         String origMessageId = buttonData[1];
-        String buttonIdPrefix = buttonData[2];
+        String encodedButtonPrefix = buttonData[2];
         String target = event.getValue(TARGET).getAsString().trim();
 
         if (!PositionMapper.isTilePositionValid(target)) {
@@ -87,8 +92,8 @@ public class BlindSelectionService {
         }
 
         List<Button> chooseTargetButtons = new ArrayList<>();
-        chooseTargetButtons.add(Buttons.blue("blindValidation_" + buttonIdPrefix + "_" + target, target));
-        chooseTargetButtons.add(Buttons.red("blindSelection~MDL_" + buttonIdPrefix, "Change Selection"));
+        chooseTargetButtons.add(Buttons.blue("blindValidation_" + encodedButtonPrefix + "_" + target, target));
+        chooseTargetButtons.add(Buttons.red("blindSelection~MDL_" + encodedButtonPrefix, "Change Selection"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Please select the target:", chooseTargetButtons);
 
@@ -98,7 +103,7 @@ public class BlindSelectionService {
     @ButtonHandler("blindValidation_")
     public static void doBlindValidation(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String[] parts = buttonID.split("_");
-        String buttonIdPrefix = parts[1];
+        String originalButtonPrefix = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
         String target = parts[2];
 
         Button actionButton = null;
@@ -107,7 +112,7 @@ public class BlindSelectionService {
         if (validTargets != null && validTargets.contains(VALID_SEPARATOR + target + VALID_SEPARATOR)) {
             msg = "### 👍 " + target + " is valid for this action.";
             actionButton = Buttons.green(
-                    buttonIdPrefix + "_" + target, event.getButton().getLabel());
+                    originalButtonPrefix + "_" + target, event.getButton().getLabel());
         }
         game.removeStoredValue(VALIDATION_KEY);
 

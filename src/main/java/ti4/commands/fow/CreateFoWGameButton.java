@@ -16,6 +16,7 @@ import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.service.fow.CreateFoWGameService;
 import ti4.service.game.CreateGameService;
+import ti4.spring.jda.JdaService;
 
 class CreateFoWGameButton extends Subcommand {
 
@@ -39,6 +40,11 @@ class CreateFoWGameButton extends Subcommand {
         Member gm = CreateFoWGameService.getGM(event);
         List<Member> members = CreateFoWGameService.getPlayers(event);
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString();
+
+        if (!JdaService.fowServers.isEmpty() && !JdaService.fowServers.contains(event.getGuild())) {
+            MessageHelper.sendMessageToEventChannel(event, "This command can only be run in a FoW Server");
+            return;
+        }
 
         Guild guild = CreateFoWGameService.findFoWGuildWithSpace(event.getGuild(), members.size() + 1);
         if (guild == null) {
