@@ -155,6 +155,22 @@ def remove_blacklisted_keys(
     return cleaned_data
 
 
+def clean_cdn_urls(data: Any) -> Any:
+    """Recursively remove CDN URL references and ?raw=true from data"""
+    CDN_URL = "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources"
+
+    if isinstance(data, dict):
+        return {key: clean_cdn_urls(value) for key, value in data.items()}
+    elif isinstance(data, list):
+        return [clean_cdn_urls(item) for item in data]
+    elif isinstance(data, str):
+        cleaned = data.replace(CDN_URL, "")
+        cleaned = cleaned.replace("?raw=true", "")
+        return cleaned
+    else:
+        return data
+
+
 def aggregate_data(config: Dict[str, Any]) -> List[Dict[str, Any]]:
     """Generic function to aggregate data from JSON files"""
     input_folder = Path(config["input_folder"])
@@ -182,11 +198,13 @@ def aggregate_data(config: Dict[str, Any]) -> List[Dict[str, Any]]:
                 for item in data:
                     if isinstance(item, dict):
                         item = remove_blacklisted_keys(item, config["blacklist"])
+                    item = clean_cdn_urls(item)
                     all_data.append(item)
             else:
                 # If it's a single object or we don't handle arrays
                 if isinstance(data, dict):
                     data = remove_blacklisted_keys(data, config["blacklist"])
+                data = clean_cdn_urls(data)
                 all_data.append(data)
 
             print(f"Processed: {json_file.name}")
