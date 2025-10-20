@@ -588,6 +588,12 @@ public class Mapper {
         return colorModel.getName();
     }
 
+    public static String getColorDisplayName(String color) {
+        ColorModel colorModel = getColor(color);
+        if (colorModel == null) return null;
+        return colorModel.getDisplayName();
+    }
+
     // ####################
     // Combat modifiers
 

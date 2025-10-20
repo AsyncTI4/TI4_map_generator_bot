@@ -1629,6 +1629,12 @@ public class Player extends PlayerProperties {
         return (color != null && !"null".equals(color)) ? Mapper.getColorID(color) : "null";
     }
 
+    @JsonIgnore
+    public String getColorDisplayName() {
+        String color = getColor();
+        return (color != null && !"null".equals(color)) ? Mapper.getColorDisplayName(color) : "null";
+    }
+
     public void addAllianceMember(String color) {
         if (!"null".equals(color)) {
             setAllianceMembers(getAllianceMembers() + color);
