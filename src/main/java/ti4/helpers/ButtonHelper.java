@@ -108,6 +108,7 @@ import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.TileEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
+import ti4.service.fow.BlindSelectionService;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
@@ -3951,6 +3952,7 @@ public class ButtonHelper {
                         "echoPlaceFrontier_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
             }
         }
+        BlindSelectionService.filterForBlindPositionSelection(game, player, buttons, "echoPlaceFrontier");
         return buttons;
     }
 
