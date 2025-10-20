@@ -17,6 +17,8 @@ class ScoreSO extends GameStateSubcommand {
                         "Secret objective ID, which is found between ()")
                 .setRequired(true)
                 .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color who scores the SO")
+                .setAutoComplete(true));
     }
 
     @Override

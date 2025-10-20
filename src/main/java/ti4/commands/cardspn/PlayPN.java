@@ -20,6 +20,8 @@ class PlayPN extends GameStateSubcommand {
                         Constants.PROMISSORY_NOTE_ID,
                         "Promissory note ID, which is found between (), or name/part of name")
                 .setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color who plays the PN")
+                .setAutoComplete(true));
     }
 
     @Override

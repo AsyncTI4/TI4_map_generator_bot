@@ -2958,7 +2958,11 @@ public class ButtonHelper {
         }
         boolean success = game.removeLaw(game.getLaws().get("minister_peace"));
         if (success) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "The _Minister of Peace_ law has been discarded.");
+            String msg = "The _Minister of Peace_ law has been discarded.";
+            MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "## " + game.getPing() + " " + msg);
+            }
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found");
             return;
@@ -6988,6 +6992,11 @@ public class ButtonHelper {
                 player.getFactionEmoji()
                         + " has decided to use the _Imperial Arbiter_ law to swap a strategy card with someone.");
         game.removeLaw("arbiter");
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    "## " + game.getPing() + " The _Imperial Arbiter_ law has been discarded.");
+        }
         List<Button> buttons = ButtonHelperFactionSpecific.getSwapSCButtons(game, "imperialarbiter", player);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
