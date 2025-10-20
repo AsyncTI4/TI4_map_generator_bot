@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Unified script to convert images to WebP and upload to S3.
-Only converts local PNG/JPG files if their WebP equivalent doesn't already exist in S3.
+- Converts local PNG/JPG files to WebP if they don't already exist in S3
+- Copies existing WebP files if they don't already exist in S3
 This avoids unnecessary conversion work when the asset is already on the server.
 """
 
@@ -14,6 +15,7 @@ from botocore.exceptions import NoCredentialsError, ClientError
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import mimetypes
+import shutil
 from PIL import Image
 
 # Set up logging
@@ -93,8 +95,8 @@ def get_all_s3_keys(s3_client, bucket_name, prefix=""):
 
 
 def is_image_file(file_path):
-    """Check if file is a JPG or PNG image."""
-    return file_path.suffix.lower() in [".jpg", ".jpeg", ".png"]
+    """Check if file is a JPG, PNG, or WebP image."""
+    return file_path.suffix.lower() in [".jpg", ".jpeg", ".png", ".webp"]
 
 
 def convert_image_to_webp(source_file, dest_file):
@@ -113,15 +115,23 @@ def convert_image_to_webp(source_file, dest_file):
         return False
 
 
-def upload_file(s3_client, local_file, bucket_name, s3_key):
+def upload_file(s3_client, local_file, bucket_name, s3_key, content_type=None):
     """Upload a single file to S3."""
     try:
+        # Auto-detect content type if not provided
+        if content_type is None:
+            content_type, _ = mimetypes.guess_type(str(local_file))
+            if content_type is None:
+                content_type = "application/octet-stream"
+
         extra_args = {
-            "ContentType": "image/webp",
+            "ContentType": content_type,
             "CacheControl": "max-age=31536000",  # Cache for 1 year
         }
 
-        s3_client.upload_file(str(local_file), bucket_name, s3_key, ExtraArgs=extra_args)
+        s3_client.upload_file(
+            str(local_file), bucket_name, s3_key, ExtraArgs=extra_args
+        )
         return True, None
     except Exception as e:
         return False, str(e)
@@ -129,16 +139,16 @@ def upload_file(s3_client, local_file, bucket_name, s3_key):
 
 def scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, prefix=""):
     """
-    Scan local images and convert only those that don't exist in S3.
+    Scan local images and convert/copy only those that don't exist in S3.
 
     Args:
-        source_dir: Local source directory with PNG/JPG files
-        dest_dir: Temporary directory for WebP conversion
+        source_dir: Local source directory with PNG/JPG/WebP files
+        dest_dir: Temporary directory for WebP conversion/copying
         existing_s3_keys: Set of S3 object keys already in bucket
         prefix: S3 prefix for key comparison
 
     Returns:
-        List of (local_webp_file, s3_key) tuples to upload
+        Tuple: (files_to_upload, converted_count, copied_count, skipped_count, error_count)
     """
     logger.info("=" * 50)
     logger.info("STAGE 1: SCANNING AND CONVERTING IMAGES")
@@ -146,6 +156,7 @@ def scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, prefix=""):
 
     files_to_upload = []
     converted_count = 0
+    copied_count = 0
     skipped_conversion_count = 0
     conversion_error_count = 0
 
@@ -177,22 +188,40 @@ def scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, prefix=""):
             # Need to convert - check if local WebP exists
             dest_file = dest_root / dest_filename
 
-            # Convert the image
-            logger.info(f"[CONVERT] {source_file.name} -> {dest_filename}")
-            if convert_image_to_webp(source_file, dest_file):
-                converted_count += 1
-                files_to_upload.append((dest_file, s3_key))
+            # If source is already WebP, just copy it
+            if source_file.suffix.lower() == ".webp":
+                logger.info(f"[COPY] {source_file.name} (already WebP)")
+                try:
+                    shutil.copy2(source_file, dest_file)
+                    copied_count += 1
+                    files_to_upload.append((dest_file, s3_key))
+                except Exception as e:
+                    logger.error(f"Failed to copy {source_file}: {e}")
+                    conversion_error_count += 1
             else:
-                conversion_error_count += 1
+                # Convert the image
+                logger.info(f"[CONVERT] {source_file.name} -> {dest_filename}")
+                if convert_image_to_webp(source_file, dest_file):
+                    converted_count += 1
+                    files_to_upload.append((dest_file, s3_key))
+                else:
+                    conversion_error_count += 1
 
     logger.info("=" * 50)
     logger.info("CONVERSION SUMMARY:")
     logger.info(f"Images converted: {converted_count}")
+    logger.info(f"WebP files copied: {copied_count}")
     logger.info(f"Conversions skipped (already in S3): {skipped_conversion_count}")
     logger.info(f"Conversion errors: {conversion_error_count}")
     logger.info("=" * 50)
 
-    return files_to_upload, converted_count, skipped_conversion_count, conversion_error_count
+    return (
+        files_to_upload,
+        converted_count,
+        copied_count,
+        skipped_conversion_count,
+        conversion_error_count,
+    )
 
 
 def upload_images(s3_client, files_to_upload, bucket_name):
@@ -253,6 +282,96 @@ def upload_images(s3_client, files_to_upload, bucket_name):
     return uploaded_count, error_count
 
 
+def scan_and_upload_directory(s3_client, source_dir, bucket_name, existing_s3_keys, prefix=""):
+    """
+    Scan a directory and upload all files to S3 that don't already exist.
+
+    Args:
+        s3_client: Boto3 S3 client
+        source_dir: Local directory to upload
+        bucket_name: S3 bucket name
+        existing_s3_keys: Set of S3 object keys already in bucket
+        prefix: S3 prefix for uploaded files
+
+    Returns:
+        Tuple: (uploaded_count, skipped_count, error_count)
+    """
+    if not source_dir.exists():
+        logger.info(f"Directory does not exist: {source_dir}")
+        return 0, 0, 0
+
+    logger.info("=" * 50)
+    logger.info(f"UPLOADING DIRECTORY: {source_dir}")
+    logger.info("=" * 50)
+
+    files_to_upload = []
+    skipped_count = 0
+
+    for root, dirs, files in os.walk(source_dir):
+        root_path = Path(root)
+        relative_path = root_path.relative_to(source_dir)
+
+        for file in files:
+            local_file = root_path / file
+            relative_file_path = relative_path / file
+            s3_key = str(relative_file_path).replace("\\", "/")
+
+            if prefix:
+                s3_key = f"{prefix.rstrip('/')}/{s3_key}"
+
+            # Check if file already exists in S3
+            if s3_key in existing_s3_keys:
+                logger.info(f"[SKIP] Already in S3: {s3_key}")
+                skipped_count += 1
+                continue
+
+            files_to_upload.append((local_file, s3_key))
+
+    if not files_to_upload:
+        logger.info(f"No new files to upload from {source_dir}")
+        return 0, skipped_count, 0
+
+    logger.info(f"Found {len(files_to_upload)} new files to upload")
+
+    uploaded_count = 0
+    error_count = 0
+
+    # Upload files concurrently
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        future_to_file = {
+            executor.submit(upload_file, s3_client, local_file, bucket_name, s3_key): (
+                local_file,
+                s3_key,
+            )
+            for local_file, s3_key in files_to_upload
+        }
+
+        for future in as_completed(future_to_file):
+            local_file, s3_key = future_to_file[future]
+            try:
+                success, error = future.result()
+                if success:
+                    uploaded_count += 1
+                    logger.info(
+                        f"[UPLOAD] ({uploaded_count}/{len(files_to_upload)}): {s3_key}"
+                    )
+                else:
+                    error_count += 1
+                    logger.error(f"[ERROR] Failed to upload {s3_key}: {error}")
+            except Exception as e:
+                error_count += 1
+                logger.error(f"Upload task failed for {s3_key}: {e}")
+
+    logger.info("=" * 50)
+    logger.info(f"UPLOAD SUMMARY for {source_dir}:")
+    logger.info(f"Files uploaded: {uploaded_count}")
+    logger.info(f"Files skipped: {skipped_count}")
+    logger.info(f"Upload errors: {error_count}")
+    logger.info("=" * 50)
+
+    return uploaded_count, skipped_count, error_count
+
+
 def main():
     """Main function to run the unified conversion and upload process."""
     parser = argparse.ArgumentParser(
@@ -268,11 +387,11 @@ def main():
     )
     parser.add_argument(
         "--source-dir",
-        help="Source directory with PNG/JPG images (default: src/main/resources)",
+        help="Source directory with PNG/JPG/WebP images (default: src/main/resources)",
     )
     parser.add_argument(
         "--dest-dir",
-        help="Destination directory for WebP conversion (default: src/main/webp)",
+        help="Destination directory for WebP conversion/copying (default: src/main/webp)",
     )
 
     args = parser.parse_args()
@@ -321,8 +440,8 @@ def main():
         logger.info(f"Found {len(existing_s3_keys)} existing objects in S3")
 
         # Scan local images and convert only new ones
-        files_to_upload, converted, skipped_conv, conv_errors = scan_and_convert_images(
-            source_dir, dest_dir, existing_s3_keys, args.prefix
+        files_to_upload, converted, copied, skipped_conv, conv_errors = (
+            scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, args.prefix)
         )
 
         if conv_errors > 0:
@@ -331,17 +450,29 @@ def main():
         # Upload converted images
         uploaded, upload_errors = upload_images(s3_client, files_to_upload, args.bucket)
 
+        # Upload TypeScript files from web_data directory
+        script_dir = Path(__file__).parent
+        project_root = script_dir.parent
+        web_data_dir = project_root / "web_data"
+
+        web_uploaded, web_skipped, web_errors = scan_and_upload_directory(
+            s3_client, web_data_dir, args.bucket, existing_s3_keys, prefix="web_data"
+        )
+
         # Final summary
         logger.info("=" * 50)
         logger.info("FINAL SUMMARY:")
         logger.info(f"Images converted: {converted}")
+        logger.info(f"WebP files copied: {copied}")
         logger.info(f"Conversions skipped (already in S3): {skipped_conv}")
-        logger.info(f"Files uploaded: {uploaded}")
+        logger.info(f"Image files uploaded: {uploaded}")
+        logger.info(f"Web data files uploaded: {web_uploaded}")
+        logger.info(f"Web data files skipped: {web_skipped}")
         logger.info(f"Conversion errors: {conv_errors}")
-        logger.info(f"Upload errors: {upload_errors}")
+        logger.info(f"Upload errors: {upload_errors + web_errors}")
         logger.info("=" * 50)
 
-        total_errors = conv_errors + upload_errors
+        total_errors = conv_errors + upload_errors + web_errors
         if total_errors > 0:
             logger.warning(f"Completed with {total_errors} total errors")
             sys.exit(1)
