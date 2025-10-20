@@ -20,7 +20,7 @@
         "faction": "arborec"
     },
     {
-        "alias": "tf-bioplasmosis",
+        "alias": "tf-bio",
         "name": "Bioplasmosis",
         "types": [
             "BIOTIC"
@@ -98,7 +98,7 @@
         "faction": "saar"
     },
     {
-        "alias": "tf-chaosmapping",
+        "alias": "tf-chaos",
         "name": "Chaos Mapping",
         "types": [
             "CYBERNETIC"
@@ -118,7 +118,7 @@
         "faction": "muaat"
     },
     {
-        "alias": "tf-starforge",
+        "alias": "tf-star_forge",
         "name": "Star Forge",
         "types": [
             "CYBERNETIC"
@@ -128,7 +128,7 @@
         "faction": "muaat"
     },
     {
-        "alias": "tf-magmusreactor",
+        "alias": "tf-mr",
         "name": "Magmus Reactor",
         "types": [
             "PROPULSION"
@@ -138,22 +138,22 @@
         "faction": "muaat"
     },
     {
-        "alias": "tf-guildships",
+        "alias": "tf-guild_ships",
         "name": "Guild Ships",
         "types": [
             "PROPULSION"
         ],
-        "text": "You can negotiate transactions with players who are not your neighbor.",
+        "text": "You can negotiate transactions with players who are not your neighbor. When you are negotiating a transaction, action cards can be exchanged as part of the transaction.",
         "source": "twilights_fall",
         "faction": "hacan"
     },
     {
-        "alias": "tf-arbiters",
-        "name": "Arbiters",
+        "alias": "tf-sledfactories",
+        "name": "Sled Factories",
         "types": [
             "CYBERNETIC"
         ],
-        "text": "When you are negotiating a transaction, action cards can be exchanged as part of the transaction.",
+        "text": "When 1 or more of your units use PRODUCTION: Reduce the combined cost of the produced units by 2.",
         "source": "twilights_fall",
         "faction": "hacan"
     },
@@ -178,12 +178,12 @@
         "faction": "sol"
     },
     {
-        "alias": "tf-orbitaldrop",
+        "alias": "tf-orbital_drop",
         "name": "Orbital Drop",
         "types": [
             "BIOTIC"
         ],
-        "text": "ACTION: Spend 1 token from your strategy pool to place 2 infantry from your reinforcement son 1 planet you control.",
+        "text": "ACTION: Spend 1 token from your strategy pool to place 2 infantry from your reinforcements on 1 planet you control.",
         "source": "twilights_fall",
         "faction": "sol"
     },
@@ -198,7 +198,7 @@
         "faction": "sol"
     },
     {
-        "alias": "tf-quantumentaglement",
+        "alias": "tf-quantum_entanglement",
         "name": "Quantum Entanglement",
         "types": [
             "PROPULSION"
@@ -278,7 +278,7 @@
         "faction": "mentak"
     },
     {
-        "alias": "tf-mirrorcomputing",
+        "alias": "tf-mc",
         "name": "Mirror Computing",
         "types": [
             "CYBERNETIC"
@@ -303,12 +303,12 @@
         "types": [
             "BIOTIC"
         ],
-        "text": "At the end of the strategy phase: Place the Twilight Fall \"0\" token on your strategy card; you are first in initiative order.",
+        "text": "At the end of the strategy phase: Place the Twilight Fall \"0\" token on your strategy card; you are first in initiative order. This card cannot have a singularity token placed on it.",
         "source": "twilights_fall",
         "faction": "naalu"
     },
     {
-        "alias": "tf-neuroglaive",
+        "alias": "tf-ng",
         "name": "Neuroglaive",
         "types": [
             "WARFARE"
@@ -378,7 +378,7 @@
         "faction": "sardakk"
     },
     {
-        "alias": "tf-spatialconduit",
+        "alias": "tf-scc",
         "name": "Spatial Conduit Cylinder",
         "types": [
             "PROPULSION"
@@ -388,7 +388,7 @@
         "faction": "jolnar"
     },
     {
-        "alias": "tf-eres",
+        "alias": "tf-ers",
         "name": "E-Res Siphons",
         "types": [
             "CYBERNETIC"
@@ -418,7 +418,7 @@
         "faction": "winnu"
     },
     {
-        "alias": "tf-hegemonic",
+        "alias": "tf-htp",
         "name": "Hegemonic Trade Policy",
         "types": [
             "CYBERNETIC"
@@ -438,7 +438,7 @@
         "faction": "winnu"
     },
     {
-        "alias": "tf-instincttraining",
+        "alias": "tf-it",
         "name": "Instinct Training",
         "types": [
             "BIOTIC"
@@ -448,7 +448,7 @@
         "faction": "xxcha"
     },
     {
-        "alias": "tf-nullificationfield",
+        "alias": "tf-nf",
         "name": "Nullification Field",
         "types": [
             "CYBERNETIC"
@@ -478,8 +478,8 @@
         "faction": "yin"
     },
     {
-        "alias": "tf-overdrive",
-        "name": "Overdrive",
+        "alias": "tf-devotion",
+        "name": "Devotion",
         "types": [
             "PROPULSION"
         ],
@@ -518,7 +518,7 @@
         "faction": "yssaril"
     },
     {
-        "alias": "tf-stalltactics",
+        "alias": "tf-stall_tactics",
         "name": "Stall Tactics",
         "types": [
             "PROPULSION"
@@ -543,7 +543,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "When you gain trade goods form choosing a previously unchosen strategy card, triple those trade goods.",
+        "text": "When you gain trade goods form choosing a previously unchosen strategy card or from the Amicus strategy card, triple those trade goods.",
         "source": "twilights_fall",
         "faction": "nomad"
     },
@@ -553,7 +553,7 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "After any player's genome becomes exhausted, you may spend 3 influence to ready that genomel iof you ready another player's genome you may perform a transaction with that player. ",
+        "text": "After any player's genome becomes exhausted, you may spend 3 influence to ready that genome. If you ready another player's genome you may perform a transaction with that player. ",
         "source": "twilights_fall",
         "faction": "nomad"
     },
@@ -563,7 +563,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "Planets that contain your structures have their resource and influence values increased by 1 and are treated as having all 3 planet traits (Cultural, Hazardous, and Industrial).",
+        "text": "Planets that contain your structures are treated as having all 3 planet traits (Cultural, Hazardous, and Industrial).",
         "source": "twilights_fall",
         "faction": "titans"
     },
@@ -598,7 +598,7 @@
         "faction": "naaz"
     },
     {
-        "alias": "tf-distantsuns",
+        "alias": "tf-distant_suns",
         "name": "Distant Suns",
         "types": [
             "PROPULSION"
@@ -718,8 +718,8 @@
         "faction": "bastion"
     },
     {
-        "alias": "tf-dangerclose",
-        "name": "Danger Close",
+        "alias": "tf-proxima",
+        "name": "Proxima Targeting VI",
         "types": [
             "WARFARE"
         ],
@@ -738,7 +738,7 @@
         "faction": "bastion"
     },
     {
-        "alias": "tf-subatomicsplicer",
+        "alias": "tf-subatomic",
         "name": "Subatomic Splicer",
         "types": [
             "CYBERNETIC"
@@ -778,8 +778,8 @@
         "faction": "deepwrought"
     },
     {
-        "alias": "tf-researchtheory",
-        "name": "Research Theory",
+        "alias": "tf-radicaladvancement",
+        "name": "Radical Advancement",
         "types": [
             "BIOTIC"
         ],

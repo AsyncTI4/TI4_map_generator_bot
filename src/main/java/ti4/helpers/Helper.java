@@ -122,7 +122,7 @@ public class Helper {
         if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
             return false;
         }
-        if (player.hasTech("tp")
+        if ((player.hasTech("tp") || player.hasTech("tf-crafty"))
                 && game.getActivePlayerID() != null
                 && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
             for (Player p2 : game.getRealPlayers()) {
@@ -1262,9 +1262,21 @@ public class Helper {
         for (String thing : spentThings) {
             boolean found = false;
             switch (thing) {
+                case "dwsDiscount" -> {
+                    msg.append("> Used Deepwrought's Commander Discount ")
+                            .append(MiscEmojis.Resources_1)
+                            .append("\n");
+                    res += 1;
+                    found = true;
+                }
                 case "sarween" -> {
                     msg.append("> Used _Sarween Tools_ " + TechEmojis.CyberneticTech + "\n");
                     res += 1;
+                    found = true;
+                }
+                case "sledfactories" -> {
+                    msg.append("> Used _Sled Factories_ " + TechEmojis.CyberneticTech + "\n");
+                    res += 2;
                     found = true;
                 }
                 case "absol_sarween" -> {
@@ -1903,7 +1915,8 @@ public class Helper {
                 UnitModel removedUnit =
                         player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
                 if (!"flagship".equalsIgnoreCase(removedUnit.getBaseType())
-                        || !game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")) {
+                        || (!game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")
+                                && !player.hasTech("tf-quantumdrive"))) {
                     cost += (int) removedUnit.getCost() * entry.getValue();
                 }
                 totalUnits += entry.getValue();

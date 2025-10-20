@@ -751,6 +751,13 @@ public class UnfiledButtonHandlers {
                 MessageHelper.sendMessageToChannel(event.getChannel(), msg);
                 event.getMessage().editMessage(exhaustedMessage).queue();
             }
+            case "tf-sledfactories" -> { // Sarween Tools
+                player.addSpentThing("sledfactories");
+                String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
+                ButtonHelper.deleteTheOneButton(event, event.getButton().getCustomId(), false);
+
+                event.getMessage().editMessage(exhaustedMessage).queue();
+            }
             case "absol_st" -> { // Absol's Sarween Tools
                 player.addSpentThing("absol_sarween");
                 String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
@@ -1973,7 +1980,10 @@ public class UnfiledButtonHandlers {
                     }
                 }
                 if ("statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
-                    if (player.hasAbility("versatile") || player.hasTech("hm") || cyber) {
+                    if (player.hasAbility("versatile")
+                            || player.hasTech("hm")
+                            || cyber
+                            || player.hasTech("tf-inheritancesystems")) {
                         int properGain = 2;
                         String reasons = "";
                         if (player.hasAbility("versatile")) {
@@ -1983,6 +1993,10 @@ public class UnfiledButtonHandlers {
                         if (player.hasTech("hm")) {
                             properGain += 1;
                             reasons += (properGain == 1 ? "" : ", ") + "_Hyper Metabolism_";
+                        }
+                        if (player.hasTech("tf-inheritancesystems")) {
+                            properGain += 1;
+                            reasons += (properGain == 1 ? "" : ", ") + "_Inheritance Systems_";
                         }
                         if (cyber) {
                             properGain += 1;
@@ -2107,12 +2121,20 @@ public class UnfiledButtonHandlers {
                             "Exhaust AI Development Algorithm (" + ButtonHelper.getNumberOfUnitUpgrades(player) + "r)",
                             TechEmojis.WarfareTech));
                 }
-                if (player.hasTechReady("st")
+                if (player.hasTech("st")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red("useTech_st", "Use Sarween Tools", TechEmojis.CyberneticTech));
+                }
+                if (player.hasTechReady("tf-sledfactories")
+                        && !"muaatagent".equalsIgnoreCase(buttonID)
+                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
+                        && !buttonID.contains("integrated")) {
+                    buttons.add(
+                            Buttons.red("useTech_tf-sledfactories", "Use Sled Factories", TechEmojis.CyberneticTech));
                 }
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     buttons.add(Buttons.red("useRelic_boon", "Use Boon Of The Cerulean God Relic"));
@@ -3297,7 +3319,10 @@ public class UnfiledButtonHandlers {
                     cyber = true;
                 }
             }
-            if (player.hasAbility("versatile") || player.hasTech("hm") || cyber) {
+            if (player.hasAbility("versatile")
+                    || player.hasTech("hm")
+                    || cyber
+                    || player.hasTech("tf-inheritancesystems")) {
                 int properGain = 2;
                 String reasons = "";
                 if (player.hasAbility("versatile")) {
@@ -3307,6 +3332,10 @@ public class UnfiledButtonHandlers {
                 if (player.hasTech("hm")) {
                     properGain += 1;
                     reasons += (properGain == 1 ? "" : ", ") + "_Hyper Metabolism_";
+                }
+                if (player.hasTech("tf-inheritancesystems")) {
+                    properGain += 1;
+                    reasons += (properGain == 1 ? "" : ", ") + "_Inheritance Systems_";
                 }
                 if (cyber) {
                     properGain += 1;

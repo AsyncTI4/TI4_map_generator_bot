@@ -1274,9 +1274,8 @@ public class AgendaHelper {
 
         boolean playerPrevotesIsEmpty =
                 game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
-        boolean playerIsNotActivePlayer =
-                (player != game.getActivePlayer() || "agendaWaiting".equalsIgnoreCase(game.getPhaseOfGame()));
-        boolean playerIsPrevoting = !playerPrevotesIsEmpty && playerIsNotActivePlayer;
+        boolean playerIsNotActivePlayer = "agendaWaiting".equalsIgnoreCase(game.getPhaseOfGame());
+        boolean playerIsPrevoting = !playerPrevotesIsEmpty || playerIsNotActivePlayer;
         if (playerIsPrevoting) {
             if ("0".equalsIgnoreCase(votes)) {
                 MessageHelper.sendMessageToChannel(
@@ -3450,9 +3449,13 @@ public class AgendaHelper {
             voteCount = baseResourceCount + baseInfluenceCount;
         }
 
-        boolean executive = player.getFaction().equals(game.getStoredValue("executiveOrder"));
+        boolean executive = player.getFaction().equalsIgnoreCase(game.getStoredValue("executiveOrder"));
         if (player.hasUnlockedBreakthrough("xxchabt") || executive) {
             voteCount = Math.max(baseResourceCount, baseInfluenceCount);
+        }
+
+        if (executive) {
+            voteCount += player.getTg();
         }
 
         // Xxcha Alliance - +1 vote for each planet
