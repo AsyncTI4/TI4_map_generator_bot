@@ -26,7 +26,6 @@ public class EventAuditService {
                         thread && button.getMessageChannel().getName().contains("Draft Bag-");
                 if (cardThread
                         || draftThread
-                        || isFow
                         || button.getButton().getCustomId().contains("anonDeclare")
                         || button.getButton().getCustomId().contains("requestAllFollow")) {
                     yield "someone pressed button: [CLASSIFIED]";
