@@ -1987,6 +1987,10 @@ public class Game extends GameProperties {
         return getSecretObjectives().remove(id);
     }
 
+    public boolean removeRelicFromGame(String id) {
+        return relics.remove(id);
+    }
+
     public boolean removePOFromGame(String id) {
         if (publicObjectives1.remove(id)) return true;
         if (publicObjectives2.remove(id)) return true;

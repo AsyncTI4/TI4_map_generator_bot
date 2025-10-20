@@ -316,6 +316,10 @@ public class AutoCompleteProvider {
                         .filter(unit -> (unit.getId() + " " + unit.getName())
                                 .toLowerCase()
                                 .contains(enteredValue))
+                        .filter(model -> model.getSource() != ComponentSource.miltymod
+                                && model.getSource() != ComponentSource.project_pi
+                                && model.getSource() != ComponentSource.twilights_fall
+                                && model.getSource() != ComponentSource.asteroid)
                         .limit(25)
                         .map(unit -> new Command.Choice(unit.getId() + " (" + unit.getName() + ")", unit.getId()))
                         .collect(Collectors.toList());
@@ -632,7 +636,9 @@ public class AutoCompleteProvider {
             }
             case Constants.DRAFT_MODE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<FrankenDraftMode> modes = Arrays.asList(FrankenDraftMode.values());
+                List<FrankenDraftMode> modes = new ArrayList<>();
+                modes.addAll(Arrays.asList(FrankenDraftMode.values()));
+                modes.remove(FrankenDraftMode.TWILIGHTSFALL);
                 List<Command.Choice> options = modes.stream()
                         .filter(mode -> mode.search(enteredValue))
                         .limit(25)
