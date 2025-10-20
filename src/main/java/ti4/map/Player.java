@@ -70,6 +70,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
+import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -421,6 +422,7 @@ public class Player extends PlayerProperties {
         return getTechs().contains("cl2")
                 || getTechs().contains("so2")
                 || getTechs().contains("inf2")
+                || getTechs().contains("tf-specops")
                 || getTechs().contains("lw2")
                 || getTechs().contains("batyriinf")
                 || getTechs().contains("dscymiinf")
@@ -675,6 +677,9 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasUnit(String unitID) {
+        if (unitID.contains("flagship") && hasUnlockedBreakthrough("nekrobt")) {
+            return ValefarZService.hasFlagshipAbility(getGame(), this, unitID);
+        }
         return getUnitsOwned().contains(unitID);
     }
 

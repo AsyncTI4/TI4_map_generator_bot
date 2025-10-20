@@ -296,7 +296,7 @@ public class TacticalActionOutputService {
         if (player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
             bonusMoveValue++;
         }
-        if (player.hasAbility("slipstream") && (tileHasWormhole || movingFromHome)) {
+        if (player.hasAbility("slipstream") && (tileHasWormhole || (movingFromHome && !game.isTwilightsFallMode()))) {
             bonusMoveValue++;
         }
         if (!game.getStoredValue("crucibleBoost").isEmpty()) {

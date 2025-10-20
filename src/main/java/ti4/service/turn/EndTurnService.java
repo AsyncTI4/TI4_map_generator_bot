@@ -140,6 +140,7 @@ public class EndTurnService {
                         mainPlayer.getCardsInfoThread(),
                         "You were the last player to pass, and so you can score _Prove Endurance_.");
             }
+            CommanderUnlockCheckService.checkPlayer(mainPlayer, "ralnel");
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, mainPlayer, event)) {
                 EndPhaseService.EndActionPhase(event, game, gameChannel);
                 game.updateActivePlayer(null);

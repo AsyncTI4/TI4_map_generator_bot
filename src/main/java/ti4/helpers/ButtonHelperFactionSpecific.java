@@ -903,7 +903,8 @@ public class ButtonHelperFactionSpecific {
 
     public static void checkForStymie(Game game, Player activePlayer, Tile tile) {
         for (Player p2 : ButtonHelper.getOtherPlayersWithUnitsInTheSystem(activePlayer, game, tile)) {
-            if (p2.getPromissoryNotes().containsKey("stymie") && game.getPNOwner("stymie") != p2) {
+            if ((p2.getPromissoryNotes().containsKey("stymie") && game.getPNOwner("stymie") != p2)
+                    || p2.hasTech("tf_stymie")) {
                 String msg = p2.getRepresentationUnfogged() + ", you have the opportunity to _Stymie_ "
                         + activePlayer.getFactionEmojiOrColor() + ".";
                 List<Button> buttons = new ArrayList<>();
@@ -931,7 +932,9 @@ public class ButtonHelperFactionSpecific {
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         event.getMessage().delete().queue();
-        PromissoryNoteHelper.resolvePNPlay("stymie", player, game, event);
+        if (!game.isTwilightsFallMode()) {
+            PromissoryNoteHelper.resolvePNPlay("stymie", player, game, event);
+        }
     }
 
     @ButtonHandler("stymiePlayerStep2_")
@@ -2619,6 +2622,9 @@ public class ButtonHelperFactionSpecific {
             Tile tile,
             UnitHolder uH) {
         Player cabal = Helper.getPlayerFromAbility(game, "devour");
+        if (cabal == null) {
+            Helper.getPlayerFromAbility(game, "amalgamation");
+        }
         if (cabal == owner) {
             cabal = null;
         }
@@ -3539,6 +3545,66 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(
                     p2.getCorrectChannel(),
                     p2.getRepresentationUnfogged() + " _Temporal Command Suite_ was exhausted by " + player.getColor()
+                            + " to ready your " + agent + ".");
+        }
+        event.getMessage().delete().queue();
+    }
+
+    @ButtonHandler("useTCS_")
+    public static void resolveTCSUse(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        buttonID = buttonID.replace("absol_jr", "absoljr");
+        String agent = buttonID.split("_")[1];
+        String faction = buttonID.split("_")[2];
+        Player p2 = game.getPlayerFromColorOrFaction(faction);
+        if (p2 == null) return;
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
+        Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+        buttons.add(DoneExhausting);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(), "Use Buttons to Pay 3 influence", buttons);
+        Leader playerLeader = p2.getLeader(agent).orElse(null);
+        if (playerLeader == null) {
+            if (agent.contains("titanprototype")) {
+                p2.removeExhaustedRelic("titanprototype");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getFactionEmoji() + " spent 3 influence via _ Temporal Command Suite_ to ready " + agent
+                                + ", owned by " + p2.getColor() + ".");
+                if (p2 != player) {
+                    MessageHelper.sendMessageToChannel(
+                            p2.getCorrectChannel(),
+                            p2.getRepresentationUnfogged() + " 3 influence was spent by " + player.getColor()
+                                    + " to ready your " + agent + ".");
+                }
+                event.getMessage().delete().queue();
+            }
+            if (agent.contains("absol")) {
+                p2.removeExhaustedRelic("absol_jr");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getFactionEmoji() + " spent 3 influence via _ Temporal Command Suite_ to ready " + agent
+                                + ", owned by " + p2.getColor() + ".");
+                if (p2 != player) {
+                    MessageHelper.sendMessageToChannel(
+                            p2.getCorrectChannel(),
+                            p2.getRepresentationUnfogged() + " 3 influence was spent by " + player.getColor()
+                                    + " to ready your " + agent + ".");
+                }
+                event.getMessage().delete().queue();
+            }
+            return;
+        }
+        RefreshLeaderService.refreshLeader(p2, playerLeader, game);
+
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getFactionEmoji() + " spent 3 influence via _Temporal Command Suite_ to ready " + agent
+                        + ", owned by " + p2.getColor() + ".");
+
+        if (p2 != player) {
+            MessageHelper.sendMessageToChannel(
+                    p2.getCorrectChannel(),
+                    p2.getRepresentationUnfogged() + " 3 influence was spent by " + player.getColor()
                             + " to ready your " + agent + ".");
         }
         event.getMessage().delete().queue();

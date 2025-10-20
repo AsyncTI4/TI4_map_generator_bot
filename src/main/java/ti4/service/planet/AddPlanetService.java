@@ -386,6 +386,24 @@ public class AddPlanetService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
 
+        if (player.hasAbility("liberate") && tile != null && !setup) {
+            // When you gain control of a planet
+            // (MUST) ready that planet if it contains a number of your infantry equal to or greater than that planet's
+            // resource value;
+            // otherwise, place 1 infantry on that planet.
+            List<Button> liberateButtons = new ArrayList<>();
+            String planetStr = unitHolder.getName();
+            String planetName = Mapper.getPlanet(planetStr).getName();
+            liberateButtons.add(Buttons.gray(
+                    player.getFinsFactionCheckerPrefix() + "liberate_" + planetStr,
+                    "Liberate " + planetName,
+                    FactionEmojis.Bastion));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    "Resolve Liberate on " + planetName + " (Before OR after exploration)",
+                    liberateButtons);
+        }
+
         if (game.getActivePlayerID() != null
                 && !("".equalsIgnoreCase(game.getActivePlayerID()))
                 && player.hasUnexhaustedLeader("vaylerianagent")
@@ -511,6 +529,7 @@ public class AddPlanetService {
         if (((game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID())))
                         || game.getPhaseOfGame().contains("agenda"))
                 && player.hasUnit("saar_mech")
+                && !ButtonHelper.isLawInPlay(game, "articles_war")
                 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
             List<Button> saarButton = new ArrayList<>();
             saarButton.add(Buttons.green(

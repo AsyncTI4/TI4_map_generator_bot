@@ -54,6 +54,34 @@ public class DiscordantStarsHelper {
         }
     }
 
+    public static void checkTFTerraform(Game game) {
+        List<String> planets = new ArrayList<>();
+        for (Player player : game.getRealPlayers()) {
+            if (player.hasTech("tf-terraform")) {
+
+                for (Tile tile : game.getTileMap().values()) {
+                    for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                        if (unitHolder instanceof Planet planet) {
+                            if (player.getPlanets().contains(planet.getName())) {
+                                if (!planet.hasStructures(game)
+                                        && planet.getTokenList().contains("attachment_threetraits.png")) {
+                                    planet.removeToken("attachment_threetraits.png");
+                                } else if (planet.hasStructures(game)) {
+                                    planet.addToken("attachment_threetraits.png");
+                                    planets.add(planet.getName());
+                                }
+                            } else if (planet.getTokenList().contains("attachment_threetraits.png")
+                                    && !planets.contains(planet.getName())) {
+
+                                planet.removeToken("attachment_threetraits.png");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public static void checkTombWorlds(Game game) {
         Player player = Helper.getPlayerFromAbility(game, "tomb_worlds");
         if (player == null) {

@@ -36,6 +36,9 @@ public class WhisperService {
             player1 = player.getFactionEmoji() + "(" + StringUtils.capitalize(player.getFaction()) + ") " + player1;
         }
         for (Player player2 : game.getRealPlayers()) {
+            if("".equalsIgnoreCase(player2.getPing())){
+                continue;
+            }
             msg = msg.replace(player2.getPing(), player2.getUserName());
         }
 

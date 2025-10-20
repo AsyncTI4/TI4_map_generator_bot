@@ -320,8 +320,7 @@ public class MiltyService {
             breakthrough = "keleresbt";
         }
         // BREAKTHROUGH
-        if (game.isThundersEdge() && Mapper.getBreakthrough(breakthrough) != null) {
-
+        if (Mapper.getBreakthrough(breakthrough) != null) {
             player.setBreakthroughID(breakthrough);
             player.setBreakthroughUnlocked(false);
             player.setBreakthroughExhausted(false);
