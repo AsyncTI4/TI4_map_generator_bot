@@ -1,11 +1,11 @@
 {
     "id": "sig01",
-    "name": "Garbozia",
+    "name": "Bozgarbia",
     "aliases": [
         "sig01",
-        "garbozia"
+        "bozgarbia"
     ],
-    "imagePath": "SIG01_Garbozia.png",
+    "imagePath": "SIG01_Bozgarbia.png",
     "shipPositionsType": "TYPE04",
     "spaceTokenLocations": [
         {
@@ -27,7 +27,7 @@
     ],
     "wormholes": [],
     "planets": [
-        "garbozia"
+        "bozgarbia"
     ],
     "source": "sigma",
     "tileBack": "blue"

@@ -1,9 +1,9 @@
 {
-    "id": "garbozia",
+    "id": "bozgarbia",
     "tileId": "sig01",
-    "name": "Garbozia",
+    "name": "Bozgarbia",
     "aliases": [
-        "garbozia"
+        "bozgarbia"
     ],
     "positionInTile": {
         "x": 170.0,
@@ -16,10 +16,10 @@
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": "The Wasteland",
-    "legendaryAbilityText": "When you explore Garbozia, draw 1 card from each planet exploration deck. Choose 1 to resolve, and discard the rest.\nYou may exhaust this card at the end of your turn to explore Garbozia",
+    "legendaryAbilityText": "When you explore Bozgarbia, draw 1 card from each planet exploration deck. Choose 1 to resolve, and discard the rest.\nYou may exhaust this card at the end of your turn to explore Bozgarbia",
     "legendaryAbilityFlavourText": "*Thousands of years of garbage fills once majestic canyons, endlessly strewn over the moon's surface. Who knows what ancient treasure lays amongst the trash?*",
     "unitPositions": {
-        "unitHolderName": "garbozia",
+        "unitHolderName": "bozgarbia",
         "coordinateMap": {
             "control": [
                 {

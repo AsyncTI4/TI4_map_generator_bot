@@ -12,6 +12,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
+import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.map.helper.GameHelper;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
@@ -47,6 +49,7 @@ public class DataMigrationManager {
 
     static {
         migrations = new HashMap<>();
+        migrations.put("renameGarboziaToBozgarbia_201025", DataMigrationManager::renameGarboziaToBozgarbia_201025);
         // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
@@ -143,4 +146,21 @@ public class DataMigrationManager {
         }
         return migrationsApplied;
     }
+
+    private static Boolean renameGarboziaToBozgarbia_201025(Game game) {
+        for (Tile t : game.getTileMap().values()) {
+            if (t.getTileID().equals("sig01")) {
+                for (Player p : game.getPlayers().values()) {
+                    if (p.getPlanets().remove("garbozia"))
+                        p.getPlanets().add("bozgarbia");
+                    if (p.getExhaustedPlanets().remove("garbozia"))
+                        p.getExhaustedPlanets().add("bozgarbia");
+                    if (p.getExhaustedPlanetsAbilities().remove("garbozia"))
+                        p.getExhaustedPlanetsAbilities().add("bozgarbia");
+                }
+                return true;
+            }
+        }
+        return false;
+    } 
 }
