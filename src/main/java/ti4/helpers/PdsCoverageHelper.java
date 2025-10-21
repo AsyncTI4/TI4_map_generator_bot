@@ -53,7 +53,7 @@ public class PdsCoverageHelper {
                 for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
                     // Check for Imperial II HQ on Mecatol Rex
                     if (sameTile && Constants.MECATOLS.contains(unitHolder.getName())) {
-                        if (player.controlsMecatol(false) && player.getTechs().contains("iihq")) {
+                        if (player.controlsMecatol(false) && player.getPlanets().contains("custodia_vigilia")) {
                             diceCount.add(5 - mod);
                         }
                     }
@@ -112,7 +112,7 @@ public class PdsCoverageHelper {
                 Collections.sort(diceCount);
 
                 // Apply Plasma Scoring tech (duplicate best die)
-                if (player.getTechs().contains("ps")) {
+                if (player.hasTech("ps")) {
                     diceCount.addFirst(diceCount.getFirst());
                 }
 

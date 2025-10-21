@@ -87,7 +87,7 @@ public class CheckDistanceHelper {
                                     && player != null
                                     && !player.hasAbility("celestial_being")
                                     && !player.getRelics().contains("circletofthevoid")
-                                    && !player.getAbilities().contains("voidborn")
+                                    && !player.hasAbility("voidborn")
                                     && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2)
                                     && !ButtonHelper.isLawInPlay(game, "shared_research"))
                             || (tile.isSupernova()
@@ -95,7 +95,8 @@ public class CheckDistanceHelper {
                                     && !player.hasAbility("celestial_being")
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2)
-                                    && !player.getAbilities().contains("gashlai_physiology"))
+                                    && !player.hasAbility("gashlai_physiology")
+                                    && !player.hasTech("tf-mr"))
                             || (player != null
                                     && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
                                     && !player.hasTech("lwd")
@@ -107,10 +108,10 @@ public class CheckDistanceHelper {
                             || (tile.isAsteroidField()
                                     && player != null
                                     && !player.hasAbility("celestial_being")
-                                    && !player.getTechs().contains("amd")
-                                    && !player.getTechs().contains("wavelength")
+                                    && !player.hasTech("amd")
+                                    && !player.hasTech("wavelength")
                                     && !player.getRelics().contains("circletofthevoid")
-                                    && !player.getTechs().contains("absol_amd")
+                                    && !player.hasTech("absol_amd")
                                     && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2))) {
                         continue;
                     }

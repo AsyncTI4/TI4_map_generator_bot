@@ -126,6 +126,17 @@ public class ScorePublicObjectiveService {
                     + player.getCCRepresentation() + ". Use buttons to gain 1 command token.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
+        if (player.hasTech("tf-yinascendant") && !poName.toLowerCase().contains("custodian")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), player.getRepresentation() + " gains 1 card due to Yin Ascendant.");
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
+            buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
+            buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
+            buttons.add(Buttons.red("deleteButtons", "Done resolving"));
+            String message2 = player.getRepresentationUnfogged() + " use buttons to resolve.";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+        }
         if (!poName.toLowerCase().contains("custodian")
                 && (player.hasAbility("yin_breakthrough") || player.hasUnlockedBreakthrough("yinbt"))) {
             BreakthroughHelper.resolveYinBreakthroughAbility(game, player);

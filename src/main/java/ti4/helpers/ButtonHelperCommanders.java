@@ -719,6 +719,16 @@ public class ButtonHelperCommanders {
                 }
             }
         }
+        if (player.hasTech("tf-peaceaccords")) {
+            List<Button> buttons2 = ButtonHelperAbilities.getXxchaPeaceAccordsButtons(
+                    game, player, event, player.getFinsFactionCheckerPrefix());
+            if (!buttons2.isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged() + ", please resolve **Peace Accords**.",
+                        buttons2);
+            }
+        }
     }
 
     public static void resolveNekroCommanderCheck(Player player, String tech, Game game) {

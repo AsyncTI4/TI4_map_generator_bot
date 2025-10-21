@@ -21,15 +21,19 @@ public class TradeStrategyCardService {
         if (event instanceof ButtonInteractionEvent e) {
             reacted = true;
         }
+        int num = 3;
+        if (player.hasTech("tf-futurepath")) {
+            num = 9;
+        }
         ButtonHelperStats.replenishComms(event, game, player, reacted);
         if (event instanceof ButtonInteractionEvent e) {
-            String msg = " gained 3" + MiscEmojis.getTGorNomadCoinEmoji(game) + " " + player.gainTG(3)
+            String msg = " gained " + num + MiscEmojis.getTGorNomadCoinEmoji(game) + " " + player.gainTG(num)
                     + " and replenished commodities (" + oldComm + " -> " + player.getCommodities() + MiscEmojis.comm
                     + ")";
             ReactionService.addReaction(e, game, player, msg);
         }
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
-        ButtonHelperAgents.resolveArtunoCheck(player, 3);
+        ButtonHelperAgents.resolveArtunoCheck(player, num);
         ButtonHelperAbilities.pillageCheck(player, game);
     }
 }

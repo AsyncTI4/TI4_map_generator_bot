@@ -694,6 +694,7 @@ public class ExploreService {
                 if (((game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID())))
                                 || game.getPhaseOfGame().contains("agenda"))
                         && player.hasUnit("saar_mech")
+                        && !ButtonHelper.isLawInPlay(game, "articles_war")
                         && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
                     List<Button> saarButton = new ArrayList<>();
                     saarButton.add(Buttons.green(
