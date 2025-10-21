@@ -93,6 +93,7 @@ import ti4.model.UnitModel;
 import ti4.selections.selectmenus.SelectFaction;
 import ti4.service.PlanetService;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.ValefarZService;
 import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -147,11 +148,14 @@ public class ButtonHelper {
     }
 
     public static boolean doesPlayerHaveFSHere(String flagshipID, Player player, Tile tile) {
-        if (!player.hasUnit(flagshipID) || tile == null) {
+
+        if (tile == null || tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, player.getColor()) < 1) {
             return false;
         }
-        UnitHolder space = tile.getUnitHolders().get("space");
-        return space.getUnitCount(UnitType.Flagship, player.getColor()) > 0;
+        if (ValefarZService.hasFlagshipAbility(player.getGame(), player, flagshipID)) {
+            return true;
+        }
+        return false;
     }
 
     public static boolean doesPlayerHaveMechHere(String mechID, Player player, Tile tile) {
@@ -263,7 +267,7 @@ public class ButtonHelper {
 
         if (totalAmount == 1) {
             String message = UnitEmojis.infantry + " died. Rolling for resurrection. ";
-            Die dice = new Die(player.hasTech("so2") ? 5 : 6);
+            Die dice = new Die((player.hasTech("so2") || player.hasTech("tf-specops")) ? 5 : 6);
             message += dice.getGreenDieIfSuccessOrRedDieIfFailure();
             if (dice.isSuccess()) {
                 message +=
@@ -337,7 +341,7 @@ public class ButtonHelper {
         String idNPC = "";
         for (String pnShortHand : sender.getPromissoryNotes().keySet()) {
             if (sender.getPromissoryNotesInPlayArea().contains(pnShortHand)
-                    || (receiver.getAbilities().contains("hubris") && pnShortHand.endsWith("_an"))) {
+                    || (receiver.hasAbility("hubris") && pnShortHand.endsWith("_an"))) {
                 continue;
             }
             if (game.isNoSwapMode()) {
@@ -541,7 +545,9 @@ public class ButtonHelper {
         if (player.getNombox().hasUnits()
                 && !whatIsItFor.contains("inf")
                 && !whatIsItFor.contains("both")
-                && (player.hasAbility("devour") || player.hasAbility("riftmeld"))) {
+                && (player.hasAbility("amalgamation")
+                        || player.hasAbility("devour")
+                        || player.hasAbility("riftmeld"))) {
             buttons.add(Buttons.gray("getReleaseButtons", "Release captured units", FactionEmojis.Cabal));
         }
         if (player.getNombox().hasUnits() && player.hasAbility("mark_of_pharadn")) {
@@ -998,7 +1004,7 @@ public class ButtonHelper {
             return true;
         }
 
-        return player.getTechs().contains("mr") && tile.getTileModel().isSupernova();
+        return player.hasTech("mr") && tile.getTileModel().isSupernova();
     }
 
     @ButtonHandler("forceARefresh_")
@@ -1188,6 +1194,11 @@ public class ButtonHelper {
                 game.drawActionCard(player.getUserID());
                 amount = 2;
             }
+            if (player.hasTech("tf-inheritancesystems")) {
+                message = " _Inheritance Systems_ has been accounted for.";
+                game.drawActionCard(player.getUserID());
+                amount = 2;
+            }
             if (player.hasAbility("scheming")) {
                 message +=
                         " **Scheming** has been accounted for, please use the blue buttons inside your `#cards-info` thread to discard 1 action card.";
@@ -1352,9 +1363,9 @@ public class ButtonHelper {
         }
         if (!game.isFowMode()
                 && activeSystem.isAsteroidField()
-                && !player.getTechs().contains("amd")
-                && !player.getTechs().contains("wavelength")
-                && !player.getTechs().contains("absol_amd")
+                && !player.hasTech("amd")
+                && !player.hasTech("wavelength")
+                && !player.hasTech("absol_amd")
                 && !player.getRelics().contains("circletofthevoid")
                 && !player.hasAbility("celestial_being")) {
             MessageHelper.sendMessageToChannel(
@@ -1460,8 +1471,7 @@ public class ButtonHelper {
             String fincheckerForNonActive = "FFCC_" + nonActivePlayer.getFaction() + "_";
             String ident = nonActivePlayer.getRepresentationUnfogged();
             // eres
-            if (nonActivePlayer.getTechs().contains("ers")
-                    && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem)) {
+            if (nonActivePlayer.hasTech("ers") && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem)) {
                 if (justChecking) {
                     if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger _E-Res Siphons_.");
@@ -1509,8 +1519,7 @@ public class ButtonHelper {
                 }
             }
             // neuroglaive
-            if (nonActivePlayer.getTechs().contains("ng")
-                    && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem)) {
+            if (nonActivePlayer.hasTech("ng") && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem)) {
                 if (justChecking) {
                     if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger _Neuroglaive_.");
@@ -4506,7 +4515,9 @@ public class ButtonHelper {
         if (!FOWPlusService.canActivatePosition(tile.getPosition(), player, game)) return false;
         if (tile.isAsteroidField()) {
             for (Player p2 : game.getRealPlayers()) {
-                if (p2.hasTech("cm") && p2 != player && FoWHelper.playerHasActualShipsInSystem(p2, tile)) {
+                if ((p2.hasTech("cm") || p2.hasTech("tf-nomadic"))
+                        && p2 != player
+                        && FoWHelper.playerHasActualShipsInSystem(p2, tile)) {
                     return false;
                 }
             }
@@ -4706,6 +4717,17 @@ public class ButtonHelper {
                         if (audioFile.exists()) {
                             MessageHelper.sendFileToChannel(player.getCorrectChannel(), audioFile);
                         }
+                    }
+                } else {
+                    if (game.isTwilightsFallMode()
+                            && ((Planet) uH).isLegendary()
+                            && game.getStoredValue("planetsTakenThisRound").contains(uH.getName())) {
+                        AddUnitService.addUnits(
+                                event, tile, game, player.getColor(), "sd " + uH.getName() + ", pds " + uH.getName());
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentationUnfogged()
+                                        + ", due to your **Reclamation** ability, 1 PDS and 1 space dock have been added to the legendary planet. This is optional though.");
                     }
                 }
             }
@@ -5007,6 +5029,19 @@ public class ButtonHelper {
                 || unitHolder.getTokenList().contains(Mapper.getAttachmentImagePath(Constants.PROPULSION));
     }
 
+    // "tfawaken_"
+    @ButtonHandler("tfawaken_")
+    public static void resolveTFAwaken(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        String planetName = buttonID.split("_")[2];
+        RemoveUnitService.removeUnits(
+                event, game.getTileByPosition(pos), game, player.getColor(), "1 infantry " + planetName);
+        AddUnitService.addUnits(event, game.getTileByPosition(pos), game, player.getColor(), "1 pds " + planetName);
+        String successMessage = player.getFactionEmoji() + " replaced 1 " + UnitEmojis.infantry + " on "
+                + Helper.getPlanetRepresentation(planetName, game) + " with 1 pds using awaken.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), successMessage);
+    }
+
     @ButtonHandler("absolsdn_")
     public static void resolveAbsolScanlink(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         if (buttonID.contains("Decline")) {
@@ -5053,7 +5088,8 @@ public class ButtonHelper {
             String planetID = buttonID.split("_")[2];
             if (player.hasAbility("awaken")
                     && !game.getAllPlanetsWithSleeperTokens().contains(planetID)
-                    && player.getPlanets().contains(planetID)) {
+                    && player.getPlanets().contains(planetID)
+                    && !game.isTwilightsFallMode()) {
                 Button placeSleeper = Buttons.green(
                         "putSleeperOnPlanet_" + planetID, "Put Sleeper on " + planetID, MiscEmojis.Sleeper);
                 Button decline = Buttons.red("deleteButtons", "Decline To Put a Sleeper Down");
@@ -5193,7 +5229,7 @@ public class ButtonHelper {
     public static List<Tile> getTilesWithShipsInTheSystem(Player player, Game game) {
         List<Tile> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
-            if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
+            if (FoWHelper.playerHasActualShipsInSystem(player, tileEntry.getValue())) {
                 Tile tile = tileEntry.getValue();
                 buttons.add(tile);
             }
@@ -6800,7 +6836,7 @@ public class ButtonHelper {
                 if (tilePos.equalsIgnoreCase(adjTilePos) && Constants.MECATOLS.contains(unitHolder.getName())) {
                     for (Player p2 : game.getRealPlayers()) {
                         if (p2.controlsMecatol(false)
-                                && p2.getTechs().contains("iihq")
+                                && p2.hasPlanet("custodia_vigilia")
                                 && !playersWithPds2.contains(p2)) {
                             if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
                                 if (FoWHelper.otherPlayersHaveShipsInSystem(
@@ -7395,6 +7431,13 @@ public class ButtonHelper {
                         .append(TechEmojis.CyberneticTech)
                         .append("_Sarween Tools_.");
                 resourcesAvailable += 1;
+            }
+            if (player.hasTech("tf-sledfactories")) {
+                youCanSpend
+                        .append(" You also have ")
+                        .append(TechEmojis.CyberneticTech)
+                        .append("_Sled Factories_.");
+                resourcesAvailable += 2;
             }
             if (player.hasTechReady("aida")) {
                 youCanSpend

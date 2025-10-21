@@ -63,6 +63,7 @@ class StartFrankenDraft extends GameStateSubcommand {
                     game.setTwilightsFallMode(true);
                     game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_twilights_fall"));
                     game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
+                    game.setStrategyCardSet("twilights_fall_sc");
                     game.removeSOFromGame("baf");
                     game.removeSOFromGame("dp");
                     game.removeSOFromGame("dtd");

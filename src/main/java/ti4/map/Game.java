@@ -4150,6 +4150,10 @@ public class Game extends GameProperties {
             return false;
         }
 
+        if (leaderID.equalsIgnoreCase("sardakkcommander") && player.hasTech("tf-valkyrie")) {
+            return true;
+        }
+
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);

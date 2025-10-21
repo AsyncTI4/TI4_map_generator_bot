@@ -234,14 +234,15 @@ public class ComponentActionHelper {
                                 factionEmoji);
                         compButtons.add(lButton);
                     }
-
-                } else if ("mahactcommander".equalsIgnoreCase(leaderID)
-                        && p1.getTacticalCC() > 0
-                        && !ButtonHelper.getTilesWithYourCC(p1, game, event).isEmpty()) {
-                    Button lButton = Buttons.gray(finChecker + "mahactCommander", "Use " + leaderName, factionEmoji);
-                    compButtons.add(lButton);
                 }
             }
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(p1, "mahactcommander")
+                && p1.getTacticalCC() > 0
+                && !ButtonHelper.getTilesWithYourCC(p1, game, event).isEmpty()) {
+
+            Button lButton = Buttons.gray(finChecker + "mahactCommander", "Use Mahact Commander", FactionEmojis.Mahact);
+            compButtons.add(lButton);
         }
 
         // Relics
@@ -314,8 +315,9 @@ public class ComponentActionHelper {
         // Abilities
         if (p1.hasAbility("star_forge")
                 && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar"))
-                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Warsun)
-                        .isEmpty()) {
+                && (!CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Warsun)
+                                .isEmpty()
+                        || game.isTwilightsFallMode())) {
             Button abilityButton =
                     Buttons.green(finChecker + prefix + "ability_starForge", "Starforge", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
@@ -376,7 +378,7 @@ public class ComponentActionHelper {
         }
 
         // Other "abilities"
-        if (p1.getUnitsOwned().contains("muaat_flagship")
+        if (p1.hasUnit("muaat_flagship")
                 && p1.getStrategicCC() > 0
                 && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Flagship)
                         .isEmpty()) {
@@ -486,6 +488,9 @@ public class ComponentActionHelper {
 
                     List<Tile> tiles =
                             CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Warsun);
+                    if (game.isTwilightsFallMode()) {
+                        tiles = ButtonHelper.getTilesWithShipsInTheSystem(p1, game);
+                    }
                     List<Button> buttons = new ArrayList<>();
                     String message = p1.getRepresentationNoPing()
                             + " is using their **Star Forge** ability.\n Please choose the system you wish to **Star Forge** in.";

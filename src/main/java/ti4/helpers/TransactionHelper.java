@@ -1145,7 +1145,7 @@ public class TransactionHelper {
 
                 for (String pnShortHand : p1.getPromissoryNotes().keySet()) {
                     if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand)
-                            || (p2.getAbilities().contains("hubris") && pnShortHand.endsWith("an"))) {
+                            || (p2.hasAbility("hubris") && pnShortHand.endsWith("an"))) {
                         continue;
                     }
                     PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
@@ -1609,7 +1609,11 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.gray("newTransact_starCharts_" + p1.getFaction() + "_" + p2.getFaction(), "Star Charts"));
         }
-        if ((p1.hasAbility("arbiters") || p2.hasAbility("arbiters")) && p1.getAc() > 0) {
+        if ((p1.hasAbility("arbiters")
+                        || p2.hasAbility("arbiters")
+                        || p1.hasTech("tf-guild_ships")
+                        || p2.hasTech("tf-guild_ships"))
+                && p1.getAc() > 0) {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_ACs_" + p1.getFaction() + "_" + p2.getFaction(), "Action Cards"));
         }
@@ -1753,7 +1757,11 @@ public class TransactionHelper {
         if (ButtonHelper.getNumberOfStarCharts(p1) > 0) {
             stuffToTransButtons.add(Buttons.gray(finChecker + "transact_starCharts_" + p2.getFaction(), "Star Charts"));
         }
-        if ((p1.hasAbility("arbiters") || p2.hasAbility("arbiters")) && p1.getAc() > 0) {
+        if ((p1.hasAbility("arbiters")
+                        || p2.hasAbility("arbiters")
+                        || p1.hasTech("tf-guild_ships")
+                        || p2.hasTech("tf-guild_ships"))
+                && p1.getAc() > 0) {
             stuffToTransButtons.add(Buttons.green(finChecker + "transact_ACs_" + p2.getFaction(), "Action Cards"));
         }
         if (p1.getPnCount() > 0) {

@@ -709,6 +709,10 @@
             {
                 "type": "ability",
                 "alias": "unrelenting"
+            },
+            {
+                "type": "tech",
+                "alias": "tf-unrelenting"
             }
         ],
         "forCombatAbility": "combatround"

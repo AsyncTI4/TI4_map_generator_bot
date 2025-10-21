@@ -154,6 +154,12 @@ public class Planet extends UnitHolder {
                 .anyMatch(UnitModel::getIsGroundForce);
     }
 
+    public boolean hasStructures(Game game) {
+        return getUnits().keySet().stream()
+                .flatMap(uk -> game.getPriorityUnitByUnitKey(uk, this).stream())
+                .anyMatch(UnitModel::getIsStructure);
+    }
+
     @Override
     public boolean removeToken(String tokenFileName) {
         boolean containedToken = super.removeToken(tokenFileName);

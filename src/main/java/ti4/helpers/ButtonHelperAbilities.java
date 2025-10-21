@@ -1834,9 +1834,20 @@ public class ButtonHelperAbilities {
     public static List<String> getPossibleTechForNekroToGainFromPlayer(
             Player nekro, Player victim, List<String> currentList, Game game) {
         List<String> techToGain = new ArrayList<>(currentList);
+        if (victim.getPromissoryNotesInPlayArea().contains("antivirus")) {
+            return techToGain;
+        }
         for (String tech : victim.getTechs()) {
             if (!nekro.getTechs().contains(tech) && !techToGain.contains(tech) && !"iihq".equalsIgnoreCase(tech)) {
-                techToGain.add(tech);
+                if (!game.playerHasLeaderUnlockedOrAlliance(victim, "bastioncommander")
+                        || !Mapper.getTech(tech).isFactionTech()) {
+                    if (game.isTwilightsFallMode()
+                            || nekro.hasTech("vax")
+                            || nekro.hasTech("vay")
+                            || !Mapper.getTech(tech).isFactionTech()) {
+                        techToGain.add(tech);
+                    }
+                }
             }
         }
         return techToGain;

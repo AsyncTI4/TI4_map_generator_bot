@@ -1383,13 +1383,25 @@ public class ButtonHelperAgents {
         for (Player p2 : game.getRealPlayers()) {
             if (p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")) {
                 List<Button> buttons2 = new ArrayList<>();
-                buttons2.add(Buttons.green(
-                        p2.getFinsFactionCheckerPrefix() + "exhaustTCS_" + agent + "_" + player.getFaction(),
-                        "Exhaust Temporal Command Suite to Ready " + agent));
-                buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
-                String msg = p2.getRepresentationUnfogged()
-                        + " you have the opportunity to exhaust _ Temporal Command Suite_ to ready " + agent
-                        + " and potentially resolve a transaction.";
+                String msg;
+                if (game.isTwilightsFallMode()) {
+                    buttons2.add(Buttons.green(
+                            p2.getFinsFactionCheckerPrefix() + "useTCS_" + agent + "_" + player.getFaction(),
+                            "Spend 3 influence to Ready " + agent));
+                    buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
+                    msg = p2.getRepresentationUnfogged()
+                            + " you have the opportunity to spend 3 influence via _ Temporal Command Suite_ to ready "
+                            + agent
+                            + " and potentially resolve a transaction.";
+                } else {
+                    buttons2.add(Buttons.green(
+                            p2.getFinsFactionCheckerPrefix() + "exhaustTCS_" + agent + "_" + player.getFaction(),
+                            "Exhaust Temporal Command Suite to Ready " + agent));
+                    buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
+                    msg = p2.getRepresentationUnfogged()
+                            + " you have the opportunity to exhaust _ Temporal Command Suite_ to ready " + agent
+                            + " and potentially resolve a transaction.";
+                }
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons2);
             }
         }
@@ -2291,7 +2303,7 @@ public class ButtonHelperAgents {
                             && !player.getRelics().contains("circletofthevoid")
                             && !player.hasAbility("celestial_being"))
                     || (tile.isSupernova()
-                            && !player.getTechs().contains("mr")
+                            && !player.hasTech("mr")
                             && !player.getRelics().contains("circletofthevoid")
                             && !player.hasAbility("celestial_being"))
                     || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
@@ -2472,6 +2484,22 @@ public class ButtonHelperAgents {
                 String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
                 String buttonID = "exhaustAgent_l1z1xagent_" + game.getActiveSystem() + "_" + planetId;
                 buttons.add(Buttons.green(buttonID, "Use L1Z1X Agent on " + planetRepresentation, FactionEmojis.L1Z1X));
+            }
+        }
+        return buttons;
+    }
+
+    public static List<Button> getTFAwakenButtons(Game game, Tile tile, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        if (tile == null) return buttons;
+
+        for (Planet planet : tile.getPlanetUnitHolders()) {
+            String planetId = planet.getName();
+            if (player.getPlanetsAllianceMode().contains(planetId)
+                    && FoWHelper.playerHasInfantryOnPlanet(player, tile, planetId)) {
+                String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
+                String buttonID = "tfawaken_" + game.getActiveSystem() + "_" + planetId;
+                buttons.add(Buttons.green(buttonID, "Use Awaken on " + planetRepresentation, FactionEmojis.Titans));
             }
         }
         return buttons;

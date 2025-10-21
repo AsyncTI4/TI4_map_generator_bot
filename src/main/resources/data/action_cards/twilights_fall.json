@@ -36,7 +36,7 @@
         "name": "Scarab",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose a splaiced card you own; gain 2 trade goods for each card you own with a faction origin that matches that card",
+        "text": "Choose a spliced card you own; gain 2 trade goods for each card you own with a faction origin that matches that card",
         "source": "twilights_fall"
     },
     {
@@ -148,7 +148,7 @@
         "name": "Evolve",
         "phase": "Action",
         "window": "Action",
-        "text": "Draw 1 ability from any ability deck.",
+        "text": "Draw 1 ability from any splice deck.",
         "source": "twilights_fall"
     },
     {
