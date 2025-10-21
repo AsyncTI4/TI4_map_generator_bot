@@ -26,18 +26,22 @@ jobs:
         run: |
           pip install -r scripts/requirements.txt
 
+      - name: Generate TypeScript data files
+        run: |
+          python scripts/generate_data.py all
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::144233825305:role/GithubActionsRole
+          role-to-assume: arn:aws:iam::412381764112:role/GithubActionsWebsiteRole
           aws-region: us-east-1
 
-      - name: Convert and upload images to S3
+      - name: Convert and upload images and data to S3
         run: |
           python scripts/convert_and_upload_to_s3.py
 
       - name: Report results
         if: always()
         run: |
-          echo "Image conversion and upload process completed"
+          echo "Image conversion, data generation, and upload process completed"
           echo "Check logs above for detailed conversion and upload statistics"

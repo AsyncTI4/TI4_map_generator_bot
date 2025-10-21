@@ -25,6 +25,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.BlindSelectionService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
@@ -366,6 +367,7 @@ public class TeHelperActionCards {
         Predicate<Tile> emptyTile =
                 Tile.tileHasNoPlayerShips(game).and(tile -> !tile.getTileModel().isHyperlane());
         List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(player, game, prefix, emptyTile, false);
+        BlindSelectionService.filterForBlindPositionSelection(game, player, buttons, player.finChecker() + prefix);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
