@@ -22,7 +22,7 @@
             "experimentalagent",
             "solagent",
             "hyperagent",
-            "nomagagentartuno",
+            "nomadagentartuno",
             "naaluagent",
             "firmamentagent",
             "muaatagent",
@@ -34,7 +34,7 @@
             "hacanagent",
             "sardakkagent",
             "yinagent",
-            "nomagagentthundarian",
+            "nomadagentthundarian",
             "valiantagent"
         ],
         "source": "twilights_fall"
@@ -191,7 +191,7 @@
             "tf-mc",
             "tf-foresight",
             "tf-telepathic",
-            "tf-neuroglaive",
+            "tf-ng",
             "tf-singularityx",
             "tf-singularityy",
             "tf-singularityz",
