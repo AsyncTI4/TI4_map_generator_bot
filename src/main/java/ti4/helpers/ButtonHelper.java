@@ -2189,7 +2189,9 @@ public class ButtonHelper {
         int count = 0;
         List<String> planets = player.getPlanetsAllianceMode();
         if (!alliance) {
-            planets = player.getPlanets();
+            planets = new ArrayList<>();
+            planets.addAll(player.getPlanets());
+            planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
         }
         for (String planet : planets) {
             Planet p = game.getPlanetsInfo().get(planet);
