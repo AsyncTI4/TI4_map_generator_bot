@@ -1842,8 +1842,8 @@ public class ButtonHelperAbilities {
                 if (!game.playerHasLeaderUnlockedOrAlliance(victim, "bastioncommander")
                         || !Mapper.getTech(tech).isFactionTech()) {
                     if (game.isTwilightsFallMode()
-                            || nekro.hasTech("vax")
-                            || nekro.hasTech("vay")
+                            || (nekro.hasTech("vax") || nekro.getFactionTechs().contains("vax"))
+                            || (nekro.hasTech("vay") || nekro.getFactionTechs().contains("vay"))
                             || !Mapper.getTech(tech).isFactionTech()) {
                         techToGain.add(tech);
                     }
