@@ -13,6 +13,8 @@ class DrawSO extends GameStateSubcommand {
     public DrawSO() {
         super(Constants.DRAW_SO, "Draw Secret Objective", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color who draws")
+                .setAutoComplete(true));
     }
 
     @Override

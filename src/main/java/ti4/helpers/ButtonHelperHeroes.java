@@ -42,6 +42,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.BlindSelectionService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.franken.FrankenLeaderService;
 import ti4.service.leader.PlayHeroService;
@@ -2282,6 +2283,7 @@ public class ButtonHelperHeroes {
                 }
             }
         }
+        BlindSelectionService.filterForBlindPositionSelection(game, player, buttons, finChecker + "benedictionStep1");
         return buttons;
     }
 

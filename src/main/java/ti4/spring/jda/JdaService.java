@@ -94,6 +94,7 @@ public class JdaService {
     private static Guild guildUndenary;
     private static Guild guildDuodenary;
     public static Guild guildFogOfWar;
+    public static Guild guildFogOfWarSecondary;
     public static Guild guildCommunityPlays;
     private static Guild guildMegagame;
     public static final Set<Guild> guilds = new HashSet<>();
@@ -227,8 +228,8 @@ public class JdaService {
         }
 
         // Async: FOW Chapter Secondary
-        // if (args.length >= 13) {
-        //    guildFogOfWarSecondary = initGuild(args[12], false);
+        // if (args.length >= 18) {
+        //    guildFogOfWarSecondary = initGuild(args[17], false);
         //    fowServers.add(guildFogOfWarSecondary);
         // }
 

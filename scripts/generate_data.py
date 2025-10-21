@@ -13,7 +13,7 @@ import argparse
 CONFIGS = {
     "tech": {
         "input_folder": "src/main/resources/data/technologies",
-        "output_file": "techs.ts",
+        "output_file": "tech.ts",
         "type_import": "Tech",
         "export_name": "techs",
         "sort_key": "alias",
@@ -155,6 +155,22 @@ def remove_blacklisted_keys(
     return cleaned_data
 
 
+def clean_cdn_urls(data: Any) -> Any:
+    """Recursively remove CDN URL references and ?raw=true from data"""
+    CDN_URL = "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources"
+
+    if isinstance(data, dict):
+        return {key: clean_cdn_urls(value) for key, value in data.items()}
+    elif isinstance(data, list):
+        return [clean_cdn_urls(item) for item in data]
+    elif isinstance(data, str):
+        cleaned = data.replace(CDN_URL, "")
+        cleaned = cleaned.replace("?raw=true", "")
+        return cleaned
+    else:
+        return data
+
+
 def aggregate_data(config: Dict[str, Any]) -> List[Dict[str, Any]]:
     """Generic function to aggregate data from JSON files"""
     input_folder = Path(config["input_folder"])
@@ -182,11 +198,13 @@ def aggregate_data(config: Dict[str, Any]) -> List[Dict[str, Any]]:
                 for item in data:
                     if isinstance(item, dict):
                         item = remove_blacklisted_keys(item, config["blacklist"])
+                    item = clean_cdn_urls(item)
                     all_data.append(item)
             else:
                 # If it's a single object or we don't handle arrays
                 if isinstance(data, dict):
                     data = remove_blacklisted_keys(data, config["blacklist"])
+                data = clean_cdn_urls(data)
                 all_data.append(data)
 
             print(f"Processed: {json_file.name}")
@@ -199,12 +217,17 @@ def aggregate_data(config: Dict[str, Any]) -> List[Dict[str, Any]]:
     return all_data
 
 
-def write_typescript_file(data: List[Dict[str, Any]], config: Dict[str, Any]):
+def write_typescript_file(
+    data: List[Dict[str, Any]], config: Dict[str, Any], output_dir: Path
+):
     """Write the aggregated data to a TypeScript file"""
     # Sort data by the configured key
     data.sort(key=lambda x: x.get(config["sort_key"], ""))
 
-    output_file = config["output_file"]
+    # Create output directory if it doesn't exist
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    output_file = output_dir / config["output_file"]
 
     try:
         with open(output_file, "w", encoding="utf-8") as f:
@@ -247,6 +270,12 @@ def main():
     parser.add_argument(
         "--list-types", action="store_true", help="List all available data types"
     )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default="web_data",
+        help="Output directory for generated files (default: web_data)",
+    )
 
     args = parser.parse_args()
 
@@ -255,6 +284,9 @@ def main():
         for data_type, config in CONFIGS.items():
             print(f"  {data_type}: {config['input_folder']} -> {config['output_file']}")
         return
+
+    output_dir = Path(args.output_dir)
+    print(f"Output directory: {output_dir.absolute()}")
 
     if args.data_type == "all":
         # Process all data types
@@ -265,7 +297,7 @@ def main():
 
             data = aggregate_data(config)
             if data:
-                write_typescript_file(data, config)
+                write_typescript_file(data, config, output_dir)
             else:
                 print(f"No data found for {data_type}")
     else:
@@ -273,12 +305,12 @@ def main():
         config = CONFIGS[args.data_type]
         print(f"Processing {args.data_type}...")
         print(f"Input folder: {config['input_folder']}")
-        print(f"Output file: {config['output_file']}")
+        print(f"Output file: {output_dir / config['output_file']}")
         print("-" * 50)
 
         data = aggregate_data(config)
         if data:
-            write_typescript_file(data, config)
+            write_typescript_file(data, config, output_dir)
         else:
             print("No data found")
 
