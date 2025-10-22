@@ -226,7 +226,6 @@ public class MantisBuildImageGeneratorService {
         float ringCount = getRingCount(game);
         ringCount += ringCount == RING_MIN_COUNT ? 1.5f : 1;
         int mapWidth = (int) (ringCount * 520 + EXTRA_X * 2);
-        // mapWidth += hasExtraRow(game) ? EXTRA_X : 0;
         return mapWidth;
     }
 }

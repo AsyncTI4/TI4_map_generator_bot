@@ -1,6 +1,7 @@
 package ti4.service.draft;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,12 +63,12 @@ public class DraftSaveService {
 
             // Save draft choices
             var sortedTypes = state.getPicks().keySet().stream()
-                    .sorted((a, b) -> a.toString().compareTo(b.toString()))
+                    .sorted(Comparator.comparing(DraftableType::toString))
                     .toList();
             for (var draftableTypes : sortedTypes) {
                 List<DraftChoice> choiceListValues = state.getPicks().get(draftableTypes);
                 var sortedPicks = choiceListValues.stream()
-                        .sorted((a, b) -> a.getChoiceKey().compareTo(b.getChoiceKey()))
+                        .sorted(Comparator.comparing(DraftChoice::getChoiceKey))
                         .toList();
                 for (DraftChoice choice : sortedPicks) {
                     lines.add(PLAYER_PICK_DATA
