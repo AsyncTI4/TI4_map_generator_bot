@@ -145,7 +145,18 @@ public class MantisMapBuildService {
 
         Player player = game.getPlayer(playerUserId);
 
-        // TODO: Other validation before locking it in?
+        // In case buttons accidentally stick around, ensure this player is actually up to place something
+        var groupedPositions = getGroupedPositions(game, mapTemplateModel);
+        List<String> positionsToPlace = getNextPositionGroup(game, groupedPositions);
+        if (!positionsToPlace.contains(position)) {
+            return DraftButtonService.USER_MISTAKE_PREFIX
+                    + "You can't place a tile there. Are your buttons stale? Consider refreshing the draft info.";
+        }
+        String currentPlayer = getPlayerUserIdForTilePosition(draftManager, mapTemplateModel, positionsToPlace.get(0));
+        if (!currentPlayer.equals(playerUserId)) {
+            return DraftButtonService.USER_MISTAKE_PREFIX
+                    + "It's not your turn. Are your buttons stale? Consider refreshing the draft info.";
+        }
 
         if (!placeTile(game, mantisTileDraftable, position, tileId)) {
             return "Error: Unable to place tile " + tileId + " at " + position + ".";
@@ -188,12 +199,21 @@ public class MantisMapBuildService {
             return DraftButtonService.USER_MISTAKE_PREFIX + "It's not your tile to mulligan.";
         }
 
+        // In case buttons accidentally stick around, ensure this player is actually up to place something
+        var groupedPositions = getGroupedPositions(game, mapTemplateModel);
+        List<String> positionsToPlace = getNextPositionGroup(game, groupedPositions);
+        String currentPlayer = getPlayerUserIdForTilePosition(draftManager, mapTemplateModel, positionsToPlace.get(0));
+        if (!currentPlayer.equals(playerUserId)) {
+            return DraftButtonService.USER_MISTAKE_PREFIX
+                    + "It's not your turn. Are your buttons stale? Consider refreshing the draft info.";
+        }
+
         List<PlayerRemainingTiles> allPlayerRemainingTiles = getPlayerRemainingTiles(draftManager, mantisTileDraftable);
 
         mantisTileDraftable.getMulliganTileIDs().add(tileId);
         mantisTileDraftable.setDrawnTileId(null);
         updateMapBuild(event, game, mantisTileDraftable, mapTemplateModel, allPlayerRemainingTiles, tileId);
-        return null;
+        return DraftButtonService.DELETE_MESSAGE;
     }
 
     public String handleRepost(Game game, MapTemplateModel mapTemplateModel) {
@@ -323,47 +343,8 @@ public class MantisMapBuildService {
         // Get the tile positions, grouped by player, and then grouped again by
         // placement order.
         Map<Integer, Map<Integer, List<String>>> placementGroups = getGroupedPositions(game, mapTemplateModel);
+        List<String> nextGroup = getNextPositionGroup(game, placementGroups);
 
-        // Get the group keys ordered, to find the next group to place.
-        List<Integer> groupKeys = new ArrayList<>(placementGroups.keySet());
-        groupKeys.sort(Integer::compareTo);
-
-        // Find the first group that has a position without a tile
-        List<String> nextGroup = null;
-        for (Integer groupKey : groupKeys) {
-            Map<Integer, List<String>> playerNumToTiles = placementGroups.get(groupKey);
-            List<Entry<Integer, List<String>>> orderedPlayerPositions = playerNumToTiles.entrySet().stream()
-                    .sorted(Entry.comparingByKey())
-                    .toList();
-            for (Entry<Integer, List<String>> entry : orderedPlayerPositions) {
-                List<String> positions = entry.getValue();
-                List<String> currentUnplacedPositions = new ArrayList<>();
-                for (String pos : positions) {
-                    Tile tileAtPos = game.getTileByPosition(pos);
-                    if (tileAtPos == null || TileHelper.isDraftTile(tileAtPos.getTileModel())) {
-                        // This position needs a tile placed
-                        currentUnplacedPositions.add(pos);
-                    }
-                }
-
-                if (currentUnplacedPositions.isEmpty()) {
-                    // No unplaced positions found
-                    continue;
-                }
-
-                if (nextGroup == null) {
-                    // If this is the first group with unplaced positions, start with it.
-                    nextGroup = currentUnplacedPositions;
-                } else if (currentUnplacedPositions.size() > nextGroup.size()) {
-                    // If this group has more unplaced positions than the current nextGroup, use it
-                    // instead.
-                    nextGroup = currentUnplacedPositions;
-                }
-            }
-
-            // If this group had any players with unplaced positions, we're done searching.
-            if (nextGroup != null) break;
-        }
         if (nextGroup == null || nextGroup.isEmpty()) {
             // All done!
             MessageHelper.sendMessageToChannel(responseChannel, "Map building complete!");
@@ -513,9 +494,12 @@ public class MantisMapBuildService {
                             }
                             for (Attachment attachment : msg.getAttachments()) {
                                 if (attachment.getFileName().startsWith(IMAGE_UNIQUE_STRING) && attachment.isImage()) {
+                                    if (replaced) {
+                                        msg.delete().queue();
+                                        continue;
+                                    }
                                     msg.editMessageAttachments(mapImage).queue();
                                     replaced = true;
-                                    break;
                                 }
                             }
                         }
@@ -650,8 +634,54 @@ public class MantisMapBuildService {
         return playerUserId;
     }
 
+    private List<String> getNextPositionGroup(Game game, Map<Integer, Map<Integer, List<String>>> placementGroups) {
+        // Get the group keys ordered, to find the next group to place.
+        List<Integer> groupKeys = new ArrayList<>(placementGroups.keySet());
+        groupKeys.sort(Integer::compareTo);
+
+        // Find the first group that has a position without a tile
+        List<String> nextGroup = null;
+        for (Integer groupKey : groupKeys) {
+            Map<Integer, List<String>> playerNumToTiles = placementGroups.get(groupKey);
+            List<Entry<Integer, List<String>>> orderedPlayerPositions = playerNumToTiles.entrySet().stream()
+                    .sorted(Entry.comparingByKey())
+                    .toList();
+            for (Entry<Integer, List<String>> entry : orderedPlayerPositions) {
+                List<String> positions = entry.getValue();
+                List<String> currentUnplacedPositions = new ArrayList<>();
+                for (String pos : positions) {
+                    Tile tileAtPos = game.getTileByPosition(pos);
+                    if (tileAtPos == null || TileHelper.isDraftTile(tileAtPos.getTileModel())) {
+                        // This position needs a tile placed
+                        currentUnplacedPositions.add(pos);
+                    }
+                }
+
+                if (currentUnplacedPositions.isEmpty()) {
+                    // No unplaced positions found
+                    continue;
+                }
+
+                if (nextGroup == null) {
+                    // If this is the first group with unplaced positions, start with it.
+                    nextGroup = currentUnplacedPositions;
+                } else if (currentUnplacedPositions.size() > nextGroup.size()) {
+                    // If this group has more unplaced positions than the current nextGroup, use it
+                    // instead.
+                    nextGroup = currentUnplacedPositions;
+                }
+            }
+
+            // If this group had any players with unplaced positions, we're done searching.
+            if (nextGroup != null) break;
+        }
+
+        return nextGroup;
+    }
+
     /**
-     * Gets all of the template tile positions in which a tile must be placed, grouped
+     * Gets all of the template tile positions in which a tile must be placed,
+     * grouped
      * with the other positions
      * that could receive a tile at the same time. For example, the tile positions
      * adjacent to Mecatol Rex

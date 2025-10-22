@@ -166,7 +166,7 @@ public class MantisTileDraftable extends Draftable {
         TI4Emoji emoji = TileEmojis.getTileEmojiFromTileID(tileID);
         Button button =
                 Button.secondary(makeButtonId(choiceKey), representation).withEmoji(emoji.asEmoji());
-        return new DraftChoice(TYPE, choiceKey, button, representation, representation, emoji.emojiString());
+        return new DraftChoice(TYPE, choiceKey, button, tile.getLongDescription(), representation, emoji.emojiString());
     }
 
     @Override
