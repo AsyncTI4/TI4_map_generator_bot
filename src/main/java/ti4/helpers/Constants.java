@@ -1039,6 +1039,7 @@ public class Constants {
     public static final String DRAFT_SEAT = "seat";
     public static final String DRAFT_SLICE = "slice";
     public static final String DRAFT_SPEAKER_ORDER = "speaker_order";
+    public static final String DRAFT_MANTIS_TILE = "mantis_tile";
 
     // subcommands
     public static final String DRAFT_MANAGE_DEBUG = "debug";
@@ -1050,6 +1051,7 @@ public class Constants {
     public static final String DRAFT_MANAGE_CAN_SETUP_PLAYERS = "can_setup_players";
     public static final String DRAFT_MANAGE_SETUP_PLAYERS = "setup_players";
     public static final String DRAFT_MANAGE_ADD_DRAFTABLE = "add_draftable";
+    public static final String DRAFT_MANAGE_REMOVE_DRAFTABLE = "remove_draftable";
     public static final String DRAFT_MANAGE_SET_ORCHESTRATOR = "set_orchestrator";
     public static final String DRAFT_MANAGE_ADD_PLAYER = "add_player";
     public static final String DRAFT_MANAGE_REMOVE_PLAYER = "remove_player";
@@ -1058,11 +1060,11 @@ public class Constants {
     public static final String DRAFT_MANAGE_ADD_ALL_GAME_PLAYERS = "add_all_game_players";
     public static final String DRAFT_MANAGE_SWAP_PLAYERS = "swap_players";
     public static final String DRAFT_MANAGE_REPLACE_PLAYER = "replace_player";
-    public static final String DRAFT_MANAGE_LIST_DRAFTABLES = "list_draftables";
-    public static final String DRAFT_MANAGE_DISPLAY_ORCHESTRATOR = "display_orchestrator";
     public static final String DRAFT_MANAGE_MAKE_PICK = "make_pick";
+    public static final String DRAFT_MANAGE_UNPICK = "unpick";
     public static final String DRAFT_MANAGE_CUSTOM_COMMAND = "custom_draftable_command";
     public static final String DRAFT_MANAGE_CUSTOM_ORCHESTRATOR_COMMAND = "custom_orchestrator_command";
+    public static final String DRAFT_MANAGE_SETUP_DRAFT = "setup_draft";
     public static final String DRAFT_MANAGE_SETUP_NUCLEUS = "setup_nucleus";
     public static final String DRAFT_FACTION_ADD = "add";
     public static final String DRAFT_FACTION_REMOVE = "remove";
@@ -1077,6 +1079,9 @@ public class Constants {
     public static final String DRAFT_SLICE_ADD_SLICE = "add_slice";
     public static final String DRAFT_SLICE_REMOVE_SLICE = "remove_slice";
     public static final String DRAFT_SPEAKER_ORDER_SET_PICK_COUNT = "set_pick_count";
+    public static final String DRAFT_MANTIS_TILE_START_BUILDING = "start_building";
+    public static final String DRAFT_MANTIS_TILE_CONFIGURE = "configure";
+    public static final String DRAFT_MANTIS_TILE_SET_TILES = "set_tiles";
 
     // options
     public static final String FORCE_OPTION = "force";
@@ -1103,6 +1108,7 @@ public class Constants {
     public static final String DRAFT_TILE_9_OPTION = "tile_9";
     public static final String DRAFT_NEW_SLICE_OPTION = "new_slice_name";
     public static final String PICK_COUNT_OPTION = "pick_count";
+    public static final String PLAYER_PICKS_OPTION = "pick";
 
     // ABILITY, TECH, AGENT, COMMANDER, HERO, MECH, FLAGSHIP, COMMODITIES, PN, HOMESYSTEM, STARTINGTECH, STARTINGFLEET,
     // BLUETILE, REDTILE, DRAFTORDER

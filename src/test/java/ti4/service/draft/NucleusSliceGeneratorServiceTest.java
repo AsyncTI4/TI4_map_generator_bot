@@ -92,6 +92,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
         MiltySettings settings = game.initializeMiltySettings();
         settings.getDraftMode().setChosenKey("nucleus");
+        settings.getSourceSettings().getTeDemo().setVal(true);
         settings.getSourceSettings().getDiscoStars().setVal(true);
         settings.getSourceSettings().getUnchartedSpace().setVal(true);
         settings.getSourceSettings().getEronous().setVal(true);
@@ -114,6 +115,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
         MiltySettings settings = game.initializeMiltySettings();
         settings.getDraftMode().setChosenKey("nucleus");
+        settings.getSourceSettings().getTeDemo().setVal(true);
         settings.getSourceSettings().getDiscoStars().setVal(true);
         settings.getSourceSettings().getUnchartedSpace().setVal(true);
         settings.getSourceSettings().getEronous().setVal(true);
@@ -136,6 +138,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
         MiltySettings settings = game.initializeMiltySettings();
         settings.getDraftMode().setChosenKey("nucleus");
+        settings.getSourceSettings().getTeDemo().setVal(true);
         settings.getSourceSettings().getDiscoStars().setVal(true);
         settings.getSourceSettings().getUnchartedSpace().setVal(true);
         settings.getSourceSettings().getEronous().setVal(true);
