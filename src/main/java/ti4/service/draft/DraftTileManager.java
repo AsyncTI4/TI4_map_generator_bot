@@ -204,7 +204,7 @@ public class DraftTileManager {
         return DISALLOWED_TERMS.stream().anyMatch(term -> id.contains(term) || path.contains(term));
     }
 
-    private static MiltyDraftTile getDraftTileFromModel(TileModel tileModel) {
+    public static MiltyDraftTile getDraftTileFromModel(TileModel tileModel) {
         String tileID = tileModel.getId();
         if (tiles.containsKey(tileID)) return tiles.get(tileID);
 

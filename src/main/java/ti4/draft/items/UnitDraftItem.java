@@ -25,7 +25,7 @@ public class UnitDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getShortDescription() {
-        return "Unit - " + getUnit().getName();
+        return "Unit - " + getUnit().getName() + " (" + getUnit().getUnitType().toString() + ")";
     }
 
     @JsonIgnore
@@ -33,15 +33,20 @@ public class UnitDraftItem extends DraftItem {
     public String getLongDescriptionImpl() {
         UnitModel unit = getUnit();
         StringBuilder sb = new StringBuilder();
-        sb.append("Cost: ");
-        float cost = unit.getCost();
-        sb.append(cost == (int) cost ? "" + (int) cost : "" + cost); // type shenanigans
-        sb.append(" Combat: ");
-        sb.append(unit.getCombatHitsOn());
-        if (unit.getCombatDieCount() > 1) {
-            sb.append("x").append(unit.getCombatDieCount());
+        if (unit.getCost() > 0) {
+            sb.append("Cost: ");
+            float cost = unit.getCost();
+            sb.append(cost == (int) cost ? "" + (int) cost : "" + cost); // type shenanigans
         }
-        sb.append(" ");
+        if (unit.getCombatHitsOn() > 0) {
+            sb.append(" Combat: ");
+            sb.append(unit.getCombatHitsOn());
+            if (unit.getCombatDieCount() > 1) {
+                sb.append("x").append(unit.getCombatDieCount());
+            }
+            sb.append(" ");
+        }
+
         if (unit.getSustainDamage()) {
             sb.append("SUSTAIN DAMAGE ");
         }
@@ -52,12 +57,22 @@ public class UnitDraftItem extends DraftItem {
                     .append(unit.getAfbDieCount())
                     .append(" ");
         }
+        if (unit.getSpaceCannonDieCount() > 0) {
+            sb.append("SPACE CANNON ")
+                    .append(unit.getSpaceCannonHitsOn())
+                    .append("x")
+                    .append(unit.getSpaceCannonDieCount())
+                    .append(" ");
+        }
         if (unit.getProductionValue() > 0) {
             sb.append("PRODUCTION ");
             sb.append(unit.getProductionValue());
             sb.append(" ");
         }
-        if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get());
+        if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get() + " ");
+        if (unit.getFaction().isPresent()) {
+            sb.append("Faction: " + unit.getFaction().get());
+        }
         return sb.toString();
     }
 

@@ -210,7 +210,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "Keep this card in your play area [it does not count as a real mech]; the COST of your mechs is reduced by 1."
+        "ability": "Keep this card in your play area [it acts in addition to your normal mech card]; the COST of your mechs is reduced by 1."
     },
     {
         "id": "tf-eidolonterminus",
@@ -226,7 +226,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "Keep this card in your play area [it does not count as a real mech]; the COMBAT value of your mechs is reduced by 1."
+        "ability": "Keep this card in your play area [it acts in addition to your normal mech card]; the COMBAT value of your mechs is reduced by 1."
     },
     {
         "id": "tf-eidolonlandwaster",
@@ -242,7 +242,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "Keep this card in your play area [it does not count as a real mech]; your mechs roll 1 additional die during combat."
+        "ability": "Keep this card in your play area [it acts in addition to your normal mech card]; your mechs roll 1 additional die during combat."
     },
     {
         "id": "tf-heltitan",
@@ -296,7 +296,7 @@
         "id": "tf-exotrireme",
         "baseType": "dreadnought",
         "asyncId": "dn",
-        "name": "Exotrireme (TME)",
+        "name": "Exotrireme",
         "source": "twilights_fall",
         "faction": "sardakk",
         "moveValue": 2,
@@ -399,7 +399,7 @@
         "id": "tf-hcf",
         "baseType": "fighter",
         "asyncId": "ff",
-        "name": "Hybrid Cystral Fighter (TF)",
+        "name": "Hybrid Crystral Fighter (TF)",
         "source": "twilights_fall",
         "faction": "naalu",
         "moveValue": 2,
@@ -459,7 +459,7 @@
         "baseType": "spacedock",
         "asyncId": "sd",
         "faction": "hacan",
-        "name": "Production Biomes (TME)",
+        "name": "Production Biomes",
         "source": "twilights_fall",
         "productionValue": 9,
         "isStructure": true,
@@ -470,7 +470,7 @@
         "baseType": "spacedock",
         "asyncId": "sd",
         "faction": "saar",
-        "name": "Floating Factories (TME)",
+        "name": "Floating Factories",
         "source": "twilights_fall",
         "productionValue": 7,
         "isStructure": true,
@@ -481,7 +481,7 @@
         "baseType": "spacedock",
         "asyncId": "sd",
         "faction": "bastion",
-        "name": "Helios Entity (TME)",
+        "name": "Helios Entity",
         "source": "twilights_fall",
         "productionValue": 2,
         "isStructure": true,
