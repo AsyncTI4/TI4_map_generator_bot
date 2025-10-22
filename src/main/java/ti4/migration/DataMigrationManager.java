@@ -49,7 +49,9 @@ public class DataMigrationManager {
 
     static {
         migrations = new HashMap<>();
-        migrations.put("renameGarboziaToBozgarbia_201025", DataMigrationManager::renameGarboziaToBozgarbia_201025);
+        migrations.put(
+                "renameGarboziaToBozgarbia_201025_withEnded",
+                DataMigrationManager::renameGarboziaToBozgarbia_201025_withEnded);
         // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
@@ -147,20 +149,26 @@ public class DataMigrationManager {
         return migrationsApplied;
     }
 
-    private static Boolean renameGarboziaToBozgarbia_201025(Game game) {
+    public static Boolean renameGarboziaToBozgarbia_201025_withEnded(Game game) {
+        Tile old = null;
         for (Tile t : game.getTileMap().values()) {
             if (t.getTileID().equals("sig01")) {
-                for (Player p : game.getPlayers().values()) {
-                    if (p.getPlanets().remove("garbozia"))
-                        p.getPlanets().add("bozgarbia");
-                    if (p.getExhaustedPlanets().remove("garbozia"))
-                        p.getExhaustedPlanets().add("bozgarbia");
-                    if (p.getExhaustedPlanetsAbilities().remove("garbozia"))
-                        p.getExhaustedPlanetsAbilities().add("bozgarbia");
-                }
-                return true;
+                old = t;
+                break;
             }
         }
-        return false;
-    } 
+        if (old == null) return false;
+
+        Player p = game.getPlanetOwner("garbozia");
+        if (p == null) return false;
+
+        p.getPlanets().remove("garbozia");
+        p.getExhaustedPlanets().remove("garbozia");
+        p.getExhaustedPlanetsAbilities().remove("garbozia");
+
+        p.getPlanets().add("bozgarbia");
+        p.getExhaustedPlanets().add("bozgarbia");
+        p.getExhaustedPlanetsAbilities().add("bozgarbia");
+        return true;
+    }
 }

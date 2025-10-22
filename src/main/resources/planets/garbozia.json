@@ -1,0 +1,20 @@
+{
+    "id": "garbozia",
+    "tileId": "98",
+    "name": "Garbozia",
+    "aliases": ["garbozia", "garbage"],
+    "resources": 2,
+    "influence": 1,
+    "planetTypes": ["HAZARDOUS"],
+    "legendaryAbilityName": "Dok 'N Pic's Salvage Yard",
+    "legendaryAbilityText": "Exhaust this card when you pass to place 1 action card from the discard pile faceup on this card; you can purge cards on this card to play them as if they were in your hand.",
+    "legendaryAbilityFlavourText": "Throw 'er on the 'eap with the rest.",
+    "planetLayout": {
+        "unitHolderName": "garbozia",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": { "x": 170.0, "y": 150.0 },
+        "extraIcons": 1,
+        "planetRadius": 95
+    },
+    "source": "thunders_edge"
+}

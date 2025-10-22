@@ -231,9 +231,10 @@ class GameLoadService {
                                         found = true;
                                     }
                                 }
-                                if (tile.getTileID().equals("sig01") && unitHolderName.equals("garbozia")){
+                                if (tile.getTileID().equals("sig01") && unitHolderName.equals("garbozia")) {
                                     // DELETE ME
-                                    unitHolderName = "bozgarbia";}
+                                    unitHolderName = "bozgarbia";
+                                }
                                 if (!found && !tile.isSpaceHolderValid(unitHolderName)) {
                                     BotLogger.warning(
                                             new LogOrigin(game),
