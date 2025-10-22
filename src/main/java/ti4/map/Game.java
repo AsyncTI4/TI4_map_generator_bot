@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -1841,10 +1841,7 @@ public class Game extends GameProperties {
             return ButtonHelper.isCoatlHealed(this);
         }
         if (isTwilightsFallMode()) {
-            if (getTyrant() == null) {
-                return false;
-            }
-            return true;
+          return getTyrant() != null;
         }
         if (isLiberationC4Mode()) {
             return true;
@@ -3528,6 +3525,7 @@ public class Game extends GameProperties {
     }
 
     public void resetActionCardDeck(DeckModel deck) {
+        setAcDeckID(deck.getAlias());
         setActionCards(deck.getNewShuffledDeck());
         discardActionCards.clear();
         for (Player player : players.values()) {

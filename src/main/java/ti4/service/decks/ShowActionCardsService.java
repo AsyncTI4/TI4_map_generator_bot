@@ -94,7 +94,6 @@ public class ShowActionCardsService {
         // Build the string
         StringBuilder sb = new StringBuilder("__").append(title).append("__:");
         int index = 1;
-        int pad = cardsByName.size() > 99 ? 4 : (cardsByName.size() > 9 ? 3 : 2);
         for (Map.Entry<String, List<Map.Entry<String, Integer>>> acEntryList : entries) {
             List<String> ids = acEntryList.getValue().stream()
                     .map(i -> "`(" + i.getValue() + ")`")
