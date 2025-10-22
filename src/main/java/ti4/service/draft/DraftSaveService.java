@@ -61,8 +61,15 @@ public class DraftSaveService {
             PlayerDraftState state = entry.getValue();
 
             // Save draft choices
-            for (var choiceListValues : state.getPicks().values()) {
-                for (DraftChoice choice : choiceListValues) {
+            var sortedTypes = state.getPicks().keySet().stream()
+                    .sorted((a, b) -> a.toString().compareTo(b.toString()))
+                    .toList();
+            for (var draftableTypes : sortedTypes) {
+                List<DraftChoice> choiceListValues = state.getPicks().get(draftableTypes);
+                var sortedPicks = choiceListValues.stream()
+                        .sorted((a, b) -> a.getChoiceKey().compareTo(b.getChoiceKey()))
+                        .toList();
+                for (DraftChoice choice : sortedPicks) {
                     lines.add(PLAYER_PICK_DATA
                             + KEY_SEPARATOR
                             + shortId

@@ -128,6 +128,8 @@ public class DraftSaveServiceTest extends BaseTi4Test {
                 return TestData.createSliceDraftable();
             case "SpeakerOrderDraftable":
                 return TestData.createSpeakerOrderDraftable();
+            case "MantisTileDraftable":
+                return TestData.createMantisTileDraftable();
             default:
                 return null;
         }

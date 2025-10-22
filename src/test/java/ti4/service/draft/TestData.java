@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Constants;
+import ti4.helpers.ListHelper;
 import ti4.map.Tile;
 import ti4.service.draft.draftables.FactionDraftable;
+import ti4.service.draft.draftables.MantisTileDraftable;
 import ti4.service.draft.draftables.SeatDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
@@ -66,6 +68,20 @@ public class TestData {
             slices.add(slice);
         }
         draftable.initialize(slices);
+        return draftable;
+    }
+
+    public MantisTileDraftable createMantisTileDraftable() {
+        MantisTileDraftable draftable = new MantisTileDraftable();
+        List<Integer> tileIds = ListHelper.listOfIntegers(20, 62);
+
+        draftable.load(String.join(",", tileIds.stream().map(Object::toString).toList()));
+        draftable.setMulligans(2);
+        draftable.setExtraBlues(1);
+        draftable.setExtraReds(1);
+        draftable.getMulliganTileIDs().add("20");
+        draftable.getMulliganTileIDs().add("21");
+        draftable.getDiscardedTileIDs().add("22");
         return draftable;
     }
 
