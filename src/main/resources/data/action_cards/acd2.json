@@ -291,7 +291,7 @@
         "name": "Espionage",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Look at another player's action cards. Then, that player gives you 1 action card, unscored secret objective, or promissory note from their hand.",
+        "text": "Look at another player's action cards. Then, that player gives you 1 action card, secret objective, or promissory note from their hand.",
         "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
         "source": "action_deck_2"
     },
@@ -681,7 +681,7 @@
         "alias": "relay_connection1",
         "name": "Relay Connection",
         "phase": "Action",
-        "window": "After you produce a ship in a system",
+        "window": "After you produce a ship",
         "text": "Produce 1 ship of that type in any number of  systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
         "flavorText": "",
         "source": "action_deck_2"
@@ -690,7 +690,7 @@
         "alias": "relay_connection2",
         "name": "Relay Connection",
         "phase": "Action",
-        "window": "After you produce a ship in a system",
+        "window": "After you produce a ship",
         "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
         "flavorText": "",
         "source": "action_deck_2"
@@ -699,7 +699,7 @@
         "alias": "relay_connection3",
         "name": "Relay Connection",
         "phase": "Action",
-        "window": "After you produce a ship in a system",
+        "window": "After you produce a ship",
         "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
         "flavorText": "",
         "source": "action_deck_2"
@@ -708,7 +708,7 @@
         "alias": "relay_connection4",
         "name": "Relay Connection",
         "phase": "Action",
-        "window": "After you produce a ship in a system",
+        "window": "After you produce a ship",
         "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
         "flavorText": "His engineers broke into celebration as Umbat called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
         "source": "action_deck_2"
@@ -1079,7 +1079,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may resolve a card from its discard pile instead.",
-        "flavorText": "Carth breathed in the familiar air of Silver Sands. Home. Were it that she never had to leave.",
+        "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "action_deck_2"
     },
     {
