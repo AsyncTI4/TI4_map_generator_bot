@@ -1841,7 +1841,7 @@ public class Game extends GameProperties {
             return ButtonHelper.isCoatlHealed(this);
         }
         if (isTwilightsFallMode()) {
-          return getTyrant() != null;
+            return getTyrant() != null;
         }
         if (isLiberationC4Mode()) {
             return true;
