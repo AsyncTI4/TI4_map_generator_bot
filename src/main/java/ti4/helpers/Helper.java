@@ -2205,7 +2205,8 @@ public class Helper {
                 }
                 if (!player.getPlanetsAllianceMode().contains(unitHolder.getName())
                         && !"genericModifyAllTiles".equals(warfareNOtherstuff)
-                        && !"genericBuild".equals(warfareNOtherstuff)) {
+                        && !"genericBuild".equals(warfareNOtherstuff)
+                        && !game.getPlanetsPlayerIsCoexistingOn(player).contains(unitHolder.getName())) {
                     continue;
                 }
 
@@ -3225,5 +3226,33 @@ public class Helper {
             sb.append(StringUtils.repeat(ut.getUnitTypeEmoji().toString(), count));
         }
         return sb.toString();
+    }
+
+    public static Map<UnitType, Integer> getUnitList(String unitList) {
+        Map<UnitType, Integer> unitCounts = new HashMap<>();
+        String[] units = unitList.split(",");
+        StringBuilder sb = new StringBuilder();
+        for (String desc : units) {
+            String[] split = desc.trim().split(" ");
+            String alias;
+            int count;
+            if (StringUtils.isNumeric(split[0])) {
+                count = Integer.parseInt(split[0]);
+                alias = split[1];
+            } else {
+                count = 1;
+                alias = split[0];
+            }
+            if (alias.isEmpty()) {
+                continue;
+            }
+            UnitType ut = Units.findUnitType(AliasHandler.resolveUnit(alias));
+            if (unitCounts.containsKey(ut)) {
+                unitCounts.put(ut, unitCounts.get(ut) + count);
+            } else {
+                unitCounts.put(ut, count);
+            }
+        }
+        return unitCounts;
     }
 }

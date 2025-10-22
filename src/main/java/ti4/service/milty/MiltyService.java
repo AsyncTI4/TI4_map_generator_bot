@@ -256,7 +256,7 @@ public class MiltyService {
                     String message = "Player:" + playerInfo.getUserName() + " already uses color:" + color
                             + " - changing color to " + newColor;
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-                    return;
+                    break;
                 } else if (faction.equals(playerInfo.getFaction())) {
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),

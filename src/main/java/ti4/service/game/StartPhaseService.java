@@ -24,6 +24,7 @@ import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperModifyUnits;
+import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.DisplayType;
 import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
@@ -91,6 +92,7 @@ public class StartPhaseService {
             case "finSpecialSomnoFix" -> Helper.addBotHelperPermissionsToGameChannels(event);
             case "finSpecialAbsol" -> AgendaHelper.resolveAbsolAgainstChecksNBalances(game);
             case "finFixSecrets" -> game.fixScrewedSOs();
+            case "finTFSlice" -> ButtonHelperTwilightsFall.startSliceBuild(game, event);
             case "setupHomebrew" -> HomebrewService.offerGameHomebrewButtons(event.getMessageChannel());
             case "cptiExplores" -> {
                 game.setCptiExploreMode(true);

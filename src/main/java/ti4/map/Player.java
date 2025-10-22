@@ -2580,7 +2580,7 @@ public class Player extends PlayerProperties {
         Predicate<ColorModel> nonExclusive = cm -> !ColorChangeHelper.colorIsExclusive(cm.getAlias(), this);
         String color = getUserSettings().getPreferredColors().stream()
                 .filter(c -> !ColorChangeHelper.colorIsExclusive(c, this))
-                .filter(c -> getGame().getUnusedColors().contains(c))
+                .filter(c -> getGame().getUnusedColors().contains(Mapper.getColor(c)))
                 .findFirst()
                 .orElse(game.getUnusedColorsPreferringBase().stream()
                         .filter(nonExclusive)
