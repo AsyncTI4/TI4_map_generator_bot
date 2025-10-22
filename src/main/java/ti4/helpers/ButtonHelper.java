@@ -1225,8 +1225,10 @@ public class ButtonHelper {
                         continue;
                     } else if (player == titans) {
                         slumberBonus++;
+                        game.drawActionCard(player.getUserID());
                     } else if (p2 == titans) {
                         slumberBonus++;
+                        game.drawActionCard(player.getUserID());
                         break;
                     }
                 }

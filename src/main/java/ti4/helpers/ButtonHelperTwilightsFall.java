@@ -6,22 +6,219 @@ import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
+import ti4.draft.DraftBag;
+import ti4.draft.DraftItem;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
+import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.service.button.ReactionService;
+import ti4.service.draft.DraftTileManager;
+import ti4.service.franken.FrankenDraftBagService;
+import ti4.service.milty.MiltyDraftHelper;
+import ti4.service.milty.MiltyDraftManager;
+import ti4.service.milty.MiltyDraftManager.PlayerDraft;
+import ti4.service.milty.MiltyDraftSlice;
+import ti4.service.milty.MiltyDraftTile;
 import ti4.service.unit.AddUnitService;
 
 public class ButtonHelperTwilightsFall {
+
+    public static void startSliceBuild(Game game, GenericInteractionCreateEvent event) {
+        try {
+            MiltyDraftManager manager = game.getMiltyDraftManager();
+            List<String> playerIDs = new ArrayList<>();
+            for (Player p : game.getRealPlayers()) {
+                playerIDs.add(p.getUserID());
+            }
+            manager.setPlayers(playerIDs);
+            for (Player p : game.getPlayers().values()) {
+                DraftBag bag = p.getDraftHand();
+                PlayerDraft draft = manager.getPlayerDraft(p);
+                List<MiltyDraftTile> slice = new ArrayList<>();
+                for (DraftItem.Category category : FrankenDraftBagService.TFcomponentCategories) {
+                    List<DraftItem> items = bag.Contents.stream()
+                            .filter(item -> item.ItemCategory == category)
+                            .toList();
+                    if (items.isEmpty()) {
+                        continue;
+                    }
+                    List<Button> buttons = new ArrayList<>();
+                    if (category == DraftItem.Category.DRAFTORDER) {
+                        draft.setPosition(Integer.parseInt(items.getFirst().ItemId));
+                        if (Integer.parseInt(items.getFirst().ItemId) == 1) {
+                            game.setSpeaker(p);
+                        }
+                    }
+                    if (category == DraftItem.Category.HOMESYSTEM) {
+                        draft.setFaction(items.getFirst().ItemId);
+                        for (DraftItem item : items) {
+                            buttons.add(Buttons.green("chooseHomeSystem_" + item.ItemId, item.getShortDescription()));
+                            game.setStoredValue(
+                                    "draftedHSFor" + p.getUserID(),
+                                    game.getStoredValue("draftedHSFor" + p.getUserID()) + "_" + item.ItemId);
+                        }
+                        MessageHelper.sendMessageToChannel(
+                                p.getCardsInfoThread(),
+                                p.getRepresentation() + " choose your starting home system",
+                                buttons);
+                    }
+                    if (category == DraftItem.Category.STARTINGFLEET) {
+                        for (DraftItem item : items) {
+                            buttons.add(
+                                    Buttons.green("chooseStartingFleet_" + item.ItemId, item.getShortDescription()));
+                        }
+                        MessageHelper.sendMessageToChannel(
+                                p.getCardsInfoThread(),
+                                p.getRepresentation() + " after choosing your home system, choose your starting fleet",
+                                buttons);
+                    }
+                    if (category == DraftItem.Category.BLUETILE || category == DraftItem.Category.REDTILE) {
+                        for (DraftItem item : items) {
+                            TileModel tile = TileHelper.getTileById(item.ItemId);
+                            slice.add(DraftTileManager.getDraftTileFromModel(tile));
+                        }
+                    }
+                }
+                Collections.shuffle(slice);
+                if (slice.get(1).getTile().getPlanetUnitHolders().isEmpty()) {
+                    Collections.rotate(slice, 1);
+                    if (slice.get(1).getTile().getPlanetUnitHolders().isEmpty()) {
+                        Collections.rotate(slice, 1);
+                    }
+                }
+                MiltyDraftSlice mslice = new MiltyDraftSlice();
+                mslice.setTiles(slice);
+                draft.setSlice(mslice);
+            }
+            MiltyDraftHelper.buildPartialMap(game, event);
+        } catch (Exception e) {
+            BotLogger.error(new LogOrigin(event, game), "err", e);
+        }
+    }
+
+    @ButtonHandler("chooseStartingFleet_")
+    public static void chooseStartingFleet(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String factionFleet = buttonID.split("_")[1];
+
+        String pos = "";
+        for (String faction :
+                game.getStoredValue("draftedHSFor" + player.getUserID()).split("_")) {
+            if (!faction.isEmpty() && Mapper.getFaction(faction).getHomeSystem() != null) {
+                if (game.getTile(Mapper.getFaction(faction).getHomeSystem()) != null) {
+                    pos = game.getTile(Mapper.getFaction(faction).getHomeSystem())
+                            .getPosition();
+                }
+            }
+        }
+
+        Tile tile = game.getTileByPosition(pos);
+
+        if (!pos.isEmpty()) {
+            Map<UnitType, Integer> unitCounts =
+                    Helper.getUnitList(Mapper.getFaction(factionFleet).getStartingFleet());
+            for (UnitType unit : unitCounts.keySet()) {
+                int amount = unitCounts.get(unit);
+                UnitModel mod =
+                        player.getUnitsByAsyncID(unit.getValue().toLowerCase()).getFirst();
+                String bestResPlanet = null;
+                int best = 0;
+                for (Planet plan : tile.getPlanetUnitHolders()) {
+                    if (plan.getResources() > best) {
+                        best = plan.getResources();
+                        bestResPlanet = plan.getName();
+                    }
+                }
+                if (mod != null) {
+                    if (bestResPlanet == null
+                            || mod.getIsShip()
+                            || (UnitType.Spacedock == unit
+                                    && (player.hasUnit("saar_spacedock") || player.hasUnit("tf-floatingfactory")))) {
+                        AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " " + mod.getAsyncId());
+                    } else {
+                        if (UnitType.Spacedock == unit) {
+                            AddUnitService.addUnits(
+                                    event,
+                                    tile,
+                                    game,
+                                    player.getColor(),
+                                    amount + " " + mod.getAsyncId() + " " + bestResPlanet);
+                        } else {
+                            while (amount > 0) {
+                                for (Planet plan : tile.getPlanetUnitHolders()) {
+                                    if (amount > 0) {
+                                        AddUnitService.addUnits(
+                                                event,
+                                                tile,
+                                                game,
+                                                player.getColor(),
+                                                "1 " + mod.getAsyncId() + " " + plan.getName());
+                                        amount--;
+                                    }
+                                    player.refreshPlanet(plan.getName());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(), player.getRepresentation() + " set starting fleet successfully.");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(), player.getRepresentation() + " couldnt figure out that fleet, sorry.");
+        }
+
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("chooseHomeSystem_")
+    public static void chooseHomeSystem(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String factionHS = buttonID.split("_")[1];
+
+        String pos = "";
+        for (String faction :
+                game.getStoredValue("draftedHSFor" + player.getUserID()).split("_")) {
+            if (!faction.isEmpty() && Mapper.getFaction(faction).getHomeSystem() != null) {
+                if (game.getTile(Mapper.getFaction(faction).getHomeSystem()) != null) {
+                    pos = game.getTile(Mapper.getFaction(faction).getHomeSystem())
+                            .getPosition();
+                }
+            }
+        }
+
+        String tileID = Mapper.getFaction(factionHS).getHomeSystem();
+        tileID = AliasHandler.resolveTile(tileID);
+
+        if (!pos.isEmpty() && tileID != null) {
+
+            Tile toAdd = new Tile(tileID, pos);
+            game.setTile(toAdd);
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(), player.getRepresentation() + " set home system successfully.");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(), player.getRepresentation() + " couldnt figure out that HS, sorry.");
+        }
+
+        ButtonHelper.deleteMessage(event);
+    }
 
     // @ButtonHandler("initiateASplice_")
     public static void initiateASplice(Game game, Player startPlayer, String buttonID, List<Player> participants) {
@@ -30,7 +227,6 @@ public class ButtonHelperTwilightsFall {
             spliceType = buttonID.split("_")[1];
         }
         game.setStoredValue("spliceType", spliceType);
-
         if (!game.getStoredValue("reverseSpliceOrder").isEmpty()) {
             Collections.reverse(participants);
             Collections.rotate(participants, -1);
@@ -97,6 +293,21 @@ public class ButtonHelperTwilightsFall {
                 "willParticipateInSplice", game.getStoredValue("willParticipateInSplice") + "_" + player.getFaction());
         ButtonHelperSCs.scFollow(game, player, event, buttonID);
 
+        if (splice == 7) {
+            List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
+            Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            buttons.add(DoneExhausting);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), player.getRepresentation() + " Use Buttons to Pay 3i/3r", buttons);
+        }
+        if (splice == 6) {
+            List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
+            Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            buttons.add(DoneExhausting);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), player.getRepresentation() + " Use Buttons to Pay 4r", buttons);
+        }
+
         // Some message in SC thread to say they are participating?
 
     }
@@ -110,7 +321,7 @@ public class ButtonHelperTwilightsFall {
             spliceType = "genome";
         }
         if (splice == 6) {
-            spliceType = "unit";
+            spliceType = "units";
         }
         List<Player> participants = new ArrayList<>();
         List<Player> fullOrder = Helper.getSpeakerOrFullPriorityOrderFromPlayer(player, game);
@@ -195,7 +406,8 @@ public class ButtonHelperTwilightsFall {
 
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.getActionsChannel(),
-                    player.getRepresentation() + " has chosen to get a commonly available tech instead of splicing: "
+                    player.getRepresentation()
+                            + " has chosen to get a commonly available tech instead of splicing: the tech is "
                             + Mapper.getTech(cardID).getName(),
                     Mapper.getTech(cardID).getRepresentationEmbed());
             triggerYellowUnits(game, player);
@@ -264,24 +476,30 @@ public class ButtonHelperTwilightsFall {
         drawParadigm(game, player, event, true);
     }
 
+    @ButtonHandler("addMagusSpliceCard")
+    public static void addMagusSpliceCard(Game game, Player player, ButtonInteractionEvent event) {
+        game.setStoredValue("paid6ForSplice", "yes");
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(), "Magus Holder chose to pay the 3i/3r for an extra draw.");
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
+        Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+        buttons.add(DoneExhausting);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use Buttons to Pay 3i/3r", buttons);
+    }
+
     public static void drawParadigm(Game game, Player player, ButtonInteractionEvent event, boolean scPara) {
 
         String messageID = event.getMessageId();
 
         if (scPara) {
             boolean used = ButtonHelperSCs.addUsedSCPlayer(messageID, game, player);
-            StrategyCardModel scModel = null;
-            for (int scNum : player.getUnfollowedSCs()) {
-                if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok8imperial")
-                        || game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("tf8")) {
-                    scModel = game.getStrategyCardModelByInitiative(scNum).get();
-                }
-            }
-
-            if (!player.getFollowedSCs().contains(scModel.getInitiative())) {
+            StrategyCardModel scModel = game.getStrategyCardModelByInitiative(8).get();
+            if (scModel != null && !player.getFollowedSCs().contains(scModel.getInitiative())) {
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
             }
-            if (!used
+
+            if (scModel != null
+                    && !used
                     && (scModel.usesAutomationForSCID("pok8imperial") || scModel.usesAutomationForSCID("tf8"))
                     && !player.getFollowedSCs().contains(scModel.getInitiative())
                     && game.getPlayedSCs().contains(scModel.getInitiative())) {
@@ -291,6 +509,7 @@ public class ButtonHelperTwilightsFall {
                 if (player.getStrategicCC() > 0) {
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Aeterna**");
                 }
+
                 String message = ButtonHelperSCs.deductCC(game, player, scNum);
                 ReactionService.addReaction(event, game, player, message);
             }

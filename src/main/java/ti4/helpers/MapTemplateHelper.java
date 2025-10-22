@@ -208,7 +208,7 @@ public class MapTemplateHelper {
                         game.setTile(toAdd);
                         somethingHappened = true;
                     } else if (faction != null
-                            && !faction.startsWith("keleres")
+                            && (!faction.startsWith("keleres") || game.isTwilightsFallMode() || game.isFrankenGame())
                             && tile.getHome() != null
                             && tile.getHome()) {
                         String tileID = Mapper.getFaction(faction).getHomeSystem();

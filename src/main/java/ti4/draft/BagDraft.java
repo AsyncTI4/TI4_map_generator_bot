@@ -125,7 +125,15 @@ public abstract class BagDraft {
     public String getLongBagRepresentation(DraftBag bag, Game game) {
         StringBuilder sb = new StringBuilder();
         for (DraftItem.Category cat : DraftItem.Category.values()) {
-            sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat, game));
+            if (this instanceof FrankenDraft) {
+                if (FrankenDraft.getItemLimitForCategory(cat, game) > 0) {
+                    sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat, game));
+                }
+            } else {
+                if (this.getItemLimitForCategory(cat) > 0) {
+                    sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat, game));
+                }
+            }
         }
         sb.append("**Total Cards: ").append(bag.Contents.size()).append("**\n");
         return sb.toString();
