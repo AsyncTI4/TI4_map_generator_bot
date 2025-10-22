@@ -13,6 +13,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -40,18 +41,14 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
 
     public static void doAction(
             GenericInteractionCreateEvent event, Player player, String planet, Game game, boolean exhaust) {
-        doAction(player, planet, game, exhaust);
-    }
-
-    private static void doAction(Player player, String planet, Game game, boolean exhaust) {
         if (player == null) return;
         if (exhaust) {
             player.exhaustPlanetAbility(planet);
         }
-        resolveAbility(player, planet, game);
+        resolveAbility(event, player, planet, game);
     }
 
-    private static void resolveAbility(Player player, String planet, Game game) {
+    private static void resolveAbility(GenericInteractionCreateEvent event, Player player, String planet, Game game) {
         planet = AliasHandler.resolvePlanet(planet);
         PlanetModel model = Mapper.getPlanet(planet);
         MessageChannel channel = player.getCorrectChannel();
@@ -95,6 +92,10 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             case "thundersedge" -> {
                 output = "Use buttons to do another action.";
                 buttons.addAll(StartTurnService.getStartOfTurnButtons(player, game, true, null));
+            }
+            case "garbozia" -> {
+                NewStuffHelper.resolveGarboziaTE(event, game, player, "garbozia_page0");
+                output = "blank";
             }
             case "mrte" -> {
                 channel = player.getCardsInfoThread();
