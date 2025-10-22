@@ -212,6 +212,9 @@ public class MantisMapBuildService {
 
         mantisTileDraftable.getMulliganTileIDs().add(tileId);
         mantisTileDraftable.setDrawnTileId(null);
+        DraftItem oldTileItem = mantisTileDraftable.getDraftItem(MantisTileDraftable.makeChoiceKey(tileId));
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), "Mulliganed tile " + oldTileItem.getLongDescription() + ".");
         updateMapBuild(event, game, mantisTileDraftable, mapTemplateModel, allPlayerRemainingTiles, tileId);
         return DraftButtonService.DELETE_MESSAGE;
     }
