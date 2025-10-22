@@ -1834,9 +1834,20 @@ public class ButtonHelperAbilities {
     public static List<String> getPossibleTechForNekroToGainFromPlayer(
             Player nekro, Player victim, List<String> currentList, Game game) {
         List<String> techToGain = new ArrayList<>(currentList);
+        if (victim.getPromissoryNotesInPlayArea().contains("antivirus")) {
+            return techToGain;
+        }
         for (String tech : victim.getTechs()) {
             if (!nekro.getTechs().contains(tech) && !techToGain.contains(tech) && !"iihq".equalsIgnoreCase(tech)) {
-                techToGain.add(tech);
+                if (!game.playerHasLeaderUnlockedOrAlliance(victim, "bastioncommander")
+                        || !Mapper.getTech(tech).isFactionTech()) {
+                    if (game.isTwilightsFallMode()
+                            || (nekro.hasTech("vax") || nekro.getFactionTechs().contains("vax"))
+                            || (nekro.hasTech("vay") || nekro.getFactionTechs().contains("vay"))
+                            || !Mapper.getTech(tech).isFactionTech()) {
+                        techToGain.add(tech);
+                    }
+                }
             }
         }
         return techToGain;
@@ -2408,6 +2419,16 @@ public class ButtonHelperAbilities {
             ObjectiveHelper.secondHalfOfPeakStage2(game, player, 1);
         }
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("foretellPeak_")
+    public static void foretellPeak(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
+            ObjectiveHelper.secondHalfOfPeakStage1(game, player, Integer.parseInt(buttonID.split("_")[2]));
+        } else {
+            ObjectiveHelper.secondHalfOfPeakStage2(game, player, Integer.parseInt(buttonID.split("_")[2]));
+        }
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("initialPeak")

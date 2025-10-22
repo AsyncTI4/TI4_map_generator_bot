@@ -1976,6 +1976,20 @@ public class MapGenerator implements AutoCloseable {
                 graphics.setColor(Color.WHITE);
             }
         }
+        if (player.isTyrant()) {
+            String speakerFile = ResourceHelper.getInstance().getTokenFile("tyrant");
+            if (speakerFile != null) {
+                BufferedImage bufferedImage = ImageHelper.read(speakerFile);
+                point = PositionMapper.getPlayerStats(Constants.STATS_SPEAKER);
+                int negativeDelta = 0;
+                graphics.drawImage(
+                        bufferedImage,
+                        point.x + deltaX + deltaSplitX + negativeDelta,
+                        point.y + deltaY - deltaSplitY,
+                        null);
+                graphics.setColor(Color.WHITE);
+            }
+        }
         String activePlayerID = game.getActivePlayerID();
         String phase = game.getPhaseOfGame();
         if (player.isPassed()) {

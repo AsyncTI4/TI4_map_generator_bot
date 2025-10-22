@@ -252,6 +252,9 @@ public class PickStrategyCardButtonHandler {
         Integer tgCount = strategyCardToTradeGoodCount.get(scPicked);
         if (tgCount != null && tgCount != 0) {
             int tg = player.getTg();
+            if (player.hasTech("tf-futurepath")) {
+                tgCount *= 3;
+            }
             tg += tgCount;
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

@@ -39,6 +39,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
+import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -70,6 +71,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
+import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -421,6 +423,7 @@ public class Player extends PlayerProperties {
         return getTechs().contains("cl2")
                 || getTechs().contains("so2")
                 || getTechs().contains("inf2")
+                || getTechs().contains("tf-specops")
                 || getTechs().contains("lw2")
                 || getTechs().contains("batyriinf")
                 || getTechs().contains("dscymiinf")
@@ -645,6 +648,18 @@ public class Player extends PlayerProperties {
         return actionCards;
     }
 
+    public List<String> getPlayableActionCards() {
+        List<String> cards = new ArrayList<>(actionCards.keySet());
+        Game game = getGame();
+        if (game != null) {
+            List<String> garboziaCards = game.getDiscardACStatus().keySet().stream()
+                    .filter(ac -> game.getDiscardACStatus().get(ac) == ACStatus.garbozia)
+                    .toList();
+            cards.addAll(garboziaCards);
+        }
+        return cards;
+    }
+
     public Map<String, Integer> getEvents() {
         return events;
     }
@@ -675,6 +690,9 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasUnit(String unitID) {
+        if (unitID.contains("flagship") && hasUnlockedBreakthrough("nekrobt")) {
+            return ValefarZService.hasFlagshipAbility(getGame(), this, unitID);
+        }
         return getUnitsOwned().contains(unitID);
     }
 
@@ -2116,6 +2134,10 @@ public class Player extends PlayerProperties {
             gainCustodiaVigilia();
         }
 
+        if ("cr2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("mentakbt")) {
+            addOwnedUnitByID("mentak_cruiser3");
+        }
+
         // Update Owned Units when Researching a Unit Upgrade
         TechnologyModel techModel = Mapper.getTech(techID);
         if (techID == null) return;
@@ -2571,6 +2593,7 @@ public class Player extends PlayerProperties {
         Predicate<ColorModel> nonExclusive = cm -> !ColorChangeHelper.colorIsExclusive(cm.getAlias(), this);
         String color = getUserSettings().getPreferredColors().stream()
                 .filter(c -> !ColorChangeHelper.colorIsExclusive(c, this))
+                .filter(c -> getGame().getUnusedColors().contains(Mapper.getColor(c)))
                 .findFirst()
                 .orElse(game.getUnusedColorsPreferringBase().stream()
                         .filter(nonExclusive)

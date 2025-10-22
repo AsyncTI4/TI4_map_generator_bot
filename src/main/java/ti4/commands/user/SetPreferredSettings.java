@@ -16,6 +16,8 @@ class SetPreferredSettings extends Subcommand {
                 OptionType.BOOLEAN, "pre_decline_sc", "True to be prompted to pre-decline on strategy cards"));
         addOptions(new OptionData(OptionType.BOOLEAN, "pillage_msg", "True to get the Pillage flavor text"));
         addOptions(new OptionData(OptionType.BOOLEAN, "sarween_msg", "True to get the Sarween Tools flavor text"));
+        addOptions(
+                new OptionData(OptionType.BOOLEAN, "auto_debt_clearance", "True to auto clear debt when you send tgs"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 "pass_on_agenda_stuff",
@@ -39,6 +41,9 @@ class SetPreferredSettings extends Subcommand {
 
         Boolean pillage = event.getOption("pillage_msg", null, OptionMapping::getAsBoolean);
         if (pillage != null) userSettings.setPrefersPillageMsg(pillage);
+
+        Boolean debtClearance = event.getOption("auto_debt_clearance", null, OptionMapping::getAsBoolean);
+        if (debtClearance != null) userSettings.setPrefersAutoDebtClearance(debtClearance);
 
         Boolean sarween = event.getOption("sarween_msg", null, OptionMapping::getAsBoolean);
         if (sarween != null) userSettings.setPrefersSarweenMsg(sarween);

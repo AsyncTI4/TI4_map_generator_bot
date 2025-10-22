@@ -1274,9 +1274,8 @@ public class AgendaHelper {
 
         boolean playerPrevotesIsEmpty =
                 game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
-        boolean playerIsNotActivePlayer =
-                (player != game.getActivePlayer() || "agendaWaiting".equalsIgnoreCase(game.getPhaseOfGame()));
-        boolean playerIsPrevoting = !playerPrevotesIsEmpty && playerIsNotActivePlayer;
+        boolean playerIsNotActivePlayer = "agendaWaiting".equalsIgnoreCase(game.getPhaseOfGame());
+        boolean playerIsPrevoting = !playerPrevotesIsEmpty || playerIsNotActivePlayer;
         if (playerIsPrevoting) {
             if ("0".equalsIgnoreCase(votes)) {
                 MessageHelper.sendMessageToChannel(
@@ -3333,7 +3332,11 @@ public class AgendaHelper {
         ButtonHelper.deleteTheOneButton(event);
         boolean success = game.removeLaw(game.getLaws().get("minister_war"));
         if (success) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "The _Minister of War_ law has been discarded.");
+            String msg = "The _Minister of War_ law has been discarded.";
+            MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "## " + game.getPing() + " " + msg);
+            }
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found");
         }
@@ -3450,9 +3453,13 @@ public class AgendaHelper {
             voteCount = baseResourceCount + baseInfluenceCount;
         }
 
-        boolean executive = player.getFaction().equals(game.getStoredValue("executiveOrder"));
+        boolean executive = player.getFaction().equalsIgnoreCase(game.getStoredValue("executiveOrder"));
         if (player.hasUnlockedBreakthrough("xxchabt") || executive) {
             voteCount = Math.max(baseResourceCount, baseInfluenceCount);
+        }
+
+        if (executive) {
+            voteCount += player.getTg();
         }
 
         // Xxcha Alliance - +1 vote for each planet

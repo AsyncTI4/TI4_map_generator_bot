@@ -23,6 +23,12 @@ class CardsInfoButtonHandler {
                     .setArchived(true)
                     .queue(); // archiving it to combat a common bug that is solved via archiving
         }
+        // List<String> techs = Mapper.getDeck("techs_tf").getNewShuffledDeck();
+        // for(String tech : techs){
+        //     if(Mapper.getTech(tech) == null){
+        //         System.out.println(tech);
+        //     }
+        // }
         CardsInfoService.sendCardsInfo(game, player, event);
         EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
     }

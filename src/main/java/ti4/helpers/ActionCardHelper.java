@@ -2,8 +2,10 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
@@ -44,6 +46,11 @@ import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class ActionCardHelper {
+    public enum ACStatus {
+        ralnelbt,
+        garbozia,
+        purged;
+    }
 
     public static void sendActionCardInfo(Game game, Player player) {
         // AC INFO
@@ -57,6 +64,77 @@ public class ActionCardHelper {
         }
 
         sendTrapCardInfo(player);
+        sendGarboziaInfo(game, player);
+    }
+
+    private static void sendGarboziaInfo(Game game, Player player) {
+        if (player.hasPlanet("garbozia")) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    getGarboziaInfo(game, player),
+                    getPurgeGarboziaActionCardButtons(game));
+        }
+    }
+
+    private static String getGarboziaInfo(Game game, Player player) {
+        StringBuilder sb = new StringBuilder();
+        // ACTION CARDS
+        sb.append("### ")
+                .append(MiscEmojis.LegendaryPlanet)
+                .append(" **Garbozia Action Cards:**")
+                .append("\n");
+
+        Map<String, Integer> actionCards = game.getDiscardActionCards();
+        if (actionCards == null || actionCards.isEmpty()) {
+            sb.append("> None");
+            return sb.toString();
+        }
+
+        int index = 1;
+        for (Entry<String, Integer> ac : actionCards.entrySet()) {
+            ACStatus status = game.getDiscardACStatus().getOrDefault(ac.getKey(), null);
+            if (status != ACStatus.garbozia) continue;
+
+            Integer value = ac.getValue();
+            ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
+            sb.append("`")
+                    .append(index)
+                    .append(".")
+                    .append(Helper.leftpad("(" + value, 4))
+                    .append(")`");
+            if (actionCard == null) {
+                sb.append("Something broke here");
+            } else {
+                sb.append(actionCard.getRepresentation());
+            }
+            index++;
+        }
+        return sb.toString();
+    }
+
+    private static Map<String, Integer> getGarboziaActionCards(Game game) {
+        Map<String, Integer> cards = new HashMap<>();
+        for (Entry<String, ACStatus> discard : game.getDiscardACStatus().entrySet()) {
+            if (discard.getValue() != ACStatus.garbozia) continue;
+            Integer ident = game.getDiscardActionCards().get(discard.getKey());
+            cards.put(discard.getKey(), ident);
+        }
+        return cards;
+    }
+
+    private static List<Button> getPurgeGarboziaActionCardButtons(Game game) {
+        List<Button> buttons = new ArrayList<>();
+        for (Entry<String, Integer> card : getGarboziaActionCards(game).entrySet()) {
+            String key = card.getKey();
+            Integer ident = card.getValue();
+            ACStatus status = game.getDiscardACStatus().get(key);
+            if (status == ACStatus.garbozia) {
+                String id = Constants.AC_PLAY_FROM_HAND + ident;
+                String label = Mapper.getActionCard(card.getKey()).getName();
+                buttons.add(Buttons.red(id, label, CardEmojis.ActionCard));
+            }
+        }
+        return buttons;
     }
 
     private static void sendTrapCardInfo(Player player) {
@@ -215,7 +293,33 @@ public class ActionCardHelper {
                 "deflection",
                 "summit",
                 "bounty_contracts");
-        return CollectionUtils.containsAny(prePlayable, player.getActionCards().keySet());
+        List<String> actionCards = new ArrayList<>();
+        actionCards.addAll(player.getActionCards().keySet());
+        if (player.hasPlanet("garbozia")) {
+            actionCards.addAll(getGarboziaActionCards(player.getGame()).keySet());
+        }
+        return CollectionUtils.containsAny(prePlayable, actionCards);
+    }
+
+    public static List<Button> getGarboziaComponentActionCards(Game game, Player player) {
+        List<Button> acButtons = new ArrayList<>();
+        Map<String, Integer> garboziaCards = getGarboziaActionCards(player.getGame());
+        if (player.hasPlanet("garbozia") && !garboziaCards.isEmpty()) {
+            for (Entry<String, Integer> ac : garboziaCards.entrySet()) {
+                Integer value = ac.getValue();
+                String key = ac.getKey();
+                String ac_name = Mapper.getActionCard(key).getName();
+                ActionCardModel actionCard = Mapper.getActionCard(key);
+                String actionCardWindow = actionCard.getWindow();
+                if (ac_name != null && "action".equalsIgnoreCase(actionCardWindow)) {
+                    acButtons.add(Buttons.red(
+                            Constants.AC_PLAY_FROM_HAND + value,
+                            "(" + value + ") " + ac_name,
+                            MiscEmojis.LegendaryPlanet));
+                }
+            }
+        }
+        return acButtons;
     }
 
     public static List<Button> getActionPlayActionCardButtons(Player player) {
@@ -235,6 +339,32 @@ public class ActionCardHelper {
                 if (acName != null && "action".equalsIgnoreCase(actionCardWindow)) {
                     acButtons.add(Buttons.red(
                             Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.ActionCard));
+                }
+            }
+        }
+        acButtons.addAll(getGarboziaComponentActionCards(player.getGame(), player));
+        return acButtons;
+    }
+
+    public static List<Button> getGarboziaCombatActionCards(Game game, Player player) {
+        List<Button> acButtons = new ArrayList<>();
+        Map<String, Integer> garboziaCards = getGarboziaActionCards(player.getGame());
+        if (player.hasPlanet("garbozia") && !garboziaCards.isEmpty()) {
+            for (Entry<String, Integer> ac : garboziaCards.entrySet()) {
+                Integer value = ac.getValue();
+                String key = ac.getKey();
+                String ac_name = Mapper.getActionCard(key).getName();
+                ActionCardModel actionCard = Mapper.getActionCard(key);
+                String actionCardWindow = actionCard.getWindow();
+                if (ac_name != null) {
+                    if (actionCardWindow.contains("combat")
+                            || actionCardWindow.contains("roll")
+                            || actionCardWindow.contains("hit")) {
+                        acButtons.add(Buttons.red(
+                                Constants.AC_PLAY_FROM_HAND + value,
+                                "(" + value + ") " + ac_name,
+                                MiscEmojis.LegendaryPlanet));
+                    }
                 }
             }
         }
@@ -263,6 +393,7 @@ public class ActionCardHelper {
                 }
             }
         }
+        acButtons.addAll(getGarboziaCombatActionCards(player.getGame(), player));
         return acButtons;
     }
 
@@ -397,6 +528,27 @@ public class ActionCardHelper {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
     }
 
+    public static String playACFromGarbozia(
+            GenericInteractionCreateEvent event, Game game, Player player, String value) {
+        String acID = null;
+        int acIndex = -1;
+        try {
+            acIndex = Integer.parseInt(value);
+            for (Entry<String, Integer> ac : game.getDiscardActionCards().entrySet()) {
+                if (ac.getValue().equals(acIndex)) {
+                    acID = ac.getKey();
+                }
+            }
+        } catch (Exception e) {
+            return "Error parsing ID";
+        }
+
+        if (acID == null) {
+            return "No such Action Card ID found, please retry";
+        }
+        return resolveActionCard(event, game, player, acID, acIndex, null);
+    }
+
     public static String resolveActionCard(
             GenericInteractionCreateEvent event,
             Game game,
@@ -412,7 +564,7 @@ public class ActionCardHelper {
         String activePlayerID = game.getActivePlayerID();
         if (player.isPassed() && activePlayerID != null) {
             Player activePlayer = game.getPlayer(activePlayerID);
-            if (activePlayer != null && activePlayer.hasTech("tp")) {
+            if (activePlayer != null && (activePlayer.hasTech("tp") || activePlayer.hasTech("tf-crafty"))) {
                 return "You are passed and the active player owns _Transparasteel Plating_, preventing you from playing action cards.";
             }
         }
@@ -459,14 +611,22 @@ public class ActionCardHelper {
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Played the _" + actionCardTitle
                         + "_ action card.");
 
-        if (player.hasAbility("cybernetic_madness")) {
+        boolean fromGarbozia = false;
+        if (player.hasPlanet("garbozia") && game.getDiscardACStatus().getOrDefault(acID, null) == ACStatus.garbozia) {
+            game.getDiscardACStatus().put(acID, ACStatus.purged);
+            if (!game.isFowMode()) {
+                fromGarbozia = true;
+            }
+        } else if (player.hasAbility("cybernetic_madness")) {
             game.purgedActionCard(player.getUserID(), acIndex);
         } else {
             game.discardActionCard(player.getUserID(), acIndex);
         }
 
-        String message = game.getPing() + ", " + (game.isFowMode() ? "someone" : player.getRepresentation())
-                + " played the action card _" + actionCardTitle + "_.";
+        String message = game.getPing() + ", " + (game.isFowMode() ? "someone" : player.getRepresentation());
+        message += fromGarbozia ? " purged " : " played ";
+        message += "the action card _" + actionCardTitle + "_";
+        message += fromGarbozia ? " using Garbozia." : ".";
 
         List<Button> buttons = new ArrayList<>();
         Button sabotageButton = Buttons.red(
@@ -1239,6 +1399,14 @@ public class ActionCardHelper {
                             player,
                             hackButtons);
                 }
+                // "tf-engineer", -- 2 extra cards
+                // "tf-thieve" -- take the last card
+                // "tf-helix"
+                // "tf-reverse"
+                // "alias": "tf-scarab", "name": "Scarab","Choose a spliced card you own; gain 2 trade goods for each
+                // card you own with a faction origin that matches that card",
+                // Discard 1 of your neighbor's genomes. tf-genophage
+                // "tf-mutate1" "tf-mutate2" discard and draw an ability
                 if ("insider".equals(automationID)) {
                     codedButtons.add(Buttons.green(
                             player.getFinsFactionCheckerPrefix() + "resolveInsiderInformation", buttonLabel));
@@ -1327,6 +1495,7 @@ public class ActionCardHelper {
                         new StringBuilder(player.getRepresentationUnfogged() + " you can use _Reverse Engineer_ on ");
                 if (actionCards.size() > 1) msg.append("one of the following cards:");
 
+                List<String> ralnel = new ArrayList<>();
                 List<Button> reverseButtons = new ArrayList<>();
                 String reversePrefix =
                         Constants.AC_PLAY_FROM_HAND + player.getActionCards().get(reverseEngineerID) + "_reverse_";
@@ -1335,6 +1504,11 @@ public class ActionCardHelper {
                     ActionCardModel model = Mapper.getActionCard(acID);
                     if (!model.getWindow().toLowerCase().startsWith("action")) {
                         continue;
+                    }
+
+                    if (game.getDiscardACStatus().get(acID) != null) {
+                        if (game.getDiscardACStatus().get(acID) == ACStatus.ralnelbt) ralnel.add(acID);
+                        continue; // on RN bt or garbozia or purged
                     }
 
                     String id = reversePrefix + model.getName();
@@ -1347,6 +1521,10 @@ public class ActionCardHelper {
                     reverseButtons.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCardsInfoThread(), msg.toString(), reverseButtons);
+                }
+                if (!ralnel.isEmpty()) {
+                    String error = "The action cards were not placed in the discard pile: " + String.join(", ", ralnel);
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), error);
                 }
             }
         }
@@ -1370,26 +1548,33 @@ public class ActionCardHelper {
         int acIndex = -1;
         try {
             acIndex = Integer.parseInt(value);
-            for (Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
-                if (so.getValue().equals(acIndex)) {
-                    acID = so.getKey();
+            for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
+                if (ac.getValue().equals(acIndex)) {
+                    acID = ac.getKey();
                 }
+            }
+            if (acID == null) {
+                acID = getGarboziaACIdentByNumber(game, player, acIndex);
             }
         } catch (Exception e) {
             boolean foundSimilarName = false;
             String cardName = "";
-            for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
-                String actionCardName = Mapper.getActionCard(ac.getKey()).getName();
-                if (actionCardName != null) {
-                    actionCardName = actionCardName.toLowerCase();
-                    if (actionCardName.contains(value) || ac.getKey().equalsIgnoreCase(value)) {
-                        if (foundSimilarName && !cardName.equals(actionCardName)) {
-                            return "Multiple cards with similar name founds, please use ID";
+            if ((acID = getGarboziaACIdentByAlias(game, player, value)) != null) {
+                acIndex = game.getDiscardActionCards().get(acID);
+            } else {
+                for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
+                    String actionCardName = Mapper.getActionCard(ac.getKey()).getName();
+                    if (actionCardName != null) {
+                        actionCardName = actionCardName.toLowerCase();
+                        if (actionCardName.contains(value) || ac.getKey().equalsIgnoreCase(value)) {
+                            if (foundSimilarName && !cardName.equals(actionCardName)) {
+                                return "Multiple cards with similar name founds, please use ID";
+                            }
+                            acID = ac.getKey();
+                            acIndex = ac.getValue();
+                            foundSimilarName = true;
+                            cardName = actionCardName;
                         }
-                        acID = ac.getKey();
-                        acIndex = ac.getValue();
-                        foundSimilarName = true;
-                        cardName = actionCardName;
                     }
                 }
             }
@@ -1398,6 +1583,28 @@ public class ActionCardHelper {
             return "No such Action Card ID found, please retry";
         }
         return resolveActionCard(event, game, player, acID, acIndex, channel);
+    }
+
+    private static String getGarboziaACIdentByAlias(Game game, Player player, String key) {
+        if (player.hasPlanet("garbozia")) {
+            for (Entry<String, ACStatus> entry : game.getDiscardACStatus().entrySet()) {
+                if (entry.getValue() != ACStatus.garbozia) continue;
+                if (entry.getKey().equals(key)) {
+                    return entry.getKey();
+                }
+            }
+        }
+        return null;
+    }
+
+    private static String getGarboziaACIdentByNumber(Game game, Player player, int key) {
+        if (player.hasPlanet("garbozia")) {
+            for (Entry<String, ACStatus> entry : game.getDiscardACStatus().entrySet()) {
+                if (entry.getValue() != ACStatus.garbozia) continue;
+                if (game.getDiscardActionCards().get(entry.getKey()).equals(key)) return entry.getKey();
+            }
+        }
+        return null;
     }
 
     public static void sendActionCard(
@@ -1594,7 +1801,7 @@ public class ActionCardHelper {
                 .append(" to each of: ");
         int count = 0;
         for (Tile tile : game.getTileMap().values()) {
-            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            for (UnitHolder unitHolder : tile.getPlanetUnitHolders()) {
                 if (planets.contains(unitHolder.getName())) {
                     Set<String> tokenList = unitHolder.getTokenList();
                     boolean ignorePlanet = false;

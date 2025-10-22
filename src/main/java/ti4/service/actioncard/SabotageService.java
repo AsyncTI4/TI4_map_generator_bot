@@ -26,7 +26,8 @@ public class SabotageService {
 
         if (player.isPassed()
                 && game.getActivePlayer() != null
-                && game.getActivePlayer().hasTech("tp")) {
+                && (game.getActivePlayer().hasTech("tp")
+                        || game.getActivePlayer().hasTech("tf-crafty"))) {
             return false;
         }
 

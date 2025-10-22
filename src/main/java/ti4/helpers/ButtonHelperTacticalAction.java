@@ -194,8 +194,7 @@ public class ButtonHelperTacticalAction {
                 if (player == nonActivePlayer) {
                     continue;
                 }
-                if (nonActivePlayer.getTechs().contains("vw")
-                        && FoWHelper.playerHasUnitsInSystem(nonActivePlayer, tile)) {
+                if (nonActivePlayer.hasTech("vw") && FoWHelper.playerHasUnitsInSystem(nonActivePlayer, tile)) {
 
                     if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(
@@ -478,6 +477,13 @@ public class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, button3);
         }
 
+        List<Button> button4 = ButtonHelperAgents.getTFAwakenButtons(game, tile, player);
+        if (player.hasTech("tf-awaken") && !button3.isEmpty() && !game.isL1Hero()) {
+            String msg = player.getRepresentationUnfogged()
+                    + ", you can use these buttons to change an infantry into a PDS using awaken.";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, button4);
+        }
+
         if (tile.isAnomaly() && player.getActionCards().containsKey("harness")) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
@@ -493,9 +499,7 @@ public class ButtonHelperTacticalAction {
         }
 
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, tile, game);
-        if ((player.getTechs().contains("sdn")
-                        || player.getTechs().contains("absol_sdn")
-                        || player.getTechs().contains("wavelength"))
+        if ((player.hasTech("sdn") || player.hasTech("absol_sdn") || player.hasTech("wavelength"))
                 && !button2.isEmpty()
                 && !game.isL1Hero()) {
             MessageHelper.sendMessageToChannelWithButtons(

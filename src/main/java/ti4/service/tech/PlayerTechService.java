@@ -67,7 +67,6 @@ public class PlayerTechService {
         }
         if ("cr2".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             if (player.hasUnlockedBreakthrough("mentakbt")) {
-                player.addOwnedUnitByID("mentak_cruiser3");
                 message += "\nAutomatically added Mentak's cruiser 3.";
             }
         }
@@ -706,6 +705,14 @@ public class PlayerTechService {
         }
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, payType + "tech");
         TechnologyModel techM = Mapper.getTechs().get(AliasHandler.resolveTech(tech));
+        List<Button> dwsCommanders = game.getPlayers().values().stream()
+                .filter(p1 -> p1 != player)
+                .filter(p1 -> game.playerHasLeaderUnlockedOrAlliance(p1, "deepwroughtcommander"))
+                .map(p1 -> Buttons.gray(
+                        "useDwsDiscount_" + p1.getFaction(),
+                        "Use " + p1.getFaction() + "'s DWS Commander Discount",
+                        p1.getFactionEmoji()))
+                .toList();
         if (techM.isUnitUpgrade() && player.hasTechReady("aida")) {
             Button aiDEVButton = Buttons.red("exhaustTech_aida", "Exhaust AI Development Algorithm");
             buttons.add(aiDEVButton);

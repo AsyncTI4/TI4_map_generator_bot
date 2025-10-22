@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperModifyUnits;
@@ -784,13 +785,29 @@ public class StartCombatService {
                                 + ", a reminder that if you win the combat, you may use this button to remove a command token from the system.",
                         buttons);
             }
-            if (player.hasAbility("technological_singularity") && !otherPlayer.isDummy()) {
+            if (player.hasAbility("technological_singularity")
+                    && !otherPlayer.isDummy()
+                    && !ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(
+                                    player, otherPlayer, new ArrayList<>(), game)
+                            .isEmpty()) {
                 Button steal = Buttons.gray(
                         player.finChecker() + "nekroStealTech_" + otherPlayer.getFaction(),
                         "Copy a Technology",
                         FactionEmojis.Nekro);
                 String message = msg
                         + ", a reminder that when you first kill an opponent's unit this combat, you may use the button to copy a technology.";
+                MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, steal);
+            }
+            if ((player.hasTech("tf-singularityz")
+                            || player.hasTech("tf-singularityy")
+                            || player.hasTech("tf-singularityx"))
+                    && !otherPlayer.isDummy()) {
+                Button steal = Buttons.gray(
+                        player.finChecker() + "nekroStealTech_" + otherPlayer.getFaction(),
+                        "Copy a Technology",
+                        FactionEmojis.Nekro);
+                String message = msg
+                        + ", a reminder that when you first kill an opponent's unit this combat, you may use the button to copy a technology. If you copy more techs than you have singularities, manually remove old ones with /tech remove";
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, steal);
             }
             if (player.hasUnit("ghemina_mech")

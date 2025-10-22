@@ -122,7 +122,7 @@ public class Helper {
         if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
             return false;
         }
-        if (player.hasTech("tp")
+        if ((player.hasTech("tp") || player.hasTech("tf-crafty"))
                 && game.getActivePlayerID() != null
                 && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
             for (Player p2 : game.getRealPlayers()) {
@@ -1262,9 +1262,21 @@ public class Helper {
         for (String thing : spentThings) {
             boolean found = false;
             switch (thing) {
+                case "dwsDiscount" -> {
+                    msg.append("> Used Deepwrought's Commander Discount ")
+                            .append(MiscEmojis.Resources_1)
+                            .append("\n");
+                    res += 1;
+                    found = true;
+                }
                 case "sarween" -> {
                     msg.append("> Used _Sarween Tools_ " + TechEmojis.CyberneticTech + "\n");
                     res += 1;
+                    found = true;
+                }
+                case "sledfactories" -> {
+                    msg.append("> Used _Sled Factories_ " + TechEmojis.CyberneticTech + "\n");
+                    res += 2;
                     found = true;
                 }
                 case "absol_sarween" -> {
@@ -1677,9 +1689,9 @@ public class Helper {
                 productionValueTotal += 5;
             }
             if (player.hasUnlockedBreakthrough("ghostbt")
-                    && !tile.getWormholes().isEmpty()
+                    && !tile.getWormholes(game).isEmpty()
                     && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
-                productionValueTotal += tile.getWormholes().size();
+                productionValueTotal += tile.getWormholes(game).size();
             }
         }
 
@@ -1903,7 +1915,8 @@ public class Helper {
                 UnitModel removedUnit =
                         player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
                 if (!"flagship".equalsIgnoreCase(removedUnit.getBaseType())
-                        || !game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")) {
+                        || (!game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")
+                                && !player.hasTech("tf-quantumdrive"))) {
                     cost += (int) removedUnit.getCost() * entry.getValue();
                 }
                 totalUnits += entry.getValue();
@@ -2192,7 +2205,8 @@ public class Helper {
                 }
                 if (!player.getPlanetsAllianceMode().contains(unitHolder.getName())
                         && !"genericModifyAllTiles".equals(warfareNOtherstuff)
-                        && !"genericBuild".equals(warfareNOtherstuff)) {
+                        && !"genericBuild".equals(warfareNOtherstuff)
+                        && !game.getPlanetsPlayerIsCoexistingOn(player).contains(unitHolder.getName())) {
                     continue;
                 }
 
@@ -2304,6 +2318,7 @@ public class Helper {
                 || player.getActionCards().containsKey("war_machine3")
                 || player.getActionCards().containsKey("war_machine4")
                 || player.getActionCards().containsKey("war_machine_ds")
+                // deprecated, but needs to sit here for a while til those games finish
                 || player.getActionCards().containsKey("war_machine1_acd2")
                 || player.getActionCards().containsKey("war_machine2_acd2")
                 || player.getActionCards().containsKey("war_machine3_acd2")
@@ -3211,5 +3226,33 @@ public class Helper {
             sb.append(StringUtils.repeat(ut.getUnitTypeEmoji().toString(), count));
         }
         return sb.toString();
+    }
+
+    public static Map<UnitType, Integer> getUnitList(String unitList) {
+        Map<UnitType, Integer> unitCounts = new HashMap<>();
+        String[] units = unitList.split(",");
+        StringBuilder sb = new StringBuilder();
+        for (String desc : units) {
+            String[] split = desc.trim().split(" ");
+            String alias;
+            int count;
+            if (StringUtils.isNumeric(split[0])) {
+                count = Integer.parseInt(split[0]);
+                alias = split[1];
+            } else {
+                count = 1;
+                alias = split[0];
+            }
+            if (alias.isEmpty()) {
+                continue;
+            }
+            UnitType ut = Units.findUnitType(AliasHandler.resolveUnit(alias));
+            if (unitCounts.containsKey(ut)) {
+                unitCounts.put(ut, unitCounts.get(ut) + count);
+            } else {
+                unitCounts.put(ut, count);
+            }
+        }
+        return unitCounts;
     }
 }

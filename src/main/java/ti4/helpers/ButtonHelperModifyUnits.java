@@ -1012,12 +1012,12 @@ public class ButtonHelperModifyUnits {
 
     private static boolean canRetreatTo(Game game, Player player, Tile tile, boolean skilledRetreat) {
         if ((tile.isAsteroidField()
-                        && !player.getTechs().contains("amd")
-                        && !player.getTechs().contains("wavelength")
+                        && !player.hasTech("amd")
+                        && !player.hasTech("wavelength")
                         && !player.getRelics().contains("circletofthevoid")
                         && !player.hasAbility("celestial_being"))
                 || (tile.isSupernova()
-                        && !player.getTechs().contains("mr")
+                        && !player.hasTech("mr")
                         && !player.getRelics().contains("circletofthevoid")
                         && !player.hasAbility("celestial_being"))
                 || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
@@ -2094,8 +2094,8 @@ public class ButtonHelperModifyUnits {
             }
             if (player.hasUnlockedBreakthrough("ghostbt")
                     && tile != null
-                    && tile.getWormholes().size() > 0) {
-                player.addSpentThing("ghostbt" + tile.getWormholes().size());
+                    && tile.getWormholes(game).size() > 0) {
+                player.addSpentThing("ghostbt" + tile.getWormholes(game).size());
             }
         } else {
             if (orbitalDrop) {

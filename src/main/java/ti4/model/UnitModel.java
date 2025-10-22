@@ -217,6 +217,11 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
                 return 3;
             }
         }
+        if (player.hasRelic("lightrailordnance")) {
+            if ("spacedock".equalsIgnoreCase(baseType)) {
+                return 2;
+            }
+        }
         return spaceCannonDieCount;
     }
 

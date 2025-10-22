@@ -256,7 +256,7 @@ public class MiltyService {
                     String message = "Player:" + playerInfo.getUserName() + " already uses color:" + color
                             + " - changing color to " + newColor;
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-                    return;
+                    break;
                 } else if (faction.equals(playerInfo.getFaction())) {
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
@@ -320,8 +320,7 @@ public class MiltyService {
             breakthrough = "keleresbt";
         }
         // BREAKTHROUGH
-        if (game.isThundersEdge() && Mapper.getBreakthrough(breakthrough) != null) {
-
+        if (Mapper.getBreakthrough(breakthrough) != null) {
             player.setBreakthroughID(breakthrough);
             player.setBreakthroughUnlocked(false);
             player.setBreakthroughExhausted(false);

@@ -455,11 +455,11 @@ public class StartTurnService {
                 String label = (player == nomad ? "Use" : "Use/Request") + " Thunder's Paradox";
                 startButtons.add(Buttons.gray("startThundersParadox", label, FactionEmojis.Nomad));
             }
-            if (player.getTechs().contains("parasite-obs")) {
+            if (player.hasTech("parasite-obs")) {
                 startButtons.add(Buttons.gray("startNeuralParasite", "Use Neural Parasite", FactionEmojis.Obsidian));
             }
 
-            if (player.getTechs().contains("cm")) {
+            if (player.hasTech("cm") || player.hasTech("tf-chaos")) {
                 startButtons.add(
                         Buttons.gray(finChecker + "startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));
             }
@@ -473,14 +473,13 @@ public class StartTurnService {
                 startButtons.add(
                         Buttons.gray(finChecker + "healCoatl", "Heal Coatl (Costs 6 Resources)", FactionEmojis.Argent));
             }
-            if (player.getTechs().contains("dspharinf")
+            if (player.hasTech("dspharinf")
                     && !ButtonHelperFactionSpecific.getPharadnInf2ReleaseButtons(player, game)
                             .isEmpty()) {
                 startButtons.add(Buttons.gray(
                         finChecker + "startPharadnInfRevive", "Release 1 Infantry", FactionEmojis.pharadn));
             }
-            if (player.getTechs().contains("dscymiy")
-                    && !player.getExhaustedTechs().contains("dscymiy")) {
+            if (player.hasTech("dscymiy") && !player.getExhaustedTechs().contains("dscymiy")) {
                 startButtons.add(Buttons.gray(
                         finChecker + "exhaustTech_dscymiy", "Exhaust Recursive Worm", FactionEmojis.cymiae));
             }

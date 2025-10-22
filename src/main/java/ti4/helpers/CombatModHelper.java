@@ -186,6 +186,24 @@ public class CombatModHelper {
                         relevantMod.get(), unit.getUnitEmoji() + " " + unit.getName() + " " + unit.getAbility()));
             }
         }
+        if (player.hasTech("tf-zealous")) {
+            Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
+                    .filter(modifier -> modifier.isRelevantTo(Constants.LEADER, "argentcommander"))
+                    .findFirst();
+
+            if (relevantMod.isPresent()
+                    && checkModPassesCondition(
+                            relevantMod.get(),
+                            tile,
+                            player,
+                            opponent,
+                            unitsByQuantity,
+                            opponentUnitsByQuantity,
+                            game)) {
+                modifiers.add(new NamedCombatModifierModel(
+                        relevantMod.get(), Mapper.getLeader("argentcommander").getName()));
+            }
+        }
 
         for (Leader leader : game.playerUnlockedLeadersOrAlliance(player)) {
             if (leader.isExhausted() || leader.isLocked()) {
@@ -337,8 +355,7 @@ public class CombatModHelper {
                 }
             }
             case Constants.MOD_HAS_FRAGILE ->
-                meetsCondition =
-                        player.getAbilities().contains("fragile") && !ButtonHelper.isLawInPlay(game, "articles_war");
+                meetsCondition = player.hasAbility("fragile") && !ButtonHelper.isLawInPlay(game, "articles_war");
             case Constants.MOD_OPPONENT_NO_CC_FLEET ->
                 meetsCondition = !player.getMahactCC().contains(opponent.getColor());
             case "next_to_structure" ->
