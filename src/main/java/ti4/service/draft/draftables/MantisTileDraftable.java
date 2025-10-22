@@ -431,6 +431,9 @@ public class MantisTileDraftable extends Draftable {
                 draftManager.getPlayerStates().entrySet()) {
             String playerUserId = entry.getKey();
             Player player = draftManager.getGame().getPlayer(playerUserId);
+            if (player == null) {
+                return "Could not find player with user ID " + playerUserId + ".";
+            }
             PlayerDraftState pState = entry.getValue();
             List<DraftChoice> mantisPicks = pState.getPicks(TYPE);
             if (mantisPicks == null) {

@@ -30,7 +30,7 @@ class DraftManagerMakePick extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         DraftManager draftManager = game.getDraftManager();
-        String playerUserId = event.getOption(Constants.PLAYER).getAsString();
+        String playerUserId = event.getOption(Constants.PLAYER).getAsUser().getId();
         DraftableType draftableType = DraftableType.of(
                 event.getOption(Constants.DRAFTABLE_TYPE_OPTION).getAsString());
         String choiceKey =

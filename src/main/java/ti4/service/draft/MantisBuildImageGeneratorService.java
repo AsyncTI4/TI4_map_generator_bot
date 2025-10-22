@@ -86,7 +86,7 @@ public class MantisBuildImageGeneratorService {
         // Add all on-board game tiles to the image
         for (Tile tile : tileMap.values()) {
             try {
-                Point tilePos = getTilePosition(game, tile.getPosition());
+                Point tilePos = getPositionPoint(game, tile.getPosition());
                 BufferedImage tileImage = tileGenerator.draw(tile, TileStep.Tile);
                 graphicsMain.drawImage(tileImage, tilePos.x, tilePos.y, null);
                 tileImagePoints.put(tile.getPosition(), tilePos);
@@ -100,7 +100,7 @@ public class MantisBuildImageGeneratorService {
                 Tile tile = tileMap.get(tilePos);
                 if (tile == null) {
                     BotLogger.warning("MantisBuildImageGeneratorService: Could not find tile at position " + tilePos
-                            + " to highlight.");
+                            + " to render as a placement option.");
                     continue;
                 }
                 Point tilePoint = tileImagePoints.get(tile.getPosition());
@@ -149,7 +149,7 @@ public class MantisBuildImageGeneratorService {
     }
 
     private void drawPendingTile(Graphics graphics, Game game, Tile tile) {
-        Point tilePoint = getTilePosition(game, PENDING_TILE_POS);
+        Point tilePoint = getPositionPoint(game, PENDING_TILE_POS);
         Point base = new Point(tilePoint.x + TILE_PADDING, tilePoint.y + TILE_PADDING + 20 - 150);
         TileGenerator tileGenerator = new TileGenerator(game, null, DisplayType.map);
         BufferedImage tileImage = tileGenerator.draw(tile, TileStep.Tile);
@@ -162,7 +162,7 @@ public class MantisBuildImageGeneratorService {
                 graphics, "CURRENT", base.x + 172, base.y - 80, Color.white, hCenter, null, outlineStroke, Color.black);
     }
 
-    private Point getTilePosition(Game game, String position) {
+    private Point getPositionPoint(Game game, String position) {
         Point positionPoint = PositionMapper.getTilePosition(position);
         if (positionPoint == null) {
             return null;

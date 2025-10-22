@@ -674,7 +674,7 @@ public class MantisMapBuildService {
 
         // Remove the home position, which by convention seems to be the first one in
         // the list
-        emulatedPositions.removeFirst();
+        emulatedPositions.remove(0);
 
         Map<Integer, Map<Integer, List<String>>> groupToPlayerNumToTiles = new HashMap<>();
         for (MapTemplateTile tile : mapTemplateModel.getTemplateTiles()) {
@@ -788,7 +788,7 @@ public class MantisMapBuildService {
         }
         MessageHelper.sendMessageToChannel(
                 playerChannel,
-                player.getRepresentation() + "You need to discard down to " + desiredAmount + " of these tiles",
+                player.getRepresentation() + " You need to discard down to " + desiredAmount + " of these tiles",
                 discardButtons);
     }
 
