@@ -1202,5 +1202,14 @@
         "automationID": "war_machine",
         "flavorText": "Warden Gim shuddered as one of the prisoners fell from exhaustion and was trampled by the others. The munitions were crucial to his alliance, but the price weighed heavily on his soul.",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "propaganda",
+        "name": "Propaganda",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Exhaust up to 2 of your non-home planets other than Mecatol Rex to place a number of infantry from your reinforcements on each of those planets equal to its influence value.",
+        "flavorText": "Sara, Blake, and Nolad stepped in front of the camera with a salute as Jace spoke, \"They're doing their part. Are you? Join the Mobile Infantry and save the universe. Service guarantees citizenship.\"",
+        "source": "action_deck_2_old"
     }
 ]
