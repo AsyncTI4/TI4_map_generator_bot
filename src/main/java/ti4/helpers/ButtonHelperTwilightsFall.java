@@ -321,7 +321,7 @@ public class ButtonHelperTwilightsFall {
             spliceType = "genome";
         }
         if (splice == 6) {
-            spliceType = "unit";
+            spliceType = "units";
         }
         List<Player> participants = new ArrayList<>();
         List<Player> fullOrder = Helper.getSpeakerOrFullPriorityOrderFromPlayer(player, game);
@@ -739,7 +739,7 @@ public class ButtonHelperTwilightsFall {
                 cards.add(allCards.remove(0));
             }
         }
-        if (type.equalsIgnoreCase("unit")) {
+        if (type.equalsIgnoreCase("units")) {
             List<String> allCards = new ArrayList<>();
             Map<String, UnitModel> allUnits = Mapper.getUnits();
             for (String unitID : allUnits.keySet()) {

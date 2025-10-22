@@ -87,12 +87,14 @@ public class SusSlashCommandService {
                 && event.getMessageChannel() != managedGame.getTableTalkChannel()
                 && !event.getMessageChannel().getName().contains("bot-map-updates");
 
-        if ((event.getInteraction().getSubcommandName() != null
-                        && ("replace".equalsIgnoreCase(event.getInteraction().getSubcommandName())
-                                || "leave"
-                                        .equalsIgnoreCase(event.getInteraction().getSubcommandName())))
-                || (!managedGame.isFowMode() && (isPrivateThread || isNotGameChannel) && !isPublicThread)) {
-            reportSusSlashCommand(event, jumpUrl);
+        if (event.getInteraction().getSubcommandName() != null) {
+
+            if ("replace".equalsIgnoreCase(event.getInteraction().getSubcommandName())
+                    || "leave".equalsIgnoreCase(event.getInteraction().getSubcommandName())) {
+                reportSusSlashCommand(event, jumpUrl);
+            } else if (!managedGame.isFowMode() && (isPrivateThread || isNotGameChannel) && !isPublicThread) {
+                reportLittleSusSlashCommand(event, jumpUrl);
+            }
         }
 
         if (managedGame.isFowMode()) {
@@ -117,7 +119,15 @@ public class SusSlashCommandService {
         if (moderationLogChannel == null) return;
         String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + jumpUrl;
         MessageHelper.sendMessageToChannel(moderationLogChannel, sb);
-        if (event.getInteraction().getSubcommandName() != null
-                && "replace".equalsIgnoreCase(event.getInteraction().getSubcommandName())) {}
+    }
+
+    public static void reportLittleSusSlashCommand(SlashCommandInteractionEvent event, String jumpUrl) {
+        TextChannel moderationLogChannel =
+                JdaService.guildPrimary.getTextChannelsByName("sus-slash-commands-log", true).stream()
+                        .findFirst()
+                        .orElse(null);
+        if (moderationLogChannel == null) return;
+        String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + jumpUrl;
+        MessageHelper.sendMessageToChannel(moderationLogChannel, sb);
     }
 }
