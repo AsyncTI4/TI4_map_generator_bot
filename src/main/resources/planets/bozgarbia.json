@@ -1,0 +1,113 @@
+{
+    "id": "bozgarbia",
+    "tileId": "sig01",
+    "name": "Bozgarbia",
+    "aliases": [
+        "bozgarbia"
+    ],
+    "positionInTile": {
+        "x": 170.0,
+        "y": 150.0
+    },
+    "resources": 1,
+    "influence": 0,
+    "factionHomeworld": null,
+    "planetType": "INDUSTRIAL",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": "The Wasteland",
+    "legendaryAbilityText": "When you explore Bozgarbia, draw 1 card from each planet exploration deck. Choose 1 to resolve, and discard the rest.\nYou may exhaust this card at the end of your turn to explore Bozgarbia",
+    "legendaryAbilityFlavourText": "*Thousands of years of garbage fills once majestic canyons, endlessly strewn over the moon's surface. Who knows what ancient treasure lays amongst the trash?*",
+    "unitPositions": {
+        "unitHolderName": "bozgarbia",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 132.0,
+                    "y": 140.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 192.0,
+                    "y": 175.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 137.0,
+                    "y": 167.0
+                },
+                {
+                    "x": 154.0,
+                    "y": 167.0
+                },
+                {
+                    "x": 171.0,
+                    "y": 167.0
+                },
+                {
+                    "x": 146.0,
+                    "y": 178.0
+                },
+                {
+                    "x": 164.0,
+                    "y": 178.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 139.0,
+                    "y": 96.0
+                },
+                {
+                    "x": 157.0,
+                    "y": 96.0
+                },
+                {
+                    "x": 132.0,
+                    "y": 109.0
+                },
+                {
+                    "x": 150.0,
+                    "y": 109.0
+                },
+                {
+                    "x": 168.0,
+                    "y": 109.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 151.0,
+                    "y": 137.0
+                },
+                {
+                    "x": 118.0,
+                    "y": 137.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 75.0,
+                    "y": 129.0
+                },
+                {
+                    "x": 83.0,
+                    "y": 98.0
+                },
+                {
+                    "x": 202.0,
+                    "y": 129.0
+                },
+                {
+                    "x": 194.0,
+                    "y": 98.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "flavourText": "*A solitary moon, which orbits the home of a once-great civilization, and served as the principal repository for its waste material.*",
+    "source": "sigma"
+}

@@ -62,6 +62,7 @@ class MigrationHelper {
 
             mapNeededMigrating |= replace(game.getActionCards(), toReplace, replacement);
             mapNeededMigrating |= replaceKey(game.getDiscardActionCards(), toReplace, replacement);
+            mapNeededMigrating |= replaceKey(game.getDiscardACStatus(), toReplace, replacement);
 
             for (Player player : game.getRealPlayers()) {
                 mapNeededMigrating |= replaceKey(player.getActionCards(), toReplace, replacement);

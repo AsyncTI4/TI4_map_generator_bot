@@ -13,10 +13,12 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.helpers.Constants;
@@ -146,7 +148,10 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         writeCards(game.getDiscardActionCards(), writer, Constants.AC_DISCARDED);
-        writeCards(game.getPurgedActionCards(), writer, Constants.AC_PURGED);
+        Map<String, String> discardStatus = new LinkedHashMap<String, String>(
+                game.getDiscardACStatus().entrySet().stream().collect(Collectors.toMap(Entry::getKey, e -> e.getValue()
+                        .toString())));
+        writeCardsStrings(discardStatus, writer, Constants.AC_STATUS);
 
         writer.write(Constants.EXPLORE + " " + String.join(",", game.getAllExplores()));
         writer.write(System.lineSeparator());

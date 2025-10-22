@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -15,8 +16,14 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.collections4.ListUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
-// import ti4.map.Game.ACStatus;
+import ti4.helpers.ActionCardHelper.ACStatus;
+import ti4.image.Mapper;
+import ti4.listeners.annotations.ButtonHandler;
+import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
+import ti4.service.emoji.CardEmojis;
 
 public class NewStuffHelper {
 
@@ -102,48 +109,48 @@ public class NewStuffHelper {
         }
     }
 
-    // @ButtonHandler("garbozia_")
-    // public static void resolveGarboziaTE(GenericInteractionCreateEvent event, Game game, Player player, String
-    // buttonID) {
-    //     String buttonPrefix = player.getFinsFactionCheckerPrefix() + "garbozia_";
-    //     String message = "Use buttons to pick an action card from the discard and put it on Doc 'N Pic's Salvage
-    // Yard:";
-    //     List<Button> buttons = garboziaButtons(game, player);
-    //     if (checkAndHandlePaginationChange(event, player.getCorrectChannel(), buttons, message, buttonPrefix,
-    // buttonID)) {
-    //         return; // no further handling necessary
-    //     }
+    @ButtonHandler("garbozia_")
+    public static void resolveGarboziaTE(
+            GenericInteractionCreateEvent event, Game game, Player player, String buttonID) {
+        String buttonPrefix = player.getFinsFactionCheckerPrefix() + "garbozia_";
+        String message = "Use buttons to pick an action card from the discard and put it on Doc 'N Pic's Salvage Yard:";
+        List<Button> buttons = garboziaButtons(game, player);
+        if (checkAndHandlePaginationChange(
+                event, player.getCorrectChannel(), buttons, message, buttonPrefix, buttonID)) {
+            return; // no further handling necessary
+        }
 
-    //     Matcher pick = Pattern.compile("garbozia_pick" + RegexHelper.acRegex(game)).matcher(buttonID);
-    //     if (pick.matches()) {
-    //         String acNum = pick.group("ac");
-    //         ActionCardModel acModel = Mapper.getActionCard(acNum);
-    //         //game.getDiscardACStatus().put(acNum, ACStatus.garbozia);
+        Matcher pick =
+                Pattern.compile("garbozia_pick" + RegexHelper.acRegex(game)).matcher(buttonID);
+        if (pick.matches()) {
+            String acNum = pick.group("ac");
+            ActionCardModel acModel = Mapper.getActionCard(acNum);
+            game.getDiscardACStatus().put(acNum, ACStatus.garbozia);
 
-    //         String msg = player.getRepresentation() + " picked up " + acModel.getName() + " from the discard and
-    // placed it on Doc 'N Pic's Salvage Yard.";
-    //         msg += "\n> You can check the cards on garbozia at any time by looking at the Action Card discard pile in
-    // the bot map thread";
-    //         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-    //         ActionCardHelper.sendActionCardInfo(game, player, event);
-    //         ButtonHelper.deleteMessage(event);
-    //         return;
-    //     }
-    // }
+            String msg = player.getRepresentation() + " picked up " + acModel.getName()
+                    + " from the discard and placed it on Doc 'N Pic's Salvage Yard.";
+            msg +=
+                    "\n> You can check the cards on garbozia at any time by looking at the Action Card discard pile in the bot map thread";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            ActionCardHelper.sendActionCardInfo(game, player, event);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+    }
 
-    // public static List<Button> garboziaButtons(Game game, Player player) {
-    //     List<Button> allButtons = new ArrayList<>();
-    //     Map<String, ACStatus> status = game.getDiscardACStatus();
-    //     String prefixID = player.getFinsFactionCheckerPrefix() + "garbozia_";
+    public static List<Button> garboziaButtons(Game game, Player player) {
+        List<Button> allButtons = new ArrayList<>();
+        Map<String, ACStatus> status = game.getDiscardACStatus();
+        String pre = player.finChecker() + "garbozia_pick";
 
-    //     // Right now, none of the statuses allow the card to be picked up. Add more to this list if it changes in the
-    // future
-    //     List<ACStatus> allowedStatus = new ArrayList<>(Collections.singleton(null));
-    //     game.getDiscardActionCards().entrySet().stream()
-    //         .filter(e -> allowedStatus.contains(status.getOrDefault(e.getKey(), null)))
-    //         .map(e -> Buttons.green(prefixID + "pick" + e.getKey(), Mapper.getActionCard(e.getKey()).getName(),
-    // CardEmojis.ActionCard))
-    //         .forEach(allButtons::add);
-    //     return allButtons;
-    // }
+        // Right now, only a 'null' status allows the card to be picked up. Add more to this list if it changes in the
+        // future
+        List<ACStatus> allowedStatus = new ArrayList<>(Collections.singleton(null));
+        game.getDiscardActionCards().entrySet().stream()
+                .filter(e -> allowedStatus.contains(status.getOrDefault(e.getKey(), null)))
+                .map(e -> Map.entry(e.getKey(), Mapper.getActionCard(e.getKey()).getName()))
+                .map(e -> Buttons.green(pre + e.getKey(), e.getValue(), CardEmojis.ActionCard))
+                .forEach(allButtons::add);
+        return allButtons;
+    }
 }

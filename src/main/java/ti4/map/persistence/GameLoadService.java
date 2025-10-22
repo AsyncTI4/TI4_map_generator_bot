@@ -33,6 +33,7 @@ import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
+import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -230,6 +231,10 @@ class GameLoadService {
                                         found = true;
                                     }
                                 }
+                                if (tile.getTileID().equals("sig01") && unitHolderName.equals("garbozia")) {
+                                    // DELETE ME
+                                    unitHolderName = "bozgarbia";
+                                }
                                 if (!found && !tile.isSpaceHolderValid(unitHolderName)) {
                                     BotLogger.warning(
                                             new LogOrigin(game),
@@ -381,7 +386,10 @@ class GameLoadService {
                 case Constants.AGENDAS -> game.setAgendas(getCardList(info));
                 case Constants.MANDATES -> game.setMandates(getCardList(info));
                 case Constants.AC_DISCARDED -> game.setDiscardActionCards(getParsedCards(info));
-                case Constants.AC_PURGED -> game.setPurgedActionCards(getParsedCards(info));
+                case Constants.AC_STATUS -> game.setDiscardActionCardStatus(getParsedCardStatus(info));
+                case Constants.AC_PURGED ->
+                    game.setPurgedActionCards(
+                            getParsedCards(info).keySet().stream().toList()); // @Deprecated
                 case Constants.DISCARDED_AGENDAS -> game.setDiscardAgendas(getParsedCards(info));
                 case Constants.SENT_AGENDAS -> game.setSentAgendas(getParsedCards(info));
                 case Constants.LAW -> game.setLaws(getParsedCards(info));
@@ -832,6 +840,24 @@ class GameLoadService {
             String id = cardInfo.nextToken();
             Integer index = Integer.parseInt(cardInfo.nextToken());
             cards.put(id, index);
+        }
+        return cards;
+    }
+
+    private static Map<String, ACStatus> getParsedCardStatus(String tokenizer) {
+        StringTokenizer actionCardToken = new StringTokenizer(tokenizer, ";");
+        Map<String, ACStatus> cards = new LinkedHashMap<>();
+        while (actionCardToken.hasMoreTokens()) {
+            StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
+            String id = cardInfo.nextToken();
+            ACStatus status =
+                    switch (cardInfo.nextToken()) {
+                        case "garbozia" -> ACStatus.garbozia;
+                        case "ralnelbt" -> ACStatus.ralnelbt;
+                        case "purged" -> ACStatus.purged;
+                        default -> null;
+                    };
+            cards.put(id, status);
         }
         return cards;
     }
