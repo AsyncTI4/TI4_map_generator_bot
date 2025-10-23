@@ -345,6 +345,7 @@ public class ButtonHelperTwilightsFall {
                     participants.add(p);
                 }
             }
+            game.removeStoredValue("willParticipateInSplice");
         }
         if (splice == 7 && !game.getStoredValue("paid6ForSplice").isEmpty()) {
             participants.add(player);
@@ -466,6 +467,7 @@ public class ButtonHelperTwilightsFall {
         } else {
             game.removeStoredValue("lastSplicer");
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " The splice is complete.");
+            game.removeStoredValue("willParticipateInSplice");
         }
         ButtonHelper.deleteMessage(event);
     }
