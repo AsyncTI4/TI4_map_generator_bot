@@ -783,7 +783,7 @@
         "types": [
             "BIOTIC"
         ],
-        "text": "At the start of the status phase, you may replace 1 of your non-faction technologies: Reveal technology from the deck until your reveal another technology of the same color and gain it; shuffle the replaced technology and other revealed cards back into your deck.",
+        "text": "At the start of the status phase, you may replace 1 of your non-faction abilities: Reveal abilities from the deck until your reveal another ability of the same color and gain it; shuffle the replaced technology and other revealed cards back into your deck.",
         "source": "twilights_fall",
         "faction": "deepwrought"
     },
