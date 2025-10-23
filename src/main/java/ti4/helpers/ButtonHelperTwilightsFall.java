@@ -228,9 +228,10 @@ public class ButtonHelperTwilightsFall {
         }
         game.setStoredValue("spliceType", spliceType);
         if (!game.getStoredValue("reverseSpliceOrder").isEmpty()) {
-            Collections.reverse(participants);
-            Collections.rotate(participants, -1);
             game.removeStoredValue("reverseSpliceOrder");
+        } else {
+            Collections.reverse(participants);
+            Collections.rotate(participants, 1);
         }
         if (!game.getStoredValue("engineerACSplice").isEmpty()) {
             participants.add(0, startPlayer);
@@ -255,10 +256,7 @@ public class ButtonHelperTwilightsFall {
                         "savedParticipants", game.getStoredValue("savedParticipants") + "_" + p.getFaction());
             }
         }
-        MessageHelper.sendMessageToChannel(
-                game.getActionsChannel(),
-                "A splice has started, buttons have been sent to " + startPlayer.getRepresentation()
-                        + "'s cards and info thread to select a card.");
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), "A splice has started.");
     }
 
     public static List<String> getSpliceCards(Game game) {
@@ -282,7 +280,7 @@ public class ButtonHelperTwilightsFall {
         List<Button> buttons = getSpliceButtons(game, type, cards, player);
         List<MessageEmbed> embeds = getSpliceEmbeds(game, type, cards, player);
         String msg = player.getRepresentation() + " Select a card to splice into your faction:";
-        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), msg, embeds, buttons);
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCorrectChannel(), msg, embeds, buttons);
     }
 
     @ButtonHandler("participateInSplice_")
@@ -291,6 +289,7 @@ public class ButtonHelperTwilightsFall {
         int splice = Integer.parseInt(buttonID.split("_")[1]);
         game.setStoredValue(
                 "willParticipateInSplice", game.getStoredValue("willParticipateInSplice") + "_" + player.getFaction());
+
         ButtonHelperSCs.scFollow(game, player, event, buttonID);
 
         if (splice == 7) {

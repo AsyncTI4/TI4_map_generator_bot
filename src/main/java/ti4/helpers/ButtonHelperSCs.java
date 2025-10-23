@@ -48,6 +48,9 @@ public class ButtonHelperSCs {
     public static void resolveConstructionPrimaryTE(ButtonInteractionEvent event, Game game, Player player) {
         StrategyCardModel scModel =
                 game.getStrategyCardModelByName("construction").orElse(null);
+        if (scModel == null) {
+            game.getStrategyCardModelByInitiative(4).orElse(null);
+        }
         if (player.getSCs().contains(scModel.getInitiative())) {
             List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock);
 
@@ -879,7 +882,8 @@ public class ButtonHelperSCs {
         boolean used = addUsedSCPlayer(messageID, game, player);
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
-            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok4construction")) {
+            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok4construction")
+                    || game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("te4construction")) {
                 scModel = game.getStrategyCardModelByInitiative(scNum).get();
             }
         }
@@ -1379,7 +1383,9 @@ public class ButtonHelperSCs {
             return;
         }
         boolean used = addUsedSCPlayer(messageID, game, player);
-        if (!used) {
+        if (!used
+                && !player.getFollowedSCs().contains(scNum)
+                && game.getPlayedSCs().contains(scNum)) {
             if (player.getStrategicCC() > 0) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(
                         player, game, event, "followed **" + Helper.getSCName(scNum, game) + "**");

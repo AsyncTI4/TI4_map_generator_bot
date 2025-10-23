@@ -3810,6 +3810,7 @@ public class ButtonHelper {
         if (spaceHolder.getUnitCount(UnitType.Spacedock, player) > 0) {
             if (!(player.hasUnit("absol_saar_spacedock")
                     || player.hasUnit("saar_spacedock")
+                    || player.hasUnit("tf-floatingfactory")
                     || player.hasTech("ffac2")
                     || player.hasTech("absol_ffac2"))) {
                 structuresViolated = true;
