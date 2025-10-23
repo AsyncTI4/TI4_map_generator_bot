@@ -316,8 +316,8 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
-    public Set<String> getTechSpecialities() {
-        Set<String> specialties = new HashSet<>();
+    public List<String> getTechSpecialities() {
+        List<String> specialties = new ArrayList<>();
         if (isNotBlank(originalTechSpeciality)) {
             specialties.add(originalTechSpeciality);
         }

@@ -2829,6 +2829,7 @@ class PlayerAreaGenerator {
                         || unit.getUpgradesToUnitId().isPresent();
                 boolean corsair = unit.getAlias().equals("mentak_cruiser3");
                 if (game.isFrankenGame()
+                        || game.isTwilightsFallMode()
                         || corsair
                         || unitHasUpgrade
                         || "echoes".equals(player.getFactionModel().getAlias())) {
