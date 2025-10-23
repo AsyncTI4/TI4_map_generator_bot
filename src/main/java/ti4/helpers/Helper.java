@@ -2157,10 +2157,6 @@ public class Helper {
                         unitButtons.add(mfButton);
                     }
                 }
-                unitButtons.add(Buttons.green(
-                        "sarMechStep1_" + tile.getPosition() + "_" + warfareNOtherstuff,
-                        "Use Self-Assembly Routines",
-                        TechEmojis.WarfareTech));
             }
             if (playerHasWarMachine(player)) {
                 ActionCardHelper.sendActionCardInfo(game, player, event);
