@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -2834,14 +2837,7 @@ public class ButtonHelper {
                             + ". This ends their turn, but they may still resolve any \"end of turn\" abilities.");
             player.setTacticalCC(player.getTacticalCC() - 1);
             List<Button> conclusionButtons = new ArrayList<>();
-            Button endTurn = Buttons.red(finChecker + "turnEnd", "End Turn");
-            conclusionButtons.add(endTurn);
-            if (getEndOfTurnAbilities(player, game).size() > 1) {
-                conclusionButtons.add(Buttons.blue(
-                        "endOfTurnAbilities",
-                        "Do End Of Turn Ability ("
-                                + (getEndOfTurnAbilities(player, game).size() - 1) + ")"));
-            }
+            conclusionButtons.add(getEndTurnButton(game, player));
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(), "Use the buttons to end turn.", conclusionButtons);
         } else if (!game.isFowMode() || FoWHelper.playerIsInSystem(game, tile, player, false)) {
@@ -2894,14 +2890,7 @@ public class ButtonHelper {
                         + " command token has been removed from your fleet pool");
         checkFleetInEveryTile(mahact, game);
         List<Button> conclusionButtons = new ArrayList<>();
-        Button endTurn = Buttons.red(target.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn");
-        conclusionButtons.add(endTurn);
-        if (getEndOfTurnAbilities(target, game).size() > 1) {
-            conclusionButtons.add(Buttons.blue(
-                    "endOfTurnAbilities",
-                    "Do End Of Turn Ability ("
-                            + (getEndOfTurnAbilities(target, game).size() - 1) + ")"));
-        }
+        conclusionButtons.add(getEndTurnButton(game, target));
         List<Button> buttons = getGainCCButtons(target);
         String trueIdentity = target.getRepresentationUnfogged();
         String message2 = trueIdentity + ", your current command tokens are " + target.getCCRepresentation()
@@ -2912,7 +2901,7 @@ public class ButtonHelper {
                 target.getCorrectChannel(),
                 target.getRepresentation(true, true)
                         + " You've been hit by"
-                        + (RandomHelper.isOneInX(1000) ? ", you've been struck by" : "")
+                        + (RandomHelper.isOneInX(1000) ? ", you've been struck by," : "")
                         + " the Starlancer (Mahact mech) ability. You gain 1 command token to any command pool. "
                         + "Then, use the buttons to resolve \"end of turn\" abilities and then end turn.",
                 conclusionButtons);
@@ -2936,20 +2925,13 @@ public class ButtonHelper {
                 mahact.getCorrectChannel(),
                 mahact.getRepresentationUnfogged() + " you have spent a command token from your strategy pool.");
         List<Button> conclusionButtons = new ArrayList<>();
-        Button endTurn = Buttons.red(target.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn");
-        conclusionButtons.add(endTurn);
-        if (getEndOfTurnAbilities(target, game).size() > 1) {
-            conclusionButtons.add(Buttons.blue(
-                    "endOfTurnAbilities",
-                    "Do End Of Turn Ability ("
-                            + (getEndOfTurnAbilities(target, game).size() - 1) + ")"));
-        }
+        conclusionButtons.add(getEndTurnButton(game, target));
 
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCorrectChannel(),
                 target.getRepresentationUnfogged()
                         + " You've been hit by"
-                        + (RandomHelper.isOneInX(1000) ? ", you've been struck by" : "")
+                        + (RandomHelper.isOneInX(1000) ? ", you've been struck by," : "")
                         + " _Nullification Field_. 1 command token has been placed from your tactic pool in the system and your turn has been ended."
                         + " Use the buttons to resolve \"end of turn\" abilities and then end turn.",
                 conclusionButtons);
@@ -2994,19 +2976,12 @@ public class ButtonHelper {
                 minister.getCorrectChannel(),
                 minister.getRepresentationUnfogged() + ", you have used the _Minister of Peace_ law.");
         List<Button> conclusionButtons = new ArrayList<>();
-        Button endTurn = Buttons.red(target.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn");
-        conclusionButtons.add(endTurn);
-        if (getEndOfTurnAbilities(target, game).size() > 1) {
-            conclusionButtons.add(Buttons.blue(
-                    "endOfTurnAbilities",
-                    "Do End Of Turn Ability ("
-                            + (getEndOfTurnAbilities(target, game).size() - 1) + ")"));
-        }
+        conclusionButtons.add(getEndTurnButton(game, target));
 
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCorrectChannel(),
                 target.getRepresentationUnfogged()
-                        + " You've been hit by" + (RandomHelper.isOneInX(1000) ? ", you've been struck by" : "")
+                        + " You've been hit by" + (RandomHelper.isOneInX(1000) ? ", you've been struck by," : "")
                         + " the _Minister of Peace_ law. 1 command token has been placed from your tactic pool in the system and your turn has been ended."
                         + " Use the buttons to resolve \"end of turn\" abilities and then end turn.",
                 conclusionButtons);
@@ -3986,47 +3961,81 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
+    public static Button getPassButton(Game game, Player player) {
+        int passingAbilities = getPassingAbilities(player, game).size();
+        if (passingAbilities > 0) {
+            String abilities = " (+" + passingAbilities + (passingAbilities > 1 ? " abilities)" : " ability)");
+            return Buttons.red(player.finChecker() + "passingAbilities", "Pass" + abilities);
+        }
+        return Buttons.red(player.finChecker() + "passForRound", "Pass");
+    }
+
+    public static List<Button> getPassingAbilities(Player player, Game game) {
+        String finChecker = player.getFinsFactionCheckerPrefix();
+        List<Button> passButtons = new ArrayList<>();
+        List<String> implementedLegendaryPlanets = List.of(
+                "ordinianc4", // Codex 4
+                "garbozia", // Thunders Edge
+                "faunus",
+                "ordinian",
+                "industrex");
+        for (String planet : implementedLegendaryPlanets) {
+            String prettyPlanet = Mapper.getPlanet(planet).getName();
+            if (player.getPlanets().contains(planet)
+                    && !player.getExhaustedPlanetsAbilities().contains(planet)) {
+                passButtons.add(Buttons.green(
+                        finChecker + "planetAbilityExhaust_" + planet, "Use " + prettyPlanet + " Ability"));
+            }
+        }
+
+        if (player.hasReadyBreakthrough("ralnelbt")) {
+            passButtons.add(Buttons.green(finChecker + "dataSkimmer_page0", "Use Data Skimmer", FactionEmojis.Ralnel));
+        }
+
+        passButtons.addAll(getEndOfTurnAbilities(player, game));
+        return passButtons;
+    }
+
+    public static Button getEndTurnButton(Game game, Player player) {
+        int abilities = getEndOfTurnAbilities(player, game).size();
+        if (abilities > 0) {
+            String text = " (+" + abilities + (abilities > 1 ? " abilities)" : " ability)");
+            return Buttons.red(player.finChecker() + "endOfTurnAbilities", "End Turn" + text);
+        }
+        return Buttons.red(player.finChecker() + "turnEnd", "End Turn");
+    }
+
     public static List<Button> getEndOfTurnAbilities(Player player, Game game) {
         List<Button> endButtons = new ArrayList<>();
 
         // Legendary Planets
         List<String> implementedLegendaryPlanets = List.of(
-                "mallice",
+                "mallice", // PoK
                 "hexmallice",
                 "mirage",
                 "hopesend",
-                "primor", // PoK
-                "ordinianc4", // Codex 4
-                "ordinian",
-                "faunus",
-                "garbozia",
-                "industrex",
-                "silence",
+                "primor",
+                "mrte", // Thunders Edge
+                "thundersedge",
+                "silence", // DS
                 "prism",
                 "emelpar",
                 "echo",
                 "domna",
-                "mrte",
-                "thundersedge",
-                "uikos", // DS
-                "illusion",
-                "phantasm"); // Other
+                "uikos",
+                "illusion", // Other
+                "phantasm");
         for (String planet : implementedLegendaryPlanets) {
-            String prettyPlanet = Mapper.getPlanet(planet).getName();
-            String pass = "";
-            if (planet.contains("ordinian")
-                    || planet.contains("faunus")
-                    || planet.contains("garbozia")
-                    || planet.contains("industrex")) {
-                pass = " (Upon Pass Turn)";
-            }
-            if (player.getPlanets().contains(planet)
+            String label = "Use " + Mapper.getPlanet(planet).getName() + " Ability";
+
+            if (player.hasPlanet(planet)
                     && !player.getExhaustedPlanetsAbilities().contains(planet)) {
                 String id = player.finChecker() + "planetAbilityExhaust_" + planet;
-                endButtons.add(Buttons.green(
-                        id, "Use " + prettyPlanet + " Ability" + pass, PlanetEmojis.getPlanetEmojiOrNull(planet)));
+                endButtons.add(Buttons.green(id, label, PlanetEmojis.getPlanetEmojiOrNull(planet)));
             }
         }
+
+        // Expeditions
         String expeditionText = game.getExpeditions().getTopLevelExpeditionButtonText();
         boolean thundersEdgeOnBoard = game.getTileFromPlanet("thundersedge") != null;
         if (expeditionText != null && !thundersEdgeOnBoard && game.isThundersEdge()) {
@@ -4114,7 +4123,6 @@ public class ButtonHelper {
         if (player.getStasisInfantry() > 0 && player.hasTech("dsqhetinf")) {
             endButtons.add(Buttons.red(player.finChecker() + "startQhetInfRevival", "Revive Up To 2 Infantry"));
         }
-        endButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
         return endButtons;
     }
 
@@ -7295,9 +7303,36 @@ public class ButtonHelper {
         return false;
     }
 
+    public static boolean shouldConfirmPrePass(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String whatToPreset = buttonID.split("_")[1];
+        boolean confirmed = buttonID.endsWith("_confirm");
+
+        if (whatToPreset.startsWith("Pre Pass "))
+            return !confirmed && !getPassingAbilities(player, game).isEmpty();
+        return false;
+    }
+
+    public static void sendConfirmPrePass(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Button btn = event.getButton()
+                .withId(buttonID + "_confirm")
+                .withLabel("Confirm " + event.getButton().getLabel());
+        String message = player.getRepresentation()
+                + " you have some abilities that you could resolve before you pass, are you sure you want to preset a pass?";
+        for (Button b : getPassingAbilities(player, game)) {
+            message += "\n> " + b.getLabel();
+        }
+        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), message, btn);
+    }
+
     @ButtonHandler("resolvePreassignment_")
     public static void resolvePreAssignment(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String messageID = buttonID.split("_")[1];
+        if (shouldConfirmPrePass(event, game, player, buttonID)) {
+            sendConfirmPrePass(event, game, player, buttonID);
+            return;
+        }
+
         String msg = player.getFactionEmoji() + " successfully preset " + messageID;
         String part2 = player.getFaction();
         if (messageID.toLowerCase().contains("pre pass")) {
