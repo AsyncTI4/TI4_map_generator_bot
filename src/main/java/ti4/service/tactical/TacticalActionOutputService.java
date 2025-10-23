@@ -299,6 +299,9 @@ public class TacticalActionOutputService {
         if (player.hasAbility("slipstream") && (tileHasWormhole || (movingFromHome && !game.isTwilightsFallMode()))) {
             bonusMoveValue++;
         }
+        if (player.hasAbility("song_of_something") && movingFromHome) {
+            bonusMoveValue++;
+        }
         if (!game.getStoredValue("crucibleBoost").isEmpty()) {
             bonusMoveValue += 1;
         }
