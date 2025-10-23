@@ -2228,6 +2228,10 @@ public class Player extends PlayerProperties {
         getPurgedTechs().add(tech);
     }
 
+    public void unpurgeTech(String tech) {
+        getPurgedTechs().remove(tech);
+    }
+
     public void addPlanet(String planet) {
         if (!getPlanets().contains(planet)) {
             getPlanets().add(planet);

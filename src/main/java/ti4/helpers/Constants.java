@@ -900,6 +900,7 @@ public class Constants {
     public static final String TECH_ADD = "add";
     public static final String TECH_REMOVE = "remove";
     public static final String TECH_PURGE = "purge";
+    public static final String TECH_UNPURGE = "unpurge";
     public static final String TECH_EXHAUST = "exhaust";
     public static final String TECH_REFRESH = "ready";
 
