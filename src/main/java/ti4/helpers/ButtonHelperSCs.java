@@ -6,14 +6,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.helpers.Units.UnitKey;
@@ -1333,6 +1335,13 @@ public class ButtonHelperSCs {
         if (setStatus) {
             player.addFollowedSC(scNum, event);
             suffix = " **" + Helper.getSCName(scNum, game) + "**";
+        }
+
+        if(game.isTwilightsFallMode()){
+            if(scNum == 2 || scNum == 6 || scNum == 7){
+                game.setStoredValue(
+                "willParticipateInSplice", game.getStoredValue("willParticipateInSplice").replace("_"+player.getFaction(),""));
+            }
         }
         ReactionService.addReaction(event, game, player, "is not following" + suffix + ".");
         String players = game.getStoredValue(messageID + "SCReacts");
