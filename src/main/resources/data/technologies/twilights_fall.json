@@ -93,7 +93,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "You can score objectives even if you do not control the planets in your home system. Your ships can move through and into asteroid fields. Other players cannot activate asteroid fields that contain 1 or more of your ships.",
+        "text": "You can score objectives even if you do not control the planets in your home system.\nOther players cannot activate asteroid fields that contain 1 or more of your ships.",
         "source": "twilights_fall",
         "faction": "saar"
     },
@@ -133,7 +133,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "Your units can move into and through supernovas. Each supernova that contains 1 or more of your units gain PRODUCTION 5 as if it were of your units.",
+        "text": "Your units can move into and through supernovas.\nEach supernova that does not contain other players' units and each system that contains 1 or more of your war suns gains PRODUCTION 5 as if it were one of your units.",
         "source": "twilights_fall",
         "faction": "muaat"
     },
@@ -143,7 +143,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "You can negotiate transactions with players who are not your neighbor. When you are negotiating a transaction, action cards can be exchanged as part of the transaction.",
+        "text": "You can negotiate transactions with players who are not your neighbor.\nYou can exchange action cards with other players as part of transactions.",
         "source": "twilights_fall",
         "faction": "hacan"
     },
@@ -213,7 +213,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "During your tactical actions: Apply +1 to the move value of each of your ships that starts it movement in your home system or in a system that contains either an alpha or beta wormhole.",
+        "text": "During your tactical actions: Apply +1 to the move value of each of your ships that starts its movement in a system that contains a wormhole.",
         "source": "twilights_fall",
         "faction": "ghost"
     },
@@ -223,7 +223,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "At the start of a space combat in a a system that contains a wormhole or 1 or more of your ships: You may produce 1 hit and assign it to 1 of your opponent's ships.",
+        "text": "At the start of a space combat in a system that contains a wormhole and 1 or more of your ships: You may produce 1 hit and assign it to 1 of your opponent's ships.",
         "source": "twilights_fall",
         "faction": "ghost"
     },
@@ -253,7 +253,7 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "During the status phase, draw 1 additional action card and gain 1 additional command token.",
+        "text": "During the status phase: Draw 1 additional action card and gain 1 additional command token.",
         "source": "twilights_fall",
         "faction": "l1z1x"
     },
@@ -273,7 +273,7 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "After 1 of your neighbors gain trade goods or resolves a transaction: If they have 3 or more trade goods, you may take 1 of their trade goods or commodities.",
+        "text": "After 1 of your neighbors gains trade goods or resolves a transaction: If they have 3 or more trade goods, you may take 1 of their trade goods or commodities.",
         "source": "twilights_fall",
         "faction": "mentak"
     },
@@ -293,7 +293,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "After another player moves ships into a system that contains 1 or more of your ship: You may place 1 token from your strategy pool in an adjacent system that does not contain another player's ships; move your ships from the active system into that system.",
+        "text": "After another player moves ships into a system that contains 1 or more of your ships: You may place 1 token from your strategy pool in an adjacent system that does not contain another player's ships; move your ships from the active system into that system.",
         "source": "twilights_fall",
         "faction": "naalu"
     },
@@ -303,7 +303,7 @@
         "types": [
             "BIOTIC"
         ],
-        "text": "At the end of the strategy phase: Place the Twilight Fall \"0\" token on your strategy card; you are first in initiative order. This card cannot have a singularity token placed on it.",
+        "text": "At the end of the strategy phase: Place the Naalu \"0\" token on your strategy card; you are first in initiative order.\nThis card cannot have a singularity token placed on it.",
         "source": "twilights_fall",
         "faction": "naalu"
     },
@@ -319,31 +319,31 @@
     },
     {
         "alias": "tf-singularityx",
-        "name": "Genetic Singularity X",
+        "name": "Singularity X",
         "types": [
             "BIOTIC"
         ],
-        "text": "Once per combat, after 1 of your opponent's units is destroyed: You may place the \"Singularity X\" token on another player's ability. While that token is on a card, this card gains that card's text. You cannot place a singularity token on a card that already has a singularity token. ",
+        "text": "Once per combat, after 1 of your opponent's units is destroyed: You may place the \"Singularity X\" token on one of your opponent's abilities. While that token is on a card, this card gains that card's text. You cannot place a singularity token on a card that already has a singularity token.",
         "source": "twilights_fall",
         "faction": "nekro"
     },
     {
         "alias": "tf-singularityy",
-        "name": "Genetic Singularity Y",
+        "name": "Singularity Y",
         "types": [
             "BIOTIC"
         ],
-        "text": "Once per combat, after 1 of your opponent's units is destroyed: You may place the \"Singularity Y\" token on another player's ability. While that token is on a card, this card gains that card's text. You cannot place a singularity token on a card that already has a singularity token. ",
+        "text": "Once per combat, after 1 of your opponent's units is destroyed: You may place the \"Singularity Y\" token on one of your opponent's abilities. While that token is on a card, this card gains that card's text. You cannot place a singularity token on a card that already has a singularity token.",
         "source": "twilights_fall",
         "faction": "nekro"
     },
     {
         "alias": "tf-singularityz",
-        "name": "Genetic Singularity Z",
+        "name": "Singularity Z",
         "types": [
             "BIOTIC"
         ],
-        "text": "Once per combat, after 1 of your opponent's units is destroyed: You may place the \"Singularity Z\" token on another player's ability. While that token is on a card, this card gains that card's text. You cannot place a singularity token on a card that already has a singularity token. ",
+        "text": "Once per combat, after 1 of your opponent's units is destroyed: You may place the \"Singularity Z\" token on one of your opponent's abilities. While that token is on a card, this card gains that card's text. You cannot place a singularity token on a card that already has a singularity token.",
         "source": "twilights_fall",
         "faction": "nekro"
     },
@@ -359,7 +359,7 @@
     },
     {
         "alias": "tf-valkyrie",
-        "name": "Valkyrie",
+        "name": "Valkyrie Vanguard",
         "types": [
             "PROPULSION"
         ],
@@ -373,7 +373,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "After making combat rolls during a round of ground combat: If your opponent produced 1 or more hits, you produce 1 additional hit",
+        "text": "After making combat rolls during a round of ground combat: If your opponent produced 1 or more hits, you produce 1 additional hit.",
         "source": "twilights_fall",
         "faction": "sardakk"
     },
@@ -393,7 +393,7 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "ter another player activates a system that contains 1 or more of your ships: Gain 4 trade goods",
+        "text": "After another player activates a system that contains 1 or more of your ships: Gain 4 trade goods.",
         "source": "twilights_fall",
         "faction": "jolnar"
     },
@@ -403,7 +403,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "After you roll dice for a unit ability, you may reroll any of those dice. ",
+        "text": "After you roll dice for a unit ability: You may reroll any of those dice.",
         "source": "twilights_fall",
         "faction": "jolnar"
     },
@@ -413,7 +413,7 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "After you resolve an action during which you gained control of a legendary planet: You may place 1 PDS and 1 space dock from your reinforcements on that planet",
+        "text": "After you resolve an action during which you gained control of a legendary planet: You may place 1 PDS and 1 space dock from your reinforcements on that planet.",
         "source": "twilights_fall",
         "faction": "winnu"
     },
@@ -423,7 +423,7 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "When 1 or more of your units use PRODUCTION: You may swap the resource and influence values of 1 planet you control during that use of PRODUCTION.",
+        "text": "When 1 or more of your units use PRODUCTION: You may swap the resource and influence values of 1 planet you control during this use of PRODUCTION.",
         "source": "twilights_fall",
         "faction": "winnu"
     },
@@ -443,7 +443,7 @@
         "types": [
             "BIOTIC"
         ],
-        "text": "When another player plays an action card: You may  spend 1 token from your strategy pool to cancel that action card.",
+        "text": "When another player plays an action card: You may spend 1 token from your strategy pool to cancel that action card.",
         "source": "twilights_fall",
         "faction": "xxcha"
     },
@@ -453,7 +453,7 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "When another player activates a system that contains 1 or more of your structures: You may spend 1 token from your strategy pool to immediately end that player's turn; their command token is discarded from the game board.",
+        "text": "When another player activates a system that contains 1 or more of your ships: You may exhaust this card and spend 1 token from your strategy pool to immediately end that player's turn.",
         "source": "twilights_fall",
         "faction": "xxcha"
     },
@@ -463,7 +463,7 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "After you spend a token from your strategy pool: You may gain control of 1 planet that does not contain the custodians token or any units and is in a system that is adjacent to a planet you control.",
+        "text": "After you spend a token from your strategy pool: You may gain control of 1 planet that does not contain the custodians token or any units and is adjacent to a planet you control.",
         "source": "twilights_fall",
         "faction": "xxcha"
     },
@@ -483,7 +483,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "After each space battle round: You may destroy 1 of your cruisers or destroyers in the active system to produce 1 hit and assign it to 1 of your opponent's ships in that system.",
+        "text": "After each space combat round: You may destroy 1 of your cruisers or destroyers in the active system to produce 1 hit and assign it to 1 of your opponent's ships in that system.",
         "source": "twilights_fall",
         "faction": "yin"
     },
@@ -493,7 +493,7 @@
         "types": [
             "BIOTIC"
         ],
-        "text": "When you score an objective: Draw 1 genome, technology, or unit upgrade technology.",
+        "text": "When you score an objective: Draw 1 genome, ability, or unit upgrade.",
         "source": "twilights_fall",
         "faction": "yin"
     },
@@ -513,7 +513,7 @@
         "types": [
             "BIOTIC"
         ],
-        "text": "You can have any number of action cards in your hand.  Game effects cannot prevent you from using this ability. During your turn of the action phase, players that have passed cannot play action cards.",
+        "text": "You can have any number of action cards in your hand.  Game effects cannot prevent you from using this ability.\nDuring your turn of the action phase, players that have passed cannot play action cards.",
         "source": "twilights_fall",
         "faction": "yssaril"
     },
@@ -543,7 +543,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "When you gain trade goods form choosing a previously unchosen strategy card or from the Amicus strategy card, triple those trade goods.",
+        "text": "When you gain trade goods from choosing a previously unchosen strategy card or from the \"Amicus\" strategy card: Triple those trade goods.",
         "source": "twilights_fall",
         "faction": "nomad"
     },
@@ -553,7 +553,7 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "After any player's genome becomes exhausted, you may spend 3 influence to ready that genome. If you ready another player's genome you may perform a transaction with that player. ",
+        "text": "After any player's genome becomes exhausted: You may spend 3 influence to ready that genome; if you ready another player's genome you may perform a transaction with that player. ",
         "source": "twilights_fall",
         "faction": "nomad"
     },
@@ -563,7 +563,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "Planets that contain your structures are treated as having all 3 planet traits (Cultural, Hazardous, and Industrial).",
+        "text": "Planets that contain your structures are treated as having all 3 planet traits (cultural, hazardous, and industrial).",
         "source": "twilights_fall",
         "faction": "titans"
     },
@@ -603,7 +603,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "When you explore a planet or draw a frontier card, you may draw 1 additional card; choose 1 to resolve and discard the rest.",
+        "text": "When you explore a planet that contains 1 of your mechs: You may draw 1 additional card; choose 1 to resolve and discard the rest.",
         "source": "twilights_fall",
         "faction": "naaz"
     },
@@ -613,7 +613,7 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "ACTION: Either purge 2 of your relic fragments of the same type to gain 1 relic; or purge 1 of your relic fragments to gain 1 command token.",
+        "text": "ACTION: Either purge 2 of your relic fragments of the same type to gain 1 relic or purge 1 of your relic fragments to gain 1 command token.",
         "source": "twilights_fall",
         "faction": "naaz"
     },
@@ -623,7 +623,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "Your ships do not roll for gravity rifts during this movement; apply an additional +1 to the move values of your ships that would move out of or through a gravity rift instead.",
+        "text": "Your ships do not roll for gravity rifts; apply an additional +1 to the move values of your ships that would move out of or through a gravity rift instead.",
         "source": "twilights_fall",
         "faction": "cabal"
     },
@@ -633,7 +633,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "Capture your opponent's non-structure units that are destroyed during combat. When you produce a unit, you may return 1 captured unit of that type to produce that unit without spending resources.",
+        "text": "Capture your opponent's non-structure units that are destroyed during combat.\nWhen you produce a unit, you may return 1 captured unit of that type to produce that unit without spending resources.",
         "source": "twilights_fall",
         "faction": "cabal"
     },
@@ -643,7 +643,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "Systems that contain your structures are also gravity rifts; your ships do not roll for these gravity rifts.",
+        "text": "Systems that contain your space docks are also gravity rifts; your ships do not roll for these gravity rifts.\nPlace a dimensional tear token beneath your space docks as a reminder.",
         "source": "twilights_fall",
         "faction": "cabal"
     },
@@ -653,7 +653,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "When 1 or more of your units uses ANTI-FIGHTER BARRAGE, for each hit produced in excess of your opponent's Fighters, choose 1 of your opponent's ships that has SUSTAIN DAMAGE to become damaged.",
+        "text": "When 1 or more of your units uses ANTI-FIGHTER BARRAGE: For each hit produced in excess of your opponent's fighters, choose 1 of your opponent's ships that has SUSTAIN DAMAGE to become damaged.",
         "source": "twilights_fall",
         "faction": "argent"
     },
@@ -663,7 +663,7 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "Other players cannot move ships through systems that contain your structures. Each planet that contains 1 or more of your structures gains the PRODUCTION 1 ability as if it were a unit.",
+        "text": "Other players cannot move ships through systems that contain your structures.\nEach planet that contains 1 or more of your structures gains the PRODUCTION 1 ability as if it were a unit.",
         "source": "twilights_fall",
         "faction": "argent"
     },
@@ -673,7 +673,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "When 1 or more of your units make a roll for a unit ability: You may choose 1 of those units to roll 1 additional die.",
+        "text": "When 1 or more of your units roll dice for a unit ability: You may choose 1 of those units to roll 1 additional die.",
         "source": "twilights_fall",
         "faction": "argent"
     },
@@ -683,7 +683,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "After you or one of your neighbors activates a system that is adjacent to an anomaly, you may apply +1 to the move value of all of that player's ships during this tactical action",
+        "text": "After you or one of your neighbors activates a system that is adjacent to an anomaly: You may apply +1 to the move value of all of that player's ships during this tactical action",
         "source": "twilights_fall",
         "faction": "empyrean"
     },
@@ -693,7 +693,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "Nebulae do not affect your ships' movement. You can allow players to move their ships through systems that contain your ships.",
+        "text": "Nebulae do not affect your ships' movement.\nYou can allow players to move their ships through systems that contain your ships.",
         "source": "twilights_fall",
         "faction": "empyrean"
     },
@@ -703,7 +703,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "After another player moves ships into a system that contains 1 of your command tokens: You may return that token to your reinforcements ",
+        "text": "After another player moves ships into a system that contains 1 of your command tokens: You may return that token to your reinforcements.",
         "source": "twilights_fall",
         "faction": "empyrean"
     },
@@ -713,7 +713,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "After you gain control of a planet, you may ready that planet if it contains a number of your infantry equal to or greater than that planet's resource value; otherwise, place 1 infantry on that planet.",
+        "text": "When you gain control of a planet: Ready that planet if it contains a number of your infantry equal to or greater than that planet's resource value; otherwise, place 1 infantry on that planet.",
         "source": "twilights_fall",
         "faction": "bastion"
     },
@@ -723,7 +723,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "Cancel 1 hit produced by each BOMBARDMENT roll agianst your units. At the start of a round of ground combat, you may resolve BOMBARDMENT 7(x3) against your opponet's ground forces; if you do, resolve BOMBARDMENT 7 (x3) agianst your own ground forces.",
+        "text": "Cancel 1 hit produced by each BOMBARDMENT roll against your units.\nAt the start of a round of ground combat, you may resolve BOMBARDMENT 7(x3) against your opponet's ground forces; if you do, resolve BOMBARDMENT 7 (x3) agianst your own ground forces.",
         "source": "twilights_fall",
         "faction": "bastion"
     },
@@ -733,7 +733,7 @@
         "types": [
             "BIOTIC"
         ],
-        "text": "Your cards cannot be canceled by \"Shatter\" action cards. Your abilities cannot be copied, taken, or discarded by other players.",
+        "text": "Your action cards cannot be canceled by \"Shatter\" action cards.\nYour other abilities cannot be taken, purged, or discarded by other players and cannot have singularity tokens placed on them.",
         "source": "twilights_fall",
         "faction": "bastion"
     },
@@ -773,7 +773,7 @@
         "types": [
             "BIOTIC"
         ],
-        "text": "When ground forces are committed, whether you are attacking or defending player, you may choose for your units on that planet to coexist.",
+        "text": "When ground forces are committed: If your units on that planet are not already coexisting, you may choose for your units to coexist.",
         "source": "twilights_fall",
         "faction": "deepwrought"
     },
@@ -783,7 +783,7 @@
         "types": [
             "BIOTIC"
         ],
-        "text": "At the start of the status phase, you may replace 1 of your non-faction abilities: Reveal abilities from the deck until your reveal another ability of the same color and gain it; shuffle the replaced technology and other revealed cards back into your deck.",
+        "text": "At the start of the status phase: You may choose to replace 1 of your abilities; if you do, reveal abilities from the deck until you reveal another ability with the same technology color and gain it; shuffle the replaced technology and the other revealed cards back into your deck.",
         "source": "twilights_fall",
         "faction": "deepwrought"
     },
@@ -793,7 +793,7 @@
         "types": [
             "BIOTIC"
         ],
-        "text": "At the start of the status phase, choose a technology type and gain trade goods equal to the number of technology of that color that you own.",
+        "text": "At the start of the status phase: Choose a technology color and gain trade goods equal to the number of abilities you own that have that technology color.",
         "source": "twilights_fall",
         "faction": "deepwrought"
     },
@@ -803,17 +803,17 @@
         "types": [
             "WARFARE"
         ],
-        "text": "After a player activates a system that contains your ships, you may move up to 2 ships from adjacent systems that do not contain your command tokens into the active system.",
+        "text": "After a player activates a system that contains your ships: You may move up to 2 of your ships into the active system from adjacent systems that do not contain your command tokens.",
         "source": "twilights_fall",
         "faction": "ralnel"
     },
     {
-        "alias": "tf-miniaturization",
-        "name": "Miniaturization",
+        "alias": "tf-couriertransport",
+        "name": "Courier Transport",
         "types": [
             "PROPULSION"
         ],
-        "text": "Your structures can be transported by any ship; this does not require or count against capacity. When transported, they lose unit abilities until the end of the turn. At the end of your turn, you may place structures in the space area of the active system on planets you control in that system.",
+        "text": "After you activate a system: You may move your structures from adjacent systems that do not contain your command tokens onto planets you control in the active system.",
         "source": "twilights_fall",
         "faction": "ralnel"
     },
@@ -833,7 +833,7 @@
         "types": [
             "BIOTIC"
         ],
-        "text": "Replenish your commodities at the start of the strategy phase, then gain 1 trade good.",
+        "text": "At the start of the strategy phase: Replenish your commodities, then gain 1 trade good.",
         "source": "twilights_fall",
         "faction": "keleres"
     },
@@ -843,7 +843,7 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "Once per action, when you resolve one of your PRODUCTION abilities, you may resolve an additional one of your PRODUCTION abilities in any system.",
+        "text": "Once per action, when you resolve one a unit's PRODUCTION ability: You may resolve another of your unit's PRODUCTION abilities in any system.",
         "source": "twilights_fall",
         "faction": "keleres"
     },
@@ -863,17 +863,17 @@
         "types": [
             "WARFARE"
         ],
-        "text": "You can count planets in systems that contain your ships as controlled by you for the purpose of scoring secret objectives.",
+        "text": "You can treat planets in systems that contain your ships as if you controlled them for the purpose of scoring secret objectives.",
         "source": "twilights_fall",
-        "faction": "firmament"
+        "faction": "obsidian"
     },
     {
-        "alias": "tf-biogranicparasite",
-        "name": "Biorganic Parasite",
+        "alias": "tf-neuralparasite",
+        "name": "Neural Parasite",
         "types": [
             "BIOTIC"
         ],
-        "text": "At the start of each of your turns, destroy 1 of another player's infantry in or adjacent to a system that contains your infantry.",
+        "text": "At the start of your turn: Destroy 1 of another player's infantry in or adjacent to a system that contains your infantry.",
         "source": "twilights_fall",
         "faction": "obsidian"
     },
@@ -883,7 +883,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "When this card enters play, put the Fracture into play and place an ingress token on Mecatol Rex.\n> Apply +1 Move value to your ships that start their movement in the Fracture.\n> Apply +1 to the result of each of your units combat rolls in the Fracture.",
+        "text": "When you gain this card, put the Fracture into play.\nApply +1 to the Move value to each of your ships that starts its movement in The Fracture.\nApply +2 to the result of each of your units' combat rolls in The Fracture.",
         "source": "twilights_fall",
         "faction": "obsidian"
     }
