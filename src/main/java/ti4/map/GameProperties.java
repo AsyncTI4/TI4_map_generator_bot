@@ -1,9 +1,13 @@
 package ti4.map;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
+import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.Constants;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.map.pojo.ExportableField;
@@ -164,6 +168,9 @@ public class GameProperties {
     private List<String> agendas;
     private List<String> mandates;
     private List<String> events; // ignis_aurora
+
+    private Map<String, Integer> discardActionCards = new LinkedHashMap<>();
+    private Map<String, ACStatus> discardACStatus = new HashMap<>();
 
     // Priority Track
     private PriorityTrackMode priorityTrackMode = PriorityTrackMode.NONE;

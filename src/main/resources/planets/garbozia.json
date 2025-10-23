@@ -1,113 +1,20 @@
 {
     "id": "garbozia",
-    "tileId": "sig01",
+    "tileId": "98",
     "name": "Garbozia",
-    "aliases": [
-        "garbozia"
-    ],
-    "positionInTile": {
-        "x": 170.0,
-        "y": 150.0
-    },
-    "resources": 1,
-    "influence": 0,
-    "factionHomeworld": null,
-    "planetType": "INDUSTRIAL",
-    "cardImagePath": null,
-    "techSpecialties": null,
-    "legendaryAbilityName": "The Wasteland",
-    "legendaryAbilityText": "When you explore Garbozia, draw 1 card from each planet exploration deck. Choose 1 to resolve, and discard the rest.\nYou may exhaust this card at the end of your turn to explore Garbozia",
-    "legendaryAbilityFlavourText": "*Thousands of years of garbage fills once majestic canyons, endlessly strewn over the moon's surface. Who knows what ancient treasure lays amongst the trash?*",
-    "unitPositions": {
+    "aliases": ["garbozia", "garbage"],
+    "resources": 2,
+    "influence": 1,
+    "planetTypes": ["HAZARDOUS"],
+    "legendaryAbilityName": "Dok 'N Pic's Salvage Yard",
+    "legendaryAbilityText": "Exhaust this card when you pass to place 1 action card from the discard pile faceup on this card; you can purge cards on this card to play them as if they were in your hand.",
+    "legendaryAbilityFlavourText": "Throw 'er on the 'eap with the rest.",
+    "planetLayout": {
         "unitHolderName": "garbozia",
-        "coordinateMap": {
-            "control": [
-                {
-                    "x": 132.0,
-                    "y": 140.0
-                }
-            ],
-            "sd": [
-                {
-                    "x": 192.0,
-                    "y": 175.0
-                }
-            ],
-            "pd": [
-                {
-                    "x": 137.0,
-                    "y": 167.0
-                },
-                {
-                    "x": 154.0,
-                    "y": 167.0
-                },
-                {
-                    "x": 171.0,
-                    "y": 167.0
-                },
-                {
-                    "x": 146.0,
-                    "y": 178.0
-                },
-                {
-                    "x": 164.0,
-                    "y": 178.0
-                }
-            ],
-            "mf": [
-                {
-                    "x": 139.0,
-                    "y": 96.0
-                },
-                {
-                    "x": 157.0,
-                    "y": 96.0
-                },
-                {
-                    "x": 132.0,
-                    "y": 109.0
-                },
-                {
-                    "x": 150.0,
-                    "y": 109.0
-                },
-                {
-                    "x": 168.0,
-                    "y": 109.0
-                }
-            ],
-            "tkn_gf": [
-                {
-                    "x": 151.0,
-                    "y": 137.0
-                },
-                {
-                    "x": 118.0,
-                    "y": 137.0
-                }
-            ],
-            "att": [
-                {
-                    "x": 75.0,
-                    "y": 129.0
-                },
-                {
-                    "x": 83.0,
-                    "y": 98.0
-                },
-                {
-                    "x": 202.0,
-                    "y": 129.0
-                },
-                {
-                    "x": 194.0,
-                    "y": 98.0
-                }
-            ]
-        },
-        "removeUnitCoordinate": true
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": { "x": 170.0, "y": 150.0 },
+        "extraIcons": 1,
+        "planetRadius": 95
     },
-    "flavourText": "*A solitary moon, which orbits the home of a once-great civilization, and served as the principal repository for its waste material.*",
-    "source": "sigma"
+    "source": "thunders_edge"
 }

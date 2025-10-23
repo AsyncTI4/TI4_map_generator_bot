@@ -7,7 +7,7 @@ import ti4.service.decks.ShowActionCardsService;
 
 class ShowAllUnplayedACs extends GameStateSubcommand {
 
-    public ShowAllUnplayedACs() {
+    ShowAllUnplayedACs() {
         super(Constants.SHOW_UNPLAYED_AC, "Show all unplayed Action Cards", false, false);
     }
 

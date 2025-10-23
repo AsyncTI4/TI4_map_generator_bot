@@ -13,6 +13,7 @@ public class TechCommand implements ParentCommand {
                     new TechAdd(),
                     new TechRemove(),
                     new TechPurge(),
+                    new TechUnpurge(),
                     new TechExhaust(),
                     new TechRefresh(),
                     new TechInfo(),

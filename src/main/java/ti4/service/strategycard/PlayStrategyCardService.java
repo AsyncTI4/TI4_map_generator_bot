@@ -334,18 +334,9 @@ public class PlayStrategyCardService {
         }
 
         List<Button> conclusionButtons = new ArrayList<>();
-        Button endTurn = Buttons.red(player.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn");
-        Button deleteButton =
-                Buttons.red(player.getFinsFactionCheckerPrefix() + "doAnotherAction", "Do Another Action");
-        conclusionButtons.add(endTurn);
-
-        if (ButtonHelper.getEndOfTurnAbilities(player, game).size() > 1) {
-            conclusionButtons.add(Buttons.blue(
-                    player.getFinsFactionCheckerPrefix() + "endOfTurnAbilities",
-                    "Do End Of Turn Ability ("
-                            + (ButtonHelper.getEndOfTurnAbilities(player, game).size() - 1) + ")"));
-        }
-        conclusionButtons.add(deleteButton);
+        conclusionButtons.add(ButtonHelper.getEndTurnButton(game, player));
+        conclusionButtons.add(
+                Buttons.red(player.getFinsFactionCheckerPrefix() + "doAnotherAction", "Do Another Action"));
         conclusionButtons.add(Buttons.red(
                 player.getFinsFactionCheckerPrefix() + "endTurnWhenAllReactedTo_" + scToPlay,
                 "End Turn When All Have Reacted"));

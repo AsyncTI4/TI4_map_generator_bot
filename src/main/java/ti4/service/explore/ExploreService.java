@@ -88,11 +88,11 @@ public class ExploreService {
         if (RiftSetModeService.willPlanetGetStellarConverted(planetName, player, game, event)) {
             return;
         }
-        if ("garbozia".equalsIgnoreCase(planetName)) {
+        if ("bozgarbia".equalsIgnoreCase(planetName)) {
             if (player.hasAbility("distant_suns")) {
                 String reportMessage =
                         """
-                    Garbozia exploration with **Distant Suns** is not implemented.\
+                    Bozgarbia exploration with **Distant Suns** is not implemented.\
 
                     Please use `/explore draw_and_discard trait` then `/explore use explore_card_id` to manually resolve this exploration.\
 
@@ -113,7 +113,7 @@ public class ExploreService {
             ExploreModel exploreModelI = Mapper.getExplore(cardIDI);
 
             String reportMessage = player.getFactionEmoji() + " explored " + MiscEmojis.LegendaryPlanet
-                    + "Garbozia ability and found a _"
+                    + "Bozgarbia ability and found a _"
                     + exploreModelC.getName() + "_, _" + exploreModelH.getName() + "_ and a _" + exploreModelI.getName()
                     + "_.";
             if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
