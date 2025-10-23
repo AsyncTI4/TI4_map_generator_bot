@@ -223,7 +223,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "At the start of a space combat in a a system that contains a wormhole or 1 or more of your ships: You may produce 1 hit and assign it to 1 of your opponent's ships.",
+        "text": "At the start of a space combat in a system that contains a wormhole and 1 or more of your ships: You may produce 1 hit and assign it to 1 of your opponent's ships.",
         "source": "twilights_fall",
         "faction": "ghost"
     },
@@ -393,7 +393,7 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "ter another player activates a system that contains 1 or more of your ships: Gain 4 trade goods",
+        "text": "After another player activates a system that contains 1 or more of your ships: Gain 4 trade goods",
         "source": "twilights_fall",
         "faction": "jolnar"
     },
@@ -443,7 +443,7 @@
         "types": [
             "BIOTIC"
         ],
-        "text": "When another player plays an action card: You may  spend 1 token from your strategy pool to cancel that action card.",
+        "text": "When another player plays an action card: You may spend 1 token from your strategy pool to cancel that action card.",
         "source": "twilights_fall",
         "faction": "xxcha"
     },
@@ -483,7 +483,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "After each space battle round: You may destroy 1 of your cruisers or destroyers in the active system to produce 1 hit and assign it to 1 of your opponent's ships in that system.",
+        "text": "After each space combat round: You may destroy 1 of your cruisers or destroyers in the active system to produce 1 hit and assign it to 1 of your opponent's ships in that system.",
         "source": "twilights_fall",
         "faction": "yin"
     },
@@ -543,7 +543,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "When you gain trade goods form choosing a previously unchosen strategy card or from the Amicus strategy card, triple those trade goods.",
+        "text": "When you gain trade goods from choosing a previously unchosen strategy card or from the Amicus strategy card, triple those trade goods.",
         "source": "twilights_fall",
         "faction": "nomad"
     },
@@ -723,7 +723,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "Cancel 1 hit produced by each BOMBARDMENT roll agianst your units. At the start of a round of ground combat, you may resolve BOMBARDMENT 7(x3) against your opponet's ground forces; if you do, resolve BOMBARDMENT 7 (x3) agianst your own ground forces.",
+        "text": "Cancel 1 hit produced by each BOMBARDMENT roll against your units. At the start of a round of ground combat, you may resolve BOMBARDMENT 7(x3) against your opponet's ground forces; if you do, resolve BOMBARDMENT 7 (x3) against your own ground forces.",
         "source": "twilights_fall",
         "faction": "bastion"
     },
@@ -783,7 +783,7 @@
         "types": [
             "BIOTIC"
         ],
-        "text": "At the start of the status phase, you may replace 1 of your non-faction abilities: Reveal abilities from the deck until your reveal another ability of the same color and gain it; shuffle the replaced technology and other revealed cards back into your deck.",
+        "text": "At the start of the status phase, you may replace 1 of your non-faction abilities: Reveal abilities from the deck until your reveal another ability of the same color and gain it; shuffle the replaced ability and other revealed cards back into the deck.",
         "source": "twilights_fall",
         "faction": "deepwrought"
     },
