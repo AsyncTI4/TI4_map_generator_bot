@@ -1029,7 +1029,7 @@
         "name": "Side Project",
         "phase": "Action",
         "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites.",
+        "text": "Gain a technology of the same color that has no prerequisites. [Note: This may be used as a prerequisite of the technology you are researching.]",
         "automationID": "side_project",
         "flavorText": "As the council meeting drew to a close, Suffi stood up. \"Before we adjourn, I'd like to announce that our neural enhancement project has entered the final phase of clinical trials.\"",
         "source": "action_deck_2"
@@ -1039,7 +1039,7 @@
         "name": "Side Project",
         "phase": "Action",
         "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites.",
+        "text": "Gain a technology of the same color that has no prerequisites. [Note: This may be used as a prerequisite of the technology you are researching.]",
         "automationID": "side_project",
         "flavorText": "A projection showed four individuals competing in a task, with one participant fiercely outpacing the others as he interfaced with the device through thought alone. The council murmured approvingly.",
         "source": "action_deck_2"
@@ -1049,7 +1049,7 @@
         "name": "Side Project",
         "phase": "Action",
         "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites.",
+        "text": "Gain a technology of the same color that has no prerequisites. [Note: This may be used as a prerequisite of the technology you are researching.]",
         "automationID": "side_project",
         "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi, where did you even find the time to organize this project?\"",
         "source": "action_deck_2"
@@ -1059,7 +1059,7 @@
         "name": "Side Project",
         "phase": "Action",
         "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites.",
+        "text": "Gain a technology of the same color that has no prerequisites. [Note: This may be used as a prerequisite of the technology you are researching.]",
         "automationID": "side_project",
         "flavorText": "Suffi parted her hair, revealing a small metal plate indicative of a neural implant. Xander gasped, realizing she must have had the surgery long ago. \"You did this before the trials were completed?\" Suffi shrugged. \"Before the trials even began.\"",
         "source": "action_deck_2"
