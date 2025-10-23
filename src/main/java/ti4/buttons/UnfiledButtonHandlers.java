@@ -3360,10 +3360,19 @@ public class UnfiledButtonHandlers {
         }
     }
 
+    @ButtonHandler("passingAbilities")
+    private static void passingAbilities(ButtonInteractionEvent event, Player player, Game game) {
+        String msg = "Use buttons to do an ability when you pass:";
+        List<Button> buttons = ButtonHelper.getPassingAbilities(player, game);
+        buttons.add(0, Buttons.red(player.finChecker() + "passForRound", "Pass"));
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(event.getMessageChannel(), msg, buttons);
+    }
+
     @ButtonHandler("endOfTurnAbilities")
     public static void endOfTurnAbilities(ButtonInteractionEvent event, Player player, Game game) {
         String msg = "Use buttons to do an end of turn ability";
         List<Button> buttons = ButtonHelper.getEndOfTurnAbilities(player, game);
+        buttons.add(0, Buttons.red(player.finChecker() + "turnEnd", "End Turn"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(event.getMessageChannel(), msg, buttons);
     }
 
