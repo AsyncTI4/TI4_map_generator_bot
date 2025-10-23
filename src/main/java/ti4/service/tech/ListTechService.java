@@ -247,7 +247,7 @@ public class ListTechService {
             }
             if (ButtonHelper.checkForTechSkips(game, planet)) {
                 Planet unitHolder = game.getPlanetsInfo().get(planet);
-                Set<String> techTypes = unitHolder.getTechSpecialities();
+                List<String> techTypes = unitHolder.getTechSpecialities();
                 for (String type : techTypes) {
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "zealotscommander")) {
                         wilds++;

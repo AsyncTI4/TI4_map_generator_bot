@@ -1205,7 +1205,7 @@ public class TileGenerator {
                 }
                 boolean anySkips = false;
                 for (Planet planet : tile.getPlanetUnitHolders()) {
-                    Set<String> skips = planet.getTechSpecialities();
+                    List<String> skips = planet.getTechSpecialities();
                     int number = skips.size();
                     if (number == 0) {
                         continue;
