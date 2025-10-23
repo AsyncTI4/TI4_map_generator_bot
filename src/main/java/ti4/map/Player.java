@@ -39,6 +39,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
+import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -648,6 +649,18 @@ public class Player extends PlayerProperties {
 
     public Map<String, Integer> getActionCards() {
         return actionCards;
+    }
+
+    public List<String> getPlayableActionCards() {
+        List<String> cards = new ArrayList<>(actionCards.keySet());
+        Game game = getGame();
+        if (game != null) {
+            List<String> garboziaCards = game.getDiscardACStatus().keySet().stream()
+                    .filter(ac -> game.getDiscardACStatus().get(ac) == ACStatus.garbozia)
+                    .toList();
+            cards.addAll(garboziaCards);
+        }
+        return cards;
     }
 
     public Map<String, Integer> getEvents() {
@@ -2216,6 +2229,10 @@ public class Player extends PlayerProperties {
             removeTech(tech);
         }
         getPurgedTechs().add(tech);
+    }
+
+    public void unpurgeTech(String tech) {
+        getPurgedTechs().remove(tech);
     }
 
     public void addPlanet(String planet) {

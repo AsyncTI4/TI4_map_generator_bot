@@ -402,15 +402,7 @@ public class StartTurnService {
         }
 
         if (!hadAnyUnplayedSCs && !doneActionThisTurn) {
-            Button pass = Buttons.red(finChecker + "passForRound", "Pass");
-
-            int numEndOfTurn = ButtonHelper.getEndOfTurnAbilities(player, game).size() - 1;
-            if (numEndOfTurn > 0) {
-                startButtons.add(Buttons.blue(
-                        finChecker + "endOfTurnAbilities", "Do End Of Turn Ability (" + numEndOfTurn + ")"));
-            }
-
-            startButtons.add(pass);
+            startButtons.add(ButtonHelper.getPassButton(game, player));
             if (!game.isFowMode()) {
                 for (Player p2 : game.getRealPlayers()) {
                     for (int sc : player.getSCs()) {
@@ -433,15 +425,7 @@ public class StartTurnService {
         }
         if (doneActionThisTurn) {
             ButtonHelperFactionSpecific.checkBlockadeStatusOfEverything(player, game, event);
-            if (ButtonHelper.getEndOfTurnAbilities(player, game).size() > 1) {
-                startButtons.add(Buttons.blue(
-                        "endOfTurnAbilities",
-                        "Do End Of Turn Ability ("
-                                + (ButtonHelper.getEndOfTurnAbilities(player, game)
-                                                .size()
-                                        - 1) + ")"));
-            }
-            startButtons.add(Buttons.red(finChecker + "turnEnd", "End Turn"));
+            startButtons.add(ButtonHelper.getEndTurnButton(game, player));
             if (IsPlayerElectedService.isPlayerElected(game, player, "minister_war")) {
                 startButtons.add(Buttons.gray(finChecker + "ministerOfWar", "Use Minister of War"));
             }

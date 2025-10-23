@@ -90,6 +90,14 @@ public class PlayerTechService {
                         + Mapper.getTech(techID).getRepresentation(false) + ".");
     }
 
+    public static void unpurgeTech(GenericInteractionCreateEvent event, Player player, String techID) {
+        player.unpurgeTech(techID);
+        MessageHelper.sendMessageToEventChannel(
+                event,
+                player.getRepresentation(false, false) + " un-purged technology: "
+                        + Mapper.getTech(techID).getRepresentation(false) + ".");
+    }
+
     public static void refreshTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.refreshTech(techID);
         MessageHelper.sendMessageToEventChannel(

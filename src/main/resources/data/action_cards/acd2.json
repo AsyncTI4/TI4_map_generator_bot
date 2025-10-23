@@ -291,7 +291,7 @@
         "name": "Espionage",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Look at another player's action cards. Then, that player gives you 1 action card, unscored secret objective, or promissory note from their hand.",
+        "text": "Look at another player's action cards. Then, that player gives you 1 action card, secret objective, or promissory note from their hand.",
         "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
         "source": "action_deck_2"
     },
@@ -681,7 +681,7 @@
         "alias": "relay_connection1",
         "name": "Relay Connection",
         "phase": "Action",
-        "window": "After you produce a ship in a system",
+        "window": "After you produce a ship",
         "text": "Produce 1 ship of that type in any number of  systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
         "flavorText": "",
         "source": "action_deck_2"
@@ -690,7 +690,7 @@
         "alias": "relay_connection2",
         "name": "Relay Connection",
         "phase": "Action",
-        "window": "After you produce a ship in a system",
+        "window": "After you produce a ship",
         "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
         "flavorText": "",
         "source": "action_deck_2"
@@ -699,7 +699,7 @@
         "alias": "relay_connection3",
         "name": "Relay Connection",
         "phase": "Action",
-        "window": "After you produce a ship in a system",
+        "window": "After you produce a ship",
         "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
         "flavorText": "",
         "source": "action_deck_2"
@@ -708,7 +708,7 @@
         "alias": "relay_connection4",
         "name": "Relay Connection",
         "phase": "Action",
-        "window": "After you produce a ship in a system",
+        "window": "After you produce a ship",
         "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
         "flavorText": "His engineers broke into celebration as Umbat called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
         "source": "action_deck_2"
@@ -1029,7 +1029,7 @@
         "name": "Side Project",
         "phase": "Action",
         "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites.",
+        "text": "Gain a technology of the same color that has no prerequisites. [Note: This may be used as a prerequisite of the technology you are researching.]",
         "automationID": "side_project",
         "flavorText": "As the council meeting drew to a close, Suffi stood up. \"Before we adjourn, I'd like to announce that our neural enhancement project has entered the final phase of clinical trials.\"",
         "source": "action_deck_2"
@@ -1039,7 +1039,7 @@
         "name": "Side Project",
         "phase": "Action",
         "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites.",
+        "text": "Gain a technology of the same color that has no prerequisites. [Note: This may be used as a prerequisite of the technology you are researching.]",
         "automationID": "side_project",
         "flavorText": "A projection showed four individuals competing in a task, with one participant fiercely outpacing the others as he interfaced with the device through thought alone. The council murmured approvingly.",
         "source": "action_deck_2"
@@ -1049,7 +1049,7 @@
         "name": "Side Project",
         "phase": "Action",
         "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites.",
+        "text": "Gain a technology of the same color that has no prerequisites. [Note: This may be used as a prerequisite of the technology you are researching.]",
         "automationID": "side_project",
         "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi, where did you even find the time to organize this project?\"",
         "source": "action_deck_2"
@@ -1059,7 +1059,7 @@
         "name": "Side Project",
         "phase": "Action",
         "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites.",
+        "text": "Gain a technology of the same color that has no prerequisites. [Note: This may be used as a prerequisite of the technology you are researching.]",
         "automationID": "side_project",
         "flavorText": "Suffi parted her hair, revealing a small metal plate indicative of a neural implant. Xander gasped, realizing she must have had the surgery long ago. \"You did this before the trials were completed?\" Suffi shrugged. \"Before the trials even began.\"",
         "source": "action_deck_2"
@@ -1079,7 +1079,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may resolve a card from its discard pile instead.",
-        "flavorText": "Carth breathed in the familiar air of Silver Sands. Home. Were it that she never had to leave.",
+        "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "action_deck_2"
     },
     {

@@ -22,6 +22,7 @@ import ti4.message.MessageHelper;
 import ti4.service.draft.DraftComponentFactory;
 import ti4.service.draft.DraftSetupService;
 import ti4.service.draft.draftables.FactionDraftable;
+import ti4.service.draft.draftables.MantisTileDraftable;
 import ti4.service.draft.draftables.SeatDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
@@ -43,6 +44,7 @@ public class DraftSystemSettings extends SettingsMenu {
     private final GameSetupSettings gameSetupSettings;
     private final SourceSettings sourceSettings;
     private final SliceDraftableSettings sliceSettings;
+    private final MantisTileDraftableSettings mantisTileSettings;
     private final FactionDraftableSettings factionSettings;
     private final PublicSnakeDraftSettings publicSnakeDraftSettings;
     // Bonus Attributes
@@ -90,6 +92,8 @@ public class DraftSystemSettings extends SettingsMenu {
         gameSetupSettings = new GameSetupSettings(game, json != null ? json.get("gameSetupSettings") : null, this);
         sourceSettings = new SourceSettings(game, json, this);
         sliceSettings = new SliceDraftableSettings(game, json != null ? json.get("sliceSettings") : null, this);
+        mantisTileSettings =
+                new MantisTileDraftableSettings(game, json != null ? json.get("mantisTileSettings") : null, this);
         factionSettings = new FactionDraftableSettings(game, json != null ? json.get("factionSettings") : null, this);
         publicSnakeDraftSettings =
                 new PublicSnakeDraftSettings(game, json != null ? json.get("publicSnakeDraftSettings") : null, this);
@@ -113,6 +117,9 @@ public class DraftSystemSettings extends SettingsMenu {
         }
         if (draftablesList.getKeys().contains(FactionDraftable.class.getSimpleName())) {
             implemented.add(factionSettings);
+        }
+        if (draftablesList.getKeys().contains(MantisTileDraftable.class.getSimpleName())) {
+            implemented.add(mantisTileSettings);
         }
         if (draftOrchestrator.getValue().equals(PublicSnakeDraftOrchestrator.class.getSimpleName())) {
             implemented.add(publicSnakeDraftSettings);
