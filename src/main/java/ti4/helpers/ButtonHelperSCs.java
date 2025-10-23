@@ -1334,6 +1334,14 @@ public class ButtonHelperSCs {
             player.addFollowedSC(scNum, event);
             suffix = " **" + Helper.getSCName(scNum, game) + "**";
         }
+
+        if (game.isTwilightsFallMode()) {
+            if (scNum == 2 || scNum == 6 || scNum == 7) {
+                game.setStoredValue(
+                        "willParticipateInSplice",
+                        game.getStoredValue("willParticipateInSplice").replace("_" + player.getFaction(), ""));
+            }
+        }
         ReactionService.addReaction(event, game, player, "is not following" + suffix + ".");
         String players = game.getStoredValue(messageID + "SCReacts");
 
