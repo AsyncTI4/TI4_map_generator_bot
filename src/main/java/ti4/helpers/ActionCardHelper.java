@@ -1283,6 +1283,19 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
 
+            if ("tf-rise".equals(automationID)) {
+                codedButtons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "riseOfAMessiah", "1 infantry on every planet"));
+                codedButtons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "fighterConscription", "1 fighter with every ship"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-mutate1".equals(automationID) || "tf-mutate2".equals(automationID)) {
+                codedButtons.add(Buttons.red("discardSpliceCard_ability", "Discard 1 Ability"));
+                codedButtons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
+                codedButtons.add(Buttons.gray("deletebuttons", "Done Resolving"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
             if ("messiah".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "riseOfAMessiah", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);

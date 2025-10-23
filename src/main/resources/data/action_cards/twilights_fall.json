@@ -221,6 +221,7 @@
         "phase": "Action",
         "window": "When you announce a retreat",
         "text": "Immediately retreat; do not place a command token in that system.",
+        "automationID": "skilled_retreat",
         "source": "twilights_fall"
     },
     {

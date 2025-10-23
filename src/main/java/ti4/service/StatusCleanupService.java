@@ -30,6 +30,7 @@ public class StatusCleanupService {
     public void runStatusCleanup(Game game) {
         game.removeStoredValue("deflectedSC");
         game.removeStoredValue("pharadnPNUsed");
+        game.removeStoredValue("willParticipateInSplice");
         Map<String, Tile> tileMap = game.getTileMap();
         for (Tile tile : tileMap.values()) {
             for (Player toldar : game.getRealPlayers()) {
