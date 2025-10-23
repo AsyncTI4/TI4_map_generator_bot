@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -1491,12 +1490,12 @@ public class ButtonHelperModifyUnits {
                         player.getFactionEmoji()
                                 + " did not place a command token in system they retreated to due to the Eusosociality ability.");
             } else {
-                if(game.isTwilightsFallMode() && buttonID.contains("skilled")){
-                     MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        player.getFactionEmoji()
-                                + " did not place a command token in system they retreated to due to Feint ability.");
-                }else{
+                if (game.isTwilightsFallMode() && buttonID.contains("skilled")) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(),
+                            player.getFactionEmoji()
+                                    + " did not place a command token in system they retreated to due to Feint ability.");
+                } else {
                     CommandCounterHelper.addCC(event, player, tile2, true);
                     Helper.isCCCountCorrect(player);
                 }
