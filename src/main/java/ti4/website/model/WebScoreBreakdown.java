@@ -31,6 +31,8 @@ public class WebScoreBreakdown {
 
         // Special properties
         private Boolean tombInPlay; // Only for CROWN type - null for others
+        private Boolean
+                canDrawSecret; // Only for IMPERIAL type - indicates if the player can draw a secret instead of scoring
     }
 
     public enum EntryType {
@@ -178,10 +180,23 @@ public class WebScoreBreakdown {
         }
 
         // SFTT (Support for the Throne) - losable
-        if (hasSupportForThrone(player, game)) {
-            ScoreBreakdownEntry entry = createEntry(EntryType.SFTT, null, null, EntryState.SCORED, true, 1, null, null);
-            entry.setDescription(buildDescription(EntryType.SFTT, EntryState.SCORED, null, null, player, game));
-            relicEntries.add(entry);
+        // Count each SFTT card in play area (excluding player's own)
+        List<ScoreBreakdownEntry> sfttEntries = new ArrayList<>();
+        List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
+        if (promissoryNotesInPlayArea != null) {
+            for (String pnId : promissoryNotesInPlayArea) {
+                // SFTT promissory notes end with "_sftt" (e.g., "blue_sftt", "red_sftt")
+                if (pnId != null && pnId.endsWith("_sftt")) {
+                    // Check if this is not the player's own SFTT
+                    String pnColor = pnId.substring(0, pnId.length() - 5); // Remove "_sftt"
+                    if (!pnColor.equals(player.getColor())) {
+                        ScoreBreakdownEntry entry =
+                                createEntry(EntryType.SFTT, null, null, EntryState.SCORED, true, 1, null, null);
+                        entry.setDescription("Support for the Throne (" + pnColor + ")");
+                        sfttEntries.add(entry);
+                    }
+                }
+            }
         }
 
         // Shard of the Throne - losable
@@ -224,10 +239,11 @@ public class WebScoreBreakdown {
             }
         }
 
-        // Add entries in the correct order: PO1 → PO2 → Secrets → Custodians → Imperial → Relics → Agendas
+        // Add entries in the correct order: PO1 → PO2 → Secrets → SFTT → Custodians → Imperial → Relics → Agendas
         entries.addAll(po1Entries);
         entries.addAll(po2Entries);
         entries.addAll(secretEntries);
+        entries.addAll(sfttEntries);
         entries.addAll(custodianEntries);
         entries.addAll(imperialEntries);
         entries.addAll(relicEntries);
@@ -285,13 +301,15 @@ public class WebScoreBreakdown {
                 // Determine if QUALIFIES or POTENTIAL
                 EntryState state = progress >= threshold ? EntryState.QUALIFIES : EntryState.POTENTIAL;
 
-                candidates.add(new PublicObjectiveCandidate(poKey, type, po.getPoints(), state, progress, threshold));
+                // Get point value from the objective model
+                int pointValue = po.getPoints();
+
+                candidates.add(new PublicObjectiveCandidate(poKey, type, pointValue, state, progress, threshold));
             }
         }
 
         // Sort candidates by: 1) point value (desc), 2) state (QUALIFIES before POTENTIAL), 3) progress % (desc)
         candidates.sort(Comparator.comparingInt((PublicObjectiveCandidate c) -> c.pointValue)
-                .reversed()
                 .thenComparingInt(c -> c.state == EntryState.QUALIFIES ? 0 : 1)
                 .thenComparingDouble(c -> c.threshold > 0 ? (double) c.progress / c.threshold : 0.0)
                 .reversed());
@@ -321,7 +339,17 @@ public class WebScoreBreakdown {
         if (hasImperialUntapped(player, game)) {
             ScoreBreakdownEntry entry =
                     createEntry(EntryType.IMPERIAL, null, null, imperialEntryState, false, 1, null, null);
-            entry.setDescription("Imperial Point (Imperial)");
+
+            // Check if the Imperial holder can also draw a secret (not at cap)
+            boolean canDrawSecret = canImperialHolderDrawSecret(player, game);
+            entry.setCanDrawSecret(canDrawSecret);
+
+            // Update description based on whether they can draw a secret
+            if (canDrawSecret) {
+                entry.setDescription("Imperial Point (or draw secret)");
+            } else {
+                entry.setDescription("Imperial Point");
+            }
             entries.add(entry);
         }
 
@@ -583,6 +611,23 @@ public class WebScoreBreakdown {
         return player.getPlanets().contains(MECATOL_REX_PLANET);
     }
 
+    private static boolean canImperialHolderDrawSecret(Player player, Game game) {
+        if (player == null || game == null) return false;
+
+        // Check if player is the Imperial holder
+        if (!player.getSCs().contains(IMPERIAL_STRATEGY_CARD)) {
+            return false;
+        }
+
+        // Check secret limit
+        int maxSecrets = player.getMaxSOCount();
+        int currentSecrets =
+                player.getSecrets().size() + player.getSecretsScored().size();
+
+        // Can draw a secret if not at cap
+        return currentSecrets < maxSecrets;
+    }
+
     private static boolean canDrawAnotherSecret(Player player, Game game) {
         if (player == null || game == null) return false;
 
@@ -594,12 +639,7 @@ public class WebScoreBreakdown {
             return false;
         }
 
-        // Check if Imperial SC is in the game and not yet played
-        if (!game.getScTradeGoods().containsKey(IMPERIAL_STRATEGY_CARD)) {
-            return false; // Imperial not in this game
-        }
-
-        // Find who has Imperial
+        // Find who has Imperial (if anyone picked it)
         Player imperialHolder = null;
         for (Player p : game.getRealPlayers()) {
             if (p.getSCs().contains(IMPERIAL_STRATEGY_CARD)) {
@@ -608,25 +648,27 @@ public class WebScoreBreakdown {
             }
         }
 
-        // If Imperial has been played (exhausted), can't draw
-        if (imperialHolder != null && imperialHolder.getExhaustedSCs().contains(IMPERIAL_STRATEGY_CARD)) {
+        // If no one picked Imperial, can't draw secrets via Imperial
+        if (imperialHolder == null) {
             return false;
         }
 
-        // Player must either have Imperial or have a strategy token to follow
-        boolean hasImperial = player.getSCs().contains(IMPERIAL_STRATEGY_CARD);
+        // If Imperial has been played (exhausted), can't draw
+        if (imperialHolder.getExhaustedSCs().contains(IMPERIAL_STRATEGY_CARD)) {
+            return false;
+        }
+
+        // If this player is the Imperial holder, they can't draw a secret via Imperial
+        // because the primary is either score an Imperial point OR draw a secret (not both)
+        boolean isImperialHolder = player.getSCs().contains(IMPERIAL_STRATEGY_CARD);
+        if (isImperialHolder) {
+            return false;
+        }
+
+        // Player must have a strategy token to follow Imperial
         boolean hasStrategyToken = player.getStrategicCC() > 0;
 
-        return hasImperial || hasStrategyToken;
-    }
-
-    private static boolean hasSupportForThrone(Player player, Game game) {
-        if (game == null) return false;
-
-        // SFTT is typically an agenda that gives a point
-        return game.getLaws().containsKey(CUSTOM_PO_SUPPORT_FOR_THRONE)
-                || (game.getCustomPublicVP() != null
-                        && game.getCustomPublicVP().containsKey(CUSTOM_PO_SUPPORT_FOR_THRONE));
+        return hasStrategyToken;
     }
 
     private static boolean hasStyx(Player player) {
