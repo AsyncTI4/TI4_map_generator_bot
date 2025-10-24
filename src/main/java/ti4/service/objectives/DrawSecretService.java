@@ -130,7 +130,7 @@ public class DrawSecretService {
                 }
                 game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
             }
-            if (game.isThundersEdge() || !game.getStoredValue("useNewRex").isEmpty()) {
+            if (game.isThundersEdge() || !game.getStoredValue("useNewRex").isEmpty() || game.isTwilightsFallMode()) {
                 Tile mr = game.getMecatolTile();
                 if (mr != null) {
                     String pos = mr.getPosition();

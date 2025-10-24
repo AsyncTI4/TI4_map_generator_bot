@@ -1390,6 +1390,11 @@ public class ButtonHelperFactionSpecific {
         Player saar = game.getPNOwner("ragh");
         saar = saar == null ? game.getPNOwner("sigma_raghs_call") : saar;
         for (String planet : saar.getPlanetsAllianceMode()) {
+            if (planet.equalsIgnoreCase("triad")
+                    || (game.getUnitHolderFromPlanet(planet) != null
+                            && game.getUnitHolderFromPlanet(planet).isSpaceStation())) {
+                continue;
+            }
             if (!planet.equalsIgnoreCase(origPlanet)) {
                 buttons.add(Buttons.gray(
                         "raghsCallStepTwo_" + origPlanet + "_" + planet,

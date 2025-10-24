@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -985,6 +982,11 @@ public class ButtonHelper {
         }
         boolean tileHasShips = tile.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip);
         if (player.hasAbility("voidmaker") && tile.getPlanetUnitHolders().isEmpty() && tileHasShips) {
+            return true;
+        }
+        if (player.hasUnlockedBreakthrough("ghostbt")
+                && !tile.getWormholes(player.getGame()).isEmpty()
+                && tileHasShips) {
             return true;
         }
         for (UnitHolder unitHolder : unitHolders.values()) {

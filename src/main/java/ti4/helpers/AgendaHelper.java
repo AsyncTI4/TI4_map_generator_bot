@@ -1065,7 +1065,7 @@ public class AgendaHelper {
     }
 
     private static void pingAboutDebt(Game game) {
-        if (game.isHiddenAgendaMode()) {
+        if (game.isHiddenAgendaMode() || !game.getStoredValue("executiveOrder").isEmpty()) {
             return;
         }
         for (Player player : game.getRealPlayers()) {
