@@ -290,11 +290,11 @@ public class WebScoreBreakdown {
         }
 
         // Sort candidates by: 1) point value (desc), 2) state (QUALIFIES before POTENTIAL), 3) progress % (desc)
-        candidates.sort(
-            Comparator.comparingInt((PublicObjectiveCandidate c) -> c.pointValue).reversed()
+        candidates.sort(Comparator.comparingInt((PublicObjectiveCandidate c) -> c.pointValue)
+                .reversed()
                 .thenComparingInt(c -> c.state == EntryState.QUALIFIES ? 0 : 1)
-                .thenComparingDouble(c -> c.threshold > 0 ? (double) c.progress / c.threshold : 0.0).reversed()
-        );
+                .thenComparingDouble(c -> c.threshold > 0 ? (double) c.progress / c.threshold : 0.0)
+                .reversed());
 
         // Add top N candidates to entries
         for (int i = 0; i < Math.min(maxPublicObjectives, candidates.size()); i++) {
