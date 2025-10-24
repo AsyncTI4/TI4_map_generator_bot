@@ -79,6 +79,7 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.map.FractureService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -2140,6 +2141,12 @@ public class Player extends PlayerProperties {
         if ("cr2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("mentakbt")) {
             addOwnedUnitByID("mentak_cruiser3");
         }
+
+        if ("planesplitter-firm".equalsIgnoreCase(techID)) {
+            FractureService.spawnFracture(null, game);
+            FractureService.spawnIngressTokens(null, game, this, false);
+        }
+
 
         // Update Owned Units when Researching a Unit Upgrade
         TechnologyModel techModel = Mapper.getTech(techID);

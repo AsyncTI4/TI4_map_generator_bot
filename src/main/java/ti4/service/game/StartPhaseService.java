@@ -73,7 +73,6 @@ public class StartPhaseService {
         switch (phase) {
             case "strategy" -> startStrategyPhase(event, game);
             case "voting", "agendaVoting" -> AgendaHelper.startTheVoting(game);
-            case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
             case "shuffleDecks" -> game.shuffleDecks();
             case "agenda" -> {
                 game.setPhaseOfGame("agenda");
@@ -91,6 +90,7 @@ public class StartPhaseService {
             case "giveAgendaButtonsBack" -> Helper.giveMeBackMyAgendaButtons(game);
             case "finSpecialSomnoFix" -> Helper.addBotHelperPermissionsToGameChannels(event);
             case "finSpecialAbsol" -> AgendaHelper.resolveAbsolAgainstChecksNBalances(game);
+            case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
             case "finFixSecrets" -> game.fixScrewedSOs();
             case "finFixScrewedRelics" -> game.fixScrewedRelics();
             case "finTFSlice" -> ButtonHelperTwilightsFall.startSliceBuild(game, event);

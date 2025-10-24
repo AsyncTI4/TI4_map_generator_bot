@@ -1329,6 +1329,10 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveLocust", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
+            if ("tf-create".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveCreate", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
             if ("tf-reflect".equals(automationID)) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "convertComms_1_stay",

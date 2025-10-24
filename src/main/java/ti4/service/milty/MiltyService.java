@@ -49,6 +49,7 @@ import ti4.service.info.TechInfoService;
 import ti4.service.info.UnitInfoService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.planet.AddPlanetService;
+import ti4.service.rules.ThundersEdgeRulesService;
 import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
 import ti4.spring.jda.JdaService;
@@ -184,6 +185,10 @@ public class MiltyService {
                     MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
                     game.setPhaseOfGame("miltydraft");
                     GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
+                    if (game.isThundersEdge()) {
+                        ThundersEdgeRulesService.alertTabletalkWithRulesAtStartOfDraft(game);
+                    }
+
                 }
             });
         }
