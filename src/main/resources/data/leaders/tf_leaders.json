@@ -94,7 +94,7 @@
         "name": "Poison of the Nefishh",
         "title": "Naalu Paradigm",
         "abilityWindow": "At the end of the status phase",
-        "abilityText": "You may choose an bility owned by another player; they must either give you that ability or give you 2 other abilities. If you do, purge this card.",
+        "abilityText": "You may choose an ability owned by another player; they must either give you that ability or give you 2 other abilities. If you do, purge this card.",
         "unlockCondition": "Always Unlocked",
         "source": "twilights_fall"
     },
