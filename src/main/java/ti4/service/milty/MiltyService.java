@@ -113,7 +113,7 @@ public class MiltyService {
             sources.add(ComponentSource.ds);
             sources.add(ComponentSource.uncharted_space);
         }
-        if (game.isThundersEdge() || !game.getStoredValue("useEntropicScar").isEmpty()) {
+        if (game.isThundersEdge() || !game.getStoredValue("useEntropicScar").isEmpty() || game.isTwilightsFallMode()) {
             sources.add(ComponentSource.thunders_edge);
         }
 

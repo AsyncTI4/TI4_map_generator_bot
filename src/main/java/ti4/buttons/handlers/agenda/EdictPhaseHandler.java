@@ -170,7 +170,7 @@ public class EdictPhaseHandler {
         String msg = player.getRepresentation() + " use buttons to resolve the edict.";
         switch (edict) {
             case "tf-bless" -> {
-                buttons.add(Buttons.green("blessBoon_tg", "Gain 3 TG"));
+                buttons.add(Buttons.green("blessBoonTg", "Gain 3 TG"));
                 buttons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
                 buttons.add(Buttons.blue("redistributeCCButtons", "Gain 1 Command Token"));
                 msg += " " + game.getPing() + " other players get to resolve 1 of the 3 boons.";
@@ -306,6 +306,6 @@ public class EdictPhaseHandler {
                     "Proceed to Strategy Phase (will refresh all cards and ping the priority player)");
             MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg2, proceedToStrategyPhase);
         }
-        ButtonHelper.deleteMessage(event);
+        ButtonHelper.deleteAllButtons(event);
     }
 }
