@@ -80,7 +80,7 @@ public class WebScoreBreakdown {
             return;
         }
 
-        // Scored PO1's and PO2's
+        // Scored PO1's and PO2's (and custom objectives like Custodian/Imperial)
         Map<String, List<String>> scoredPublics = game.getScoredPublicObjectives();
         if (scoredPublics != null) {
             for (Map.Entry<String, List<String>> poEntry : scoredPublics.entrySet()) {
@@ -91,10 +91,7 @@ public class WebScoreBreakdown {
                     continue;
                 }
 
-                PublicObjectiveModel po = Mapper.getPublicObjective(poKey);
-                if (po == null) continue;
-
-                // Handle custodians - can be multi-scored
+                // Handle custodians - can be multi-scored (check BEFORE the Mapper check)
                 if (Constants.CUSTODIAN.equals(poKey)) {
                     int count = Collections.frequency(scoringPlayers, player.getUserID());
                     for (int i = 0; i < count; i++) {
@@ -107,7 +104,7 @@ public class WebScoreBreakdown {
                     continue;
                 }
 
-                // Handle imperial - can be multi-scored
+                // Handle imperial - can be multi-scored (check BEFORE the Mapper check)
                 if (Constants.IMPERIAL_RIDER.equals(poKey)) {
                     int count = Collections.frequency(scoringPlayers, player.getUserID());
                     for (int i = 0; i < count; i++) {
@@ -119,6 +116,10 @@ public class WebScoreBreakdown {
                     }
                     continue;
                 }
+
+                // Try to get as a real public objective
+                PublicObjectiveModel po = Mapper.getPublicObjective(poKey);
+                if (po == null) continue; // Not a real PO, skip it
 
                 // Determine type based on stage
                 EntryType type;
@@ -172,6 +173,9 @@ public class WebScoreBreakdown {
         }
 
         // Agenda points (from customPublicVP)
+        // Note: customPublicVP is game-wide, not player-specific
+        // For entries we recognize (custodian, imperial, relics), we skip them here
+        // because they're handled elsewhere in player-specific ways
         Map<String, Integer> customVP = game.getCustomPublicVP();
         if (customVP != null) {
             for (Map.Entry<String, Integer> vpEntry : customVP.entrySet()) {
@@ -187,14 +191,16 @@ public class WebScoreBreakdown {
                         || "baldrick_crownofemphidia".equals(key)
                         || "bookoflatvinia".equals(key)
                         || "baldrick_bookoflatvinia".equals(key)
-                        || "styx".equals(key)) {
+                        || "styx".equals(key)
+                        || "support_for_the_throne".equals(key)) {
                     continue;
                 }
 
+                // For unrecognized entries, mark as AGENDA with UNSURE description for testing
                 boolean losable = isAgendaLosable(key);
                 ScoreBreakdownEntry entry =
                         createEntry(EntryType.AGENDA, null, key, EntryState.SCORED, losable, vp, null, null);
-                entry.setDescription(buildDescription(EntryType.AGENDA, EntryState.SCORED, null, key, player, game));
+                entry.setDescription("UNSURE: " + key);
                 entries.add(entry);
             }
         }
