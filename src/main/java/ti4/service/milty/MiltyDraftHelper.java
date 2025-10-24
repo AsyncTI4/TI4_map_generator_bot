@@ -374,7 +374,7 @@ public class MiltyDraftHelper {
         String path =
                 tileModel.getImagePath() == null ? "" : tileModel.getImagePath().toLowerCase();
         List<String> disallowedTerms = List.of(
-                "corner", "lane", "mecatol", "blank", "border", "fow", "anomaly", "deltawh", "seed", "mr", "mrte",
+                "corner", "lane", "mecatol", "blank", "border", "fow", "anomaly", "deltawh", "seed", "sorrowwh", "fracture","mr", "mrte",
                 "mallice", "ethan", "prison", "kwon", "home", "hs", "red", "blue", "green", "gray", "gate", "setup");
         return disallowedTerms.stream().anyMatch(term -> id.contains(term) || path.contains(term));
     }

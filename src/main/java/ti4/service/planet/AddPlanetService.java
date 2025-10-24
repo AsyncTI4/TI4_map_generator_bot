@@ -557,6 +557,31 @@ public class AddPlanetService {
         if (Constants.MECATOLS.contains(planet) && player.controlsMecatol(true)) {
             CommanderUnlockCheckService.checkPlayer(player, "winnu");
         }
+        if (player.isRealPlayer() && "styx".equalsIgnoreCase(planet)) {
+            String marrow = "A Song Like Marrow";
+            Integer id = game.getRevealedPublicObjectives().getOrDefault(marrow, null);
+            if (id == null) id = game.getRevealedPublicObjectives().getOrDefault("styx", null);
+            if (id == null) id = game.getRevealedPublicObjectives().getOrDefault("Styx", null);
+
+
+            String message = null;
+            if (id != null) {
+                game.scorePublicObjective(player.getUserID(), id);
+                message = player.getRepresentation() + " scored '" + marrow + "'";
+            } else {
+                id = game.addCustomPO(marrow, 1);
+                game.scorePublicObjective(player.getUserID(), id);
+                message = "Custom PO '" + marrow + "' has been added.\n" + player.getRepresentation() + " scored '" + marrow + "'";
+            }
+            for (Player p : game.getRealPlayers()) {
+                if (p.is(player)) continue;
+                game.unscorePublicObjective(message, id);
+            }
+
+
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        }
+
         if ("thundersedge".equalsIgnoreCase(planet) && player.isRealPlayer() && !player.isBreakthroughUnlocked()) {
             BreakthroughCommandHelper.unlockBreakthrough(game, player);
         }

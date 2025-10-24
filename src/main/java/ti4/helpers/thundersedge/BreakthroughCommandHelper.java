@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.buttons.Buttons;
 import ti4.commands.CommandHelper;
 import ti4.helpers.BreakthroughHelper;
 import ti4.map.Game;
@@ -14,6 +17,9 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
 import ti4.service.breakthrough.StellarGenesisService;
+import ti4.service.emoji.DiceEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.map.FractureService;
 
 public class BreakthroughCommandHelper {
 
@@ -74,10 +80,20 @@ public class BreakthroughCommandHelper {
                     player.addOwnedUnitByID("mentak_cruiser3");
                 }
             }
+            // if (!FractureService.isFractureInPlay(game))
+            //     serveRollFractureButtons(game, player);
             if (bt.getAlias().equals("muaatbt")) StellarGenesisService.serveAvernusButtons(game, player);
             if (bt.getAlias().equals("keleresbt")) player.gainCustodiaVigilia();
         });
     }
+
+    public static void serveRollFractureButtons(Game game, Player player) {
+        Button rollFracture = Buttons.green(player.getFinsFactionCheckerPrefix() + "rollFracture", "Roll for the fracture", MiscEmojis.RollDice);
+        String message = "It looks like the fracture isn't in play yet. Use the button to roll for the fracture!";
+        message += "\n> If you roll a [" + DiceEmojis.d10blue_1 + "] or [" + DiceEmojis.d10blue_0 + "], the fracture will appear.";
+        MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, rollFracture);
+    }
+
 
     public static void lockBreakthrough(Player player) {
         withBreakthrough(player, bt -> {

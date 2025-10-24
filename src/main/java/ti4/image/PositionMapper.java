@@ -1,6 +1,6 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.Point;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,8 +15,11 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
+
 import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.SerializationUtils;
+
 import ti4.ResourceHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -97,7 +100,11 @@ public class PositionMapper {
         return positions;
     }
 
-    public static Point getScaledTilePosition(Game game, String position, int x, int y) {
+     public static Point getScaledTilePosition(Game game, String position, int x, int y) {
+        return getScaledTilePosition(game, position, x, y, 0);
+     }
+
+    public static Point getScaledTilePosition(Game game, String position, int x, int y, int fractureYbump) {
         int ringCount = game.getRingCount();
         ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
         if (ringCount == RING_MIN_COUNT) {
@@ -110,15 +117,19 @@ public class PositionMapper {
                 y -= 150;
             } else if ("bl".equalsIgnoreCase(position)) {
                 y -= lower * SPACE_FOR_TILE_HEIGHT * 2 - 150;
+                y += fractureYbump;
             } else if ("tr".equalsIgnoreCase(position)) {
                 x -= lower * HORIZONTAL_TILE_SPACING * 2;
                 y -= 150;
+                y += fractureYbump;
             } else if ("br".equalsIgnoreCase(position)) {
                 x -= lower * HORIZONTAL_TILE_SPACING * 2;
                 y -= lower * SPACE_FOR_TILE_HEIGHT * 2 - 150;
+                y -= (fractureYbump - 300) / 2; // always 50
             } else {
                 x -= lower * HORIZONTAL_TILE_SPACING;
                 y -= lower * SPACE_FOR_TILE_HEIGHT;
+                y += fractureYbump;
             }
             return new Point(x, y);
         }

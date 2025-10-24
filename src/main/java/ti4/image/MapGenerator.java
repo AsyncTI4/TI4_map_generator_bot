@@ -58,6 +58,7 @@ import ti4.model.PlanetModel;
 import ti4.model.StrategyCardModel;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
+import ti4.service.map.FractureService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.settings.GlobalSettings;
 import ti4.spring.api.image.GameImageService;
@@ -106,6 +107,7 @@ public class MapGenerator implements AutoCloseable {
     private int minY = -1;
     private int maxX = -1;
     private int maxY = -1;
+    private int fractureYbump = 0;
     private boolean isFoWPrivate;
     private Player fowPlayer;
 
@@ -161,6 +163,11 @@ public class MapGenerator implements AutoCloseable {
 
         // Height of map section
         int mapHeight = getMapHeight(game);
+        if (FractureService.isFractureInPlay(game)) {
+            fractureYbump = 400;
+            mapHeight += fractureYbump;
+        }
+
 
         // Width of map section
         mapWidth = Math.max(MINIMUM_WIDTH_OF_PLAYER_AREA, getMapWidth(game));
@@ -1103,7 +1110,7 @@ public class MapGenerator implements AutoCloseable {
         for (String pos : statTiles) {
             Point p = PositionMapper.getTilePosition(pos);
             if (p == null) return;
-            p = PositionMapper.getScaledTilePosition(game, pos, p.x, p.y);
+            p = PositionMapper.getScaledTilePosition(game, pos, p.x, p.y, fractureYbump);
             p.translate(EXTRA_X, EXTRA_Y);
             points.put(pos, p);
         }
@@ -1831,7 +1838,7 @@ public class MapGenerator implements AutoCloseable {
             Point anchorProjectedPoint = PositionMapper.getTilePosition(playerStatsAnchor);
             if (anchorProjectedPoint != null) {
                 Point playerStatsAnchorPoint = PositionMapper.getScaledTilePosition(
-                        game, playerStatsAnchor, anchorProjectedPoint.x, anchorProjectedPoint.y);
+                        game, playerStatsAnchor, anchorProjectedPoint.x, anchorProjectedPoint.y, fractureYbump);
                 Integer anchorLocationIndex =
                         PositionMapper.getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition());
                 anchorLocationIndex = anchorLocationIndex == null ? 0 : anchorLocationIndex - 1;
@@ -2361,7 +2368,7 @@ public class MapGenerator implements AutoCloseable {
                 maxY = Math.max(maxY, y);
             }
 
-            positionPoint = PositionMapper.getScaledTilePosition(game, position, x, y);
+            positionPoint = PositionMapper.getScaledTilePosition(game, position, x, y, fractureYbump);
             int tileX = positionPoint.x + EXTRA_X - TILE_PADDING;
             int tileY = positionPoint.y + EXTRA_Y - TILE_PADDING;
 
