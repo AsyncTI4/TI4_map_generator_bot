@@ -603,6 +603,12 @@ public class ButtonHelperAgents {
                     event.getMessageChannel(), "Please choose which planet you wish to explore.", buttons);
         }
 
+        if ("researchagent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " used their genome to add 3 cards to the draft.";
+            MessageHelper.sendMessageToChannel(channel, exhaustText);
+            game.setStoredValue("researchagentSplice", "Yes");
+        }
+
         if ("augersagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Clodho, the Ilyxum"
                     + ssruuSlash + " agent.";
