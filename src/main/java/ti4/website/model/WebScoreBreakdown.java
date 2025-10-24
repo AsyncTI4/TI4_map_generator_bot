@@ -79,7 +79,16 @@ public class WebScoreBreakdown {
             return;
         }
 
-        // Scored PO1's and PO2's (and custom objectives like Custodian/Imperial)
+        // Collect scored entries first, then add them in the correct order
+        List<ScoreBreakdownEntry> po1Entries = new ArrayList<>();
+        List<ScoreBreakdownEntry> po2Entries = new ArrayList<>();
+        List<ScoreBreakdownEntry> secretEntries = new ArrayList<>();
+        List<ScoreBreakdownEntry> custodianEntries = new ArrayList<>();
+        List<ScoreBreakdownEntry> imperialEntries = new ArrayList<>();
+        List<ScoreBreakdownEntry> relicEntries = new ArrayList<>();
+        List<ScoreBreakdownEntry> agendaEntries = new ArrayList<>();
+
+        // Process scored public objectives (PO1, PO2, Custodian, Imperial)
         Map<String, List<String>> scoredPublics = game.getScoredPublicObjectives();
         if (scoredPublics != null) {
             for (Map.Entry<String, List<String>> poEntry : scoredPublics.entrySet()) {
@@ -98,7 +107,7 @@ public class WebScoreBreakdown {
                                 createEntry(EntryType.CUSTODIAN, null, null, EntryState.SCORED, false, 1, null, null);
                         entry.setDescription(
                                 buildDescription(EntryType.CUSTODIAN, EntryState.SCORED, null, null, player, game));
-                        entries.add(entry);
+                        custodianEntries.add(entry);
                     }
                     continue;
                 }
@@ -111,7 +120,7 @@ public class WebScoreBreakdown {
                                 createEntry(EntryType.IMPERIAL, null, null, EntryState.SCORED, false, 1, null, null);
                         entry.setDescription(
                                 buildDescription(EntryType.IMPERIAL, EntryState.SCORED, null, null, player, game));
-                        entries.add(entry);
+                        imperialEntries.add(entry);
                     }
                     continue;
                 }
@@ -133,7 +142,12 @@ public class WebScoreBreakdown {
                 ScoreBreakdownEntry entry =
                         createEntry(type, poKey, null, EntryState.SCORED, false, po.getPoints(), null, null);
                 entry.setDescription(buildDescription(type, EntryState.SCORED, poKey, null, player, game));
-                entries.add(entry);
+
+                if (type == EntryType.PO_1) {
+                    po1Entries.add(entry);
+                } else {
+                    po2Entries.add(entry);
+                }
             }
         }
 
@@ -145,7 +159,7 @@ public class WebScoreBreakdown {
                         createEntry(EntryType.SECRET, secretKey, null, EntryState.SCORED, false, 1, null, null);
                 entry.setDescription(
                         buildDescription(EntryType.SECRET, EntryState.SCORED, secretKey, null, player, game));
-                entries.add(entry);
+                secretEntries.add(entry);
             }
         }
 
@@ -153,7 +167,7 @@ public class WebScoreBreakdown {
         if (hasSupportForThrone(player, game)) {
             ScoreBreakdownEntry entry = createEntry(EntryType.SFTT, null, null, EntryState.SCORED, true, 1, null, null);
             entry.setDescription(buildDescription(EntryType.SFTT, EntryState.SCORED, null, null, player, game));
-            entries.add(entry);
+            relicEntries.add(entry);
         }
 
         // Shard of the Throne - losable
@@ -161,14 +175,14 @@ public class WebScoreBreakdown {
             ScoreBreakdownEntry entry =
                     createEntry(EntryType.SHARD, null, null, EntryState.SCORED, true, 1, null, null);
             entry.setDescription(buildDescription(EntryType.SHARD, EntryState.SCORED, null, null, player, game));
-            entries.add(entry);
+            relicEntries.add(entry);
         }
 
         // Styx token - losable (homebrew)
         if (hasStyx(player)) {
             ScoreBreakdownEntry entry = createEntry(EntryType.STYX, null, null, EntryState.SCORED, true, 1, null, null);
             entry.setDescription(buildDescription(EntryType.STYX, EntryState.SCORED, null, null, player, game));
-            entries.add(entry);
+            relicEntries.add(entry);
         }
 
         // Agenda points (from customPublicVP)
@@ -182,10 +196,13 @@ public class WebScoreBreakdown {
                 Integer vp = vpEntry.getValue();
 
                 // Skip custodian/imperial/relics which we already handled as specific types
+                // Note: Shard can appear as both relic ID and custom PO name in the map
                 if (Constants.CUSTODIAN.equals(key)
                         || Constants.IMPERIAL_RIDER.equals(key)
                         || "shard".equals(key)
                         || "absol_shardofthethrone1".equals(key)
+                        || "Shard of the Throne".equals(key) // Custom PO name for Shard
+                        || key.startsWith("Shard of the Throne (") // Absol variants: "Shard of the Throne (1)", etc.
                         || "emphidia".equals(key)
                         || "baldrick_crownofemphidia".equals(key)
                         || "bookoflatvinia".equals(key)
@@ -200,9 +217,18 @@ public class WebScoreBreakdown {
                 ScoreBreakdownEntry entry =
                         createEntry(EntryType.AGENDA, null, key, EntryState.SCORED, losable, vp, null, null);
                 entry.setDescription("UNSURE: " + key);
-                entries.add(entry);
+                agendaEntries.add(entry);
             }
         }
+
+        // Add entries in the correct order: PO1 → PO2 → Secrets → Custodians → Imperial → Relics → Agendas
+        entries.addAll(po1Entries);
+        entries.addAll(po2Entries);
+        entries.addAll(secretEntries);
+        entries.addAll(custodianEntries);
+        entries.addAll(imperialEntries);
+        entries.addAll(relicEntries);
+        entries.addAll(agendaEntries);
     }
 
     private static void addQualifiesAndPotentialEntries(Player player, Game game, List<ScoreBreakdownEntry> entries) {
