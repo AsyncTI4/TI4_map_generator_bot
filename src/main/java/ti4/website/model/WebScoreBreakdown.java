@@ -302,7 +302,13 @@ public class WebScoreBreakdown {
                 EntryType type = typeOpt.get();
 
                 // Get progress and threshold
-                int progress = ListPlayerInfoService.getPlayerProgressOnObjective(poKey, game, player);
+                int progress;
+                try {
+                    progress = ListPlayerInfoService.getPlayerProgressOnObjective(poKey, game, player);
+                } catch (Exception e) {
+                    // If we can't calculate progress (e.g., due to invalid tech data), default to 0
+                    progress = 0;
+                }
                 int threshold = ListPlayerInfoService.getObjectiveThreshold(poKey, game);
 
                 // Determine if QUALIFIES or POTENTIAL
