@@ -78,18 +78,17 @@ public class WebScoreBreakdown {
 
     // Known relic and special keys to skip when processing customPublicVP
     private static final Set<String> KNOWN_RELIC_AND_SPECIAL_KEYS = Set.of(
-        Constants.CUSTODIAN,
-        Constants.IMPERIAL_RIDER,
-        RELIC_SHARD,
-        RELIC_SHARD_ABSOL,
-        CUSTOM_PO_SHARD,
-        RELIC_CROWN,
-        RELIC_CROWN_BALDRICK,
-        RELIC_LATVINIA,
-        RELIC_LATVINIA_BALDRICK,
-        RELIC_STYX,
-        CUSTOM_PO_SUPPORT_FOR_THRONE
-    );
+            Constants.CUSTODIAN,
+            Constants.IMPERIAL_RIDER,
+            RELIC_SHARD,
+            RELIC_SHARD_ABSOL,
+            CUSTOM_PO_SHARD,
+            RELIC_CROWN,
+            RELIC_CROWN_BALDRICK,
+            RELIC_LATVINIA,
+            RELIC_LATVINIA_BALDRICK,
+            RELIC_STYX,
+            CUSTOM_PO_SUPPORT_FOR_THRONE);
 
     public static WebScoreBreakdown fromPlayer(Player player, Game game) {
         if (player == null || game == null) {
@@ -291,10 +290,9 @@ public class WebScoreBreakdown {
         }
 
         // Sort candidates by: 1) point value (desc), 2) state (QUALIFIES before POTENTIAL)
-        candidates.sort(
-            Comparator.comparingInt((PublicObjectiveCandidate c) -> c.pointValue).reversed()
-                .thenComparingInt(c -> c.state == EntryState.QUALIFIES ? 0 : 1)
-        );
+        candidates.sort(Comparator.comparingInt((PublicObjectiveCandidate c) -> c.pointValue)
+                .reversed()
+                .thenComparingInt(c -> c.state == EntryState.QUALIFIES ? 0 : 1));
 
         // Add top N candidates to entries
         for (int i = 0; i < Math.min(maxPublicObjectives, candidates.size()); i++) {
@@ -367,10 +365,11 @@ public class WebScoreBreakdown {
         // Latvinia - state depends on tech types
         if (hasBookOfLatvinia(player)) {
             int techTypes = countUniqueTechTypes(player);
-            EntryState latvniaState = (techTypes >= LATVINIA_TECH_TYPE_THRESHOLD) ? EntryState.QUALIFIES : EntryState.POTENTIAL;
+            EntryState latvniaState =
+                    (techTypes >= LATVINIA_TECH_TYPE_THRESHOLD) ? EntryState.QUALIFIES : EntryState.POTENTIAL;
 
-            ScoreBreakdownEntry entry =
-                    createEntry(EntryType.LATVINIA, null, null, latvniaState, false, 1, techTypes, LATVINIA_TECH_TYPE_THRESHOLD);
+            ScoreBreakdownEntry entry = createEntry(
+                    EntryType.LATVINIA, null, null, latvniaState, false, 1, techTypes, LATVINIA_TECH_TYPE_THRESHOLD);
             entry.setDescription(buildDescription(EntryType.LATVINIA, latvniaState, null, null, player, game));
             entries.add(entry);
         }
@@ -522,7 +521,6 @@ public class WebScoreBreakdown {
         return Collections.frequency(scoringPlayers, player.getUserID());
     }
 
-
     private static boolean isTombInPlay(Game game) {
         if (game == null || game.getTileMap() == null) return false;
 
@@ -564,7 +562,8 @@ public class WebScoreBreakdown {
 
     private static boolean hasImperialUntapped(Player player, Game game) {
         if (player == null) return false;
-        return player.getSCs().contains(IMPERIAL_STRATEGY_CARD) && !player.getExhaustedSCs().contains(IMPERIAL_STRATEGY_CARD);
+        return player.getSCs().contains(IMPERIAL_STRATEGY_CARD)
+                && !player.getExhaustedSCs().contains(IMPERIAL_STRATEGY_CARD);
     }
 
     private static boolean hasWinnuHeroAvailable(Player player) {
@@ -624,7 +623,8 @@ public class WebScoreBreakdown {
 
         // SFTT is typically an agenda that gives a point
         return game.getLaws().containsKey(CUSTOM_PO_SUPPORT_FOR_THRONE)
-                || (game.getCustomPublicVP() != null && game.getCustomPublicVP().containsKey(CUSTOM_PO_SUPPORT_FOR_THRONE));
+                || (game.getCustomPublicVP() != null
+                        && game.getCustomPublicVP().containsKey(CUSTOM_PO_SUPPORT_FOR_THRONE));
     }
 
     private static boolean hasStyx(Player player) {
@@ -683,8 +683,7 @@ public class WebScoreBreakdown {
 
         int count = Collections.frequency(scoringPlayers, player.getUserID());
         for (int i = 0; i < count; i++) {
-            ScoreBreakdownEntry entry =
-                    createEntry(type, null, null, EntryState.SCORED, false, 1, null, null);
+            ScoreBreakdownEntry entry = createEntry(type, null, null, EntryState.SCORED, false, 1, null, null);
             entry.setDescription(buildDescription(type, EntryState.SCORED, null, null, player, game));
             targetList.add(entry);
         }
