@@ -215,11 +215,10 @@ public class WebScoreBreakdown {
         }
 
         // Agenda points (from customPublicVP)
-        // Note: customPublicVP is game-wide, not player-specific
-        // For entries we recognize (custodian, imperial, relics), we skip them here
-        // because they're handled elsewhere in player-specific ways
+        // Note: customPublicVP defines the point value, but we need to check scoredPublicObjectives
+        // to see which players actually have it scored
         Map<String, Integer> customVP = game.getCustomPublicVP();
-        if (customVP != null) {
+        if (customVP != null && scoredPublics != null) {
             for (Map.Entry<String, Integer> vpEntry : customVP.entrySet()) {
                 String key = vpEntry.getKey();
                 Integer vp = vpEntry.getValue();
@@ -230,12 +229,22 @@ public class WebScoreBreakdown {
                     continue;
                 }
 
-                // For unrecognized entries, mark as AGENDA with UNSURE description for testing
+                // Check if this player actually scored this custom objective
+                List<String> scoringPlayers = scoredPublics.get(key);
+                if (scoringPlayers == null || !scoringPlayers.contains(player.getUserID())) {
+                    continue; // This player doesn't have this custom objective scored
+                }
+
+                // Check if this is a multi-scored custom objective
+                int count = Collections.frequency(scoringPlayers, player.getUserID());
                 boolean losable = isAgendaLosable(key);
-                ScoreBreakdownEntry entry =
-                        createEntry(EntryType.AGENDA, null, key, EntryState.SCORED, losable, vp, null, null);
-                entry.setDescription("UNSURE: " + key);
-                agendaEntries.add(entry);
+
+                for (int i = 0; i < count; i++) {
+                    ScoreBreakdownEntry entry =
+                            createEntry(EntryType.AGENDA, null, key, EntryState.SCORED, losable, vp, null, null);
+                    entry.setDescription(key);
+                    agendaEntries.add(entry);
+                }
             }
         }
 
