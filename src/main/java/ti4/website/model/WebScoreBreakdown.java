@@ -54,8 +54,41 @@ public class WebScoreBreakdown {
         UNSCORED // Drawn/held but cannot currently score
     }
 
+    // Constants for magic values
+    private static final int IMPERIAL_STRATEGY_CARD = 8;
+    private static final String MECATOL_REX_PLANET = "mr";
+    private static final int LATVINIA_TECH_TYPE_THRESHOLD = 4;
+
+    // Relic ID constants
+    private static final String RELIC_SHARD = "shard";
+    private static final String RELIC_SHARD_ABSOL = "absol_shardofthethrone1";
+    private static final String RELIC_CROWN = "emphidia";
+    private static final String RELIC_CROWN_BALDRICK = "baldrick_crownofemphidia";
+    private static final String RELIC_LATVINIA = "bookoflatvinia";
+    private static final String RELIC_LATVINIA_BALDRICK = "baldrick_bookoflatvinia";
+    private static final String RELIC_STYX = "styx";
+
+    // Custom public objective names (used in game.getRevealedPublicObjectives())
+    private static final String CUSTOM_PO_SHARD = "Shard of the Throne";
+    private static final String CUSTOM_PO_SHARD_PREFIX = "Shard of the Throne (";
+    private static final String CUSTOM_PO_SUPPORT_FOR_THRONE = "support_for_the_throne";
+
     // Hardcoded metadata for losable agendas
     private static final Set<String> LOSABLE_AGENDAS = Set.of("political_censure", "mutiny");
+
+    // Known relic and special keys to skip when processing customPublicVP
+    private static final Set<String> KNOWN_RELIC_AND_SPECIAL_KEYS = Set.of(
+            Constants.CUSTODIAN,
+            Constants.IMPERIAL_RIDER,
+            RELIC_SHARD,
+            RELIC_SHARD_ABSOL,
+            CUSTOM_PO_SHARD,
+            RELIC_CROWN,
+            RELIC_CROWN_BALDRICK,
+            RELIC_LATVINIA,
+            RELIC_LATVINIA_BALDRICK,
+            RELIC_STYX,
+            CUSTOM_PO_SUPPORT_FOR_THRONE);
 
     public static WebScoreBreakdown fromPlayer(Player player, Game game) {
         if (player == null || game == null) {
@@ -68,8 +101,7 @@ public class WebScoreBreakdown {
         breakdown.entries = new ArrayList<>();
 
         addScoredEntries(player, game, breakdown.entries);
-        addQualifiesEntries(player, game, breakdown.entries);
-        addPotentialEntries(player, game, breakdown.entries);
+        addQualifiesAndPotentialEntries(player, game, breakdown.entries);
         addUnscoredEntries(player, game, breakdown.entries);
 
         return breakdown;
@@ -80,7 +112,16 @@ public class WebScoreBreakdown {
             return;
         }
 
-        // Scored PO1's and PO2's (and custom objectives like Custodian/Imperial)
+        // Collect scored entries first, then add them in the correct order
+        List<ScoreBreakdownEntry> po1Entries = new ArrayList<>();
+        List<ScoreBreakdownEntry> po2Entries = new ArrayList<>();
+        List<ScoreBreakdownEntry> secretEntries = new ArrayList<>();
+        List<ScoreBreakdownEntry> custodianEntries = new ArrayList<>();
+        List<ScoreBreakdownEntry> imperialEntries = new ArrayList<>();
+        List<ScoreBreakdownEntry> relicEntries = new ArrayList<>();
+        List<ScoreBreakdownEntry> agendaEntries = new ArrayList<>();
+
+        // Process scored public objectives (PO1, PO2, Custodian, Imperial)
         Map<String, List<String>> scoredPublics = game.getScoredPublicObjectives();
         if (scoredPublics != null) {
             for (Map.Entry<String, List<String>> poEntry : scoredPublics.entrySet()) {
@@ -93,27 +134,13 @@ public class WebScoreBreakdown {
 
                 // Handle custodians - can be multi-scored (check BEFORE the Mapper check)
                 if (Constants.CUSTODIAN.equals(poKey)) {
-                    int count = Collections.frequency(scoringPlayers, player.getUserID());
-                    for (int i = 0; i < count; i++) {
-                        ScoreBreakdownEntry entry =
-                                createEntry(EntryType.CUSTODIAN, null, null, EntryState.SCORED, false, 1, null, null);
-                        entry.setDescription(
-                                buildDescription(EntryType.CUSTODIAN, EntryState.SCORED, null, null, player, game));
-                        entries.add(entry);
-                    }
+                    addMultiScoredEntries(player, poKey, scoringPlayers, EntryType.CUSTODIAN, game, custodianEntries);
                     continue;
                 }
 
                 // Handle imperial - can be multi-scored (check BEFORE the Mapper check)
                 if (Constants.IMPERIAL_RIDER.equals(poKey)) {
-                    int count = Collections.frequency(scoringPlayers, player.getUserID());
-                    for (int i = 0; i < count; i++) {
-                        ScoreBreakdownEntry entry =
-                                createEntry(EntryType.IMPERIAL, null, null, EntryState.SCORED, false, 1, null, null);
-                        entry.setDescription(
-                                buildDescription(EntryType.IMPERIAL, EntryState.SCORED, null, null, player, game));
-                        entries.add(entry);
-                    }
+                    addMultiScoredEntries(player, poKey, scoringPlayers, EntryType.IMPERIAL, game, imperialEntries);
                     continue;
                 }
 
@@ -122,19 +149,19 @@ public class WebScoreBreakdown {
                 if (po == null) continue; // Not a real PO, skip it
 
                 // Determine type based on stage
-                EntryType type;
-                if (Mapper.getPublicObjectivesStage1().containsKey(poKey)) {
-                    type = EntryType.PO_1;
-                } else if (Mapper.getPublicObjectivesStage2().containsKey(poKey)) {
-                    type = EntryType.PO_2;
-                } else {
-                    continue;
-                }
+                Optional<EntryType> typeOpt = getPublicObjectiveType(poKey);
+                if (typeOpt.isEmpty()) continue;
+                EntryType type = typeOpt.get();
 
                 ScoreBreakdownEntry entry =
                         createEntry(type, poKey, null, EntryState.SCORED, false, po.getPoints(), null, null);
                 entry.setDescription(buildDescription(type, EntryState.SCORED, poKey, null, player, game));
-                entries.add(entry);
+
+                if (type == EntryType.PO_1) {
+                    po1Entries.add(entry);
+                } else {
+                    po2Entries.add(entry);
+                }
             }
         }
 
@@ -146,7 +173,7 @@ public class WebScoreBreakdown {
                         createEntry(EntryType.SECRET, secretKey, null, EntryState.SCORED, false, 1, null, null);
                 entry.setDescription(
                         buildDescription(EntryType.SECRET, EntryState.SCORED, secretKey, null, player, game));
-                entries.add(entry);
+                secretEntries.add(entry);
             }
         }
 
@@ -154,22 +181,22 @@ public class WebScoreBreakdown {
         if (hasSupportForThrone(player, game)) {
             ScoreBreakdownEntry entry = createEntry(EntryType.SFTT, null, null, EntryState.SCORED, true, 1, null, null);
             entry.setDescription(buildDescription(EntryType.SFTT, EntryState.SCORED, null, null, player, game));
-            entries.add(entry);
+            relicEntries.add(entry);
         }
 
         // Shard of the Throne - losable
-        if (player.hasRelic("shard") || player.hasRelic("absol_shardofthethrone1")) {
+        if (hasShardOfTheThrone(player)) {
             ScoreBreakdownEntry entry =
                     createEntry(EntryType.SHARD, null, null, EntryState.SCORED, true, 1, null, null);
             entry.setDescription(buildDescription(EntryType.SHARD, EntryState.SCORED, null, null, player, game));
-            entries.add(entry);
+            relicEntries.add(entry);
         }
 
         // Styx token - losable (homebrew)
         if (hasStyx(player)) {
             ScoreBreakdownEntry entry = createEntry(EntryType.STYX, null, null, EntryState.SCORED, true, 1, null, null);
             entry.setDescription(buildDescription(EntryType.STYX, EntryState.SCORED, null, null, player, game));
-            entries.add(entry);
+            relicEntries.add(entry);
         }
 
         // Agenda points (from customPublicVP)
@@ -183,16 +210,8 @@ public class WebScoreBreakdown {
                 Integer vp = vpEntry.getValue();
 
                 // Skip custodian/imperial/relics which we already handled as specific types
-                if (Constants.CUSTODIAN.equals(key)
-                        || Constants.IMPERIAL_RIDER.equals(key)
-                        || "shard".equals(key)
-                        || "absol_shardofthethrone1".equals(key)
-                        || "emphidia".equals(key)
-                        || "baldrick_crownofemphidia".equals(key)
-                        || "bookoflatvinia".equals(key)
-                        || "baldrick_bookoflatvinia".equals(key)
-                        || "styx".equals(key)
-                        || "support_for_the_throne".equals(key)) {
+                // Note: Shard can appear as both relic ID and custom PO name in the map
+                if (KNOWN_RELIC_AND_SPECIAL_KEYS.contains(key) || key.startsWith(CUSTOM_PO_SHARD_PREFIX)) {
                     continue;
                 }
 
@@ -201,18 +220,27 @@ public class WebScoreBreakdown {
                 ScoreBreakdownEntry entry =
                         createEntry(EntryType.AGENDA, null, key, EntryState.SCORED, losable, vp, null, null);
                 entry.setDescription("UNSURE: " + key);
-                entries.add(entry);
+                agendaEntries.add(entry);
             }
         }
+
+        // Add entries in the correct order: PO1 → PO2 → Secrets → Custodians → Imperial → Relics → Agendas
+        entries.addAll(po1Entries);
+        entries.addAll(po2Entries);
+        entries.addAll(secretEntries);
+        entries.addAll(custodianEntries);
+        entries.addAll(imperialEntries);
+        entries.addAll(relicEntries);
+        entries.addAll(agendaEntries);
     }
 
-    private static void addQualifiesEntries(Player player, Game game, List<ScoreBreakdownEntry> entries) {
+    private static void addQualifiesAndPotentialEntries(Player player, Game game, List<ScoreBreakdownEntry> entries) {
         if (player == null || game == null || entries == null) {
             return;
         }
 
-        // This method now handles BOTH QUALIFIES and POTENTIAL public objectives
-        // They share the same cap and are sorted together
+        // This method handles all QUALIFIES and POTENTIAL entries
+        // The state is determined by whether the player meets the requirements
 
         // Determine max total public objectives based on scoring opportunities
         int maxPublicObjectives = 1; // Base: 1 scoring opportunity (status phase)
@@ -246,14 +274,9 @@ public class WebScoreBreakdown {
                 if (po == null) continue;
 
                 // Determine type
-                EntryType type;
-                if (Mapper.getPublicObjectivesStage1().containsKey(poKey)) {
-                    type = EntryType.PO_1;
-                } else if (Mapper.getPublicObjectivesStage2().containsKey(poKey)) {
-                    type = EntryType.PO_2;
-                } else {
-                    continue;
-                }
+                Optional<EntryType> typeOpt = getPublicObjectiveType(poKey);
+                if (typeOpt.isEmpty()) continue;
+                EntryType type = typeOpt.get();
 
                 // Get progress and threshold
                 int progress = ListPlayerInfoService.getPlayerProgressOnObjective(poKey, game, player);
@@ -266,17 +289,12 @@ public class WebScoreBreakdown {
             }
         }
 
-        // Sort candidates by: 1) point value (desc), 2) state (QUALIFIES before POTENTIAL)
-        candidates.sort((a, b) -> {
-            // First compare by point value (descending)
-            int pointCompare = Integer.compare(b.pointValue, a.pointValue);
-            if (pointCompare != 0) return pointCompare;
-
-            // Then by state (QUALIFIES before POTENTIAL)
-            if (a.state == EntryState.QUALIFIES && b.state == EntryState.POTENTIAL) return -1;
-            if (a.state == EntryState.POTENTIAL && b.state == EntryState.QUALIFIES) return 1;
-            return 0;
-        });
+        // Sort candidates by: 1) point value (desc), 2) state (QUALIFIES before POTENTIAL), 3) progress % (desc)
+        candidates.sort(Comparator.comparingInt((PublicObjectiveCandidate c) -> c.pointValue)
+                .reversed()
+                .thenComparingInt(c -> c.state == EntryState.QUALIFIES ? 0 : 1)
+                .thenComparingDouble(c -> c.threshold > 0 ? (double) c.progress / c.threshold : 0.0)
+                .reversed());
 
         // Add top N candidates to entries
         for (int i = 0; i < Math.min(maxPublicObjectives, candidates.size()); i++) {
@@ -294,50 +312,28 @@ public class WebScoreBreakdown {
             entries.add(entry);
         }
 
-        // Latvinia if held and has 4 tech types but not scored
-        if (player.hasRelic("bookoflatvinia") || player.hasRelic("baldrick_bookoflatvinia")) {
-            int techTypes = countUniqueTechTypes(player);
+        // Imperial points - can score one from Imperial SC and one from Winnu Hero (ADDITIVE)
+        // QUALIFIES if has Mecatol Rex, otherwise will be added as POTENTIAL in addPotentialEntries
+        boolean hasMecatol = hasControlOfMecatol(player, game);
+        EntryState imperialEntryState = hasMecatol ? EntryState.QUALIFIES : EntryState.POTENTIAL;
 
-            if (techTypes >= 4) {
-                ScoreBreakdownEntry entry =
-                        createEntry(EntryType.LATVINIA, null, null, EntryState.QUALIFIES, false, 1, techTypes, 4);
-                entry.setDescription(
-                        buildDescription(EntryType.LATVINIA, EntryState.QUALIFIES, null, null, player, game));
-                entries.add(entry);
-            }
-        }
-
-        // Crown if player has crown AND controls tomb planet
-        if (player.hasRelic("emphidia") || player.hasRelic("baldrick_crownofemphidia")) {
-            if (controlsTombOfEmphidia(player, game)) {
-                ScoreBreakdownEntry entry =
-                        createEntry(EntryType.CROWN, null, null, EntryState.QUALIFIES, false, 1, null, null);
-                entry.setTombInPlay(true);
-                entry.setDescription(buildDescription(EntryType.CROWN, EntryState.QUALIFIES, null, null, player, game));
-                entries.add(entry);
-            }
-        }
-    }
-
-    private static void addPotentialEntries(Player player, Game game, List<ScoreBreakdownEntry> entries) {
-        if (player == null || game == null || entries == null) {
-            return;
-        }
-
-        // Public objectives are now handled in addQualifiesEntries
-        // This method now only handles non-public-objective POTENTIAL entries
-
-        // Custodians (if Imperial + untapped OR Winnu hero available)
-        if ((hasImperialUntapped(player, game) || hasWinnuHeroAvailable(player))
-                && !hasControlOfMecatol(player, game)
-                && !hasPlayerScoredObjective(player, Constants.CUSTODIAN, game)) {
+        // Imperial SC point - QUALIFIES if has Mecatol
+        if (hasImperialUntapped(player, game)) {
             ScoreBreakdownEntry entry =
-                    createEntry(EntryType.CUSTODIAN, null, null, EntryState.POTENTIAL, false, 1, null, null);
-            entry.setDescription(buildDescription(EntryType.CUSTODIAN, EntryState.POTENTIAL, null, null, player, game));
+                    createEntry(EntryType.IMPERIAL, null, null, imperialEntryState, false, 1, null, null);
+            entry.setDescription("Imperial Point (Imperial)");
             entries.add(entry);
         }
 
-        // Every drawn unscored secret
+        // Winnu Hero point - QUALIFIES if has Mecatol
+        if (hasWinnuHeroAvailable(player)) {
+            ScoreBreakdownEntry entry =
+                    createEntry(EntryType.IMPERIAL, null, null, imperialEntryState, false, 1, null, null);
+            entry.setDescription("Imperial Point (Winnu Hero)");
+            entries.add(entry);
+        }
+
+        // Drawn secrets - always POTENTIAL (never qualifies since secrets are drawn randomly)
         Map<String, Integer> secrets = player.getSecrets();
         if (secrets != null) {
             for (String secretKey : secrets.keySet()) {
@@ -350,38 +346,34 @@ public class WebScoreBreakdown {
             }
         }
 
-        // Crown of Emphidia (if held and not already in QUALIFIES)
-        if ((player.hasRelic("emphidia") || player.hasRelic("baldrick_crownofemphidia"))
-                && !alreadyHasEntry(entries, EntryType.CROWN, EntryState.QUALIFIES)) {
-
+        // Crown of Emphidia - state depends on tomb status
+        if (hasCrownOfEmphidia(player)) {
             boolean tombInPlay = isTombInPlay(game);
             boolean controlsTomb = controlsTombOfEmphidia(player, game);
 
-            // If tomb in play and controls it, would be in QUALIFIES (already handled)
-            // So only add to POTENTIAL if doesn't qualify
-            if (!tombInPlay || !controlsTomb) {
-                ScoreBreakdownEntry entry =
-                        createEntry(EntryType.CROWN, null, null, EntryState.POTENTIAL, false, 1, null, null);
-                entry.setTombInPlay(tombInPlay);
-                entry.setDescription(buildDescription(EntryType.CROWN, EntryState.POTENTIAL, null, null, player, game));
+            // QUALIFIES if tomb in play and player controls it
+            // POTENTIAL if tomb in play but player doesn't control it
+            // Will be UNSCORED if tomb not in play (handled in addUnscoredEntries)
+            if (tombInPlay) {
+                EntryState crownState = controlsTomb ? EntryState.QUALIFIES : EntryState.POTENTIAL;
+
+                ScoreBreakdownEntry entry = createEntry(EntryType.CROWN, null, null, crownState, false, 1, null, null);
+                entry.setTombInPlay(true);
+                entry.setDescription(buildDescription(EntryType.CROWN, crownState, null, null, player, game));
                 entries.add(entry);
             }
         }
 
-        // Latvinia with progress tracker (if held and not in QUALIFIES)
-        if ((player.hasRelic("bookoflatvinia") || player.hasRelic("baldrick_bookoflatvinia"))
-                && !alreadyHasEntry(entries, EntryType.LATVINIA, EntryState.QUALIFIES)) {
-
+        // Latvinia - state depends on tech types
+        if (hasBookOfLatvinia(player)) {
             int techTypes = countUniqueTechTypes(player);
+            EntryState latvniaState =
+                    (techTypes >= LATVINIA_TECH_TYPE_THRESHOLD) ? EntryState.QUALIFIES : EntryState.POTENTIAL;
 
-            // Only add if doesn't qualify (< 4 tech types)
-            if (techTypes < 4) {
-                ScoreBreakdownEntry entry =
-                        createEntry(EntryType.LATVINIA, null, null, EntryState.POTENTIAL, false, 1, techTypes, 4);
-                entry.setDescription(
-                        buildDescription(EntryType.LATVINIA, EntryState.POTENTIAL, null, null, player, game));
-                entries.add(entry);
-            }
+            ScoreBreakdownEntry entry = createEntry(
+                    EntryType.LATVINIA, null, null, latvniaState, false, 1, techTypes, LATVINIA_TECH_TYPE_THRESHOLD);
+            entry.setDescription(buildDescription(EntryType.LATVINIA, latvniaState, null, null, player, game));
+            entries.add(entry);
         }
     }
 
@@ -399,9 +391,7 @@ public class WebScoreBreakdown {
         }
 
         // Crown if held but tomb NOT in play and not already added
-        if ((player.hasRelic("emphidia") || player.hasRelic("baldrick_crownofemphidia"))
-                && !alreadyHasEntry(entries, EntryType.CROWN)) {
-
+        if (hasCrownOfEmphidia(player) && !alreadyHasEntry(entries, EntryType.CROWN)) {
             boolean tombInPlay = isTombInPlay(game);
 
             // Only add as UNSCORED if tomb not in play
@@ -480,17 +470,7 @@ public class WebScoreBreakdown {
             PublicObjectiveModel po = Mapper.getPublicObjective(objectiveKey);
             String baseName = po != null ? po.getName() : objectiveKey;
 
-            List<String> scoringOpportunities = new ArrayList<>();
-            scoringOpportunities.add("status phase");
-
-            if (hasImperialUntapped(player, game)) {
-                scoringOpportunities.add("imperial");
-            }
-
-            if (hasWinnuHeroAvailable(player)) {
-                scoringOpportunities.add("winnu hero");
-            }
-
+            List<String> scoringOpportunities = getScoringOpportunities(player, game);
             return baseName + " (" + String.join(" or ", scoringOpportunities) + ")";
         }
 
@@ -502,13 +482,7 @@ public class WebScoreBreakdown {
                     // POTENTIAL and QUALIFIES both hide the secret
                     return "Drawn Secret";
                 case CUSTODIAN:
-                    List<String> custodianOpportunities = new ArrayList<>();
-                    if (hasImperialUntapped(player, game)) {
-                        custodianOpportunities.add("imperial");
-                    }
-                    if (hasWinnuHeroAvailable(player)) {
-                        custodianOpportunities.add("winnu hero");
-                    }
+                    List<String> custodianOpportunities = getScoringOpportunities(player, game);
                     return "Custodians (" + String.join(" or ", custodianOpportunities) + ")";
                 case CROWN:
                     return "Crown of Emphidia";
@@ -539,39 +513,14 @@ public class WebScoreBreakdown {
         return scoringPlayers != null && scoringPlayers.contains(player.getUserID());
     }
 
-    private static List<PublicObjectiveInfo> getUnscoredRevealedPublics(Player player, Game game) {
-        List<PublicObjectiveInfo> result = new ArrayList<>();
-        Map<String, Integer> revealedPublics = game.getRevealedPublicObjectives();
-        if (revealedPublics == null) return result;
+    private static int countPlayerScoresForObjective(Player player, String objectiveKey, Game game) {
+        Map<String, List<String>> scoredPublics = game.getScoredPublicObjectives();
+        if (scoredPublics == null) return 0;
 
-        for (String poKey : revealedPublics.keySet()) {
-            // Skip if scored
-            if (hasPlayerScoredObjective(player, poKey, game)) {
-                continue;
-            }
+        List<String> scoringPlayers = scoredPublics.get(objectiveKey);
+        if (scoringPlayers == null) return 0;
 
-            // Skip special objectives (custodian, imperial)
-            if (Constants.CUSTODIAN.equals(poKey) || Constants.IMPERIAL_RIDER.equals(poKey)) {
-                continue;
-            }
-
-            PublicObjectiveModel po = Mapper.getPublicObjective(poKey);
-            if (po == null) continue;
-
-            // Determine type
-            EntryType type;
-            if (Mapper.getPublicObjectivesStage1().containsKey(poKey)) {
-                type = EntryType.PO_1;
-            } else if (Mapper.getPublicObjectivesStage2().containsKey(poKey)) {
-                type = EntryType.PO_2;
-            } else {
-                continue;
-            }
-
-            result.add(new PublicObjectiveInfo(poKey, type, po.getPoints()));
-        }
-
-        return result;
+        return Collections.frequency(scoringPlayers, player.getUserID());
     }
 
     private static boolean isTombInPlay(Game game) {
@@ -615,7 +564,8 @@ public class WebScoreBreakdown {
 
     private static boolean hasImperialUntapped(Player player, Game game) {
         if (player == null) return false;
-        return player.getSCs().contains(8) && !player.getExhaustedSCs().contains(8);
+        return player.getSCs().contains(IMPERIAL_STRATEGY_CARD)
+                && !player.getExhaustedSCs().contains(IMPERIAL_STRATEGY_CARD);
     }
 
     private static boolean hasWinnuHeroAvailable(Player player) {
@@ -630,7 +580,7 @@ public class WebScoreBreakdown {
 
     private static boolean hasControlOfMecatol(Player player, Game game) {
         if (player == null) return false;
-        return player.getPlanets().contains("mr");
+        return player.getPlanets().contains(MECATOL_REX_PLANET);
     }
 
     private static boolean canDrawAnotherSecret(Player player, Game game) {
@@ -644,27 +594,27 @@ public class WebScoreBreakdown {
             return false;
         }
 
-        // Check if Imperial SC (8) is in the game and not yet played
-        if (!game.getScTradeGoods().containsKey(8)) {
+        // Check if Imperial SC is in the game and not yet played
+        if (!game.getScTradeGoods().containsKey(IMPERIAL_STRATEGY_CARD)) {
             return false; // Imperial not in this game
         }
 
         // Find who has Imperial
         Player imperialHolder = null;
         for (Player p : game.getRealPlayers()) {
-            if (p.getSCs().contains(8)) {
+            if (p.getSCs().contains(IMPERIAL_STRATEGY_CARD)) {
                 imperialHolder = p;
                 break;
             }
         }
 
         // If Imperial has been played (exhausted), can't draw
-        if (imperialHolder != null && imperialHolder.getExhaustedSCs().contains(8)) {
+        if (imperialHolder != null && imperialHolder.getExhaustedSCs().contains(IMPERIAL_STRATEGY_CARD)) {
             return false;
         }
 
         // Player must either have Imperial or have a strategy token to follow
-        boolean hasImperial = player.getSCs().contains(8);
+        boolean hasImperial = player.getSCs().contains(IMPERIAL_STRATEGY_CARD);
         boolean hasStrategyToken = player.getStrategicCC() > 0;
 
         return hasImperial || hasStrategyToken;
@@ -674,13 +624,14 @@ public class WebScoreBreakdown {
         if (game == null) return false;
 
         // SFTT is typically an agenda that gives a point
-        return game.getLaws().containsKey("support_for_the_throne")
-                || (game.getCustomPublicVP() != null && game.getCustomPublicVP().containsKey("support_for_the_throne"));
+        return game.getLaws().containsKey(CUSTOM_PO_SUPPORT_FOR_THRONE)
+                || (game.getCustomPublicVP() != null
+                        && game.getCustomPublicVP().containsKey(CUSTOM_PO_SUPPORT_FOR_THRONE));
     }
 
     private static boolean hasStyx(Player player) {
         if (player == null) return false;
-        return player.hasRelic("styx");
+        return player.hasRelic(RELIC_STYX);
     }
 
     private static boolean alreadyHasEntry(List<ScoreBreakdownEntry> entries, EntryType type) {
@@ -698,29 +649,61 @@ public class WebScoreBreakdown {
         return entries.stream().anyMatch(e -> objectiveKey.equals(e.getObjectiveKey()));
     }
 
-    // Helper class for sorting publics (still used by getUnscoredRevealedPublics)
-    private static class PublicObjectiveInfo {
-        private final String key;
-        private final EntryType type;
-        private final int pointValue;
+    private static boolean hasShardOfTheThrone(Player player) {
+        if (player == null) return false;
+        return player.hasRelic(RELIC_SHARD) || player.hasRelic(RELIC_SHARD_ABSOL);
+    }
 
-        public PublicObjectiveInfo(String key, EntryType type, int pointValue) {
-            this.key = key;
-            this.type = type;
-            this.pointValue = pointValue;
+    private static boolean hasCrownOfEmphidia(Player player) {
+        if (player == null) return false;
+        return player.hasRelic(RELIC_CROWN) || player.hasRelic(RELIC_CROWN_BALDRICK);
+    }
+
+    private static boolean hasBookOfLatvinia(Player player) {
+        if (player == null) return false;
+        return player.hasRelic(RELIC_LATVINIA) || player.hasRelic(RELIC_LATVINIA_BALDRICK);
+    }
+
+    private static Optional<EntryType> getPublicObjectiveType(String poKey) {
+        if (poKey == null) return Optional.empty();
+
+        if (Mapper.getPublicObjectivesStage1().containsKey(poKey)) {
+            return Optional.of(EntryType.PO_1);
+        } else if (Mapper.getPublicObjectivesStage2().containsKey(poKey)) {
+            return Optional.of(EntryType.PO_2);
+        }
+        return Optional.empty();
+    }
+
+    private static void addMultiScoredEntries(
+            Player player,
+            String poKey,
+            List<String> scoringPlayers,
+            EntryType type,
+            Game game,
+            List<ScoreBreakdownEntry> targetList) {
+
+        int count = Collections.frequency(scoringPlayers, player.getUserID());
+        for (int i = 0; i < count; i++) {
+            ScoreBreakdownEntry entry = createEntry(type, null, null, EntryState.SCORED, false, 1, null, null);
+            entry.setDescription(buildDescription(type, EntryState.SCORED, null, null, player, game));
+            targetList.add(entry);
+        }
+    }
+
+    private static List<String> getScoringOpportunities(Player player, Game game) {
+        List<String> opportunities = new ArrayList<>();
+        opportunities.add("status phase");
+
+        if (hasImperialUntapped(player, game)) {
+            opportunities.add("imperial");
         }
 
-        public String getKey() {
-            return key;
+        if (hasWinnuHeroAvailable(player)) {
+            opportunities.add("winnu hero");
         }
 
-        public EntryType getType() {
-            return type;
-        }
-
-        public int getPointValue() {
-            return pointValue;
-        }
+        return opportunities;
     }
 
     // Helper class for public objective candidates with state information
