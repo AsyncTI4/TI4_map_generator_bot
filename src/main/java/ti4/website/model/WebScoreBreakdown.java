@@ -68,8 +68,7 @@ public class WebScoreBreakdown {
         breakdown.entries = new ArrayList<>();
 
         addScoredEntries(player, game, breakdown.entries);
-        addQualifiesEntries(player, game, breakdown.entries);
-        addPotentialEntries(player, game, breakdown.entries);
+        addQualifiesAndPotentialEntries(player, game, breakdown.entries);
         addUnscoredEntries(player, game, breakdown.entries);
 
         return breakdown;
@@ -206,13 +205,13 @@ public class WebScoreBreakdown {
         }
     }
 
-    private static void addQualifiesEntries(Player player, Game game, List<ScoreBreakdownEntry> entries) {
+    private static void addQualifiesAndPotentialEntries(Player player, Game game, List<ScoreBreakdownEntry> entries) {
         if (player == null || game == null || entries == null) {
             return;
         }
 
-        // This method now handles BOTH QUALIFIES and POTENTIAL public objectives
-        // They share the same cap and are sorted together
+        // This method handles all QUALIFIES and POTENTIAL entries
+        // The state is determined by whether the player meets the requirements
 
         // Determine max total public objectives based on scoring opportunities
         int maxPublicObjectives = 1; // Base: 1 scoring opportunity (status phase)
@@ -294,50 +293,28 @@ public class WebScoreBreakdown {
             entries.add(entry);
         }
 
-        // Latvinia if held and has 4 tech types but not scored
-        if (player.hasRelic("bookoflatvinia") || player.hasRelic("baldrick_bookoflatvinia")) {
-            int techTypes = countUniqueTechTypes(player);
+        // Imperial points - can score one from Imperial SC and one from Winnu Hero (ADDITIVE)
+        // QUALIFIES if has Mecatol Rex, otherwise will be added as POTENTIAL in addPotentialEntries
+        boolean hasMecatol = hasControlOfMecatol(player, game);
+        EntryState imperialEntryState = hasMecatol ? EntryState.QUALIFIES : EntryState.POTENTIAL;
 
-            if (techTypes >= 4) {
-                ScoreBreakdownEntry entry =
-                        createEntry(EntryType.LATVINIA, null, null, EntryState.QUALIFIES, false, 1, techTypes, 4);
-                entry.setDescription(
-                        buildDescription(EntryType.LATVINIA, EntryState.QUALIFIES, null, null, player, game));
-                entries.add(entry);
-            }
-        }
-
-        // Crown if player has crown AND controls tomb planet
-        if (player.hasRelic("emphidia") || player.hasRelic("baldrick_crownofemphidia")) {
-            if (controlsTombOfEmphidia(player, game)) {
-                ScoreBreakdownEntry entry =
-                        createEntry(EntryType.CROWN, null, null, EntryState.QUALIFIES, false, 1, null, null);
-                entry.setTombInPlay(true);
-                entry.setDescription(buildDescription(EntryType.CROWN, EntryState.QUALIFIES, null, null, player, game));
-                entries.add(entry);
-            }
-        }
-    }
-
-    private static void addPotentialEntries(Player player, Game game, List<ScoreBreakdownEntry> entries) {
-        if (player == null || game == null || entries == null) {
-            return;
-        }
-
-        // Public objectives are now handled in addQualifiesEntries
-        // This method now only handles non-public-objective POTENTIAL entries
-
-        // Custodians (if Imperial + untapped OR Winnu hero available)
-        if ((hasImperialUntapped(player, game) || hasWinnuHeroAvailable(player))
-                && !hasControlOfMecatol(player, game)
-                && !hasPlayerScoredObjective(player, Constants.CUSTODIAN, game)) {
+        // Imperial SC point - QUALIFIES if has Mecatol
+        if (hasImperialUntapped(player, game)) {
             ScoreBreakdownEntry entry =
-                    createEntry(EntryType.CUSTODIAN, null, null, EntryState.POTENTIAL, false, 1, null, null);
-            entry.setDescription(buildDescription(EntryType.CUSTODIAN, EntryState.POTENTIAL, null, null, player, game));
+                    createEntry(EntryType.IMPERIAL, null, null, imperialEntryState, false, 1, null, null);
+            entry.setDescription("Imperial Point (Imperial)");
             entries.add(entry);
         }
 
-        // Every drawn unscored secret
+        // Winnu Hero point - QUALIFIES if has Mecatol
+        if (hasWinnuHeroAvailable(player)) {
+            ScoreBreakdownEntry entry =
+                    createEntry(EntryType.IMPERIAL, null, null, imperialEntryState, false, 1, null, null);
+            entry.setDescription("Imperial Point (Winnu Hero)");
+            entries.add(entry);
+        }
+
+        // Drawn secrets - always POTENTIAL (never qualifies since secrets are drawn randomly)
         Map<String, Integer> secrets = player.getSecrets();
         if (secrets != null) {
             for (String secretKey : secrets.keySet()) {
@@ -350,38 +327,33 @@ public class WebScoreBreakdown {
             }
         }
 
-        // Crown of Emphidia (if held and not already in QUALIFIES)
-        if ((player.hasRelic("emphidia") || player.hasRelic("baldrick_crownofemphidia"))
-                && !alreadyHasEntry(entries, EntryType.CROWN, EntryState.QUALIFIES)) {
-
+        // Crown of Emphidia - state depends on tomb status
+        if (player.hasRelic("emphidia") || player.hasRelic("baldrick_crownofemphidia")) {
             boolean tombInPlay = isTombInPlay(game);
             boolean controlsTomb = controlsTombOfEmphidia(player, game);
 
-            // If tomb in play and controls it, would be in QUALIFIES (already handled)
-            // So only add to POTENTIAL if doesn't qualify
-            if (!tombInPlay || !controlsTomb) {
-                ScoreBreakdownEntry entry =
-                        createEntry(EntryType.CROWN, null, null, EntryState.POTENTIAL, false, 1, null, null);
-                entry.setTombInPlay(tombInPlay);
-                entry.setDescription(buildDescription(EntryType.CROWN, EntryState.POTENTIAL, null, null, player, game));
+            // QUALIFIES if tomb in play and player controls it
+            // POTENTIAL if tomb in play but player doesn't control it
+            // Will be UNSCORED if tomb not in play (handled in addUnscoredEntries)
+            if (tombInPlay) {
+                EntryState crownState = controlsTomb ? EntryState.QUALIFIES : EntryState.POTENTIAL;
+
+                ScoreBreakdownEntry entry = createEntry(EntryType.CROWN, null, null, crownState, false, 1, null, null);
+                entry.setTombInPlay(true);
+                entry.setDescription(buildDescription(EntryType.CROWN, crownState, null, null, player, game));
                 entries.add(entry);
             }
         }
 
-        // Latvinia with progress tracker (if held and not in QUALIFIES)
-        if ((player.hasRelic("bookoflatvinia") || player.hasRelic("baldrick_bookoflatvinia"))
-                && !alreadyHasEntry(entries, EntryType.LATVINIA, EntryState.QUALIFIES)) {
-
+        // Latvinia - state depends on tech types
+        if (player.hasRelic("bookoflatvinia") || player.hasRelic("baldrick_bookoflatvinia")) {
             int techTypes = countUniqueTechTypes(player);
+            EntryState latvniaState = (techTypes >= 4) ? EntryState.QUALIFIES : EntryState.POTENTIAL;
 
-            // Only add if doesn't qualify (< 4 tech types)
-            if (techTypes < 4) {
-                ScoreBreakdownEntry entry =
-                        createEntry(EntryType.LATVINIA, null, null, EntryState.POTENTIAL, false, 1, techTypes, 4);
-                entry.setDescription(
-                        buildDescription(EntryType.LATVINIA, EntryState.POTENTIAL, null, null, player, game));
-                entries.add(entry);
-            }
+            ScoreBreakdownEntry entry =
+                    createEntry(EntryType.LATVINIA, null, null, latvniaState, false, 1, techTypes, 4);
+            entry.setDescription(buildDescription(EntryType.LATVINIA, latvniaState, null, null, player, game));
+            entries.add(entry);
         }
     }
 
@@ -537,6 +509,16 @@ public class WebScoreBreakdown {
 
         List<String> scoringPlayers = scoredPublics.get(objectiveKey);
         return scoringPlayers != null && scoringPlayers.contains(player.getUserID());
+    }
+
+    private static int countPlayerScoresForObjective(Player player, String objectiveKey, Game game) {
+        Map<String, List<String>> scoredPublics = game.getScoredPublicObjectives();
+        if (scoredPublics == null) return 0;
+
+        List<String> scoringPlayers = scoredPublics.get(objectiveKey);
+        if (scoringPlayers == null) return 0;
+
+        return Collections.frequency(scoringPlayers, player.getUserID());
     }
 
     private static List<PublicObjectiveInfo> getUnscoredRevealedPublics(Player player, Game game) {
