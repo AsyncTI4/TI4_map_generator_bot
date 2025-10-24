@@ -32,6 +32,7 @@ import ti4.website.model.WebCardPool;
 import ti4.website.model.WebLaw;
 import ti4.website.model.WebObjectives;
 import ti4.website.model.WebPlayerArea;
+import ti4.website.model.WebScoreBreakdown;
 import ti4.website.model.WebStatTilePositions;
 import ti4.website.model.WebStrategyCard;
 import ti4.website.model.WebTilePositions;
@@ -86,12 +87,8 @@ public class AsyncTi4WebsiteHelper {
     }
 
     public static void putPlayerData(String gameId, Game game) {
-        if (!uploadsEnabled()) return;
         String bucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
-        if (bucket == null || bucket.isEmpty()) {
-            BotLogger.error("S3 bucket not configured.");
-            return;
-        }
+        boolean isDevMode = !uploadsEnabled() || bucket == null || bucket.isEmpty();
 
         try {
             List<WebPlayerArea> playerDataList = new ArrayList<>();
@@ -104,6 +101,12 @@ public class AsyncTi4WebsiteHelper {
             WebStatTilePositions webStatTilePositions = WebStatTilePositions.fromGame(game);
             WebObjectives webObjectives = WebObjectives.fromGame(game);
             WebCardPool webCardPool = WebCardPool.fromGame(game);
+
+            // Create score breakdowns for each player
+            Map<String, WebScoreBreakdown> playerScoreBreakdowns = new HashMap<>();
+            for (Player player : game.getRealPlayersNNeutral()) {
+                playerScoreBreakdowns.put(player.getFaction(), WebScoreBreakdown.fromPlayer(player, game));
+            }
 
             // Create laws with metadata
             List<WebLaw> lawsInPlay = new ArrayList<>();
@@ -127,6 +130,7 @@ public class AsyncTi4WebsiteHelper {
             webData.put("lawsInPlay", lawsInPlay);
             webData.put("cardPool", webCardPool);
             webData.put("strategyCards", strategyCards);
+            webData.put("scoreBreakdowns", playerScoreBreakdowns);
             webData.put("tilePositions", webTilePositions.getTilePositions());
             webData.put("tileUnitData", tileUnitData);
             webData.put("statTilePositions", webStatTilePositions.getStatTilePositions());
@@ -140,14 +144,22 @@ public class AsyncTi4WebsiteHelper {
 
             String json = EgressClientManager.getObjectMapper().writeValueAsString(webData);
 
-            putObjectInBucket(
-                    String.format("webdata/%s/%s.json", gameId, gameId),
-                    AsyncRequestBody.fromString(json),
-                    "application/json",
-                    "no-cache, no-store, must-revalidate",
-                    null);
+            if (isDevMode) {
+                // Dev/local mode - print to console instead of uploading
+                System.out.println("=== DEV MODE: Web Player Data for game " + gameId + " ===");
+                System.out.println(json);
+                System.out.println("=== END Web Player Data ===");
+            } else {
+                // Production mode - upload to S3
+                putObjectInBucket(
+                        String.format("webdata/%s/%s.json", gameId, gameId),
+                        AsyncRequestBody.fromString(json),
+                        "application/json",
+                        "no-cache, no-store, must-revalidate",
+                        null);
 
-            notifyGameRefreshWebsocket(gameId);
+                notifyGameRefreshWebsocket(gameId);
+            }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Could not put data to web server", e);
         }
