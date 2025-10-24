@@ -9,8 +9,6 @@ import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.model.PublicObjectiveModel;
-import ti4.model.TechnologyModel;
-import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.info.ListPlayerInfoService;
 
 @Data
@@ -401,14 +399,14 @@ public class WebScoreBreakdown {
             }
         }
 
-        // Latvinia - state depends on tech types
+        // Latvinia - state depends on tech skips from controlled planets
         if (hasBookOfLatvinia(player)) {
-            int techTypes = countUniqueTechTypes(player);
+            int techSkips = countUniqueTechSkips(player, game);
             EntryState latvniaState =
-                    (techTypes >= LATVINIA_TECH_TYPE_THRESHOLD) ? EntryState.QUALIFIES : EntryState.POTENTIAL;
+                    (techSkips >= LATVINIA_TECH_TYPE_THRESHOLD) ? EntryState.QUALIFIES : EntryState.POTENTIAL;
 
             ScoreBreakdownEntry entry = createEntry(
-                    EntryType.LATVINIA, null, null, latvniaState, false, 1, techTypes, LATVINIA_TECH_TYPE_THRESHOLD);
+                    EntryType.LATVINIA, null, null, latvniaState, false, 1, techSkips, LATVINIA_TECH_TYPE_THRESHOLD);
             entry.setDescription(buildDescription(EntryType.LATVINIA, latvniaState, null, null, player, game));
             entries.add(entry);
         }
@@ -583,20 +581,17 @@ public class WebScoreBreakdown {
                 .anyMatch(planet -> player.getPlanets().contains(planet.getName()));
     }
 
-    private static int countUniqueTechTypes(Player player) {
-        if (player == null) return 0;
+    private static int countUniqueTechSkips(Player player, Game game) {
+        if (player == null || game == null) return 0;
 
-        Set<TechnologyType> types = new HashSet<>();
-        Collection<String> techs = player.getTechs();
-        if (techs == null) return 0;
-
-        for (String techID : techs) {
-            TechnologyModel tech = Mapper.getTech(techID);
-            if (tech != null && tech.getTypes() != null) {
-                types.addAll(tech.getTypes());
+        Set<String> skips = new HashSet<>();
+        for (String planetName : player.getPlanetsAllianceMode()) {
+            Planet planet = game.getUnitHolderFromPlanet(planetName);
+            if (planet != null) {
+                skips.addAll(planet.getTechSpecialities());
             }
         }
-        return types.size();
+        return skips.size();
     }
 
     private static boolean hasImperialUntapped(Player player, Game game) {
