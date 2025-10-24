@@ -118,7 +118,7 @@
         "faction": "muaat"
     },
     {
-        "alias": "tf-star_forge",
+        "alias": "tf-starforge",
         "name": "Star Forge",
         "types": [
             "CYBERNETIC"
@@ -138,7 +138,7 @@
         "faction": "muaat"
     },
     {
-        "alias": "tf-guild_ships",
+        "alias": "tf-guildships",
         "name": "Guild Ships",
         "types": [
             "PROPULSION"
@@ -178,7 +178,7 @@
         "faction": "sol"
     },
     {
-        "alias": "tf-orbital_drop",
+        "alias": "tf-orbitaldrop",
         "name": "Orbital Drop",
         "types": [
             "BIOTIC"
@@ -198,7 +198,7 @@
         "faction": "sol"
     },
     {
-        "alias": "tf-quantum_entanglement",
+        "alias": "tf-quantumentanglement",
         "name": "Quantum Entanglement",
         "types": [
             "PROPULSION"
@@ -518,7 +518,7 @@
         "faction": "yssaril"
     },
     {
-        "alias": "tf-stall_tactics",
+        "alias": "tf-stalltactics",
         "name": "Stall Tactics",
         "types": [
             "PROPULSION"
@@ -598,7 +598,7 @@
         "faction": "naaz"
     },
     {
-        "alias": "tf-distant_suns",
+        "alias": "tf-distantsuns",
         "name": "Distant Suns",
         "types": [
             "PROPULSION"
@@ -648,7 +648,7 @@
         "faction": "cabal"
     },
     {
-        "alias": "tf-raid_formation",
+        "alias": "tf-raidformation",
         "name": "Raid Formation",
         "types": [
             "WARFARE"

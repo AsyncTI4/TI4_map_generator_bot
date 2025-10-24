@@ -318,12 +318,13 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public List<String> getTechSpecialities() {
         List<String> specialties = new ArrayList<>();
-        if (isNotBlank(originalTechSpeciality)) {
-            specialties.add(originalTechSpeciality);
-        }
+
         specialties.addAll(techSpeciality);
         specialties.removeAll(Collections.singleton(null));
         specialties.removeAll(Collections.singleton(""));
+        if (isNotBlank(originalTechSpeciality) && specialties.isEmpty()) {
+            specialties.add(originalTechSpeciality);
+        }
         return specialties;
     }
 

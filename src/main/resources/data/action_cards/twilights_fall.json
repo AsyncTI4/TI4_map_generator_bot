@@ -204,7 +204,7 @@
         "name": "Meteor",
         "phase": "Action",
         "window": "When you would remove ground forces due to insufficient capacity",
-        "text": "Comitt those ground forces to a planet in that system instead; resolve an invasion on that planet using only those ground forces",
+        "text": "Commit those ground forces to a planet in that system instead; resolve an invasion on that planet using only those ground forces",
         "source": "twilights_fall"
     },
     {

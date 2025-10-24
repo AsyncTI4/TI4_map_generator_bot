@@ -397,6 +397,7 @@ public class CombatModHelper {
             case Constants.MOD_NEBULA_DEFENDER -> {
                 if ((onTile.isNebula() || tile.isNebula())
                         && !game.getActivePlayerID().equals(player.getUserID())
+                        && !game.getActivePlayer().getAllianceMembers().contains(player.getFaction())
                         && !game.getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
                     meetsCondition = true;
                 }

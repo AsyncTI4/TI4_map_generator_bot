@@ -3035,7 +3035,7 @@ public class Helper {
         }
     }
 
-    public static void checkEndGame(Game game, Player player) {
+    public static boolean checkEndGame(Game game, Player player) {
         if (player.getTotalVictoryPoints() >= game.getVp()) {
             if (game.isLiberationC4Mode()) {
                 if ("sol".equalsIgnoreCase(player.getFaction()) || "xxcha".equalsIgnoreCase(player.getFaction())) {
@@ -3048,13 +3048,13 @@ public class Helper {
                             && xxcha.getTotalVictoryPoints() >= 10) {
                         // good
                     } else {
-                        return;
+                        return false;
                     }
                 }
             }
             if (game.isCivilizedSocietyMode()) {
                 checkEndGameCivilizedSociety(game);
-                return;
+                return false;
             }
             List<Button> buttons = new ArrayList<>();
             if (!game.isFowMode()) {
@@ -3088,6 +3088,7 @@ public class Helper {
                         titleButton);
             }
         }
+        return true;
     }
 
     public static boolean mechCheck(String planetName, Game game, Player player) {

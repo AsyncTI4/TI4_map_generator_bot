@@ -301,6 +301,9 @@ public class StatusHelper {
                                     + ", the bot does not believe that you can score any of your secret objectives.");
                 }
             }
+            if (Helper.checkEndGame(game, player)) {
+                break;
+            }
         }
 
         List<Button> poButtons = getScoreObjectiveButtons(game);

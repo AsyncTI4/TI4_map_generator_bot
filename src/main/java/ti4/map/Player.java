@@ -612,7 +612,7 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasAbility(String ability) {
-        if (getTechs().contains("tf-" + ability)) {
+        if (getTechs().contains("tf-" + ability.replace("_", ""))) {
             return true;
         }
         return getAbilities().contains(ability);

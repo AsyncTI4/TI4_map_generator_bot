@@ -92,6 +92,7 @@ public class StartPhaseService {
             case "finSpecialSomnoFix" -> Helper.addBotHelperPermissionsToGameChannels(event);
             case "finSpecialAbsol" -> AgendaHelper.resolveAbsolAgainstChecksNBalances(game);
             case "finFixSecrets" -> game.fixScrewedSOs();
+            case "finFixScrewedRelics" -> game.fixScrewedRelics();
             case "finTFSlice" -> ButtonHelperTwilightsFall.startSliceBuild(game, event);
             case "setupHomebrew" -> HomebrewService.offerGameHomebrewButtons(event.getMessageChannel());
             case "cptiExplores" -> {

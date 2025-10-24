@@ -1113,7 +1113,9 @@ public class ButtonHelperModifyUnits {
                     }
                 }
                 int mechCount = unitHolder.getUnitCount(UnitType.Mech, player2.getColor());
-                if (player2.ownsUnit("keleres_mech") && mechCount > 0) {
+                if (player2.ownsUnit("keleres_mech")
+                        && mechCount > 0
+                        && !ButtonHelper.isLawInPlay(game, "articles_war")) {
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                     Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
                     buttons.add(DoneExhausting);

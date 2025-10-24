@@ -260,6 +260,19 @@ public class Game extends GameProperties {
         setUpPeakableObjectives(5, 2);
     }
 
+    public void fixScrewedRelics() {
+
+        for (Player p2 : getRealPlayers()) {
+            List<String> relics = new ArrayList<>();
+            relics.addAll(p2.getRelics());
+            for (String relic : relics) {
+                if (Mapper.getRelic(relic) == null) {
+                    p2.removeRelic(relic);
+                }
+            }
+        }
+    }
+
     public void fixScrewedSOs() {
         MessageHelper.sendMessageToChannel(
                 getActionsChannel(),
