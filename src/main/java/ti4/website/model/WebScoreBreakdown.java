@@ -80,7 +80,7 @@ public class WebScoreBreakdown {
             return;
         }
 
-        // Scored PO1's and PO2's
+        // Scored PO1's and PO2's (and custom objectives like Custodian/Imperial)
         Map<String, List<String>> scoredPublics = game.getScoredPublicObjectives();
         if (scoredPublics != null) {
             for (Map.Entry<String, List<String>> poEntry : scoredPublics.entrySet()) {
@@ -91,10 +91,7 @@ public class WebScoreBreakdown {
                     continue;
                 }
 
-                PublicObjectiveModel po = Mapper.getPublicObjective(poKey);
-                if (po == null) continue;
-
-                // Handle custodians - can be multi-scored
+                // Handle custodians - can be multi-scored (check BEFORE the Mapper check)
                 if (Constants.CUSTODIAN.equals(poKey)) {
                     int count = Collections.frequency(scoringPlayers, player.getUserID());
                     for (int i = 0; i < count; i++) {
@@ -107,7 +104,7 @@ public class WebScoreBreakdown {
                     continue;
                 }
 
-                // Handle imperial - can be multi-scored
+                // Handle imperial - can be multi-scored (check BEFORE the Mapper check)
                 if (Constants.IMPERIAL_RIDER.equals(poKey)) {
                     int count = Collections.frequency(scoringPlayers, player.getUserID());
                     for (int i = 0; i < count; i++) {
@@ -119,6 +116,10 @@ public class WebScoreBreakdown {
                     }
                     continue;
                 }
+
+                // Try to get as a real public objective
+                PublicObjectiveModel po = Mapper.getPublicObjective(poKey);
+                if (po == null) continue; // Not a real PO, skip it
 
                 // Determine type based on stage
                 EntryType type;
@@ -172,21 +173,34 @@ public class WebScoreBreakdown {
         }
 
         // Agenda points (from customPublicVP)
+        // Note: customPublicVP is game-wide, not player-specific
+        // For entries we recognize (custodian, imperial, relics), we skip them here
+        // because they're handled elsewhere in player-specific ways
         Map<String, Integer> customVP = game.getCustomPublicVP();
         if (customVP != null) {
             for (Map.Entry<String, Integer> vpEntry : customVP.entrySet()) {
                 String key = vpEntry.getKey();
                 Integer vp = vpEntry.getValue();
 
-                // Skip custodian/imperial which we already handled
-                if (Constants.CUSTODIAN.equals(key) || Constants.IMPERIAL_RIDER.equals(key)) {
+                // Skip custodian/imperial/relics which we already handled as specific types
+                if (Constants.CUSTODIAN.equals(key)
+                        || Constants.IMPERIAL_RIDER.equals(key)
+                        || "shard".equals(key)
+                        || "absol_shardofthethrone1".equals(key)
+                        || "emphidia".equals(key)
+                        || "baldrick_crownofemphidia".equals(key)
+                        || "bookoflatvinia".equals(key)
+                        || "baldrick_bookoflatvinia".equals(key)
+                        || "styx".equals(key)
+                        || "support_for_the_throne".equals(key)) {
                     continue;
                 }
 
+                // For unrecognized entries, mark as AGENDA with UNSURE description for testing
                 boolean losable = isAgendaLosable(key);
                 ScoreBreakdownEntry entry =
                         createEntry(EntryType.AGENDA, null, key, EntryState.SCORED, losable, vp, null, null);
-                entry.setDescription(buildDescription(EntryType.AGENDA, EntryState.SCORED, null, key, player, game));
+                entry.setDescription("UNSURE: " + key);
                 entries.add(entry);
             }
         }
@@ -197,7 +211,24 @@ public class WebScoreBreakdown {
             return;
         }
 
-        // Revealed publics where player meets threshold
+        // This method now handles BOTH QUALIFIES and POTENTIAL public objectives
+        // They share the same cap and are sorted together
+
+        // Determine max total public objectives based on scoring opportunities
+        int maxPublicObjectives = 1; // Base: 1 scoring opportunity (status phase)
+
+        // Check for Imperial holder + untapped
+        if (hasImperialUntapped(player, game)) {
+            maxPublicObjectives++;
+        }
+
+        // Check for Winnu hero unlocked and unused
+        if (hasWinnuHeroAvailable(player)) {
+            maxPublicObjectives++;
+        }
+
+        // Build list of all candidate public objectives with their state
+        List<PublicObjectiveCandidate> candidates = new ArrayList<>();
         Map<String, Integer> revealedPublics = game.getRevealedPublicObjectives();
         if (revealedPublics != null) {
             for (String poKey : revealedPublics.keySet()) {
@@ -211,31 +242,56 @@ public class WebScoreBreakdown {
                     continue;
                 }
 
+                PublicObjectiveModel po = Mapper.getPublicObjective(poKey);
+                if (po == null) continue;
+
+                // Determine type
+                EntryType type;
+                if (Mapper.getPublicObjectivesStage1().containsKey(poKey)) {
+                    type = EntryType.PO_1;
+                } else if (Mapper.getPublicObjectivesStage2().containsKey(poKey)) {
+                    type = EntryType.PO_2;
+                } else {
+                    continue;
+                }
+
                 // Get progress and threshold
                 int progress = ListPlayerInfoService.getPlayerProgressOnObjective(poKey, game, player);
                 int threshold = ListPlayerInfoService.getObjectiveThreshold(poKey, game);
 
-                // If player qualifies (meets or exceeds threshold)
-                if (progress >= threshold) {
-                    PublicObjectiveModel po = Mapper.getPublicObjective(poKey);
-                    if (po == null) continue;
+                // Determine if QUALIFIES or POTENTIAL
+                EntryState state = progress >= threshold ? EntryState.QUALIFIES : EntryState.POTENTIAL;
 
-                    // Determine type
-                    EntryType type;
-                    if (Mapper.getPublicObjectivesStage1().containsKey(poKey)) {
-                        type = EntryType.PO_1;
-                    } else if (Mapper.getPublicObjectivesStage2().containsKey(poKey)) {
-                        type = EntryType.PO_2;
-                    } else {
-                        continue;
-                    }
-
-                    ScoreBreakdownEntry entry = createEntry(
-                            type, poKey, null, EntryState.QUALIFIES, false, po.getPoints(), progress, threshold);
-                    entry.setDescription(buildDescription(type, EntryState.QUALIFIES, poKey, null, player, game));
-                    entries.add(entry);
-                }
+                candidates.add(new PublicObjectiveCandidate(poKey, type, po.getPoints(), state, progress, threshold));
             }
+        }
+
+        // Sort candidates by: 1) point value (desc), 2) state (QUALIFIES before POTENTIAL)
+        candidates.sort((a, b) -> {
+            // First compare by point value (descending)
+            int pointCompare = Integer.compare(b.pointValue, a.pointValue);
+            if (pointCompare != 0) return pointCompare;
+
+            // Then by state (QUALIFIES before POTENTIAL)
+            if (a.state == EntryState.QUALIFIES && b.state == EntryState.POTENTIAL) return -1;
+            if (a.state == EntryState.POTENTIAL && b.state == EntryState.QUALIFIES) return 1;
+            return 0;
+        });
+
+        // Add top N candidates to entries
+        for (int i = 0; i < Math.min(maxPublicObjectives, candidates.size()); i++) {
+            PublicObjectiveCandidate candidate = candidates.get(i);
+            ScoreBreakdownEntry entry = createEntry(
+                    candidate.type,
+                    candidate.key,
+                    null,
+                    candidate.state,
+                    false,
+                    candidate.pointValue,
+                    candidate.progress,
+                    candidate.threshold);
+            entry.setDescription(buildDescription(candidate.type, candidate.state, candidate.key, null, player, game));
+            entries.add(entry);
         }
 
         // Latvinia if held and has 4 tech types but not scored
@@ -268,45 +324,8 @@ public class WebScoreBreakdown {
             return;
         }
 
-        // Get all revealed unscored publics, sorted by point value (descending)
-        List<PublicObjectiveInfo> unscoredPublics = getUnscoredRevealedPublics(player, game);
-        unscoredPublics.sort(
-                Comparator.comparingInt(PublicObjectiveInfo::getPointValue).reversed());
-
-        // Determine how many potential publics to show
-        int potentialPublicsCount = 1; // Base: show highest value unscored public
-
-        // Check for Imperial holder + untapped
-        if (hasImperialUntapped(player, game)) {
-            potentialPublicsCount++;
-        }
-
-        // Check for Winnu hero unlocked and unused
-        if (hasWinnuHeroAvailable(player)) {
-            potentialPublicsCount++;
-        }
-
-        // Add potential publics (up to calculated count)
-        for (int i = 0; i < Math.min(potentialPublicsCount, unscoredPublics.size()); i++) {
-            PublicObjectiveInfo info = unscoredPublics.get(i);
-
-            // Get progress info
-            int progress = ListPlayerInfoService.getPlayerProgressOnObjective(info.getKey(), game, player);
-            int threshold = ListPlayerInfoService.getObjectiveThreshold(info.getKey(), game);
-
-            ScoreBreakdownEntry entry = createEntry(
-                    info.getType(),
-                    info.getKey(),
-                    null,
-                    EntryState.POTENTIAL,
-                    false,
-                    info.getPointValue(),
-                    progress,
-                    threshold);
-            entry.setDescription(
-                    buildDescription(info.getType(), EntryState.POTENTIAL, info.getKey(), null, player, game));
-            entries.add(entry);
-        }
+        // Public objectives are now handled in addQualifiesEntries
+        // This method now only handles non-public-objective POTENTIAL entries
 
         // Custodians (if Imperial + untapped OR Winnu hero available)
         if ((hasImperialUntapped(player, game) || hasWinnuHeroAvailable(player))
@@ -674,7 +693,12 @@ public class WebScoreBreakdown {
         return entries.stream().anyMatch(e -> e.getType() == type && e.getState() == state);
     }
 
-    // Helper class for sorting publics
+    private static boolean alreadyHasEntryForObjective(List<ScoreBreakdownEntry> entries, String objectiveKey) {
+        if (entries == null || objectiveKey == null) return false;
+        return entries.stream().anyMatch(e -> objectiveKey.equals(e.getObjectiveKey()));
+    }
+
+    // Helper class for sorting publics (still used by getUnscoredRevealedPublics)
     private static class PublicObjectiveInfo {
         private final String key;
         private final EntryType type;
@@ -696,6 +720,26 @@ public class WebScoreBreakdown {
 
         public int getPointValue() {
             return pointValue;
+        }
+    }
+
+    // Helper class for public objective candidates with state information
+    private static class PublicObjectiveCandidate {
+        private final String key;
+        private final EntryType type;
+        private final int pointValue;
+        private final EntryState state;
+        private final int progress;
+        private final int threshold;
+
+        public PublicObjectiveCandidate(
+                String key, EntryType type, int pointValue, EntryState state, int progress, int threshold) {
+            this.key = key;
+            this.type = type;
+            this.pointValue = pointValue;
+            this.state = state;
+            this.progress = progress;
+            this.threshold = threshold;
         }
     }
 }
