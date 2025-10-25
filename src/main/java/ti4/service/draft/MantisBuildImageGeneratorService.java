@@ -14,14 +14,12 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
 import ti4.image.MapGenerator.HorizontalAlign;
-import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileStep;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.logging.BotLogger;
-import ti4.model.MapTemplateModel;
 import ti4.service.image.FileUploadService;
 
 @UtilityClass
@@ -40,24 +38,17 @@ public class MantisBuildImageGeneratorService {
     /**
      * Draw a simple image of the current map, and if optionally a tile which has been drawn
      * for a player to place.
-     * @param draftManager The draft manager for the draft; also contains the Game object.
+     * @param mapBuildContext The context for building the map; contains the Game object.
      * @param uniqueKey A unique key to include in the file name.
      * @param currentPositions A list of tile positions to highlight on the map as available for the next tile.
      * @param pendingTileId A Tile ID to draw separately as pending placement by the current player.
      * @return A FileUpload containing the image, or null if the image could not be generated.
      */
     public FileUpload tryGenerateImage(
-            DraftManager draftManager, String uniqueKey, List<String> currentPositions, String pendingTileId) {
-
-        Game game = draftManager.getGame();
-        String mapTemplateId = game.getMapTemplateID();
-        MapTemplateModel mapTemplate = Mapper.getMapTemplate(mapTemplateId);
-        if (mapTemplate == null) {
-            return null;
-        }
+            MantisMapBuildContext mapBuildContext, String uniqueKey, List<String> currentPositions, String pendingTileId) {
 
         currentPositions = currentPositions == null ? List.of() : currentPositions;
-        BufferedImage mapImage = generateImage(draftManager, mapTemplate, currentPositions, pendingTileId);
+        BufferedImage mapImage = generateImage(mapBuildContext, currentPositions, pendingTileId);
         if (mapImage == null) {
             return null;
         }
@@ -67,18 +58,17 @@ public class MantisBuildImageGeneratorService {
     }
 
     private BufferedImage generateImage(
-            DraftManager draftManager,
-            MapTemplateModel mapTemplate,
+            MantisMapBuildContext mapBuildContext,
             List<String> currentPositions,
             String pendingTileId) {
-        int width = getMapWidth(draftManager.getGame());
-        int height = getMapHeight(draftManager.getGame());
+
+        Game game = mapBuildContext.game();
+        int width = getMapWidth(game);
+        int height = getMapHeight(game);
         BufferedImage mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics graphicsMain = mainImage.getGraphics();
 
-        Game game = draftManager.getGame();
-
-        Map<String, Tile> tileMap = getRelevantTiles(draftManager);
+        Map<String, Tile> tileMap = getRelevantTiles(mapBuildContext);
 
         TileGenerator tileGenerator = new TileGenerator(game, null, DisplayType.map);
         Map<String, Point> tileImagePoints = new HashMap<>();
@@ -87,7 +77,7 @@ public class MantisBuildImageGeneratorService {
         for (Tile tile : tileMap.values()) {
             try {
                 Point tilePos = getPositionPoint(game, tile.getPosition());
-                BufferedImage tileImage = tileGenerator.draw(tile, TileStep.Tile);
+                BufferedImage tileImage = tileGenerator.draw(tile, TileStep.TileUnannotated);
                 graphicsMain.drawImage(tileImage, tilePos.x, tilePos.y, null);
                 tileImagePoints.put(tile.getPosition(), tilePos);
             } catch (Exception e) {
@@ -178,8 +168,8 @@ public class MantisBuildImageGeneratorService {
         return new Point(tileX, tileY);
     }
 
-    private Map<String, Tile> getRelevantTiles(DraftManager draftManager) {
-        Game game = draftManager.getGame();
+    private Map<String, Tile> getRelevantTiles(MantisMapBuildContext mapBuildContext) {
+        Game game = mapBuildContext.game();
         Map<String, Tile> tileMap = new HashMap<>(game.getTileMap());
         tileMap.remove("tl");
         tileMap.remove("tr");

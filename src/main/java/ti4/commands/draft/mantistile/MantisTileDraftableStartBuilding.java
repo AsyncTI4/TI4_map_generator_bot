@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+import ti4.service.draft.MantisMapBuildContext;
 import ti4.service.draft.MantisMapBuildService;
 import ti4.service.draft.draftables.MantisTileDraftable;
 
@@ -22,6 +23,7 @@ class MantisTileDraftableStartBuilding extends GameStateSubcommand {
             return;
         }
 
-        MantisMapBuildService.initializeMapBuilding(getGame().getDraftManager());
+        MantisMapBuildContext mapBuildContext = MantisMapBuildContext.from(getGame().getDraftManager(), draftable);
+        MantisMapBuildService.initializeMapBuilding(mapBuildContext);
     }
 }

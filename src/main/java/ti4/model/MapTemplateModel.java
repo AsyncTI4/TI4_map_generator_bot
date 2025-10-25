@@ -54,6 +54,7 @@ public class MapTemplateModel implements ModelInterface {
     private Integer tilesPerNucleusSlice;
 
     public boolean isValid() {
+        //where is this calllllllled?
         return alias != null
                 && (tileDisplayCoords().size() == (1 + tilesPerPlayer()))
                 && ((bluePerPlayer() + redPerPlayer()) == tilesPerPlayer())
