@@ -366,7 +366,7 @@ public enum CardEmojis implements TI4Emoji {
                 .append(tf_4_4);
         return sb.toString();
     }
-    
+
     /**
      * @return Fancy SC5 Emojis for Amicus
      */
