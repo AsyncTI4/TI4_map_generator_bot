@@ -1,6 +1,5 @@
 package ti4.service.draft;
 
-import io.micrometer.common.lang.NonNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -33,13 +32,13 @@ public record MantisMapBuildContext(
         @Nonnull Function<String, String> makeButtonId,
         @Nullable String drawnTileId,
         @Nullable String mulliganedTileId,
-        @NonNull Consumer<String> persistDrawnTile,
-        @NonNull Consumer<String> persistMulligan,
-        @NonNull Consumer<String> persistDiscard,
+        @Nonnull Consumer<String> persistDrawnTile,
+        @Nonnull Consumer<String> persistMulligan,
+        @Nonnull Consumer<String> persistDiscard,
         // Player corresponding to the "playerNum" value in map templates
-        @NonNull Function<Integer, Optional<Player>> getPlayerForPosition,
-        @NonNull List<PlayerTiles> availablePlayerTiles,
-        @NonNull Supplier<List<PlayerTiles>> getAvailableTiles,
+        @Nonnull Function<Integer, Optional<Player>> getPlayerForPosition,
+        @Nonnull List<PlayerTiles> availablePlayerTiles,
+        @Nonnull Supplier<List<PlayerTiles>> getAvailableTiles,
         @Nonnull Consumer<GenericInteractionCreateEvent> buildCompleteCallback) {
 
     public MantisMapBuildContext afterMulligan() {
@@ -95,7 +94,7 @@ public record MantisMapBuildContext(
     }
 
     public static MantisMapBuildContext from(
-            @Nonnull DraftManager draftManager, @NonNull MantisTileDraftable mantisTileDraftable) {
+            @Nonnull DraftManager draftManager, @Nonnull MantisTileDraftable mantisTileDraftable) {
         String mapTemplateId = draftManager.getGame().getMapTemplateID();
         if (mapTemplateId == null) {
             throw new IllegalStateException("Game does not have a map template ID set.");

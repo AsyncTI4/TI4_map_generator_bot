@@ -1,6 +1,5 @@
 package ti4.service.draft;
 
-import io.micrometer.common.lang.NonNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,7 +38,7 @@ public class MantisMapBuildService {
     public static final String ACTION_PREFIX = "mbuild_";
     private static final String IMAGE_UNIQUE_STRING = "mantismapbuild";
 
-    public void initializeMapBuilding(@NonNull MantisMapBuildContext mapBuildContext) {
+    public void initializeMapBuilding(@Nonnull MantisMapBuildContext mapBuildContext) {
         MessageChannel gameChannel = mapBuildContext.game().getMainGameChannel();
         if (anyNeedsToDiscard(mapBuildContext.availablePlayerTiles(), mapBuildContext.mapTemplateModel())) {
             MessageHelper.sendMessageToChannel(
@@ -205,7 +204,7 @@ public class MantisMapBuildService {
     private String validateAction(
             @Nonnull GenericInteractionCreateEvent event,
             @Nonnull MantisMapBuildContext mapBuildContext,
-            @NonNull String tileId,
+            @Nonnull String tileId,
             @Nullable String tilePosition) {
 
         if (tilePosition != null) {
@@ -491,7 +490,7 @@ public class MantisMapBuildService {
 
     private DraftItem drawTile(
             @Nullable GenericInteractionCreateEvent event,
-            @NonNull MantisMapBuildContext mapBuildContext,
+            @Nonnull MantisMapBuildContext mapBuildContext,
             @Nonnull Player player,
             @Nonnull PlayerTiles playerRemainingTiles) {
         MessageChannel responseChannel =
@@ -540,7 +539,7 @@ public class MantisMapBuildService {
     }
 
     private Integer getPlayerNumberForTilePosition(
-            @NonNull MapTemplateModel mapTemplateModel, @NonNull String position) {
+            @Nonnull MapTemplateModel mapTemplateModel, @Nonnull String position) {
         // Get the template tile at that position
         MapTemplateTile templateTile = mapTemplateModel.getTemplateTiles().stream()
                 .filter(t -> t.getPos().equals(position))

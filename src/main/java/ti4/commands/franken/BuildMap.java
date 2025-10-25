@@ -29,19 +29,19 @@ class BuildMap extends GameStateSubcommand {
         String mapTemplateId = game.getMapTemplateID();
         MapTemplateModel mapTemplate = mapTemplateId != null ? Mapper.getMapTemplate(mapTemplateId) : null;
         if (mapTemplate == null) {
-            MapTemplateModel defaultTempalte = Mapper.getDefaultMapTemplateForPlayerCount(
+            MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(
                     game.getRealPlayers().size());
-            if (defaultTempalte == null) {
+            if (defaultTemplate == null) {
                 MessageHelper.sendMessageToEventChannel(
                         event,
                         "No map template is set and no default template is available for "
                                 + game.getRealPlayers().size() + " players.");
                 return;
             }
-            game.setMapTemplateID(defaultTempalte.getID());
+            game.setMapTemplateID(defaultTemplate.getID());
             MessageHelper.sendMessageToEventChannel(
                     event,
-                    "No map template was set. Set to default template: " + defaultTempalte.getAlias()
+                    "No map template was set. Set to default template: " + defaultTemplate.getAlias()
                             + ". You can use `/map set_map_template` to change it. Run this command again to proceed.");
             return;
         }
