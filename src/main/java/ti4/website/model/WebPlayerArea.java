@@ -40,6 +40,7 @@ public class WebPlayerArea {
     private String factionImage;
     private FactionImageType factionImageType;
     private String color;
+    private String colorDisplayName;
     private String displayName;
     private String discordId;
     private String cardsInfoThreadLink;
@@ -173,6 +174,7 @@ public class WebPlayerArea {
         webPlayerArea.setFactionImageType(factionImageResult.type);
 
         webPlayerArea.setColor(player.getColor());
+        webPlayerArea.setColorDisplayName(player.getColorDisplayName());
         webPlayerArea.setDisplayName(player.getDisplayName());
         webPlayerArea.setDiscordId(player.getUserID());
         webPlayerArea.setCardsInfoThreadLink(player.getCardsInfoThreadJumpLink());
