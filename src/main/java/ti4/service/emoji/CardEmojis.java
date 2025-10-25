@@ -376,9 +376,9 @@ public enum CardEmojis implements TI4Emoji {
                 .appendCodePoint(0x2060)
                 .append(tf_5_2)
                 .appendCodePoint(0x2060)
-                .append(tf_5_4)
+                .append(tf_5_3)
                 .appendCodePoint(0x2060)
-                .append(tf_5_3);
+                .append(tf_5_4);
         return sb.toString();
     }
 
