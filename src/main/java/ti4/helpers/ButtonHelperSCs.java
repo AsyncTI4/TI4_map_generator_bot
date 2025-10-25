@@ -1177,6 +1177,9 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("leadership").orElse(null);
         }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByInitiative(1).get();
+        }
         int leadershipInitiative = scModel.getInitiative();
 
         if (!player.getFollowedSCs().contains(leadershipInitiative)) {

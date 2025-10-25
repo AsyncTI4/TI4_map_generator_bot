@@ -154,11 +154,6 @@ public class PlayHeroService {
                         buttons);
             }
             case "xanhero" -> {
-                game.getTileMap().values().stream()
-                        .flatMap(t -> t.getUnitHolders().values().stream())
-                        .forEach(uh -> uh.removeAllUnitDamage(player.getColorID()));
-                String message = player.getRepresentation() + " repaired all of their units.";
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 int amount = 0;
                 for (Tile tile : game.getTileMap().values()) {
                     for (UnitHolder uh : tile.getUnitHolders().values()) {
@@ -167,11 +162,16 @@ public class PlayHeroService {
                         }
                     }
                 }
+                game.getTileMap().values().stream()
+                        .flatMap(t -> t.getUnitHolders().values().stream())
+                        .forEach(uh -> uh.removeAllUnitDamage(player.getColorID()));
+                String message = player.getRepresentation() + " repaired all of their units.";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if (amount > 0) {
                     String gainedTg = player.gainTG(amount, true);
                     ButtonHelperAgents.resolveArtunoCheck(player, amount);
                     message = player.getRepresentation() + " gained " + amount + " tg " + gainedTg
-                            + ", equal to the amount of opposing damaged units.";
+                            + ", equal to the amount of damaged units.";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 }
                 MessageHelper.sendMessageToChannel(
