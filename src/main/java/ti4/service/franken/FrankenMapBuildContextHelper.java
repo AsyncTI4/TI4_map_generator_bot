@@ -109,8 +109,8 @@ public class FrankenMapBuildContextHelper {
                     .filter(item -> item.ItemCategory == Category.BLUETILE || item.ItemCategory == Category.REDTILE)
                     .collect(Collectors.toList());
 
-            // Count how many of the mulliganed tiles are in this bag (one tile can be
-            // mulliganed more than once)
+            // Count how many of the mulliganned tiles are in this bag (one tile can be
+            // mulliganned more than once)
             int mulligansUsed = 0;
             for (String mulliganedTileId : mulliganedTiles) {
                 boolean isInBag = tileItems.stream()
