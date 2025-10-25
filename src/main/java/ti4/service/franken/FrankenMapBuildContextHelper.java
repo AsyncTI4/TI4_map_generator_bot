@@ -112,9 +112,9 @@ public class FrankenMapBuildContextHelper {
             // Count how many of the mulliganned tiles are in this bag (one tile can be
             // mulliganned more than once)
             int mulligansUsed = 0;
-            for (String mulliganedTileId : mulliganedTiles) {
+            for (String mulligannedTileId : mulliganedTiles) {
                 boolean isInBag = tileItems.stream()
-                        .filter(item -> item.ItemId.equals(mulliganedTileId))
+                        .filter(item -> item.ItemId.equals(mulligannedTileId))
                         .findFirst()
                         .isPresent();
                 if (isInBag) {
