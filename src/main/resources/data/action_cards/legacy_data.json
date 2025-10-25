@@ -218,15 +218,6 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "relay_connection2",
-        "name": "Relay Connection",
-        "phase": "Action",
-        "window": "Action",
-        "text": "Choose 1 ship type. You may produce 1 ship of that type in each system that contains 1 of your space docks.",
-        "flavorText": "His engineers broke into celebration as Umbat called out to praise them, \"The forge burns, my soul alight! This is our freedom!\"",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "shrapnel_turrets2",
         "name": "Shrapnel Turrets",
         "phase": "Action",

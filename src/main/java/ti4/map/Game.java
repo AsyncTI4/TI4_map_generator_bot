@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -3889,6 +3889,14 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
+    public List<Player> getRealPlayersExcludingThis(Player p) {
+        return players.values().stream()
+                .filter(Player::isRealPlayer)
+                .filter(p1 -> p1 != p)
+                .toList();
+    }
+
+    @JsonIgnore
     public List<Player> getRealPlayersNNeutral() {
         return players.values().stream()
                 .filter(p -> p.isRealPlayer() || (p.getFaction() != null && "neutral".equals(p.getFaction())))
@@ -4307,9 +4315,23 @@ public class Game extends GameProperties {
         return getStrategyCardSet().getStrategyCardModelByName(name);
     }
 
+    public String getSCName(int scInitiative) {
+        if (getStrategyCardModelByInitiative(scInitiative).isPresent()) {
+            return getStrategyCardModelByInitiative(scInitiative).get().getName();
+        }
+        return "SC#" + scInitiative;
+    }
+
+    public String getSCEmojiWordRepresentation(int scInitiative) {
+        if (getStrategyCardModelByInitiative(scInitiative).isPresent()) {
+            return getStrategyCardModelByInitiative(scInitiative).get().getEmojiWordRepresentation();
+        }
+        return "SC#" + scInitiative;
+    }
+
     /**
      * @param scID
-     * @return true when the Game's SC Set contains a strategt card which uses a certain automation
+     * @return true when the Game's SC Set contains a strategy card which uses a certain automation
      */
     public boolean usesStrategyCardAutomation(String scID) {
         return getStrategyCardSet().getStrategyCardModels().stream()
