@@ -45,7 +45,10 @@ public class MantisBuildImageGeneratorService {
      * @return A FileUpload containing the image, or null if the image could not be generated.
      */
     public FileUpload tryGenerateImage(
-            MantisMapBuildContext mapBuildContext, String uniqueKey, List<String> currentPositions, String pendingTileId) {
+            MantisMapBuildContext mapBuildContext,
+            String uniqueKey,
+            List<String> currentPositions,
+            String pendingTileId) {
 
         currentPositions = currentPositions == null ? List.of() : currentPositions;
         BufferedImage mapImage = generateImage(mapBuildContext, currentPositions, pendingTileId);
@@ -58,9 +61,7 @@ public class MantisBuildImageGeneratorService {
     }
 
     private BufferedImage generateImage(
-            MantisMapBuildContext mapBuildContext,
-            List<String> currentPositions,
-            String pendingTileId) {
+            MantisMapBuildContext mapBuildContext, List<String> currentPositions, String pendingTileId) {
 
         Game game = mapBuildContext.game();
         int width = getMapWidth(game);

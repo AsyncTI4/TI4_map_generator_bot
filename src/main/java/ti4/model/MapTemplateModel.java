@@ -166,7 +166,7 @@ public class MapTemplateModel implements ModelInterface {
         for (int i = 1; i <= playerCount; i++) {
             if (!playerNumbers.contains(i)) return false;
         }
-        if(playerNumbers.size() != playerCount) return false;
+        if (playerNumbers.size() != playerCount) return false;
         return true;
     }
 

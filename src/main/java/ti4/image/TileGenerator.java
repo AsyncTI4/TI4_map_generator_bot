@@ -323,7 +323,7 @@ public class TileGenerator {
                 }
 
                 // We've drawn the basic tile; that's all that's needed for some of these
-                if(step == TileStep.TileUnannotated) {
+                if (step == TileStep.TileUnannotated) {
                     break;
                 }
 

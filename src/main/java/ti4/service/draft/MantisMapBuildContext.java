@@ -1,22 +1,19 @@
 package ti4.service.draft;
 
-
+import io.micrometer.common.lang.NonNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import io.micrometer.common.lang.NonNull;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.draft.DraftItem;
 import ti4.draft.DraftItem.Category;
@@ -30,21 +27,20 @@ import ti4.service.draft.draftables.SpeakerOrderDraftable;
 import ti4.service.franken.FrankenDraftBagService;
 
 public record MantisMapBuildContext(
-            @Nonnull Game game,
-            @Nonnull MapTemplateModel mapTemplateModel,
-            @Nonnull Integer mulliganLimit,
-            @Nonnull Function<String, String> makeButtonId,
-            @Nullable String drawnTileId,
-            @Nullable String mulliganedTileId,
-            @NonNull Consumer<String> persistDrawnTile,
-            @NonNull Consumer<String> persistMulligan,
-            @NonNull Consumer<String> persistDiscard,
-            // Player corresponding to the "playerNum" value in map templates
-            @NonNull Function<Integer, Optional<Player>> getPlayerForPosition,
-            @NonNull List<PlayerTiles> availablePlayerTiles,
-            @NonNull Supplier<List<PlayerTiles>> getAvailableTiles,
-            @Nonnull Consumer<GenericInteractionCreateEvent> buildCompleteCallback
-    ) {
+        @Nonnull Game game,
+        @Nonnull MapTemplateModel mapTemplateModel,
+        @Nonnull Integer mulliganLimit,
+        @Nonnull Function<String, String> makeButtonId,
+        @Nullable String drawnTileId,
+        @Nullable String mulliganedTileId,
+        @NonNull Consumer<String> persistDrawnTile,
+        @NonNull Consumer<String> persistMulligan,
+        @NonNull Consumer<String> persistDiscard,
+        // Player corresponding to the "playerNum" value in map templates
+        @NonNull Function<Integer, Optional<Player>> getPlayerForPosition,
+        @NonNull List<PlayerTiles> availablePlayerTiles,
+        @NonNull Supplier<List<PlayerTiles>> getAvailableTiles,
+        @Nonnull Consumer<GenericInteractionCreateEvent> buildCompleteCallback) {
 
     public MantisMapBuildContext afterMulligan() {
         return new MantisMapBuildContext(
@@ -53,15 +49,14 @@ public record MantisMapBuildContext(
                 mulliganLimit,
                 makeButtonId,
                 null,
-                drawnTileId, //mulliganedTileId = drawnTileId
+                drawnTileId, // mulliganedTileId = drawnTileId
                 persistDrawnTile,
                 persistMulligan,
                 persistDiscard,
                 getPlayerForPosition,
                 getAvailableTiles.get(),
                 getAvailableTiles,
-                buildCompleteCallback
-        );
+                buildCompleteCallback);
     }
 
     public MantisMapBuildContext withRegeneratedPlayerTiles() {
@@ -78,8 +73,7 @@ public record MantisMapBuildContext(
                 getPlayerForPosition,
                 getAvailableTiles.get(),
                 getAvailableTiles,
-                buildCompleteCallback
-        );
+                buildCompleteCallback);
     }
 
     public MantisMapBuildContext afterTilePlaced() {
@@ -97,17 +91,17 @@ public record MantisMapBuildContext(
                 getPlayerForPosition,
                 getAvailableTiles.get(),
                 getAvailableTiles,
-                buildCompleteCallback
-        );
+                buildCompleteCallback);
     }
 
-    public static MantisMapBuildContext from(@Nonnull DraftManager draftManager, @NonNull MantisTileDraftable mantisTileDraftable) {
+    public static MantisMapBuildContext from(
+            @Nonnull DraftManager draftManager, @NonNull MantisTileDraftable mantisTileDraftable) {
         String mapTemplateId = draftManager.getGame().getMapTemplateID();
-        if(mapTemplateId == null) {
+        if (mapTemplateId == null) {
             throw new IllegalStateException("Game does not have a map template ID set.");
         }
         MapTemplateModel mapTemplateModel = Mapper.getMapTemplate(mapTemplateId);
-        if(mapTemplateModel == null) {
+        if (mapTemplateModel == null) {
             throw new IllegalStateException("Could not find map template model for ID: " + mapTemplateId);
         }
         return new MantisMapBuildContext(
@@ -123,8 +117,7 @@ public record MantisMapBuildContext(
                 (Integer playerNum) -> getPlayerBySpeakerOrder(draftManager, playerNum),
                 getPlayerTileState(draftManager, mantisTileDraftable),
                 () -> getPlayerTileState(draftManager, mantisTileDraftable),
-                draftManager::trySetupPlayers
-        );
+                draftManager::trySetupPlayers);
     }
 
     /**
@@ -157,7 +150,7 @@ public record MantisMapBuildContext(
                     picks.get(0).getChoiceKey());
 
             if (playerPosition != null && playerPosition == playerNum) {
-                if(game.getPlayer(playerId) == null) {
+                if (game.getPlayer(playerId) == null) {
                     return Optional.empty();
                 }
                 return Optional.of(game.getPlayer(playerId));
@@ -167,7 +160,7 @@ public record MantisMapBuildContext(
     }
 
     private static List<PlayerTiles> getPlayerTileState(
-        DraftManager draftManager, MantisTileDraftable mantisDraftable) {
+            DraftManager draftManager, MantisTileDraftable mantisDraftable) {
         List<PlayerTiles> result = new ArrayList<>();
         Set<String> placedTiles = draftManager.getGame().getTileMap().values().stream()
                 .map(t -> t.getTileID())
@@ -194,11 +187,11 @@ public record MantisMapBuildContext(
 
     public static MantisMapBuildContext fromFranken(@Nonnull Game game) {
         String mapTemplateId = game.getMapTemplateID();
-        if(mapTemplateId == null) {
+        if (mapTemplateId == null) {
             throw new IllegalStateException("Game does not have a map template ID set.");
         }
         MapTemplateModel mapTemplateModel = Mapper.getMapTemplate(mapTemplateId);
-        if(mapTemplateModel == null) {
+        if (mapTemplateModel == null) {
             throw new IllegalStateException("Could not find map template model for ID: " + mapTemplateId);
         }
         return new MantisMapBuildContext(
@@ -228,15 +221,16 @@ public record MantisMapBuildContext(
                     game.setStoredValue("frankenMapBuildDiscards", discards);
                 },
                 playerNum -> {
-                    for(Player player : game.getPlayers().values()) {
-                        if(player.getCurrentDraftBag() == null) {
+                    for (Player player : game.getPlayers().values()) {
+                        if (player.getCurrentDraftBag() == null) {
                             continue;
                         }
                         boolean hasSpeakerOrder = player.getCurrentDraftBag().Contents.stream()
-                            .filter(item -> item.ItemCategory == Category.DRAFTORDER)
-                            .filter(item -> item.ItemId.equals("" + playerNum))
-                            .findFirst().isPresent();
-                        if(hasSpeakerOrder) {
+                                .filter(item -> item.ItemCategory == Category.DRAFTORDER)
+                                .filter(item -> item.ItemId.equals("" + playerNum))
+                                .findFirst()
+                                .isPresent();
+                        if (hasSpeakerOrder) {
                             return Optional.of(player);
                         }
                     }
@@ -249,15 +243,13 @@ public record MantisMapBuildContext(
                     game.setStoredValue("frankenMapBuildMulligans", null);
                     game.setStoredValue("frankenMapBuildDiscards", null);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map build complete!");
-                }
-        );
+                });
     }
 
     private static List<PlayerTiles> getPlayerTileStateFranken(Game game) {
         List<PlayerTiles> result = new ArrayList<>();
-        Set<String> placedTiles = game.getTileMap().values().stream()
-                .map(t -> t.getTileID())
-                .collect(Collectors.toSet());
+        Set<String> placedTiles =
+                game.getTileMap().values().stream().map(t -> t.getTileID()).collect(Collectors.toSet());
         String discardedTilesStr = game.getStoredValue("frankenMapBuildDiscards");
         Set<String> discardedTiles = new HashSet<>();
         if (discardedTilesStr != null && !discardedTilesStr.isEmpty()) {
@@ -278,11 +270,12 @@ public record MantisMapBuildContext(
 
             // Count how many of the mulliganed tiles are in this bag (one tile can be mulliganed more than once)
             int mulligansUsed = 0;
-            for(String mulliganedTileId : mulliganedTiles) {
+            for (String mulliganedTileId : mulliganedTiles) {
                 boolean isInBag = tileItems.stream()
                         .filter(item -> item.ItemId.equals(mulliganedTileId))
-                        .findFirst().isPresent();
-                if(isInBag) {
+                        .findFirst()
+                        .isPresent();
+                if (isInBag) {
                     mulligansUsed++;
                 }
             }
@@ -298,15 +291,16 @@ public record MantisMapBuildContext(
         return result;
     }
 
-    public static record PlayerTiles(String playerUserId, List<String> blueTileIds, List<String> redTileIds, Integer mulligansUsed) {
+    public record PlayerTiles(
+            String playerUserId, List<String> blueTileIds, List<String> redTileIds, Integer mulligansUsed) {
         public static PlayerTiles create(
-            String playerUserId, MantisTileDraftable mantisDraftable, List<DraftChoice> playerPicks) {
+                String playerUserId, MantisTileDraftable mantisDraftable, List<DraftChoice> playerPicks) {
 
             Integer mulligansUsed = 0;
             List<String> blueTileIds = new ArrayList<>();
             List<String> redTileIds = new ArrayList<>();
             for (DraftChoice choice : playerPicks) {
-                
+
                 // Add choice to the correct list
                 Category category = mantisDraftable.getItemCategory(choice.getChoiceKey());
                 String tileId = MantisTileDraftable.getItemId(choice.getChoiceKey());

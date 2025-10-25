@@ -23,7 +23,8 @@ class MantisTileDraftableStartBuilding extends GameStateSubcommand {
             return;
         }
 
-        MantisMapBuildContext mapBuildContext = MantisMapBuildContext.from(getGame().getDraftManager(), draftable);
+        MantisMapBuildContext mapBuildContext =
+                MantisMapBuildContext.from(getGame().getDraftManager(), draftable);
         MantisMapBuildService.initializeMapBuilding(mapBuildContext);
     }
 }

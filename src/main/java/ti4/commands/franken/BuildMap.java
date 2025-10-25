@@ -28,28 +28,35 @@ class BuildMap extends GameStateSubcommand {
         // Set a default template if none is set
         String mapTemplateId = game.getMapTemplateID();
         MapTemplateModel mapTemplate = mapTemplateId != null ? Mapper.getMapTemplate(mapTemplateId) : null;
-        if(mapTemplate == null) {
-            MapTemplateModel defaultTempalte = Mapper.getDefaultMapTemplateForPlayerCount(game.getRealPlayers().size());
-            if(defaultTempalte == null) {
-                MessageHelper.sendMessageToEventChannel(event, "No map template is set and no default template is available for " + game.getRealPlayers().size() + " players.");
+        if (mapTemplate == null) {
+            MapTemplateModel defaultTempalte = Mapper.getDefaultMapTemplateForPlayerCount(
+                    game.getRealPlayers().size());
+            if (defaultTempalte == null) {
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        "No map template is set and no default template is available for "
+                                + game.getRealPlayers().size() + " players.");
                 return;
             }
             game.setMapTemplateID(defaultTempalte.getID());
-            MessageHelper.sendMessageToEventChannel(event, "No map template was set. Set to default template: " + defaultTempalte.getAlias() + ". You can use `/map set_map_template` to change it. Run this command again to proceed.");
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "No map template was set. Set to default template: " + defaultTempalte.getAlias()
+                            + ". You can use `/map set_map_template` to change it. Run this command again to proceed.");
             return;
         }
 
         // Put draft tiles onto the board for rendering purposes
         PartialMapService.placeFromTemplate(mapTemplate, game);
-        
+
         BagDraft draft = game.getActiveBagDraft();
-        if(draft == null) {
+        if (draft == null) {
             MessageHelper.sendMessageToEventChannel(event, "There is no active draft.");
             return;
         }
 
         // Check that the draft is complete
-        if(!draft.isDraftStageComplete()) {
+        if (!draft.isDraftStageComplete()) {
             MessageHelper.sendMessageToEventChannel(event, "The draft is not complete yet.");
             return;
         }
@@ -58,28 +65,37 @@ class BuildMap extends GameStateSubcommand {
         int expectedBlueTiles = draft.getItemLimitForCategory(Category.BLUETILE);
         int expectedRedTiles = draft.getItemLimitForCategory(Category.REDTILE);
         int expectedDraftOrders = draft.getItemLimitForCategory(Category.DRAFTORDER);
-        for(Player player : game.getRealPlayers()) {
+        for (Player player : game.getRealPlayers()) {
             DraftBag draftHand = player.getDraftHand();
-            if(draftHand == null){
+            if (draftHand == null) {
                 continue;
             }
             int playerBlueTiles = draftHand.getCategoryCount(Category.BLUETILE);
-            if(playerBlueTiles != expectedBlueTiles) {
-                MessageHelper.sendMessageToEventChannel(event, "Player " + player.getUserName() + " has " + playerBlueTiles + " blue tiles, but " + expectedBlueTiles + " are expected.");
+            if (playerBlueTiles != expectedBlueTiles) {
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        "Player " + player.getUserName() + " has " + playerBlueTiles + " blue tiles, but "
+                                + expectedBlueTiles + " are expected.");
                 return;
             }
             int playerRedTiles = draftHand.getCategoryCount(Category.REDTILE);
-            if(playerRedTiles != expectedRedTiles) {
-                MessageHelper.sendMessageToEventChannel(event, "Player " + player.getUserName() + " has " + playerRedTiles + " red tiles, but " + expectedRedTiles + " are expected.");
+            if (playerRedTiles != expectedRedTiles) {
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        "Player " + player.getUserName() + " has " + playerRedTiles + " red tiles, but "
+                                + expectedRedTiles + " are expected.");
                 return;
             }
             int playerDraftOrders = draftHand.getCategoryCount(Category.DRAFTORDER);
-            if(playerDraftOrders != expectedDraftOrders) {
-                MessageHelper.sendMessageToEventChannel(event, "Player " + player.getUserName() + " has " + playerDraftOrders + " draft orders, but " + expectedDraftOrders + " are expected.");
+            if (playerDraftOrders != expectedDraftOrders) {
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        "Player " + player.getUserName() + " has " + playerDraftOrders + " draft orders, but "
+                                + expectedDraftOrders + " are expected.");
                 return;
             }
         }
-        
+
         // Send the buttons
         MantisMapBuildContext mapBuildContext = MantisMapBuildContext.fromFranken(game);
         MantisMapBuildService.initializeMapBuilding(mapBuildContext);

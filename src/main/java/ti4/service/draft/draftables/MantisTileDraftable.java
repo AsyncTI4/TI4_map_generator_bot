@@ -166,12 +166,17 @@ public class MantisTileDraftable extends Draftable {
             representation = tileID;
         }
         TI4Emoji emoji = TileEmojis.getTileEmojiFromTileID(tileID);
-        Button button =
-                Button.secondary(makeButtonId(choiceKey), representation);
-        if(emoji != null) {
+        Button button = Button.secondary(makeButtonId(choiceKey), representation);
+        if (emoji != null) {
             button = button.withEmoji(emoji.asEmoji());
         }
-        return new DraftChoice(TYPE, choiceKey, button, tile.getLongDescription(), representation, emoji != null ? emoji.emojiString() : null);
+        return new DraftChoice(
+                TYPE,
+                choiceKey,
+                button,
+                tile.getLongDescription(),
+                representation,
+                emoji != null ? emoji.emojiString() : null);
     }
 
     @Override
@@ -183,8 +188,7 @@ public class MantisTileDraftable extends Draftable {
         }
 
         if (commandKey.startsWith(MantisMapBuildService.ACTION_PREFIX)) {
-            MantisMapBuildContext mapBuildContext =
-                    MantisMapBuildContext.from(draftManager, this);
+            MantisMapBuildContext mapBuildContext = MantisMapBuildContext.from(draftManager, this);
             return MantisMapBuildService.handleAction(event, mapBuildContext, commandKey);
         }
 
@@ -279,10 +283,9 @@ public class MantisTileDraftable extends Draftable {
                     .filter(msg -> !msg.isUsingComponentsV2())
                     .filter(msg -> msg.getContentRaw().startsWith("You picked the tiles: "))
                     .findFirst()
-                    .ifPresentOrElse(
-                            msg -> msg.editMessage(summary.toString()).queue(), () -> cardsInfoChannel
-                                    .sendMessage(summary.toString())
-                                    .queue());
+                    .ifPresentOrElse(msg -> msg.editMessage(summary.toString()).queue(), () -> cardsInfoChannel
+                            .sendMessage(summary.toString())
+                            .queue());
         });
     }
 
@@ -610,8 +613,7 @@ public class MantisTileDraftable extends Draftable {
         discardedTileIDs.clear();
         mulliganTileIDs.clear();
         drawnTileId = null;
-        MantisMapBuildContext mapBuildContext =
-                MantisMapBuildContext.from(draftManager, this);
+        MantisMapBuildContext mapBuildContext = MantisMapBuildContext.from(draftManager, this);
         MantisMapBuildService.initializeMapBuilding(mapBuildContext);
     }
 

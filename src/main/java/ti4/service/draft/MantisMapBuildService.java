@@ -1,16 +1,14 @@
 package ti4.service.draft;
 
+import io.micrometer.common.lang.NonNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import io.micrometer.common.lang.NonNull;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
@@ -53,7 +51,10 @@ public class MantisMapBuildService {
         }
     }
 
-    public String handleAction(@Nonnull GenericInteractionCreateEvent event, @Nonnull MantisMapBuildContext mapBuildContext, @Nonnull String action) {
+    public String handleAction(
+            @Nonnull GenericInteractionCreateEvent event,
+            @Nonnull MantisMapBuildContext mapBuildContext,
+            @Nonnull String action) {
         if (action.startsWith(ACTION_PREFIX)) {
             action = action.substring(ACTION_PREFIX.length());
         }
@@ -72,7 +73,9 @@ public class MantisMapBuildService {
     }
 
     private String handlePlaceTile(
-            @Nonnull GenericInteractionCreateEvent event, @Nonnull MantisMapBuildContext mapBuildContext, @Nonnull String actionParams) {
+            @Nonnull GenericInteractionCreateEvent event,
+            @Nonnull MantisMapBuildContext mapBuildContext,
+            @Nonnull String actionParams) {
         String[] params = actionParams.split("_", 2);
         if (params.length != 2) {
             return "Error: Invalid parameters for place tile action: " + actionParams;
@@ -82,17 +85,14 @@ public class MantisMapBuildService {
         String tileId = params[1];
 
         String validationError = validateAction(event, mapBuildContext, tileId, position);
-        if(validationError != null) {
+        if (validationError != null) {
             return validationError;
         }
 
         // Get these before placing the tile, since the tile won't be available afterwards
-        PlayerTiles playerTiles = getPlayerTilesWithTileId(
-                mapBuildContext.availablePlayerTiles(), tileId);
+        PlayerTiles playerTiles = getPlayerTilesWithTileId(mapBuildContext.availablePlayerTiles(), tileId);
         Player player = mapBuildContext.game().getPlayer(playerTiles.playerUserId());
-        Category tileCategory = playerTiles.blueTileIds().contains(tileId)
-                ? Category.BLUETILE
-                : Category.REDTILE;
+        Category tileCategory = playerTiles.blueTileIds().contains(tileId) ? Category.BLUETILE : Category.REDTILE;
         DraftItem placedTile = DraftItem.generate(tileCategory, tileId);
 
         if (!placeTile(mapBuildContext, position, tileId)) {
@@ -114,9 +114,9 @@ public class MantisMapBuildService {
 
     private String handleMulliganTile(
             GenericInteractionCreateEvent event, @Nonnull MantisMapBuildContext mapBuildContext, String actionParams) {
-        
+
         String tileId = actionParams;
-        
+
         String validationError = validateAction(event, mapBuildContext, tileId, null);
         if (validationError != null) {
             return validationError;
@@ -126,15 +126,13 @@ public class MantisMapBuildService {
         mapBuildContext.persistMulligan().accept(tileId);
         // Get a new context object with the mulligan set, and drawn tile cleared
         MantisMapBuildContext updatedContext = mapBuildContext.afterMulligan();
-        PlayerTiles playerTiles = getPlayerTilesWithTileId(
-                mapBuildContext.availablePlayerTiles(), tileId);
+        PlayerTiles playerTiles = getPlayerTilesWithTileId(mapBuildContext.availablePlayerTiles(), tileId);
         Player player = mapBuildContext.game().getPlayer(playerTiles.playerUserId());
-        Category tileCategory = playerTiles.blueTileIds().contains(tileId)
-                ? Category.BLUETILE
-                : Category.REDTILE;
+        Category tileCategory = playerTiles.blueTileIds().contains(tileId) ? Category.BLUETILE : Category.REDTILE;
         DraftItem oldTileItem = DraftItem.generate(tileCategory, tileId);
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), player.getRepresentation() + " mulliganed tile " + oldTileItem.getLongDescription() + ".");
+                event.getMessageChannel(),
+                player.getRepresentation() + " mulliganed tile " + oldTileItem.getLongDescription() + ".");
         updateMapBuild(event, updatedContext);
         return DraftButtonService.DELETE_MESSAGE;
     }
@@ -156,7 +154,8 @@ public class MantisMapBuildService {
         }
 
         PlayerTiles playerTiles = mapBuildContext.availablePlayerTiles().stream()
-                .filter(pt -> pt.blueTileIds().contains(tileId) || pt.redTileIds().contains(tileId))
+                .filter(pt ->
+                        pt.blueTileIds().contains(tileId) || pt.redTileIds().contains(tileId))
                 .findFirst()
                 .orElse(null);
 
@@ -165,27 +164,29 @@ public class MantisMapBuildService {
             return "Error: You do not have tile " + tileId + " drafted.";
         }
 
-        Category tileCategory = playerTiles.blueTileIds().contains(tileId)
-                ? Category.BLUETILE
-                : Category.REDTILE;
+        Category tileCategory = playerTiles.blueTileIds().contains(tileId) ? Category.BLUETILE : Category.REDTILE;
 
         mapBuildContext.persistDiscard().accept(tileId);
 
         // Update check for needed discards
         mapBuildContext = mapBuildContext.withRegeneratedPlayerTiles();
-        boolean anyNeedToDiscard = anyNeedsToDiscard(mapBuildContext.availablePlayerTiles(), mapBuildContext.mapTemplateModel());
+        boolean anyNeedToDiscard =
+                anyNeedsToDiscard(mapBuildContext.availablePlayerTiles(), mapBuildContext.mapTemplateModel());
         PlayerTiles playerRemainingTiles = mapBuildContext.availablePlayerTiles().stream()
                 .filter(pr -> pr.playerUserId().equals(playerTiles.playerUserId()))
                 .findFirst()
                 .orElse(null);
 
         boolean categoryNeedsDiscard = tileCategory == Category.BLUETILE
-                ? playerRemainingTiles.blueTileIds().size() > mapBuildContext.mapTemplateModel().bluePerPlayer()
-                : playerRemainingTiles.redTileIds().size() > mapBuildContext.mapTemplateModel().redPerPlayer();
+                ? playerRemainingTiles.blueTileIds().size()
+                        > mapBuildContext.mapTemplateModel().bluePerPlayer()
+                : playerRemainingTiles.redTileIds().size()
+                        > mapBuildContext.mapTemplateModel().redPerPlayer();
 
         if (!anyNeedToDiscard) {
             MessageHelper.sendMessageToChannel(
-                    mapBuildContext.game().getMainGameChannel(), "All players have discarded excess tiles. Continuing map building!");
+                    mapBuildContext.game().getMainGameChannel(),
+                    "All players have discarded excess tiles. Continuing map building!");
             // Start building with a null event to force new messaging in the main thread
             updateMapBuild(null, mapBuildContext);
             return DraftButtonService.DELETE_MESSAGE;
@@ -201,15 +202,23 @@ public class MantisMapBuildService {
         }
     }
 
-    private String validateAction(@Nonnull GenericInteractionCreateEvent event, @Nonnull MantisMapBuildContext mapBuildContext, @NonNull String tileId, @Nullable String tilePosition) {
+    private String validateAction(
+            @Nonnull GenericInteractionCreateEvent event,
+            @Nonnull MantisMapBuildContext mapBuildContext,
+            @NonNull String tileId,
+            @Nullable String tilePosition) {
 
-        if(tilePosition != null) {
+        if (tilePosition != null) {
             // Validate that the map position belongs to the interacting player
-            Integer templatePlayerNum = getPlayerNumberForTilePosition(mapBuildContext.mapTemplateModel(), tilePosition);
+            Integer templatePlayerNum =
+                    getPlayerNumberForTilePosition(mapBuildContext.mapTemplateModel(), tilePosition);
             if (templatePlayerNum == null) {
                 return "Error: Could not determine player number for tile position " + tilePosition + ".";
             }
-            Player tilePlayer = mapBuildContext.getPlayerForPosition().apply(templatePlayerNum).orElse(null);
+            Player tilePlayer = mapBuildContext
+                    .getPlayerForPosition()
+                    .apply(templatePlayerNum)
+                    .orElse(null);
             if (tilePlayer == null) {
                 return "Error: Could not find player for tile position " + tilePosition + ".";
             }
@@ -221,8 +230,7 @@ public class MantisMapBuildService {
         }
 
         // Validate that the interacting player owns this tile
-        PlayerTiles playerTiles = getPlayerTilesWithTileId(
-                mapBuildContext.availablePlayerTiles(), tileId);
+        PlayerTiles playerTiles = getPlayerTilesWithTileId(mapBuildContext.availablePlayerTiles(), tileId);
         if (playerTiles == null) {
             return "Error: Could not find any player that has tile " + tileId + " drafted.";
         }
@@ -231,16 +239,17 @@ public class MantisMapBuildService {
                 && !buttonEvent.getUser().getId().equals(playerWithTileId)) {
             return DraftButtonService.USER_MISTAKE_PREFIX + "It's not your tile to place.";
         }
-        
+
         // Check if the buttons are stale; ensure they pertain to the latest positions needing tiles
         var groupedPositions = getGroupedPositions(mapBuildContext.game(), mapBuildContext.mapTemplateModel());
         List<String> positionsToPlace = getNextPositionGroup(mapBuildContext.game(), groupedPositions);
-        Integer templatePlayerNum = getPlayerNumberForTilePosition(
-                mapBuildContext.mapTemplateModel(), positionsToPlace.get(0));
+        Integer templatePlayerNum =
+                getPlayerNumberForTilePosition(mapBuildContext.mapTemplateModel(), positionsToPlace.get(0));
         if (templatePlayerNum == null) {
             return "Error: Could not determine player number for tile position " + positionsToPlace.get(0) + ".";
         }
-        Player nextPlayerToPlace = mapBuildContext.getPlayerForPosition().apply(templatePlayerNum).orElse(null);
+        Player nextPlayerToPlace =
+                mapBuildContext.getPlayerForPosition().apply(templatePlayerNum).orElse(null);
         if (nextPlayerToPlace == null) {
             return "Error: Could not find player for tile position " + positionsToPlace.get(0) + ".";
         }
@@ -267,15 +276,14 @@ public class MantisMapBuildService {
         return true;
     }
 
-    private void updateMapBuild(
-            GenericInteractionCreateEvent event,
-            MantisMapBuildContext mapBuildContext
-            ) {
-        MessageChannel responseChannel = event == null ? mapBuildContext.game().getMainGameChannel() : event.getMessageChannel();
+    private void updateMapBuild(GenericInteractionCreateEvent event, MantisMapBuildContext mapBuildContext) {
+        MessageChannel responseChannel =
+                event == null ? mapBuildContext.game().getMainGameChannel() : event.getMessageChannel();
 
         // Get the tile positions, grouped by player, and then grouped again by
         // placement order.
-        Map<Integer, Map<Integer, List<String>>> placementGroups = getGroupedPositions(mapBuildContext.game(), mapBuildContext.mapTemplateModel());
+        Map<Integer, Map<Integer, List<String>>> placementGroups =
+                getGroupedPositions(mapBuildContext.game(), mapBuildContext.mapTemplateModel());
         List<String> nextGroup = getNextPositionGroup(mapBuildContext.game(), placementGroups);
 
         if (nextGroup == null || nextGroup.isEmpty()) {
@@ -288,18 +296,21 @@ public class MantisMapBuildService {
 
         // Use the first position in the group to determine which player is placing
         // next.
-        Integer templatePlayerNum = getPlayerNumberForTilePosition(
-                mapBuildContext.mapTemplateModel(), nextGroup.get(0));
+        Integer templatePlayerNum =
+                getPlayerNumberForTilePosition(mapBuildContext.mapTemplateModel(), nextGroup.get(0));
         if (templatePlayerNum == null) {
             MessageHelper.sendMessageToChannel(
                     responseChannel,
-                    "Error: Could not determine player number for next tile placement position at " + nextGroup.get(0) + ".");
+                    "Error: Could not determine player number for next tile placement position at " + nextGroup.get(0)
+                            + ".");
             return;
         }
-        Player player = mapBuildContext.getPlayerForPosition().apply(templatePlayerNum).orElse(null);
+        Player player =
+                mapBuildContext.getPlayerForPosition().apply(templatePlayerNum).orElse(null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(
-                    responseChannel, "Error: Could not find player for next tile placement position at " + nextGroup.get(0) + ".");
+                    responseChannel,
+                    "Error: Could not find player for next tile placement position at " + nextGroup.get(0) + ".");
             return;
         }
 
@@ -353,7 +364,8 @@ public class MantisMapBuildService {
         }
 
         String mulliganString = canMulligan
-                ? " You can mulligan to draw a different tile (used " + mulligansUsed + " of " + mapBuildContext.mulliganLimit() + ")."
+                ? " You can mulligan to draw a different tile (used " + mulligansUsed + " of "
+                        + mapBuildContext.mulliganLimit() + ")."
                 : mapBuildContext.mulliganLimit() > 0 ? " (No mulligans remaining.)" : "";
 
         FileUpload mapImage = MantisBuildImageGeneratorService.tryGenerateImage(
@@ -372,7 +384,8 @@ public class MantisMapBuildService {
             List<String> openPositions,
             boolean canMulligan,
             String mulliganString) {
-        MessageChannel responseChannel = event == null ? mapBuildContext.game().getMainGameChannel() : event.getMessageChannel();
+        MessageChannel responseChannel =
+                event == null ? mapBuildContext.game().getMainGameChannel() : event.getMessageChannel();
 
         if (nextTile == null) {
             MessageHelper.sendMessageToChannel(
@@ -385,7 +398,8 @@ public class MantisMapBuildService {
         // TODO: Handle option to block adjacent anomalies when alternatives exist
         List<Button> buttons = new ArrayList<>();
         for (String pos : openPositions) {
-            String buttonId = mapBuildContext.makeButtonId().apply(ACTION_PREFIX + "place_" + pos + "_" + nextTile.ItemId);
+            String buttonId =
+                    mapBuildContext.makeButtonId().apply(ACTION_PREFIX + "place_" + pos + "_" + nextTile.ItemId);
             buttons.add(Buttons.blue(buttonId, pos));
         }
         if (canMulligan) {
@@ -462,8 +476,7 @@ public class MantisMapBuildService {
             @Nullable GenericInteractionCreateEvent event,
             @NonNull MantisMapBuildContext mapBuildContext,
             @Nonnull Player player,
-            @Nonnull PlayerTiles playerRemainingTiles
-            ) {
+            @Nonnull PlayerTiles playerRemainingTiles) {
         MessageChannel responseChannel =
                 event == null ? player.getGame().getMainGameChannel() : event.getMessageChannel();
 
@@ -476,8 +489,9 @@ public class MantisMapBuildService {
             } else {
                 MessageHelper.sendMessageToChannel(
                         responseChannel,
-                        "Error: Previously drawn tile " + mapBuildContext.drawnTileId() + " is no longer available for player "
-                                + player.getRepresentation() + " to place next tile.");
+                        "Error: Previously drawn tile " + mapBuildContext.drawnTileId()
+                                + " is no longer available for player " + player.getRepresentation()
+                                + " to place next tile.");
                 return null;
             }
         }
@@ -506,7 +520,8 @@ public class MantisMapBuildService {
         return DraftItem.generate(category, selectedTileId);
     }
 
-    private Integer getPlayerNumberForTilePosition(@NonNull MapTemplateModel mapTemplateModel, @NonNull String position) {
+    private Integer getPlayerNumberForTilePosition(
+            @NonNull MapTemplateModel mapTemplateModel, @NonNull String position) {
         // Get the template tile at that position
         MapTemplateTile templateTile = mapTemplateModel.getTemplateTiles().stream()
                 .filter(t -> t.getPos().equals(position))
@@ -519,8 +534,7 @@ public class MantisMapBuildService {
         return templateTile.getPlayerNumber();
     }
 
-    private PlayerTiles getPlayerTilesWithTileId(
-            List<PlayerTiles> allPlayerTiles, String tileId) {
+    private PlayerTiles getPlayerTilesWithTileId(List<PlayerTiles> allPlayerTiles, String tileId) {
         for (PlayerTiles pt : allPlayerTiles) {
             if (pt.blueTileIds().contains(tileId) || pt.redTileIds().contains(tileId)) {
                 return pt;
@@ -645,9 +659,7 @@ public class MantisMapBuildService {
         return Integer.valueOf(emulatedTilePos.substring(0, emulatedTilePos.length() - 2));
     }
 
-    private void sendDiscardButtons(
-            MantisMapBuildContext mapBuildContext
-            ) {
+    private void sendDiscardButtons(MantisMapBuildContext mapBuildContext) {
         for (PlayerTiles prt : mapBuildContext.availablePlayerTiles()) {
             Player player = mapBuildContext.game().getPlayer(prt.playerUserId());
             if (player == null) {
@@ -657,7 +669,8 @@ public class MantisMapBuildService {
                 continue;
             }
 
-            int blueToDiscard = prt.blueTileIds().size() - mapBuildContext.mapTemplateModel().bluePerPlayer();
+            int blueToDiscard = prt.blueTileIds().size()
+                    - mapBuildContext.mapTemplateModel().bluePerPlayer();
             if (blueToDiscard > 0) {
                 sendDiscardButtons(
                         mapBuildContext,
@@ -668,7 +681,8 @@ public class MantisMapBuildService {
                         mapBuildContext.mapTemplateModel().bluePerPlayer());
             }
 
-            int redToDiscard = prt.redTileIds().size() - mapBuildContext.mapTemplateModel().redPerPlayer();
+            int redToDiscard =
+                    prt.redTileIds().size() - mapBuildContext.mapTemplateModel().redPerPlayer();
             if (redToDiscard > 0) {
                 sendDiscardButtons(
                         mapBuildContext,
