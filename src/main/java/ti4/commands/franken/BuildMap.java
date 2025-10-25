@@ -1,6 +1,8 @@
 package ti4.commands.franken;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
@@ -14,11 +16,13 @@ import ti4.model.MapTemplateModel;
 import ti4.service.draft.MantisMapBuildContext;
 import ti4.service.draft.MantisMapBuildService;
 import ti4.service.draft.PartialMapService;
+import ti4.service.franken.FrankenMapBuildContextHelper;
 
 class BuildMap extends GameStateSubcommand {
 
     public BuildMap() {
         super(Constants.FRANKEN_BUILD_MAP, "Send buttons to build map from drafted tiles", true, false);
+        addOption(OptionType.INTEGER, "mulligans", "Number of mulligans allowed (default: 1)", false);
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -96,8 +100,12 @@ class BuildMap extends GameStateSubcommand {
             }
         }
 
+        // Store mulligan limit
+        int mulligansAllowed = event.getOption("mulligans", 1, OptionMapping::getAsInt);
+        game.setStoredValue("frankenMapBuildMulliganLimit", Integer.toString(Math.max(0, mulligansAllowed)));
+
         // Send the buttons
-        MantisMapBuildContext mapBuildContext = MantisMapBuildContext.fromFranken(game);
+        MantisMapBuildContext mapBuildContext = FrankenMapBuildContextHelper.createContext(game);
         MantisMapBuildService.initializeMapBuilding(mapBuildContext);
     }
 }
