@@ -433,7 +433,26 @@ public class MantisMapBuildService {
                         }
                     });
         } else {
-            MessageHelper.sendFileUploadToChannel(fallbackChannel, mapImage);
+            // Clean up previous versions of the image
+            fallbackChannel.getHistory().retrievePast(20).queue(history -> {
+                for (Message msg : history) {
+                    if (!msg.getAuthor().getId().equals(JdaService.getBotId())) {
+                        continue;
+                    }
+                    if (msg.getAttachments().isEmpty()) {
+                        continue;
+                    }
+                    for (Attachment attachment : msg.getAttachments()) {
+                        if (attachment.getFileName().startsWith(IMAGE_UNIQUE_STRING) && attachment.isImage()) {
+                            msg.delete().queue();
+                            continue;
+                        }
+                    }
+                }
+
+                // Send new image
+                MessageHelper.sendFileUploadToChannel(fallbackChannel, mapImage);
+            });
         }
     }
 
