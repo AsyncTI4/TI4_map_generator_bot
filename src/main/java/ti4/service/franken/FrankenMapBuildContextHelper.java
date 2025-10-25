@@ -96,10 +96,10 @@ public class FrankenMapBuildContextHelper {
         if (discardedTilesStr != null && !discardedTilesStr.isEmpty()) {
             discardedTiles.addAll(Arrays.asList(discardedTilesStr.split(",")));
         }
-        String mulliganedTilesStr = game.getStoredValue(MULLIGANS_KEY);
-        List<String> mulliganedTiles = new ArrayList<>();
-        if (mulliganedTilesStr != null && !mulliganedTilesStr.isEmpty()) {
-            mulliganedTiles.addAll(Arrays.asList(mulliganedTilesStr.split(",")));
+        String mulligannedTilesStr = game.getStoredValue(MULLIGANS_KEY);
+        List<String> mulligannedTiles = new ArrayList<>();
+        if (mulligannedTilesStr != null && !mulligannedTilesStr.isEmpty()) {
+            mulligannedTiles.addAll(Arrays.asList(mulligannedTilesStr.split(",")));
         }
         for (Player player : game.getRealPlayers()) {
             if (player.getDraftHand() == null) {
@@ -112,7 +112,7 @@ public class FrankenMapBuildContextHelper {
             // Count how many of the mulliganned tiles are in this bag (one tile can be
             // mulliganned more than once)
             int mulligansUsed = 0;
-            for (String mulligannedTileId : mulliganedTiles) {
+            for (String mulligannedTileId : mulligannedTiles) {
                 boolean isInBag = tileItems.stream()
                         .filter(item -> item.ItemId.equals(mulligannedTileId))
                         .findFirst()
