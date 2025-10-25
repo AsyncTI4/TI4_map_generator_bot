@@ -16,6 +16,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
+import ti4.service.draft.DraftButtonService;
 import ti4.service.draft.MantisMapBuildContext;
 import ti4.service.draft.MantisMapBuildService;
 import ti4.service.franken.FrankenAbilityService;
@@ -167,6 +168,13 @@ class FrankenButtonHandler {
         BagDraft draft = game.getActiveBagDraft();
 
         if (!action.contains(":")) {
+            if (action.startsWith(MantisMapBuildService.ACTION_PREFIX)) {
+                MantisMapBuildContext mapBuildContext = MantisMapBuildContext.fromFranken(game);
+                String outcome = MantisMapBuildService.handleAction(event, mapBuildContext, action);
+                DraftButtonService.handleButtonResult(event, outcome);
+                return;
+            }
+
             switch (action) {
                 case "reset_queue" -> {
                     player.getCurrentDraftBag().Contents.addAll(player.getDraftQueue().Contents);
@@ -202,7 +210,7 @@ class FrankenButtonHandler {
                         MessageHelper.sendMessageToChannel(
                                 game.getActionsChannel(),
                                 game.getPing()
-                                        + " the draft stage of the FrankenDraft is complete. Please select your abilities from your drafted hands.");
+                                        + " the draft stage of the FrankenDraft is complete. Please select your abilities from your drafted hands. To do a mantis build, use `/franken build_map` before building your faction.");
                         FrankenDraftBagService.applyDraftBags(event, game);
                         return;
                     }
@@ -223,10 +231,6 @@ class FrankenButtonHandler {
                 case "show_bag" -> {
                     FrankenDraftBagService.showPlayerBag(game, player);
                     return;
-                }
-                case MantisMapBuildService.ACTION_PREFIX -> {
-                    MantisMapBuildContext mapBuildContext = MantisMapBuildContext.fromFranken(game);
-                    MantisMapBuildService.handleAction(event, mapBuildContext, action);
                 }
             }
         }

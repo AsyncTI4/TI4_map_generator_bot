@@ -18,7 +18,7 @@ import ti4.service.draft.PartialMapService;
 class BuildMap extends GameStateSubcommand {
 
     public BuildMap() {
-        super(Constants.FRANKEN_BUILD_MAP, "Send buttons to build map from drafted tiles", false, false);
+        super(Constants.FRANKEN_BUILD_MAP, "Send buttons to build map from drafted tiles", true, false);
     }
 
     public void execute(SlashCommandInteractionEvent event) {

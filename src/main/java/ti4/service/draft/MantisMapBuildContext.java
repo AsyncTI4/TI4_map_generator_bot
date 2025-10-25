@@ -221,11 +221,11 @@ public record MantisMapBuildContext(
                     game.setStoredValue("frankenMapBuildDiscards", discards);
                 },
                 playerNum -> {
-                    for (Player player : game.getPlayers().values()) {
-                        if (player.getCurrentDraftBag() == null) {
+                    for (Player player : game.getRealPlayers()) {
+                        if (player.getDraftHand() == null) {
                             continue;
                         }
-                        boolean hasSpeakerOrder = player.getCurrentDraftBag().Contents.stream()
+                        boolean hasSpeakerOrder = player.getDraftHand().Contents.stream()
                                 .filter(item -> item.ItemCategory == Category.DRAFTORDER)
                                 .filter(item -> item.ItemId.equals("" + playerNum))
                                 .findFirst()
@@ -239,10 +239,9 @@ public record MantisMapBuildContext(
                 getPlayerTileStateFranken(game),
                 () -> getPlayerTileStateFranken(game),
                 event -> {
-                    game.setStoredValue("frankenMapBuildTileId", null);
-                    game.setStoredValue("frankenMapBuildMulligans", null);
-                    game.setStoredValue("frankenMapBuildDiscards", null);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map build complete!");
+                    game.removeStoredValue("frankenMapBuildTileId");
+                    game.removeStoredValue("frankenMapBuildMulligans");
+                    game.removeStoredValue("frankenMapBuildDiscards");
                 });
     }
 
@@ -260,11 +259,11 @@ public record MantisMapBuildContext(
         if (mulliganedTilesStr != null && !mulliganedTilesStr.isEmpty()) {
             mulliganedTiles.addAll(Arrays.asList(mulliganedTilesStr.split(",")));
         }
-        for (Player player : game.getPlayers().values()) {
-            if (player.getCurrentDraftBag() == null) {
+        for (Player player : game.getRealPlayers()) {
+            if (player.getDraftHand() == null) {
                 continue;
             }
-            List<DraftItem> tileItems = player.getCurrentDraftBag().Contents.stream()
+            List<DraftItem> tileItems = player.getDraftHand().Contents.stream()
                     .filter(item -> item.ItemCategory == Category.BLUETILE || item.ItemCategory == Category.REDTILE)
                     .collect(Collectors.toList());
 

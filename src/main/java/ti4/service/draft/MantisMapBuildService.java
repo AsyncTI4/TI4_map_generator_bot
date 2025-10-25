@@ -286,10 +286,27 @@ public class MantisMapBuildService {
                 getGroupedPositions(mapBuildContext.game(), mapBuildContext.mapTemplateModel());
         List<String> nextGroup = getNextPositionGroup(mapBuildContext.game(), placementGroups);
 
+        // Check if the build is complete
         if (nextGroup == null || nextGroup.isEmpty()) {
             // All done!
             MessageHelper.sendMessageToChannel(responseChannel, "Map building complete!");
+            // Clean up the map build images
+            if (event != null) {
+                event.getMessageChannel().getHistory().retrievePast(50).queue(messageHistory -> {
+                    for (Message msg : messageHistory) {
+                        List<Attachment> attachments = msg.getAttachments();
+                        for (Attachment att : attachments) {
+                            if (att.getFileName().contains(IMAGE_UNIQUE_STRING)) {
+                                msg.delete().queue();
+                                break;
+                            }
+                        }
+                    }
+                });
+            }
+            // Update the main game map
             ButtonHelper.updateMap(mapBuildContext.game(), event, "Mantis Map Build Completed");
+            // Do any post-build work
             mapBuildContext.buildCompleteCallback().accept(event);
             return;
         }
@@ -481,15 +498,16 @@ public class MantisMapBuildService {
                 event == null ? player.getGame().getMainGameChannel() : event.getMessageChannel();
 
         // If there's already a drawn tile, use that one.
-        if (mapBuildContext.drawnTileId() != null) {
-            if (playerRemainingTiles.blueTileIds().contains(mapBuildContext.drawnTileId())) {
-                return DraftItem.generate(Category.BLUETILE, mapBuildContext.drawnTileId());
-            } else if (playerRemainingTiles.redTileIds().contains(mapBuildContext.drawnTileId())) {
-                return DraftItem.generate(Category.REDTILE, mapBuildContext.drawnTileId());
+        String drawnTileId = mapBuildContext.drawnTileId();
+        if (drawnTileId != null && !drawnTileId.isEmpty()) {
+            if (playerRemainingTiles.blueTileIds().contains(drawnTileId)) {
+                return DraftItem.generate(Category.BLUETILE, drawnTileId);
+            } else if (playerRemainingTiles.redTileIds().contains(drawnTileId)) {
+                return DraftItem.generate(Category.REDTILE, drawnTileId);
             } else {
                 MessageHelper.sendMessageToChannel(
                         responseChannel,
-                        "Error: Previously drawn tile " + mapBuildContext.drawnTileId()
+                        "Error: Previously drawn tile " + drawnTileId
                                 + " is no longer available for player " + player.getRepresentation()
                                 + " to place next tile.");
                 return null;
@@ -500,8 +518,9 @@ public class MantisMapBuildService {
         List<String> availableTileIDs = new ArrayList<>();
         availableTileIDs.addAll(playerRemainingTiles.blueTileIds());
         availableTileIDs.addAll(playerRemainingTiles.redTileIds());
-        if (mapBuildContext.mulliganedTileId() != null) {
-            availableTileIDs.remove(mapBuildContext.mulliganedTileId());
+        String mulliganedTileId = mapBuildContext.mulliganedTileId();
+        if (mulliganedTileId != null && !mulliganedTileId.isEmpty()) {
+            availableTileIDs.remove(mulliganedTileId);
         }
         if (availableTileIDs.isEmpty()) {
             MessageHelper.sendMessageToChannel(
