@@ -16,6 +16,7 @@ import ti4.service.draft.draftables.FactionDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
 import ti4.service.draft.orchestrators.PublicSnakeDraftOrchestrator;
+import ti4.service.rules.ThundersEdgeRulesService;
 
 @UtilityClass
 public class DraftSetupService {
@@ -135,6 +136,9 @@ public class DraftSetupService {
                     draftManager.tryStartDraft();
                     game.setPhaseOfGame("miltydraft");
                     GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
+                    if (game.isThundersEdge()) {
+                        ThundersEdgeRulesService.alertTabletalkWithRulesAtStartOfDraft(game);
+                    }
                 }
             });
         }

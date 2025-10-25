@@ -1,6 +1,6 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.Point;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -98,6 +98,10 @@ public class PositionMapper {
     }
 
     public static Point getScaledTilePosition(Game game, String position, int x, int y) {
+        return getScaledTilePosition(game, position, x, y, 0);
+    }
+
+    public static Point getScaledTilePosition(Game game, String position, int x, int y, int fractureYbump) {
         int ringCount = game.getRingCount();
         ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
         if (ringCount == RING_MIN_COUNT) {
@@ -110,15 +114,19 @@ public class PositionMapper {
                 y -= 150;
             } else if ("bl".equalsIgnoreCase(position)) {
                 y -= lower * SPACE_FOR_TILE_HEIGHT * 2 - 150;
+                y += fractureYbump;
             } else if ("tr".equalsIgnoreCase(position)) {
                 x -= lower * HORIZONTAL_TILE_SPACING * 2;
                 y -= 150;
+                y += fractureYbump;
             } else if ("br".equalsIgnoreCase(position)) {
                 x -= lower * HORIZONTAL_TILE_SPACING * 2;
                 y -= lower * SPACE_FOR_TILE_HEIGHT * 2 - 150;
+                y -= (fractureYbump - 300) / 2; // always 50
             } else {
                 x -= lower * HORIZONTAL_TILE_SPACING;
                 y -= lower * SPACE_FOR_TILE_HEIGHT;
+                y += fractureYbump;
             }
             return new Point(x, y);
         }

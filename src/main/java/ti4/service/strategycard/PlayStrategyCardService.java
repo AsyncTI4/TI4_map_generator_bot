@@ -189,7 +189,9 @@ public class PlayStrategyCardService {
 
         // set the action rows
         baseMessageObject.addComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons));
-        AutoPingMetadataManager.setupQuickPing(game.getName());
+        if (!game.isTwilightsFallMode() || (scToPlay != 6 && scToPlay != 2 && scToPlay != 7)) {
+            AutoPingMetadataManager.setupQuickPing(game.getName());
+        }
         sendAndHandleMessageResponse(baseMessageObject.build(), game, player, event, scToPlay, scModel, scButtons);
 
         // Trade Primary
@@ -798,34 +800,31 @@ public class PlayStrategyCardService {
     }
 
     private static List<Button> getTF2Buttons(int sc, Player player) {
-        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button start = Buttons.red(player.getFinsFactionCheckerPrefix() + "startSplice_2", "Start Splice");
         Button refreshButton = Buttons.green(player.getFinsFactionCheckerPrefix() + "diploRefresh2", "Ready 2 Planets");
         Button participate = Buttons.blue("participateInSplice_2", "Participate In Splice");
 
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
-        return List.of(followButton, start, refreshButton, participate, noFollowButton);
+        return List.of(start, refreshButton, participate, noFollowButton);
     }
 
     private static List<Button> getTF6Buttons(int sc, Player player) {
-        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button start = Buttons.red(player.getFinsFactionCheckerPrefix() + "startSplice_6", "Start Splice");
         Button refreshButton = Buttons.green(
                 player.getFinsFactionCheckerPrefix() + "primaryOfAnarchy7", "Resolve PRODUCTION in a system");
         Button participate = Buttons.blue("participateInSplice_6", "Participate In Splice");
 
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
-        return List.of(followButton, start, refreshButton, participate, noFollowButton);
+        return List.of(start, refreshButton, participate, noFollowButton);
     }
 
     private static List<Button> getTF7Buttons(int sc, Player player) {
-        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button start = Buttons.red(player.getFinsFactionCheckerPrefix() + "startSplice_7", "Start Splice");
         Button refreshButton = Buttons.green(
                 player.getFinsFactionCheckerPrefix() + "addMagusSpliceCard", "Spend 3R and 3I to Add a Splice Card");
         Button participate = Buttons.blue("participateInSplice_7", "Participate In Splice");
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
-        return List.of(followButton, start, refreshButton, participate, noFollowButton);
+        return List.of(start, refreshButton, participate, noFollowButton);
     }
 
     private static List<Button> getAnarchy2Buttons(int sc) {

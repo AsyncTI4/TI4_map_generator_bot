@@ -83,6 +83,7 @@ public class ListTechService {
                     msg += "\n> Reduced Strategy CCs by 1 (" + player.getStrategicCC();
                     player.setStrategicCC(player.getStrategicCC() - 1);
                     msg += "->" + player.getStrategicCC() + ")";
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
                 }
                 player.addTech(tech);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
