@@ -13,6 +13,10 @@ class UnitModelTest extends BaseTi4Test {
     void testUnitModels() {
         for (UnitModel unitModel : Mapper.getUnits().values()) {
             assertTrue(
+                    validateFaction(unitModel),
+                    unitModel.getAlias() + ": invalid Faction: "
+                            + unitModel.getFaction().orElse(null));
+            assertTrue(
                     validateBaseType(unitModel),
                     unitModel.getAlias() + ": invalid BaseType: " + unitModel.getBaseType());
             assertTrue(
@@ -34,6 +38,15 @@ class UnitModelTest extends BaseTi4Test {
             assertTrue(
                     validateAsyncID(unitModel), unitModel.getAlias() + ": invalid asyncID: " + unitModel.getAsyncId());
         }
+    }
+
+    private static boolean validateFaction(UnitModel unitModel) {
+        if (unitModel.getFaction().isEmpty()) return true;
+        if (Mapper.isValidFaction(unitModel.getFaction().get())) return true;
+        System.out.println("[TEST FAILURE] Unit **" + unitModel.getId()
+                + "** failed validation due to invalid Faction ID: `"
+                + unitModel.getFaction().get() + "`");
+        return false;
     }
 
     private static boolean validateBaseType(UnitModel unitModel) {

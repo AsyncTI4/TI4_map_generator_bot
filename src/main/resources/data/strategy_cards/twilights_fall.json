@@ -6,6 +6,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tf1",
+        "colourHexCode": "#FFFFFF",
         "botSCAutomationID": "pok1leadership",
         "source": "twilights_fall"
     },
@@ -16,6 +17,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tf2",
+        "colourHexCode": "#FFFFFF",
         "source": "twilights_fall"
     },
     {
@@ -25,6 +27,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tf3",
+        "colourHexCode": "#FFFFFF",
         "botSCAutomationID": "pok3politics",
         "source": "twilights_fall"
     },
@@ -35,6 +38,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tf4",
+        "colourHexCode": "#FFFFFF",
         "botSCAutomationID": "te4construction",
         "source": "twilights_fall"
     },
@@ -45,6 +49,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tf5",
+        "colourHexCode": "#FFFFFF",
         "botSCAutomationID": "pok5trade",
         "source": "twilights_fall"
     },
@@ -55,6 +60,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tf6",
+        "colourHexCode": "#FFFFFF",
         "source": "twilights_fall"
     },
     {
@@ -64,6 +70,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tf7",
+        "colourHexCode": "#FFFFFF",
         "source": "twilights_fall"
     },
     {
@@ -73,6 +80,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tf8",
+        "colourHexCode": "#FFFFFF",
         "source": "twilights_fall"
     }
 ]
