@@ -1329,6 +1329,40 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveLocust", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
+            if ("tf-create".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveCreate", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-scarab".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveScarab", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-irradiate".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveIrradiate", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("tf-lash".equals(automationID)) {
+                MessageHelper.sendMessageToChannel(
+                        channel2,
+                        introMsg
+                                + "\nJust tell the opponent what unit to destroy. They can use the assign hits button to do so.");
+            }
+
+            if ("tf-magnificence".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveMagnificence", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("tf-genophage".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveGenophage", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-transpose1".equals(automationID) || "tf-transpose2".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveTranspose", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
             if ("tf-reflect".equals(automationID)) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "convertComms_1_stay",
@@ -1452,11 +1486,13 @@ public class ActionCardHelper {
                 }
                 if ("hack".equals(automationID)) {
                     game.setHasHackElectionBeenPlayed(true);
+                    game.setStoredValue("hackElectionFaction", player.getFaction());
                     Button resetHack = Buttons.red("hack_election", "Set the Voting Order as Normal");
                     List<Button> hackButtons = List.of(resetHack);
                     MessageHelper.sendMessageToChannelWithFactionReact(
                             mainGameChannel,
-                            "Voting order has been reversed." + " Please hit this button if _Hack Election_ is Sabo'd.",
+                            "The player who played hack election will now vote last."
+                                    + " Please hit this button if _Hack Election_ is Sabo'd.",
                             game,
                             player,
                             hackButtons);

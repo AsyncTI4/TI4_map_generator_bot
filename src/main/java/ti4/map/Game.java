@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -3886,6 +3886,14 @@ public class Game extends GameProperties {
     @JsonIgnore
     public List<Player> getRealPlayers() {
         return players.values().stream().filter(Player::isRealPlayer).toList();
+    }
+
+    @JsonIgnore
+    public List<Player> getRealPlayersExcludingThis(Player p) {
+        return players.values().stream()
+                .filter(Player::isRealPlayer)
+                .filter(p1 -> p1 != p)
+                .toList();
     }
 
     @JsonIgnore
