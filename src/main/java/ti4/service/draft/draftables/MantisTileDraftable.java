@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.draft.DraftItem;
 import ti4.draft.DraftItem.Category;
@@ -36,6 +37,7 @@ import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftTileManager;
 import ti4.service.draft.Draftable;
 import ti4.service.draft.DraftableType;
+import ti4.service.draft.MantisMapBuildContext;
 import ti4.service.draft.MantisMapBuildService;
 import ti4.service.draft.PlayerDraftState;
 import ti4.service.draft.PlayerSetupService.PlayerSetupState;
@@ -164,9 +166,17 @@ public class MantisTileDraftable extends Draftable {
             representation = tileID;
         }
         TI4Emoji emoji = TileEmojis.getTileEmojiFromTileID(tileID);
-        Button button =
-                Button.secondary(makeButtonId(choiceKey), representation).withEmoji(emoji.asEmoji());
-        return new DraftChoice(TYPE, choiceKey, button, tile.getLongDescription(), representation, emoji.emojiString());
+        Button button = Button.secondary(makeButtonId(choiceKey), representation);
+        if (emoji != null) {
+            button = button.withEmoji(emoji.asEmoji());
+        }
+        return new DraftChoice(
+                TYPE,
+                choiceKey,
+                button,
+                tile.getLongDescription(),
+                representation,
+                emoji != null ? emoji.emojiString() : null);
     }
 
     @Override
@@ -178,7 +188,8 @@ public class MantisTileDraftable extends Draftable {
         }
 
         if (commandKey.startsWith(MantisMapBuildService.ACTION_PREFIX)) {
-            return MantisMapBuildService.handleAction(event, draftManager, commandKey);
+            MantisMapBuildContext mapBuildContext = MantisMapBuildContext.from(draftManager, this);
+            return MantisMapBuildService.handleAction(event, mapBuildContext, commandKey);
         }
 
         return "Unknown command: " + commandKey;
@@ -262,19 +273,19 @@ public class MantisTileDraftable extends Draftable {
             summary.append(String.join(", ", pickNames));
         }
 
-        if (player.getCardsInfoThread() == null) {
+        ThreadChannel cardsInfoChannel = player.getCardsInfoThread();
+        if (cardsInfoChannel == null) {
             return; // Not sure this needs to be logged anywhere
         }
 
-        player.getCardsInfoThread().getHistory().retrievePast(10).queue(messages -> {
+        cardsInfoChannel.getHistory().retrievePast(10).queue(messages -> {
             messages.stream()
                     .filter(msg -> !msg.isUsingComponentsV2())
                     .filter(msg -> msg.getContentRaw().startsWith("You picked the tiles: "))
                     .findFirst()
-                    .ifPresentOrElse(
-                            msg -> msg.editMessage(summary.toString()).queue(), () -> player.getCardsInfoThread()
-                                    .sendMessage(summary.toString())
-                                    .queue());
+                    .ifPresentOrElse(msg -> msg.editMessage(summary.toString()).queue(), () -> cardsInfoChannel
+                            .sendMessage(summary.toString())
+                            .queue());
         });
     }
 
@@ -602,7 +613,8 @@ public class MantisTileDraftable extends Draftable {
         discardedTileIDs.clear();
         mulliganTileIDs.clear();
         drawnTileId = null;
-        MantisMapBuildService.initializeMapBuilding(draftManager);
+        MantisMapBuildContext mapBuildContext = MantisMapBuildContext.from(draftManager, this);
+        MantisMapBuildService.initializeMapBuilding(mapBuildContext);
     }
 
     @Override

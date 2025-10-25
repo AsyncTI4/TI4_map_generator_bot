@@ -3,6 +3,7 @@ package ti4.image;
 public enum TileStep {
     Setup,
     Tile,
+    TileUnannotated,
     Extras,
     Units,
     Distance,

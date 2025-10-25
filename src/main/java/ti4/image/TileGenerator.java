@@ -294,7 +294,7 @@ public class TileGenerator {
 
         switch (step) {
             case Setup -> {} // do nothing
-            case Tile -> {
+            case Tile, TileUnannotated -> {
                 BufferedImage image;
                 if (CustomHyperlaneService.isCustomHyperlaneTile(tile)) {
                     image = HyperlaneTileGenerator.generateHyperlaneTile(tile, game);
@@ -320,6 +320,11 @@ public class TileGenerator {
                         default:
                             tileGraphics.drawImage(anomalyImage, TILE_PADDING, TILE_PADDING, null);
                     }
+                }
+
+                // We've drawn the basic tile; that's all that's needed for some of these
+                if (step == TileStep.TileUnannotated) {
+                    break;
                 }
 
                 // ADD HEX BORDERS FOR CONTROL
