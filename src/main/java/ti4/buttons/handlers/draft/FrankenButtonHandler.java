@@ -23,6 +23,7 @@ import ti4.service.franken.FrankenAbilityService;
 import ti4.service.franken.FrankenDraftBagService;
 import ti4.service.franken.FrankenFactionTechService;
 import ti4.service.franken.FrankenLeaderService;
+import ti4.service.franken.FrankenMapBuildContextHelper;
 import ti4.service.franken.FrankenPromissoryService;
 import ti4.service.franken.FrankenUnitService;
 import ti4.service.player.PlayerStatsService;
@@ -169,7 +170,7 @@ class FrankenButtonHandler {
 
         if (!action.contains(":")) {
             if (action.startsWith(MantisMapBuildService.ACTION_PREFIX)) {
-                MantisMapBuildContext mapBuildContext = MantisMapBuildContext.fromFranken(game);
+                MantisMapBuildContext mapBuildContext = FrankenMapBuildContextHelper.createContext(game);
                 String outcome = MantisMapBuildService.handleAction(event, mapBuildContext, action);
                 DraftButtonService.handleButtonResult(event, outcome);
                 return;

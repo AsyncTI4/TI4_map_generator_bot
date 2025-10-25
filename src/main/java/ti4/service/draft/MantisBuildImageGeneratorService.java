@@ -28,8 +28,8 @@ public class MantisBuildImageGeneratorService {
     private static final int RING_MAX_COUNT = 8;
     private static final int RING_MIN_COUNT = 3;
     private static final int TILE_PADDING = 100;
-    private static final int EXTRA_X = 0; // padding at left/right of map
-    private static final int EXTRA_Y = 0; // padding at top/bottom of map
+    private static final int EXTRA_X = 50; // padding at left/right of map
+    private static final int EXTRA_Y = 150; // padding at top/bottom of map
     private static final int SPACE_FOR_TILE_HEIGHT = 300; // space to calculate tile image height with
     private static final BasicStroke outlineStroke = new BasicStroke(12.0f);
 
