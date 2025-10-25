@@ -7,12 +7,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nonnull;
-
-import org.apache.commons.lang3.math.NumberUtils;
-
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.math.NumberUtils;
 import ti4.draft.DraftItem;
 import ti4.draft.DraftItem.Category;
 import ti4.image.Mapper;
@@ -92,8 +89,8 @@ public class FrankenMapBuildContextHelper {
 
     private static List<PlayerTiles> getPlayerTileStateFranken(Game game) {
         List<PlayerTiles> result = new ArrayList<>();
-        Set<String> placedTiles = game.getTileMap().values().stream().map(t -> t.getTileID())
-                .collect(Collectors.toSet());
+        Set<String> placedTiles =
+                game.getTileMap().values().stream().map(t -> t.getTileID()).collect(Collectors.toSet());
         String discardedTilesStr = game.getStoredValue(DISCARDS_KEY);
         Set<String> discardedTiles = new HashSet<>();
         if (discardedTilesStr != null && !discardedTilesStr.isEmpty()) {
