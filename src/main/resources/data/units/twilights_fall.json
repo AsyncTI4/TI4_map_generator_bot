@@ -601,7 +601,7 @@
         "asyncId": "mf",
         "name": "The Sharpened Edge",
         "source": "twilights_fall",
-        "faction": "redtf_",
+        "faction": "redtf",
         "capacityUsed": 1,
         "cost": 2,
         "combatHitsOn": 6,

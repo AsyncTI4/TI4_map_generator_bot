@@ -638,6 +638,10 @@ public class Helper {
         return (year2 - year1) * 365 + (month2 - month1) * 30 + (day2 - day1);
     }
 
+    /**
+     * @deprecated - Use {@link  Game#getSCEmojiWordRepresentation()} instead
+     */
+    @Deprecated
     public static String getSCAsMention(int sc, Game game) {
         if (game.isHomebrewSCMode()) {
             return getSCName(sc, game);
@@ -655,11 +659,19 @@ public class Helper {
         };
     }
 
+    /**
+     * @deprecated - Use {@link Game#getSCEmojiWordRepresentation()} instead
+     */
+    @Deprecated
     public static String getSCRepresentation(Game game, int sc) {
         if (game.isHomebrewSCMode()) return "SC #" + sc + " " + getSCName(sc, game);
         return getSCAsMention(sc, game);
     }
 
+    /**
+     * @deprecated - Use {@link Game#getSCName()} instead
+     */
+    @Deprecated
     public static String getSCName(int sc, Game game) {
         if (Optional.ofNullable(game.getScSetID()).isPresent() && !"null".equals(game.getScSetID())) {
             return game.getStrategyCardSet().getSCName(sc);
