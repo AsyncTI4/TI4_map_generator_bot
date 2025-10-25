@@ -42,7 +42,7 @@ public record MantisMapBuildContext(
             @Nonnull Consumer<GenericInteractionCreateEvent> buildCompleteCallback
     ) {
 
-        public MantisMapBuildContext withMulligan() {
+        public MantisMapBuildContext afterMulligan() {
             return new MantisMapBuildContext(
                     game,
                     mapTemplateModel,
@@ -60,13 +60,32 @@ public record MantisMapBuildContext(
             );
         }
 
-        public MantisMapBuildContext regeneratePlayerTiles() {
+        public MantisMapBuildContext withRegeneratedPlayerTiles() {
             return new MantisMapBuildContext(
                     game,
                     mapTemplateModel,
                     mulliganLimit,
                     makeButtonId,
                     drawnTileId,
+                    mulliganedTileId,
+                    persistDrawnTile,
+                    persistMulligan,
+                    persistDiscard,
+                    getPlayerForPosition,
+                    getAvailableTiles.get(),
+                    getAvailableTiles,
+                    buildCompleteCallback
+            );
+        }
+
+        public MantisMapBuildContext afterTilePlaced() {
+            persistDrawnTile().accept(null);
+            return new MantisMapBuildContext(
+                    game,
+                    mapTemplateModel,
+                    mulliganLimit,
+                    makeButtonId,
+                    null,
                     mulliganedTileId,
                     persistDrawnTile,
                     persistMulligan,

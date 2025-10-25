@@ -99,6 +99,9 @@ public class MantisMapBuildService {
             return "Error: Unable to place tile " + tileId + " at " + position + ".";
         }
 
+        // Persist 'null' for drawn tile and clear it from the context
+        mapBuildContext = mapBuildContext.afterTilePlaced();
+
         // Post the pick
         MessageHelper.sendMessageToChannel(
                 mapBuildContext.game().getMainGameChannel(),
@@ -122,7 +125,7 @@ public class MantisMapBuildService {
         // Persist the mulligan to our parent state
         mapBuildContext.persistMulligan().accept(tileId);
         // Get a new context object with the mulligan set, and drawn tile cleared
-        MantisMapBuildContext updatedContext = mapBuildContext.withMulligan();
+        MantisMapBuildContext updatedContext = mapBuildContext.afterMulligan();
         PlayerTiles playerTiles = getPlayerTilesWithTileId(
                 mapBuildContext.availablePlayerTiles(), tileId);
         Player player = mapBuildContext.game().getPlayer(playerTiles.playerUserId());
@@ -169,7 +172,7 @@ public class MantisMapBuildService {
         mapBuildContext.persistDiscard().accept(tileId);
 
         // Update check for needed discards
-        mapBuildContext = mapBuildContext.regeneratePlayerTiles();
+        mapBuildContext = mapBuildContext.withRegeneratedPlayerTiles();
         boolean anyNeedToDiscard = anyNeedsToDiscard(mapBuildContext.availablePlayerTiles(), mapBuildContext.mapTemplateModel());
         PlayerTiles playerRemainingTiles = mapBuildContext.availablePlayerTiles().stream()
                 .filter(pr -> pr.playerUserId().equals(playerTiles.playerUserId()))
@@ -261,7 +264,6 @@ public class MantisMapBuildService {
         }
 
         mapBuildContext.game().setTile(new Tile(tileId, position));
-        mapBuildContext.persistDrawnTile().accept(null);
         return true;
     }
 
@@ -343,7 +345,7 @@ public class MantisMapBuildService {
                             + " (automatically; no alternatives).");
 
             // Regenerate possible tiles
-            mapBuildContext = mapBuildContext.regeneratePlayerTiles();
+            mapBuildContext = mapBuildContext.withRegeneratedPlayerTiles();
 
             // Recursively do this update until we encounter a decision or finish
             updateMapBuild(event, mapBuildContext);
@@ -405,7 +407,7 @@ public class MantisMapBuildService {
             // Attempt replace
             buttonEvent
                     .getChannel()
-                    .getHistoryAround(buttonEvent.getMessage(), 20)
+                    .getHistoryAround(buttonEvent.getMessage(), 50)
                     .queue(history -> {
                         boolean replaced = false;
                         for (Message msg : history.getRetrievedHistory()) {
@@ -434,7 +436,7 @@ public class MantisMapBuildService {
                     });
         } else {
             // Clean up previous versions of the image
-            fallbackChannel.getHistory().retrievePast(20).queue(history -> {
+            fallbackChannel.getHistory().retrievePast(50).queue(history -> {
                 for (Message msg : history) {
                     if (!msg.getAuthor().getId().equals(JdaService.getBotId())) {
                         continue;
