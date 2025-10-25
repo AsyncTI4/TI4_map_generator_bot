@@ -639,7 +639,7 @@ public class Helper {
     }
 
     /**
-     * @deprecated - Use {@link StrategyCardModel#getEmojiWordRepresentation()} instead
+     * @deprecated - Use {@link  Game#getSCEmojiWordRepresentation()} instead
      */
     @Deprecated
     public static String getSCAsMention(int sc, Game game) {
@@ -660,7 +660,7 @@ public class Helper {
     }
 
     /**
-     * @deprecated - Use {@link StrategyCardModel#getEmojiWordRepresentation()} instead
+     * @deprecated - Use {@link Game#getSCEmojiWordRepresentation()} instead
      */
     @Deprecated
     public static String getSCRepresentation(Game game, int sc) {
@@ -669,7 +669,7 @@ public class Helper {
     }
 
     /**
-     * @deprecated - Use {@link StrategyCardModel#getName()} instead
+     * @deprecated - Use {@link Game#getSCName()} instead
      */
     @Deprecated
     public static String getSCName(int sc, Game game) {

@@ -4307,9 +4307,23 @@ public class Game extends GameProperties {
         return getStrategyCardSet().getStrategyCardModelByName(name);
     }
 
+    public String getSCName(int scInitiative) {
+        if (getStrategyCardModelByInitiative(scInitiative).isPresent()) {
+            return getStrategyCardModelByInitiative(scInitiative).get().getName();
+        }
+        return "SC#" + scInitiative;
+    }
+
+    public String getSCEmojiWordRepresentation(int scInitiative) {
+        if (getStrategyCardModelByInitiative(scInitiative).isPresent()) {
+            return getStrategyCardModelByInitiative(scInitiative).get().getEmojiWordRepresentation();
+        }
+        return "SC#" + scInitiative;
+    }
+
     /**
      * @param scID
-     * @return true when the Game's SC Set contains a strategt card which uses a certain automation
+     * @return true when the Game's SC Set contains a strategy card which uses a certain automation
      */
     public boolean usesStrategyCardAutomation(String scID) {
         return getStrategyCardSet().getStrategyCardModels().stream()
