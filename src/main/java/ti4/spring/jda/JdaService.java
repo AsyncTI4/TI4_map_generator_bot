@@ -213,6 +213,12 @@ public class JdaService {
             guildNonary = initGuild(args[13], true);
         }
 
+        // Async: FOW Chapter Secondary
+        if (args.length >= 18) {
+           guildFogOfWarSecondary = initGuild(args[17], false);
+           fowServers.add(guildFogOfWarSecondary);
+        }
+
         // Async: 10th Server
         if (args.length >= 15) {
             guildDecenary = initGuild(args[14], true);
@@ -226,12 +232,6 @@ public class JdaService {
         if (args.length >= 17) {
             guildDuodenary = initGuild(args[16], true);
         }
-
-        // Async: FOW Chapter Secondary
-        // if (args.length >= 18) {
-        //    guildFogOfWarSecondary = initGuild(args[17], false);
-        //    fowServers.add(guildFogOfWarSecondary);
-        // }
 
         if (guildPrimary == null || guilds.isEmpty()) {
             BotLogger.info("Failed to start the bot on the primary guild. Aborting.");
