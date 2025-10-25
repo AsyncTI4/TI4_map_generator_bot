@@ -97,7 +97,7 @@
         "title": "The Invincible",
         "abilityName": "Titles Are Silly",
         "abilityWindow": "ACTION:",
-        "abilityText": "Gain 1 trade good for each damaged unit on the game board owned by another player. Then, repair all of your damaged units and choose any number of other players. For each chosen player, repair all of their damaged units that are in or adjacent to a system that contains 1 of your space docks. Then, purge this card.",
+        "abilityText": "ACTION: Gain 1 trade good for each damaged unit on the game board. Then, repair all of your damaged units and choose any number of other players. For each chosen player, repair all of their damaged units that are in or adjacent to a system that contains 1 of your space docks.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "balacasi"
     },
@@ -221,7 +221,7 @@
         "name": "Chrono-Tactician Xelthar",
         "title": "The Judicial",
         "abilityWindow": "ACTION:",
-        "abilityText": "Spend 1 token from your strategy pool to place 1 mech on a planet you control.",
+        "abilityText": "Spend 1 token from your strategy pool to place 1 mech on a planet you control. When a public objective is revealed, you may place 1 infantry on a planet you control.",
         "unlockCondition": "Have 5 infantry that are not in or adjacent to your home system",
         "source": "balacasi"
     },

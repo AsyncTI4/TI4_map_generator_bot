@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -19,7 +18,6 @@ import ti4.model.BreakthroughModel;
 import ti4.service.breakthrough.StellarGenesisService;
 import ti4.service.emoji.DiceEmojis;
 import ti4.service.emoji.MiscEmojis;
-import ti4.service.map.FractureService;
 
 public class BreakthroughCommandHelper {
 
@@ -88,12 +86,13 @@ public class BreakthroughCommandHelper {
     }
 
     public static void serveRollFractureButtons(Game game, Player player) {
-        Button rollFracture = Buttons.green(player.getFinsFactionCheckerPrefix() + "rollFracture", "Roll for the fracture", MiscEmojis.RollDice);
+        Button rollFracture = Buttons.green(
+                player.getFinsFactionCheckerPrefix() + "rollFracture", "Roll for the fracture", MiscEmojis.RollDice);
         String message = "It looks like the fracture isn't in play yet. Use the button to roll for the fracture!";
-        message += "\n> If you roll a [" + DiceEmojis.d10blue_1 + "] or [" + DiceEmojis.d10blue_0 + "], the fracture will appear.";
+        message += "\n> If you roll a [" + DiceEmojis.d10blue_1 + "] or [" + DiceEmojis.d10blue_0
+                + "], the fracture will appear.";
         MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, rollFracture);
     }
-
 
     public static void lockBreakthrough(Player player) {
         withBreakthrough(player, bt -> {

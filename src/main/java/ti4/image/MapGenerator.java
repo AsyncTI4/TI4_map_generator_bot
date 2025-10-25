@@ -168,7 +168,6 @@ public class MapGenerator implements AutoCloseable {
             mapHeight += fractureYbump;
         }
 
-
         // Width of map section
         mapWidth = Math.max(MINIMUM_WIDTH_OF_PLAYER_AREA, getMapWidth(game));
 

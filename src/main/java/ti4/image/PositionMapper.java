@@ -15,11 +15,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
-
 import org.apache.commons.lang3.SerializationUtils;
-
 import ti4.ResourceHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -100,9 +97,9 @@ public class PositionMapper {
         return positions;
     }
 
-     public static Point getScaledTilePosition(Game game, String position, int x, int y) {
+    public static Point getScaledTilePosition(Game game, String position, int x, int y) {
         return getScaledTilePosition(game, position, x, y, 0);
-     }
+    }
 
     public static Point getScaledTilePosition(Game game, String position, int x, int y, int fractureYbump) {
         int ringCount = game.getRingCount();

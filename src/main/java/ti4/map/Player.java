@@ -2147,7 +2147,6 @@ public class Player extends PlayerProperties {
             FractureService.spawnIngressTokens(null, game, this, false);
         }
 
-
         // Update Owned Units when Researching a Unit Upgrade
         TechnologyModel techModel = Mapper.getTech(techID);
         if (techID == null) return;

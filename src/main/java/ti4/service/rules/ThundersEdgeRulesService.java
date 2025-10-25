@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -22,23 +21,21 @@ public class ThundersEdgeRulesService {
 
     private static List<MessageEmbed> getRuleEmbeds(String... rules) {
         return Arrays.asList(rules).stream()
-            .map(Mapper::getRule).filter(Objects::nonNull)
-            .map(RuleModel::getRepresentationEmbed).filter(Objects::nonNull)
-            .toList();
+                .map(Mapper::getRule)
+                .filter(Objects::nonNull)
+                .map(RuleModel::getRepresentationEmbed)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     public static List<MessageEmbed> startOfDraftRules(Game game) {
         List<MessageEmbed> relevantRules = new ArrayList<>();
-        relevantRules.addAll(getRuleEmbeds(
-            "expeditions",
-            "breakthroughAndSynergy",
-            "coexist"));
+        relevantRules.addAll(getRuleEmbeds("expeditions", "breakthroughAndSynergy", "coexist"));
 
         Set<String> extraRules = new HashSet<>();
         for (var slice : game.getMiltyDraftManager().getSlices()) {
             for (var tile : slice.getTiles()) {
-                if (tile.getTile().isScar())
-                    extraRules.add("entropicScar");
+                if (tile.getTile().isScar()) extraRules.add("entropicScar");
                 for (var planet : tile.getTile().getPlanetUnitHolders()) {
                     if (planet.isSpaceStation()) extraRules.add("spaceStations");
                     if (planet.getPlanetTypes().size() > 1) extraRules.add("dualTraitsSkips");
@@ -46,8 +43,7 @@ public class ThundersEdgeRulesService {
                 }
             }
         }
-        for (String rule : extraRules)
-            relevantRules.addAll(getRuleEmbeds(rule));
+        for (String rule : extraRules) relevantRules.addAll(getRuleEmbeds(rule));
         return relevantRules;
     }
 
@@ -57,7 +53,8 @@ public class ThundersEdgeRulesService {
 
     public static void alertTabletalkWithRulesAtStartOfDraft(Game game) {
         String msg = "Hello " + game.getPing() + "!\n";
-        msg += "It looks like you are playing with Thunder's Edge. Since it's brand new, you might like some of the rules posted here for your convenience:";
+        msg +=
+                "It looks like you are playing with Thunder's Edge. Since it's brand new, you might like some of the rules posted here for your convenience:";
         if (game.getTableTalkChannel() != null) {
             List<MessageEmbed> embeds = startOfDraftRules(game);
             MessageHelper.sendMessageToChannelWithEmbeds(game.getTableTalkChannel(), msg, embeds);
@@ -66,11 +63,11 @@ public class ThundersEdgeRulesService {
 
     public static void alertTabletalkWithFractureRules(Game game) {
         String msg = "Hello " + game.getPing() + "!\n";
-        msg += "It looks like The Fracture has spawned, and since it's a new feature you might like some of the rules posted here for your convenience:";
+        msg +=
+                "It looks like The Fracture has spawned, and since it's a new feature you might like some of the rules posted here for your convenience:";
         if (game.getTableTalkChannel() != null) {
             List<MessageEmbed> fractureEmbeds = fractureSpawnedRuleEmbeds();
             MessageHelper.sendMessageToChannelWithEmbeds(game.getTableTalkChannel(), msg, fractureEmbeds);
         }
     }
-
 }

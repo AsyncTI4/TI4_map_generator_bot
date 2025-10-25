@@ -2,7 +2,6 @@ package ti4.service.breakthrough;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
@@ -18,8 +17,10 @@ public class AlRaithService {
 
     // Cabal Breakthrough
     public static void serveBeginCabalBreakthroughButtons(ButtonInteractionEvent event, Game game, Player player) {
-        Button startCabalBreakthrough = Buttons.red(player.finChecker() + "beginCabalBreakthroughMove", "Move Ingress Tokens");
-        String message = "After you finish setting the ingress tokens on the map, click this button to move up to 3 of them into systems that contain gravity rifts.";
+        Button startCabalBreakthrough =
+                Buttons.red(player.finChecker() + "beginCabalBreakthroughMove", "Move Ingress Tokens");
+        String message =
+                "After you finish setting the ingress tokens on the map, click this button to move up to 3 of them into systems that contain gravity rifts.";
         MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, startCabalBreakthrough);
     }
 
@@ -34,16 +35,18 @@ public class AlRaithService {
         int totalIngress = tilesWithIngress.size();
 
         // Send notice
-        String notice = player.getRepresentation() + " you can move up to 3 ingress tokens into systems that contain gravity rifts.";
+        String notice = player.getRepresentation()
+                + " you can move up to 3 ingress tokens into systems that contain gravity rifts.";
         if (totalIngress < 3) {
-            notice = player.getRepresentation() + " Only " + totalIngress + " ingress tokens spawned. You can move any of those ingress tokens into systems that contain gravity rifts.";
+            notice = player.getRepresentation() + " Only " + totalIngress
+                    + " ingress tokens spawned. You can move any of those ingress tokens into systems that contain gravity rifts.";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), notice);
         ButtonHelper.deleteMessage(event);
 
-        //List<Button> buttons = new ArrayList<>();
-        //for (int i = 0; i < Math.min(3, totalIngress); i++) {
+        // List<Button> buttons = new ArrayList<>();
+        // for (int i = 0; i < Math.min(3, totalIngress); i++) {
 
-        //}
+        // }
     }
 }

@@ -2650,6 +2650,12 @@ public class AgendaHelper {
                 orderList.add(orderList.indexOf(speaker.get()) + 1, rhodun);
             }
         }
+        if (game.isHasHackElectionBeenPlayed()
+                && !game.getStoredValue("hackElectionFaction").isEmpty()) {
+            Player hacker = game.getPlayerFromColorOrFaction(game.getStoredValue("hackElectionFaction"));
+            orderList.remove(hacker);
+            orderList.add(hacker);
+        }
 
         // Check if Player has Edyn Mandate faction tech - if it is, put it at the end of the vote list.
         Optional<Player> edynPlayer = orderList.stream()
@@ -4049,6 +4055,7 @@ public class AgendaHelper {
         game.setStoredValue("Abstain On Agenda", "");
         game.resetCurrentAgendaVotes();
         game.setHasHackElectionBeenPlayed(false);
+        game.removeStoredValue("hackElectionFaction");
         game.setPlayersWhoHitPersistentNoAfter("");
         game.setPlayersWhoHitPersistentNoWhen("");
         game.setLatestOutcomeVotedFor("");
@@ -4692,6 +4699,7 @@ public class AgendaHelper {
     @ButtonHandler("hack_election")
     public static void hackElection(ButtonInteractionEvent event, Game game) {
         game.setHasHackElectionBeenPlayed(false);
+        game.removeStoredValue("hackElectionFaction");
         MessageHelper.sendMessageToChannel(event.getChannel(), "Set Order Back To Normal");
         ButtonHelper.deleteMessage(event);
     }

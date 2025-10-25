@@ -139,7 +139,6 @@ public class DraftSetupService {
                     if (game.isThundersEdge()) {
                         ThundersEdgeRulesService.alertTabletalkWithRulesAtStartOfDraft(game);
                     }
-
                 }
             });
         }

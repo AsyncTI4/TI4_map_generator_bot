@@ -4520,8 +4520,7 @@ public class ButtonHelper {
             ringButtons.add(ringX);
         }
         String cornerStr = "Corners";
-        if (game.getTileByPosition("frac1") != null)
-            cornerStr += " & Fracture";
+        if (game.getTileByPosition("frac1") != null) cornerStr += " & Fracture";
         Button corners = Buttons.green(finChecker + "ring_corners", cornerStr);
         ringButtons.add(corners);
         if (FOWPlusService.isActive(game)) {
@@ -7475,10 +7474,11 @@ public class ButtonHelper {
         }
 
         if (player.hasUnlockedBreakthrough("ghostbt")) {
-                youCanSpend
-                        .append(" You also have ")
-                        .append(" the Ghost Breakthrough for a discount equal to the number of wormholes in the system (not counted in the total rn.)");
-            }
+            youCanSpend
+                    .append(" You also have ")
+                    .append(
+                            " the Ghost Breakthrough for a discount equal to the number of wormholes in the system (not counted in the total rn.)");
+        }
         if (production) {
             if (player.hasTech("st")) {
                 youCanSpend
