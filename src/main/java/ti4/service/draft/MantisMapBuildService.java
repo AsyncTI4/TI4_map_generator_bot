@@ -112,7 +112,7 @@ public class MantisMapBuildService {
         return DraftButtonService.DELETE_MESSAGE;
     }
 
-    public String handleMulliganTile(
+    private String handleMulliganTile(
             GenericInteractionCreateEvent event, @Nonnull MantisMapBuildContext mapBuildContext, String actionParams) {
         
         String tileId = actionParams;
@@ -139,13 +139,13 @@ public class MantisMapBuildService {
         return DraftButtonService.DELETE_MESSAGE;
     }
 
-    public String handleRepost(MantisMapBuildContext mapBuildContext) {
+    private String handleRepost(MantisMapBuildContext mapBuildContext) {
         // Calling this without an event should cause an update
         updateMapBuild(null, mapBuildContext);
         return DraftButtonService.DELETE_MESSAGE;
     }
 
-    public String handleDiscardTile(
+    private String handleDiscardTile(
             GenericInteractionCreateEvent event, @Nonnull MantisMapBuildContext mapBuildContext, String actionParams) {
 
         String tileId = actionParams;

@@ -16,6 +16,8 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
+import ti4.service.draft.MantisMapBuildContext;
+import ti4.service.draft.MantisMapBuildService;
 import ti4.service.franken.FrankenAbilityService;
 import ti4.service.franken.FrankenDraftBagService;
 import ti4.service.franken.FrankenFactionTechService;
@@ -221,6 +223,10 @@ class FrankenButtonHandler {
                 case "show_bag" -> {
                     FrankenDraftBagService.showPlayerBag(game, player);
                     return;
+                }
+                case MantisMapBuildService.ACTION_PREFIX -> {
+                    MantisMapBuildContext mapBuildContext = MantisMapBuildContext.fromFranken(game);
+                    MantisMapBuildService.handleAction(event, mapBuildContext, action);
                 }
             }
         }
