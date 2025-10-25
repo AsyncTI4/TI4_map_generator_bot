@@ -33,7 +33,8 @@ public class FrankenCommand implements ParentCommand {
                     new BanFaction(),
                     new SetBreakthrough(),
                     new ApplyDraftBags(),
-                    new SetHomeSystemPosition())
+                    new SetHomeSystemPosition(),
+                    new BuildMap())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

@@ -57,7 +57,8 @@ public class MapTemplateModel implements ModelInterface {
         return alias != null
                 && (tileDisplayCoords().size() == (1 + tilesPerPlayer()))
                 && ((bluePerPlayer() + redPerPlayer()) == tilesPerPlayer())
-                && nucleusValidation();
+                && nucleusValidation()
+                && validatePlayerNumbers();
     }
 
     public boolean isNucleusTemplate() {
@@ -153,6 +154,20 @@ public class MapTemplateModel implements ModelInterface {
             }
         }
         return locations;
+    }
+
+    private boolean validatePlayerNumbers() {
+        // Ensure they adhere to the convention of being 1-indexed, contiguous, and matching playerCount
+        Set<Integer> playerNumbers = new HashSet<>();
+        for (MapTemplateTile t : templateTiles) {
+            if (t.playerNumber == null) continue;
+            playerNumbers.add(t.playerNumber);
+        }
+        for (int i = 1; i <= playerCount; i++) {
+            if (!playerNumbers.contains(i)) return false;
+        }
+        if (playerNumbers.size() != playerCount) return false;
+        return true;
     }
 
     private boolean nucleusValidation() {
