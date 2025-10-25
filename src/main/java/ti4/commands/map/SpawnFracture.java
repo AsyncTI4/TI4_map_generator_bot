@@ -14,7 +14,10 @@ import ti4.service.map.FractureService;
 public class SpawnFracture extends GameStateSubcommand {
     public SpawnFracture() {
         super(Constants.FRACTURE, "Add the fracture tiles, neutral units, and ingress tokens to the map", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color that triggered the fracture").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(
+                        OptionType.STRING, Constants.FACTION_COLOR, "Faction or color that triggered the fracture")
+                .setAutoComplete(true)
+                .setRequired(true));
     }
 
     @Override

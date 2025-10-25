@@ -188,7 +188,6 @@ public class MiltyService {
                     if (game.isThundersEdge()) {
                         ThundersEdgeRulesService.alertTabletalkWithRulesAtStartOfDraft(game);
                     }
-
                 }
             });
         }

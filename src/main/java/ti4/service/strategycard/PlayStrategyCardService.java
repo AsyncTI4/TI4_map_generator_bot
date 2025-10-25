@@ -3,7 +3,6 @@ package ti4.service.strategycard;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
@@ -190,7 +189,7 @@ public class PlayStrategyCardService {
 
         // set the action rows
         baseMessageObject.addComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons));
-        if(!game.isTwilightsFallMode() || (scToPlay != 6 && scToPlay != 2 &&scToPlay != 7)){
+        if (!game.isTwilightsFallMode() || (scToPlay != 6 && scToPlay != 2 && scToPlay != 7)) {
             AutoPingMetadataManager.setupQuickPing(game.getName());
         }
         sendAndHandleMessageResponse(baseMessageObject.build(), game, player, event, scToPlay, scModel, scButtons);

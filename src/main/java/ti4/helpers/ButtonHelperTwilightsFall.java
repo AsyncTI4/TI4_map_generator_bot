@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -14,8 +11,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
-import ti4.helpers.DiceHelper.Die;
-import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
@@ -24,7 +19,6 @@ import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
@@ -42,7 +36,6 @@ import ti4.service.milty.MiltyDraftManager.PlayerDraft;
 import ti4.service.milty.MiltyDraftSlice;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.unit.AddUnitService;
-import ti4.service.unit.DestroyUnitService;
 
 public class ButtonHelperTwilightsFall {
 
@@ -194,8 +187,6 @@ public class ButtonHelperTwilightsFall {
 
         ButtonHelper.deleteMessage(event);
     }
-
-    
 
     @ButtonHandler("chooseHomeSystem_")
     public static void chooseHomeSystem(Game game, Player player, String buttonID, ButtonInteractionEvent event) {

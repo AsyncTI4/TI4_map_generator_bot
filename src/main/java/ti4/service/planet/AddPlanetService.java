@@ -563,7 +563,6 @@ public class AddPlanetService {
             if (id == null) id = game.getRevealedPublicObjectives().getOrDefault("styx", null);
             if (id == null) id = game.getRevealedPublicObjectives().getOrDefault("Styx", null);
 
-
             String message = null;
             if (id != null) {
                 game.scorePublicObjective(player.getUserID(), id);
@@ -571,13 +570,13 @@ public class AddPlanetService {
             } else {
                 id = game.addCustomPO(marrow, 1);
                 game.scorePublicObjective(player.getUserID(), id);
-                message = "Custom PO '" + marrow + "' has been added.\n" + player.getRepresentation() + " scored '" + marrow + "'";
+                message = "Custom PO '" + marrow + "' has been added.\n" + player.getRepresentation() + " scored '"
+                        + marrow + "'";
             }
             for (Player p : game.getRealPlayers()) {
                 if (p.is(player)) continue;
                 game.unscorePublicObjective(message, id);
             }
-
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
