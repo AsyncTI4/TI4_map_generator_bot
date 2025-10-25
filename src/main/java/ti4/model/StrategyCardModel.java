@@ -49,8 +49,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         StringBuilder sb = new StringBuilder();
 
         // TITLE
-        sb.append(getEmojiWordRepresentation())
-                .append(source.emoji());
+        sb.append(getEmojiWordRepresentation()).append(source.emoji());
         eb.setTitle(sb.toString());
 
         // PRIMARY
