@@ -49,11 +49,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         StringBuilder sb = new StringBuilder();
 
         // TITLE
-        sb.append("**")
-                .append(initiative)
-                .append("** __")
-                .append(name)
-                .append("__")
+        sb.append(getEmojiWordRepresentation())
                 .append(source.emoji());
         eb.setTitle(sb.toString());
 
@@ -169,7 +165,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     @Nullable
     public String getEmojiWordRepresentation() {
         switch (source) {
-            case pok, base, thunders_edge -> {
+            case pok, base, thunders_edge, codex1 -> {
                 return switch (initiative) {
                     case 1 -> CardEmojis.SC1Mention();
                     case 2 -> CardEmojis.SC2Mention();
