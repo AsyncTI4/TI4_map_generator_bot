@@ -850,7 +850,7 @@
         "phase": "Action",
         "window": "After you produce hits against a non-upgraded unit that matches a unit upgrade technology you own",
         "text": "Those hits must be assigned to units of that type, if able.",
-        "flavorText": "Chaos consumed the battlefield as swarms of fighters tumbled into the destortion field. Unlenn smiled. \"Perfect. Full burn—target their primaries.\"",
+        "flavorText": "Chaos consumed the battlefield as swarms of fighters tumbled into the distortion field. Unlenn smiled. \"Perfect. Full burn—target their primaries.\"",
         "source": "action_deck_2"
     },
     {
