@@ -43,6 +43,8 @@ public class FactionDraftable extends SinglePickDraftable {
     @Getter
     private static final List<String> keleresFlavors = List.of("mentak", "xxcha", "argent");
 
+    public static final DraftableType TYPE = DraftableType.of("Faction");
+
     public void initialize(
             int numFactions,
             List<ComponentSource> sources,
@@ -131,8 +133,6 @@ public class FactionDraftable extends SinglePickDraftable {
         return Mapper.getFaction(choiceKey);
     }
 
-    public static final DraftableType TYPE = DraftableType.of("Faction");
-
     @Override
     public DraftableType getType() {
         return TYPE;
@@ -198,7 +198,7 @@ public class FactionDraftable extends SinglePickDraftable {
                 }
             }
             if (informFactions.isEmpty()) {
-                return "No factions remain to show info for.";
+                return DraftButtonService.USER_MISTAKE_PREFIX + "No factions remain to show info for.";
             } else {
                 sendFactionInfo(draftManager, playerUserId, informFactions);
             }
@@ -216,7 +216,7 @@ public class FactionDraftable extends SinglePickDraftable {
                 }
             }
             if (informFactions.isEmpty()) {
-                return "No factions have been picked yet to show info for.";
+                return DraftButtonService.USER_MISTAKE_PREFIX + "No factions have been picked yet to show info for.";
             } else {
                 sendFactionInfo(draftManager, playerUserId, informFactions);
             }
