@@ -563,7 +563,7 @@ public class StartPhaseService {
                             }
                         }));
 
-        if ("action_deck_2".equals(game.getAcDeckID()) && game.getRound() > 1) {
+        if (game.isAcd2() && game.getRound() > 1) {
             handleStartOfStrategyForAcd2(game);
         }
     }

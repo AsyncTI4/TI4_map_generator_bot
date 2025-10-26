@@ -1570,7 +1570,7 @@ public class AgendaHelper {
                 .append(", the current winner is \"")
                 .append(formattedWinner)
                 .append("\".\n");
-        if (!"action_deck_2".equals(game.getAcDeckID())) {
+        if (!game.isAcd2()) {
             handleShenanigans(game, winner);
             message.append(
                     "When shenanigans have concluded, please confirm resolution or discard the result and manually resolve it yourselves.");
