@@ -215,8 +215,8 @@ public class JdaService {
 
         // Async: FOW Chapter Secondary
         if (args.length >= 18) {
-           guildFogOfWarSecondary = initGuild(args[17], false);
-           fowServers.add(guildFogOfWarSecondary);
+            guildFogOfWarSecondary = initGuild(args[17], false);
+            fowServers.add(guildFogOfWarSecondary);
         }
 
         // Async: 10th Server
