@@ -148,7 +148,7 @@
         "name": "Evolve",
         "phase": "Action",
         "window": "Action",
-        "text": "Draw 1 ability from any splice deck.",
+        "text": "Draw 1 card from any splice deck.",
         "source": "twilights_fall"
     },
     {

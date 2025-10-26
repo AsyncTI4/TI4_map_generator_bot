@@ -1293,14 +1293,14 @@ public class ActionCardHelper {
             if ("tf-mutate1".equals(automationID) || "tf-mutate2".equals(automationID)) {
                 codedButtons.add(Buttons.red("discardSpliceCard_ability", "Discard 1 Ability"));
                 codedButtons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
-                codedButtons.add(Buttons.gray("deletebuttons", "Done Resolving"));
+                codedButtons.add(Buttons.gray("deleteButtons", "Done Resolving"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
             if ("tf-evolve".equals(automationID)) {
                 codedButtons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
                 codedButtons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
                 codedButtons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
-                codedButtons.add(Buttons.gray("deletebuttons", "Done Resolving"));
+                codedButtons.add(Buttons.gray("deleteButtons", "Done Resolving"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
             if ("tf-helix".equals(automationID)) {
@@ -1310,7 +1310,7 @@ public class ActionCardHelper {
                         player.getFinsFactionCheckerPrefix() + "startSplice_2_all", "Initiate Genome Splice"));
                 codedButtons.add(Buttons.blue(
                         player.getFinsFactionCheckerPrefix() + "startSplice_6_all", "Initiate Unit Upgrade Splice"));
-                codedButtons.add(Buttons.gray("deletebuttons", "Done Resolving"));
+                codedButtons.add(Buttons.gray("deleteButtons", "Done Resolving"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
             // "tf-reverse"
@@ -1372,11 +1372,16 @@ public class ActionCardHelper {
                         player.getFinsFactionCheckerPrefix() + "gainComms_1_stay",
                         "Gain 1 Commodity",
                         MiscEmojis.comm));
-                codedButtons.add(Buttons.gray("deletebuttons", "Done Resolving"));
+                codedButtons.add(Buttons.gray("deleteButtons", "Done Resolving"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
             if ("tf-thieve".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveThieve", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-elevate".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.getFinsFactionCheckerPrefix() + "drawParadigmAC", "Draw Paradigm"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
             if ("messiah".equals(automationID)) {
