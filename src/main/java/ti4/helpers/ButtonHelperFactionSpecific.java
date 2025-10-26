@@ -3178,6 +3178,26 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("creussTFCruiserStep3_")
+    public static void creussTFCruiserStep3(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String tilePos = buttonID.split("_")[1];
+        String type = buttonID.split("_")[2];
+        String tokenName = "creuss" + type;
+        Tile tile = game.getTileByPosition(tilePos);
+        tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
+        String msg = player.getRepresentation() + " moved " + MiscEmojis.getCreussWormhole(tokenName) + " " + type
+                + " wormhole to " + tile.getRepresentationForButtons(game, player);
+        for (Tile tile_ : game.getTileMap().values()) {
+            if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
+                msg += " (from " + tile_.getRepresentationForButtons(game, player) + ")";
+                break;
+            }
+        }
+        msg += ".";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        event.getMessage().delete().queue();
+    }
+
     @ButtonHandler("nivynMechStep2_")
     public static void nivynMechStep2(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String tilePos = buttonID.split("_")[1];
@@ -3248,6 +3268,21 @@ public class ButtonHelperFactionSpecific {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("creussTFCruiserStep2_")
+    public static void creussTFCruiserStep2(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        String tilePos = buttonID.split("_")[1];
+        buttons.add(Buttons.red("creussTFCruiserStep3_" + tilePos + "_alpha", "Alpha", MiscEmojis.CreussAlpha));
+        buttons.add(Buttons.green("creussTFCruiserStep3_" + tilePos + "_beta", "Beta", MiscEmojis.CreussBeta));
+        buttons.add(Buttons.blue("creussTFCruiserStep3_" + tilePos + "_gamma", "Gamma", MiscEmojis.CreussGamma));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", please choose the type of wormhole you wish to place in "
+                        + tilePos + ".",
+                buttons);
+        event.getMessage().delete().queue();
+    }
+
     @ButtonHandler("creussMechStep2_")
     public static void creussMechStep2(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
@@ -3274,6 +3309,20 @@ public class ButtonHelperFactionSpecific {
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
                         + ", please choose the system with the mech you wish to remove in order to place a Creuss wormhole.",
+                buttons);
+    }
+
+    @ButtonHandler("creussTFCruiserStep1_")
+    public static void creussTFCruiserStep1(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Cruiser)) {
+            buttons.add(Buttons.green(
+                    "creussTFCruiserStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", please choose the system with the cruiser where you would like to place the creuss wormhole.",
                 buttons);
     }
 
