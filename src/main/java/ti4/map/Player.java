@@ -106,6 +106,12 @@ public class Player extends PlayerProperties {
 
     private final Tile nomboxTile = new Tile("nombox", "nombox");
 
+    @Getter
+    private final Map<String, Integer> plotCards = new LinkedHashMap<>();
+
+    @Getter
+    private final Map<String, List<String>> plotCardsFactions = new LinkedHashMap<>();
+
     private final Map<String, Integer> actionCards = new LinkedHashMap<>();
     private final Map<String, Integer> events = new LinkedHashMap<>();
     private final Map<String, Integer> trapCards = new LinkedHashMap<>();
@@ -666,6 +672,39 @@ public class Player extends PlayerProperties {
 
     public Map<String, Integer> getEvents() {
         return events;
+    }
+
+    public void setPlotCard(String id, Integer identifier) {
+        plotCards.put(id, identifier);
+    }
+
+    public void setPlotCard(String id) {
+        if (plotCards.containsKey(id)) return;
+
+        Collection<Integer> values = plotCards.values();
+        int identifier = ThreadLocalRandom.current().nextInt(100);
+        while (values.contains(identifier)) {
+            identifier = ThreadLocalRandom.current().nextInt(100);
+        }
+        plotCards.put(id, identifier);
+    }
+
+    public void setPlotCardFaction(String id, String faction) {
+        if (!plotCardsFactions.containsKey(id)) plotCardsFactions.put(id, new ArrayList<>());
+        plotCardsFactions.get(id).add(faction);
+    }
+
+    public void removePlotCardFaction(String id) {
+        plotCardsFactions.remove(id);
+    }
+
+    public boolean isOtherPlayerPuppeted(Player p2) {
+        for (List<String> puppets : getPlotCardsFactions().values()) {
+            if (puppets.contains(p2.getFaction())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Map<String, Integer> getTrapCards() {

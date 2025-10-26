@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -503,17 +502,17 @@ public class ButtonHelperTacticalAction {
         if ((player.hasTech("sdn") || player.hasTech("absol_sdn") || player.hasTech("wavelength"))
                 && !button2.isEmpty()
                 && !game.isL1Hero()) {
-                    if(game.isTwilightsFallMode()){
-                        MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + ", Please resolve a wavelength explore.",
-                    button2);
-                    }else{
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + ", Please resolve _Scanlink Drone Network_.",
-                    button2);
-                    }
+            if (game.isTwilightsFallMode()) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + ", Please resolve a wavelength explore.",
+                        button2);
+            } else {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + ", Please resolve _Scanlink Drone Network_.",
+                        button2);
+            }
         }
         if (!game.isL1Hero()) {
             // All players get to use Magen

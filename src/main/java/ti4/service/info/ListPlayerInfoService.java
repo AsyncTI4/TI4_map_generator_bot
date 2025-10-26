@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.helpers.ButtonHelper;
@@ -281,7 +280,7 @@ public class ListPlayerInfoService {
                 x++;
             }
             msg.append(representSecrets(game)).append("\n");
-            if(!game.isTwilightsFallMode()){
+            if (!game.isTwilightsFallMode()) {
                 msg.append(representSupports(game)).append("\n");
             }
             if (gameHasTransferablePoints(game)) {

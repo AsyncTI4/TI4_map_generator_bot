@@ -8,15 +8,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -876,8 +874,8 @@ public class ButtonHelperAgents {
         }
 
         if ("redcreussagent".equalsIgnoreCase(agent) || "crimsonagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
-                    + "the Crimson " + ssruuSlash + " agent.";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Crimson "
+                    + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.replace("redcreussagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -892,7 +890,6 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannelWithButtons(
                     p2.getCorrectChannel(), p2.getRepresentationUnfogged() + message, buttons);
         }
-        
 
         if ("yinagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Brother Milor, the Yin"
@@ -1362,7 +1359,7 @@ public class ButtonHelperAgents {
         if ("ralnelagent".equalsIgnoreCase(agent) && game.isFowMode()) {
             TeHelperAgents.postRalNelAgentStep1(event, game, player);
         }
-        
+
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             String exhaustedMessage = buttonEvent.getMessage().getContentRaw();
             if ("".equalsIgnoreCase(exhaustedMessage)) {

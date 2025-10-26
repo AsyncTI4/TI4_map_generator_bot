@@ -1,5 +1,7 @@
 package ti4.helpers.settingsFramework.menus;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -8,10 +10,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -146,8 +144,7 @@ public class PlayerFactionSettings extends SettingsMenu {
         }
         if (parent != null && parent instanceof MiltySettings ms) {
             if (ms.getSourceSettings().getBetaTestMode().isVal())
-                ls.add(Buttons.red(
-                        idPrefix + "teFactions", "Prioritize TE Factions"));
+                ls.add(Buttons.red(idPrefix + "teFactions", "Prioritize TE Factions"));
         }
         return ls;
     }
@@ -185,7 +182,7 @@ public class PlayerFactionSettings extends SettingsMenu {
 
             List<String> newKeys = new ArrayList<>();
             for (FactionModel model : priFactions.getAllValues().values()) {
-                if(model.getAlias().equalsIgnoreCase("obsidian")){
+                if (model.getAlias().equalsIgnoreCase("obsidian")) {
                     continue;
                 }
                 if (model.getSource() == ComponentSource.thunders_edge) newKeys.add(model.getAlias());

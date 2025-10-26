@@ -40,7 +40,10 @@ class WeirdGameSetup extends GameStateSubcommand {
                 OptionType.BOOLEAN,
                 Constants.UNCHARTED_SPACE_STUFF,
                 "True to add the Uncharted Space Stuff to the draft pool."));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.BETA_TEST_MODE,
+                "True to test new features that may not be released to all games yet."));
         addOptions(new OptionData(
                 OptionType.INTEGER, Constants.CC_LIMIT, "Command token limit each player should have, default 16."));
         addOptions(new OptionData(
