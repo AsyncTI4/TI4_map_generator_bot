@@ -182,7 +182,9 @@ public class HomebrewService {
                         event.getMessageChannel(), "Set the explores/action cards/relics to Discordant Stars stuff.");
             }
             case HBACDECK2 -> {
-                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_deck_2"));
+                String acd2 = "action_deck_2";
+                String suffix = game.isThundersEdge() && game.isProphecyOfKings() ? "_pok_te" : game.isThundersEdge() ? "_te" : game.isProphecyOfKings() ? "_pok" : "";
+                game.validateAndSetActionCardDeck(event, Mapper.getDeck(acd2 + suffix));
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(), "Set the action card deck to Action Card Deck 2.");
             }

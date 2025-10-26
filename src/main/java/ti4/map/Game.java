@@ -718,9 +718,8 @@ public class Game extends GameProperties {
             ACStatus status = getDiscardACStatus().get(ac);
             ActionCardModel acModel = Mapper.getActionCard(ac);
             if (acModel != null && acModel.getName().contains(name)) {
-                if (Arrays.asList(null, ACStatus.ralnelbt, ACStatus.purged).contains(status))
-                    return true; // it cannot be played
-                return false; // it's on garbozia
+              return Arrays.asList(null, ACStatus.ralnelbt, ACStatus.purged).contains(status); // it cannot be played
+              // it's on garbozia
             } else if (acModel == null) {
                 BotLogger.error(ac + " is returning a null AC when sent to Mapper in game " + getName());
             }
@@ -848,8 +847,7 @@ public class Game extends GameProperties {
         gameModes.put("VotC", isVotcMode());
         gameModes.put(SourceEmojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
         gameModes.put("HomebrewSC", isHomebrewSCMode());
-        gameModes.put("Little Omega", isLittleOmega());
-        gameModes.put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
+        gameModes.put("AC Deck 2", isAcd2());
         gameModes.put("Omega Phase", isOmegaPhaseMode());
         gameModes.put("Priority Track", hasAnyPriorityTrackMode());
         gameModes.put("Homebrew", isHomebrew());
@@ -861,6 +859,10 @@ public class Game extends GameProperties {
                 .filter(Entry::getValue)
                 .map(Entry::getKey)
                 .collect(Collectors.joining(", "));
+    }
+
+    public boolean isAcd2() {
+        return getAcDeckID().startsWith("action_deck_2");
     }
 
     @JsonIgnore
@@ -3001,7 +3003,7 @@ public class Game extends GameProperties {
     }
 
     public void pbd1000decks() {
-        setActionCards(multiplyDeck(2, "action_cards_pok", "action_deck_2"));
+        setActionCards(multiplyDeck(2, "action_cards_pok", "action_deck_2_pok"));
         setSecretObjectives(multiplyDeck(3, "pbd100_secret_objectives"));
     }
 
@@ -3134,7 +3136,7 @@ public class Game extends GameProperties {
     }
 
     private boolean shouldPutCardOnRalnel(Player discardingPlayer) {
-        if (!getPhaseOfGame().equals("action")) return false;
+        if (!"action".equals(getPhaseOfGame())) return false;
         for (Player p : getRealPlayers()) {
             if (p == discardingPlayer) continue;
             if (p.hasUnlockedBreakthrough("ralnelbt") && !p.isPassed()) return true;
@@ -3201,7 +3203,7 @@ public class Game extends GameProperties {
             if (player.getPlanets().contains("garbozia")) { // allow checking for garbozia
                 for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
                     if (ac.getValue().equals(acIDNumber)
-                            && ACStatus.garbozia.equals(getDiscardACStatus().get(ac.getKey()))) {
+                            && getDiscardACStatus().get(ac.getKey()) == ACStatus.garbozia) {
                         acID = ac.getKey();
                         break;
                     }
@@ -3222,7 +3224,7 @@ public class Game extends GameProperties {
 
     public Map<String, Integer> getPurgedActionCards() {
         return new HashMap<>(getDiscardActionCards().entrySet().stream()
-                .filter(e -> ACStatus.purged.equals(getDiscardACStatus().get(e.getKey())))
+                .filter(e -> getDiscardACStatus().get(e.getKey()) == ACStatus.purged)
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
     }
 
@@ -3232,7 +3234,7 @@ public class Game extends GameProperties {
             String acID = "";
             for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
                 ACStatus status = getDiscardACStatus().get(ac.getKey());
-                if (ac.getValue().equals(acIDNumber) && !ACStatus.purged.equals(status)) {
+                if (ac.getValue().equals(acIDNumber) && status != ACStatus.purged) {
                     acID = ac.getKey();
                     break;
                 }
@@ -3253,7 +3255,7 @@ public class Game extends GameProperties {
             String acID = "";
             for (Map.Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
                 ACStatus status = getDiscardACStatus().get(ac.getKey());
-                if (ac.getValue().equals(acIDNumber) && ACStatus.purged.equals(status)) {
+                if (ac.getValue().equals(acIDNumber) && status == ACStatus.purged) {
                     acID = ac.getKey();
                     break;
                 }
@@ -4205,7 +4207,7 @@ public class Game extends GameProperties {
             return false;
         }
 
-        if (leaderID.equalsIgnoreCase("sardakkcommander") && player.hasTech("tf-valkyrie")) {
+        if ("sardakkcommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-valkyrie")) {
             return true;
         }
 
@@ -4758,13 +4760,6 @@ public class Game extends GameProperties {
         }
 
         return scText;
-    }
-
-    @JsonIgnore
-    public boolean isLittleOmega() {
-        return getStage1PublicDeckID().contains("little_omega")
-                || getStage2PublicDeckID().contains("little_omega")
-                || getAgendaDeckID().contains("little_omega");
     }
 
     // Currently unused
