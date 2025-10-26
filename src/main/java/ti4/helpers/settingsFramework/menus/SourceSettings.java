@@ -59,8 +59,7 @@ public class SourceSettings extends SettingsMenu {
                 "Ignis Aurora Mod",
                 game.getTechnologyDeckID().toLowerCase().contains("baldrick"));
         eronous = new BooleanSetting("Eronous", "Eronous Tiles", false);
-        actionCardDeck2 = new BooleanSetting(
-                "ActionCardDeck2", "Action Card Deck 2", game.isAcd2());
+        actionCardDeck2 = new BooleanSetting("ActionCardDeck2", "Action Card Deck 2", game.isAcd2());
         // Emojis
         base.setEmoji(SourceEmojis.TI4BaseGame);
         pok.setEmoji(SourceEmojis.TI4PoK);

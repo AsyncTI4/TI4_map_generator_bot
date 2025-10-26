@@ -183,7 +183,9 @@ public class HomebrewService {
             }
             case HBACDECK2 -> {
                 String acd2 = "action_deck_2";
-                String suffix = game.isThundersEdge() && game.isProphecyOfKings() ? "_pok_te" : game.isThundersEdge() ? "_te" : game.isProphecyOfKings() ? "_pok" : "";
+                String suffix = game.isThundersEdge() && game.isProphecyOfKings()
+                        ? "_pok_te"
+                        : game.isThundersEdge() ? "_te" : game.isProphecyOfKings() ? "_pok" : "";
                 game.validateAndSetActionCardDeck(event, Mapper.getDeck(acd2 + suffix));
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(), "Set the action card deck to Action Card Deck 2.");
