@@ -375,6 +375,8 @@ public class ButtonHelperTwilightsFallActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    public static void sendDestroyButtonsForSpecificTileAndSurrounding(Game game, Tile tile) {}
+
     // twinning
     // tf-manifest
     // "tf-flux"
@@ -389,7 +391,6 @@ public class ButtonHelperTwilightsFallActionCards {
     // tartarus
     // timestop
     // starflare
-    // elevate
     // converge
 
     // dragonfreed
