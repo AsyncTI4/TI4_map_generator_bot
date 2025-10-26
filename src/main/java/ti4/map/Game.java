@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -718,8 +718,8 @@ public class Game extends GameProperties {
             ACStatus status = getDiscardACStatus().get(ac);
             ActionCardModel acModel = Mapper.getActionCard(ac);
             if (acModel != null && acModel.getName().contains(name)) {
-              return Arrays.asList(null, ACStatus.ralnelbt, ACStatus.purged).contains(status); // it cannot be played
-              // it's on garbozia
+                // true = it cannot be played, false = it's on garbozia
+                return Arrays.asList(null, ACStatus.ralnelbt, ACStatus.purged).contains(status);
             } else if (acModel == null) {
                 BotLogger.error(ac + " is returning a null AC when sent to Mapper in game " + getName());
             }
