@@ -45,7 +45,8 @@
             "pds",
             "bastion_spacedock"
         ],
-        "source": "thunders_edge"
+        "source": "thunders_edge",
+        "priorityNumber": 21
     },
     {
         "alias": "deepwrought",
@@ -86,7 +87,8 @@
             "pds",
             "spacedock"
         ],
-        "source": "thunders_edge"
+        "source": "thunders_edge",
+        "priorityNumber": 7
     },
     {
         "alias": "firmament",
@@ -133,7 +135,8 @@
             "pds",
             "spacedock"
         ],
-        "source": "thunders_edge"
+        "source": "thunders_edge",
+        "priorityNumber": 30
     },
     {
         "alias": "obsidian",
@@ -228,7 +231,8 @@
             "pds",
             "spacedock"
         ],
-        "source": "thunders_edge"
+        "source": "thunders_edge",
+        "priorityNumber": 16
     },
     {
         "alias": "ralnel",
@@ -275,6 +279,7 @@
             "pds",
             "spacedock"
         ],
-        "source": "thunders_edge"
+        "source": "thunders_edge",
+        "priorityNumber": 12
     }
 ]
