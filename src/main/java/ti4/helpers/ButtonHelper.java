@@ -4415,6 +4415,7 @@ public class ButtonHelper {
 
         if (!player.hasTech("fl")
                 && !player.hasTech("absol_fl")
+                && !player.hasPlanet("thundersedge")
                 && !game.playerHasLeaderUnlockedOrAlliance(player, "kelerescommander")
                 && !player.hasAbility("arrow_of_time")) {
             MessageHelper.sendEphemeralMessageToEventChannel(

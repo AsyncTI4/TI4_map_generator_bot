@@ -447,6 +447,12 @@ public class StartTurnService {
                 startButtons.add(
                         Buttons.gray(finChecker + "startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));
             }
+
+            if (player.ownsUnit("tf-ahksylfier")
+                    && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser", false) > 0) {
+                startButtons.add(
+                        Buttons.gray("creussTFCruiserStep1_", "Use Creuss Cruiser Ability", FactionEmojis.Ghost));
+            }
             if (player.hasUnit("redtf_flagship")
                     && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", true) < 1) {
                 startButtons.add(Buttons.gray(finChecker + "startRedTFDeploy", "Deploy Flagship", FactionEmojis.redtf));

@@ -473,8 +473,13 @@ public class ButtonHelperTwilightsFall {
     }
 
     @ButtonHandler("drawParadigm")
-    public static void drawParadigm(Game game, Player player, ButtonInteractionEvent event) {
-        drawParadigm(game, player, event, true);
+    public static void drawParadigm(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        if (buttonID.contains("AC")) {
+            drawParadigm(game, player, event, false);
+            ButtonHelper.deleteMessage(event);
+        } else {
+            drawParadigm(game, player, event, true);
+        }
     }
 
     @ButtonHandler("addMagusSpliceCard")
