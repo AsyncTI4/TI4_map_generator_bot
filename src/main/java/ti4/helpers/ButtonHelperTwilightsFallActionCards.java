@@ -6,12 +6,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -369,7 +367,7 @@ public class ButtonHelperTwilightsFallActionCards {
             if (Mapper.getUnit(card).getBaseType().equalsIgnoreCase(unitT)) {
                 UnitModel unitModel = Mapper.getUnit(card);
                 String asyncId = unitModel.getAsyncId();
-                if(!asyncId.equalsIgnoreCase("fs") && !asyncId.equalsIgnoreCase("mf")){
+                if (!asyncId.equalsIgnoreCase("fs") && !asyncId.equalsIgnoreCase("mf")) {
                     List<UnitModel> unitsToRemove = player.getUnitsByAsyncID(asyncId).stream()
                             .filter(unit -> unit.getFaction().isEmpty()
                                     || unit.getUpgradesFromUnitId().isEmpty())
@@ -389,12 +387,15 @@ public class ButtonHelperTwilightsFallActionCards {
     }
 
     public static void sendDestroyButtonsForSpecificTileAndSurrounding(Game game, Tile tile) {
-        for(String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), null, false, true)){
+        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), null, false, true)) {
             Tile tile2 = game.getTileByPosition(pos);
-            for(Player player : game.getRealPlayers()){
-                if(FoWHelper.playerHasUnitsInSystem(player, tile2)){
+            for (Player player : game.getRealPlayers()) {
+                if (FoWHelper.playerHasUnitsInSystem(player, tile2)) {
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix()+"getDamageButtons_" + pos + "_" + "deleteThis_combat", "Destroy Units in "+tile2.getRepresentationForButtons()));
+                    buttons.add(Buttons.red(
+                            player.getFinsFactionCheckerPrefix() + "getDamageButtons_" + pos + "_"
+                                    + "deleteThis_combat",
+                            "Destroy Units in " + tile2.getRepresentationForButtons()));
                     String msg = player.getRepresentation() + " use this button to destroy units.";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
                 }

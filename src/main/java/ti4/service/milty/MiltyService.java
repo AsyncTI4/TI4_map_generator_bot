@@ -7,13 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.CommandHelper;
 import ti4.commands.tokens.AddTokenCommand;
@@ -364,7 +362,7 @@ public class MiltyService {
             game.setTile(tile);
         }
 
-         // HANDLE GHOSTS' HOME SYSTEM LOCATION
+        // HANDLE GHOSTS' HOME SYSTEM LOCATION
         if ("crimson".equals(faction)) {
             tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
             String pos = "tr";
@@ -374,10 +372,10 @@ public class MiltyService {
             if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
                 pos = "bl";
             }
-            if(game.getTileByPosition(pos) != null){
-                if(pos.equalsIgnoreCase("tr")){
+            if (game.getTileByPosition(pos) != null) {
+                if (pos.equalsIgnoreCase("tr")) {
                     pos = "br";
-                }else{
+                } else {
                     pos = "tr";
                 }
             }
@@ -523,7 +521,7 @@ public class MiltyService {
                     if (techs.isEmpty()) {
                         buttons = List.of(Buttons.GET_A_FREE_TECH, Buttons.DONE_DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
-                        if(factionModel.getStartingTechAmount() > 1){
+                        if (factionModel.getStartingTechAmount() > 1) {
                             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                         }
                     } else {

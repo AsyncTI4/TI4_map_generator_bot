@@ -441,7 +441,7 @@ public class ButtonHelperTwilightsFall {
                 if (type.equalsIgnoreCase("units")) {
                     UnitModel unitModel = Mapper.getUnit(cardID);
                     String asyncId = unitModel.getAsyncId();
-                    if(!asyncId.equalsIgnoreCase("fs") && !asyncId.equalsIgnoreCase("mf")){
+                    if (!asyncId.equalsIgnoreCase("fs") && !asyncId.equalsIgnoreCase("mf")) {
                         List<UnitModel> unitsToRemove = player.getUnitsByAsyncID(asyncId).stream()
                                 .filter(unit -> unit.getFaction().isEmpty()
                                         || unit.getUpgradesFromUnitId().isEmpty())

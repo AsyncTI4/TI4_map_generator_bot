@@ -369,6 +369,13 @@ public class ComponentActionHelper {
                     finChecker + prefix + "ability_fabrication", "Purge 1 Fragment for 1 Token", FactionEmojis.Naaz);
             compButtons.add(abilityButton);
         }
+        if (p1.hasAbility("puppetsoftheblade")
+                && p1.getPlotCardsFactions().values().stream().anyMatch(ary -> ary != null && ary.size() > 0)) {
+            Button abilityButton = Buttons.green(
+                    finChecker + prefix + "ability_puppetsoftheblade", "Become The Obsidian", FactionEmojis.Obsidian);
+            compButtons.add(abilityButton);
+        }
+
         if (p1.hasAbility("classified_developments")) {
             Button abilityButton = Buttons.green(
                     finChecker + prefix + "ability_classifieddevelopments",

@@ -1327,6 +1327,11 @@ public class Constants {
     public static final String CRON_NAME = "cron_name";
     public static final String RUN_CRON = "run_cron";
 
+    public static final String HELIOS_ATTACHMENT_1 = "attachment_helios1.png";
+    public static final String HELIOS_ATTACHMENT_2 = "attachment_helios2.png";
+    public static final String PLOT_CARDS = "plot_cards";
+    public static final String PLOT_FACTIONS = "plot_factions";
+
     public static final String BREAKTHROUGH_CMD = "breakthrough";
     public static final String BREAKTHROUGH_LOCK = "lock";
     public static final String BREAKTHROUGH_UNLOCK = "unlock";
