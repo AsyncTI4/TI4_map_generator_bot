@@ -15,7 +15,14 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
+
 import javax.annotation.Nullable;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -26,10 +33,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -1058,9 +1061,10 @@ public class AgendaHelper {
                     "You may use the button to get your two technologies.",
                     Buttons.GET_A_TECH);
         } else if (!d1.isSuccess() && !game.isFowMode()) {
-            Button modify = Buttons.gray("getModifyTiles", "Modify Units");
-            MessageHelper.sendMessageToChannelWithButton(
-                    game.getMainGameChannel(), "Please remove units in or adjacent to the Mecatol Rex system.", modify);
+            Tile tile = game.getMecatolTile();
+                    ButtonHelperTwilightsFallActionCards.sendDestroyButtonsForSpecificTileAndSurrounding(game, tile);
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(), "Please destroy units in or adjacent to the Mecatol Rex system.");
         }
     }
 

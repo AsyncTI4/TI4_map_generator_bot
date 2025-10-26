@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -18,6 +19,7 @@ import ti4.model.BreakthroughModel;
 import ti4.service.breakthrough.StellarGenesisService;
 import ti4.service.emoji.DiceEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.map.FractureService;
 
 public class BreakthroughCommandHelper {
 
@@ -78,8 +80,8 @@ public class BreakthroughCommandHelper {
                     player.addOwnedUnitByID("mentak_cruiser3");
                 }
             }
-            // if (!FractureService.isFractureInPlay(game))
-            //     serveRollFractureButtons(game, player);
+            if (!FractureService.isFractureInPlay(game) && game.isTestBetaFeaturesMode())
+                serveRollFractureButtons(game, player);
             if (bt.getAlias().equals("muaatbt")) StellarGenesisService.serveAvernusButtons(game, player);
             if (bt.getAlias().equals("keleresbt")) player.gainCustodiaVigilia();
         });

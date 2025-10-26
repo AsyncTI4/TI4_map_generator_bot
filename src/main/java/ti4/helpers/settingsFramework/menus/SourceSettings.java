@@ -1,11 +1,13 @@
 package ti4.helpers.settingsFramework.menus;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
+
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -29,6 +31,7 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting pok;
     private final BooleanSetting codexes;
     private final BooleanSetting discoStars;
+    private final BooleanSetting betaTestMode;
     private final BooleanSetting unchartedSpace;
     private final BooleanSetting absol;
     private final BooleanSetting ignis;
@@ -50,6 +53,7 @@ public class SourceSettings extends SettingsMenu {
         base = new BooleanSetting("BaseGame", "Base Game", true);
         pok = new BooleanSetting("PoK", "Prophecy of Kings", true);
         codexes = new BooleanSetting("Codexes", "Codex 1-4", true);
+        betaTestMode = new BooleanSetting("Beta", "Beta Mode", game.isTestBetaFeaturesMode());
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
         teDemo = new BooleanSetting("ThundersEdge", "Thunders Edge Demo", game.isThundersEdge());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
@@ -154,6 +158,7 @@ public class SourceSettings extends SettingsMenu {
                     ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
         if (discoStars.isVal()) sources.add(ComponentSource.ds);
         if (absol.isVal()) sources.add(ComponentSource.absol);
+        if (betaTestMode.isVal()) sources.add(ComponentSource.thunders_edge);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
         if (ignis.isVal()) sources.add(ComponentSource.ignis_aurora);
         return sources;
