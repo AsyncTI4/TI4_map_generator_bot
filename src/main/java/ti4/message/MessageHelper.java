@@ -1045,7 +1045,7 @@ public class MessageHelper {
         sendMessageToChannelWithEmbeds(channel, message, embeds);
     }
 
-    private static List<Button> sanitizeButtons(List<Button> buttons, MessageChannel channel) {
+    public static List<Button> sanitizeButtons(List<Button> buttons, MessageChannel channel) {
         if (buttons == null) return null;
         List<Button> newButtons = new ArrayList<>();
         List<String> goodButtonIDs = new ArrayList<>();
