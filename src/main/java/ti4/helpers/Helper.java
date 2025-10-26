@@ -3099,8 +3099,9 @@ public class Helper {
                                 + "Press **End Game** only after done giving titles.",
                         titleButton);
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
     public static boolean mechCheck(String planetName, Game game, Player player) {
