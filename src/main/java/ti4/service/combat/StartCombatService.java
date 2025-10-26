@@ -1173,7 +1173,7 @@ public class StartCombatService {
             }
         }
 
-        if (p1.hasTech("nekroc4y")
+        if ((p1.hasTech("nekroc4y") || p1.hasTech("subatomic"))
                 && isSpaceCombat
                 && tile != p1.getHomeSystemTile()
                 && p1.getHomeSystemTile() != null) {
@@ -1182,11 +1182,11 @@ public class StartCombatService {
                             .contains(p1.getHomeSystemTile())) {
                 buttons.add(Buttons.green(
                         p1.getFinsFactionCheckerPrefix() + "useNekroNullRef",
-                        "Use Null Reference (Upon Each Destroy)",
-                        FactionEmojis.Nekro));
+                        "Use Subatomic Splicer (Upon Each Destroy)",
+                        FactionEmojis.Crimson));
             }
         }
-        if (p2.hasTech("nekroc4y")
+        if ((p2.hasTech("nekroc4y") || p2.hasTech("subatomic"))
                 && isSpaceCombat
                 && tile != p2.getHomeSystemTile()
                 && p2.getHomeSystemTile() != null
@@ -1196,8 +1196,8 @@ public class StartCombatService {
                             .contains(p2.getHomeSystemTile())) {
                 buttons.add(Buttons.green(
                         p2.getFinsFactionCheckerPrefix() + "useNekroNullRef",
-                        "Use Null Reference (Upon Each Destroy)",
-                        FactionEmojis.Nekro));
+                        "Use Subatomic Splicer (Upon Each Destroy)",
+                        FactionEmojis.Crimson));
             }
         }
 

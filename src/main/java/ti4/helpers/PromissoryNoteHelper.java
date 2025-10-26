@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.buttons.Buttons;
+import ti4.helpers.thundersedge.TeHelperPromissories;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -520,6 +521,9 @@ public class PromissoryNoteHelper {
             StartPhaseService.startActionPhase(event, game, false);
             // in case Naalu gets eliminated and the PN goes away
             game.setStoredValue("naaluPNUser", player.getFaction());
+        }
+        if ("shareknowledge".equalsIgnoreCase(id)) {
+            TeHelperPromissories.offerShareKnowledgeButtons(game, player);
         }
         if ("bmf".equalsIgnoreCase(id)) {
             if (fromHand) {
