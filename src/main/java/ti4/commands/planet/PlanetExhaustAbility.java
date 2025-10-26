@@ -91,7 +91,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             }
             case "thundersedge" -> {
                 output = "Use buttons to do another action.";
-                buttons.addAll(StartTurnService.getStartOfTurnButtons(player, game, true, null));
+                buttons.addAll(StartTurnService.getStartOfTurnButtons(player, game, true, null, true));
             }
             case "garbozia" -> {
                 NewStuffHelper.resolveGarboziaTE(event, game, player, "garbozia_page0");
