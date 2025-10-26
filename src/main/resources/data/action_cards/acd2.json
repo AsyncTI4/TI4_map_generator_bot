@@ -534,7 +534,7 @@
         "name": "Overtime",
         "phase": "Action",
         "window": "At the end of your turn",
-        "text": "Spend up to 2 trade goods to ready an equal number of non-home planets you control.",
+        "text": "Ready 1 of your components that isn't a strategy card.",
         "flavorText": "Captain Agerro sighed. The work was not what he had expected, not what he had wanted, but it had to be done. Fighting would come later.",
         "source": "action_deck_2"
     },
@@ -1021,8 +1021,8 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "short-lived_clone",
-        "name": "Short-lived Clone",
+        "alias": "simulacrum",
+        "name": "Simulacrum",
         "phase": "Action",
         "window": "At the start of your turn",
         "text": "Choose 1 agent. Ready or exhaust that agent.",

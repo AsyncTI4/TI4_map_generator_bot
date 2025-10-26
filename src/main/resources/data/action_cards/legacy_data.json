@@ -218,7 +218,34 @@
         "source": "deprecated"
     },
     {
+        "alias": "relay_connection1",
+        "name": "Relay Connection",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose 1 ship type. You may produce 1 ship of that type in each system that contains 1 of your space docks.",
+        "flavorText": "His engineers broke into celebration as Umbat called out to praise them, \"The forge burns, my soul alight! This is our freedom!\"",
+        "source": "deprecated"
+    },
+    {
         "alias": "relay_connection2",
+        "name": "Relay Connection",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose 1 ship type. You may produce 1 ship of that type in each system that contains 1 of your space docks.",
+        "flavorText": "His engineers broke into celebration as Umbat called out to praise them, \"The forge burns, my soul alight! This is our freedom!\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "relay_connection3",
+        "name": "Relay Connection",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose 1 ship type. You may produce 1 ship of that type in each system that contains 1 of your space docks.",
+        "flavorText": "His engineers broke into celebration as Umbat called out to praise them, \"The forge burns, my soul alight! This is our freedom!\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "relay_connection4",
         "name": "Relay Connection",
         "phase": "Action",
         "window": "Action",
@@ -1308,6 +1335,15 @@
         "text": "Destroy that ship.",
         "automationID": "direct_hit",
         "flavorText": "The Loncara Ssodu's secondary batteries made quick work of the escorts as the dreadnought's crew abandoned ship.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "short-lived_clone",
+        "name": "Short-lived Clone",
+        "phase": "Action",
+        "window": "At the start of your turn",
+        "text": "Choose 1 agent. Ready or exhaust that agent.",
+        "flavorText": "\"Damn thing tried to kill me,\" Suffi grunted as she heaved the corpse onto the floor. \"Best we destroy that spinner after all. This galaxy can barely handle one of me.\"",
         "source": "deprecated"
     }
 ]
