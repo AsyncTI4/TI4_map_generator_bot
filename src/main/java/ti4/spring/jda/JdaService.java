@@ -214,23 +214,23 @@ public class JdaService {
         }
 
         // Async: FOW Chapter Secondary
-        if (args.length >= 18) {
-            guildFogOfWarSecondary = initGuild(args[17], false);
+        if (args.length >= 15) {
+            guildFogOfWarSecondary = initGuild(args[14], false);
             fowServers.add(guildFogOfWarSecondary);
         }
 
         // Async: 10th Server
-        if (args.length >= 15) {
-            guildDecenary = initGuild(args[14], true);
+        if (args.length >= 16) {
+            guildDecenary = initGuild(args[15], true);
         }
         // Async: 11th Server
-        if (args.length >= 16) {
-            guildUndenary = initGuild(args[15], true);
+        if (args.length >= 17) {
+            guildUndenary = initGuild(args[16], true);
         }
 
         // Async: 12th Server
-        if (args.length >= 17) {
-            guildDuodenary = initGuild(args[16], true);
+        if (args.length >= 18) {
+            guildDuodenary = initGuild(args[17], true);
         }
 
         if (guildPrimary == null || guilds.isEmpty()) {
