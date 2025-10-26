@@ -166,7 +166,7 @@ public class Helper {
     }
 
     private static boolean checkAcd2ForAllSabotagesDiscarded(Game game) {
-        return "action_deck_2".equals(game.getAcDeckID())
+        return game.isAcd2()
                 && game.getDiscardActionCards().containsKey("sabotage1_acd2")
                 && game.getDiscardActionCards().containsKey("sabotage2_acd2")
                 && game.getDiscardActionCards().containsKey("sabotage3_acd2")
