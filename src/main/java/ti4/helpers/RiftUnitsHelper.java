@@ -210,7 +210,11 @@ public class RiftUnitsHelper {
             unit = unit.replace("damaged", "");
             damaged = true;
         }
-        Die d1 = new Die(4);
+        int threshold = 4;
+        if (cabal != null && game.isTwilightsFallMode()) {
+            threshold = 6;
+        }
+        Die d1 = new Die(threshold);
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
         String msg = unitKey.unitEmoji() + " in tile " + tile.getPosition() + " rolled a "
                 + d1.getGreenDieIfSuccessOrRedDieIfFailure();
@@ -225,7 +229,8 @@ public class RiftUnitsHelper {
             msg += " and failed. Condolences for your loss.";
             if (cabal != null
                     && cabal != player
-                    && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, game, cabal)) {
+                    && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, game, cabal)
+                    && !game.isTwilightsFallMode()) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, 1, unit, event);
             } else if (RiftSetModeService.isActive(game)) {
                 msg = RiftSetModeService.riftSetCabalEatsUnit(msg, player, game, unit, event);

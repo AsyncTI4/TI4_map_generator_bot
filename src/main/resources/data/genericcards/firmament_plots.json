@@ -8,7 +8,7 @@
     },
     {
         "alias": "siphon",
-        "name": "Siphon",
+        "name": "Syphon",
         "text": "When the puppeted player gains commodities, you gain an equal number of trade goods.",
         "cardType": "plot",
         "source": "thunders_edge"
@@ -22,7 +22,7 @@
     },
     {
         "alias": "assail",
-        "name": "Assail",
+        "name": "Asail",
         "text": "Apply +1 to the results of each of your combat and unit ability rolls against the puppeted player.",
         "cardType": "plot",
         "source": "thunders_edge"

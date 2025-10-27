@@ -3748,7 +3748,7 @@ public class ButtonHelper {
         }
         int ageOfFightersFleet;
         if (game.isAgeOfFightersMode()) {
-            if (player.hasTech("hcf2") || player.hasTech("absol_hcf2")) {
+            if (player.hasTech("hcf2") || player.hasTech("absol_hcf2") || player.hasUnit("tf-hcf")) {
                 ageOfFightersFleet = Math.min(numFighter2s, fleetCap - numOfCapitalShips);
             } else {
                 ageOfFightersFleet = Math.min(numFighter2s, (fleetCap - numOfCapitalShips) / 2);
@@ -3761,7 +3761,7 @@ public class ButtonHelper {
                 capacityViolated = true;
             } else {
                 numFighter2s = numInfNFightersNMechs - capacity;
-                if (player.hasTech("hcf2") || player.hasTech("absol_hcf2")) {
+                if (player.hasTech("hcf2") || player.hasTech("absol_hcf2") || player.hasUnit("tf-hcf")) {
                     numFighter2sFleet += numFighter2s;
                 } else {
                     numFighter2sFleet += numFighter2s * 2;

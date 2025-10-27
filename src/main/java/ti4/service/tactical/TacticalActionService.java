@@ -404,7 +404,9 @@ public class TacticalActionService {
         List<UnitType> committable = new ArrayList<>(List.of(UnitType.Mech, UnitType.Infantry));
         boolean naaluFS = (player.hasUnit("naalu_flagship") || player.hasUnit("sigma_naalu_flagship_2"))
                 && space.getUnitCount(UnitType.Flagship, player) > 0;
-        boolean belkoFF = player.hasUnit("belkosea_fighter") || player.hasUnit("belkosea_fighter2");
+        boolean belkoFF = player.hasUnit("belkosea_fighter")
+                || player.hasUnit("belkosea_fighter2")
+                || player.hasUnit("tf-morphwing");
         if (naaluFS || belkoFF) committable.add(UnitType.Fighter);
         return committable;
     }

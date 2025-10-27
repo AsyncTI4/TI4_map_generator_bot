@@ -454,6 +454,12 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "opponent_has_been_asailed" -> {
+                if (player.hasAbility("marionettes")
+                        && player.getPlotCardsFactions().get("assail").contains(opponent.getFaction())) {
+                    meetsCondition = true;
+                }
+            }
             case "nivyn_commander_damaged" -> {
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "nivyncommander")) {
                     meetsCondition = true;
