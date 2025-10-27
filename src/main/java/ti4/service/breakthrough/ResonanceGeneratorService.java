@@ -42,8 +42,9 @@ public class ResonanceGeneratorService {
     public void postInitialButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         // not having a breach is not *technically* required, but like, why would you place an active breach if you can
         // instead flip the one there ??
-        Predicate<Tile> unitsAndNoBreach =
-                Tile.tileHasPlayerUnits(player).and(Tile.tileHasBreach().negate());
+        Predicate<Tile> unitsAndNoBreach = Tile.tileHasPlayerUnits(player)
+                .and(Tile.tileHasBreach().negate())
+                .and(tile -> !tile.isHomeSystem(game));
         List<Button> place =
                 ButtonHelper.getTilesWithPredicateForAction(player, game, "placeBreach", unitsAndNoBreach, false);
         List<Button> flip =
@@ -86,7 +87,7 @@ public class ResonanceGeneratorService {
 
         String msg = player.getRepresentationNoPing() + " Flipped " + oldState + " breach to " + newState + " in tile "
                 + tile.getRepresentationForButtons(game, player);
-        msg += " using " + resonanceRep() + ".";
+        // msg += " using " + resonanceRep() + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }

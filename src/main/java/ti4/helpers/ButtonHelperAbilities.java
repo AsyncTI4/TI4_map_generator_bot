@@ -1926,7 +1926,7 @@ public class ButtonHelperAbilities {
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),
                                 player.getRepresentation() + " your number of oceans increased and is now "
-                                        + player.getOceans().size() + "). The new oceans were gained readied.");
+                                        + player.getOceans().size() + ". The new oceans were also readied.");
                         CommanderUnlockCheckService.checkPlayer(player, "deepwrought");
                     }
                 }

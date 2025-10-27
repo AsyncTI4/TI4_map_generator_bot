@@ -1100,9 +1100,9 @@ public class ButtonHelperModifyUnits {
             if (player != player2 && players.contains(player)) {
                 if (player2.hasUnlockedBreakthrough("titansbt")
                         || player.hasUnlockedBreakthrough("titansbt")
-                        || player.hasAbility("research_team")
+                        || player.hasAbility("researchteam")
                         || player.hasUnit("tf-ambassador")
-                        || player2.hasAbility("research_team")) {
+                        || player2.hasAbility("researchteam")) {
                     String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
                     String msg = player.getRepresentation() + " " + player2.getRepresentation()
                             + " the game is unsure if a combat should occur on " + planetName

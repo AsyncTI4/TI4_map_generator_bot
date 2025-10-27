@@ -17,6 +17,7 @@ import ti4.service.emoji.MiscEmojis;
 public class SpaceTokenModel implements TokenModelInterface, EmbeddableModel {
     private String id;
     private String imagePath;
+    private String spaceOrPlanet;
     private String tokenPlanetName;
     private Boolean isAnomaly;
     private Boolean isRift;
@@ -25,6 +26,10 @@ public class SpaceTokenModel implements TokenModelInterface, EmbeddableModel {
     private List<String> aliasList;
     private List<Wormhole> wormholes;
     private ComponentSource source;
+    private String placement;
+    private Double scale;
+    private Boolean isPlanet;
+    private String attachmentID;
 
     @Override
     public boolean isValid() {
