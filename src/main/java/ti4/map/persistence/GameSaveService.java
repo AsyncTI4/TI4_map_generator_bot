@@ -821,7 +821,7 @@ class GameSaveService {
             writeCardsStrings(player.getTrapCardsPlanets(), writer, Constants.LIZHO_TRAP_PLANETS);
 
             writeCards(player.getPlotCards(), writer, Constants.PLOT_CARDS);
-            // writeCardsStringList(player.getPlotCardsFactions(), writer, Constants.PLOT_FACTIONS);
+            writeCardsStringList(player.getPlotCardsFactions(), writer, Constants.PLOT_FACTIONS);
 
             writer.write(Constants.FRAGMENTS + " " + String.join(",", player.getFragments()));
             writer.write(System.lineSeparator());
@@ -1054,6 +1054,19 @@ class GameSaveService {
     private static void writeBoolLine(Writer writer, String field, boolean bool) throws IOException {
         String output = bool ? "true" : "false";
         writer.write(field + " " + output);
+        writer.write(System.lineSeparator());
+    }
+
+    private static void writeCardsStringList(Map<String, List<String>> cardList, Writer writer, String saveID)
+            throws IOException {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, List<String>> entry : cardList.entrySet()) {
+            sb.append(entry.getKey())
+                    .append(",")
+                    .append(String.join(",", entry.getValue()))
+                    .append(";");
+        }
+        writer.write(saveID + " " + sb);
         writer.write(System.lineSeparator());
     }
 
