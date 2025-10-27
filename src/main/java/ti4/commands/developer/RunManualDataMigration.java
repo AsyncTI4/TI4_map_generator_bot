@@ -16,7 +16,7 @@ import ti4.migration.DataMigrationManager;
 
 class RunManualDataMigration extends Subcommand {
 
-    public RunManualDataMigration() {
+    RunManualDataMigration() {
         super(Constants.RUN_MANUAL_DATA_MIGRATION, "Run a manual data migration on a game.");
         addOptions(new OptionData(OptionType.STRING, Constants.MIGRATION_NAME, "migration name").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "The game to run the migration against")
