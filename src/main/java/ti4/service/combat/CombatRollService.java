@@ -1171,6 +1171,18 @@ public class CombatRollService {
         }
     }
 
+    public static Map<UnitModel, Integer> getProximaBombardUnit(Tile tile, Player player) {
+        UnitModel proximaFakeUnit = new UnitModel();
+        proximaFakeUnit.setBombardDieCount(3);
+        proximaFakeUnit.setBombardHitsOn(8);
+        proximaFakeUnit.setName(Mapper.getTech("proxima").getName());
+        proximaFakeUnit.setAsyncId("ProximaBombard");
+        proximaFakeUnit.setId("ProximaBombard");
+        proximaFakeUnit.setBaseType("dn");
+        proximaFakeUnit.setFaction(player.getFaction());
+        return Map.of(proximaFakeUnit, 1);
+    }
+
     public static Map<UnitModel, Integer> getUnitsInBombardment(
             Tile tile, Player player, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());

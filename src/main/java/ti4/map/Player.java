@@ -912,6 +912,7 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasPlayablePromissoryInHand(String pn) {
+        if (pn.equals("malevolency")) return getPromissoryNotes().containsKey(pn);
         return promissoryNotes.containsKey(pn) && !getPromissoryNotesOwned().contains(pn);
     }
 
@@ -2838,6 +2839,9 @@ public class Player extends PlayerProperties {
                 return tile;
             }
             if (getPlanets().contains("creuss") && tile.getUnitHolders().get("creuss") != null) {
+                return tile;
+            }
+            if (tile.getUnitHolders().get("ahkcreuss") != null && getAbilities().contains("sorrow")) {
                 return tile;
             }
         }

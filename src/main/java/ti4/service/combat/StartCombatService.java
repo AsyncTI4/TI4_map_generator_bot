@@ -44,6 +44,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
 
@@ -1871,6 +1872,9 @@ public class StartCombatService {
                         String id = p.finChecker() + "letnevMechRes_" + unitH.getName() + "_mech";
                         String label = "Deploy Dunlain Reaper on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.Letnev));
+                    }
+                    if (isGroundCombat) {
+                        BastionTechService.addProximaCombatButton(game, p1, p2, tile, unitH, buttons);
                     }
                 }
                 // Assimilate
