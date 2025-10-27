@@ -61,8 +61,7 @@ public class SourceSettings extends SettingsMenu {
                 "Ignis Aurora Mod",
                 game.getTechnologyDeckID().toLowerCase().contains("baldrick"));
         eronous = new BooleanSetting("Eronous", "Eronous Tiles", false);
-        actionCardDeck2 = new BooleanSetting(
-                "ActionCardDeck2", "Action Card Deck 2", "action_deck_2".equalsIgnoreCase(game.getAcDeckID()));
+        actionCardDeck2 = new BooleanSetting("ActionCardDeck2", "Action Card Deck 2", game.isAcd2());
         // Emojis
         base.setEmoji(SourceEmojis.TI4BaseGame);
         pok.setEmoji(SourceEmojis.TI4PoK);
@@ -244,7 +243,7 @@ public class SourceSettings extends SettingsMenu {
 
                 // Decks for Uncharted Space
                 String explore = ds ? "explores_DS" : "explores_pok";
-                String acs = acd2 ? "action_deck_2" : (ds ? "action_cards_ds" : "action_cards_pok");
+                String acs = acd2 ? getAcd2Version(pok, teDemo) : (ds ? "action_cards_ds" : "action_cards_pok");
 
                 // set 'em up
                 decks.getRelics().setChosenKey(relic);
@@ -264,5 +263,11 @@ public class SourceSettings extends SettingsMenu {
             }
             case "Eronous" -> {}
         }
+    }
+
+    private String getAcd2Version(BooleanSetting pok, BooleanSetting teDemo) {
+        // when TE is fully implemented, this needs to check for _pok, _pok_te, or _te.
+        String suffix = pok.isVal() ? "_pok" : teDemo.isVal() ? "_te" : "";
+        return "action_deck_2" + suffix;
     }
 }

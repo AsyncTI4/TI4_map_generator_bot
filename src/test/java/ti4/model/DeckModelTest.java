@@ -1,6 +1,6 @@
 package ti4.model;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,6 @@ class DeckModelTest extends BaseTi4Test {
             case RELIC -> validateRelicDeck(deckModel);
             case EXPLORE -> validateExploreDecks(deckModel);
             case OTHER -> true;
-            default -> false;
         };
     }
 
