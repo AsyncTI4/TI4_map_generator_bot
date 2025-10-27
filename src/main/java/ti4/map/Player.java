@@ -106,6 +106,12 @@ public class Player extends PlayerProperties {
 
     private final Tile nomboxTile = new Tile("nombox", "nombox");
 
+    @Getter
+    private final Map<String, Integer> plotCards = new LinkedHashMap<>();
+
+    @Getter
+    private final Map<String, List<String>> plotCardsFactions = new LinkedHashMap<>();
+
     private final Map<String, Integer> actionCards = new LinkedHashMap<>();
     private final Map<String, Integer> events = new LinkedHashMap<>();
     private final Map<String, Integer> trapCards = new LinkedHashMap<>();
@@ -157,6 +163,17 @@ public class Player extends PlayerProperties {
                 .map(planet -> game.getPlanetsInfo().get(planet))
                 .filter(Planet::isSpaceStation)
                 .count();
+    }
+
+    public List<String> getOceans() {
+        List<String> oceans = new ArrayList<>();
+        for (String planet : getPlanets()) {
+            if (planet.contains("ocean")) {
+                oceans.add(planet);
+            }
+        }
+
+        return oceans;
     }
 
     public Tile getNomboxTile() {
@@ -668,6 +685,39 @@ public class Player extends PlayerProperties {
         return events;
     }
 
+    public void setPlotCard(String id, Integer identifier) {
+        plotCards.put(id, identifier);
+    }
+
+    public void setPlotCard(String id) {
+        if (plotCards.containsKey(id)) return;
+
+        Collection<Integer> values = plotCards.values();
+        int identifier = ThreadLocalRandom.current().nextInt(100);
+        while (values.contains(identifier)) {
+            identifier = ThreadLocalRandom.current().nextInt(100);
+        }
+        plotCards.put(id, identifier);
+    }
+
+    public void setPlotCardFaction(String id, String faction) {
+        if (!plotCardsFactions.containsKey(id)) plotCardsFactions.put(id, new ArrayList<>());
+        plotCardsFactions.get(id).add(faction);
+    }
+
+    public void removePlotCardFaction(String id) {
+        plotCardsFactions.remove(id);
+    }
+
+    public boolean isOtherPlayerPuppeted(Player p2) {
+        for (List<String> puppets : getPlotCardsFactions().values()) {
+            if (puppets.contains(p2.getFaction())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Map<String, Integer> getTrapCards() {
         return trapCards;
     }
@@ -873,6 +923,7 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasPlayablePromissoryInHand(String pn) {
+        if (pn.equals("malevolency")) return getPromissoryNotes().containsKey(pn);
         return promissoryNotes.containsKey(pn) && !getPromissoryNotesOwned().contains(pn);
     }
 
@@ -2799,6 +2850,9 @@ public class Player extends PlayerProperties {
                 return tile;
             }
             if (getPlanets().contains("creuss") && tile.getUnitHolders().get("creuss") != null) {
+                return tile;
+            }
+            if (tile.getUnitHolders().get("ahkcreuss") != null && getAbilities().contains("sorrow")) {
                 return tile;
             }
         }

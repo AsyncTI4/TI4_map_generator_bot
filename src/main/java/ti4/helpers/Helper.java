@@ -2901,6 +2901,9 @@ public class Helper {
             if ((player.getFaction().contains("ghost") && game.getTile("17") != null) && ghostish) {
                 tile = game.getTile("17");
             }
+            if ((player.getFaction().contains("crimson") && game.getTile("94") != null)) {
+                tile = game.getTile("94");
+            }
             if (tile != null) {
                 int parsedLocation = 9999;
                 try {

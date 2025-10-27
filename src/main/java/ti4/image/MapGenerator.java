@@ -69,6 +69,7 @@ import ti4.website.model.WebsiteOverlay;
 public class MapGenerator implements AutoCloseable {
 
     private static final int RING_MAX_COUNT = 8;
+
     private static final int RING_MIN_COUNT = 3;
     private static final int PLAYER_STATS_HEIGHT = 650; // + 34 per teammate + 34 if line is long
     private static final int TILE_PADDING = 100;
@@ -277,6 +278,7 @@ public class MapGenerator implements AutoCloseable {
             return;
         }
         Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
+        boolean showFracture = FractureService.isFractureInPlay(game);
         // Show Grey Setup Tiles
         if (game.isShowMapSetup() || tilesToDisplay.isEmpty()) {
             int ringCount = game.getRingCount();
@@ -287,6 +289,7 @@ public class MapGenerator implements AutoCloseable {
             maxY = -1;
             for (String position : PositionMapper.getTilePositions()) {
                 String tileRing = "0";
+                if (position.startsWith("frac") && !showFracture) continue;
                 if (position.length() == 3) {
                     tileRing = position.substring(0, 1);
                 } else if (position.length() == 4) {

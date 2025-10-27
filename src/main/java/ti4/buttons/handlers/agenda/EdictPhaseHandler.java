@@ -11,12 +11,14 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperTwilightsFall;
+import ti4.helpers.ButtonHelperTwilightsFallActionCards;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.RelicModel;
@@ -208,7 +210,8 @@ public class EdictPhaseHandler {
                     buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
                 } else {
                     msg += "💥 💥 💥 💥";
-                    buttons.add(Buttons.gray("getModifyTiles", "Modify Units"));
+                    Tile tile = game.getMecatolTile();
+                    ButtonHelperTwilightsFallActionCards.sendDestroyButtonsForSpecificTileAndSurrounding(game, tile);
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
             }

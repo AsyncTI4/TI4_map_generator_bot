@@ -365,6 +365,17 @@ public class ButtonHelperTwilightsFallActionCards {
         for (String card : allCards) {
             embeds.add(Mapper.getUnit(card).getRepresentationEmbed());
             if (Mapper.getUnit(card).getBaseType().equalsIgnoreCase(unitT)) {
+                UnitModel unitModel = Mapper.getUnit(card);
+                String asyncId = unitModel.getAsyncId();
+                if (!asyncId.equalsIgnoreCase("fs") && !asyncId.equalsIgnoreCase("mf")) {
+                    List<UnitModel> unitsToRemove = player.getUnitsByAsyncID(asyncId).stream()
+                            .filter(unit -> unit.getFaction().isEmpty()
+                                    || unit.getUpgradesFromUnitId().isEmpty())
+                            .toList();
+                    for (UnitModel u : unitsToRemove) {
+                        player.removeOwnedUnitByID(u.getId());
+                    }
+                }
                 player.addOwnedUnitByID(card);
                 found = Mapper.getUnit(card).getAutoCompleteName() + "\nIt has been automatically gained";
                 break;
@@ -375,7 +386,22 @@ public class ButtonHelperTwilightsFallActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void sendDestroyButtonsForSpecificTileAndSurrounding(Game game, Tile tile) {}
+    public static void sendDestroyButtonsForSpecificTileAndSurrounding(Game game, Tile tile) {
+        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), null, false, true)) {
+            Tile tile2 = game.getTileByPosition(pos);
+            for (Player player : game.getRealPlayers()) {
+                if (FoWHelper.playerHasUnitsInSystem(player, tile2)) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.red(
+                            player.getFinsFactionCheckerPrefix() + "getDamageButtons_" + pos + "_"
+                                    + "deleteThis_combat",
+                            "Destroy Units in " + tile2.getRepresentationForButtons()));
+                    String msg = player.getRepresentation() + " use this button to destroy units.";
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+                }
+            }
+        }
+    }
 
     // twinning
     // tf-manifest

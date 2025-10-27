@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -189,7 +190,7 @@ public class ActionCardHelper {
         return sb.toString();
     }
 
-    private static String getTrapCardRepresentation(String trapID, Map<String, String> trapCardsPlanets) {
+    public static String getTrapCardRepresentation(String trapID, Map<String, String> trapCardsPlanets) {
         StringBuilder sb = new StringBuilder();
         GenericCardModel trap = Mapper.getTrap(trapID);
         String planet = trapCardsPlanets.get(trapID);
@@ -201,9 +202,93 @@ public class ActionCardHelper {
             if (representation == null) {
                 representation = planet;
             }
-            sb.append("\n> Planet: ").append(representation);
+            sb.append("\n> Planet: ").append(representation).append("");
         }
         sb.append("\n");
+        return sb.toString();
+    }
+
+    public static void sendPlotCardInfo(Game game, Player player) {
+        if (player.hasAbility("plotsplots")
+                || player.hasAbility("bladesorchestra")
+                || player.hasAbility("puppetsoftheblade")) { // firmament/obsidian plot abilities
+            List<Button> buttons = getPlotCardButtons(game, player);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(), getPlotCardInfo(game, player), buttons);
+        }
+    }
+
+    public static List<Button> getPlotCardButtons(Game game, Player player) {
+        boolean hasManageAbility = false;
+        if (player.hasAbility("plotsplots")) hasManageAbility = true;
+        if (player.hasLeader("firmamenthero")) hasManageAbility = true;
+        if (!hasManageAbility) return new ArrayList<>();
+
+        List<Button> buttons = new ArrayList<>();
+        player.getPlotCards().entrySet().stream()
+                .map(plot -> Map.entry(plot.getValue(), Mapper.getPlot(plot.getKey())))
+                .sorted(Comparator.comparingInt(Entry::getKey))
+                .forEachOrdered(plotEntry -> {
+                    GenericCardModel plot = plotEntry.getValue();
+                    String buttonID = "addFactionTokenToPlot_" + plot.getAlias();
+                    String buttonText = plot.getName();
+                    buttons.add(Buttons.green(buttonID, buttonText));
+                });
+        player.getPlotCards().entrySet().stream()
+                .map(plot -> Map.entry(plot.getValue(), Mapper.getPlot(plot.getKey())))
+                .sorted(Comparator.comparingInt(Entry::getKey))
+                .forEachOrdered(plotEntry -> {
+                    GenericCardModel plot = plotEntry.getValue();
+                    String buttonID = "removeFactionTokenFromPlot_" + plot.getAlias();
+                    String buttonText = "Remove from " + plot.getName();
+                    List<String> factions = player.getPlotCardsFactions().get(plot.getAlias());
+                    if (factions != null && !factions.isEmpty()) {
+                        buttons.add(Buttons.red(buttonID, buttonText));
+                    }
+                });
+        return buttons;
+    }
+
+    public static List<Button> getFactionButtonsForPlot(Game game, Player player, String plotID, String prefix) {
+        List<Button> buttons = new ArrayList<>();
+        List<String> factions = player.getPlotCardsFactions().get(plotID);
+        game.getRealPlayers().stream().forEach(p -> {
+            boolean valid = factions == null || !factions.contains(p.getFaction());
+            if (prefix.startsWith("remove")) valid = factions != null && factions.contains(p.getFaction());
+            if (valid) {
+                String id = prefix + plotID + "_" + p.getFaction();
+                buttons.add(Buttons.gray(id, "", p.getFactionEmoji()));
+            }
+        });
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
+        return buttons;
+    }
+
+    public static String getPlotCardInfo(Game game, Player player) {
+        StringBuilder sb = new StringBuilder("### **__Plot Cards:__**\n");
+        player.getPlotCards().entrySet().stream()
+                .map(plot -> Map.entry(plot.getValue(), Mapper.getPlot(plot.getKey())))
+                .sorted(Comparator.comparingInt(Entry::getKey))
+                .forEachOrdered(plotEntry -> {
+                    GenericCardModel plot = plotEntry.getValue();
+                    Integer value = plotEntry.getKey();
+                    List<String> factions = player.getPlotCardsFactions().get(plot.getAlias());
+                    sb.append("`").append(Helper.leftpad("(" + value, 3)).append(")`");
+                    sb.append(getPlotCardRepresentation(game, plot, factions));
+                });
+        return sb.toString();
+    }
+
+    private static String getPlotCardRepresentation(Game game, GenericCardModel plot, List<String> factions) {
+        StringBuilder sb = new StringBuilder(plot.getRepresentation()).append("\n");
+        if (factions != null) {
+            List<String> factionEmojis = factions.stream()
+                    .map(game::getPlayerFromColorOrFaction)
+                    .filter(x -> x != null)
+                    .map(Player::getFactionEmoji)
+                    .toList();
+            sb.append("> ").append(String.join(", ", factionEmojis)).append("\n");
+        }
         return sb.toString();
     }
 
