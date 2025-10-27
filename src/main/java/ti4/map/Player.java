@@ -2238,7 +2238,7 @@ public class Player extends PlayerProperties {
                     + Mapper.getTech(techID).getName() + "** for 4 resources.";
 
             List<Button> buttons2 = new ArrayList<>();
-            buttons2.add(Buttons.GET_A_TECH);
+            buttons2.add(Buttons.green("acquireATechdeleteThisMessage", "Get a Technology"));
             buttons2.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(obsidian.getCorrectChannel(), msg, buttons2);
         }

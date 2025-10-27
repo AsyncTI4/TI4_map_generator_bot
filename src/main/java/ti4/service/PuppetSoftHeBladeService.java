@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ComponentActionHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -58,19 +57,6 @@ public class PuppetSoftHeBladeService {
                 for (String faction : puppetedFactions) {
                     Player p2 = game.getPlayerFromColorOrFaction(faction);
                     if (p2 != null) factions += p2.getFactionEmoji() + " ";
-                    if (plotID.equals("seethe")) {
-                        ComponentActionHelper.resolveAtomicsStep2(player, game, null, "spoof_" + faction);
-                    }
-                    if (plotID.equals("extract")
-                            && ButtonHelperActionCards.getExtractButtons(game, player, p2)
-                                            .size()
-                                    > 0) {
-                        MessageHelper.sendMessageToChannelWithButtons(
-                                player.getCorrectChannel(),
-                                "Please choose the technology you wish to acquire from extracting the technical knowledge of "
-                                        + p2.getRepresentation() + ":",
-                                ButtonHelperActionCards.getExtractButtons(game, player, p2));
-                    }
                 }
                 plotInfo.append("\n> - Puppeted Factions for ")
                         .append(plot.getName())
