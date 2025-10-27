@@ -167,6 +167,100 @@ public class ButtonHelperTwilightsFallActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("resolveCoerce")
+    public static void resolveCoerce(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+            buttons.add(Buttons.gray("coerceStep2_" + p2.getFaction(), p2.getFactionNameOrColor()));
+        }
+        String msg = player.getRepresentation() + " choose the player you wish to coerce.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("coerceStep2")
+    public static void coerceStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<>();
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        for (String ability : p2.getTechs()) {
+            TechnologyModel tech = Mapper.getTech(ability);
+            if (!tech.getFaction().isPresent()) {
+                continue;
+            }
+            buttons.add(Buttons.gray(
+                    p2.getFinsFactionCheckerPrefix() + "coerceStep3_" + player.getFaction() + "_" + ability,
+                    tech.getAutoCompleteName()));
+        }
+        String msg = p2.getRepresentation() + " choose the ability you wish to give to " + player.getRepresentation();
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("coerceStep3")
+    public static void coerceStep3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String ability1 = buttonID.split("_")[2];
+        TechnologyModel tech1 = Mapper.getTech(ability1);
+        player.removeTech(ability1);
+        p2.addTech(ability1);
+        String msg = player.getRepresentation() + " lost " + tech1.getName() + " to " + p2.getFactionNameOrColor();
+        String msg2 =
+                p2.getRepresentation() + " you gained " + tech1.getName() + " from " + player.getFactionNameOrColor();
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void resolvePoison(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+            buttons.add(Buttons.gray("poisonHeroStep2_" + p2.getFaction(), p2.getFactionNameOrColor()));
+        }
+        String msg = player.getRepresentation() + " choose the player you wish to poison.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+    }
+
+    @ButtonHandler("poisonHeroStep2")
+    public static void poisonHeroStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<>();
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        for (String ability : p2.getTechs()) {
+            TechnologyModel tech = Mapper.getTech(ability);
+            if (!tech.getFaction().isPresent()) {
+                continue;
+            }
+            buttons.add(Buttons.gray("poisonHeroStep3_" + p2.getFaction() + "_" + ability, tech.getAutoCompleteName()));
+        }
+        String msg = player.getRepresentation() + " choose the ability you wish to try to steal.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("poisonHeroStep3")
+    public static void poisonHeroStep3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<>();
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String ability1 = buttonID.split("_")[2];
+        TechnologyModel tech1 = Mapper.getTech(ability1);
+        buttons.add(Buttons.gray(
+                p2.getFinsFactionCheckerPrefix() + "coerceStep3_" + player.getFaction() + "_" + ability1,
+                "Give" + tech1.getAutoCompleteName()));
+        buttons.add(Buttons.gray(
+                p2.getFinsFactionCheckerPrefix() + "poisonHeroStep4_" + player.getFaction(), "Give 2 Abilities"));
+        String msg = p2.getRepresentation()
+                + " you have been hit with the poison paradigm and now much choose to either give them the ability they want or give them 2 of the abilities you choose.";
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("poisonHeroStep4")
+    public static void poisonHeroStep4(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        coerceStep2(game, p2, null, "spoof_" + player.getFaction());
+        coerceStep2(game, p2, null, "spoof_" + player.getFaction());
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("transposeStep2")
     public static void transposeStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
@@ -453,7 +547,6 @@ public class ButtonHelperTwilightsFallActionCards {
     // trine
     // pax
     // ignis
-    // coerce
     // statis/crisis
     // tartarus
     // timestop
@@ -461,17 +554,11 @@ public class ButtonHelperTwilightsFallActionCards {
     // converge
 
     // dragonfreed
-    // swa tie up with argent swa2
     // linkship is ralnel FS ability
-    // coexistence for the amabassador
     // mageon for yssaril infantry
     // 3 x mech cards
-    // exos tie to exos
-    // creuss cruisers
     // cabal carrier
-    // hcf half capacity
     // morphwing for swappin into infantry
-    // triune for watcher powers
     // yin infantry for special revival
     // hacan spacedocks have production biomes
     // bastion spacedocks

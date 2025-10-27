@@ -3684,6 +3684,33 @@ public class ButtonHelperFactionSpecific {
         return false;
     }
 
+    public static boolean isNextToTriunes(Game game, Player ACPlayer, Player EmpyPlayer) {
+        if (ACPlayer == null || EmpyPlayer == null) {
+            return false;
+        }
+        if (ACPlayer.getFaction().equalsIgnoreCase(EmpyPlayer.getFaction())) {
+            return false;
+        }
+        List<Tile> tiles =
+                CheckUnitContainmentService.getTilesContainingPlayersUnits(game, EmpyPlayer, UnitType.Fighter);
+        int count = 0;
+        for (Tile tile : tiles) {
+            int systemFF = tile.getSpaceUnitHolder().getUnitCount(UnitType.Fighter, EmpyPlayer.getColor());
+            Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tile.getPosition(), EmpyPlayer, true);
+            for (String adjTile : adjTiles) {
+                Tile adjT = game.getTileMap().get(adjTile);
+                if (FoWHelper.playerHasUnitsInSystem(ACPlayer, adjT)) {
+                    count += systemFF;
+                    break;
+                }
+            }
+        }
+        if (count > 2) {
+            return true;
+        }
+        return false;
+    }
+
     public static List<Button> getLanefirATSButtons(Player p1, Player p2) {
         List<Button> ats = new ArrayList<>();
 

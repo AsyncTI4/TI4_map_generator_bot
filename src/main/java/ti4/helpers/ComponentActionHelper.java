@@ -846,7 +846,9 @@ public class ComponentActionHelper {
         List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getPlanets()) {
             Tile tile = game.getTileFromPlanet(planet);
-            if (tile != null && !tile.isHomeSystem(game)) {
+            if (tile != null
+                    && !tile.isHomeSystem(game)
+                    && !game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
                 buttons.add(Buttons.gray(
                         "atomicsStep3_" + p2.getFaction() + "_" + planet,
                         Helper.getPlanetRepresentation(planet, game)));
@@ -869,7 +871,7 @@ public class ComponentActionHelper {
         if (p2.hasAbility("data_recovery")) {
             ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
         }
-        if (!game.isFowMode()) {
+        if (!game.isFowMode() && game.isStellarAtomicsMode()) {
             DisasterWatchHelper.postTileInDisasterWatch(
                     game,
                     event,
@@ -893,8 +895,10 @@ public class ComponentActionHelper {
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " has nuked " + planetRep
                             + ", destroying every unit there belonging to " + p2.getRepresentationUnfogged() + ".");
-            DisasterWatchHelper.postTileInDisasterWatch(
-                    game, event, game.getTileFromPlanet(planet), 0, planetRep + ", post war crimes.");
+            if (game.isStellarAtomicsMode()) {
+                DisasterWatchHelper.postTileInDisasterWatch(
+                        game, event, game.getTileFromPlanet(planet), 0, planetRep + ", post war crimes.");
+            }
         }
     }
 
