@@ -606,7 +606,7 @@
         "name": "Rapid Fulfillment",
         "phase": "Action",
         "window": "After a player activates a system that contains your units",
-        "text": "You may resolve a transaction with any player; action cards can be included as part of this transaction. Then, produce up to 2 ships in that system that have a combined cost of 3 or less.",
+        "text": "You may resolve a transaction with any player; action cards can be included as part of this transaction. Then, produce up to 2 ships in that system that have a combined cost of 3 or less. [Note: This transaction does not require you to be neighbors or count towards your transaction limit.]",
         "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
         "source": "action_deck_2"
     },
