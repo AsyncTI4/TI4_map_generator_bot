@@ -741,6 +741,13 @@ public class ButtonHelperTwilightsFall {
                     allCards.remove(tech);
                 }
             }
+            List<String> someCardList = new ArrayList<>();
+            someCardList.addAll(allCards);
+            for (String card : someCardList) {
+                if (game.getStoredValue("purgedAbilities").contains("_" + card)) {
+                    allCards.remove(card);
+                }
+            }
             for (int i = 0; i < size && allCards.size() > 0; i++) {
                 cards.add(allCards.remove(0));
             }

@@ -2081,6 +2081,10 @@ public class ButtonHelperModifyUnits {
             buttons.add(Buttons.red(
                     "exhaustAgent_ghotiagent_" + player.getFaction(), "Use Ghoti Agent", FactionEmojis.ghoti));
         }
+        if (player.hasUnexhaustedLeader("experimentalagent")) {
+            buttons.add(
+                    Buttons.gray("exhaustAgent_experimentalagent", "Use Experimental Genome", FactionEmojis.Jolnar));
+        }
         if (player.hasUnexhaustedLeader("mortheusagent")) {
             buttons.add(Buttons.red(
                     "exhaustAgent_mortheusagent_" + player.getFaction(), "Use Mortheus Agent", FactionEmojis.mortheus));
