@@ -13,6 +13,44 @@
         "source": "thunders_edge"
     },
     {
+        "id": "breachactive",
+        "imagePath": "token_breachActive.png",
+        "aliasList": [
+            "breachactive",
+            "token_breachactive"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "id": "breachinactive",
+        "imagePath": "token_breachInactive.png",
+        "aliasList": [
+            "breachinactive",
+            "token_breachinactive"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "id": "ingress",
+        "imagePath": "token_ingress.png",
+        "aliasList": [
+            "ingress",
+            "token_ingress"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "id": "relictoken",
+        "imagePath": "token_relictoken.png",
+        "aliasList": [
+            "relic",
+            "token_relic",
+            "relictoken",
+            "token_relictoken"
+        ],
+        "source": "thunders_edge"
+    },
+    {
         "id": "thundersedge",
         "imagePath": "token_thundersedge.png",
         "spaceOrPlanet": "space",

@@ -1,0 +1,16 @@
+[
+    {
+        "id": "helios1",
+        "imagePath": "attachment_helios1.png",
+        "resourcesModifier": 1,
+        "isFakeAttachment": true,
+        "source": "thunders_edge"
+    },
+    {
+        "id": "helios2",
+        "imagePath": "attachment_helios2.png",
+        "resourcesModifier": 2,
+        "isFakeAttachment": true,
+        "source": "thunders_edge"
+    }
+]
