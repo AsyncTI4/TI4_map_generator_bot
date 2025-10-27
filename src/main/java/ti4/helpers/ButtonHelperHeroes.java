@@ -2301,8 +2301,13 @@ public class ButtonHelperHeroes {
             Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         List<Button> buttons = getJolNarHeroSwapInOptions(player, game, buttonID);
         String message = player.getRepresentationUnfogged() + ", please choose the technology you wish to acquire.";
+        if (game.getPhaseOfGame().toLowerCase().contains("status")) {
+            ButtonHelper.deleteMessage(event);
+            message += " It must contain exactly 1 more pre-requisite than the technology you are swapping out.";
+        } else {
+            ButtonHelper.deleteTheOneButton(event);
+        }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("swapTechs_")

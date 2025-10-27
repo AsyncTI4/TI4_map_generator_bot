@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Helper;
@@ -150,6 +151,7 @@ public class TeHelperActionCards {
                 + Helper.getPlanetRepresentation(planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
+        ButtonHelperAbilities.oceanBoundCheck(game);
     }
 
     @ButtonHandler("exchangeProgramPart2")
@@ -194,10 +196,11 @@ public class TeHelperActionCards {
         AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "inf " + planet);
         game.removeStoredValue("coexistFlag");
 
-        String message = player.getRepresentation() + " placed an infantry on the planet of "
+        String message = player.getRepresentation() + " placed an infantry into coexistence on the planet of "
                 + Helper.getPlanetRepresentation(planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
+        ButtonHelperAbilities.oceanBoundCheck(game);
     }
 
     @ButtonHandler("loseAFleetCultural")

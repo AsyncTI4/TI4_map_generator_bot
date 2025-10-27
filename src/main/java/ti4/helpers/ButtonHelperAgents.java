@@ -971,6 +971,28 @@ public class ButtonHelperAgents {
             game.setCurrentReacts("letnevagent", p2.getFaction());
         }
 
+        if ("deepwroughtagent".equalsIgnoreCase(agent)) {
+            String faction = rest.split("_")[1];
+            Player p2 = game.getPlayerFromColorOrFaction(faction);
+            if (p2 == null) return;
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + " the Deepwrought"
+                    + ssruuSlash + " agent to allow " + p2.getRepresentation() + " to skip a pre-req.";
+            MessageHelper.sendMessageToChannel(channel, exhaustText);
+
+            List<Button> buttons = new ArrayList<>();
+            for (String planet : p2.getPlanets()) {
+                if (game.getUnitHolderFromPlanet(planet) != null
+                        && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)) {
+                    buttons.add(Buttons.gray(
+                            player.getFinsFactionCheckerPrefix() + "exchangeProgramPart3_" + planet,
+                            Helper.getPlanetRepresentation(planet, game)));
+                }
+            }
+            String msg = player.getRepresentation()
+                    + " after the user of the agent skips a pre-req, choose the planet of theirs that you will coexist on.";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+        }
+
         if ("cymiaeagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
                     + "Skhot Unit X-12, the Cymiae" + ssruuSlash + " agent.";
@@ -1064,6 +1086,82 @@ public class ButtonHelperAgents {
             ActionCardHelper.sendActionCardInfo(game, player);
             String headerText2 = p2.getRepresentationUnfogged() + " you got 1 action card from " + ssruuClever
                     + "Suffi An, the Mentak" + ssruuSlash + " agent";
+            headerText2 += p2.hasAbility("scheming")
+                    ? ", then drew another action card for **Scheming**. Please now discard 1 action card."
+                    : ".";
+            MessageHelper.sendMessageToPlayerCardsInfoThread(p2, headerText2);
+            ActionCardHelper.sendActionCardInfo(game, p2);
+            if (player.hasAbility("scheming")) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentationUnfogged() + ", please choose the action card you wish to discard.",
+                        ActionCardHelper.getDiscardActionCardButtons(player, false));
+            }
+            if (p2.hasAbility("scheming")) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        p2.getCardsInfoThread(),
+                        p2.getRepresentationUnfogged() + ", please choose the action card you wish to discard.",
+                        ActionCardHelper.getDiscardActionCardButtons(p2, false));
+            }
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), successMessage);
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), successMessage2);
+        }
+
+        if ("hyperagent".equalsIgnoreCase(agent)) {
+            String exhaustText =
+                    player.getRepresentation() + " has exhausted " + ssruuClever + "the Hyper" + ssruuSlash + " agent.";
+            MessageHelper.sendMessageToChannel(channel, exhaustText);
+            String faction = rest.split("_")[1];
+            Player p2 = game.getPlayerFromColorOrFaction(faction);
+            if (p2 == null) return;
+            String successMessage = player.getFactionEmoji() + " drew 1 action card";
+            String successMessage2 = p2.getFactionEmoji() + " drew 1 action card";
+            if (p2.getTg() > 0) {
+                p2.setTg(p2.getTg() - 1);
+                player.gainTG(1, true);
+                successMessage2 += " and gave 1 TG to " + player.getRepresentation();
+            }
+            if (player.hasAbility("scheming")) {
+                game.drawActionCard(player.getUserID());
+                successMessage += ", then drew another action card for **Scheming**. Please now discard 1 action card";
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentationUnfogged() + " use buttons to discard an action card.",
+                        ActionCardHelper.getDiscardActionCardButtons(player, false));
+            }
+            successMessage += ". ";
+            if (p2.hasAbility("scheming")) {
+                game.drawActionCard(p2.getUserID());
+                successMessage2 += ", then drew another action card for **Scheming**. Please now discard 1 action card";
+                MessageHelper.sendMessageToChannelWithButtons(
+                        p2.getCardsInfoThread(),
+                        p2.getRepresentationUnfogged() + ", please choose the action card you wish to discard.",
+                        ActionCardHelper.getDiscardActionCardButtons(p2, false));
+            }
+            successMessage2 += ". ";
+            if (player.hasAbility("autonetic_memory")) {
+                ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
+            } else {
+                game.drawActionCard(player.getUserID());
+            }
+
+            if (p2.hasAbility("autonetic_memory")) {
+                ButtonHelperAbilities.autoneticMemoryStep1(game, p2, 1);
+            } else {
+                game.drawActionCard(p2.getUserID());
+            }
+
+            ButtonHelper.checkACLimit(game, player);
+            ButtonHelper.checkACLimit(game, p2);
+            String headerText = player.getRepresentationUnfogged() + " you got 1 action card from " + ssruuClever
+                    + "the Hyper" + ssruuSlash + " agent";
+            headerText += player.hasAbility("scheming")
+                    ? ", then drew another action card for **Scheming**. Please now discard 1 action card."
+                    : ".";
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
+            ActionCardHelper.sendActionCardInfo(game, player);
+            String headerText2 = p2.getRepresentationUnfogged() + " you got 1 action card from " + ssruuClever
+                    + "the Hyper" + ssruuSlash + " agent";
             headerText2 += p2.hasAbility("scheming")
                     ? ", then drew another action card for **Scheming**. Please now discard 1 action card."
                     : ".";

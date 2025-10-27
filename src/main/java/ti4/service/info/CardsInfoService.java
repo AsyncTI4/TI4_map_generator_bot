@@ -136,6 +136,20 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("saaragent")) {
             buttons.add(Buttons.gray("getAgentSelection_saaragent", "Use Saar Agent", FactionEmojis.Saar));
         }
+        if (player.hasUnexhaustedLeader("deepwroughtagent")) {
+            buttons.add(Buttons.gray(
+                    "getAgentSelection_deepwroughtagent",
+                    "Use Deepwrought Agent on Someone Else",
+                    FactionEmojis.Deepwrought));
+        }
+        if (player.hasUnexhaustedLeader("hyperagent")) {
+            buttons.add(Buttons.gray(
+                    "getAgentSelection_hyperagent", "Use Hyper Agent on Someone Else", FactionEmojis.Mentak));
+        }
+        if (player.hasUnexhaustedLeader("firmamentagent")) {
+            buttons.add(
+                    Buttons.gray("getAgentSelection_firmamentagent", "Use Firmament Agent", FactionEmojis.Firmament));
+        }
         if (player.hasAbility("laws_order") && !game.getLaws().isEmpty()) {
             buttons.add(Buttons.gray(
                     player.getFinsFactionCheckerPrefix() + "useLawsOrder",

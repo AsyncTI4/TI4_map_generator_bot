@@ -1,5 +1,6 @@
 package ti4.service.leader;
 
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -69,12 +70,12 @@ public class CommanderUnlockCheckService {
                 }
             }
             case "bastion" -> {
-                // int totGalvanized = game.getTileMap().values().stream()
-                //     .flatMap(t -> t.getUnitHolders().values().stream())
-                //     .collect(Collectors.summingInt(UnitHolder::getTotalGalvanizedCount));
-                // if (totGalvanized >= 3) {
-                //     shouldBeUnlocked = true;
-                // }
+                int totGalvanized = game.getTileMap().values().stream()
+                        .flatMap(t -> t.getUnitHolders().values().stream())
+                        .collect(Collectors.summingInt(UnitHolder::getTotalGalvanizedCount));
+                if (totGalvanized >= 3) {
+                    shouldBeUnlocked = true;
+                }
             }
             case "deepwrought" -> {
                 shouldBeUnlocked = player.getPlanets().stream().anyMatch(s -> s.startsWith("ocean"));

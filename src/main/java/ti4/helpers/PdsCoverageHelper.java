@@ -53,7 +53,7 @@ public class PdsCoverageHelper {
                 for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
                     // Check for Imperial II HQ on Mecatol Rex
                     if (sameTile && Constants.MECATOLS.contains(unitHolder.getName())) {
-                        if (player.controlsMecatol(false) && player.getPlanets().contains("custodia_vigilia")) {
+                        if (player.controlsMecatol(false) && player.getPlanets().contains("custodiavigilia")) {
                             diceCount.add(5 - mod);
                         }
                     }
