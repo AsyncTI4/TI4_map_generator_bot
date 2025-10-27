@@ -15,6 +15,7 @@
     {
         "id": "breachactive",
         "imagePath": "token_breachActive.png",
+        "spaceOrPlanet": "space",
         "aliasList": [
             "breachactive",
             "token_breachactive"
@@ -24,6 +25,7 @@
     {
         "id": "breachinactive",
         "imagePath": "token_breachInactive.png",
+        "spaceOrPlanet": "space",
         "aliasList": [
             "breachinactive",
             "token_breachinactive"
@@ -33,6 +35,7 @@
     {
         "id": "ingress",
         "imagePath": "token_ingress.png",
+        "spaceOrPlanet": "space",
         "aliasList": [
             "ingress",
             "token_ingress"
@@ -42,6 +45,7 @@
     {
         "id": "relictoken",
         "imagePath": "token_relictoken.png",
+        "spaceOrPlanet": "planet",
         "aliasList": [
             "relic",
             "token_relic",

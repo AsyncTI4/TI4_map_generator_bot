@@ -874,10 +874,10 @@ public class ButtonHelperAgents {
         }
 
         if ("redcreussagent".equalsIgnoreCase(agent) || "crimsonagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Crimson "
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Crimson"
                     + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
-            String faction = rest.replace("redcreussagent_", "");
+            String faction = rest.replace("redcreussagent_", "").replace("crimsonagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             message = ", please choose the first system that you wish to swap a ship between (and transport).";
             List<Button> buttons = new ArrayList<>();
@@ -1454,7 +1454,7 @@ public class ButtonHelperAgents {
                 game.setStoredValue("ghostagent_active", game.getActiveSystem());
             }
         }
-        if ("ralnelagent".equalsIgnoreCase(agent) && game.isFowMode()) {
+        if ("ralnelagent".equalsIgnoreCase(agent)) {
             TeHelperAgents.postRalNelAgentStep1(event, game, player);
         }
 

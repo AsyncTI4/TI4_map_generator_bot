@@ -3799,6 +3799,7 @@ public class ButtonHelper {
         if (spaceHolder.getUnitCount(UnitType.Spacedock, player) > 0) {
             if (!(player.hasUnit("absol_saar_spacedock")
                     || player.hasUnit("saar_spacedock")
+                    || player.hasAbility("miniaturization")
                     || player.hasUnit("tf-floatingfactory")
                     || player.hasTech("ffac2")
                     || player.hasTech("absol_ffac2"))) {
@@ -3806,7 +3807,9 @@ public class ButtonHelper {
             }
         }
         if (spaceHolder.getUnitCount(UnitType.Pds, player) > 0) {
-            if (!(player.ownsUnit("mirveda_pds") || player.ownsUnit("mirveda_pds2"))) {
+            if (!(player.ownsUnit("mirveda_pds")
+                    || player.ownsUnit("mirveda_pds2")
+                    || player.hasAbility("miniaturization"))) {
                 structuresViolated = true;
             }
         }

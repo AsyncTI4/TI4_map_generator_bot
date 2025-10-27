@@ -28,6 +28,7 @@ import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.TitlesHelper;
 import ti4.helpers.Units;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.map.Game;
@@ -696,6 +697,10 @@ public class MiltyService {
         if ("true".equalsIgnoreCase(game.getStoredValue("removeSupports"))) {
             player.removeOwnedPromissoryNoteByID(player.getColor() + "_sftt");
             player.removePromissoryNote(player.getColor() + "_sftt");
+        }
+
+        if (game.isThundersEdge() && player.getFaction().equalsIgnoreCase("crimson")) {
+            BreakthroughCommandHelper.unlockBreakthrough(game, player);
         }
 
         if (game.isRapidMobilizationMode()) {

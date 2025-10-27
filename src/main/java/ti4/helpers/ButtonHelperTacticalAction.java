@@ -668,6 +668,10 @@ public class ButtonHelperTacticalAction {
         if (player.hasTech("ffac2")) {
             movableFromPlanets.add(UnitType.Spacedock);
         }
+        if (player.hasAbility("miniaturization")) {
+            movableFromPlanets.addAll(List.of(UnitType.Spacedock, UnitType.Pds));
+        }
+
         boolean remove = "remove".equalsIgnoreCase(moveOrRemove);
 
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();

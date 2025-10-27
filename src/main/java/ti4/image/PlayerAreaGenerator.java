@@ -782,7 +782,7 @@ class PlayerAreaGenerator {
         if (player.hasAbility("galvanize")) {
             String tokenFile = ResourceHelper.getResourceFromFolder("extra/", "marker_galvanize.png");
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
-            int maxGalvanizeTokens = 8;
+            int maxGalvanizeTokens = 7;
             List<Point> points = new ArrayList<>();
             IntStream.range(0, maxGalvanizeTokens).forEach(i -> points.add(new Point(i * 20, 20 * ((i + 1) % 2))));
             int totGalvanized = game.getTileMap().values().stream()
