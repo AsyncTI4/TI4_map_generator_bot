@@ -22,15 +22,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
-
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
-
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
 import ti4.helpers.ButtonHelper;
@@ -72,6 +69,7 @@ import ti4.website.model.WebsiteOverlay;
 public class MapGenerator implements AutoCloseable {
 
     private static final int RING_MAX_COUNT = 8;
+
     private static final int RING_MIN_COUNT = 3;
     private static final int PLAYER_STATS_HEIGHT = 650; // + 34 per teammate + 34 if line is long
     private static final int TILE_PADDING = 100;
