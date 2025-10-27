@@ -1123,6 +1123,13 @@ public class UnfiledButtonHandlers {
                     "Remove the Watcher",
                     ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "mech", true));
             ButtonHelper.deleteMessage(event);
+        } else if ("tf".equalsIgnoreCase(type)) {
+            message += " three triune fighters! The relevant fighters should now be removed by the owner.";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    "Remove the Fighters",
+                    ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "ff", true));
+
         } else if ("xxcha".equalsIgnoreCase(type)) {
             message +=
                     "_Instinct Training_! The technology has been exhausted and a command token removed from strategy pool.";

@@ -479,6 +479,19 @@ public class PlayHeroService {
                         player.getRepresentation(true, showFlavourText) + ", please use the buttons to resolve.",
                         buttons);
             }
+            case "poisonhero" -> {
+                ButtonHelperTwilightsFallActionCards.resolvePoison(game, player);
+            }
+            case "eternityhero" -> {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green("searchSpliceDeck_ability", "Search For Ability"));
+                buttons.add(Buttons.green("searchSpliceDeck_units", "Search For Unit Upgrade"));
+                buttons.add(Buttons.green("searchSpliceDeck_genome", "Search For Genome"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(),
+                        player.getRepresentation(true, showFlavourText) + ", please use the buttons to resolve.",
+                        buttons);
+            }
             case "bentorhero" -> {
                 ButtonHelperHeroes.resolveBentorHero(game, player);
                 MessageHelper.sendMessageToChannel(
@@ -575,6 +588,11 @@ public class PlayHeroService {
                         event.getMessageChannel(),
                         "Use buttons to roll some dice, and maybe even capture some stuff.",
                         buttons);
+            }
+            case "eventhero" -> {
+                List<Button> buttons = ButtonHelperHeroes.getCabalHeroButtons(player, game);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(), "Use buttons to roll some dice", buttons);
             }
             case "yssarilhero" -> {
                 for (Player p2 : game.getRealPlayers()) {

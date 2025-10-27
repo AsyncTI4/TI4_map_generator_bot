@@ -2543,6 +2543,44 @@ public class ButtonHelperActionCards {
         return techs;
     }
 
+    public static List<Button> getExtractButtons(Game game, Player player, Player p2) {
+        List<String> techToGain = new ArrayList<>();
+        techToGain = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, techToGain, game);
+        List<Button> techs = new ArrayList<>();
+        for (String tech : techToGain) {
+            if (Mapper.getTech(AliasHandler.resolveTech(tech))
+                    .getFaction()
+                    .orElse("")
+                    .isEmpty()) {
+                if (Mapper.getTech(tech).isUnitUpgrade()) {
+                    boolean hasSpecialUpgrade = false;
+                    for (String factionTech : player.getNotResearchedFactionTechs()) {
+                        TechnologyModel fTech = Mapper.getTech(factionTech);
+                        if (fTech != null
+                                && !fTech.getAlias()
+                                        .equalsIgnoreCase(Mapper.getTech(tech).getAlias())
+                                && fTech.isUnitUpgrade()
+                                && fTech.getBaseUpgrade()
+                                        .orElse("bleh")
+                                        .equalsIgnoreCase(Mapper.getTech(tech).getAlias())) {
+                            hasSpecialUpgrade = true;
+                        }
+                    }
+                    if (!hasSpecialUpgrade) {
+                        techs.add(Buttons.green(
+                                "getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
+                                Mapper.getTech(tech).getName()));
+                    }
+                } else {
+                    techs.add(Buttons.green(
+                            "getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
+                            Mapper.getTech(tech).getName()));
+                }
+            }
+        }
+        return techs;
+    }
+
     private static List<Button> getGhostShipButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
