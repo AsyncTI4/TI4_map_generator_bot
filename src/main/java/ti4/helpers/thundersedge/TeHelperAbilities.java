@@ -158,6 +158,10 @@ public class TeHelperAbilities {
         }
 
         // Update Buttons
+        if (miniLandingButtons(game, player).isEmpty()) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         MessageHelper.editMessageButtons(event, miniLandingButtons(game, player));
     }
 
@@ -172,6 +176,9 @@ public class TeHelperAbilities {
             int pds = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Pds, player) - dmgPds;
 
             for (Planet planet : activeSystem.getPlanetUnitHolders()) {
+                if (!player.getPlanetsAllianceMode().contains(planet)) {
+                    continue;
+                }
                 for (int x = 1; x <= Math.min(2, pds); x++) {
                     String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "pd_"
                             + planet.getName();
