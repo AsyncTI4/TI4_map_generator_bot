@@ -555,6 +555,10 @@ public class ButtonHelperActionCards {
         String type = buttonID.split("_")[3];
         String msg = player.getRepresentationNoPing() + " has chosen the recently deceased " + baseType
                 + ", which hits on a " + numHit + ", to have been _Courageous To The End_.";
+        if (game.isTwilightsFallMode()) {
+            msg = player.getRepresentationNoPing() + " has chosen the recently deceased " + baseType
+                    + ", which hits on a " + numHit + ", to have been the target of the Valient Genome.";
+        }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         String result = player.getFactionEmojiOrColor() + " rolling for " + type + ":\n";
         Tile tile = game.getTileFromPositionOrAlias(game.getActiveSystem());
@@ -570,6 +574,9 @@ public class ButtonHelperActionCards {
             StringBuilder resultBuilder = new StringBuilder(result);
 
             int numOfUnit = 2;
+            if (game.isTwilightsFallMode()) {
+                numOfUnit = 1;
+            }
 
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
             List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
@@ -595,7 +602,7 @@ public class ButtonHelperActionCards {
                                 ButtonHelper.getButtonsForRemovingAllUnitsInSystem(p2, game, tile, "courageouscombat");
                         MessageHelper.sendMessageToChannelWithButtons(
                                 p2.getCorrectChannel(),
-                                p2.getRepresentation() + ", you can use the buttons to destroy your ship(s).",
+                                p2.getRepresentation() + ", you can use the buttons to destroy your units.",
                                 buttons);
                     }
                 }
