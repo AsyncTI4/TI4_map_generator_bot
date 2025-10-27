@@ -1098,13 +1098,19 @@ public class ButtonHelperModifyUnits {
                 }
             }
             if (player != player2 && players.contains(player)) {
-                if (player2.hasUnlockedBreakthrough("titansbt") || player.hasUnlockedBreakthrough("titansbt")) {
+                if (player2.hasUnlockedBreakthrough("titansbt")
+                        || player.hasUnlockedBreakthrough("titansbt")
+                        || player.hasAbility("research_team")
+                        || player.hasUnit("tf-ambassador")
+                        || player2.hasAbility("research_team")) {
                     String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
-                    String msg = player.getRepresentation() + " the game is unsure if a combat should occur on "
-                            + planetName + " or if you are coexisting. Please inform it with the buttons.";
+                    String msg = player.getRepresentation() + " " + player2.getRepresentation()
+                            + " the game is unsure if a combat should occur on " + planetName
+                            + " or if you are coexisting. Please inform it with the buttons.\n\n";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.red("startCombatOn_" + unitHolder.getName(), "Engage in Combat"));
-                    buttons.add(Buttons.green("deleteButtons", "They are coexisting"));
+                    buttons.add(Buttons.green(
+                            "enterCoexistence_" + unitHolder.getName(), "I want to enter/continue Coexistence"));
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
 
                 } else {

@@ -165,6 +165,17 @@ public class Player extends PlayerProperties {
                 .count();
     }
 
+    public List<String> getOceans() {
+        List<String> oceans = new ArrayList<>();
+        for (String planet : getPlanets()) {
+            if (planet.contains("ocean")) {
+                oceans.add(planet);
+            }
+        }
+
+        return oceans;
+    }
+
     public Tile getNomboxTile() {
         return nomboxTile;
     }

@@ -5074,6 +5074,7 @@ public class ButtonHelper {
         String successMessage = player.getFactionEmoji() + " replaced 1 " + UnitEmojis.infantry + " on "
                 + Helper.getPlanetRepresentation(planetName, game) + " with 1 pds using awaken.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), successMessage);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("absolsdn_")
@@ -6870,7 +6871,7 @@ public class ButtonHelper {
                 if (tilePos.equalsIgnoreCase(adjTilePos) && Constants.MECATOLS.contains(unitHolder.getName())) {
                     for (Player p2 : game.getRealPlayers()) {
                         if (p2.controlsMecatol(false)
-                                && p2.hasPlanet("custodia_vigilia")
+                                && p2.hasPlanet("custodiavigilia")
                                 && !playersWithPds2.contains(p2)) {
                             if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
                                 if (FoWHelper.otherPlayersHaveShipsInSystem(

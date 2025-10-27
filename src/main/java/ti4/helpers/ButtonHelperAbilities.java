@@ -1863,6 +1863,77 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
+    // enterCoexistence_
+
+    @ButtonHandler("enterCoexistence_")
+    public static void enterCoexistence(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        event.getMessage().delete().queue();
+        String planet = buttonID.split("_")[1];
+        UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
+        Tile tile = game.getTileFromPlanet(planet);
+        List<Player> playersWithUnitsOnPlanet = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, unitHolder);
+        Optional<Player> enemyPlayer = playersWithUnitsOnPlanet.stream()
+                .filter(p -> player != p && !player.isPlayerMemberOfAlliance(p))
+                .findFirst();
+        if (player.getPlanets().contains(planet) && enemyPlayer.isPresent()) {
+            AddPlanetService.addPlanet(enemyPlayer.get(), planet, game);
+        }
+        oceanBoundCheck(game);
+    }
+
+    public static void oceanBoundCheck(Game game) {
+        Player player = Helper.getPlayerFromAbility(game, "oceanbound");
+        if (player != null) {
+            List<String> oceans = player.getOceans();
+            List<String> coexisting = game.getPlanetsPlayerIsCoexistingOn(player);
+            if (oceans.size() != coexisting.size()) {
+                if (oceans.size() > coexisting.size()) {
+                    int dif = oceans.size() - coexisting.size();
+                    int readied = 0;
+                    for (String ocean : oceans) {
+                        if (dif > 0) {
+                            dif--;
+                            if (player.getReadiedPlanets().contains(ocean)) {
+                                readied++;
+                            }
+                            player.removePlanet(ocean);
+                        }
+                        if (readied > 0 && player.getExhaustedPlanets().contains(ocean)) {
+                            player.refreshPlanet(ocean);
+                        }
+                    }
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + " your number of oceans reduced down to your number of coexisting planets ("
+                                    + coexisting.size() + ").");
+                } else {
+                    if (oceans.size() < 5) {
+                        int dif = Math.min(5, coexisting.size()) - oceans.size();
+                        for (String planet : coexisting) {
+                            if (dif > 0) {
+                                for (int x = 1; x <= 5; x++) {
+                                    String oceanName = "ocean" + x;
+                                    if (!player.getOceans().contains(oceanName)) {
+                                        player.addPlanet(oceanName);
+                                        player.refreshPlanet(oceanName);
+                                        dif--;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentation() + " your number of oceans increased and is now "
+                                        + player.getOceans().size() + "). The new oceans were gained readied.");
+                        CommanderUnlockCheckService.checkPlayer(player, "deepwrought");
+                    }
+                }
+            }
+        }
+    }
+
     @ButtonHandler("startCombatOn_")
     public static void startCombatOn(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         event.getMessage().delete().queue();

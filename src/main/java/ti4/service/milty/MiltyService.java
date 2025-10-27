@@ -362,9 +362,10 @@ public class MiltyService {
             game.setTile(tile);
         }
 
-        // HANDLE GHOSTS' HOME SYSTEM LOCATION
+        // HANDLE Crimson' HOME SYSTEM LOCATION
         if ("crimson".equals(faction)) {
             tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            tile.addToken(Constants.TOKEN_BREACH_INACTIVE, Constants.SPACE);
             String pos = "tr";
             if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
                 pos = "br";

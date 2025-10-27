@@ -146,6 +146,36 @@ public class StatusHelper {
                                 + (numScoredSOs == 1 ? "" : "s") + " and " + numScoredPos + " commodit"
                                 + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
             }
+            if (player.hasTech("hydrothermal")) {
+                int oceans = 0;
+                for (Player p2 : game.getRealPlayers()) {
+                    oceans = Math.max(oceans, p2.getOceans().size());
+                }
+                if (oceans > 0) {
+                    player.setTg(player.getTg() + oceans);
+                    ButtonHelperAbilities.pillageCheck(player, game);
+                    ButtonHelperAgents.resolveArtunoCheck(player, oceans);
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged() + " you gained " + oceans + " trade good"
+                                    + (oceans == 1 ? "" : "s") + " due to the Hydrothermal technology.");
+                }
+            }
+            if (player.hasTech("radical")) {
+                List<Button> buttons = new ArrayList<>();
+                for (String tech : player.getTechs()) {
+                    TechnologyModel techModel = Mapper.getTech(tech);
+                    if (techModel != null && !techModel.isUnitUpgrade()) {
+                        buttons.add(Buttons.green(
+                                "jnHeroSwapOut_" + tech, techModel.getName(), techModel.getCondensedReqsEmojis(true)));
+                    }
+                }
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + " choose a technology to replace due to Radical Advancement.",
+                        buttons);
+            }
             if (player.getPromissoryNotes().containsKey("dspnuyda")
                     && !player.getPromissoryNotesOwned().contains("dspnuyda")) {
                 MessageHelper.sendMessageToChannel(
@@ -382,6 +412,7 @@ public class StatusHelper {
         }
 
         for (Player player : game.getRealPlayers()) {
+
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
             for (String pn : pns) {
                 Player pnOwner = game.getPNOwner(pn);
