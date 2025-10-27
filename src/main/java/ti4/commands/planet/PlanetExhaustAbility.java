@@ -103,7 +103,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                         + " Choose a secret to discard, the bot will automatically draw a replacement:";
                 buttons.addAll(SecretObjectiveHelper.getSODiscardButtonsWithSuffix(player, "redraw"));
             }
-            case "ordinianc4", "oridinian" -> {
+            case "ordinianc4", "ordinian" -> {
                 ActionCardHelper.drawActionCards(game, player, 1, true);
                 String msg = "Your current command tokens are " + player.getCCRepresentation()
                         + ". Use buttons to gain 1 command token.";
