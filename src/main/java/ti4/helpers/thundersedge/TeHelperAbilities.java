@@ -176,7 +176,7 @@ public class TeHelperAbilities {
             int pds = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Pds, player) - dmgPds;
 
             for (Planet planet : activeSystem.getPlanetUnitHolders()) {
-                if (!player.getPlanetsAllianceMode().contains(planet)) {
+                if (!player.getPlanetsAllianceMode().contains(planet.getName())) {
                     continue;
                 }
                 for (int x = 1; x <= Math.min(2, pds); x++) {
