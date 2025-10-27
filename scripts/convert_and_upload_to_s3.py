@@ -53,8 +53,37 @@ def bucket_exists(s3_client, bucket_name):
         return False
 
 
-def get_all_s3_keys(s3_client, bucket_name, prefix=""):
-    all_keys = set()
+def compute_local_md5(file_path):
+    """Compute MD5 hash of a local file to match S3 ETag format."""
+    import hashlib
+
+    md5_hash = hashlib.md5()
+    try:
+        with open(file_path, "rb") as f:
+            # Read in chunks to handle large files efficiently
+            for chunk in iter(lambda: f.read(8192), b""):
+                md5_hash.update(chunk)
+        # Return hex digest (S3 ETags are hex strings)
+        return md5_hash.hexdigest()
+    except Exception as e:
+        logger.error(f"Failed to compute MD5 for {file_path}: {e}")
+        return None
+
+
+def get_all_s3_keys(s3_client, bucket_name, prefix="", with_etags=False):
+    """Fetch all S3 keys from the bucket.
+
+    Args:
+        s3_client: Boto3 S3 client
+        bucket_name: S3 bucket name
+        prefix: Optional key prefix to filter results
+        with_etags: If True, return dict with ETags; if False, return set of keys only
+
+    Returns:
+        dict or set: If with_etags=True, returns dict mapping S3 key to ETag (MD5 hash without quotes).
+                     If with_etags=False, returns set of S3 keys only.
+    """
+    all_keys = {} if with_etags else set()
     continuation_token = None
 
     try:
@@ -71,7 +100,13 @@ def get_all_s3_keys(s3_client, bucket_name, prefix=""):
 
             if "Contents" in response:
                 for obj in response["Contents"]:
-                    all_keys.add(obj["Key"])
+                    if with_etags:
+                        # Store key with its ETag (strip quotes from ETag)
+                        etag = obj.get("ETag", "").strip('"')
+                        all_keys[obj["Key"]] = etag
+                    else:
+                        # Just store the key
+                        all_keys.add(obj["Key"])
 
             if not response.get("IsTruncated"):
                 break
@@ -142,34 +177,69 @@ def convert_image_to_webp(source_file, dest_file):
 
 
 def _process_single_image(
-    source_file, dest_root, relative_path, s3_key, existing_s3_keys
+    source_file, dest_root, relative_path, s3_key, existing_s3_keys, check_hash=False
 ):
+    """Process a single image file: convert/copy and check if upload is needed.
 
-    # Check if already in S3
-    if s3_key in existing_s3_keys:
-        logger.info(f"[SKIP CONVERT] Already in S3: {s3_key}")
-        return "skipped", None, True
+    Args:
+        source_file: Path to source image file
+        dest_root: Destination directory for WebP files
+        relative_path: Relative path for directory structure
+        s3_key: S3 key where file will be uploaded
+        existing_s3_keys: Dict mapping S3 keys to their ETags (or set of keys if check_hash=False)
+        check_hash: If True, compare file hashes; if False, only check filename existence
+
+    Returns:
+        tuple: (action, dest_file, success) where action is one of:
+            "skipped" - file exists in S3 (and hash matches if check_hash=True)
+            "copied" - WebP file copied (new or updated)
+            "converted" - image converted to WebP (new or updated)
+            "error" - processing failed
+    """
+    # Default mode: just check if file exists in S3 by key
+    if not check_hash:
+        if s3_key in existing_s3_keys:
+            logger.info(f"[SKIP CONVERT] Already in S3: {s3_key}")
+            return "skipped", None, True
 
     # Calculate destination file
     dest_filename = source_file.stem + ".webp"
     dest_file = dest_root / dest_filename
 
-    # If already WebP, just copy
+    # Convert or copy the file
     if source_file.suffix.lower() == ".webp":
-        logger.info(f"[COPY] {source_file.name} (already WebP)")
+        # Already WebP, just copy
         try:
             shutil.copy2(source_file, dest_file)
-            return "copied", dest_file, True
+            action = "copied"
         except Exception as e:
             logger.error(f"Failed to copy {source_file}: {e}")
             return "error", None, False
-
-    # Convert to WebP
-    logger.info(f"[CONVERT] {source_file.name} -> {dest_filename}")
-    if convert_image_to_webp(source_file, dest_file):
-        return "converted", dest_file, True
     else:
-        return "error", None, False
+        # Convert to WebP
+        if not convert_image_to_webp(source_file, dest_file):
+            return "error", None, False
+        action = "converted"
+
+    # Hash checking mode: compare file contents
+    if check_hash and s3_key in existing_s3_keys:
+        # File exists in S3, compare hashes
+        s3_etag = existing_s3_keys[s3_key]
+        local_md5 = compute_local_md5(dest_file)
+
+        if local_md5 and local_md5 == s3_etag:
+            # Hashes match, skip upload
+            logger.info(f"[SKIP] Hash matches S3: {s3_key}")
+            return "skipped", None, True
+        else:
+            # Hashes differ, need to upload
+            logger.info(f"[UPDATE] Hash differs, will re-upload: {s3_key}")
+            logger.info(f"  {action.upper()} {source_file.name} -> {dest_filename}")
+            return action, dest_file, True
+    else:
+        # New file or hash checking disabled, needs upload
+        logger.info(f"[{action.upper()}] {source_file.name} -> {dest_filename}")
+        return action, dest_file, True
 
 
 def upload_file(s3_client, local_file, bucket_name, s3_key, content_type=None):
@@ -236,7 +306,7 @@ def _concurrent_upload_batch(
     return uploaded_count, error_count
 
 
-def scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, prefix=""):
+def scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, prefix="", check_hash=False):
     _log_header("STAGE 1: SCANNING AND CONVERTING IMAGES")
 
     files_to_upload = []
@@ -256,7 +326,7 @@ def scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, prefix=""):
 
         # Process the image
         action, dest_file, success = _process_single_image(
-            source_file, dest_root, relative_path, s3_key, existing_s3_keys
+            source_file, dest_root, relative_path, s3_key, existing_s3_keys, check_hash
         )
 
         # Update statistics and upload list
@@ -266,12 +336,13 @@ def scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, prefix=""):
         else:
             stats["skipped" if action == "skipped" else "errors"] += 1
 
+    skip_reason = "hash matches S3" if check_hash else "already in S3"
     _log_summary(
         "CONVERSION SUMMARY:",
         {
             "Images converted": stats["converted"],
             "WebP files copied": stats["copied"],
-            "Conversions skipped (already in S3)": stats["skipped"],
+            f"Conversions skipped ({skip_reason})": stats["skipped"],
             "Conversion errors": stats["errors"],
         },
     )
@@ -295,30 +366,70 @@ def upload_images(s3_client, files_to_upload, bucket_name):
 
 
 def scan_and_upload_directory(
-    s3_client, source_dir, bucket_name, existing_s3_keys, prefix=""
+    s3_client, source_dir, bucket_name, existing_s3_keys, prefix="", check_hash=False
 ):
+    """Scan directory and upload files.
+
+    Args:
+        s3_client: Boto3 S3 client
+        source_dir: Local directory to upload
+        bucket_name: S3 bucket name
+        existing_s3_keys: Dict mapping S3 keys to their ETags (or set of keys if check_hash=False)
+        prefix: S3 key prefix
+        check_hash: If True, compare file hashes; if False, only check filename existence
+
+    Returns:
+        tuple: (uploaded_count, skipped_count, error_count)
+    """
     if not source_dir.exists():
         logger.info(f"Directory does not exist: {source_dir}")
         return 0, 0, 0
 
-    _log_header(f"UPLOADING DIRECTORY: {source_dir} (replacing all files)")
+    mode_msg = "with hash checking" if check_hash else "replacing all files"
+    _log_header(f"UPLOADING DIRECTORY: {source_dir} ({mode_msg})")
 
-    files_to_upload = [
-        (local_file, _build_s3_key(relative_path / local_file.name, prefix))
-        for local_file, relative_path in _scan_directory(source_dir)
-    ]
+    # Scan all files
+    files_to_upload = []
+    skipped_count = 0
+
+    for local_file, relative_path in _scan_directory(source_dir):
+        s3_key = _build_s3_key(relative_path / local_file.name, prefix)
+
+        # Default mode: skip only if exists
+        if not check_hash:
+            if s3_key in existing_s3_keys:
+                logger.info(f"[SKIP] Already in S3: {s3_key}")
+                skipped_count += 1
+                continue
+            files_to_upload.append((local_file, s3_key))
+            continue
+
+        # Hash checking mode: compare file contents
+        if s3_key in existing_s3_keys:
+            local_md5 = compute_local_md5(local_file)
+            s3_etag = existing_s3_keys[s3_key]
+
+            if local_md5 and local_md5 == s3_etag:
+                logger.info(f"[SKIP] Hash matches S3: {s3_key}")
+                skipped_count += 1
+                continue
+            else:
+                logger.info(f"[UPDATE] Hash differs, will re-upload: {s3_key}")
+
+        files_to_upload.append((local_file, s3_key))
 
     if not files_to_upload:
-        logger.info(f"No files to upload from {source_dir}")
-        return 0, 0, 0
+        msg = "all match S3" if check_hash else "all exist in S3"
+        logger.info(f"No files to upload from {source_dir} ({msg})")
+        return 0, skipped_count, 0
 
-    logger.info(f"Found {len(files_to_upload)} files to upload")
+    logger.info(f"Found {len(files_to_upload)} files to upload ({skipped_count} skipped)")
 
     uploaded_count, error_count = _concurrent_upload_batch(
         s3_client, files_to_upload, bucket_name, f"files from {source_dir.name}"
     )
 
-    return uploaded_count, 0, error_count
+    return uploaded_count, skipped_count, error_count
 
 
 def main():
@@ -342,6 +453,11 @@ def main():
         "--dest-dir",
         help="Destination directory for WebP conversion/copying (default: src/main/webp)",
     )
+    parser.add_argument(
+        "--check-hash",
+        action="store_true",
+        help="Enable hash checking to detect file changes (default: only check filename existence)",
+    )
 
     args = parser.parse_args()
 
@@ -361,6 +477,7 @@ def main():
     logger.info(f"S3 bucket: {args.bucket}")
     if args.prefix:
         logger.info(f"S3 prefix: {args.prefix}")
+    logger.info(f"Hash checking: {'enabled' if args.check_hash else 'disabled (filename only)'}")
 
     try:
         # Initialize S3 client
@@ -373,14 +490,14 @@ def main():
 
         logger.info(f"Bucket {args.bucket} exists and is accessible")
 
-        # Fetch existing S3 keys
+        # Fetch existing S3 keys (with or without ETags based on check_hash flag)
         logger.info("Fetching existing S3 objects...")
-        existing_s3_keys = get_all_s3_keys(s3_client, args.bucket, args.prefix)
+        existing_s3_keys = get_all_s3_keys(s3_client, args.bucket, args.prefix, args.check_hash)
         logger.info(f"Found {len(existing_s3_keys)} existing objects in S3")
 
         # Scan local images and convert only new ones
         files_to_upload, converted, copied, skipped_conv, conv_errors = (
-            scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, args.prefix)
+            scan_and_convert_images(source_dir, dest_dir, existing_s3_keys, args.prefix, args.check_hash)
         )
 
         if conv_errors > 0:
@@ -393,7 +510,7 @@ def main():
         web_data_dir = project_root / "web_data"
 
         web_uploaded, web_skipped, web_errors = scan_and_upload_directory(
-            s3_client, web_data_dir, args.bucket, existing_s3_keys, prefix="web_data"
+            s3_client, web_data_dir, args.bucket, existing_s3_keys, prefix="web_data", check_hash=args.check_hash
         )
 
         # Final summary
