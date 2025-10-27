@@ -153,6 +153,9 @@ public class FactionDraftable extends SinglePickDraftable {
             }
             String choiceKey = factionAlias;
             String buttonText = factionName;
+            if (factionName.toLowerCase().contains("naalu")) {
+                buttonText += " (Uses New Agent and Mech)";
+            }
             String buttonEmoji = faction.getFactionEmoji();
             String unformattedName = factionName;
             String formattedName = faction.getFactionEmoji() + " **" + factionName + "**";
