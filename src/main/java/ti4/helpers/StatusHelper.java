@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -18,6 +20,7 @@ import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -25,8 +28,10 @@ import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
+import ti4.service.breakthrough.SowingReapingService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.PlanetEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
@@ -470,9 +475,45 @@ public class StatusHelper {
         sendMitosisButtons(game);
         sendHoldingCompanyButtons(game);
         sendEntropicScarButtons(game);
-
+        sendNeuralParasiteButtons(game);
+        sendRemoveBreachButtons(game);
+        SowingReapingService.sendTheSowingButtons(game);
         // Obligatory abilities
         resolveSolFlagship(game);
+    }
+
+    public static void sendRemoveBreachButtons(Game game) {
+        Predicate<Tile> hasBreach = t -> t.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
+        Function<Player, Predicate<Tile>> hasPlayerShips = p -> (t -> FoWHelper.playerHasShipsInSystem(p, t));
+        for (Player p : game.getRealPlayers()) {
+            List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(
+                    p, game, "statusRemoveBreach", hasBreach.and(hasPlayerShips.apply(p)), false);
+            if (!buttons.isEmpty()) {
+                buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Done removing"));
+                String msg =
+                        p.getRepresentation() + " You may remove active breaches from systems that contain your ships:";
+                MessageHelper.sendMessageToChannelWithButtons(p.getCorrectChannel(), msg, buttons);
+            }
+        }
+    }
+
+    private static void sendNeuralParasiteButtons(Game game) {
+        List<Player> firmaments = Helper.getPlayersFromTech(game, "parasite-firm");
+        if (firmaments == null || firmaments.isEmpty()) return;
+
+        for (Player player : firmaments) {
+            Tile home = player.getHomeSystemTile();
+            List<Button> buttons = new ArrayList<>();
+            for (Planet planet : home.getPlanetUnitHolders()) {
+                String id = player.finChecker() + "placeOneNDone_skipbuild_gf_" + planet.getName();
+                String label = Helper.getUnitHolderRepresentation(home, planet.getName(), game, player);
+                buttons.add(Buttons.green(id, label, PlanetEmojis.getPlanetEmoji(planet.getName())));
+            }
+            TechnologyModel parasiteModel = Mapper.getTech("parasite-firm");
+            String parasiteMsg = player.getRepresentationUnfogged() + ", a reminder to do "
+                    + parasiteModel.getNameRepresentation() + ".";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), parasiteMsg, buttons);
+        }
     }
 
     private static void sendMitosisButtons(Game game) {

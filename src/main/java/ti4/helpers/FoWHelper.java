@@ -268,6 +268,9 @@ public class FoWHelper {
         Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player);
         adjacentPositions.addAll(wormholeAdjacencies);
 
+        Set<String> otherAdjacencies = getNonWormholeAdjacencies(game, position, player);
+        adjacentPositions.addAll(otherAdjacencies);
+
         // If player has ghoti commander, is active player and has activated a system
         if (player != null
                 && game.playerHasLeaderUnlockedOrAlliance(player, "ghoticommander")
@@ -297,6 +300,53 @@ public class FoWHelper {
             adjacentPositions.add(position);
         } else {
             adjacentPositions.remove(position);
+        }
+        return adjacentPositions;
+    }
+
+    private static Set<String> getNonWormholeAdjacencies(Game game, String position, Player player) {
+        enum Feature {
+            ingress,
+            egress,
+            breach;
+        }
+
+        Set<String> adjacentPositions = new HashSet<>();
+        Set<Tile> allTiles = new HashSet<>(game.getTileMap().values());
+        Tile tile = game.getTileByPosition(position);
+
+        Set<Feature> adjToFeatures = new HashSet<>();
+        for (String alias : tile.getTileModel().getAliases()) {
+            if (alias.startsWith("egress")) adjToFeatures.add(Feature.ingress);
+        }
+
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            for (String token : unitHolder.getTokenList()) {
+                switch (token) {
+                    case Constants.TOKEN_BREACH_ACTIVE -> adjToFeatures.add(Feature.breach);
+                    case Constants.TOKEN_INGRESS -> adjToFeatures.add(Feature.egress);
+                }
+            }
+        }
+
+        for (Tile t : allTiles) {
+            if (adjToFeatures.contains(Feature.egress)
+                    && t.getTileModel().getAliases().stream().anyMatch(x -> x.startsWith("egress"))) {
+                adjacentPositions.add(t.getPosition());
+                continue;
+            }
+            for (UnitHolder unitHolder : t.getUnitHolders().values()) {
+                for (String token : unitHolder.getTokenList()) {
+                    if (adjToFeatures.contains(Feature.breach) && token.equals(Constants.TOKEN_BREACH_ACTIVE)) {
+                        adjacentPositions.add(t.getPosition());
+                        break;
+                    }
+                    if (adjToFeatures.contains(Feature.ingress) && token.equals(Constants.TOKEN_INGRESS)) {
+                        adjacentPositions.add(t.getPosition());
+                        break;
+                    }
+                }
+            }
         }
         return adjacentPositions;
     }
@@ -602,6 +652,20 @@ public class FoWHelper {
             if (unitHolder.getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
                 wormholeIDs.add(Constants.DELTA);
             }
+        }
+
+        if (player != null && player.hasAbility("sundered")) {
+            Set<String> keepers = new HashSet<>(Set.of("epsilon"));
+            if (player.hasAbility("quantum_entanglement") || wh_recon || absol_recon) {
+                keepers.addAll(Set.of("alpha", "beta"));
+            }
+            wormholeIDs.removeIf(wh -> !keepers.contains(wh.toLowerCase()));
+        }
+
+        if (player != null
+                && player.getFaction().equals("ghost")
+                && game.getPlayerFromColorOrFaction("crimson") != null) {
+            wormholeIDs.removeIf(wh -> "epsilon".equals(wh.toLowerCase()));
         }
 
         if ((player != null && player.hasAbility("quantum_entanglement")) || wh_recon || absol_recon) {

@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CheckDistanceHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
@@ -293,12 +294,19 @@ public class TacticalActionOutputService {
             bonusMoveValue = maxBase - baseMoveValue;
         }
 
+        boolean tileHasBreach = tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
+
         if (player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
             bonusMoveValue++;
         }
         if (player.hasAbility("slipstream") && (tileHasWormhole || (movingFromHome && !game.isTwilightsFallMode()))) {
             bonusMoveValue++;
         }
+
+        if (player.hasUnlockedBreakthrough("crimsonbt") && (tileHasBreach || movingFromHome)) {
+            bonusMoveValue++;
+        }
+
         if (player.hasAbility("song_of_something") && movingFromHome) {
             bonusMoveValue++;
         }

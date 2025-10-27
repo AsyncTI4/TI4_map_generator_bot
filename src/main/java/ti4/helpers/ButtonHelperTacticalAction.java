@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -12,7 +13,9 @@ import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperGeneral;
+import ti4.helpers.thundersedge.TeHelperPromissories;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -81,6 +84,14 @@ public class ButtonHelperTacticalAction {
                                 + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                                 + " agent to place 1 space dock for 2 trade goods or 2 commodities",
                         buttons);
+            }
+            if (player.hasAbility("miniaturization")) {
+                String msg = player.getRepresentation()
+                        + " You can land your structures on planets in the active system using your ability Miniaturization:";
+                List<Button> buttons = TeHelperAbilities.miniLandingButtons(game, player);
+                if (buttons.size() > 0) {
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                }
             }
         }
 
@@ -542,6 +553,38 @@ public class ButtonHelperTacticalAction {
                 String magenMsg = magenPlayer.getRepresentation()
                         + " you can, and must, use _Magen Defense Grid_ to place an infantry with each of your structures in the active system.";
                 MessageHelper.sendMessageToChannelWithButton(magenPlayer.getCorrectChannel(), magenMsg, useMagen);
+            }
+            if (player.hasPlayablePromissoryInHand("malevolency")) {
+                MessageHelper.sendMessageToPlayerCardsInfoThread(
+                        player,
+                        player.getRepresentationUnfogged()
+                                + " Reminder you have the Malevolency promissory note, and now is the window to pass it on if you so wish.");
+            }
+            Set<String> tokens = activeSystem.getSpaceUnitHolder().getTokenList();
+            if (player.hasAbility("incursion")
+                    && (tokens.contains(Constants.TOKEN_BREACH_ACTIVE)
+                            || tokens.contains(Constants.TOKEN_BREACH_INACTIVE))) {
+                String label = tokens.contains(Constants.TOKEN_BREACH_ACTIVE) ? "inactive" : "active";
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "flipBreach_" + pos, "Flip breach to " + label));
+                buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+                String msg = player.getRepresentation()
+                        + " You can use the buttons to flip the breach in the active system:";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+            }
+            if (player.hasPlayablePromissoryInHand("couriertransport")
+                    && activeSystem.getPlanetUnitHolders().size() > 0) {
+                String msg = player.getRepresentation()
+                        + " You can use courier transport to move your structures from adjacent systems that do not contain your command tokens onto planets you control in this system. Do you want to use it?";
+                List<Button> buttons = List.of(
+                        Buttons.green("startCourierTransport_" + pos, "Play Courier Transport"),
+                        Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+                if (TeHelperPromissories.getCourierTransportButtons(game, player, pos)
+                                .size()
+                        > 1) {
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+                }
             }
         }
         if (player.hasAbility("awaken")

@@ -23,12 +23,14 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.TriadService;
 import ti4.service.planet.AddPlanetService;
+import ti4.service.tech.BastionTechService;
 import ti4.service.unit.AddUnitService;
 
 public class TeHelperGeneral {
 
     public static void checkTransientInfo(Game game) {
         TriadService.checkAndUpdateTriad(game);
+        BastionTechService.checkHeliosAttachment(game);
     }
 
     @ButtonHandler("expeditionInfo")

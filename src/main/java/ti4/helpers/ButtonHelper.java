@@ -59,6 +59,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
+import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
@@ -617,7 +618,7 @@ public class ButtonHelper {
     public static String playerHasDMZPlanet(Player player, Game game) {
         String dmzPlanet = "no";
         for (String planet : player.getPlanets()) {
-            if (planet.contains("custodia") || planet.contains("ghoti")) {
+            if (planet.contains("custodia") || planet.contains("ghoti") || planet.startsWith("ocean")) {
                 continue;
             }
             Planet p = game.getPlanetsInfo().get(planet);
@@ -1614,6 +1615,17 @@ public class ButtonHelper {
                             ident + ", please use these buttons to resolve Dirzuga Rophal, the Arborec commander.",
                             buttons);
                 }
+            }
+
+            if (nonActivePlayer.hasAbility("survivalinstinct")
+                    && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem)) {
+                Player ralnel = nonActivePlayer;
+                List<Button> buttons =
+                        TeHelperAbilities.getSurvivalInstinctSystemButtons(game, ralnel, activeSystem, null);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        ralnel.getCorrectChannel(),
+                        ralnel.getRepresentation() + " you can use the buttons to resolve Survival Instinct:",
+                        buttons);
             }
 
             if (nonActivePlayer.hasLeaderUnlocked("celdaurihero")
