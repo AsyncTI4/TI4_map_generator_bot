@@ -697,6 +697,14 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), msg, getJolNarAgentButtons(player, game));
         }
+        if ("experimentalagent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Experiment"
+                    + ssruuSlash + " genome.";
+            MessageHelper.sendMessageToChannel(channel, exhaustText);
+            String msg = player.getRepresentationUnfogged() + " you may use the buttons to remove infantry.";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), msg, getJolNarAgentButtons(player, game));
+        }
 
         if ("empyreanagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Acamar, the Empyrean"
@@ -957,6 +965,19 @@ public class ButtonHelperAgents {
                     p2.getFactionEmojiOrColor() + " will receive " + ssruuClever + "Evelyn Delouis, the Sol"
                             + ssruuSlash + " agent, on their next roll.");
             game.setCurrentReacts("solagent", p2.getFaction());
+        }
+        if ("valientagent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Valient genome.";
+            MessageHelper.sendMessageToChannel(channel, exhaustText);
+            String faction = rest.split("_")[1];
+            Player p2 = game.getPlayerFromColorOrFaction(faction);
+            String msg = p2.getRepresentationNoPing()
+                    + ", please choose the recently deceased unit that you wish to use the genome on.";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    p2.getCorrectChannel(),
+                    msg,
+                    ButtonHelperActionCards.getCourageousOptions(p2, game, true, "courageous"));
+            ButtonHelper.deleteMessage(event);
         }
         if ("letnevagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever

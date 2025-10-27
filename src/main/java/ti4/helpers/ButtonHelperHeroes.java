@@ -1270,12 +1270,21 @@ public class ButtonHelperHeroes {
                         + ".");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, count);
-        game.setComponentAction(true);
-        List<TechnologyModel> techs = new ArrayList<>();
-        for (String type : techTypes) techs.addAll(ListTechService.getAllTechOfAType(game, type, player));
-        List<Button> buttons = ListTechService.getTechButtons(techs, player, "nekro");
-        String message = player.getRepresentation() + ", please choose which technology you wish to get.";
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+
+        if (game.isTwilightsFallMode()) {
+            game.setComponentAction(true);
+            List<TechnologyModel> techs = new ArrayList<>();
+            for (String type : techTypes) techs.addAll(ListTechService.getAllTechOfAType(game, type, player));
+            List<Button> buttons = ListTechService.getTechButtons(techs, player, "nekro");
+            String message = player.getRepresentation() + ", please choose which technology you wish to get.";
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        } else {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
+            buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), "Use buttons to draw 1 ability.", buttons);
+        }
         ButtonHelper.deleteMessage(event);
     }
 

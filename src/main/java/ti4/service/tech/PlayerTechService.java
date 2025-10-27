@@ -734,6 +734,9 @@ public class PlayerTechService {
             Button aiDEVButton = Buttons.red("exhaustTech_absol_aida" + inf, "Exhaust AI Development Algorithm");
             buttons.add(aiDEVButton);
         }
+        if (payType.equals("res")) {
+            buttons.addAll(dwsCommanders);
+        }
         if (!techM.isUnitUpgrade() && player.hasAbility("iconoclasm")) {
 
             for (int x = 1; x < player.getCrf() + 1; x++) {
@@ -768,8 +771,12 @@ public class PlayerTechService {
             buttons.add(Buttons.red("prophetsTears_AC", "Exhaust Prophet's Tears for Action Card"));
             buttons.add(Buttons.red("prophetsTears_TechSkip", "Exhaust Prophet's Tears for Technology Prerequisite"));
         }
-        if (player.hasExternalAccessToLeader("jolnaragent") || player.hasUnexhaustedLeader("jolnaragent")) {
+        if (player.hasUnexhaustedLeader("jolnaragent")) {
             buttons.add(Buttons.gray("exhaustAgent_jolnaragent", "Use Jol-Nar Agent", FactionEmojis.Jolnar));
+        }
+        if (player.hasUnexhaustedLeader("experimentalagent")) {
+            buttons.add(
+                    Buttons.gray("exhaustAgent_experimentalagent", "Use Experimental Genome", FactionEmojis.Jolnar));
         }
         if (player.hasUnexhaustedLeader("veldyragent")) {
             buttons.add(Buttons.red(

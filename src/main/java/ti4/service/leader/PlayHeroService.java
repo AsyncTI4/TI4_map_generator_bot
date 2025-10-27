@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +17,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperHeroes;
+import ti4.helpers.ButtonHelperTwilightsFallActionCards;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
@@ -36,6 +38,7 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.ActionCardModel;
+import ti4.model.AgendaModel;
 import ti4.model.LeaderModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.PlanetService;
@@ -435,6 +438,47 @@ public class PlayHeroService {
                                 + ", please choose which planet you wish to get a technology and trade goods from (and kill any enemy units).",
                         buttons);
             }
+            case "lawshero" -> {
+                ButtonHelperTwilightsFallActionCards.resolveLawsHero(game, player);
+            }
+            case "devourhero" -> {
+                List<Button> buttons = ButtonHelperHeroes.getNekroHeroButtons(player, game);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(),
+                        player.getRepresentation(true, showFlavourText)
+                                + ", please choose which planet you wish to get trade goods from (and kill any enemy units).",
+                        buttons);
+            }
+            case "voicehero" -> {
+                List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
+                if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
+                    edicts.removeIf(edict2 -> edict2.equalsIgnoreCase("tf-censure"));
+                }
+                List<Button> buttons = new ArrayList<>();
+                List<MessageEmbed> embeds = new ArrayList<>();
+                Player tyrant = player;
+                for (int x = 0; x < 3; x++) {
+                    AgendaModel edict = Mapper.getAgenda(edicts.get(x));
+                    buttons.add(Buttons.green(
+                            tyrant.getFinsFactionCheckerPrefix() + "resolveEdict_" + edicts.get(x), edict.getName()));
+                    embeds.add(edict.getRepresentationEmbed());
+                }
+                String msg = tyrant.getRepresentation()
+                        + " you should now choose which of the 3 edicts you wish to resolve.";
+                MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                        tyrant.getCorrectChannel(), msg, embeds, buttons);
+            }
+            case "brilliancehero" -> {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
+                buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
+                buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
+                buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(),
+                        player.getRepresentation(true, showFlavourText) + ", please use the buttons to resolve.",
+                        buttons);
+            }
             case "bentorhero" -> {
                 ButtonHelperHeroes.resolveBentorHero(game, player);
                 MessageHelper.sendMessageToChannel(
@@ -476,6 +520,15 @@ public class PlayHeroService {
                         player.getRepresentation(true, showFlavourText)
                                 + ", use the button to do __two__ of the available secondaries.\n-# All are presented for convenience, but two is the limit.",
                         buttons);
+            }
+            case "forgehero" -> {
+                RelicHelper.drawRelicAndNotify(player, event, game);
+                List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+                String trueIdentity = player.getRepresentationUnfogged();
+                String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()
+                        + ". Use buttons to gain 2 command tokens.";
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
+                game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
             case "mahacthero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getBenediction1stTileOptions(player, game);

@@ -2622,7 +2622,8 @@ public class AgendaHelper {
                 Collections.rotate(orderList, rotationDistance);
             }
         }
-        if (game.isHasHackElectionBeenPlayed()) {
+        if (game.isHasHackElectionBeenPlayed()
+                && game.getStoredValue("hackElectionFaction").isEmpty()) {
             Collections.reverse(orderList);
             if (optSpeaker.isPresent()) {
                 int rotationDistance = orderList.size() - orderList.indexOf(optSpeaker.get()) - 1;

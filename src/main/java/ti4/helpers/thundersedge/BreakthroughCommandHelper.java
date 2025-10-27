@@ -77,6 +77,7 @@ public class BreakthroughCommandHelper {
             if ("mentakbt".equalsIgnoreCase(bt.getID())) {
                 if (player.hasTech("cr2")) {
                     player.addOwnedUnitByID("mentak_cruiser3");
+                    player.removeOwnedUnitByID("cruiser2");
                 }
             }
             if (!FractureService.isFractureInPlay(game) && game.isTestBetaFeaturesMode())
@@ -111,7 +112,7 @@ public class BreakthroughCommandHelper {
                 player.setBreakthroughActive(true);
                 String message = player.getRepresentation() + " activated their breakthrough: " + bt.getName();
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                if (bt.getName().equalsIgnoreCase("naazbt")) {
+                if (bt.getAlias().equalsIgnoreCase("naazbt")) {
                     player.addOwnedUnitByID("naaz_voltron");
                 }
             }
@@ -124,7 +125,7 @@ public class BreakthroughCommandHelper {
                 player.setBreakthroughActive(false);
                 String message = player.getRepresentation() + " de-activated their breakthrough: " + bt.getName();
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                if (bt.getName().equalsIgnoreCase("naazbt")) {
+                if (bt.getAlias().equalsIgnoreCase("naazbt")) {
                     player.removeOwnedUnitByID("naaz_voltron");
                 }
             }

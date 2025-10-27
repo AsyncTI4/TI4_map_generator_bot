@@ -285,6 +285,47 @@ public class ButtonHelperTwilightsFallActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    public static void resolveLawsHero(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayers()) {
+            buttons.add(Buttons.gray("lawsHeroStep2_" + p2.getFaction(), p2.getFactionNameOrColor()));
+        }
+        String msg = player.getRepresentation() + " choose the player you wish to purge an ability from.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+    }
+
+    @ButtonHandler("lawsHeroStep2")
+    public static void lawsHeroStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<>();
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        for (String tech : p2.getTechs()) {
+            TechnologyModel techM = Mapper.getTech(tech);
+            if (!tech.equalsIgnoreCase("wavelength") || !tech.equalsIgnoreCase("antimatter")) {
+                continue;
+            }
+            buttons.add(Buttons.gray("lawsHeroStep3_" + p2.getFaction() + "_" + tech, techM.getName()));
+        }
+        String msg = player.getRepresentation() + " choose the ability that you wish to purge.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("lawsHeroStep3")
+    public static void lawsHeroStep3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String agent = buttonID.split("_")[2];
+        game.setStoredValue("purgedAbilities", game.getStoredValue("purgedAbilities") + "_" + agent);
+        TechnologyModel lead = Mapper.getTech(agent);
+        p2.removeTech(agent);
+        String msg = player.getRepresentation() + " choose to remove " + lead.getAutoCompleteName() + " from "
+                + p2.getFactionNameOrColor();
+        String msg2 = p2.getRepresentation() + " you lost " + lead.getAutoCompleteName() + " to a laws paradigm by "
+                + player.getFactionNameOrColor();
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("genophageStep2")
     public static void genophageStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
