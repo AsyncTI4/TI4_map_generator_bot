@@ -65,6 +65,7 @@ public class ActionCardHelper {
         }
 
         sendTrapCardInfo(player);
+        sendPlotCardInfo(game, player);
         sendGarboziaInfo(game, player);
     }
 
