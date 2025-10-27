@@ -97,7 +97,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
                 player.getFactionEmoji()
-                        + " is using _???\\_NULL\\_REFERENCE\\_???_ to produce 1 recently destroyed ship in their home system (they can do this upon each death of a ship, but each payment is separate).");
+                        + " is using _Subatomic Splicer_ to produce 1 recently destroyed ship in their home system (they can do this upon each death of a ship, but each payment is separate).");
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
 

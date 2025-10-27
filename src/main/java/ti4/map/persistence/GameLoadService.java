@@ -987,6 +987,27 @@ class GameLoadService {
                         player.setEvent(id, index);
                     }
                 }
+                case Constants.PLOT_CARDS -> {
+                    StringTokenizer plotCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (plotCardToken.hasMoreTokens()) {
+                        StringTokenizer plotCardInfo = new StringTokenizer(plotCardToken.nextToken(), ",");
+                        String id = plotCardInfo.nextToken();
+                        Integer index = Integer.parseInt(plotCardInfo.nextToken());
+                        player.setPlotCard(id, index);
+                    }
+                }
+                case Constants.PLOT_FACTIONS -> {
+                    StringTokenizer plotCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (plotCardToken.hasMoreTokens()) {
+                        StringTokenizer plotCardInfo = new StringTokenizer(plotCardToken.nextToken(), ",");
+                        String id = plotCardInfo.nextToken();
+                        while (plotCardInfo.hasMoreTokens()) {
+                            String faction = plotCardInfo.nextToken();
+                            player.setPlotCardFaction(id, faction);
+                        }
+                    }
+                }
+
                 case Constants.LIZHO_TRAP_CARDS -> {
                     StringTokenizer trapCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
                     while (trapCardToken.hasMoreTokens()) {

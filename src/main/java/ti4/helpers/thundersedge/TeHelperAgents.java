@@ -53,7 +53,7 @@ public class TeHelperAgents {
         return true;
     }
 
-    private static void postRalNelAgentStep1(GenericInteractionCreateEvent event, Game game, Player player) {
+    public static void postRalNelAgentStep1(GenericInteractionCreateEvent event, Game game, Player player) {
         Map<String, Integer> acsBefore = new HashMap<>(player.getActionCards());
         ActionCardHelper.drawActionCards(game, player, 2, true);
         Map<String, Integer> acsAfter = new HashMap<>(player.getActionCards());
@@ -69,7 +69,7 @@ public class TeHelperAgents {
 
         String msg = player.getRepresentation(true, true) + " Choose an action card to send to another player:";
         if (player.getActionCards().size() > ButtonHelper.getACLimit(game, player))
-            msg += "\n> NOTE: This happens BEFORE discarding down to hand limit!!!";
+            msg += "\n> NOTE: This happens BEFORE discarding down to hand limit.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 

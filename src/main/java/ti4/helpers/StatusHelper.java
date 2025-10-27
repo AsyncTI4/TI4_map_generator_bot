@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -18,6 +20,7 @@ import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -25,8 +28,10 @@ import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
+import ti4.service.breakthrough.SowingReapingService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.PlanetEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
@@ -140,6 +145,36 @@ public class StatusHelper {
                         player.getRepresentationUnfogged() + " you gained " + numScoredSOs + " trade good"
                                 + (numScoredSOs == 1 ? "" : "s") + " and " + numScoredPos + " commodit"
                                 + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
+            }
+            if (player.hasTech("hydrothermal")) {
+                int oceans = 0;
+                for (Player p2 : game.getRealPlayers()) {
+                    oceans = Math.max(oceans, p2.getOceans().size());
+                }
+                if (oceans > 0) {
+                    player.setTg(player.getTg() + oceans);
+                    ButtonHelperAbilities.pillageCheck(player, game);
+                    ButtonHelperAgents.resolveArtunoCheck(player, oceans);
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged() + " you gained " + oceans + " trade good"
+                                    + (oceans == 1 ? "" : "s") + " due to the Hydrothermal technology.");
+                }
+            }
+            if (player.hasTech("radical")) {
+                List<Button> buttons = new ArrayList<>();
+                for (String tech : player.getTechs()) {
+                    TechnologyModel techModel = Mapper.getTech(tech);
+                    if (techModel != null && !techModel.isUnitUpgrade()) {
+                        buttons.add(Buttons.green(
+                                "jnHeroSwapOut_" + tech, techModel.getName(), techModel.getCondensedReqsEmojis(true)));
+                    }
+                }
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + " choose a technology to replace due to Radical Advancement.",
+                        buttons);
             }
             if (player.getPromissoryNotes().containsKey("dspnuyda")
                     && !player.getPromissoryNotesOwned().contains("dspnuyda")) {
@@ -377,6 +412,7 @@ public class StatusHelper {
         }
 
         for (Player player : game.getRealPlayers()) {
+
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
             for (String pn : pns) {
                 Player pnOwner = game.getPNOwner(pn);
@@ -470,9 +506,45 @@ public class StatusHelper {
         sendMitosisButtons(game);
         sendHoldingCompanyButtons(game);
         sendEntropicScarButtons(game);
-
+        sendNeuralParasiteButtons(game);
+        sendRemoveBreachButtons(game);
+        SowingReapingService.sendTheSowingButtons(game);
         // Obligatory abilities
         resolveSolFlagship(game);
+    }
+
+    public static void sendRemoveBreachButtons(Game game) {
+        Predicate<Tile> hasBreach = t -> t.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
+        Function<Player, Predicate<Tile>> hasPlayerShips = p -> (t -> FoWHelper.playerHasShipsInSystem(p, t));
+        for (Player p : game.getRealPlayers()) {
+            List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(
+                    p, game, "statusRemoveBreach", hasBreach.and(hasPlayerShips.apply(p)), false);
+            if (!buttons.isEmpty()) {
+                buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Done removing"));
+                String msg =
+                        p.getRepresentation() + " You may remove active breaches from systems that contain your ships:";
+                MessageHelper.sendMessageToChannelWithButtons(p.getCorrectChannel(), msg, buttons);
+            }
+        }
+    }
+
+    private static void sendNeuralParasiteButtons(Game game) {
+        List<Player> firmaments = Helper.getPlayersFromTech(game, "parasite-firm");
+        if (firmaments == null || firmaments.isEmpty()) return;
+
+        for (Player player : firmaments) {
+            Tile home = player.getHomeSystemTile();
+            List<Button> buttons = new ArrayList<>();
+            for (Planet planet : home.getPlanetUnitHolders()) {
+                String id = player.finChecker() + "placeOneNDone_skipbuild_gf_" + planet.getName();
+                String label = Helper.getUnitHolderRepresentation(home, planet.getName(), game, player);
+                buttons.add(Buttons.green(id, label, PlanetEmojis.getPlanetEmoji(planet.getName())));
+            }
+            TechnologyModel parasiteModel = Mapper.getTech("parasite-firm");
+            String parasiteMsg = player.getRepresentationUnfogged() + ", a reminder to do "
+                    + parasiteModel.getNameRepresentation() + ".";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), parasiteMsg, buttons);
+        }
     }
 
     private static void sendMitosisButtons(Game game) {

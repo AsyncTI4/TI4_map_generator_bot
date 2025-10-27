@@ -44,6 +44,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
 
@@ -1173,7 +1174,7 @@ public class StartCombatService {
             }
         }
 
-        if (p1.hasTech("nekroc4y")
+        if ((p1.hasTech("nekroc4y") || p1.hasTech("subatomic"))
                 && isSpaceCombat
                 && tile != p1.getHomeSystemTile()
                 && p1.getHomeSystemTile() != null) {
@@ -1182,11 +1183,11 @@ public class StartCombatService {
                             .contains(p1.getHomeSystemTile())) {
                 buttons.add(Buttons.green(
                         p1.getFinsFactionCheckerPrefix() + "useNekroNullRef",
-                        "Use Null Reference (Upon Each Destroy)",
-                        FactionEmojis.Nekro));
+                        "Use Subatomic Splicer (Upon Each Destroy)",
+                        FactionEmojis.Crimson));
             }
         }
-        if (p2.hasTech("nekroc4y")
+        if ((p2.hasTech("nekroc4y") || p2.hasTech("subatomic"))
                 && isSpaceCombat
                 && tile != p2.getHomeSystemTile()
                 && p2.getHomeSystemTile() != null
@@ -1196,8 +1197,8 @@ public class StartCombatService {
                             .contains(p2.getHomeSystemTile())) {
                 buttons.add(Buttons.green(
                         p2.getFinsFactionCheckerPrefix() + "useNekroNullRef",
-                        "Use Null Reference (Upon Each Destroy)",
-                        FactionEmojis.Nekro));
+                        "Use Subatomic Splicer (Upon Each Destroy)",
+                        FactionEmojis.Crimson));
             }
         }
 
@@ -1871,6 +1872,9 @@ public class StartCombatService {
                         String id = p.finChecker() + "letnevMechRes_" + unitH.getName() + "_mech";
                         String label = "Deploy Dunlain Reaper on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.Letnev));
+                    }
+                    if (isGroundCombat) {
+                        BastionTechService.addProximaCombatButton(game, p1, p2, tile, unitH, buttons);
                     }
                 }
                 // Assimilate

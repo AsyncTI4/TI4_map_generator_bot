@@ -9,6 +9,7 @@ import ti4.service.emoji.FactionEmojis;
 @Data
 public class GenericCardModel implements ModelInterface, EmbeddableModel {
     public enum CardType {
+        plot,
         trap
     }
 
@@ -49,6 +50,7 @@ public class GenericCardModel implements ModelInterface, EmbeddableModel {
     private String cardTypeEmoji() {
         return switch (cardType) {
             case trap -> FactionEmojis.lizho.toString();
+            case plot -> FactionEmojis.Obsidian.toString();
         };
     }
 

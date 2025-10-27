@@ -429,6 +429,7 @@ public class PlayerTechService {
                     player.refreshTech("lgf");
                 }
             }
+            case "planesplitter-obs" -> TeHelperTechs.initializePlanesplitterStep1(game, player);
             case "det", "absol_det" -> {
                 deleteIfButtonEvent(event);
                 ButtonHelper.starChartStep1(game, player, "unknown");

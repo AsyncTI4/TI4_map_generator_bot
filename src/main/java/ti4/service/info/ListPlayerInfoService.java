@@ -280,7 +280,9 @@ public class ListPlayerInfoService {
                 x++;
             }
             msg.append(representSecrets(game)).append("\n");
-            msg.append(representSupports(game)).append("\n");
+            if (!game.isTwilightsFallMode()) {
+                msg.append(representSupports(game)).append("\n");
+            }
             if (gameHasTransferablePoints(game)) {
                 msg.append(representTransferablePoints(game)).append("\n");
             }

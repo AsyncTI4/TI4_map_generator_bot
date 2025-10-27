@@ -1058,9 +1058,10 @@ public class AgendaHelper {
                     "You may use the button to get your two technologies.",
                     Buttons.GET_A_TECH);
         } else if (!d1.isSuccess() && !game.isFowMode()) {
-            Button modify = Buttons.gray("getModifyTiles", "Modify Units");
-            MessageHelper.sendMessageToChannelWithButton(
-                    game.getMainGameChannel(), "Please remove units in or adjacent to the Mecatol Rex system.", modify);
+            Tile tile = game.getMecatolTile();
+            ButtonHelperTwilightsFallActionCards.sendDestroyButtonsForSpecificTileAndSurrounding(game, tile);
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(), "Please destroy units in or adjacent to the Mecatol Rex system.");
         }
     }
 

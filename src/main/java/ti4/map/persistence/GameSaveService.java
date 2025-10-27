@@ -820,6 +820,9 @@ class GameSaveService {
             writeCards(player.getTrapCards(), writer, Constants.LIZHO_TRAP_CARDS);
             writeCardsStrings(player.getTrapCardsPlanets(), writer, Constants.LIZHO_TRAP_PLANETS);
 
+            writeCards(player.getPlotCards(), writer, Constants.PLOT_CARDS);
+            // writeCardsStringList(player.getPlotCardsFactions(), writer, Constants.PLOT_FACTIONS);
+
             writer.write(Constants.FRAGMENTS + " " + String.join(",", player.getFragments()));
             writer.write(System.lineSeparator());
 
