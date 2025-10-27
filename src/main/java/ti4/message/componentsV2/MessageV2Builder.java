@@ -171,8 +171,7 @@ public class MessageV2Builder {
                     .map(msg -> MessageV2Builder.ComponentTypeTree(msg.getComponentTree()))
                     .collect(Collectors.toList());
             BotLogger.warning(
-                    Constants.jabberwockyPing() + "Attempted to send a v2 message that exceeds the component limit, "
-                            + "but splitting is disabled. Message not sent.\n"
+                    Constants.jabberwockyPing() + " Someone attempted to send a v2 message that is split beyond the maximum. Message not sent.\n"
                             + String.join("\n---\n", componentTrees));
             return;
         }
@@ -243,22 +242,28 @@ public class MessageV2Builder {
         List<MessageCreateData> messages = new ArrayList<>();
         List<MessageTopLevelComponent> currentPartition = new ArrayList<>();
         int currentCount = 0;
+        int currentCharacterCount = 0;
         while (!topLevelComponents.isEmpty()) {
             MessageTopLevelComponent component = topLevelComponents.removeFirst();
             int componentCount = MessageV2Builder.CountComponents(component);
-            if (componentCount > Message.MAX_COMPONENT_COUNT_IN_COMPONENT_TREE) {
+            int characterCount = MessageV2Builder.CountCharacters(component);
+            if (componentCount > Message.MAX_COMPONENT_COUNT_IN_COMPONENT_TREE || characterCount > Message.MAX_CONTENT_LENGTH_COMPONENT_V2) {
                 BotLogger.warning("Cannot send a message with a top-level component that exceeds the component limit.\n"
                         + MessageV2Builder.ComponentTypeTree(component));
                 continue;
             }
-            if (currentCount + componentCount > Message.MAX_COMPONENT_COUNT_IN_COMPONENT_TREE
+            boolean exceedsCharacterLimit = currentCharacterCount + characterCount > Message.MAX_CONTENT_LENGTH_COMPONENT_V2;
+            boolean exceedsComponentLimit = currentCount + componentCount > Message.MAX_COMPONENT_COUNT_IN_COMPONENT_TREE;
+            if ((exceedsComponentLimit || exceedsCharacterLimit)
                     && !currentPartition.isEmpty()) {
                 messages.add(buildMessage(currentPartition));
                 currentPartition.clear();
                 currentCount = 0;
+                currentCharacterCount = 0;
             }
             currentPartition.add(component);
             currentCount += componentCount;
+            currentCharacterCount += characterCount;
         }
         if (!currentPartition.isEmpty()) {
             messages.add(buildMessage(currentPartition));
@@ -305,6 +310,35 @@ public class MessageV2Builder {
                                 .sum()
                         + 1;
             case Label label -> 1 + CountComponents(label.getChild());
+            case null -> 0;
+            default ->
+                throw new IllegalArgumentException(
+                        "Unknown component type: " + component.getClass().getName());
+        };
+    }
+
+    public static int CountCharacters(Component component) {
+        return switch (component) {
+            case ActionRow actionRow -> 0;
+            case Button button -> 0;
+            case StringSelectMenu stringSelectMenu -> 0;
+            case TextInput textInput -> 0;
+            case EntitySelectMenu entitySelectMenu -> 0;
+            case Section section ->
+                section.getContentComponents().stream()
+                                .mapToInt(MessageV2Builder::CountCharacters)
+                                .sum()
+                        + CountCharacters(section.getAccessory());
+            case TextDisplay textDisplay -> textDisplay.getContent().length();
+            case Thumbnail thumbnail -> 0;
+            case MediaGallery mediaGallery -> 0;
+            case FileDisplay fileDisplay -> 0;
+            case Separator separator -> 0;
+            case Container container ->
+                container.getComponents().stream()
+                                .mapToInt(MessageV2Builder::CountCharacters)
+                                .sum();
+            case Label label -> label.getLabel().length() + CountCharacters(label.getChild());
             case null -> 0;
             default ->
                 throw new IllegalArgumentException(

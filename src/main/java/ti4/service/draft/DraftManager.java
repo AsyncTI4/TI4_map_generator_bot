@@ -254,8 +254,7 @@ public class DraftManager extends DraftPlayerManager {
         if (blockingSetup != null) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
-                    "The draft has ended. Some additional setup needs to happen before the game can start: "
-                            + blockingSetup);
+                    "The draft has ended. Some additional setup needs to happen before the game can start.");
         } else {
             trySetupPlayers(event);
         }

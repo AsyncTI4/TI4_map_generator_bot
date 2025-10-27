@@ -1,14 +1,23 @@
 package ti4.service.unit;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitState;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 import ti4.service.planet.FlipTileService;
@@ -61,6 +70,69 @@ public class AddUnitService {
         }
 
         handleFogOfWar(tile, color, game, unitList);
+        checkFleetCapacity(tile, color, game);
+    }
+
+    /**
+     * Ignore any locations in the provided unit list, and place them all in "default" locations.
+     * This is useful when the unitList is for a different tile than what you're placing.
+     * Ex. You draft a starting fleet, and place it on a different home system.
+     */
+    public static void addUnitsToDefaultLocations(GenericInteractionCreateEvent event, Tile tile, Game game, String color, List<ParsedUnit> parsedUnits) {
+        // Combine units of the same type, ignoring location
+        Map<UnitType, Integer> combinedUnits = new HashMap<>();
+        for(ParsedUnit parsedUnit : parsedUnits) {
+            combinedUnits.put(
+                    parsedUnit.getUnitKey().getUnitType(),
+                    combinedUnits.getOrDefault(parsedUnit.getUnitKey().getUnitType(), 0) + parsedUnit.getCount()
+            );
+        }
+
+        // Get the planet names, ordered by resources descending
+        List<String> planetNames = tile.getPlanetUnitHolders().stream()
+                .sorted((ph1, ph2) -> Integer.compare(
+                        ph2.getPlanetModel().getResources(),
+                        ph1.getPlanetModel().getResources()))
+                .map(UnitHolder::getName)
+                .toList();
+
+        // Distribute non-space units amongst planets evenly, and dump ships into space
+        List<ParsedUnit> assignedUnits = new ArrayList<>();
+        for(Entry<UnitType, Integer> entry : combinedUnits.entrySet()) {
+            UnitType unitType = entry.getKey();
+            Integer totalAmt = entry.getValue();
+            // Ships go to space
+            if(unitType.isShip()) {
+                assignedUnits.add(new ParsedUnit(Units.getUnitKey(unitType, color), totalAmt, Constants.SPACE));
+                continue;
+            }
+
+            // Non-ships get distributed to planets, prioritizing high-resource planets
+            int minUnitsPerPlanet = totalAmt / planetNames.size();
+            int remainder = totalAmt % planetNames.size();
+            for(int i = 0; i < planetNames.size(); i++ ) {
+                int amtForThisPlanet = minUnitsPerPlanet + (i < remainder ? 1 : 0);
+                if(amtForThisPlanet > 0) {
+                    assignedUnits.add(new ParsedUnit(Units.getUnitKey(unitType, color), amtForThisPlanet, planetNames.get(i)));
+                }
+            }
+        }
+
+        // Now actually add the units
+        StringBuilder unitList = new StringBuilder();
+        boolean first = true;
+        for (ParsedUnit parsedUnit : assignedUnits) {
+            tile.addUnit(parsedUnit.getLocation(), parsedUnit.getUnitKey(), parsedUnit.getCount());
+            tile = FlipTileService.flipTileIfNeeded(tile, game);
+            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.getLocation(), game);
+            if (!first) {
+                unitList.append(", ");
+            }
+            unitList.append(parsedUnit.getCount()).append(" ").append(parsedUnit.getUnitKey().asyncID()).append(" ").append(parsedUnit.getLocation());
+            first = false;
+        }
+
+        handleFogOfWar(tile, color, game, unitList.toString());
         checkFleetCapacity(tile, color, game);
     }
 

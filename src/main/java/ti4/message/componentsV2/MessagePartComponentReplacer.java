@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nonnull;
+
 import net.dv8tion.jda.api.components.Component;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.attribute.ICustomId;
@@ -54,7 +57,7 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
      * requests)
      */
     @Override
-    public Component apply(Component curComponent) {
+    public Component apply(@Nonnull Component curComponent) {
         ReplaceMessagePart replacement = tryGetReplacementByCustomId(curComponent);
         if (replacement == null) {
             replacement = tryGetReplacementByPattern(curComponent);
@@ -163,9 +166,6 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
             return false;
         }
         String content = textDisplay.getContent();
-        if (content == null) {
-            return false;
-        }
         return content.matches(pattern);
     }
 

@@ -52,7 +52,7 @@ public class RedTileDraftItem extends DraftItem {
 
     private void buildPlanetString(PlanetModel planet, StringBuilder sb) {
         sb.append(planet.getName());
-        sb.append(planet.getPlanetTypes().stream().map(this::planetTypeEmoji).reduce("", String::concat));
+        sb.append(planetTypeEmoji(planet.getPlanetType()));
         sb.append(" (");
         sb.append(planet.getResources()).append("/").append(planet.getInfluence());
         if (planet.isLegendary()) {

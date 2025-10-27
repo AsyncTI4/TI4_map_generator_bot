@@ -1,12 +1,16 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.collections4.ListUtils;
+
 import ti4.service.emoji.TI4Emoji;
 
 public final class StringHelper {
@@ -207,5 +211,53 @@ public final class StringHelper {
         } while (index < initial.length());
 
         return output.toString();
+    }
+
+    public static List<String> chunkMessage(String input, int maxLength) {
+        if (input == null || maxLength <= 0) return Collections.emptyList();
+        if (input.length() <= maxLength) return List.of(input);
+
+        // Try each of these separators in sequence, trying to find the first one that works.
+        List<String> chunkSeparators = List.of("\r\n\r\n", "\n\n", "\r\n", "\n", ". ", " ");
+
+        for (String sep : chunkSeparators) {
+            String[] chunks = input.split(Pattern.quote(sep));
+            List<String> messages = new ArrayList<>();
+            StringBuilder currentMessage = new StringBuilder();
+            for (String chunk : chunks) {
+                if (chunk.length() > maxLength) {
+                    // This chunk is too big, so this separator won't work
+                    messages.clear();
+                    break;
+                }
+                if (currentMessage.length() + chunk.length() + sep.length() > maxLength) {
+                    // This chunk would make the message too big, so start a new message
+                    if (currentMessage.length() > 0) {
+                        messages.add(currentMessage.toString());
+                    }
+                    currentMessage = new StringBuilder(chunk);
+                } else {
+                    // This chunk fits in the current message
+                    if (currentMessage.length() > 0) {
+                        currentMessage.append(sep);
+                    }
+                    currentMessage.append(chunk);
+                }
+            }
+            if (currentMessage.length() > 0) {
+                messages.add(currentMessage.toString());
+            }
+            if (!messages.isEmpty()) {
+                return messages;
+            }
+        }
+
+        // Nothing good worked, just do the crappy character-by-character split
+        List<List<String>> partitioned = ListUtils.partition(List.of(input.split("")), maxLength);
+        List<String> messages = new ArrayList<>();
+        for (List<String> part : partitioned) {
+            messages.add(String.join("", part));
+        }
+        return messages;
     }
 }

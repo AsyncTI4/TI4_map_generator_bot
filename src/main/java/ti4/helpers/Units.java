@@ -188,6 +188,13 @@ public class Units {
             };
         }
 
+        public boolean isShip() {
+            return switch (this) {
+                case Fighter, Destroyer, Cruiser, Carrier, Dreadnought, Flagship, Cavalry, Lady, Warsun -> true;
+                default -> false;
+            };
+        }
+
         @Override
         public String toString() {
             return value;

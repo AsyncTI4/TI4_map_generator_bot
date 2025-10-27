@@ -3,6 +3,7 @@ package ti4.helpers.twilightsfall;
 import java.util.List;
 import java.util.Objects;
 
+import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.model.FactionModel;
@@ -19,33 +20,47 @@ public class TwilightsFallInfoHelper {
      * Starting Units and Home System.
      */
     public static String getFactionSetupInfo(FactionModel faction) {
+        return getFactionSetupInfo(faction, true, true, true);
+    }
+
+    public static String getFactionSetupInfo(FactionModel faction, boolean includeUnits, boolean includeSystem,
+            boolean includePriority) {
         if (faction == null) {
             throw new IllegalArgumentException("FactionModel cannot be null");
         }
 
         StringBuilder setupInfo = new StringBuilder();
-        setupInfo.append(faction.getFactionName()).append(System.lineSeparator());
-        setupInfo.append("> Starting Units: ").append(faction.getStartingFleet()).append(System.lineSeparator());
-        TileModel homeTile = TileHelper.getTileById(faction.getHomeSystem());
-        String homeAttributes = buildHomeSystemAttributes(homeTile);
-        List<String> planetNames = faction.getHomePlanets();
-        List<PlanetModel> planets = planetNames.stream().map(Mapper::getPlanet).filter(Objects::nonNull).toList();
-        List<String> planetRepresentations = planets.stream()
-                .map(TwilightsFallInfoHelper::buildPlanetString)
-                .toList();
-        setupInfo.append("> Home System: ").append(homeAttributes).append(System.lineSeparator());
-        setupInfo.append("> ").append(String.join(", ", planetRepresentations)).append(System.lineSeparator());
-        List<String> legendaryAbilities = planets.stream()
-                .filter(p -> p.isLegendary())
-                .map(p -> "**" + p.getShortName() + "**: " + p.getLegendaryAbilityText())
-                .toList();
-        for (String ability : legendaryAbilities) {
-            setupInfo.append("> ").append(ability).append(System.lineSeparator());
-        }
-        if (faction.getPriorityNumber() != null) {
-            setupInfo.append("> Priority Number: **").append(faction.getPriorityNumber()).append("**")
+        setupInfo.append(faction.getFactionEmoji()).append(" ").append(faction.getFactionName())
+                .append(System.lineSeparator());
+        if (includeUnits) {
+            setupInfo.append("> Starting Units: ").append(Helper.getUnitListEmojis(faction.getStartingFleet()))
                     .append(System.lineSeparator());
         }
+        if (includeSystem) {
+            TileModel homeTile = TileHelper.getTileById(faction.getHomeSystem());
+            String homeAttributes = buildHomeSystemAttributes(homeTile);
+            List<String> planetNames = faction.getHomePlanets();
+            List<PlanetModel> planets = planetNames.stream().map(Mapper::getPlanet).filter(Objects::nonNull).toList();
+            List<String> planetRepresentations = planets.stream()
+                    .map(p -> "> - " + buildPlanetString(p))
+                    .toList();
+            setupInfo.append("> Home System: ").append(homeAttributes).append(System.lineSeparator());
+            setupInfo.append(String.join(System.lineSeparator(), planetRepresentations)).append(System.lineSeparator());
+            List<String> legendaryAbilities = planets.stream()
+                    .filter(p -> p.isLegendary())
+                    .map(p -> "**" + p.getShortName() + "**: " + p.getLegendaryAbilityText())
+                    .toList();
+            for (String ability : legendaryAbilities) {
+                setupInfo.append("> ").append(ability).append(System.lineSeparator());
+            }
+        }
+        if (includePriority) {
+            if (faction.getPriorityNumber() != null) {
+                setupInfo.append("> Priority Number: **").append(faction.getPriorityNumber()).append("**")
+                        .append(System.lineSeparator());
+            }
+        }
+
         return setupInfo.toString();
     }
 
@@ -79,7 +94,6 @@ public class TwilightsFallInfoHelper {
     private static String buildPlanetString(PlanetModel planet) {
         StringBuilder sb = new StringBuilder();
         sb.append(planet.getName());
-        sb.append(planet.getPlanetTypes().stream().map(t -> t.getEmoji()).reduce("", String::concat));
         sb.append(" (");
         sb.append(planet.getResources()).append("/").append(planet.getInfluence());
         if (planet.isLegendary()) {
