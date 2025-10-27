@@ -283,6 +283,8 @@ public class AndcatReferenceCardsMessageHelper {
             updatePackageButtons(event, draftManager, player, refPackage);
 
             if(this.draftable.whatsStoppingSetup(draftManager) == null) {
+                // TODO: Print speaker order and priority numbers
+                // TODO: Block for Keleres to pick their HS tile
                 draftManager.trySetupPlayers(event);
             }
 

@@ -78,6 +78,8 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
 
         List<String> effBannedFactions = new ArrayList<>(bannedFactions);
 
+        // TODO: Balance the packages somehow
+
         List<String> availableFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
                 .filter(f -> !effBannedFactions.contains(f.getAlias()))
                 .filter(f -> !presetFactions.contains(f.getAlias()))
@@ -460,7 +462,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
     private void doPostSetupWork(DraftManager draftManager, Player player, ReferenceCardPackage refPackage) {
 
         Game game = draftManager.getGame();
-        
+
         // Add home system planets to player, refreshed
         FactionModel homeSystemFaction = Mapper.getFaction(refPackage.homeSystemFaction());
         for (String planet : homeSystemFaction.getHomePlanets()) {
