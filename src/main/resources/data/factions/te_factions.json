@@ -52,7 +52,7 @@
         "alias": "deepwrought",
         "factionName": "The Deepwrought Scholarate",
         "homeSystem": "95",
-        "startingFleet": "2 inf i, 1 inf o, sd i, 4 ff, cv, dn",
+        "startingFleet": "3 inf i, sd i, 4 ff, cv, dn",
         "commodities": 3,
         "factionTech": [
             "hydrothermal",
@@ -101,10 +101,10 @@
             "parasite-firm"
         ],
         "startingTechOptions": [
-            "dxa",
-            "bs",
-            "gls",
-            "pi"
+            "nm",
+            "pa",
+            "st",
+            "sdn"
         ],
         "startingTechAmount": 1,
         "homePlanets": [
@@ -142,19 +142,13 @@
         "alias": "obsidian",
         "factionName": "The Obsidian",
         "homeSystem": "96b",
-        "startingFleet": "1 inf c, 2 inf t, cv, 3 ff, ca, dd, sd t",
+        "startingFleet": "1 inf c, 2 inf t, cv, 3 ff, ca, dd, sd c",
         "commodities": 3,
         "factionTech": [
             "planesplitter-obs",
             "parasite-obs"
         ],
-        "startingTechOptions": [
-            "dxa",
-            "bs",
-            "gls",
-            "pi"
-        ],
-        "startingTechAmount": 1,
+        "startingTech": [],
         "homePlanets": [
             "cronoshollow",
             "tallinhollow"

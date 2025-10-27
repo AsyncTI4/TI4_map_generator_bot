@@ -59,6 +59,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
+import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
@@ -617,7 +618,7 @@ public class ButtonHelper {
     public static String playerHasDMZPlanet(Player player, Game game) {
         String dmzPlanet = "no";
         for (String planet : player.getPlanets()) {
-            if (planet.contains("custodia") || planet.contains("ghoti")) {
+            if (planet.contains("custodia") || planet.contains("ghoti") || planet.startsWith("ocean")) {
                 continue;
             }
             Planet p = game.getPlanetsInfo().get(planet);
@@ -1614,6 +1615,17 @@ public class ButtonHelper {
                             ident + ", please use these buttons to resolve Dirzuga Rophal, the Arborec commander.",
                             buttons);
                 }
+            }
+
+            if (nonActivePlayer.hasAbility("survivalinstinct")
+                    && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem)) {
+                Player ralnel = nonActivePlayer;
+                List<Button> buttons =
+                        TeHelperAbilities.getSurvivalInstinctSystemButtons(game, ralnel, activeSystem, null);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        ralnel.getCorrectChannel(),
+                        ralnel.getRepresentation() + " you can use the buttons to resolve Survival Instinct:",
+                        buttons);
             }
 
             if (nonActivePlayer.hasLeaderUnlocked("celdaurihero")
@@ -3787,6 +3799,7 @@ public class ButtonHelper {
         if (spaceHolder.getUnitCount(UnitType.Spacedock, player) > 0) {
             if (!(player.hasUnit("absol_saar_spacedock")
                     || player.hasUnit("saar_spacedock")
+                    || player.hasAbility("miniaturization")
                     || player.hasUnit("tf-floatingfactory")
                     || player.hasTech("ffac2")
                     || player.hasTech("absol_ffac2"))) {
@@ -3794,7 +3807,9 @@ public class ButtonHelper {
             }
         }
         if (spaceHolder.getUnitCount(UnitType.Pds, player) > 0) {
-            if (!(player.ownsUnit("mirveda_pds") || player.ownsUnit("mirveda_pds2"))) {
+            if (!(player.ownsUnit("mirveda_pds")
+                    || player.ownsUnit("mirveda_pds2")
+                    || player.hasAbility("miniaturization"))) {
                 structuresViolated = true;
             }
         }
@@ -4415,6 +4430,7 @@ public class ButtonHelper {
 
         if (!player.hasTech("fl")
                 && !player.hasTech("absol_fl")
+                && !player.hasPlanet("thundersedge")
                 && !game.playerHasLeaderUnlockedOrAlliance(player, "kelerescommander")
                 && !player.hasAbility("arrow_of_time")) {
             MessageHelper.sendEphemeralMessageToEventChannel(
@@ -5061,6 +5077,7 @@ public class ButtonHelper {
         String successMessage = player.getFactionEmoji() + " replaced 1 " + UnitEmojis.infantry + " on "
                 + Helper.getPlanetRepresentation(planetName, game) + " with 1 pds using awaken.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), successMessage);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("absolsdn_")
@@ -6857,7 +6874,7 @@ public class ButtonHelper {
                 if (tilePos.equalsIgnoreCase(adjTilePos) && Constants.MECATOLS.contains(unitHolder.getName())) {
                     for (Player p2 : game.getRealPlayers()) {
                         if (p2.controlsMecatol(false)
-                                && p2.hasPlanet("custodia_vigilia")
+                                && p2.hasPlanet("custodiavigilia")
                                 && !playersWithPds2.contains(p2)) {
                             if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
                                 if (FoWHelper.otherPlayersHaveShipsInSystem(

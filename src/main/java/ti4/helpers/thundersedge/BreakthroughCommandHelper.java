@@ -18,6 +18,7 @@ import ti4.model.BreakthroughModel;
 import ti4.service.breakthrough.StellarGenesisService;
 import ti4.service.emoji.DiceEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.map.FractureService;
 
 public class BreakthroughCommandHelper {
 
@@ -78,8 +79,8 @@ public class BreakthroughCommandHelper {
                     player.addOwnedUnitByID("mentak_cruiser3");
                 }
             }
-            // if (!FractureService.isFractureInPlay(game))
-            //     serveRollFractureButtons(game, player);
+            if (!FractureService.isFractureInPlay(game) && game.isTestBetaFeaturesMode())
+                serveRollFractureButtons(game, player);
             if (bt.getAlias().equals("muaatbt")) StellarGenesisService.serveAvernusButtons(game, player);
             if (bt.getAlias().equals("keleresbt")) player.gainCustodiaVigilia();
         });
