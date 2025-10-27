@@ -244,6 +244,7 @@ public class Player extends PlayerProperties {
                     activeUnits.add("mentak_cruiser3");
                     if (!getUnitsOwned().contains("mentak_cruiser3")) {
                         addOwnedUnitByID("mentak_cruiser3");
+                        removeOwnedUnitByID("cruiser2");
                     }
                     break;
                 }

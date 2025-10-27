@@ -284,30 +284,31 @@ public class EdictPhaseHandler {
         }
 
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCorrectChannel(), msg, embeds, buttons);
-
-        Player yellowFSPlayer = game.getPlayerFromColorOrFaction("orangetf");
-        if (yellowFSPlayer != null
-                && ButtonHelper.getNumberOfUnitsOnTheBoard(game, yellowFSPlayer, "flagship", false) < 1) {
-            yellowFSPlayer = null;
-        }
-        if (!buttonID.contains("orangetf") && yellowFSPlayer != null) {
-            String msg2 = yellowFSPlayer.getRepresentation()
-                    + " after resolving the edict, use this button to resolve an additional edict from your flagship.";
-            List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
-            if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
-                edicts.removeIf(edict2 -> edict2.equalsIgnoreCase("tf-censure"));
+        if (!game.getPhaseOfGame().contains("action")) {
+            Player yellowFSPlayer = game.getPlayerFromColorOrFaction("orangetf");
+            if (yellowFSPlayer != null
+                    && ButtonHelper.getNumberOfUnitsOnTheBoard(game, yellowFSPlayer, "flagship", false) < 1) {
+                yellowFSPlayer = null;
             }
-            Button proceedToStrategyPhase = Buttons.green(
-                    yellowFSPlayer.getFinsFactionCheckerPrefix() + "resolveEdict_" + edicts.get(0) + "_orangetf",
-                    "Resolve 1 Edict");
-            MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg2, proceedToStrategyPhase);
-        } else {
-            String msg2 = player.getRepresentation()
-                    + " after resolving the edict, use this button to proceed to the strategy phase.";
-            Button proceedToStrategyPhase = Buttons.green(
-                    "proceed_to_strategy",
-                    "Proceed to Strategy Phase (will refresh all cards and ping the priority player)");
-            MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg2, proceedToStrategyPhase);
+            if (!buttonID.contains("orangetf") && yellowFSPlayer != null) {
+                String msg2 = yellowFSPlayer.getRepresentation()
+                        + " after resolving the edict, use this button to resolve an additional edict from your flagship.";
+                List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
+                if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
+                    edicts.removeIf(edict2 -> edict2.equalsIgnoreCase("tf-censure"));
+                }
+                Button proceedToStrategyPhase = Buttons.green(
+                        yellowFSPlayer.getFinsFactionCheckerPrefix() + "resolveEdict_" + edicts.get(0) + "_orangetf",
+                        "Resolve 1 Edict");
+                MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg2, proceedToStrategyPhase);
+            } else {
+                String msg2 = player.getRepresentation()
+                        + " after resolving the edict, use this button to proceed to the strategy phase.";
+                Button proceedToStrategyPhase = Buttons.green(
+                        "proceed_to_strategy",
+                        "Proceed to Strategy Phase (will refresh all cards and ping the priority player)");
+                MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg2, proceedToStrategyPhase);
+            }
         }
         ButtonHelper.deleteAllButtons(event);
     }
