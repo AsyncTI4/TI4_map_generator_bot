@@ -332,6 +332,24 @@ public class PromissoryNoteHelper {
         if ("crucible".equalsIgnoreCase(id)) {
             game.setStoredValue("crucibleBoost", "2");
         }
+        if ("blackops".equalsIgnoreCase(id)) {
+            String ms = player.gainTG(2, true);
+            ButtonHelperAgents.resolveArtunoCheck(player, 2);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + " you gained 2 trade goods " + ms + " from Black Ops.");
+            String trueIdentity = player.getRepresentationUnfogged();
+            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+            String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()
+                    + ". Use buttons to gain 2 command tokens.";
+            MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
+            game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+            ActionCardHelper.sendPlotCardInfo(game, owner);
+            MessageHelper.sendMessageToChannel(
+                    owner.getCardsInfoThread(),
+                    owner.getRepresentation() + " place a plot into play with " + player.getRepresentationNoPing()
+                            + " token on it from black ops");
+        }
         if ("ms".equalsIgnoreCase(id)) {
             List<Button> buttons =
                     new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));

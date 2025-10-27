@@ -565,11 +565,13 @@ public class ListPlayerInfoService {
                 planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
                 for (String p : planets) {
                     Tile tile = game.getTileFromPlanet(p);
-                    if (tile != null && !tile.isHomeSystem(game)) {
+                    if (tile != null
+                            && !tile.isHomeSystem(game)
+                            && !game.getUnitHolderFromPlanet(p).isSpaceStation()) {
                         count++;
                     }
                 }
-                return count - player.numberOfSpaceStations();
+                return count;
             }
             case "research_outposts", "brain_trust", "brain_trust_omegaphase" -> {
                 int count = 0;
