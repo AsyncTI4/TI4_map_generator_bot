@@ -43,6 +43,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.metadata.TechSummariesMetadataManager;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.VisionariaSelectService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -514,6 +515,8 @@ public class PlayerTechService {
         boolean isResearch = !buttonID.contains("__comp");
         boolean isStrat = !buttonID.contains("__comp");
         boolean paymentRequired = !buttonID.contains("__noPay");
+        boolean shareKnowledge = false;
+        boolean dwsBreakthrough = false;
 
         List<String> buttonIDComponents = Arrays.asList(PatternHelper.DOUBLE_UNDERSCORE_PATTERN.split(buttonID));
         buttonID = buttonIDComponents.getFirst();
@@ -522,6 +525,19 @@ public class PlayerTechService {
         if (buttonIDComponents.contains("comp")) {
             isResearch = false;
             isStrat = false;
+        }
+        if (buttonIDComponents.contains("shareKnowledge")) {
+            paymentRequired = false;
+            shareKnowledge = true;
+            isResearch = false;
+            isStrat = false;
+        }
+        if (buttonIDComponents.contains("dwsbt")) {
+            paymentRequired = true;
+            paymentType = "tgsonly";
+            isResearch = true;
+            isStrat = false;
+            dwsBreakthrough = true;
         }
 
         String techID = StringUtils.substringAfter(buttonID, "getTech_");
@@ -618,6 +634,10 @@ public class PlayerTechService {
                     buttons);
         }
 
+        if (shareKnowledge) {
+            game.setStoredValue("ShareKnowledge_" + player.getFaction(), techID);
+            message.append(" - This tech will be automatically removed at the end of the next status phase");
+        }
         if (isResearch) {
             ButtonHelperFactionSpecific.resolveResearchAgreementCheck(player, techID, game);
         }
@@ -688,6 +708,9 @@ public class PlayerTechService {
                     game.setStoredValue("zealotsHeroTechs", game.getStoredValue("zealotsHeroTechs") + "-" + techID);
                 }
             }
+        }
+        if (dwsBreakthrough) {
+            VisionariaSelectService.resolveTechResearch(game, player, techID);
         }
         if (player.hasUnit("augers_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
             MessageHelper.sendMessageToChannel(
