@@ -1293,14 +1293,23 @@ public class ButtonHelperHeroes {
         List<Button> empties = new ArrayList<>();
 
         List<Tile> tiles = new ArrayList<>();
-        for (Player p : game.getRealPlayers()) {
-            if (p.hasTech("dt2")
-                    || p.getUnitsOwned().contains("cabal_spacedock")
-                    || p.getUnitsOwned().contains("cabal_spacedock2")
-                    || p.hasTech("absol_dt2")
-                    || p.getUnitsOwned().contains("absol_cabal_spacedock")
-                    || p.getUnitsOwned().contains("absol_cabal_spacedock2")) {
-                tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p, UnitType.Spacedock));
+        if (game.isTwilightsFallMode()) {
+            for (Tile tile : game.getTileMap().values()) {
+                if (tile.isGravityRift(game)) {
+                    tiles.add(tile);
+                }
+            }
+        } else {
+            for (Player p : game.getRealPlayers()) {
+                if (p.hasTech("dt2")
+                        || p.getUnitsOwned().contains("cabal_spacedock")
+                        || p.getUnitsOwned().contains("cabal_spacedock2")
+                        || p.hasTech("absol_dt2")
+                        || p.getUnitsOwned().contains("absol_cabal_spacedock")
+                        || p.getUnitsOwned().contains("absol_cabal_spacedock2")) {
+                    tiles.addAll(
+                            CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p, UnitType.Spacedock));
+                }
             }
         }
 
@@ -1310,11 +1319,12 @@ public class ButtonHelperHeroes {
             adjTiles.addAll(tiles);
         }
         for (Tile tile : tiles) {
-            for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)) {
+            for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
                 Tile tileToAdd = game.getTileByPosition(pos);
                 if (!tileToAdd.getTileModel().isHyperlane()
                         && !adjTiles.contains(tileToAdd)
-                        && !tile.getPosition().equalsIgnoreCase(pos)) {
+                        && !tile.getPosition().equalsIgnoreCase(pos)
+                        && FoWHelper.otherPlayersHaveShipsInSystem(player, tileToAdd, game)) {
                     adjTiles.add(tileToAdd);
                 }
             }
@@ -1325,7 +1335,9 @@ public class ButtonHelperHeroes {
                     finChecker + "cabalHeroTile_" + tile.getPosition(),
                     "Roll For Units In " + tile.getRepresentationForButtons(game, player)));
         }
-        empties.add(Buttons.red(finChecker + "cabalHeroAll", "Resolve Hero For All Tiles [Experimental]"));
+        if (!game.isTwilightsFallMode()) {
+            empties.add(Buttons.red(finChecker + "cabalHeroAll", "Resolve Hero For All Tiles [Experimental]"));
+        }
         SortHelper.sortButtonsByTitle(empties);
         return empties;
     }
@@ -1783,7 +1795,8 @@ public class ButtonHelperHeroes {
                 continue;
             }
             if (FoWHelper.playerHasShipsInSystem(p2, tile)
-                    && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, game, player)) {
+                    && (!ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, game, player)
+                            || game.isTwilightsFallMode())) {
                 RiftUnitsHelper.riftAllUnitsInASystem(pos, event, game, p2, p2.getFactionEmoji(), player);
             }
             if (FoWHelper.playerHasShipsInSystem(p2, tile)

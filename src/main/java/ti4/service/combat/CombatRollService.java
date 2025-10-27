@@ -941,7 +941,8 @@ public class CombatRollService {
 
             int argentInfKills = 0;
             if (player != opponent
-                    && "argent_destroyer2".equalsIgnoreCase(unitModel.getId())
+                    && ("argent_destroyer2".equalsIgnoreCase(unitModel.getId())
+                            || "tf-swa".equalsIgnoreCase(unitModel.getId()))
                     && rollType == CombatRollType.AFB
                     && space.getUnitCount(Units.UnitType.Infantry, opponent.getColor()) > 0) {
                 for (DiceHelper.Die die : resultRolls) {

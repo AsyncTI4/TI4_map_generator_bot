@@ -149,7 +149,7 @@ public class ButtonHelperStats {
         Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
         if (obsidian != null && obsidian.getPlotCardsFactions().get("siphon").contains(player.getFaction())) {
             String siphonMsg = obsidian.getRepresentation()
-                    + " the puppeted player for Siphon has gained commodities, so you gain " + realGain
+                    + " the puppeted player for Syphon has gained commodities, so you gain " + realGain
                     + " trade goods. ";
             siphonMsg += "(" + obsidian.getTg() + "->" + (obsidian.getTg() + realGain) + ")";
             MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), siphonMsg);

@@ -295,6 +295,20 @@ public class PlayStrategyCardService {
             }
         }
 
+        Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
+        if (obsidian != null && obsidian.getPlotCardsFactions().get("enervate").contains(player.getFaction())) {
+            if (!scModel.usesAutomationForSCID("pok1leadership")) {
+                String enervateMsg = obsidian.getRepresentation()
+                        + " the puppeted player for Enervate has played a strategy card, so you have been marked as following for free. ";
+                MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), enervateMsg);
+                obsidian.addFollowedSC(scToPlay, event);
+            } else {
+                String enervateMsg = obsidian.getRepresentation()
+                        + " the puppeted player for Enervate has played leadership, so you can resolve the primary instead of the secondary. ";
+                MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), enervateMsg);
+            }
+        }
+
         if (!scModel.usesAutomationForSCID("pok1leadership")) {
             Button emelpar = Buttons.red("scepterE_follow_" + scToPlay, "Exhaust " + RelicHelper.sillySpelling());
             for (Player player3 : playersToFollow) {

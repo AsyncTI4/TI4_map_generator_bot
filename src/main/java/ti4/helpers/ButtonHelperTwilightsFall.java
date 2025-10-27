@@ -699,13 +699,41 @@ public class ButtonHelperTwilightsFall {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("searchSpliceDeck")
+    public static void searchSpliceDeck(Game game, String buttonID, Player player, ButtonInteractionEvent event) {
+        String type = buttonID;
+        if (buttonID.contains("_")) {
+            type = buttonID.split("_")[1];
+        }
+        List<Button> buttons = new ArrayList<>();
+        List<String> cards = getDeckForSplicing(game, type, 100);
+        for (String card : cards) {
+            buttons.add(Buttons.green(
+                    "drawSingularNewSpliceCard_" + type + "_" + card,
+                    "Draw "
+                            + (type.equalsIgnoreCase("ability")
+                                    ? Mapper.getTech(card).getName()
+                                    : type.equalsIgnoreCase("genome")
+                                            ? Mapper.getLeader(card).getName()
+                                            : Mapper.getUnit(card).getName())));
+        }
+        String msg = player.getRepresentation() + " use buttons to draw a card from the splice deck.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("drawSingularNewSpliceCard")
-    public static void drawSingularNewSpliceCard(Game game, String buttonID, Player player) {
+    public static void drawSingularNewSpliceCard(
+            Game game, String buttonID, Player player, ButtonInteractionEvent event) {
         String type = buttonID;
         if (buttonID.contains("_")) {
             type = buttonID.split("_")[1];
         }
         String cardID = getDeckForSplicing(game, type, 1).get(0);
+        if (buttonID.split("_").length > 2) {
+            cardID = buttonID.split("_")[2];
+            ButtonHelper.deleteMessage(event);
+        }
         if (type.equalsIgnoreCase("ability")) {
             player.addTech(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
