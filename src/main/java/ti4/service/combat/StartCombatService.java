@@ -1251,6 +1251,14 @@ public class StartCombatService {
                         FactionEmojis.Sol));
             }
 
+            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("valientagent")) {
+                buttons.add(Buttons.gray(
+                        finChecker + "getAgentSelection_valientagent",
+                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Valient Genome",
+                        FactionEmojis.Bastion));
+            }
+
             if ((!game.isFowMode() || agentHolder == p1)
                     && agentHolder.hasUnexhaustedLeader("kyroagent")
                     && isGroundCombat) {

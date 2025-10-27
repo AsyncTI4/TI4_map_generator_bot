@@ -118,10 +118,12 @@ public class PositionMapper {
             } else if ("tr".equalsIgnoreCase(position)) {
                 x -= lower * HORIZONTAL_TILE_SPACING * 2;
                 y -= 150;
-                y += fractureYbump;
             } else if ("br".equalsIgnoreCase(position)) {
                 x -= lower * HORIZONTAL_TILE_SPACING * 2;
                 y -= lower * SPACE_FOR_TILE_HEIGHT * 2 - 150;
+                y += fractureYbump;
+            } else if (position.startsWith("frac")) {
+                x -= lower * HORIZONTAL_TILE_SPACING;
                 y -= (fractureYbump - 300) / 2; // always 50
             } else {
                 x -= lower * HORIZONTAL_TILE_SPACING;

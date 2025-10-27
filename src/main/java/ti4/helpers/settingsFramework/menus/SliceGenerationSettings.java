@@ -64,7 +64,7 @@ public class SliceGenerationSettings extends SettingsMenu {
         minimumInf = new IntegerSetting("MinInf", "Min Optimal Inf", 3, 0, 5, 1);
         totalValue = new IntegerRangeSetting("TotVal", "Total Optimal Value", 9, 0, 11, 13, 9, 20, 1);
         extraWorms = new BooleanSetting("ExtraWH", "More Wormholes", true);
-        numLegends = new IntegerRangeSetting("Legends", "Legendary Count", 1, 0, 2, 2, 0, 20, 1);
+        numLegends = new IntegerRangeSetting("Legends", "Legendary Count", 1, 0, 6, 2, 0, 20, 1);
 
         // Emojis
         minimumRes.setEmoji(MiscEmojis.resources);
