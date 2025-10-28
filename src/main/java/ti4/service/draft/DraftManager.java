@@ -254,7 +254,8 @@ public class DraftManager extends DraftPlayerManager {
         if (blockingSetup != null) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
-                    game.getPing() + "The draft has ended. Some additional setup needs to happen before the game can start.");
+                    game.getPing()
+                            + "The draft has ended. Some additional setup needs to happen before the game can start.");
         } else {
             trySetupPlayers(event);
         }
@@ -318,11 +319,12 @@ public class DraftManager extends DraftPlayerManager {
             Player player = game.getPlayer(userId);
 
             // Default color if not set
-            boolean playerHasColor = player.getColor() != null && !player.getColor().equals("null");
+            boolean playerHasColor =
+                    player.getColor() != null && !player.getColor().equals("null");
             if (!playerHasColor && playerSetupState.getColor() == null) {
                 String color = player.getNextAvailableColour();
                 playerSetupState.setColor(color);
-            } else if(playerHasColor && playerSetupState.getColor() == null) {
+            } else if (playerHasColor && playerSetupState.getColor() == null) {
                 playerSetupState.setColor(player.getColor());
             }
 

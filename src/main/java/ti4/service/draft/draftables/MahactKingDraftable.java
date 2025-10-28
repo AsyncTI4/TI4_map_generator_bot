@@ -33,10 +33,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
     public static final DraftableType TYPE = DraftableType.of("King");
 
     public void initialize(
-            int numFactions,
-            List<ComponentSource> sources,
-            List<String> presetFactions,
-            List<String> bannedFactions) {
+            int numFactions, List<ComponentSource> sources, List<String> presetFactions, List<String> bannedFactions) {
 
         List<String> effBannedFactions = new ArrayList<>(bannedFactions);
         List<String> availableFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
@@ -253,8 +250,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
         for (String factionAlias : draftFactions) {
             FactionModel faction = Mapper.getFaction(factionAlias);
             if (faction == null) {
-                return "Unknown faction in draftFactions: " + factionAlias
-                        + ". Remove it with `/draft king remove`.";
+                return "Unknown faction in draftFactions: " + factionAlias + ". Remove it with `/draft king remove`.";
             }
 
             if (factionAlias.contains("keleres")) {

@@ -8,9 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.commons.collections4.ListUtils;
-
 import ti4.service.emoji.TI4Emoji;
 
 public final class StringHelper {

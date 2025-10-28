@@ -99,10 +99,10 @@ public class DraftSystemSettings extends SettingsMenu {
         mantisTileSettings =
                 new MantisTileDraftableSettings(game, json != null ? json.get("mantisTileSettings") : null, this);
         factionSettings = new FactionDraftableSettings(game, json != null ? json.get("factionSettings") : null, this);
-        andcatReferenceCardsDraftableSettings =
-                new AndcatReferenceCardsDraftableSettings(game, json != null ? json.get("andcatReferenceCardsDraftableSettings") : null, this);
-        mahactKingDraftableSettings =
-                new MahactKingDraftableSettings(game, json != null ? json.get("mahactKingDraftableSettings") : null, this);
+        andcatReferenceCardsDraftableSettings = new AndcatReferenceCardsDraftableSettings(
+                game, json != null ? json.get("andcatReferenceCardsDraftableSettings") : null, this);
+        mahactKingDraftableSettings = new MahactKingDraftableSettings(
+                game, json != null ? json.get("mahactKingDraftableSettings") : null, this);
         publicSnakeDraftSettings =
                 new PublicSnakeDraftSettings(game, json != null ? json.get("publicSnakeDraftSettings") : null, this);
 

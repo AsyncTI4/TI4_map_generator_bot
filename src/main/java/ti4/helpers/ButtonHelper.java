@@ -2684,7 +2684,7 @@ public class ButtonHelper {
 
     private static void doButtonsForSleepers(Player player, Game game, Tile tile, ButtonInteractionEvent event) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
-        if (!player.hasAbility("awaken")) {
+        if (!player.hasAbility("awaken") || game.isTwilightsFallMode()) {
             return;
         }
         for (String planet : tile.getPlanetsWithSleeperTokens()) {

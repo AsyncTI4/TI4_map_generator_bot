@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Consumer;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -40,20 +39,19 @@ import ti4.service.draft.PlayerDraftState;
 import ti4.service.draft.PlayerSetupService.PlayerSetupState;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.planet.AddPlanetService;
+import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParseUnitService;
 import ti4.service.unit.ParsedUnit;
-import ti4.service.unit.AddUnitService;
 
 public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
 
-    public static record ReferenceCardPackage(
+    public record ReferenceCardPackage(
             Integer key,
             List<String> factions,
             String homeSystemFaction,
             String startingUnitsFaction,
             String speakerOrderFaction,
-            Boolean choicesFinal) {
-    }
+            Boolean choicesFinal) {}
 
     @Getter
     private final Map<Integer, ReferenceCardPackage> referenceCardPackages = new HashMap<>();
@@ -71,10 +69,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
     }
 
     public void initialize(
-            int numPackages,
-            List<ComponentSource> sources,
-            List<String> presetFactions,
-            List<String> bannedFactions) {
+            int numPackages, List<ComponentSource> sources, List<String> presetFactions, List<String> bannedFactions) {
 
         List<String> effBannedFactions = new ArrayList<>(bannedFactions);
 
@@ -96,10 +91,9 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         randomOrder = new LinkedList<>(randomOrder.stream().distinct().toList());
 
         if (randomOrder.size() < numPackages * 3) {
-            BotLogger.warning(
-                    "Not enough factions to fill Andcat Reference Card Packages. " +
-                            "Requested " + numPackages + " packages but only " + randomOrder.size()
-                            + " factions available.");
+            BotLogger.warning("Not enough factions to fill Andcat Reference Card Packages. " + "Requested "
+                    + numPackages + " packages but only " + randomOrder.size()
+                    + " factions available.");
             return;
         }
 
@@ -109,17 +103,13 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
                 packageFactions.add(randomOrder.removeFirst());
             }
             if (packageFactions.size() < 3) {
-                BotLogger.warning(new LogOrigin(),
-                        "Not enough factions to fill Andcat Reference Card Package " + packageKey +
-                                ". Only found " + packageFactions.size() + " factions.");
+                BotLogger.warning(
+                        new LogOrigin(),
+                        "Not enough factions to fill Andcat Reference Card Package " + packageKey + ". Only found "
+                                + packageFactions.size() + " factions.");
             }
-            ReferenceCardPackage refCardPackage = new ReferenceCardPackage(
-                    packageKey,
-                    packageFactions,
-                    null,
-                    null,
-                    null,
-                    null);
+            ReferenceCardPackage refCardPackage =
+                    new ReferenceCardPackage(packageKey, packageFactions, null, null, null, null);
             referenceCardPackages.put(packageKey, refCardPackage);
         }
     }
@@ -129,7 +119,8 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         for (String factionKey : refCardPackage.factions) {
             FactionModel faction = Mapper.getFaction(factionKey);
             if (faction == null) {
-                BotLogger.warning(new LogOrigin(),
+                BotLogger.warning(
+                        new LogOrigin(),
                         "Cannot find faction model for faction " + factionKey + " in ReferenceCardPackage.");
                 continue;
             }
@@ -158,10 +149,15 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             List<FactionModel> factionsInPackage = getFactionsInPackage(entry.getValue());
             String choiceKey = "package" + packageKey;
             String unformattedName = "Package " + packageKey;
-            String formattedName = "Package " + packageKey + " (" +
-                    String.join(", ", factionsInPackage.stream().map(FactionModel::getShortName).toList()) + ")";
-            String identifyingEmoji = factionsInPackage.stream().map(FactionModel::getFactionEmoji).reduce("",
-                    String::concat);
+            String formattedName = "Package " + packageKey + " ("
+                    + String.join(
+                            ", ",
+                            factionsInPackage.stream()
+                                    .map(FactionModel::getShortName)
+                                    .toList()) + ")";
+            String identifyingEmoji = factionsInPackage.stream()
+                    .map(FactionModel::getFactionEmoji)
+                    .reduce("", String::concat);
             DraftChoice choice = new DraftChoice(
                     getType(),
                     choiceKey,
@@ -189,8 +185,8 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
     }
 
     @Override
-    public String handleCustomCommand(GenericInteractionCreateEvent event, DraftManager draftManager,
-            String playerUserId, String commandKey) {
+    public String handleCustomCommand(
+            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String commandKey) {
 
         List<ReferenceCardPackage> informPackages;
         if (commandKey.equals("remaininginfo")) {
@@ -232,11 +228,13 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             AndcatReferenceCardsMessageHelper.sendPackageInfos(draftManager, playerUserId, informPackages);
         } else if (commandKey.startsWith("info_")) {
             String[] tokens = commandKey.substring("info_".length()).split("_");
-            informPackages = Arrays.asList(tokens).stream().map(this::getPackageByChoiceKey).toList();
+            informPackages = Arrays.asList(tokens).stream()
+                    .map(this::getPackageByChoiceKey)
+                    .toList();
             AndcatReferenceCardsMessageHelper.sendPackageInfos(draftManager, playerUserId, informPackages);
         } else if (commandKey.startsWith("assign_")) {
-            new AndcatReferenceCardsMessageHelper(this).handleAssignButton(event, draftManager, playerUserId,
-                    commandKey);
+            new AndcatReferenceCardsMessageHelper(this)
+                    .handleAssignButton(event, draftManager, playerUserId, commandKey);
         } else {
             return "Unknown command: " + commandKey;
         }
@@ -256,8 +254,8 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
     }
 
     @Override
-    public void postApplyDraftPick(GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId,
-            DraftChoice choice) {
+    public void postApplyDraftPick(
+            GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, DraftChoice choice) {
         PartialMapService.tryUpdateMap(draftManager, event, true);
     }
 
@@ -275,7 +273,10 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
                     .append(SAVE_SEPARATOR);
             sb.append(refPackage.speakerOrderFaction() != null ? refPackage.speakerOrderFaction() : "null")
                     .append(SAVE_SEPARATOR);
-            sb.append(refPackage.choicesFinal() != null ? refPackage.choicesFinal().toString() : "null")
+            sb.append(
+                            refPackage.choicesFinal() != null
+                                    ? refPackage.choicesFinal().toString()
+                                    : "null")
                     .append(SAVE_SEPARATOR);
         }
         return sb.toString();
@@ -300,12 +301,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
                 choicesFinal = Boolean.parseBoolean(tokens[i + 5]);
             }
             ReferenceCardPackage refPackage = new ReferenceCardPackage(
-                    packageKey,
-                    factions,
-                    homeSystemFaction,
-                    startingUnitsFaction,
-                    speakerOrderFaction,
-                    choicesFinal);
+                    packageKey, factions, homeSystemFaction, startingUnitsFaction, speakerOrderFaction, choicesFinal);
             referenceCardPackages.put(packageKey, refPackage);
         }
     }
@@ -332,8 +328,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             for (String factionAlias : refPackage.factions()) {
                 FactionModel faction = Mapper.getFaction(factionAlias);
                 if (faction == null) {
-                    return "Unknown faction in draftFactions: " + factionAlias
-                            + ".";
+                    return "Unknown faction in draftFactions: " + factionAlias + ".";
                 }
 
                 if (distinctFactions.contains(factionAlias)) {
@@ -406,35 +401,30 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             Player player = draftManager.getGame().getPlayer(playerUserId);
             List<DraftChoice> playerChoices = draftManager.getPlayerPicks(playerUserId, TYPE);
             if (playerChoices == null || playerChoices.isEmpty()) {
-                return "Player " + player.getRepresentation()
-                        + " has not picked a reference card package.";
+                return "Player " + player.getRepresentation() + " has not picked a reference card package.";
             }
 
             DraftChoice pick = playerChoices.get(0);
             ReferenceCardPackage refPackage = this.getPackageByChoiceKey(pick.getChoiceKey());
             if (refPackage.homeSystemFaction() == null) {
-                return "Player " + player.getRepresentation()
-                        + " has not assigned a home system faction.";
+                return "Player " + player.getRepresentation() + " has not assigned a home system faction.";
             }
             if (refPackage.startingUnitsFaction() == null) {
-                return "Player " + player.getRepresentation()
-                        + " has not assigned a starting units faction.";
+                return "Player " + player.getRepresentation() + " has not assigned a starting units faction.";
             }
             if (refPackage.speakerOrderFaction() == null) {
-                return "Player " + player.getRepresentation()
-                        + " has not assigned a speaker order priority faction.";
+                return "Player " + player.getRepresentation() + " has not assigned a speaker order priority faction.";
             }
             if (refPackage.choicesFinal() == null || !refPackage.choicesFinal()) {
-                return "Player " + player.getRepresentation()
-                        + " has not finalized their reference card assignments.";
+                return "Player " + player.getRepresentation() + " has not finalized their reference card assignments.";
             }
         }
         return null;
     }
 
     @Override
-    public Consumer<Player> setupPlayer(DraftManager draftManager, String playerUserId,
-            PlayerSetupState playerSetupState) {
+    public Consumer<Player> setupPlayer(
+            DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
 
         Game game = draftManager.getGame();
         List<DraftChoice> playerChoices = draftManager.getPlayerPicks(playerUserId, TYPE);
@@ -448,8 +438,8 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         List<String> speakerOrder = getSpeakerOrder(draftManager);
         int speakerPosition = speakerOrder.indexOf(playerUserId) + 1;
         playerSetupState.setSetSpeaker(speakerPosition == 1);
-        String homeTilePosition = MapTemplateHelper.getPlayerHomeSystemLocation(
-                speakerPosition, game.getMapTemplateID());
+        String homeTilePosition =
+                MapTemplateHelper.getPlayerHomeSystemLocation(speakerPosition, game.getMapTemplateID());
         playerSetupState.setPositionHS(homeTilePosition);
 
         // After setting a home system position, the slice can be placed
@@ -477,14 +467,15 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         // Clear existing units at the home system
         List<String> speakerOrder = getSpeakerOrder(draftManager);
         int speakerPosition = speakerOrder.indexOf(player.getUserID()) + 1;
-        String homeTilePosition = MapTemplateHelper.getPlayerHomeSystemLocation(
-                speakerPosition, game.getMapTemplateID());
+        String homeTilePosition =
+                MapTemplateHelper.getPlayerHomeSystemLocation(speakerPosition, game.getMapTemplateID());
         Tile hsTile = game.getTileByPosition(homeTilePosition);
         hsTile.removeAllUnits(player.getColor());
 
         // Parse and add units
         FactionModel startingUnitsFaction = Mapper.getFaction(refPackage.startingUnitsFaction());
-        List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(null, player.getColor(), hsTile, startingUnitsFaction.getStartingFleet());
+        List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(
+                null, player.getColor(), hsTile, startingUnitsFaction.getStartingFleet());
         AddUnitService.addUnitsToDefaultLocations(null, hsTile, game, player.getColor(), parsedUnits);
     }
 
@@ -492,12 +483,14 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         List<Entry<String, PlayerDraftState>> playerStates = new ArrayList<>();
 
         // Ensure the speaker order is set
-        for (Entry<String, PlayerDraftState> entry : draftManager.getPlayerStates().entrySet()) {
+        for (Entry<String, PlayerDraftState> entry :
+                draftManager.getPlayerStates().entrySet()) {
             PlayerDraftState pState = entry.getValue();
             if (pState.getPickCount(AndcatReferenceCardsDraftable.TYPE) == 0) {
                 return Collections.emptyList();
             }
-            String choiceKey = pState.getPicks(AndcatReferenceCardsDraftable.TYPE).get(0).getChoiceKey();
+            String choiceKey =
+                    pState.getPicks(AndcatReferenceCardsDraftable.TYPE).get(0).getChoiceKey();
             ReferenceCardPackage refPackage = this.getPackageByChoiceKey(choiceKey);
             if (refPackage.speakerOrderFaction() == null) {
                 return Collections.emptyList();
@@ -519,9 +512,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             ReferenceCardPackage p2Package = this.getPackageByChoiceKey(p2Choice.getChoiceKey());
             FactionModel p2SpeakerFaction = Mapper.getFaction(p2Package.speakerOrderFaction());
 
-            return Integer.compare(
-                    p1SpeakerFaction.getPriorityNumber(),
-                    p2SpeakerFaction.getPriorityNumber());
+            return Integer.compare(p1SpeakerFaction.getPriorityNumber(), p2SpeakerFaction.getPriorityNumber());
         });
 
         return playerStates.stream().map(Entry::getKey).toList();

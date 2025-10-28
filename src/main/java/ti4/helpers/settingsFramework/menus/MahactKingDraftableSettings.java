@@ -37,16 +37,10 @@ public class MahactKingDraftableSettings extends SettingsMenu {
         // Initialize values & keys for ban/priority factions
         Set<String> empty = new HashSet<>();
         Set<Entry<String, FactionModel>> allFactions = new HashSet<>();
-        banFactions = new ListSetting<>(
-                "BanKings", "Banned kings", "Ban king", "Unban king", allFactions, empty, empty);
+        banFactions =
+                new ListSetting<>("BanKings", "Banned kings", "Ban king", "Unban king", allFactions, empty, empty);
         priFactions = new ListSetting<>(
-                "PriKings",
-                "Prioritized kings",
-                "Prioritize king",
-                "Unprioritize king",
-                allFactions,
-                empty,
-                empty);
+                "PriKings", "Prioritized kings", "Prioritize king", "Unprioritize king", allFactions, empty, empty);
 
         // Emojis
         banFactions.setGetEmoji(FactionModel::getFactionEmoji);

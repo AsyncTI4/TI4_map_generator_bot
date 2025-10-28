@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
@@ -78,14 +77,14 @@ public class AddUnitService {
      * This is useful when the unitList is for a different tile than what you're placing.
      * Ex. You draft a starting fleet, and place it on a different home system.
      */
-    public static void addUnitsToDefaultLocations(GenericInteractionCreateEvent event, Tile tile, Game game, String color, List<ParsedUnit> parsedUnits) {
+    public static void addUnitsToDefaultLocations(
+            GenericInteractionCreateEvent event, Tile tile, Game game, String color, List<ParsedUnit> parsedUnits) {
         // Combine units of the same type, ignoring location
         Map<UnitType, Integer> combinedUnits = new HashMap<>();
-        for(ParsedUnit parsedUnit : parsedUnits) {
+        for (ParsedUnit parsedUnit : parsedUnits) {
             combinedUnits.put(
                     parsedUnit.getUnitKey().getUnitType(),
-                    combinedUnits.getOrDefault(parsedUnit.getUnitKey().getUnitType(), 0) + parsedUnit.getCount()
-            );
+                    combinedUnits.getOrDefault(parsedUnit.getUnitKey().getUnitType(), 0) + parsedUnit.getCount());
         }
 
         // Get the planet names, ordered by resources descending
@@ -98,11 +97,11 @@ public class AddUnitService {
 
         // Distribute non-space units amongst planets evenly, and dump ships into space
         List<ParsedUnit> assignedUnits = new ArrayList<>();
-        for(Entry<UnitType, Integer> entry : combinedUnits.entrySet()) {
+        for (Entry<UnitType, Integer> entry : combinedUnits.entrySet()) {
             UnitType unitType = entry.getKey();
             Integer totalAmt = entry.getValue();
             // Ships go to space
-            if(unitType.isShip()) {
+            if (unitType.isShip()) {
                 assignedUnits.add(new ParsedUnit(Units.getUnitKey(unitType, color), totalAmt, Constants.SPACE));
                 continue;
             }
@@ -110,10 +109,11 @@ public class AddUnitService {
             // Non-ships get distributed to planets, prioritizing high-resource planets
             int minUnitsPerPlanet = totalAmt / planetNames.size();
             int remainder = totalAmt % planetNames.size();
-            for(int i = 0; i < planetNames.size(); i++ ) {
+            for (int i = 0; i < planetNames.size(); i++) {
                 int amtForThisPlanet = minUnitsPerPlanet + (i < remainder ? 1 : 0);
-                if(amtForThisPlanet > 0) {
-                    assignedUnits.add(new ParsedUnit(Units.getUnitKey(unitType, color), amtForThisPlanet, planetNames.get(i)));
+                if (amtForThisPlanet > 0) {
+                    assignedUnits.add(
+                            new ParsedUnit(Units.getUnitKey(unitType, color), amtForThisPlanet, planetNames.get(i)));
                 }
             }
         }
@@ -128,7 +128,11 @@ public class AddUnitService {
             if (!first) {
                 unitList.append(", ");
             }
-            unitList.append(parsedUnit.getCount()).append(" ").append(parsedUnit.getUnitKey().asyncID()).append(" ").append(parsedUnit.getLocation());
+            unitList.append(parsedUnit.getCount())
+                    .append(" ")
+                    .append(parsedUnit.getUnitKey().asyncID())
+                    .append(" ")
+                    .append(parsedUnit.getLocation());
             first = false;
         }
 
