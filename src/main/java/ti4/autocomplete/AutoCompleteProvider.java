@@ -318,7 +318,6 @@ public class AutoCompleteProvider {
                                 .contains(enteredValue))
                         .filter(model -> model.getSource() != ComponentSource.miltymod
                                 && model.getSource() != ComponentSource.project_pi
-                                && model.getSource() != ComponentSource.twilights_fall
                                 && model.getSource() != ComponentSource.asteroid)
                         .limit(25)
                         .map(unit -> new Command.Choice(unit.getId() + " (" + unit.getName() + ")", unit.getId()))
@@ -1601,7 +1600,6 @@ public class AutoCompleteProvider {
                 .filter(model -> model.search(enteredValue, source))
                 .filter(model -> model.getSource() != ComponentSource.miltymod
                         && model.getSource() != ComponentSource.project_pi
-                        && model.getSource() != ComponentSource.twilights_fall
                         && model.getSource() != ComponentSource.asteroid)
                 .filter(model -> !(model instanceof ColorableModelInterface cm) || !cm.isDupe())
                 .limit(25)

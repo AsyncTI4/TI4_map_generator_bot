@@ -92,7 +92,7 @@
         "alias": "firmament",
         "factionName": "The Firmament",
         "homeSystem": "96a",
-        "startingFleet": "1 inf c, 2 inf t, cv, 3 ff, ca, dd, sd t",
+        "startingFleet": "1 inf c, 2 inf t, cv, 3 ff, ca, dd, sd c",
         "commodities": 3,
         "factionTech": [
             "planesplitter-firm",
