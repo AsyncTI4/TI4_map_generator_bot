@@ -6,8 +6,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Units.UnitKey;
@@ -15,6 +17,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -668,6 +671,8 @@ public class CombatModHelper {
                     scalingCount = Math.min(scalingCount, 2);
                 }
                 case "opponent_sftt" -> getOpponentSfttCount(opponent);
+                case "nonhome_system_with_planet" -> getSystemsWithControlledPlanets(game, player);
+                case "galvanized_unit_count" -> getGalvanizedUnitCount(game, activeSystem, origUnit, player);
                 case "unique_ships" -> getUniqueNonFighterShipCount(game, activeSystem, player);
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {
@@ -713,5 +718,27 @@ public class CombatModHelper {
                 .map(Mapper::getPromissoryNote)
                 .filter(pn -> pn.getName().equals("Support for the Throne"))
                 .count();
+    }
+
+    public static int getSystemsWithControlledPlanets(Game game, Player player) {
+        return (int) player.getPlanetsAllianceMode().stream()
+                .map(game::getTileFromPlanet)
+                .distinct()
+                .filter(Objects::nonNull)
+                .filter(Predicate.not(Tile::isHomeSystem))
+                .count();
+    }
+
+    public static int getGalvanizedUnitCount(Game game, Tile activeSystem, UnitModel origUnit, Player player) {
+        UnitKey uk = Units.getUnitKey(origUnit.getUnitType(), player.getColorID());
+        UnitHolder space = activeSystem.getSpaceUnitHolder();
+        if (origUnit.getIsGroundForce() && !activeSystem.getPlanetUnitHolders().isEmpty()) {
+            for (Planet planet : activeSystem.getPlanetUnitHolders()) {
+                if (planet.getUnitCount(uk) > 0) {
+                    space = planet;
+                }
+            }
+        }
+        return space.getGalvanizedUnitCount(uk);
     }
 }
