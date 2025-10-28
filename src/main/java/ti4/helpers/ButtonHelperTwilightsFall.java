@@ -130,52 +130,11 @@ public class ButtonHelperTwilightsFall {
         Tile tile = game.getTileByPosition(pos);
 
         if (!pos.isEmpty()) {
-            Map<UnitType, Integer> unitCounts =
-                    Helper.getUnitList(Mapper.getFaction(factionFleet).getStartingFleet());
-            for (UnitType unit : unitCounts.keySet()) {
-                int amount = unitCounts.get(unit);
-                UnitModel mod =
-                        player.getUnitsByAsyncID(unit.getValue().toLowerCase()).getFirst();
-                String bestResPlanet = null;
-                int best = 0;
-                for (Planet plan : tile.getPlanetUnitHolders()) {
-                    if (plan.getResources() > best) {
-                        best = plan.getResources();
-                        bestResPlanet = plan.getName();
-                    }
-                }
-                if (mod != null) {
-                    if (bestResPlanet == null
-                            || mod.getIsShip()
-                            || (UnitType.Spacedock == unit
-                                    && (player.hasUnit("saar_spacedock") || player.hasUnit("tf-floatingfactory")))) {
-                        AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " " + mod.getAsyncId());
-                    } else {
-                        if (UnitType.Spacedock == unit) {
-                            AddUnitService.addUnits(
-                                    event,
-                                    tile,
-                                    game,
-                                    player.getColor(),
-                                    amount + " " + mod.getAsyncId() + " " + bestResPlanet);
-                        } else {
-                            while (amount > 0) {
-                                for (Planet plan : tile.getPlanetUnitHolders()) {
-                                    if (amount > 0) {
-                                        AddUnitService.addUnits(
-                                                event,
-                                                tile,
-                                                game,
-                                                player.getColor(),
-                                                "1 " + mod.getAsyncId() + " " + plan.getName());
-                                        amount--;
-                                    }
-                                    player.refreshPlanet(plan.getName());
-                                }
-                            }
-                        }
-                    }
-                }
+            String unitList = Mapper.getFaction(factionFleet).getStartingFleet();
+            AddUnitService.addUnitsToDefaultLocations(event, tile, game, player.getColor(), unitList);
+            
+            for (Planet plan : tile.getPlanetUnitHolders()) {
+                player.refreshPlanet(plan.getName());
             }
 
             MessageHelper.sendMessageToChannel(
