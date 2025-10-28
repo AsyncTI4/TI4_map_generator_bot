@@ -132,7 +132,7 @@ public class ButtonHelperTwilightsFall {
         if (!pos.isEmpty()) {
             String unitList = Mapper.getFaction(factionFleet).getStartingFleet();
             AddUnitService.addUnitsToDefaultLocations(event, tile, game, player.getColor(), unitList);
-            
+
             for (Planet plan : tile.getPlanetUnitHolders()) {
                 player.refreshPlanet(plan.getName());
             }

@@ -78,9 +78,10 @@ public class AddUnitService {
      * This is useful when the unitList is for a different tile than what you're placing.
      * Ex. You draft a starting fleet, and place it on a different home system.
      */
-    public static void addUnitsToDefaultLocations(GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList) {
+    public static void addUnitsToDefaultLocations(
+            GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList) {
         Player player = game.getPlayerFromColorOrFaction(color);
-        if(player == null) {
+        if (player == null) {
             throw new IllegalArgumentException("No player found for color/faction: " + color);
         }
         // Combine units of the same type, ignoring location
@@ -95,14 +96,15 @@ public class AddUnitService {
 
         // Distribute non-space units amongst planets evenly, and dump ships into space
         List<ParsedUnit> assignedUnits = new ArrayList<>();
-        for(Entry<UnitType, Integer> entry : unitCounts.entrySet()) {
+        for (Entry<UnitType, Integer> entry : unitCounts.entrySet()) {
             UnitType unitType = entry.getKey();
             Integer totalAmt = entry.getValue();
             UnitModel mod =
                     player.getUnitsByAsyncID(unitType.getValue().toLowerCase()).getFirst();
             // Ships go to space
-            if(mod.getIsShip()|| (UnitType.Spacedock == unitType
-                                    && (player.hasUnit("saar_spacedock") || player.hasUnit("tf-floatingfactory")))) {
+            if (mod.getIsShip()
+                    || (UnitType.Spacedock == unitType
+                            && (player.hasUnit("saar_spacedock") || player.hasUnit("tf-floatingfactory")))) {
                 assignedUnits.add(new ParsedUnit(Units.getUnitKey(unitType, color), totalAmt, Constants.SPACE));
                 continue;
             }
@@ -129,7 +131,12 @@ public class AddUnitService {
             if (!first) {
                 unitListBuilder.append(", ");
             }
-            unitListBuilder.append(parsedUnit.getCount()).append(" ").append(parsedUnit.getUnitKey().asyncID()).append(" ").append(parsedUnit.getLocation());
+            unitListBuilder
+                    .append(parsedUnit.getCount())
+                    .append(" ")
+                    .append(parsedUnit.getUnitKey().asyncID())
+                    .append(" ")
+                    .append(parsedUnit.getLocation());
             first = false;
         }
 
