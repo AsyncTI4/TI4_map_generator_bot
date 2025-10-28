@@ -86,7 +86,7 @@
         "title": "Wistful Soul",
         "abilityWindow": "At the end of a combat between any players:",
         "abilityText": "Gain 1 commodity or convert 1 of your commodities to a trade good.",
-        "unlockCondition": "Unknown",
+        "unlockCondition": "Place a breach token in a system that contains another player's unit.",
         "source": "thunders_edge"
     },
     {

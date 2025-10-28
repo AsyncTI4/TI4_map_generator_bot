@@ -76,7 +76,7 @@
         "name": "Thieve",
         "phase": "Action",
         "window": "After a splice ends, if you did not participate",
-        "text": "Take the remaining spliced card.",
+        "text": "Take all remaining cards.",
         "source": "twilights_fall"
     },
     {

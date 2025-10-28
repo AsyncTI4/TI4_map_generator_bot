@@ -4660,6 +4660,11 @@ public class ButtonHelper {
                 }
             }
         }
+        for (String unitID : player.getUnitsOwned()) {
+            if (unitID.contains("tf-")) {
+                count++;
+            }
+        }
         return count;
     }
 

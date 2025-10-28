@@ -9,6 +9,7 @@ import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.draft.items.CommoditiesDraftItem;
+import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -213,6 +214,9 @@ class FrankenButtonHandler {
                                 game.getPing()
                                         + " the draft stage of the FrankenDraft is complete. Please select your abilities from your drafted hands. To do a mantis build, use `/franken build_map` before building your faction.");
                         FrankenDraftBagService.applyDraftBags(event, game);
+                        if (game.isTwilightsFallMode()) {
+                            ButtonHelperTwilightsFall.startSliceBuild(game, event);
+                        }
                         return;
                     }
                     int passCounter = 0;
