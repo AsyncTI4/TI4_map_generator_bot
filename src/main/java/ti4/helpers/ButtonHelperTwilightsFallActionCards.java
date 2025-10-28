@@ -159,7 +159,7 @@ public class ButtonHelperTwilightsFallActionCards {
     @ButtonHandler("resolveTranspose")
     public static void resolveTranspose(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+        for (Player p2 : player.getNeighbouringPlayers(false)) {
             buttons.add(Buttons.gray("transposeStep2_" + p2.getFaction(), p2.getFactionNameOrColor()));
         }
         String msg = player.getRepresentation() + " choose the player you wish to transpose with.";

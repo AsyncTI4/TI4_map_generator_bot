@@ -298,7 +298,7 @@
     },
     {
         "alias": "tf-coerce",
-        "name": "Ignis",
+        "name": "Coerce",
         "phase": "Action",
         "window": "Action",
         "text": "Choose a player; that player must give you 1 of their abilities.",
