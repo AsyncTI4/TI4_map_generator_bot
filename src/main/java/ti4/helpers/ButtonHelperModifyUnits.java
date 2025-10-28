@@ -1031,7 +1031,7 @@ public class ButtonHelperModifyUnits {
                 || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
             return false;
         }
-        if (skilledRetreat) {
+        if (skilledRetreat && !game.isTwilightsFallMode()) {
             return true;
         }
         if (Tile.playerCanRetreatHere(player).test(tile)) {

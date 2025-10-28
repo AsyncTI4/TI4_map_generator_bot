@@ -779,7 +779,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithEmbed(bEvent.getChannel(), message, acEmbed);
             }
         }
-        if (acID.contains("sabo")) {
+        if (acID.contains("sabo") || acID.contains("shatter")) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
         } else {
             String buttonLabel = "Resolve " + actionCardTitle;

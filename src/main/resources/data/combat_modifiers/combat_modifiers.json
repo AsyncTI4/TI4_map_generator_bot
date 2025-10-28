@@ -519,6 +519,7 @@
         "valueScalingType": "opponent_sftt",
         "persistenceType": "CONDITIONAL",
         "condition": "opponent_has_sftt",
+        "scope": "",
         "related": [
             {
                 "type": "breakthrough",

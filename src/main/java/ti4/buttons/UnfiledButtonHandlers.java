@@ -1151,7 +1151,7 @@ public class UnfiledButtonHandlers {
             boolean hasSabo = false;
             String saboID = "3";
             for (String AC : player.getActionCards().keySet()) {
-                if (AC.contains("sabo")) {
+                if (AC.contains("sabo") || AC.contains("shatter")) {
                     hasSabo = true;
                     saboID = "" + player.getActionCards().get(AC);
                     break;
