@@ -40,8 +40,6 @@ import ti4.service.draft.PlayerSetupService.PlayerSetupState;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.unit.AddUnitService;
-import ti4.service.unit.ParseUnitService;
-import ti4.service.unit.ParsedUnit;
 
 public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
 
@@ -474,9 +472,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
 
         // Parse and add units
         FactionModel startingUnitsFaction = Mapper.getFaction(refPackage.startingUnitsFaction());
-        List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(
-                null, player.getColor(), hsTile, startingUnitsFaction.getStartingFleet());
-        AddUnitService.addUnitsToDefaultLocations(null, hsTile, game, player.getColor(), parsedUnits);
+        AddUnitService.addUnitsToDefaultLocations(null, hsTile, game, player.getColor(), startingUnitsFaction.getStartingFleet());
     }
 
     public List<String> getSpeakerOrder(DraftManager draftManager) {
