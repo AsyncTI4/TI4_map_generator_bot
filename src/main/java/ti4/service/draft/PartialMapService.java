@@ -2,7 +2,6 @@ package ti4.service.draft;
 
 import java.util.List;
 import java.util.Map.Entry;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.AliasHandler;
@@ -16,11 +15,11 @@ import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
 import ti4.service.draft.draftables.AndcatReferenceCardsDraftable;
+import ti4.service.draft.draftables.AndcatReferenceCardsDraftable.ReferenceCardPackage;
 import ti4.service.draft.draftables.FactionDraftable;
 import ti4.service.draft.draftables.SeatDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
-import ti4.service.draft.draftables.AndcatReferenceCardsDraftable.ReferenceCardPackage;
 import ti4.service.map.AddTileService;
 import ti4.service.milty.MiltyDraftSlice;
 
@@ -87,7 +86,8 @@ public class PartialMapService {
         }
 
         // For each player, see if they've made enough picks to place some things on the map.
-        for (Entry<String, PlayerDraftState> entry : draftManager.getPlayerStates().entrySet()) {
+        for (Entry<String, PlayerDraftState> entry :
+                draftManager.getPlayerStates().entrySet()) {
             String playerUserId = entry.getKey();
             PlayerDraftState pState = entry.getValue();
             // Get their position, to see if we can do anything
@@ -148,10 +148,8 @@ public class PartialMapService {
         return updateMap;
     }
 
-    private Integer getPlayerPosition(
-            DraftManager draftManager, String playerUserId, PlayerDraftState pState) {
-        SeatDraftable seatDraftable =
-                (SeatDraftable) draftManager.getDraftable(SeatDraftable.TYPE);
+    private Integer getPlayerPosition(DraftManager draftManager, String playerUserId, PlayerDraftState pState) {
+        SeatDraftable seatDraftable = (SeatDraftable) draftManager.getDraftable(SeatDraftable.TYPE);
         SpeakerOrderDraftable speakerOrderDraftable =
                 (SpeakerOrderDraftable) draftManager.getDraftable(SpeakerOrderDraftable.TYPE);
         AndcatReferenceCardsDraftable andcatDraftable =
@@ -171,13 +169,13 @@ public class PartialMapService {
                         pState.getPicks(speakerOrderDraftable.getType()).get(0).getChoiceKey();
                 return SpeakerOrderDraftable.getSpeakerOrderFromChoiceKey(pickChoiceKey);
             }
-        } else if(andcatDraftable != null) {
-            if(pState.getPickCount(andcatDraftable.getType()) > 0) {
+        } else if (andcatDraftable != null) {
+            if (pState.getPickCount(andcatDraftable.getType()) > 0) {
                 String pickChoiceKey =
                         pState.getPicks(andcatDraftable.getType()).get(0).getChoiceKey();
                 ReferenceCardPackage refPackage = andcatDraftable.getPackageByChoiceKey(pickChoiceKey);
                 List<String> speakerOrder = andcatDraftable.getSpeakerOrder(draftManager);
-                if(speakerOrder != null && refPackage.speakerOrderFaction() != null) {
+                if (speakerOrder != null && refPackage.speakerOrderFaction() != null) {
                     Integer orderIndex = speakerOrder.indexOf(playerUserId);
                     return orderIndex < 0 ? null : orderIndex + 1; // speaker order is 1-based
                 }
@@ -192,12 +190,13 @@ public class PartialMapService {
             String factionId = pState.getPicks(FactionDraftable.TYPE).get(0).getChoiceKey();
             return Mapper.getFaction(factionId);
         }
-        if(pState.getPickCount(AndcatReferenceCardsDraftable.TYPE) > 0) {
-            String choiceKey = pState.getPicks(AndcatReferenceCardsDraftable.TYPE).get(0).getChoiceKey();
+        if (pState.getPickCount(AndcatReferenceCardsDraftable.TYPE) > 0) {
+            String choiceKey =
+                    pState.getPicks(AndcatReferenceCardsDraftable.TYPE).get(0).getChoiceKey();
             AndcatReferenceCardsDraftable arcDraftable =
                     (AndcatReferenceCardsDraftable) draftManager.getDraftable(AndcatReferenceCardsDraftable.TYPE);
             ReferenceCardPackage refPackage = arcDraftable.getPackageByChoiceKey(choiceKey);
-            if(refPackage.choicesFinal() == true && refPackage.homeSystemFaction() != null) {
+            if (refPackage.choicesFinal() == true && refPackage.homeSystemFaction() != null) {
                 String factionId = refPackage.homeSystemFaction();
                 return Mapper.getFaction(factionId);
             }

@@ -166,7 +166,7 @@ public class Helper {
     }
 
     private static boolean checkAcd2ForAllSabotagesDiscarded(Game game) {
-        return "action_deck_2".equals(game.getAcDeckID())
+        return game.isAcd2()
                 && game.getDiscardActionCards().containsKey("sabotage1_acd2")
                 && game.getDiscardActionCards().containsKey("sabotage2_acd2")
                 && game.getDiscardActionCards().containsKey("sabotage3_acd2")
@@ -2901,6 +2901,9 @@ public class Helper {
             if ((player.getFaction().contains("ghost") && game.getTile("17") != null) && ghostish) {
                 tile = game.getTile("17");
             }
+            if ((player.getFaction().contains("crimson") && game.getTile("94") != null)) {
+                tile = game.getTile("94");
+            }
             if (tile != null) {
                 int parsedLocation = 9999;
                 try {
@@ -3099,8 +3102,9 @@ public class Helper {
                                 + "Press **End Game** only after done giving titles.",
                         titleButton);
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
     public static boolean mechCheck(String planetName, Game game, Player player) {

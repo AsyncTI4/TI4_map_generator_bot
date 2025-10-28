@@ -2,7 +2,6 @@ package ti4.helpers.twilightsfall;
 
 import java.util.List;
 import java.util.Objects;
-
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
@@ -23,29 +22,38 @@ public class TwilightsFallInfoHelper {
         return getFactionSetupInfo(faction, true, true, true);
     }
 
-    public static String getFactionSetupInfo(FactionModel faction, boolean includeUnits, boolean includeSystem,
-            boolean includePriority) {
+    public static String getFactionSetupInfo(
+            FactionModel faction, boolean includeUnits, boolean includeSystem, boolean includePriority) {
         if (faction == null) {
             throw new IllegalArgumentException("FactionModel cannot be null");
         }
 
         StringBuilder setupInfo = new StringBuilder();
-        setupInfo.append(faction.getFactionEmoji()).append(" ").append(faction.getFactionName())
+        setupInfo
+                .append(faction.getFactionEmoji())
+                .append(" ")
+                .append(faction.getFactionName())
                 .append(System.lineSeparator());
         if (includeUnits) {
-            setupInfo.append("> Starting Units: ").append(Helper.getUnitListEmojis(faction.getStartingFleet()))
+            setupInfo
+                    .append("> Starting Units: ")
+                    .append(Helper.getUnitListEmojis(faction.getStartingFleet()))
                     .append(System.lineSeparator());
         }
         if (includeSystem) {
             TileModel homeTile = TileHelper.getTileById(faction.getHomeSystem());
             String homeAttributes = buildHomeSystemAttributes(homeTile);
             List<String> planetNames = faction.getHomePlanets();
-            List<PlanetModel> planets = planetNames.stream().map(Mapper::getPlanet).filter(Objects::nonNull).toList();
-            List<String> planetRepresentations = planets.stream()
-                    .map(p -> "> - " + buildPlanetString(p))
+            List<PlanetModel> planets = planetNames.stream()
+                    .map(Mapper::getPlanet)
+                    .filter(Objects::nonNull)
                     .toList();
+            List<String> planetRepresentations =
+                    planets.stream().map(p -> "> - " + buildPlanetString(p)).toList();
             setupInfo.append("> Home System: ").append(homeAttributes).append(System.lineSeparator());
-            setupInfo.append(String.join(System.lineSeparator(), planetRepresentations)).append(System.lineSeparator());
+            setupInfo
+                    .append(String.join(System.lineSeparator(), planetRepresentations))
+                    .append(System.lineSeparator());
             List<String> legendaryAbilities = planets.stream()
                     .filter(p -> p.isLegendary())
                     .map(p -> "**" + p.getShortName() + "**: " + p.getLegendaryAbilityText())
@@ -56,7 +64,10 @@ public class TwilightsFallInfoHelper {
         }
         if (includePriority) {
             if (faction.getPriorityNumber() != null) {
-                setupInfo.append("> Priority Number: **").append(faction.getPriorityNumber()).append("**")
+                setupInfo
+                        .append("> Priority Number: **")
+                        .append(faction.getPriorityNumber())
+                        .append("**")
                         .append(System.lineSeparator());
             }
         }
@@ -85,7 +96,8 @@ public class TwilightsFallInfoHelper {
             // TODO: Scar
             attributes.append(TileEmojis.TileRedBack);
         }
-        if (homeTile.getAliases().contains("creussgate") || homeTile.getAliases().contains("crimsongate")) {
+        if (homeTile.getAliases().contains("creussgate")
+                || homeTile.getAliases().contains("crimsongate")) {
             attributes.append("(off board)");
         }
         return attributes.toString().trim();

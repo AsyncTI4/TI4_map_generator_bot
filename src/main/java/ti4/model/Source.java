@@ -39,7 +39,6 @@ public class Source {
         // lil homebrew
         lazax,
         action_deck_2,
-        action_deck_2_old,
         keleresplus,
         little_omega,
         project_pi,
@@ -85,6 +84,9 @@ public class Source {
         eronous,
         riftset,
         ascendant_sun,
+
+        // legacy values that have to stick around for a while to make sure games work
+        deprecated,
 
         // catchall
         other;

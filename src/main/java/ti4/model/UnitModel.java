@@ -11,9 +11,11 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.UnitHolder;
 import ti4.model.Source.ComponentSource;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.ExploreEmojis;
@@ -445,6 +447,13 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public boolean getSustainDamage() {
         return Optional.ofNullable(sustainDamage).orElse(false);
+    }
+
+    public boolean getSustainDamage(Player player, UnitHolder space) {
+        Game game = player.getGame();
+        boolean base = getSustainDamage();
+        boolean adjQuietus = TeHelperUnits.affectedByQuietus(game, player, space);
+        return !adjQuietus && base;
     }
 
     public boolean getDisablesPlanetaryShield() {

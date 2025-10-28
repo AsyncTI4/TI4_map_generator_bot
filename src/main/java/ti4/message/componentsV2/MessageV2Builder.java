@@ -170,9 +170,9 @@ public class MessageV2Builder {
             List<String> componentTrees = combinedComponents.stream()
                     .map(msg -> MessageV2Builder.ComponentTypeTree(msg.getComponentTree()))
                     .collect(Collectors.toList());
-            BotLogger.warning(
-                    Constants.jabberwockyPing() + " Someone attempted to send a v2 message that is split beyond the maximum. Message not sent.\n"
-                            + String.join("\n---\n", componentTrees));
+            BotLogger.warning(Constants.jabberwockyPing()
+                    + " Someone attempted to send a v2 message that is split beyond the maximum. Message not sent.\n"
+                    + String.join("\n---\n", componentTrees));
             return;
         }
         MessageHelper.sendMessagesWithRetry(channel, combinedComponents, null, "Failed to send v2 message", 1);
@@ -247,15 +247,17 @@ public class MessageV2Builder {
             MessageTopLevelComponent component = topLevelComponents.removeFirst();
             int componentCount = MessageV2Builder.CountComponents(component);
             int characterCount = MessageV2Builder.CountCharacters(component);
-            if (componentCount > Message.MAX_COMPONENT_COUNT_IN_COMPONENT_TREE || characterCount > Message.MAX_CONTENT_LENGTH_COMPONENT_V2) {
+            if (componentCount > Message.MAX_COMPONENT_COUNT_IN_COMPONENT_TREE
+                    || characterCount > Message.MAX_CONTENT_LENGTH_COMPONENT_V2) {
                 BotLogger.warning("Cannot send a message with a top-level component that exceeds the component limit.\n"
                         + MessageV2Builder.ComponentTypeTree(component));
                 continue;
             }
-            boolean exceedsCharacterLimit = currentCharacterCount + characterCount > Message.MAX_CONTENT_LENGTH_COMPONENT_V2;
-            boolean exceedsComponentLimit = currentCount + componentCount > Message.MAX_COMPONENT_COUNT_IN_COMPONENT_TREE;
-            if ((exceedsComponentLimit || exceedsCharacterLimit)
-                    && !currentPartition.isEmpty()) {
+            boolean exceedsCharacterLimit =
+                    currentCharacterCount + characterCount > Message.MAX_CONTENT_LENGTH_COMPONENT_V2;
+            boolean exceedsComponentLimit =
+                    currentCount + componentCount > Message.MAX_COMPONENT_COUNT_IN_COMPONENT_TREE;
+            if ((exceedsComponentLimit || exceedsCharacterLimit) && !currentPartition.isEmpty()) {
                 messages.add(buildMessage(currentPartition));
                 currentPartition.clear();
                 currentCount = 0;
@@ -336,8 +338,8 @@ public class MessageV2Builder {
             case Separator separator -> 0;
             case Container container ->
                 container.getComponents().stream()
-                                .mapToInt(MessageV2Builder::CountCharacters)
-                                .sum();
+                        .mapToInt(MessageV2Builder::CountCharacters)
+                        .sum();
             case Label label -> label.getLabel().length() + CountCharacters(label.getChild());
             case null -> 0;
             default ->

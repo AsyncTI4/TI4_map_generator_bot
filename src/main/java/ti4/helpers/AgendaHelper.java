@@ -1058,9 +1058,10 @@ public class AgendaHelper {
                     "You may use the button to get your two technologies.",
                     Buttons.GET_A_TECH);
         } else if (!d1.isSuccess() && !game.isFowMode()) {
-            Button modify = Buttons.gray("getModifyTiles", "Modify Units");
-            MessageHelper.sendMessageToChannelWithButton(
-                    game.getMainGameChannel(), "Please remove units in or adjacent to the Mecatol Rex system.", modify);
+            Tile tile = game.getMecatolTile();
+            ButtonHelperTwilightsFallActionCards.sendDestroyButtonsForSpecificTileAndSurrounding(game, tile);
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(), "Please destroy units in or adjacent to the Mecatol Rex system.");
         }
     }
 
@@ -1570,7 +1571,7 @@ public class AgendaHelper {
                 .append(", the current winner is \"")
                 .append(formattedWinner)
                 .append("\".\n");
-        if (!"action_deck_2".equals(game.getAcDeckID())) {
+        if (!game.isAcd2()) {
             handleShenanigans(game, winner);
             message.append(
                     "When shenanigans have concluded, please confirm resolution or discard the result and manually resolve it yourselves.");

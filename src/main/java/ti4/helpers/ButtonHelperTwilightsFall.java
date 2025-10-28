@@ -398,6 +398,17 @@ public class ButtonHelperTwilightsFall {
                             Mapper.getLeader(cardID).getRepresentationEmbed());
                 }
                 if (type.equalsIgnoreCase("units")) {
+                    UnitModel unitModel = Mapper.getUnit(cardID);
+                    String asyncId = unitModel.getAsyncId();
+                    if (!asyncId.equalsIgnoreCase("fs") && !asyncId.equalsIgnoreCase("mf")) {
+                        List<UnitModel> unitsToRemove = player.getUnitsByAsyncID(asyncId).stream()
+                                .filter(unit -> unit.getFaction().isEmpty()
+                                        || unit.getUpgradesFromUnitId().isEmpty())
+                                .toList();
+                        for (UnitModel u : unitsToRemove) {
+                            player.removeOwnedUnitByID(u.getId());
+                        }
+                    }
                     player.addOwnedUnitByID(cardID);
                     MessageHelper.sendMessageToChannelWithEmbed(
                             game.getActionsChannel(),
@@ -432,8 +443,13 @@ public class ButtonHelperTwilightsFall {
     }
 
     @ButtonHandler("drawParadigm")
-    public static void drawParadigm(Game game, Player player, ButtonInteractionEvent event) {
-        drawParadigm(game, player, event, true);
+    public static void drawParadigm(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        if (buttonID.contains("AC")) {
+            drawParadigm(game, player, event, false);
+            ButtonHelper.deleteMessage(event);
+        } else {
+            drawParadigm(game, player, event, true);
+        }
     }
 
     @ButtonHandler("addMagusSpliceCard")

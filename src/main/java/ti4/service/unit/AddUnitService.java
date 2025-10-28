@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
@@ -111,10 +110,11 @@ public class AddUnitService {
             // Non-ships get distributed to planets, prioritizing high-resource planets
             int minUnitsPerPlanet = totalAmt / planetNames.size();
             int remainder = totalAmt % planetNames.size();
-            for(int i = 0; i < planetNames.size(); i++ ) {
+            for (int i = 0; i < planetNames.size(); i++) {
                 int amtForThisPlanet = minUnitsPerPlanet + (i < remainder ? 1 : 0);
-                if(amtForThisPlanet > 0) {
-                    assignedUnits.add(new ParsedUnit(Units.getUnitKey(unitType, color), amtForThisPlanet, planetNames.get(i)));
+                if (amtForThisPlanet > 0) {
+                    assignedUnits.add(
+                            new ParsedUnit(Units.getUnitKey(unitType, color), amtForThisPlanet, planetNames.get(i)));
                 }
             }
         }

@@ -28,6 +28,7 @@ import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.TitlesHelper;
 import ti4.helpers.Units;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.map.Game;
@@ -362,6 +363,28 @@ public class MiltyService {
             game.setTile(tile);
         }
 
+        // HANDLE Crimson' HOME SYSTEM LOCATION
+        if ("crimson".equals(faction)) {
+            tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            tile.addToken(Constants.TOKEN_BREACH_INACTIVE, Constants.SPACE);
+            String pos = "tr";
+            if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
+                pos = "br";
+            }
+            if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
+                pos = "bl";
+            }
+            if (game.getTileByPosition(pos) != null) {
+                if (pos.equalsIgnoreCase("tr")) {
+                    pos = "br";
+                } else {
+                    pos = "tr";
+                }
+            }
+            tile = new Tile("118", pos);
+            game.setTile(tile);
+        }
+
         // STARTING COMMODITIES
         player.setCommoditiesBase(factionModel.getCommodities());
 
@@ -500,6 +523,9 @@ public class MiltyService {
                     if (techs.isEmpty()) {
                         buttons = List.of(Buttons.GET_A_FREE_TECH, Buttons.DONE_DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                        if (factionModel.getStartingTechAmount() > 1) {
+                            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                        }
                     } else {
                         for (int x = 0; x < bonusOptions; x++) {
                             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
@@ -671,6 +697,10 @@ public class MiltyService {
         if ("true".equalsIgnoreCase(game.getStoredValue("removeSupports"))) {
             player.removeOwnedPromissoryNoteByID(player.getColor() + "_sftt");
             player.removePromissoryNote(player.getColor() + "_sftt");
+        }
+
+        if (game.isThundersEdge() && player.getFaction().equalsIgnoreCase("crimson")) {
+            BreakthroughCommandHelper.unlockBreakthrough(game, player);
         }
 
         if (game.isRapidMobilizationMode()) {

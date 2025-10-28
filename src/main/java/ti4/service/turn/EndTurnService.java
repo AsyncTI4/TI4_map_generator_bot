@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.FoWHelper;
 import ti4.map.Game;
@@ -77,6 +78,7 @@ public class EndTurnService {
         game.setStoredValue("lawsDisabled", "no");
         game.removeStoredValue("endTurnWhenSCFinished");
         game.removeStoredValue("fleetLogWhenSCFinished");
+        ButtonHelperAbilities.oceanBoundCheck(game);
         game.removeStoredValue("mahactHeroTarget");
         game.removeStoredValue("possiblyUsedRift");
         game.setActiveSystem("");
