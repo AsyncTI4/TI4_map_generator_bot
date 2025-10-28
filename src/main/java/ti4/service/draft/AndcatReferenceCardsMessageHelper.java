@@ -164,6 +164,8 @@ public class AndcatReferenceCardsMessageHelper {
 
         // Send the message
         messageBuilder.send();
+
+        // TODO: Send a summary message to the main game channel
     }
 
     public void updatePackageButtons(
@@ -328,6 +330,8 @@ public class AndcatReferenceCardsMessageHelper {
             if (this.draftable.whatsStoppingSetup(draftManager) == null) {
                 // TODO: Print speaker order and priority numbers
                 // TODO: Block for Keleres to pick their HS tile
+                // TODO: Make sure setup messages go to the main game channel, not the event channel (e.g. frontier
+                // tokens)
                 draftManager.trySetupPlayers(event);
             }
 

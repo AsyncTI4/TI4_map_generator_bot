@@ -472,7 +472,8 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
 
         // Parse and add units
         FactionModel startingUnitsFaction = Mapper.getFaction(refPackage.startingUnitsFaction());
-        AddUnitService.addUnitsToDefaultLocations(null, hsTile, game, player.getColor(), startingUnitsFaction.getStartingFleet());
+        AddUnitService.addUnitsToDefaultLocations(
+                null, hsTile, game, player.getColor(), startingUnitsFaction.getStartingFleet());
     }
 
     public List<String> getSpeakerOrder(DraftManager draftManager) {
