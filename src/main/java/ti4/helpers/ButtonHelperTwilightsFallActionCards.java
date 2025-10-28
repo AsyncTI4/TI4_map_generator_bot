@@ -424,7 +424,7 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void genophageStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        for (String agent : player.getLeaderIDs()) {
+        for (String agent : p2.getLeaderIDs()) {
 
             if (!agent.contains("agent")) {
                 continue;

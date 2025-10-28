@@ -1417,6 +1417,9 @@ public class TransactionHelper {
                 if (id.contains("dspnveld") && !p2.getAllianceMembers().contains(p1.getFaction())) {
                     PromissoryNoteHelper.resolvePNPlay(id, p2, game, event);
                 }
+                if (id.contains("blackops") && !p2.getAllianceMembers().contains(p1.getFaction())) {
+                    PromissoryNoteHelper.resolvePNPlay(id, p2, game, event);
+                }
                 boolean sendSftT = false;
                 boolean sendAlliance = false;
                 String promissoryNoteOwner = Mapper.getPromissoryNote(id).getOwner();
