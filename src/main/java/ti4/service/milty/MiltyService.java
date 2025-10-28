@@ -444,29 +444,30 @@ public class MiltyService {
                     player.getCorrectChannel(),
                     MiscEmojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
         }
-
-        // STARTING PNs
-        player.initPNs();
-        Set<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
-        playerPNs.addAll(factionModel.getPromissoryNotes());
-        player.setPromissoryNotesOwned(playerPNs);
-        if (game.isBaseGameMode()) {
-            Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
-            for (String pnID : pnsOwned) {
-                if (pnID.endsWith("_an")
-                        && "Alliance".equals(Mapper.getPromissoryNote(pnID).getName())) {
-                    player.removeOwnedPromissoryNoteByID(pnID);
+        if (!game.isTwilightsFallMode()) {
+            // STARTING PNs
+            player.initPNs();
+            Set<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
+            playerPNs.addAll(factionModel.getPromissoryNotes());
+            player.setPromissoryNotesOwned(playerPNs);
+            if (game.isBaseGameMode()) {
+                Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
+                for (String pnID : pnsOwned) {
+                    if (pnID.endsWith("_an")
+                            && "Alliance".equals(Mapper.getPromissoryNote(pnID).getName())) {
+                        player.removeOwnedPromissoryNoteByID(pnID);
+                    }
                 }
             }
-        }
-        if (game.isAbsolMode()) {
-            Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
-            for (String pnID : pnsOwned) {
-                if (pnID.endsWith("_ps")
-                        && "Political Secret"
-                                .equals(Mapper.getPromissoryNote(pnID).getName())) {
-                    player.removeOwnedPromissoryNoteByID(pnID);
-                    player.addOwnedPromissoryNoteByID("absol_" + pnID);
+            if (game.isAbsolMode()) {
+                Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
+                for (String pnID : pnsOwned) {
+                    if (pnID.endsWith("_ps")
+                            && "Political Secret"
+                                    .equals(Mapper.getPromissoryNote(pnID).getName())) {
+                        player.removeOwnedPromissoryNoteByID(pnID);
+                        player.addOwnedPromissoryNoteByID("absol_" + pnID);
+                    }
                 }
             }
         }

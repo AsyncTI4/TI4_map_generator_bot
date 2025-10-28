@@ -422,6 +422,7 @@ public class ButtonHelperModifyUnits {
             case "fighter" ->
                 hits > 0
                         && (player.hasUnit("naalu_flagship")
+                                || player.hasUnit("tf-morphwing")
                                 || player.hasUnit("sigma_naalu_flagship_2")
                                 || player.hasUnit("belkosea_fighter")
                                 || player.hasUnit("belkosea_fighter2"))
@@ -830,7 +831,7 @@ public class ButtonHelperModifyUnits {
                             || game.getActiveSystem().equalsIgnoreCase(tile.getPosition())) {
                         buttons.add(Buttons.red(
                                 "removeThisTypeOfUnit_" + type.humanReadableName() + "_" + tile.getPosition() + "_"
-                                        + uH.getName(),
+                                        + uH.getName() + "_" + player.getColor(),
                                 type.humanReadableName() + " from " + tile.getRepresentation() + " "
                                         + ("space".equals(uH.getName())
                                                 ? "in Space"
@@ -850,19 +851,26 @@ public class ButtonHelperModifyUnits {
         Tile tile = game.getTileByPosition(tilePos);
         String unitH = buttonID.split("_")[3];
         UnitHolder uH = tile.getUnitHolders().get(unitH);
-
-        RemoveUnitService.removeUnits(
-                event, tile, game, player.getColor(), "1 " + unit + " " + unitH.replace("space", ""));
+        String color = player.getColor();
+        if (buttonID.split("_").length > 4) {
+            color = buttonID.split("_")[4];
+        }
+        if (color.equalsIgnoreCase(player.getColor())) {
+            RemoveUnitService.removeUnits(event, tile, game, color, "1 " + unit + " " + unitH.replace("space", ""));
+        } else {
+            DestroyUnitService.destroyUnits(
+                    event, tile, game, color, "1 " + unit + " " + unitH.replace("space", ""), false);
+        }
         if (uH.getUnitCount(
                         Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID())
                                 .getUnitType(),
-                        player.getColor())
+                        color)
                 < 1) {
             ButtonHelper.deleteTheOneButton(event);
         }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " removed 1 " + unit + " from "
+                player.getRepresentationNoPing() + " removed 1 " + color + " " + unit + " from "
                         + ("space".equals(unitH) ? "the space area of" : StringUtils.capitalize(unitH) + ", in")
                         + " tile " + tile.getRepresentationForButtons(game, player) + ".");
     }
@@ -1023,7 +1031,7 @@ public class ButtonHelperModifyUnits {
                 || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
             return false;
         }
-        if (skilledRetreat) {
+        if (skilledRetreat && !game.isTwilightsFallMode()) {
             return true;
         }
         if (Tile.playerCanRetreatHere(player).test(tile)) {
@@ -2080,6 +2088,10 @@ public class ButtonHelperModifyUnits {
         if (player.hasUnexhaustedLeader("ghotiagent")) {
             buttons.add(Buttons.red(
                     "exhaustAgent_ghotiagent_" + player.getFaction(), "Use Ghoti Agent", FactionEmojis.ghoti));
+        }
+        if (player.hasUnexhaustedLeader("experimentalagent")) {
+            buttons.add(
+                    Buttons.gray("exhaustAgent_experimentalagent", "Use Experimental Genome", FactionEmojis.Jolnar));
         }
         if (player.hasUnexhaustedLeader("mortheusagent")) {
             buttons.add(Buttons.red(
