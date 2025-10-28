@@ -54,21 +54,21 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "blackmail",
+        "name": "Blackmail",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome gives you 1 random promissory note from their hand.",
+        "flavorText": "Milor spun around at the sound of a familiar voice whispering his name. Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother,\" they said in unison.",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "boarding_party",
         "name": "Boarding Party",
         "phase": "Action",
         "window": "After you destroy 1 of your opponent's ships that has a cost of 4 or less",
         "text": "Place 1 matching ship from your reinforcements in the active system. [Note: If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
         "flavorText": "\"Brother,\" the officer cried, \"our ships are breaking up! If we retreat now...\" Milor glared at him. \"No! Launch the remaining fighters and board the enemy in the lifepods. In Darien's name, we fight to the last!\"",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "bounty",
-        "name": "Bounty",
-        "phase": "Action",
-        "window": "After you destroy another player's unit that has a cost of 3 or more",
-        "text": "Gain 4 trade goods.",
-        "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'ula screamed from behind her gag as she watched him reroute the ship toward Arcturus.",
         "source": "action_deck_2"
     },
     {
@@ -940,12 +940,12 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "blackmail",
-        "name": "Blackmail",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome gives you 1 random promissory note from their hand.",
-        "flavorText": "Milor spun around at the sound of a familiar voice whispering his name. Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother,\" they said in unison.",
+        "alias": "bounty",
+        "name": "Bounty",
+        "phase": "Action",
+        "window": "After you destroy another player's unit that has a cost of 3 or more",
+        "text": "Capture that unit and gain 3 trade goods.",
+        "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'ula screamed from behind her gag as she watched him reroute the ship toward Arcturus.",
         "source": "action_deck_2"
     },
     {
@@ -1106,7 +1106,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Reveal the alliance ability of a random, unused faction and predict aloud an outcome of this agenda. If your prediction is correct, gain that alliance ability; otherwise, purge it.",
-        "flavorText": "S'ula limped toward the podium, meeting the jeers with a defiant smirk. They had been chased to the ends of the universe and now stood before the council with an offer to capitulate—to one of them. That little addendum would set the chamber at each other's throats, just long enough for the others to escape.",
+        "flavorText": "S'ula limped toward the podium, meeting the jeers with a defiant smirk. They had been chased to the ends of the universe and now stood before the council with an offer to capitulate—to one of them. That little addendum would set the chamber at each other's throats, just long enough for her crew to escape.",
         "source": "action_deck_2"
     },
     {
