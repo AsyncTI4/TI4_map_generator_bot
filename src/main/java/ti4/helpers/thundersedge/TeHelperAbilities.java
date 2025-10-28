@@ -169,6 +169,7 @@ public class TeHelperAbilities {
         List<Button> buttons = new ArrayList<>();
         Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
         if (activeSystem != null) {
+            // TODO: galvanize
             int dmgDocks =
                     activeSystem.getSpaceUnitHolder().getDamagedUnitCount(UnitType.Spacedock, player.getColorID());
             int docks = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Spacedock, player) - dmgDocks;

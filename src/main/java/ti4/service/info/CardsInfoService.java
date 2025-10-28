@@ -80,6 +80,9 @@ public class CardsInfoService {
         if (IsPlayerElectedService.isPlayerElected(game, player, "minister_peace")) {
             buttons.add(Buttons.gray("ministerOfPeace", "Use Minister of Peace", CardEmojis.Agenda));
         }
+        if (game.getPlayers().values().stream().anyMatch(p -> p.getAbilities().contains("galvanize"))) {
+            buttons.add(Buttons.gray("getToggleGalvanizeTiles", "Galvanize Units", FactionEmojis.Bastion));
+        }
         if (player.hasUnlockedBreakthrough("titansbt")) {
             buttons.add(Buttons.gray("selectPlayerToSleeper", "Add a sleeper token", MiscEmojis.Sleeper));
         }
