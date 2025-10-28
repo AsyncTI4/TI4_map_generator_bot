@@ -438,12 +438,88 @@
         "forCombatAbility": "AFB"
     },
     {
+        "alias": "plus1_roll_asail_afb",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "opponent_has_been_asailed",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "ability",
+                "alias": "marionettes"
+            }
+        ],
+        "forCombatAbility": "AFB"
+    },
+    {
+        "alias": "plus1_roll_asail_spacecannon_off",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "opponent_has_been_asailed",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "ability",
+                "alias": "marionettes"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "plus1_roll_asail_spacecannon_def",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "opponent_has_been_asailed",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "ability",
+                "alias": "marionettes"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonDefence"
+    },
+    {
+        "alias": "plus1_roll_asail_bombard",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "opponent_has_been_asailed",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "ability",
+                "alias": "marionettes"
+            }
+        ],
+        "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "plus1_roll_asail_combat",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "opponent_has_been_asailed",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "ability",
+                "alias": "marionettes"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
         "alias": "plus1_per_opponent_sftt",
         "type": "result_modifier",
         "value": "+1",
         "valueScalingType": "opponent_sftt",
         "persistenceType": "CONDITIONAL",
         "condition": "opponent_has_sftt",
+        "scope": "",
         "related": [
             {
                 "type": "breakthrough",

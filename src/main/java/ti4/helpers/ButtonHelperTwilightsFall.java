@@ -161,7 +161,8 @@ public class ButtonHelperTwilightsFall {
                 }
             }
         }
-
+        String positionHS = pos;
+        String faction = factionHS;
         String tileID = Mapper.getFaction(factionHS).getHomeSystem();
         tileID = AliasHandler.resolveTile(tileID);
 
@@ -169,6 +170,43 @@ public class ButtonHelperTwilightsFall {
 
             Tile toAdd = new Tile(tileID, pos);
             game.setTile(toAdd);
+            toAdd.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            player.setHomeSystemPosition(pos);
+            player.setPlayerStatsAnchorPosition(pos);
+            if ("ghost".equals(faction)) {
+                pos = "tr";
+                if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
+                    pos = "br";
+                }
+                if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
+                    pos = "bl";
+                }
+                Tile tile = new Tile("51", pos);
+                game.setTile(tile);
+                player.setHomeSystemPosition(pos);
+            }
+
+            // HANDLE Crimson' HOME SYSTEM LOCATION
+            if ("crimson".equals(faction)) {
+                toAdd.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+                pos = "tr";
+                if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
+                    pos = "br";
+                }
+                if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
+                    pos = "bl";
+                }
+                if (game.getTileByPosition(pos) != null) {
+                    if (pos.equalsIgnoreCase("tr")) {
+                        pos = "br";
+                    } else {
+                        pos = "tr";
+                    }
+                }
+                Tile tile = new Tile("118", pos);
+                game.setTile(tile);
+                player.setHomeSystemPosition(pos);
+            }
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(), player.getRepresentation() + " set home system successfully.");
         } else {
@@ -658,13 +696,41 @@ public class ButtonHelperTwilightsFall {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("searchSpliceDeck")
+    public static void searchSpliceDeck(Game game, String buttonID, Player player, ButtonInteractionEvent event) {
+        String type = buttonID;
+        if (buttonID.contains("_")) {
+            type = buttonID.split("_")[1];
+        }
+        List<Button> buttons = new ArrayList<>();
+        List<String> cards = getDeckForSplicing(game, type, 100);
+        for (String card : cards) {
+            buttons.add(Buttons.green(
+                    "drawSingularNewSpliceCard_" + type + "_" + card,
+                    "Draw "
+                            + (type.equalsIgnoreCase("ability")
+                                    ? Mapper.getTech(card).getName()
+                                    : type.equalsIgnoreCase("genome")
+                                            ? Mapper.getLeader(card).getName()
+                                            : Mapper.getUnit(card).getName())));
+        }
+        String msg = player.getRepresentation() + " use buttons to draw a card from the splice deck.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("drawSingularNewSpliceCard")
-    public static void drawSingularNewSpliceCard(Game game, String buttonID, Player player) {
+    public static void drawSingularNewSpliceCard(
+            Game game, String buttonID, Player player, ButtonInteractionEvent event) {
         String type = buttonID;
         if (buttonID.contains("_")) {
             type = buttonID.split("_")[1];
         }
         String cardID = getDeckForSplicing(game, type, 1).get(0);
+        if (buttonID.split("_").length > 2) {
+            cardID = buttonID.split("_")[2];
+            ButtonHelper.deleteMessage(event);
+        }
         if (type.equalsIgnoreCase("ability")) {
             player.addTech(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
@@ -698,6 +764,13 @@ public class ButtonHelperTwilightsFall {
             for (Player p : game.getRealPlayers()) {
                 for (String tech : p.getTechs()) {
                     allCards.remove(tech);
+                }
+            }
+            List<String> someCardList = new ArrayList<>();
+            someCardList.addAll(allCards);
+            for (String card : someCardList) {
+                if (game.getStoredValue("purgedAbilities").contains("_" + card)) {
+                    allCards.remove(card);
                 }
             }
             for (int i = 0; i < size && allCards.size() > 0; i++) {

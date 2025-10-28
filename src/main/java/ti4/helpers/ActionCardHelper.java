@@ -65,6 +65,7 @@ public class ActionCardHelper {
         }
 
         sendTrapCardInfo(player);
+        sendPlotCardInfo(game, player);
         sendGarboziaInfo(game, player);
     }
 
@@ -738,6 +739,23 @@ public class ActionCardHelper {
                             + actionCardTitle + "_. Use buttons to decide whether to Sabo this action card.",
                     empyButtons);
         }
+        Player tfTriune = Helper.getPlayerFromUnit(game, "tf-triune");
+        if (tfTriune != null && ButtonHelperFactionSpecific.isNextToTriunes(game, player, tfTriune)) {
+            Button tfButton = Buttons.gray(
+                    "sabotage_tf_" + actionCardTitle + "_" + player.getFaction(),
+                    "Cancel " + actionCardTitle + " With Triunes",
+                    UnitEmojis.fighter);
+            List<Button> tfButtons = new ArrayList<>();
+            tfButtons.add(tfButton);
+            Button refuse = Buttons.red("deleteButtons", "Delete These Buttons");
+            tfButtons.add(refuse);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    tfTriune.getCardsInfoThread(),
+                    tfTriune.getRepresentationUnfogged()
+                            + "You have three fighters adjacent to some units of the player who played _"
+                            + actionCardTitle + "_. Use buttons to decide whether to Shatter this action card.",
+                    tfButtons);
+        }
         String instinctTrainingID = "it";
         for (Player player2 : game.getPlayers().values()) {
             if (!player.equals(player2) && player2.hasTechReady(instinctTrainingID) && player2.getStrategicCC() > 0) {
@@ -761,7 +779,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithEmbed(bEvent.getChannel(), message, acEmbed);
             }
         }
-        if (acID.contains("sabo")) {
+        if (acID.contains("sabo") || acID.contains("shatter")) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
         } else {
             String buttonLabel = "Resolve " + actionCardTitle;
@@ -1444,6 +1462,10 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveGenophage", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
+            if ("tf-coerce".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveCoerce", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
             if ("tf-transpose1".equals(automationID) || "tf-transpose2".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveTranspose", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
@@ -1587,14 +1609,6 @@ public class ActionCardHelper {
                             player,
                             hackButtons);
                 }
-                // "tf-engineer", -- 2 extra cards
-                // "tf-thieve" -- take the last card
-                // "tf-helix"
-                // "tf-reverse"
-                // "alias": "tf-scarab", "name": "Scarab","Choose a spliced card you own; gain 2 trade goods for each
-                // card you own with a faction origin that matches that card",
-                // Discard 1 of your neighbor's genomes. tf-genophage
-                // "tf-mutate1" "tf-mutate2" discard and draw an ability
                 if ("insider".equals(automationID)) {
                     codedButtons.add(Buttons.green(
                             player.getFinsFactionCheckerPrefix() + "resolveInsiderInformation", buttonLabel));

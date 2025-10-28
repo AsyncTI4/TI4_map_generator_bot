@@ -3748,7 +3748,7 @@ public class ButtonHelper {
         }
         int ageOfFightersFleet;
         if (game.isAgeOfFightersMode()) {
-            if (player.hasTech("hcf2") || player.hasTech("absol_hcf2")) {
+            if (player.hasTech("hcf2") || player.hasTech("absol_hcf2") || player.hasUnit("tf-hcf")) {
                 ageOfFightersFleet = Math.min(numFighter2s, fleetCap - numOfCapitalShips);
             } else {
                 ageOfFightersFleet = Math.min(numFighter2s, (fleetCap - numOfCapitalShips) / 2);
@@ -3761,7 +3761,7 @@ public class ButtonHelper {
                 capacityViolated = true;
             } else {
                 numFighter2s = numInfNFightersNMechs - capacity;
-                if (player.hasTech("hcf2") || player.hasTech("absol_hcf2")) {
+                if (player.hasTech("hcf2") || player.hasTech("absol_hcf2") || player.hasUnit("tf-hcf")) {
                     numFighter2sFleet += numFighter2s;
                 } else {
                     numFighter2sFleet += numFighter2s * 2;
@@ -4570,7 +4570,8 @@ public class ButtonHelper {
         String ringNum = buttonID.replace("ring_", "");
 
         if ("corners".equalsIgnoreCase(ringNum)) {
-            List<String> cornerPositions = List.of("tl", "tr", "bl", "br");
+            List<String> cornerPositions =
+                    List.of("tl", "tr", "bl", "br", "frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7");
             for (String pos : cornerPositions) {
                 Tile t = game.getTileByPosition(pos);
                 if (canActivateTile(game, player, t)) {
@@ -4657,6 +4658,11 @@ public class ButtonHelper {
                     count++;
                     types.add(tech);
                 }
+            }
+        }
+        for (String unitID : player.getUnitsOwned()) {
+            if (unitID.contains("tf-")) {
+                count++;
             }
         }
         return count;

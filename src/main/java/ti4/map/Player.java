@@ -244,6 +244,7 @@ public class Player extends PlayerProperties {
                     activeUnits.add("mentak_cruiser3");
                     if (!getUnitsOwned().contains("mentak_cruiser3")) {
                         addOwnedUnitByID("mentak_cruiser3");
+                        removeOwnedUnitByID("cruiser2");
                     }
                     break;
                 }
@@ -1522,6 +1523,10 @@ public class Player extends PlayerProperties {
             List<GenericCardModel> allTraps = new ArrayList<>(Mapper.getTraps().values());
             allTraps.forEach(trap -> setTrapCard(trap.getAlias()));
         }
+        if (hasAbility("puppetsoftheblade")) {
+            List<GenericCardModel> allPlots = new ArrayList<>(Mapper.getPlots().values());
+            allPlots.stream().forEach(plot -> setPlotCard(plot.getAlias()));
+        }
     }
 
     @JsonIgnore
@@ -2195,10 +2200,6 @@ public class Player extends PlayerProperties {
             gainCustodiaVigilia();
         }
 
-        if ("cr2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("mentakbt")) {
-            addOwnedUnitByID("mentak_cruiser3");
-        }
-
         if ("planesplitter-firm".equalsIgnoreCase(techID)) {
             FractureService.spawnFracture(null, game);
             FractureService.spawnIngressTokens(null, game, this, false);
@@ -2223,6 +2224,23 @@ public class Player extends PlayerProperties {
 
                 addOwnedUnitByID(unitModel.getId());
             }
+        }
+        if ("cr2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("mentakbt")) {
+            addOwnedUnitByID("mentak_cruiser3");
+        }
+        Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
+        if (!techModel.getFaction().isPresent()
+                && obsidian != null
+                && obsidian.getPlotCardsFactions().get("extract").contains(getFaction())
+                && !obsidian.getTechs().contains(techID)) {
+            String msg = obsidian.getRepresentation()
+                    + ", your _Extract_ plot card allows you to gain a copy of the newly researched tech **"
+                    + Mapper.getTech(techID).getName() + "** for 4 resources.";
+
+            List<Button> buttons2 = new ArrayList<>();
+            buttons2.add(Buttons.green("acquireATechdeleteThisMessage", "Get a Technology"));
+            buttons2.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(obsidian.getCorrectChannel(), msg, buttons2);
         }
     }
 

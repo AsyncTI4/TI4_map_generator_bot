@@ -500,6 +500,15 @@ public class StatusHelper {
             endOfRoundMessage +=
                     " Good things to share are highlights, plots, current relations with neighbors, or really anything you want (or nothing).";
             MessageHelper.sendMessageToChannelWithButton(p2.getCardsInfoThread(), endOfRoundMessage, editSummary);
+
+            Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
+            if (obsidian != null
+                    && obsidian.getPlotCardsFactions().get("seethe").contains(p2.getFaction())) {
+                String seetheMsg = obsidian.getRepresentation() + " use the buttons to destroy one of "
+                        + p2.getRepresentation() + " infantry using seethe.";
+                List<Button> removeButtons = ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(p2, game, "gf");
+                MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), seetheMsg, removeButtons);
+            }
         }
 
         // Optional abilities

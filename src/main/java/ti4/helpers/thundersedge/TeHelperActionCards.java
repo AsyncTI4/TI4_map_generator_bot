@@ -266,12 +266,13 @@ public class TeHelperActionCards {
         List<Button> buttons = game.getPlanetsInfo().values().stream()
                 .filter(p -> !p.isHomePlanet(game) && !p.hasUnits())
                 .filter(p -> game.getTileFromPlanet(p.getName()) != null)
+                .filter(p -> game.getUnitHolderFromPlanet(p.getName()) != null
+                        && !game.getUnitHolderFromPlanet(p.getName()).isSpaceStation())
                 .map(p -> {
                     String id = player.finChecker() + "resolveTeMercenaryContract_" + p.getName();
                     String label = Helper.getPlanetRepresentation(p.getName(), game);
                     for (Player p2 : game.getRealPlayers()) {
                         if (p2.hasPlanet(p.getName())) {
-                            if (p2 == player) return null;
                             return Buttons.red(id, label, p2.getFactionEmoji());
                         }
                     }

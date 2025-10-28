@@ -1123,6 +1123,13 @@ public class UnfiledButtonHandlers {
                     "Remove the Watcher",
                     ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "mech", true));
             ButtonHelper.deleteMessage(event);
+        } else if ("tf".equalsIgnoreCase(type)) {
+            message += " three triune fighters! The relevant fighters should now be removed by the owner.";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    "Remove the Fighters",
+                    ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "ff", true));
+
         } else if ("xxcha".equalsIgnoreCase(type)) {
             message +=
                     "_Instinct Training_! The technology has been exhausted and a command token removed from strategy pool.";
@@ -1144,7 +1151,7 @@ public class UnfiledButtonHandlers {
             boolean hasSabo = false;
             String saboID = "3";
             for (String AC : player.getActionCards().keySet()) {
-                if (AC.contains("sabo")) {
+                if (AC.contains("sabo") || AC.contains("shatter")) {
                     hasSabo = true;
                     saboID = "" + player.getActionCards().get(AC);
                     break;
@@ -2170,6 +2177,10 @@ public class UnfiledButtonHandlers {
                 if (player.hasUnexhaustedLeader("ghotiagent")) {
                     buttons.add(Buttons.red(
                             "exhaustAgent_ghotiagent_" + player.getFaction(), "Use Ghoti Agent", FactionEmojis.ghoti));
+                }
+                if (player.hasUnexhaustedLeader("experimentalagent")) {
+                    buttons.add(Buttons.gray(
+                            "exhaustAgent_experimentalagent", "Use Experimental Genome", FactionEmojis.Jolnar));
                 }
                 if (player.hasUnexhaustedLeader("mortheusagent")) {
                     buttons.add(Buttons.red(

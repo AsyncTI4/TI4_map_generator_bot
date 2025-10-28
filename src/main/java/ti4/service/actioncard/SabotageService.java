@@ -69,6 +69,12 @@ public class SabotageService {
             return true;
         }
 
+        if (player.hasUnit("tf-triune")
+                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Fighter)
+                        .isEmpty()) {
+            return true;
+        }
+
         boolean bigAcDeckGame =
                 (game.getActionCardDeckSize() + game.getDiscardActionCards().size()) > 180;
         return (bigAcDeckGame || playerHasSabotage(player))

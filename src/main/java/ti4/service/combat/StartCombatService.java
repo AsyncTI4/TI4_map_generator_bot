@@ -1251,6 +1251,14 @@ public class StartCombatService {
                         FactionEmojis.Sol));
             }
 
+            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("valientagent")) {
+                buttons.add(Buttons.gray(
+                        finChecker + "getAgentSelection_valientagent",
+                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Valient Genome",
+                        FactionEmojis.Bastion));
+            }
+
             if ((!game.isFowMode() || agentHolder == p1)
                     && agentHolder.hasUnexhaustedLeader("kyroagent")
                     && isGroundCombat) {
@@ -1338,9 +1346,9 @@ public class StartCombatService {
         // Exo 2s
         if ("space".equalsIgnoreCase(groundOrSpace) && !game.isFowMode()) {
             if ((tile.getSpaceUnitHolder().getUnitCount(Units.UnitType.Dreadnought, p1.getColor()) > 0
-                            && p1.hasTech("exo2"))
+                            && (p1.hasTech("exo2") || p2.hasUnit("tf-exotrireme")))
                     || (tile.getSpaceUnitHolder().getUnitCount(Units.UnitType.Dreadnought, p2.getColor()) > 0
-                            && p2.hasTech("exo2"))) {
+                            && (p2.hasTech("exo2") || p2.hasUnit("tf-exotrireme")))) {
                 buttons.add(Buttons.blue(
                         "assCannonNDihmohn_exo_" + tile.getPosition(),
                         "Use Exotrireme II Ability",

@@ -1,5 +1,7 @@
 package ti4.service.leader;
 
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.ButtonHelper;
@@ -89,10 +91,10 @@ public class CommanderUnlockCheckService {
                 // TODO: (TE) @{wherever crimson destroyers are handled}
             }
             case "firmament" -> {
-                // for (Entry<String, List<String>> entry : player.getPlotCardsFactions().entrySet()) {
-                //     if (entry.getValue() != null && entry.getValue().size() > 0)
-                //         shouldBeUnlocked = true;
-                // }
+                for (Entry<String, List<String>> entry :
+                        player.getPlotCardsFactions().entrySet()) {
+                    if (entry.getValue() != null && entry.getValue().size() > 0) shouldBeUnlocked = true;
+                }
             }
             case "obsidian" -> {
                 for (Tile t : game.getTileMap().values()) {
