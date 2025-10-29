@@ -214,7 +214,8 @@ class FrankenButtonHandler {
                         MessageHelper.sendMessageToChannel(
                                 game.getActionsChannel(),
                                 game.getPing()
-                                        + " the draft stage of the FrankenDraft is complete. Choose how to set up the map. Once the map is finalized, select your abilities from your drafted hands.", List.of(randomizeButton, mantisButton));
+                                        + " the draft stage of the FrankenDraft is complete. Choose how to set up the map. Once the map is finalized, select your abilities from your drafted hands.",
+                                List.of(randomizeButton, mantisButton));
                         FrankenDraftBagService.applyDraftBags(event, game);
                         return;
                     }

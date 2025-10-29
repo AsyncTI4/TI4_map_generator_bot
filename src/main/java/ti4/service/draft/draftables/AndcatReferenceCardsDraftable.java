@@ -468,7 +468,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         String homeTilePosition =
                 MapTemplateHelper.getPlayerHomeSystemLocation(speakerPosition, game.getMapTemplateID());
         Tile hsTile = game.getTileByPosition(homeTilePosition);
-        
+
         // Clear existing units at the home system
         hsTile.removeAllUnits(player.getColor());
 

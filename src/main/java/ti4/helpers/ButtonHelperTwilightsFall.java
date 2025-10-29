@@ -54,8 +54,11 @@ public class ButtonHelperTwilightsFall {
             manager.setPlayers(playerIDs);
             List<DraftItem.Category> componentCategories = game.isTwilightsFallMode()
                     ? FrankenDraftBagService.TFcomponentCategories
-                    : List.of(DraftItem.Category.DRAFTORDER, DraftItem.Category.HOMESYSTEM,
-                            DraftItem.Category.STARTINGFLEET, DraftItem.Category.BLUETILE,
+                    : List.of(
+                            DraftItem.Category.DRAFTORDER,
+                            DraftItem.Category.HOMESYSTEM,
+                            DraftItem.Category.STARTINGFLEET,
+                            DraftItem.Category.BLUETILE,
                             DraftItem.Category.REDTILE);
             for (Player p : game.getPlayers().values()) {
                 DraftBag bag = p.getDraftHand();
@@ -133,7 +136,9 @@ public class ButtonHelperTwilightsFall {
             manager.setPlayers(playerIDs);
             List<DraftItem.Category> componentCategories = game.isTwilightsFallMode()
                     ? FrankenDraftBagService.TFcomponentCategories
-                    : List.of(DraftItem.Category.DRAFTORDER, DraftItem.Category.HOMESYSTEM,
+                    : List.of(
+                            DraftItem.Category.DRAFTORDER,
+                            DraftItem.Category.HOMESYSTEM,
                             DraftItem.Category.STARTINGFLEET);
             for (Player p : game.getPlayers().values()) {
                 DraftBag bag = p.getDraftHand();
@@ -190,7 +195,7 @@ public class ButtonHelperTwilightsFall {
                 game.setMapTemplateID(defaultTemplate.getAlias());
                 manager.setMapTemplate(defaultTemplate.getAlias());
             }
-        
+
             // Place draft tiles
             MiltyDraftHelper.buildPartialMap(game, event);
 
