@@ -565,7 +565,7 @@ public class ButtonHelperActionCards {
         // Actually roll for each unit
         int totalHits = 0;
         UnitModel unit = player.getUnitByBaseType(baseType);
-        int toHit = unit.getCombatDieHitsOnForAbility(CombatRollType.combatround);
+        int toHit = unit.getCombatDieHitsOnForAbility(CombatRollType.combatround, player);
         int modifierToHit = 0;
         int extraRollsForUnit = 0;
         int numRollsPerUnit = 1;

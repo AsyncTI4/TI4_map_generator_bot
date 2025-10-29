@@ -1277,13 +1277,6 @@ public class Helper {
         for (String thing : spentThings) {
             boolean found = false;
             switch (thing) {
-                case "dwsDiscount" -> {
-                    msg.append("> Used Deepwrought's Commander Discount ")
-                            .append(MiscEmojis.Resources_1)
-                            .append("\n");
-                    res += 1;
-                    found = true;
-                }
                 case "sarween" -> {
                     msg.append("> Used _Sarween Tools_ " + TechEmojis.CyberneticTech + "\n");
                     res += 1;
@@ -1397,7 +1390,16 @@ public class Helper {
                     }
                 }
             } else {
-
+                if (thing.contains("dwsDiscount")) {
+                    String faction = thing.replace("dwsDiscount_", "");
+                    if (game.isFowMode()) {
+                        faction = "someone";
+                    }
+                    msg.append("> Used " + faction + "'s Commander Discount ")
+                            .append(MiscEmojis.Resources_1)
+                            .append("\n");
+                    res += 1;
+                }
                 if (thing.contains("boon")) {
                     msg.append("> Used Boon Relic ").append(ExploreEmojis.Relic).append("\n");
                     res += 1;
