@@ -83,12 +83,12 @@ public class PdsCoverageHelper {
                         }
 
                         // Check if PDS can shoot (deep space cannon or same tile)
-                        if (model.getDeepSpaceCannon() || sameTile) {
-                            for (int i = model.getSpaceCannonDieCount() * unitEntry.getValue(); i > 0; i--) {
-                                diceCount.add(model.getSpaceCannonHitsOn() - mod - tempMod);
+                        if (model.getDeepSpaceCannon(player) || sameTile) {
+                            for (int i = model.getSpaceCannonDieCount(player) * unitEntry.getValue(); i > 0; i--) {
+                                diceCount.add(model.getSpaceCannonHitsOn(player) - mod - tempMod);
                             }
                         } else if (game.playerHasLeaderUnlockedOrAlliance(player, "mirvedacommander")) {
-                            diceCountMirveda.add(model.getSpaceCannonHitsOn() - mod - tempMod);
+                            diceCountMirveda.add(model.getSpaceCannonHitsOn(player) - mod - tempMod);
                         }
                     }
 
