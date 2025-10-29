@@ -71,6 +71,23 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 
+    public static List<Button> argentBreakthroughStep1(Game game, Player player, Tile activeSystem) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green(
+                "argentHeroStep2_" + activeSystem.getPosition(),
+                activeSystem.getRepresentationForButtons(game, player)));
+        for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, activeSystem.getPosition(), player, false)) {
+            Tile tile = game.getTileByPosition(pos);
+            if (CommandCounterHelper.hasCC(player, tile)
+                    && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
+                buttons.add(Buttons.green(
+                        "argentHeroStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+            }
+        }
+        buttons.add(Buttons.red("deleteButtons", "Done resolving"));
+        return buttons;
+    }
+
     @ButtonHandler("argentHeroStep2_")
     public static void argentHeroStep2(Game game, Player player, GenericInteractionCreateEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
@@ -1271,7 +1288,7 @@ public class ButtonHelperHeroes {
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, count);
 
-        if (game.isTwilightsFallMode()) {
+        if (!game.isTwilightsFallMode()) {
             game.setComponentAction(true);
             List<TechnologyModel> techs = new ArrayList<>();
             for (String type : techTypes) techs.addAll(ListTechService.getAllTechOfAType(game, type, player));

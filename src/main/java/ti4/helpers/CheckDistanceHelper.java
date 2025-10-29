@@ -119,6 +119,9 @@ public class CheckDistanceHelper {
                 if (!forMap) {
                     if (tile != null && tile.isGravityRift(game)) {
                         num = -1;
+                        if (game.isCosmicPhenomenaeMode()) {
+                            num = -2;
+                        }
                     }
                 }
                 if (distances.get(existingPosition) != null) {
