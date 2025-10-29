@@ -21,7 +21,9 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.service.draft.DraftComponentFactory;
 import ti4.service.draft.DraftSetupService;
+import ti4.service.draft.draftables.AndcatReferenceCardsDraftable;
 import ti4.service.draft.draftables.FactionDraftable;
+import ti4.service.draft.draftables.MahactKingDraftable;
 import ti4.service.draft.draftables.MantisTileDraftable;
 import ti4.service.draft.draftables.SeatDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
@@ -46,6 +48,8 @@ public class DraftSystemSettings extends SettingsMenu {
     private final SliceDraftableSettings sliceSettings;
     private final MantisTileDraftableSettings mantisTileSettings;
     private final FactionDraftableSettings factionSettings;
+    private final AndcatReferenceCardsDraftableSettings andcatReferenceCardsDraftableSettings;
+    private final MahactKingDraftableSettings mahactKingDraftableSettings;
     private final PublicSnakeDraftSettings publicSnakeDraftSettings;
     // Bonus Attributes
     @Setter
@@ -95,6 +99,10 @@ public class DraftSystemSettings extends SettingsMenu {
         mantisTileSettings =
                 new MantisTileDraftableSettings(game, json != null ? json.get("mantisTileSettings") : null, this);
         factionSettings = new FactionDraftableSettings(game, json != null ? json.get("factionSettings") : null, this);
+        andcatReferenceCardsDraftableSettings = new AndcatReferenceCardsDraftableSettings(
+                game, json != null ? json.get("andcatReferenceCardsDraftableSettings") : null, this);
+        mahactKingDraftableSettings = new MahactKingDraftableSettings(
+                game, json != null ? json.get("mahactKingDraftableSettings") : null, this);
         publicSnakeDraftSettings =
                 new PublicSnakeDraftSettings(game, json != null ? json.get("publicSnakeDraftSettings") : null, this);
 
@@ -120,6 +128,12 @@ public class DraftSystemSettings extends SettingsMenu {
         }
         if (draftablesList.getKeys().contains(MantisTileDraftable.class.getSimpleName())) {
             implemented.add(mantisTileSettings);
+        }
+        if (draftablesList.getKeys().contains(AndcatReferenceCardsDraftable.class.getSimpleName())) {
+            implemented.add(andcatReferenceCardsDraftableSettings);
+        }
+        if (draftablesList.getKeys().contains(MahactKingDraftable.class.getSimpleName())) {
+            implemented.add(mahactKingDraftableSettings);
         }
         if (draftOrchestrator.getValue().equals(PublicSnakeDraftOrchestrator.class.getSimpleName())) {
             implemented.add(publicSnakeDraftSettings);
@@ -174,9 +188,10 @@ public class DraftSystemSettings extends SettingsMenu {
 
     @ButtonHandler("startDraftSystem")
     public static void startDraft(ButtonInteractionEvent event, Game game) {
-        String preset = event.getButton().getCustomId().replace("startDraftSystem", "");
+        String buttonCustomId = event.getButton().getCustomId();
+        String preset = buttonCustomId != null ? buttonCustomId.replace("startDraftSystem", "") : null;
         DraftSystemSettings settings = new DraftSystemSettings(game, null);
-        if (preset.equals("_nucleusPreset")) {
+        if ("_nucleusPreset".equals(preset)) {
             if (game.getPlayers().size() < 3) {
                 MessageHelper.sendEphemeralMessageToEventChannel(event, "Nucleus draft requires at least 3 players");
                 return;
@@ -206,5 +221,16 @@ public class DraftSystemSettings extends SettingsMenu {
         getDraftOrchestrator().setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
         getSliceSettings().getMapGenerationMode().setChosenKey("Nucleus");
         setPreset("Nucleus Draft");
+    }
+
+    public void setupAndcatTwilightsFallPreset() {
+        getDraftablesList()
+                .setKeys(List.of(
+                        AndcatReferenceCardsDraftable.class.getSimpleName(),
+                        SliceDraftable.class.getSimpleName(),
+                        MahactKingDraftable.class.getSimpleName()));
+        getDraftOrchestrator().setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
+        getSliceSettings().getMapGenerationMode().setChosenKey("Milty");
+        setPreset("Twilights Fall (Andcat Draft)");
     }
 }

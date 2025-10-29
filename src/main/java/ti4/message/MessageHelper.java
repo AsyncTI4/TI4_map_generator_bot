@@ -610,6 +610,24 @@ public class MessageHelper {
         }
     }
 
+    public static void sendMessagesWithRetry(
+            MessageChannel channel,
+            List<MessageCreateData> messageCreateDataList,
+            MessageFunction successAction,
+            String errorHeader,
+            int remainingAttempts) {
+        Iterator<MessageCreateData> iterator = messageCreateDataList.iterator();
+        while (iterator.hasNext()) {
+            MessageCreateData messageCreateData = iterator.next();
+            if (iterator.hasNext()) { // not last message
+                sendMessageWithRetry(
+                        channel, messageCreateData, null, "Failed to send intermediate message", remainingAttempts);
+            } else { // last message, do action
+                sendMessageWithRetry(channel, messageCreateData, successAction, errorHeader, remainingAttempts);
+            }
+        }
+    }
+
     private static void sendMessageWithRetry(
             MessageChannel channel,
             MessageCreateData messageCreateData,
@@ -1045,7 +1063,7 @@ public class MessageHelper {
         sendMessageToChannelWithEmbeds(channel, message, embeds);
     }
 
-    private static List<Button> sanitizeButtons(List<Button> buttons, MessageChannel channel) {
+    public static List<Button> sanitizeButtons(List<Button> buttons, MessageChannel channel) {
         if (buttons == null) return null;
         List<Button> newButtons = new ArrayList<>();
         List<String> goodButtonIDs = new ArrayList<>();

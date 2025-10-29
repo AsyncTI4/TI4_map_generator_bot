@@ -10,7 +10,10 @@ import lombok.experimental.UtilityClass;
 import ti4.helpers.Constants;
 import ti4.helpers.ListHelper;
 import ti4.map.Tile;
+import ti4.model.Source.ComponentSource;
+import ti4.service.draft.draftables.AndcatReferenceCardsDraftable;
 import ti4.service.draft.draftables.FactionDraftable;
+import ti4.service.draft.draftables.MahactKingDraftable;
 import ti4.service.draft.draftables.MantisTileDraftable;
 import ti4.service.draft.draftables.SeatDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
@@ -82,6 +85,22 @@ public class TestData {
         draftable.getMulliganTileIDs().add("20");
         draftable.getMulliganTileIDs().add("21");
         draftable.getDiscardedTileIDs().add("22");
+        return draftable;
+    }
+
+    public MahactKingDraftable createMahactKingDraftable() {
+        MahactKingDraftable draftable = new MahactKingDraftable();
+        draftable.initialize(6, List.of(ComponentSource.twilights_fall), List.of(), List.of());
+        return draftable;
+    }
+
+    public AndcatReferenceCardsDraftable createAndcatReferenceCardsDraftable() {
+        AndcatReferenceCardsDraftable draftable = new AndcatReferenceCardsDraftable();
+        draftable.initialize(
+                6,
+                List.of(ComponentSource.base, ComponentSource.pok, ComponentSource.thunders_edge),
+                List.of(),
+                List.of());
         return draftable;
     }
 

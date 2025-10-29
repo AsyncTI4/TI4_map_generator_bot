@@ -717,7 +717,7 @@ class PlayerAreaGenerator {
     }
 
     private int sleeperTokens(Player player, int xDeltaFromRightSide, int yDelta) {
-        if (!player.hasAbility("awaken")) {
+        if (!player.hasAbility("awaken") || player.hasAbility("tf-awaken")) {
             return xDeltaFromRightSide;
         }
         String sleeperFile = ResourceHelper.getInstance().getTokenFile(Constants.TOKEN_SLEEPER_PNG);
