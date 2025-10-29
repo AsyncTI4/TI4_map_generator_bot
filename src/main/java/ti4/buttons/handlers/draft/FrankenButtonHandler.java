@@ -5,11 +5,11 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.buttons.Buttons;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.draft.items.CommoditiesDraftItem;
-import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -209,14 +209,13 @@ class FrankenButtonHandler {
                                     + FrankenDraftBagService.getBagReceipt(player.getCurrentDraftBag()));
                     FrankenDraftBagService.displayPlayerHand(game, player);
                     if (draft.isDraftStageComplete()) {
+                        Button randomizeButton = Buttons.green("startFrankenSliceBuild", "Randomize your slices");
+                        Button mantisButton = Buttons.green("startFrankenMantisBuild", "Mantis build slices");
                         MessageHelper.sendMessageToChannel(
                                 game.getActionsChannel(),
                                 game.getPing()
-                                        + " the draft stage of the FrankenDraft is complete. Please select your abilities from your drafted hands. To do a mantis build, use `/franken build_map` before building your faction.");
+                                        + " the draft stage of the FrankenDraft is complete. Choose how to set up the map. Once the map is finalized, select your abilities from your drafted hands.", List.of(randomizeButton, mantisButton));
                         FrankenDraftBagService.applyDraftBags(event, game);
-                        if (game.isTwilightsFallMode()) {
-                            ButtonHelperTwilightsFall.startSliceBuild(game, event);
-                        }
                         return;
                     }
                     int passCounter = 0;
