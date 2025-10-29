@@ -3,10 +3,15 @@
         "id": "tf1",
         "initiative": 1,
         "name": "Lux",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Gain 3 command tokens",
+            "Spend any amount of influence to gain 1 command token for every 3 influence spent"
+        ],
+        "secondaryTexts": [
+            "Spend any amount of influence to gain 1 command token for every 3 influence spent"
+        ],
         "imageFileName": "tf1",
-        "colourHexCode": "#FFFFFF",
+        "colourHexCode": "#ec1c24",
         "botSCAutomationID": "pok1leadership",
         "source": "twilights_fall"
     },
@@ -17,7 +22,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tf2",
-        "colourHexCode": "#FFFFFF",
+        "colourHexCode": "#f69421",
         "source": "twilights_fall"
     },
     {
@@ -27,7 +32,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tf3",
-        "colourHexCode": "#FFFFFF",
+        "colourHexCode": "#fff200",
         "botSCAutomationID": "pok3politics",
         "source": "twilights_fall"
     },
@@ -35,10 +40,15 @@
         "id": "tf4",
         "initiative": 4,
         "name": "Civitas",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Either place 1 structure on a planet you control, or use the PRODUCTION ability of 1 of your space docks.",
+            "Place 1 structure on a planet you control."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to place 1 structure on a planet you control."
+        ],
         "imageFileName": "tf4",
-        "colourHexCode": "#FFFFFF",
+        "colourHexCode": "#39b54a",
         "botSCAutomationID": "te4construction",
         "source": "twilights_fall"
     },
@@ -46,10 +56,16 @@
         "id": "tf5",
         "initiative": 5,
         "name": "Amicus",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Gain 3 trade goods.",
+            "Replenish commodities.",
+            "Choose any number of other players. Those players use the secondary ability of this strategy card without spending a command token."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to replenish your commodities."
+        ],
         "imageFileName": "tf5",
-        "colourHexCode": "#FFFFFF",
+        "colourHexCode": "#00a99d",
         "botSCAutomationID": "pok5trade",
         "source": "twilights_fall"
     },
@@ -60,7 +76,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tf6",
-        "colourHexCode": "#FFFFFF",
+        "colourHexCode": "#008ed4",
         "source": "twilights_fall"
     },
     {
@@ -70,7 +86,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tf7",
-        "colourHexCode": "#FFFFFF",
+        "colourHexCode": "#15489f",
         "source": "twilights_fall"
     },
     {
@@ -80,7 +96,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tf8",
-        "colourHexCode": "#FFFFFF",
+        "colourHexCode": "#752b90",
         "source": "twilights_fall"
     }
 ]

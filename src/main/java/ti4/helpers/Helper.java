@@ -1407,6 +1407,9 @@ public class Helper {
                             .append(CardEmojis.ActionCard)
                             .append("\n");
                     res += 1;
+                    if (game.isWildWildGalaxyMode()) {
+                        res += 4;
+                    }
                 }
                 if (thing.contains("ghostbt")) {
                     int wormholes =
@@ -1640,6 +1643,16 @@ public class Helper {
 
     public static int getProductionValueOfUnitHolder(Player player, Game game, Tile tile, UnitHolder uH) {
         int productionValueTotal = 0;
+        boolean cosmicSuper = false;
+        if (game.isCosmicPhenomenaeMode()) {
+            for (String pos : FoWHelper.getAdjacentTiles(game, getDamagePath(), player, false, true)) {
+                Tile adjacentTile = game.getTileByPosition(pos);
+                if (adjacentTile != null && adjacentTile.isSupernova()) {
+                    cosmicSuper = true;
+                    break;
+                }
+            }
+        }
         for (UnitKey unit : uH.getUnits().keySet()) {
             if (unit.getColor().equalsIgnoreCase(player.getColor())) {
                 if (unit.getUnitType() == UnitType.TyrantsLament
@@ -1686,6 +1699,9 @@ public class Helper {
                 if (productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValue++;
                 }
+                if (productionValue > 0 && cosmicSuper) {
+                    productionValue++;
+                }
                 if (productionValue > 0 && player.hasAbility("synthesis")) {
                     productionValue++;
                 }
@@ -1723,6 +1739,9 @@ public class Helper {
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValueTotal++;
                 }
+                if (cosmicSuper) {
+                    productionValueTotal++;
+                }
                 if (player.hasAbility("synthesis")) {
                     productionValueTotal++;
                 }
@@ -1739,6 +1758,9 @@ public class Helper {
                 if (player.hasAbility("synthesis")) {
                     productionValueTotal++;
                 }
+                if (cosmicSuper) {
+                    productionValueTotal++;
+                }
             }
             if (token.contains("availyn")) {
                 productionValueTotal += 3;
@@ -1746,6 +1768,9 @@ public class Helper {
                     productionValueTotal++;
                 }
                 if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
+                if (cosmicSuper) {
                     productionValueTotal++;
                 }
             }
@@ -1759,6 +1784,9 @@ public class Helper {
                 if (player.hasAbility("synthesis")) {
                     productionValueTotal++;
                 }
+                if (cosmicSuper) {
+                    productionValueTotal++;
+                }
             }
             if (token.contains("facilitynavalbase")) {
                 planetUnitVal += 3;
@@ -1767,6 +1795,9 @@ public class Helper {
                     productionValueTotal++;
                 }
                 if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
+                if (cosmicSuper) {
                     productionValueTotal++;
                 }
             }
@@ -1779,6 +1810,9 @@ public class Helper {
             productionValueTotal += structures;
             planetUnitVal = structures;
             if (player.hasRelic("boon_of_the_cerulean_god")) {
+                productionValueTotal++;
+            }
+            if (cosmicSuper) {
                 productionValueTotal++;
             }
         }
@@ -1795,6 +1829,9 @@ public class Helper {
             if (player.hasAbility("synthesis")) {
                 productionValueTotal++;
             }
+            if (cosmicSuper) {
+                productionValueTotal++;
+            }
         } else {
             if (player.hasTech("absol_ie")
                     && planetUnitVal < 1
@@ -1802,6 +1839,9 @@ public class Helper {
                 productionValueTotal += 1;
                 planetUnitVal = 1;
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+                if (cosmicSuper) {
                     productionValueTotal++;
                 }
             } else {
@@ -1817,6 +1857,9 @@ public class Helper {
                     if (player.hasRelic("boon_of_the_cerulean_god")) {
                         productionValueTotal++;
                     }
+                    if (cosmicSuper) {
+                        productionValueTotal++;
+                    }
                     planetUnitVal = 1;
                 }
                 if (player.getReadiedPlanets().contains(uH.getName())
@@ -1826,6 +1869,10 @@ public class Helper {
                     if (player.hasRelic("boon_of_the_cerulean_god")) {
                         productionValueTotal++;
                     }
+                    if (cosmicSuper) {
+                        productionValueTotal++;
+                    }
+
                     planetUnitVal = 1;
                 }
             }
@@ -1837,12 +1884,25 @@ public class Helper {
             if (player.hasRelic("boon_of_the_cerulean_god")) {
                 productionValueTotal++;
             }
+            if (cosmicSuper) {
+                productionValueTotal++;
+            }
         }
 
         return productionValueTotal;
     }
 
     public static int getProductionValue(Player player, Game game, Tile tile, boolean singleDock) {
+        boolean cosmicSuper = false;
+        if (game.isCosmicPhenomenaeMode()) {
+            for (String pos : FoWHelper.getAdjacentTiles(game, getDamagePath(), player, false, true)) {
+                Tile adjacentTile = game.getTileByPosition(pos);
+                if (adjacentTile != null && adjacentTile.isSupernova()) {
+                    cosmicSuper = true;
+                    break;
+                }
+            }
+        }
         int productionValueTotal = 0;
         if (!singleDock) {
             for (UnitHolder uH : tile.getUnitHolders().values()) {
@@ -1853,6 +1913,9 @@ public class Helper {
                     && FoWHelper.playerHasShipsInSystem(player, tile)) {
                 productionValueTotal += 2;
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+                if (cosmicSuper) {
                     productionValueTotal++;
                 }
             }
@@ -1891,6 +1954,9 @@ public class Helper {
                             }
                         }
                         if (productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")) {
+                            productionValue++;
+                        }
+                        if (cosmicSuper) {
                             productionValue++;
                         }
                         if (productionValue > highestProd) {

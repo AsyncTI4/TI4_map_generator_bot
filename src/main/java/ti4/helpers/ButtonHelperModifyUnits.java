@@ -1512,8 +1512,15 @@ public class ButtonHelperModifyUnits {
                             player.getFactionEmoji()
                                     + " did not place a command token in system they retreated to due to Feint ability.");
                 } else {
-                    CommandCounterHelper.addCC(event, player, tile2, true);
-                    Helper.isCCCountCorrect(player);
+                    if (game.isWildWildGalaxyMode() && buttonID.contains("skilled")) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getMessageChannel(),
+                                player.getFactionEmoji()
+                                        + " did not place a command token in system they retreated to due to the Wild Wild Galacy Event.");
+                    } else {
+                        CommandCounterHelper.addCC(event, player, tile2, true);
+                        Helper.isCCCountCorrect(player);
+                    }
                 }
             }
         }
@@ -1793,7 +1800,7 @@ public class ButtonHelperModifyUnits {
                     break;
                 }
             }
-            if (game.getStrategyCardSet().getAlias().equalsIgnoreCase("te")) {
+            if (game.getStrategyCardSet().getAlias().equalsIgnoreCase("te") || game.isTwilightsFallMode()) {
                 hasConstruction = true;
             }
 

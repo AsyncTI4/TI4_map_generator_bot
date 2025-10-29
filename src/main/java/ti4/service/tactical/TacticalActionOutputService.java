@@ -271,7 +271,7 @@ public class TacticalActionOutputService {
 
         boolean movingFromHome = tile == player.getHomeSystemTile();
         boolean tileHasWormhole = FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition());
-
+        Tile activeSystem = getActiveSystem(game);
         // Calculate base move value (pretty easy)
         int baseMoveValue = model.getMoveValue();
         if (baseMoveValue == 0) return 0;
@@ -302,6 +302,13 @@ public class TacticalActionOutputService {
         if (player.hasAbility("slipstream") && (tileHasWormhole || (movingFromHome && !game.isTwilightsFallMode()))) {
             bonusMoveValue++;
         }
+        if (game.isCallOfTheVoidMode() && activeSystem.getPosition().contains("frac")) {
+            bonusMoveValue++;
+        }
+
+        if (player.hasUnlockedBreakthrough("cabalbt") && tile.getPosition().contains("frac")) {
+            bonusMoveValue++;
+        }
 
         if (player.hasUnlockedBreakthrough("crimsonbt") && (tileHasBreach || movingFromHome)) {
             bonusMoveValue++;
@@ -315,12 +322,14 @@ public class TacticalActionOutputService {
         }
         if (!game.getStoredValue("flankspeedBoost").isEmpty()) {
             bonusMoveValue += 1;
+            if (game.isWildWildGalaxyMode()) {
+                bonusMoveValue += 1;
+            }
         }
         if (!game.getStoredValue("baldrickGDboost").isEmpty()) {
             bonusMoveValue += 1;
         }
 
-        Tile activeSystem = getActiveSystem(game);
         for (UnitHolder uhPlanet : activeSystem.getPlanetUnitHolders()) {
             if (player.getPlanets().contains(uhPlanet.getName())) {
                 continue;

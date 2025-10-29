@@ -269,7 +269,7 @@ public class PlayStrategyCardService {
                     player.getCorrectChannel(), assignSpeakerMessage2, forceRefresh);
 
             for (Player p2 : playersToFollow) {
-                if (!p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
+                if (!game.isTwilightsFallMode() && !p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
                     String message2 = "Heads up, " + p2.getRepresentationUnfogged()
                             + ", **Trade** has just been played and this is a reminder that you do not hold your _Trade Agreement_.";
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message2);
@@ -683,7 +683,7 @@ public class PlayStrategyCardService {
             case "luminous9" -> getLuminous9Buttons(sc, player);
             case "luminous2" -> getLuminous2Buttons(sc, player);
             case "luminous7" -> getLuminous7Buttons(sc);
-            case "te4construction" -> getThundersEdgeConstructionButtons(sc);
+            case "te4construction" -> getThundersEdgeConstructionButtons(sc, game);
             case "te6warfare" -> getThundersEdgeWarfareButtons(sc);
             case "anarchy3" -> getAnarchy3Buttons(sc, player);
             case "anarchy7" -> getAnarchy7Buttons(sc);
@@ -712,12 +712,16 @@ public class PlayStrategyCardService {
         };
     }
 
-    private static List<Button> getThundersEdgeConstructionButtons(int sc) {
+    private static List<Button> getThundersEdgeConstructionButtons(int sc, Game game) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
         Button buildButton = Buttons.green("constructionPrimary_produce", "[Primary] Use Production");
         Button sdButton = Buttons.green("construction_spacedock", "Place A SD", UnitEmojis.spacedock);
         Button pdsButton = Buttons.green("construction_pds", "Place a PDS", UnitEmojis.pds);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        if (game.isMonumentToTheAgesMode()) {
+            Button facilityButton = Buttons.green("construction_agesmonument", "Place A Monument (Cost 5r)");
+            return List.of(followButton, buildButton, sdButton, pdsButton, facilityButton, noFollowButton);
+        }
         return List.of(followButton, buildButton, sdButton, pdsButton, noFollowButton);
     }
 
@@ -933,6 +937,10 @@ public class PlayStrategyCardService {
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         if (game.isFacilitiesMode()) {
             Button facilityButton = Buttons.green("construction_facility", "Place A Facility");
+            return List.of(followButton, sdButton, pdsButton, facilityButton, noFollowButton);
+        }
+        if (game.isMonumentToTheAgesMode()) {
+            Button facilityButton = Buttons.green("construction_agesmonument", "Place A Monument (Cost 5r)");
             return List.of(followButton, sdButton, pdsButton, facilityButton, noFollowButton);
         }
         return List.of(followButton, sdButton, pdsButton, noFollowButton);

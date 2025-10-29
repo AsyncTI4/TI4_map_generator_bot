@@ -405,6 +405,15 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "nebula_cosmic_defender" -> {
+                if (game.isCosmicPhenomenaeMode()
+                        && (onTile.isNebula() || tile.isNebula())
+                        && !game.getActivePlayerID().equals(player.getUserID())
+                        && !game.getActivePlayer().getAllianceMembers().contains(player.getFaction())
+                        && !game.getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
+                    meetsCondition = true;
+                }
+            }
             case "arcane_defender" -> {
                 if (tile != null) {
                     for (UnitHolder uH : tile.getPlanetUnitHolders()) {
@@ -511,6 +520,13 @@ public class CombatModHelper {
                                 "naaz_flagship", player, game.getTileByPosition(game.getActiveSystem()))
                         || ButtonHelper.doesPlayerHaveFSHere(
                                 "sigma_naazrokha_flagship_2", player, game.getTileByPosition(game.getActiveSystem()))) {
+                    meetsCondition = true;
+                }
+            }
+            case "wildMB" -> {
+                if (game.isWildWildGalaxyMode()
+                        && !game.getStoredValue("wildMB" + player.getFaction()).isEmpty()) {
+                    game.removeStoredValue("wildMB" + player.getFaction());
                     meetsCondition = true;
                 }
             }
