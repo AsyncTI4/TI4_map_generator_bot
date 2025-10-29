@@ -1,13 +1,15 @@
 package ti4.image;
 
 import java.util.HashSet;
+import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Constants;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.helpers.ImageTestHelper.TestMode;
 import ti4.image.helpers.TileImageTestHelper;
@@ -25,15 +27,15 @@ import ti4.testUtils.BaseTi4Test;
  * <p> 3. Change TestMode back to "Compare"
  * <p><p> For advanced tips & complaints, ping Jazzxhands in discord
  */
-
-// @org.junit.jupiter.api.Disabled
+@org.junit.jupiter.api.Disabled
 public class TileImageTest extends BaseTi4Test {
 
     public static Game testGame;
     private static Player testPlayer1;
     private static Player testPlayer2;
+    private static Player testPlayer3;
 
-    public static final TestMode testMode = TestMode.Compare;
+    public static final TestMode testMode = TestMode.SaveTemp;
 
     @AfterAll
     static void readyForProduction() {
@@ -59,9 +61,14 @@ public class TileImageTest extends BaseTi4Test {
         testPlayer2.setColor("black");
         testPlayer2.setUnitsOwned(new HashSet<>(cabal.getUnits()));
         testPlayer2.setDecalSet("cb_96");
+
+        testPlayer3 = testGame.addPlayer(Constants.chassitId, "Chassit");
+        FactionModel bastion = Mapper.getFaction("bastion");
+        testPlayer3.setFaction(testGame, "bastion");
+        testPlayer3.setColor("copper");
+        testPlayer3.setUnitsOwned(new HashSet<>(bastion.getUnits()));
     }
 
-    @Disabled
     @Test
     @Order(1)
     void generateDevilsTestImage() {
@@ -107,7 +114,6 @@ public class TileImageTest extends BaseTi4Test {
         TileImageTestHelper.runTest(devils, "Devils.png");
     }
 
-    @Disabled
     @Test
     @Order(2)
     void generateMirageTestImage() {
@@ -122,7 +128,6 @@ public class TileImageTest extends BaseTi4Test {
         TileImageTestHelper.runTest(emptyAlpha, "Mirage.png");
     }
 
-    @Disabled
     @Test
     @Order(3)
     void generateTripleMirageTestImage() {
@@ -138,7 +143,6 @@ public class TileImageTest extends BaseTi4Test {
         TileImageTestHelper.runTest(rigels, "TripleMirage.png");
     }
 
-    @Disabled
     @Test
     @Order(4)
     void generateCabalDockTestImage() {
@@ -150,5 +154,25 @@ public class TileImageTest extends BaseTi4Test {
                 testPlayer2, acheron, "acheron", UnitType.Mech, UnitType.Infantry, UnitType.Spacedock);
 
         TileImageTestHelper.runTest(acheron, "Acheron.png");
+    }
+
+    @Test
+    @Order(5)
+    void generateGalvanizeTestImage() {
+        Tile thibah = new Tile("21", "207");
+        testGame.setTile(thibah);
+
+        UnitKey dn = Units.getUnitKey(UnitType.Dreadnought, testPlayer3.getColor());
+        UnitKey inf = Units.getUnitKey(UnitType.Infantry, testPlayer3.getColor());
+        UnitKey mf = Units.getUnitKey(UnitType.Mech, testPlayer3.getColor());
+        UnitKey ff = Units.getUnitKey(UnitType.Fighter, testPlayer3.getColor());
+        // none, dmg, galv, both
+        thibah.getSpaceUnitHolder().addUnitsWithStates(dn, List.of(1, 1, 1, 1));
+        thibah.getSpaceUnitHolder().addUnitsWithStates(ff, List.of(5, 0, 1, 0));
+        TileImageTestHelper.addUnitsAndControlToPlanet(testPlayer3, thibah, "thibah", UnitType.Spacedock);
+        thibah.getUnitHolderFromPlanet("thibah").addUnitsWithStates(inf, List.of(1, 0, 3, 0));
+        thibah.getUnitHolderFromPlanet("thibah").addUnitsWithStates(mf, List.of(1, 0, 1, 1));
+
+        TileImageTestHelper.runTest(thibah, "Thibah.png");
     }
 }

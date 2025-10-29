@@ -583,6 +583,26 @@ public class Helper {
     }
 
     @Nullable
+    public static String getGalvanizeTokenPath() {
+        String tokenPath = ResourceHelper.getResourceFromFolder("extra/", "marker_galvanize.png");
+        if (tokenPath == null) {
+            BotLogger.warning("Could not find token: marker_galvanize");
+            return null;
+        }
+        return tokenPath;
+    }
+
+    @Nullable
+    public static String getGalvanizeTagPath() {
+        String tokenPath = ResourceHelper.getResourceFromFolder("extra/", "marker_galvanized.png");
+        if (tokenPath == null) {
+            BotLogger.warning("Could not find token: marker_galvanized");
+            return null;
+        }
+        return tokenPath;
+    }
+
+    @Nullable
     public static String getDamagePath() {
         String tokenPath = ResourceHelper.getResourceFromFolder("extra/", "marker_damage.png");
         if (tokenPath == null) {
@@ -1301,6 +1321,7 @@ public class Helper {
                     && !thing.contains("boon")
                     && !thing.contains("warmachine")
                     && !thing.contains("ghostbt")
+                    && !thing.contains("dwsDiscount")
                     && !thing.contains("aida")
                     && !thing.contains("commander")
                     && !thing.contains("agent")
