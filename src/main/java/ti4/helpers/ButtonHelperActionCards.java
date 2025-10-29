@@ -1403,10 +1403,15 @@ public class ButtonHelperActionCards {
                     + ", you are being forced to give a promissory note to somebody. Please choose which promissory note you wish to send.";
         }
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
+        if (game.isWildWildGalaxyMode()) {
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
+        }
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", buttons to send a promissory note have been given to "
                         + p2.getFactionEmojiOrColor() + ".");
+
         ButtonHelper.deleteMessage(event);
     }
 

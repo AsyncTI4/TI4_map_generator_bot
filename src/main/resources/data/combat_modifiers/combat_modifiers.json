@@ -94,6 +94,37 @@
         ]
     },
     {
+        "alias": "plus1_1round_wild",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "scope": "",
+        "forCombatAbility": "combatround",
+        "persistenceType": "CONDITIONAL",
+        "condition": "wildMB",
+        "related": [
+            {
+                "type": "action_cards",
+                "alias": "morale_boost_ds"
+            },
+            {
+                "type": "action_cards",
+                "alias": "mb1"
+            },
+            {
+                "type": "action_cards",
+                "alias": "mb2"
+            },
+            {
+                "type": "action_cards",
+                "alias": "mb3"
+            },
+            {
+                "type": "action_cards",
+                "alias": "mb4"
+            }
+        ]
+    },
+    {
         "alias": "plus1_1round_fighter",
         "type": "DIE_MOD",
         "value": "+2",
@@ -291,6 +322,22 @@
                 "type": "custom",
                 "alias": "custom",
                 "message": ":shield: Defenders get +1 to ship rolls in a nebula."
+            }
+        ]
+    },
+    {
+        "alias": "plus2_roll_in_nebula_cosmic",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "CONDITIONAL",
+        "condition": "nebula_cosmic_defender",
+        "scope": "_ship_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": ":shield: Defenders get +2 to ship rolls in a nebula during Cosmic Phenomenae."
             }
         ]
     },

@@ -170,7 +170,8 @@ public class PlayerStatsService {
                 game.getStrategyCardModelByInitiative(scNumber).orElse(null);
 
         // WARNING IF PICKING TRADE WHEN PLAYER DOES NOT HAVE THEIR TRADE AGREEMENT
-        if (scModel.usesAutomationForSCID("pok5trade")
+        if (!game.isTwilightsFallMode()
+                && scModel.usesAutomationForSCID("pok5trade")
                 && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
             String message = player.getRepresentationUnfogged()
                     + " heads up, you just picked **Trade** but don't currently hold your _Trade Agreement_.";

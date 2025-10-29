@@ -41,6 +41,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.unit.AddUnitService;
 
 public class ButtonHelperSCs {
 
@@ -163,7 +164,10 @@ public class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("pok2diplomacy").orElse(null);
+            scModel = game.getStrategyCardModelByName("diplomacy").orElse(null);
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("noctis").orElse(null);
         }
         if (!used
                 && scModel != null
@@ -327,6 +331,9 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("trade").orElse(null);
         }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("amicus").orElse(null);
+        }
         int scNum = scModel.getInitiative();
 
         if (player.getStrategicCC() > 0) {
@@ -356,6 +363,9 @@ public class ButtonHelperSCs {
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("imperial").orElse(null);
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("aeterna").orElse(null);
         }
         if (!player.getFollowedSCs().contains(scModel.getInitiative())) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
@@ -464,7 +474,7 @@ public class ButtonHelperSCs {
             return;
         }
 
-        if (!player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
+        if (!game.isTwilightsFallMode() && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
@@ -502,7 +512,7 @@ public class ButtonHelperSCs {
         player.addFollowedSC(tradeInitiative, event);
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(tradeInitiative) && p2.getCommodities() > 0) {
-                if (!p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
+                if (!game.isTwilightsFallMode() && !p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
                     continue;
                 }
                 int ogComms = p2.getCommodities();
@@ -838,6 +848,9 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("warfare").orElse(null);
         }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("calamitas").orElse(null);
+        }
         if (!used
                 && scModel != null
                 && scModel.usesAutomationForSCID("pok6warfare")
@@ -890,6 +903,9 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("construction").orElse(null);
         }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("civitas").orElse(null);
+        }
         int scNum = scModel.getInitiative();
         boolean automationExists = scModel != null
                 && (scModel.usesAutomationForSCID("pok4construction")
@@ -917,19 +933,61 @@ public class ButtonHelperSCs {
             List<Button> buttons = getPossibleFacilities(game, player);
             MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
         } else {
-            UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
-            String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your "
-                    + unitKey.unitName() + " on for **Construction**.";
-            if (!player.getSCs().contains(4) && !scModel.getBotSCAutomationID().equals("te4construction")) {
-                message += "\n-# It will place a command token in the system as well.";
+            if ("agesmonument".equalsIgnoreCase(unit)) {
+                String message = player.getRepresentationUnfogged()
+                        + ", please choose the planet you wish to put your monument on for **Construction**.";
+                if (!player.getSCs().contains(4)
+                        && !scModel.getBotSCAutomationID().equals("te4construction")) {
+                    message += "\n-# It will place a command token in the system as well.";
+                }
+                List<Button> buttons = new ArrayList<>();
+                for (String planet : player.getPlanetsAllianceMode()) {
+                    if (game.getUnitHolderFromPlanet(planet) != null
+                            && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)
+                            && !game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
+                        buttons.add(Buttons.green(
+                                "placeAgesMonument_" + planet, Helper.getPlanetRepresentation(planet, game)));
+                    }
+                }
+                MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
+            } else {
+
+                UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
+                String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your "
+                        + unitKey.unitName() + " on for **Construction**.";
+                if (!player.getSCs().contains(4)
+                        && !scModel.getBotSCAutomationID().equals("te4construction")) {
+                    message += "\n-# It will place a command token in the system as well.";
+                }
+                List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");
+                MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
             }
-            List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");
-            MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
         }
         // List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(message, buttons);
         // for (MessageCreateData messageD : messageList) {
         //     event.getHook().setEphemeral(true).sendMessage(messageD).queue();
         // }
+    }
+
+    @ButtonHandler("placeAgesMonument_")
+    public static void placeAgesMonument(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String planet = buttonID.split("_")[1];
+        AddUnitService.addUnits(
+                event,
+                game.getTileFromPlanet(planet),
+                game,
+                game.getPlayerFromColorOrFaction("neutral").getColor(),
+                "1 sd " + planet);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation(true, false) + " dropped a monument on "
+                        + Helper.getPlanetRepresentation(planet, game) + " for the cost of 5 resources.");
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
+        Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
+        buttons.add(DoneExhausting);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(), "Use Buttons to Pay For The Monument", buttons);
+        event.getMessage().delete().queue();
     }
 
     public static List<String> findUsedFacilities(Game game, Player player) {
@@ -1449,6 +1507,9 @@ public class ButtonHelperSCs {
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("politics").orElse(null);
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("Tyrannus").orElse(null);
         }
         if (!used
                 && scModel != null

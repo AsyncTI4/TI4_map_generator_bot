@@ -565,6 +565,24 @@ public class StatusHelper {
                 arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(game, arborec));
     }
 
+    private static void handleMonumentToTheAges(Game game) {
+        if (!game.isMonumentToTheAgesMode()) {
+            return;
+        }
+        Player neutral = game.getPlayerFromColorOrFaction("neutral");
+        for (Tile tile : game.getTileMap().values()) {
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                if (planet.getUnitCount(UnitType.Spacedock, neutral) > 0) {
+
+                    int remaining = game.changeCommsOnPlanet(1, planet.getName());
+
+                    String msg = "A commodity was placed on the Monument to the Ages at " + planet.getName() + ".";
+                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+                }
+            }
+        }
+    }
+
     public static void sendEntropicScarButtons(Game game) {
         Map<Player, Integer> scars = new HashMap<>();
         for (Tile t : game.getTileMap().values()) {

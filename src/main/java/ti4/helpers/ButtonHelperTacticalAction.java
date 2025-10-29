@@ -93,6 +93,16 @@ public class ButtonHelperTacticalAction {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                 }
             }
+
+            if (player.hasUnlockedBreakthrough("argentbt")) {
+                String msg = player.getRepresentation()
+                        + " You can use your breakthrough to move ships (and things they transport) between the active system and any adjacent system with only your units and your CC";
+                List<Button> buttons = ButtonHelperHeroes.argentBreakthroughStep1(
+                        game, player, game.getTileByPosition(game.getActiveSystem()));
+                if (buttons.size() > 2) {
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                }
+            }
         }
 
         if (!game.isAbsolMode()
@@ -181,13 +191,25 @@ public class ButtonHelperTacticalAction {
                     empyButtons);
         }
         if (unitsWereMoved
-                && (tile.getUnitHolders().size() == 1)
+                && (tile.getPlanetUnitHolders().isEmpty())
                 && player.getPlanets().contains("ghoti")) {
             player.setCommodities(player.getCommodities() + 1);
             String msg = player.getRepresentation()
                     + " gained 1 commodity due to the legendary ability of Ghoti. Your commodities are now "
                     + player.getCommodities() + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        }
+
+        if (unitsWereMoved && game.isCallOfTheVoidMode() && tile.getPosition().contains("frac")) {
+            String msg = player.getRepresentation()
+                    + " you should gain 1 command token due to moving in the fracture while the Call of the Void Galactic Event is in play.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+            String trueIdentity = player.getRepresentationUnfogged();
+            String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()
+                    + ". Use buttons to gain 1 command tokens.";
+            MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
+            game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         }
         boolean flagshipMoved = game.getTacticalActionDisplacement().values().stream()
                 .anyMatch(m -> m.containsKey(Units.getUnitKey(UnitType.Flagship, player.getColor())));
@@ -507,6 +529,16 @@ public class ButtonHelperTacticalAction {
                     player.getCardsInfoThread(),
                     player.getRepresentation()
                             + ", you activated another players ships, and so could now play _Rally_.");
+        }
+
+        if (player.hasUnlockedBreakthrough("argentbt")
+                && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
+            List<Button> button2 = ButtonHelper.argentBreakthroughResolution(player, tile, game);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", you can use this button to place command tokens down via Argent breakthrough ability.",
+                    button2);
         }
 
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, tile, game);
