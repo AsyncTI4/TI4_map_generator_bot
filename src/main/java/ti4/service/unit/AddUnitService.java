@@ -99,8 +99,9 @@ public class AddUnitService {
         for (Entry<UnitType, Integer> entry : unitCounts.entrySet()) {
             UnitType unitType = entry.getKey();
             Integer totalAmt = entry.getValue();
+            String asyncId = unitType.getValue().toLowerCase();
             UnitModel mod =
-                    player.getUnitsByAsyncID(unitType.getValue().toLowerCase()).getFirst();
+                    player.getUnitsByAsyncID(asyncId).getFirst();
             // Ships go to space
             if (mod.getIsShip()
                     || (UnitType.Spacedock == unitType

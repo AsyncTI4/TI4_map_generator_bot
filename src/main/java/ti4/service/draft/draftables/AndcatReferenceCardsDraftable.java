@@ -462,12 +462,14 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             player.refreshPlanet(planetResolved);
         }
 
-        // Clear existing units at the home system
+        // Get the HS tile
         List<String> speakerOrder = getSpeakerOrder(draftManager);
         int speakerPosition = speakerOrder.indexOf(player.getUserID()) + 1;
         String homeTilePosition =
                 MapTemplateHelper.getPlayerHomeSystemLocation(speakerPosition, game.getMapTemplateID());
         Tile hsTile = game.getTileByPosition(homeTilePosition);
+        
+        // Clear existing units at the home system
         hsTile.removeAllUnits(player.getColor());
 
         // Parse and add units
