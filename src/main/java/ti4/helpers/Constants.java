@@ -1219,6 +1219,7 @@ public class Constants {
     public static final String MONUMENTS_TO_THE_AGES_MODE = "monuments_to_the_ages_mode";
     public static final String COSMIC_PHENOMENAE_MODE = "cosmic_phenomenae_mode";
     public static final String WEIRD_WORMHOLES_MODE = "weird_wormholes_mode";
+    public static final String CALL_OF_THE_VOID_MODE = "call_of_the_void_mode";
     public static final String WILD_WILD_GALAXY_MODE = "wild_wild_galaxy_mode";
     public static final String STELLAR_ATOMICS_MODE = "stellar_atomics_mode";
     public static final String NO_SWAP_MODE = "no_swap_mode";

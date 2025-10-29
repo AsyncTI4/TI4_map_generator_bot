@@ -112,26 +112,33 @@ public class TEOptionService {
             galacticEventButtons.add(
                     Buttons.green("enableDaneMode_RapidMobilization_enable", "Enable Rapid Mobilization"));
         }
-        // if (game.isCosmicPhenomenaeMode()) {
-        //     daneLinkButtons.add(Buttons.red("enableDaneMode_Cosmic_disable", "Disable Cosmic Phenomenae"));
-        // } else {
-        //     daneLinkButtons.add(Buttons.green("enableDaneMode_Cosmic_enable", "Enable Cosmic Phenomenae"));
-        // }
+        if (game.isCosmicPhenomenaeMode()) {
+            galacticEventButtons.add(Buttons.red("enableDaneMode_Cosmic_disable", "Disable Cosmic Phenomenae"));
+        } else {
+            galacticEventButtons.add(Buttons.green("enableDaneMode_Cosmic_enable", "Enable Cosmic Phenomenae"));
+        }
         // if (game.isMonumentToTheAgesMode()) {
-        //     daneLinkButtons.add(Buttons.red("enableDaneMode_Monument_disable", "Disable Monuments to the Ages"));
+        //     galacticEventButtons.add(Buttons.red("enableDaneMode_Monument_disable", "Disable Monuments to the
+        // Ages"));
         // } else {
-        //     daneLinkButtons.add(Buttons.green("enableDaneMode_Monument_enable", "Enable Monuments to the Ages"));
+        //     galacticEventButtons.add(Buttons.green("enableDaneMode_Monument_enable", "Enable Monuments to the
+        // Ages"));
         // }
         if (game.isWeirdWormholesMode()) {
             galacticEventButtons.add(Buttons.red("enableDaneMode_WeirdWormholes_disable", "Disable Weird Wormholes"));
         } else {
             galacticEventButtons.add(Buttons.green("enableDaneMode_WeirdWormholes_enable", "Enable Weird Wormholes"));
         }
-        // if (game.isWildWildGalaxyMode()) {
-        //     daneLinkButtons.add(Buttons.red("enableDaneMode_WildGalaxy_disable", "Disable Wild Wild Galaxy"));
-        // } else {
-        //     daneLinkButtons.add(Buttons.green("enableDaneMode_WildGalaxy_enable", "Enable Wild Wild Galaxy"));
-        // }
+        if (game.isWildWildGalaxyMode()) {
+            galacticEventButtons.add(Buttons.red("enableDaneMode_WildGalaxy_disable", "Disable Wild Wild Galaxy"));
+        } else {
+            galacticEventButtons.add(Buttons.green("enableDaneMode_WildGalaxy_enable", "Enable Wild Wild Galaxy"));
+        }
+        if (game.isCallOfTheVoidMode()) {
+            galacticEventButtons.add(Buttons.red("enableDaneMode_CallOfTheVoid_disable", "Disable Call of the Void"));
+        } else {
+            galacticEventButtons.add(Buttons.green("enableDaneMode_CallOfTheVoid_enable", "Enable Call of the Void"));
+        }
         if (game.isConventionsOfWarAbandonedMode()) {
             galacticEventButtons.add(
                     Buttons.red("enableDaneMode_Conventions_disable", "Disable Conventions of War Abandoned"));

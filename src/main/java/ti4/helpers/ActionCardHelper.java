@@ -64,6 +64,12 @@ public class ActionCardHelper {
                     getPlayActionCardButtons(game, player));
         }
 
+        if (game.isWildWildGalaxyMode()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    "This is a reminder that in Wild Wild Galaxy mode, each of the 4 of a type Action Cards are modified in some way. The text you see may not be entirely accurate as a result.");
+        }
+
         sendTrapCardInfo(player);
         sendPlotCardInfo(game, player);
         sendGarboziaInfo(game, player);
@@ -691,6 +697,9 @@ public class ActionCardHelper {
         }
 
         CryypterHelper.checkForAssigningYssarilEnvoy(event, game, player, acID);
+        if (game.isWildWildGalaxyMode() && actionCard.getName().toLowerCase().contains("morale boost")) {
+            game.setStoredValue("wildMB" + player.getFaction(), "yes");
+        }
 
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
@@ -781,6 +790,14 @@ public class ActionCardHelper {
         }
         if (acID.contains("sabo") || acID.contains("shatter")) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
+            if (game.isWildWildGalaxyMode()) {
+                Button codex1 = Buttons.green("codexCardPick_1", "Card #1");
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + " You can use this button to pick up the sabod card from the discard, per Wild Wild Galaxy",
+                        List.of(codex1));
+            }
         } else {
             String buttonLabel = "Resolve " + actionCardTitle;
             String automationID = actionCard.getAutomationID();

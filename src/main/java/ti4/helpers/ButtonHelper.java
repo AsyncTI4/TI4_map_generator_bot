@@ -2252,7 +2252,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not minor factions mode");
             return;
         }
-        if (game.getRealPlayers().size() < 3) {
+        if (game.getRealPlayers().size() < 3 && game.getPlayers().size() > 3) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(), "Set up all real players before pressing this button");
             return;
@@ -5195,6 +5195,21 @@ public class ButtonHelper {
         return buttons;
     }
 
+    public static List<Button> argentBreakthroughResolution(Player player, Tile tile, Game game) {
+        List<Button> buttons = new ArrayList<>();
+        if (tile == null) return buttons;
+
+        for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+            Tile tile2 = game.getTileByPosition(pos);
+            if (!FoWHelper.otherPlayersHaveUnitsInSystem(player, tile2, game)
+                    && !CommandCounterHelper.hasCC(player, tile2)) {
+                buttons.add(Buttons.green("placeCC_" + pos, tile2.getRepresentationForButtons(), FactionEmojis.Argent));
+            }
+            buttons.add(Buttons.red("deleteButtons", "Done"));
+        }
+        return buttons;
+    }
+
     public static List<Button> lanefirFSResolution(Player player, Game game) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         List<Button> buttons = new ArrayList<>();
@@ -6789,9 +6804,10 @@ public class ButtonHelper {
             Tile tile = game.getTileByPosition(pos);
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder instanceof Planet planet) {
-                    if (!player.getPlanetsAllianceMode().contains(planet.getName())
-                            && !isPlanetLegendaryOrHome(unitHolder.getName(), game, false, player)
-                            && !Constants.MECATOLS.contains(planet.getName())) {
+                    if ((!player.getPlanetsAllianceMode().contains(planet.getName())
+                                    && !isPlanetLegendaryOrHome(unitHolder.getName(), game, false, player)
+                                    && !Constants.MECATOLS.contains(planet.getName()))
+                            || game.isWildWildGalaxyMode()) {
                         buttons.add(Buttons.green(
                                 finChecker + "stellarConvert_" + planet.getName(),
                                 "Stellar Convert " + Helper.getPlanetRepresentation(planet.getName(), game)));

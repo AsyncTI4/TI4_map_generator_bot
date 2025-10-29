@@ -1122,6 +1122,13 @@ public class CombatRollService {
                                 entry.getKey() != null && entry.getKey().getIsShip())
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             }
+            if (player.getGame().isCosmicPhenomenaeMode() && tile.isAsteroidField() && !player.hasFF2Tech()) {
+                output = new HashMap<>(unitsInCombat.entrySet().stream()
+                        .filter(entry -> entry.getKey() != null
+                                && entry.getKey().getIsShip()
+                                && entry.getKey().getUnitType() != UnitType.Fighter)
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+            }
         } else {
             output = new HashMap<>(unitsInCombat.entrySet().stream()
                     .filter(entry -> entry.getKey() != null

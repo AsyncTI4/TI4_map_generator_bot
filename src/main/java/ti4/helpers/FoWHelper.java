@@ -308,7 +308,8 @@ public class FoWHelper {
         enum Feature {
             ingress,
             egress,
-            breach;
+            breach,
+            scar;
         }
 
         Set<String> adjacentPositions = new HashSet<>();
@@ -318,6 +319,12 @@ public class FoWHelper {
         Set<Feature> adjToFeatures = new HashSet<>();
         for (String alias : tile.getTileModel().getAliases()) {
             if (alias.startsWith("egress")) adjToFeatures.add(Feature.ingress);
+        }
+
+        if (game.isCosmicPhenomenaeMode()) {
+            if (tile.isScar()) {
+                adjToFeatures.add(Feature.scar);
+            }
         }
 
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
@@ -334,6 +341,12 @@ public class FoWHelper {
                     && t.getTileModel().getAliases().stream().anyMatch(x -> x.startsWith("egress"))) {
                 adjacentPositions.add(t.getPosition());
                 continue;
+            }
+            if (game.isCosmicPhenomenaeMode()) {
+                if (adjToFeatures.contains(Feature.scar) && t.isScar()) {
+                    adjacentPositions.add(t.getPosition());
+                    continue;
+                }
             }
             for (UnitHolder unitHolder : t.getUnitHolders().values()) {
                 for (String token : unitHolder.getTokenList()) {
