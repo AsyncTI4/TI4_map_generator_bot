@@ -18,16 +18,16 @@ public class TEOptionService {
     public static void chooseExp(Game game, ButtonInteractionEvent event, String buttonID) {
 
         String choice = buttonID.split("_")[1];
-        switch (choice) {
-            case "newPok" -> {
+        switch (choice.toLowerCase()) {
+            case "newpok" -> {
                 game.removeStoredValue("useOldPok");
                 game.setThundersEdge(false);
             }
-            case "oldPok" -> {
+            case "oldpok" -> {
                 game.setStoredValue("useOldPok", "true");
                 game.setThundersEdge(false);
             }
-            case "teAndNewPok" -> {
+            case "te" -> {
                 game.setThundersEdge(true);
                 game.removeStoredValue("useOldPok");
             }
@@ -35,9 +35,9 @@ public class TEOptionService {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 "Set game to use "
-                        + (choice.equals("newPok")
+                        + (choice.equalsIgnoreCase("newPok")
                                 ? "New PoK"
-                                : choice.equals("oldPok") ? "Old PoK" : "Thunder's Edge + New PoK")
+                                : choice.equalsIgnoreCase("oldPok") ? "Old PoK" : "Thunder's Edge + New PoK")
                         + " components.");
     }
 
