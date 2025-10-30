@@ -2,6 +2,7 @@ package ti4.buttons.handlers.leader.hero;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -228,6 +229,22 @@ class OtherHeroButtonHandler {
         String msg = player.getRepresentationNoPing()
                 + ", please choose the unit that recently died, with which you wish to resolve _A" + p
                 + "ollo Protocol_.";
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                msg,
+                ButtonHelperActionCards.getCourageousOptions(player, game, true, "orlando"));
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler("purgeBastionHero_")
+    public static void purgeBastionHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
+        StringBuilder p = new StringBuilder("p");
+        while (RandomHelper.isOneInX(12)) {
+            p.append("p");
+        }
+        purgeHeroPreamble(event, player, game, "bastionhero", "Lyra Keen, the Bastion hero");
+        String msg = player.getRepresentationNoPing()
+                + ", please choose the galvanized unit that recently died, with which you wish to resolve _Intelligence Unshackledl_.";
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 msg,
