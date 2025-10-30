@@ -1600,7 +1600,7 @@ class PlayerAreaGenerator {
                 for (int i = 0; i < numInReinforcements; i++) {
                     Point position = reinforcementsPosition.getPosition(unitID);
                     if (position == null) break;
-                    
+
                     graphics.drawImage(image, x + position.x, y + position.y, null);
                     if (decalImage != null) {
                         graphics.drawImage(decalImage, x + position.x, y + position.y, null);
