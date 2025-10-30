@@ -22,8 +22,11 @@ public class SlashCommandListener extends ListenerAdapter {
 
     private static final long DELAY_THRESHOLD_MILLISECONDS = 1500;
 
-    private static final List<String> SLASHCOMMANDS_WITH_MODALS =
-            Arrays.asList(Constants.ADD_TILE_LIST, Constants.ADD_TILE_LIST_RANDOM, Constants.EDIT_TRACK_RECORD);
+    private static final List<String> SLASHCOMMANDS_WITH_MODALS = Arrays.asList(
+            Constants.ADD_TILE_LIST,
+            Constants.ADD_TILE_LIST_RANDOM,
+            Constants.EDIT_TRACK_RECORD,
+            Constants.IMPORT_MAP_JSON);
 
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
