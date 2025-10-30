@@ -54,9 +54,7 @@ public class DraftSetupService {
             sources.add(ComponentSource.ds);
             sources.add(ComponentSource.uncharted_space);
         }
-        if (game.isTwilightsFallMode()
-                || game.isThundersEdge()
-                || !game.getStoredValue("useEntropicScar").isEmpty()) {
+        if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
             sources.add(ComponentSource.thunders_edge);
         }
         // Setup managers and game state
@@ -172,7 +170,7 @@ public class DraftSetupService {
             tileSources.add(ComponentSource.ds);
             tileSources.add(ComponentSource.uncharted_space);
         }
-        if (game.isThundersEdge() || !game.getStoredValue("useEntropicScar").isEmpty()) {
+        if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
             tileSources.add(ComponentSource.thunders_edge);
         }
         DraftTileManager tileManager = game.getDraftTileManager();
