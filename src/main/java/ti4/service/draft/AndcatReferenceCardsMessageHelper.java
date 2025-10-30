@@ -189,7 +189,7 @@ public class AndcatReferenceCardsMessageHelper {
             }
 
             if (refPackage.choicesFinal() != null && refPackage.choicesFinal()) {
-                messageBuilder.append(playerRepresentation + ": 🔒");
+                messageBuilder.append(playerRepresentation).append(": 🔒");
                 continue;
             }
 
