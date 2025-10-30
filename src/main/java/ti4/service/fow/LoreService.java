@@ -157,8 +157,8 @@ public class LoreService {
                 PlanetModel planet = Mapper.getPlanet(target);
                 if (!game.getPlanets().contains(target)) isValidLore = false;
 
-                buttonLabel = planet.getName();
-                emoji = planet.getEmoji().toString();
+                buttonLabel = planet == null ? target : planet.getName();
+                emoji = planet != null ? planet.getEmoji().toString() : null;
             }
 
             if (isValidLore) {
@@ -309,6 +309,10 @@ public class LoreService {
                 .map(entry -> entry.getKey() + ";" + entry.getValue()[0] + ";" + entry.getValue()[1])
                 .collect(Collectors.joining("|"));
         game.setStoredValue(SYSTEM_LORE_KEY, loreString);
+    }
+
+    public static void clearLore(Game game) {
+        game.removeStoredValue(SYSTEM_LORE_KEY);
     }
 
     private static MessageEmbed buildLoreEmbed(Game game, String target, String[] lore, boolean isSystemLore) {
