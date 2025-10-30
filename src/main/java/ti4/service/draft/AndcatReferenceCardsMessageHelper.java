@@ -24,14 +24,15 @@ import ti4.service.draft.draftables.AndcatReferenceCardsDraftable;
 import ti4.service.draft.draftables.AndcatReferenceCardsDraftable.ReferenceCardPackage;
 
 public class AndcatReferenceCardsMessageHelper {
+    private static final String USER_SUMMARY_PREFIX = "### Selecting which faction for what purpose\n";
+
     private AndcatReferenceCardsDraftable draftable;
 
     public AndcatReferenceCardsMessageHelper(AndcatReferenceCardsDraftable draftable) {
         this.draftable = draftable;
     }
 
-    public static void sendPackageInfos(
-            DraftManager draftManager, String playerUserId, List<ReferenceCardPackage> packages) {
+    public void sendPackageInfos(DraftManager draftManager, String playerUserId, List<ReferenceCardPackage> packages) {
         if (packages == null || packages.isEmpty()) {
             return;
         }
@@ -40,6 +41,7 @@ public class AndcatReferenceCardsMessageHelper {
                 player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " Here's an overview of the packages:");
         sendPackageInfos(player.getCardsInfoThread(), packages);
+        updatePackagePickSummary(draftManager);
     }
 
     public static void sendPackageInfos(MessageChannel channel, List<ReferenceCardPackage> packages) {
@@ -164,8 +166,74 @@ public class AndcatReferenceCardsMessageHelper {
 
         // Send the message
         messageBuilder.send();
+    }
 
-        // TODO: Send a summary message to the main game channel
+    public void updatePackagePickSummary(DraftManager draftManager) {
+        StringBuilder messageBuilder = new StringBuilder();
+        messageBuilder.append(USER_SUMMARY_PREFIX);
+        for (String playerUserId : draftManager.getPlayerUserIds()) {
+            Player player = draftManager.getGame().getPlayer(playerUserId);
+            String playerRepresentation = player.getRepresentation(true, false, true, true);
+            List<DraftChoice> playerPicks = draftManager.getPlayerPicks(playerUserId, this.draftable.getType());
+            messageBuilder.append(System.lineSeparator());
+            if (playerPicks.isEmpty()) {
+                messageBuilder
+                        .append(playerRepresentation)
+                        .append(" has not picked a package of faction reference cards.");
+                continue;
+            }
+
+            ReferenceCardPackage refPackage =
+                    this.draftable.getPackageByChoiceKey(playerPicks.get(0).getChoiceKey());
+            if (refPackage == null) {
+                messageBuilder.append(playerRepresentation).append(" has an invalid package pick.");
+                continue;
+            }
+
+            if (refPackage.choicesFinal() != null && refPackage.choicesFinal()) {
+                messageBuilder.append(playerRepresentation).append(": 🔒");
+                continue;
+            }
+
+            messageBuilder.append(playerRepresentation).append(": ");
+            messageBuilder.append(System.lineSeparator()).append("- Home System: ");
+            if (refPackage.homeSystemFaction() != null) {
+                messageBuilder.append("✅");
+            } else {
+                messageBuilder.append("❌");
+            }
+
+            messageBuilder.append(System.lineSeparator()).append("- Starting Units: ");
+            if (refPackage.startingUnitsFaction() != null) {
+                messageBuilder.append("✅");
+            } else {
+                messageBuilder.append("❌");
+            }
+
+            messageBuilder.append(System.lineSeparator()).append("- Priority Number: ");
+            if (refPackage.speakerOrderFaction() != null) {
+                messageBuilder.append("✅");
+            } else {
+                messageBuilder.append("❌");
+            }
+        }
+
+        draftManager.getGame().getActionsChannel().getHistory().retrievePast(6).queue(history -> {
+            // Try to update existing message if possible
+            for (var message : history) {
+                if (message.getAuthor().isBot() && message.getContentRaw().startsWith(USER_SUMMARY_PREFIX)) {
+                    message.editMessage(messageBuilder.toString()).queue();
+                    return;
+                }
+            }
+
+            // Fall back to sending it again
+            draftManager
+                    .getGame()
+                    .getActionsChannel()
+                    .sendMessage(messageBuilder.toString())
+                    .queue();
+        });
     }
 
     public void updatePackageButtons(
@@ -326,6 +394,7 @@ public class AndcatReferenceCardsMessageHelper {
             // Disable buttons
             Player player = draftManager.getGame().getPlayer(playerUserId);
             updatePackageButtons(event, draftManager, player, refPackage);
+            updatePackagePickSummary(draftManager);
 
             if (this.draftable.whatsStoppingSetup(draftManager) == null) {
                 // TODO: Print speaker order and priority numbers
@@ -440,6 +509,7 @@ public class AndcatReferenceCardsMessageHelper {
         // Update buttons
         Player player = draftManager.getGame().getPlayer(playerUserId);
         updatePackageButtons(event, draftManager, player, refPackage);
+        updatePackagePickSummary(draftManager);
 
         return null;
     }
