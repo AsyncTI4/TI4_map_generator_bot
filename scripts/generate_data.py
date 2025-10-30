@@ -11,6 +11,15 @@ import argparse
 
 # Configuration for different data types
 CONFIGS = {
+    "attachments": {
+        "input_folder": "src/main/resources/data/attachments",
+        "output_file": "attachments.ts",
+        "type_import": "Attachment",
+        "export_name": "attachments",
+        "sort_key": "id",
+        "is_array_data": True,
+        "blacklist": [],
+    },
     "tech": {
         "input_folder": "src/main/resources/data/technologies",
         "output_file": "tech.ts",
@@ -134,6 +143,15 @@ CONFIGS = {
         "type_import": "Exploration",
         "export_name": "explorations",
         "sort_key": "id",
+        "is_array_data": True,
+        "blacklist": [],
+    },
+    "breakthroughs": {
+        "input_folder": "src/main/resources/data/breakthroughs",
+        "output_file": "breakthroughs.ts",
+        "type_import": "Breakthrough",
+        "export_name": "breakthroughs",
+        "sort_key": "alias",
         "is_array_data": True,
         "blacklist": [],
     },
