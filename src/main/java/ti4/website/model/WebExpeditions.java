@@ -1,12 +1,11 @@
 package ti4.website.model;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Data;
 import ti4.map.Expeditions;
 import ti4.map.Game;
 import ti4.map.Player;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Data
 public class WebExpeditions {
