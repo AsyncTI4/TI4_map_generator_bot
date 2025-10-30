@@ -32,13 +32,11 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -1589,8 +1587,8 @@ class PlayerAreaGenerator {
                 // Load voltron data
                 UnitModel model = player == null ? null : player.getUnitFromUnitKey(unitKey);
                 boolean voltron = model == null ? false : model.getAlias().equals("naaz_voltron");
-                BufferedImage voltronDecal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
-
+                BufferedImage voltronDecal =
+                        ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
 
                 int numInReinforcements = unitCap - count;
                 BufferedImage image = ImageHelper.read(getUnitPath(unitKey));
@@ -1858,7 +1856,8 @@ class PlayerAreaGenerator {
                 // Load voltron data
                 UnitModel model = p == null ? null : p.getUnitFromUnitKey(unitKey);
                 boolean voltron = model == null ? false : model.getAlias().equals("naaz_voltron");
-                BufferedImage voltronDecal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
+                BufferedImage voltronDecal =
+                        ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
 
                 BufferedImage spoopy = null;
                 if (unitKey.getUnitType() == UnitType.Warsun) {
@@ -2972,7 +2971,8 @@ class PlayerAreaGenerator {
                 }
                 if (unit.getAlias().equals("naaz_voltron")) {
                     // paint the special voltron decal
-                    BufferedImage voltronDecal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
+                    BufferedImage voltronDecal =
+                            ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
                     graphics.drawImage(voltronDecal, deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, null);
                 }
                 if (unit.getAsyncId().equals("fs")) {
@@ -2980,7 +2980,8 @@ class PlayerAreaGenerator {
                     if (player.hasUnlockedBreakthrough("nekrobt")) {
                         List<String> flagships = new ArrayList<>();
                         flagships.add(unitFaction);
-                        flagships.addAll(Arrays.asList(game.getStoredValue("valefarZ").split("\\|")));
+                        flagships.addAll(
+                                Arrays.asList(game.getStoredValue("valefarZ").split("\\|")));
                         Point offs = new Point(unitFactionOffset.x - 20, unitFactionOffset.y - 20);
                         for (String fsFaction : flagships) {
                             drawFactionIconImage(graphics, fsFaction, deltaX + x + offs.x, y + offs.y, 32, 32);
@@ -2989,7 +2990,8 @@ class PlayerAreaGenerator {
                     } else if (game.getStoredValue("valefarZ").contains(unitFaction)) {
                         String tokenFile = ResourceHelper.getResourceFromFolder("extra/", "marker_valefarZ.png");
                         BufferedImage valefarZ = ImageHelper.read(tokenFile);
-                        graphics.drawImage(valefarZ, deltaX + x + unitFactionOffset.x - 10, y + unitFactionOffset.y + 10, null);
+                        graphics.drawImage(
+                                valefarZ, deltaX + x + unitFactionOffset.x - 10, y + unitFactionOffset.y + 10, null);
                     }
                 }
             }
