@@ -40,6 +40,7 @@ import ti4.service.draft.PartialMapService;
 import ti4.service.draft.PlayerDraftState;
 import ti4.service.draft.PlayerSetupService.PlayerSetupState;
 import ti4.service.emoji.TI4Emoji;
+import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.unit.AddUnitService;
 
@@ -467,8 +468,23 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             PriorityTrackHelper.AssignPlayerToPriority(draftManager.getGame(), player, speakerPosition);
         }
 
-        // Add home system planets to player, refreshed
+        // Get the HS tile
+        String homeTilePosition =
+                MapTemplateHelper.getPlayerHomeSystemLocation(speakerPosition, game.getMapTemplateID());
+        Tile hsTile = game.getTileByPosition(homeTilePosition);
+
+        // Add home system extra tiles if needed
         FactionModel homeSystemFaction = Mapper.getFaction(refPackage.homeSystemFaction());
+        MiltyService.setupExtraFactionTiles(game, player, homeSystemFaction.getAlias(), homeTilePosition, hsTile);
+        if (player.getHomeSystemPosition() != null
+                && !"null".equals(player.getHomeSystemPosition())
+                && !player.getHomeSystemPosition().isEmpty()) {
+            // Some home systems get changed, e.g. Ghosts
+            homeTilePosition = player.getHomeSystemPosition();
+            hsTile = game.getTileByPosition(player.getHomeSystemPosition());
+        }
+
+        // Add home system planets to player, refreshed
         for (String planet : homeSystemFaction.getHomePlanets()) {
             if (planet.isEmpty()) {
                 continue;
@@ -477,11 +493,6 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             AddPlanetService.addPlanet(player, planetResolved, game, null, true);
             player.refreshPlanet(planetResolved);
         }
-
-        // Get the HS tile
-        String homeTilePosition =
-                MapTemplateHelper.getPlayerHomeSystemLocation(speakerPosition, game.getMapTemplateID());
-        Tile hsTile = game.getTileByPosition(homeTilePosition);
 
         // Clear existing units at the home system
         hsTile.removeAllUnits(player.getColor());

@@ -36,6 +36,9 @@ public abstract class BagDraft {
         if ("twilights_fall".equals(draftType)) {
             return new TwilightsFallFrankenDraft(game);
         }
+        if ("inaugural_splice".equals(draftType)) {
+            return new InauguralSpliceFrankenDraft(game);
+        }
         return null;
     }
 

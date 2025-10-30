@@ -9,6 +9,7 @@ import ti4.buttons.Buttons;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
+import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.items.CommoditiesDraftItem;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -209,14 +210,21 @@ class FrankenButtonHandler {
                                     + FrankenDraftBagService.getBagReceipt(player.getCurrentDraftBag()));
                     FrankenDraftBagService.displayPlayerHand(game, player);
                     if (draft.isDraftStageComplete()) {
-                        Button randomizeButton = Buttons.green("startFrankenSliceBuild", "Randomize your slices");
-                        Button mantisButton = Buttons.green("startFrankenMantisBuild", "Mantis build slices");
-                        MessageHelper.sendMessageToChannel(
-                                game.getActionsChannel(),
-                                game.getPing()
-                                        + " the draft stage of the FrankenDraft is complete. Choose how to set up the map. Once the map is finalized, select your abilities from your drafted hands.",
-                                List.of(randomizeButton, mantisButton));
-                        FrankenDraftBagService.applyDraftBags(event, game);
+                        if (draft instanceof InauguralSpliceFrankenDraft) {
+                            MessageHelper.sendMessageToChannel(
+                                    game.getActionsChannel(), game.getPing() + " the Inaugural Splice is complete!");
+                            FrankenDraftBagService.applyDraftBags(event, game, false);
+                        } else {
+                            Button randomizeButton = Buttons.green("startFrankenSliceBuild", "Randomize your slices");
+                            Button mantisButton = Buttons.green("startFrankenMantisBuild", "Mantis build slices");
+                            MessageHelper.sendMessageToChannel(
+                                    game.getActionsChannel(),
+                                    game.getPing()
+                                            + " the draft stage of the FrankenDraft is complete. Choose how to set up the map. Once the map is finalized, select your abilities from your drafted hands.",
+                                    List.of(randomizeButton, mantisButton));
+
+                            FrankenDraftBagService.applyDraftBags(event, game);
+                        }
                         return;
                     }
                     int passCounter = 0;

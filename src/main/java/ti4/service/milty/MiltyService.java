@@ -349,41 +349,8 @@ public class MiltyService {
         // String statsAnchor = PositionMapper.getEquivalentPositionAtRing(game.getRingCount(), positionHS);
         player.setPlayerStatsAnchorPosition(positionHS);
 
-        // HANDLE GHOSTS' HOME SYSTEM LOCATION
-        if ("ghost".equals(faction) || "miltymod_ghost".equals(faction)) {
-            tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
-            String pos = "tr";
-            if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
-                pos = "br";
-            }
-            if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
-                pos = "bl";
-            }
-            tile = new Tile("51", pos);
-            game.setTile(tile);
-        }
-
-        // HANDLE Crimson' HOME SYSTEM LOCATION
-        if ("crimson".equals(faction)) {
-            tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
-            tile.addToken(Constants.TOKEN_BREACH_INACTIVE, Constants.SPACE);
-            String pos = "tr";
-            if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
-                pos = "br";
-            }
-            if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
-                pos = "bl";
-            }
-            if (game.getTileByPosition(pos) != null) {
-                if (pos.equalsIgnoreCase("tr")) {
-                    pos = "br";
-                } else {
-                    pos = "tr";
-                }
-            }
-            tile = new Tile("118", pos);
-            game.setTile(tile);
-        }
+        // GHOST AND CRIMSON EXTRA HS TILES
+        setupExtraFactionTiles(game, player, faction, positionHS, tile);
 
         // STARTING COMMODITIES
         player.setCommoditiesBase(factionModel.getCommodities());
@@ -726,6 +693,46 @@ public class MiltyService {
                         "You cannot do Rapid Mobilization now, but once the map is setup, you can click this button to do so.",
                         buttons);
             }
+        }
+    }
+
+    public static void setupExtraFactionTiles(Game game, Player player, String faction, String positionHS, Tile tile) {
+        // HANDLE GHOSTS' HOME SYSTEM LOCATION
+        if ("ghost".equals(faction) || "miltymod_ghost".equals(faction)) {
+            tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            String pos = "tr";
+            if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
+                pos = "br";
+            }
+            if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
+                pos = "bl";
+            }
+            tile = new Tile("51", pos);
+            game.setTile(tile);
+            player.setHomeSystemPosition(pos);
+        }
+
+        // HANDLE Crimson' HOME SYSTEM LOCATION
+        if ("crimson".equals(faction)) {
+            tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            tile.addToken(Constants.TOKEN_BREACH_INACTIVE, Constants.SPACE);
+            String pos = "tr";
+            if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
+                pos = "br";
+            }
+            if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
+                pos = "bl";
+            }
+            if (game.getTileByPosition(pos) != null) {
+                if (pos.equalsIgnoreCase("tr")) {
+                    pos = "br";
+                } else {
+                    pos = "tr";
+                }
+            }
+            tile = new Tile("118", pos);
+            game.setTile(tile);
+            player.setHomeSystemPosition(pos);
         }
     }
 
