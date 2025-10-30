@@ -1,6 +1,11 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +24,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -111,6 +117,8 @@ class UnitRenderGenerator {
         ctx = buildSystemContext(tile, unitHolder, frogPlayer);
 
         BufferedImage dmgImage = ImageHelper.readScaled(Helper.getDamagePath(), 0.8f);
+        BufferedImage galvTag = ImageHelper.readScaled(Helper.getGalvanizeTagPath(), 0.8f);
+        BufferedImage galvSingle = ImageHelper.readScaled(Helper.getGalvanizeTokenPath(), 0.8f);
 
         Map<UnitType, Integer> unitTypeCounts = new HashMap<>();
 
@@ -156,7 +164,6 @@ class UnitRenderGenerator {
             if (unitImage == null) continue;
             if (bulkUnitCount != null && bulkUnitCount > 0) unitCount = 1;
 
-            Integer unitDamageCount = unitHolder.getDamagedUnitCount(unitKey);
             BufferedImage decal = getUnitDecal(player, unitKey);
             BufferedImage spoopy = getSpoopyImage(unitKey, player);
             UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
@@ -181,9 +188,24 @@ class UnitRenderGenerator {
                     Set.of(UnitType.Infantry, UnitType.Fighter).contains(unitKey.getUnitType()));
 
             // DRAW UNITS
-            for (int i = 0; i < unitCount; i++) {
-                Point position = calculateUnitPosition(posCtx, unitKey, i + unitTypeCounts.get(unitKey.getUnitType()));
-                ImagePosition imagePos = calculateImagePosition(posCtx, position);
+            List<Integer> unitStates = unitHolder.getUnitStates(unitKey);
+            List<UnitState> states = UnitState.unitRenderOrder().stream()
+                    .flatMap(st -> Collections.nCopies(unitStates.get(st.ordinal()), st).stream())
+                    .toList();
+            int unitRenderCt = 0;
+            UnitState prevState = null;
+            Point position = null;
+            ImagePosition imagePos = null;
+            for (UnitState stateToRender : states) {
+                if (prevState != null && !prevState.isGalvanized() && stateToRender.isGalvanized()) {
+                    // Add a little extra separation between non-galvanized and galvanized units
+                    unitRenderCt++;
+                }
+                prevState = stateToRender;
+
+                position = calculateUnitPosition(
+                        posCtx, unitKey, unitRenderCt + unitTypeCounts.get(unitKey.getUnitType()));
+                imagePos = calculateImagePosition(posCtx, position);
                 int imageX = imagePos.x();
                 int imageY = imagePos.y();
 
@@ -232,11 +254,12 @@ class UnitRenderGenerator {
                 }
 
                 // INFORMATIONAL DECALS
+                optionallyDrawEidolonMaximumDecal(unitKey, imageX, imageY);
                 optionallyDrawMechTearDecal(unitKey, imageX, imageY);
                 optionallyDrawWarsunCrackDecal(unitKey, imageX, imageY);
 
                 // UNIT TAGS
-                drawUnitTags(unitKey, player, imagePos, i);
+                drawUnitTags(unitKey, player, imagePos, unitRenderCt);
 
                 if (bulkUnitCount != null) {
                     Color groupUnitColor =
@@ -257,17 +280,29 @@ class UnitRenderGenerator {
                             imagePos); // TODO: can only show two player's Fighter/Infantry
                 }
 
-                if (unitDamageCount != null && unitDamageCount > 0 && dmgImage != null) {
+                if (stateToRender.isDamaged() && dmgImage != null) {
                     drawDamageIcon(position, imagePos, unitImage, dmgImage, unitKey.getUnitType());
-                    unitDamageCount--;
                 }
+                if (unitKey.getUnitType() == UnitType.Mech && stateToRender.isGalvanized() && galvSingle != null) {
+                    Point galvPos = position;
+                    galvPos.translate(10, 0);
+                    drawDamageIcon(galvPos, imagePos, unitImage, galvSingle, unitKey.getUnitType());
+                }
+
+                unitRenderCt++;
+                if (bulkUnitCount != null && bulkUnitCount > 0) break;
+            }
+
+            int galvAmt = unitHolder.getGalvanizedUnitCount(unitKey);
+            if (galvAmt > 0 && unitKey.getUnitType() != UnitType.Mech && position != null && imagePos != null) {
+                drawGalvanizeTag(position, imagePos, unitImage, galvTag, galvSingle, unitKey.getUnitType(), galvAmt);
             }
 
             // Persist unit type counts
             if (unitTypeCounts.containsKey(unitKey.getUnitType())) {
-                unitTypeCounts.put(unitKey.getUnitType(), unitTypeCounts.get(unitKey.getUnitType()) + unitCount);
+                unitTypeCounts.put(unitKey.getUnitType(), unitTypeCounts.get(unitKey.getUnitType()) + unitRenderCt);
             } else {
-                unitTypeCounts.put(unitKey.getUnitType(), unitCount);
+                unitTypeCounts.put(unitKey.getUnitType(), unitRenderCt);
             }
         }
     }
@@ -286,6 +321,13 @@ class UnitRenderGenerator {
                 "agenda_publicize_weapon_schematics" + DrawingUtil.getBlackWhiteFileSuffix(unitKey.getColorID());
         BufferedImage wsCrackImage = ImageHelper.read(resourceHelper.getTokenFile(imagePath));
         tileGraphics.drawImage(wsCrackImage, imageX, imageY, null);
+    }
+
+    private void optionallyDrawEidolonMaximumDecal(UnitKey unitKey, int imageX, int imageY) {
+        UnitModel model = game.getUnitFromUnitKey(unitKey);
+        if (model == null || !model.getAlias().equals("naaz_voltron")) return;
+        BufferedImage voltron = ImageHelper.read(resourceHelper.getDecalFile("Voltron.png"));
+        tileGraphics.drawImage(voltron, imageX, imageY, null);
     }
 
     private void drawUnitTags(UnitKey unitKey, Player player, ImagePosition imagePos, int iteration) {
@@ -378,6 +420,41 @@ class UnitRenderGenerator {
                 MapGenerator.VerticalAlign.Bottom,
                 strokeWidth,
                 stroke);
+    }
+
+    private void drawGalvanizeTag(
+            Point unitPos,
+            ImagePosition imagePos,
+            BufferedImage unitImage,
+            BufferedImage galvTag,
+            BufferedImage galvSingle,
+            UnitType unitType,
+            int amt) {
+        int imageDmgX, imageDmgY;
+
+        if (unitType == UnitType.Infantry || unitType == UnitType.Fighter) {
+            imageDmgX = getCenteredDamageX(unitPos, imagePos, unitImage, galvTag);
+            imageDmgY = getCenteredDamageY(unitPos, imagePos, unitImage, galvTag);
+            imageDmgX += 33;
+            imageDmgY -= 15;
+        } else {
+            imageDmgX = getCenteredDamageX(unitPos, imagePos, unitImage, galvTag);
+            imageDmgY = getCenteredDamageY(unitPos, imagePos, unitImage, galvTag);
+            imageDmgX += 5;
+            imageDmgY -= 20;
+        }
+
+        if (ctx.isTokenPlanet) {
+            imageDmgX -= TILE_PADDING;
+            imageDmgY -= TILE_PADDING;
+        }
+
+        imageDmgX += TILE_PADDING;
+        imageDmgY += TILE_PADDING;
+        tileGraphics.drawImage(galvTag, imageDmgX, imageDmgY, null);
+        tileGraphics.setFont(Storage.getFont20());
+        DrawingUtil.superDrawStringCentered(
+                tileGraphics, Integer.toString(amt), imageDmgX + 38, imageDmgY + 16, Color.white, null, Color.black);
     }
 
     private void drawDamageIcon(

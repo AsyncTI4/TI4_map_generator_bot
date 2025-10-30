@@ -309,7 +309,7 @@ public class WebPlayerArea {
 
         // Special token reinforcements
         // Sleeper tokens (Titans faction only)
-        if (player.hasAbility("awaken")) {
+        if (player.hasAbility("awaken") && !game.isTwilightsFallMode()) {
             webPlayerArea.setSleeperTokensReinf(5 - game.getSleeperTokensPlacedCount());
         } else {
             webPlayerArea.setSleeperTokensReinf(0);

@@ -33,22 +33,24 @@ import ti4.service.unit.RemoveUnitService;
 
 public class TeHelperCommanders {
     @ButtonHandler("useDwsDiscount_")
-    public static void useDwsTechDiscount(
-            Game game, Player eventPlayer, ButtonInteractionEvent event, String buttonID) {
-        String faction = buttonID.replace("useDwsDiscount_", "");
-        Player player = game.getPlayerFromColorOrFaction(faction);
-        if (player == null) return;
-        String message = player.getRepresentation(true, true);
-        if (game.isFowMode()) {
-            message += " someone";
-        } else {
-            message += " " + eventPlayer.getRepresentation(true, false);
-        }
-        player.addSpentThing("dwsDiscount");
-        message +=
-                " has used your commander to get a discount on tech. Use the buttons to gain or convert 1 commodity.";
-        message += "\n-# You have (" + player.getCommoditiesRepresentation() + ") commodities.";
-        List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true);
+    public static void useDwsTechDiscount(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String commanderFaction = buttonID.replace("useDwsDiscount_", "");
+        Player dws = game.getPlayerFromColorOrFaction(commanderFaction);
+        if (dws == null) return;
+
+        // Add the discount to spent things for the player using the discount
+        player.addSpentThing("dwsDiscount_" + commanderFaction);
+        ButtonHelper.deleteTheOneButton(event, buttonID, false);
+        String editedMsg = Helper.buildSpentThingsMessage(player, game, "res");
+        event.editMessage(editedMsg).queue();
+
+        // Notify the DWS commander holder that their discount was used
+        String message = dws.getRepresentation(true, true) + " ";
+        message += game.isFowMode() ? "someone" : player.getRepresentation(true, false);
+        message += " has used your commander to get a discount on tech.";
+        message += " Use the buttons to gain or convert 1 commodity.";
+        message += "\n-# You have (" + dws.getCommoditiesRepresentation() + ") commodities.";
+        List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(dws, true);
         MessageHelper.sendMessageToChannelWithButtons(game.getActionsChannel(), message, buttons);
     }
 
