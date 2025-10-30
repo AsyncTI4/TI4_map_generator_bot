@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
+
 import ti4.ResourceHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CalendarHelper;
@@ -254,6 +255,7 @@ class UnitRenderGenerator {
                 }
 
                 // INFORMATIONAL DECALS
+                optionallyDrawEidolonMaximumDecal(unitKey, imageX, imageY);
                 optionallyDrawMechTearDecal(unitKey, imageX, imageY);
                 optionallyDrawWarsunCrackDecal(unitKey, imageX, imageY);
 
@@ -320,6 +322,13 @@ class UnitRenderGenerator {
                 "agenda_publicize_weapon_schematics" + DrawingUtil.getBlackWhiteFileSuffix(unitKey.getColorID());
         BufferedImage wsCrackImage = ImageHelper.read(resourceHelper.getTokenFile(imagePath));
         tileGraphics.drawImage(wsCrackImage, imageX, imageY, null);
+    }
+
+    private void optionallyDrawEidolonMaximumDecal(UnitKey unitKey, int imageX, int imageY) {
+        UnitModel model = game.getUnitFromUnitKey(unitKey);
+        if (model == null || !model.getAlias().equals("naaz_voltron")) return;
+        BufferedImage voltron = ImageHelper.read(resourceHelper.getDecalFile("Voltron.png"));
+        tileGraphics.drawImage(voltron, imageX, imageY, null);
     }
 
     private void drawUnitTags(UnitKey unitKey, Player player, ImagePosition imagePos, int iteration) {
