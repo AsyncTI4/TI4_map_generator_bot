@@ -4,12 +4,6 @@ import java.awt.Color;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,6 +27,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.SortHelper;
+import ti4.helpers.URLReaderHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -57,7 +52,6 @@ public class LoreService {
 
     private static final String SYSTEM_LORE_KEY = "fowSystemLore";
     private static final String LORE_EXPORT_FILENAME = "_lore_export.txt";
-    private static final int MAX_IMPORT_SIZE = 500_000; // 500kB
     private static final int LORE_TEXT_MAX_LENGTH = 1000;
     private static final int FOOTER_TEXT_MAX_LENGTH = 200;
 
@@ -78,7 +72,8 @@ public class LoreService {
         try (FileWriter writer = new FileWriter(exportFile)) {
             writer.write(game.getStoredValue(SYSTEM_LORE_KEY));
         } catch (IOException e) {
-            e.printStackTrace();
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Failed to export lore: " + e.getMessage());
+            return;
         }
 
         event.getChannel()
@@ -102,36 +97,8 @@ public class LoreService {
     @ModalHandler("gmLoreImportFromURL")
     public static void importLoreFromURL(ModalInteractionEvent event, Game game) {
         String url = event.getValue("url").getAsString();
-        String loreString = null;
-
-        try {
-            HttpClient client = HttpClient.newBuilder()
-                    .connectTimeout(Duration.ofSeconds(5))
-                    .build();
-
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .timeout(Duration.ofSeconds(5))
-                    .GET()
-                    .build();
-
-            HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
-
-            if (response.statusCode() != 200) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "HTTP error: " + response.statusCode());
-                return;
-            }
-
-            byte[] body = response.body();
-            if (body.length > MAX_IMPORT_SIZE) {
-                MessageHelper.sendMessageToChannel(
-                        event.getChannel(), "File exceeds max allowed size (" + MAX_IMPORT_SIZE + " bytes)");
-                return;
-            }
-
-            loreString = new String(body, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Error fetching URL: " + e.getMessage());
+        String loreString = URLReaderHelper.readFromURL(url, event.getChannel());
+        if (loreString == null) {
             return;
         }
 
@@ -190,8 +157,8 @@ public class LoreService {
                 PlanetModel planet = Mapper.getPlanet(target);
                 if (!game.getPlanets().contains(target)) isValidLore = false;
 
-                buttonLabel = planet.getName();
-                emoji = planet.getEmoji().toString();
+                buttonLabel = planet == null ? target : planet.getName();
+                emoji = planet != null ? planet.getEmoji().toString() : null;
             }
 
             if (isValidLore) {
@@ -204,7 +171,7 @@ public class LoreService {
         return loreButtons;
     }
 
-    private static Map<String, String[]> getSavedLore(Game game) {
+    public static Map<String, String[]> getSavedLore(Game game) {
         return readLore(game.getStoredValue(SYSTEM_LORE_KEY));
     }
 
@@ -269,7 +236,7 @@ public class LoreService {
             String validatedTarget = validateLore(targets[i], loreText, footerText, savedLoreMap, game);
             if (validatedTarget == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), targets[i] + " is invalid to save lore");
-                return;
+                continue;
             }
             targets[i] = validatedTarget;
         }
@@ -311,6 +278,12 @@ public class LoreService {
         }
     }
 
+    public static void addLore(String target, String loreText, String footerText, Game game) {
+        Map<String, String[]> savedLoreMap = getSavedLore(game);
+        setLore(target, loreText, footerText, savedLoreMap, game, new StringBuilder());
+        saveLore(game, savedLoreMap);
+    }
+
     private static void setLore(
             String target,
             String loreText,
@@ -328,7 +301,7 @@ public class LoreService {
     }
 
     private static String clean(String input) {
-        return input.trim().replace(";", "").replace("|", "");
+        return input == null ? "" : input.trim().replace(";", "").replace("|", "");
     }
 
     private static void saveLore(Game game, Map<String, String[]> lore) {
@@ -336,6 +309,10 @@ public class LoreService {
                 .map(entry -> entry.getKey() + ";" + entry.getValue()[0] + ";" + entry.getValue()[1])
                 .collect(Collectors.joining("|"));
         game.setStoredValue(SYSTEM_LORE_KEY, loreString);
+    }
+
+    public static void clearLore(Game game) {
+        game.removeStoredValue(SYSTEM_LORE_KEY);
     }
 
     private static MessageEmbed buildLoreEmbed(Game game, String target, String[] lore, boolean isSystemLore) {
@@ -367,7 +344,7 @@ public class LoreService {
         return eb.build();
     }
 
-    private static boolean hasLoreToShow(Game game, String target) {
+    public static boolean hasLoreToShow(Game game, String target) {
         return game.isFowMode() && getSavedLore(game).containsKey(target);
     }
 

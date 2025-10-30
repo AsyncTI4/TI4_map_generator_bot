@@ -218,11 +218,14 @@ public class CustomHyperlaneService {
                 return;
             }
 
-            hyperlaneData = normalizeMatrix(hyperlaneData); // force two-way connections
-            customHyperlaneData.put(position, hyperlaneData);
+            CustomHyperlaneService.insertData(game, position, hyperlaneData);
             MessageHelper.sendMessageToChannel(
                     event.getChannel(), "Hyperlane data `" + hyperlaneData + "` added to " + position + ".");
         }
+    }
+
+    public static void insertData(Game game, String position, String hyperlaneData) {
+        game.getCustomHyperlaneData().put(position, normalizeMatrix(hyperlaneData));
     }
 
     @ButtonHandler("customHyperlaneTransform~MDL")
@@ -340,7 +343,7 @@ public class CustomHyperlaneService {
         return matrixBuilder.toString();
     }
 
-    private static boolean isValidConnectionMatrix(String input) {
+    public static boolean isValidConnectionMatrix(String input) {
         String[] rows = input.split(";");
         if (rows.length != 6) return false;
 
