@@ -65,10 +65,6 @@ public class NucleusImageGeneratorService {
         if (!mapTemplate.isNucleusTemplate()) {
             return null;
         }
-        if (draftManager.getDraftable(SeatDraftable.TYPE) == null
-                && draftManager.getDraftable(SpeakerOrderDraftable.TYPE) == null) {
-            return null;
-        }
 
         if (restrictChoiceKeys != null) {
             // This COULD absolutely support limited choice keys. Any tile not present in the restricted set
