@@ -32,13 +32,11 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
