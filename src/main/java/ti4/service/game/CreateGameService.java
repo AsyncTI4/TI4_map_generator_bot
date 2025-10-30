@@ -270,7 +270,7 @@ public class CreateGameService {
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("chooseExp_newPoK", "New PoK"));
-        buttons.add(Buttons.red("chooseExp_oldPoK", "Old PoK"));
+        buttons.add(Buttons.gray("chooseExp_oldPoK", "Old PoK"));
         buttons.add(Buttons.blue("chooseExp_te", "Thunder's Edge + New PoK"));
         String expMsg =
                 "Which expansion are you using for this game?\n-# This will adjust available components accordingly. To elaborate on the options:\n"
