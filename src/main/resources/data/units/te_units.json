@@ -112,7 +112,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "While this unit is in or adjacent to a system that contains an active breach, other players' units in systems  with active breaches lose all of their unit abilities."
+        "ability": "While this unit is in a system that contains an active breach, other players' units in systems with active breaches lose all of their unit abilities"
     },
     {
         "id": "crimson_mech",
