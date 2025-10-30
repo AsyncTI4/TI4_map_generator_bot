@@ -4,7 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -14,7 +18,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
@@ -1727,6 +1730,20 @@ public class StartCombatService {
                     finChecker + "purgeRedCreussHero_" + tile.getPosition(),
                     "Purge Red Creuss Hero",
                     FactionEmojis.Ghost));
+        }
+        if (p1.hasLeaderUnlocked("bastionhero") && !game.isFowMode()) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Buttons.gray(
+                    finChecker + "purgeBastionHero_" + tile.getPosition(),
+                    "Purge Bastion",
+                    FactionEmojis.Bastion));
+        }
+        if (p2.hasLeaderUnlocked("bastionhero") && !game.isFowMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Buttons.gray(
+                    finChecker + "purgeBastionHero_" + tile.getPosition(),
+                    "Purge Bastion",
+                    FactionEmojis.Bastion));
         }
 
         if (game.isLiberationC4Mode()) {
