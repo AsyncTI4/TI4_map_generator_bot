@@ -11,7 +11,6 @@ import ti4.draft.PoweredFrankenDraft;
 import ti4.draft.PoweredOnePickFrankenDraft;
 import ti4.draft.TwilightsFallFrankenDraft;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -60,19 +59,7 @@ class StartFrankenDraft extends GameStateSubcommand {
                 case POWEREDONEPICK -> game.setBagDraft(new PoweredOnePickFrankenDraft(game));
                 case TWILIGHTSFALL -> {
                     game.setBagDraft(new TwilightsFallFrankenDraft(game));
-                    game.setTwilightsFallMode(true);
-                    game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_twilights_fall"));
-                    game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
-                    game.setStrategyCardSet("twilights_fall_sc");
-                    game.removeSOFromGame("baf");
-                    game.removeSOFromGame("dp");
-                    game.removeSOFromGame("dtd");
-                    game.removeSOFromGame("sb");
-                    game.removeRelicFromGame("quantumcore");
-                    game.removeRelicFromGame("mawofworlds");
-                    game.removeRelicFromGame("prophetstears");
-                    game.validateAndSetActionCardDeck(event, Mapper.getDeck("tf_action_deck"));
-                    game.setTechnologyDeckID("techs_tf");
+                    game.setupTwilightsFallMode(event);
                 }
             }
         }

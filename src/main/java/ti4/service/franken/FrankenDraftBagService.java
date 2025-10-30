@@ -68,9 +68,15 @@ public class FrankenDraftBagService {
             DraftItem.Category.DRAFTORDER);
 
     public static void applyDraftBags(GenericInteractionCreateEvent event, Game game) {
+        applyDraftBags(event, game, true);
+    }
+
+    public static void applyDraftBags(GenericInteractionCreateEvent event, Game game, boolean includeGameSetup) {
         BagDraft draft = game.getActiveBagDraft();
 
-        setSpeakerOrder(event, game); // Category.DRAFTORDER
+        if (includeGameSetup) {
+            setSpeakerOrder(event, game); // Category.DRAFTORDER
+        }
 
         for (Player player : game.getPlayers().values()) {
             DraftBag bag = player.getDraftHand();
@@ -93,7 +99,10 @@ public class FrankenDraftBagService {
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                     player.getCardsInfoThread(), null, List.of(embed), List.of(Buttons.FACTION_EMBED));
         }
-        game.setShowMapSetup(true);
+
+        if (includeGameSetup) {
+            game.setShowMapSetup(true);
+        }
     }
 
     private static void setSpeakerOrder(GenericInteractionCreateEvent event, Game game) {

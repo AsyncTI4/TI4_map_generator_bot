@@ -566,6 +566,22 @@ public class Game extends GameProperties {
         activeDraft = draft;
     }
 
+    public void setupTwilightsFallMode(GenericInteractionCreateEvent event) {
+        setTwilightsFallMode(true);
+        validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_twilights_fall"));
+        validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
+        setStrategyCardSet("twilights_fall_sc");
+        removeSOFromGame("baf");
+        removeSOFromGame("dp");
+        removeSOFromGame("dtd");
+        removeSOFromGame("sb"); // get this stuff too
+        removeRelicFromGame("quantumcore");
+        removeRelicFromGame("mawofworlds");
+        removeRelicFromGame("prophetstears");
+        validateAndSetActionCardDeck(event, Mapper.getDeck("tf_action_deck"));
+        setTechnologyDeckID("techs_tf");
+    }
+
     public void addActionCardDuplicates(List<String> acIDs) {
         getActionCards().addAll(acIDs);
         Collections.shuffle(getActionCards());
@@ -4038,6 +4054,12 @@ public class Game extends GameProperties {
 
         tileMap.remove(position);
         planets.clear();
+    }
+
+    public void removeAllTiles() {
+        for (Tile tile : new ArrayList<Tile>(tileMap.values())) {
+            removeTile(tile.getPosition());
+        }
     }
 
     public void removePlanet(UnitHolder planet) {
