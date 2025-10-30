@@ -34,6 +34,21 @@ public class WebPlayerArea {
         private final int deployedCount;
     }
 
+    @Data
+    public static class BreakthroughInfo {
+        private final String breakthroughId;
+        private final boolean unlocked;
+        private final boolean exhausted;
+        private final int tradeGoodsStored;
+    }
+
+    @Data
+    public static class PlotCardInfo {
+        private final String plotAlias;
+        private final Integer identifier;
+        private final List<String> factions;
+    }
+
     // Basic properties
     private String userName;
     private String faction;
@@ -157,6 +172,12 @@ public class WebPlayerArea {
 
     // Debt tokens: debt that this player is OWED by other players (faction/color -> count)
     private Map<String, Integer> debtTokens;
+
+    // Breakthrough (Thunder's Edge)
+    private BreakthroughInfo breakthrough;
+
+    // Plot cards (Firmament/Obsidian)
+    private List<PlotCardInfo> plotCards;
 
     // Faction abilities
     private List<String> abilities;
@@ -306,6 +327,35 @@ public class WebPlayerArea {
 
         // Faction abilities
         webPlayerArea.setAbilities(new ArrayList<>(player.getAbilities()));
+
+        // Breakthrough info (Thunder's Edge)
+        if (game.isThundersEdge()) {
+            String breakthroughId = player.getBreakthroughID();
+            if (breakthroughId != null && !breakthroughId.isEmpty()) {
+                webPlayerArea.setBreakthrough(new BreakthroughInfo(
+                    breakthroughId,
+                    player.isBreakthroughUnlocked(),
+                    player.isBreakthroughExhausted(),
+                    player.getBreakthroughTGs()
+                ));
+            } else {
+                webPlayerArea.setBreakthrough(null);
+            }
+        } else {
+            webPlayerArea.setBreakthrough(null);
+        }
+
+        // Plot cards (Firmament/Obsidian)
+        List<PlotCardInfo> plotCardsList = new ArrayList<>();
+        if (player.hasAbility("bladesorchestra") || player.hasAbility("plotsplots")) {
+            for (Map.Entry<String, Integer> plotEntry : player.getPlotCards().entrySet()) {
+                String plotAlias = plotEntry.getKey();
+                Integer identifier = plotEntry.getValue();
+                List<String> factions = player.getPlotCardsFactions().getOrDefault(plotAlias, new ArrayList<>());
+                plotCardsList.add(new PlotCardInfo(plotAlias, identifier, factions));
+            }
+        }
+        webPlayerArea.setPlotCards(plotCardsList);
 
         // Special token reinforcements
         // Sleeper tokens (Titans faction only)
