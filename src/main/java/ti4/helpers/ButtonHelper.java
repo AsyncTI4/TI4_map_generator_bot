@@ -7542,7 +7542,7 @@ public class ButtonHelper {
                         .append(" resources.");
                 resourcesAvailable += getNumberOfUnitUpgrades(player);
             }
-            if (game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander")) {
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander") || player.hasTech("tf-abundance")) {
                 youCanSpend.append(" You also have Titans commander.");
                 resourcesAvailable += 1;
             }
