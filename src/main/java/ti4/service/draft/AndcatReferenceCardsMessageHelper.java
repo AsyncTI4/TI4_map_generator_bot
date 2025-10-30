@@ -177,7 +177,7 @@ public class AndcatReferenceCardsMessageHelper {
             List<DraftChoice> playerPicks = draftManager.getPlayerPicks(playerUserId, this.draftable.getType());
             messageBuilder.append(System.lineSeparator());
             if (playerPicks.isEmpty()) {
-                messageBuilder.append(playerRepresentation + " has not picked a package of faction reference cards.");
+                messageBuilder.append(playerRepresentation).append(" has not picked a package of faction reference cards.");
                 continue;
             }
 
