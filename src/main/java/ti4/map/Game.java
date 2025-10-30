@@ -4056,6 +4056,12 @@ public class Game extends GameProperties {
         planets.clear();
     }
 
+    public void removeAllTiles() {
+        for (Tile tile : new ArrayList<Tile>(tileMap.values())) {
+            removeTile(tile.getPosition());
+        }
+    }
+
     public void removePlanet(UnitHolder planet) {
         for (Player player_ : players.values()) {
             String color = player_.getColor();

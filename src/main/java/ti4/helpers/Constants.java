@@ -330,6 +330,8 @@ public class Constants {
     public static final String DRAW_ONLY = "draw_only";
     public static final String ADD_TILE_LIST_RANDOM = "add_tile_list_random";
     public static final String GENERATE_PAINBOX_MAP = "generate_painbox_map";
+    public static final String IMPORT_MAP_JSON = "import_json";
+    public static final String EXPORT_MAP_JSON = "export_json";
     public static final String BLUE_TILES = "blue_tiles";
     public static final String RED_TILES = "red_tiles";
     public static final String HOME_SYSTEMS = "home_systems";
