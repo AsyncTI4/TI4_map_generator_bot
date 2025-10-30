@@ -17,6 +17,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.MapTemplateHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.helpers.settingsFramework.menus.AndcatReferenceCardsDraftableSettings;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
@@ -201,7 +203,8 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             if (informPackages.isEmpty()) {
                 return DraftButtonService.USER_MISTAKE_PREFIX + "No packages remain to show info for.";
             } else {
-                AndcatReferenceCardsMessageHelper.sendPackageInfos(draftManager, playerUserId, informPackages);
+                new AndcatReferenceCardsMessageHelper(this)
+                        .sendPackageInfos(draftManager, playerUserId, informPackages);
             }
         } else if (commandKey.equals("pickedinfo")) {
             informPackages = new ArrayList<>();
@@ -219,17 +222,18 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             if (informPackages.isEmpty()) {
                 return DraftButtonService.USER_MISTAKE_PREFIX + "No packages have been picked yet to show info for.";
             } else {
-                AndcatReferenceCardsMessageHelper.sendPackageInfos(draftManager, playerUserId, informPackages);
+                new AndcatReferenceCardsMessageHelper(this)
+                        .sendPackageInfos(draftManager, playerUserId, informPackages);
             }
         } else if (commandKey.equals("allinfo")) {
             informPackages = new ArrayList<>(referenceCardPackages.values());
-            AndcatReferenceCardsMessageHelper.sendPackageInfos(draftManager, playerUserId, informPackages);
+            new AndcatReferenceCardsMessageHelper(this).sendPackageInfos(draftManager, playerUserId, informPackages);
         } else if (commandKey.startsWith("info_")) {
             String[] tokens = commandKey.substring("info_".length()).split("_");
             informPackages = Arrays.asList(tokens).stream()
                     .map(this::getPackageByChoiceKey)
                     .toList();
-            AndcatReferenceCardsMessageHelper.sendPackageInfos(draftManager, playerUserId, informPackages);
+            new AndcatReferenceCardsMessageHelper(this).sendPackageInfos(draftManager, playerUserId, informPackages);
         } else if (commandKey.startsWith("assign_")) {
             new AndcatReferenceCardsMessageHelper(this)
                     .handleAssignButton(event, draftManager, playerUserId, commandKey);
@@ -438,7 +442,9 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         playerSetupState.setSetSpeaker(speakerPosition == 1);
         String homeTilePosition =
                 MapTemplateHelper.getPlayerHomeSystemLocation(speakerPosition, game.getMapTemplateID());
-        playerSetupState.setPositionHS(homeTilePosition);
+        if (shouldAlsoSetSeat(draftManager)) {
+            playerSetupState.setPositionHS(homeTilePosition);
+        }
 
         // After setting a home system position, the slice can be placed
         PartialMapService.tryUpdateMap(draftManager, null, true);
@@ -450,6 +456,16 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
     private void doPostSetupWork(DraftManager draftManager, Player player, ReferenceCardPackage refPackage) {
 
         Game game = draftManager.getGame();
+        List<String> speakerOrder = getSpeakerOrder(draftManager);
+        int speakerPosition = speakerOrder.indexOf(player.getUserID()) + 1;
+
+        // If not setting seat, Speaker Order needs to be set via Priority Track
+        if (!shouldAlsoSetSeat(draftManager)) {
+            if (game.getPriorityTrackMode() == PriorityTrackMode.NONE) {
+                game.setPriorityTrackMode(PriorityTrackMode.THIS_ROUND_ONLY);
+            }
+            PriorityTrackHelper.AssignPlayerToPriority(draftManager.getGame(), player, speakerPosition);
+        }
 
         // Add home system planets to player, refreshed
         FactionModel homeSystemFaction = Mapper.getFaction(refPackage.homeSystemFaction());
@@ -463,8 +479,6 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         }
 
         // Get the HS tile
-        List<String> speakerOrder = getSpeakerOrder(draftManager);
-        int speakerPosition = speakerOrder.indexOf(player.getUserID()) + 1;
         String homeTilePosition =
                 MapTemplateHelper.getPlayerHomeSystemLocation(speakerPosition, game.getMapTemplateID());
         Tile hsTile = game.getTileByPosition(homeTilePosition);
@@ -515,5 +529,9 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         });
 
         return playerStates.stream().map(Entry::getKey).toList();
+    }
+
+    private boolean shouldAlsoSetSeat(DraftManager draftManager) {
+        return !draftManager.getDraftables().stream().anyMatch(d -> d instanceof SeatDraftable);
     }
 }

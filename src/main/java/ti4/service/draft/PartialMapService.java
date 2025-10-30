@@ -196,7 +196,9 @@ public class PartialMapService {
             AndcatReferenceCardsDraftable arcDraftable =
                     (AndcatReferenceCardsDraftable) draftManager.getDraftable(AndcatReferenceCardsDraftable.TYPE);
             ReferenceCardPackage refPackage = arcDraftable.getPackageByChoiceKey(choiceKey);
-            if (refPackage.choicesFinal() == true && refPackage.homeSystemFaction() != null) {
+            if (refPackage.choicesFinal() != null
+                    && refPackage.choicesFinal()
+                    && refPackage.homeSystemFaction() != null) {
                 String factionId = refPackage.homeSystemFaction();
                 return Mapper.getFaction(factionId);
             }
