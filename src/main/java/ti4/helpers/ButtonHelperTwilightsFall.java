@@ -39,6 +39,7 @@ import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
 import ti4.service.milty.MiltyDraftSlice;
 import ti4.service.milty.MiltyDraftTile;
+import ti4.service.milty.MiltyService;
 import ti4.service.unit.AddUnitService;
 
 public class ButtonHelperTwilightsFall {
@@ -267,41 +268,7 @@ public class ButtonHelperTwilightsFall {
             game.setTile(toAdd);
             player.setHomeSystemPosition(pos);
             player.setPlayerStatsAnchorPosition(pos);
-            if ("ghost".equals(faction)) {
-                toAdd.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
-                pos = "tr";
-                if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
-                    pos = "br";
-                }
-                if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
-                    pos = "bl";
-                }
-                Tile tile = new Tile("51", pos);
-                game.setTile(tile);
-                player.setHomeSystemPosition(pos);
-            }
-
-            // HANDLE Crimson' HOME SYSTEM LOCATION
-            if ("crimson".equals(faction)) {
-                toAdd.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
-                pos = "tr";
-                if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
-                    pos = "br";
-                }
-                if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
-                    pos = "bl";
-                }
-                if (game.getTileByPosition(pos) != null) {
-                    if (pos.equalsIgnoreCase("tr")) {
-                        pos = "br";
-                    } else {
-                        pos = "tr";
-                    }
-                }
-                Tile tile = new Tile("118", pos);
-                game.setTile(tile);
-                player.setHomeSystemPosition(pos);
-            }
+            MiltyService.setupExtraFactionTiles(game, player, faction, positionHS, toAdd);
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(), player.getRepresentation() + " set home system successfully.");
         } else {

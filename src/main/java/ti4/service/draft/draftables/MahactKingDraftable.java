@@ -281,6 +281,10 @@ public class MahactKingDraftable extends SinglePickDraftable {
         // There may be homebrew here someday...
         // SourceSettings sourceSettings = draftSystemSettings.getSourceSettings();
 
+        if (!game.isTwilightsFallMode()) {
+            game.setupTwilightsFallMode(event);
+        }
+
         initialize(
                 kingSettings.getNumFactions().getVal(),
                 List.of(ComponentSource.twilights_fall),
