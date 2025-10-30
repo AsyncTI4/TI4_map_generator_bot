@@ -2406,19 +2406,19 @@ public class ButtonHelper {
                 if (removedUnit == null) continue;
 
                 float hitChance;
-                if (removedUnit.getAfbDieCount(player, game) > 0) {
-                    hitChance = ((11.0f - removedUnit.getAfbHitsOn(player, game)) / 10);
+                if (removedUnit.getAfbDieCount(player) > 0) {
+                    hitChance = ((11.0f - removedUnit.getAfbHitsOn(player)) / 10);
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")) {
                         hitChance = 1 - ((1 - hitChance) * (1 - hitChance));
                     }
-                    count += removedUnit.getAfbDieCount(player, game) * hitChance * uh.getUnitCount(unit);
+                    count += removedUnit.getAfbDieCount(player) * hitChance * uh.getUnitCount(unit);
                 }
-                if (removedUnit.getSpaceCannonDieCount() > 0) {
-                    hitChance = ((11.0f - removedUnit.getSpaceCannonHitsOn()) / 10);
+                if (removedUnit.getSpaceCannonDieCount(player) > 0) {
+                    hitChance = ((11.0f - removedUnit.getSpaceCannonHitsOn(player)) / 10);
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")) {
                         hitChance = 1 - ((1 - hitChance) * (1 - hitChance));
                     }
-                    count += removedUnit.getSpaceCannonDieCount() * hitChance * uh.getUnitCount(unit);
+                    count += removedUnit.getSpaceCannonDieCount(player) * hitChance * uh.getUnitCount(unit);
                 }
                 if (removedUnit.getBombardDieCount() > 0) {
                     hitChance = ((11.0f - removedUnit.getBombardHitsOn()) / 10);
@@ -6930,8 +6930,8 @@ public class ButtonHelper {
                             || ("xxcha_mech".equalsIgnoreCase(model.getId()) && isLawInPlay(game, "articles_war"))) {
                         continue;
                     }
-                    if (model.getSpaceCannonDieCount() > 0
-                            && (model.getDeepSpaceCannon()
+                    if (model.getSpaceCannonDieCount(owningPlayer) > 0
+                            && (model.getDeepSpaceCannon(owningPlayer)
                                     || tilePos.equalsIgnoreCase(adjTilePos)
                                     || game.playerHasLeaderUnlockedOrAlliance(owningPlayer, "mirvedacommander"))) {
                         if (owningPlayer == player

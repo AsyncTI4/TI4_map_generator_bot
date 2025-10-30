@@ -658,7 +658,7 @@ public class CombatRollService {
             UnitModel unitModel = entry.getKey();
             int numOfUnit = entry.getValue();
 
-            int toHit = unitModel.getCombatDieHitsOnForAbility(rollType, player, game);
+            int toHit = unitModel.getCombatDieHitsOnForAbility(rollType, player);
             int modifierToHit = CombatModHelper.getCombinedModifierForUnit(
                     unitModel,
                     numOfUnit,
@@ -681,7 +681,7 @@ public class CombatRollService {
                     rollType,
                     activeSystem,
                     unitHolder);
-            int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player, game);
+            int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player);
             boolean extraRollsCount = false;
             if ((numRollsPerUnit > 1 || extraRollsForUnit > 0)
                     && "true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"))) {
@@ -701,7 +701,7 @@ public class CombatRollService {
                 numOfUnit = 1;
                 game.setStoredValue("TnelisAgentFaction", "");
             }
-            boolean usingMetali = unitModel.getAfbDieCount() == 0 && unitModel.getAfbDieCount(player, game) == 3;
+            boolean usingMetali = unitModel.getAfbDieCount() == 0 && unitModel.getAfbDieCount(player) == 3;
             if (rollType == CombatRollType.AFB && usingMetali) {
                 numOfUnit = 1;
                 if (!metaliVoidCounted) {
@@ -1153,7 +1153,7 @@ public class CombatRollService {
         Map<UnitModel, Integer> unitsInCombat = getUnitsInCombat(player, unitsByAsyncId);
 
         Map<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
-                .filter(entry -> entry.getKey() != null && entry.getKey().getAfbDieCount(player, player.getGame()) > 0)
+                .filter(entry -> entry.getKey() != null && entry.getKey().getAfbDieCount(player) > 0)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
         checkBadUnits(player, event, unitsByAsyncId, output);
 
@@ -1201,8 +1201,7 @@ public class CombatRollService {
         Map<UnitModel, Integer> unitsInCombat = getUnitsInCombat(player, unitsByAsyncId);
 
         Map<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
-                .filter(entry ->
-                        entry.getKey() != null && entry.getKey().getBombardDieCount(player, player.getGame()) > 0)
+                .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount(player) > 0)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
         checkBadUnits(player, event, unitsByAsyncId, output);
 
@@ -1253,7 +1252,7 @@ public class CombatRollService {
         }
 
         Map<UnitModel, Integer> output = new HashMap<>(unitsOnPlanet.entrySet().stream()
-                .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount() > 0)
+                .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount(player) > 0)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 
         checkBadUnits(player, event, unitsByAsyncId, output);
@@ -1342,19 +1341,19 @@ public class CombatRollService {
         }
 
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsOnTile.entrySet().stream()
-                .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount(player, game) > 0)
+                .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount(player) > 0)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 
         Map<UnitModel, Integer> adjacentOutput = new HashMap<>(unitsOnAdjacentTiles.entrySet().stream()
                 .filter(entry -> entry.getKey() != null
-                        && entry.getKey().getSpaceCannonDieCount(player, game) > 0
-                        && (entry.getKey().getDeepSpaceCannon()
+                        && entry.getKey().getSpaceCannonDieCount(player) > 0
+                        && (entry.getKey().getDeepSpaceCannon(player)
                                 || game.playerHasLeaderUnlockedOrAlliance(player, "mirvedacommander")
                                 || ("spacedock".equalsIgnoreCase(entry.getKey().getBaseType()))))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
         int limit = 0;
         for (var entry : adjacentOutput.entrySet()) {
-            if (entry.getKey().getDeepSpaceCannon()) {
+            if (entry.getKey().getDeepSpaceCannon(player)) {
                 if (output.containsKey(entry.getKey())) {
                     output.put(entry.getKey(), entry.getValue() + output.get(entry.getKey()));
                 } else {

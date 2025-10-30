@@ -274,6 +274,11 @@ public abstract class UnitHolder {
     }
 
     @JsonIgnore
+    public List<Integer> getUnitStates(UnitKey key) {
+        return unitsByState.getOrDefault(key, UnitState.emptyList());
+    }
+
+    @JsonIgnore
     public int getUnitCount() {
         int count = 0;
         for (UnitKey uk : unitsByState.keySet()) count += getUnitCount(uk);
