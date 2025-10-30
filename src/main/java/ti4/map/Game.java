@@ -250,8 +250,8 @@ public class Game extends GameProperties {
         setActionCards(Mapper.getShuffledDeck("action_cards_pok"));
         setAgendas(Mapper.getShuffledDeck("agendas_pok"));
         explore = Mapper.getShuffledDeck("explores_pok");
-        setRelics(Mapper.getShuffledDeck("relics_pok"));
-        setStrategyCardSet("pok");
+        setRelics(Mapper.getShuffledDeck("relics_pok_te"));
+        setStrategyCardSet("te");
 
         // OTHER
         setEvents(new ArrayList<>()); // ignis_aurora

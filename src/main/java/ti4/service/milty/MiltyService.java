@@ -485,6 +485,12 @@ public class MiltyService {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, factionModel.getFactionSheetMessage());
         AbilityInfoService.sendAbilityInfo(player, event);
         TechInfoService.sendTechInfo(game, player, event);
+        if (!game.getStoredValue("useOldPok").isEmpty()) {
+            player.removeLeader("naaluagent-te");
+            player.addLeader("naaluagent");
+            player.removeOwnedUnitByID("naalu_mech_te");
+            player.addOwnedUnitByID("naalu_mech");
+        }
         if (game.isThundersEdge() && player.hasLeader("xxchahero")) {
             player.removeLeader("xxchahero");
             player.addLeader("xxchahero-te");

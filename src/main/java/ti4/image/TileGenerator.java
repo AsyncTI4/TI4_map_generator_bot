@@ -1700,7 +1700,8 @@ public class TileGenerator {
                         default -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
                     };
             float scale = 0.95f;
-            List<String> smallLegendaries = List.of("mirage", "mallice", "mallicelocked", "eko", "domna", "avernus");
+            List<String> smallLegendaries =
+                    List.of("mirage", "mallice", "mallicelocked", "eko", "domna", "avernus", "industrex");
             if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
                     && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
                 scale = 1.65f;

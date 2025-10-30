@@ -717,7 +717,7 @@ class PlayerAreaGenerator {
     }
 
     private int sleeperTokens(Player player, int xDeltaFromRightSide, int yDelta) {
-        if (!player.hasAbility("awaken")) {
+        if (!player.hasAbility("awaken") || player.hasTech("tf-awaken")) {
             return xDeltaFromRightSide;
         }
         String sleeperFile = ResourceHelper.getInstance().getTokenFile(Constants.TOKEN_SLEEPER_PNG);
@@ -2371,10 +2371,14 @@ class PlayerAreaGenerator {
         g2.setStroke(stroke2);
 
         int deltaX = 0;
+        if (game.isTwilightsFallMode()) {
+            deltaX = techField(x, y, techsFiltered.get("NONE"), exhaustedTechs, deltaX, player);
+        }
         deltaX = techField(x, y, techsFiltered.get(Constants.PROPULSION), exhaustedTechs, deltaX, player);
         deltaX = techField(x, y, techsFiltered.get(Constants.WARFARE), exhaustedTechs, deltaX, player);
         deltaX = techField(x, y, techsFiltered.get(Constants.CYBERNETIC), exhaustedTechs, deltaX, player);
         deltaX = techField(x, y, techsFiltered.get(Constants.BIOTIC), exhaustedTechs, deltaX, player);
+
         deltaX = techFieldUnit(x, y, techsFiltered.get(Constants.UNIT_UPGRADE), deltaX, player, game);
         deltaX = techGenSynthesis(x, y, deltaX, player, techsFiltered.get(Constants.UNIT_UPGRADE));
         deltaX = techField(x, y, purgedTechs, Collections.emptyList(), deltaX, player);
