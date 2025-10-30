@@ -54,9 +54,7 @@ public class DraftSetupService {
             sources.add(ComponentSource.ds);
             sources.add(ComponentSource.uncharted_space);
         }
-        if (game.isTwilightsFallMode()
-                || game.isThundersEdge()
-                || !game.getStoredValue("useEntropicScar").isEmpty()) {
+        if (!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) {
             sources.add(ComponentSource.thunders_edge);
         }
         // Setup managers and game state

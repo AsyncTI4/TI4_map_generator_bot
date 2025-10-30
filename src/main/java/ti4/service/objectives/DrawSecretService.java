@@ -113,11 +113,13 @@ public class DrawSecretService {
                             game.getActionsChannel(), files, message.toString(), true, false);
                 }
             }
-            if (game.isThundersEdge() || !game.getStoredValue("useNewSCs").isEmpty()) {
-                game.setStrategyCardSet("te");
-            }
-            if (game.isThundersEdge() || !game.getStoredValue("useNewRelics").isEmpty()) {
-                game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
+
+            if ((!game.getStoredValue("useOldPok").isEmpty()) && !game.isTwilightsFallMode()) {
+                game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok"));
+                game.setStrategyCardSet("pok");
+            } else if (!game.isThundersEdge() && !game.isTwilightsFallMode()) {
+                game.removeRelicFromGame("quantumcore");
+                game.removeRelicFromGame("thesilverflame");
             }
             if (game.isThundersEdge()) {
                 Player neutral = game.getPlayerFromColorOrFaction("neutral");
@@ -130,7 +132,7 @@ public class DrawSecretService {
                 }
                 game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
             }
-            if (game.isThundersEdge() || !game.getStoredValue("useNewRex").isEmpty() || game.isTwilightsFallMode()) {
+            if (game.isThundersEdge() || game.getStoredValue("useNewRex").isEmpty() || game.isTwilightsFallMode()) {
                 Tile mr = game.getMecatolTile();
                 if (mr != null) {
                     String pos = mr.getPosition();
