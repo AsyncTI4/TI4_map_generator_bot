@@ -193,7 +193,7 @@ public class AndcatReferenceCardsMessageHelper {
                 continue;
             }
 
-            messageBuilder.append(playerRepresentation + ": ");
+            messageBuilder.append(playerRepresentation).append(": ");
             messageBuilder.append(System.lineSeparator()).append("- Home System: ");
             if (refPackage.homeSystemFaction() != null) {
                 messageBuilder.append("✅");
