@@ -333,11 +333,10 @@ public class WebPlayerArea {
             String breakthroughId = player.getBreakthroughID();
             if (breakthroughId != null && !breakthroughId.isEmpty()) {
                 webPlayerArea.setBreakthrough(new BreakthroughInfo(
-                    breakthroughId,
-                    player.isBreakthroughUnlocked(),
-                    player.isBreakthroughExhausted(),
-                    player.getBreakthroughTGs()
-                ));
+                        breakthroughId,
+                        player.isBreakthroughUnlocked(),
+                        player.isBreakthroughExhausted(),
+                        player.getBreakthroughTGs()));
             } else {
                 webPlayerArea.setBreakthrough(null);
             }
