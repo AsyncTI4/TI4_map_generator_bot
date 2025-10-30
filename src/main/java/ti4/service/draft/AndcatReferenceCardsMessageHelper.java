@@ -184,7 +184,7 @@ public class AndcatReferenceCardsMessageHelper {
             ReferenceCardPackage refPackage =
                     this.draftable.getPackageByChoiceKey(playerPicks.get(0).getChoiceKey());
             if (refPackage == null) {
-                messageBuilder.append(playerRepresentation + " has an invalid package pick.");
+                messageBuilder.append(playerRepresentation).append(" has an invalid package pick.");
                 continue;
             }
 
