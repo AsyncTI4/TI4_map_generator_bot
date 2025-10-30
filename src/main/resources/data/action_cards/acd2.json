@@ -67,7 +67,7 @@
         "name": "Boarding Party",
         "phase": "Action",
         "window": "After you destroy 1 of your opponent's ships that has a cost of 4 or less",
-        "text": "Place 1 matching ship from your reinforcements in the active system. [Note: If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
+        "text": "Place 1 damaged ship of that type from your reinforcements in the active system. [Note: If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
         "flavorText": "\"Brother,\" the officer cried, \"our ships are breaking up! If we retreat now...\" Milor glared at him. \"No! Launch the remaining fighters and board the enemy in the lifepods. In Darien's name, we fight to the last!\"",
         "source": "action_deck_2"
     },
@@ -122,7 +122,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Discard 1 or more action cards to choose an equal number of other players. Each of those players gives you 1 random action card.",
-        "flavorText": "The leaked documents brought a smile to Willard's face. Schemes upon schemes, none of which would ever reach fruition.",
+        "flavorText": "The cabin door exploded as they forced it open, sending three of Claire's guards to their graves. Inside, they found neither Ronald nor the documents signed by the Custodian arbiter.",
         "source": "action_deck_2"
     },
     {
@@ -292,7 +292,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Look at another player's action cards. Then, that player gives you 1 action card, secret objective, or promissory note from their hand.",
-        "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
+        "flavorText": "The leaked documents brought a smile to Willard's face. Schemes upon schemes, none of which would ever reach fruition. ",
         "source": "action_deck_2"
     },
     {
@@ -300,7 +300,7 @@
         "name": "False Manifest",
         "phase": "Action",
         "window": "When another player gains 3 or more trade goods",
-        "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods.",
+        "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods. [Note: This works at any time such a quantity could be Pillaged. The additional trade good gained does not open another Pillage window.]",
         "flavorText": "The deal was too good to be true. Every seal was genuine, every signature correct. Only Suffi and the cargo were amiss.",
         "source": "action_deck_2"
     },
@@ -534,7 +534,7 @@
         "name": "Overtime",
         "phase": "Action",
         "window": "At the end of your turn",
-        "text": "Ready 1 of your components that isn't a strategy card.",
+        "text": "Spend up to 2 trade goods to ready an equal number of your components, other than strategy cards.",
         "flavorText": "Captain Agerro sighed. The work was not what he had expected, not what he had wanted, but it had to be done. Fighting would come later.",
         "source": "action_deck_2"
     },
@@ -597,7 +597,7 @@
         "name": "Ramming Speed",
         "phase": "Action",
         "window": "After 1 of your ships is destroyed during combat",
-        "text": "Destroy 1 of your opponent's participating ships that has a cost equal to or lower than your destroyed unit's cost.",
+        "text": "Destroy 1 of your opponent's ships in the active system that has a cost equal to or lower than your destroyed unit's cost.",
         "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
         "source": "action_deck_2"
     },
@@ -715,7 +715,7 @@
         "phase": "Any",
         "window": "When another player plays an action card other than 'Sabotage'",
         "text": "Cancel that action card.",
-        "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother Milor,\" they said in unison.",
+        "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
         "source": "action_deck_2"
     },
     {
@@ -823,7 +823,7 @@
         "phase": "Any",
         "window": "When you would spend a command token from your strategy pool",
         "text": "Remove 1 of your command tokens from the game board instead.",
-        "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair and finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
+        "flavorText": "",
         "source": "action_deck_2"
     },
     {
@@ -868,7 +868,7 @@
         "phase": "Action",
         "window": "After you produce hits against a non-upgraded unit that matches a unit upgrade technology you own",
         "text": "Those hits must be assigned to units of that type, if able.",
-        "flavorText": "\"Battle isn't arithmetic,\" Unlenn mused to his lieutenant. \"It's power, the way space misbehaves, the patience to find an Ixthian heel, and so much more. The lesser houses never learn.\"",
+        "flavorText": "\"Battle isn’t arithmetic,\" Unlenn said. \"Every enemy can be exploited; each has an Ixthian heel. This is a harsh lesson we must teach our lessers.\"",
         "source": "action_deck_2"
     },
     {
@@ -1240,7 +1240,7 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Destroy 1 of your units to move 1 ingress token into that unit's system. Then, gain 2 commodities or your breakthrough.",
+        "text": "Destroy 1 of your units to move 1 ingress token into that unit's system. Then, gain 2 trade goods or your breakthrough.",
         "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "action_deck_2"
     },

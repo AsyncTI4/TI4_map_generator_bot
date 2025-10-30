@@ -47,7 +47,8 @@
             "grn",
             "ptr"
         ],
-        "source": "base"
+        "source": "base",
+        "priorityNumber": 29
     },
     {
         "alias": "ghost",
@@ -101,7 +102,8 @@
             "blu",
             "gcr"
         ],
-        "source": "base"
+        "source": "base",
+        "priorityNumber": 20
     },
     {
         "alias": "hacan",
@@ -156,7 +158,8 @@
             "ylw",
             "crm"
         ],
-        "source": "base"
+        "source": "base",
+        "priorityNumber": 18
     },
     {
         "alias": "jolnar",
@@ -214,7 +217,8 @@
             "ppl",
             "lgy"
         ],
-        "source": "base"
+        "source": "base",
+        "priorityNumber": 24
     },
     {
         "alias": "l1z1x",
@@ -268,7 +272,8 @@
             "red",
             "rby"
         ],
-        "source": "base"
+        "source": "base",
+        "priorityNumber": 5
     },
     {
         "alias": "letnev",
@@ -321,7 +326,8 @@
             "red",
             "blk"
         ],
-        "source": "base"
+        "source": "base",
+        "priorityNumber": 8
     },
     {
         "alias": "mentak",
@@ -374,7 +380,8 @@
             "org",
             "gld"
         ],
-        "source": "base"
+        "source": "base",
+        "priorityNumber": 15
     },
     {
         "alias": "muaat",
@@ -426,7 +433,8 @@
             "org",
             "mgm"
         ],
-        "source": "base"
+        "source": "base",
+        "priorityNumber": 14
     },
     {
         "alias": "naalu",
@@ -479,7 +487,8 @@
             "grn",
             "wtm"
         ],
-        "source": "base"
+        "source": "base",
+        "priorityNumber": 28
     },
     {
         "alias": "nekro",
@@ -532,7 +541,8 @@
             "red",
             "pld"
         ],
-        "source": "base"
+        "source": "base",
+        "priorityNumber": 22
     },
     {
         "alias": "saar",
@@ -584,7 +594,8 @@
             "org",
             "tan"
         ],
-        "source": "base"
+        "source": "base",
+        "priorityNumber": 17
     },
     {
         "alias": "sardakk",
@@ -636,7 +647,8 @@
             "wtm",
             "psn"
         ],
-        "source": "base"
+        "source": "base",
+        "priorityNumber": 10
     },
     {
         "alias": "sol",
@@ -688,7 +700,8 @@
             "spr",
             "gry"
         ],
-        "source": "base"
+        "source": "base",
+        "priorityNumber": 3
     },
     {
         "alias": "winnu",
@@ -747,7 +760,8 @@
             "sns",
             "crm"
         ],
-        "source": "base"
+        "source": "base",
+        "priorityNumber": 27
     },
     {
         "alias": "xxcha",
@@ -799,7 +813,8 @@
             "grn",
             "hqn"
         ],
-        "source": "base"
+        "source": "base",
+        "priorityNumber": 26
     },
     {
         "alias": "yin",
@@ -850,7 +865,8 @@
             "ppl",
             "rby"
         ],
-        "source": "base"
+        "source": "base",
+        "priorityNumber": 4
     },
     {
         "alias": "yssaril",
@@ -903,6 +919,7 @@
             "grn",
             "cqr"
         ],
-        "source": "base"
+        "source": "base",
+        "priorityNumber": 11
     }
 ]

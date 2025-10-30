@@ -161,7 +161,9 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
 
         return (Player p) -> {
             if (!shouldAlsoSetSeat(draftManager)) {
-                draftManager.getGame().setPriorityTrackMode(PriorityTrackMode.THIS_ROUND_ONLY);
+                if (draftManager.getGame().getPriorityTrackMode() == PriorityTrackMode.NONE) {
+                    draftManager.getGame().setPriorityTrackMode(PriorityTrackMode.THIS_ROUND_ONLY);
+                }
                 PriorityTrackHelper.AssignPlayerToPriority(draftManager.getGame(), p, speakerNum);
             }
         };

@@ -1233,7 +1233,7 @@ public class ButtonHelperFactionSpecific {
                 if (numOfUnit < 1) {
                     continue;
                 }
-                int toHit = unit.getCombatDieHitsOnForAbility(CombatRollType.combatround);
+                int toHit = unit.getCombatDieHitsOnForAbility(CombatRollType.combatround, player);
                 int modifierToHit = 0;
                 int extraRollsForUnit = 0;
                 int numRollsPerUnit = 1;

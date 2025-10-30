@@ -583,6 +583,26 @@ public class Helper {
     }
 
     @Nullable
+    public static String getGalvanizeTokenPath() {
+        String tokenPath = ResourceHelper.getResourceFromFolder("extra/", "marker_galvanize.png");
+        if (tokenPath == null) {
+            BotLogger.warning("Could not find token: marker_galvanize");
+            return null;
+        }
+        return tokenPath;
+    }
+
+    @Nullable
+    public static String getGalvanizeTagPath() {
+        String tokenPath = ResourceHelper.getResourceFromFolder("extra/", "marker_galvanized.png");
+        if (tokenPath == null) {
+            BotLogger.warning("Could not find token: marker_galvanized");
+            return null;
+        }
+        return tokenPath;
+    }
+
+    @Nullable
     public static String getDamagePath() {
         String tokenPath = ResourceHelper.getResourceFromFolder("extra/", "marker_damage.png");
         if (tokenPath == null) {
@@ -1277,13 +1297,6 @@ public class Helper {
         for (String thing : spentThings) {
             boolean found = false;
             switch (thing) {
-                case "dwsDiscount" -> {
-                    msg.append("> Used Deepwrought's Commander Discount ")
-                            .append(MiscEmojis.Resources_1)
-                            .append("\n");
-                    res += 1;
-                    found = true;
-                }
                 case "sarween" -> {
                     msg.append("> Used _Sarween Tools_ " + TechEmojis.CyberneticTech + "\n");
                     res += 1;
@@ -1308,6 +1321,7 @@ public class Helper {
                     && !thing.contains("boon")
                     && !thing.contains("warmachine")
                     && !thing.contains("ghostbt")
+                    && !thing.contains("dwsDiscount")
                     && !thing.contains("aida")
                     && !thing.contains("commander")
                     && !thing.contains("agent")
@@ -1397,7 +1411,16 @@ public class Helper {
                     }
                 }
             } else {
-
+                if (thing.contains("dwsDiscount")) {
+                    String faction = thing.replace("dwsDiscount_", "");
+                    if (game.isFowMode()) {
+                        faction = "someone";
+                    }
+                    msg.append("> Used " + faction + "'s Commander Discount ")
+                            .append(MiscEmojis.Resources_1)
+                            .append("\n");
+                    res += 1;
+                }
                 if (thing.contains("boon")) {
                     msg.append("> Used Boon Relic ").append(ExploreEmojis.Relic).append("\n");
                     res += 1;

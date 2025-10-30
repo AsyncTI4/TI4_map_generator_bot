@@ -1,14 +1,23 @@
 package ti4.service.unit;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitState;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
+import ti4.model.UnitModel;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 import ti4.service.planet.FlipTileService;
@@ -61,6 +70,77 @@ public class AddUnitService {
         }
 
         handleFogOfWar(tile, color, game, unitList);
+        checkFleetCapacity(tile, color, game);
+    }
+
+    /**
+     * Ignore any locations in the provided unit list, and place them all in "default" locations.
+     * This is useful when the unitList is for a different tile than what you're placing.
+     * Ex. You draft a starting fleet, and place it on a different home system.
+     */
+    public static void addUnitsToDefaultLocations(
+            GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList) {
+        Player player = game.getPlayerFromColorOrFaction(color);
+        if (player == null) {
+            throw new IllegalArgumentException("No player found for color/faction: " + color);
+        }
+        // Combine units of the same type, ignoring location
+        Map<UnitType, Integer> unitCounts = Helper.getUnitList(unitList);
+        // Get the planet names, ordered by resources descending
+        List<String> planetNames = tile.getPlanetUnitHolders().stream()
+                .sorted((ph1, ph2) -> Integer.compare(
+                        ph2.getPlanetModel().getResources(),
+                        ph1.getPlanetModel().getResources()))
+                .map(UnitHolder::getName)
+                .toList();
+
+        // Distribute non-space units amongst planets evenly, and dump ships into space
+        List<ParsedUnit> assignedUnits = new ArrayList<>();
+        for (Entry<UnitType, Integer> entry : unitCounts.entrySet()) {
+            UnitType unitType = entry.getKey();
+            Integer totalAmt = entry.getValue();
+            String asyncId = unitType.getValue().toLowerCase();
+            UnitModel mod = player.getUnitsByAsyncID(asyncId).getFirst();
+            // Ships go to space
+            if (mod.getIsShip()
+                    || (UnitType.Spacedock == unitType
+                            && (player.hasUnit("saar_spacedock") || player.hasUnit("tf-floatingfactory")))) {
+                assignedUnits.add(new ParsedUnit(Units.getUnitKey(unitType, color), totalAmt, Constants.SPACE));
+                continue;
+            }
+
+            // Non-ships get distributed to planets, prioritizing high-resource planets
+            int minUnitsPerPlanet = totalAmt / planetNames.size();
+            int remainder = totalAmt % planetNames.size();
+            for (int i = 0; i < planetNames.size(); i++) {
+                int amtForThisPlanet = minUnitsPerPlanet + (i < remainder ? 1 : 0);
+                if (amtForThisPlanet > 0) {
+                    assignedUnits.add(
+                            new ParsedUnit(Units.getUnitKey(unitType, color), amtForThisPlanet, planetNames.get(i)));
+                }
+            }
+        }
+
+        // Now actually add the units
+        StringBuilder unitListBuilder = new StringBuilder();
+        boolean first = true;
+        for (ParsedUnit parsedUnit : assignedUnits) {
+            tile.addUnit(parsedUnit.getLocation(), parsedUnit.getUnitKey(), parsedUnit.getCount());
+            tile = FlipTileService.flipTileIfNeeded(tile, game);
+            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.getLocation(), game);
+            if (!first) {
+                unitListBuilder.append(", ");
+            }
+            unitListBuilder
+                    .append(parsedUnit.getCount())
+                    .append(" ")
+                    .append(parsedUnit.getUnitKey().asyncID())
+                    .append(" ")
+                    .append(parsedUnit.getLocation());
+            first = false;
+        }
+
+        handleFogOfWar(tile, color, game, unitListBuilder.toString());
         checkFleetCapacity(tile, color, game);
     }
 

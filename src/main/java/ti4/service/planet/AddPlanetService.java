@@ -69,7 +69,9 @@ public class AddPlanetService {
             setup = false;
         }
         if (unitHolder == null) {
-            BotLogger.error(new LogOrigin(event), "Unitholder found null in addPlanet for planet " + planet);
+            BotLogger.error(
+                    event != null ? new LogOrigin(event) : null,
+                    "Unitholder found null in addPlanet for planet " + planet);
             unitHolder = game.getUnitHolderFromPlanet(planet);
         }
         if (player.isRealPlayer() && unitHolder.getTokenList().contains("token_freepeople.png")) {

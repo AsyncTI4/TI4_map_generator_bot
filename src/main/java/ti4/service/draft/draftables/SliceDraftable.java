@@ -242,6 +242,7 @@ public class SliceDraftable extends SinglePickDraftable {
     private String doMiltyGeneration(
             GenericInteractionCreateEvent event, Game game, DraftSystemSettings draftSystemSettings) {
         DraftSpec specs = DraftSpec.SliceSpecsFromDraftSystemSettings(draftSystemSettings);
+        game.setMapTemplateID(specs.getTemplate().getID());
 
         // Ensure we can't start yet
         slices = null;
@@ -249,6 +250,7 @@ public class SliceDraftable extends SinglePickDraftable {
         SliceGenerationPipeline.queue(event, this, game.getDraftTileManager(), specs, (Boolean success) -> {
             if (success) {
                 game.getDraftManager().tryStartDraft();
+                GameManager.save(game, "Milty generation");
             } else {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),

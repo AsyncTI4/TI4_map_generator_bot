@@ -23,13 +23,17 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.FactionModel;
+import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.service.button.ReactionService;
 import ti4.service.draft.DraftTileManager;
+import ti4.service.draft.MantisMapBuildContext;
+import ti4.service.draft.MantisMapBuildService;
 import ti4.service.franken.FrankenDraftBagService;
+import ti4.service.franken.FrankenMapBuildContextHelper;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
@@ -39,6 +43,7 @@ import ti4.service.unit.AddUnitService;
 
 public class ButtonHelperTwilightsFall {
 
+    @ButtonHandler("startFrankenSliceBuild")
     public static void startSliceBuild(Game game, GenericInteractionCreateEvent event) {
         try {
             MiltyDraftManager manager = game.getMiltyDraftManager();
@@ -47,11 +52,19 @@ public class ButtonHelperTwilightsFall {
                 playerIDs.add(p.getUserID());
             }
             manager.setPlayers(playerIDs);
+            List<DraftItem.Category> componentCategories = game.isTwilightsFallMode()
+                    ? FrankenDraftBagService.TFcomponentCategories
+                    : List.of(
+                            DraftItem.Category.DRAFTORDER,
+                            DraftItem.Category.HOMESYSTEM,
+                            DraftItem.Category.STARTINGFLEET,
+                            DraftItem.Category.BLUETILE,
+                            DraftItem.Category.REDTILE);
             for (Player p : game.getPlayers().values()) {
                 DraftBag bag = p.getDraftHand();
                 PlayerDraft draft = manager.getPlayerDraft(p);
                 List<MiltyDraftTile> slice = new ArrayList<>();
-                for (DraftItem.Category category : FrankenDraftBagService.TFcomponentCategories) {
+                for (DraftItem.Category category : componentCategories) {
                     List<DraftItem> items = bag.Contents.stream()
                             .filter(item -> item.ItemCategory == category)
                             .toList();
@@ -112,6 +125,88 @@ public class ButtonHelperTwilightsFall {
         }
     }
 
+    @ButtonHandler("startFrankenMantisBuild")
+    public static void startMantisBuild(Game game, GenericInteractionCreateEvent event) {
+        try {
+            MiltyDraftManager manager = game.getMiltyDraftManager();
+            List<String> playerIDs = new ArrayList<>();
+            for (Player p : game.getRealPlayers()) {
+                playerIDs.add(p.getUserID());
+            }
+            manager.setPlayers(playerIDs);
+            List<DraftItem.Category> componentCategories = game.isTwilightsFallMode()
+                    ? FrankenDraftBagService.TFcomponentCategories
+                    : List.of(
+                            DraftItem.Category.DRAFTORDER,
+                            DraftItem.Category.HOMESYSTEM,
+                            DraftItem.Category.STARTINGFLEET);
+            for (Player p : game.getPlayers().values()) {
+                DraftBag bag = p.getDraftHand();
+                PlayerDraft draft = manager.getPlayerDraft(p);
+                for (DraftItem.Category category : componentCategories) {
+                    List<DraftItem> items = bag.Contents.stream()
+                            .filter(item -> item.ItemCategory == category)
+                            .toList();
+                    if (items.isEmpty()) {
+                        continue;
+                    }
+                    List<Button> buttons = new ArrayList<>();
+                    if (category == DraftItem.Category.DRAFTORDER) {
+                        draft.setPosition(Integer.parseInt(items.getFirst().ItemId));
+                        if (Integer.parseInt(items.getFirst().ItemId) == 1) {
+                            game.setSpeaker(p);
+                        }
+                    }
+                    if (category == DraftItem.Category.HOMESYSTEM) {
+                        draft.setFaction(items.getFirst().ItemId);
+                        for (DraftItem item : items) {
+                            buttons.add(Buttons.green("chooseHomeSystem_" + item.ItemId, item.getShortDescription()));
+                            game.setStoredValue(
+                                    "draftedHSFor" + p.getUserID(),
+                                    game.getStoredValue("draftedHSFor" + p.getUserID()) + "_" + item.ItemId);
+                        }
+                        MessageHelper.sendMessageToChannel(
+                                p.getCardsInfoThread(),
+                                p.getRepresentation() + " choose your starting home system",
+                                buttons);
+                    }
+                    if (category == DraftItem.Category.STARTINGFLEET) {
+                        for (DraftItem item : items) {
+                            buttons.add(
+                                    Buttons.green("chooseStartingFleet_" + item.ItemId, item.getShortDescription()));
+                        }
+                        MessageHelper.sendMessageToChannel(
+                                p.getCardsInfoThread(),
+                                p.getRepresentation() + " after choosing your home system, choose your starting fleet",
+                                buttons);
+                    }
+                }
+            }
+
+            // Ensure map template is set
+            String mapTemplate = game.getMapTemplateID();
+            if (mapTemplate == null || mapTemplate.equals("null")) {
+                MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(
+                        manager.getPlayers().size());
+                if (defaultTemplate == null) {
+                    throw new Exception("idk how to build this map yet: " + game.getName() + ", players: "
+                            + manager.getPlayers().size());
+                }
+                game.setMapTemplateID(defaultTemplate.getAlias());
+                manager.setMapTemplate(defaultTemplate.getAlias());
+            }
+
+            // Place draft tiles
+            MiltyDraftHelper.buildPartialMap(game, event);
+
+            // Send buttons for map build
+            MantisMapBuildContext mapBuildContext = FrankenMapBuildContextHelper.createContext(game);
+            MantisMapBuildService.initializeMapBuilding(mapBuildContext);
+        } catch (Exception e) {
+            BotLogger.error(new LogOrigin(event, game), "err", e);
+        }
+    }
+
     @ButtonHandler("chooseStartingFleet_")
     public static void chooseStartingFleet(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String factionFleet = buttonID.split("_")[1];
@@ -130,52 +225,11 @@ public class ButtonHelperTwilightsFall {
         Tile tile = game.getTileByPosition(pos);
 
         if (!pos.isEmpty()) {
-            Map<UnitType, Integer> unitCounts =
-                    Helper.getUnitList(Mapper.getFaction(factionFleet).getStartingFleet());
-            for (UnitType unit : unitCounts.keySet()) {
-                int amount = unitCounts.get(unit);
-                UnitModel mod =
-                        player.getUnitsByAsyncID(unit.getValue().toLowerCase()).getFirst();
-                String bestResPlanet = null;
-                int best = 0;
-                for (Planet plan : tile.getPlanetUnitHolders()) {
-                    if (plan.getResources() > best) {
-                        best = plan.getResources();
-                        bestResPlanet = plan.getName();
-                    }
-                }
-                if (mod != null) {
-                    if (bestResPlanet == null
-                            || mod.getIsShip()
-                            || (UnitType.Spacedock == unit
-                                    && (player.hasUnit("saar_spacedock") || player.hasUnit("tf-floatingfactory")))) {
-                        AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " " + mod.getAsyncId());
-                    } else {
-                        if (UnitType.Spacedock == unit) {
-                            AddUnitService.addUnits(
-                                    event,
-                                    tile,
-                                    game,
-                                    player.getColor(),
-                                    amount + " " + mod.getAsyncId() + " " + bestResPlanet);
-                        } else {
-                            while (amount > 0) {
-                                for (Planet plan : tile.getPlanetUnitHolders()) {
-                                    if (amount > 0) {
-                                        AddUnitService.addUnits(
-                                                event,
-                                                tile,
-                                                game,
-                                                player.getColor(),
-                                                "1 " + mod.getAsyncId() + " " + plan.getName());
-                                        amount--;
-                                    }
-                                    player.refreshPlanet(plan.getName());
-                                }
-                            }
-                        }
-                    }
-                }
+            String unitList = Mapper.getFaction(factionFleet).getStartingFleet();
+            AddUnitService.addUnitsToDefaultLocations(event, tile, game, player.getColor(), unitList);
+
+            for (Planet plan : tile.getPlanetUnitHolders()) {
+                player.refreshPlanet(plan.getName());
             }
 
             MessageHelper.sendMessageToChannel(
@@ -211,10 +265,10 @@ public class ButtonHelperTwilightsFall {
 
             Tile toAdd = new Tile(tileID, pos);
             game.setTile(toAdd);
-            toAdd.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
             player.setHomeSystemPosition(pos);
             player.setPlayerStatsAnchorPosition(pos);
             if ("ghost".equals(faction)) {
+                toAdd.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
                 pos = "tr";
                 if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
                     pos = "br";

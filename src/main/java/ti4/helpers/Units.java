@@ -228,6 +228,10 @@ public class Units {
             return List.of(dmg, dmg_glv, glv, none);
         }
 
+        public static List<UnitState> unitRenderOrder() {
+            return List.of(none, dmg, glv, dmg_glv);
+        }
+
         public static List<Integer> emptyList() {
             List<Integer> ls = new ArrayList<>();
             for (int i = 0; i < values().length; i++) ls.add(0);
