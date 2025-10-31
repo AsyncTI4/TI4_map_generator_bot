@@ -1436,7 +1436,6 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.gray("deleteButtons", "Done Resolving"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
-            // "tf-reverse"
 
             if ("tf-reverse".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveReverseTF", buttonLabel));
