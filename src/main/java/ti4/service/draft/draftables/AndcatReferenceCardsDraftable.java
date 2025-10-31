@@ -14,8 +14,10 @@ import java.util.function.Consumer;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.collections4.ListUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.Constants;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
@@ -69,15 +71,11 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         return "Faction Reference Cards";
     }
 
-    public void initialize(
+    public String initialize(
             int numPackages, List<ComponentSource> sources, List<String> presetFactions, List<String> bannedFactions) {
 
-        List<String> effBannedFactions = new ArrayList<>(bannedFactions);
-
-        // TODO: Balance the packages somehow
-
         List<String> availableFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
-                .filter(f -> !effBannedFactions.contains(f.getAlias()))
+                .filter(f -> !bannedFactions.contains(f.getAlias()))
                 .filter(f -> !presetFactions.contains(f.getAlias()))
                 .filter(f -> f.getPriorityNumber() != null)
                 .filter(f -> sources.contains(f.getSource()))
@@ -92,27 +90,47 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         randomOrder = new LinkedList<>(randomOrder.stream().distinct().toList());
 
         if (randomOrder.size() < numPackages * 3) {
-            BotLogger.warning("Not enough factions to fill Andcat Reference Card Packages. " + "Requested "
-                    + numPackages + " packages but only " + randomOrder.size()
-                    + " factions available.");
-            return;
+            return "Not enough factions to fill Andcat Reference Card Packages. " + "Requested "
+                    + numPackages + " packages (requiring " + (numPackages * 3) + " factions) but only "
+                    + randomOrder.size()
+                    + " factions available.";
+        }
+
+        List<String> selectedFactions = randomOrder.stream()
+                .limit(numPackages * 3)
+                .sorted((p1, p2) -> {
+                    FactionModel f1 = Mapper.getFaction(p1);
+                    FactionModel f2 = Mapper.getFaction(p2);
+                    return Integer.compare(f1.getPriorityNumber(), f2.getPriorityNumber());
+                })
+                .toList();
+        List<List<String>> partitionedFactions = ListUtils.partition(selectedFactions, 3);
+        if (partitionedFactions.size() < numPackages) {
+            BotLogger.warning(Constants.jabberwockyPing()
+                    + " Not enough factions to fill Andcat Reference Card Packages after prioritization. "
+                    + "Requested " + numPackages + " packages but only " + partitionedFactions.size() + " packages "
+                    + "available after prioritization.");
+            return "Couldn't fill all reference card packages for some reason. A developer has been pinged. You can try enabling more factions in the meantime.";
+        }
+        if (partitionedFactions.getLast().size() < 3) {
+            BotLogger.warning(Constants.jabberwockyPing()
+                    + " Last Andcat Reference Card Package has less than 3 factions after prioritization. "
+                    + "Requested " + numPackages + " packages but last package only has "
+                    + partitionedFactions.getLast().size() + " factions.");
+            return "Couldn't fill all reference card packages for some reason. A developer has been pinged. You can try enabling more factions in the meantime.";
         }
 
         for (int packageKey = 1; packageKey <= numPackages; packageKey++) {
             List<String> packageFactions = new ArrayList<>();
-            for (int i = 0; i < 3 && !randomOrder.isEmpty(); i++) {
-                packageFactions.add(randomOrder.removeFirst());
-            }
-            if (packageFactions.size() < 3) {
-                BotLogger.warning(
-                        new LogOrigin(),
-                        "Not enough factions to fill Andcat Reference Card Package " + packageKey + ". Only found "
-                                + packageFactions.size() + " factions.");
-            }
+            packageFactions.add(partitionedFactions.get(0).get(packageKey - 1));
+            packageFactions.add(partitionedFactions.get(1).get(packageKey - 1));
+            packageFactions.add(partitionedFactions.get(2).get(packageKey - 1));
             ReferenceCardPackage refCardPackage =
                     new ReferenceCardPackage(packageKey, packageFactions, null, null, null, null);
             referenceCardPackages.put(packageKey, refCardPackage);
         }
+
+        return null;
     }
 
     public static List<FactionModel> getFactionsInPackage(ReferenceCardPackage refCardPackage) {
@@ -374,18 +392,19 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         AndcatReferenceCardsDraftableSettings settings = draftSystemSettings.getAndcatReferenceCardsDraftableSettings();
         SourceSettings sourceSettings = draftSystemSettings.getSourceSettings();
 
-        initialize(
+        String error = initialize(
                 settings.getNumPackages().getVal(),
                 sourceSettings.getFactionSources(),
                 settings.getPriFactions().getKeys().stream().toList(),
                 settings.getBanFactions().getKeys().stream().toList());
 
-        return null;
+        return error;
     }
 
     @Override
     public void onDraftEnd(DraftManager draftManager) {
         // Send buttons to assign reference cards to specific setup things
+        AndcatReferenceCardsMessageHelper andcatMessageHelper = new AndcatReferenceCardsMessageHelper(this);
         for (String playerId : draftManager.getPlayerStates().keySet()) {
             List<DraftChoice> playerChoices = draftManager.getPlayerPicks(playerId, TYPE);
             if (playerChoices == null || playerChoices.isEmpty()) {
@@ -394,8 +413,10 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             DraftChoice pick = playerChoices.get(0);
             ReferenceCardPackage refPackage = this.getPackageByChoiceKey(pick.getChoiceKey());
             Player player = draftManager.getGame().getPlayer(playerId);
-            new AndcatReferenceCardsMessageHelper(this).sendPackageButtons(draftManager, player, refPackage);
+
+            andcatMessageHelper.sendPackageButtons(draftManager, player, refPackage);
         }
+        andcatMessageHelper.updatePackagePickSummary(draftManager);
     }
 
     @Override
