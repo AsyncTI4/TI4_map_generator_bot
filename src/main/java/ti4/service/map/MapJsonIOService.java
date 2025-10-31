@@ -46,7 +46,12 @@ public class MapJsonIOService {
         importMapFromJson(game, jsonString, event.getChannel());
     }
 
-    public static String exportMapAsJson(GenericInteractionCreateEvent event, Game game) {
+    public static String exportMapAsJson(
+            GenericInteractionCreateEvent event,
+            Game game,
+            boolean includeTokens,
+            boolean includeAttachments,
+            boolean includeLore) {
         try {
             MapDataIO mapData = new MapDataIO();
             List<TileIO> tiles = new ArrayList<>();
@@ -58,7 +63,8 @@ public class MapJsonIOService {
                 t.setTileID(tile.getTileID());
 
                 // tokens
-                if (tile.getSpaceUnitHolder() != null
+                if (includeTokens
+                        && tile.getSpaceUnitHolder() != null
                         && !tile.getSpaceUnitHolder().getTokenList().isEmpty()) {
                     t.setTokens(new ArrayList<>(tile.getSpaceUnitHolder().getTokenList()));
                 }
@@ -89,13 +95,14 @@ public class MapJsonIOService {
                     boolean planetHasExportedData = false;
                     PlanetIO pi = new PlanetIO();
                     pi.setPlanetID(planet.getName());
-                    if (planet.getAttachments() != null
+                    if (includeAttachments
+                            && planet.getAttachments() != null
                             && !planet.getAttachments().isEmpty()) {
                         pi.setAttachments(new ArrayList<>(planet.getAttachments()));
                         planetHasExportedData = true;
                     }
                     String[] loreData = savedLoreMap.get(planet.getName());
-                    if (loreData != null) {
+                    if (includeLore && loreData != null) {
                         pi.setPlanetLore(Arrays.asList(loreData[0], loreData[1]));
                         planetHasExportedData = true;
                     }
@@ -109,7 +116,7 @@ public class MapJsonIOService {
 
                 // system lore
                 String[] loreData = savedLoreMap.get(tile.getPosition());
-                if (loreData != null) {
+                if (includeLore && loreData != null) {
                     t.setSystemLore(Arrays.asList(loreData[0], loreData[1]));
                 }
 
@@ -151,7 +158,9 @@ public class MapJsonIOService {
             game.removeAllTiles();
             game.clearAdjacentTileOverrides();
             game.clearCustomAdjacentTiles();
-            game.setBorderAnomalies(null);
+            game.setBorderAnomalies(Collections.emptyList());
+            game.setCustomHyperlaneData(Collections.emptyMap());
+            LoreService.clearLore(game);
 
             for (TileIO tileIO : mapData.getMapInfo()) {
                 if (handleTile(tileIO, game, errorSb)) {
