@@ -222,7 +222,7 @@ public class JdaService {
             guildFogOfWarSecondary = initGuild(args[14], false);
             fowServers.add(guildFogOfWarSecondary);
         }
-        
+
         // Async: Tournament Server 1
         if (args.length >= 16) {
             guildTourney = initGuild(args[15], false);
