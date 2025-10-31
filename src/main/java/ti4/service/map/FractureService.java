@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.ButtonHelper;
@@ -40,15 +38,16 @@ public class FractureService {
     @ButtonHandler("rollFracture")
     private static void resolveFractureRoll(ButtonInteractionEvent event, Game game, Player player) {
         int result = new Die(0).getResult();
-        if(player.hasBreakthrough("cabalbt")){
-            String msg = player.getRepresentation(false, false) + " has Cabal breakthrough so the Fracture enters automatically"
-                        + "! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+        if (player.hasBreakthrough("cabalbt")) {
+            String msg = player.getRepresentation(false, false)
+                    + " has Cabal breakthrough so the Fracture enters automatically"
+                    + "! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
             spawnFracture(event, game);
             spawnIngressTokens(event, game, player, true);
             AlRaithService.serveBeginCabalBreakthroughButtons(event, game, player);
-            
-        }else{
+
+        } else {
             if (result == 1 || result == 10) { // success
                 String msg = player.getRepresentation(false, false) + " rolled a " + DiceEmojis.getGreenDieEmoji(result)
                         + "! The Fracture is now in play! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";

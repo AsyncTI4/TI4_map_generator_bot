@@ -315,6 +315,9 @@ public class FoWHelper {
         Set<String> adjacentPositions = new HashSet<>();
         Set<Tile> allTiles = new HashSet<>(game.getTileMap().values());
         Tile tile = game.getTileByPosition(position);
+        if (tile == null) {
+            return adjacentPositions;
+        }
 
         Set<Feature> adjToFeatures = new HashSet<>();
         for (String alias : tile.getTileModel().getAliases()) {
