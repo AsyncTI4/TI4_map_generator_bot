@@ -26,19 +26,15 @@ class ServerGameStats extends Subcommand {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        List<String> skipGuilds = new ArrayList<>();
-        skipGuilds.add("847560709730730064"); // CPTI
-        skipGuilds.add("1062139934745559160"); // FoW
-        skipGuilds.add("1218341032857440259"); // Megagame
+        List<Guild> guildsToShow = new ArrayList<>(JdaService.serversToCreateNewGamesOn);
 
         boolean includeHub = event.getOption(Constants.INCLUDE_HUB, false, OptionMapping::getAsBoolean);
-        if (!includeHub) skipGuilds.add(Constants.ASYNCTI4_HUB_SERVER_ID);
+        if (includeHub) guildsToShow.add(JdaService.guildPrimary);
 
         int hostedGames = 0;
         int roomForGames = 0;
 
-        List<Guild> guilds = JdaService.guilds.stream()
-                .filter(g -> !skipGuilds.contains(g.getId()))
+        List<Guild> guilds = guildsToShow.stream()
                 .sorted(Comparator.comparing(Guild::getIdLong)) // Sort by creation date
                 .toList();
 
