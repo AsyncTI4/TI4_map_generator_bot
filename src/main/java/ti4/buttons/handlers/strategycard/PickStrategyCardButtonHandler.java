@@ -112,7 +112,7 @@ public class PickStrategyCardButtonHandler {
                 }
             }
         }
-        if (game.getStoredValue("deflectedSC").equalsIgnoreCase(num)) {
+        if (game.getStoredValue("deflectedSC").equalsIgnoreCase(num) && !game.isTwilightsFallMode()) {
             if (player.getStrategicCC() < 1) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),

@@ -297,7 +297,7 @@ public class ButtonHelperAgents {
             if (ownedUnit != null && ownedUnit.getCost() <= removedUnit.getCost() + 2) {
                 String buttonID = finChecker + "arboAgentPutShip_" + ownedUnit.getBaseType() + "_" + tile.getPosition();
                 String buttonText = "Place " + ownedUnit.getName();
-                buttons.add(Buttons.red(buttonID, buttonText, ownedUnit.getUnitEmoji()));
+                buttons.add(Buttons.green(buttonID, buttonText, ownedUnit.getUnitEmoji()));
             }
         }
 
@@ -966,8 +966,8 @@ public class ButtonHelperAgents {
                             + ssruuSlash + " agent, on their next roll.");
             game.setCurrentReacts("solagent", p2.getFaction());
         }
-        if ("valientagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Valient genome.";
+        if ("valiantagent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Valiant genome.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);

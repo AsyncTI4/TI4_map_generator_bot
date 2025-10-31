@@ -845,6 +845,9 @@ public class Helper {
                 label += " [Has " + game.getScTradeGoods().get(sc) + " Trade Good"
                         + (game.getScTradeGoods().get(sc) == 1 ? "" : "s") + "]";
             }
+            if (game.isTwilightsFallMode() && game.getStoredValue("deflectedSC").equalsIgnoreCase(sc + "")) {
+                label += " [Has Tartarus On It]";
+            }
             if (sc == ButtonHelper.getKyroHeroSC(game)) {
                 label += " - Kyro Hero Cursed";
             }
@@ -1870,6 +1873,24 @@ public class Helper {
                 if (adjacentTile != null && adjacentTile.isSupernova()) {
                     cosmicSuper = true;
                     break;
+                }
+            }
+        }
+        if (tile.isScar()) {
+            return 0;
+        }
+        if (game.isTwilightsFallMode()) {
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                if (p2.hasTech("tf-smotheringpresence")) {
+                    for (String tilePos : FoWHelper.getAdjacentTiles(game, getDamagePath(), player, false, true)) {
+                        Tile t2 = game.getTileByPosition(tilePos);
+                        for (UnitHolder uH : t2.getUnitHolders().values()) {
+                            if (uH.getUnitCount(UnitType.Pds, p2.getColor()) > 0
+                                    || uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
+                                return 0;
+                            }
+                        }
+                    }
                 }
             }
         }

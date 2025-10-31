@@ -268,15 +268,21 @@ public class CreateGameService {
         Button teOptions = Buttons.green("offerTEOptionButtons", "Galactic Events");
         MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Enable Galactic Events", teOptions);
 
+        Button tfOptions = Buttons.green("startTFGame", "Start Twilight's Fall Game");
+        MessageHelper.sendMessageToChannelWithButton(
+                actionsChannel,
+                "If you want to start a Twilight's Fall Game (alternate game mode included in Thunder's Edge) use this button",
+                tfOptions);
+
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("chooseExp_newPoK", "New PoK"));
         buttons.add(Buttons.gray("chooseExp_oldPoK", "Old PoK"));
         buttons.add(Buttons.blue("chooseExp_te", "Thunder's Edge + New PoK"));
         String expMsg =
                 "Which expansion are you using for this game?\n-# This will adjust available components accordingly. To elaborate on the options:\n"
-                        + "> **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, or the fracture. This mode has the new relics, finalized codex cards (except Xxcha hero), new tiles, and new Strategy Cards. It is the default if you do not press any of these buttons.\n"
+                        + "> **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, ACs, or the fracture. This mode has the new relics, finalized codex cards (except Xxcha hero), new tiles, and new Strategy Cards. It is the default if you do not press any of these buttons.\n"
                         + "> **Old PoK** - Use only components from Prophecy of Kings expansion + Codex 1-4.5\n"
-                        + "> **Thunder's Edge + New PoK** - Use components from both expansions, including all mechanics from Thunder's Edge. Does not have the new factions or Fracture until Friday 10/31/2025"
+                        + "> **Thunder's Edge + New PoK** - Use components from both expansions, including all mechanics from Thunder's Edge."
                         + "\n-# Please realize that these are broad overviews and that some small components may not fit perfectly into these categories.";
         MessageHelper.sendMessageToChannelWithButtons(actionsChannel, expMsg, buttons);
     }

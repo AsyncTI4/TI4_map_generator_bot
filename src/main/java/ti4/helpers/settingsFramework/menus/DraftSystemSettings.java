@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.ReadOnlyTextSetting;
@@ -202,6 +203,16 @@ public class DraftSystemSettings extends SettingsMenu {
                         "Nucleus draft supports at most 8 players; you'll need to remove excess players from the draft.");
             }
             settings.setupNucleusPreset();
+        }
+        if ("_andcatPreset".equals(preset)) {
+
+            if (game.getPlayers().size() > 8) {
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        "This draft supports at most 8 players; you'll need to remove excess players from the draft.");
+            }
+            settings.setupAndcatTwilightsFallPreset();
+            ButtonHelper.deleteMessage(event);
         }
         game.setDraftSystemSettings(settings);
         settings.postMessageAndButtons(event);

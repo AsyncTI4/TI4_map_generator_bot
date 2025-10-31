@@ -67,7 +67,7 @@ public class DestroyUnitService {
         handleDestroyedUnits(event, game, units, combat);
     }
 
-    private static void destroyAllPlayerNonStructureUnits(
+    public static void destroyAllPlayerNonStructureUnits(
             GenericInteractionCreateEvent event,
             Game game,
             Player player,

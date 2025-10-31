@@ -729,6 +729,7 @@ class GameLoadService {
                     game.setRapidMobilizationMode(loadBooleanOrDefault(info, false));
                 case Constants.WILD_WILD_GALAXY_MODE -> game.setWildWildGalaxyMode(loadBooleanOrDefault(info, false));
                 case Constants.WEIRD_WORMHOLES_MODE -> game.setWeirdWormholesMode(loadBooleanOrDefault(info, false));
+                case Constants.NO_FRACTURE -> game.setNoFractureMode(loadBooleanOrDefault(info, false));
                 case Constants.CALL_OF_THE_VOID_MODE -> game.setCallOfTheVoidMode(loadBooleanOrDefault(info, false));
                 case Constants.COSMIC_PHENOMENAE_MODE ->
                     game.setCosmicPhenomenaeMode(loadBooleanOrDefault(info, false));

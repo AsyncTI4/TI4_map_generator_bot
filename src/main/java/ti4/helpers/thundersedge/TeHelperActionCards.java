@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
@@ -50,7 +51,7 @@ public class TeHelperActionCards {
             case "exchangeprogram" ->
                 buttons.add(Buttons.green(ffcc + "exchangeProgramStart", "Start Exchange Program"));
             case "extremeduress" -> nop(); // preset
-            case "lieinwait" -> nop();
+            case "lieinwait" -> buttons.add(Buttons.green(ffcc + "lieInWait", resolve));
             case "mercenarycontract" -> buttons.add(Buttons.green(ffcc + "teMercenaryContract_page0", resolve));
             case "piratecontract" -> buttons.add(Buttons.green(ffcc + "pirateContract", resolve));
             case "piratefleet" -> buttons.add(Buttons.green(ffcc + "pirateFleet", resolve));
@@ -97,6 +98,31 @@ public class TeHelperActionCards {
         }
         String message = "Choose the player who you are trying to have an exchange with.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("lieInWait")
+    private static void lieInWait(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : player.getNeighbouringPlayers(true)) {
+            if (p2 == player || p2.getAc() == 0) {
+                continue;
+            }
+            if (game.isFowMode()) {
+                buttons.add(Buttons.gray(
+                        player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button =
+                        Buttons.gray(player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        String message = player.getRepresentationUnfogged()
+                + ", please tell the bot which neighbor of your's did the transaction";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
 
