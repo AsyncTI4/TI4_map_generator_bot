@@ -1477,4 +1477,5 @@ public class Constants {
     public static final String MOVE_TILE = "move_tile";
     public static final String TRANSACTION = "transaction";
     public static final String ALL = "ALL";
+    public static final String BLUE_REVERIE_MODE = "blue_reverie_mode";
 }
