@@ -1,7 +1,5 @@
 package ti4.helpers.settingsFramework.menus;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -9,6 +7,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
+
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -37,7 +39,7 @@ public class FactionDraftableSettings extends SettingsMenu {
         super(MENU_ID, "Faction Settings", "Control faction draft options.", parent);
 
         int players = parent.getPlayerUserIds().size();
-        numFactions = new IntegerSetting("#Factions", "Number of Factions", players + 1, 2, 24, 1);
+        numFactions = new IntegerSetting("#Factions", "Number of Factions", players + 1, 2, 30, 1);
         // Initialize values & keys for ban/priority factions
         Set<String> empty = new HashSet<>();
         Set<Entry<String, FactionModel>> allFactions = new HashSet<>();
