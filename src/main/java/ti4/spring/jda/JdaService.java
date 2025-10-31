@@ -99,6 +99,7 @@ public class JdaService {
     public static Guild guildFogOfWarSecondary;
     public static Guild guildCommunityPlays;
     private static Guild guildMegagame;
+    private static Guild guildTourney;
     public static final Set<Guild> guilds = new HashSet<>();
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new ArrayList<>();
@@ -221,19 +222,25 @@ public class JdaService {
             guildFogOfWarSecondary = initGuild(args[14], false);
             fowServers.add(guildFogOfWarSecondary);
         }
+        
+        // Async: Tournament Server 1
+        if (args.length >= 16) {
+            guildTourney = initGuild(args[15], false);
+        }
 
         // Async: 10th Server
-        if (args.length >= 16) {
-            guildDecenary = initGuild(args[15], true);
-        }
-        // Async: 11th Server
         if (args.length >= 17) {
-            guildUndenary = initGuild(args[16], true);
+            guildDecenary = initGuild(args[16], true);
+        }
+
+        // Async: 11th Server
+        if (args.length >= 18) {
+            guildUndenary = initGuild(args[17], true);
         }
 
         // Async: 12th Server
-        if (args.length >= 18) {
-            guildDuodenary = initGuild(args[17], true);
+        if (args.length >= 19) {
+            guildDuodenary = initGuild(args[18], true);
         }
 
         if (guildPrimary == null || guilds.isEmpty()) {
@@ -397,6 +404,7 @@ public class JdaService {
         adminRoles.add(jda.getRoleById("1312882116597518422")); // Async Septenary (Duder's Domain)
         adminRoles.add(jda.getRoleById("1378702133297414170")); // Async Octonary (What's up Dock)
         adminRoles.add(jda.getRoleById("1410728648817770532")); // Async Nonary (Ship Flag)
+        adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Tourney
         adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Decenary (TBD)
         adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Undenary (TBD)
         adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
@@ -436,6 +444,7 @@ public class JdaService {
         developerRoles.add(jda.getRoleById("1312882116597518421")); // Async Septenary (Duder's Domain)
         developerRoles.add(jda.getRoleById("1378702133297414169")); // Async Octonary (What's up Dock)
         developerRoles.add(jda.getRoleById("1410728648817770531")); // Async Nonary (Ship Flag)
+        developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Tourney
         developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Decenary (TBD)
         developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Undenary (TBD)
         developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
@@ -468,6 +477,7 @@ public class JdaService {
         bothelperRoles.add(jda.getRoleById("1312882116597518419")); // Async Septenary (Duder's Domain)
         bothelperRoles.add(jda.getRoleById("1378702133297414167")); // Async Octonary (What's up Dock)
         bothelperRoles.add(jda.getRoleById("1410728648817770529")); // Async Nonary (Ship Flag)
+        bothelperRoles.add(jda.getRoleById("0000000000000000000")); // Async Tourney
         bothelperRoles.add(jda.getRoleById("0000000000000000000")); // Async Decenary (TBD)
         bothelperRoles.add(jda.getRoleById("0000000000000000000")); // Async Undenary (TBD)
         bothelperRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
