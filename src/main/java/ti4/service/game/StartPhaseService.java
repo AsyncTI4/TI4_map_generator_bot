@@ -95,6 +95,7 @@ public class StartPhaseService {
             case "finFixScrewedRelics" -> game.fixScrewedRelics();
             case "finTFSlice" -> ButtonHelperTwilightsFall.startSliceBuild(game, event);
             case "setupHomebrew" -> HomebrewService.offerGameHomebrewButtons(event.getMessageChannel());
+            case "offerSetup" -> CreateGameService.presentSetupToPlayers(game);
             case "cptiExplores" -> {
                 game.setCptiExploreMode(true);
                 DeckModel deckModel = Mapper.getDeck("explores_cpti");
@@ -255,6 +256,11 @@ public class StartPhaseService {
                     && game.getStoredValue("Deflection").contains(player2.getFaction())
                     && player2.getActionCards().containsKey("deflection")) {
                 ActionCardHelper.playAC(event, game, player2, "deflection", game.getMainGameChannel());
+            }
+            if (game.getStoredValue("Tartarus") != null
+                    && game.getStoredValue("Tartarus").contains(player2.getFaction())
+                    && player2.getActionCards().containsKey("tf-tartarus")) {
+                ActionCardHelper.playAC(event, game, player2, "tf-tartarus", game.getMainGameChannel());
             }
             if (player2.hasLeader("zealotshero")
                     && player2.getLeader("zealotshero").get().isActive()

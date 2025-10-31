@@ -624,7 +624,7 @@ public class ButtonHelperModifyUnits {
                 if (p2 == player) {
                     continue;
                 }
-                if (!game.getStoredValue(p2.getFaction() + "graviton").isEmpty()) {
+                if (!game.getStoredValue(p2.getFaction() + "graviton").isEmpty() || p2.ownsUnit("tf-justicerrail")) {
                     assignHitOrder = new ArrayList<>(List.of(
                             "destroyer",
                             "cruiser",
@@ -1148,6 +1148,12 @@ public class ButtonHelperModifyUnits {
             if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
                 List<Button> b2s = new ArrayList<>();
                 b2s.add(Buttons.green("returnFFToSpace_" + tile.getPosition(), "Return Fighters to Space"));
+                if (player.hasUnit("tf-morphwhing")) {
+                    b2s.add(Buttons.green(
+                            "convertFFToInf_" + unitHolder.getName(),
+                            "Convert 1 Fighter to Infantry on "
+                                    + Helper.getPlanetRepresentation(unitHolder.getName(), game)));
+                }
                 b2s.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
@@ -1194,6 +1200,23 @@ public class ButtonHelperModifyUnits {
         return buttons;
     }
 
+    @ButtonHandler("convertFFToInf_")
+    public static void convertFFToInf(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+
+        UnitHolder uh = game.getUnitHolderFromPlanet(buttonID.split("_")[1]);
+        String msg = player.getRepresentation() + " converted 1 Fighter into 1 Infantry on "
+                + Helper.getPlanetRepresentation(uh.getName(), game) + ".";
+        RemoveUnitService.removeUnits(
+                event, game.getTileFromPlanet(uh.getName()), game, player.getColor(), "1 fighter " + uh.getName());
+        AddUnitService.addUnits(
+                event, game.getTileFromPlanet(uh.getName()), game, player.getColor(), "1 infantry " + uh.getName());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+
+        if (uh.getUnitCount(UnitType.Fighter, player) < 1) {
+            ButtonHelper.deleteTheOneButton(event);
+        }
+    }
+
     @ButtonHandler("startDevotion_")
     public static void startDevotion(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         ButtonHelper.deleteTheOneButton(event);
@@ -1223,7 +1246,7 @@ public class ButtonHelperModifyUnits {
         }
     }
 
-    private static List<Button> getOpposingUnitsToHit(Player player, Game game, Tile tile, boolean exoHit) {
+    public static List<Button> getOpposingUnitsToHit(Player player, Game game, Tile tile, boolean exoHit) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
 
         String exo = "";
@@ -1245,7 +1268,7 @@ public class ButtonHelperModifyUnits {
                     continue;
                 }
                 UnitModel unitModel = p2.getUnitFromUnitKey(unitKey);
-                if (!unitModel.getIsShip()) {
+                if (!unitModel.getIsShip() && !game.isTwilightsFallMode()) {
                     continue;
                 }
 

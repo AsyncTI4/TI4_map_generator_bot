@@ -33,6 +33,9 @@ public class TechDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
+        if (getTech().getRequirementsEmoji().equalsIgnoreCase("none")) {
+            return getTech().getText();
+        }
         return getTech().getText() + " " + getTech().getRequirementsEmoji();
     }
 

@@ -26,6 +26,7 @@ import ti4.model.LeaderModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.unit.DestroyUnitService;
 
 public class ButtonHelperTwilightsFallActionCards {
@@ -91,8 +92,8 @@ public class ButtonHelperTwilightsFallActionCards {
         Die d1 = new Die(3);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " choose to hit the infantry on Tile " + tileP + " on " + uHName
-                        + " and rolled a " + d1.getResult());
+                player.getRepresentation() + " chose to hit the " + color + " " + UnitEmojis.infantry + " on Tile "
+                        + tileP + " on " + uHName + " and rolled a " + d1.getResult());
         if (d1.isSuccess()) {
             UnitKey key = Units.getUnitKey(UnitType.Infantry, color);
             DestroyUnitService.destroyUnit(
@@ -475,6 +476,38 @@ public class ButtonHelperTwilightsFallActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("resolveIgnis")
+    public static void resolveIgnis(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        if (player.getTacticalCC() <= 0) {
+            String msg = player.getRepresentation()
+                    + " does not have enough tactical command counters to place a tactic token.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        for (Tile tile : game.getTileMap().values()) {
+            if (!tile.isHomeSystem(game) && FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
+                buttons.add(Buttons.gray("ignisStep2_" + tile.getPosition(), tile.getRepresentationForButtons()));
+            }
+        }
+        String msg = player.getRepresentation() + " choose the tile you wish to place a tactic token in.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("ignisStep2_")
+    public static void ignisStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        player.setTacticalCC(player.getTacticalCC() - 1);
+        Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
+        CommandCounterHelper.addCC(event, player, tile);
+        List<Button> buttons = ButtonHelperModifyUnits.getOpposingUnitsToHit(player, game, tile, true);
+
+        String msg = player.getRepresentation() + " choose the opposing unit you wish to destroy.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("irradiateStep2")
     public static void irradiateStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<MessageEmbed> embeds = new ArrayList<>();
@@ -531,37 +564,84 @@ public class ButtonHelperTwilightsFallActionCards {
                             player.getFinsFactionCheckerPrefix() + "getDamageButtons_" + pos + "_"
                                     + "deleteThis_combat",
                             "Destroy Units in " + tile2.getRepresentationForButtons()));
-                    String msg = player.getRepresentation() + " use this button to destroy units.";
+                    String msg = player.getRepresentation() + " use this button to destroy units in "
+                            + tile.getRepresentationForButtons();
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
                 }
             }
         }
     }
 
-    // twinning
+    @ButtonHandler("resolveStarFlare")
+    public static void resolveStarFlare(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.isSupernova()) {
+                buttons.add(Buttons.gray("starFlareStep2_" + tile.getPosition(), tile.getRepresentationForButtons()));
+            }
+        }
+        String msg = player.getRepresentation() + " choose the supernova you wish to have erupt.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveConverge")
+    public static void resolveConverge(Game game, Player player, ButtonInteractionEvent event) {
+        game.setStoredValue(player.getFaction() + "graviton", "true");
+        String msg = player.getRepresentation() + " will auto target non-fighter ships/mechs in auto assigment.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveAtomize")
+    public static void resolveAtomize(Game game, Player player, ButtonInteractionEvent event) {
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+        if (tile != null) {
+            UnitHolder uh = tile.getSpaceUnitHolder();
+            for (Player player_ : game.getPlayers().values()) {
+                DestroyUnitService.destroyAllPlayerNonStructureUnits(event, game, player_, tile, uh, true);
+            }
+            String msg = player.getRepresentation() + " purged their flagship and destroyed all units in "
+                    + tile.getRepresentationForButtons();
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            ButtonHelper.deleteMessage(event);
+            player.setUnitCap("fs", 0);
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Couldnt find the active system.");
+        }
+    }
+
+    @ButtonHandler("starFlareStep2_")
+    public static void starFlareStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        player.setTacticalCC(player.getTacticalCC() - 1);
+        Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
+        sendDestroyButtonsForSpecificTileAndSurrounding(game, tile);
+        String msg =
+                player.getRepresentation() + " everyone should now destroy 3 units in each tile in and adjacent to "
+                        + tile.getRepresentationForButtons();
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        ButtonHelper.deleteMessage(event);
+    }
+
     // tf-manifest
-    // "tf-flux"
-    // Tyrant image
     // "tf-unravel"
-    // "tf-atomize"
     // trine
-    // pax
-    // ignis
     // statis/crisis
-    // tartarus
     // timestop
-    // starflare
-    // converge
+    // tf-manipulate
 
     // dragonfreed
     // linkship is ralnel FS ability
-    // mageon for yssaril infantry
     // 3 x mech cards
     // cabal carrier
-    // morphwing for swappin into infantry
-    // yin infantry for special revival
-    // hacan spacedocks have production biomes
-    // bastion spacedocks
-    //
+    // flagship upgrade
+    // 3 mech abilities of TF factions
+
+    // crimson and smothering suppressing sustains (and production)
+    // Ral nel flagship
+    // 3 ACs Automation
+    // Ral Nel Hero
+    // Scoring of others secrets for firmament
 
 }

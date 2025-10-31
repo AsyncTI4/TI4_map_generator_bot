@@ -988,11 +988,18 @@ public class ButtonHelperFactionSpecific {
         buttons = Helper.getPlaceUnitButtons(event, player, game, tile, warfareOrTactical + "asn", "place");
         String message = player.getRepresentation()
                 + ", please use the buttons to produce."
-                + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
+                + ButtonHelper.getListOfStuffAvailableToSpend(player, game, true);
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         } else {
             MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+        }
+        if (player.hasUnit("tf-productionbiomes")) {
+            String msg2 = player.getRepresentation()
+                    + " you have the Production Biomes (special spacedock) and so may spend a command counter to get 4tg (and give 2tg to someone else) that you can spend on this build.";
+            List<Button> buttons2 = new ArrayList<>();
+            buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons2);
         }
         event.getMessage().delete().queue();
     }

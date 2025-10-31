@@ -661,7 +661,9 @@ public class ActionCardHelper {
             }
         }
 
-        if ("Action".equalsIgnoreCase(actionCardWindow) && game.getPlayer(activePlayerID) != player) {
+        if ("Action".equalsIgnoreCase(actionCardWindow)
+                && game.getPlayer(activePlayerID) != player
+                && !game.isTwilightsFallMode()) {
             return "You are trying to play an action card with a component action, and the game does not think you are the active player."
                     + " You may fix this with `/player turn_start`. Until then, you are #denied.";
         }
@@ -842,7 +844,7 @@ public class ActionCardHelper {
                                 player.finChecker() + "increaseTGonSC_" + sc, Helper.getSCName(sc, game), scEmoji);
                     } else {
                         button = Buttons.gray(
-                                player.finChecker() + "deflectSC_" + sc, sc + " " + Helper.getSCName(sc, game));
+                                player.finChecker() + "increaseTGonSC_" + sc, sc + " " + Helper.getSCName(sc, game));
                     }
                     scButtons.add(button);
                 }
@@ -853,7 +855,7 @@ public class ActionCardHelper {
                                 + ", please use buttons to increase trade goods on strategy cards. Each button press adds 1 trade good.",
                         scButtons);
             }
-            if ("deflection".equals(automationID)) {
+            if ("deflection".equals(automationID) || "tf-tartarus".equals(automationID)) {
                 List<Button> scButtons = new ArrayList<>();
                 for (int sc : game.getSCList()) {
                     TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
@@ -869,7 +871,8 @@ public class ActionCardHelper {
                 }
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2,
-                        player.getRepresentation() + " Use buttons to choose which strategy card will be _Deflect_'d.",
+                        player.getRepresentation()
+                                + " Use buttons to choose which strategy card will be the target of your AC.",
                         scButtons);
             }
 
@@ -1144,7 +1147,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
-            if ("parley".equals(automationID)) {
+            if ("parley".equals(automationID) || "tf-pax".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveParleyStep1", buttonLabel));
             }
@@ -1433,7 +1436,6 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.gray("deleteButtons", "Done Resolving"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
-            // "tf-reverse"
 
             if ("tf-reverse".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveReverseTF", buttonLabel));
@@ -1459,6 +1461,29 @@ public class ActionCardHelper {
             }
             if ("tf-irradiate".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveIrradiate", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-ignis".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveIgnis", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-atomize".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveAtomize", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-flux".equals(automationID)) {
+                codedButtons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "resolveUnexpected", "Lift a Command Token"));
+                codedButtons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "resolveSignalJammingStep1", "Place a Command Token"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-starflare".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveStarFlare", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-converge".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveConverge", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -1658,7 +1683,7 @@ public class ActionCardHelper {
                 //     "Please indicate \"No Afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
             }
 
-            if ("Action".equalsIgnoreCase(actionCardWindow)) {
+            if ("Action".equalsIgnoreCase(actionCardWindow) && game.getPlayer(activePlayerID) == player) {
                 game.setJustPlayedComponentAC(true);
                 List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -1674,6 +1699,7 @@ public class ActionCardHelper {
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
                 }
                 serveReverseEngineerButtons(game, player, List.of(acID));
+                serveTwinningButtons(game, player, List.of(acID));
             }
         }
 
@@ -1732,6 +1758,53 @@ public class ActionCardHelper {
 
                     String id = reversePrefix + model.getName();
                     String label = "Reverse Engineer " + model.getName();
+                    reverseButtons.add(Buttons.green(id, label, CardEmojis.ActionCard));
+                    if (actionCards.size() == 1) msg.append(model.getName()).append(".");
+                }
+
+                if (!reverseButtons.isEmpty()) {
+                    reverseButtons.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(), msg.toString(), reverseButtons);
+                }
+                if (!ralnel.isEmpty()) {
+                    String error = "The action cards were not placed in the discard pile: " + String.join(", ", ralnel);
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), error);
+                }
+            }
+        }
+    }
+
+    public static void serveTwinningButtons(Game game, Player discardingPlayer, List<String> actionCards) {
+        for (Player player : game.getRealPlayers()) {
+            if (player == discardingPlayer) continue;
+            if (IsPlayerElectedService.isPlayerElected(game, player, "censure")) continue;
+            if (IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) continue;
+
+            String reverseEngineerID = "tf-twinning";
+            if (player.getActionCards().containsKey(reverseEngineerID)) {
+                StringBuilder msg =
+                        new StringBuilder(player.getRepresentationUnfogged() + " you can use _Twinning_ on ");
+                if (actionCards.size() > 1) msg.append("one of the following cards:");
+
+                List<String> ralnel = new ArrayList<>();
+                List<Button> reverseButtons = new ArrayList<>();
+                String reversePrefix =
+                        Constants.AC_PLAY_FROM_HAND + player.getActionCards().get(reverseEngineerID) + "_twinning_";
+
+                for (String acID : actionCards) {
+                    ActionCardModel model = Mapper.getActionCard(acID);
+                    if (!model.getWindow().toLowerCase().startsWith("action")) {
+                        continue;
+                    }
+
+                    if (game.getDiscardACStatus().get(acID) != null) {
+                        if (game.getDiscardACStatus().get(acID) == ACStatus.ralnelbt) ralnel.add(acID);
+                        continue; // on RN bt or garbozia or purged
+                    }
+
+                    String id = reversePrefix + model.getName();
+                    String label = "Twin " + model.getName();
                     reverseButtons.add(Buttons.green(id, label, CardEmojis.ActionCard));
                     if (actionCards.size() == 1) msg.append(model.getName()).append(".");
                 }

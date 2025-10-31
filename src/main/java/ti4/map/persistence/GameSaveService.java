@@ -548,6 +548,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.WEIRD_WORMHOLES_MODE + " " + game.isWeirdWormholesMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.NO_FRACTURE + " " + game.isNoFractureMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.CALL_OF_THE_VOID_MODE + " " + game.isCallOfTheVoidMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.WILD_WILD_GALAXY_MODE + " " + game.isWildWildGalaxyMode());

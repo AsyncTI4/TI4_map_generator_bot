@@ -161,7 +161,15 @@ public class ButtonHelperTacticalAction {
         }
         MessageHelper.sendMessageToChannel(
                 event.getChannel(), message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, game, true));
+
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        if (player.hasUnit("tf-productionbiomes")) {
+            String msg = player.getRepresentation()
+                    + " you have the Production Biomes (special spacedock) and so may spend a command counter to get 4tg (and give 2tg to someone else) that you can spend on this build.";
+            List<Button> buttons2 = new ArrayList<>();
+            buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
+        }
         ButtonHelper.deleteMessage(event);
     }
 
@@ -189,6 +197,25 @@ public class ButtonHelperTacticalAction {
                             + "Acamar, the Empyrean" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                             + " agent.",
                     empyButtons);
+        }
+        if (unitsWereMoved
+                && player.hasUnit("tf-yssarilinfantry")
+                && tile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0) {
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                if (p2.getAc() == 0) {
+                    continue;
+                }
+                if (FoWHelper.playerHasUnitsInSystem(p2, tile)) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.gray(
+                            player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(),
+                            "Take AC from " + p2.getColor()));
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + " use this button to resolve the ability of your yssaril infantry.");
+                }
+            }
         }
         if (unitsWereMoved
                 && (tile.getPlanetUnitHolders().isEmpty())

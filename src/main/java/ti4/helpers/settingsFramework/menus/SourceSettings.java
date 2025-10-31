@@ -53,7 +53,7 @@ public class SourceSettings extends SettingsMenu {
         codexes = new BooleanSetting("Codexes", "Codex 1-4", true);
         betaTestMode = new BooleanSetting("Beta", "Beta Mode", game.isTestBetaFeaturesMode());
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
-        teDemo = new BooleanSetting("ThundersEdge", "Thunders Edge Demo", game.isThundersEdge());
+        teDemo = new BooleanSetting("ThundersEdge", "Thunders Edge", game.isThundersEdge());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
         absol = new BooleanSetting("Absol", "Absol Mod", game.isAbsolMode());
         ignis = new BooleanSetting(
@@ -155,7 +155,7 @@ public class SourceSettings extends SettingsMenu {
                     ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
         if (discoStars.isVal()) sources.add(ComponentSource.ds);
         if (absol.isVal()) sources.add(ComponentSource.absol);
-        if (betaTestMode.isVal()) sources.add(ComponentSource.thunders_edge);
+        if (teDemo.isVal()) sources.add(ComponentSource.thunders_edge);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
         if (ignis.isVal()) sources.add(ComponentSource.ignis_aurora);
         return sources;
@@ -194,11 +194,6 @@ public class SourceSettings extends SettingsMenu {
                         .setEphemeral(true)
                         .queue();
             case "ThundersEdge" -> {
-                event.getHook()
-                        .sendMessage(
-                                "This is only a demo of TE until 10/31/25. No Fracture or new factions until then.")
-                        .setEphemeral(true)
-                        .queue();
                 game.setThundersEdge(true);
                 game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
             }

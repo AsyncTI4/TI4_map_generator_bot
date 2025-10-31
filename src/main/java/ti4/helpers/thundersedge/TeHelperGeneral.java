@@ -20,6 +20,7 @@ import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.TriadService;
 import ti4.service.planet.AddPlanetService;
@@ -31,6 +32,29 @@ public class TeHelperGeneral {
     public static void checkTransientInfo(Game game) {
         TriadService.checkAndUpdateTriad(game);
         BastionTechService.checkHeliosAttachment(game);
+        checkCoexistTransfer(game);
+    }
+
+    public static void checkCoexistTransfer(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            List<String> susPlanets = new ArrayList<>();
+            for (String planet : game.getPlanetsPlayerIsCoexistingOn(player)) {
+                UnitHolder uH = game.getUnitHolderFromPlanet(planet);
+                boolean otherPresent = false;
+                for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                    if (FoWHelper.playerHasUnitsOnPlanet(p2, uH)) {
+                        otherPresent = true;
+                        break;
+                    }
+                }
+                if (!otherPresent) {
+                    susPlanets.add(planet);
+                }
+            }
+            for (String planet : susPlanets) {
+                AddPlanetService.addPlanet(player, planet, game);
+            }
+        }
     }
 
     @ButtonHandler("expeditionInfo")

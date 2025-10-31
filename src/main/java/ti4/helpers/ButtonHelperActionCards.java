@@ -557,7 +557,7 @@ public class ButtonHelperActionCards {
                 + ", which hits on a " + numHit + ", to have been _Courageous To The End_.";
         if (game.isTwilightsFallMode()) {
             msg = player.getRepresentationNoPing() + " has chosen the recently deceased " + baseType
-                    + ", which hits on a " + numHit + ", to have been the target of the Valient Genome.";
+                    + ", which hits on a " + numHit + ", to have been the target of the Valiant Genome.";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         String result = player.getFactionEmojiOrColor() + " rolling for " + type + ":\n";
@@ -756,9 +756,9 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveParleyStep1")
     public static void resolveParleyStep1(Player player, Game game, ButtonInteractionEvent event) {
-        String message =
-                player.getRepresentationUnfogged() + ", please choose the planet you wish to resolve _Parley_ on."
-                        + " If it's not present (because the opponent took it already), try pressing UNDO, then `/planet add` it back to yourself, then try again.";
+        String message = player.getRepresentationUnfogged()
+                + ", please choose the planet you wish to resolve remove enemy landed ground forces from."
+                + " If it's not present (because the opponent took it already), try pressing UNDO, then `/planet add` it back to yourself, then try again.";
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             buttons.add(Buttons.gray(
@@ -792,6 +792,12 @@ public class ButtonHelperActionCards {
                     spaceUnitHolder.addUnitsWithStates(key, removed);
                 }
             }
+        }
+        if (game.isTwilightsFallMode()) {
+            List<Button> buttons = ButtonHelperModifyUnits.getOpposingUnitsToHit(player, game, tile, true);
+            String msg = player.getRepresentation()
+                    + " choose the opposing unit (which attempted to land) that you wish to destroy.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -1996,6 +2002,16 @@ public class ButtonHelperActionCards {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
+        if (player.getActionCards().containsKey("tf-tartarus")) {
+            String msg = player.getRepresentation()
+                    + ", you have the option to pre-play _Tartarus_."
+                    + " Start-of-strategy-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("resolvePreassignment_Tartarus", "Pre-Play Deflection"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        }
     }
 
     @ButtonHandler("resolveProfessionalArcheologists")
@@ -2677,6 +2693,27 @@ public class ButtonHelperActionCards {
                 MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
                 ActionCardHelper.sendActionCardInfo(game, player);
+            }
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveTwinning_")
+    public static void resolveTwinning(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String acName = buttonID.replace("resolveTwinning_", "");
+        List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());
+        for (String acStringID : acStrings) {
+            ActionCardModel actionCard = Mapper.getActionCard(acStringID);
+            String actionCardTitle = actionCard.getName();
+            if (acName.equalsIgnoreCase(actionCardTitle)) {
+                boolean picked = game.pickActionCard(
+                        player.getUserID(), game.getDiscardActionCards().get(acStringID));
+                if (!picked) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getChannel(), "No such action card ID found, please retry.");
+                    return;
+                }
+                ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
             }
         }
         ButtonHelper.deleteMessage(event);

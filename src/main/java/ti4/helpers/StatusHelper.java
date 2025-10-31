@@ -28,6 +28,7 @@ import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.breakthrough.SowingReapingService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -160,6 +161,19 @@ public class StatusHelper {
                             player.getRepresentationUnfogged() + " you gained " + oceans + " trade good"
                                     + (oceans == 1 ? "" : "s") + " due to the Hydrothermal technology.");
                 }
+            }
+            if (player.hasTech("tf-geneticresearch")) {
+                int maxNum = 0;
+                for (TechnologyType type : TechnologyType.mainFour) {
+                    maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, type));
+                }
+                player.setTg(player.getTg() + maxNum);
+                ButtonHelperAbilities.pillageCheck(player, game);
+                ButtonHelperAgents.resolveArtunoCheck(player, maxNum);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged() + " you gained " + maxNum + " trade good"
+                                + (maxNum == 1 ? "" : "s") + " due to the Genetic Research technology.");
             }
             if (player.hasTech("radical")) {
                 List<Button> buttons = new ArrayList<>();

@@ -127,6 +127,18 @@ public class PlayHeroService {
             case "xxchahero-te" -> {
                 ButtonHelperHeroes.xxchaHeroTEStart(game, player);
             }
+            case "obsidianhero" -> {
+                player.clearExhaustedPlanets(false);
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getRepresentationUnfogged() + ", all of your planets have been readied.");
+            }
+            case "firmamenthero" -> {
+                ActionCardHelper.sendPlotCardInfo(game, player);
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getRepresentationUnfogged() + ", select a plot from cards info to put into play.");
+            }
             case "titanshero" -> {
                 Tile t = player.getHomeSystemTile();
                 if (game.getTileFromPlanet("elysium") != null && game.getTileFromPlanet("elysium") == t) {
