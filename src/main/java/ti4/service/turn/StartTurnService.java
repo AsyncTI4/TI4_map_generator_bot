@@ -286,7 +286,7 @@ public class StartTurnService {
                 }
             }
             if (!player.hasFollowedSC(sc)) {
-                sb.append("> ").append(Helper.getSCRepresentation(game, sc));
+                sb.append("> ").append(game.getSCEmojiWordRepresentation(sc));
                 if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
                     sb.append(" ").append(game.getStoredValue("scPlay" + sc));
                 }

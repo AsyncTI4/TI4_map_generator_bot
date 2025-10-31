@@ -225,12 +225,12 @@ public class ConvertTTPGtoAsync {
             // PLAYER STRATEGY CARDS
             if (!ttpgPlayer.getStrategyCards().isEmpty()) {
                 String ttpgSC = (String) ttpgPlayer.getStrategyCards().getFirst();
-                if (Objects.nonNull(ttpgSC)) asyncPlayer.addSC(Helper.getSCNumber(ttpgSC));
+                if (Objects.nonNull(ttpgSC)) asyncPlayer.addSC(getSCNumber(ttpgSC));
             }
             if (!ttpgPlayer.getStrategyCardsFaceDown().isEmpty()) {
                 String ttpgSCplayed =
                         (String) ttpgPlayer.getStrategyCardsFaceDown().getFirst();
-                if (Objects.nonNull(ttpgSCplayed)) asyncGame.setSCPlayed(Helper.getSCNumber(ttpgSCplayed), true);
+                if (Objects.nonNull(ttpgSCplayed)) asyncGame.setSCPlayed(getSCNumber(ttpgSCplayed), true);
             }
 
             // PLAYER SCORED OBJECTIVES
@@ -817,5 +817,19 @@ public class ConvertTTPGtoAsync {
         ObjectWriter objectWriter = objectMapper.writer();
         if (prettyPrint) objectWriter = objectWriter.with(SerializationFeature.INDENT_OUTPUT);
         return objectWriter.writeValueAsString(node);
+    }
+
+    private static Integer getSCNumber(String sc) {
+        return switch (sc.toLowerCase()) {
+            case "leadership" -> 1;
+            case "diplomacy" -> 2;
+            case "politics" -> 3;
+            case "construction" -> 4;
+            case "trade" -> 5;
+            case "warfare" -> 6;
+            case "technology" -> 7;
+            case "imperial" -> 8;
+            default -> 0;
+        };
     }
 }
