@@ -2389,7 +2389,7 @@ class PlayerAreaGenerator {
 
         int deltaX = 0;
         if (game.isTwilightsFallMode()) {
-            deltaX = techField(x, y, techsFiltered.get("NONE"), exhaustedTechs, deltaX, player);
+            deltaX = techField(x, y, techsFiltered.get("none"), exhaustedTechs, deltaX, player);
         }
         deltaX = techField(x, y, techsFiltered.get(Constants.PROPULSION), exhaustedTechs, deltaX, player);
         deltaX = techField(x, y, techsFiltered.get(Constants.WARFARE), exhaustedTechs, deltaX, player);

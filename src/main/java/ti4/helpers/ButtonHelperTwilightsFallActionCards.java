@@ -629,6 +629,7 @@ public class ButtonHelperTwilightsFallActionCards {
     // trine
     // statis/crisis
     // timestop
+    // tf-manipulate
 
     // dragonfreed
     // linkship is ralnel FS ability
@@ -641,9 +642,6 @@ public class ButtonHelperTwilightsFallActionCards {
     // Ral nel flagship
     // 3 ACs Automation
     // Ral Nel Hero
-
-    // Test Drafts of TF & TE
-    // Ability to get wavelength at end of inaugeral splice
     // Scoring of others secrets for firmament
 
 }

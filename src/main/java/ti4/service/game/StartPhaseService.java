@@ -95,6 +95,7 @@ public class StartPhaseService {
             case "finFixScrewedRelics" -> game.fixScrewedRelics();
             case "finTFSlice" -> ButtonHelperTwilightsFall.startSliceBuild(game, event);
             case "setupHomebrew" -> HomebrewService.offerGameHomebrewButtons(event.getMessageChannel());
+            case "offerSetup" -> CreateGameService.presentSetupToPlayers(game);
             case "cptiExplores" -> {
                 game.setCptiExploreMode(true);
                 DeckModel deckModel = Mapper.getDeck("explores_cpti");
