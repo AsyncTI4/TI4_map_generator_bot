@@ -95,6 +95,11 @@ public class ResonanceGeneratorService {
     @ButtonHandler("placeBreach_")
     private static void resolvePlaceBreach(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("placeBreach_", "");
+        String source = resonanceRep();
+        if (pos.contains("_")) {
+            source = "a crimson destroyer";
+            pos = pos.split("_")[1];
+        }
         Tile tile = game.getTileByPosition(pos);
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
 
@@ -104,7 +109,7 @@ public class ResonanceGeneratorService {
         }
 
         String msg = "Placed active breach in tile " + tile.getRepresentation();
-        msg += " using " + resonanceRep() + ".";
+        msg += " using " + source + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         checkCrimsonCommanderUnlock(game, player, tile);
         ButtonHelper.deleteMessage(event);
