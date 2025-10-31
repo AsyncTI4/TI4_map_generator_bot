@@ -636,7 +636,6 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<FrankenDraftMode> modes = new ArrayList<>();
                 modes.addAll(Arrays.asList(FrankenDraftMode.values()));
-                modes.remove(FrankenDraftMode.TWILIGHTSFALL);
                 List<Command.Choice> options = modes.stream()
                         .filter(mode -> mode.search(enteredValue))
                         .limit(25)

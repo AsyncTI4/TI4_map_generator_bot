@@ -257,7 +257,7 @@ public class DraftManager extends DraftPlayerManager {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
                     game.getPing()
-                            + "The draft has ended. Some additional setup needs to happen before the game can start.");
+                            + "The draft has ended. Some additional setup needs to happen before the game can start. Check your cards info threads for details.");
         } else {
             trySetupPlayers(event);
         }

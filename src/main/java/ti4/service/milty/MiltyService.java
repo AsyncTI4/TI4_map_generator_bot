@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.CommandHelper;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -53,7 +52,6 @@ import ti4.service.planet.AddPlanetService;
 import ti4.service.rules.ThundersEdgeRulesService;
 import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class MiltyService {
@@ -134,6 +132,7 @@ public class MiltyService {
         List<String> unbannedFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
                 .filter(f -> specs.factionSources.contains(f.getSource()))
                 .filter(f -> !specs.bannedFactions.contains(f.getAlias()))
+                .filter(f -> !f.getAlias().contains("obsidian"))
                 .filter(f -> !f.getAlias().contains("keleres")
                         || "keleresm".equals(f.getAlias())) // Limit the pool to only 1 keleres flavor
                 .map(FactionModel::getAlias)
@@ -310,16 +309,6 @@ public class MiltyService {
             return;
         }
 
-        if (factionModel.getSource() == Source.ComponentSource.thunders_edge
-                || factionModel.getSource() == Source.ComponentSource.twilights_fall) {
-            if (!CommandHelper.hasRole(event, JdaService.bothelperRoles)) {
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        "Thunder's Edge and Twilight Fall Factions Will Not be Ready til October 31st");
-                return;
-            }
-        }
-
         String breakthrough = factionModel.getAlias() + "bt";
         if (breakthrough.contains("keleres")) {
             breakthrough = "keleresbt";
@@ -350,7 +339,42 @@ public class MiltyService {
         player.setPlayerStatsAnchorPosition(positionHS);
 
         // GHOST AND CRIMSON EXTRA HS TILES
-        setupExtraFactionTiles(game, player, faction, positionHS, tile);
+        if ("ghost".equals(faction) || "miltymod_ghost".equals(faction)) {
+            tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            String pos = "tr";
+            if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
+                pos = "br";
+            }
+            if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
+                pos = "bl";
+            }
+            tile = new Tile("51", pos);
+            game.setTile(tile);
+            player.setHomeSystemPosition(pos);
+        }
+
+        // HANDLE Crimson' HOME SYSTEM LOCATION
+        if ("crimson".equals(faction)) {
+            tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            tile.addToken(Constants.TOKEN_BREACH_INACTIVE, Constants.SPACE);
+            String pos = "tr";
+            if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
+                pos = "br";
+            }
+            if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
+                pos = "bl";
+            }
+            if (game.getTileByPosition(pos) != null) {
+                if (pos.equalsIgnoreCase("tr")) {
+                    pos = "br";
+                } else {
+                    pos = "tr";
+                }
+            }
+            tile = new Tile("118", pos);
+            game.setTile(tile);
+            player.setHomeSystemPosition(pos);
+        }
 
         // STARTING COMMODITIES
         player.setCommoditiesBase(factionModel.getCommodities());

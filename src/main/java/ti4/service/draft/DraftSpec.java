@@ -10,7 +10,6 @@ import ti4.helpers.settingsFramework.menus.MiltySliceDraftableSettings;
 import ti4.helpers.settingsFramework.menus.PlayerFactionSettings;
 import ti4.helpers.settingsFramework.menus.SliceGenerationSettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
-import ti4.helpers.thundersedge.TeHelperDemo;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.MapTemplateModel;
@@ -85,10 +84,6 @@ public class DraftSpec {
         // Load Player & Faction Ban Specifications
         PlayerFactionSettings pfSettings = settings.getPlayerSettings();
         specs.bannedFactions.addAll(pfSettings.getBanFactions().getKeys());
-        if (game.isThundersEdge()) {
-            specs.bannedFactions.addAll(TeHelperDemo.getExcludedFactions());
-            specs.numFactions = Math.min(25 - TeHelperDemo.getExcludedFactions().size(), specs.numFactions);
-        }
 
         specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
         specs.priorityFactions.removeAll(specs.bannedFactions);

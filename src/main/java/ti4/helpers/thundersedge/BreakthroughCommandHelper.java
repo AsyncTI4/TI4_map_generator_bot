@@ -80,7 +80,7 @@ public class BreakthroughCommandHelper {
                     player.removeOwnedUnitByID("cruiser2");
                 }
             }
-            if (!FractureService.isFractureInPlay(game) && game.isTestBetaFeaturesMode())
+            if (!FractureService.isFractureInPlay(game) && !game.isNoFractureMode())
                 serveRollFractureButtons(game, player);
             if (bt.getAlias().equals("muaatbt")) StellarGenesisService.serveAvernusButtons(game, player);
             if (bt.getAlias().equals("keleresbt")) player.gainCustodiaVigilia();
