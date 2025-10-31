@@ -635,16 +635,15 @@ public class ButtonHelperTwilightsFallActionCards {
     // 3 x mech cards
     // cabal carrier
     // flagship upgrade
+    // 3 mech abilities of TF factions
 
-    // transfer owership of coexist at end of turn
-    // crimson destroyers
     // crimson and smothering suppressing sustains (and production)
     // Ral nel flagship
-    // Scoring of others secrets for firmament
+    // 3 ACs Automation
+    // Ral Nel Hero
 
-    // 5 ACs
-    // 3 mech abilities of TF factions
-    // Test Drafts of TF
+    // Test Drafts of TF & TE
     // Ability to get wavelength at end of inaugeral splice
+    // Scoring of others secrets for firmament
 
 }

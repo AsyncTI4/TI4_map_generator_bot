@@ -531,7 +531,56 @@ public class StartCombatService {
         for (Player p : game.getRealPlayers()) {
             // offer buttons for all crimson commander holders
             offerRedGhostCommanderButtons(p, game, event);
-            if (p.hasUnit("crimson_destroyer")) {}
+            if (p.hasUnit("crimson_destroyer")) {
+                List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p, UnitType.Destroyer);
+                boolean inRange = false;
+                for (Tile tile2 : destroyers) {
+                    if (FoWHelper.getAdjacentTiles(game, tile.getPosition(), p, false, true)
+                            .contains(tile2.getPosition())) {
+                        inRange = true;
+                    }
+                }
+                if (inRange) {
+                    String msg = p.getRepresentation()
+                            + " at the end of the combat, if your destroyer is still within or adjacent to the tile containing the combat, you can use this button to place an inactive breach";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green(
+                            p.getFinsFactionCheckerPrefix() + "placeInactiveBreach_" + tile.getPosition(),
+                            "Place Inactive Breach"));
+                    buttons.add(Buttons.red(p.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline to place"));
+                    MessageHelper.sendMessageToChannel(p.getCorrectChannel(), msg, buttons);
+                }
+            }
+            if (p.hasUnit("crimson_destroyer2")) {
+                List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p, UnitType.Destroyer);
+                boolean inRange = false;
+                for (String adjPos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p, false, true)) {
+                    for (Tile tile2 : destroyers) {
+                        if (FoWHelper.getAdjacentTiles(game, adjPos, p, false, true)
+                                .contains(tile2.getPosition())) {
+                            inRange = true;
+                            break;
+                        }
+                    }
+                    if (inRange) {
+                        break;
+                    }
+                }
+
+                if (inRange) {
+                    String msg = p.getRepresentation()
+                            + " at the end of the combat, if your destroyer is still in the active system or within 2 tiles away, you can use these buttons to place an active or inactive breach";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green(
+                            p.getFinsFactionCheckerPrefix() + "placeBreach_" + tile.getPosition() + "_destroyer",
+                            "Place Active Breach"));
+                    buttons.add(Buttons.blue(
+                            p.getFinsFactionCheckerPrefix() + "placeInactiveBreach_" + tile.getPosition(),
+                            "Place Inactive Breach"));
+                    buttons.add(Buttons.red(p.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline to place"));
+                    MessageHelper.sendMessageToChannel(p.getCorrectChannel(), msg, buttons);
+                }
+            }
         }
 
         if (tile.isHomeSystem(game)

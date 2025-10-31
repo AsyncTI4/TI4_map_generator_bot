@@ -268,6 +268,12 @@ public class CreateGameService {
         Button teOptions = Buttons.green("offerTEOptionButtons", "Galactic Events");
         MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Enable Galactic Events", teOptions);
 
+        Button tfOptions = Buttons.green("startTFGame", "Start Twilight's Fall Game");
+        MessageHelper.sendMessageToChannelWithButton(
+                actionsChannel,
+                "If you want to start a Twilight's Fall Game (alternate game mode included in Thunder's Edge) use this button",
+                tfOptions);
+
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("chooseExp_newPoK", "New PoK"));
         buttons.add(Buttons.gray("chooseExp_oldPoK", "Old PoK"));
