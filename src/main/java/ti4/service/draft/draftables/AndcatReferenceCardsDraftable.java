@@ -104,15 +104,15 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
                     return Integer.compare(f1.getPriorityNumber(), f2.getPriorityNumber());
                 })
                 .toList();
-        List<List<String>> partitionedFactions = ListUtils.partition(selectedFactions, 3);
-        if (partitionedFactions.size() < numPackages) {
+        List<List<String>> partitionedFactions = ListUtils.partition(selectedFactions, numPackages);
+        if (partitionedFactions.size() < 3) {
             BotLogger.warning(Constants.jabberwockyPing()
                     + " Not enough factions to fill Andcat Reference Card Packages after prioritization. "
                     + "Requested " + numPackages + " packages but only " + partitionedFactions.size() + " packages "
                     + "available after prioritization.");
             return "Couldn't fill all reference card packages for some reason. A developer has been pinged. You can try enabling more factions in the meantime.";
         }
-        if (partitionedFactions.getLast().size() < 3) {
+        if (partitionedFactions.getLast().size() < numPackages) {
             BotLogger.warning(Constants.jabberwockyPing()
                     + " Last Andcat Reference Card Package has less than 3 factions after prioritization. "
                     + "Requested " + numPackages + " packages but last package only has "

@@ -34,7 +34,7 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
         super(MENU_ID, "Reference Card Package Settings", "Control reference card package options.", parent);
 
         int players = parent.getPlayerUserIds().size();
-        numPackages = new IntegerSetting("#Packages", "Number of Packages", players, 2, 24, 1);
+        numPackages = new IntegerSetting("#Packages", "Number of Packages", players, 2, 9, 1);
         // Initialize values & keys for ban/priority factions
         Set<String> empty = new HashSet<>();
         Set<Entry<String, FactionModel>> allFactions = new HashSet<>();
