@@ -125,8 +125,8 @@
         "category": "agenda",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. When the owner of this card resolves the primary or secondary ability of the "Technology" strategy card, they do not need to spend resources to research technology. At the end of their turn, the owner of this card may discard this card to spend four resources and research one technology.",
-        "mapText": "When the owner of this card resolves the primary or secondary ability of the "Technology" strategy card, they do not need to spend resources to research technology. At the end of their turn, the owner of this card may discard this card to spend four resources and research one technology.",
+        "text1": "The elected player gains this card. When the owner of this card resolves the primary or secondary ability of the \"Technology\" strategy card, they do not need to spend resources to research technology. At the end of their turn, the owner of this card may discard this card to spend four resources and research one technology.",
+        "mapText": "When the owner of this card resolves the primary or secondary ability of the \"Technology\" strategy card, they do not need to spend resources to research technology. At the end of their turn, the owner of this card may discard this card to spend four resources and research one technology.",
         "source": "byz_agendas"
     },
     {
