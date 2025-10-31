@@ -158,8 +158,8 @@ public class MapJsonIOService {
             game.removeAllTiles();
             game.clearAdjacentTileOverrides();
             game.clearCustomAdjacentTiles();
-            game.setBorderAnomalies(Collections.emptyList());
-            game.setCustomHyperlaneData(Collections.emptyMap());
+            game.setBorderAnomalies(null);
+            game.getCustomHyperlaneData().clear();
             LoreService.clearLore(game);
 
             for (TileIO tileIO : mapData.getMapInfo()) {
