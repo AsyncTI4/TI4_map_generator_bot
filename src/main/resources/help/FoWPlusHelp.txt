@@ -16,8 +16,4 @@ __**Other effects:**__
 > You cannot remove tokens from tiles you cannot see.
 > Includes a custom explore deck with new FoW+-exclusive cards.
 
-To enable FoW+ Mode
-`/game weird_game_setup fow_plus:True`.
-
-Many of these FoW+ features can also be toggled individually in standard Fog of War games using
-`/fow fow_options`
+Many of these FoW+ features can also be toggled individually in standard Fog of War games.
