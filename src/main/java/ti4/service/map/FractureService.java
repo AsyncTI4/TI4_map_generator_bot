@@ -65,6 +65,7 @@ public class FractureService {
     }
 
     public static void spawnFracture(GenericInteractionCreateEvent event, Game game) {
+        if (isFractureInPlay(game)) return;
         List<String> fracture = Arrays.asList(
                 "fracture1", "fracture2", "fracture3", "fracture4", "fracture5", "fracture6", "fracture7");
         List<String> positions = Arrays.asList("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7");
@@ -175,12 +176,16 @@ public class FractureService {
                 List<Button> buttons = event.getMessage().getButtons();
                 List<Button> newButtons = new ArrayList<>();
                 for (Button b : buttons) {
-                    if (b.getId().endsWith(buttonID)) continue;
+                    if (b.getCustomId().endsWith(buttonID)) continue;
+                    if (b.getCustomId().toLowerCase().contains("undo")) {
+                        newButtons.add(b);
+                        continue;
+                    }
                     String ffcc = player.finChecker();
-                    String idSansChecker = b.getId().replace(player.finChecker(), "");
+                    String idSansChecker = b.getCustomId().replace(player.finChecker(), "");
                     RegexService.runMatcher(regex, idSansChecker, m2 -> {
                         String pos = matcher.group("pos");
-                        newButtons.add(b.withId(ffcc + "addIngressToken_" + pos + "_" + (remaining - 1)));
+                        newButtons.add(b.withCustomId(ffcc + "addIngressToken_" + pos + "_" + (remaining - 1)));
                     });
                 }
                 MessageHelper.editMessageButtons(event, newButtons);
