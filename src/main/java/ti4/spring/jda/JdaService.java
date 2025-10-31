@@ -111,12 +111,10 @@ public class JdaService {
         String[] args = applicationArguments.getSourceArgs();
         jda = JDABuilder.createDefault(args[0])
                 // This is a privileged gateway intent that is used to update user information and join/leaves
-                // (including kicks).
-                // This is required to cache all members of a guild (including chunking)
+                // (including kicks). This is required to cache all members of a guild (including chunking)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 // This is a privileged gateway intent this is only used to enable access to the user content in
-                // messages
-                // (also including embeds/attachments/components).
+                // messages (also including embeds/attachments/components).
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                 // not 100 sure this is needed? It may be for the Emoji cache... but do we actually need that?
                 .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
@@ -127,21 +125,27 @@ public class JdaService {
                 .setChunkingFilter(ChunkingFilter.ALL)
                 // This allows us to use our own ShutdownHook, created below
                 .setEnableShutdownHook(false)
+                .setStatus(OnlineStatus.DO_NOT_DISTURB)
+                .setActivity(Activity.customStatus("STARTING UP: Connecting to Servers"))
                 .build();
 
         BotLogger.info("INITIALIZING LISTENERS");
         jda.addEventListener(
+                // Priority Listeners First
                 new BotRuntimeStatsListener(),
                 new MessageListener(),
-                new DeletionListener(),
-                new ChannelCreationListener(),
                 new SlashCommandListener(),
                 ButtonListener.getInstance(),
-                ModalListener.getInstance(),
-                new SelectionMenuListener(),
                 new UserJoinServerListener(),
+                new AutoCompleteListener(),
+
+                // Non-Priority Listeners
+                new DeletionListener(),
+                new SelectionMenuListener(),
+                new ChannelCreationListener(),
                 new UserLeaveServerListener(),
-                new AutoCompleteListener());
+                ModalListener.getInstance() // ModalListener has a long init time
+                );
 
         BotLogger.info("AWAITING JDA READY");
         try {
@@ -149,9 +153,6 @@ public class JdaService {
         } catch (InterruptedException e) {
             BotLogger.error("Error waiting for bot to get ready", e);
         }
-
-        jda.getPresence()
-                .setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
 
         BotLogger.info("INITIALIZING SERVERS");
 
@@ -306,9 +307,8 @@ public class JdaService {
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
-        jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
-        updatePresence();
         BotLogger.info("BOT IS READY TO RECEIVE COMMANDS");
+        updatePresence();
     }
 
     private static Guild initGuild(String guildID, boolean addToNewGameServerList) {
@@ -373,7 +373,7 @@ public class JdaService {
 
     public static void updatePresence() {
         long activeGames = GameManager.getActiveGameCount();
-        jda.getPresence().setActivity(Activity.playing(activeGames + " games of Async TI4"));
+        jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing(activeGames + " games of Async TI4"));
     }
 
     /**
