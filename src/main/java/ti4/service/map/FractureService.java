@@ -57,6 +57,7 @@ public class FractureService {
     }
 
     public static void spawnFracture(GenericInteractionCreateEvent event, Game game) {
+        if (isFractureInPlay(game)) return;
         List<String> fracture = Arrays.asList(
                 "fracture1", "fracture2", "fracture3", "fracture4", "fracture5", "fracture6", "fracture7");
         List<String> positions = Arrays.asList("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7");
