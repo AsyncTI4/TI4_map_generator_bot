@@ -13,6 +13,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -79,6 +80,7 @@ public class EndTurnService {
         game.removeStoredValue("endTurnWhenSCFinished");
         game.removeStoredValue("fleetLogWhenSCFinished");
         ButtonHelperAbilities.oceanBoundCheck(game);
+        TeHelperGeneral.checkCoexistTransfer(game);
         game.removeStoredValue("mahactHeroTarget");
         game.removeStoredValue("possiblyUsedRift");
         game.setActiveSystem("");
