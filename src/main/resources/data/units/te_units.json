@@ -309,7 +309,6 @@
         "source": "thunders_edge",
         "faction": "naaz",
         "moveValue": 3,
-        "capacityUsed": 1,
         "combatHitsOn": 4,
         "combatDieCount": 4,
         "sustainDamage": true,
