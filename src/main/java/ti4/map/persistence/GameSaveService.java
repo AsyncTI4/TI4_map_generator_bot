@@ -13,10 +13,12 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.helpers.Constants;
@@ -26,6 +28,7 @@ import ti4.helpers.PatternHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
 import ti4.json.ObjectMapperFactory;
@@ -145,7 +148,10 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         writeCards(game.getDiscardActionCards(), writer, Constants.AC_DISCARDED);
-        writeCards(game.getPurgedActionCards(), writer, Constants.AC_PURGED);
+        Map<String, String> discardStatus = new LinkedHashMap<String, String>(
+                game.getDiscardACStatus().entrySet().stream().collect(Collectors.toMap(Entry::getKey, e -> e.getValue()
+                        .toString())));
+        writeCardsStrings(discardStatus, writer, Constants.AC_STATUS);
 
         writer.write(Constants.EXPLORE + " " + String.join(",", game.getAllExplores()));
         writer.write(System.lineSeparator());
@@ -157,6 +163,9 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         writer.write(Constants.SPEAKER + " " + game.getSpeakerUserID());
+        writer.write(System.lineSeparator());
+
+        writer.write(Constants.TYRANT + " " + game.getTyrantUserID());
         writer.write(System.lineSeparator());
 
         writer.write(Constants.ACTIVE_PLAYER + " " + game.getActivePlayerID());
@@ -475,6 +484,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.THUNDERS_EDGE_MODE + " " + game.isThundersEdge());
         writer.write(System.lineSeparator());
+        writer.write(Constants.TWILIGHTS_FALL_MODE + " " + game.isTwilightsFallMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.LIGHT_FOG_MODE + " " + game.isLightFogMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.CPTI_EXPLORE_MODE + " " + game.isCptiExploreMode());
@@ -522,6 +533,28 @@ class GameSaveService {
         writer.write(Constants.STELLAR_ATOMICS_MODE + " " + game.isStellarAtomicsMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.AGE_OF_FIGHTERS_MODE + " " + game.isAgeOfFightersMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.ZEALOUS_ORTHODOXY_MODE + " " + game.isZealousOrthodoxyMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.ADVENT_OF_THE_WARSUN_MODE + " " + game.isAdventOfTheWarsunMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.CULTURAL_EXCHANGE_PROGRAM_MODE + " " + game.isCulturalExchangeProgramMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.CONVENTIONS_OF_WAR_ABANDONED_MODE + " " + game.isConventionsOfWarAbandonedMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.RAPID_MOBILIZATION_MODE + " " + game.isRapidMobilizationMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.MONUMENTS_TO_THE_AGES_MODE + " " + game.isMonumentToTheAgesMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.WEIRD_WORMHOLES_MODE + " " + game.isWeirdWormholesMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.CALL_OF_THE_VOID_MODE + " " + game.isCallOfTheVoidMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.WILD_WILD_GALAXY_MODE + " " + game.isWildWildGalaxyMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.COSMIC_PHENOMENAE_MODE + " " + game.isCosmicPhenomenaeMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.MERCENARIES_FOR_HIRE_MODE + " " + game.isMercenariesForHireMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.CIVILIZED_SOCIETY_MODE + " " + game.isCivilizedSocietyMode());
         writer.write(System.lineSeparator());
@@ -617,6 +650,16 @@ class GameSaveService {
         } else if (game.getMiltyJson() != null) {
             // default to the already stored value, if we failed to read it previously
             writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + game.getMiltyJson());
+            writer.write(System.lineSeparator());
+        }
+
+        DraftSystemSettings draftSettings = game.getDraftSystemSettingsUnsafe();
+        if (draftSettings != null) {
+            writer.write(Constants.DRAFT_SYSTEM_SETTINGS + " " + draftSettings.json());
+            writer.write(System.lineSeparator());
+        } else if (game.getDraftSystemSettingsJson() != null) {
+            // default to the already stored value, if we failed to read it previously
+            writer.write(Constants.DRAFT_SYSTEM_SETTINGS + " " + game.getDraftSystemSettingsJson());
             writer.write(System.lineSeparator());
         }
 
@@ -744,6 +787,9 @@ class GameSaveService {
             writer.write(Constants.SARWEEN_COUNT + " " + player.getSarweenCounter());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.GHOST_COMMANDER_COUNT + " " + player.getGhostCommanderCounter());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.MAGEN_INFANTRY_COUNT + " " + player.getMagenInfantryCounter());
             writer.write(System.lineSeparator());
 
@@ -775,6 +821,9 @@ class GameSaveService {
 
             writeCards(player.getTrapCards(), writer, Constants.LIZHO_TRAP_CARDS);
             writeCardsStrings(player.getTrapCardsPlanets(), writer, Constants.LIZHO_TRAP_PLANETS);
+
+            writeCards(player.getPlotCards(), writer, Constants.PLOT_CARDS);
+            writeCardsStringList(player.getPlotCardsFactions(), writer, Constants.PLOT_FACTIONS);
 
             writer.write(Constants.FRAGMENTS + " " + String.join(",", player.getFragments()));
             writer.write(System.lineSeparator());
@@ -814,7 +863,7 @@ class GameSaveService {
             writer.write(Constants.TECH_PURGED + " " + String.join(",", player.getPurgedTechs()));
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.PLANETS + " " + String.join(",", player.getPlanets()));
+            writer.write(Constants.PLANETS + " " + String.join(",", player.getUniquePlanets()));
             writer.write(System.lineSeparator());
             writer.write(Constants.PLANETS_EXHAUSTED + " " + String.join(",", player.getExhaustedPlanets()));
             writer.write(System.lineSeparator());
@@ -1007,6 +1056,19 @@ class GameSaveService {
     private static void writeBoolLine(Writer writer, String field, boolean bool) throws IOException {
         String output = bool ? "true" : "false";
         writer.write(field + " " + output);
+        writer.write(System.lineSeparator());
+    }
+
+    private static void writeCardsStringList(Map<String, List<String>> cardList, Writer writer, String saveID)
+            throws IOException {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, List<String>> entry : cardList.entrySet()) {
+            sb.append(entry.getKey())
+                    .append(",")
+                    .append(String.join(",", entry.getValue()))
+                    .append(";");
+        }
+        writer.write(saveID + " " + sb);
         writer.write(System.lineSeparator());
     }
 

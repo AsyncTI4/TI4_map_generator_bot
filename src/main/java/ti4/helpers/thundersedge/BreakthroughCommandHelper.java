@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.buttons.Buttons;
 import ti4.commands.CommandHelper;
 import ti4.helpers.BreakthroughHelper;
 import ti4.map.Game;
@@ -14,6 +16,9 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
 import ti4.service.breakthrough.StellarGenesisService;
+import ti4.service.emoji.DiceEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.map.FractureService;
 
 public class BreakthroughCommandHelper {
 
@@ -69,8 +74,26 @@ public class BreakthroughCommandHelper {
             if ("yinbt".equalsIgnoreCase(bt.getID())) {
                 BreakthroughHelper.resolveYinBreakthroughAbility(player.getGame(), player);
             }
+            if ("mentakbt".equalsIgnoreCase(bt.getID())) {
+                if (player.hasTech("cr2")) {
+                    player.addOwnedUnitByID("mentak_cruiser3");
+                    player.removeOwnedUnitByID("cruiser2");
+                }
+            }
+            if (!FractureService.isFractureInPlay(game) && game.isTestBetaFeaturesMode())
+                serveRollFractureButtons(game, player);
             if (bt.getAlias().equals("muaatbt")) StellarGenesisService.serveAvernusButtons(game, player);
+            if (bt.getAlias().equals("keleresbt")) player.gainCustodiaVigilia();
         });
+    }
+
+    public static void serveRollFractureButtons(Game game, Player player) {
+        Button rollFracture = Buttons.green(
+                player.getFinsFactionCheckerPrefix() + "rollFracture", "Roll for the fracture", MiscEmojis.RollDice);
+        String message = "It looks like the fracture isn't in play yet. Use the button to roll for the fracture!";
+        message += "\n> If you roll a [" + DiceEmojis.d10blue_1 + "] or [" + DiceEmojis.d10blue_0
+                + "], the fracture will appear.";
+        MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, rollFracture);
     }
 
     public static void lockBreakthrough(Player player) {
@@ -88,17 +111,23 @@ public class BreakthroughCommandHelper {
             if (!player.isBreakthroughActive()) {
                 player.setBreakthroughActive(true);
                 String message = player.getRepresentation() + " activated their breakthrough: " + bt.getName();
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                if (bt.getAlias().equalsIgnoreCase("naazbt")) {
+                    player.addOwnedUnitByID("naaz_voltron");
+                }
             }
         });
     }
 
-    public static void deactivateBreakthrough(GenericInteractionCreateEvent event, Player player) {
+    public static void deactivateBreakthrough(Player player) {
         withBreakthrough(player, bt -> {
             if (player.isBreakthroughActive()) {
                 player.setBreakthroughActive(false);
                 String message = player.getRepresentation() + " de-activated their breakthrough: " + bt.getName();
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                if (bt.getAlias().equalsIgnoreCase("naazbt")) {
+                    player.removeOwnedUnitByID("naaz_voltron");
+                }
             }
         });
     }

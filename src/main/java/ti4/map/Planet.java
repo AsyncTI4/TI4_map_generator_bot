@@ -107,6 +107,17 @@ public class Planet extends UnitHolder {
         });
     }
 
+    public void updateTriadStats(Player player) {
+        if (getName().equals("triad")) {
+            resourcesModifier = 0;
+            if (player.getHrf() > 0) resourcesModifier++;
+            if (player.getIrf() > 0) resourcesModifier++;
+            if (player.getCrf() > 0) resourcesModifier++;
+            if (player.getUrf() > 0) resourcesModifier++;
+            influenceModifier = resourcesModifier;
+        }
+    }
+
     @JsonIgnore
     @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
     public List<String> getAttachments() {
@@ -141,6 +152,12 @@ public class Planet extends UnitHolder {
         return getUnits().keySet().stream()
                 .flatMap(uk -> game.getPriorityUnitByUnitKey(uk, this).stream())
                 .anyMatch(UnitModel::getIsGroundForce);
+    }
+
+    public boolean hasStructures(Game game) {
+        return getUnits().keySet().stream()
+                .flatMap(uk -> game.getPriorityUnitByUnitKey(uk, this).stream())
+                .anyMatch(UnitModel::getIsStructure);
     }
 
     @Override
@@ -273,6 +290,11 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
+    public boolean isSpaceStation() {
+        return getPlanetModel().isSpaceStation();
+    }
+
+    @JsonIgnore
     public Set<String> getPlanetTypes() {
         Set<String> types = new HashSet<>();
         List<String> three = List.of("hazardous", "cultural", "industrial");
@@ -294,14 +316,15 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
-    public Set<String> getTechSpecialities() {
-        Set<String> specialties = new HashSet<>();
-        if (isNotBlank(originalTechSpeciality)) {
-            specialties.add(originalTechSpeciality);
-        }
+    public List<String> getTechSpecialities() {
+        List<String> specialties = new ArrayList<>();
+
         specialties.addAll(techSpeciality);
         specialties.removeAll(Collections.singleton(null));
         specialties.removeAll(Collections.singleton(""));
+        if (isNotBlank(originalTechSpeciality) && specialties.isEmpty()) {
+            specialties.add(originalTechSpeciality);
+        }
         return specialties;
     }
 

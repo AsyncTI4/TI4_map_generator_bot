@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.buttons.Buttons;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
@@ -21,6 +22,7 @@ import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.HeroUnlockCheckService;
+import ti4.service.leader.UnlockLeaderService;
 
 public class SecretObjectiveHelper {
 
@@ -48,9 +50,36 @@ public class SecretObjectiveHelper {
             } else {
                 message.append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(entry.getKey()));
             }
+            boolean zealous = false;
+            String leader = "";
+            if (game.isZealousOrthodoxyMode()
+                    && game.getScoredPublicObjectives().get("Zealous Orthodoxy") == null
+                    && player.getSecretsScored().size() == 2) {
+                zealous = true;
+                int poIndex = game.addCustomPO("Zealous Orthodoxy", 1);
+                game.scorePublicObjective(player.getUserID(), poIndex);
+                MessageHelper.sendMessageToChannel(
+                        game.getActionsChannel(),
+                        player.getRepresentation()
+                                + " also scored 1 VP due to Zealous Orthodoxy. Everyone will gain their commander ability.");
+                for (Leader leaderP : player.getLeaders()) {
+                    if (leaderP.getId().contains("commander")) {
+                        leader = leaderP.getId();
+                        if (leaderP.isLocked()) {
+                            UnlockLeaderService.unlockLeader(leader, game, player);
+                            game.addFakeCommander(leader);
+                        }
+                        break;
+                    }
+                }
+            }
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
                     continue;
+                }
+                if (zealous && !leader.isEmpty()) {
+                    p2.addLeader(leader);
+                    UnlockLeaderService.unlockLeader(leader, game, p2);
                 }
                 if (p2.hasLeaderUnlocked("tnelishero")) {
                     List<Button> buttons = new ArrayList<>();
@@ -150,6 +179,18 @@ public class SecretObjectiveHelper {
             String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
                     + player.getCCRepresentation()
                     + ". Use buttons to gain 1 command token.";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+        }
+
+        if (player.hasTech("tf-yinascendant")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), player.getRepresentation() + " gains 1 card due to Yin Ascendant.");
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
+            buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
+            buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
+            buttons.add(Buttons.red("deleteButtons", "Done resolving"));
+            String message2 = player.getRepresentationUnfogged() + " use buttons to resolve.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
         CommanderUnlockCheckService.checkPlayer(player, "nomad");

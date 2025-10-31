@@ -8,6 +8,7 @@ import ti4.service.breakthrough.DeorbitBarrageService;
 import ti4.service.breakthrough.PsychosporeService;
 import ti4.service.breakthrough.ResonanceGeneratorService;
 import ti4.service.breakthrough.TheIconService;
+import ti4.service.breakthrough.VaultsOfTheHeirService;
 import ti4.service.breakthrough.VisionariaSelectService;
 
 public class TeHelperBreakthroughs {
@@ -18,6 +19,7 @@ public class TeHelperBreakthroughs {
             case "crimsonbt" -> ResonanceGeneratorService.postInitialButtons(event, game, player);
             case "deepwroughtbt" -> VisionariaSelectService.postInitialButtons(event, game, player);
             case "saarbt" -> DeorbitBarrageService.postInitialButtons(game, player);
+            case "mahactbt" -> VaultsOfTheHeirService.postInitialButtons(event, game, player);
             case "bastionbt" -> TheIconService.iconStepOne(event, game, player);
             default -> {
                 MessageHelper.sendMessageToChannel(

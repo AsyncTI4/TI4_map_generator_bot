@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CheckDistanceHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
@@ -270,7 +271,7 @@ public class TacticalActionOutputService {
 
         boolean movingFromHome = tile == player.getHomeSystemTile();
         boolean tileHasWormhole = FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition());
-
+        Tile activeSystem = getActiveSystem(game);
         // Calculate base move value (pretty easy)
         int baseMoveValue = model.getMoveValue();
         if (baseMoveValue == 0) return 0;
@@ -293,10 +294,27 @@ public class TacticalActionOutputService {
             bonusMoveValue = maxBase - baseMoveValue;
         }
 
+        boolean tileHasBreach = tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
+
         if (player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
             bonusMoveValue++;
         }
-        if (player.hasAbility("slipstream") && (tileHasWormhole || movingFromHome)) {
+        if (player.hasAbility("slipstream") && (tileHasWormhole || (movingFromHome && !game.isTwilightsFallMode()))) {
+            bonusMoveValue++;
+        }
+        if (game.isCallOfTheVoidMode() && activeSystem.getPosition().contains("frac")) {
+            bonusMoveValue++;
+        }
+
+        if (player.hasUnlockedBreakthrough("cabalbt") && tile.getPosition().contains("frac")) {
+            bonusMoveValue++;
+        }
+
+        if (player.hasUnlockedBreakthrough("crimsonbt") && (tileHasBreach || movingFromHome)) {
+            bonusMoveValue++;
+        }
+
+        if (player.hasAbility("song_of_something") && movingFromHome) {
             bonusMoveValue++;
         }
         if (!game.getStoredValue("crucibleBoost").isEmpty()) {
@@ -304,12 +322,14 @@ public class TacticalActionOutputService {
         }
         if (!game.getStoredValue("flankspeedBoost").isEmpty()) {
             bonusMoveValue += 1;
+            if (game.isWildWildGalaxyMode()) {
+                bonusMoveValue += 1;
+            }
         }
         if (!game.getStoredValue("baldrickGDboost").isEmpty()) {
             bonusMoveValue += 1;
         }
 
-        Tile activeSystem = getActiveSystem(game);
         for (UnitHolder uhPlanet : activeSystem.getPlanetUnitHolders()) {
             if (player.getPlanets().contains(uhPlanet.getName())) {
                 continue;

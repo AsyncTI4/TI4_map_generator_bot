@@ -112,7 +112,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "While this unit is in or adjacent to a system that contains an active breach, other players' units in systems  with active breaches lose all of their unit abilities."
+        "ability": "While this unit is in a system that contains an active breach, other players' units in systems with active breaches lose all of their unit abilities"
     },
     {
         "id": "crimson_mech",
@@ -140,7 +140,7 @@
         "moveValue": 2,
         "capacityUsed": 1,
         "cost": 1,
-        "combatHitsOn": 9,
+        "combatHitsOn": 8,
         "combatDieCount": 1,
         "afbHitsOn": 9,
         "afbDieCount": 2,
@@ -159,7 +159,7 @@
         "moveValue": 2,
         "capacityUsed": 1,
         "cost": 1,
-        "combatHitsOn": 8,
+        "combatHitsOn": 7,
         "combatDieCount": 1,
         "afbHitsOn": 6,
         "afbDieCount": 3,
@@ -317,5 +317,38 @@
         "isGroundForce": true,
         "isShip": true,
         "ability": "This unit is both a ship and ground force. It cannot be assigned hits from unit abilities. Repair it at the start of every combat round. Game effects cannot place or produce your mechs. When this unit is destroyed or removed, flip this card and return it to your play area."
+    },
+    {
+        "id": "mentak_cruiser3",
+        "baseType": "cruiser",
+        "asyncId": "ca",
+        "name": "Corsair",
+        "source": "thunders_edge",
+        "faction": "mentak",
+        "moveValue": 3,
+        "capacityValue": 2,
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "isShip": true,
+        "ability": "If the active system contains another player's non-fighter ships, this unit can move through systems that contain other players' ships."
+    },
+    {
+        "id": "naalu_mech_te",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Iconoclast TE",
+        "faction": "naalu",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "sustainDamage": true,
+        "isGroundForce": true,
+        "ability": "DEPLOY: When another player gains a relic, place 1 mech on any planet you control.",
+        "homebrewReplacesID": "naalu_mech_omega",
+        "imageURL": "",
+        "source": "thunders_edge"
     }
 ]

@@ -192,7 +192,7 @@ public enum LeaderEmojis implements TI4Emoji {
             case "mahactagent" -> MahactAgent;
             case "mentakagent", "kelerescommander" -> MentakAgent;
             case "muaatagent" -> MuaatAgent;
-            case "naaluagent" -> NaaluAgent;
+            case "naaluagent", "naaluagent-te" -> NaaluAgent;
             case "naazagent" -> NaazAgent;
             case "nekroagent" -> NekroAgent;
             case "nomadagentartuno" -> NomadAgentArtuno;
@@ -260,7 +260,7 @@ public enum LeaderEmojis implements TI4Emoji {
             case "solhero" -> SolHero;
             case "titanshero" -> TitansHero;
             case "winnuhero" -> WinnuHero;
-            case "xxchahero" -> XxchaHero;
+            case "xxchahero", "xxchahero-te" -> XxchaHero;
             case "yinhero" -> YinHero;
             case "yssarilhero" -> YssarilHero;
             case "redghosthero", "redcreusshero" -> RedCreussHero;

@@ -1,5 +1,8 @@
 package ti4.service.leader;
 
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -68,6 +71,39 @@ public class CommanderUnlockCheckService {
                     shouldBeUnlocked = true;
                 }
             }
+            case "bastion" -> {
+                int totGalvanized = game.getTileMap().values().stream()
+                        .flatMap(t -> t.getUnitHolders().values().stream())
+                        .collect(Collectors.summingInt(UnitHolder::getTotalGalvanizedCount));
+                if (totGalvanized >= 3) {
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "deepwrought" -> {
+                shouldBeUnlocked = player.getPlanets().stream().anyMatch(s -> s.startsWith("ocean"));
+            }
+            case "ralnel" -> {
+                shouldBeUnlocked = true;
+            }
+            case "crimson" -> {
+                shouldBeUnlocked = true;
+                // This commander unlock is checked in @ResonanceGeneratorService and
+                // TODO: (TE) @{wherever crimson destroyers are handled}
+            }
+            case "firmament" -> {
+                for (Entry<String, List<String>> entry :
+                        player.getPlotCardsFactions().entrySet()) {
+                    if (entry.getValue() != null && entry.getValue().size() > 0) shouldBeUnlocked = true;
+                }
+            }
+            case "obsidian" -> {
+                for (Tile t : game.getTileMap().values()) {
+                    if (t.getPosition().startsWith("frac") && t.containsPlayersUnits(player)) {
+                        shouldBeUnlocked = true;
+                    }
+                }
+            }
+
             case "vaden" -> {
                 if (ButtonHelper.howManyDifferentDebtPlayerHas(player)
                         > (game.getRealPlayers().size() / 2) - 1) {

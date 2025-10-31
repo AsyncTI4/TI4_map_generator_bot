@@ -1,0 +1,1 @@
+{"id":"tsionstation","tileId":"109","name":"Tsion Station","aliases":["tsion","tsionstation"],"resources":1,"influence":1,"planetTypes":["SPACESTATION"],"planetLayout":{"unitHolderName":"tsionstation","resourcesLocation":"BottomRight","centerPosition":{"x":200.0,"y":210.0}},"source":"thunders_edge"}

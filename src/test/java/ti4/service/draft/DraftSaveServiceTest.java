@@ -21,7 +21,7 @@ public class DraftSaveServiceTest extends BaseTi4Test {
         draftManager.setPlayers(game.getPlayerIDs().stream().toList());
 
         // Just add one of every draftable
-        for (String draftableClassName : DraftComponentFactory.getKnownDraftableTypes()) {
+        for (String draftableClassName : DraftComponentFactory.getKnownDraftableClasses()) {
             Draftable draftable = getDraftableWithTestData(draftableClassName);
             assertNotNull(draftable, "No test data set up for draftable type: " + draftableClassName);
             draftManager.addDraftable(draftable);
@@ -41,7 +41,7 @@ public class DraftSaveServiceTest extends BaseTi4Test {
         }
 
         // Try save and load with each orchestrator type
-        for (String orchestratorClassName : DraftComponentFactory.getKnownOrchestratorTypes()) {
+        for (String orchestratorClassName : DraftComponentFactory.getKnownOrchestratorClasses()) {
             DraftOrchestrator orchestrator = getOrchestratorWithTestData(orchestratorClassName);
             assertNotNull(orchestrator, "No test data set up for orchestrator class: " + orchestratorClassName);
             draftManager.setOrchestrator(orchestrator);
@@ -128,6 +128,12 @@ public class DraftSaveServiceTest extends BaseTi4Test {
                 return TestData.createSliceDraftable();
             case "SpeakerOrderDraftable":
                 return TestData.createSpeakerOrderDraftable();
+            case "MantisTileDraftable":
+                return TestData.createMantisTileDraftable();
+            case "MahactKingDraftable":
+                return TestData.createMahactKingDraftable();
+            case "AndcatReferenceCardsDraftable":
+                return TestData.createAndcatReferenceCardsDraftable();
             default:
                 return null;
         }

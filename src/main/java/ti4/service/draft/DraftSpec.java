@@ -3,11 +3,14 @@ package ti4.service.draft;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
+import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
+import ti4.helpers.settingsFramework.menus.MiltySliceDraftableSettings;
 import ti4.helpers.settingsFramework.menus.PlayerFactionSettings;
 import ti4.helpers.settingsFramework.menus.SliceGenerationSettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
+import ti4.helpers.thundersedge.TeHelperDemo;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.MapTemplateModel;
@@ -83,14 +86,12 @@ public class DraftSpec {
         PlayerFactionSettings pfSettings = settings.getPlayerSettings();
         specs.bannedFactions.addAll(pfSettings.getBanFactions().getKeys());
         if (game.isThundersEdge()) {
-            List<String> newKeys = new ArrayList<>();
-            newKeys.addAll(
-                    List.of("arborec", "sol", "letnev", "winnu", "sardakk", "yin", "l1z1x", "naalu", "saar", "naaz"));
-            specs.priorityFactions.addAll(newKeys);
-            specs.numFactions = Math.min(10, specs.numFactions);
-        } else {
-            specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
+            specs.bannedFactions.addAll(TeHelperDemo.getExcludedFactions());
+            specs.numFactions = Math.min(25 - TeHelperDemo.getExcludedFactions().size(), specs.numFactions);
         }
+
+        specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
+        specs.priorityFactions.removeAll(specs.bannedFactions);
         specs.setPlayerIDs(new ArrayList<>(pfSettings.getGamePlayers().getKeys()));
         if (pfSettings.getPresetDraftOrder().isVal()) {
             specs.playerDraftOrder = new ArrayList<>(game.getPlayers().keySet());
@@ -104,6 +105,41 @@ public class DraftSpec {
 
         if (sliceSettings.getParsedSlices() != null) {
             specs.presetSlices = sliceSettings.getParsedSlices();
+        }
+
+        return specs;
+    }
+
+    public static DraftSpec SliceSpecsFromDraftSystemSettings(DraftSystemSettings settings) {
+        Game game = settings.getGame();
+        DraftSpec specs = new DraftSpec(game);
+
+        // Load Game Specifications
+        MapTemplateModel template = settings.getSliceSettings().getMapTemplate().getValue();
+        if (template == null) {
+            template = Mapper.getDefaultMapTemplateForPlayerCount(specs.playerIDs.size());
+            game.setMapTemplateID(template.getID());
+        }
+        specs.setTemplate(template);
+
+        // Load Slice Generation Specifications
+        MiltySliceDraftableSettings sliceSettings = settings.getSliceSettings().getMiltySettings();
+        specs.numSlices = settings.getSliceSettings().getNumSlices().getVal();
+        specs.anomaliesCanTouch = false;
+        specs.extraWHs = sliceSettings.getExtraWorms().isVal();
+        specs.minLegend = sliceSettings.getNumLegends().getValLow();
+        specs.maxLegend = sliceSettings.getNumLegends().getValHigh();
+        specs.minTot = sliceSettings.getTotalValue().getValLow();
+        specs.maxTot = sliceSettings.getTotalValue().getValHigh();
+        specs.setPlayerIDs(new ArrayList<>(settings.getPlayerUserIds()));
+
+        // Load Sources Specifications
+        SourceSettings sources = settings.getSourceSettings();
+        specs.setTileSources(sources.getTileSources());
+        specs.setFactionSources(sources.getFactionSources());
+
+        if (settings.getSliceSettings().getParsedSlices() != null) {
+            specs.presetSlices = settings.getSliceSettings().getParsedSlices();
         }
 
         return specs;

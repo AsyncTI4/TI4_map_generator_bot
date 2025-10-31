@@ -1,0 +1,27 @@
+{
+    "id": "tiamat",
+    "tileId": "107",
+    "name": "Tiamat",
+    "aliases": [
+        "tiamat",
+        "dragon"
+    ],
+    "resources": 1,
+    "influence": 2,
+    "planetTypes": [
+        "CULTURAL"
+    ],
+    "techSpecialties": [
+        "CYBERNETIC",
+        "CYBERNETIC"
+    ],
+    "planetLayout": {
+        "unitHolderName": "tiamat",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135.0,
+            "y": 85.0
+        }
+    },
+    "source": "thunders_edge"
+}

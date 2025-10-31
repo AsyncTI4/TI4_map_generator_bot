@@ -296,29 +296,9 @@ public class MessageHelper {
                             yield new StringTokenizer(game.getPlayersWhoHitPersistentNoAfter(), "_");
                         }
                         case AGENDA_CONFOUNDING_CONFUSING_LEGAL_TEXT -> {
-                            String oldMessageId = GameMessageManager.replace(
-                                    game.getName(),
-                                    message.getId(),
-                                    GameMessageType.AGENDA_CONFOUNDING_CONFUSING_LEGAL_TEXT,
-                                    game.getLastModifiedDate());
-                            if (oldMessageId != null) {
-                                game.getMainGameChannel()
-                                        .deleteMessageById(oldMessageId)
-                                        .queue(Consumers.nop(), BotLogger::catchRestError);
-                            }
                             yield new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
                         }
                         case AGENDA_DEADLY_PLOT -> {
-                            String oldMessageId = GameMessageManager.replace(
-                                    game.getName(),
-                                    message.getId(),
-                                    GameMessageType.AGENDA_DEADLY_PLOT,
-                                    game.getLastModifiedDate());
-                            if (oldMessageId != null) {
-                                game.getMainGameChannel()
-                                        .deleteMessageById(oldMessageId)
-                                        .queue(Consumers.nop(), BotLogger::catchRestError);
-                            }
                             yield new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
                         }
                         default -> {
@@ -626,6 +606,24 @@ public class MessageHelper {
                         },
                         finalMessageText,
                         1);
+            }
+        }
+    }
+
+    public static void sendMessagesWithRetry(
+            MessageChannel channel,
+            List<MessageCreateData> messageCreateDataList,
+            MessageFunction successAction,
+            String errorHeader,
+            int remainingAttempts) {
+        Iterator<MessageCreateData> iterator = messageCreateDataList.iterator();
+        while (iterator.hasNext()) {
+            MessageCreateData messageCreateData = iterator.next();
+            if (iterator.hasNext()) { // not last message
+                sendMessageWithRetry(
+                        channel, messageCreateData, null, "Failed to send intermediate message", remainingAttempts);
+            } else { // last message, do action
+                sendMessageWithRetry(channel, messageCreateData, successAction, errorHeader, remainingAttempts);
             }
         }
     }
@@ -961,7 +959,7 @@ public class MessageHelper {
         return getMessageCreateDataObjects(message, null, buttons);
     }
 
-    private static List<List<ActionRow>> getPartitionedButtonLists(List<Button> buttons) {
+    public static List<List<ActionRow>> getPartitionedButtonLists(List<Button> buttons) {
         List<List<ActionRow>> partitionedButtonRows = new ArrayList<>();
         try {
             buttons.removeIf(Objects::isNull);
@@ -1065,7 +1063,7 @@ public class MessageHelper {
         sendMessageToChannelWithEmbeds(channel, message, embeds);
     }
 
-    private static List<Button> sanitizeButtons(List<Button> buttons, MessageChannel channel) {
+    public static List<Button> sanitizeButtons(List<Button> buttons, MessageChannel channel) {
         if (buttons == null) return null;
         List<Button> newButtons = new ArrayList<>();
         List<String> goodButtonIDs = new ArrayList<>();

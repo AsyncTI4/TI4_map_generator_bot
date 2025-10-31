@@ -36,6 +36,7 @@ import ti4.cron.OldUndoFileCleanupCron;
 import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
+import ti4.cron.ThreadArchiveCron;
 import ti4.cron.UploadStatsCron;
 import ti4.cron.WinningPathCron;
 import ti4.executors.ExecutorServiceManager;
@@ -63,6 +64,7 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogBufferManager;
 import ti4.migration.DataMigrationManager;
 import ti4.selections.SelectionManager;
+import ti4.service.draft.SliceGenerationPipeline;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
@@ -93,6 +95,7 @@ public class JdaService {
     private static Guild guildUndenary;
     private static Guild guildDuodenary;
     public static Guild guildFogOfWar;
+    public static Guild guildFogOfWarSecondary;
     public static Guild guildCommunityPlays;
     private static Guild guildMegagame;
     public static final Set<Guild> guilds = new HashSet<>();
@@ -211,25 +214,25 @@ public class JdaService {
             guildNonary = initGuild(args[13], true);
         }
 
-        // Async: 10th Server
+        // Async: FOW Chapter Secondary
         if (args.length >= 15) {
-            guildDecenary = initGuild(args[14], true);
+            guildFogOfWarSecondary = initGuild(args[14], false);
+            fowServers.add(guildFogOfWarSecondary);
+        }
+
+        // Async: 10th Server
+        if (args.length >= 16) {
+            guildDecenary = initGuild(args[15], true);
         }
         // Async: 11th Server
-        if (args.length >= 16) {
-            guildUndenary = initGuild(args[15], true);
+        if (args.length >= 17) {
+            guildUndenary = initGuild(args[16], true);
         }
 
         // Async: 12th Server
-        if (args.length >= 17) {
-            guildDuodenary = initGuild(args[16], true);
+        if (args.length >= 18) {
+            guildDuodenary = initGuild(args[17], true);
         }
-
-        // Async: FOW Chapter Secondary
-        // if (args.length >= 13) {
-        //    guildFogOfWarSecondary = initGuild(args[12], false);
-        //    fowServers.add(guildFogOfWarSecondary);
-        // }
 
         if (guildPrimary == null || guilds.isEmpty()) {
             BotLogger.info("Failed to start the bot on the primary guild. Aborting.");
@@ -297,6 +300,7 @@ public class JdaService {
         SabotageAutoReactCron.register();
         FastScFollowCron.register();
         CloseLaunchThreadsCron.register();
+        ThreadArchiveCron.register();
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
 
@@ -397,6 +401,7 @@ public class JdaService {
         adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Undenary (TBD)
         adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
+        adminRoles.add(jda.getRoleById("1429853811899502675")); // FoW Server Chapter 2
         adminRoles.add(jda.getRoleById("951230650680225863")); // Community Server
         adminRoles.add(jda.getRoleById("1218342096474341396")); // Megagame Server
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
@@ -435,6 +440,7 @@ public class JdaService {
         developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Undenary (TBD)
         developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
+        developerRoles.add(jda.getRoleById("1429853811882594528")); // FoW Server Chapter 2
         developerRoles.add(jda.getRoleById("1395072365389680711")); // Megagame Server
         developerRoles.add(jda.getRoleById("1172651397397880832")); // PrisonerOne's Test Server
         developerRoles.add(jda.getRoleById("1215453013154734130")); // Sigma's Server
@@ -467,6 +473,8 @@ public class JdaService {
         bothelperRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
+        bothelperRoles.add(jda.getRoleById("1429853811891241128")); // FoW Server Chapter 2 Bothelper
+        bothelperRoles.add(jda.getRoleById("1429853811891241129")); // FoW Server Chapter 2 Game Supervisor
         bothelperRoles.add(jda.getRoleById("1248693989193023519")); // Community Server
         bothelperRoles.add(jda.getRoleById("1395072619417436183")); // Megagame Server
         bothelperRoles.add(jda.getRoleById("1225597399385374781")); // ForlornGeas's Server
@@ -519,6 +527,11 @@ public class JdaService {
                 BotLogger.info("FINISHED RENDERING MAPS");
             } else {
                 BotLogger.info("DID NOT FINISH RENDERING MAPS");
+            }
+            if (SliceGenerationPipeline.shutdown()) { // will wait for up to an additional 20 seconds
+                BotLogger.info("FINISHED RENDERING SLICE DRAFTS");
+            } else {
+                BotLogger.info("DID NOT FINISH RENDERING SLICE DRAFTS");
             }
             if (StatisticsPipeline.shutdown()) { // will wait for up to an additional 20 seconds
                 BotLogger.info("FINISHED PROCESSING STATISTICS");

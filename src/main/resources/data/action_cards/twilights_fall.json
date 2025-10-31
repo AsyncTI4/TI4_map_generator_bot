@@ -1,0 +1,403 @@
+[
+    {
+        "alias": "tf-transpose1",
+        "name": "Transpose",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Give 1 of your abilities to 1 of your neighbors, then take one of their abilities.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-transpose2",
+        "name": "Transpose",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Give 1 of your abilities to 1 of your neighbors, then take one of their abilities.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-mutate1",
+        "name": "Mutate",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Discard 1 of your abilities and draw 1 random ability",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-mutate2",
+        "name": "Mutate",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Discard 1 of your abilities and draw 1 random ability",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-scarab",
+        "name": "Scarab",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose a spliced card you own; gain 2 trade goods for each card you own with a faction origin that matches that card",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-genophage",
+        "name": "Genophage",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Discard 1 of your neighbor's genomes.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-engineer",
+        "name": "Engineer",
+        "phase": "Action",
+        "window": "When you draw cards for a splice that you initiated",
+        "text": "Add 2 additional cards to the splice; after you choose your card, choose and discard 2 of the spliced cards before passing them to the next player.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-manipulate",
+        "name": "Manipulate",
+        "phase": "Action",
+        "window": "After another player initiates a splice that you are not participating in",
+        "text": "Take the spliced cards. Choose which card each participating player will take.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-helix",
+        "name": "Helix",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Initiate a splice of any type, including all players.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-thieve",
+        "name": "Thieve",
+        "phase": "Action",
+        "window": "After a splice ends, if you did not participate",
+        "text": "Take all remaining cards.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-lash",
+        "name": "Lash",
+        "phase": "Action",
+        "window": "When 1 of your units is destroyed",
+        "text": "Destroy a unit in its system that has an equal or lower cost.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-locust",
+        "name": "Locust",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose 1 infantry in a system adjacent to your units and roll 1 die. On a result of 3 or higher, destroy that infantry and choose an infantry in the same or an adjacent system to repeat the roll; for each new roll, choose an infantry owned by a different player than the previous infantry, if able.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-spark1",
+        "name": "Spark",
+        "phase": "Action",
+        "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
+        "text": "Destroy that unit.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-spark2",
+        "name": "Spark",
+        "phase": "Action",
+        "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
+        "text": "Destroy that unit.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-command1",
+        "name": "Command",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "Apply +1 to the move value of each of your ships during this tactical action. Additionally your ships may move through or into asteroid fields during this movement.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-command2",
+        "name": "Command",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "Apply +1 to the move value of each of your ships during this tactical action. Additionally your ships may move through or into asteroid fields during this movement.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-shatter1",
+        "name": "Shatter",
+        "phase": "Action",
+        "window": "When another player exhausts a genome or plays an action card other than \"Shatter\"",
+        "text": "That genome is exhausted without effect, or that action card is canceled.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-shatter2",
+        "name": "Shatter",
+        "phase": "Action",
+        "window": "When another player exhausts a genome or plays an action card other than \"Shatter\"",
+        "text": "That genome is exhausted without effect, or that action card is canceled.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-evolve",
+        "name": "Evolve",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Draw 1 card from any splice deck.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-magnificence",
+        "name": "Magnificence",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Move all units from the space area of any system into an adjacent system that contains a different player's ships. Space combat is resolved in that system; neither player can retreat or resolve abilities that would move their ships.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-irradiate",
+        "name": "Irradiate",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose 1 unit type other than a flagship; reveal cards from the unit upgrade deck until you reveal a card of that type, if able. Then, gain that card and shuffle the rest back into the unit upgrade deck.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-reverse",
+        "name": "Reverse",
+        "phase": "Action",
+        "window": "When a splice begins",
+        "text": "Reverse the order the spliced cards are passed.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-twinning",
+        "name": "Twinning",
+        "phase": "Action",
+        "window": "After another player resolves the component action of an action card",
+        "text": "Immediately resolve that action card.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-meddle",
+        "name": "Meddle",
+        "phase": "Action",
+        "window": "When any die is rolled",
+        "text": "Add or sintract 1 from its result.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-hardlight1",
+        "name": "Hardlight",
+        "phase": "Action",
+        "window": "Before hits are assigned to your units",
+        "text": "Cancel up to 2 hits.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-meteor",
+        "name": "Meteor",
+        "phase": "Action",
+        "window": "When you would remove ground forces due to insufficient capacity",
+        "text": "Commit those ground forces to a planet in that system instead; resolve an invasion on that planet using only those ground forces",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-hardlight2",
+        "name": "Hardlight",
+        "phase": "Action",
+        "window": "Before hits are assigned to your units",
+        "text": "Cancel up to 2 hits.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-feint",
+        "name": "Feint",
+        "phase": "Action",
+        "window": "When you announce a retreat",
+        "text": "Immediately retreat; do not place a command token in that system.",
+        "automationID": "skilled_retreat",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-manifest",
+        "name": "Manifest",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Resolve the PRODUCTION ability of 1 of your units; reduce the combined cost of the produced units by 3.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-flux",
+        "name": "Flux",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Either remove any player's command token from the board, or place a command token from any player's reinforcements in a system that contains or is adjacent to one of your ships. ",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-entangle",
+        "name": "Entangle",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "All systems that contain alpha wormholes, beta wormholes, gamma wormholes, and gravity rifts are adjacent for this movement.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-unravel",
+        "name": "Unravel",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose and purge a relic. If the relic belonged to another player, that player gains 1 victory point; if it belonged to you, put the Fracture into play and place 1 additional ingress token in a system that contains your units.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-rise",
+        "name": "Rise",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Either place 1 infantry on each planet you control or place 1 fighter in each system that contains your ships or space docks.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-atomize",
+        "name": "Atomize",
+        "phase": "Action",
+        "window": "When your flagship is destroyed",
+        "text": "Purge your flagship and destroy all units in its system",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-trine",
+        "name": "Trine",
+        "phase": "Action",
+        "window": "During the \"space cannon offense\" step of a tactical action",
+        "text": "Your units up 2 system away can use their SPACE CANNON abilities against units in the active system.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-pax",
+        "name": "Pax",
+        "phase": "Action",
+        "window": "After another player commits units to land on a planet you control",
+        "text": "Return the committed units to the space area; choose 1 of them to destroy.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-ignis",
+        "name": "Ignis",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Place a command token from your tactic pool in any non-home system; choose and destroy 1 unit in that system.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-coerce",
+        "name": "Coerce",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose a player; that player must give you 1 of their abilities.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-stasis",
+        "name": "Stasis",
+        "phase": "Action",
+        "window": "At the start of another player's turn",
+        "text": "Immediately end that player's turn.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-tartarus",
+        "name": "Tartarus",
+        "phase": "Strategy",
+        "window": "At the start of the strategy phase",
+        "text": "Choose a strategy card: that card cannot be picked unless there is no other option.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-create",
+        "name": "Create",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Draw 1 relic.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-timestop",
+        "name": "Timestop",
+        "phase": "Action",
+        "window": "When a player activates a system that contains your units",
+        "text": "Immediately perform an action, during which you are the active player.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-starflare",
+        "name": "Starflare",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose a supernova; each player destroys 3 of their units in that supernova and each adjacent system.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-vault",
+        "name": "Vault",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "You may ignore the effects of anomalies during this movement.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-meld",
+        "name": "Meld",
+        "phase": "Action",
+        "window": "When any die is rolled",
+        "text": "Roll two dice instead, and add the results together (max 10)",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-reflect",
+        "name": "Reflect",
+        "phase": "Action",
+        "window": "Action",
+        "text": "For each trade good you have, either gain 1 commodity or convert 1 of your commodities to a trade good.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-elevate",
+        "name": "Elevate",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Draw 1 paradigm.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-cloak",
+        "name": "Cloak",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "Your ships can move through systems that contain other players ships during this action, and SPACE CANNON cannot be used against them.",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-converge",
+        "name": "Converge",
+        "phase": "Action",
+        "window": "Before you roll dice for space cannon",
+        "text": "Your hits must be applied to non-fighter ships during SPACE CANNON OFFENSE, or mechs during SPACE CANNON DEFENSE, if able",
+        "source": "twilights_fall"
+    },
+    {
+        "alias": "tf-divinity",
+        "name": "Divinity",
+        "phase": "Action",
+        "window": "When 1 of your units would be destroyed",
+        "text": "It is not destroyed instead.",
+        "source": "twilights_fall"
+    }
+]

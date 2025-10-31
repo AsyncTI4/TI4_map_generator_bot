@@ -15,7 +15,8 @@ public class BorderAnomalyModel {
         NEBULA("Nebula", "nebula_border.png"), //
         MINEFIELD("Minefield", "minefield_border.png"), //
         ARROW("Arrow", "adjacency_arrow.png"), //
-        SPATIAL_TEAR("Spatial Tear", "spatial_tear_border.png"), //
+        SPATIAL_TEAR("Spatial Tear", "spatial_tear_border.png"),
+        VOID_TETHER("Void Tether", "void_tether.png"), //
 
         // PBD 100 two
         CORE_BORDER("Core border", "core_border.png"), //
@@ -52,6 +53,12 @@ public class BorderAnomalyModel {
                 .collect(Collectors.toMap(BorderAnomalyType::toSearchString, (t -> t)));
         if (allTypes.containsKey(type.toLowerCase())) {
             return allTypes.get(type.toLowerCase());
+        }
+
+        for (BorderAnomalyType anomalyType : BorderAnomalyType.values()) {
+            if (anomalyType.getName().equalsIgnoreCase(type)) {
+                return anomalyType;
+            }
         }
         return null;
     }

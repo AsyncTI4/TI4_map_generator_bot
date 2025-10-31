@@ -18,6 +18,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileHelper;
@@ -421,6 +422,7 @@ public class ButtonHelperModifyUnits {
             case "fighter" ->
                 hits > 0
                         && (player.hasUnit("naalu_flagship")
+                                || player.hasUnit("tf-morphwing")
                                 || player.hasUnit("sigma_naalu_flagship_2")
                                 || player.hasUnit("belkosea_fighter")
                                 || player.hasUnit("belkosea_fighter2"))
@@ -829,7 +831,7 @@ public class ButtonHelperModifyUnits {
                             || game.getActiveSystem().equalsIgnoreCase(tile.getPosition())) {
                         buttons.add(Buttons.red(
                                 "removeThisTypeOfUnit_" + type.humanReadableName() + "_" + tile.getPosition() + "_"
-                                        + uH.getName(),
+                                        + uH.getName() + "_" + player.getColor(),
                                 type.humanReadableName() + " from " + tile.getRepresentation() + " "
                                         + ("space".equals(uH.getName())
                                                 ? "in Space"
@@ -849,19 +851,26 @@ public class ButtonHelperModifyUnits {
         Tile tile = game.getTileByPosition(tilePos);
         String unitH = buttonID.split("_")[3];
         UnitHolder uH = tile.getUnitHolders().get(unitH);
-
-        RemoveUnitService.removeUnits(
-                event, tile, game, player.getColor(), "1 " + unit + " " + unitH.replace("space", ""));
+        String color = player.getColor();
+        if (buttonID.split("_").length > 4) {
+            color = buttonID.split("_")[4];
+        }
+        if (color.equalsIgnoreCase(player.getColor())) {
+            RemoveUnitService.removeUnits(event, tile, game, color, "1 " + unit + " " + unitH.replace("space", ""));
+        } else {
+            DestroyUnitService.destroyUnits(
+                    event, tile, game, color, "1 " + unit + " " + unitH.replace("space", ""), false);
+        }
         if (uH.getUnitCount(
                         Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID())
                                 .getUnitType(),
-                        player.getColor())
+                        color)
                 < 1) {
             ButtonHelper.deleteTheOneButton(event);
         }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " removed 1 " + unit + " from "
+                player.getRepresentationNoPing() + " removed 1 " + color + " " + unit + " from "
                         + ("space".equals(unitH) ? "the space area of" : StringUtils.capitalize(unitH) + ", in")
                         + " tile " + tile.getRepresentationForButtons(game, player) + ".");
     }
@@ -1011,24 +1020,25 @@ public class ButtonHelperModifyUnits {
 
     private static boolean canRetreatTo(Game game, Player player, Tile tile, boolean skilledRetreat) {
         if ((tile.isAsteroidField()
-                        && !player.getTechs().contains("amd")
+                        && !player.hasTech("amd")
+                        && !player.hasTech("wavelength")
                         && !player.getRelics().contains("circletofthevoid")
                         && !player.hasAbility("celestial_being"))
                 || (tile.isSupernova()
-                        && !player.getTechs().contains("mr")
+                        && !player.hasTech("mr")
                         && !player.getRelics().contains("circletofthevoid")
                         && !player.hasAbility("celestial_being"))
                 || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
             return false;
         }
-        if (skilledRetreat) {
+        if (skilledRetreat && !game.isTwilightsFallMode()) {
             return true;
         }
         if (Tile.playerCanRetreatHere(player).test(tile)) {
             return true;
         }
         return !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)
-                && (player.hasTech("det") || player.hasTech("absol_det"));
+                && (player.hasTech("det") || player.hasTech("absol_det") || player.hasTech("antimatter"));
     }
 
     public static List<Button> getRetreatingGroundTroopsButtons(Player player, Game game, String pos1, String pos2) {
@@ -1083,12 +1093,10 @@ public class ButtonHelperModifyUnits {
         if (buttonID.contains("_")) {
             tile = game.getTileByPosition(buttonID.split("_")[1]);
         } else {
-            game.getTileByPosition(game.getActiveSystem());
+            tile = game.getTileByPosition(game.getActiveSystem());
         }
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            if ("space".equalsIgnoreCase(unitHolder.getName())) {
-                continue;
-            }
+        TeHelperGeneral.addStationsToPlayArea(event, game, tile);
+        for (UnitHolder unitHolder : tile.getPlanetUnitHolders()) {
             List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
             Player player2 = player;
             for (Player p2 : players) {
@@ -1098,9 +1106,30 @@ public class ButtonHelperModifyUnits {
                 }
             }
             if (player != player2 && players.contains(player)) {
-                StartCombatService.startGroundCombat(player, player2, game, event, unitHolder, tile);
+                if (player2.hasUnlockedBreakthrough("titansbt")
+                        || player.hasUnlockedBreakthrough("titansbt")
+                        || player.hasAbility("researchteam")
+                        || player.hasUnit("tf-ambassador")
+                        || player2.hasAbility("researchteam")) {
+                    String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
+                    String msg = player.getRepresentation() + " " + player2.getRepresentation()
+                            + " the game is unsure if a combat should occur on " + planetName
+                            + " or if you are coexisting. Please inform it with the buttons.\n\n";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.red("startCombatOn_" + unitHolder.getName(), "Engage in Combat"));
+                    buttons.add(Buttons.green(
+                            "enterCoexistence_" + unitHolder.getName(), "I want to enter/continue Coexistence"));
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+
+                } else {
+                    if (game.getStoredValue("coexistFlag").isEmpty()) {
+                        StartCombatService.startGroundCombat(player, player2, game, event, unitHolder, tile);
+                    }
+                }
                 int mechCount = unitHolder.getUnitCount(UnitType.Mech, player2.getColor());
-                if (player2.ownsUnit("keleres_mech") && mechCount > 0) {
+                if (player2.ownsUnit("keleres_mech")
+                        && mechCount > 0
+                        && !ButtonHelper.isLawInPlay(game, "articles_war")) {
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                     Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
                     buttons.add(DoneExhausting);
@@ -1477,8 +1506,22 @@ public class ButtonHelperModifyUnits {
                         player.getFactionEmoji()
                                 + " did not place a command token in system they retreated to due to the Eusosociality ability.");
             } else {
-                CommandCounterHelper.addCC(event, player, tile2, true);
-                Helper.isCCCountCorrect(player);
+                if (game.isTwilightsFallMode() && buttonID.contains("skilled")) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(),
+                            player.getFactionEmoji()
+                                    + " did not place a command token in system they retreated to due to Feint ability.");
+                } else {
+                    if (game.isWildWildGalaxyMode() && buttonID.contains("skilled")) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getMessageChannel(),
+                                player.getFactionEmoji()
+                                        + " did not place a command token in system they retreated to due to the Wild Wild Galacy Event.");
+                    } else {
+                        CommandCounterHelper.addCC(event, player, tile2, true);
+                        Helper.isCCCountCorrect(player);
+                    }
+                }
             }
         }
 
@@ -1742,8 +1785,27 @@ public class ButtonHelperModifyUnits {
                                         .replace("Place", " place"),
                         "construction");
             }
+            boolean hasConstruction = false;
+            for (Integer sc : player.getSCs()) {
+                StrategyCardModel scModel =
+                        game.getStrategyCardModelByInitiative(sc).orElse(null);
+                if (scModel != null && scModel.getBotSCAutomationID().equalsIgnoreCase("te4construction")) {
+                    hasConstruction = true;
+                }
+                if (scModel != null
+                        && ("pok4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())
+                                || "monuments4construction".equalsIgnoreCase(scModel.getBotSCAutomationID()))
+                        && game.getScPlayed().containsKey(sc)) {
+                    hasConstruction = true;
+                    break;
+                }
+            }
+            if (game.getStrategyCardSet().getAlias().equalsIgnoreCase("te") || game.isTwilightsFallMode()) {
+                hasConstruction = true;
+            }
 
-            if (player.hasLeader("mahactagent") || player.hasExternalAccessToLeader("mahactagent")) {
+            if (!hasConstruction
+                    && (player.hasLeader("mahactagent") || player.hasExternalAccessToLeader("mahactagent"))) {
                 String message = playerRep
                         + ", please choose if you used Mahact's agent and thus should place the active player's (**Construction** holder) command token"
                         + " or if you followed normally and should place your own command token from reinforcements.";
@@ -1759,21 +1821,7 @@ public class ButtonHelperModifyUnits {
                 MessageHelper.sendMessageToChannelWithButtons(
                         game.isFowMode() ? player.getCorrectChannel() : event.getChannel(), message, buttons);
             } else {
-                boolean hasConstruction = false;
-                for (Integer sc : player.getSCs()) {
-                    StrategyCardModel scModel =
-                            game.getStrategyCardModelByInitiative(sc).orElse(null);
-                    if (scModel != null && scModel.getBotSCAutomationID().equalsIgnoreCase("te4construction")) {
-                        hasConstruction = true;
-                    }
-                    if (scModel != null
-                            && ("pok4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())
-                                    || "monuments4construction".equalsIgnoreCase(scModel.getBotSCAutomationID()))
-                            && game.getScPlayed().containsKey(sc)) {
-                        hasConstruction = true;
-                        break;
-                    }
-                }
+
                 if (!hasConstruction
                         && ("action".equalsIgnoreCase(game.getPhaseOfGame())
                                 || game.getCurrentAgendaInfo().contains("Strategy"))
@@ -2048,6 +2096,10 @@ public class ButtonHelperModifyUnits {
             buttons.add(Buttons.red(
                     "exhaustAgent_ghotiagent_" + player.getFaction(), "Use Ghoti Agent", FactionEmojis.ghoti));
         }
+        if (player.hasUnexhaustedLeader("experimentalagent")) {
+            buttons.add(
+                    Buttons.gray("exhaustAgent_experimentalagent", "Use Experimental Genome", FactionEmojis.Jolnar));
+        }
         if (player.hasUnexhaustedLeader("mortheusagent")) {
             buttons.add(Buttons.red(
                     "exhaustAgent_mortheusagent_" + player.getFaction(), "Use Mortheus Agent", FactionEmojis.mortheus));
@@ -2073,6 +2125,11 @@ public class ButtonHelperModifyUnits {
                             + " you have the opportunity to produce ground forces and fighters (a number up to the recently produced ships capacity value) using sol's breakthrough ability. Use buttons to resolve or decline. [Note: Finish your normal build first for best results.]";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons2);
                 }
+            }
+            if (player.hasUnlockedBreakthrough("ghostbt")
+                    && tile != null
+                    && tile.getWormholes(game).size() > 0) {
+                player.addSpentThing("ghostbt" + tile.getWormholes(game).size());
             }
         } else {
             if (orbitalDrop) {

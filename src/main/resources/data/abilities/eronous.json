@@ -4,7 +4,7 @@
         "name": "Enslave",
         "faction": "canto",
         "window": "When you gain control of a planet",
-        "windowEffect": "Place 1 infantry from your reinforcements on that planet.",
+        "windowEffect": "Place 1 infantry from your reinforcements on that planet. REMOVED",
         "source": "eronous"
     },
     
@@ -28,7 +28,7 @@
         "id": "void_tap",
         "name": "Void Tap",
         "faction": "eidolon",
-        "window": "After you activate a system that contains no planets",
+        "window": "After you activate a system that contains no planets REMOVED",
         "windowEffect": "You may gain 1 trade good.",
         "source": "eronous"
     },
@@ -91,7 +91,7 @@
         "id": "protocol_distribution",
         "name": "(Protocol) Distribution",
         "faction": "mechi",
-        "permanentEffect":"Tier 1 - After a player activates a system, you may exhaust this card to increase the movement value of one of their ships by 1. \n\nTier 2 - Your ships may ignore the effects of asteroid fields, gravity rifts and nebulas. \n\nTier 3 - At the start of a round of space combat: Apply a bonus to each of your non-fighter ships combat rolls equal to their movement value until the end of the combat.",
+        "permanentEffect":"Tier 1 - After a player activates a system, you may exhaust this card to increase the movement value of one of their ships by 1. \n\nTier 2 - After you activate a system, you may choose to ignore the moment effects of either asteroid fields, gravity rifts or nebulas. \n\nTier 3 - At the start of a round of space combat: Apply a bonus to each of your non-fighter ships combat rolls equal to their movement value until the end of the combat.",
         "source": "eronous"
     },
     {

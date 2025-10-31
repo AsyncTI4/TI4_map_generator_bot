@@ -34,7 +34,7 @@ public class FrankenDraftBagService {
 
     public static final String ACTION_NAME = "frankenDraftAction;";
 
-    private static final List<DraftItem.Category> componentCategories = List.of(
+    public static final List<DraftItem.Category> componentCategories = List.of(
             DraftItem.Category.ABILITY,
             DraftItem.Category.TECH,
             DraftItem.Category.AGENT,
@@ -44,12 +44,39 @@ public class FrankenDraftBagService {
             DraftItem.Category.FLAGSHIP,
             DraftItem.Category.COMMODITIES,
             DraftItem.Category.PN,
-            DraftItem.Category.STARTINGTECH);
+            DraftItem.Category.STARTINGTECH,
+            DraftItem.Category.UNIT,
+            DraftItem.Category.MAHACTKING);
+
+    public static final List<DraftItem.Category> TFcomponentCategories = List.of(
+            DraftItem.Category.ABILITY,
+            DraftItem.Category.TECH,
+            DraftItem.Category.AGENT,
+            DraftItem.Category.COMMANDER,
+            DraftItem.Category.HERO,
+            DraftItem.Category.MECH,
+            DraftItem.Category.FLAGSHIP,
+            DraftItem.Category.COMMODITIES,
+            DraftItem.Category.PN,
+            DraftItem.Category.STARTINGTECH,
+            DraftItem.Category.UNIT,
+            DraftItem.Category.MAHACTKING,
+            DraftItem.Category.REDTILE,
+            DraftItem.Category.BLUETILE,
+            DraftItem.Category.STARTINGFLEET,
+            DraftItem.Category.HOMESYSTEM,
+            DraftItem.Category.DRAFTORDER);
 
     public static void applyDraftBags(GenericInteractionCreateEvent event, Game game) {
+        applyDraftBags(event, game, true);
+    }
+
+    public static void applyDraftBags(GenericInteractionCreateEvent event, Game game, boolean includeGameSetup) {
         BagDraft draft = game.getActiveBagDraft();
 
-        setSpeakerOrder(event, game); // Category.DRAFTORDER
+        if (includeGameSetup) {
+            setSpeakerOrder(event, game); // Category.DRAFTORDER
+        }
 
         for (Player player : game.getPlayers().values()) {
             DraftBag bag = player.getDraftHand();
@@ -72,7 +99,10 @@ public class FrankenDraftBagService {
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                     player.getCardsInfoThread(), null, List.of(embed), List.of(Buttons.FACTION_EMBED));
         }
-        game.setShowMapSetup(true);
+
+        if (includeGameSetup) {
+            game.setShowMapSetup(true);
+        }
     }
 
     private static void setSpeakerOrder(GenericInteractionCreateEvent event, Game game) {
@@ -254,6 +284,14 @@ public class FrankenDraftBagService {
             BagDraft draft, DraftBag bag, DraftItem.Category cat, Game game) {
         StringBuilder sb = new StringBuilder();
         sb.append("### ").append(cat.toString()).append(" (");
+        if (game.isTwilightsFallMode() && cat.toString().equalsIgnoreCase("tech")) {
+            sb = new StringBuilder();
+            sb.append("### ").append("ABILITY ").append(" (");
+        }
+        if (game.isTwilightsFallMode() && cat.toString().equalsIgnoreCase("agent")) {
+            sb = new StringBuilder();
+            sb.append("### ").append("GENOME ").append(" (");
+        }
         if (draft instanceof FrankenDraft) {
             sb.append(bag.getCategoryCount(cat)).append("/").append(FrankenDraft.getItemLimitForCategory(cat, game));
         } else {

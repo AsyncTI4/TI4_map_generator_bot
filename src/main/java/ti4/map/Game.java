@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -50,6 +50,7 @@ import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
+import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -67,7 +68,9 @@ import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 import ti4.helpers.settingsFramework.menus.DeckSettings;
+import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
+import ti4.helpers.settingsFramework.menus.GameSetupSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
@@ -81,6 +84,7 @@ import ti4.map.pojo.MapPairKeySerializer;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
+import ti4.model.ActionCardModel;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.ColorModel;
@@ -118,8 +122,6 @@ public class Game extends GameProperties {
     private List<String> listOfTilePinged = new ArrayList<>();
 
     // TODO (Jazz): These should be easily added to GameProperties
-    private Map<String, Integer> discardActionCards = new LinkedHashMap<>();
-    private Map<String, Integer> purgedActionCards = new LinkedHashMap<>();
     private Map<String, Integer> thalnosUnits = new HashMap<>();
     private Map<String, Integer> slashCommandsUsed = new HashMap<>();
     private Map<String, Integer> actionCardsSabotaged = new HashMap<>();
@@ -215,10 +217,17 @@ public class Game extends GameProperties {
 
     @Setter
     @Getter
+    private String draftSystemSettingsJson;
+
+    @Setter
+    @Getter
     private String draftString;
 
     @Setter
     private MiltySettings miltySettings;
+
+    @Setter
+    private DraftSystemSettings draftSystemSettings;
 
     @Getter
     @Setter
@@ -241,14 +250,27 @@ public class Game extends GameProperties {
         setActionCards(Mapper.getShuffledDeck("action_cards_pok"));
         setAgendas(Mapper.getShuffledDeck("agendas_pok"));
         explore = Mapper.getShuffledDeck("explores_pok");
-        setRelics(Mapper.getShuffledDeck("relics_pok"));
-        setStrategyCardSet("pok");
+        setRelics(Mapper.getShuffledDeck("relics_pok_te"));
+        setStrategyCardSet("te");
 
         // OTHER
         setEvents(new ArrayList<>()); // ignis_aurora
         addCustomPO(Constants.CUSTODIAN, 1);
         setUpPeakableObjectives(5, 1);
         setUpPeakableObjectives(5, 2);
+    }
+
+    public void fixScrewedRelics() {
+
+        for (Player p2 : getRealPlayers()) {
+            List<String> relics = new ArrayList<>();
+            relics.addAll(p2.getRelics());
+            for (String relic : relics) {
+                if (Mapper.getRelic(relic) == null) {
+                    p2.removeRelic(relic);
+                }
+            }
+        }
     }
 
     public void fixScrewedSOs() {
@@ -283,6 +305,16 @@ public class Game extends GameProperties {
                 "Fixed the secret objectives. The total amount of secret objectives in deck is "
                         + getNumberOfSOsInTheDeck() + ". The number in players hands is "
                         + getNumberOfSOsInPlayersHands());
+    }
+
+    public Player getPlayerThatControlsPlanet(String planet) {
+        for (Player p : getRealPlayers()) {
+            if (p.getPlanets().contains(planet)) {
+                return p;
+            }
+        }
+
+        return null;
     }
 
     @JsonIgnore
@@ -403,9 +435,11 @@ public class Game extends GameProperties {
         return draftManager;
     }
 
-    public void clearDraftManager() {
+    public void clearAllDraftInfo() {
         draftManager = null;
         draftString = null;
+        draftSystemSettings = null;
+        draftSystemSettingsJson = null;
     }
 
     @NotNull
@@ -417,15 +451,13 @@ public class Game extends GameProperties {
             try {
                 draftManager = DraftLoadService.loadDraftManager(this, draftString);
             } catch (Exception e) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("Failed to load draft manager (and creating an empty new one instead): ")
-                        .append(e.getMessage())
-                        .append(System.lineSeparator())
-                        .append("With draft data: ")
-                        .append(System.lineSeparator())
-                        .append(String.join(System.lineSeparator(), draftString));
+                String sb = "Failed to load draft manager (and creating an empty new one instead): " + e.getMessage()
+                        + System.lineSeparator()
+                        + "With draft data: "
+                        + System.lineSeparator()
+                        + String.join(System.lineSeparator(), draftString);
 
-                BotLogger.warning(new LogOrigin(this), sb.toString(), e);
+                BotLogger.warning(new LogOrigin(this), sb, e);
                 draftManager = new DraftManager(this);
             }
         } else {
@@ -474,6 +506,33 @@ public class Game extends GameProperties {
         return miltySettings;
     }
 
+    public DraftSystemSettings getDraftSystemSettingsUnsafe() {
+        return draftSystemSettings;
+    }
+
+    public DraftSystemSettings initializeDraftSystemSettings() {
+        if (draftSystemSettings == null) {
+            if (draftSystemSettingsJson != null) {
+                try {
+                    JsonNode json = ObjectMapperFactory.build().readTree(draftSystemSettingsJson);
+                    draftSystemSettings = new DraftSystemSettings(this, json);
+                } catch (Exception e) {
+                    BotLogger.error(
+                            new LogOrigin(this),
+                            "Failed loading draft system settings for `" + getName() + "` "
+                                    + Constants.jabberwockyPing(),
+                            e);
+                    MessageHelper.sendMessageToChannel(
+                            getActionsChannel(), "Draft system settings failed to load. Resetting to default.");
+                    draftSystemSettings = new DraftSystemSettings(this, null);
+                }
+            } else {
+                draftSystemSettings = new DraftSystemSettings(this, null);
+            }
+        }
+        return draftSystemSettings;
+    }
+
     public void setPurgedPN(String purgedPN) {
         this.purgedPN.add(purgedPN);
     }
@@ -505,6 +564,22 @@ public class Game extends GameProperties {
 
     public void setBagDraft(BagDraft draft) {
         activeDraft = draft;
+    }
+
+    public void setupTwilightsFallMode(GenericInteractionCreateEvent event) {
+        setTwilightsFallMode(true);
+        validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_twilights_fall"));
+        validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
+        setStrategyCardSet("twilights_fall_sc");
+        removeSOFromGame("baf");
+        removeSOFromGame("dp");
+        removeSOFromGame("dtd");
+        removeSOFromGame("sb"); // get this stuff too
+        removeRelicFromGame("quantumcore");
+        removeRelicFromGame("mawofworlds");
+        removeRelicFromGame("prophetstears");
+        validateAndSetActionCardDeck(event, Mapper.getDeck("tf_action_deck"));
+        setTechnologyDeckID("techs_tf");
     }
 
     public void addActionCardDuplicates(List<String> acIDs) {
@@ -652,12 +727,20 @@ public class Game extends GameProperties {
         return slashCommandsUsed.values().stream().mapToInt(Integer::intValue).sum();
     }
 
+    // This is presently only used to determine if an AC is NOT playable.
+    // Therefore, the method name is now inaccurate
     public boolean isACInDiscard(String name) {
-        return discardActionCards.keySet().stream()
-                .map(Mapper::getActionCard)
-                .anyMatch(ac -> ac != null
-                        && ac.getName() != null
-                        && ac.getName().toLowerCase().contains(name.toLowerCase()));
+        for (String ac : getDiscardActionCards().keySet()) {
+            ACStatus status = getDiscardACStatus().get(ac);
+            ActionCardModel acModel = Mapper.getActionCard(ac);
+            if (acModel != null && acModel.getName().contains(name)) {
+                // true = it cannot be played, false = it's on garbozia
+                return Arrays.asList(null, ACStatus.ralnelbt, ACStatus.purged).contains(status);
+            } else if (acModel == null) {
+                BotLogger.error(ac + " is returning a null AC when sent to Mapper in game " + getName());
+            }
+        }
+        return false;
     }
 
     public List<String> getListOfTilesPinged() {
@@ -758,6 +841,17 @@ public class Game extends GameProperties {
         gameModes.put("Stellar Atomics", isStellarAtomicsMode());
         gameModes.put("Civilized Society", isCivilizedSocietyMode());
         gameModes.put("Age Of Fighters", isAgeOfFightersMode());
+
+        gameModes.put("Advent of the Warsun", isAdventOfTheWarsunMode());
+        gameModes.put("Cultural Exchange Program", isCulturalExchangeProgramMode());
+        gameModes.put("Conventions of War Abandoned", isConventionsOfWarAbandonedMode());
+        gameModes.put("Rapid Mobilization", isRapidMobilizationMode());
+        gameModes.put("Monuments to the Ages", isMonumentToTheAgesMode());
+        gameModes.put("Weird Wormholes", isWeirdWormholesMode());
+        gameModes.put("Cosmic Phenomenae", isCosmicPhenomenaeMode());
+        gameModes.put("Wild wild Galaxy", isWildWildGalaxyMode());
+        gameModes.put("Zealous Orthoxy", isZealousOrthodoxyMode());
+        gameModes.put("Mercenaries For Hire", isMercenariesForHireMode());
         gameModes.put("No Support Swaps", isNoSwapMode());
         gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
         gameModes.put("Liberation", isLiberationC4Mode());
@@ -769,8 +863,7 @@ public class Game extends GameProperties {
         gameModes.put("VotC", isVotcMode());
         gameModes.put(SourceEmojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
         gameModes.put("HomebrewSC", isHomebrewSCMode());
-        gameModes.put("Little Omega", isLittleOmega());
-        gameModes.put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
+        gameModes.put("AC Deck 2", isAcd2());
         gameModes.put("Omega Phase", isOmegaPhaseMode());
         gameModes.put("Priority Track", hasAnyPriorityTrackMode());
         gameModes.put("Homebrew", isHomebrew());
@@ -782,6 +875,10 @@ public class Game extends GameProperties {
                 .filter(Entry::getValue)
                 .map(Entry::getKey)
                 .collect(Collectors.joining(", "));
+    }
+
+    public boolean isAcd2() {
+        return getAcDeckID().startsWith("action_deck_2");
     }
 
     @JsonIgnore
@@ -1174,6 +1271,24 @@ public class Game extends GameProperties {
         return getPlayer(getSpeakerUserID());
     }
 
+    public Player getPlanetOwner(String planet) {
+        for (Player player : getRealPlayers()) {
+            if (player.getPlanets().contains(planet)) {
+                return player;
+            }
+        }
+        return null;
+    }
+
+    public void setTyrant(Player speaker) {
+        setTyrantUserID(speaker.getUserID());
+    }
+
+    @JsonIgnore
+    public Player getTyrant() {
+        return getPlayer(getTyrantUserID());
+    }
+
     public void setSpeaker(Player speaker) {
         setSpeakerUserID(speaker.getUserID());
     }
@@ -1204,6 +1319,11 @@ public class Game extends GameProperties {
 
     public void setSpecificCurrentMovedUnitsFrom1System(String unit, int count) {
         displacedUnitsFrom1System.put(unit, count);
+    }
+
+    @Override
+    public boolean isHomebrewSCMode() {
+        return !"pok".equals(getScSetID()) && !"base_game".equals(getScSetID()) && !"te".equals(getScSetID());
     }
 
     public void setSpecificThalnosUnit(String unit, int count) {
@@ -1266,6 +1386,9 @@ public class Game extends GameProperties {
         String prevFaction =
                 (prevPlayer != null && prevPlayer.getFaction() != null) ? prevPlayer.getFaction() : "jazzwuzhere&p1too";
         long elapsedTime = newTime.getTime() - lastActivePlayerChange.getTime();
+        if (lastActivePlayerChange.getTime() < 1000000) {
+            elapsedTime = 60000; // if for some reason the last Active player change was never set, ignore the time
+        }
         if (prevPlayer != null) {
             if (!factionsInCombat.contains(prevFaction) && !isTemporaryPingDisable()) {
                 prevPlayer.updateTurnStats(elapsedTime);
@@ -1711,6 +1834,14 @@ public class Game extends GameProperties {
         return false;
     }
 
+    public void shuffleObjectiveDeck(int stage) {
+        if (stage == 1) {
+            Collections.shuffle(publicObjectives1);
+        } else if (stage == 2) {
+            Collections.shuffle(publicObjectives2);
+        }
+    }
+
     public void removeRevealedObjective(String id) {
         revealedPublicObjectives.remove(id);
         soToPoList.remove(id);
@@ -1748,6 +1879,9 @@ public class Game extends GameProperties {
         boolean custodiansTaken = false;
         if (isOrdinianC1Mode()) {
             return ButtonHelper.isCoatlHealed(this);
+        }
+        if (isTwilightsFallMode()) {
+            return getTyrant() != null;
         }
         if (isLiberationC4Mode()) {
             return true;
@@ -1888,6 +2022,10 @@ public class Game extends GameProperties {
 
     public boolean removeSOFromGame(String id) {
         return getSecretObjectives().remove(id);
+    }
+
+    public boolean removeRelicFromGame(String id) {
+        return relics.remove(id);
     }
 
     public boolean removePOFromGame(String id) {
@@ -2632,10 +2770,13 @@ public class Game extends GameProperties {
 
     // Don't shuffle back cards with a status
     private void reshuffleActionCardDiscard() {
-        List<String> acsToShuffle = discardActionCards.keySet().stream().toList();
+        List<String> acsToShuffle = getDiscardActionCards().keySet().stream()
+                .filter(ac -> getDiscardACStatus().get(ac) == null)
+                .toList();
         getActionCards().addAll(acsToShuffle);
         Collections.shuffle(getActionCards());
-        acsToShuffle.forEach(ac -> discardActionCards.remove(ac)); // clear out the shuffled back cards
+        acsToShuffle.stream().forEach(ac -> getDiscardActionCards().remove(ac)); // clear out the shuffled back cards
+        acsToShuffle.stream().forEach(ac -> getDiscardACStatus().remove(ac)); // just in case
         String msg = "# " + getPing()
                 + ", the action card deck has run out of cards, and so the discard pile has been shuffled to form a new action card deck.";
         MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
@@ -2653,7 +2794,7 @@ public class Game extends GameProperties {
             getActionCards().remove(id);
             player.setActionCard(id);
             return player.getActionCards();
-        } else if (!discardActionCards.isEmpty()) {
+        } else if (!getDiscardActionCards().isEmpty()) {
             reshuffleActionCardDiscard();
             return drawActionCard(userID);
         }
@@ -2878,7 +3019,7 @@ public class Game extends GameProperties {
     }
 
     public void pbd1000decks() {
-        setActionCards(multiplyDeck(2, "action_cards_pok", "action_deck_2"));
+        setActionCards(multiplyDeck(2, "action_cards_pok", "action_deck_2_pok"));
         setSecretObjectives(multiplyDeck(3, "pbd100_secret_objectives"));
     }
 
@@ -2933,7 +3074,7 @@ public class Game extends GameProperties {
         if (!getActionCards().isEmpty()) {
             String id = getActionCards().getFirst();
             getActionCards().remove(id);
-            setDiscardActionCard(id);
+            setDiscardActionCard(id, null);
             return id;
         } else {
             reshuffleActionCardDiscard();
@@ -3010,31 +3151,36 @@ public class Game extends GameProperties {
         }
     }
 
-    private void setDiscardActionCard(String id) {
-        Collection<Integer> values = discardActionCards.values();
+    private boolean shouldPutCardOnRalnel(Player discardingPlayer) {
+        if (!"action".equals(getPhaseOfGame())) return false;
+        for (Player p : getRealPlayers()) {
+            if (p == discardingPlayer) continue;
+            if (p.hasUnlockedBreakthrough("ralnelbt") && !p.isPassed()) return true;
+        }
+        return false;
+    }
+
+    public void setDiscardActionCard(String id, ACStatus status) {
+        Collection<Integer> values = getDiscardActionCards().values();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
             identifier = ThreadLocalRandom.current().nextInt(1000);
         }
-        discardActionCards.put(id, identifier);
+        getDiscardActionCards().put(id, identifier);
+        if (status != null) getDiscardACStatus().put(id, status);
     }
 
     private void setDiscardActionCard(String id, int oldNum) {
-        Collection<Integer> values = discardActionCards.values();
+        Collection<Integer> values = getDiscardActionCards().values();
         int identifier = oldNum;
         while (values.contains(identifier)) {
             identifier = ThreadLocalRandom.current().nextInt(1000);
         }
-        discardActionCards.put(id, identifier);
+        getDiscardActionCards().put(id, identifier);
     }
 
     private void setPurgedActionCard(String id) {
-        Collection<Integer> values = purgedActionCards.values();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
-        while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
-        }
-        purgedActionCards.put(id, identifier);
+        setDiscardActionCard(id, ACStatus.purged);
     }
 
     @JsonIgnore
@@ -3051,7 +3197,8 @@ public class Game extends GameProperties {
             }
             if (!acID.isEmpty()) {
                 player.removeActionCard(acIDNumber);
-                setDiscardActionCard(acID, acIDNumber);
+                ACStatus status = shouldPutCardOnRalnel(player) ? ACStatus.ralnelbt : null;
+                setDiscardActionCard(acID, status);
                 return true;
             }
         }
@@ -3069,6 +3216,15 @@ public class Game extends GameProperties {
                     break;
                 }
             }
+            if (player.getPlanets().contains("garbozia")) { // allow checking for garbozia
+                for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
+                    if (ac.getValue().equals(acIDNumber)
+                            && getDiscardACStatus().get(ac.getKey()) == ACStatus.garbozia) {
+                        acID = ac.getKey();
+                        break;
+                    }
+                }
+            }
             if (!acID.isEmpty()) {
                 player.removeActionCard(acIDNumber);
                 setPurgedActionCard(acID);
@@ -3082,27 +3238,27 @@ public class Game extends GameProperties {
         Collections.shuffle(getActionCards());
     }
 
-    public Map<String, Integer> getDiscardActionCards() {
-        return discardActionCards;
-    }
-
     public Map<String, Integer> getPurgedActionCards() {
-        return purgedActionCards;
+        return new HashMap<>(getDiscardActionCards().entrySet().stream()
+                .filter(e -> getDiscardACStatus().get(e.getKey()) == ACStatus.purged)
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
     }
 
     public boolean pickActionCard(String userID, Integer acIDNumber) {
         Player player = getPlayer(userID);
         if (player != null) {
             String acID = "";
-            for (Entry<String, Integer> ac : discardActionCards.entrySet()) {
-                if (ac.getValue().equals(acIDNumber)) {
+            for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
+                ACStatus status = getDiscardACStatus().get(ac.getKey());
+                if (ac.getValue().equals(acIDNumber) && status != ACStatus.purged) {
                     acID = ac.getKey();
                     break;
                 }
             }
             if (!acID.isEmpty()) {
-                discardActionCards.remove(acID);
-                player.setActionCard(acID, acIDNumber);
+                getDiscardActionCards().remove(acID);
+                getDiscardACStatus().remove(acID);
+                player.setActionCard(acID);
                 return true;
             }
         }
@@ -3113,14 +3269,16 @@ public class Game extends GameProperties {
         Player player = getPlayer(userID);
         if (player != null) {
             String acID = "";
-            for (Entry<String, Integer> ac : purgedActionCards.entrySet()) {
-                if (ac.getValue().equals(acIDNumber)) {
+            for (Map.Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
+                ACStatus status = getDiscardACStatus().get(ac.getKey());
+                if (ac.getValue().equals(acIDNumber) && status == ACStatus.purged) {
                     acID = ac.getKey();
                     break;
                 }
             }
             if (!acID.isEmpty()) {
-                purgedActionCards.remove(acID);
+                getDiscardActionCards().remove(acID);
+                getDiscardACStatus().remove(acID);
                 player.setActionCard(acID);
                 return true;
             }
@@ -3130,14 +3288,15 @@ public class Game extends GameProperties {
 
     public boolean shuffleActionCardBackIntoDeck(Integer acIDNumber) {
         String acID = "";
-        for (Entry<String, Integer> ac : discardActionCards.entrySet()) {
+        for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
             if (ac.getValue().equals(acIDNumber)) {
                 acID = ac.getKey();
                 break;
             }
         }
         if (!acID.isEmpty()) {
-            discardActionCards.remove(acID);
+            getDiscardActionCards().remove(acID);
+            getDiscardACStatus().remove(acID);
             getActionCards().add(acID);
             Collections.shuffle(getActionCards());
             return true;
@@ -3299,12 +3458,46 @@ public class Game extends GameProperties {
             setStoredValue("IslandMode", "true");
         }
 
-        return validateAndSetAllDecks(event, miltySettings);
+        DeckSettings deckSettings = settings.getDecks();
+        return validateAndSetAllDecks(
+                event,
+                deckSettings,
+                settings.getStage1s().getVal(),
+                settings.getStage2s().getVal());
     }
 
-    private boolean validateAndSetAllDecks(GenericInteractionCreateEvent event, MiltySettings miltySettings) {
-        DeckSettings deckSettings = miltySettings.getGameSettings().getDecks();
+    public boolean loadGameSettingsFromSettings(
+            GenericInteractionCreateEvent event, DraftSystemSettings draftSettings) {
+        GameSetupSettings gameSetupSettings = draftSettings.getGameSetupSettings();
+        SourceSettings sources = draftSettings.getSourceSettings();
+        if (sources.getAbsol().isVal()) setAbsolMode(true);
 
+        setVp(gameSetupSettings.getPointTotal().getVal());
+
+        if (getMaxSOCountPerPlayer() != 4) {
+            setMaxSOCountPerPlayer(gameSetupSettings.getSecrets().getVal());
+        }
+        if (gameSetupSettings.getTigl().isVal()) {
+            TIGLHelper.initializeTIGLGame(this);
+        }
+        setAllianceMode(gameSetupSettings.getAlliance().isVal());
+
+        // TODO
+        // MiltySliceDraftableSettings miltySettings = draftSettings.getMiltySliceDraftableSettings();
+        // if ("1pIsland".equals(miltySettings.getMapTemplate().getValue().getAlias())) {
+        //     setStoredValue("IslandMode", "true");
+        // }
+
+        DeckSettings deckSettings = gameSetupSettings.getDecks();
+        return validateAndSetAllDecks(
+                event,
+                deckSettings,
+                gameSetupSettings.getStage1s().getVal(),
+                gameSetupSettings.getStage2s().getVal());
+    }
+
+    private boolean validateAndSetAllDecks(
+            GenericInteractionCreateEvent event, DeckSettings deckSettings, int stage1Count, int stage2Count) {
         boolean success = true;
         // &= is the "and operator". It will assign true to success iff success is true and the result is true.
         // Otherwise it will propagate a false value to the end
@@ -3322,8 +3515,15 @@ public class Game extends GameProperties {
 
         // Setup peakable objectives
         if (publicObjectives1Peakable.size() != 4) {
-            setUpPeakableObjectives(miltySettings.getGameSettings().getStage1s().getVal(), 1);
-            setUpPeakableObjectives(miltySettings.getGameSettings().getStage2s().getVal(), 2);
+            if (isOmegaPhaseMode()) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "This game is using Omega Phase, so the objective setup was ignored. If there's a problem with it, use `/omegaphase "
+                                + Constants.RESET_OMEGA_PHASE_OBJECTIVES + "`");
+            } else {
+                setUpPeakableObjectives(stage1Count, 1);
+                setUpPeakableObjectives(stage2Count, 2);
+            }
         }
 
         if (isAbsolMode() && !deckSettings.getAgendas().getChosenKey().contains("absol")) {
@@ -3386,8 +3586,10 @@ public class Game extends GameProperties {
     }
 
     public void resetActionCardDeck(DeckModel deck) {
+        setAcDeckID(deck.getAlias());
         setActionCards(deck.getNewShuffledDeck());
-        discardActionCards.clear();
+        getDiscardActionCards().clear();
+        getDiscardACStatus().clear();
         for (Player player : players.values()) {
             player.getActionCards().clear();
         }
@@ -3403,7 +3605,7 @@ public class Game extends GameProperties {
         for (String ac : oldDeck) {
             newDeck.remove(ac);
         }
-        if (!discardActionCards.isEmpty()) {
+        if (!getDiscardActionCards().isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Since there were action cards in the discard pile, will just shuffle any new action cards into the existing deck.");
@@ -3586,24 +3788,29 @@ public class Game extends GameProperties {
 
     @JsonSetter
     public void setDiscardActionCards(Map<String, Integer> discardActionCards) {
-        this.discardActionCards = discardActionCards;
+        discardActionCards.entrySet().stream()
+                .forEach(e -> getDiscardActionCards().put(e.getKey(), e.getValue()));
     }
 
-    public void setPurgedActionCards(Map<String, Integer> purgedActionCards) {
-        this.purgedActionCards = purgedActionCards;
+    @JsonSetter
+    public void setDiscardActionCardStatus(Map<String, ACStatus> discardACStatus) {
+        discardACStatus.entrySet().stream().forEach(e -> getDiscardACStatus().put(e.getKey(), e.getValue()));
     }
 
     public void setDiscardActionCards(List<String> discardActionCardList) {
-        Map<String, Integer> discardActionCards = new LinkedHashMap<>();
         for (String card : discardActionCardList) {
-            Collection<Integer> values = discardActionCards.values();
+            Collection<Integer> values = getDiscardActionCards().values();
             int identifier = ThreadLocalRandom.current().nextInt(1000);
             while (values.contains(identifier)) {
                 identifier = ThreadLocalRandom.current().nextInt(1000);
             }
-            discardActionCards.put(card, identifier);
+            getDiscardActionCards().put(card, identifier);
         }
-        this.discardActionCards = discardActionCards;
+    }
+
+    @JsonIgnore
+    public void setPurgedActionCards(List<String> purgedActionCardList) {
+        purgedActionCardList.forEach(ac -> setDiscardActionCard(ac, ACStatus.purged));
     }
 
     @JsonIgnore
@@ -3700,6 +3907,14 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
+    public List<Player> getRealPlayersExcludingThis(Player p) {
+        return players.values().stream()
+                .filter(Player::isRealPlayer)
+                .filter(p1 -> p1 != p)
+                .toList();
+    }
+
+    @JsonIgnore
     public List<Player> getRealPlayersNNeutral() {
         return players.values().stream()
                 .filter(p -> p.isRealPlayer() || (p.getFaction() != null && "neutral".equals(p.getFaction())))
@@ -3769,6 +3984,11 @@ public class Game extends GameProperties {
                 .collect(Collectors.toSet());
     }
 
+    @JsonIgnore
+    public Set<String> getRealFactions() {
+        return getRealPlayers().stream().map(Player::getFaction).collect(Collectors.toSet());
+    }
+
     public void setPlayers(Map<String, Player> players) {
         this.players = players;
     }
@@ -3836,6 +4056,12 @@ public class Game extends GameProperties {
         planets.clear();
     }
 
+    public void removeAllTiles() {
+        for (Tile tile : new ArrayList<Tile>(tileMap.values())) {
+            removeTile(tile.getPosition());
+        }
+    }
+
     public void removePlanet(UnitHolder planet) {
         for (Player player_ : players.values()) {
             String color = player_.getColor();
@@ -3877,6 +4103,12 @@ public class Game extends GameProperties {
             if ("ghoti".equalsIgnoreCase(getStoredValue("terraformedPlanet"))) {
                 planets.get("ghoti").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
             }
+            planets.put("ocean1", new Planet("ocean1", new Point(0, 0)));
+            planets.put("ocean2", new Planet("ocean2", new Point(0, 0)));
+            planets.put("ocean3", new Planet("ocean3", new Point(0, 0)));
+            planets.put("ocean4", new Planet("ocean4", new Point(0, 0)));
+            planets.put("ocean5", new Planet("ocean5", new Point(0, 0)));
+            planets.put("triad", new Planet("triad", new Point(0, 0)));
         }
         return planets.keySet();
     }
@@ -3997,6 +4229,10 @@ public class Game extends GameProperties {
             return false;
         }
 
+        if ("sardakkcommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-valkyrie")) {
+            return true;
+        }
+
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
@@ -4103,9 +4339,23 @@ public class Game extends GameProperties {
         return getStrategyCardSet().getStrategyCardModelByName(name);
     }
 
+    public String getSCName(int scInitiative) {
+        if (getStrategyCardModelByInitiative(scInitiative).isPresent()) {
+            return getStrategyCardModelByInitiative(scInitiative).get().getName();
+        }
+        return "SC#" + scInitiative;
+    }
+
+    public String getSCEmojiWordRepresentation(int scInitiative) {
+        if (getStrategyCardModelByInitiative(scInitiative).isPresent()) {
+            return getStrategyCardModelByInitiative(scInitiative).get().getEmojiWordRepresentation();
+        }
+        return "SC#" + scInitiative;
+    }
+
     /**
      * @param scID
-     * @return true when the Game's SC Set contains a strategt card which uses a certain automation
+     * @return true when the Game's SC Set contains a strategy card which uses a certain automation
      */
     public boolean usesStrategyCardAutomation(String scID) {
         return getStrategyCardSet().getStrategyCardModels().stream()
@@ -4340,6 +4590,41 @@ public class Game extends GameProperties {
         return null;
     }
 
+    public List<String> getPlanetsPlayerIsCoexistingOn(Player player) {
+        List<String> coexistPlanets = new ArrayList<>();
+
+        for (Player p2 : getRealPlayers()) {
+            if (p2.getFaction().equalsIgnoreCase(player.getFaction())
+                    || player.getAllianceMembers().contains(p2.getFaction())) {
+                continue;
+            }
+            for (String planet : p2.getPlanets()) {
+                UnitHolder uH = getUnitHolderFromPlanet(planet);
+                if (uH != null && FoWHelper.playerHasUnitsOnPlanet(player, uH)) {
+                    coexistPlanets.add(planet);
+                }
+            }
+        }
+        return coexistPlanets;
+    }
+
+    public List<String> getPlayersPlanetsThatOthersAreCoexistingOn(Player player) {
+        List<String> coexistPlanets = new ArrayList<>();
+
+        for (Player p2 : getRealPlayers()) {
+            if (p2.getFaction().equalsIgnoreCase(player.getFaction())) {
+                continue;
+            }
+            for (String planet : player.getPlanets()) {
+                UnitHolder uH = getUnitHolderFromPlanet(planet);
+                if (uH != null && FoWHelper.playerHasUnitsOnPlanet(p2, uH) && !coexistPlanets.contains(planet)) {
+                    coexistPlanets.add(planet);
+                }
+            }
+        }
+        return coexistPlanets;
+    }
+
     @Nullable
     public Planet getUnitHolderFromPlanet(String planetName) {
         Tile tile_ = getTileFromPlanet(planetName);
@@ -4347,6 +4632,11 @@ public class Game extends GameProperties {
             return null;
         }
         return tile_.getUnitHolderFromPlanet(planetName);
+    }
+
+    public boolean isPlanetSpaceStation(String planet) {
+        return getUnitHolderFromPlanet(planet) != null
+                && getUnitHolderFromPlanet(planet).isSpaceStation();
     }
 
     @Nullable
@@ -4492,13 +4782,6 @@ public class Game extends GameProperties {
         }
 
         return scText;
-    }
-
-    @JsonIgnore
-    public boolean isLittleOmega() {
-        return getStage1PublicDeckID().contains("little_omega")
-                || getStage2PublicDeckID().contains("little_omega")
-                || getAgendaDeckID().contains("little_omega");
     }
 
     // Currently unused
@@ -4657,7 +4940,7 @@ public class Game extends GameProperties {
         if (strategyCardModel == null) {
             throw new IllegalArgumentException("Strategy card set not found for ID: " + scSetID);
         }
-        setHomebrewSCMode(!"pok".equals(scSetID) && !"base_game".equals(scSetID));
+        setHomebrewSCMode(!"pok".equals(scSetID) && !"base_game".equals(scSetID) && !"te".equals(scSetID));
 
         Map<Integer, Integer> oldTGs = getScTradeGoods();
         setScTradeGoods(new LinkedHashMap<>());

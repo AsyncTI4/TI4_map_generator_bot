@@ -1,0 +1,134 @@
+[
+    {
+        "id": "experimentalagent",
+        "faction": "jolnar",
+        "type": "agent",
+        "name": "Experimental Genome",
+        "title": "Sacrifice",
+        "abilityWindow": "When a player spends resources",
+        "abilityText": "You may exhaust this card to allow that player to remove any number of their infantry from the game board. For each unit removed, reduce the resources spent by 1.",
+        "unlockCondition": "Always Unlocked",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "hyperagent",
+        "faction": "mentak",
+        "type": "agent",
+        "name": "Hyper Genome",
+        "title": "Energy",
+        "abilityWindow": "At any time",
+        "abilityText": "You may exhaust this card and choose another player; that player gives you 1 trade good, if able, then you each draw 1 action card.",
+        "unlockCondition": "Always Unlocked",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "researchagent",
+        "faction": "deepwrought",
+        "type": "agent",
+        "name": "Research Genome",
+        "title": "Energy",
+        "abilityWindow": "When a player initiates a splice",
+        "abilityText": "You may exhaust this card to add 3 additional cards to that splice.",
+        "unlockCondition": "Always Unlocked",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "valiantagent",
+        "faction": "bastion",
+        "type": "agent",
+        "name": "Valiant Genome",
+        "title": "Energy",
+        "abilityWindow": "After a player's unit is destroyed during combat",
+        "abilityText": "You may exhaust this card to roll 1 die. If the result is equal to or greater than that unit's combat value, their opponent must choose and destroy 1 of their units.",
+        "unlockCondition": "Always Unlocked",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "brilliancehero",
+        "faction": "jolnar",
+        "type": "hero",
+        "name": "Brilliance of the Hylar",
+        "title": "Jol Nar Paradigm",
+        "abilityWindow": "Action",
+        "abilityText": "Gain 1 genome, 1 unit upgrade, and 1 technology. Then purge this card.",
+        "unlockCondition": "Always Unlocked",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "devourhero",
+        "faction": "nekro",
+        "type": "hero",
+        "name": "Devour World",
+        "title": "Nekro Paradigm",
+        "abilityWindow": "Action",
+        "abilityText": "Choose a planet that has a technology specialty in a system that contains your units. Destroy any other player's units on that planet. Gain trade goods equal to that planet's combined resource and influence values and draw 1 ability. Then, purge this card.",
+        "unlockCondition": "Always Unlocked",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "voicehero",
+        "faction": "xxcha",
+        "type": "hero",
+        "name": "Voice of the Council",
+        "title": "Xxcha Paradigm",
+        "abilityWindow": "Action",
+        "abilityText": "Reveal 3 editcs; choose 1 to resolve and suffle the rest back into the edict deck. Then, purge this card.",
+        "unlockCondition": "Always Unlocked",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "forgehero",
+        "faction": "naaz",
+        "type": "hero",
+        "name": "Forge Legend",
+        "title": "Naaz Rokha Paradigm",
+        "abilityWindow": "Action",
+        "abilityText": "Gain 1 relic and 2 command tokens. Then, purge this card",
+        "unlockCondition": "Always Unlocked",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "poisonhero",
+        "faction": "naalu",
+        "type": "hero",
+        "name": "Poison of the Nefishh",
+        "title": "Naalu Paradigm",
+        "abilityWindow": "At the end of the status phase",
+        "abilityText": "You may choose an ability owned by another player; they must either give you that ability or give you 2 other abilities. If you do, purge this card.",
+        "unlockCondition": "Always Unlocked",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "eternityhero",
+        "faction": "obsidian",
+        "type": "hero",
+        "name": "Eternity's end",
+        "title": "Obsidian Paradigm",
+        "abilityWindow": "Action",
+        "abilityText": "Search the ability, unit upgrade, or genome deck for a card and gain it. Then, purge this card.",
+        "unlockCondition": "Always Unlocked",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "lawshero",
+        "faction": "deepwrought",
+        "type": "hero",
+        "name": "The Laws Unwritten",
+        "title": "Deepwrought Paradigm",
+        "abilityWindow": "Action",
+        "abilityText": "Purge an ability owned by any player. Then, purge this card.",
+        "unlockCondition": "Always Unlocked",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "eventhero",
+        "faction": "cabal",
+        "type": "hero",
+        "name": "Event Horizon",
+        "title": "Cabal Paradigm",
+        "abilityWindow": "Action",
+        "abilityText": "Each other player rolls a die for each of their non-fighter ships that are in or adjacent to a system that contains a gravity rift; on a 1-5, return that unit to their reinforcements. Then, purge this card.",
+        "unlockCondition": "Always Unlocked",
+        "source": "twilights_fall"
+    }
+]

@@ -290,7 +290,9 @@ class ActionCardHandButtonHandler {
                     ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
-        ButtonHelper.deleteTheOneButton(event);
+        if (!game.isTwilightsFallMode()) {
+            ButtonHelper.deleteTheOneButton(event);
+        }
     }
 
     @ButtonHandler("drawActionCards_")

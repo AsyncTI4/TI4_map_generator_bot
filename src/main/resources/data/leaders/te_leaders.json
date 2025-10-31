@@ -18,7 +18,7 @@
         "title": "Children of Ordinian",
         "abilityWindow": "At any time",
         "abilityText": "Your action cards cannot be canceled by \"Sabotage\" action cards. The Nekro Virus cannot place assimilator tokens on your components.",
-        "unlockCondition": "Unknown",
+        "unlockCondition": "There are 3 galvanized units on the game board",
         "source": "thunders_edge"
     },
     {
@@ -86,7 +86,7 @@
         "title": "Wistful Soul",
         "abilityWindow": "At the end of a combat between any players:",
         "abilityText": "Gain 1 commodity or convert 1 of your commodities to a trade good.",
-        "unlockCondition": "Unknown",
+        "unlockCondition": "Place a breach token in a system that contains another player's unit.",
         "source": "thunders_edge"
     },
     {
@@ -120,7 +120,7 @@
         "title": "Actuary General",
         "abilityWindow": "When you declare a retreat",
         "abilityText": "Immediately retreat up to 2 of your ships from the active system to an adjacent system that does not contain another player's ships. Place a command token from your reinforcements into that system.",
-        "unlockCondition": "Unknown",
+        "unlockCondition": "Be the last person to pass during the Action Phase",
         "source": "thunders_edge"
     },
     {
@@ -146,6 +146,17 @@
         "abilityText": "Place any combination of up to 4 PDS or mechs onto planets you control; ready each planet that you place a unit on. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "homebrewReplacesID": "xxchahero",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "naaluagent-te",
+        "faction": "naalu",
+        "type": "agent",
+        "name": "Z'eu",
+        "title": "Agent of the Nefishh",
+        "abilityWindow": "After any player's command token is placed in a system:",
+        "abilityText": "You may exhaust this card to return that token to that player's reinforcements.",
+        "unlockCondition": "Always Unlocked",
         "source": "thunders_edge"
     },
     {

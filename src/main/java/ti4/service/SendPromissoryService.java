@@ -73,7 +73,7 @@ public class SendPromissoryService {
         Player owner = game.getPNOwner(id);
         if (model.isPlayedDirectlyToPlayArea() && receiver != owner && !receiver.isPlayerMemberOfAlliance(owner)) {
             receiver.addPromissoryNoteToPlayArea(id);
-            if (id.startsWith("dspnveld")) {
+            if (id.startsWith("dspnveld") && !receiver.getAllianceMembers().contains(owner.getFaction())) {
                 PromissoryNoteHelper.resolvePNPlay(id, receiver, game, event);
             }
         }

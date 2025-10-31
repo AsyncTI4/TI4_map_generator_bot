@@ -67,6 +67,7 @@ import ti4.model.RuleModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.SourceModel;
+import ti4.model.SpaceTokenModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
@@ -104,6 +105,7 @@ public class Mapper {
     private static final Map<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
     private static final Map<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
     private static final Map<String, RelicModel> relics = new HashMap<>();
+    private static final Map<String, SpaceTokenModel> spaceTokens = new HashMap<>();
     private static final Map<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
     private static final Map<String, SourceModel> sources = new HashMap<>();
     private static final Map<String, StrategyCardSetModel> strategyCardSets = new HashMap<>();
@@ -158,6 +160,7 @@ public class Mapper {
         importJsonObjectsFromFolder("galactic_events", galacticevents, GalacticEventModel.class);
 
         importJsonObjectsFromFolder("tokens", tokens, TokenModel.class);
+        importJsonObjectsFromFolder("tokens", spaceTokens, SpaceTokenModel.class);
         importJsonObjectsFromFolder("units", units, UnitModel.class);
         readData("decals.properties", decals);
         readData("general.properties", general);
@@ -203,6 +206,35 @@ public class Mapper {
                 BotLogger.error("Could not import JSON Objects from File: " + jsonFolderName + "/" + file.getName(), e);
             }
         }
+    }
+
+    public static List<SpaceTokenModel> getSpaceTokens() {
+        return new ArrayList<>(spaceTokens.values());
+    }
+
+    public static SpaceTokenModel getSpaceToken(String tokenID) {
+        return spaceTokens.getOrDefault(tokenID, null);
+    }
+
+    public static SpaceTokenModel getSpaceTokenFromTokenIdOrFileName(String tokenIdOrFileName) {
+        for (SpaceTokenModel model : spaceTokens.values()) {
+            if (model.getFileName().equals(tokenIdOrFileName)
+                    || model.getAlias().equals(tokenIdOrFileName)) {
+                return model;
+            }
+        }
+        return null;
+    }
+
+    public static Map<String, GenericCardModel> getPlots() {
+        Map<String, GenericCardModel> plots = getGenericCards().entrySet().stream()
+                .filter(card -> card.getValue().getCardType() == CardType.plot)
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        return new HashMap<>(plots);
+    }
+
+    public static GenericCardModel getPlot(String plotID) {
+        return getPlots().get(plotID);
     }
 
     private static <T extends ModelInterface> void importJsonObjects(
@@ -588,6 +620,12 @@ public class Mapper {
         return colorModel.getName();
     }
 
+    public static String getColorDisplayName(String color) {
+        ColorModel colorModel = getColor(color);
+        if (colorModel == null) return null;
+        return colorModel.getDisplayName();
+    }
+
     // ####################
     // Combat modifiers
 
@@ -788,6 +826,16 @@ public class Mapper {
                 .stream()
                         .filter(template -> template.getPlayerCount() == players)
                         .toList();
+    }
+
+    public static MapTemplateModel getDefaultNucleusTemplate(int playerCount) {
+        List<MapTemplateModel> templates = getMapTemplatesForPlayerCount(playerCount);
+        for (MapTemplateModel model : templates) {
+            if (model.isNucleusTemplate() && model.getPlayerCount() == playerCount) {
+                return model;
+            }
+        }
+        return null;
     }
 
     public static MapTemplateModel getDefaultMapTemplateForPlayerCount(int players) {

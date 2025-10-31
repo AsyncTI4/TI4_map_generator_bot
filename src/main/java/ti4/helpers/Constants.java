@@ -17,6 +17,7 @@ public class Constants {
     public static final String sigmaId = "214326507458396161";
     public static final String bambamId = "487030345812672523";
     public static final List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
+    public static final String jabberwockyId = "455013002953883651";
 
     // Server IDs
     public static final String ASYNCTI4_HUB_SERVER_ID = "943410040369479690";
@@ -25,9 +26,16 @@ public class Constants {
         return "<@" + jazzId + ">";
     }
 
+    public static String jabberwockyPing() {
+        return "<@" + jabberwockyId + ">";
+    }
+
     public static String bltPing() {
         return "<@" + bltId + ">";
     }
+
+    // Standard Thread Names
+    public static final String NEW_PLAYER_THREAD_NAME = "Info for Players new to AsyncTI4";
 
     // Other People IDs
     public static final String cagesId = "203608548440014848";
@@ -45,6 +53,7 @@ public class Constants {
     public static final String SHOW_GAME = "show_game";
     public static final String ONLY_LAST_MONTH = "only_last_month";
     public static final String FOWGM = "fowgm";
+    public static final String FRACTURE = "fracture";
     public static final String TEMPORARY_PING_DISABLE = "temporary_ping_disable";
     public static final String ADD_ALLIANCE_MEMBER = "add_alliance_member";
     public static final String REMOVE_ALLIANCE_MEMBER = "remove_alliance_member";
@@ -84,6 +93,7 @@ public class Constants {
     public static final String FOW_OPTIONS = "fow_options";
     public static final String BASE_GAME_MODE = "base_game_mode";
     public static final String THUNDERS_EDGE_MODE = "thunders_edge_mode";
+    public static final String TWILIGHTS_FALL_MODE = "twilights_fall_mode";
     public static final String LIGHT_FOG_MODE = "light_fog_mode";
     public static final String CPTI_EXPLORE_MODE = "cpti_explore_mode";
     public static final String RED_TAPE_MODE = "red_tape_mode";
@@ -320,6 +330,8 @@ public class Constants {
     public static final String DRAW_ONLY = "draw_only";
     public static final String ADD_TILE_LIST_RANDOM = "add_tile_list_random";
     public static final String GENERATE_PAINBOX_MAP = "generate_painbox_map";
+    public static final String IMPORT_MAP_JSON = "import_json";
+    public static final String EXPORT_MAP_JSON = "export_json";
     public static final String BLUE_TILES = "blue_tiles";
     public static final String RED_TILES = "red_tiles";
     public static final String HOME_SYSTEMS = "home_systems";
@@ -570,6 +582,7 @@ public class Constants {
     public static final String TURN_END = "turn_end";
     public static final String TURN_START = "turn_start";
     public static final String SPEAKER = "speaker";
+    public static final String TYRANT = "tyrant";
     public static final String ACTIVE_PLAYER = "active_player";
     public static final String ACTIVE_SYSTEM = "active_system";
     public static final String LAST_ACTIVE_PLAYER_PING = "last_active_player_ping";
@@ -613,6 +626,7 @@ public class Constants {
     public static final String SO_NO_SCORING = "so_no_scoring";
     public static final String PLAYER_FACTION = "player_or_faction";
     public static final String FACTION_COLOR = "faction_or_color";
+    public static final String EXPEDITION = "expedition";
     public static final String TARGET_FACTION_OR_COLOR = "target_faction_or_color";
     public static final String TARGET_PLAYER = "target_player";
     public static final String TECH_TYPE = "tech_type";
@@ -676,6 +690,7 @@ public class Constants {
     public static final String STAGE_2_PUBLIC_DECK = "s2_public_deck";
     public static final String EXPLORATION_DECKS = "exploration_decks";
     public static final String AC_DISCARDED = "action_cards_discarded";
+    public static final String AC_STATUS = "action_cards_status";
     public static final String AC_PURGED = "action_cards_purged";
     public static final String SO = "secret_objectives";
     public static final String PRODUCED_UNITS = "produced_units";
@@ -782,6 +797,7 @@ public class Constants {
     public static final String RESET_VOICE_OF_THE_COUNCIL = "reset_voice_of_the_council";
     public static final String ELECT_VOICE_OF_THE_COUNCIL = "elect_voice_of_the_council";
     public static final String IMPERIUM_REX_ID = "imperium_rex_omegaphase";
+    public static final String RESET_OMEGA_PHASE_OBJECTIVES = "reset_objectives";
     // Omega Phase state keys
     public static final String PRIORITY_TRACK = "priority_track";
     public static final String OMEGA_PHASE_MODE = "omega_phase_mode";
@@ -887,6 +903,7 @@ public class Constants {
     public static final String TECH_ADD = "add";
     public static final String TECH_REMOVE = "remove";
     public static final String TECH_PURGE = "purge";
+    public static final String TECH_UNPURGE = "unpurge";
     public static final String TECH_EXHAUST = "exhaust";
     public static final String TECH_REFRESH = "ready";
 
@@ -1016,6 +1033,7 @@ public class Constants {
     public static final String MILTY_DRAFT_MANAGER = "milty_draft_manager";
     public static final String MILTY_DRAFT_SETTINGS = "milty_draft_settings";
     public static final String DRAFT_MANAGER = "draft_manager";
+    public static final String DRAFT_SYSTEM_SETTINGS = "draft_system_settings";
     public static final String DRAFT = "draft";
 
     // groups
@@ -1025,6 +1043,7 @@ public class Constants {
     public static final String DRAFT_SEAT = "seat";
     public static final String DRAFT_SLICE = "slice";
     public static final String DRAFT_SPEAKER_ORDER = "speaker_order";
+    public static final String DRAFT_MANTIS_TILE = "mantis_tile";
 
     // subcommands
     public static final String DRAFT_MANAGE_DEBUG = "debug";
@@ -1036,6 +1055,7 @@ public class Constants {
     public static final String DRAFT_MANAGE_CAN_SETUP_PLAYERS = "can_setup_players";
     public static final String DRAFT_MANAGE_SETUP_PLAYERS = "setup_players";
     public static final String DRAFT_MANAGE_ADD_DRAFTABLE = "add_draftable";
+    public static final String DRAFT_MANAGE_REMOVE_DRAFTABLE = "remove_draftable";
     public static final String DRAFT_MANAGE_SET_ORCHESTRATOR = "set_orchestrator";
     public static final String DRAFT_MANAGE_ADD_PLAYER = "add_player";
     public static final String DRAFT_MANAGE_REMOVE_PLAYER = "remove_player";
@@ -1044,12 +1064,12 @@ public class Constants {
     public static final String DRAFT_MANAGE_ADD_ALL_GAME_PLAYERS = "add_all_game_players";
     public static final String DRAFT_MANAGE_SWAP_PLAYERS = "swap_players";
     public static final String DRAFT_MANAGE_REPLACE_PLAYER = "replace_player";
-    public static final String DRAFT_MANAGE_LIST_DRAFTABLES = "list_draftables";
-    public static final String DRAFT_MANAGE_DISPLAY_ORCHESTRATOR = "display_orchestrator";
     public static final String DRAFT_MANAGE_MAKE_PICK = "make_pick";
+    public static final String DRAFT_MANAGE_UNPICK = "unpick";
     public static final String DRAFT_MANAGE_CUSTOM_COMMAND = "custom_draftable_command";
     public static final String DRAFT_MANAGE_CUSTOM_ORCHESTRATOR_COMMAND = "custom_orchestrator_command";
-    public static final String DRAFT_MANAGE_CONVERT_TO_MILTY = "convert_to_milty";
+    public static final String DRAFT_MANAGE_SETUP_DRAFT = "setup_draft";
+    public static final String DRAFT_MANAGE_SETUP_NUCLEUS = "setup_nucleus";
     public static final String DRAFT_FACTION_ADD = "add";
     public static final String DRAFT_FACTION_REMOVE = "remove";
     public static final String DRAFT_FACTION_SET_KELERES_FLAVOR = "set_keleres_flavor";
@@ -1063,6 +1083,9 @@ public class Constants {
     public static final String DRAFT_SLICE_ADD_SLICE = "add_slice";
     public static final String DRAFT_SLICE_REMOVE_SLICE = "remove_slice";
     public static final String DRAFT_SPEAKER_ORDER_SET_PICK_COUNT = "set_pick_count";
+    public static final String DRAFT_MANTIS_TILE_START_BUILDING = "start_building";
+    public static final String DRAFT_MANTIS_TILE_CONFIGURE = "configure";
+    public static final String DRAFT_MANTIS_TILE_SET_TILES = "set_tiles";
 
     // options
     public static final String FORCE_OPTION = "force";
@@ -1089,6 +1112,7 @@ public class Constants {
     public static final String DRAFT_TILE_9_OPTION = "tile_9";
     public static final String DRAFT_NEW_SLICE_OPTION = "new_slice_name";
     public static final String PICK_COUNT_OPTION = "pick_count";
+    public static final String PLAYER_PICKS_OPTION = "pick";
 
     // ABILITY, TECH, AGENT, COMMANDER, HERO, MECH, FLAGSHIP, COMMODITIES, PN, HOMESYSTEM, STARTINGTECH, STARTINGFLEET,
     // BLUETILE, REDTILE, DRAFTORDER
@@ -1114,6 +1138,7 @@ public class Constants {
     public static final String DRAFT_LIMITS = "draft_limits";
     public static final String BAN_ABILITY = "ban_ability";
     public static final String BAN_FACTION = "ban_faction";
+    public static final String FRANKEN_BUILD_MAP = "build_map";
     public static final String ABILITY_1 = "ability_1";
     public static final String ABILITY_2 = "ability_2";
     public static final String ABILITY_3 = "ability_3";
@@ -1187,6 +1212,17 @@ public class Constants {
     public static final String DANGEROUS_WILDS_MODE = "dangerous_wilds_mode";
     public static final String CIVILIZED_SOCIETY_MODE = "civilized_society_mode";
     public static final String AGE_OF_FIGHTERS_MODE = "age_of_fighters_mode";
+    public static final String MERCENARIES_FOR_HIRE_MODE = "mercenaries_for_hire_mode";
+    public static final String ADVENT_OF_THE_WARSUN_MODE = "advent_of_the_warsun_mode";
+    public static final String ZEALOUS_ORTHODOXY_MODE = "zealous_orthodoxy_mode";
+    public static final String CULTURAL_EXCHANGE_PROGRAM_MODE = "cultural_exchange_program_mode";
+    public static final String CONVENTIONS_OF_WAR_ABANDONED_MODE = "conventions_of_war_abandoned_mode";
+    public static final String RAPID_MOBILIZATION_MODE = "rapid_mobilization_mode";
+    public static final String MONUMENTS_TO_THE_AGES_MODE = "monuments_to_the_ages_mode";
+    public static final String COSMIC_PHENOMENAE_MODE = "cosmic_phenomenae_mode";
+    public static final String WEIRD_WORMHOLES_MODE = "weird_wormholes_mode";
+    public static final String CALL_OF_THE_VOID_MODE = "call_of_the_void_mode";
+    public static final String WILD_WILD_GALAXY_MODE = "wild_wild_galaxy_mode";
     public static final String STELLAR_ATOMICS_MODE = "stellar_atomics_mode";
     public static final String NO_SWAP_MODE = "no_swap_mode";
     public static final String LIMITED_WHISPERS_MODE = "limited_whispers_mode";
@@ -1293,6 +1329,11 @@ public class Constants {
     public static final String RUN_MANUAL_DATA_MIGRATION = "run_manual_data_migration";
     public static final String CRON_NAME = "cron_name";
     public static final String RUN_CRON = "run_cron";
+
+    public static final String HELIOS_ATTACHMENT_1 = "attachment_helios1.png";
+    public static final String HELIOS_ATTACHMENT_2 = "attachment_helios2.png";
+    public static final String PLOT_CARDS = "plot_cards";
+    public static final String PLOT_FACTIONS = "plot_factions";
 
     public static final String BREAKTHROUGH_CMD = "breakthrough";
     public static final String BREAKTHROUGH_LOCK = "lock";
