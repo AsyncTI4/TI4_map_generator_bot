@@ -662,36 +662,6 @@ public class Helper {
     }
 
     /**
-     * @deprecated - Use {@link  Game#getSCEmojiWordRepresentation()} instead
-     */
-    @Deprecated
-    public static String getSCAsMention(int sc, Game game) {
-        if (game.isHomebrewSCMode()) {
-            return getSCName(sc, game);
-        }
-        return switch (sc) {
-            case 1 -> CardEmojis.SC1Mention();
-            case 2 -> CardEmojis.SC2Mention();
-            case 3 -> CardEmojis.SC3Mention();
-            case 4 -> CardEmojis.SC4Mention();
-            case 5 -> CardEmojis.SC5Mention();
-            case 6 -> CardEmojis.SC6Mention();
-            case 7 -> CardEmojis.SC7Mention();
-            case 8 -> CardEmojis.SC8Mention();
-            default -> "**SC" + sc + "**";
-        };
-    }
-
-    /**
-     * @deprecated - Use {@link Game#getSCEmojiWordRepresentation()} instead
-     */
-    @Deprecated
-    public static String getSCRepresentation(Game game, int sc) {
-        if (game.isHomebrewSCMode()) return "SC #" + sc + " " + getSCName(sc, game);
-        return getSCAsMention(sc, game);
-    }
-
-    /**
      * @deprecated - Use {@link Game#getSCName()} instead
      */
     @Deprecated
@@ -700,29 +670,6 @@ public class Helper {
             return game.getStrategyCardSet().getSCName(sc);
         }
         return "SC#" + sc;
-    }
-
-    public static Integer getSCNumber(String sc) {
-        return switch (sc.toLowerCase()) {
-            case "leadership" -> 1;
-            case "diplomacy" -> 2;
-            case "politics" -> 3;
-            case "construction" -> 4;
-            case "trade" -> 5;
-            case "warfare" -> 6;
-            case "technology" -> 7;
-            case "imperial" -> 8;
-            default -> 0;
-        };
-    }
-
-    public static String getScImageUrl(Integer sc, Game game) {
-        String scImagePath = game.getStrategyCardSet()
-                .getStrategyCardModelByInitiative(sc)
-                .map(StrategyCardModel::getImageFileName)
-                .orElse("sadFace.png");
-        return "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/strat_cards/"
-                + scImagePath + ".png";
     }
 
     public static Emoji getPlayerReactionEmoji(Game game, Player player, Message message) {
