@@ -29,7 +29,7 @@ class ServerGameStats extends Subcommand {
         List<Guild> guildsToShow = new ArrayList<>(JdaService.serversToCreateNewGamesOn);
 
         boolean includeHub = event.getOption(Constants.INCLUDE_HUB, false, OptionMapping::getAsBoolean);
-        if (includeHub) guildsToShow.add(JdaService.guildPrimary);
+        if (includeHub || JdaService.guilds.size() == 1) guildsToShow.add(JdaService.guildPrimary);
 
         int hostedGames = 0;
         int roomForGames = 0;
