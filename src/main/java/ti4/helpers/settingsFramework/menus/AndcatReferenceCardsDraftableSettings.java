@@ -38,8 +38,11 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
         // Initialize values & keys for ban/priority factions
         Set<String> empty = new HashSet<>();
         Set<Entry<String, FactionModel>> allFactions = new HashSet<>();
+        Set<String> keleres = new HashSet<>();
+        // TODO: Fix Keleres start
+        keleres.add("keleresm");
         banFactions = new ListSetting<>(
-                "BanFactionCards", "Banned faction cards", "Ban faction", "Unban faction", allFactions, empty, empty);
+                "BanFactionCards", "Banned faction cards", "Ban faction", "Unban faction", allFactions, keleres, keleres);
         priFactions = new ListSetting<>(
                 "PriFactionCards",
                 "Prioritized faction cards",
