@@ -37,6 +37,8 @@ class WeirdGameSetup extends GameStateSubcommand {
                 Constants.DISCORDANT_STARS_MODE,
                 "True to add the Discordant Stars factions to the pool."));
         addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.BLUE_REVERIE_MODE, "True to add the Blue Reverie factions to the pool."));
+        addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.UNCHARTED_SPACE_STUFF,
                 "True to add the Uncharted Space Stuff to the draft pool."));
@@ -169,6 +171,7 @@ class WeirdGameSetup extends GameStateSubcommand {
         if (event.getOption(Constants.TIGL_GAME) == null
                 && event.getOption(Constants.ABSOL_MODE) == null
                 && event.getOption(Constants.DISCORDANT_STARS_MODE) == null
+                && event.getOption(Constants.BLUE_REVERIE_MODE) == null
                 && event.getOption(Constants.BASE_GAME_MODE) == null
                 && event.getOption(Constants.MILTYMOD_MODE) == null
                 && event.getOption(Constants.VOTC_MODE) == null) {
@@ -181,11 +184,21 @@ class WeirdGameSetup extends GameStateSubcommand {
                 event.getOption(Constants.MILTYMOD_MODE, game.isMiltyModMode(), OptionMapping::getAsBoolean);
         boolean discordantStarsMode = event.getOption(
                 Constants.DISCORDANT_STARS_MODE, game.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
+        boolean blueReverieMode =
+                event.getOption(Constants.BLUE_REVERIE_MODE, game.isBlueReverieMode(), OptionMapping::getAsBoolean);
         boolean baseGameMode =
                 event.getOption(Constants.BASE_GAME_MODE, game.isBaseGameMode(), OptionMapping::getAsBoolean);
         boolean votcMode = event.getOption(Constants.VOTC_MODE, game.isVotcMode(), OptionMapping::getAsBoolean);
         return setGameMode(
-                event, game, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame, votcMode);
+                event,
+                game,
+                baseGameMode,
+                absolMode,
+                miltyModMode,
+                discordantStarsMode,
+                blueReverieMode,
+                isTIGLGame,
+                votcMode);
     }
 
     // TODO: find a better way to handle this - this is annoying
@@ -197,6 +210,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             boolean absolMode,
             boolean miltyModMode,
             boolean discordantStarsMode,
+            boolean blueReverieMode,
             boolean isTIGLGame,
             boolean votcMode) {
         if (isTIGLGame
@@ -307,8 +321,8 @@ class WeirdGameSetup extends GameStateSubcommand {
             return true;
         }
 
-        // JUST DS
-        if (discordantStarsMode) {
+        // JUST DS and/or BR
+        if (discordantStarsMode || blueReverieMode) {
             game.setDiscordantStarsMode(true);
             if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_pok"))) return false;
             if (!game.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok")))
@@ -324,6 +338,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             game.swapOutVariantTechs();
         }
         game.setDiscordantStarsMode(discordantStarsMode);
+        game.setBlueReverieMode(blueReverieMode);
 
         // JUST ABSOL
         if (absolMode) {

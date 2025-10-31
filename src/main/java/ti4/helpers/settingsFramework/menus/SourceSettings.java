@@ -29,6 +29,7 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting pok;
     private final BooleanSetting codexes;
     private final BooleanSetting discoStars;
+    private final BooleanSetting blueRev;
     private final BooleanSetting betaTestMode;
     private final BooleanSetting unchartedSpace;
     private final BooleanSetting absol;
@@ -53,6 +54,7 @@ public class SourceSettings extends SettingsMenu {
         codexes = new BooleanSetting("Codexes", "Codex 1-4", true);
         betaTestMode = new BooleanSetting("Beta", "Beta Mode", game.isTestBetaFeaturesMode());
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
+        blueRev = new BooleanSetting("BlueRev", "Blue Reverie Factions", game.isBlueReverieMode());
         teDemo = new BooleanSetting("ThundersEdge", "Thunders Edge Demo", game.isThundersEdge());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
         absol = new BooleanSetting("Absol", "Absol Mod", game.isAbsolMode());
@@ -67,6 +69,7 @@ public class SourceSettings extends SettingsMenu {
         pok.setEmoji(SourceEmojis.TI4PoK);
         codexes.setEmoji(FactionEmojis.Keleres);
         discoStars.setEmoji(SourceEmojis.DiscordantStars);
+        blueRev.setEmoji(SourceEmojis.BlueReverie);
         unchartedSpace.setEmoji(SourceEmojis.DiscordantStars);
         absol.setEmoji(SourceEmojis.Absol);
         eronous.setEmoji(SourceEmojis.Eronous);
@@ -88,7 +91,7 @@ public class SourceSettings extends SettingsMenu {
             base.initialize(json.get("base"));
             pok.initialize(json.get("pok"));
             codexes.initialize(json.get("codexes"));
-            discoStars.initialize(json.get("discoStars"));
+            blueRev.initialize(json.get("blueRev"));
             teDemo.initialize(json.get("teDemo"));
             unchartedSpace.initialize(json.get("unchartedSpace"));
             absol.initialize(json.get("absol"));
@@ -111,6 +114,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(codexes);
         ls.add(teDemo);
         ls.add(discoStars);
+        ls.add(blueRev);
         ls.add(unchartedSpace);
         ls.add(absol);
         ls.add(ignis);
@@ -139,7 +143,8 @@ public class SourceSettings extends SettingsMenu {
         if (codexes.isVal())
             sources.addAll(List.of(
                     ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
-        if (unchartedSpace.isVal() || discoStars.isVal()) sources.add(ComponentSource.uncharted_space);
+        if (unchartedSpace.isVal() || discoStars.isVal() || blueRev.isVal())
+            sources.add(ComponentSource.uncharted_space);
         if (absol.isVal()) sources.add(ComponentSource.absol);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
         return sources;
@@ -154,6 +159,7 @@ public class SourceSettings extends SettingsMenu {
             sources.addAll(List.of(
                     ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
         if (discoStars.isVal()) sources.add(ComponentSource.ds);
+        if (blueRev.isVal()) sources.add(ComponentSource.blue_reverie);
         if (absol.isVal()) sources.add(ComponentSource.absol);
         if (betaTestMode.isVal()) sources.add(ComponentSource.thunders_edge);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
@@ -191,6 +197,11 @@ public class SourceSettings extends SettingsMenu {
                 event.getHook()
                         .sendMessage(
                                 "This setting only controls factions. If you want technologies, relics, explores, etc, you need to also enable **__Uncharted Space__**.")
+                        .setEphemeral(true)
+                        .queue();
+            case "BlueRev" ->
+                event.getHook()
+                        .sendMessage("This setting only controls factions.")
                         .setEphemeral(true)
                         .queue();
             case "ThundersEdge" -> {
