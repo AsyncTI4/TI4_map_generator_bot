@@ -196,10 +196,13 @@ public class StartTurnService {
             }
         }
 
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander") && player.getCommodities() > 0) {
+        if ((game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")
+                        || game.playerHasLeaderUnlockedOrAlliance(player, "crimsoncommander"))
+                && player.getCommodities() > 0) {
             for (Player p2 : game.getRealPlayers()) {
                 if (!p2.equals(player)
-                        && game.playerHasLeaderUnlockedOrAlliance(p2, "redcreusscommander")
+                        && (game.playerHasLeaderUnlockedOrAlliance(p2, "redcreusscommander")
+                                || game.playerHasLeaderUnlockedOrAlliance(p2, "crimsoncommander"))
                         && p2.getCommodities() > 0
                         && player.getNeighbouringPlayers(true).contains(p2)) {
                     List<Button> buttonsRedCreuss = new ArrayList<>();
@@ -251,6 +254,7 @@ public class StartTurnService {
                 player.setStasisInfantry(0);
             }
         }
+
         if (!game.getStoredValue("pathOf" + player.getFaction()).isEmpty()) {
             String msg1 = player.getRepresentation() + "The Starlit path points you towards a "
                     + game.getStoredValue("pathOf" + player.getFaction()) + ".";
@@ -439,7 +443,7 @@ public class StartTurnService {
                 String label = (player == nomad ? "Use" : "Use/Request") + " Thunder's Paradox";
                 startButtons.add(Buttons.gray("startThundersParadox", label, FactionEmojis.Nomad));
             }
-            if (player.hasTech("parasite-obs")) {
+            if (player.hasTech("parasite-obs") || player.hasTech("tf-neuralparasite")) {
                 startButtons.add(Buttons.gray("startNeuralParasite", "Use Neural Parasite", FactionEmojis.Obsidian));
             }
 

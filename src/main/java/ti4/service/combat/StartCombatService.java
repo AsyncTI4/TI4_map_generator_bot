@@ -4,11 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import javax.annotation.Nullable;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -18,6 +14,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
@@ -534,6 +531,7 @@ public class StartCombatService {
         for (Player p : game.getRealPlayers()) {
             // offer buttons for all crimson commander holders
             offerRedGhostCommanderButtons(p, game, event);
+            if (p.hasUnit("crimson_destroyer")) {}
         }
 
         if (tile.isHomeSystem(game)
@@ -567,11 +565,12 @@ public class StartCombatService {
     }
 
     private static void offerRedGhostCommanderButtons(Player player, Game game, GenericInteractionCreateEvent event) {
+
         if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")
                 || game.playerHasLeaderUnlockedOrAlliance(player, "crimsoncommander")) {
             String message = player.getRepresentation(true, true)
                     + ", you may, at the __end__ of combat, gain 1 commodity or convert 1 of your commodities to a trade good,"
-                    + " with \"Total Mystery\", the Red Creuss commander."
+                    + " with Ahk Siever, the Crimson commander."
                     + "\n-# You have " + player.getCommoditiesRepresentation() + " commodities.";
             List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
@@ -636,6 +635,11 @@ public class StartCombatService {
             MessageChannel threadChannel, Game game, Player activePlayer, Tile tile) {
         StringBuilder pdsMessage = new StringBuilder();
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition());
+        if (tile.isScar()) {
+            MessageHelper.sendMessageToChannel(
+                    threadChannel, "## Reminder that you cannot use any unit abilities in an Entropic Scar.");
+            return;
+        }
         if (playersWithPds2.isEmpty() || (game.isFowMode() && !playersWithPds2.contains(activePlayer))) {
             return;
         }
@@ -791,9 +795,10 @@ public class StartCombatService {
             }
             if (player.hasAbility("technological_singularity")
                     && !otherPlayer.isDummy()
-                    && !ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(
-                                    player, otherPlayer, new ArrayList<>(), game)
-                            .isEmpty()) {
+                    && (!ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(
+                                            player, otherPlayer, new ArrayList<>(), game)
+                                    .isEmpty()
+                            || player.hasUnlockedBreakthrough("nekrobt"))) {
                 Button steal = Buttons.gray(
                         player.finChecker() + "nekroStealTech_" + otherPlayer.getFaction(),
                         "Copy a Technology",
@@ -1254,11 +1259,11 @@ public class StartCombatService {
                         FactionEmojis.Sol));
             }
 
-            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("valientagent")) {
+            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("valiantagent")) {
                 buttons.add(Buttons.gray(
-                        finChecker + "getAgentSelection_valientagent",
+                        finChecker + "getAgentSelection_valiantagent",
                         "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                + "Valient Genome",
+                                + "Valiant Genome",
                         FactionEmojis.Bastion));
             }
 
@@ -1734,16 +1739,12 @@ public class StartCombatService {
         if (p1.hasLeaderUnlocked("bastionhero") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(
-                    finChecker + "purgeBastionHero_" + tile.getPosition(),
-                    "Purge Bastion",
-                    FactionEmojis.Bastion));
+                    finChecker + "purgeBastionHero_" + tile.getPosition(), "Purge Bastion", FactionEmojis.Bastion));
         }
         if (p2.hasLeaderUnlocked("bastionhero") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(
-                    finChecker + "purgeBastionHero_" + tile.getPosition(),
-                    "Purge Bastion",
-                    FactionEmojis.Bastion));
+                    finChecker + "purgeBastionHero_" + tile.getPosition(), "Purge Bastion", FactionEmojis.Bastion));
         }
 
         if (game.isLiberationC4Mode()) {

@@ -17,7 +17,6 @@ import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.FactionDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
-import ti4.helpers.thundersedge.TeHelperDemo;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -53,10 +52,6 @@ public class FactionDraftable extends SinglePickDraftable {
             boolean isThundersEdgeDemo) {
 
         List<String> effBannedFactions = new ArrayList<>(bannedFactions);
-        if (isThundersEdgeDemo) {
-            effBannedFactions.addAll(TeHelperDemo.getExcludedFactions());
-            numFactions = Math.min(25 - TeHelperDemo.getExcludedFactions().size(), numFactions);
-        }
 
         List<String> availableFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
                 .filter(f -> !effBannedFactions.contains(f.getAlias()))

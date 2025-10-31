@@ -194,7 +194,7 @@
         "cost": 1,
         "combatHitsOn": 7,
         "isGroundForce": true,
-        "ability": "After you move this unit into a system that contains another player's units, you may look at that player's action cards and take 1 of them."
+        "ability": "After you move this unit into a system that contains another player's units, you may look at that player's action cards and take 1 of them. [Note: in async, its been decided that this should trigger once per movement and not once per infantry]"
     },
     {
         "id": "tf-lataniwarrior",

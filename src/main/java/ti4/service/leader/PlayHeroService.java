@@ -3,14 +3,12 @@ package ti4.service.leader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.ActionCardHelper;
@@ -133,15 +131,13 @@ public class PlayHeroService {
                 player.clearExhaustedPlanets(false);
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        player.getRepresentationUnfogged()
-                                + ", all of your planets have been readied.");
+                        player.getRepresentationUnfogged() + ", all of your planets have been readied.");
             }
             case "firmamenthero" -> {
                 ActionCardHelper.sendPlotCardInfo(game, player);
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        player.getRepresentationUnfogged()
-                                + ", select a plot from cards info to put into play.");
+                        player.getRepresentationUnfogged() + ", select a plot from cards info to put into play.");
             }
             case "titanshero" -> {
                 Tile t = player.getHomeSystemTile();

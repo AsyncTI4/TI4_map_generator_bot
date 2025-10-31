@@ -443,6 +443,7 @@ public class Player extends PlayerProperties {
                 || getTechs().contains("so2")
                 || getTechs().contains("inf2")
                 || getTechs().contains("tf-specops")
+                || hasUnit("tf-yinclone")
                 || getTechs().contains("lw2")
                 || getTechs().contains("batyriinf")
                 || getTechs().contains("dscymiinf")

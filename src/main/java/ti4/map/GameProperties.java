@@ -115,6 +115,7 @@ public class GameProperties {
     private @ExportableField boolean conventionsOfWarAbandonedMode;
     private @ExportableField boolean rapidMobilizationMode;
     private @ExportableField boolean weirdWormholesMode;
+    private @ExportableField boolean noFractureMode;
     private @ExportableField boolean callOfTheVoidMode;
     private @ExportableField boolean cosmicPhenomenaeMode;
     private @ExportableField boolean monumentToTheAgesMode;

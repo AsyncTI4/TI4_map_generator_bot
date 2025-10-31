@@ -1047,8 +1047,14 @@ public class UnfiledButtonHandlers {
         String sc = buttonID.split("_")[1];
         ButtonHelper.deleteMessage(event);
         game.setStoredValue("deflectedSC", sc);
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(), "Put _Deflection_ on **" + Helper.getSCName(Integer.parseInt(sc), game) + "**.");
+        if (game.isTwilightsFallMode()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Put _Tartarus_ on **" + Helper.getSCName(Integer.parseInt(sc), game) + "**.");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Put _Deflection_ on **" + Helper.getSCName(Integer.parseInt(sc), game) + "**.");
+        }
     }
 
     @ButtonHandler("finishComponentAction_")
@@ -1796,6 +1802,10 @@ public class UnfiledButtonHandlers {
             skilled = true;
         }
         String message = player.getRepresentationUnfogged() + ", please choose a system to move to.";
+        if (ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, pos, skilled)
+                .isEmpty()) {
+            message = player.getRepresentationUnfogged() + ", there are no valid systems to retreat to.";
+        }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 message,
@@ -2857,6 +2867,11 @@ public class UnfiledButtonHandlers {
                     event.getMessageChannel(),
                     player.getRepresentation() + ", a reminder that you are at the command token limit right now,"
                             + " so may need to pull a command token off your command sheet in order to retreat (unless you retreat to a system that already has one).");
+        }
+        if (ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, game.getActiveSystem(), false)
+                .isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "## However, there are no valid systems to retreat to!");
         }
     }
 
