@@ -79,14 +79,14 @@ public class MessageListener extends ListenerAdapter {
 
     private static boolean respondToBotHelperPing(Message message) {
         boolean messageMentionsBotHelper = message.getMentions().getRoles().stream()
-            .anyMatch(mentionedRole -> JdaService.bothelperRoles.stream()
-                .filter(Objects::nonNull)
-                .anyMatch(bothelperRole -> bothelperRole.getIdLong() == mentionedRole.getIdLong()));
+                .anyMatch(mentionedRole -> JdaService.bothelperRoles.stream()
+                        .filter(Objects::nonNull)
+                        .anyMatch(bothelperRole -> bothelperRole.getIdLong() == mentionedRole.getIdLong()));
         if (messageMentionsBotHelper) {
             message.reply(
-                    "When you ping BotHelpers please include the specific reason for the ping (e.g. something is not working, there is a bug, or you're not sure how to do something) and any other relevant information. " +
-                        "This will speed up the process by allowing the staff to know what you are pinging about instead of having to ask or read through your channels.")
-                .queue();
+                            "When you ping BotHelpers please include the specific reason for the ping (e.g. something is not working, there is a bug, or you're not sure how to do something) and any other relevant information. "
+                                    + "This will speed up the process by allowing the staff to know what you are pinging about instead of having to ask or read through your channels.")
+                    .queue();
         }
         return messageMentionsBotHelper;
     }
