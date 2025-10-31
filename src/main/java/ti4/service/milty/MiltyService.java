@@ -734,12 +734,19 @@ public class MiltyService {
             tile = new Tile("51", pos);
             game.setTile(tile);
             player.setHomeSystemPosition(pos);
+            if (game.isTwilightsFallMode()) {
+                player.addAbility("song_of_something");
+            }
         }
 
         // HANDLE Crimson' HOME SYSTEM LOCATION
         if ("crimson".equals(faction)) {
             tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
-            tile.addToken(Constants.TOKEN_BREACH_INACTIVE, Constants.SPACE);
+            if (!game.isTwilightsFallMode()) {
+                tile.addToken(Constants.TOKEN_BREACH_INACTIVE, Constants.SPACE);
+            } else {
+                player.addAbility("song_of_something");
+            }
             String pos = "tr";
             if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
                 pos = "br";
