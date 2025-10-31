@@ -80,7 +80,6 @@ public class MessageListener extends ListenerAdapter {
     private static boolean respondToBotHelperPing(Message message) {
         boolean messageMentionsBotHelper = message.getMentions().getRoles().stream()
                 .anyMatch(mentionedRole -> JdaService.bothelperRoles.stream()
-                        .filter(Objects::nonNull)
                         .anyMatch(bothelperRole -> bothelperRole.getIdLong() == mentionedRole.getIdLong()));
         if (messageMentionsBotHelper) {
             message.reply(
