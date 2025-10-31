@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import ti4.AsyncTI4DiscordBot;
 import ti4.cron.CronManager;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DiscordWebhook;
@@ -22,6 +21,7 @@ import ti4.message.MessageHelper;
 import ti4.service.statistics.SREStats;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
+import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class BotLogger {
@@ -101,6 +101,10 @@ public class BotLogger {
      */
     public static void warning(@Nonnull String message, @Nullable Throwable err) {
         logToChannel(null, message, err, LogSeverity.Warning);
+    }
+
+    public static void warning(@Nonnull LogOrigin logOrigin, @Nonnull String message, @Nullable Throwable err) {
+        logToChannel(logOrigin, message, err, LogSeverity.Warning);
     }
 
     /**
@@ -213,7 +217,7 @@ public class BotLogger {
                 if (channel == null) scheduleWebhookMessage(msgChunk); // Send message on webhook
                 else channel.sendMessage(msgChunk).queue(); // Send message on channel
             } else { // Handle error on last send
-                ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
+                ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildPrimary);
 
                 if (channel == null) {
                     scheduleWebhookMessage(msgChunk); // Send message on webhook
@@ -265,7 +269,7 @@ public class BotLogger {
         }
 
         // try and create a webhook
-        TextChannel channel = getLogChannel(LogSeverity.Error);
+        TextChannel channel = getLogChannel(LogSeverity.Info);
         if (channel == null) {
             System.out.println("ERROR: Unable to create bot-log webhook, no bot-log-error channel found.");
             return null;
@@ -340,7 +344,7 @@ public class BotLogger {
      */
     @Nullable
     private TextChannel getLogChannel(@Nonnull LogSeverity severity) {
-        Guild guild = AsyncTI4DiscordBot.guildPrimary;
+        Guild guild = JdaService.guildPrimary;
         if (guild == null) return null;
 
         return guild.getTextChannelsByName(severity.channelName, false).stream()

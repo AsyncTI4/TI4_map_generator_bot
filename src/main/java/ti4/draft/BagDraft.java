@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
-import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -15,6 +14,7 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.franken.FrankenDraftBagService;
+import ti4.spring.jda.JdaService;
 
 public abstract class BagDraft {
     private static final Pattern FORWARD_SLASH_PATTERN = Pattern.compile("/");
@@ -32,6 +32,12 @@ public abstract class BagDraft {
         }
         if ("poweredonepick_franken".equals(draftType)) {
             return new PoweredOnePickFrankenDraft(game);
+        }
+        if ("twilights_fall".equals(draftType)) {
+            return new TwilightsFallFrankenDraft(game);
+        }
+        if ("inaugural_splice".equals(draftType)) {
+            return new InauguralSpliceFrankenDraft(game);
         }
         return null;
     }
@@ -122,7 +128,15 @@ public abstract class BagDraft {
     public String getLongBagRepresentation(DraftBag bag, Game game) {
         StringBuilder sb = new StringBuilder();
         for (DraftItem.Category cat : DraftItem.Category.values()) {
-            sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat, game));
+            if (this instanceof FrankenDraft) {
+                if (FrankenDraft.getItemLimitForCategory(cat, game) > 0) {
+                    sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat, game));
+                }
+            } else {
+                if (this.getItemLimitForCategory(cat) > 0) {
+                    sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat, game));
+                }
+            }
         }
         sb.append("**Total Cards: ").append(bag.Contents.size()).append("**\n");
         return sb.toString();
@@ -205,7 +219,7 @@ public abstract class BagDraft {
             if (bagInfoThread != null && !bagInfoThread.isBlank() && !"null".equals(bagInfoThread)) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
 
-                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(bagInfoThread);
+                ThreadChannel threadChannel = JdaService.jda.getThreadChannelById(bagInfoThread);
                 if (threadChannel != null) return threadChannel;
 
                 // SEARCH FOR EXISTING OPEN THREAD
@@ -240,7 +254,7 @@ public abstract class BagDraft {
             if (bagInfoThread != null && !bagInfoThread.isBlank() && !"null".equals(bagInfoThread)) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
 
-                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(bagInfoThread);
+                ThreadChannel threadChannel = JdaService.jda.getThreadChannelById(bagInfoThread);
                 if (threadChannel != null) return threadChannel;
 
                 // SEARCH FOR EXISTING OPEN THREAD

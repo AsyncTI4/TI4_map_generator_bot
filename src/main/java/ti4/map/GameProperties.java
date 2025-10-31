@@ -1,9 +1,13 @@
 package ti4.map;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
+import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.Constants;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.map.pojo.ExportableField;
@@ -53,6 +57,7 @@ public class GameProperties {
     private String savedMessage;
     private boolean hasHadAStatusPhase;
     private boolean naaluAgent;
+    private boolean warfareAction;
     private boolean l1Hero;
     private boolean temporaryPingDisable;
     private boolean dominusOrb;
@@ -94,6 +99,8 @@ public class GameProperties {
 
     // Game modes / homebrew flags
     private @ExportableField boolean baseGameMode; // TODO: Make this obsolete
+    private @ExportableField boolean thundersEdge;
+    private @ExportableField boolean twilightsFallMode;
     private @ExportableField boolean prophecyOfKings = true;
     private @ExportableField boolean ageOfExplorationMode;
     private @ExportableField boolean facilitiesMode;
@@ -102,6 +109,17 @@ public class GameProperties {
     private @ExportableField boolean dangerousWildsMode;
     private @ExportableField boolean civilizedSocietyMode;
     private @ExportableField boolean ageOfFightersMode;
+    private @ExportableField boolean mercenariesForHireMode;
+    private @ExportableField boolean adventOfTheWarsunMode;
+    private @ExportableField boolean culturalExchangeProgramMode;
+    private @ExportableField boolean conventionsOfWarAbandonedMode;
+    private @ExportableField boolean rapidMobilizationMode;
+    private @ExportableField boolean weirdWormholesMode;
+    private @ExportableField boolean callOfTheVoidMode;
+    private @ExportableField boolean cosmicPhenomenaeMode;
+    private @ExportableField boolean monumentToTheAgesMode;
+    private @ExportableField boolean wildWildGalaxyMode;
+    private @ExportableField boolean zealousOrthodoxyMode;
     private @ExportableField boolean stellarAtomicsMode;
     private @ExportableField boolean noSwapMode;
     private @ExportableField boolean limitedWhispersMode;
@@ -134,6 +152,7 @@ public class GameProperties {
     // Discord Snowflakes
     private @ExportableField String guildID;
     private String speakerUserID = "";
+    private String tyrantUserID = "";
     private String activePlayerID;
     private String launchPostThreadID;
     private @ExportableField String botMapUpdatesThreadID;
@@ -150,6 +169,9 @@ public class GameProperties {
     private List<String> agendas;
     private List<String> mandates;
     private List<String> events; // ignis_aurora
+
+    private Map<String, Integer> discardActionCards = new LinkedHashMap<>();
+    private Map<String, ACStatus> discardACStatus = new HashMap<>();
 
     // Priority Track
     private PriorityTrackMode priorityTrackMode = PriorityTrackMode.NONE;

@@ -1,6 +1,7 @@
 package ti4.service.objectives;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
@@ -11,18 +12,25 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
+import ti4.commands.special.SetupNeutralPlayer;
+import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StringHelper;
 import ti4.image.ImageHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.Leader;
+import ti4.map.Planet;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.model.ColorModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.image.FileUploadService;
 import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.leader.UnlockLeaderService;
 
 @UtilityClass
 public class DrawSecretService {
@@ -103,6 +111,56 @@ public class DrawSecretService {
                             "\n-# A reminder that these reference cards are general overviews, and not specific mechanical text.");
                     MessageHelper.sendMessageWithFiles(
                             game.getActionsChannel(), files, message.toString(), true, false);
+                }
+            }
+
+            if ((!game.getStoredValue("useOldPok").isEmpty()) && !game.isTwilightsFallMode()) {
+                game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok"));
+                game.setStrategyCardSet("pok");
+            } else if (!game.isThundersEdge() && !game.isTwilightsFallMode()) {
+                game.removeRelicFromGame("quantumcore");
+                game.removeRelicFromGame("thesilverflame");
+            }
+            if (game.isThundersEdge()) {
+                Player neutral = game.getPlayerFromColorOrFaction("neutral");
+                if (neutral == null) {
+                    List<String> unusedColors = game.getUnusedColors().stream()
+                            .map(ColorModel::getName)
+                            .toList();
+                    String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+                    game.setupNeutralPlayer(color);
+                }
+                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
+            }
+            if (game.isThundersEdge() || game.getStoredValue("useNewRex").isEmpty() || game.isTwilightsFallMode()) {
+                Tile mr = game.getMecatolTile();
+                if (mr != null) {
+                    String pos = mr.getPosition();
+                    game.removeTile(pos);
+                    Tile tile = new Tile("112", pos);
+                    Planet rex = tile.getUnitHolderFromPlanet("mrte");
+                    rex.addToken(Constants.CUSTODIAN_TOKEN_PNG);
+                    game.setTile(tile);
+                }
+            }
+            if (game.isCulturalExchangeProgramMode()) {
+                List<String> factions = new ArrayList<>();
+                factions.addAll(game.getRealFactions());
+                Collections.shuffle(factions);
+                for (Player player : game.getRealPlayers()) {
+                    player.setLeaders(new ArrayList<>());
+                    String faction = factions.removeFirst();
+                    player.initLeadersForFaction(faction);
+                    for (Leader leader : player.getLeaders()) {
+                        if (leader.getId().contains("commander")) {
+                            UnlockLeaderService.unlockLeader(leader.getId(), game, player);
+                        }
+                    }
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + " Due to **Cultural Exchange Program**, you have received the leaders of "
+                                    + Mapper.getFaction(faction).getFactionName() + " this game.");
                 }
             }
             List<Button> buttons = new ArrayList<>();

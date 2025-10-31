@@ -1,0 +1,182 @@
+[
+    {
+        "alias": "lieinwait",
+        "name": "Lie in Wait",
+        "phase": "Any",
+        "window": "After 2 of your neighbors resolve a transaction",
+        "text": "Look at each of those players' hands of action cards, then choose and take 1 action card from each.",
+        "flavorText": "Suffi sauntered toward the huddle of paralyzed Hylar, whistling and twirling her pistols as she walked. \"I'll be taking these,\" she said, flashing a grin, and snatched the humming data drives from each of them in turn.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "exchangeprogram",
+        "name": "Exchange Program",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose another player. You and that player may agree to place 1 infantry from each of your reinforcements into coexistence on a planet the other player controls that contains their ground forces; if no agreement is reached, you each discard 1 token from your fleet pool.",
+        "flavorText": "Madness. *Magmus thought to himself. A city. Under water.* Absurd",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "puppetsonastring",
+        "name": "Puppets on a String",
+        "phase": "Action",
+        "window": "At the end of a player's turn, if you have passed",
+        "text": "Perform 1 action.",
+        "flavorText": "A red light flashed as the pile that was once thought to be destroyed remains of UNIT_DSGN_ASTAROTH came once more to life. \"YOU THOUGHT. YOU BELIEVED YOUR VICTORY SECURE. BUT YOU WERE WRONG.\"",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "extremeduress",
+        "name": "Extreme Duress",
+        "phase": "Action",
+        "window": "At the start of another player's turn, if they have a readied strategy card",
+        "text": "If that player's next action is not a strategic action, they discard all of their action cards, give you all of their trade goods, and show you all of their secret objectives.",
+        "flavorText": "Kan Kip Rel tugged nervously at his collar, fingering the explosive device he knew was there.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "mercenarycontract",
+        "name": "Mercenary Contract",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Spend 2 trade goods to place 2 neutral infantry on any non-home planet that contains no units; if that planet was owned by another player, they return its planet card to the planet card deck.",
+        "flavorText": "\"Just sign right 'ere - yep, right below the smeared blood. You got it, champ, get at 'em.\"",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "strategize1",
+        "name": "Strategize",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Perform the secondary ability of any readied or unchosen strategy card. [Note: You still need to pay the token from strategy unless choosing leadership]",
+        "flavorText": "Kyver stared mathis in the eye, unblinking. For a time, neither made a move. The greens and browns of Kyver's eyes were impassive. They betrayed nothing of his intent. Nothing of his past or his future. They were but windows to the wild, unforgiving jungles of Retillion.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "strategize2",
+        "name": "Strategize",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Perform the secondary ability of any readied or unchosen strategy card. [Note: You still need to pay the token from strategy unless choosing leadership]",
+        "flavorText": "Sweat dripped down Mathis' brow. To show weakness now would mean defeat. Death would be preferable to that. But then, as if the divine providence of the Lazax were within her, she saw something she had overlooked. An opening! Her hand darted forward as she made her play. She smirked.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "strategize3",
+        "name": "Strategize",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Perform the secondary ability of any readied or unchosen strategy card. [Note: You still need to pay the token from strategy unless choosing leadership]",
+        "flavorText": "Strategy. What meaning could be derived from the word, what flesh could be sucked clean off its bones? There was a spark, almost like remembering, but it faded. Violently.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "strategize4",
+        "name": "Strategize",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Perform the secondary ability of any readied or unchosen strategy card. [Note: You still need to pay the token from strategy unless choosing leadership]",
+        "flavorText": "No, there would be no strategy here, only hunger. Life, blood, love, life, fear, fear, fear. Let the ants mill about with their strategies. No strategy would avail them today.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "rescue",
+        "name": "Rescue",
+        "phase": "Action",
+        "window": "After a player moves ships into a system that contains your ships",
+        "text": "You may move 1 ship into the active system from any system that does not contain one of your command tokens.",
+        "flavorText": "\"Hold on...\" Tuck pleaded. \"We are coming. Hold on, please...\"",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "piratefleet",
+        "name": "Pirate Fleet",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Spend 3 resources to place 1 neutral carrier, 1 neutral cruiser, 1 neutral destroyer, and 2 neutral fighters in a non-home system that contains no non-neutral ships.",
+        "flavorText": "Felix rubbed his temples as the pirates - well, the other pirates - blipped one by one on the ship's scanner. It was going to be a very long day.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "brilliance",
+        "name": "Brilliance",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Ready 1 of your planets that has a technology specialty or choose 1 player to gain their breakthrough.",
+        "flavorText": "Crocoan gently stroked the bloodied feathers of screeching cir-le-sh. Such a beautiful song. At last, he'd cracked the code. Soon, Goranthis would be filled with a chorus of such soulful music.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "blackmarketdealing",
+        "name": "Black Market Dealings",
+        "phase": "Any",
+        "window": "When you are negotiating a transaction",
+        "text": "You and the other player may include relics, action cards, and unscored secret objectives as part of the transaction. This card cannot be canceled.",
+        "flavorText": "A chill went up Riad's spine as the Empyrean extended a clawed hand, a small black box floating in their palm, sucking up all the light and life in the room.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "piratecontract1",
+        "name": "Pirate Contract",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Place 1 neutral destroyer in a non-home system that contains no non-neutral ships.",
+        "flavorText": "Suffi accepted the contract, swearing her solemn vow that she would see the viceroy's daughter kidnapped and held for ransom by the day's end.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "piratecontract2",
+        "name": "Pirate Contract",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Place 1 neutral destroyer in a non-home system that contains no non-neutral ships.",
+        "flavorText": "Suffi accepted the contract, swearing her solemn vow as one of Mogar's Raiders that she would be loyal to the crew above all else.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "piratecontract3",
+        "name": "Pirate Contract",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Place 1 neutral destroyer in a non-home system that contains no non-neutral ships.",
+        "flavorText": "Suffi accepted the contract, swearing her solemn vow as a member of the Shadowscald that the job would be completed, one way or another.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "piratecontract4",
+        "name": "Pirate Contract",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Place 1 neutral stroter in a non-home system that contains no non-neutral ships.",
+        "flavorText": "Satisfied, Suffi cashed in her contracts, wondering how long it would take any of them to notice she was gone. After it was much too late, with any luck.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "crashlanding",
+        "name": "Crash Landing",
+        "phase": "Action",
+        "window": "When your last ship in the active system is destroyed",
+        "text": "Place 1 of your ground forces from the space area of the active system onto a planet in that system other than Mecatol Rex; if the planet contains other players' units, place your ground force into coexistence.",
+        "flavorText": "The Long Fall spiraled toward the surface of the rocky planet. Living up to its name, Connor thought dryly.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "crisis",
+        "name": "Crisis",
+        "phase": "Action",
+        "window": "At the end of any players turn, if there are at least 2 players who have not passed",
+        "text": "Skip the next player's turn.",
+        "flavorText": "4X41A \"Apollo\" shrieked in the skies over Ordinian. Blazing shards of metal and fire rained down upon the planet's surface - the remains of Nekro whose atoms were undergoing a rapid and violent disintegration.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "overrule",
+        "name": "Overrule",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Perform the primary ability of a readied or unchosen strategy card.",
+        "flavorText": "Treilla absentmindedly smiled a sickly sweet smile at the newly promoted commander. With any luch, he'd be dead or demoted within a day or two.",
+        "source": "thunders_edge"
+    }
+]

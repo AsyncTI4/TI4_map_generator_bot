@@ -5,7 +5,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -14,6 +13,7 @@ import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
 import ti4.service.fow.GMService;
 import ti4.service.game.GameNameService;
+import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class SusSlashCommandService {
@@ -24,6 +24,7 @@ public class SusSlashCommandService {
             Constants.BOTHELPER,
             Constants.DEVELOPER,
             Constants.SEARCH,
+            Constants.SEARCH + "2",
             Constants.USER,
             Constants.SHOW_GAME,
             Constants.CARDS_INFO,
@@ -86,12 +87,14 @@ public class SusSlashCommandService {
                 && event.getMessageChannel() != managedGame.getTableTalkChannel()
                 && !event.getMessageChannel().getName().contains("bot-map-updates");
 
-        if ((event.getInteraction().getSubcommandName() != null
-                        && ("replace".equalsIgnoreCase(event.getInteraction().getSubcommandName())
-                                || "leave"
-                                        .equalsIgnoreCase(event.getInteraction().getSubcommandName())))
-                || (!managedGame.isFowMode() && (isPrivateThread || isNotGameChannel) && !isPublicThread)) {
-            reportSusSlashCommand(event, jumpUrl);
+        if (event.getInteraction().getSubcommandName() != null) {
+
+            if ("replace".equalsIgnoreCase(event.getInteraction().getSubcommandName())
+                    || "leave".equalsIgnoreCase(event.getInteraction().getSubcommandName())) {
+                reportSusSlashCommand(event, jumpUrl);
+            } else if (!managedGame.isFowMode() && (isPrivateThread || isNotGameChannel) && !isPublicThread) {
+                reportLittleSusSlashCommand(event, jumpUrl);
+            }
         }
 
         if (managedGame.isFowMode()) {
@@ -110,13 +113,21 @@ public class SusSlashCommandService {
 
     public static void reportSusSlashCommand(SlashCommandInteractionEvent event, String jumpUrl) {
         TextChannel moderationLogChannel =
-                AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("moderation-log", true).stream()
+                JdaService.guildPrimary.getTextChannelsByName("moderation-log", true).stream()
                         .findFirst()
                         .orElse(null);
         if (moderationLogChannel == null) return;
         String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + jumpUrl;
         MessageHelper.sendMessageToChannel(moderationLogChannel, sb);
-        if (event.getInteraction().getSubcommandName() != null
-                && "replace".equalsIgnoreCase(event.getInteraction().getSubcommandName())) {}
+    }
+
+    public static void reportLittleSusSlashCommand(SlashCommandInteractionEvent event, String jumpUrl) {
+        TextChannel moderationLogChannel =
+                JdaService.guildPrimary.getTextChannelsByName("sus-slash-commands-log", true).stream()
+                        .findFirst()
+                        .orElse(null);
+        if (moderationLogChannel == null) return;
+        String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + jumpUrl;
+        MessageHelper.sendMessageToChannel(moderationLogChannel, sb);
     }
 }

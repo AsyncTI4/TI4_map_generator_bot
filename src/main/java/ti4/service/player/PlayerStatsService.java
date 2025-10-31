@@ -21,6 +21,7 @@ import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.fow.RiftSetModeService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
@@ -153,6 +154,9 @@ public class PlayerStatsService {
                         (MessageChannel) event.getChannel(), Helper.getSCName(scNumber, game) + " is already picked.");
                 return false;
             }
+            if (scNumber == 9 && !RiftSetModeService.canPickSacrifice(player, game)) {
+                return false;
+            }
         }
 
         player.addSC(scNumber);
@@ -166,7 +170,8 @@ public class PlayerStatsService {
                 game.getStrategyCardModelByInitiative(scNumber).orElse(null);
 
         // WARNING IF PICKING TRADE WHEN PLAYER DOES NOT HAVE THEIR TRADE AGREEMENT
-        if (scModel.usesAutomationForSCID("pok5trade")
+        if (!game.isTwilightsFallMode()
+                && scModel.usesAutomationForSCID("pok5trade")
                 && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
             String message = player.getRepresentationUnfogged()
                     + " heads up, you just picked **Trade** but don't currently hold your _Trade Agreement_.";

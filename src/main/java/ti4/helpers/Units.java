@@ -11,10 +11,10 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import lombok.Data;
 import lombok.Getter;
-import ti4.AsyncTI4DiscordBot;
 import ti4.image.Mapper;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
+import ti4.spring.jda.JdaService;
 
 public class Units {
 
@@ -58,7 +58,7 @@ public class Units {
 
         @JsonIgnore
         public String getFileName() {
-            if (AsyncTI4DiscordBot.testingMode) return getFileName(false);
+            if (JdaService.testingMode) return getFileName(false);
             return getFileName(RandomHelper.isOneInX(Constants.EYE_CHANCE));
         }
 
@@ -197,28 +197,39 @@ public class Units {
     public enum UnitState {
         none, // . . 0000
         dmg, // . . 0001
+        glv, // . . 0010
+        dmg_glv, // 0011
         ;
 
         public static final int DMG = 0b0000001;
+        public static final int GLV = 0b0000010;
 
         public boolean isDamaged() {
             return (ordinal() & DMG) > 0;
         }
 
-        public static List<UnitState> defaultAddOrder() {
-            return List.of(none, dmg);
+        public boolean isGalvanized() {
+            return (ordinal() & GLV) > 0;
         }
 
         public static List<UnitState> defaultRemoveOrder() {
-            return List.of(dmg, none);
+            return List.of(dmg, none, dmg_glv, glv);
+        }
+
+        public static List<UnitState> defaultAddOrder() {
+            return List.of(glv, dmg_glv, none, dmg);
         }
 
         public static List<UnitState> defaultAddStatusOrder() {
-            return List.of(none, dmg);
+            return List.of(none, dmg, glv, dmg_glv);
         }
 
         public static List<UnitState> defaultRemoveStatusOrder() {
-            return List.of(dmg, none);
+            return List.of(dmg, dmg_glv, glv, none);
+        }
+
+        public static List<UnitState> unitRenderOrder() {
+            return List.of(none, dmg, glv, dmg_glv);
         }
 
         public static List<Integer> emptyList() {
@@ -231,16 +242,19 @@ public class Units {
             return switch (this) {
                 case none -> "";
                 case dmg -> "damaged";
+                case glv -> "galvanized";
+                case dmg_glv -> "Dmg+Glv";
             };
         }
     }
 
     public static UnitState findUnitState(String state) {
-        if (state == null) return null;
-        return switch (state.toLowerCase()) {
+        return switch (state) {
             case "none" -> UnitState.none;
             case "dmg", "damaged", "damage" -> UnitState.dmg;
-            default -> null;
+            case "glv", "galvanized", "galv" -> UnitState.glv;
+            case "dmg_glv" -> UnitState.dmg_glv;
+            case null, default -> null;
         };
     }
 

@@ -300,6 +300,9 @@ public class MiltyDraftHelper {
             sources.add(ComponentSource.ds);
             sources.add(ComponentSource.uncharted_space);
         }
+        if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
+            sources.add(ComponentSource.thunders_edge);
+        }
         initDraftTiles(manager, sources);
     }
 
@@ -324,8 +327,14 @@ public class MiltyDraftHelper {
         Tile tile = new Tile(tileID, "none");
         draftTile.setTile(tile);
 
-        for (Planet planet : tile.getPlanetUnitHolders()) {
-            draftTile.addPlanet(planet);
+        if (tile.isScar()) {
+            draftTile.setHasScar(true);
+        }
+
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            if (unitHolder instanceof Planet planet) {
+                draftTile.addPlanet(planet);
+            }
         }
 
         if (tile.isAnomaly()) {
@@ -345,7 +354,7 @@ public class MiltyDraftHelper {
         for (TileModel tileModel : allTiles) {
 
             if (isInvalid(tileModel)) continue;
-            //  System.out.println(tileModel.getSource() + tileModel.getName());
+
             if (!sources.contains(tileModel.getSource())) continue;
             if (tileModel.getTileBack() == TileBack.GREEN || tileModel.isHyperlane()) continue;
 
@@ -365,8 +374,31 @@ public class MiltyDraftHelper {
         String path =
                 tileModel.getImagePath() == null ? "" : tileModel.getImagePath().toLowerCase();
         List<String> disallowedTerms = List.of(
-                "corner", "lane", "mecatol", "blank", "border", "fow", "anomaly", "deltawh", "seed", "mr", "mallice",
-                "ethan", "prison", "kwon", "home", "hs", "red", "blue", "green", "gray", "gate", "setup");
+                "corner",
+                "lane",
+                "mecatol",
+                "blank",
+                "border",
+                "fow",
+                "anomaly",
+                "deltawh",
+                "seed",
+                "sorrowwh",
+                "fracture",
+                "mr",
+                "mrte",
+                "mallice",
+                "ethan",
+                "prison",
+                "kwon",
+                "home",
+                "hs",
+                "red",
+                "blue",
+                "green",
+                "gray",
+                "gate",
+                "setup");
         return disallowedTerms.stream().anyMatch(term -> id.contains(term) || path.contains(term));
     }
 

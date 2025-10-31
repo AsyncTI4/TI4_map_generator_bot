@@ -13,12 +13,20 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
+import ti4.helpers.SecretObjectiveHelper;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
+import ti4.service.planet.EmelparService;
+import ti4.service.planet.FaunusService;
+import ti4.service.planet.IndustrexService;
+import ti4.service.turn.StartTurnService;
 
 public class PlanetExhaustAbility extends PlanetAddRemove {
 
@@ -33,18 +41,14 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
 
     public static void doAction(
             GenericInteractionCreateEvent event, Player player, String planet, Game game, boolean exhaust) {
-        doAction(player, planet, game, exhaust);
-    }
-
-    private static void doAction(Player player, String planet, Game game, boolean exhaust) {
         if (player == null) return;
         if (exhaust) {
             player.exhaustPlanetAbility(planet);
         }
-        resolveAbility(player, planet, game);
+        resolveAbility(event, player, planet, game);
     }
 
-    private static void resolveAbility(Player player, String planet, Game game) {
+    private static void resolveAbility(GenericInteractionCreateEvent event, Player player, String planet, Game game) {
         planet = AliasHandler.resolvePlanet(planet);
         PlanetModel model = Mapper.getPlanet(planet);
         MessageChannel channel = player.getCorrectChannel();
@@ -85,12 +89,47 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = "Use buttons to drop 2 infantry on a planet.";
                 buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
             }
-            case "ordinianc4" -> {
+            case "thundersedge" -> {
+                output = "Use buttons to do another action.";
+                buttons.addAll(StartTurnService.getStartOfTurnButtons(player, game, true, null, true));
+            }
+            case "garbozia" -> {
+                NewStuffHelper.resolveGarboziaTE(event, game, player, "garbozia_page0");
+                output = "blank";
+            }
+            case "mrte" -> {
+                channel = player.getCardsInfoThread();
+                output = player.getRepresentation()
+                        + " Choose a secret to discard, the bot will automatically draw a replacement:";
+                buttons.addAll(SecretObjectiveHelper.getSODiscardButtonsWithSuffix(player, "redraw"));
+            }
+            case "ordinianc4", "ordinian" -> {
                 ActionCardHelper.drawActionCards(game, player, 1, true);
                 String msg = "Your current command tokens are " + player.getCCRepresentation()
                         + ". Use buttons to gain 1 command token.";
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(), msg, ButtonHelper.getGainCCButtons(player));
+            }
+            case "faunus" -> {
+                output = player.getRepresentationUnfogged() + " Select a planet to gain control of:";
+                output += "\n> Non-home, non-legendary planet, with no units, and no attachments";
+                if (game.isFowMode()) output += "\n> Additionally, in Fog of War, you need vision of the planet";
+                buttons = FaunusService.getFaunusButtons(game, player);
+            }
+            case "emelpar" -> {
+                output = player.getRepresentationUnfogged() + " select a component to ready:";
+                buttons = EmelparService.getReadyComponentButtons(game, player);
+            }
+
+            case "industrex" -> {
+                output = "Choose a unit type to place:";
+                buttons.addAll(IndustrexService.getIndustrexButtonsPart1(game, player));
+            }
+            case "tempesta" -> {
+                PlanetModel tempesta = Mapper.getPlanet("tempesta");
+                output = player.getFactionEmojiOrColor() + " is using _" + tempesta.getLegendaryAbilityName()
+                        + "_ to apply +1 movement to a single ship.";
+                game.setStoredValue("tempestaUsed", player.getFaction());
             }
 
             case "uikos" -> {
@@ -109,10 +148,19 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "2ff", "placeOneNDone_skipbuild"));
             }
             // Homebrew
-            case "mr" -> {
-                output = "Use buttons to destroy a ground force on a legendary or a planet adjacent to Mecatol Rex.";
-                buttons.addAll(ButtonHelper.customRexLegendary(player, game));
+            // case "mr" -> {
+            //     output = "Use buttons to destroy a ground force on a legendary or a planet adjacent to Mecatol Rex.";
+            //     buttons.addAll(ButtonHelper.customRexLegendary(player, game));
+            // }
+            case "avernus" -> {
+                output = "Select the tile you would like to starforge in:";
+                List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Warsun);
+                for (Tile tile : tiles) {
+                    buttons.add(Buttons.green(
+                            "starforgeTileFree_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+                }
             }
+
             case "silence" -> {
                 output = "Use buttons to put 1 cruiser with your ships.";
                 buttons.addAll(

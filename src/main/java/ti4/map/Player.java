@@ -36,10 +36,10 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
+import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -58,6 +58,7 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.AbilityModel;
+import ti4.model.BreakthroughModel;
 import ti4.model.ColorModel;
 import ti4.model.FactionModel;
 import ti4.model.GenericCardModel;
@@ -67,20 +68,25 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
+import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.GMService;
 import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.map.FractureService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.user.AFKService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.jda.JdaService;
 
 public class Player extends PlayerProperties {
 
@@ -99,6 +105,12 @@ public class Player extends PlayerProperties {
     private @Getter @Setter TIGLRank playerTIGLRankAtGameStart;
 
     private final Tile nomboxTile = new Tile("nombox", "nombox");
+
+    @Getter
+    private final Map<String, Integer> plotCards = new LinkedHashMap<>();
+
+    @Getter
+    private final Map<String, List<String>> plotCardsFactions = new LinkedHashMap<>();
 
     private final Map<String, Integer> actionCards = new LinkedHashMap<>();
     private final Map<String, Integer> events = new LinkedHashMap<>();
@@ -140,6 +152,30 @@ public class Player extends PlayerProperties {
         return String.format("%s_%s%s", getDecalSet(), unitType, DrawingUtil.getBlackWhiteFileSuffix(getColorID()));
     }
 
+    public boolean hasSpaceStation() {
+        return getPlanets().stream()
+                .map(planet -> game.getPlanetsInfo().get(planet))
+                .anyMatch(Planet::isSpaceStation);
+    }
+
+    public int numberOfSpaceStations() {
+        return (int) getPlanets().stream()
+                .map(planet -> game.getPlanetsInfo().get(planet))
+                .filter(Planet::isSpaceStation)
+                .count();
+    }
+
+    public List<String> getOceans() {
+        List<String> oceans = new ArrayList<>();
+        for (String planet : getPlanets()) {
+            if (planet.contains("ocean")) {
+                oceans.add(planet);
+            }
+        }
+
+        return oceans;
+    }
+
     public Tile getNomboxTile() {
         return nomboxTile;
     }
@@ -166,11 +202,55 @@ public class Player extends PlayerProperties {
 
     public int getInitiative() {
         if (hasTheZeroToken()) return 0;
+        if (hasAbility("patience")) return 9;
         return getLowestSC();
     }
 
     public static Comparator<Player> comparingInitiative() {
         return Comparator.comparingInt(Player::getInitiative);
+    }
+
+    public boolean is(Player p2) {
+        if (p2 == null) return false;
+        return getUserID().equals(p2.getUserID());
+    }
+
+    public UnitModel getUnitByType(UnitType unitType) {
+        return getActiveUnits().stream()
+                .map(Mapper::getUnit)
+                .filter(Objects::nonNull)
+                .filter(unit -> unitType == unit.getUnitType())
+                .findFirst()
+                .orElse(null);
+    }
+
+    @JsonIgnore
+    public Set<String> getActiveUnits() {
+        Set<String> activeUnits = new HashSet<>(getUnitsOwned());
+        if (hasActiveBreakthrough("naazbt")) {
+            activeUnits.removeIf(unit -> "mf".equals(getUnitByID(unit).getAsyncId()));
+            activeUnits.add("naaz_voltron");
+            if (!getUnitsOwned().contains("naaz_voltron")) {
+                addOwnedUnitByID("naaz_voltron");
+            }
+        }
+        if (hasUnlockedBreakthrough("mentakbt")) {
+            for (String tech : getTechs()) {
+                TechnologyModel model = Mapper.getTech(tech);
+                if ("cr2".equals(model.getAlias())
+                        || "cr2".equals(model.getBaseUpgrade().orElse(""))
+                        || "cr2".equals(model.getHomebrewReplacesID().orElse(""))) {
+                    activeUnits.removeIf(unit -> "ca".equals(getUnitByID(unit).getAsyncId()));
+                    activeUnits.add("mentak_cruiser3");
+                    if (!getUnitsOwned().contains("mentak_cruiser3")) {
+                        addOwnedUnitByID("mentak_cruiser3");
+                        removeOwnedUnitByID("cruiser2");
+                    }
+                    break;
+                }
+            }
+        }
+        return activeUnits;
     }
 
     public int getSpentTgsThisWindow() {
@@ -222,6 +302,45 @@ public class Player extends PlayerProperties {
         getTransactionItems().remove(thing);
     }
 
+    public boolean hasBreakthrough(String bt) {
+        if (bt == null || getBreakthroughID() == null || getBreakthroughID().isEmpty()) return false;
+        return bt.equals(getBreakthroughID());
+    }
+
+    public boolean hasUnlockedBreakthrough(String bt) {
+        return hasBreakthrough(bt) && isBreakthroughUnlocked();
+    }
+
+    public boolean hasReadyBreakthrough(String bt) {
+        return hasUnlockedBreakthrough(bt) && !isBreakthroughExhausted();
+    }
+
+    public boolean hasActiveBreakthrough(String bt) {
+        return hasUnlockedBreakthrough(bt) && isBreakthroughActive();
+    }
+
+    @JsonIgnore
+    public BreakthroughModel getBreakthroughModel() {
+        if (getBreakthroughID() == null || getBreakthroughID().isEmpty()) return null;
+        return Mapper.getBreakthrough(getBreakthroughID());
+    }
+
+    @JsonIgnore
+    public Set<TechnologyType> getSynergies() {
+        Set<TechnologyType> synergies = new HashSet<>();
+        if (isBreakthroughUnlocked()) {
+            synergies.addAll(getBreakthroughModel().getSynergy());
+        }
+        if (hasRelic("quantumcore")) {
+            synergies.addAll(List.of(
+                    TechnologyType.BIOTIC,
+                    TechnologyType.WARFARE,
+                    TechnologyType.PROPULSION,
+                    TechnologyType.CYBERNETIC));
+        }
+        return Collections.unmodifiableSet(synergies);
+    }
+
     @JsonIgnore
     public int getSpentInfantryThisWindow() {
         for (String thing : getSpentThingsThisWindow()) {
@@ -233,15 +352,6 @@ public class Player extends PlayerProperties {
     }
 
     public void increaseTgsSpentThisWindow(int amount) {
-        int oldTgSpent = getSpentTgsThisWindow();
-        int newTgSpent = oldTgSpent + amount;
-        if (oldTgSpent != 0) {
-            removeSpentThing("tg_" + oldTgSpent);
-        }
-        addSpentThing("tg_" + newTgSpent);
-    }
-
-    public void increaseSarweenCount(int amount) {
         int oldTgSpent = getSpentTgsThisWindow();
         int newTgSpent = oldTgSpent + amount;
         if (oldTgSpent != 0) {
@@ -290,7 +400,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public Role getRoleForCommunity() {
         try {
-            return AsyncTI4DiscordBot.jda.getRoleById(getRoleIDForCommunity());
+            return JdaService.jda.getRoleById(getRoleIDForCommunity());
         } catch (Exception e) {
         }
         return null;
@@ -300,7 +410,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public MessageChannel getPrivateChannel() {
         try {
-            return AsyncTI4DiscordBot.jda.getTextChannelById(getPrivateChannelID());
+            return JdaService.jda.getTextChannelById(getPrivateChannelID());
         } catch (Exception e) {
             return null;
         }
@@ -332,6 +442,7 @@ public class Player extends PlayerProperties {
         return getTechs().contains("cl2")
                 || getTechs().contains("so2")
                 || getTechs().contains("inf2")
+                || getTechs().contains("tf-specops")
                 || getTechs().contains("lw2")
                 || getTechs().contains("batyriinf")
                 || getTechs().contains("dscymiinf")
@@ -363,6 +474,9 @@ public class Player extends PlayerProperties {
                 || getTechs().contains("dsbelkff")
                 || getTechs().contains("absol_ff2")
                 || getTechs().contains("absol_hcf2")
+                || ownsUnit("tf-hcf")
+                || ownsUnit("tf-triune")
+                || ownsUnit("tf-morphwing")
                 || ownsUnit("florzen_fighter")
                 || ownsUnit("eidolon_fighter")
                 || ownsUnit("eidolon_fighter2");
@@ -380,28 +494,14 @@ public class Player extends PlayerProperties {
         return false;
     }
 
-    @NotNull
-    @JsonIgnore
-    public ThreadChannel getCardsInfoThread() {
-        return getCardsInfoThread(true, false);
-    }
-
     /**
-     * Will create new Player Cards-Info threads (even if they exist but are archived) unless they exist and are open
-     */
-    public void createCardsInfoThreadChannelsIfRequired() {
-        getCardsInfoThread(false, true);
-    }
-
-    /**
-     * @param useComplete if false, will skip the RestAction.complete() steps, which may cause new Cards Info threads to be created despite
-     * @param createWithQueue if true, will return null, and will create a new CardsInfo thread (if required) using a RestAction.queue() instead of a .complete()
-     * @return
+     * Searches for the Player's CardsInfo ThreadChannel, or will create a new one if an existing ThreadChannel cannot be retrieved.
+     * @return ThreadChannel for the player's cards info
      */
     @JsonIgnore
     @Nullable
-    private ThreadChannel getCardsInfoThread(boolean useComplete, boolean createWithQueue) {
-        Game game = this.game;
+    public ThreadChannel getCardsInfoThread() {
+        // ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild()); bot didn't like this!
         TextChannel actionsChannel = game.getMainGameChannel();
         if (game.isFowMode() || game.isCommunityMode()) {
             actionsChannel = (TextChannel) getPrivateChannel();
@@ -417,7 +517,7 @@ public class Player extends PlayerProperties {
         if (actionsChannel == null) {
             BotLogger.warning(
                     new LogOrigin(this),
-                    "`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: "
+                    "`Player.getCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: "
                             + game.getName());
             return null;
         }
@@ -449,15 +549,12 @@ public class Player extends PlayerProperties {
                 }
 
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                if (useComplete) {
-                    hiddenThreadChannels = actionsChannel
-                            .retrieveArchivedPrivateThreadChannels()
-                            .complete();
-                    for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                        if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
-                            setCardsInfoThreadID(threadChannel_.getId());
-                            return threadChannel_;
-                        }
+                hiddenThreadChannels =
+                        actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                    if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
+                        setCardsInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
                     }
                 }
             }
@@ -484,16 +581,13 @@ public class Player extends PlayerProperties {
             }
 
             // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-            if (useComplete) {
-                if (hiddenThreadChannels.isEmpty())
-                    hiddenThreadChannels = actionsChannel
-                            .retrieveArchivedPrivateThreadChannels()
-                            .complete();
-                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                    if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
-                        setCardsInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
+            if (hiddenThreadChannels.isEmpty())
+                hiddenThreadChannels =
+                        actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+            for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
+                    setCardsInfoThreadID(threadChannel_.getId());
+                    return threadChannel_;
                 }
             }
         } catch (Exception e) {
@@ -506,31 +600,23 @@ public class Player extends PlayerProperties {
         // CREATE NEW THREAD
         // Make card info thread a public thread in community mode
         boolean isPrivateChannel = !game.isFowMode();
-        if (game.getName().contains("pbd100") || game.getName().contains("pbd500")) {
-            isPrivateChannel = true;
-        }
         ThreadChannelAction threadAction = actionsChannel
                 .createThreadChannel(threadName, isPrivateChannel)
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK);
         if (isPrivateChannel) {
             threadAction = threadAction.setInvitable(false);
         }
-        if (createWithQueue) {
-            threadAction.queue(
-                    c -> {
-                        setCardsInfoThreadID(c.getId());
-                        String message = "Hello " + getPing() + "! This is your private channel.";
-                        MessageHelper.sendMessageToChannel(c, message);
-                    },
-                    BotLogger::catchRestError);
-            return null;
-        }
-        ThreadChannel threadChannel = null;
-        if (useComplete) {
-            threadChannel = threadAction.complete();
-            setCardsInfoThreadID(threadChannel.getId());
-        }
+        String message = "Hello " + getPing() + "! This is your private channel.";
+        ThreadChannel threadChannel = threadAction.complete();
+        setCardsInfoThreadID(threadChannel.getId());
+        MessageHelper.sendMessageToChannel(threadChannel, message);
         return threadChannel;
+    }
+
+    public String getCardsInfoThreadJumpLink() {
+        ThreadChannel threadChannel = getCardsInfoThread();
+        if (threadChannel == null) return null;
+        return threadChannel.getJumpUrl();
     }
 
     /**
@@ -545,6 +631,9 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasAbility(String ability) {
+        if (getTechs().contains("tf-" + ability.replace("_", ""))) {
+            return true;
+        }
         return getAbilities().contains(ability);
     }
 
@@ -581,8 +670,53 @@ public class Player extends PlayerProperties {
         return actionCards;
     }
 
+    public List<String> getPlayableActionCards() {
+        List<String> cards = new ArrayList<>(actionCards.keySet());
+        Game game = getGame();
+        if (game != null) {
+            List<String> garboziaCards = game.getDiscardACStatus().keySet().stream()
+                    .filter(ac -> game.getDiscardACStatus().get(ac) == ACStatus.garbozia)
+                    .toList();
+            cards.addAll(garboziaCards);
+        }
+        return cards;
+    }
+
     public Map<String, Integer> getEvents() {
         return events;
+    }
+
+    public void setPlotCard(String id, Integer identifier) {
+        plotCards.put(id, identifier);
+    }
+
+    public void setPlotCard(String id) {
+        if (plotCards.containsKey(id)) return;
+
+        Collection<Integer> values = plotCards.values();
+        int identifier = ThreadLocalRandom.current().nextInt(100);
+        while (values.contains(identifier)) {
+            identifier = ThreadLocalRandom.current().nextInt(100);
+        }
+        plotCards.put(id, identifier);
+    }
+
+    public void setPlotCardFaction(String id, String faction) {
+        if (!plotCardsFactions.containsKey(id)) plotCardsFactions.put(id, new ArrayList<>());
+        plotCardsFactions.get(id).add(faction);
+    }
+
+    public void removePlotCardFaction(String id) {
+        plotCardsFactions.remove(id);
+    }
+
+    public boolean isOtherPlayerPuppeted(Player p2) {
+        for (List<String> puppets : getPlotCardsFactions().values()) {
+            if (puppets.contains(p2.getFaction())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Map<String, Integer> getTrapCards() {
@@ -611,6 +745,9 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasUnit(String unitID) {
+        if (unitID.contains("flagship") && hasUnlockedBreakthrough("nekrobt")) {
+            return ValefarZService.hasFlagshipAbility(getGame(), this, unitID);
+        }
         return getUnitsOwned().contains(unitID);
     }
 
@@ -677,6 +814,10 @@ public class Player extends PlayerProperties {
 
     private Integer getUnitModelPriority(UnitModel unit, UnitHolder unitHolder) {
         int score = 0;
+        if (unit.getAlias().equals("naaz_voltron")) // Always, ALWAYS use voltron, if available
+        score += 99;
+        if (unit.getAlias().equals("mentak_cruiser3")) // Always, ALWAYS use corsair, if available
+        score += 99;
         if (StringUtils.isNotBlank(unit.getFaction().orElse(""))
                 && StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse(""))) score += 4;
         if (StringUtils.isNotBlank(unit.getFaction().orElse(""))) score += 3;
@@ -783,6 +924,7 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasPlayablePromissoryInHand(String pn) {
+        if (pn.equals("malevolency")) return getPromissoryNotes().containsKey(pn);
         return promissoryNotes.containsKey(pn) && !getPromissoryNotesOwned().contains(pn);
     }
 
@@ -813,7 +955,7 @@ public class Player extends PlayerProperties {
         }
     }
 
-    private void removePromissoryNoteFromPlayArea(String id) {
+    public void removePromissoryNoteFromPlayArea(String id) {
         getPromissoryNotesInPlayArea().remove(id);
     }
 
@@ -1058,7 +1200,7 @@ public class Player extends PlayerProperties {
                 }
             }
             if (firstTime > 0) {
-                CommanderUnlockCheckService.checkConditionsAndUnlock(this, "bentor");
+                CommanderUnlockCheckService.checkPlayer(this, "bentor");
                 if (hasUnit("bentor_mech")) {
                     int mechsRemain = 4 - ButtonHelper.getNumberOfUnitsOnTheBoard(game, this, "mech", true);
                     List<Button> buttons = new ArrayList<>(
@@ -1112,6 +1254,11 @@ public class Player extends PlayerProperties {
         if (getRelics().contains("dynamiscore") || getRelics().contains("absol_dynamiscore")) {
             bonus += 2;
         }
+        for (String planet : getPlanets()) {
+            if (Mapper.getPlanet(planet) != null && Mapper.getPlanet(planet).isSpaceStation()) {
+                bonus++;
+            }
+        }
         if (game.isFacilitiesMode()) {
             for (String planet : getPlanets()) {
                 UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
@@ -1141,6 +1288,9 @@ public class Player extends PlayerProperties {
     }
 
     public void removeRelic(String relicID) {
+        if ("thetriad".equals(relicID)) {
+            removePlanet("triad");
+        }
         getRelics().remove(relicID);
     }
 
@@ -1164,7 +1314,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public User getUser() {
         // TODO: This is to handle JDA being null during tests. We should think of a cleaner solution.
-        return AsyncTI4DiscordBot.jda == null ? null : AsyncTI4DiscordBot.jda.getUserById(getUserID());
+        return JdaService.jda == null ? null : JdaService.jda.getUserById(getUserID());
     }
 
     @Override
@@ -1172,7 +1322,7 @@ public class Player extends PlayerProperties {
         User userById = getUser();
         if (userById == null) return super.getUserName();
 
-        Member member = AsyncTI4DiscordBot.guildPrimary.getMemberById(getUserID());
+        Member member = JdaService.guildPrimary.getMemberById(getUserID());
         if (member == null) {
             setUserName(userById.getName());
         } else {
@@ -1247,7 +1397,7 @@ public class Player extends PlayerProperties {
             if (roleForCommunity == null && !getTeamMateIDs().isEmpty()) {
                 StringBuilder sb = new StringBuilder((noFactionIcon ? "" : getFactionEmoji()));
                 for (String userID : getTeamMateIDs()) {
-                    User userById = AsyncTI4DiscordBot.jda.getUserById(userID);
+                    User userById = JdaService.jda.getUserById(userID);
                     if (userById == null) {
                         continue;
                     }
@@ -1373,6 +1523,10 @@ public class Player extends PlayerProperties {
             List<GenericCardModel> allTraps = new ArrayList<>(Mapper.getTraps().values());
             allTraps.forEach(trap -> setTrapCard(trap.getAlias()));
         }
+        if (hasAbility("puppetsoftheblade")) {
+            List<GenericCardModel> allPlots = new ArrayList<>(Mapper.getPlots().values());
+            allPlots.stream().forEach(plot -> setPlotCard(plot.getAlias()));
+        }
     }
 
     @JsonIgnore
@@ -1402,6 +1556,16 @@ public class Player extends PlayerProperties {
         leaders.clear();
         if (game != null && game.isBaseGameMode()) return;
         for (String leaderID : getFactionStartingLeaders()) {
+            Leader leader = new Leader(leaderID);
+            leaders.add(leader);
+        }
+    }
+
+    public void initLeadersForFaction(String faction) {
+        leaders.clear();
+        FactionModel factionSetupInfo = Mapper.getFaction(faction);
+        if (game != null && game.isBaseGameMode()) return;
+        for (String leaderID : factionSetupInfo.getLeaders()) {
             Leader leader = new Leader(leaderID);
             leaders.add(leader);
         }
@@ -1541,6 +1705,12 @@ public class Player extends PlayerProperties {
     public String getColorID() {
         String color = getColor();
         return (color != null && !"null".equals(color)) ? Mapper.getColorID(color) : "null";
+    }
+
+    @JsonIgnore
+    public String getColorDisplayName() {
+        String color = getColor();
+        return (color != null && !"null".equals(color)) ? Mapper.getColorDisplayName(color) : "null";
     }
 
     public void addAllianceMember(String color) {
@@ -1797,6 +1967,10 @@ public class Player extends PlayerProperties {
         if (getCommoditiesBase() + getCommoditiesBonus() == 0) super.setCommodities(comms);
     }
 
+    public void gainCommodities(int commodities) {
+        setCommodities(getCommodities() + commodities);
+    }
+
     @JsonIgnore
     public String getCommoditiesRepresentation() {
         return getCommodities() + "/" + (getCommoditiesBase() + getCommoditiesBonus());
@@ -1854,7 +2028,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public boolean hasIIHQ() {
-        return hasTech("iihq");
+        return hasTech("iihq") || hasUnlockedBreakthrough("keleresbt");
     }
 
     public boolean hasTech(String techID) {
@@ -1862,6 +2036,9 @@ public class Player extends PlayerProperties {
             if (getTechs().contains("absol_" + techID)) {
                 return true;
             }
+        }
+        if (getTechs().contains("tf-" + techID)) {
+            return true;
         }
         return getTechs().contains(techID);
     }
@@ -1895,6 +2072,17 @@ public class Player extends PlayerProperties {
             }
         }
         return newPlanets;
+    }
+
+    public List<String> getUniquePlanets() {
+        List<String> uniquePlanets = new ArrayList<>();
+        for (String planet : getPlanets()) {
+            if (!uniquePlanets.contains(planet)) {
+                uniquePlanets.add(planet);
+            }
+        }
+
+        return uniquePlanets;
     }
 
     public void loadDraftHand(List<String> saveString) {
@@ -1976,7 +2164,7 @@ public class Player extends PlayerProperties {
         doAdditionalThingsWhenAddingTech(techID);
     }
 
-    private void gainCustodiaVigilia() {
+    public void gainCustodiaVigilia() {
         addPlanet("custodiavigilia");
         exhaustPlanet("custodiavigilia");
 
@@ -2012,6 +2200,11 @@ public class Player extends PlayerProperties {
             gainCustodiaVigilia();
         }
 
+        if ("planesplitter-firm".equalsIgnoreCase(techID)) {
+            FractureService.spawnFracture(null, game);
+            FractureService.spawnIngressTokens(null, game, this, false);
+        }
+
         // Update Owned Units when Researching a Unit Upgrade
         TechnologyModel techModel = Mapper.getTech(techID);
         if (techID == null) return;
@@ -2031,6 +2224,23 @@ public class Player extends PlayerProperties {
 
                 addOwnedUnitByID(unitModel.getId());
             }
+        }
+        if ("cr2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("mentakbt")) {
+            addOwnedUnitByID("mentak_cruiser3");
+        }
+        Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
+        if (!techModel.getFaction().isPresent()
+                && obsidian != null
+                && obsidian.getPlotCardsFactions().get("extract").contains(getFaction())
+                && !obsidian.getTechs().contains(techID)) {
+            String msg = obsidian.getRepresentation()
+                    + ", your _Extract_ plot card allows you to gain a copy of the newly researched tech **"
+                    + Mapper.getTech(techID).getName() + "** for 4 resources.";
+
+            List<Button> buttons2 = new ArrayList<>();
+            buttons2.add(Buttons.green("acquireATechdeleteThisMessage", "Get a Technology"));
+            buttons2.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(obsidian.getCorrectChannel(), msg, buttons2);
         }
     }
 
@@ -2100,6 +2310,10 @@ public class Player extends PlayerProperties {
             removeTech(tech);
         }
         getPurgedTechs().add(tech);
+    }
+
+    public void unpurgeTech(String tech) {
+        getPurgedTechs().remove(tech);
     }
 
     public void addPlanet(String planet) {
@@ -2205,6 +2419,11 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public boolean isRealPlayer() {
         return !(isDummy() || getFaction() == null || getColor() == null || "null".equals(getColor()));
+    }
+
+    @JsonIgnore
+    public boolean isSpectator() {
+        return !isRealPlayer() && !isDummy() && !isNpc();
     }
 
     @Override
@@ -2462,6 +2681,7 @@ public class Player extends PlayerProperties {
         Predicate<ColorModel> nonExclusive = cm -> !ColorChangeHelper.colorIsExclusive(cm.getAlias(), this);
         String color = getUserSettings().getPreferredColors().stream()
                 .filter(c -> !ColorChangeHelper.colorIsExclusive(c, this))
+                .filter(c -> getGame().getUnusedColors().contains(Mapper.getColor(c)))
                 .findFirst()
                 .orElse(game.getUnusedColorsPreferringBase().stream()
                         .filter(nonExclusive)
@@ -2476,9 +2696,13 @@ public class Player extends PlayerProperties {
         return game.getSpeakerUserID().equals(getUserID());
     }
 
+    @JsonIgnore
+    public boolean isTyrant() {
+        return game.getTyrantUserID().equals(getUserID());
+    }
+
     /**
-     * @return Player's private channel if Fog of War game, otherwise the main
-     *         (action) game channel
+     * @return Player's private channel if Fog of War game, otherwise the GM channel
      */
     @JsonIgnore
     public MessageChannel getCorrectChannel() {
@@ -2486,7 +2710,7 @@ public class Player extends PlayerProperties {
             if (getPrivateChannel() != null) {
                 return getPrivateChannel();
             } else {
-                return game.getMainGameChannel();
+                return GMService.getGMChannel(game);
             }
         }
         return game.getMainGameChannel();
@@ -2644,6 +2868,9 @@ public class Player extends PlayerProperties {
                 return tile;
             }
             if (getPlanets().contains("creuss") && tile.getUnitHolders().get("creuss") != null) {
+                return tile;
+            }
+            if (tile.getUnitHolders().get("ahkcreuss") != null && getAbilities().contains("sorrow")) {
                 return tile;
             }
         }

@@ -1,7 +1,6 @@
 package ti4.testUtils;
 
 import org.junit.jupiter.api.BeforeAll;
-import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
 import ti4.image.Mapper;
@@ -9,6 +8,7 @@ import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
 import ti4.selections.SelectionManager;
 import ti4.service.emoji.ApplicationEmojiService;
+import ti4.spring.jda.JdaService;
 
 /**
  * Base test class for all Ti4 tests. Allows for proper global config.
@@ -17,11 +17,11 @@ public class BaseTi4Test {
     private static boolean isFirstRun = true;
 
     /**
-     * Logic which is ran once at the start of the entire test suit (before any test class is ran).
+     * Logic which is run once at the start of the entire test suit (before any test class is ran).
      */
     private static void globalBeforeAll() {
         // Use this to turn off random chance things that may impact testing
-        AsyncTI4DiscordBot.testingMode = true;
+        JdaService.testingMode = true;
 
         // This is set when running tests within docker. However, this must be manually
         // set when running tests within vs code for resources to be loaded properly.

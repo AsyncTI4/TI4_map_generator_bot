@@ -16,6 +16,8 @@ class SetPreferredSettings extends Subcommand {
                 OptionType.BOOLEAN, "pre_decline_sc", "True to be prompted to pre-decline on strategy cards"));
         addOptions(new OptionData(OptionType.BOOLEAN, "pillage_msg", "True to get the Pillage flavor text"));
         addOptions(new OptionData(OptionType.BOOLEAN, "sarween_msg", "True to get the Sarween Tools flavor text"));
+        addOptions(
+                new OptionData(OptionType.BOOLEAN, "auto_debt_clearance", "True to auto clear debt when you send tgs"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 "pass_on_agenda_stuff",
@@ -24,6 +26,10 @@ class SetPreferredSettings extends Subcommand {
                 OptionType.INTEGER,
                 "sabo_decline_median",
                 "Your median hours that the bot will wait for auto \"No Sabo\". Enter 0 to turn off."));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                "auto_respond_no_secrets",
+                "True to auto decline scoring status phase secrets if you can't score any"));
     }
 
     @Override
@@ -36,11 +42,23 @@ class SetPreferredSettings extends Subcommand {
         Boolean pillage = event.getOption("pillage_msg", null, OptionMapping::getAsBoolean);
         if (pillage != null) userSettings.setPrefersPillageMsg(pillage);
 
+        Boolean debtClearance = event.getOption("auto_debt_clearance", null, OptionMapping::getAsBoolean);
+        if (debtClearance != null) userSettings.setPrefersAutoDebtClearance(debtClearance);
+
         Boolean sarween = event.getOption("sarween_msg", null, OptionMapping::getAsBoolean);
         if (sarween != null) userSettings.setPrefersSarweenMsg(sarween);
 
         Boolean agenda = event.getOption("pass_on_agenda_stuff", null, OptionMapping::getAsBoolean);
         if (agenda != null) userSettings.setPrefersPassOnWhensAfters(agenda);
+
+        Boolean secrets = event.getOption("auto_respond_no_secrets", null, OptionMapping::getAsBoolean);
+        if (secrets != null) {
+            if (secrets) {
+                userSettings.setSandbagPref("bot");
+            } else {
+                userSettings.setSandbagPref("manual");
+            }
+        }
 
         Integer sabo = event.getOption("sabo_decline_median", null, OptionMapping::getAsInt);
         if (sabo != null) {

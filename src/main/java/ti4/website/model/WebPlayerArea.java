@@ -6,8 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.Data;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import ti4.helpers.Helper;
+import ti4.helpers.Storage;
 import ti4.helpers.Units;
+import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -17,21 +22,47 @@ import ti4.map.UnitHolder;
 
 @Data
 public class WebPlayerArea {
+    public enum FactionImageType {
+        DISCORD, // Discord custom emoji URL
+        EMOJI, // Unicode emoji character for NotoEmoji font
+        IMAGE // Local image converted to WebP URL
+    }
+
     @Data
     private static class UnitCountInfo {
         private final int unitCap;
         private final int deployedCount;
     }
 
+    @Data
+    public static class BreakthroughInfo {
+        private final String breakthroughId;
+        private final boolean unlocked;
+        private final boolean exhausted;
+        private final int tradeGoodsStored;
+    }
+
+    @Data
+    public static class PlotCardInfo {
+        private final String plotAlias;
+        private final Integer identifier;
+        private final List<String> factions;
+    }
+
     // Basic properties
     private String userName;
     private String faction;
+    private String factionImage;
+    private FactionImageType factionImageType;
     private String color;
+    private String colorDisplayName;
     private String displayName;
     private String discordId;
+    private String cardsInfoThreadLink;
     private boolean passed;
     private boolean eliminated;
     private boolean active;
+    private boolean hasZeroToken;
 
     // Command counters
     private int tacticalCC;
@@ -142,6 +173,12 @@ public class WebPlayerArea {
     // Debt tokens: debt that this player is OWED by other players (faction/color -> count)
     private Map<String, Integer> debtTokens;
 
+    // Breakthrough (Thunder's Edge)
+    private BreakthroughInfo breakthrough;
+
+    // Plot cards (Firmament/Obsidian)
+    private List<PlotCardInfo> plotCards;
+
     // Faction abilities
     private List<String> abilities;
 
@@ -151,12 +188,21 @@ public class WebPlayerArea {
         // Basic properties
         webPlayerArea.setUserName(player.getUserName());
         webPlayerArea.setFaction(player.getFaction());
+
+        // Set faction image and type
+        FactionImageResult factionImageResult = getFactionImagePathAndType(player);
+        webPlayerArea.setFactionImage(factionImageResult.path);
+        webPlayerArea.setFactionImageType(factionImageResult.type);
+
         webPlayerArea.setColor(player.getColor());
+        webPlayerArea.setColorDisplayName(player.getColorDisplayName());
         webPlayerArea.setDisplayName(player.getDisplayName());
         webPlayerArea.setDiscordId(player.getUserID());
+        webPlayerArea.setCardsInfoThreadLink(player.getCardsInfoThreadJumpLink());
         webPlayerArea.setPassed(player.isPassed());
         webPlayerArea.setEliminated(player.isEliminated());
         webPlayerArea.setActive(player.isActivePlayer());
+        webPlayerArea.setHasZeroToken(player.hasTheZeroToken());
 
         // Command counters
         webPlayerArea.setTacticalCC(player.getTacticalCC());
@@ -282,9 +328,37 @@ public class WebPlayerArea {
         // Faction abilities
         webPlayerArea.setAbilities(new ArrayList<>(player.getAbilities()));
 
+        // Breakthrough info (Thunder's Edge)
+        if (game.isThundersEdge()) {
+            String breakthroughId = player.getBreakthroughID();
+            if (breakthroughId != null && !breakthroughId.isEmpty()) {
+                webPlayerArea.setBreakthrough(new BreakthroughInfo(
+                        breakthroughId,
+                        player.isBreakthroughUnlocked(),
+                        player.isBreakthroughExhausted(),
+                        player.getBreakthroughTGs()));
+            } else {
+                webPlayerArea.setBreakthrough(null);
+            }
+        } else {
+            webPlayerArea.setBreakthrough(null);
+        }
+
+        // Plot cards (Firmament/Obsidian)
+        List<PlotCardInfo> plotCardsList = new ArrayList<>();
+        if (player.hasAbility("bladesorchestra") || player.hasAbility("plotsplots")) {
+            for (Map.Entry<String, Integer> plotEntry : player.getPlotCards().entrySet()) {
+                String plotAlias = plotEntry.getKey();
+                Integer identifier = plotEntry.getValue();
+                List<String> factions = player.getPlotCardsFactions().getOrDefault(plotAlias, new ArrayList<>());
+                plotCardsList.add(new PlotCardInfo(plotAlias, identifier, factions));
+            }
+        }
+        webPlayerArea.setPlotCards(plotCardsList);
+
         // Special token reinforcements
         // Sleeper tokens (Titans faction only)
-        if (player.hasAbility("awaken")) {
+        if (player.hasAbility("awaken") && !game.isTwilightsFallMode()) {
             webPlayerArea.setSleeperTokensReinf(5 - game.getSleeperTokensPlacedCount());
         } else {
             webPlayerArea.setSleeperTokensReinf(0);
@@ -431,5 +505,64 @@ public class WebPlayerArea {
         int ccCount = Helper.getCCCount(game, playerColor);
         int remainingReinforcements = ccLimit - ccCount;
         return Math.max(0, remainingReinforcements);
+    }
+
+    /**
+     * Result class for faction image path and type
+     */
+    private static class FactionImageResult {
+        final String path;
+        final FactionImageType type;
+
+        FactionImageResult(String path, FactionImageType type) {
+            this.path = path;
+            this.type = type;
+        }
+    }
+
+    /**
+     * Gets the appropriate faction image path and type for web interface.
+     * Reuses logic from DrawingUtil.getPlayerFactionIconImageScaled to maintain consistency.
+     */
+    private static FactionImageResult getFactionImagePathAndType(Player player) {
+        if (player == null) {
+            return new FactionImageResult(null, FactionImageType.IMAGE);
+        }
+
+        // Reuse the same logic as DrawingUtil.getPlayerFactionIconImageScaled
+        Emoji factionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
+
+        // 1) Discord custom emoji - return Discord URL and DISCORD type
+        if (player.hasCustomFactionEmoji() && factionEmoji instanceof CustomEmoji factionCustomEmoji) {
+            return new FactionImageResult(factionCustomEmoji.getImageUrl(), FactionImageType.DISCORD);
+        }
+        // 2) Unicode emoji - return the formatted emoji string and EMOJI type
+        else if (player.hasCustomFactionEmoji() && factionEmoji instanceof UnicodeEmoji uni) {
+            return new FactionImageResult(uni.getFormatted(), FactionImageType.EMOJI);
+        }
+
+        // 3) Local faction image - use DrawingUtil.getFactionIconPath directly
+        String factionFile = DrawingUtil.getFactionIconPath(player.getFaction());
+        if (factionFile != null) {
+            // Convert absolute path to relative path from resources
+            String resourcePath = Storage.getResourcePath();
+            if (factionFile.startsWith(resourcePath)) {
+                String relativePath = factionFile.substring(resourcePath.length());
+                // Ensure path starts with /
+                relativePath = relativePath.startsWith("/") ? relativePath : "/" + relativePath;
+
+                // Convert PNG to WebP and prepend web URL
+                if (relativePath.endsWith(".png")) {
+                    relativePath = relativePath.replace(".png", ".webp");
+                }
+
+                return new FactionImageResult("https://images.asyncti4.com" + relativePath, FactionImageType.IMAGE);
+            } else {
+                // If path doesn't start with resource path, return as-is (shouldn't happen)
+                return new FactionImageResult(factionFile, FactionImageType.IMAGE);
+            }
+        }
+
+        return new FactionImageResult(null, FactionImageType.IMAGE);
     }
 }

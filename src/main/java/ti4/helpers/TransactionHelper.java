@@ -32,6 +32,7 @@ import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -926,10 +927,12 @@ public class TransactionHelper {
                 player.addTransactionItem(itemS);
             }
         }
+        var userSettings = UserSettingsManager.get(player.getUserID());
 
         if (("tgs".equalsIgnoreCase(item) || "Comms".equalsIgnoreCase(item))
                 && p2.getDebtTokenCount(p1.getColor()) > 0
                 && !p2.hasAbility("binding_debts")
+                && userSettings.isPrefersAutoDebtClearance()
                 && !p2.hasAbility("data_recovery")) {
             int amount = Math.min(p2.getDebtTokenCount(p1.getColor()), Integer.parseInt(extraDetail));
             String clear = "sending" + receiver + "_receiving" + sender + "_ClearDebt_" + amount;
@@ -1142,7 +1145,7 @@ public class TransactionHelper {
 
                 for (String pnShortHand : p1.getPromissoryNotes().keySet()) {
                     if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand)
-                            || (p2.getAbilities().contains("hubris") && pnShortHand.endsWith("an"))) {
+                            || (p2.hasAbility("hubris") && pnShortHand.endsWith("an"))) {
                         continue;
                     }
                     PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
@@ -1403,7 +1406,7 @@ public class TransactionHelper {
                 if (game.isNoSwapMode()) {
                     if (id.endsWith("sftt") && p1.getPromissoryNotesInPlayArea().contains(p2.getColor() + "_sftt")) {
                         MessageHelper.sendMessageToChannel(
-                                event.getMessageChannel(),
+                                p1.getCardsInfoThread(),
                                 p1.getRepresentation()
                                         + ", you cannot swap _Supports For The Thrones_ in this game (it has banned _Support For The Throne_ swaps).");
                         return;
@@ -1411,7 +1414,10 @@ public class TransactionHelper {
                 }
                 p1.removePromissoryNote(id);
                 p2.setPromissoryNote(id);
-                if (id.contains("dspnveld")) {
+                if (id.contains("dspnveld") && !p2.getAllianceMembers().contains(p1.getFaction())) {
+                    PromissoryNoteHelper.resolvePNPlay(id, p2, game, event);
+                }
+                if (id.contains("blackops") && !p2.getAllianceMembers().contains(p1.getFaction())) {
                     PromissoryNoteHelper.resolvePNPlay(id, p2, game, event);
                 }
                 boolean sendSftT = false;
@@ -1497,8 +1503,13 @@ public class TransactionHelper {
         // if(game.getRealPlayers().size() > 26){
         //     return true;
         // }
+        if (IsPlayerElectedService.isPlayerElected(game, player2, "tf-censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "tf-censure")) {
+            return false;
+        }
         return player == player2
                 || !"action".equalsIgnoreCase(game.getPhaseOfGame())
+                || (player.hasSpaceStation() && player2.hasSpaceStation())
                 || game.isAgeOfCommerceMode()
                 || player.hasAbility("guild_ships")
                 || player.getPromissoryNotesInPlayArea().contains("convoys")
@@ -1601,7 +1612,11 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.gray("newTransact_starCharts_" + p1.getFaction() + "_" + p2.getFaction(), "Star Charts"));
         }
-        if ((p1.hasAbility("arbiters") || p2.hasAbility("arbiters")) && p1.getAc() > 0) {
+        if ((p1.hasAbility("arbiters")
+                        || p2.hasAbility("arbiters")
+                        || p1.hasTech("tf-guild_ships")
+                        || p2.hasTech("tf-guild_ships"))
+                && p1.getAc() > 0) {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_ACs_" + p1.getFaction() + "_" + p2.getFaction(), "Action Cards"));
         }
@@ -1745,7 +1760,11 @@ public class TransactionHelper {
         if (ButtonHelper.getNumberOfStarCharts(p1) > 0) {
             stuffToTransButtons.add(Buttons.gray(finChecker + "transact_starCharts_" + p2.getFaction(), "Star Charts"));
         }
-        if ((p1.hasAbility("arbiters") || p2.hasAbility("arbiters")) && p1.getAc() > 0) {
+        if ((p1.hasAbility("arbiters")
+                        || p2.hasAbility("arbiters")
+                        || p1.hasTech("tf-guild_ships")
+                        || p2.hasTech("tf-guild_ships"))
+                && p1.getAc() > 0) {
             stuffToTransButtons.add(Buttons.green(finChecker + "transact_ACs_" + p2.getFaction(), "Action Cards"));
         }
         if (p1.getPnCount() > 0) {

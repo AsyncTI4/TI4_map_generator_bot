@@ -10,10 +10,12 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.FoWHelper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
@@ -58,9 +60,25 @@ public class EndTurnService {
     }
 
     private static void resetStoredValuesEndOfTurn(Game game, Player player) {
+        if (player.hasAbility("phantom_energy")
+                && !game.getStoredValue("phantomEnergy").isEmpty()) {
+            for (Tile tile : game.getTileMap().values()) {
+                if (tile.hasPlayerCC(player)) {
+                    for (String asyncID : tile.getSpaceUnitHolder()
+                            .getUnitAsyncIdsOnHolder(player.getColorID())
+                            .keySet()) {
+                        game.setStoredValue(
+                                "phantomEnergy",
+                                game.getStoredValue("phantomEnergy").replace(asyncID, ""));
+                    }
+                }
+            }
+        }
+        game.removeStoredValue("fortuneSeekers");
         game.setStoredValue("lawsDisabled", "no");
         game.removeStoredValue("endTurnWhenSCFinished");
         game.removeStoredValue("fleetLogWhenSCFinished");
+        ButtonHelperAbilities.oceanBoundCheck(game);
         game.removeStoredValue("mahactHeroTarget");
         game.removeStoredValue("possiblyUsedRift");
         game.setActiveSystem("");
@@ -124,10 +142,13 @@ public class EndTurnService {
                         mainPlayer.getCardsInfoThread(),
                         "You were the last player to pass, and so you can score _Prove Endurance_.");
             }
-            EndPhaseService.EndActionPhase(event, game, gameChannel);
-            game.updateActivePlayer(null);
-            ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, mainPlayer, event);
-            ButtonHelperAgents.checkForEdynAgentActive(game, event);
+            CommanderUnlockCheckService.checkPlayer(mainPlayer, "ralnel");
+            if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, mainPlayer, event)) {
+                EndPhaseService.EndActionPhase(event, game, gameChannel);
+                game.updateActivePlayer(null);
+                ButtonHelperAgents.checkForEdynAgentActive(game, event);
+            }
+
             return;
         }
         Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);

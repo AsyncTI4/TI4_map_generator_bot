@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.handlers.strategycard.PickStrategyCardButtonHandler;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
@@ -23,7 +22,7 @@ import ti4.service.player.PlayerStatsService;
 public class PickStrategyCardService {
 
     public static void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game game, int scPicked) {
-        boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
+        boolean isFowPrivateGame = game.isFowMode();
 
         String msgExtra = "";
         boolean allPicked = true;
@@ -174,7 +173,7 @@ public class PickStrategyCardService {
             } else {
                 MessageHelper.sendMessageToChannel(
                         privatePlayer.getCorrectChannel(),
-                        privatePlayer.getRepresentation(false, false) + " had queued an strategy card pick.");
+                        privatePlayer.getRepresentation(false, false) + " had queued a strategy card pick.");
                 return PickStrategyCardButtonHandler.scPick(event, game, player, "scPick_" + unpickedStrategyCard);
             }
         }

@@ -1,5 +1,6 @@
 package ti4.spring.security;
 
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -23,10 +24,15 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/actuator/**")
+                .authorizeHttpRequests(auth -> auth.dispatcherTypeMatchers(DispatcherType.ERROR, DispatcherType.FORWARD)
+                        .permitAll()
+                        .requestMatchers("/actuator/**")
                         .hasRole("ACTUATOR")
                         // Public API paths
                         .requestMatchers("/api/public/**")
+                        .permitAll()
+                        // WebSocket handshake endpoint
+                        .requestMatchers("/ws/**")
                         .permitAll()
                         // Everything else requires auth
                         .anyRequest()

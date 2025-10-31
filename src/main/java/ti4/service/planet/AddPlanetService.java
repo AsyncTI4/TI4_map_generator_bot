@@ -20,6 +20,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -33,6 +34,7 @@ import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.FealtyUplinkService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -53,18 +55,26 @@ public class AddPlanetService {
             Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setup) {
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
         player.addPlanet(planet);
-
+        EronousPlanetService.resolveCantrisPO(game, planet, player);
         player.exhaustPlanet(planet);
-        if ("mirage".equals(planet)) {
+        if ("mirage".equals(planet) || "avernus".equals(planet) || "thundersedge".equals(planet)) {
             game.clearPlanetsCache();
         }
         Tile tile = game.getTileFromPlanet(planet);
         Planet unitHolder = game.getPlanetsInfo().get(planet);
+        if (game.getRevealedPublicObjectives().size() < 2 || unitHolder.isSpaceStation()) {
+            setup = true;
+        }
+        if (planet.equalsIgnoreCase("avernus")) {
+            setup = false;
+        }
         if (unitHolder == null) {
-            BotLogger.error(new LogOrigin(event), "Unitholder found null in addPlanet for planet " + planet);
+            BotLogger.error(
+                    event != null ? new LogOrigin(event) : null,
+                    "Unitholder found null in addPlanet for planet " + planet);
             unitHolder = game.getUnitHolderFromPlanet(planet);
         }
-        if (unitHolder.getTokenList().contains("token_freepeople.png")) {
+        if (player.isRealPlayer() && unitHolder.getTokenList().contains("token_freepeople.png")) {
             unitHolder.removeToken("token_freepeople.png");
         }
         if (unitHolder.getTokenList().contains("token_tomb.png") && player.hasAbility("ancient_empire")) {
@@ -339,6 +349,20 @@ public class AddPlanetService {
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
         }
+
+        if ((game.getPhaseOfGame().contains("agenda")
+                        || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
+                && player.hasAbility("veiled_ember_forge")
+                && !doubleCheck
+                && !setup
+                && !unitHolder.getTechSpecialities().isEmpty()) {
+            String fac = player.getFactionEmoji();
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    fac + " placed 1 PDS on " + Helper.getPlanetRepresentation(unitHolder.getName(), game)
+                            + " due to the Veiled Ember Forge ability. This is optional but was done automatically.");
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "pds " + unitHolder.getName());
+        }
         if ((game.getPhaseOfGame().contains("agenda")
                         || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
                 && player.hasTech("absol_dxa")
@@ -362,6 +386,24 @@ public class AddPlanetService {
                 message = "Tile was null, no infantry placed.";
             }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        }
+
+        if (player.hasAbility("liberate") && tile != null && !setup) {
+            // When you gain control of a planet
+            // (MUST) ready that planet if it contains a number of your infantry equal to or greater than that planet's
+            // resource value;
+            // otherwise, place 1 infantry on that planet.
+            List<Button> liberateButtons = new ArrayList<>();
+            String planetStr = unitHolder.getName();
+            String planetName = Mapper.getPlanet(planetStr).getName();
+            liberateButtons.add(Buttons.gray(
+                    player.getFinsFactionCheckerPrefix() + "liberate_" + planetStr,
+                    "Liberate " + planetName,
+                    FactionEmojis.Bastion));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    "Resolve Liberate on " + planetName + " (Before OR after exploration)",
+                    liberateButtons);
         }
 
         if (game.getActivePlayerID() != null
@@ -467,6 +509,7 @@ public class AddPlanetService {
                 && !doubleCheck
                 && (!"mirage".equals(planet))
                 && !game.isBaseGameMode()
+                && !setup
                 && player.isRealPlayer()) {
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);
             if (buttons != null && !buttons.isEmpty()) {
@@ -476,9 +519,19 @@ public class AddPlanetService {
             }
         }
 
+        if (player.hasUnlockedBreakthrough("l1z1xbt") && tile != null && !setup) {
+            Planet p = tile.getUnitHolderFromPlanet(planet);
+            if (p != null && !alreadyOwned) {
+                FealtyUplinkService.postInitialButtons(game, player, planet);
+            } else {
+                FealtyUplinkService.resolveAddInf(player, p);
+            }
+        }
+
         if (((game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID())))
                         || game.getPhaseOfGame().contains("agenda"))
                 && player.hasUnit("saar_mech")
+                && !ButtonHelper.isLawInPlay(game, "articles_war")
                 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
             List<Button> saarButton = new ArrayList<>();
             saarButton.add(Buttons.green(
@@ -505,6 +558,33 @@ public class AddPlanetService {
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "freesystems");
         if (Constants.MECATOLS.contains(planet) && player.controlsMecatol(true)) {
             CommanderUnlockCheckService.checkPlayer(player, "winnu");
+        }
+        if (player.isRealPlayer() && "styx".equalsIgnoreCase(planet)) {
+            String marrow = "A Song Like Marrow";
+            Integer id = game.getRevealedPublicObjectives().getOrDefault(marrow, null);
+            if (id == null) id = game.getRevealedPublicObjectives().getOrDefault("styx", null);
+            if (id == null) id = game.getRevealedPublicObjectives().getOrDefault("Styx", null);
+
+            String message = null;
+            if (id != null) {
+                game.scorePublicObjective(player.getUserID(), id);
+                message = player.getRepresentation() + " scored '" + marrow + "'";
+            } else {
+                id = game.addCustomPO(marrow, 1);
+                game.scorePublicObjective(player.getUserID(), id);
+                message = "Custom PO '" + marrow + "' has been added.\n" + player.getRepresentation() + " scored '"
+                        + marrow + "'";
+            }
+            for (Player p : game.getRealPlayers()) {
+                if (p.is(player)) continue;
+                game.unscorePublicObjective(message, id);
+            }
+
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        }
+
+        if ("thundersedge".equalsIgnoreCase(planet) && player.isRealPlayer() && !player.isBreakthroughUnlocked()) {
+            BreakthroughCommandHelper.unlockBreakthrough(game, player);
         }
     }
 }

@@ -57,6 +57,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetService;
@@ -84,11 +85,14 @@ public class ExploreService {
                 player.getFaction() + "planetsExplored",
                 game.getStoredValue(player.getFaction() + "planetsExplored") + planetName + "*");
 
-        if ("garbozia".equalsIgnoreCase(planetName)) {
+        if (RiftSetModeService.willPlanetGetStellarConverted(planetName, player, game, event)) {
+            return;
+        }
+        if ("bozgarbia".equalsIgnoreCase(planetName)) {
             if (player.hasAbility("distant_suns")) {
                 String reportMessage =
                         """
-                    Garbozia exploration with **Distant Suns** is not implemented.\
+                    Bozgarbia exploration with **Distant Suns** is not implemented.\
 
                     Please use `/explore draw_and_discard trait` then `/explore use explore_card_id` to manually resolve this exploration.\
 
@@ -109,7 +113,7 @@ public class ExploreService {
             ExploreModel exploreModelI = Mapper.getExplore(cardIDI);
 
             String reportMessage = player.getFactionEmoji() + " explored " + MiscEmojis.LegendaryPlanet
-                    + "Garbozia ability and found a _"
+                    + "Bozgarbia ability and found a _"
                     + exploreModelC.getName() + "_, _" + exploreModelH.getName() + "_ and a _" + exploreModelI.getName()
                     + "_.";
             if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
@@ -289,6 +293,22 @@ public class ExploreService {
                     (MessageChannel) event.getChannel(),
                     Mapper.getPlanet(planetName).getName()
                             + " has been automatically readied because you have _Pre-Fab Arcologies_.");
+        }
+        if (player.hasAbility("ultimate_authority")) {
+            Planet plan = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+            if (plan != null) {
+                if (plan.getUnitCount(player.getColorID()) > 2) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
+                    MessageHelper.sendMessageToChannel(
+                            (MessageChannel) event.getChannel(),
+                            player.getRepresentation() + " can draw 1 AC via their ultimate authority ability");
+                    MessageHelper.sendMessageToChannel(
+                            (MessageChannel) event.getChannel(),
+                            player.getRepresentation() + " use button to resolve",
+                            buttons);
+                }
+            }
         }
         if (ButtonHelper.doesPlayerHaveFSHere("ghemina_flagship_lord", player, tile)) {
             AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planetName);
@@ -491,23 +511,31 @@ public class ExploreService {
                 if (tokenFilename == null || tile == null) {
                     message = "Invalid token or tile";
                 } else {
-                    if ("ionalpha".equalsIgnoreCase(token)) {
-                        message = player.getRepresentation()
-                                + ", please choose if the _Ion Storm_ is placed on its alpha or beta side.";
-                        List<Button> buttonIon = new ArrayList<>();
-                        buttonIon.add(Buttons.gray(
-                                "addIonStorm_alpha_" + tile.getPosition(), "Place an Alpha", MiscEmojis.CreussAlpha));
-                        buttonIon.add(Buttons.green(
-                                "addIonStorm_beta_" + tile.getPosition(), "Place a Beta", MiscEmojis.CreussBeta));
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttonIon);
+                    if (tile.isScar() && ("ionalpha".equalsIgnoreCase(token) || "gamma".equalsIgnoreCase(token))) {
+                        message = "Token `" + token + "` was not added to tile " + tile.getAutoCompleteName()
+                                + " because it is an entropic scar and cannot have wormholes.";
                     } else {
-                        tile.addToken(tokenFilename, Constants.SPACE);
-                        message = "Token `" + token + "` added to tile " + tile.getAutoCompleteName() + ".";
-                        if ("gamma".equalsIgnoreCase(token) && "mallice".equals(planetID) && !game.isFowMode()) {
-                            DisasterWatchHelper.sendMessageInDisasterWatch(
-                                    game,
-                                    player.getRepresentation() + " has explored Mallice in " + game.getName()
-                                            + ", and discovered the _Gamma Wormhole_.");
+                        if ("ionalpha".equalsIgnoreCase(token)) {
+                            message = player.getRepresentation()
+                                    + ", please choose if the _Ion Storm_ is placed on its alpha or beta side.";
+                            List<Button> buttonIon = new ArrayList<>();
+                            buttonIon.add(Buttons.gray(
+                                    "addIonStorm_alpha_" + tile.getPosition(),
+                                    "Place an Alpha",
+                                    MiscEmojis.CreussAlpha));
+                            buttonIon.add(Buttons.green(
+                                    "addIonStorm_beta_" + tile.getPosition(), "Place a Beta", MiscEmojis.CreussBeta));
+                            MessageHelper.sendMessageToChannelWithButtons(
+                                    player.getCorrectChannel(), message, buttonIon);
+                        } else {
+                            tile.addToken(tokenFilename, Constants.SPACE);
+                            message = "Token `" + token + "` added to tile " + tile.getAutoCompleteName() + ".";
+                            if ("gamma".equalsIgnoreCase(token) && "mallice".equals(planetID) && !game.isFowMode()) {
+                                DisasterWatchHelper.sendMessageInDisasterWatch(
+                                        game,
+                                        player.getRepresentation() + " has explored Mallice in " + game.getName()
+                                                + ", and discovered the _Gamma Wormhole_.");
+                            }
                         }
                     }
 
@@ -666,6 +694,7 @@ public class ExploreService {
                 if (((game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID())))
                                 || game.getPhaseOfGame().contains("agenda"))
                         && player.hasUnit("saar_mech")
+                        && !ButtonHelper.isLawInPlay(game, "articles_war")
                         && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
                     List<Button> saarButton = new ArrayList<>();
                     saarButton.add(Buttons.green(
@@ -1028,6 +1057,7 @@ public class ExploreService {
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", button);
             }
         }
+        RiftSetModeService.resolveExplore(ogID, player, game);
         FOWPlusService.resolveExplore(event, ogID, tile, planetID, player, game);
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
 
@@ -1119,7 +1149,7 @@ public class ExploreService {
 
     public static void secondHalfOfExpInfo(
             List<String> types, MessageChannel channel, Player player, Game game, boolean overRide, boolean fullText) {
-        if (!FOWPlusService.deckInfoAvailable(player, game)) {
+        if (!FOWPlusService.deckInfoAvailable(player, game) || !RiftSetModeService.deckInfoAvailable(player, game)) {
             return;
         }
         boolean isGM = player != null && game.getPlayersWithGMRole().contains(player);

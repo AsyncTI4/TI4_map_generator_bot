@@ -1,25 +1,6 @@
 package ti4.map.persistence;
 
-import static ti4.map.persistence.GamePersistenceKeys.ENDGAMEINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDMAPINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYER;
-import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYERINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDTILE;
-import static ti4.map.persistence.GamePersistenceKeys.ENDTOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.ENDUNITDAMAGE;
-import static ti4.map.persistence.GamePersistenceKeys.ENDUNITHOLDER;
-import static ti4.map.persistence.GamePersistenceKeys.ENDUNITS;
-import static ti4.map.persistence.GamePersistenceKeys.GAMEINFO;
-import static ti4.map.persistence.GamePersistenceKeys.MAPINFO;
-import static ti4.map.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.PLANET_TOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.PLAYER;
-import static ti4.map.persistence.GamePersistenceKeys.PLAYERINFO;
-import static ti4.map.persistence.GamePersistenceKeys.TILE;
-import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.UNITDAMAGE;
-import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
-import static ti4.map.persistence.GamePersistenceKeys.UNITS;
+import static ti4.map.persistence.GamePersistenceKeys.*;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,11 +33,13 @@ import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
+import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
+import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -248,6 +231,10 @@ class GameLoadService {
                                         found = true;
                                     }
                                 }
+                                if (tile.getTileID().equals("sig01") && unitHolderName.equals("garbozia")) {
+                                    // DELETE ME
+                                    unitHolderName = "bozgarbia";
+                                }
                                 if (!found && !tile.isSpaceHolderValid(unitHolderName)) {
                                     BotLogger.warning(
                                             new LogOrigin(game),
@@ -327,6 +314,12 @@ class GameLoadService {
                 case Constants.PO2PEAKABLE -> game.setPublicObjectives2Peakable(getCardList(info));
                 case Constants.PO1PEEKED -> game.setPublicObjectives1Peeked(loadPeekedPublicObjectives(info));
                 case Constants.PO2PEEKED -> game.setPublicObjectives2Peeked(loadPeekedPublicObjectives(info));
+                case Constants.EXPEDITION_TECHSKIP -> game.getExpeditions().setTechSkip(info);
+                case Constants.EXPEDITION_TRADEGOODS -> game.getExpeditions().setTradeGoods(info);
+                case Constants.EXPEDITION_FIVERES -> game.getExpeditions().setFiveRes(info);
+                case Constants.EXPEDITION_FIVEINF -> game.getExpeditions().setFiveInf(info);
+                case Constants.EXPEDITION_SECRET -> game.getExpeditions().setSecret(info);
+                case Constants.EXPEDITION_ACTIONCARDS -> game.getExpeditions().setActionCards(info);
                 case Constants.SO_TO_PO -> game.setSoToPoList(getCardList(info));
                 case Constants.PURGED_PN -> game.setPurgedPNs(getCardList(info));
                 case Constants.REVEALED_PO -> game.setRevealedPublicObjectives(getParsedCards(info));
@@ -393,7 +386,10 @@ class GameLoadService {
                 case Constants.AGENDAS -> game.setAgendas(getCardList(info));
                 case Constants.MANDATES -> game.setMandates(getCardList(info));
                 case Constants.AC_DISCARDED -> game.setDiscardActionCards(getParsedCards(info));
-                case Constants.AC_PURGED -> game.setPurgedActionCards(getParsedCards(info));
+                case Constants.AC_STATUS -> game.setDiscardActionCardStatus(getParsedCardStatus(info));
+                case Constants.AC_PURGED ->
+                    game.setPurgedActionCards(
+                            getParsedCards(info).keySet().stream().toList()); // @Deprecated
                 case Constants.DISCARDED_AGENDAS -> game.setDiscardAgendas(getParsedCards(info));
                 case Constants.SENT_AGENDAS -> game.setSentAgendas(getParsedCards(info));
                 case Constants.LAW -> game.setLaws(getParsedCards(info));
@@ -426,6 +422,7 @@ class GameLoadService {
                     game.setScTradeGoods(strategyCardToTradeGoodCount);
                 }
                 case Constants.SPEAKER -> game.setSpeakerUserID(info);
+                case Constants.TYRANT -> game.setTyrantUserID(info);
                 case Constants.ACTIVE_PLAYER -> game.setActivePlayerID(info);
                 case Constants.ACTIVE_SYSTEM -> game.setActiveSystem(info);
                 case Constants.AUTO_PING -> {
@@ -642,6 +639,7 @@ class GameLoadService {
                 case Constants.FOW_MODE -> game.setFowMode(loadBooleanOrDefault(info, false));
                 case Constants.REPLACEMENT_MADE -> game.setReplacementMade(loadBooleanOrDefault(info, false));
                 case Constants.NAALU_AGENT -> game.setNaaluAgent(loadBooleanOrDefault(info, false));
+                case Constants.WARFARE_ACTION -> game.setWarfareAction(loadBooleanOrDefault(info, false));
                 case Constants.L1_HERO -> game.setL1Hero(loadBooleanOrDefault(info, false));
                 case Constants.NOMAD_COIN -> game.setNomadCoin(loadBooleanOrDefault(info, false));
                 case Constants.FAST_SC_FOLLOW -> game.setFastSCFollowMode(loadBooleanOrDefault(info, false));
@@ -668,6 +666,8 @@ class GameLoadService {
                 case Constants.JUST_PLAYED_COMPONENT_AC ->
                     game.setJustPlayedComponentAC(loadBooleanOrDefault(info, false));
                 case Constants.BASE_GAME_MODE -> game.setBaseGameMode(loadBooleanOrDefault(info, false));
+                case Constants.THUNDERS_EDGE_MODE -> game.setThundersEdge(loadBooleanOrDefault(info, false));
+                case Constants.TWILIGHTS_FALL_MODE -> game.setTwilightsFallMode(loadBooleanOrDefault(info, false));
                 case Constants.LIGHT_FOG_MODE -> game.setLightFogMode(loadBooleanOrDefault(info, false));
                 case Constants.CPTI_EXPLORE_MODE -> game.setCptiExploreMode(loadBooleanOrDefault(info, false));
                 case Constants.RED_TAPE_MODE -> game.setRedTapeMode(loadBooleanOrDefault(info, false));
@@ -715,6 +715,25 @@ class GameLoadService {
                 case Constants.STELLAR_ATOMICS_MODE -> game.setStellarAtomicsMode(loadBooleanOrDefault(info, false));
                 case Constants.DANGEROUS_WILDS_MODE -> game.setDangerousWildsMode(loadBooleanOrDefault(info, false));
                 case Constants.AGE_OF_FIGHTERS_MODE -> game.setAgeOfFightersMode(loadBooleanOrDefault(info, false));
+                case Constants.ZEALOUS_ORTHODOXY_MODE ->
+                    game.setZealousOrthodoxyMode(loadBooleanOrDefault(info, false));
+                case Constants.ADVENT_OF_THE_WARSUN_MODE ->
+                    game.setAdventOfTheWarsunMode(loadBooleanOrDefault(info, false));
+                case Constants.MERCENARIES_FOR_HIRE_MODE ->
+                    game.setMercenariesForHireMode(loadBooleanOrDefault(info, false));
+                case Constants.CULTURAL_EXCHANGE_PROGRAM_MODE ->
+                    game.setCulturalExchangeProgramMode(loadBooleanOrDefault(info, false));
+                case Constants.CONVENTIONS_OF_WAR_ABANDONED_MODE ->
+                    game.setConventionsOfWarAbandonedMode(loadBooleanOrDefault(info, false));
+                case Constants.RAPID_MOBILIZATION_MODE ->
+                    game.setRapidMobilizationMode(loadBooleanOrDefault(info, false));
+                case Constants.WILD_WILD_GALAXY_MODE -> game.setWildWildGalaxyMode(loadBooleanOrDefault(info, false));
+                case Constants.WEIRD_WORMHOLES_MODE -> game.setWeirdWormholesMode(loadBooleanOrDefault(info, false));
+                case Constants.CALL_OF_THE_VOID_MODE -> game.setCallOfTheVoidMode(loadBooleanOrDefault(info, false));
+                case Constants.COSMIC_PHENOMENAE_MODE ->
+                    game.setCosmicPhenomenaeMode(loadBooleanOrDefault(info, false));
+                case Constants.MONUMENTS_TO_THE_AGES_MODE ->
+                    game.setMonumentToTheAgesMode(loadBooleanOrDefault(info, false));
                 case Constants.CIVILIZED_SOCIETY_MODE ->
                     game.setCivilizedSocietyMode(loadBooleanOrDefault(info, false));
                 case Constants.NO_SWAP_MODE -> game.setNoSwapMode(loadBooleanOrDefault(info, false));
@@ -784,6 +803,9 @@ class GameLoadService {
                 }
                 case Constants.MILTY_DRAFT_MANAGER -> game.setMiltyDraftString(info); // We will parse this later
                 case Constants.MILTY_DRAFT_SETTINGS -> game.setMiltyJson(info); // We will parse this later
+                case Constants.DRAFT_MANAGER -> game.setDraftString(info); // We will parse this later
+                case Constants.DRAFT_SYSTEM_SETTINGS ->
+                    game.setDraftSystemSettingsJson(info); // We will parse this later
                 case Constants.GAME_TAGS -> game.setTags(getCardList(info));
                 case Constants.TIGL_RANK -> {
                     TIGLHelper.TIGLRank rank = TIGLHelper.TIGLRank.fromString(info);
@@ -819,6 +841,24 @@ class GameLoadService {
             String id = cardInfo.nextToken();
             Integer index = Integer.parseInt(cardInfo.nextToken());
             cards.put(id, index);
+        }
+        return cards;
+    }
+
+    private static Map<String, ACStatus> getParsedCardStatus(String tokenizer) {
+        StringTokenizer actionCardToken = new StringTokenizer(tokenizer, ";");
+        Map<String, ACStatus> cards = new LinkedHashMap<>();
+        while (actionCardToken.hasMoreTokens()) {
+            StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
+            String id = cardInfo.nextToken();
+            ACStatus status =
+                    switch (cardInfo.nextToken()) {
+                        case "garbozia" -> ACStatus.garbozia;
+                        case "ralnelbt" -> ACStatus.ralnelbt;
+                        case "purged" -> ACStatus.purged;
+                        default -> null;
+                    };
+            cards.put(id, status);
         }
         return cards;
     }
@@ -894,6 +934,14 @@ class GameLoadService {
                     }
                     player.setDebtTokens(debtTokens);
                 }
+                case Constants.BREAKTHROUGH -> player.setBreakthroughID(readStringLine(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_EXH ->
+                    player.setBreakthroughExhausted(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_UNL ->
+                    player.setBreakthroughUnlocked(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_ACTV ->
+                    player.setBreakthroughActive(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_TGS -> player.setBreakthroughTGs(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STRATEGY_CARD ->
                     player.setSCs(new LinkedHashSet<>(getCardList(tokenizer.nextToken()).stream()
                             .map(Integer::valueOf)
@@ -940,6 +988,27 @@ class GameLoadService {
                         player.setEvent(id, index);
                     }
                 }
+                case Constants.PLOT_CARDS -> {
+                    StringTokenizer plotCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (plotCardToken.hasMoreTokens()) {
+                        StringTokenizer plotCardInfo = new StringTokenizer(plotCardToken.nextToken(), ",");
+                        String id = plotCardInfo.nextToken();
+                        Integer index = Integer.parseInt(plotCardInfo.nextToken());
+                        player.setPlotCard(id, index);
+                    }
+                }
+                case Constants.PLOT_FACTIONS -> {
+                    StringTokenizer plotCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (plotCardToken.hasMoreTokens()) {
+                        StringTokenizer plotCardInfo = new StringTokenizer(plotCardToken.nextToken(), ",");
+                        String id = plotCardInfo.nextToken();
+                        while (plotCardInfo.hasMoreTokens()) {
+                            String faction = plotCardInfo.nextToken();
+                            player.setPlotCardFaction(id, faction);
+                        }
+                    }
+                }
+
                 case Constants.LIZHO_TRAP_CARDS -> {
                     StringTokenizer trapCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
                     while (trapCardToken.hasMoreTokens()) {
@@ -1113,6 +1182,8 @@ class GameLoadService {
                     player.setHasFoundUnkFrag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.LANEFIR_ATS_COUNT -> player.setAtsCount(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.SARWEEN_COUNT -> player.setSarweenCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.GHOST_COMMANDER_COUNT ->
+                    player.setGhostCommanderCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.MAGEN_INFANTRY_COUNT ->
                     player.setMagenInfantryCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PILLAGE_COUNT -> player.setPillageCounter(Integer.parseInt(tokenizer.nextToken()));
@@ -1198,6 +1269,11 @@ class GameLoadService {
                 tile.addToken(token, unitHolderName);
             }
         }
+    }
+
+    private static String readStringLine(String data) {
+        if (data.isBlank()) return null;
+        return StringHelper.unescape(data);
     }
 
     private static Map<String, List<String>> loadPeekedPublicObjectives(String data) {

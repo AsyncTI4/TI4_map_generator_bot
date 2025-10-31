@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AgendaHelper;
@@ -38,6 +37,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.spring.jda.JdaService;
 
 /*
  * For Eronous to run fow300
@@ -61,24 +61,19 @@ import ti4.service.option.FOWOptionService.FOWOption;
  * - Exploring a planet has chance of Stellar Converting it (with a custom token)
  *
  */
-class RiftSetModeService {
+public class RiftSetModeService {
     private static final String CRUCIBLE_PN = "crucible";
     private static final String CRUCIBLE_AGENDA = "riftset_crucible";
     private static final String RIFTSET_INVASION_EXPLORE = "riftset_invasion";
 
     private static final int CHANCE_TO_SPAWN_RIFT = 8; // 1/8
     private static final int CHANCE_TO_SPAWN_VORTEX = 16; // 1/16
-    private static final int CHANCE_TO_STELLAR_CONVERT = 100; // 1/100
-    private static final int CHANCE_TO_STELLAR_CONVERT_MIN = 25; // 1/25
+    private static final int CHANCE_TO_STELLAR_CONVERT = 20; // 1/20 = 5%
+    private static final int CHANCE_TO_STELLAR_CONVERT_MIN = 5; // 1/5  = 20%
 
     public static boolean activate(GenericInteractionCreateEvent event, Game game) {
-        if (game.getPlayer(Constants.eronousId) == null && !AsyncTI4DiscordBot.fowServers.isEmpty()) {
+        if (game.getPlayer(Constants.eronousId) == null && !JdaService.fowServers.isEmpty()) {
             MessageHelper.replyToMessage(event, "Can only use RiftSetMode if Eronous is in the game.");
-            return false;
-        }
-
-        if (!game.isFowMode()) {
-            MessageHelper.replyToMessage(event, "Can only use RiftSetMode in FoW");
             return false;
         }
 
@@ -88,10 +83,16 @@ class RiftSetModeService {
         game.setStrategyCardSet("riftset");
         game.addTag("RiftSet");
         game.setFowOption(FOWOption.RIFTSET_MODE, true);
+
+        StringBuilder sb = new StringBuilder("RiftSet Mode activated.\n");
+        sb.append("* Agenda deck set as `agendas_riftset`.\n");
+        sb.append("* Explore deck set as `explores_riftset`.\n");
+        sb.append("* Strategy cards set as `riftset`.\n");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
         return true;
     }
 
-    private static boolean isActive(Game game) {
+    public static boolean isActive(Game game) {
         return game.getFowOption(FOWOption.RIFTSET_MODE);
     }
 
@@ -187,19 +188,19 @@ class RiftSetModeService {
     }
 
     /* Round  Probability (%)
-     *  1     1.00%
-     *  2     1.19%
-     *  3     1.47%
-     *  4     1.92%
-     *  5     2.78%
-     *  6     4.00% (capped)
+     *  1     5%
+     *  2     5.9%
+     *  3     7.1%
+     *  4     9.1%
+     *  5     12.5%
+     *  6     20% (capped)
      */
     public static boolean willPlanetGetStellarConverted(
             String planetName, Player player, Game game, GenericInteractionCreateEvent event) {
         if (!isActive(game) || !game.isCustodiansScored()) return false;
 
         if (RandomHelper.isOneInX(Math.max(
-                CHANCE_TO_STELLAR_CONVERT - (int) (16 * Math.pow(Math.min(game.getRound(), 6) - 1, 2)),
+                CHANCE_TO_STELLAR_CONVERT - (int) (3 * Math.pow(Math.min(game.getRound(), 6) - 1, 2)),
                 CHANCE_TO_STELLAR_CONVERT_MIN))) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

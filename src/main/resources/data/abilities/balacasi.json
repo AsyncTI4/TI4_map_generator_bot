@@ -26,7 +26,7 @@
         "id": "quantum_fabrication",
         "name": "Quantum Fabrication",
         "faction": "xan",
-        "permanentEffect": "When you place a space dock on a planet in a non-home system using the primary or secondary ability of the Construction strategy card, you may use its PRODUCTION ability immediately.",
+        "permanentEffect": "Once per action, when you place a space dock on a planet in a non-home system using the primary or secondary ability of the Construction strategy card, you may use its PRODUCTION ability immediately.",
         "source": "balacasi"
     },
     {
@@ -81,21 +81,21 @@
     {
         "id": "patience",
         "name": "Patience",
-        "faction": "conclave",
-        "permanentEffect": "At the end of the strategy phase, place the Obsidian Infinity token on your strategy card. You are last in initiative order. When you perform a strategic action, resolve your strategy card’s secondary ability instead of its primary ability.",
+        "faction": "onyxxa",
+        "permanentEffect": "At the end of the strategy phase, place the Onyxxa Infinity token on your strategy card. You are last in initiative order. When you perform a strategic action, resolve your strategy card’s secondary ability instead of its primary ability.",
         "source": "balacasi"
     },
     {
         "id": "strategic_fluidity",
         "name": "Strategic Fluidity",
-        "faction": "conclave",
+        "faction": "onyxxa",
         "permanentEffect": "When you would spend a token from your strategy pool to resolve the secondary ability of a strategy card other than Politics, you may spend an additional command token from your strategy pool to resolve the primary ability of that card instead.",
         "source": "balacasi"
     },
     {
         "id": "increased_surveillance",
         "name": "Increased Surveillance",
-        "faction": "conclave",
+        "faction": "onyxxa",
         "permanentEffect": "When you resolve the primary ability of a strategy card, place a control token on your commander. At the start of the status phase, remove your control tokens from your commander.",
         "source": "balacasi"
     },
@@ -138,7 +138,7 @@
         "id": "marked_prey",
         "name": "Marked Prey",
         "faction": "zephyrion",
-        "permanentEffect": "At the start of the strategy phase, place any number of your bounty tokens from your reinforcements on the unit space of non-fighter ships on other players’ factions sheets. You can place a maximum of 1 bounty token per ship, per faction.",
+        "permanentEffect": "At the start of the strategy phase, place any number of your bounty tokens from your reinforcements on the unit space of non-fighter ships on other players’ factions sheets. You can have a maximum of 1 bounty token on each unit space.",
         "source": "balacasi"
     },
     {

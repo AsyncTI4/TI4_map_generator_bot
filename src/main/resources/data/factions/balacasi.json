@@ -183,8 +183,8 @@
         "source": "balacasi"
     },
     {
-        "alias": "conclave",
-        "factionName": "The Obsidian Conclave",
+        "alias": "onyxxa",
+        "factionName": "The Onyxxa Complex",
         "homeSystem": "ba4",
         "startingFleet": "1 dd, 1 cv, 2 ff, 1 dn, 3 inf v, sd v",
         "commodities": 3,
@@ -204,9 +204,9 @@
             "increased_surveillance"
         ],
         "leaders": [
-            "conclaveagent",
-            "conclavecommander",
-            "conclavehero"
+            "onyxxaagent",
+            "onyxxacommander",
+            "onyxxahero"
         ],
         "promissoryNotes": [
             "bapnconc"
@@ -217,9 +217,9 @@
             "cruiser",
             "carrier",
             "dreadnought",
-            "conclave_flagship",
+            "onyxxa_flagship",
             "infantry",
-            "conclave_mech",
+            "onyxxa_mech",
             "pds",
             "spacedock"
         ],
@@ -276,7 +276,7 @@
         "alias": "vyserix",
         "factionName": "The Vyserix Ascendancy",
         "homeSystem": "ba3",
-        "startingFleet": "1 dd, 1 cv, 2 ff, 4 inf v, sd v",
+        "startingFleet": "2 dd, 1 cv, 2 ff, 4 inf v, sd v, pds h",
         "commodities": 3,
         "factionTech": [
             "bavyseb",
@@ -322,7 +322,7 @@
         "alias": "zephyrion",
         "factionName": "The Zephyrion Pursuit",
         "homeSystem": "ba8",
-        "startingFleet": "2 cr, 1 cv, 2 ff, 3 inf d, sd d",
+        "startingFleet": "2 cr, 1 cv, 2 ff, 3 inf d, sd d, pds z",
         "commodities": 2,
         "factionTech": [
             "bazephcr",

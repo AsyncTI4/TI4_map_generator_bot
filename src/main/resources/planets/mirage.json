@@ -2,7 +2,13 @@
     "id": "mirage",
     "tileId": null,
     "name": "Mirage",
-    "aliases": ["mirage", "mirag", "miraj", "miraje", "mrag"],
+    "aliases": [
+        "mirage",
+        "mirag",
+        "miraj",
+        "miraje",
+        "mrag"
+    ],
     "positionInTile": null,
     "resources": 1,
     "influence": 2,
@@ -16,7 +22,10 @@
     "planetLayout": {
         "unitHolderName": "mirage",
         "resourcesLocation": "BottomLeft",
-        "centerPosition": { "x": 70, "y": 55 }
+        "centerPosition": {
+            "x": 70,
+            "y": 55
+        }
     },
     "contrastColor": "orange",
     "flavourText": "*Exists on no known charts and appears deserted to those who stumble across it. However, secretive locals live in cloaked cities heavily defended by swarms of starfighters.*",

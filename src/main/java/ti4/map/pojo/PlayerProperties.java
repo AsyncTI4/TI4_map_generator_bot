@@ -75,10 +75,17 @@ public class PlayerProperties {
     // LANEFIR TECH "ATS Armaments"
     private int atsCount;
 
+    private String breakthroughID = "";
+    private boolean breakthroughUnlocked = false;
+    private boolean breakthroughExhausted = false;
+    private boolean breakthroughActive = false;
+    private int breakthroughTGs = 0;
+
     // Stat tracking
     private int sarweenCounter;
     private int pillageCounter;
     private int magenInfantryCounter;
+    private int ghostCommanderCounter;
 
     // Omega Phase
     private int priorityPosition;

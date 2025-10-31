@@ -141,6 +141,12 @@ class ActionCardHandButtonHandler {
                         buttons2);
             }
             ActionCardHelper.serveReverseEngineerButtons(game, player, List.of(acID));
+            if (player.hasAbility("scrap_metal")) {
+                String message2 =
+                        player.getRepresentationUnfogged() + ", please resolve Scrap Metal ability using the buttons.";
+                List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, false);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+            }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(event, player), "Something went wrong discarding", e);
         }
@@ -200,6 +206,7 @@ class ActionCardHandButtonHandler {
                     .sendMessage("Could not parse action card ID: " + acID + ". Please play manually.")
                     .queue();
         }
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("getDiscardButtonsACs")
@@ -283,7 +290,9 @@ class ActionCardHandButtonHandler {
                     ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
-        ButtonHelper.deleteTheOneButton(event);
+        if (!game.isTwilightsFallMode()) {
+            ButtonHelper.deleteTheOneButton(event);
+        }
     }
 
     @ButtonHandler("drawActionCards_")

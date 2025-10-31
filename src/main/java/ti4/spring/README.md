@@ -5,8 +5,9 @@ This package exposes the REST API used by the TI4 map generator bot. Controllers
 
 ## Request flow
 
-1. **CircuitBreakerFilter** – runs first (`@Order(1)`). If the global circuit breaker
-   is open it throws `ServiceUnavailableException`, returning a `503` response.
+1. **CircuitBreakerFilter** – runs before Spring Security (`@Order(Ordered.HIGHEST_PRECEDENCE)`).
+   If the global circuit breaker is open it short-circuits the request and returns a
+   `503 Service Unavailable` response.
 2. **Spring Security** – authenticates the request using `DiscordOpaqueTokenIntrospector`
    and builds the security context.
 3. **ErrorLoggingFilter** – executes after authentication (`@Order(3)`) and logs any

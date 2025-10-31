@@ -7,16 +7,20 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import ti4.AsyncTI4DiscordBot;
 import ti4.executors.CircuitBreaker;
+import ti4.spring.jda.JdaService;
 
-@Order(1)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @RequiredArgsConstructor
 @Component
 public class CircuitBreakerFilter extends OncePerRequestFilter {
+
+    private static final String SERVICE_UNAVAILABLE_MESSAGE = "Service temporarily unavailable: ";
 
     @Override
     protected void doFilterInternal(
@@ -24,8 +28,16 @@ public class CircuitBreakerFilter extends OncePerRequestFilter {
             @NotNull HttpServletResponse response,
             @NotNull FilterChain filterChain)
             throws ServletException, IOException {
-        if (CircuitBreaker.isOpen() || !AsyncTI4DiscordBot.isReadyToReceiveCommands())
-            throw new ServiceUnavailableException();
+        if (CircuitBreaker.isOpen()) {
+            response.sendError(
+                    HttpStatus.SERVICE_UNAVAILABLE.value(), SERVICE_UNAVAILABLE_MESSAGE + "circuit breaker is open");
+            return;
+        }
+        if (!JdaService.isReadyToReceiveCommands()) {
+            response.sendError(
+                    HttpStatus.SERVICE_UNAVAILABLE.value(), SERVICE_UNAVAILABLE_MESSAGE + "bot is not ready");
+            return;
+        }
 
         filterChain.doFilter(request, response);
     }

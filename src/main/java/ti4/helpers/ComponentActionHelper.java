@@ -12,6 +12,7 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperBreakthroughs;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -19,11 +20,13 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.model.BreakthroughModel;
 import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.service.BookOfLatviniaService;
+import ti4.service.SilverFlameService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -54,7 +57,11 @@ public class ComponentActionHelper {
 
             boolean detAgeOfExp = ("det".equalsIgnoreCase(tech) || "absol_det".equalsIgnoreCase(tech))
                     && game.isAgeOfExplorationMode();
-            if (techText.contains("ACTION") || detAgeOfExp) {
+
+            boolean x89Conventions = ("x89".equalsIgnoreCase(tech) || "x89c4".equalsIgnoreCase(tech))
+                    && game.isConventionsOfWarAbandonedMode()
+                    && ButtonHelper.getButtonsForConventions(p1, game).size() > 0;
+            if (techText.contains("ACTION") || detAgeOfExp || x89Conventions) {
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
                     continue;
                 }
@@ -68,6 +75,10 @@ public class ComponentActionHelper {
                 && game.getScoredPublicObjectives().get("Stellar Atomics").contains(p1.getUserID())) {
             compButtons.add(Buttons.red(finChecker + prefix + "stellarAtomicsAction_", "Use Stellar Atomics"));
         }
+        if (game.isMercenariesForHireMode()) {
+            compButtons.add(
+                    Buttons.red(finChecker + prefix + "mercenariesForHireAction_", "Spend 3tg on Mercenries For Hire"));
+        }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 1) {
             compButtons.add(Buttons.red(finChecker + prefix + "doStarCharts_", "Purge 2 Star Charts"));
         }
@@ -75,6 +86,50 @@ public class ComponentActionHelper {
         if (game.isTotalWarMode() && ButtonHelperActionCards.getAllCommsInHS(p1, game) > 9) {
             Button tButton = Buttons.gray(finChecker + prefix + "doTotalWarPoint_", "Gain 1 Victory Point (Total War)");
             compButtons.add(tButton);
+        }
+
+        BreakthroughModel bt = p1.getBreakthroughModel();
+        if (bt != null && bt.getText().contains("ACTION:")) {
+            if (p1.hasReadyBreakthrough(bt.getAlias())) {
+                boolean validAction =
+                        switch (bt.getAlias()) {
+                            case "arborecbt" ->
+                                game.getTileMap().values().stream()
+                                                .filter(Tile.tileHasPlayersInfAndCC(p1))
+                                                .count()
+                                        > 0;
+                            case "crimsonbt" ->
+                                game.getTileMap().values().stream()
+                                                .filter(Tile.tileHasBreach())
+                                                .count()
+                                        > 0;
+                            case "mahactbt" -> p1.getTechs().size() > 0;
+                            case "saarbt" ->
+                                game.getTileMap().values().stream()
+                                                .filter(Tile::isAsteroidField)
+                                                .filter(Tile.tileHasPlayerShips(p1))
+                                                .count()
+                                        > 0;
+                            case "deepwroughtbt" -> true;
+                            default -> true;
+                        };
+
+                if (validAction) {
+                    TI4Emoji btEmoji = bt.getFactionEmoji();
+                    Button btButton = Buttons.green(
+                            finChecker + prefix + "exhaustBT_" + bt.getAlias(), "Exhaust " + bt.getName(), btEmoji);
+                    compButtons.add(btButton);
+                }
+            }
+        }
+        List<String> implementedLegendaryPlanets = new ArrayList<>(List.of("avernus"));
+        for (String planet : implementedLegendaryPlanets) {
+            String prettyPlanet = Mapper.getPlanet(planet).getName();
+            if (p1.getPlanets().contains(planet)
+                    && !p1.getExhaustedPlanetsAbilities().contains(planet)) {
+                compButtons.add(Buttons.green(
+                        finChecker + "planetAbilityExhaust_" + planet, "Use " + prettyPlanet + " Ability"));
+            }
         }
 
         // Leaders
@@ -150,6 +205,14 @@ public class ComponentActionHelper {
                                     factionEmoji);
                             compButtons.add(lButton);
                         }
+                        led = "onyxxaagent";
+                        if (p1.hasExternalAccessToLeader(led)) {
+                            Button lButton = Buttons.gray(
+                                    finChecker + prefix + "leader_" + led,
+                                    "Use " + leaderName + " as Onyxxa Agent",
+                                    factionEmoji);
+                            compButtons.add(lButton);
+                        }
                         led = "yssarilagent";
                         Button lButton = Buttons.gray(
                                 finChecker + prefix + "leader_" + led,
@@ -171,14 +234,15 @@ public class ComponentActionHelper {
                                 factionEmoji);
                         compButtons.add(lButton);
                     }
-
-                } else if ("mahactcommander".equalsIgnoreCase(leaderID)
-                        && p1.getTacticalCC() > 0
-                        && !ButtonHelper.getTilesWithYourCC(p1, game, event).isEmpty()) {
-                    Button lButton = Buttons.gray(finChecker + "mahactCommander", "Use " + leaderName, factionEmoji);
-                    compButtons.add(lButton);
                 }
             }
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(p1, "mahactcommander")
+                && p1.getTacticalCC() > 0
+                && !ButtonHelper.getTilesWithYourCC(p1, game, event).isEmpty()) {
+
+            Button lButton = Buttons.gray(finChecker + "mahactCommander", "Use Mahact Commander", FactionEmojis.Mahact);
+            compButtons.add(lButton);
         }
 
         // Relics
@@ -251,8 +315,9 @@ public class ComponentActionHelper {
         // Abilities
         if (p1.hasAbility("star_forge")
                 && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar"))
-                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Warsun)
-                        .isEmpty()) {
+                && (!CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Warsun)
+                                .isEmpty()
+                        || game.isTwilightsFallMode())) {
             Button abilityButton =
                     Buttons.green(finChecker + prefix + "ability_starForge", "Starforge", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
@@ -304,6 +369,13 @@ public class ComponentActionHelper {
                     finChecker + prefix + "ability_fabrication", "Purge 1 Fragment for 1 Token", FactionEmojis.Naaz);
             compButtons.add(abilityButton);
         }
+        if (p1.hasAbility("puppetsoftheblade")
+                && p1.getPlotCardsFactions().values().stream().anyMatch(ary -> ary != null && ary.size() > 0)) {
+            Button abilityButton = Buttons.green(
+                    finChecker + prefix + "ability_puppetsoftheblade", "Become The Obsidian", FactionEmojis.Obsidian);
+            compButtons.add(abilityButton);
+        }
+
         if (p1.hasAbility("classified_developments")) {
             Button abilityButton = Buttons.green(
                     finChecker + prefix + "ability_classifieddevelopments",
@@ -313,7 +385,7 @@ public class ComponentActionHelper {
         }
 
         // Other "abilities"
-        if (p1.getUnitsOwned().contains("muaat_flagship")
+        if (p1.hasUnit("muaat_flagship")
                 && p1.getStrategicCC() > 0
                 && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Flagship)
                         .isEmpty()) {
@@ -389,9 +461,12 @@ public class ComponentActionHelper {
                             "naaluagent",
                             "muaatagent",
                             "xxchaagent",
+                            "onyxxaagent",
                             "axisagent",
                             "bentoragent",
                             "kolumeagent",
+                            "crimsonagent",
+                            "bastionagent",
                             "redcreussagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
@@ -422,6 +497,9 @@ public class ComponentActionHelper {
 
                     List<Tile> tiles =
                             CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Warsun);
+                    if (game.isTwilightsFallMode()) {
+                        tiles = ButtonHelper.getTilesWithShipsInTheSystem(p1, game);
+                    }
                     List<Button> buttons = new ArrayList<>();
                     String message = p1.getRepresentationNoPing()
                             + " is using their **Star Forge** ability.\n Please choose the system you wish to **Star Forge** in.";
@@ -709,6 +787,32 @@ public class ComponentActionHelper {
                                 + ", please choose which player owns the soon-to-be nuked planet.",
                         buttons);
             }
+            case "mercenariesForHireAction" -> {
+                if (p1.getTg() < 2) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(), "You don't have enough TG (3) to hire mercenaries.");
+                    return;
+                }
+                p1.setTg(p1.getTg() - 3);
+                MessageHelper.sendMessageToChannel(
+                        p1.getCorrectChannel(),
+                        p1.getRepresentationUnfogged() + " has spent 3 TG to hire mercenaries.");
+                BreakthroughHelper.resolveYinBreakthroughAbility(game, p1);
+            }
+            case "exhaustBT" -> {
+                BreakthroughModel btModel = Mapper.getBreakthrough(buttonID);
+                p1.setBreakthroughExhausted(true);
+                String message = p1.getRepresentation() + " exhausted " + btModel.getName();
+                MessageHelper.sendMessageToChannelWithEmbed(
+                        event.getMessageChannel(), message, btModel.getRepresentationEmbed());
+                boolean implemented = TeHelperBreakthroughs.handleBreakthroughExhaust(event, game, p1, buttonID);
+
+                if (!implemented) {
+                    String unimplemented =
+                            "IDK how to do this yet. " + Constants.jazzPing() + " please implement this bt";
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), unimplemented);
+                }
+            }
             case "doTotalWarPoint" -> {
                 ButtonHelperActionCards.decrease10CommsinHS(p1, game);
                 int remaining = ButtonHelperActionCards.getAllCommsInHS(p1, game);
@@ -742,7 +846,9 @@ public class ComponentActionHelper {
         List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getPlanets()) {
             Tile tile = game.getTileFromPlanet(planet);
-            if (tile != null && !tile.isHomeSystem(game)) {
+            if (tile != null
+                    && !tile.isHomeSystem(game)
+                    && !game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
                 buttons.add(Buttons.gray(
                         "atomicsStep3_" + p2.getFaction() + "_" + planet,
                         Helper.getPlanetRepresentation(planet, game)));
@@ -765,7 +871,7 @@ public class ComponentActionHelper {
         if (p2.hasAbility("data_recovery")) {
             ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
         }
-        if (!game.isFowMode()) {
+        if (!game.isFowMode() && game.isStellarAtomicsMode()) {
             DisasterWatchHelper.postTileInDisasterWatch(
                     game,
                     event,
@@ -789,8 +895,10 @@ public class ComponentActionHelper {
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " has nuked " + planetRep
                             + ", destroying every unit there belonging to " + p2.getRepresentationUnfogged() + ".");
-            DisasterWatchHelper.postTileInDisasterWatch(
-                    game, event, game.getTileFromPlanet(planet), 0, planetRep + ", post war crimes.");
+            if (game.isStellarAtomicsMode()) {
+                DisasterWatchHelper.postTileInDisasterWatch(
+                        game, event, game.getTileFromPlanet(planet), 0, planetRep + ", post war crimes.");
+            }
         }
     }
 
@@ -888,6 +996,7 @@ public class ComponentActionHelper {
                 // handled above
             }
             case "bookoflatvinia" -> BookOfLatviniaService.purgeBookOfLatvinia(event, game, player);
+            case "thesilverflame" -> SilverFlameService.rollSilverFlame(event, game, player);
             default ->
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(), "This relic is not tied to any automation. Please resolve manually.");

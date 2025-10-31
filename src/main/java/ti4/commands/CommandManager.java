@@ -8,6 +8,7 @@ import ti4.commands.admin.AdminCommand;
 import ti4.commands.agenda.AgendaCommand;
 import ti4.commands.async.AsyncCommand;
 import ti4.commands.bothelper.BothelperCommand;
+import ti4.commands.breakthrough.BreakthroughCommand;
 import ti4.commands.button.GenericButtonCommand;
 import ti4.commands.cardsac.ACCardsCommand;
 import ti4.commands.cardspn.PNCardsCommand;
@@ -15,6 +16,7 @@ import ti4.commands.cardsso.SOCardsCommand;
 import ti4.commands.combat.CombatCommand;
 import ti4.commands.custom.CustomCommand;
 import ti4.commands.developer.DeveloperCommand;
+import ti4.commands.draft.DraftCommand;
 import ti4.commands.ds.DiscordantStarsCommand;
 import ti4.commands.event.EventCommand;
 import ti4.commands.explore.ExploreCommand;
@@ -31,6 +33,7 @@ import ti4.commands.planet.PlanetCommand;
 import ti4.commands.player.PlayerCommand;
 import ti4.commands.relic.RelicCommand;
 import ti4.commands.search.SearchCommand;
+import ti4.commands.search.SearchCommand2;
 import ti4.commands.special.Special2Command;
 import ti4.commands.special.SpecialCommand;
 import ti4.commands.statistics.StatisticsCommand;
@@ -73,6 +76,7 @@ public class CommandManager {
                     new AddCCCommand(),
                     new RemoveCCCommand(),
                     new RemoveAllCC(),
+                    new SearchCommand2(),
                     new AddFrontierTokensCommand(),
                     new MoveUnits(),
                     new ModifyUnitsButtons(),
@@ -112,12 +116,14 @@ public class CommandManager {
                     new DiscordantStarsCommand(),
                     new StatisticsCommand(),
                     new TechCommand(),
+                    new BreakthroughCommand(),
                     new PlanetCommand(),
                     new SelectionBoxDemoCommand(),
                     new UserCommand(),
                     new TiglCommand(),
                     new AsyncCommand(),
-                    new OmegaPhaseCommand())
+                    new OmegaPhaseCommand(),
+                    new DraftCommand())
             .collect(Collectors.toMap(ParentCommand::getName, command -> command));
 
     public static ParentCommand getCommand(String name) {

@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CheckDistanceHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
@@ -171,7 +172,8 @@ public class TacticalActionOutputService {
                             (uh instanceof Planet p) ? " from the planet " + p.getRepresentation(game) : "";
                     unitMoveStr += unitHolderStr;
 
-                    String distanceStr = validateMoveValue(game, player, tile, key, distance, riftDistance);
+                    String distanceStr =
+                            validateMoveValue(game, player, tile, key, movingUnitsFromTile, distance, riftDistance);
                     unitMoveStr += distanceStr;
                     lines.add(unitMoveStr);
                 }
@@ -213,8 +215,14 @@ public class TacticalActionOutputService {
     }
 
     private String validateMoveValue(
-            Game game, Player player, Tile tile, UnitKey unit, int distance, int riftDistance) {
-        int moveValue = getUnitMoveValue(game, player, tile, unit, false);
+            Game game,
+            Player player,
+            Tile tile,
+            UnitKey unit,
+            Set<UnitKey> allMovingUnits,
+            int distance,
+            int riftDistance) {
+        int moveValue = getUnitMoveValue(game, player, tile, unit, allMovingUnits, false);
         if (moveValue == 0) return "";
 
         String output = "";
@@ -226,6 +234,11 @@ public class TacticalActionOutputService {
                 output += ", used _Gravity Drive_)";
             } else {
                 output += ", __does not have _Gravity Drive___)";
+            }
+            if (player.hasUnlockedBreakthrough("winnubt")
+                    && game.getTileByPosition(game.getActiveSystem()).hasLegendary()) {
+                maxBonus++;
+                output += " (has Winnu Breakthrough for +1 movement for one ship when moving to a legendary tile)";
             }
             if (player.getTechs().contains("dsgledb")) {
                 maxBonus++;
@@ -249,7 +262,8 @@ public class TacticalActionOutputService {
         return output;
     }
 
-    private int getUnitMoveValue(Game game, Player player, Tile tile, UnitKey unit, boolean skipBonus) {
+    private int getUnitMoveValue(
+            Game game, Player player, Tile tile, UnitKey unit, Set<UnitKey> allMovingUnits, boolean skipBonus) {
         UnitModel model = player.getUnitFromUnitKey(unit);
         if (model == null) {
             return 0;
@@ -257,7 +271,7 @@ public class TacticalActionOutputService {
 
         boolean movingFromHome = tile == player.getHomeSystemTile();
         boolean tileHasWormhole = FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition());
-
+        Tile activeSystem = getActiveSystem(game);
         // Calculate base move value (pretty easy)
         int baseMoveValue = model.getMoveValue();
         if (baseMoveValue == 0) return 0;
@@ -272,10 +286,35 @@ public class TacticalActionOutputService {
 
         // Calculate bonus move value
         int bonusMoveValue = 0;
+        if (player.hasUnlockedBreakthrough("letnevbt") && allMovingUnits != null && !allMovingUnits.isEmpty()) {
+            int maxBase = allMovingUnits.stream()
+                    .map(key -> getUnitMoveValue(game, player, tile, key, null, true))
+                    .max(Integer::compare)
+                    .orElse(baseMoveValue);
+            bonusMoveValue = maxBase - baseMoveValue;
+        }
+
+        boolean tileHasBreach = tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
+
         if (player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
             bonusMoveValue++;
         }
-        if (player.hasAbility("slipstream") && (tileHasWormhole || movingFromHome)) {
+        if (player.hasAbility("slipstream") && (tileHasWormhole || (movingFromHome && !game.isTwilightsFallMode()))) {
+            bonusMoveValue++;
+        }
+        if (game.isCallOfTheVoidMode() && activeSystem.getPosition().contains("frac")) {
+            bonusMoveValue++;
+        }
+
+        if (player.hasUnlockedBreakthrough("cabalbt") && tile.getPosition().contains("frac")) {
+            bonusMoveValue++;
+        }
+
+        if (player.hasUnlockedBreakthrough("crimsonbt") && (tileHasBreach || movingFromHome)) {
+            bonusMoveValue++;
+        }
+
+        if (player.hasAbility("song_of_something") && movingFromHome) {
             bonusMoveValue++;
         }
         if (!game.getStoredValue("crucibleBoost").isEmpty()) {
@@ -283,12 +322,14 @@ public class TacticalActionOutputService {
         }
         if (!game.getStoredValue("flankspeedBoost").isEmpty()) {
             bonusMoveValue += 1;
+            if (game.isWildWildGalaxyMode()) {
+                bonusMoveValue += 1;
+            }
         }
         if (!game.getStoredValue("baldrickGDboost").isEmpty()) {
             bonusMoveValue += 1;
         }
 
-        Tile activeSystem = getActiveSystem(game);
         for (UnitHolder uhPlanet : activeSystem.getPlanetUnitHolders()) {
             if (player.getPlanets().contains(uhPlanet.getName())) {
                 continue;

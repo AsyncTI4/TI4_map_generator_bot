@@ -20,7 +20,7 @@ public class BreakthroughHelper {
             game.addFakeCommander(leaderID);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " utilized the Yin breakthrough to acquire a new commander, "
+                    player.getRepresentation() + " acquired a new commander, "
                             + Mapper.getLeader(leaderID).getName() + "!");
             UnlockLeaderService.unlockLeader(leaderID, game, player);
         } else {
@@ -35,7 +35,7 @@ public class BreakthroughHelper {
         List<String> commanders = new ArrayList<>();
         List<FactionModel> allFactions = Mapper.getFactionsValues().stream()
                 .filter(f -> game.isDiscordantStarsMode()
-                        ? f.getSource().isDs()
+                        ? f.getSource().isDs() || f.getSource().isOfficial()
                         : f.getSource().isOfficial())
                 .toList();
         for (FactionModel faction : allFactions) {
@@ -44,9 +44,16 @@ public class BreakthroughHelper {
                 commanderName = "kelerescommander";
             }
             if (game.getFactions().contains(faction.getAlias())
-                    || (game.isMinorFactionsMode() && game.getTile(faction.getID()) != null)
+                    || (game.isMinorFactionsMode() && game.getTile(faction.getHomeSystem()) != null)
                     || (Helper.getPlayerFromLeader(game, commanderName) != null)
-                    || commanders.contains(commanderName)) {
+                    || commanders.contains(commanderName)
+                    || Mapper.getLeader(commanderName) == null
+                    || "unknown"
+                            .equalsIgnoreCase(Mapper.getLeader(commanderName).getAbilityText())
+                    || Mapper.getLeader(commanderName)
+                            .getAbilityText()
+                            .toLowerCase()
+                            .contains("fracture")) {
                 continue;
             }
             commanders.add(commanderName);

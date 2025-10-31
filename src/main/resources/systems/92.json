@@ -1,0 +1,20 @@
+{
+    "id": "92",
+    "name": "Ordinian/Revelation (Bastion)",
+    "aliases": [
+        "te01",
+        "ordinian",
+        "revelation",
+        "bastion",
+        "bastionhs"
+    ],
+    "imagePath": "92_Bastion.png",
+    "planets": [
+        "ordinian",
+        "revelation"
+    ],
+    "shipPositionsType": "TYPE02",
+    "tileBack": "green",
+    "isNebula": true,
+    "source": "thunders_edge"
+}

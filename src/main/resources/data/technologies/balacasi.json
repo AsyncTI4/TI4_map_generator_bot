@@ -46,6 +46,28 @@
         "text": "At the start of a combat, you may spend 4 influence to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat."
     },
     {
+        "alias": "araracg",
+        "name": "Void Weave Implants",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGG",
+        "faction": "arachian",
+        "source": "other",
+        "text": "ACTION: Exhaust this card to perform a tactical action in a non-home system that contains your units and one of your Command Tokens. "
+    },
+    {
+        "alias": "araracy",
+        "name": "Weave Spinner",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "arachian",
+        "source": "other",
+        "text": "At the end of your turn, you may exhaust this card to place a Command Token from your reinforcement in up to 2 systems that are adjacent to a system that contains one of your command tokens. "
+    },
+    {
         "alias": "bakalodn",
         "name": "Stinger II",
         "types": [
@@ -93,23 +115,23 @@
     },
     {
         "alias": "baconcy",
-        "name": "Strategic Inversion",
+        "name": "Sacrificial Command",
         "types": [
             "CYBERNETIC"
         ],
         "requirements": "YY",
-        "faction": "conclave",
+        "faction": "onyxxa",
         "source": "balacasi",
         "text": "Once per action, when you would spend a token from your strategy pool to resolve the primary or secondary ability of a strategy card, you may destroy 1 of your non-fighter ships in or adjacent to a system that contains the active player's units. If you do, spend that token from your reinforcements instead."
     },
     {
         "alias": "baconcg",
-        "name": "Sacrificial Command",
+        "name": "Strategic Inversion",
         "types": [
             "BIOTIC"
         ],
         "requirements": "G",
-        "faction": "conclave",
+        "faction": "onyxxa",
         "source": "balacasi",
         "text": "When you perform a strategic action, you may gain 1 command token instead of resolving any ability. While you do not have any control tokens on your commander, apply +1 to your units' combat rolls."
     },
@@ -161,14 +183,14 @@
     },
     {
         "alias": "bazephy",
-        "name": "Reassignment",
+        "name": "Hunting Grounds",
         "types": [
             "CYBERNETIC"
         ],
         "requirements": "Y",
         "faction": "zephyrion",
         "source": "balacasi",
-        "text": "ACTION: Exhaust this card to place or move any number of bounty tokens from opponent’s faction sheets to the unit space of non-fighter ships on an opponents’ faction sheet."
+        "text": "ACTION: Exhaust this card to place or move any number of bounty tokens from other players' faction sheets to unit spaces of non-fighter ships on other players' faction sheets. During space combat, your opponent cannot announce retreat unless you allow it."
     },
     {
         "alias": "bazephcr",
@@ -176,7 +198,7 @@
         "types": [
             "UNITUPGRADE"
         ],
-        "requirements": "RY",
+        "requirements": "RYG",
         "faction": "zephyrion",
         "baseUpgrade": "cr2",
         "source": "balacasi",

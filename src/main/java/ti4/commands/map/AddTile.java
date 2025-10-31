@@ -51,15 +51,6 @@ class AddTile extends GameStateSubcommand {
         }
 
         Game game = getGame();
-        Boolean isFowPrivate = null;
-        if (game.isFowMode()) {
-            isFowPrivate = event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL);
-        }
-
-        if (isFowPrivate != null && isFowPrivate && !game.isAgeOfExplorationMode()) {
-            MessageHelper.replyToMessage(event, "Cannot run this command in a private channel.");
-            return;
-        }
 
         for (String position : positions) {
             Tile tile = new Tile(planetTileName, position);

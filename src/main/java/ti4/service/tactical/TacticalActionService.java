@@ -256,7 +256,7 @@ public class TacticalActionService {
         List<Button> buttons = new ArrayList<>();
 
         int productionVal = Helper.getProductionValue(player, game, tile, false);
-        if (productionVal > 0) {
+        if (productionVal > 0 || ("18".equalsIgnoreCase(tile.getTileID()) && player.hasIIHQ())) {
             buttons.add(createBuildButton(player, tile, productionVal));
         }
         if (!game.getStoredValue("possiblyUsedRift").isEmpty()) {
@@ -264,6 +264,12 @@ public class TacticalActionService {
                     player.finChecker() + "getRiftButtons_" + tile.getPosition(),
                     "Units Travelled Through Gravity Rift",
                     MiscEmojis.GravityRift));
+        }
+        if (game.isWeirdWormholesMode()) {
+            buttons.add(Buttons.green(
+                    player.finChecker() + "getWeirdWormholeButtons_" + tile.getPosition(),
+                    "Units Travelled Through Weird Wormhole",
+                    MiscEmojis.WHalpha));
         }
         if (player.hasUnexhaustedLeader("sardakkagent")) {
             buttons.addAll(ButtonHelperAgents.getSardakkAgentButtons(game));
@@ -369,6 +375,7 @@ public class TacticalActionService {
 
     private boolean shouldSkipPlacingAbilities(Game game, Player player) {
         return game.isNaaluAgent()
+                || game.isWarfareAction()
                 || game.isL1Hero()
                 || (!game.getStoredValue("hiredGunsInPlay").isEmpty() && player != game.getActivePlayer());
     }
@@ -397,7 +404,9 @@ public class TacticalActionService {
         List<UnitType> committable = new ArrayList<>(List.of(UnitType.Mech, UnitType.Infantry));
         boolean naaluFS = (player.hasUnit("naalu_flagship") || player.hasUnit("sigma_naalu_flagship_2"))
                 && space.getUnitCount(UnitType.Flagship, player) > 0;
-        boolean belkoFF = player.hasUnit("belkosea_fighter") || player.hasUnit("belkosea_fighter2");
+        boolean belkoFF = player.hasUnit("belkosea_fighter")
+                || player.hasUnit("belkosea_fighter2")
+                || player.hasUnit("tf-morphwing");
         if (naaluFS || belkoFF) committable.add(UnitType.Fighter);
         return committable;
     }

@@ -1,0 +1,28 @@
+{
+    "id": "tinnes",
+    "tileId": "105",
+    "name": "Tinnes",
+    "aliases": [
+        "tin",
+        "tiny",
+        "tinnes"
+    ],
+    "resources": 2,
+    "influence": 1,
+    "planetTypes": [
+        "INDUSTRIAL",
+        "HAZARDOUS"
+    ],
+    "techSpecialties": [
+        "BIOTIC"
+    ],
+    "planetLayout": {
+        "unitHolderName": "tinnes",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200.0,
+            "y": 210.0
+        }
+    },
+    "source": "thunders_edge"
+}

@@ -231,13 +231,13 @@ public class FOWPlusService {
 
     // If the target position is void or hyperlane that does not connect to tile we are checking from
     public static boolean shouldTraverseAdjacency(Game game, String position, int dirFrom) {
-        if (!isActive(game)) return true;
+        if (!isActive(game) && !game.getFowOption(FOWOption.HIDE_MAP)) return true;
 
-        if (isVoid(game, position)) {
+        Tile targetTile = game.getTileByPosition(position);
+        if (isVoid(game, position) || targetTile == null) {
             return false;
         }
 
-        Tile targetTile = game.getTileByPosition(position);
         if (targetTile.getTileModel() != null && targetTile.getTileModel().isHyperlane()) {
             boolean hasHyperlaneConnection = false;
             for (int i = 0; i < 6; i++) {

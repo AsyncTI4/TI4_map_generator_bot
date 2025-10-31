@@ -18,7 +18,7 @@
         "title": "The Judicial",
         "abilityWindow": "After you win a space combat:",
         "abilityText": "You may force your opponent to give you 1 action card from their hand.",
-        "unlockCondition": "Play an action card during a combat",
+        "unlockCondition": "Discard an action card after you win a combat",
         "source": "balacasi"
     },
     {
@@ -32,6 +32,40 @@
         "abilityText": "You may purge this card. If you do, roll 1 die for each of your non-fighter ships in this system. For each result equal to or greater than that ship's combat value, produce 1 hit; your opponent must assign it to 1 of their ships. During this combat, both you and your opponent ignore all of your opponent’s non-warsun unit upgrade technologies.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "balacasi"
+    },
+    {
+        "id": "arachianagent",
+        "faction": "arachian",
+        "type": "agent",
+        "name": "Qekob",
+        "title": "The Weaver",
+        "abilityWindow": "Action",
+        "abilityText": "Choose a system with a player’s command token. That player may remove one of their ships from that system and place it in that player’s home system if it contains no other player’s ships.",
+        "unlockCondition": "Always Unlocked",
+        "source": "other"
+    },
+    {
+        "id": "arachiancommander",
+        "faction": "arachian",
+        "type": "commander",
+        "name": "Zraaqu",
+        "title": "The Spinner",
+        "abilityWindow": "At the start of a space combat in a system with your command token:",
+        "abilityText": "If you are the defender, you may choose up to 2 of your opponent’s units. Those units roll 1 less combat die during the first round of this combat.",
+        "unlockCondition": "Have 6 of your Command Tokens on the game board",
+        "source": "other"
+    },
+    {
+        "id": "arachianhero",
+        "faction": "arachian",
+        "type": "hero",
+        "name": "Zhossox",
+        "title": "Spider in Chief",
+        "abilityName": "Master Web",
+        "abilityWindow": "ACTION",
+        "abilityText": "Move up to 3 of your Command Tokens on the game board to an adjacent system. Then, purge this card. ",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "other"
     },
     {
         "id": "xanagent",
@@ -63,7 +97,7 @@
         "title": "The Invincible",
         "abilityName": "Titles Are Silly",
         "abilityWindow": "ACTION:",
-        "abilityText": "Gain 1 trade good for each damaged unit on the game board owned by another player. Then, repair all of your damaged units and choose any number of other players. For each chosen player, repair all of their damaged units that are in or adjacent to a system that contains 1 of your space docks.",
+        "abilityText": "ACTION: Gain 1 trade good for each damaged unit on the game board. Then, repair all of your damaged units and choose any number of other players. For each chosen player, repair all of their damaged units that are in or adjacent to a system that contains 1 of your space docks.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "balacasi"
     },
@@ -136,8 +170,8 @@
         "source": "balacasi"
     },
     {
-        "id": "conclaveagent",
-        "faction": "conclave",
+        "id": "onyxxaagent",
+        "faction": "onyxxa",
         "type": "agent",
         "name": "Innovator Zeth",
         "title": "The Wise",
@@ -147,8 +181,8 @@
         "source": "balacasi"
     },
     {
-        "id": "conclavecommander",
-        "faction": "conclave",
+        "id": "onyxxacommander",
+        "faction": "onyxxa",
         "type": "commander",
         "name": "Strategist Kreel",
         "title": "The Judicial",
@@ -158,8 +192,8 @@
         "source": "balacasi"
     },
     {
-        "id": "conclavehero",
-        "faction": "conclave",
+        "id": "onyxxahero",
+        "faction": "onyxxa",
         "type": "hero",
         "name": "Grandmaster Xel'Kor",
         "title": "The Invincible",
@@ -187,7 +221,7 @@
         "name": "Chrono-Tactician Xelthar",
         "title": "The Judicial",
         "abilityWindow": "ACTION:",
-        "abilityText": "Spend 1 token from your strategy pool to place 1 mech on a planet you control.",
+        "abilityText": "Spend 1 token from your strategy pool to place 1 mech on a planet you control. When a public objective is revealed, you may place 1 infantry on a planet you control.",
         "unlockCondition": "Have 5 infantry that are not in or adjacent to your home system",
         "source": "balacasi"
     },

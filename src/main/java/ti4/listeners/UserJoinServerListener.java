@@ -10,9 +10,9 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import ti4.AsyncTI4DiscordBot;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -20,6 +20,7 @@ import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.spring.jda.JdaService;
 
 public class UserJoinServerListener extends ListenerAdapter {
 
@@ -30,30 +31,35 @@ public class UserJoinServerListener extends ListenerAdapter {
     }
 
     private static boolean validateEvent(GenericGuildEvent event) {
-        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
+        if (!JdaService.isReadyToReceiveCommands()) {
             return false;
         }
         String eventGuild = event.getGuild().getId();
-        return AsyncTI4DiscordBot.isValidGuild(eventGuild);
+        return JdaService.isValidGuild(eventGuild);
     }
 
     private void handleGuildMemberJoin(GuildMemberJoinEvent event) {
         try {
-            if (event.getGuild() == AsyncTI4DiscordBot.guildPrimary) {
-                AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("welcome-and-waving", true).stream()
-                        .findFirst()
-                        .ifPresent(
-                                welcomeChannel -> MessageHelper.sendMessageToChannel(
-                                        welcomeChannel,
-                                        "**Welcome** " + event.getUser().getAsMention()
-                                                + "! We're glad you're here as lucky number #"
-                                                + event.getGuild().getMemberCount() + "!\n"
-                                                + "To get started, check out the how to play documentation here: https://discord.com/channels/943410040369479690/947727176105623642/1349555940340404265. \n"
-                                                + "If you ever have any questions or difficulty, ping the Bothelper role. It's full of helpful people who should be able to assist you."));
-            }
+            welcomeNewUserToHUBServer(event);
             checkIfNewUserIsInExistingGamesAndAutoAddRole(event.getGuild(), event.getUser());
         } catch (Exception e) {
-            BotLogger.error("Error in `UserJoinServerListener.onGuildMemberJoin`", e);
+            BotLogger.error("Error in `UserJoinServerListener.handleGuildMemberJoin`", e);
+        }
+    }
+
+    private void welcomeNewUserToHUBServer(GuildMemberJoinEvent event) {
+        if (event.getGuild() == JdaService.guildPrimary) {
+            JdaService.guildPrimary.getTextChannelsByName("welcome-and-waving", true).stream()
+                    .findFirst()
+                    .ifPresent(
+                            welcomeChannel -> MessageHelper.sendMessageToChannel(
+                                    welcomeChannel,
+                                    "**Welcome** " + event.getUser().getAsMention()
+                                            + "! We're glad you're here as lucky number # "
+                                            + String.format(
+                                                    "%,d", event.getGuild().getMemberCount()) + "!\n"
+                                            + "To get started, check out the how to play documentation here: https://discord.com/channels/943410040369479690/947727176105623642/1349555940340404265. \n"
+                                            + "If you ever have any questions or difficulty, ping the Bothelper role. It's full of helpful people who should be able to assist you."));
         }
     }
 
@@ -93,6 +99,8 @@ public class UserJoinServerListener extends ListenerAdapter {
                             success -> mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS),
                             BotLogger::catchRestError);
         }
+
+        // Ping into new player thread if applicable
         var player = game.getPlayer(user.getId());
         if (player == null
                 || !ButtonHelper.isPlayerNew(player.getUserID())
@@ -100,10 +108,11 @@ public class UserJoinServerListener extends ListenerAdapter {
                 || game.isFowMode()) {
             return true;
         }
-        String msg = user.getAsMention() + " ping here";
         List<ThreadChannel> threadChannels = game.getTableTalkChannel().getThreadChannels();
         for (ThreadChannel threadChannel_ : threadChannels) {
-            if ("Info for new players".equalsIgnoreCase(threadChannel_.getName())) {
+            if (Constants.NEW_PLAYER_THREAD_NAME.equalsIgnoreCase(threadChannel_.getName())) {
+                threadChannel_.addThreadMember(user).queueAfter(1, TimeUnit.SECONDS, null, BotLogger::catchRestError);
+                String msg = user.getAsMention() + " ping here";
                 MessageHelper.sendMessageToChannel(threadChannel_, msg);
             }
         }

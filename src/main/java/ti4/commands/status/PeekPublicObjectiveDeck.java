@@ -20,7 +20,7 @@ class PeekPublicObjectiveDeck extends GameStateSubcommand {
 
     private static final String STAGE_COMMAND_NAME = "stage";
 
-    public PeekPublicObjectiveDeck() {
+    PeekPublicObjectiveDeck() {
         super("po_peek", "Peek Public Objective Deck", false, true);
         addOptions(new OptionData(OptionType.INTEGER, STAGE_COMMAND_NAME, "1 or 2").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COUNT, "Number of cards to peek."));

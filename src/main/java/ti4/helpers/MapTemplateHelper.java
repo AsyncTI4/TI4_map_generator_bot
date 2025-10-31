@@ -33,6 +33,8 @@ import ti4.service.milty.MiltyDraftSlice;
 
 public class MapTemplateHelper {
 
+    private static final String NUCLEUS_COLOR = "rainbow";
+
     public static void buildMapFromMiltyData(Game game, String mapTemplate) throws Exception {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         MapTemplateModel template = Mapper.getMapTemplate(mapTemplate);
@@ -91,10 +93,17 @@ public class MapTemplateHelper {
     }
 
     public static String getPlayerHomeSystemLocation(PlayerDraft pd, String mapTemplate) {
+        if (pd.getFaction() == null) return null;
+        return getPlayerHomeSystemLocation(pd.getPosition(), mapTemplate);
+    }
+
+    public static String getPlayerHomeSystemLocation(Integer speakerPosition, String mapTemplate) {
+        if (speakerPosition == null) return null;
+
         MapTemplateModel template = Mapper.getMapTemplate(mapTemplate);
         for (MapTemplateTile t : template.getTemplateTiles()) {
-            if (t.getPlayerNumber() != null && t.getPlayerNumber().equals(pd.getPosition())) {
-                if (pd.getFaction() != null && t.getHome() != null && t.getHome()) {
+            if (t.getPlayerNumber() != null && t.getPlayerNumber().equals(speakerPosition)) {
+                if (t.getHome() != null && t.getHome()) {
                     return t.getPos();
                 }
             }
@@ -102,7 +111,7 @@ public class MapTemplateHelper {
         return null;
     }
 
-    private static Tile getTileFromTemplateTile(MapTemplateTile tile) {
+    public static Tile getTileFromTemplateTile(MapTemplateTile tile) {
         List<String> backupColors = Arrays.asList(
                 "red",
                 "blue",
@@ -144,6 +153,11 @@ public class MapTemplateHelper {
             } else if (tile.getHome() != null) {
                 tileID = color + "blank";
             }
+        } else if (tile.getNucleusNumbers() != null && !tile.getNucleusNumbers().isEmpty()) {
+            Integer nucleusSlice = tile.getNucleusNumbers().get(0);
+            // TODO: Get a better placeholder tile.
+            // For now, use the same color for all nucleus tiles.
+            tileID = NUCLEUS_COLOR + nucleusSlice;
         }
         if (tileID != null) {
             tileID = AliasHandler.resolveTile(tileID);
@@ -194,7 +208,7 @@ public class MapTemplateHelper {
                         game.setTile(toAdd);
                         somethingHappened = true;
                     } else if (faction != null
-                            && !faction.startsWith("keleres")
+                            && (!faction.startsWith("keleres") || game.isTwilightsFallMode() || game.isFrankenGame())
                             && tile.getHome() != null
                             && tile.getHome()) {
                         String tileID = Mapper.getFaction(faction).getHomeSystem();

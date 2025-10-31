@@ -5,26 +5,26 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.AsyncTI4DiscordBot;
 import ti4.image.TileGenerator;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
+import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class DisasterWatchHelper {
 
     public static void postTileInDisasterWatch(
             Game game, GenericInteractionCreateEvent event, Tile tile, Integer rings, String message) {
-        if (AsyncTI4DiscordBot.guildPrimary
+        if (JdaService.guildPrimary
                         .getTextChannelsByName("disaster-watch-party", true)
                         .isEmpty()
                 || game.isFowMode()) {
             return;
         }
-        TextChannel watchParty = AsyncTI4DiscordBot.guildPrimary
+        TextChannel watchParty = JdaService.guildPrimary
                 .getTextChannelsByName("disaster-watch-party", true)
                 .getFirst();
         try (FileUpload systemWithContext =
@@ -35,14 +35,47 @@ public class DisasterWatchHelper {
         }
     }
 
+    public static void postTileInFlameWatch(
+            Game game, GenericInteractionCreateEvent event, Tile tile, Integer rings, String message) {
+        if (JdaService.guildPrimary
+                        .getTextChannelsByName("silver-flame-watch-party", true)
+                        .isEmpty()
+                || game.isFowMode()
+                || tile == null) {
+            return;
+        }
+        TextChannel watchParty = JdaService.guildPrimary
+                .getTextChannelsByName("silver-flame-watch-party", true)
+                .getFirst();
+        try (FileUpload systemWithContext =
+                new TileGenerator(game, event, null, rings, tile.getPosition()).createFileUpload()) {
+            MessageHelper.sendMessageWithFile(watchParty, systemWithContext, message, false);
+        } catch (IOException e) {
+            BotLogger.error(new LogOrigin(event, game), "Exception while closing FileUpload", e);
+        }
+    }
+
+    public static void sendMessageInFlameWatch(Game game, String message) {
+        if (JdaService.guildPrimary
+                        .getTextChannelsByName("silver-flame-watch-party", true)
+                        .isEmpty()
+                || game.isFowMode()) {
+            return;
+        }
+        TextChannel watchParty = JdaService.guildPrimary
+                .getTextChannelsByName("silver-flame-watch-party", true)
+                .getFirst();
+        MessageHelper.sendMessageToChannel(watchParty, message);
+    }
+
     public static void sendMessageInDisasterWatch(Game game, String message) {
-        if (AsyncTI4DiscordBot.guildPrimary
+        if (JdaService.guildPrimary
                         .getTextChannelsByName("disaster-watch-party", true)
                         .isEmpty()
                 || game.isFowMode()) {
             return;
         }
-        TextChannel watchParty = AsyncTI4DiscordBot.guildPrimary
+        TextChannel watchParty = JdaService.guildPrimary
                 .getTextChannelsByName("disaster-watch-party", true)
                 .getFirst();
         MessageHelper.sendMessageToChannel(watchParty, message);

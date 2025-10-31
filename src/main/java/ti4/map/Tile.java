@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CalendarHelper;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
@@ -89,6 +90,16 @@ public class Tile {
                     (planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
     }
 
+    public static Predicate<Tile> tileMayHaveThundersEdge() {
+        return tile -> {
+            if (tile.getTilePath().toLowerCase().contains("hyperlane")) return false;
+            if (tile.getPlanetUnitHolders().size() > 0) return false;
+            if (tile.isSupernova()) return false;
+            if (tile.getTileModel().hasWormhole()) return false;
+            return true;
+        };
+    }
+
     public void inheritFogData(Tile t) {
         fog.putAll(t.getFog());
         fogLabel.putAll(t.getFogLabel());
@@ -109,8 +120,25 @@ public class Tile {
         return Mapper.getTokenPath(tokenID);
     }
 
+    public static Predicate<Tile> tileHasPlayersInfAndCC(Player player) {
+        Predicate<UnitKey> isInf = unit -> unit.getUnitType() == UnitType.Infantry;
+        return tile -> tile.containsPlayersUnitsWithKeyCondition(player, isInf)
+                && CommandCounterHelper.hasCC(null, player.getColor(), tile);
+    }
+
     public boolean isSpaceHolderValid(String spaceHolder) {
         return unitHolders.get(spaceHolder) != null;
+    }
+
+    public static Predicate<Tile> tileHasNoPlayerShips(Game game) {
+        return tile -> {
+            for (Player p : game.getRealPlayers()) {
+                if (FoWHelper.playerHasActualShipsInSystem(p, tile)) {
+                    return false;
+                }
+            }
+            return true;
+        };
     }
 
     public void addUnit(String spaceHolder, UnitKey unitID, Integer count) {
@@ -183,6 +211,14 @@ public class Tile {
         if (unitHolder != null) {
             unitHolder.removeCC(ccID);
         }
+    }
+
+    public static Predicate<Tile> tileHasBreach() {
+        return tile -> {
+            List<String> breaches = Arrays.asList("token_breachActive.png", "token_breachInactive.png");
+            Set<String> tokens = tile.getSpaceUnitHolder().getTokenList();
+            return CollectionUtils.containsAny(tokens, breaches);
+        };
     }
 
     public void removeAllCC() {
@@ -375,15 +411,34 @@ public class Tile {
         return unitHolders;
     }
 
+    public List<Planet> getSpaceStations() {
+        List<Planet> planets = new ArrayList<>();
+        for (UnitHolder uH : unitHolders.values()) {
+            if (uH instanceof Planet p
+                    && uH.getTokenList().stream().noneMatch(token -> token.contains(Constants.WORLD_DESTROYED))) {
+                if (!p.isSpaceStation()) continue;
+
+                planets.add(p);
+            }
+        }
+        return planets;
+    }
+
     public List<Planet> getPlanetUnitHolders() {
         List<Planet> planets = new ArrayList<>();
         for (UnitHolder uH : unitHolders.values()) {
             if (uH instanceof Planet p
                     && uH.getTokenList().stream().noneMatch(token -> token.contains(Constants.WORLD_DESTROYED))) {
+                if (p.isSpaceStation()) continue;
                 planets.add(p);
             }
         }
         return planets;
+    }
+
+    public boolean hasSpaceStation() {
+        for (UnitHolder uh : unitHolders.values()) if (uh instanceof Planet p && p.isSpaceStation()) return true;
+        return false;
     }
 
     @JsonIgnore
@@ -518,15 +573,31 @@ public class Tile {
     }
 
     @JsonIgnore
-    public Set<WormholeModel.Wormhole> getWormholes() {
+    public List<WormholeModel.Wormhole> getWormholes(Game game) {
         Set<WormholeModel.Wormhole> whs = EnumSet.noneOf(WormholeModel.Wormhole.class);
-        if (getTileModel().getWormholes() != null) whs.addAll(getTileModel().getWormholes());
-        for (String token : getSpaceUnitHolder().getTokenList()) {
-            if (token.contains("alpha") || token.contains("sigma_weirdway")) whs.add(WormholeModel.Wormhole.ALPHA);
-            if (token.contains("beta") || token.contains("sigma_weirdway")) whs.add(WormholeModel.Wormhole.BETA);
-            if (token.contains("gamma")) whs.add(WormholeModel.Wormhole.GAMMA);
+        List<WormholeModel.Wormhole> whs2 = new ArrayList<>(whs);
+        if (getTileModel().getWormholes() != null) {
+            Set<WormholeModel.Wormhole> tileWhs = getTileModel().getWormholes();
+            whs2.addAll(tileWhs.stream().filter(Objects::nonNull).toList());
         }
-        return whs;
+        for (String token : getSpaceUnitHolder().getTokenList()) {
+            if (token.contains("alpha") || token.contains("sigma_weirdway")) whs2.add(WormholeModel.Wormhole.ALPHA);
+            if (token.contains("beta") || token.contains("sigma_weirdway")) whs2.add(WormholeModel.Wormhole.BETA);
+            if (token.contains("gamma")) whs2.add(WormholeModel.Wormhole.GAMMA);
+        }
+        String ghostFlagshipColor = null;
+        for (Player p : game.getPlayers().values()) {
+            if (p.ownsUnit("ghost_flagship")
+                    || p.ownsUnit("sigma_creuss_flagship_1")
+                    || p.ownsUnit("sigma_creuss_flagship_2")) {
+                ghostFlagshipColor = p.getColor();
+                break;
+            }
+        }
+        if (getSpaceUnitHolder().getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
+            whs2.add(WormholeModel.Wormhole.DELTA);
+        }
+        return whs2;
     }
 
     @JsonIgnore
@@ -558,8 +629,13 @@ public class Tile {
     }
 
     @JsonIgnore
+    public boolean isScar() {
+        return getTileModel().isScar();
+    }
+
+    @JsonIgnore
     public boolean isAnomaly() {
-        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift()) {
+        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift() || isScar()) {
             return true;
         }
         for (UnitHolder unitHolder : unitHolders.values()) {
@@ -598,7 +674,7 @@ public class Tile {
 
     @JsonIgnore
     public boolean isAnomaly(Game game) {
-        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift(game)) {
+        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift(game) || isScar()) {
             return true;
         }
         for (UnitHolder unitHolder : unitHolders.values()) {
@@ -610,11 +686,31 @@ public class Tile {
         return false;
     }
 
+    public boolean hasLegendary() {
+        for (Planet planet : getPlanetUnitHolders()) {
+            if (planet.isLegendary()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @JsonIgnore
     public boolean containsPlayersUnits(Player p) {
         return unitHolders.values().stream()
                 .flatMap(uh -> uh.getUnitKeys().stream())
                 .anyMatch(p::unitBelongsToPlayer);
+    }
+
+    @JsonIgnore
+    public int getNumberOfUnitsInSystem() {
+
+        int amount = 0;
+        for (UnitHolder uH : getUnitHolders().values()) {
+            amount += uH.getUnitCount();
+        }
+        return amount;
     }
 
     @JsonIgnore
@@ -682,7 +778,7 @@ public class Tile {
                 .sum();
     }
 
-    private static Predicate<Tile> tileHasPlayerShips(Player player) {
+    public static Predicate<Tile> tileHasPlayerShips(Player player) {
         return tile -> tile.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip);
     }
 

@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.CommandHelper;
 import ti4.commands.Subcommand;
@@ -21,6 +20,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.SearchGameHelper;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
+import ti4.spring.jda.JdaService;
 
 class CreateGameButton extends Subcommand {
 
@@ -78,7 +78,7 @@ class CreateGameButton extends Subcommand {
                     continue;
                 }
 
-                if (!member.getUser().isBot() && !CommandHelper.hasRole(event, AsyncTI4DiscordBot.developerRoles)) {
+                if (!member.getUser().isBot() && !CommandHelper.hasRole(event, JdaService.developerRoles)) {
                     int ongoingAmount = SearchGameHelper.searchGames(
                             member.getUser(), event, false, false, false, true, false, true, true, true);
                     int completedAndOngoingAmount = SearchGameHelper.searchGames(
@@ -95,7 +95,8 @@ class CreateGameButton extends Subcommand {
                         return;
                     }
                     // Used for specific people we are limiting the amount of games of
-                    if (member.getId().equalsIgnoreCase("163392891148959744")) {
+                    if ("163392891148959744".equalsIgnoreCase(member.getId())
+                            || "774413088072925226".equalsIgnoreCase(member.getId())) {
                         if (ongoingAmount > 5) {
                             MessageHelper.sendMessageToChannel(
                                     event.getChannel(),

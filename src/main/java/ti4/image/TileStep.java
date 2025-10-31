@@ -3,6 +3,7 @@ package ti4.image;
 public enum TileStep {
     Setup,
     Tile,
+    TileUnannotated,
     Extras,
     Units,
     Distance,
@@ -15,5 +16,6 @@ public enum TileStep {
     Traits,
     TechSkips,
     Attachments,
-    TileNumber
+    TileNumber,
+    Nucleus
 }

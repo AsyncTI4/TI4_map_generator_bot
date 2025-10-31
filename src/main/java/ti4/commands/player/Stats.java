@@ -61,6 +61,7 @@ class Stats extends GameStateSubcommand {
                         "Flip a strategy card's played status; enter the initiative number"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Set whether player has passed y/n"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Set whether player is speaker y/n"))
+                .addOptions(new OptionData(OptionType.STRING, Constants.TYRANT, "Set whether player is tyrant y/n"))
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.NPC, "Player is an NPC"))
                 .addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
@@ -231,6 +232,18 @@ class Stats extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, message.toString());
         }
 
+        OptionMapping optionTyrant = event.getOption(Constants.TYRANT);
+        if (optionTyrant != null) {
+            StringBuilder message = new StringBuilder(getGeneralMessage(optionTyrant));
+            String value = optionTyrant.getAsString().toLowerCase();
+            if ("y".equals(value) || "yes".equals(value)) {
+                game.setTyrantUserID(player.getUserID());
+            } else {
+                message.append(", which is not a valid input. Please use one of: y/yes");
+            }
+            MessageHelper.sendMessageToEventChannel(event, message.toString());
+        }
+
         OptionMapping optionPassed = event.getOption(Constants.PASSED);
         if (optionPassed != null) {
             StringBuilder message = new StringBuilder(getGeneralMessage(optionPassed));
@@ -302,6 +315,13 @@ class Stats extends GameStateSubcommand {
                 if (!game.isFowMode()) {
                     Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), game.getName());
                 }
+
+                var userSettings = UserSettingsManager.get(player.getUserID());
+
+                userSettings.setTrackRecord(
+                        userSettings.getTrackRecord() + " was set as an NPC in " + game.getName() + ". ");
+
+                UserSettingsManager.save(userSettings);
 
                 Guild guild = event.getGuild();
                 Member removedMember = guild.getMemberById(player.getUserID());

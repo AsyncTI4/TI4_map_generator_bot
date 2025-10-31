@@ -25,7 +25,8 @@ public class Source {
         codex2,
         codex3,
         codex4,
-        te,
+        thunders_edge,
+        twilights_fall,
 
         // big homebrew
         ds,
@@ -38,7 +39,6 @@ public class Source {
         // lil homebrew
         lazax,
         action_deck_2,
-        action_deck_2_old,
         keleresplus,
         little_omega,
         project_pi,
@@ -85,6 +85,9 @@ public class Source {
         riftset,
         ascendant_sun,
 
+        // legacy values that have to stick around for a while to make sure games work
+        deprecated,
+
         // catchall
         other;
 
@@ -109,7 +112,7 @@ public class Source {
 
         public boolean isOfficial() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3, codex4, te -> true;
+                case base, pok, codex1, codex2, codex3, codex4, thunders_edge -> true;
                 default -> false;
             };
         }
@@ -123,7 +126,7 @@ public class Source {
 
         public boolean isDs() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3, codex4, ds, uncharted_space, blue_reverie, te -> true;
+                case base, pok, codex1, codex2, codex3, codex4, ds, uncharted_space, blue_reverie -> true;
                 default -> false;
             };
         }

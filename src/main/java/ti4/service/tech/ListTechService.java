@@ -13,6 +13,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperSCs;
+import ti4.helpers.RegexHelper;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -24,6 +26,7 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.button.ReactionService;
+import ti4.service.regex.RegexService;
 
 @UtilityClass
 public class ListTechService {
@@ -45,26 +48,77 @@ public class ListTechService {
 
     private void acquireATechWithResources(
             ButtonInteractionEvent event, Game game, Player player, boolean sc, boolean first) {
-        acquireATech(event, game, player, sc, TechnologyType.mainFive, first);
+        acquireATech(event, game, player, sc, false, TechnologyType.mainFive, first);
     }
 
     @ButtonHandler("acquireAUnitTechWithInf")
     public void acquireAUnitTechWithInf(ButtonInteractionEvent event, Game game, Player player) {
         boolean sc = false;
         boolean firstTime = true;
-        acquireATech(event, game, player, sc, List.of(TechnologyType.UNITUPGRADE), firstTime);
+        acquireATech(event, game, player, sc, false, List.of(TechnologyType.UNITUPGRADE), firstTime);
     }
 
-    private void acquireATech(
+    @ButtonHandler("entropicScar_")
+    private static void gainTechFromScar(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String regex = "entropicScar_" + RegexHelper.techRegex(game);
+        RegexService.runMatcher(regex, buttonID, matcher -> {
+            String tech = matcher.group("tech");
+            TechnologyModel model = Mapper.getTech(tech);
+
+            String error = null;
+            boolean scepter = player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter");
+            if (player.getStrategicCC() < 1 && !scepter) {
+                error = player.getRepresentation()
+                        + " You seem to have misplaced your strategy tokens, and cannot use the Entropic Scar anomaly.";
+            } else if (model == null) {
+                error = "Could not find tech: " + tech;
+            } else if (player.hasTech(tech)) {
+                error = player.getRepresentation() + " You already have " + model.getName();
+            } else {
+                String msg = player.getRepresentation() + " You gained " + model.getNameRepresentation()
+                        + " using the Entropic Scar anomaly.";
+                if (scepter) {
+                    msg += "\n> Exhausted the " + RelicHelper.sillySpelling();
+                } else {
+                    msg += "\n> Reduced Strategy CCs by 1 (" + player.getStrategicCC();
+                    player.setStrategicCC(player.getStrategicCC() - 1);
+                    msg += "->" + player.getStrategicCC() + ")";
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
+                }
+                player.addTech(tech);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                ButtonHelper.deleteMessage(event);
+            }
+
+            if (error != null) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), error);
+            }
+        });
+    }
+
+    @ButtonHandler("acquireATechWithDwsBt")
+    public void acquireATechWithDwsBt(ButtonInteractionEvent event, Game game, Player player) {
+        boolean sc = false;
+        boolean dws = true;
+        boolean firstTime = !event.getButton().getCustomId().endsWith("_second");
+        acquireATech(event, game, player, sc, dws, TechnologyType.mainFour, firstTime);
+    }
+
+    public void acquireATech(
             ButtonInteractionEvent event,
             Game game,
             Player player,
             boolean sc,
+            boolean dwsBt,
             List<TechnologyType> techTypes,
             boolean first) {
         game.setComponentAction(!sc);
+        String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
+        game.setComponentAction(!sc);
+        String techPrefix = finsFactionCheckerPrefix + "getAllTechOfType_";
+        String techSuffix = dwsBt ? "_dwsbt" : "";
 
-        if (sc) {
+        if (sc || dwsBt) {
             boolean used = ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player);
             StrategyCardModel scModel =
                     game.getStrategyCardModelByName("technology").orElse(null);
@@ -85,16 +139,15 @@ public class ListTechService {
             if (first) {
                 ButtonHelperCommanders.yinCommanderSummary(player, game);
                 ButtonHelperCommanders.veldyrCommanderSummary(player, game);
-                String getAllButtonSpoof = "getAllTechOfType_allTechResearchable";
+                String getAllButtonSpoof = "getAllTechOfType_allTechResearchable" + techSuffix;
                 getAllTechOfType(event, player, getAllButtonSpoof, game, player.getCardsInfoThread());
                 return;
             }
         }
 
         List<Button> buttons = new ArrayList<>();
-        String techPrefix = player.finChecker() + "getAllTechOfType_";
         for (TechnologyType type : techTypes) {
-            String id = techPrefix + type.toString();
+            String id = techPrefix + type.toString() + techSuffix;
             if (techTypes.size() == 1 && type == TechnologyType.UNITUPGRADE) {
                 id += "_inf";
             }
@@ -124,6 +177,7 @@ public class ListTechService {
             ButtonInteractionEvent event, Player player, String buttonID, Game game, MessageChannel channel) {
         String techType = buttonID.replace("getAllTechOfType_", "");
         String payType = null;
+        boolean dwsBt = techType.endsWith("_dwsbt");
         if (techType.contains("_")) {
             String[] split = techType.split("_");
             techType = split[0];
@@ -136,16 +190,18 @@ public class ListTechService {
         List<Button> buttons = new ArrayList<>();
         if (techType.contains("allTechResearchable")) {
             for (TechnologyType type : TechnologyType.mainFive) {
-                List<TechnologyModel> techs = getAllTechOfAType(game, type.toString(), player, true);
+                List<TechnologyModel> techs = getAllTechOfAType(game, type.toString(), player, dwsBt, true);
                 buttons.addAll(getTechButtons(techs, player, payType));
             }
         } else {
-            List<TechnologyModel> techs = getAllTechOfAType(game, techType, player);
+            List<TechnologyModel> techs = getAllTechOfAType(game, techType, player, dwsBt);
             buttons.addAll(getTechButtons(techs, player, payType));
         }
 
         if (game.isComponentAction()) {
             buttons.add(Buttons.gray("acquireATech", "Get Other Technology"));
+        } else if (dwsBt) {
+            buttons.add(Buttons.gray("acquireATechWithDwsBt_second", "Get Other Technology"));
         } else {
             buttons.add(Buttons.gray("acquireATechWithSC_second", "Get Other Technology"));
         }
@@ -195,7 +251,7 @@ public class ListTechService {
             }
             if (ButtonHelper.checkForTechSkips(game, planet)) {
                 Planet unitHolder = game.getPlanetsInfo().get(planet);
-                Set<String> techTypes = unitHolder.getTechSpecialities();
+                List<String> techTypes = unitHolder.getTechSpecialities();
                 for (String type : techTypes) {
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "zealotscommander")) {
                         wilds++;
@@ -252,15 +308,32 @@ public class ListTechService {
             wilds++;
         }
 
+        // All sources of pre-requisites below can also apply via synergy.
+        // - Replace all synergies that the player has with a simple "X"
+        Set<TechnologyType> synergies = player.getSynergies();
+        for (TechnologyType synergy : synergies) {
+            requirements = switch (synergy) {
+                case PROPULSION -> requirements.replace("B", "X");
+                case BIOTIC -> requirements.replace("G", "X");
+                case CYBERNETIC -> requirements.replace("Y", "X");
+                case WARFARE -> requirements.replace("R", "X");
+                default -> requirements;
+            };
+        }
+
         for (String techID : player.getTechs()) {
             TechnologyModel playerTech = Mapper.getTech(techID);
             if (playerTech == null) continue;
             for (TechnologyType type : playerTech.getTypes()) {
+                if (synergies.contains(type)) {
+                    requirements = requirements.replaceFirst("X", "");
+                    continue;
+                }
                 switch (type) {
-                    case BIOTIC -> requirements = G.matcher(requirements).replaceFirst("");
-                    case WARFARE -> requirements = R.matcher(requirements).replaceFirst("");
-                    case PROPULSION -> requirements = B.matcher(requirements).replaceFirst("");
-                    case CYBERNETIC -> requirements = Y.matcher(requirements).replaceFirst("");
+                    case BIOTIC -> requirements = requirements.replaceFirst("G", "");
+                    case WARFARE -> requirements = requirements.replaceFirst("R", "");
+                    case PROPULSION -> requirements = requirements.replaceFirst("B", "");
+                    case CYBERNETIC -> requirements = requirements.replaceFirst("Y", "");
                     case UNITUPGRADE -> {
                         if (game.playerHasLeaderUnlockedOrAlliance(player, "kjalengardcommander")) {
                             wilds++;
@@ -270,6 +343,7 @@ public class ListTechService {
                 }
             }
         }
+
         if (ButtonHelper.isLawInPlay(game, "schematics")
                 && ("ws".equalsIgnoreCase(tech.getAlias())
                         || "ws".equalsIgnoreCase(tech.getBaseUpgrade().orElse("beh")))) {
@@ -294,7 +368,7 @@ public class ListTechService {
 
         String idPrefix = player.finChecker()
                 + switch (buttonPrefixType.toLowerCase()) {
-                    case "normal", "res", "nekro", "nopay", "free", "inf" -> "getTech_";
+                    case "normal", "res", "nekro", "nopay", "free", "inf", "shareknowledge", "dwsbt" -> "getTech_";
                     default -> "swapTechs__" + buttonPrefixType + "__";
                 };
         String idSuffix =
@@ -302,6 +376,8 @@ public class ListTechService {
                     case "nekro", "nopay" -> "__noPay";
                     case "free" -> "__noPay__comp";
                     case "inf" -> "__inf";
+                    case "dwsbt" -> "__dwsbt";
+                    case "shareknowledge" -> "__shareKnowledge";
                     default -> "";
                 };
 
@@ -323,14 +399,21 @@ public class ListTechService {
     }
 
     public static List<TechnologyModel> getAllTechOfAType(Game game, String techType, Player player) {
-        return getAllTechOfAType(game, techType, player, false);
+        return getAllTechOfAType(game, techType, player, false, false);
+    }
+
+    public static List<TechnologyModel> getAllTechOfAType(
+            Game game, String techType, Player player, boolean deepwroughtbt) {
+        return getAllTechOfAType(game, techType, player, deepwroughtbt, false);
     }
 
     private static List<TechnologyModel> getAllTechOfAType(
-            Game game, String techType, Player player, boolean hasToBeResearchable) {
+            Game game, String techType, Player player, boolean deepwroughtbt, boolean hasToBeResearchable) {
         List<TechnologyModel> validTechs = Mapper.getTechs().values().stream()
                 .filter(tech -> !hasToBeResearchable || isTechResearchable(tech, player))
                 .filter(tech -> game.getTechnologyDeck().contains(tech.getAlias()))
+                .filter(tech -> !(tech.getFaction().isPresent() && deepwroughtbt))
+                .filter(tech -> !(tech.getTypes().contains(TechnologyType.UNITUPGRADE) && deepwroughtbt))
                 .filter(tech -> tech.isType(techType)
                         || game.getStoredValue("colorChange" + tech.getAlias()).equalsIgnoreCase(techType))
                 .filter(tech -> !player.getPurgedTechs().contains(tech.getAlias()))

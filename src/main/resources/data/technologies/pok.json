@@ -1002,7 +1002,7 @@
         "requirements": "YY",
         "faction": "winnu",
         "source": "base",
-        "text": "Exhaust this card when 1 or more of your units use PRODUCTION; swap the resource and influence values of 1 planet you control until the end of your turn.",
+        "text": "Exhaust this card when 1 or more of your units use PRODUCTION; swap the resource and influence values of 1 planet you control during that use of Production.",
         "shrinkName": true,
         "shortName": "Hegemonic Trade Plcy",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/hegemonic_trade_policy.jpg?raw=true"
@@ -1088,7 +1088,6 @@
         "shrinkName": false,
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/agency_supply_network.jpg?raw=true"
     },
-    
     {
         "alias": "nekroc4y",
         "name": "???\\_NULL\\_REFERENCE\\_???",

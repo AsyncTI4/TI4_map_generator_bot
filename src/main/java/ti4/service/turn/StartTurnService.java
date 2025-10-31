@@ -29,6 +29,7 @@ import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.EidolonMaximumService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -57,12 +58,14 @@ public class StartTurnService {
             }
         }
 
+        game.removeStoredValue("fortuneSeekers");
         ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
         game.setStoredValue(player.getFaction() + "planetsExplored", "");
         game.setStoredValue("lawsDisabled", "no");
         game.removeStoredValue("audioSent");
         game.checkSOLimit(player);
         CardsInfoService.sendVariousAdditionalButtons(game, player);
+        EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
         boolean goingToPass = false;
         if (game.getStoredValue("Pre Pass " + player.getFaction()) != null
                 && game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
@@ -135,7 +138,7 @@ public class StartTurnService {
         game.setPhaseOfGame("action");
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
         Helper.startOfTurnSaboWindowReminders(game, player);
-        boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
+        boolean isFowPrivateGame = game.isFowMode();
 
         if (game.isShowBanners()) {
             BannerGenerator.drawFactionBanner(player);
@@ -321,6 +324,10 @@ public class StartTurnService {
         game.setDominusOrb(false);
         List<Button> startButtons = new ArrayList<>();
         boolean hadAnyUnplayedSCs = false;
+
+        if (doneActionThisTurn && player.hasTech("fl")) {
+            confirmed2ndAction = true;
+        }
         if (!doneActionThisTurn || confirmed2ndAction) {
             Button tacticalAction =
                     Buttons.green(finChecker + "tacticalAction", "Tactical Action (" + player.getTacticalCC() + ")");
@@ -395,15 +402,7 @@ public class StartTurnService {
         }
 
         if (!hadAnyUnplayedSCs && !doneActionThisTurn) {
-            Button pass = Buttons.red(finChecker + "passForRound", "Pass");
-
-            int numEndOfTurn = ButtonHelper.getEndOfTurnAbilities(player, game).size() - 1;
-            if (numEndOfTurn > 0) {
-                startButtons.add(Buttons.blue(
-                        finChecker + "endOfTurnAbilities", "Do End Of Turn Ability (" + numEndOfTurn + ")"));
-            }
-
-            startButtons.add(pass);
+            startButtons.add(ButtonHelper.getPassButton(game, player));
             if (!game.isFowMode()) {
                 for (Player p2 : game.getRealPlayers()) {
                     for (int sc : player.getSCs()) {
@@ -426,15 +425,7 @@ public class StartTurnService {
         }
         if (doneActionThisTurn) {
             ButtonHelperFactionSpecific.checkBlockadeStatusOfEverything(player, game, event);
-            if (ButtonHelper.getEndOfTurnAbilities(player, game).size() > 1) {
-                startButtons.add(Buttons.blue(
-                        "endOfTurnAbilities",
-                        "Do End Of Turn Ability ("
-                                + (ButtonHelper.getEndOfTurnAbilities(player, game)
-                                                .size()
-                                        - 1) + ")"));
-            }
-            startButtons.add(Buttons.red(finChecker + "turnEnd", "End Turn"));
+            startButtons.add(ButtonHelper.getEndTurnButton(game, player));
             if (IsPlayerElectedService.isPlayerElected(game, player, "minister_war")) {
                 startButtons.add(Buttons.gray(finChecker + "ministerOfWar", "Use Minister of War"));
             }
@@ -443,9 +434,28 @@ public class StartTurnService {
             }
         } else {
             game.setJustPlayedComponentAC(false);
-            if (player.getTechs().contains("cm")) {
+            Player nomad = Helper.getPlayerFromUnlockedBreakthrough(game, "nomadbt");
+            if (nomad != null && (!game.isFowMode() || player.hasUnlockedBreakthrough("nomadbt"))) {
+                String label = (player == nomad ? "Use" : "Use/Request") + " Thunder's Paradox";
+                startButtons.add(Buttons.gray("startThundersParadox", label, FactionEmojis.Nomad));
+            }
+            if (player.hasTech("parasite-obs")) {
+                startButtons.add(Buttons.gray("startNeuralParasite", "Use Neural Parasite", FactionEmojis.Obsidian));
+            }
+
+            if (player.hasTech("cm") || player.hasTech("tf-chaos")) {
                 startButtons.add(
                         Buttons.gray(finChecker + "startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));
+            }
+
+            if (player.ownsUnit("tf-ahksylfier")
+                    && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser", false) > 0) {
+                startButtons.add(
+                        Buttons.gray("creussTFCruiserStep1_", "Use Creuss Cruiser Ability", FactionEmojis.Ghost));
+            }
+            if (player.hasUnit("redtf_flagship")
+                    && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", true) < 1) {
+                startButtons.add(Buttons.gray(finChecker + "startRedTFDeploy", "Deploy Flagship", FactionEmojis.redtf));
             }
             if (game.isOrdinianC1Mode()
                     && !ButtonHelper.isCoatlHealed(game)
@@ -453,14 +463,13 @@ public class StartTurnService {
                 startButtons.add(
                         Buttons.gray(finChecker + "healCoatl", "Heal Coatl (Costs 6 Resources)", FactionEmojis.Argent));
             }
-            if (player.getTechs().contains("dspharinf")
+            if (player.hasTech("dspharinf")
                     && !ButtonHelperFactionSpecific.getPharadnInf2ReleaseButtons(player, game)
                             .isEmpty()) {
                 startButtons.add(Buttons.gray(
                         finChecker + "startPharadnInfRevive", "Release 1 Infantry", FactionEmojis.pharadn));
             }
-            if (player.getTechs().contains("dscymiy")
-                    && !player.getExhaustedTechs().contains("dscymiy")) {
+            if (player.hasTech("dscymiy") && !player.getExhaustedTechs().contains("dscymiy")) {
                 startButtons.add(Buttons.gray(
                         finChecker + "exhaustTech_dscymiy", "Exhaust Recursive Worm", FactionEmojis.cymiae));
             }
@@ -507,6 +516,9 @@ public class StartTurnService {
         if (player.hasUnexhaustedLeader("hacanagent")) {
             startButtons.add(
                     Buttons.gray(finChecker + "exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
+        }
+        if (player.hasUnlockedBreakthrough("titansbt")) {
+            startButtons.add(Buttons.gray("selectPlayerToSleeper", "Add a sleeper token", MiscEmojis.Sleeper));
         }
         if (player.hasUnexhaustedLeader("pharadnagent")) {
             startButtons.add(

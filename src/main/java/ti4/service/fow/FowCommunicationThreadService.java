@@ -28,7 +28,7 @@ public class FowCommunicationThreadService {
 
     private static final String YES_CHAR = "↔";
     private static final String NO_CHAR = "X";
-    private static final Pattern THREAD_NAME_PATTERN =
+    public static final Pattern THREAD_NAME_PATTERN =
             Pattern.compile("^(\\w+)\\s*(?:" + YES_CHAR + "|" + NO_CHAR + ")\\s*(\\w+)");
 
     public static boolean isActive(Game game) {
@@ -88,7 +88,7 @@ public class FowCommunicationThreadService {
         return player.getNeighbouringPlayers(true);
     }
 
-    private static CompletableFuture<List<ThreadChannel>> getGameThreadChannels(Game game) {
+    public static CompletableFuture<List<ThreadChannel>> getGameThreadChannels(Game game) {
         CompletableFuture<List<ThreadChannel>> future = new CompletableFuture<>();
 
         List<ThreadChannel> result = new ArrayList<>(game.getMainGameChannel().getThreadChannels());

@@ -84,7 +84,7 @@ public class ButtonHelperStats {
         String message = player.getRepresentationNoPing();
         String fogMessage;
         int initComm = player.getCommodities();
-        if (player.getCommodities() + amt > player.getCommoditiesTotal()) {
+        if (player.getCommodities() + amt > player.getCommoditiesTotal() && !game.isAgeOfCommerceMode()) {
             player.setCommodities(player.getCommoditiesTotal());
             int gained = player.getCommodities() - initComm;
             message += " gained " + gained + " commodit" + (gained == 1 ? "y" : "ies") + " (" + initComm + "->"
@@ -146,6 +146,15 @@ public class ButtonHelperStats {
                     player.getCorrectChannel(), axis, ButtonHelperAbilities.getBuyableAxisOrders(player, game));
         }
         CommanderUnlockCheckService.checkPlayer(player, "mykomentori");
+        Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
+        if (obsidian != null && obsidian.getPlotCardsFactions().get("siphon").contains(player.getFaction())) {
+            String siphonMsg = obsidian.getRepresentation()
+                    + " the puppeted player for Syphon has gained commodities, so you gain " + realGain
+                    + " trade goods. ";
+            siphonMsg += "(" + obsidian.getTg() + "->" + (obsidian.getTg() + realGain) + ")";
+            MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), siphonMsg);
+            obsidian.setTg(obsidian.getTg() + realGain);
+        }
     }
 
     public static void sendGainCCButtons(Game game, Player player, boolean redistribute) {

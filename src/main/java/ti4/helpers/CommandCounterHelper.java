@@ -3,6 +3,7 @@ package ti4.helpers;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.helpers.thundersedge.TeHelperAgents;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -47,6 +48,11 @@ public class CommandCounterHelper {
                     player.getGame(), tile.getPosition(), colorMention + " has placed a command token in the system.");
         }
         tile.addCC(ccID);
+        for (Player p : player.getGame().getRealPlayers()) {
+            if (p.hasUnexhaustedLeader("naaluagent-te")) {
+                TeHelperAgents.serveNaaluAgentButtons(player.getGame(), p, tile, player);
+            }
+        }
     }
 
     public static boolean hasCC(@Nullable GenericInteractionCreateEvent event, String color, Tile tile) {

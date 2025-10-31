@@ -3,7 +3,7 @@
         "id": "arvaxi_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
-        "name": "Wraith Aurora",
+        "name": "Wrath of the Covenant",
         "source": "balacasi",
         "faction": "arvaxi",
         "moveValue": 1,
@@ -33,10 +33,43 @@
         "ability": "When 1 or more of your units use PRODUCTION, producing this unit does not count against your PRODUCTION limit."
     },
     {
+        "id": "arachian_flagship",
+        "baseType": "flagship",
+        "asyncId": "fs",
+        "name": "The Queen Mother",
+        "source": "other",
+        "faction": "arachian",
+        "moveValue": 1,
+        "capacityValue": 3,
+        "capacityUsed": 1,
+        "cost": 8,
+        "combatHitsOn": 7,
+        "combatDieCount": 2,
+        "sustainDamage": true,
+        "canBeDirectHit": true,
+        "isShip": true,
+        "ability": "This system counts as containing one of your Command Tokens for the purpose of your faction abilities. During movement, this ship may move after your other ships."
+    },
+    {
+        "id": "arachian_mech",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Webweaver",
+        "source": "other",
+        "faction": "arachian",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "sustainDamage": true,
+        "isGroundForce": true,
+        "ability": "At the start of a ground combat on this planet: You may remove one of your infantry units from an adjacent system and place it on this planet."
+    },
+    {
         "id": "xan_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
-        "name": "Titanium Sentinel",
+        "name": "Aegis Ascendant",
         "source": "balacasi",
         "faction": "xan",
         "moveValue": 1,
@@ -146,7 +179,7 @@
         "id": "lunarium_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
-        "name": "Titanium Sentinel",
+        "name": "Umbra Vas",
         "source": "balacasi",
         "faction": "lunarium",
         "moveValue": 1,
@@ -190,7 +223,7 @@
         "combatHitsOn": 9,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "This unit has capacity equal to the number of your scored secret objectives plus 4."
+        "ability": "Apply +1 to the capacity of this ship for each of your scored secret objectives"
     },
     {
         "id": "lunarium_carrier2",
@@ -208,15 +241,15 @@
         "combatHitsOn": 9,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "After you activate this system, you may place 1 fighter in this system. This unit has capacity equal to the number of your scored secret objectives plus 6. "
+        "ability": "After you activate this system, you may place 1 fighter in this system. Apply +1 to the capacity of this ship for each of your scored secret objectives."
     },
     {
-        "id": "conclave_flagship",
+        "id": "onyxxa_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
         "name": "Igneous Khan",
         "source": "balacasi",
-        "faction": "conclave",
+        "faction": "onyxxa",
         "moveValue": 1,
         "capacityValue": 3,
         "capacityUsed": 1,
@@ -229,12 +262,12 @@
         "ability": "After you win a space combat in this system, gain 1 command token."
     },
     {
-        "id": "conclave_mech",
+        "id": "onyxxa_mech",
         "baseType": "mech",
         "asyncId": "mf",
         "name": "Obelisk",
         "source": "balacasi",
-        "faction": "conclave",
+        "faction": "onyxxa",
         "capacityUsed": 1,
         "cost": 2,
         "combatHitsOn": 6,
@@ -251,6 +284,7 @@
         "upgradesToUnitId": "xan_warsun2",
         "source": "balacasi",
         "faction": "xan",
+        "moveValue": 2,
         "capacityValue": 4,
         "capacityUsed": 1,
         "combatHitsOn": 3,
@@ -295,7 +329,7 @@
         "basicProduction": "res",
         "capacityValue": 3,
         "isStructure": true,
-        "ability": "Up to 1 non-fighter ship in this system does not count against your fleet limit.This unit’s PRODUCTION value is equal to 2 more than the resource value of this planet.Up to 3 fighters in this system do not count against your ships' capacity"
+        "ability": "Up to 1 non-fighter ship in this system does not count against your fleet limit. This unit’s PRODUCTION value is equal to 2 more than the resource value of this planet.Up to 3 fighters in this system do not count against your ships' capacity"
     },
     {
         "id": "xan_spacedock2",
@@ -353,7 +387,7 @@
         "requiredTechId": "batyriinf",
         "source": "balacasi",
         "faction": "tyris",
-        "capacityUsed": 1,
+        "capacityUsed": 0.5,
         "cost": 0.5,
         "combatHitsOn": 7,
         "combatDieCount": 1,

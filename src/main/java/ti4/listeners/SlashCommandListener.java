@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.executors.ExecutorServiceManager;
@@ -17,17 +16,21 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.SusSlashCommandService;
 import ti4.service.game.GameNameService;
+import ti4.spring.jda.JdaService;
 
 public class SlashCommandListener extends ListenerAdapter {
 
     private static final long DELAY_THRESHOLD_MILLISECONDS = 1500;
 
-    private static final List<String> SLASHCOMMANDS_WITH_MODALS =
-            Arrays.asList(Constants.ADD_TILE_LIST, Constants.ADD_TILE_LIST_RANDOM, Constants.EDIT_TRACK_RECORD);
+    private static final List<String> SLASHCOMMANDS_WITH_MODALS = Arrays.asList(
+            Constants.ADD_TILE_LIST,
+            Constants.ADD_TILE_LIST_RANDOM,
+            Constants.EDIT_TRACK_RECORD,
+            Constants.IMPORT_MAP_JSON);
 
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
-        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()
+        if (!JdaService.isReadyToReceiveCommands()
                 && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
             event.getInteraction()
                     .reply("Please try again in a moment.\nThe bot is rebooting and is not ready to receive commands.")

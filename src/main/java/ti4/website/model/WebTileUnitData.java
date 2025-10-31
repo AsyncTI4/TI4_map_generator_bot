@@ -12,6 +12,7 @@ import ti4.helpers.PdsCoverageHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
+import ti4.image.TileGenerator;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -204,6 +205,9 @@ public class WebTileUnitData {
                     // Ignore invalid stored values
                 }
             }
+
+            // Set planetary shield status
+            planetData.setPlanetaryShield(TileGenerator.shouldPlanetHaveShield(planet, game));
         }
 
         // Calculate production and capacity for each player

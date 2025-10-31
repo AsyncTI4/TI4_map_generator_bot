@@ -47,12 +47,6 @@
         "source": "other"
     },
     {
-        "id": "positiveinf2",
-        "imagePath": "attachment_positiveinf2.png",
-        "influenceModifier": 2,
-        "source": "other"
-    },
-    {
         "id": "negativeres",
         "imagePath": "attachment_negativeres.png",
         "resourcesModifier": -1,
@@ -92,6 +86,7 @@
         "id": "legendary",
         "imagePath": "attachment_legendary.png",
         "isLegendary": true,
+        "isFakeAttachment": true,
         "source": "other"
     },
     {

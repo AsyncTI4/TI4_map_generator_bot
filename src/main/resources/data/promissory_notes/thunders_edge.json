@@ -1,0 +1,57 @@
+[
+    {
+        "alias": "shareknowledge",
+        "name": "Share Knowledge",
+        "faction": "deepwrought",
+        "playArea": true,
+        "playImmediately": false,
+        "attachment": false,
+        "source": "thunders_edge",
+        "text": "ACTION: Place this card faceup in your play area and gain 1 non-faction, non-unit upgrade technology that the Deepwrought player owns; place that technology on this card. Return that technology to the deck and this card to the Deepwrought player at the end of the status phase."
+    },
+    {
+        "alias": "blackops",
+        "name": "Black Ops",
+        "faction": "firmament",
+        "playArea": false,
+        "attachment": false,
+        "source": "thunders_edge",
+        "text": "When you receive this card, if you are not the Firmament: The Firmament player may place 1 facedown plot card in their play area with your control token on it. Then, gain 2 command tokens, gain 2 trade goods, and purge this card."
+    },
+    {
+        "alias": "malevolency",
+        "name": "Malevolency",
+        "faction": "obsidian",
+        "playArea": false,
+        "attachment": false,
+        "source": "thunders_edge",
+        "text": "At the end of one of your tactical actions: Spend 1 influence to give this card to one of your neighbors; you can use this ability even if you are the Obsidian player.\nAt the end of the status phase, if you are not the Obsidian player, remove 1 command token from your fleet pool and return it to your reinforcements."
+    },
+    {
+        "alias": "nanolink",
+        "name": "Nano-Link Permit",
+        "faction": "ralnel",
+        "playArea": false,
+        "attachment": false,
+        "source": "thunders_edge",
+        "text": "After you activate a system: You may move your structures from adjacent systems that do not contain your command tokens onto planets you control in the active system. Then, return this card to the Ral Nel player."
+    },
+    {
+        "alias": "sever",
+        "name": "Sever",
+        "faction": "crimson",
+        "playArea": true,
+        "attachment": false,
+        "source": "thunders_edge",
+        "text": "ACTION: place this card face up in your play area, and place the sever token in a system that contains your units, wormholes in that system have no effect during movement. Remove the sever token and return this card to the Rebellion player at end of the status phase."
+    },
+    {
+        "alias": "raisethestandard",
+        "name": "Raise the Standard",
+        "faction": "bastion",
+        "playArea": false,
+        "attachment": false,
+        "source": "thunders_edge",
+        "text": "At the end of a combat: Galvanize 1 of your units that participated. Then, return this card to the Last Bastion player."
+    }
+]

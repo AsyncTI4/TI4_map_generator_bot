@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.FactionEmojis;
@@ -28,11 +29,13 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting pok;
     private final BooleanSetting codexes;
     private final BooleanSetting discoStars;
+    private final BooleanSetting betaTestMode;
     private final BooleanSetting unchartedSpace;
     private final BooleanSetting absol;
     private final BooleanSetting ignis;
     private final BooleanSetting eronous;
     private final BooleanSetting actionCardDeck2;
+    private final BooleanSetting teDemo;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -48,7 +51,9 @@ public class SourceSettings extends SettingsMenu {
         base = new BooleanSetting("BaseGame", "Base Game", true);
         pok = new BooleanSetting("PoK", "Prophecy of Kings", true);
         codexes = new BooleanSetting("Codexes", "Codex 1-4", true);
+        betaTestMode = new BooleanSetting("Beta", "Beta Mode", game.isTestBetaFeaturesMode());
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
+        teDemo = new BooleanSetting("ThundersEdge", "Thunders Edge Demo", game.isThundersEdge());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
         absol = new BooleanSetting("Absol", "Absol Mod", game.isAbsolMode());
         ignis = new BooleanSetting(
@@ -56,8 +61,7 @@ public class SourceSettings extends SettingsMenu {
                 "Ignis Aurora Mod",
                 game.getTechnologyDeckID().toLowerCase().contains("baldrick"));
         eronous = new BooleanSetting("Eronous", "Eronous Tiles", false);
-        actionCardDeck2 = new BooleanSetting(
-                "ActionCardDeck2", "Action Card Deck 2", "action_deck_2".equalsIgnoreCase(game.getAcDeckID()));
+        actionCardDeck2 = new BooleanSetting("ActionCardDeck2", "Action Card Deck 2", game.isAcd2());
         // Emojis
         base.setEmoji(SourceEmojis.TI4BaseGame);
         pok.setEmoji(SourceEmojis.TI4PoK);
@@ -85,8 +89,10 @@ public class SourceSettings extends SettingsMenu {
             pok.initialize(json.get("pok"));
             codexes.initialize(json.get("codexes"));
             discoStars.initialize(json.get("discoStars"));
+            teDemo.initialize(json.get("teDemo"));
             unchartedSpace.initialize(json.get("unchartedSpace"));
             absol.initialize(json.get("absol"));
+            ignis.initialize(json.get("ignis"));
             eronous.initialize(json.get("eronous"));
             actionCardDeck2.initialize(json.get("actionCardDeck2"));
         }
@@ -103,6 +109,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(base);
         ls.add(pok);
         ls.add(codexes);
+        ls.add(teDemo);
         ls.add(discoStars);
         ls.add(unchartedSpace);
         ls.add(absol);
@@ -148,6 +155,7 @@ public class SourceSettings extends SettingsMenu {
                     ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
         if (discoStars.isVal()) sources.add(ComponentSource.ds);
         if (absol.isVal()) sources.add(ComponentSource.absol);
+        if (betaTestMode.isVal()) sources.add(ComponentSource.thunders_edge);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
         if (ignis.isVal()) sources.add(ComponentSource.ignis_aurora);
         return sources;
@@ -159,6 +167,9 @@ public class SourceSettings extends SettingsMenu {
         if (parent instanceof MiltySettings ms) {
             game = ms.getGame();
             decks = ms.getGameSettings().getDecks();
+        } else if (parent instanceof DraftSystemSettings dss) {
+            game = dss.getGame();
+            decks = dss.getGameSetupSettings().getDecks();
         }
         if (game == null || decks == null) return;
 
@@ -182,6 +193,15 @@ public class SourceSettings extends SettingsMenu {
                                 "This setting only controls factions. If you want technologies, relics, explores, etc, you need to also enable **__Uncharted Space__**.")
                         .setEphemeral(true)
                         .queue();
+            case "ThundersEdge" -> {
+                event.getHook()
+                        .sendMessage(
+                                "This is only a demo of TE until 10/31/25. No Fracture or new factions until then.")
+                        .setEphemeral(true)
+                        .queue();
+                game.setThundersEdge(true);
+                game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
+            }
             case "Ignis" -> {
                 boolean ignis = this.ignis.isVal();
 
@@ -223,7 +243,7 @@ public class SourceSettings extends SettingsMenu {
 
                 // Decks for Uncharted Space
                 String explore = ds ? "explores_DS" : "explores_pok";
-                String acs = acd2 ? "action_deck_2" : (ds ? "action_cards_ds" : "action_cards_pok");
+                String acs = acd2 ? getAcd2Version(pok, teDemo) : (ds ? "action_cards_ds" : "action_cards_pok");
 
                 // set 'em up
                 decks.getRelics().setChosenKey(relic);
@@ -243,5 +263,11 @@ public class SourceSettings extends SettingsMenu {
             }
             case "Eronous" -> {}
         }
+    }
+
+    private String getAcd2Version(BooleanSetting pok, BooleanSetting teDemo) {
+        // when TE is fully implemented, this needs to check for _pok, _pok_te, or _te.
+        String suffix = pok.isVal() ? "_pok" : teDemo.isVal() ? "_te" : "";
+        return "action_deck_2" + suffix;
     }
 }
