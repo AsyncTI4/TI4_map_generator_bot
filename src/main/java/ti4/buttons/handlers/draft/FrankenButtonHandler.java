@@ -215,7 +215,8 @@ class FrankenButtonHandler {
                                     game.getActionsChannel(), game.getPing() + " the Inaugural Splice is complete!");
                             FrankenDraftBagService.applyDraftBags(event, game, false);
                         } else {
-                            Button randomizeButton = Buttons.green("startFrankenSliceBuild", "Randomize your slices");
+                            Button randomizeButton =
+                                    Buttons.green("startFrankenSliceBuild", "Randomize your slices (sorta)");
                             Button mantisButton = Buttons.green("startFrankenMantisBuild", "Mantis build slices");
                             MessageHelper.sendMessageToChannel(
                                     game.getActionsChannel(),

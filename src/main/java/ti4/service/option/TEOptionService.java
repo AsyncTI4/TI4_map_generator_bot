@@ -33,10 +33,10 @@ public class TEOptionService {
 
     @ButtonHandler("startTFDraft")
     public static void startTFDraft(Game game, ButtonInteractionEvent event) {
+        game.setupTwilightsFallMode(event);
         FrankenDraftBagService.setUpFrankenFactions(game, event, true);
         FrankenDraftBagService.clearPlayerHands(game);
         game.setBagDraft(new TwilightsFallFrankenDraft(game));
-        game.setupTwilightsFallMode(event);
         FrankenDraftBagService.startDraft(game);
         ButtonHelper.deleteMessage(event);
     }

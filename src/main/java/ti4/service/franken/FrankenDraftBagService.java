@@ -26,6 +26,8 @@ import ti4.map.Player;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.fow.GMService;
 import ti4.service.game.SetOrderService;
 import ti4.service.milty.MiltyService;
 
@@ -95,6 +97,21 @@ public class FrankenDraftBagService {
                         + "\nClick the buttons below to add or remove items from your faction.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
             }
+            if (game.isTwilightsFallMode()) {
+                List<Button> buttons = new ArrayList<>();
+
+                List<MessageEmbed> embeds = new ArrayList<>();
+                embeds.add(Mapper.getTech("wavelength").getRepresentationEmbed());
+                embeds.add(Mapper.getTech("antimatter").getRepresentationEmbed());
+
+                String msg = player.getRepresentation()
+                        + " You should only keep two abilities, 1 genome, and 1 unit out of those you drafted. Instead of keeping 1 of those, you can instead use these buttons to take one of the two following technologies instead.";
+                MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), msg, embeds);
+                buttons.add(Buttons.green("getTech_wavelength__noPay__comp", "Select Wavelength"));
+                buttons.add(Buttons.green("getTech_antimatter__noPay__comp", "Select Antimatter"));
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Get Tech", buttons);
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Get Tech", buttons);
+            }
             MessageEmbed embed = player.getRepresentationEmbed();
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                     player.getCardsInfoThread(), null, List.of(embed), List.of(Buttons.FACTION_EMBED));
@@ -103,6 +120,12 @@ public class FrankenDraftBagService {
         if (includeGameSetup) {
             game.setShowMapSetup(true);
         }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel(),
+                "Press this button after every player has chosen their components.",
+                List.of(Buttons.green(
+                        "deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt)));
     }
 
     private static void setSpeakerOrder(GenericInteractionCreateEvent event, Game game) {
