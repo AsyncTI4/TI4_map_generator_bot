@@ -18,7 +18,8 @@ public class CategoryCleanupCron {
                 .filter(category -> category.getName().startsWith("PBD #"))
                 .filter(category -> category.getChannels().isEmpty())
                 .forEach(category -> {
-                    BotLogger.info("**CategoryCleanupCron** Deleted empty category: " + category.getName() + " on guild: " + guild.getName());
+                    BotLogger.info("**CategoryCleanupCron** Deleted empty category: " + category.getName()
+                            + " on guild: " + guild.getName());
                     category.delete().queue();
                 }));
     }
