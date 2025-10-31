@@ -42,7 +42,13 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
         // TODO: Fix Keleres start
         keleres.add("keleresm");
         banFactions = new ListSetting<>(
-                "BanFactionCards", "Banned faction cards", "Ban faction", "Unban faction", allFactions, keleres, keleres);
+                "BanFactionCards",
+                "Banned faction cards",
+                "Ban faction",
+                "Unban faction",
+                allFactions,
+                keleres,
+                keleres);
         priFactions = new ListSetting<>(
                 "PriFactionCards",
                 "Prioritized faction cards",
