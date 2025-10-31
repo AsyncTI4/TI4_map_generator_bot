@@ -66,6 +66,10 @@ public class MoveUnits extends GameStateCommand {
         data.add(new OptionData(
                 OptionType.BOOLEAN, Constants.PRIORITIZE_DAMAGED, "Prioritize moving damaged units. Default false."));
         data.add(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.COEXIST,
+                "Coexist with existing units. Default false. True will skip combat."));
+        data.add(new OptionData(
                 OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command"));
         return data;
     }
@@ -89,6 +93,7 @@ public class MoveUnits extends GameStateCommand {
 
         String color = getPlayer().getColor();
         boolean prioritizeDamaged = event.getOption(Constants.PRIORITIZE_DAMAGED, false, OptionMapping::getAsBoolean);
+        boolean coexist = event.getOption(Constants.COEXIST, false, OptionMapping::getAsBoolean);
         String fromUnitList = event.getOption(Constants.UNIT_NAMES).getAsString();
         List<RemovedUnit> removed =
                 RemoveUnitService.removeUnits(event, tileFrom, game, color, fromUnitList, prioritizeDamaged);
@@ -118,7 +123,7 @@ public class MoveUnits extends GameStateCommand {
                         buttons);
             }
         }
-        StartCombatService.combatCheck(game, event, tileTo);
+        if (!coexist) StartCombatService.combatCheck(game, event, tileTo);
         UnitCommandHelper.handleCcUseOption(event, tileTo, color, game);
         UnitCommandHelper.handleGenerateMapOption(event, game);
     }
