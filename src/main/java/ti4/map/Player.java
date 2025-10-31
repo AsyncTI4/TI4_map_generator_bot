@@ -2232,6 +2232,8 @@ public class Player extends PlayerProperties {
         Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
         if (!techModel.getFaction().isPresent()
                 && obsidian != null
+                && !obsidian.is(this)
+                && obsidian.getPlotCardsFactions().get("extract") != null
                 && obsidian.getPlotCardsFactions().get("extract").contains(getFaction())
                 && !obsidian.getTechs().contains(techID)) {
             String msg = obsidian.getRepresentation()
