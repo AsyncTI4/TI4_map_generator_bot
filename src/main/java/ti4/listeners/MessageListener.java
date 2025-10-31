@@ -36,6 +36,7 @@ public class MessageListener extends ListenerAdapter {
     private static final int EXECUTION_TIME_WARNING_THRESHOLD_SECONDS = 1;
     private static final Pattern FUTURE = Pattern.compile("future");
     private static final Pattern PATTERN = Pattern.compile("[^a-zA-Z0-9]+$");
+    private static final int BOTHELPER_MENTION_REMINDER_MESSAGE_LENGTH_THRESHOLD = 20;
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
@@ -78,16 +79,19 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private static boolean respondToBotHelperPing(Message message) {
+        boolean messageLikelyMissingExplanation =
+                message.getContentRaw().length() < BOTHELPER_MENTION_REMINDER_MESSAGE_LENGTH_THRESHOLD;
         boolean messageMentionsBotHelper = message.getMentions().getRoles().stream()
                 .anyMatch(mentionedRole -> JdaService.bothelperRoles.stream()
                         .anyMatch(bothelperRole -> bothelperRole.getIdLong() == mentionedRole.getIdLong()));
-        if (messageMentionsBotHelper) {
+        boolean shouldRespondToBotHelperPing = messageLikelyMissingExplanation && messageMentionsBotHelper;
+        if (shouldRespondToBotHelperPing) {
             message.reply(
-                            "When you ping BotHelpers please include the specific reason for the ping (e.g. something is not working, there is a bug, or you're not sure how to do something) and any other relevant information. "
-                                    + "This will speed up the process by allowing the staff to know what you are pinging about instead of having to ask or read through your channels.")
+                            "Friendly reminder in case you forgot, please include the specific reason for the ping (e.g. something is not working, there is a bug, or you're not sure how to do something) and any other relevant information. "
+                                    + "This will speed up the process by allowing the staff to know what you are pinging about and how it occurred. Thanks!")
                     .queue();
         }
-        return messageMentionsBotHelper;
+        return shouldRespondToBotHelperPing;
     }
 
     private static Player getPlayer(MessageReceivedEvent event, Game game) {
