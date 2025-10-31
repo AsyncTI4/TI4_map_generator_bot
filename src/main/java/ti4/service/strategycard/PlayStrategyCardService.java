@@ -114,14 +114,14 @@ public class PlayStrategyCardService {
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " played "
-                        + Helper.getSCRepresentation(game, scToPlay) + ".");
+                        + game.getSCEmojiWordRepresentation(scToPlay));
 
         if (!winnuHero) {
             game.setSCPlayed(scToPlay, true);
         }
         ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
         StringBuilder message = new StringBuilder();
-        message.append(Helper.getSCRepresentation(game, scToPlay)).append(" played");
+        message.append(game.getSCEmojiWordRepresentation(scToPlay)).append(" played");
         if (!game.isFowMode()) {
             message.append(" by ").append(player.getRepresentation());
         }
@@ -164,7 +164,7 @@ public class PlayStrategyCardService {
         // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
         if (!winnuHero) {
             if (scModel.hasImageFile()) {
-                MessageHelper.sendMessageToChannel(mainGameChannel, Helper.getScImageUrl(scToPlay, game));
+                MessageHelper.sendMessageToChannel(mainGameChannel, scModel.getImageFileUrl());
             } else {
                 baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
             }
@@ -569,7 +569,7 @@ public class PlayStrategyCardService {
             threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             threadChannel.queue(m5 -> {
                 if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE) && scModel.hasImageFile()) {
-                    MessageHelper.sendMessageToChannel(m5, Helper.getScImageUrl(scToPlay, game));
+                    MessageHelper.sendMessageToChannel(m5, scModel.getImageFileUrl());
                     if (ShouldPrintFollowOrder(game, scModel)) {
                         List<Player> playersInOrder = getPlayersInFollowOrder(game, player);
                         StringBuilder playerOrder =
