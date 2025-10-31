@@ -1,11 +1,16 @@
 package ti4.commands.help;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.ResourceHelper;
 import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
+import ti4.message.MessageHelper;
 
 public class HelpCommand implements ParentCommand {
 
@@ -19,7 +24,9 @@ public class HelpCommand implements ParentCommand {
                     new Monuments(),
                     new DiscordantStars(),
                     new NewPlayerInfo(),
-                    new HowToPlayTI4())
+                    new HowToPlayTI4(),
+                    new FoWHelp(),
+                    new FoWPlusHelp())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
@@ -35,5 +42,15 @@ public class HelpCommand implements ParentCommand {
     @Override
     public Map<String, Subcommand> getSubcommands() {
         return subcommands;
+    }
+
+    public static void showHelpText(GenericInteractionCreateEvent event, String helpFileName) {
+        String path = ResourceHelper.getInstance().getHelpFile(helpFileName);
+        try {
+            String message = Files.readString(Paths.get(path));
+            MessageHelper.sendMessageToEventChannel(event, message);
+        } catch (Exception e) {
+            MessageHelper.sendMessageToEventChannel(event, "HELP FILE " + helpFileName + " IS BLANK");
+        }
     }
 }
