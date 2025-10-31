@@ -37,7 +37,7 @@ class SecretObjectiveButtonHandler {
             int soIndex = Integer.parseInt(soID);
 
             String msg = player.getRepresentation() + " discarded a secret objective";
-            if (game.getRound() == 1 && !game.isFowMode()) {
+            if (game.getRound() == 1 && !game.isFowMode() && player.getSo() > 0) {
                 int amountLeftToDiscard = -1;
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2.getSo() > 1) {

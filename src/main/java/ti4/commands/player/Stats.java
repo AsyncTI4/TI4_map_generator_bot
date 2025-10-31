@@ -61,6 +61,7 @@ class Stats extends GameStateSubcommand {
                         "Flip a strategy card's played status; enter the initiative number"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Set whether player has passed y/n"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Set whether player is speaker y/n"))
+                .addOptions(new OptionData(OptionType.STRING, Constants.TYRANT, "Set whether player is tyrant y/n"))
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.NPC, "Player is an NPC"))
                 .addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
@@ -225,6 +226,18 @@ class Stats extends GameStateSubcommand {
             String value = optionSpeaker.getAsString().toLowerCase();
             if ("y".equals(value) || "yes".equals(value)) {
                 game.setSpeakerUserID(player.getUserID());
+            } else {
+                message.append(", which is not a valid input. Please use one of: y/yes");
+            }
+            MessageHelper.sendMessageToEventChannel(event, message.toString());
+        }
+
+        OptionMapping optionTyrant = event.getOption(Constants.TYRANT);
+        if (optionTyrant != null) {
+            StringBuilder message = new StringBuilder(getGeneralMessage(optionTyrant));
+            String value = optionTyrant.getAsString().toLowerCase();
+            if ("y".equals(value) || "yes".equals(value)) {
+                game.setTyrantUserID(player.getUserID());
             } else {
                 message.append(", which is not a valid input. Please use one of: y/yes");
             }

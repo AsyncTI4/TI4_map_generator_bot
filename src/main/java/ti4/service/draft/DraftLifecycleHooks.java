@@ -21,6 +21,17 @@ import ti4.map.Player;
  */
 public abstract class DraftLifecycleHooks {
     /**
+     * Check whether this component is ready to start the draft. Draftables should generally
+     * return a specific error message until they are completely ready to start. Then they
+     * should return null.
+     * @param draftManager The draft manager for the draft; also contains the Game object.
+     * @return Null if ready to start the draft, or a SPECIFIC message describing what is being waited on.
+     */
+    public String whatsStoppingDraftStart(DraftManager draftManager) {
+        return null;
+    }
+
+    /**
      * Check whether this component is ready to end the draft. Draftables should generally
      * return a blocking reason until all players have picked one of its choices.
      * This is called after every pick automatically.

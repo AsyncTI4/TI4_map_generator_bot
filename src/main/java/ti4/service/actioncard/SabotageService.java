@@ -26,7 +26,8 @@ public class SabotageService {
 
         if (player.isPassed()
                 && game.getActivePlayer() != null
-                && game.getActivePlayer().hasTech("tp")) {
+                && (game.getActivePlayer().hasTech("tp")
+                        || game.getActivePlayer().hasTech("tf-crafty"))) {
             return false;
         }
 
@@ -64,6 +65,12 @@ public class SabotageService {
 
         if (player.hasUnit("empyrean_mech")
                 && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Mech)
+                        .isEmpty()) {
+            return true;
+        }
+
+        if (player.hasUnit("tf-triune")
+                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Fighter)
                         .isEmpty()) {
             return true;
         }

@@ -53,7 +53,7 @@ public class PdsCoverageHelper {
                 for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
                     // Check for Imperial II HQ on Mecatol Rex
                     if (sameTile && Constants.MECATOLS.contains(unitHolder.getName())) {
-                        if (player.controlsMecatol(false) && player.getTechs().contains("iihq")) {
+                        if (player.controlsMecatol(false) && player.getPlanets().contains("custodiavigilia")) {
                             diceCount.add(5 - mod);
                         }
                     }
@@ -83,12 +83,12 @@ public class PdsCoverageHelper {
                         }
 
                         // Check if PDS can shoot (deep space cannon or same tile)
-                        if (model.getDeepSpaceCannon() || sameTile) {
-                            for (int i = model.getSpaceCannonDieCount() * unitEntry.getValue(); i > 0; i--) {
-                                diceCount.add(model.getSpaceCannonHitsOn() - mod - tempMod);
+                        if (model.getDeepSpaceCannon(player) || sameTile) {
+                            for (int i = model.getSpaceCannonDieCount(player) * unitEntry.getValue(); i > 0; i--) {
+                                diceCount.add(model.getSpaceCannonHitsOn(player) - mod - tempMod);
                             }
                         } else if (game.playerHasLeaderUnlockedOrAlliance(player, "mirvedacommander")) {
-                            diceCountMirveda.add(model.getSpaceCannonHitsOn() - mod - tempMod);
+                            diceCountMirveda.add(model.getSpaceCannonHitsOn(player) - mod - tempMod);
                         }
                     }
 
@@ -112,7 +112,7 @@ public class PdsCoverageHelper {
                 Collections.sort(diceCount);
 
                 // Apply Plasma Scoring tech (duplicate best die)
-                if (player.getTechs().contains("ps")) {
+                if (player.hasTech("ps")) {
                     diceCount.addFirst(diceCount.getFirst());
                 }
 

@@ -10,9 +10,7 @@
     "imagePath": "114_EntropicScar.png",
     "shipPositionsType": "TYPE08",
     "planets": [],
-    "wormholes": [
-        null
-    ],
+    "wormholes": [],
     "tileBack": "red",
     "isScar": true,
     "source": "thunders_edge"

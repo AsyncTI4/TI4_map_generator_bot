@@ -3,6 +3,8 @@ package ti4.service.draft.draftables;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import ti4.map.Player;
+import ti4.service.draft.DraftButtonService;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
 import ti4.service.draft.Draftable;
@@ -25,7 +27,8 @@ public abstract class FixedNumberDraftable extends Draftable {
     public String isValidDraftChoice(DraftManager draftManager, String playerUserId, DraftChoice choice) {
         if (!CommonDraftableValidators.hasRemainingChoices(
                 draftManager, playerUserId, getType(), getNumPicksPerPlayer())) {
-            return "You already have picked " + getNumPicksPerPlayer() + " " + getDisplayName() + "!";
+            return DraftButtonService.USER_MISTAKE_PREFIX + "You already have picked " + getNumPicksPerPlayer() + " "
+                    + getDisplayName() + "!";
         }
 
         return super.isValidDraftChoice(draftManager, playerUserId, choice);
@@ -69,8 +72,9 @@ public abstract class FixedNumberDraftable extends Draftable {
         for (String playerUserId : draftManager.getPlayerStates().keySet()) {
             int pickCount = draftManager.getPlayerPicks(playerUserId, getType()).size();
             if (pickCount < getNumPicksPerPlayer()) {
-                return "Player " + playerUserId + " needs to make " + (getNumPicksPerPlayer() - pickCount)
-                        + " more pick(s) for " + getDisplayName() + "!";
+                Player player = draftManager.getGame().getPlayer(playerUserId);
+                return "Player " + (player != null ? player.getRepresentation() : playerUserId) + " needs to make "
+                        + (getNumPicksPerPlayer() - pickCount) + " more pick(s) for " + getDisplayName() + "!";
             }
         }
         return null;

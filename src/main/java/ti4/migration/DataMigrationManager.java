@@ -12,6 +12,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
+import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.map.helper.GameHelper;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
@@ -40,10 +42,16 @@ public class DataMigrationManager {
     /// format: migrationName_DDMMYY
     /// The migration will be run on any game created on or before that date
     /// Migration will not be run on finished games
+    ///
+    /// format option: append "_withEnded" to also run on ended games
+    ///
     private static final Map<String, Function<Game, Boolean>> migrations;
 
     static {
         migrations = new HashMap<>();
+        migrations.put(
+                "renameGarboziaToBozgarbia_201025_withEnded",
+                DataMigrationManager::renameGarboziaToBozgarbia_201025_withEnded);
         // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
@@ -60,8 +68,14 @@ public class DataMigrationManager {
                         migrationNamesToCutoffDates.get(entry.getKey()).orElse(null);
                 if (migrationCutoffDate == null) continue;
 
+                Boolean migrateEndedGames = getMigrationForGamesEnded(entry.getKey());
+
                 var migratedGames = migrateGames(
-                        GameManager.getManagedGames(), entry.getKey(), entry.getValue(), migrationCutoffDate);
+                        GameManager.getManagedGames(),
+                        entry.getKey(),
+                        entry.getValue(),
+                        migrationCutoffDate,
+                        migrateEndedGames);
                 migrationNamesToAppliedGameNames
                         .computeIfAbsent(entry.getKey(), k -> new ArrayList<>())
                         .addAll(migratedGames);
@@ -82,6 +96,9 @@ public class DataMigrationManager {
 
     private static Optional<LocalDate> getMigrationForGamesBeforeDate(String migrationName) {
         String migrationDateString = migrationName.substring(migrationName.indexOf('_') + 1);
+        if (migrationDateString.endsWith("_withEnded")) {
+            migrationDateString = migrationDateString.replace("_withEnded", "");
+        }
         try {
             return Optional.of(LocalDate.parse(migrationDateString, MIGRATION_DATE_FORMATTER));
         } catch (Exception e) {
@@ -94,14 +111,19 @@ public class DataMigrationManager {
         return Optional.empty();
     }
 
+    private static Boolean getMigrationForGamesEnded(String migrationName) {
+        return migrationName.endsWith("_withEnded");
+    }
+
     private static List<String> migrateGames(
             List<ManagedGame> games,
             String migrationName,
             Function<Game, Boolean> migrationMethod,
-            LocalDate migrationForGamesBeforeDate) {
+            LocalDate migrationForGamesBeforeDate,
+            Boolean migrateEndedGames) {
         List<String> migrationsApplied = new ArrayList<>();
         for (var managedGame : games) {
-            if (managedGame.isHasEnded()) continue;
+            if (managedGame.isHasEnded() && !migrateEndedGames) continue;
 
             LocalDate mapCreatedOn = null;
             try {
@@ -125,5 +147,28 @@ public class DataMigrationManager {
             }
         }
         return migrationsApplied;
+    }
+
+    public static Boolean renameGarboziaToBozgarbia_201025_withEnded(Game game) {
+        Tile old = null;
+        for (Tile t : game.getTileMap().values()) {
+            if (t.getTileID().equals("sig01")) {
+                old = t;
+                break;
+            }
+        }
+        if (old == null) return false;
+
+        Player p = game.getPlanetOwner("garbozia");
+        if (p == null) return false;
+
+        p.getPlanets().remove("garbozia");
+        p.getExhaustedPlanets().remove("garbozia");
+        p.getExhaustedPlanetsAbilities().remove("garbozia");
+
+        p.getPlanets().add("bozgarbia");
+        p.getExhaustedPlanets().add("bozgarbia");
+        p.getExhaustedPlanetsAbilities().add("bozgarbia");
+        return true;
     }
 }

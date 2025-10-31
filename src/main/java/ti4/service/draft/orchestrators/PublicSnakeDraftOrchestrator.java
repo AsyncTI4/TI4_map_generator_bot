@@ -12,6 +12,10 @@ import lombok.Setter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.buttons.Buttons;
+import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
+import ti4.helpers.settingsFramework.menus.PublicSnakeDraftSettings;
+import ti4.helpers.settingsFramework.menus.SettingsMenu;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.draft.DraftButtonService;
@@ -113,7 +117,14 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
         State targetState =
                 (State) draftManager.getPlayerStates().get(playerUserId).getOrchestratorState();
+        int currentIndex = targetState.getOrderIndex();
         int targetIndex = position - 1;
+        if (currentIndex == targetIndex) {
+            // No change
+            return;
+        }
+
+        // Finally set the target player's index
         targetState.setOrderIndex(targetIndex);
     }
 
@@ -131,7 +142,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     public void sendDraftButtons(DraftManager draftManager) {
         List<String> playerOrder = getDraftOrder(draftManager);
         String currentPlayerUserId = getCurrentPlayer(playerOrder);
-        draftManager.getGame().setActivePlayerID(currentPlayerUserId);
+        Player activePlayer = draftManager.getGame().getPlayer(currentPlayerUserId);
+        draftManager.getGame().updateActivePlayer(activePlayer);
         PublicDraftInfoService.send(
                 draftManager,
                 playerOrder,
@@ -152,14 +164,14 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         // Picks are made one player at a time, with all buttons visible.
         // Ensure this is the current player
         if (!playerUserId.equals(getCurrentPlayer(playerOrder))) {
-            return "It's not your turn to draft.";
+            return DraftButtonService.USER_MISTAKE_PREFIX + "It's not your turn to draft.";
         }
         // Ensure no one else has picked this choice
         if (draftManager
                         .getPlayersWithChoiceKey(choice.getType(), choice.getChoiceKey())
                         .size()
                 > 0) {
-            return "That choice has already been taken.";
+            return DraftButtonService.USER_MISTAKE_PREFIX + "That choice has already been taken.";
         }
 
         // Persist the choice in Player State.
@@ -231,7 +243,9 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
                     List.of(),
                     List.of(),
                     List.of(getReprintDraftButton()));
-            draftManager.getGame().setActivePlayerID(getCurrentPlayer(playerOrder));
+
+            Player activePlayer = draftManager.getGame().getPlayer(getCurrentPlayer(playerOrder));
+            draftManager.getGame().updateActivePlayer(activePlayer);
         }
 
         // Delete buttons when they're picked.
@@ -349,6 +363,33 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
         // This draft mode doesn't do any player setup itself, the draftables handle
         // everything.
+        return null;
+    }
+
+    @Override
+    public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
+        if (menu == null || !(menu instanceof DraftSystemSettings)) {
+            return "Error: Could not find parent draft system settings.";
+        }
+        DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
+        Game game = draftSystemSettings.getGame();
+        if (game == null) {
+            return "Error: Could not find game instance.";
+        }
+        PublicSnakeDraftSettings snakeSettings = draftSystemSettings.getPublicSnakeDraftSettings();
+        if (snakeSettings.getPresetDraftOrder().isVal()) {
+            List<String> presetOrder = snakeSettings.getOrderedPlayerIds();
+            if (presetOrder == null
+                    || presetOrder.size()
+                            != draftSystemSettings.getPlayerUserIds().size()) {
+                return "Error: Preset draft order is enabled, but the order is incomplete.";
+            }
+
+            initialize(game.getDraftManager(), presetOrder);
+        } else {
+            initialize(game.getDraftManager(), null);
+        }
+
         return null;
     }
 

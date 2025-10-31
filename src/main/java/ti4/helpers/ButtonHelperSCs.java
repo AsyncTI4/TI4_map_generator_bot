@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -40,8 +41,117 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.unit.AddUnitService;
 
 public class ButtonHelperSCs {
+
+    @ButtonHandler("constructionPrimary_produce")
+    public static void resolveConstructionPrimaryTE(ButtonInteractionEvent event, Game game, Player player) {
+        StrategyCardModel scModel =
+                game.getStrategyCardModelByName("construction").orElse(null);
+        if (scModel == null) {
+            game.getStrategyCardModelByInitiative(4).orElse(null);
+        }
+        if (player.getSCs().contains(scModel.getInitiative())) {
+            List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock);
+
+            String prefix = player.getFinsFactionCheckerPrefix() + "constructionBuild_";
+            List<Button> buttons = new ArrayList<>();
+            tiles.forEach(t ->
+                    buttons.add(Buttons.blue(prefix + t.getPosition(), t.getRepresentationForButtons(game, player))));
+
+            String message = player.getRepresentation() + " Choose a tile to resolve production using 1 space dock:";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        } else {
+            event.getHook()
+                    .sendMessage("You do not hold construction, so you can not use a primary ability")
+                    .setEphemeral(true)
+                    .queue();
+        }
+    }
+
+    @ButtonHandler("constructionBuild_")
+    public static void resolveConstructionBuild(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String pos = buttonID.replace("constructionBuild_", "");
+        Tile tile = game.getTileByPosition(pos);
+
+        String infomsg =
+                player.getFactionEmoji() + " is resolving Construction Primary in tile " + tile.getRepresentation();
+        ButtonHelper.sendMessageToRightStratThread(player, game, infomsg, "construction");
+
+        List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "construction", "place");
+        int productionVal = Helper.getProductionValue(player, game, tile, true);
+        String message = player.getRepresentation()
+                + " Use the buttons to produce. Reminder that when using construction primary, you can only use 1 dock. ";
+        message += ButtonHelper.getListOfStuffAvailableToSpend(player, game) + "\nYou have " + productionVal
+                + " PRODUCTION value in this system.";
+        if (productionVal > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander"))
+            message +=
+                    "\n> - You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit.";
+        if (productionVal > 0 && IsPlayerElectedService.isPlayerElected(game, player, "prophecy"))
+            message +=
+                    "\n> - Reminder that you have prophecy of Ixth and should produce 2 fighters if you want to keep it. Its removal is not automated.";
+
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Produce Units", buttons);
+    }
+
+    @ButtonHandler("warfareTeBuild")
+    private static void warfareSecondaryThundersEdge(ButtonInteractionEvent event, Game game, Player player) {
+        StrategyCardModel warfare = Mapper.getStrategyCard("te6warfare");
+        if (warfare == null) return;
+        String messageID = event.getMessageId();
+        boolean used = addUsedSCPlayer(messageID, game, player);
+        if (!used
+                && !player.getFollowedSCs().contains(warfare.getInitiative())
+                && game.getPlayedSCs().contains(warfare.getInitiative())) {
+            int scNum = warfare.getInitiative();
+            player.addFollowedSC(scNum, event);
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
+            if (player.getStrategicCC() > 0) {
+                ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Warfare**");
+            }
+            String message = deductCC(game, player, scNum);
+            ReactionService.addReaction(event, game, player, message);
+        }
+
+        sendWarfareButtons(event, game, player, warfare);
+    }
+
+    private static void sendWarfareButtons(
+            ButtonInteractionEvent event, Game game, Player player, StrategyCardModel model) {
+        boolean singleDock = !model.usesAutomationForSCID("te6warfare");
+
+        Tile tile = player.getHomeSystemTile();
+        List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "warfare", "place");
+        int productionValue = Helper.getProductionValue(player, game, tile, singleDock);
+
+        String message = player.getRepresentation() + " Use the buttons to produce.";
+        message += ButtonHelper.getListOfStuffAvailableToSpend(player, game, true);
+        message += "\nYou have " + productionValue + " PRODUCTION value in this system.";
+
+        if (singleDock) {
+            message +=
+                    "\n> - Reminder that when following **Warfare**, you may only use 1 space dock in your home system. ";
+        }
+        if (productionValue > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
+            message +=
+                    "\n> - You also have the That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 fighters/infantry that don't count towards PRODUCTION limit.";
+        }
+        if (productionValue > 0 && IsPlayerElectedService.isPlayerElected(game, player, "prophecy")) {
+            message +=
+                    "\n> - Reminder that you have _Prophecy of Ixth_ and should produce at least 2 fighters if you wish to keep it. Its removal is not automated.";
+        }
+        if (!game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Produce Units", buttons);
+        } else {
+            MessageHelper.sendMessageToChannel(player.getPrivateChannel(), message);
+            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), "Produce Units", buttons);
+        }
+    }
 
     @ButtonHandler("diploRefresh2")
     public static void diploRefresh2(Game game, Player player, ButtonInteractionEvent event) {
@@ -54,7 +164,10 @@ public class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("pok2diplomacy").orElse(null);
+            scModel = game.getStrategyCardModelByName("diplomacy").orElse(null);
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("noctis").orElse(null);
         }
         if (!used
                 && scModel != null
@@ -218,6 +331,9 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("trade").orElse(null);
         }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("amicus").orElse(null);
+        }
         int scNum = scModel.getInitiative();
 
         if (player.getStrategicCC() > 0) {
@@ -240,19 +356,23 @@ public class ButtonHelperSCs {
         boolean used = addUsedSCPlayer(messageID, game, player);
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
-            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok8imperial")) {
+            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok8imperial")
+                    || game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("tf8")) {
                 scModel = game.getStrategyCardModelByInitiative(scNum).get();
             }
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("imperial").orElse(null);
         }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("aeterna").orElse(null);
+        }
         if (!player.getFollowedSCs().contains(scModel.getInitiative())) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
         }
         if (!game.getPhaseOfGame().contains("agenda")
                 && !used
-                && scModel.usesAutomationForSCID("pok8imperial")
+                && (scModel.usesAutomationForSCID("pok8imperial") || scModel.usesAutomationForSCID("tf8"))
                 && !player.getFollowedSCs().contains(scModel.getInitiative())
                 && game.getPlayedSCs().contains(scModel.getInitiative())) {
             int scNum = scModel.getInitiative();
@@ -354,7 +474,7 @@ public class ButtonHelperSCs {
             return;
         }
 
-        if (!player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
+        if (!game.isTwilightsFallMode() && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
@@ -392,7 +512,7 @@ public class ButtonHelperSCs {
         player.addFollowedSC(tradeInitiative, event);
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(tradeInitiative) && p2.getCommodities() > 0) {
-                if (!p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
+                if (!game.isTwilightsFallMode() && !p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
                     continue;
                 }
                 int ogComms = p2.getCommodities();
@@ -728,6 +848,9 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("warfare").orElse(null);
         }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("calamitas").orElse(null);
+        }
         if (!used
                 && scModel != null
                 && scModel.usesAutomationForSCID("pok6warfare")
@@ -772,15 +895,21 @@ public class ButtonHelperSCs {
         boolean used = addUsedSCPlayer(messageID, game, player);
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
-            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok4construction")) {
+            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok4construction")
+                    || game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("te4construction")) {
                 scModel = game.getStrategyCardModelByInitiative(scNum).get();
             }
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("construction").orElse(null);
         }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("civitas").orElse(null);
+        }
         int scNum = scModel.getInitiative();
-        boolean automationExists = scModel != null && scModel.usesAutomationForSCID("pok4construction");
+        boolean automationExists = scModel != null
+                && (scModel.usesAutomationForSCID("pok4construction")
+                        || scModel.usesAutomationForSCID("te4construction"));
         if (!used
                 && scModel != null
                 && !player.getFollowedSCs().contains(scNum)
@@ -798,25 +927,67 @@ public class ButtonHelperSCs {
         String unit = buttonID.replace("construction_", "");
         if ("facility".equalsIgnoreCase(unit)) {
             String message = player.getRepresentationUnfogged() + ", please choose the facility you wish to place.";
-            if (!player.getSCs().contains(4)) {
+            if (!player.getSCs().contains(4) && !scModel.getBotSCAutomationID().equals("te4construction")) {
                 message += "\n## __It will place a command token in the system as well.__ ";
             }
             List<Button> buttons = getPossibleFacilities(game, player);
             MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
         } else {
-            UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
-            String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your "
-                    + unitKey.unitName() + " on for **Construction**.";
-            if (!player.getSCs().contains(4)) {
-                message += "\n-# It will place a command token in the system as well.";
+            if ("agesmonument".equalsIgnoreCase(unit)) {
+                String message = player.getRepresentationUnfogged()
+                        + ", please choose the planet you wish to put your monument on for **Construction**.";
+                if (!player.getSCs().contains(4)
+                        && !scModel.getBotSCAutomationID().equals("te4construction")) {
+                    message += "\n-# It will place a command token in the system as well.";
+                }
+                List<Button> buttons = new ArrayList<>();
+                for (String planet : player.getPlanetsAllianceMode()) {
+                    if (game.getUnitHolderFromPlanet(planet) != null
+                            && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)
+                            && !game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
+                        buttons.add(Buttons.green(
+                                "placeAgesMonument_" + planet, Helper.getPlanetRepresentation(planet, game)));
+                    }
+                }
+                MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
+            } else {
+
+                UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
+                String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your "
+                        + unitKey.unitName() + " on for **Construction**.";
+                if (!player.getSCs().contains(4)
+                        && !scModel.getBotSCAutomationID().equals("te4construction")) {
+                    message += "\n-# It will place a command token in the system as well.";
+                }
+                List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");
+                MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
             }
-            List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");
-            MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
         }
         // List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(message, buttons);
         // for (MessageCreateData messageD : messageList) {
         //     event.getHook().setEphemeral(true).sendMessage(messageD).queue();
         // }
+    }
+
+    @ButtonHandler("placeAgesMonument_")
+    public static void placeAgesMonument(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String planet = buttonID.split("_")[1];
+        AddUnitService.addUnits(
+                event,
+                game.getTileFromPlanet(planet),
+                game,
+                game.getPlayerFromColorOrFaction("neutral").getColor(),
+                "1 sd " + planet);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation(true, false) + " dropped a monument on "
+                        + Helper.getPlanetRepresentation(planet, game) + " for the cost of 5 resources.");
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
+        Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
+        buttons.add(DoneExhausting);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(), "Use Buttons to Pay For The Monument", buttons);
+        event.getMessage().delete().queue();
     }
 
     public static List<String> findUsedFacilities(Game game, Player player) {
@@ -1064,6 +1235,9 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("leadership").orElse(null);
         }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByInitiative(1).get();
+        }
         int leadershipInitiative = scModel.getInitiative();
 
         if (!player.getFollowedSCs().contains(leadershipInitiative)) {
@@ -1221,6 +1395,14 @@ public class ButtonHelperSCs {
             player.addFollowedSC(scNum, event);
             suffix = " **" + Helper.getSCName(scNum, game) + "**";
         }
+
+        if (game.isTwilightsFallMode()) {
+            if (scNum == 2 || scNum == 6 || scNum == 7) {
+                game.setStoredValue(
+                        "willParticipateInSplice",
+                        game.getStoredValue("willParticipateInSplice").replace("_" + player.getFaction(), ""));
+            }
+        }
         ReactionService.addReaction(event, game, player, "is not following" + suffix + ".");
         String players = game.getStoredValue(messageID + "SCReacts");
 
@@ -1270,7 +1452,9 @@ public class ButtonHelperSCs {
             return;
         }
         boolean used = addUsedSCPlayer(messageID, game, player);
-        if (!used) {
+        if (!used
+                && !player.getFollowedSCs().contains(scNum)
+                && game.getPlayedSCs().contains(scNum)) {
             if (player.getStrategicCC() > 0) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(
                         player, game, event, "followed **" + Helper.getSCName(scNum, game) + "**");
@@ -1323,6 +1507,9 @@ public class ButtonHelperSCs {
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("politics").orElse(null);
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("Tyrannus").orElse(null);
         }
         if (!used
                 && scModel != null

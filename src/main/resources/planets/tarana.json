@@ -1,0 +1,1 @@
+{"id":"tarana","tileId":"111","name":"Tarana","aliases":["tarana"],"resources":1,"influence":2,"planetTypes":["CULTURAL","INDUSTRIAL"],"planetLayout":{"unitHolderName":"tarana","resourcesLocation":"TopLeft","centerPosition":{"x":135.0,"y":85.0}},"source":"thunders_edge"}

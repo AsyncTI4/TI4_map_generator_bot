@@ -183,14 +183,14 @@
     },
     {
         "alias": "bazephy",
-        "name": "Reassignment",
+        "name": "Hunting Grounds",
         "types": [
             "CYBERNETIC"
         ],
         "requirements": "Y",
         "faction": "zephyrion",
         "source": "balacasi",
-        "text": "ACTION: Exhaust this card to place or move any number of bounty tokens from opponent’s faction sheets to the unit space of non-fighter ships on an opponents’ faction sheet."
+        "text": "ACTION: Exhaust this card to place or move any number of bounty tokens from other players' faction sheets to unit spaces of non-fighter ships on other players' faction sheets. During space combat, your opponent cannot announce retreat unless you allow it."
     },
     {
         "alias": "bazephcr",

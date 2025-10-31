@@ -92,6 +92,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
         MiltySettings settings = game.initializeMiltySettings();
         settings.getDraftMode().setChosenKey("nucleus");
+        settings.getSourceSettings().getTeDemo().setVal(true);
         settings.getSourceSettings().getDiscoStars().setVal(true);
         settings.getSourceSettings().getUnchartedSpace().setVal(true);
         settings.getSourceSettings().getEronous().setVal(true);
@@ -114,6 +115,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
         MiltySettings settings = game.initializeMiltySettings();
         settings.getDraftMode().setChosenKey("nucleus");
+        settings.getSourceSettings().getTeDemo().setVal(true);
         settings.getSourceSettings().getDiscoStars().setVal(true);
         settings.getSourceSettings().getUnchartedSpace().setVal(true);
         settings.getSourceSettings().getEronous().setVal(true);
@@ -136,6 +138,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
         MiltySettings settings = game.initializeMiltySettings();
         settings.getDraftMode().setChosenKey("nucleus");
+        settings.getSourceSettings().getTeDemo().setVal(true);
         settings.getSourceSettings().getDiscoStars().setVal(true);
         settings.getSourceSettings().getUnchartedSpace().setVal(true);
         settings.getSourceSettings().getEronous().setVal(true);
@@ -176,7 +179,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
         Map<String, Integer> failureReasons = new HashMap<>();
         for (int i = 0; i < REASONABLE_MAX_ATTEMPTS; ++i) {
             outcome = NucleusSliceGeneratorService.tryGenerateNucleusAndSlices(
-                    game, mapTemplate, specs.getNumSlices(), strictMode);
+                    game, mapTemplate, new NucleusSpecs(specs), strictMode);
             if (outcome.slices() != null) {
                 assert outcome.slices().size() == game.getPlayers().size() + 1 + EXTRA_SLICES;
                 return;

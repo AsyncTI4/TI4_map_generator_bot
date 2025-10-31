@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperModifyUnits;
@@ -43,6 +44,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
 
@@ -89,7 +91,18 @@ public class StartCombatService {
                 .filter(p -> player != p && !player.isPlayerMemberOfAlliance(p))
                 .findFirst();
         if (enemyPlayer.isPresent()) {
-            startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
+            if (enemyPlayer.get().hasUnlockedBreakthrough("titansbt") || player.hasUnlockedBreakthrough("titansbt")) {
+                String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
+                String msg = player.getRepresentation() + " the game is unsure if a combat should occur on "
+                        + planetName + " or if you are coexisting. Please inform it with the buttons.";
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.red("startCombatOn_" + unitHolder.getName(), "Engage in Combat"));
+                buttons.add(Buttons.green("deleteButtons", "They are coexisting"));
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+
+            } else {
+                startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
+            }
             return true;
         }
         return false;
@@ -341,7 +354,7 @@ public class StartCombatService {
             UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
             for (Units.UnitKey unit : space.getUnits().keySet()) {
                 Player player = game.getPlayerFromColorOrFaction(unit.getColor());
-                UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).getFirst();
+                UnitModel removedUnit = player.getPriorityUnitByAsyncID(unit.asyncID(), space);
                 if (removedUnit.getIsShip() && removedUnit.getSustainDamage()) {
                     sustain = true;
                     break;
@@ -749,7 +762,8 @@ public class StartCombatService {
             }
 
             if ((player.hasAbility("edict") || player.hasAbility("imperia"))
-                    && !player.getMahactCC().contains(otherPlayer.getColor())) {
+                    && !player.getMahactCC().contains(otherPlayer.getColor())
+                    && !otherPlayer.getFaction().equalsIgnoreCase("neutral")) {
                 buttons = new ArrayList<>();
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons.add(Buttons.gray(
@@ -772,13 +786,29 @@ public class StartCombatService {
                                 + ", a reminder that if you win the combat, you may use this button to remove a command token from the system.",
                         buttons);
             }
-            if (player.hasAbility("technological_singularity") && !otherPlayer.isDummy()) {
+            if (player.hasAbility("technological_singularity")
+                    && !otherPlayer.isDummy()
+                    && !ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(
+                                    player, otherPlayer, new ArrayList<>(), game)
+                            .isEmpty()) {
                 Button steal = Buttons.gray(
                         player.finChecker() + "nekroStealTech_" + otherPlayer.getFaction(),
                         "Copy a Technology",
                         FactionEmojis.Nekro);
                 String message = msg
                         + ", a reminder that when you first kill an opponent's unit this combat, you may use the button to copy a technology.";
+                MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, steal);
+            }
+            if ((player.hasTech("tf-singularityz")
+                            || player.hasTech("tf-singularityy")
+                            || player.hasTech("tf-singularityx"))
+                    && !otherPlayer.isDummy()) {
+                Button steal = Buttons.gray(
+                        player.finChecker() + "nekroStealTech_" + otherPlayer.getFaction(),
+                        "Copy a Technology",
+                        FactionEmojis.Nekro);
+                String message = msg
+                        + ", a reminder that when you first kill an opponent's unit this combat, you may use the button to copy a technology. If you copy more techs than you have singularities, manually remove old ones with /tech remove";
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, steal);
             }
             if (player.hasUnit("ghemina_mech")
@@ -1144,7 +1174,7 @@ public class StartCombatService {
             }
         }
 
-        if (p1.hasTech("nekroc4y")
+        if ((p1.hasTech("nekroc4y") || p1.hasTech("subatomic"))
                 && isSpaceCombat
                 && tile != p1.getHomeSystemTile()
                 && p1.getHomeSystemTile() != null) {
@@ -1153,11 +1183,11 @@ public class StartCombatService {
                             .contains(p1.getHomeSystemTile())) {
                 buttons.add(Buttons.green(
                         p1.getFinsFactionCheckerPrefix() + "useNekroNullRef",
-                        "Use Null Reference (Upon Each Destroy)",
-                        FactionEmojis.Nekro));
+                        "Use Subatomic Splicer (Upon Each Destroy)",
+                        FactionEmojis.Crimson));
             }
         }
-        if (p2.hasTech("nekroc4y")
+        if ((p2.hasTech("nekroc4y") || p2.hasTech("subatomic"))
                 && isSpaceCombat
                 && tile != p2.getHomeSystemTile()
                 && p2.getHomeSystemTile() != null
@@ -1167,8 +1197,8 @@ public class StartCombatService {
                             .contains(p2.getHomeSystemTile())) {
                 buttons.add(Buttons.green(
                         p2.getFinsFactionCheckerPrefix() + "useNekroNullRef",
-                        "Use Null Reference (Upon Each Destroy)",
-                        FactionEmojis.Nekro));
+                        "Use Subatomic Splicer (Upon Each Destroy)",
+                        FactionEmojis.Crimson));
             }
         }
 
@@ -1219,6 +1249,14 @@ public class StartCombatService {
                         "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                                 + "Sol Agent",
                         FactionEmojis.Sol));
+            }
+
+            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("valientagent")) {
+                buttons.add(Buttons.gray(
+                        finChecker + "getAgentSelection_valientagent",
+                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Valient Genome",
+                        FactionEmojis.Bastion));
             }
 
             if ((!game.isFowMode() || agentHolder == p1)
@@ -1308,9 +1346,9 @@ public class StartCombatService {
         // Exo 2s
         if ("space".equalsIgnoreCase(groundOrSpace) && !game.isFowMode()) {
             if ((tile.getSpaceUnitHolder().getUnitCount(Units.UnitType.Dreadnought, p1.getColor()) > 0
-                            && p1.hasTech("exo2"))
+                            && (p1.hasTech("exo2") || p2.hasUnit("tf-exotrireme")))
                     || (tile.getSpaceUnitHolder().getUnitCount(Units.UnitType.Dreadnought, p2.getColor()) > 0
-                            && p2.hasTech("exo2"))) {
+                            && (p2.hasTech("exo2") || p2.hasUnit("tf-exotrireme")))) {
                 buttons.add(Buttons.blue(
                         "assCannonNDihmohn_exo_" + tile.getPosition(),
                         "Use Exotrireme II Ability",
@@ -1842,6 +1880,9 @@ public class StartCombatService {
                         String id = p.finChecker() + "letnevMechRes_" + unitH.getName() + "_mech";
                         String label = "Deploy Dunlain Reaper on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.Letnev));
+                    }
+                    if (isGroundCombat) {
+                        BastionTechService.addProximaCombatButton(game, p1, p2, tile, unitH, buttons);
                     }
                 }
                 // Assimilate

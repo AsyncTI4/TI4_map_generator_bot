@@ -87,7 +87,10 @@ public class TransactionGenerator {
         drawEmojiWithCenteredInt(g2, CardEmojis.PN, p1.getPromissoryNotes().size(), x, y);
         drawEmojiWithCenteredInt(g2, CardEmojis.PN, p2.getPromissoryNotes().size(), width - x - emojiSize, y);
         // ACs
-        if (p1.hasAbility("arbiters") || p2.hasAbility("arbiters")) {
+        if (p1.hasAbility("arbiters")
+                || p2.hasAbility("arbiters")
+                || p1.hasTech("tf-guild_ships")
+                || p2.hasTech("tf-guild_ships")) {
             x += emojiSize + 5;
             drawEmojiWithCenteredInt(
                     g2, CardEmojis.ActionCard, p1.getActionCards().size(), x, y);

@@ -41,6 +41,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     private String factionReferenceImageURL;
     private String wikiURL;
     private List<String> preferredColours;
+    private Integer priorityNumber;
 
     public boolean isValid() {
         return alias != null

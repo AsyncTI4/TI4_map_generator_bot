@@ -38,6 +38,16 @@ public class RegexHelper {
         return colors;
     }
 
+    /** @return group "breakthrough" */
+    public static String breakthroughRegex(Game game) {
+        Set<String> bts = new HashSet<>();
+        for (Player p : game.getRealPlayers()) {
+            String bt = p.getBreakthroughID();
+            if (Mapper.isValidBreakthrough(bt)) bts.add(bt);
+        }
+        return regexBuilder("breakthrough", bts);
+    }
+
     private static Set<String> legalFactions(Game game) {
         Set<String> factionAliases = new HashSet<>();
         Mapper.getFactionsValues().forEach(faction -> {
@@ -102,7 +112,7 @@ public class RegexHelper {
     }
 
     /** @return group "unittype" */
-    private static String unitTypeRegex(String group) {
+    public static String unitTypeRegex(String group) {
         Set<String> types = new HashSet<>();
         Arrays.asList(UnitType.values()).forEach(x -> {
             types.add(x.getValue());

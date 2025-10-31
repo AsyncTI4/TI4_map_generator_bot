@@ -102,6 +102,9 @@ class SendPN extends GameStateSubcommand {
         if (id.contains("dspnveld") && !targetPlayer.ownsPromissoryNote(id)) {
             PromissoryNoteHelper.resolvePNPlay(id, targetPlayer, game, event);
         }
+        if (id.contains("blackops") && !targetPlayer.ownsPromissoryNote(id)) {
+            PromissoryNoteHelper.resolvePNPlay(id, targetPlayer, game, event);
+        }
 
         boolean placeDirectlyInPlayArea = pnModel.isPlayedDirectlyToPlayArea();
         if (placeDirectlyInPlayArea

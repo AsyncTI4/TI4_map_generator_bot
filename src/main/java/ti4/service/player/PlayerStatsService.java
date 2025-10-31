@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -21,6 +20,7 @@ import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.fow.RiftSetModeService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
@@ -150,15 +150,18 @@ public class PlayerStatsService {
         for (Player playerStats : players.values()) {
             if (playerStats.getSCs().contains(scNumber)) {
                 MessageHelper.sendMessageToChannel(
-                        (MessageChannel) event.getChannel(), Helper.getSCName(scNumber, game) + " is already picked.");
+                        (MessageChannel) event.getChannel(), game.getSCName(scNumber) + " is already picked.");
+                return false;
+            }
+            if (scNumber == 9 && !RiftSetModeService.canPickSacrifice(player, game)) {
                 return false;
             }
         }
 
         player.addSC(scNumber);
         if (game.isFowMode()) {
-            String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " picked "
-                    + Helper.getSCName(scNumber, game);
+            String messageToSend =
+                    ColorEmojis.getColorEmojiWithName(player.getColor()) + " picked " + game.getSCName(scNumber);
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
         }
 
@@ -166,7 +169,8 @@ public class PlayerStatsService {
                 game.getStrategyCardModelByInitiative(scNumber).orElse(null);
 
         // WARNING IF PICKING TRADE WHEN PLAYER DOES NOT HAVE THEIR TRADE AGREEMENT
-        if (scModel.usesAutomationForSCID("pok5trade")
+        if (!game.isTwilightsFallMode()
+                && scModel.usesAutomationForSCID("pok5trade")
                 && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
             String message = player.getRepresentationUnfogged()
                     + " heads up, you just picked **Trade** but don't currently hold your _Trade Agreement_.";
@@ -174,7 +178,7 @@ public class PlayerStatsService {
         }
 
         Integer tgCount = strategyCardToTradeGoodCount.get(scNumber);
-        String msg = player.getRepresentationUnfogged() + " picked " + Helper.getSCRepresentation(game, scNumber) + ".";
+        String msg = player.getRepresentationUnfogged() + " picked " + scModel.getEmojiWordRepresentation();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (tgCount != null && tgCount != 0) {
             int tg = player.getTg();
@@ -182,11 +186,10 @@ public class PlayerStatsService {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
-                            + " from picking " + Helper.getSCName(scNumber, game) + ".");
+                            + " from picking " + game.getSCName(scNumber) + ".");
             if (game.isFowMode()) {
-                String messageToSend =
-                        ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " trade good"
-                                + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scNumber, game) + ".";
+                String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
+                        + " trade good" + (tgCount == 1 ? "" : "s") + " from picking " + game.getSCName(scNumber) + ".";
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);

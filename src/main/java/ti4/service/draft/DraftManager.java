@@ -6,10 +6,12 @@ import java.util.function.Consumer;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.helpers.ButtonHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.franken.FrankenDraftBagService;
 import ti4.service.map.AddTileListService;
 
 /**
@@ -189,7 +191,27 @@ public class DraftManager extends DraftPlayerManager {
         // faction,
         // something that builds a map, etc.
 
-        return true;
+        return whatsStoppingDraftStart() == null;
+    }
+
+    public String whatsStoppingDraftStart() {
+        if (draftables.isEmpty()) {
+            return "No draftables have been added to the draft. Try `/draft manage add_draftable`.";
+        }
+        for (Draftable d : draftables) {
+            String reason = d.whatsStoppingDraftStart(this);
+            if (reason != null) {
+                return reason;
+            }
+        }
+        if (orchestrator == null) {
+            return "No orchestrator has been set for the draft. Try `/draft manage set_orchestrator`.";
+        }
+        String reason = orchestrator.whatsStoppingDraftStart(this);
+        if (reason != null) {
+            return reason;
+        }
+        return null;
     }
 
     public void tryEndDraft(GenericInteractionCreateEvent event) {
@@ -220,17 +242,22 @@ public class DraftManager extends DraftPlayerManager {
                     event.getMessageChannel(), "WARNING: Forcing the draft to end despite: " + blockingReason);
         }
 
+        // Clear active player
+        game.updateActivePlayer(null);
+
+        // Make all the draft components do their end-of-draft work
         orchestrator.onDraftEnd(this);
         for (Draftable draftable : draftables) {
             draftable.onDraftEnd(this);
         }
 
+        // If nothing is blocking setup, do it now. Otherwise wait.
         String blockingSetup = whatsStoppingSetup();
         if (blockingSetup != null) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
-                    "The draft has ended. Some additional setup needs to happen before the game can start: "
-                            + blockingSetup);
+                    game.getPing()
+                            + "The draft has ended. Some additional setup needs to happen before the game can start.");
         } else {
             trySetupPlayers(event);
         }
@@ -294,9 +321,13 @@ public class DraftManager extends DraftPlayerManager {
             Player player = game.getPlayer(userId);
 
             // Default color if not set
-            if (playerSetupState.getColor() == null) {
+            boolean playerHasColor =
+                    player.getColor() != null && !player.getColor().equals("null");
+            if (!playerHasColor && playerSetupState.getColor() == null) {
                 String color = player.getNextAvailableColour();
                 playerSetupState.setColor(color);
+            } else if (playerHasColor && playerSetupState.getColor() == null) {
+                playerSetupState.setColor(player.getColor());
             }
 
             // Do common setup chores
@@ -312,6 +343,11 @@ public class DraftManager extends DraftPlayerManager {
         game.setPhaseOfGame("playerSetup");
         AddTileListService.finishSetup(game, event);
         ButtonHelper.updateMap(game, event);
+
+        if (game.isTwilightsFallMode()) {
+            game.setBagDraft(new InauguralSpliceFrankenDraft(game));
+            FrankenDraftBagService.startDraft(game);
+        }
     }
 
     public String whatsStoppingSetup() {
