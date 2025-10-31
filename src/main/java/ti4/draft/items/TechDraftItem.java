@@ -1,11 +1,9 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import ti4.draft.DraftItem;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
@@ -73,7 +71,8 @@ public class TechDraftItem extends DraftItem {
         List<DraftItem> allItems = new ArrayList<>();
         if (game.isTwilightsFallMode()) {
             for (TechnologyModel tech : Mapper.getTechs().values()) {
-                if (tech.getSource() == ComponentSource.twilights_fall && tech.getFaction().isPresent()) {
+                if (tech.getSource() == ComponentSource.twilights_fall
+                        && tech.getFaction().isPresent()) {
                     allItems.add(generate(Category.TECH, tech.getID()));
                 }
             }

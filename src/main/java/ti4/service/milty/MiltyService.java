@@ -7,13 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
@@ -736,7 +734,7 @@ public class MiltyService {
             tile = new Tile("51", pos);
             game.setTile(tile);
             player.setHomeSystemPosition(pos);
-             if(game.isTwilightsFallMode()){
+            if (game.isTwilightsFallMode()) {
                 player.addAbility("song_of_something");
             }
         }
@@ -744,9 +742,9 @@ public class MiltyService {
         // HANDLE Crimson' HOME SYSTEM LOCATION
         if ("crimson".equals(faction)) {
             tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
-            if(!game.isTwilightsFallMode()){
+            if (!game.isTwilightsFallMode()) {
                 tile.addToken(Constants.TOKEN_BREACH_INACTIVE, Constants.SPACE);
-            }else{
+            } else {
                 player.addAbility("song_of_something");
             }
             String pos = "tr";
