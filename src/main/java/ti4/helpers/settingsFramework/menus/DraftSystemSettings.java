@@ -242,6 +242,7 @@ public class DraftSystemSettings extends SettingsMenu {
                         MahactKingDraftable.class.getSimpleName()));
         getDraftOrchestrator().setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
         getSliceSettings().getMapGenerationMode().setChosenKey("Milty");
+        getSourceSettings().getTeDemo().setVal(true);
         setPreset("Twilights Fall (Andcat Draft)");
     }
 }
