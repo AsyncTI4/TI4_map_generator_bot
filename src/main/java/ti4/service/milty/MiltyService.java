@@ -132,6 +132,7 @@ public class MiltyService {
         List<String> unbannedFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
                 .filter(f -> specs.factionSources.contains(f.getSource()))
                 .filter(f -> !specs.bannedFactions.contains(f.getAlias()))
+                .filter(f -> !f.getAlias().contains("obsidian"))
                 .filter(f -> !f.getAlias().contains("keleres")
                         || "keleresm".equals(f.getAlias())) // Limit the pool to only 1 keleres flavor
                 .map(FactionModel::getAlias)
