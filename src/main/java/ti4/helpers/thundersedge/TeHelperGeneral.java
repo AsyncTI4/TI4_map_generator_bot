@@ -32,7 +32,6 @@ public class TeHelperGeneral {
     public static void checkTransientInfo(Game game) {
         TriadService.checkAndUpdateTriad(game);
         BastionTechService.checkHeliosAttachment(game);
-        checkCoexistTransfer(game);
     }
 
     public static void checkCoexistTransfer(Game game) {
