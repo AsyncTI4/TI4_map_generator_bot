@@ -24,6 +24,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Service;
 import ti4.commands.CommandManager;
 import ti4.cron.AutoPingCron;
+import ti4.cron.CategoryCleanupCron;
 import ti4.cron.CloseLaunchThreadsCron;
 import ti4.cron.CronManager;
 import ti4.cron.EndOldGamesCron;
@@ -314,6 +315,7 @@ public class JdaService {
         ThreadArchiveCron.register();
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
+        CategoryCleanupCron.register();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
