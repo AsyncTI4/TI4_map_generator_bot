@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.CommandHelper;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -53,7 +52,6 @@ import ti4.service.planet.AddPlanetService;
 import ti4.service.rules.ThundersEdgeRulesService;
 import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class MiltyService {
@@ -308,16 +306,6 @@ public class MiltyService {
                     event.getMessageChannel(),
                     "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
             return;
-        }
-
-        if (factionModel.getSource() == Source.ComponentSource.thunders_edge
-                || factionModel.getSource() == Source.ComponentSource.twilights_fall) {
-            if (!CommandHelper.hasRole(event, JdaService.bothelperRoles)) {
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        "Thunder's Edge and Twilight Fall Factions Will Not be Ready til October 31st");
-                return;
-            }
         }
 
         String breakthrough = factionModel.getAlias() + "bt";

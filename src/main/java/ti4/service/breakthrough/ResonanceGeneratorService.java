@@ -109,4 +109,23 @@ public class ResonanceGeneratorService {
         checkCrimsonCommanderUnlock(game, player, tile);
         ButtonHelper.deleteMessage(event);
     }
+
+    @ButtonHandler("placeInactiveBreach_")
+    private static void resolvePlaceInactiveBreach(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.replace("placeInactiveBreach_", "");
+        Tile tile = game.getTileByPosition(pos);
+        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+
+        // TODO: JAZZ - idk if you can have multiple, so don't double add for now
+        if (!space.getTokenList().contains(Constants.TOKEN_BREACH_INACTIVE)) {
+            space.addToken(Constants.TOKEN_BREACH_INACTIVE);
+        }
+
+        String msg = "Placed inactive breach in tile " + tile.getRepresentation();
+        msg += " using the crimson destroyer.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        checkCrimsonCommanderUnlock(game, player, tile);
+        ButtonHelper.deleteMessage(event);
+    }
 }

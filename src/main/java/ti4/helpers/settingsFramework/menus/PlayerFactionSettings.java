@@ -143,8 +143,8 @@ public class PlayerFactionSettings extends SettingsMenu {
                         idPrefix + "dsFactionsOnly", "Only DS and BR Factions", SourceEmojis.DiscordantStars));
         }
         if (parent != null && parent instanceof MiltySettings ms) {
-            if (ms.getSourceSettings().getBetaTestMode().isVal())
-                ls.add(Buttons.red(idPrefix + "teFactions", "Prioritize TE Factions"));
+            // if (ms.getSourceSettings().getBetaTestMode().isVal())
+            ls.add(Buttons.red(idPrefix + "teFactions", "Prioritize TE Factions"));
         }
         return ls;
     }

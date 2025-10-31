@@ -62,7 +62,13 @@ public class AddPlanetService {
         }
         Tile tile = game.getTileFromPlanet(planet);
         Planet unitHolder = game.getPlanetsInfo().get(planet);
-        if (game.getRevealedPublicObjectives().size() < 2 || unitHolder.isSpaceStation()) {
+
+        if (!planet.equalsIgnoreCase("custodiavigilia") && !planet.equalsIgnoreCase("ghoti")) {
+            if (unitHolder == null || tile == null || unitHolder.isSpaceStation()) {
+                return;
+            }
+        }
+        if (game.getRevealedPublicObjectives().size() < 2) {
             setup = true;
         }
         if (planet.equalsIgnoreCase("avernus")) {
@@ -586,5 +592,6 @@ public class AddPlanetService {
         if ("thundersedge".equalsIgnoreCase(planet) && player.isRealPlayer() && !player.isBreakthroughUnlocked()) {
             BreakthroughCommandHelper.unlockBreakthrough(game, player);
         }
+        ButtonHelperAbilities.oceanBoundCheck(game);
     }
 }

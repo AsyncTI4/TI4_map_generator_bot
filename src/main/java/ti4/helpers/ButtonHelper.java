@@ -255,6 +255,16 @@ public class ButtonHelper {
                 return;
             }
         }
+        if (player.hasUnit("tf-yinclone")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    (totalAmount <= 10
+                                    ? UnitEmojis.infantry.toString().repeat(totalAmount)
+                                    : UnitEmojis.infantry + "×" + totalAmount)
+                            + " died and auto-revived. You will be prompted to place them on a planets you control at the start of your next turn.");
+            player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
+            return;
+        }
         if (player.hasTech("dsqhetinf")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -500,7 +510,7 @@ public class ButtonHelper {
                 }
             }
         }
-        if (player.ownsUnit("cymiae_infantry2")) {
+        if (player.ownsUnit("cymiae_infantry2") || player.ownsUnit("tf-yinclone")) {
             buttons = new ArrayList<>();
             for (String planet : player.getPlanets()) {
                 if (game.getTileFromPlanet(planet) != null) {
@@ -7440,6 +7450,12 @@ public class ButtonHelper {
             buttons2.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons2);
         }
+    }
+
+    @ButtonHandler("useProductionBiomes")
+    public static void useProductionBiomes(Player player, Game game, ButtonInteractionEvent event) {
+        deleteMessage(event);
+        ButtonHelperFactionSpecific.resolveProductionBiomesStep1(player, game, event);
     }
 
     @ButtonHandler("removePreset_")

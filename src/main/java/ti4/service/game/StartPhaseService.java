@@ -256,6 +256,11 @@ public class StartPhaseService {
                     && player2.getActionCards().containsKey("deflection")) {
                 ActionCardHelper.playAC(event, game, player2, "deflection", game.getMainGameChannel());
             }
+            if (game.getStoredValue("Tartarus") != null
+                    && game.getStoredValue("Tartarus").contains(player2.getFaction())
+                    && player2.getActionCards().containsKey("tf-tartarus")) {
+                ActionCardHelper.playAC(event, game, player2, "tf-tartarus", game.getMainGameChannel());
+            }
             if (player2.hasLeader("zealotshero")
                     && player2.getLeader("zealotshero").get().isActive()
                     && !game.getStoredValue("zealotsHeroTechs").isEmpty()) {

@@ -880,13 +880,9 @@ public class ButtonHelperSCs {
             message +=
                     "Reminder that you have _Prophecy of Ixth_ and should produce at least 2 fighters if you wish to keep it. Its removal is not automated.";
         }
-        if (!game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Produce Units", buttons);
-        } else {
-            MessageHelper.sendMessageToChannel(player.getPrivateChannel(), message);
-            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), "Produce Units", buttons);
-        }
+
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Produce Units", buttons);
     }
 
     @ButtonHandler("construction_")
