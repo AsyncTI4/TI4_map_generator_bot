@@ -74,6 +74,8 @@ import ti4.settings.GlobalSettings.ImplementedSettings;
 public class JdaService {
 
     // TODO: Eventually we need to make these non-static and autowire in this service.
+    //       Another thought: we may not want to trust any old "Admin" role on a server
+    //       should actually have admin rights
     public static final Set<Role> adminRoles = new HashSet<>();
     public static final Set<Role> developerRoles = new HashSet<>();
     public static final Set<Role> bothelperRoles = new HashSet<>();
