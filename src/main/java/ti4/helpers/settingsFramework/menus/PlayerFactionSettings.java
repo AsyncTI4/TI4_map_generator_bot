@@ -144,7 +144,7 @@ public class PlayerFactionSettings extends SettingsMenu {
         }
         if (parent != null && parent instanceof MiltySettings ms) {
             // if (ms.getSourceSettings().getBetaTestMode().isVal())
-            ls.add(Buttons.red(idPrefix + "teFactions", "Prioritize TE Factions"));
+            ls.add(Buttons.green(idPrefix + "teFactions", "Prioritize Thunder's Edge Factions"));
         }
         return ls;
     }
