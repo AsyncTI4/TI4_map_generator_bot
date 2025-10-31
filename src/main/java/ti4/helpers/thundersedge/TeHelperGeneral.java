@@ -141,7 +141,7 @@ public class TeHelperGeneral {
                 game.clearPlanetsCache();
 
                 int most = exp.getMostCompleteByAny();
-                AddUnitService.addUnits(event, tile, game, p2.getColor(), most + " inf t");
+                AddUnitService.addUnits(event, tile, game, p2.getColor(), most + " inf thundersedge");
                 ButtonHelper.deleteMessage(event);
                 String message = "Placed Thunder's Edge in " + tile.getRepresentationForButtons(game, player)
                         + " and added " + most + " " + p2.getRepresentation() + " infantry.";
