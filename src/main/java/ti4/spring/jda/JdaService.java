@@ -126,8 +126,6 @@ public class JdaService {
                 .setChunkingFilter(ChunkingFilter.ALL)
                 // This allows us to use our own ShutdownHook, created below
                 .setEnableShutdownHook(false)
-                .setStatus(OnlineStatus.DO_NOT_DISTURB)
-                .setActivity(Activity.customStatus("STARTING UP: Connecting to Servers"))
                 .build();
 
         BotLogger.info("INITIALIZING LISTENERS");
@@ -154,6 +152,9 @@ public class JdaService {
         } catch (InterruptedException e) {
             BotLogger.error("Error waiting for bot to get ready", e);
         }
+
+        jda.getPresence()
+                .setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
 
         BotLogger.info("INITIALIZING SERVERS");
 
