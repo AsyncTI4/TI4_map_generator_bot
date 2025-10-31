@@ -30,7 +30,7 @@ public class MahactKingDraftableSettings extends SettingsMenu {
     private static final String MENU_ID = "dsMahactKing";
 
     public MahactKingDraftableSettings(Game game, JsonNode json, DraftSystemSettings parent) {
-        super(MENU_ID, "Faction Settings", "Control faction draft options.", parent);
+        super(MENU_ID, "Mahact King Settings", "Control mahact king draft options.", parent);
 
         int players = parent.getPlayerUserIds().size();
         numFactions = new IntegerSetting("#Kings", "Number of Kings", players, 2, 24, 1);

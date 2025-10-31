@@ -18,6 +18,7 @@ import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
+import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -387,14 +388,18 @@ public class FrankenDraftBagService {
         if (!game.getStoredValue("frankenLimitLATERPICK").isEmpty()) {
             next = Integer.parseInt(game.getStoredValue("frankenLimitLATERPICK"));
         }
-        String message =
-                "# " + game.getPing() + " Franken Draft has started!\n" + "> As a reminder, for the first bag you pick "
-                        + first + " item" + (first == 1 ? "" : "s") + ", and for all the bags after that you pick "
-                        + next + " item" + (next == 1 ? "" : "s") + ".\n"
-                        + "> After each pick, the draft thread will be recreated. Sometimes discord will lag while sending long messages, so the buttons may take a few seconds to show up\n"
-                        + "> Once you have made your "
-                        + next + " pick" + (next == 1 ? "" : "s") + " (" + first
-                        + " in the first bag), the bags will automatically be passed once everyone is ready.";
+        String draftName = "Franken Draft";
+        if (draft instanceof InauguralSpliceFrankenDraft) {
+            draftName = "Inaugural Splice";
+        }
+        String message = "# " + game.getPing() + " " + draftName + " has started!\n"
+                + "> As a reminder, for the first bag you pick "
+                + first + " item" + (first == 1 ? "" : "s") + ", and for all the bags after that you pick "
+                + next + " item" + (next == 1 ? "" : "s") + ".\n"
+                + "> After each pick, the draft thread will be recreated. Sometimes discord will lag while sending long messages, so the buttons may take a few seconds to show up\n"
+                + "> Once you have made your "
+                + next + " pick" + (next == 1 ? "" : "s") + " (" + first
+                + " in the first bag), the bags will automatically be passed once everyone is ready.";
 
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
     }

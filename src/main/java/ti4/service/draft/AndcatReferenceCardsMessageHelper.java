@@ -41,7 +41,6 @@ public class AndcatReferenceCardsMessageHelper {
                 player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " Here's an overview of the packages:");
         sendPackageInfos(player.getCardsInfoThread(), packages);
-        updatePackagePickSummary(draftManager);
     }
 
     public static void sendPackageInfos(MessageChannel channel, List<ReferenceCardPackage> packages) {
