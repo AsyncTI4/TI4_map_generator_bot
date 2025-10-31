@@ -1,0 +1,23 @@
+## FoW+ — "To make fog even foggier"
+
+A special Fog of War variant by Solax for those who think the unknown isn’t unknown enough.
+
+__**Major changes:**__
+> Only tiles next to your own are visible — unexplored (0b) tiles vanish completely, obscuring even the map’s shape.
+> Player stats visible only when adjacent to their Home System.
+> Total votes and voting order are hidden.
+> Explore and Relic decks cannot be viewed.
+> No communication during the Agenda Phase.
+> Anchored player info areas are hidden.
+
+__**Other effects:**__
+> You can only activate tiles you can see — or use the Blind Tile button to venture into the unknown.
+> Activating a position without a tile sends your ships into The Void.
+> You cannot remove tokens from tiles you cannot see.
+> Includes a custom explore deck with new FoW+-exclusive cards.
+
+To enable FoW+ Mode
+`/game weird_game_setup fow_plus:True`.
+
+Many of these FoW+ features can also be toggled individually in standard Fog of War games using
+`/fow fow_options`

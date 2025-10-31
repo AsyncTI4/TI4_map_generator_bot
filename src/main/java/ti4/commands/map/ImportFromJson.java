@@ -29,7 +29,7 @@ class ImportFromJson extends GameStateSubcommand {
                 .setRequired(true)
                 .setPlaceholder("http://your.url/fow123_map.json");
 
-        Modal importMapModal = Modal.create("importMapFromJSON", "Import map")
+        Modal importMapModal = Modal.create("importMapFromJSON", "Import map (WIP)")
                 .addComponents(Label.of("URL", url.build()))
                 .build();
         event.replyModal(importMapModal).queue();

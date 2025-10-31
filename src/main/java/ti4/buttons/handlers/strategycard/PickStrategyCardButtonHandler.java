@@ -98,14 +98,14 @@ public class PickStrategyCardButtonHandler {
                         ActionCardHelper.playAC(event, game, p2, "disgrace", game.getMainGameChannel());
                         game.setStoredValue("Public Disgrace", "");
                         String msg = player.getRepresentationUnfogged() + " picked "
-                                + Helper.getSCRepresentation(game, scpick) + ".";
+                                + game.getSCEmojiWordRepresentation(scpick);
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),
                                 player.getRepresentation()
-                                        + " you have been _Public Disgrace_'d because someone preset it to occur when the number "
-                                        + scpick
+                                        + " you have been _Public Disgrace_'d because someone preset it to occur when "
+                                        + game.getSCEmojiWordRepresentation(scpick)
                                         + " was chosen. If this is a mistake or the _Public Disgrace_ is Sabo'd, feel free to pick the strategy card again. Otherwise, pick a different strategy card.");
                         return false;
                     }
