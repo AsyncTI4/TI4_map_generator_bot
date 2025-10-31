@@ -166,12 +166,16 @@ public class FractureService {
                 List<Button> buttons = event.getMessage().getButtons();
                 List<Button> newButtons = new ArrayList<>();
                 for (Button b : buttons) {
-                    if (b.getId().endsWith(buttonID)) continue;
+                    if (b.getCustomId().endsWith(buttonID)) continue;
+                    if (b.getCustomId().toLowerCase().contains("undo")) {
+                        newButtons.add(b);
+                        continue;
+                    }
                     String ffcc = player.finChecker();
-                    String idSansChecker = b.getId().replace(player.finChecker(), "");
+                    String idSansChecker = b.getCustomId().replace(player.finChecker(), "");
                     RegexService.runMatcher(regex, idSansChecker, m2 -> {
                         String pos = matcher.group("pos");
-                        newButtons.add(b.withId(ffcc + "addIngressToken_" + pos + "_" + (remaining - 1)));
+                        newButtons.add(b.withCustomId(ffcc + "addIngressToken_" + pos + "_" + (remaining - 1)));
                     });
                 }
                 MessageHelper.editMessageButtons(event, newButtons);
