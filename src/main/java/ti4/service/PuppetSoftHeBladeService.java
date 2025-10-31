@@ -254,8 +254,12 @@ public class PuppetSoftHeBladeService {
         List<String> techs = new ArrayList<>();
         techs.addAll(player.getTechs());
         for (String tech : techs) {
+            boolean exh = player.getExhaustedTechs().contains(tech);
             player.removeTech(tech);
             player.addTech(tech);
+            if (exh) {
+                player.exhaustTech(tech);
+            }
         }
 
         if (ownedFactionTech.isEmpty()) return "Sucessfully changed faction techs.";
