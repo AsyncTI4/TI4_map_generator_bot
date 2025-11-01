@@ -148,7 +148,7 @@
         "name": "Pirate Contract",
         "phase": "Action",
         "window": "Action",
-        "text": "Place 1 neutral stroter in a non-home system that contains no non-neutral ships.",
+        "text": "Place 1 neutral destroyer in a non-home system that contains no non-neutral ships.",
         "flavorText": "Satisfied, Suffi cashed in her contracts, wondering how long it would take any of them to notice she was gone. After it was much too late, with any luck.",
         "source": "thunders_edge"
     },
