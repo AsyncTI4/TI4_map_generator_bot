@@ -156,6 +156,14 @@ public class Tile {
         unitHolder.addDamagedUnit(unitID, count);
     }
 
+    public void addGalvanize(String spaceHolder, UnitKey unitID, @Nullable Integer count) {
+        UnitHolder unitHolder = unitHolders.get(spaceHolder);
+        if (unitHolder == null || count == null) {
+            return;
+        }
+        unitHolder.addGalvanizedUnit(unitID, count);
+    }
+
     public void addCC(String ccID) {
         UnitHolder unitHolder = unitHolders.get(Constants.SPACE);
         if (unitHolder != null) {
