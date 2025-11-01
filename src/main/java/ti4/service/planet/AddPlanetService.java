@@ -64,11 +64,11 @@ public class AddPlanetService {
         Planet unitHolder = game.getPlanetsInfo().get(planet);
 
         if (!planet.equalsIgnoreCase("custodiavigilia") && !planet.equalsIgnoreCase("ghoti")) {
-            if (unitHolder == null || tile == null || unitHolder.isSpaceStation()) {
+            if (unitHolder == null || tile == null) {
                 return;
             }
         }
-        if (game.getRevealedPublicObjectives().size() < 2) {
+        if (game.getRevealedPublicObjectives().size() < 2 || (unitHolder != null && unitHolder.isSpaceStation())) {
             setup = true;
         }
         if (planet.equalsIgnoreCase("avernus")) {
