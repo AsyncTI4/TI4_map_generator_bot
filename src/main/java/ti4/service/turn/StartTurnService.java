@@ -406,6 +406,21 @@ public class StartTurnService {
         }
 
         if (!hadAnyUnplayedSCs && !doneActionThisTurn) {
+            if (player.hasLeaderUnlocked("ralnelhero")) {
+                if (game.getStoredValue("ralnelHero") != null) {}
+
+                String presetRalnelHero =
+                        "You have the ralnel hero unlocked! If you're not about to pass, you can ignore this message. Otherwise, you can use the preset button ";
+                presetRalnelHero +=
+                        "to automatically use your hero when the last player passes. Don't worry, you can always unset the preset later if you decide you don't want to use it.";
+
+                List<Button> ralnelHeroButtons = new ArrayList<>();
+                ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset RalNel Hero"));
+                ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete these buttons"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
+            }
+
             startButtons.add(ButtonHelper.getPassButton(game, player));
             if (!game.isFowMode()) {
                 for (Player p2 : game.getRealPlayers()) {

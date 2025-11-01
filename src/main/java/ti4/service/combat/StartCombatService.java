@@ -881,7 +881,14 @@ public class StartCombatService {
                         + ", a reminder that if you win the combat, you may use the button to resolve your mech ability.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, explore);
             }
-
+            if (player.hasUnlockedBreakthrough("obsidianbt") && player.isOtherPlayerPuppeted(otherPlayer)) {
+                Button reap = Buttons.gray(
+                        player.finChecker() + "theReapingAddTg", "Add TG to The Reaping", FactionEmojis.Obsidian);
+                String message = msg
+                        + " this is a reminder that if you win this combat, you may use the button to add a trade good onto your breakthrough, "
+                        + FactionEmojis.Obsidian + " **The Reaping**.";
+                MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, reap);
+            }
             if ("space".equalsIgnoreCase(type) && player.hasTech("so")) {
                 buttons = new ArrayList<>();
                 buttons.add(

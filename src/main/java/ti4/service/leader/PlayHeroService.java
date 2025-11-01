@@ -127,6 +127,18 @@ public class PlayHeroService {
             case "xxchahero-te" -> {
                 ButtonHelperHeroes.xxchaHeroTEStart(game, player);
             }
+            case "ralnelhero" -> {
+                // You may choose to no longer be passed; if you do, gain 2 command tokens, draw 1 action card, and
+                // purge this card
+                player.setPassed(false);
+                String prefix = player.getFinsFactionCheckerPrefix();
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green(prefix + "gain_CC", "Gain 2 CCs"));
+                buttons.add(Buttons.green(prefix + "drawActionCards_1", "Draw 1 AC"));
+                buttons.add(Buttons.DONE_DELETE_BUTTONS);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(), "Use buttons to gain 2 CCs then draw 1 action card:", buttons);
+            }
             case "obsidianhero" -> {
                 player.clearExhaustedPlanets(false);
                 MessageHelper.sendMessageToChannel(

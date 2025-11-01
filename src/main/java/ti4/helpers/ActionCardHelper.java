@@ -248,7 +248,7 @@ public class ActionCardHelper {
                     GenericCardModel plot = plotEntry.getValue();
                     String buttonID = "removeFactionTokenFromPlot_" + plot.getAlias();
                     String buttonText = "Remove from " + plot.getName();
-                    List<String> factions = player.getPlotCardsFactions().get(plot.getAlias());
+                    List<String> factions = player.getPuppetedFactionsForPlot(plot.getAlias());
                     if (factions != null && !factions.isEmpty()) {
                         buttons.add(Buttons.red(buttonID, buttonText));
                     }
@@ -258,7 +258,7 @@ public class ActionCardHelper {
 
     public static List<Button> getFactionButtonsForPlot(Game game, Player player, String plotID, String prefix) {
         List<Button> buttons = new ArrayList<>();
-        List<String> factions = player.getPlotCardsFactions().get(plotID);
+        List<String> factions = player.getPuppetedFactionsForPlot(plotID);
         game.getRealPlayers().stream().forEach(p -> {
             boolean valid = factions == null || !factions.contains(p.getFaction());
             if (prefix.startsWith("remove")) valid = factions != null && factions.contains(p.getFaction());
@@ -279,7 +279,7 @@ public class ActionCardHelper {
                 .forEachOrdered(plotEntry -> {
                     GenericCardModel plot = plotEntry.getValue();
                     Integer value = plotEntry.getKey();
-                    List<String> factions = player.getPlotCardsFactions().get(plot.getAlias());
+                    List<String> factions = player.getPuppetedFactionsForPlot(plot.getAlias());
                     sb.append("`").append(Helper.leftpad("(" + value, 3)).append(")`");
                     sb.append(getPlotCardRepresentation(game, plot, factions));
                 });

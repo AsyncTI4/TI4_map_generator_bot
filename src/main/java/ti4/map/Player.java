@@ -720,6 +720,10 @@ public class Player extends PlayerProperties {
         return false;
     }
 
+    public List<String> getPuppetedFactionsForPlot(String plot) {
+        return getPlotCardsFactions().getOrDefault(plot, List.of());
+    }
+
     public Map<String, Integer> getTrapCards() {
         return trapCards;
     }
@@ -2233,8 +2237,7 @@ public class Player extends PlayerProperties {
         if (!techModel.getFaction().isPresent()
                 && obsidian != null
                 && !obsidian.is(this)
-                && obsidian.getPlotCardsFactions().get("extract") != null
-                && obsidian.getPlotCardsFactions().get("extract").contains(getFaction())
+                && obsidian.getPuppetedFactionsForPlot("extract").contains(getFaction())
                 && !obsidian.getTechs().contains(techID)) {
             String msg = obsidian.getRepresentation()
                     + ", your _Extract_ plot card allows you to gain a copy of the newly researched tech **"
