@@ -715,10 +715,18 @@ public class CombatModHelper {
                     scalingCount += count;
                     scalingCount = Math.min(scalingCount, 2);
                 }
-                case "opponent_sftt" -> getOpponentSfttCount(opponent);
-                case "nonhome_system_with_planet" -> getSystemsWithControlledPlanets(game, player);
-                case "galvanized_unit_count" -> getGalvanizedUnitCount(game, activeSystem, origUnit, player);
-                case "unique_ships" -> getUniqueNonFighterShipCount(game, activeSystem, player);
+                case "opponent_sftt" -> {
+                    scalingCount = getOpponentSfttCount(opponent);
+                }
+                case "nonhome_system_with_planet" -> {
+                    scalingCount = getSystemsWithControlledPlanets(game, player);
+                }
+                case "galvanized_unit_count" -> {
+                    scalingCount = getGalvanizedUnitCount(game, activeSystem, origUnit, player);
+                }
+                case "unique_ships" -> {
+                    scalingCount = getUniqueNonFighterShipCount(game, activeSystem, player);
+                }
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {
                         scalingCount = opponent.getTechs().stream()
