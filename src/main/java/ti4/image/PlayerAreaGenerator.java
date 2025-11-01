@@ -2423,6 +2423,7 @@ class PlayerAreaGenerator {
             String resource = bt.getBackgroundResource();
 
             BufferedImage btBox = createPABox(name, resource, faction, boxColor, textColor);
+            drawRectWithOverlay(graphics, x, y - 3, 44, 154, bt);
             graphics.drawImage(btBox, x, y - 3, null);
 
             if (player.getBreakthroughTGs() > 0) {
