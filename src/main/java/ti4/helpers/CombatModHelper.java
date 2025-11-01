@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -461,6 +462,17 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "galvanized" -> {
+                if (tile != null) {
+                    UnitHolder uh = getCorrectUnitHolder(unitsByQuantity, tile, opponent);
+                    for (UnitKey uk :
+                            uh.getUnitsByStateForPlayer(player.getColorID()).keySet()) {
+                        if (uh.getGalvanizedUnitCount(uk) > 0) {
+                            meetsCondition = true;
+                        }
+                    }
+                }
+            }
             case "opponent_has_sftt" -> {
                 if (player.hasUnlockedBreakthrough("winnubt") && getOpponentSfttCount(opponent) > 0) {
                     meetsCondition = true;
@@ -544,6 +556,23 @@ public class CombatModHelper {
             default -> meetsCondition = true;
         }
         return meetsCondition;
+    }
+
+    public static UnitHolder getCorrectUnitHolder(Map<UnitModel, Integer> units, Tile t, Player p) {
+        record UhScore(UnitHolder uh, int score) {}
+        return t.getUnitHolders().values().stream()
+                .map(uh -> {
+                    int score = 0;
+                    for (Entry<UnitModel, Integer> e : units.entrySet()) {
+                        UnitKey uk = Units.getUnitKey(e.getKey().getUnitType(), p.getColorID());
+                        if (uh.getUnitCount(uk) == e.getValue()) score++;
+                    }
+                    return new UhScore(uh, score);
+                })
+                .sorted(Comparator.comparingInt(UhScore::score).reversed())
+                .findFirst()
+                .map(UhScore::uh)
+                .orElse(t.getSpaceUnitHolder());
     }
 
     private static Integer getVariableModValue(

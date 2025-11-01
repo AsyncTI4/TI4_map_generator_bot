@@ -561,7 +561,7 @@
     },
     {
         "alias": "plus1_per_opponent_sftt",
-        "type": "result_modifier",
+        "type": "mods",
         "value": "+1",
         "valueScalingType": "opponent_sftt",
         "persistenceType": "CONDITIONAL",
