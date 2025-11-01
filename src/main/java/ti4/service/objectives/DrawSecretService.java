@@ -116,6 +116,7 @@ public class DrawSecretService {
 
             if ((!game.getStoredValue("useOldPok").isEmpty()) && !game.isTwilightsFallMode()) {
                 game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok"));
+                game.resetRelics();
                 game.setStrategyCardSet("pok");
             } else if (!game.isThundersEdge() && !game.isTwilightsFallMode()) {
                 game.removeRelicFromGame("quantumcore");
