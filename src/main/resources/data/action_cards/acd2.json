@@ -1191,11 +1191,11 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "rogue_traders",
-        "name": "Rogue Traders",
+        "alias": "refugees",
+        "name": "Refugees",
         "phase": "Action",
-        "window": "ACTION",
-        "text": "Remove 1 of your non-fighter ships from a system to place any number of fighters from your reinforcements in that system that have a combined cost equal to that ship's cost value. Then, place a matching neutral ship in a non-home system that contains no non-neutral ships.",
+        "window": "After you lose a ground combat",
+        "text": "Place 2 infantry from your reinforcements into coexistence on any non-home planets your opponent controls. [Note: You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.]",
         "flavorText": "",
         "source": "action_deck_2"
     },
