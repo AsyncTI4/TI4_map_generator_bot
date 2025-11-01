@@ -27,7 +27,6 @@ import ti4.map.helper.GameHelper;
 import ti4.map.pojo.PlayerProperties;
 import ti4.message.logging.BotLogger;
 import ti4.model.AgendaModel;
-import ti4.model.EventModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.website.EgressClientManager;
@@ -188,15 +187,6 @@ public class GameStatsDashboardPayload {
         objectives.put("Secret Objectives", secrets);
 
         return objectives;
-    }
-
-    public List<String> getEventsInEffect() {
-        return game.getEventsInEffect().keySet().stream()
-                .map(eventId -> {
-                    EventModel eventModel = Mapper.getEvent(eventId);
-                    return eventModel != null ? eventModel.getName() : eventId;
-                })
-                .toList();
     }
 
     public List<String> getModes() {

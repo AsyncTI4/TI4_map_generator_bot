@@ -38,7 +38,7 @@ import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
 import ti4.cron.ThreadArchiveCron;
-import ti4.cron.UploadAbbreviatedStatsCron;
+import ti4.cron.UploadRecentStatsCron;
 import ti4.cron.UploadStatsCron;
 import ti4.cron.WinningPathCron;
 import ti4.executors.ExecutorServiceManager;
@@ -306,7 +306,7 @@ public class JdaService {
         LogCacheStatsCron.register();
         WinningPathCron.register();
         UploadStatsCron.register();
-        UploadAbbreviatedStatsCron.register();
+        UploadRecentStatsCron.register();
         OldUndoFileCleanupCron.register();
         EndOldGamesCron.register();
         LogButtonRuntimeStatisticsCron.register();

@@ -198,7 +198,6 @@ public class AsyncTi4WebsiteHelper {
         }
     }
 
-
     public static void putAbbreviatedStats() throws IOException {
         if (!uploadsEnabled()) return;
         String bucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
@@ -273,8 +272,7 @@ public class AsyncTi4WebsiteHelper {
                                 String.format("Failed to upload abbreviated game stats to S3 bucket %s.", bucket),
                                 throwable);
                     } else {
-                        BotLogger.info(
-                                String.format("Abbreviated statistics upload to bucket %s complete.", bucket));
+                        BotLogger.info(String.format("Abbreviated statistics upload to bucket %s complete.", bucket));
                     }
 
                     try {
