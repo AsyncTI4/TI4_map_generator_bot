@@ -309,10 +309,7 @@ public class MiltyService {
             return;
         }
 
-        String breakthrough = factionModel.getAlias() + "bt";
-        if (breakthrough.contains("keleres")) {
-            breakthrough = "keleresbt";
-        }
+        String breakthrough = factionModel.getBreakthrough();
         // BREAKTHROUGH
         if (Mapper.getBreakthrough(breakthrough) != null) {
             player.setBreakthroughID(breakthrough);
