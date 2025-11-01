@@ -271,7 +271,7 @@ public class GameStatsDashboardPayload {
 
         PriorityTrackMode priorityTrackMode = game.getPriorityTrackMode();
         if (priorityTrackMode != null && priorityTrackMode != PriorityTrackMode.NONE) {
-            enabledModes.add(priorityTrackMode.name() + " Priority Track Mode");
+            enabledModes.add(priorityTrackMode.name() + " Priority Track");
         }
 
         return enabledModes;
