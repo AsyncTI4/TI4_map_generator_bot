@@ -16,6 +16,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.model.ColorModel;
 import ti4.model.FactionModel;
+import ti4.model.NamedCombatModifierModel;
 import ti4.model.TileModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -102,12 +103,16 @@ public class CombatModifierTest extends BaseTi4Test {
 
         Set<String> modifiers = new HashSet<>();
         CombatModHelper.getModifiers(p1, p2, unitsMap, oppUnits, model, testGame, type, Constants.COMBAT_MODIFIERS)
-                .forEach(mod -> modifiers.add(mod.getModifier().getAlias()));
+                .forEach(mod -> modifiers.add(mod2str(mod)));
         CombatModHelper.getModifiers(p1, p2, unitsMap, oppUnits, model, testGame, type, Constants.COMBAT_EXTRA_ROLLS)
-                .forEach(mod -> modifiers.add(mod.getModifier().getAlias()));
+                .forEach(mod -> modifiers.add(mod2str(mod)));
         CombatModHelper.getModifiers(p1, p2, unitsMap, oppUnits, model, testGame, type, "bonus_hits")
-                .forEach(mod -> modifiers.add(mod.getModifier().getAlias()));
+                .forEach(mod -> modifiers.add(mod2str(mod)));
         return modifiers;
+    }
+
+    private static String mod2str(NamedCombatModifierModel mod) {
+        return mod.getModifier().getAlias();
     }
 
     private static void assertListsEqual(String name, Set<String> actual, Set<String> expected) {
