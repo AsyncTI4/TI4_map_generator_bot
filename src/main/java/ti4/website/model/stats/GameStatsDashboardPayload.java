@@ -66,19 +66,6 @@ public class GameStatsDashboardPayload {
         return tile.getTileID();
     }
 
-    public Map<String, Map<String, Boolean>> getConfig() {
-        boolean baseMagen = game.getRealAndEliminatedPlayers().stream().anyMatch(p -> p.hasTech("md_base"));
-        return Map.of(
-                "config",
-                Map.of(
-                        "baseMagen", baseMagen,
-                        "codex1", true, // TODO: don't fake this
-                        "codex2", true, // TODO: don't fake this
-                        "codex3", true, // TODO: don't fake this
-                        "codex4", true, // TODO: don't fake this
-                        "note_that_this_map_is_probably_not_accurate", true));
-    }
-
     public String getHexSummary() {
         return game.getHexSummary();
     }

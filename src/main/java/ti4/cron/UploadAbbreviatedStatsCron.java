@@ -14,7 +14,7 @@ public class UploadAbbreviatedStatsCron {
                 UploadAbbreviatedStatsCron::uploadAbbreviatedStats,
                 13,
                 45,
-                ZoneId.of("UTC"));
+                ZoneId.of("UTC")); // ParsleySage is currently pulling at 14:00 UTC
     }
 
     private static void uploadAbbreviatedStats() {
